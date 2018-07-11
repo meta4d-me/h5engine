@@ -166,6 +166,7 @@ namespace gd3d.framework
                     this.bones.push(bonename);
                     this.indexDic[bonename] = i;
                 }
+                this.indexDic["len"] = this.boneCount;
 
                 this.subclipCount = read.readInt();
                 this.subclips = [];

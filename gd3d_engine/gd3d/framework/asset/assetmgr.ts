@@ -610,7 +610,7 @@ namespace gd3d.framework
             if (id != null)
             {
                 var r = this.mapRes[id];
-                if (r != null )//&& !r[this._loadingTag])
+                if (r != null)//&& !r[this._loadingTag])
                     return r.asset;
             }
             if (flag)
@@ -1010,18 +1010,110 @@ namespace gd3d.framework
             }
             return freechannel;
         }
-        public loadByMulQueue()
-        {
-            if (this.waitQueueState.length == 0) return;
-            let freechannel = this.checkFreeChannel();
-            if (freechannel == -1) return;
+        // public loadByMulQueue()
+        // {
+        //     if (this.waitQueueState.length == 0) return;
+        //     let freechannel = this.checkFreeChannel();
+        //     if (freechannel == -1) return;
 
-            let curloadinfo = this.waitQueueState.shift();
-            this.loadingQueueState[freechannel] = curloadinfo;
-            let state = curloadinfo.state;
-            let url = state.url;
-            let type = curloadinfo.type;
-            let onstate = curloadinfo.onstate;
+        //     let curloadinfo = this.waitQueueState.shift();
+        //     this.loadingQueueState[freechannel] = curloadinfo;
+        //     let state = curloadinfo.state;
+        //     let url = state.url;
+        //     let type = curloadinfo.type;
+        //     let onstate = curloadinfo.onstate;
+
+        //     if (type == AssetTypeEnum.Bundle)//加载包
+        //     {
+        //         gd3d.io.loadText(url, (txt, err) =>
+        //         {
+        //             if (err != null)
+        //             {
+        //                 curloadinfo.state.iserror = true;
+        //                 curloadinfo.state.errs.push(new Error(err.message));
+        //                 onstate(state);
+        //                 return;
+        //             }
+        //             let json = JSON.parse(txt);
+        //             let filename = "";
+        //             if (json["files"])
+        //             {
+        //                 filename = this.getFileName(url);
+
+        //                 var ab = new assetBundle(url);
+        //                 ab.name = filename;
+        //                 ab.parse(JSON.parse(txt));
+        //                 ab.load(this, onstate, state);
+        //             } else
+        //             {
+        //                 let loadurl = url.replace(".assetbundle.json", ".packs.txt");
+        //                 filename = this.getFileName(url);
+
+        //                 var ab = new assetBundle(url);
+        //                 ab.name = filename;
+        //                 ab.totalLength = json["totalLength"];
+        //                 ab.loadCompressBundle(loadurl, onstate, state, this);
+        //             }
+
+
+        //             this.mapBundle[filename] = ab;
+        //         });
+        //     }
+        //     else if (type == AssetTypeEnum.CompressBundle)
+        //     {
+        //         gd3d.io.loadText(url, (txt, err) =>
+        //         {
+        //             if (err != null)
+        //             {
+        //                 curloadinfo.state.iserror = true;
+        //                 curloadinfo.state.errs.push(new Error(err.message));
+        //                 onstate(state);
+        //                 return;
+        //             }
+
+        //             //压缩的bundle在packs.txt中
+        //             let loadurl = url.replace(".assetbundle.json", ".packs.txt");
+        //             let filename = this.getFileName(url);
+        //             let json = JSON.parse(txt);
+
+        //             var ab = new assetBundle(url);
+        //             ab.name = filename;
+        //             ab.totalLength = json["totalLength"];
+        //             ab.loadCompressBundle(loadurl, onstate, state, this);
+        //         });
+
+        //     }
+        //     else
+        //     {
+        //         state.totaltask = 1;
+        //         this.loadSingleRes(url, type, (s) =>
+        //         {
+        //             if (s.iserror)
+        //             {
+        //                 onstate(state);
+        //                 this.loadByMulQueue();
+        //                 return;
+        //             }
+
+        //             if (s.progressCall)
+        //             {
+        //                 s.progressCall = false;
+        //                 onstate(state);
+        //                 return;
+        //             }
+        //             state.curtask = 1;
+        //             s.isfinish = true;
+        //             onstate(s);
+        //             this.doWaitState(url, s);
+        //             this.loadByMulQueue();
+        //         }, state, null, (handle) =>
+        //             {
+
+        //             });
+        //     }
+        // }
+        private unPkg(type: AssetTypeEnum, url: string, state: stateLoad, onstate: (state: stateLoad) => void)
+        {
 
             if (type == AssetTypeEnum.Bundle)//加载包
             {
@@ -1029,8 +1121,8 @@ namespace gd3d.framework
                 {
                     if (err != null)
                     {
-                        curloadinfo.state.iserror = true;
-                        curloadinfo.state.errs.push(new Error(err.message));
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
                         onstate(state);
                         return;
                     }
@@ -1065,8 +1157,8 @@ namespace gd3d.framework
                 {
                     if (err != null)
                     {
-                        curloadinfo.state.iserror = true;
-                        curloadinfo.state.errs.push(new Error(err.message));
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
                         onstate(state);
                         return;
                     }
@@ -1091,7 +1183,6 @@ namespace gd3d.framework
                     if (s.iserror)
                     {
                         onstate(state);
-                        this.loadByMulQueue();
                         return;
                     }
 
@@ -1105,14 +1196,13 @@ namespace gd3d.framework
                     s.isfinish = true;
                     onstate(s);
                     this.doWaitState(url, s);
-                    this.loadByMulQueue();
-                }, state, null, (handle) =>
+                }, state, null, (data) =>
                     {
-
+                        if (data.handle)
+                            data.handle();
                     });
             }
         }
-
         /**
          * @public
          * @language zh_CN
@@ -1138,10 +1228,9 @@ namespace gd3d.framework
                 this.doWaitState(url, state);
                 return;
             }
-            console.log(url);
+            // console.log(`** mgr loadCompressBundle: ${url}`);
             type = AssetTypeEnum.CompressBundle;
-            this.waitQueueState.push({ state, type, onstate });
-            this.loadByMulQueue();
+            this.unPkg(type,url,state,onstate);
         }
         /**
          * @public
@@ -1154,16 +1243,17 @@ namespace gd3d.framework
          * @param type 资源的类型
          * @param onstate 状态返回的回调
          */
-        private time: number;
+        // private time: number;
         load(url: string, type: AssetTypeEnum = AssetTypeEnum.Auto, onstate: (state: stateLoad) => void = null)
         {
             if (onstate == null)
                 onstate = () => { };
-            if (!this.time)
-                this.time = Date.now();
+            // if (!this.time)
+            //     this.time = Date.now();
 
-            console.log(`assetmgr:${url} ${((Date.now() - this.time))}ms ${Date.now()}`);
-            this.time = Date.now();
+            // console.log(`assetmgr:${url} ${((Date.now() - this.time))}ms ${Date.now()}`);
+            // this.time = Date.now();
+            // console.log(`** mgr load: ${url}`);
             let name = this.getFileName(url);
             if (this.mapInLoad[name] != null)
             {
@@ -1189,135 +1279,137 @@ namespace gd3d.framework
                 onstate(state);
                 return;
             }
-            if (type == AssetTypeEnum.Bundle)//加载包
-            {
-                gd3d.io.loadText(url, (txt, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    let json = JSON.parse(txt);
-                    let filename = "";
-                    if (json["files"])
-                    {
-                        filename = this.getFileName(url);
 
-                        var ab = new assetBundle(url);
-                        ab.name = filename;
-                        ab.parse(JSON.parse(txt));
-                        ab.load(this, onstate, state);
-                    } else
-                    {
-                        let loadurl = url.replace(".assetbundle.json", ".packs.txt");
-                        filename = this.getFileName(url);
+            this.unPkg(type,url,state,onstate);
+            // if (type == AssetTypeEnum.Bundle)//加载包
+            // {
+            //     gd3d.io.loadText(url, (txt, err) =>
+            //     {
+            //         if (err != null)
+            //         {
+            //             state.iserror = true;
+            //             state.errs.push(new Error(err.message));
+            //             onstate(state);
+            //             return;
+            //         }
+            //         let json = JSON.parse(txt);
+            //         let filename = "";
+            //         if (json["files"])
+            //         {
+            //             filename = this.getFileName(url);
 
-                        var ab = new assetBundle(url);
-                        ab.name = filename;
-                        ab.totalLength = json["totalLength"];
-                        ab.loadCompressBundle(loadurl, onstate, state, this);
-                    }
+            //             var ab = new assetBundle(url);
+            //             ab.name = filename;
+            //             ab.parse(JSON.parse(txt));
+            //             ab.load(this, onstate, state);
+            //         } else
+            //         {
+            //             let loadurl = url.replace(".assetbundle.json", ".packs.txt");
+            //             filename = this.getFileName(url);
+
+            //             var ab = new assetBundle(url);
+            //             ab.name = filename;
+            //             ab.totalLength = json["totalLength"];
+            //             ab.loadCompressBundle(loadurl, onstate, state, this);
+            //         }
 
 
-                    this.mapBundle[filename] = ab;
-                });
-            }
-            else if (type == AssetTypeEnum.CompressBundle)
-            {
-                gd3d.io.loadText(url, (txt, err) =>
-                {
-                    if (err != null)
-                    {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
+            //         this.mapBundle[filename] = ab;
+            //     });
+            // }
+            // else if (type == AssetTypeEnum.CompressBundle)
+            // {
+            //     gd3d.io.loadText(url, (txt, err) =>
+            //     {
+            //         if (err != null)
+            //         {
+            //             state.iserror = true;
+            //             state.errs.push(new Error(err.message));
+            //             onstate(state);
+            //             return;
+            //         }
 
-                    //压缩的bundle在packs.txt中
-                    let loadurl = url.replace(".assetbundle.json", ".packs.txt");
-                    let filename = this.getFileName(url);
-                    let json = JSON.parse(txt);
+            //         //压缩的bundle在packs.txt中
+            //         let loadurl = url.replace(".assetbundle.json", ".packs.txt");
+            //         let filename = this.getFileName(url);
+            //         let json = JSON.parse(txt);
 
-                    var ab = new assetBundle(url);
-                    ab.name = filename;
-                    ab.totalLength = json["totalLength"];
-                    ab.loadCompressBundle(loadurl, onstate, state, this);
-                });
+            //         var ab = new assetBundle(url);
+            //         ab.name = filename;
+            //         ab.totalLength = json["totalLength"];
+            //         ab.loadCompressBundle(loadurl, onstate, state, this);
+            //     });
 
-            }
-            else
-            {
-                state.totaltask = 1;
-                this.loadSingleRes(url, type, (s) =>
-                {
-                    if (s.iserror)
-                    {
-                        onstate(state);
-                        return;
-                    }
+            // }
+            // else
+            // {
+            //     state.totaltask = 1;
+            //     this.loadSingleRes(url, type, (s) =>
+            //     {
+            //         if (s.iserror)
+            //         {
+            //             onstate(state);
+            //             return;
+            //         }
 
-                    if (s.progressCall)
-                    {
-                        s.progressCall = false;
-                        onstate(state);
-                        return;
-                    }
-                    state.curtask = 1;
-                    s.isfinish = true;
-                    onstate(s);
-                }, state, null, (data) =>
-                    {
-                        if(data.handle)
-                            data.handle();
-                    });
-            }
+            //         if (s.progressCall)
+            //         {
+            //             s.progressCall = false;
+            //             onstate(state);
+            //             return;
+            //         }
+            //         state.curtask = 1;
+            //         s.isfinish = true;
+            //         onstate(s);
+            //     }, state, null, (data) =>
+            //         {
+            //             if (data.handle)
+            //                 data.handle();
+            //         });
+            // }
         }
 
-        oldload(url: string, type: AssetTypeEnum = AssetTypeEnum.Auto, onstate: (state: stateLoad) => void = null)
-        {
-            if (onstate == null)
-                onstate = () => { };
-            console.log(`assetmgr:${url}`);
-            let name = this.getFileName(url);
-            if (this.mapInLoad[name] != null)
-            {
-                let _state = this.mapInLoad[name];
-                if (_state.isfinish)
-                {
-                    onstate(this.mapInLoad[name]);
-                }
-                else
-                {
-                    if (this.waitStateDic[name] == null)
-                        this.waitStateDic[name] = [];
-                    this.waitStateDic[name].push(onstate);
-                }
-                return;
-            }
+        // oldload(url: string, type: AssetTypeEnum = AssetTypeEnum.Auto, onstate: (state: stateLoad) => void = null)
+        // {
+        //     if (onstate == null)
+        //         onstate = () => { };
+        //     console.log(`assetmgr:${url}`);
+        //     let name = this.getFileName(url);
+        //     if (this.mapInLoad[name] != null)
+        //     {
+        //         let _state = this.mapInLoad[name];
+        //         if (_state.isfinish)
+        //         {
+        //             onstate(this.mapInLoad[name]);
+        //         }
+        //         else
+        //         {
+        //             if (this.waitStateDic[name] == null)
+        //                 this.waitStateDic[name] = [];
+        //             this.waitStateDic[name].push(onstate);
+        //         }
+        //         return;
+        //     }
 
-            var state = new stateLoad();
-            this.mapInLoad[name] = state;
-            state.url = url;
-            //确定资源类型
-            if (type == AssetTypeEnum.Auto)
-            {
-                type = this.calcType(url);
-            }
-            if (type == AssetTypeEnum.Unknown)
-            {
-                state.errs.push(new Error("can not sure about type:" + url));
-                state.iserror = true;
-                onstate(state);
-                this.doWaitState(url, state);
-                return;
-            }
-            this.waitQueueState.push({ state, type, onstate });
-            this.loadByMulQueue();
-        }
+        //     var state = new stateLoad();
+        //     this.mapInLoad[name] = state;
+        //     state.url = url;
+        //     //确定资源类型
+        //     if (type == AssetTypeEnum.Auto)
+        //     {
+        //         type = this.calcType(url);
+        //     }
+        //     if (type == AssetTypeEnum.Unknown)
+        //     {
+        //         state.errs.push(new Error("can not sure about type:" + url));
+        //         state.iserror = true;
+        //         onstate(state);
+        //         this.doWaitState(url, state);
+        //         return;
+        //     }
+        //     this.waitQueueState.push({ state, type, onstate });
+        //     this.loadByMulQueue();
+        // }
 
         private loadForNoCache(url: string, type: AssetTypeEnum = AssetTypeEnum.Auto, onstate: (state: stateLoad) => void = null)
         {
@@ -1341,8 +1433,9 @@ namespace gd3d.framework
                 this.doWaitState(url, state);
                 return;
             }
-            this.waitQueueState.push({ state, type, onstate });
-            this.loadByMulQueue();
+            this.unPkg(type,url,state,onstate);
+            // this.waitQueueState.push({ state, type, onstate });
+            // this.loadByMulQueue();
         }
         /**
          * @public
