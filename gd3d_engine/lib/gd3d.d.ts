@@ -903,6 +903,33 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class assetBundle {
+        name: string;
+        private id;
+        assetmgr: assetMgr;
+        private files;
+        private packages;
+        private bundlePackBin;
+        private bundlePackJson;
+        url: string;
+        path: string;
+        totalLength: number;
+        loadLightMap: boolean;
+        constructor(url: string);
+        loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr): void;
+        parse(json: any, totalLength?: number): void;
+        unload(): void;
+        private curLoadState;
+        load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
+        downloadFinsih(state: any, list: any, haveBin: boolean, onstate: any, packlist: any, mapPackes: any, assetmgr: any): void;
+        NextHandle(list: any, state: any, onstate: any): void;
+        private mapIsNull(map);
+        mapNamed: {
+            [id: string]: number;
+        };
+    }
+}
+declare namespace gd3d.framework {
     enum AssetTypeEnum {
         Unknown = 0,
         Auto = 1,
@@ -972,28 +999,6 @@ declare namespace gd3d.framework {
         errs: Error[];
         url: string;
     }
-    class assetBundle {
-        name: string;
-        private id;
-        assetmgr: assetMgr;
-        private files;
-        private packages;
-        private bundlePackBin;
-        private bundlePackJson;
-        url: string;
-        path: string;
-        totalLength: number;
-        loadLightMap: boolean;
-        constructor(url: string);
-        loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr): void;
-        parse(json: any, totalLength?: number): void;
-        unload(): void;
-        private curLoadState;
-        load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
-        mapNamed: {
-            [id: string]: number;
-        };
-    }
     class assetMgr {
         app: application;
         webgl: WebGLRenderingContext;
@@ -1036,6 +1041,11 @@ declare namespace gd3d.framework {
         getAsset(id: number): IAsset;
         getAssetByName(name: string, bundlename?: string): IAsset;
         getAssetBundle(bundlename: string): assetBundle;
+        static useBinJs: boolean;
+        private static bin;
+        static correctFileName(name: string): string;
+        static txt: string;
+        static correctTxtFileName(name: string): string;
         unuse(res: IAsset, disposeNow?: boolean): void;
         use(res: IAsset): void;
         private readonly _loadingTag;
@@ -1054,16 +1064,17 @@ declare namespace gd3d.framework {
         private regAssetFactory(type, factory);
         private getAssetFactory(type);
         private initAssetFactorys();
-        loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad, asset?: IAsset): void;
+        loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad, asset: IAsset, call: (handle: any) => void): void;
         private waitStateDic;
         doWaitState(name: string, state: stateLoad): void;
         private waitQueueState;
         private loadingQueueState;
         private loadingCountLimit;
         private checkFreeChannel();
-        loadByMulQueue(): void;
+        private unPkg(type, url, state, onstate);
         loadCompressBundle(url: string, onstate?: (state: stateLoad) => void): void;
         load(url: string, type?: AssetTypeEnum, onstate?: (state: stateLoad) => void): void;
+        private loadForNoCache(url, type?, onstate?);
         unload(url: string, onstate?: () => void): void;
         waitlightmapScene: {
             [sceneurl: string]: string[];
@@ -1077,7 +1088,7 @@ declare namespace gd3d.framework {
         loadSingleResImmediate(url: string, type: AssetTypeEnum): any;
         loadImmediate(url: string, type?: AssetTypeEnum): any;
         getFileName(url: string): string;
-        calcType(url: string): AssetTypeEnum;
+        calcType(url: string | any): AssetTypeEnum;
         private particlemat;
         getDefParticleMat(): material;
     }
@@ -1175,14 +1186,14 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class AssetFactory_Aniclip implements IAssetFactory {
         newAsset(): animationClip;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: animationClip): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: animationClip, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: animationClip): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_Atlas implements IAssetFactory {
         newAsset(): atlas;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: atlas): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: atlas, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: atlas): void;
     }
 }
@@ -1191,41 +1202,41 @@ declare namespace gd3d.framework {
     class AssetFactory_DDS implements IAssetFactory {
         newAsset(): texture;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture): void;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_f14eff implements IAssetFactory {
         newAsset(): f14eff;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: f14eff): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: f14eff, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: f14eff): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_Font implements IAssetFactory {
         newAsset(filename?: string): font;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: font): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: font, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: font): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_GLFragmentShader implements IAssetFactory {
         newAsset(): IAsset;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_GLVertexShader implements IAssetFactory {
         newAsset(): IAsset;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset): void;
     }
 }
 declare namespace gd3d.framework {
     interface IAssetFactory {
         newAsset(assetName?: string): IAsset;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset): void;
     }
     class AssetFactoryTools {
@@ -1239,77 +1250,77 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class assetfactory_keyFrameAniClip implements IAssetFactory {
         newAsset(): keyFrameAniClip;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: keyFrameAniClip): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: keyFrameAniClip, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: keyFrameAniClip): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_Material implements IAssetFactory {
         newAsset(filename?: string): material;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: material): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: material, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: material): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_Mesh implements IAssetFactory {
         newAsset(): mesh;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: mesh): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: mesh, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: mesh): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_PathAsset implements IAssetFactory {
         newAsset(): pathasset;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: pathasset): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: pathasset, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: pathasset): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_Prefab implements IAssetFactory {
         newAsset(): prefab;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: prefab): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: prefab, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: prefab): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_PVR implements IAssetFactory {
         newAsset(): texture;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_Scene implements IAssetFactory {
         newAsset(): rawscene;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: rawscene): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: rawscene, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: rawscene): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_Shader implements IAssetFactory {
         newAsset(): shader;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: shader): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: shader, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: shader): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_TextAsset implements IAssetFactory {
         newAsset(): textasset;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: textasset): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: textasset, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: textasset): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_Texture implements IAssetFactory {
         newAsset(): texture;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_TextureDesc implements IAssetFactory {
         newAsset(): texture;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture): void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture): void;
     }
 }
@@ -1762,6 +1773,9 @@ declare namespace gd3d.framework {
         data: gd3d.render.meshData;
         submesh: subMeshInfo[];
         onReadFinish: () => void;
+        private reading;
+        private readProcess(read, data, objVF, vcount, vec10tpose, callback);
+        private readFinish(read, data, buf, objVF, webgl);
         Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): threading.gdPromise<{}>;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
@@ -1828,7 +1842,7 @@ declare namespace gd3d.framework {
         getCloneTrans2D(): transform2D;
         apply(trans: transform): void;
         jsonstr: string;
-        Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<{}>;
+        Parse(jsonStr: string, assetmgr: assetMgr): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1846,7 +1860,7 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         resetLightMap(assetmgr: assetMgr): void;
         private lightmapData;
-        Parse(txt: string, assetmgr: assetMgr): threading.gdPromise<{}>;
+        Parse(txt: string, assetmgr: assetMgr): void;
         getSceneRoot(): transform;
         useLightMap(scene: scene): void;
         useFog(scene: scene): void;
@@ -2726,7 +2740,7 @@ declare namespace gd3d.framework {
             [frame: number]: F14FrameData;
         };
         constructor();
-        parse(json: any, assetmgr: assetMgr, assetbundle: string): threading.gdPromise<{}>;
+        parse(json: any, assetmgr: assetMgr, assetbundle: string): void;
     }
     class F14FrameData {
         frameindex: number;
