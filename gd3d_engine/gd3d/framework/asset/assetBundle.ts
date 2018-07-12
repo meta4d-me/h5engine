@@ -512,6 +512,14 @@ namespace gd3d.framework
         {
             let waitArrs = [];
             let count = 0;
+            let finish = () =>
+            {
+                if (count >= waitArrs.length)
+                {
+                    state.isfinish = true;
+                    onstate(state);
+                }
+            };
             for (let hitem of list)
             {
                 if (!hitem.handle)
@@ -523,20 +531,13 @@ namespace gd3d.framework
                     waitArrs.push(waiting);
                     waiting.then(() =>
                     {
-                        if(count>= waitArrs.length)
-                        {
-                            state.isfinish = true;
-                            onstate(state);
-                        }
+                        finish();
                     });
                 }
             }
+            if (waitArrs.length < 1)
+                finish();
 
-            // setTimeout(() =>
-            // {
-            //     // console.log(`##state2 ${this.url} ${state.url} 下载完成`)
-             
-            // }, 10);
         }
 
         private mapIsNull(map): boolean
