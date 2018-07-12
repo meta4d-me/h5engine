@@ -514,7 +514,7 @@ namespace gd3d.framework
             let count = 0;
             let finish = () =>
             {
-                if (count >= waitArrs.length)
+                if (++count >= waitArrs.length)
                 {
                     state.isfinish = true;
                     onstate(state);
