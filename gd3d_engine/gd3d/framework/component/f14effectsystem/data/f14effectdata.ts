@@ -8,8 +8,9 @@ namespace gd3d.framework
 
         parsejson(json: any, assetmgr: assetMgr, assetbundle: string)
         {
-            return new threading.gdPromise((resolve) =>
-            {
+             
+            // return new threading.gdPromise((resolve) =>
+            // {
 
                 this.beloop = json.beloop;
 
@@ -32,7 +33,7 @@ namespace gd3d.framework
                 }
 
 
-            });
+            // });
         }
     }
 

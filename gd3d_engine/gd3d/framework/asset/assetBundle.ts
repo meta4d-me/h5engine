@@ -511,8 +511,15 @@ namespace gd3d.framework
                     {
                         if (++count >= waitArrs.length)
                         {
-                            while (lastHandle.length > 0)
-                                lastHandle.shift().handle();
+                            lastHandle.sort((a, b) =>
+                            {
+                                return b.type - a.type;
+                            })
+                            while (lastHandle.length > 0){
+                                let iitem = lastHandle.shift();
+                                // console.log(`abname: ${this.name} iitem:${AssetTypeEnum[iitem.type]}`);
+                                iitem.handle();
+                            }
                             waitArrs = [];
                             finish();
                         }
