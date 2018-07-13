@@ -32,16 +32,19 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(respack, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: keyFrameAniClip)
+        loadByPack(respack, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: keyFrameAniClip, call: (handle: () => void) => void)
         {
-            let filename = getFileName(url);
+            call(() =>
+            {
+                let filename = getFileName(url);
 
-            state.resstate[filename] = new ResourceState();
-            let _buffer = respack[filename];
-            let _clip = asset ? asset : new keyFrameAniClip(filename);
-            _clip.Parse(_buffer);
+                state.resstate[filename] = new ResourceState();
+                let _buffer = respack[filename];
+                let _clip = asset ? asset : new keyFrameAniClip(filename);
+                _clip.Parse(_buffer);
 
-            AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+            });
         }
     }
 }

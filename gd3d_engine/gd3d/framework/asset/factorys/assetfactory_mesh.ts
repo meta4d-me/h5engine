@@ -42,7 +42,7 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: mesh)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: mesh, call: (handle: () => void) => void)
         {
             let filename = getFileName(url);
 
@@ -53,9 +53,14 @@ namespace gd3d.framework
             //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
             // };
             // _mesh.Parse(_buffer, assetMgr.webgl);
-            _mesh.Parse(_buffer, assetMgr.webgl).then(() =>
+            call(() =>
             {
-                AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+               return _mesh.Parse(_buffer, assetMgr.webgl).then(() =>
+                {
+
+                    AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+
+                });
             });
         }
     }

@@ -38,21 +38,24 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: rawscene)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: rawscene, call: (handle: () => void) => void)
         {
-            let bundlename = getFileName(state.url);
-            let filename = getFileName(url);
+            call(() =>
+            {
+                let bundlename = getFileName(state.url);
+                let filename = getFileName(url);
 
-            state.resstate[filename] = new ResourceState();
-            let txt = respack[filename];
-            let _scene = asset ? asset : new rawscene(filename);
-            _scene.assetbundle = bundlename;
-            _scene.Parse(txt, assetMgr);
-            AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
-            // _scene.Parse(txt, assetMgr).then(() =>
-            // {
-            //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
-            // });
+                state.resstate[filename] = new ResourceState();
+                let txt = respack[filename];
+                let _scene = asset ? asset : new rawscene(filename);
+                _scene.assetbundle = bundlename;
+                _scene.Parse(txt, assetMgr);
+                AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
+                // _scene.Parse(txt, assetMgr).then(() =>
+                // {
+                //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
+                // });
+            });
         }
     }
 }

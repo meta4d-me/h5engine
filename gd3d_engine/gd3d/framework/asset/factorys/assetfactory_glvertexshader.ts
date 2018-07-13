@@ -37,8 +37,10 @@ namespace gd3d.framework
                 });
         }
 
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void)
         {
+            call(() =>
+            {
             let filename = getFileName(url);
             let name = filename.substring(0, filename.indexOf("."));
 
@@ -52,6 +54,7 @@ namespace gd3d.framework
 
             //assetMgr.shaderPool.compileVS(assetMgr.webgl, name, txt);
             onstate(state);
+            });
         }
     }
 }

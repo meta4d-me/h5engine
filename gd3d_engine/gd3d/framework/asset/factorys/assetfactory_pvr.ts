@@ -34,9 +34,10 @@ namespace gd3d.framework
                 });
         }
 
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: texture)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void)
         {
-
+            call(() =>
+            {});
         }
     }
 }

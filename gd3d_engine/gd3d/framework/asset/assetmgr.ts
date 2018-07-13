@@ -872,6 +872,38 @@ namespace gd3d.framework
 
 
         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 加载单个资源
+         * 所有load进来的资源，均use一遍，引用计数为1
+         * 再unload 一次 归0，则可dispose（）
+         * @version egret-gd3d 1.0
+         * @param url 资源的url
+         * @param type 资源的类型
+         * @param onstate 状态返回的回调
+         * @param state 资源加载的总状态
+         */
+        loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad, asset: IAsset, call: (handle: any) => void)
+        {
+            // if (url.indexOf("glsl") == -1 && url.indexOf(".shader.json") == -1)
+            // {
+            //     // console.log("aaa");
+            // }
+            let assetFactory: IAssetFactory = this.getAssetFactory(type);
+            if (assetFactory != null)
+            {
+                assetFactory.load(url, onstate, state, this, asset, (chandle) =>
+                {
+                    call({ url: url, handle: chandle });
+                });
+            }
+            else
+            {
+                throw new Error("cant use the type:" + type);
+            }
+        }
+        /**
          * @private
          * @param packnum 
          * @param url 
@@ -879,12 +911,15 @@ namespace gd3d.framework
          * @param onstate 
          * @param state 
          */
-        loadResByPack(respack: any, url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad, asset: IAsset)
+        loadResByPack(respack: any, url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad, asset: IAsset, call: (handle: any) => void)
         {
             let assetFactory: IAssetFactory = this.getAssetFactory(type);
             if (assetFactory != null)
             {
-                assetFactory.loadByPack(respack, url, onstate, state, this, asset);
+                assetFactory.loadByPack(respack, url, onstate, state, this, asset, ((chandle) =>
+                {
+                    call({ url: url, handle: chandle });
+                }));
             }
             else
             {
@@ -927,38 +962,6 @@ namespace gd3d.framework
         }
 
 
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 加载单个资源
-         * 所有load进来的资源，均use一遍，引用计数为1
-         * 再unload 一次 归0，则可dispose（）
-         * @version egret-gd3d 1.0
-         * @param url 资源的url
-         * @param type 资源的类型
-         * @param onstate 状态返回的回调
-         * @param state 资源加载的总状态
-         */
-        loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad, asset: IAsset, call: (handle: any) => void)
-        {
-            // if (url.indexOf("glsl") == -1 && url.indexOf(".shader.json") == -1)
-            // {
-            //     // console.log("aaa");
-            // }
-            let assetFactory: IAssetFactory = this.getAssetFactory(type);
-            if (assetFactory != null)
-            {
-                assetFactory.load(url, onstate, state, this, asset, (chandle) =>
-                {
-                    call({ url: url, handle: chandle });
-                });
-            }
-            else
-            {
-                throw new Error("cant use the type:" + type);
-            }
-        }
 
         private waitStateDic: { [name: string]: Function[] } = {};
         /**
@@ -1230,7 +1233,7 @@ namespace gd3d.framework
             }
             // console.log(`** mgr loadCompressBundle: ${url}`);
             type = AssetTypeEnum.CompressBundle;
-            this.unPkg(type,url,state,onstate);
+            this.unPkg(type, url, state, onstate);
         }
         /**
          * @public
@@ -1280,7 +1283,7 @@ namespace gd3d.framework
                 return;
             }
 
-            this.unPkg(type,url,state,onstate);
+            this.unPkg(type, url, state, onstate);
             // if (type == AssetTypeEnum.Bundle)//加载包
             // {
             //     gd3d.io.loadText(url, (txt, err) =>
@@ -1433,7 +1436,7 @@ namespace gd3d.framework
                 this.doWaitState(url, state);
                 return;
             }
-            this.unPkg(type,url,state,onstate);
+            this.unPkg(type, url, state, onstate);
             // this.waitQueueState.push({ state, type, onstate });
             // this.loadByMulQueue();
         }

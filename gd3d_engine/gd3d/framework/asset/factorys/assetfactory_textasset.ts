@@ -33,15 +33,18 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: textasset)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: textasset, call: (handle: () => void) => void)
         {
-            let filename = getFileName(url);
-            state.resstate[filename] = new ResourceState();
-            let txt = respack[filename];
-            let _textasset = asset ? asset : new textasset(filename);
-            _textasset.content = txt;
+            call(() =>
+            {
+                let filename = getFileName(url);
+                state.resstate[filename] = new ResourceState();
+                let txt = respack[filename];
+                let _textasset = asset ? asset : new textasset(filename);
+                _textasset.content = txt;
 
-            AssetFactoryTools.useAsset(assetMgr, onstate, state, _textasset, url);
+                AssetFactoryTools.useAsset(assetMgr, onstate, state, _textasset, url);
+            });
         }
     }
 }

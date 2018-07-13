@@ -44,28 +44,31 @@ namespace gd3d.framework
                 });
         }
 
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: shader)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: shader, call: (handle: () => void) => void)
         {
-            let filename = getFileName(url);
-            let name = filename.substring(0, filename.indexOf("."));
-
-            state.resstate[filename] = new ResourceState();
-            let txt = respack[filename];
-            state.resstate[filename].state = 1;//完成
-            var _shader = new shader(filename);
-            try
+            call(() =>
             {
-                _shader.parse(assetMgr, JSON.parse(txt));
-            }
-            catch (e)
-            {
-                console.error("error  filename :" + filename);
-                throw new Error("shader on parse");
-            }
+                let filename = getFileName(url);
+                let name = filename.substring(0, filename.indexOf("."));
 
-            assetMgr.setAssetUrl(_shader, url);
-            assetMgr.mapShader[filename] = _shader;
-            onstate(state);
+                state.resstate[filename] = new ResourceState();
+                let txt = respack[filename];
+                state.resstate[filename].state = 1;//完成
+                var _shader = new shader(filename);
+                try
+                {
+                    _shader.parse(assetMgr, JSON.parse(txt));
+                }
+                catch (e)
+                {
+                    console.error("error  filename :" + filename);
+                    throw new Error("shader on parse");
+                }
+
+                assetMgr.setAssetUrl(_shader, url);
+                assetMgr.mapShader[filename] = _shader;
+                onstate(state);
+            });
         }
     }
 }

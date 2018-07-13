@@ -38,7 +38,7 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(respack, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: animationClip)
+        loadByPack(respack, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: animationClip, call: (handle: () => void) => void)
         {
             let filename = getFileName(url);
 
@@ -48,10 +48,12 @@ namespace gd3d.framework
             // _clip.Parse(_buffer);
 
             // AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
-
-            _clip.Parse(_buffer).then(() =>
+            call(() =>
             {
-                AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+               return _clip.Parse(_buffer).then(() =>
+                {
+                    AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                });
             });
         }
     }

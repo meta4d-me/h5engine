@@ -23,7 +23,7 @@ namespace gd3d.framework
 
                     let _prefab = asset ? asset : new prefab(filename);
                     _prefab.assetbundle = bundlename;
-                    _prefab.Parse(txt, assetMgr);
+                    _prefab.Parse(txt, assetMgr);                  
                     AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
                     // _prefab.Parse(txt, assetMgr).then(() =>
                     // {
@@ -40,22 +40,25 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: prefab)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: prefab, call: (handle: () => void) => void)
         {
-            let bundlename = getFileName(state.url);
-            let filename = getFileName(url);
+            call(() =>
+            {
+                let bundlename = getFileName(state.url);
+                let filename = getFileName(url);
 
-            state.resstate[filename] = new ResourceState();
-            let txt = respack[filename];
-            let _prefab = asset ? asset : new prefab(filename);
-            _prefab.assetbundle = bundlename;
+                state.resstate[filename] = new ResourceState();
+                let txt = respack[filename];
+                let _prefab = asset ? asset : new prefab(filename);
+                _prefab.assetbundle = bundlename;
 
-            // _prefab.Parse(txt, assetMgr).then(() =>
-            // {
-            //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
-            // });
-            _prefab.Parse(txt, assetMgr);
-            AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+                // _prefab.Parse(txt, assetMgr).then(() =>
+                // {
+                //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+                // });
+                _prefab.Parse(txt, assetMgr);
+                AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+            });
         }
     }
 }

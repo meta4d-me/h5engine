@@ -34,8 +34,10 @@ namespace gd3d.framework
 
         }
 
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: pathasset)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: pathasset, call: (handle: () => void) => void)
         {
+            call(() =>
+            {
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
@@ -44,6 +46,7 @@ namespace gd3d.framework
             _path.Parse(JSON.parse(txt));
 
             AssetFactoryTools.useAsset(assetMgr, onstate, state, _path, url);
+            });
         }
     }
 }

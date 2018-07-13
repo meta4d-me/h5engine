@@ -307,7 +307,7 @@ namespace gd3d.framework
                             break;
                     }
                     if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
-                        && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt)
+                        && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt && type != AssetTypeEnum.Prefab)
                     {
                         if (!asset)
                             continue;
@@ -332,11 +332,9 @@ namespace gd3d.framework
                     list.push({ url: item.url, type: item.type, asset: item.asset, state: state, handle: undefined });
                 }
             }
-            // let realTotal = list.length;
+
 
             state.bundleLoadState = AssetBundleLoadState.None;
-
-            // let binCount = 0;
             let packlist = [];
             let haveBin = false;
             let tempMap = {};
@@ -350,26 +348,18 @@ namespace gd3d.framework
                 if (mapPackes[surl] != undefined)
                 {
                     packlist.push({ surl, type, asset, loadstate });
-                    // --realTotal;
                     delete tempMap[surl];
-                    // if (--realTotal === 0)
                     if (this.mapIsNull(tempMap))
-                        this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr);
-                    // console.log(`lrb ${this.url} 开始下载:${surl}`);
+                        this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
                 }
                 else
                 {
-
-                    // console.log(`lb ${this.url} 开始下载:${surl}`);
-                    //把压缩后的txt bin下载放在bundle里
                     if (type == AssetTypeEnum.PackBin)
                     {
                         haveBin = true;
-                        // ++realTotal;
-                        // ++binCount;
                         gd3d.io.loadArrayBuffer(surl, (_buffer, err) =>
                         {
-                            // console.log(`lb ${surl} 下载完成`);
+
                             if (err != null)
                             {
                                 state.iserror = true;
@@ -400,21 +390,9 @@ namespace gd3d.framework
                                 state.bundleLoadState |= loadstate;
 
                             delete tempMap[surl];
-                            // if (--realTotal === 0)
                             if (this.mapIsNull(tempMap))
-                                this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr);
-                            // if (--binCount == 0)
-                            // {
-                            //     setTimeout(() =>
-                            //     {
-                            //         respackCall(() =>
-                            //         {
+                                this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
 
-                            //             if (realTotal === 0)
-                            //                 this.downloadFinsih(state, list, respackCall, onstate);
-                            //         });
-                            //     }, 0);
-                            // }
                         },
                             (loadedLength, totalLength) =>
                             {
@@ -424,7 +402,7 @@ namespace gd3d.framework
                     }
                     else
                     {
-                        // console.log(`slg ${this.url} 开始下载:${surl} ${gd3d.framework.AssetTypeEnum[type]}`);
+
                         assetmgr.loadSingleRes(surl, type, (s) =>
                         {
                             if (s.iserror)
@@ -447,19 +425,11 @@ namespace gd3d.framework
 
                         }, state, asset, (data) =>
                             {
-                                // console.log(`lb ${this.url} ${surl} 下载完成`);
+
                                 list[handles[data.url]].handle = data.handle;
                                 delete tempMap[data.url];
-                                // if (--realTotal === 0)
-                                // {
-                                //state.isfinish = true;
                                 if (this.mapIsNull(tempMap))
-                                    this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr);
-                                // }
-                                // else
-                                // {
-                                //     onstate(state);
-                                // }
+                                    this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
                             });
                     }
 
@@ -468,7 +438,7 @@ namespace gd3d.framework
 
         }
 
-        downloadFinsih(state, list, haveBin: boolean, onstate, packlist, mapPackes, assetmgr)
+        downloadFinsih(state, list, haveBin: boolean, onstate, packlist, mapPackes, assetmgr: assetMgr, handles)
         {
             if (haveBin)
             {
@@ -495,9 +465,13 @@ namespace gd3d.framework
 
                             if (state != undefined)
                                 state.bundleLoadState |= uitem.loadstate;
-                            if (++count >= packlist.length)
-                                fcall();
-                        }, state, uitem.asset);
+
+                        }, state, uitem.asset, (data) =>
+                            {
+                                list[handles[data.url]].handle = data.handle;
+                                if (++count >= packlist.length)
+                                    fcall();
+                            });
                     }
                 };
                 respackCall(() =>
@@ -512,27 +486,38 @@ namespace gd3d.framework
         {
             let waitArrs = [];
             let count = 0;
+            let lastHandle = [];
             let finish = () =>
             {
-                if (++count >= waitArrs.length)
-                {
-                    state.isfinish = true;
-                    onstate(state);
-                }
+                state.isfinish = true;
+                onstate(state);
             };
             for (let hitem of list)
             {
                 if (!hitem.handle)
                     continue;
-                let waiting = hitem.handle();
 
+                if (hitem.type == AssetTypeEnum.Prefab || hitem.type == AssetTypeEnum.F14Effect)
+                {
+                    lastHandle.push(hitem)
+                    continue;
+                }
+
+                let waiting = hitem.handle();
                 if (waiting instanceof threading.gdPromise)
                 {
                     waitArrs.push(waiting);
                     waiting.then(() =>
                     {
-                        finish();
+                        if (++count >= waitArrs.length)
+                        {
+                            while (lastHandle.length > 0)
+                                lastHandle.shift().handle();
+                            waitArrs = [];
+                            finish();
+                        }
                     });
+
                 }
             }
             if (waitArrs.length < 1)
