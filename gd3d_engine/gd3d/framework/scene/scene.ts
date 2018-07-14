@@ -4,7 +4,7 @@ namespace gd3d.framework
      * @public
      * @language zh_CN
      * @classdesc
-     * åœºæ™¯æ˜¯åŸºç¡€çš„åŠŸèƒ½ï¼Œæœ‰åœºæ™¯å›¾ï¼Œç›¸å½“äºUnityçš„Level
+     * ?ºæ?¯æ?¯å?ºç??????½ï????ºæ?¯å?¾ï??¸å?äº?Unity??Level
      * @version egret-gd3d 1.0
      */
     export class scene
@@ -13,7 +13,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * å…¨å±€çš„applicationå®ä¾‹
+         * ?¨å???applicationå®?ä¾?
          * @version egret-gd3d 1.0
          */
         app: application;
@@ -21,7 +21,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * å…¨å±€çš„webglå®ä¾‹
+         * ?¨å???webglå®?ä¾?
          * @version egret-gd3d 1.0
          */
         webgl: WebGLRenderingContext;
@@ -43,8 +43,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * åœºæ™¯åç§°
-         * @version egret-gd3d 1.0
+         * ?ºæ?¯å??ç§?         * @version egret-gd3d 1.0
          */
         name: string;
         private rootNode: transform;
@@ -52,8 +51,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * æ¸²æŸ“åˆ—è¡¨
-         * @version egret-gd3d 1.0
+         * æ¸²æ????è¡?         * @version egret-gd3d 1.0
          */
         renderList: renderList;
         private assetmgr: assetMgr;
@@ -62,7 +60,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * æ·»åŠ ScreenSpaceOverlay
+         * æ·»å??ScreenSpaceOverlay
          * @version egret-gd3d 1.0
          */
         addScreenSpaceOverlay(overlay: overlay2D)
@@ -78,7 +76,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * åˆ é™¤ScreenSpaceOverlay
+         * ????creenSpaceOverlay
          * @version egret-gd3d 1.0
          */
         removeScreenSpaceOverlay(overlay)
@@ -92,18 +90,16 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * å‚ä¸æ¸²æŸ“çš„ç›¸æœº
-         * @version egret-gd3d 1.0
+         * ??ä¸?æ¸²æ?????¸æ??         * @version egret-gd3d 1.0
          */
-        public renderCameras: camera[] = [];//éœ€è¦camera class 
+        public renderCameras: camera[] = [];//??è¦?camera class 
 
         private _mainCamera: camera = null;
         /**
          * @public
          * @language zh_CN
          * @classdesc
-         * è·å–å½“å‰ä¸»ç›¸æœº
-         * @version egret-gd3d 1.0
+         * ?·å??å½???ä¸»ç?¸æ??         * @version egret-gd3d 1.0
          */
         public get mainCamera()
         {
@@ -117,8 +113,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * è®¾ç½®å½“å‰ä¸»ç›¸æœº
-         * @param _camera ç›¸æœºç»„ä»¶å®ä¾‹
+         * è®¾ç½®å½???ä¸»ç?¸æ??         * @param _camera ?¸æ?ºç?ä»¶å?ä¾?
          * @version egret-gd3d 1.0
          */
         public set mainCamera(_camera: camera)
@@ -132,56 +127,54 @@ namespace gd3d.framework
             }
         }
         public renderContext: renderContext[] = [];
-        private renderLights: light[] = [];//éœ€è¦å…‰æº class
+        private renderLights: light[] = [];//??è¦???æº? class
         /**
          * @public
          * @language zh_CN
          * @classdesc
-         * lightmapåˆ—è¡¨
-         * @version egret-gd3d 1.0
+         * lightmap??è¡?         * @version egret-gd3d 1.0
          */
         lightmaps: texture[] = [];//lightmap
         /**
          * @public
          * @language zh_CN
          * @classdesc
-         * é›¾æ•ˆ
+         * ?¾æ??
          * @version egret-gd3d 1.0
          */
         fog: Fog;
 
-        onLateUpdate:(delta:number)=>any;
+        /**
+         * lateUpdate
+         */
+        onLateUpdate : (delta: number) => any;
         /**
          * @public
          * @language zh_CN
          * @classdesc
-         * åœºæ™¯çš„åˆ·æ–°å‡½æ•°
-         * @param delta
+         * ?ºæ?¯ç???·æ?°å?½æ??         * @param delta
          * @version egret-gd3d 1.0
          */
         update(delta: number)
         {
             
 
-            //æ›´æ–°çŸ©é˜µ
-            this.rootNode.updateTran(false);
-            this.rootNode.updateAABBChild();//æ›´æ–°å®Œtarnå†æ›´æ–°å­ç‰©ä½“aabb ç¡®ä¿æ¯ä¸ªtransformçš„aabbæ­£ç¡®
+            //?´æ?°ç?©é??            this.rootNode.updateTran(false);
+            this.rootNode.updateAABBChild();//?´æ?°å?tarn???´æ?°å??©ä?aabb ç¡®ä?æ¯?ä¸?ransform??aabbæ­£ç¡®
 
-            //æ›´æ–°è·‘ä¸€éï¼Œåˆ·å‡ºæ¸²æŸ“åˆ—è¡¨
-            this.renderCameras.length = 0;
+            //?´æ?°è?ä¸???ï¼??·å?ºæ¸²????è¡?            this.renderCameras.length = 0;
             this.renderLights.length = 0;
             this.renderList.clear();
 
             // aniplayer.playerCaches = [];
 
-            //é€’å½’çš„æ›´æ–°ä¸å¡«å……æ¸²æŸ“åˆ—è¡¨
-            this.updateScene(this.rootNode, delta);
+            //??å½????´æ?°ä?å¡«å??æ¸²æ????è¡?            this.updateScene(this.rootNode, delta);
+            //lateupdate
             if(this.onLateUpdate)
                 this.onLateUpdate(delta);
 
-            //æ’åº
-            //æ’åºcamera å¹¶ç»˜åˆ¶
-            if (this.renderCameras.length > 1)
+            //??åº?
+            //??åº?camera å¹¶ç???            if (this.renderCameras.length > 1)
             {
                 this.renderCameras.sort((a, b) =>
                 {
@@ -214,7 +207,7 @@ namespace gd3d.framework
             }
         }
 
-        //æ›´æ–°å’Œæ¸²æŸ“ scene overlayers
+        //?´æ?°å??æ¸²æ?? scene overlayers
         private updateSceneOverLay(delta: number)
         {
             if (!this._overlay2d || this._overlay2d.length < 1) return;
@@ -275,11 +268,10 @@ namespace gd3d.framework
         }
 
         private RealCameraNumber: number = 0;
-        //è¿™ä¸ªå‡½æ•°åé¢è¿˜æœ‰åˆ«çš„è¿‡ç¨‹ï¼Œåº”è¯¥ç•™ç»™camera
+        //è¿?ä¸ªå?½æ?°å???¢è????«ç??è¿?ç¨?ï¼?åº?è¯¥ç??ç»?camera
         private _renderCamera(camindex: number)
         {
-            //å¢åŠ å½“å‰ç¼–è¾‘å™¨çŠ¶æ€ï¼Œç®¡æ§åœºç¼–ç›¸æœº
-            //ä¸€ä¸ªcamera ä¸æ˜¯ä¸€æ¬¡å•çº¯çš„ç»˜åˆ¶ï¼Œcamera è¿˜æœ‰å¤šä¸ªç»˜åˆ¶é
+            //å¢???å½???ç¼?è¾??¨ç?¶æ??ï¼?ç®¡æ?§å?ºç??¸æ??            //ä¸?ä¸?amera ä¸??¯ä?æ¬¡å??çº¯ç??ç»??¶ï?camera è¿???å¤?ä¸ªç??¶é??
             var cam = this.renderCameras[camindex];
             var context = this.renderContext[camindex];
             //sceneMgr.camera=cam;
@@ -291,7 +283,7 @@ namespace gd3d.framework
                 cam.renderScene(this, context);
                 this.RealCameraNumber++;
 
-                // //è¿˜æœ‰overlay
+                // //è¿???overlay
                 let overLays: IOverLay[] = cam.getOverLays();
                 for (var i = 0; i < overLays.length; i++)
                 {
@@ -308,7 +300,7 @@ namespace gd3d.framework
                 cam.fillRenderer(this);
                 cam.renderScene(this, context);
                 this.RealCameraNumber++;
-                //----------------------------------åœºç¼–ç›¸æœºçš„overlayå±•ç¤º----------------------------------------------------
+                //----------------------------------?ºç??¸æ?ºç??overlayå±?ç¤?---------------------------------------------------
                 if (this.app.be2dstate)
                 {
                     let overLays: IOverLay[] = cam.getOverLays();
@@ -358,18 +350,16 @@ namespace gd3d.framework
             }
         }
 
-        private objupdateInEditor(node: transform, delta)//åœºç¼–ä¸‹
+        private objupdateInEditor(node: transform, delta)//?ºç?ä¸?
         {
-            node.gameObject.init();//ç»„ä»¶è¿˜æœªåˆå§‹åŒ–çš„åˆå§‹åŒ–
+            node.gameObject.init();//ç»?ä»¶è??ªå??å§???????å§???
             if (node.gameObject.renderer != null)
             {
-                node.gameObject.renderer.update(delta);//update äº†å•¥
-            }
+                node.gameObject.renderer.update(delta);//update äº???            }
             var c = node.gameObject.camera;
             if (c != null)
             {
-                node.gameObject.camera.update(delta);//update äº†å•¥
-            }
+                node.gameObject.camera.update(delta);//update äº???            }
 
             this.collectCameraAndLight(node);
 
@@ -381,11 +371,11 @@ namespace gd3d.framework
                 }
             }
         }
-        private objupdate(node: transform, delta)//playçŠ¶æ€ä¸‹
+        private objupdate(node: transform, delta)//play?¶æ??ä¸?
         {
             if (node.hasComponent == false && node.hasComponentChild == false)
                 return;
-            node.gameObject.init(this.app.bePlay);//ç»„ä»¶è¿˜æœªåˆå§‹åŒ–çš„åˆå§‹åŒ–
+            node.gameObject.init(this.app.bePlay);//ç»?ä»¶è??ªå??å§???????å§???
             if (node.gameObject.components.length > 0)
             {
                 node.gameObject.update(delta);
@@ -405,9 +395,7 @@ namespace gd3d.framework
 
         private collectCameraAndLight(node: transform)
         {
-            //update çš„æ—¶å€™åªæ”¶é›†æ‘„åƒæœºå’Œç¯å…‰ä¿¡æ¯
-            //æ”¶é›†æ‘„åƒæœº
-            var c = node.gameObject.camera;
+            //update ???¶å???ªæ?¶é???????ºå???¯å??ä¿¡æ??            //?¶é????????            var c = node.gameObject.camera;
             if (c != null && c.gameObject.visibleInScene)
             {
                 this.renderCameras.push(c);
@@ -416,7 +404,7 @@ namespace gd3d.framework
             {
                 this.renderContext.push(new renderContext(this.webgl));
             }
-            //æ”¶é›†ç¯å…‰
+            //?¶é???¯å??
             var l = node.gameObject.light;
             if (l != null && node.gameObject.visible)
             {
@@ -428,8 +416,8 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * åœºæ™¯æ ¹èŠ‚ç‚¹ä¸‹æ·»åŠ ç‰©ä½“
-         * @param node è¦æ·»åŠ çš„transform
+         * ?ºæ?¯æ?¹è???¹ä?æ·»å???©ä?
+         * @param node è¦?æ·»å????transform
          * @version egret-gd3d 1.0
          */
         addChild(node: transform)
@@ -441,8 +429,8 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * åœºæ™¯æ ¹èŠ‚ç‚¹ä¸‹ç§»å‡ºç‰©ä½“
-         * @param node è¦ç§»å‡ºçš„transform
+         * ?ºæ?¯æ?¹è???¹ä?ç§»å?ºç?©ä?
+         * @param node è¦?ç§»å?ºç??transform
          * @version egret-gd3d 1.0
          */
         removeChild(node: transform)
@@ -454,8 +442,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * è·å–childrenåˆ—è¡¨
-         * @version egret-gd3d 1.0
+         * ?·å??children??è¡?         * @version egret-gd3d 1.0
          */
         getChildren(): transform[]
         {
@@ -466,7 +453,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * è·å–childrenæ•°é‡
+         * ?·å??children?°é??
          * @version egret-gd3d 1.0
          */
         getChildCount(): number
@@ -479,8 +466,8 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * æ ¹æ®ç´¢å¼•è·å–child
-         * @param index ç´¢å¼•
+         * ?¹æ?®ç´¢å¼??·å??child
+         * @param index ç´¢å?
          * @version egret-gd3d 1.0
          */
         getChild(index: number): transform
@@ -492,7 +479,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * æ ¹æ®nameè·å–child
+         * ?¹æ??ame?·å??child
          * @param name
          * @version egret-gd3d 1.0
          */
@@ -506,8 +493,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * è·å–åœºæ™¯æ ¹èŠ‚ç‚¹
-         * @version egret-gd3d 1.0
+         * ?·å???ºæ?¯æ?¹è????         * @version egret-gd3d 1.0
          */
         getRoot()
         {
@@ -518,9 +504,9 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * è·å–å°„çº¿è·¯å¾„ä¸Šçš„æ‰€æœ‰ç‰©ä½“
-         * @param ray å°„çº¿å®ä¾‹
-         * @param isPickMesh æ˜¯å¦ä¸ºæ‹¾å–mesh å¦ä¸ºæ‹¾å–collider
+         * ?·å??å°?çº¿è·¯å¾?ä¸????????©ä?
+         * @param ray å°?çº¿å?ä¾?
+         * @param isPickMesh ?¯å?¦ä¸º?¾å??mesh ?¦ä¸º?¾å??collider
          * @version egret-gd3d 1.0
          */
         public pickAll(ray: ray, outInfos: pickinfo[], isPickMesh: boolean = false, root: transform = this.getRoot(), layermask: number = NaN): boolean
@@ -534,9 +520,9 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * è·å–å°„çº¿æ‹¾å–åˆ°çš„æœ€è¿‘ç‰©ä½“
-         * @param ray å°„çº¿å®ä¾‹
-         * @param isPickMesh æ˜¯å¦ä¸ºæ‹¾å–mesh å¦ä¸ºæ‹¾å–collider
+         * ?·å??å°?çº¿æ?¾å???°ç????è¿??©ä?
+         * @param ray å°?çº¿å?ä¾?
+         * @param isPickMesh ?¯å?¦ä¸º?¾å??mesh ?¦ä¸º?¾å??collider
          * @version egret-gd3d 1.0
          */
         public pick(ray: ray, outInfo: pickinfo, isPickMesh: boolean = false, root: transform = this.getRoot(), layermask: number = NaN): boolean
@@ -664,7 +650,7 @@ namespace gd3d.framework
                     //console.error(`${tran.gameObject.layer}  --  ${layermask}`);
                     if (canDo)
                     {
-                        //æŒ‚äº†collider
+                        //??äº?collider
                         let pinfo = math.pool.new_pickInfo();
                         var bool = ray.intersectCollider(tran, pinfo);
                         if (bool)
