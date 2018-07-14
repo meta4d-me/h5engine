@@ -1256,7 +1256,7 @@ namespace gd3d.framework
 
             // console.log(`assetmgr:${url} ${((Date.now() - this.time))}ms ${Date.now()}`);
             // this.time = Date.now();
-            console.log(`资源包 : ${url} 开始加载`);
+            // console.log(`资源包 : ${url} 开始加载`);
             let name = this.getFileName(url);
             if (this.mapInLoad[name] != null)
             {
@@ -1283,136 +1283,9 @@ namespace gd3d.framework
                 return;
             }
 
-            this.unPkg(type, url, state, onstate);
-            // if (type == AssetTypeEnum.Bundle)//加载包
-            // {
-            //     gd3d.io.loadText(url, (txt, err) =>
-            //     {
-            //         if (err != null)
-            //         {
-            //             state.iserror = true;
-            //             state.errs.push(new Error(err.message));
-            //             onstate(state);
-            //             return;
-            //         }
-            //         let json = JSON.parse(txt);
-            //         let filename = "";
-            //         if (json["files"])
-            //         {
-            //             filename = this.getFileName(url);
-
-            //             var ab = new assetBundle(url);
-            //             ab.name = filename;
-            //             ab.parse(JSON.parse(txt));
-            //             ab.load(this, onstate, state);
-            //         } else
-            //         {
-            //             let loadurl = url.replace(".assetbundle.json", ".packs.txt");
-            //             filename = this.getFileName(url);
-
-            //             var ab = new assetBundle(url);
-            //             ab.name = filename;
-            //             ab.totalLength = json["totalLength"];
-            //             ab.loadCompressBundle(loadurl, onstate, state, this);
-            //         }
-
-
-            //         this.mapBundle[filename] = ab;
-            //     });
-            // }
-            // else if (type == AssetTypeEnum.CompressBundle)
-            // {
-            //     gd3d.io.loadText(url, (txt, err) =>
-            //     {
-            //         if (err != null)
-            //         {
-            //             state.iserror = true;
-            //             state.errs.push(new Error(err.message));
-            //             onstate(state);
-            //             return;
-            //         }
-
-            //         //压缩的bundle在packs.txt中
-            //         let loadurl = url.replace(".assetbundle.json", ".packs.txt");
-            //         let filename = this.getFileName(url);
-            //         let json = JSON.parse(txt);
-
-            //         var ab = new assetBundle(url);
-            //         ab.name = filename;
-            //         ab.totalLength = json["totalLength"];
-            //         ab.loadCompressBundle(loadurl, onstate, state, this);
-            //     });
-
-            // }
-            // else
-            // {
-            //     state.totaltask = 1;
-            //     this.loadSingleRes(url, type, (s) =>
-            //     {
-            //         if (s.iserror)
-            //         {
-            //             onstate(state);
-            //             return;
-            //         }
-
-            //         if (s.progressCall)
-            //         {
-            //             s.progressCall = false;
-            //             onstate(state);
-            //             return;
-            //         }
-            //         state.curtask = 1;
-            //         s.isfinish = true;
-            //         onstate(s);
-            //     }, state, null, (data) =>
-            //         {
-            //             if (data.handle)
-            //                 data.handle();
-            //         });
-            // }
+            this.unPkg(type, url, state, onstate);           
         }
 
-        // oldload(url: string, type: AssetTypeEnum = AssetTypeEnum.Auto, onstate: (state: stateLoad) => void = null)
-        // {
-        //     if (onstate == null)
-        //         onstate = () => { };
-        //     console.log(`assetmgr:${url}`);
-        //     let name = this.getFileName(url);
-        //     if (this.mapInLoad[name] != null)
-        //     {
-        //         let _state = this.mapInLoad[name];
-        //         if (_state.isfinish)
-        //         {
-        //             onstate(this.mapInLoad[name]);
-        //         }
-        //         else
-        //         {
-        //             if (this.waitStateDic[name] == null)
-        //                 this.waitStateDic[name] = [];
-        //             this.waitStateDic[name].push(onstate);
-        //         }
-        //         return;
-        //     }
-
-        //     var state = new stateLoad();
-        //     this.mapInLoad[name] = state;
-        //     state.url = url;
-        //     //确定资源类型
-        //     if (type == AssetTypeEnum.Auto)
-        //     {
-        //         type = this.calcType(url);
-        //     }
-        //     if (type == AssetTypeEnum.Unknown)
-        //     {
-        //         state.errs.push(new Error("can not sure about type:" + url));
-        //         state.iserror = true;
-        //         onstate(state);
-        //         this.doWaitState(url, state);
-        //         return;
-        //     }
-        //     this.waitQueueState.push({ state, type, onstate });
-        //     this.loadByMulQueue();
-        // }
 
         private loadForNoCache(url: string, type: AssetTypeEnum = AssetTypeEnum.Auto, onstate: (state: stateLoad) => void = null)
         {
@@ -1437,8 +1310,7 @@ namespace gd3d.framework
                 return;
             }
             this.unPkg(type, url, state, onstate);
-            // this.waitQueueState.push({ state, type, onstate });
-            // this.loadByMulQueue();
+           
         }
         /**
          * @public
