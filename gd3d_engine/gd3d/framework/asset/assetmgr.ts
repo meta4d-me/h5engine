@@ -1256,7 +1256,7 @@ namespace gd3d.framework
 
             // console.log(`assetmgr:${url} ${((Date.now() - this.time))}ms ${Date.now()}`);
             // this.time = Date.now();
-            // console.log(`** mgr load: ${url}`);
+            console.log(`资源包 : ${url} 开始加载`);
             let name = this.getFileName(url);
             if (this.mapInLoad[name] != null)
             {

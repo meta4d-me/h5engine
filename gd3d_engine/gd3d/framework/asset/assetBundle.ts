@@ -489,6 +489,7 @@ namespace gd3d.framework
             let lastHandle = [];
             let finish = () =>
             {
+                console.log(`资源包 :${this.url} 加载完成`);
                 state.isfinish = true;
                 onstate(state);
             };
@@ -515,10 +516,11 @@ namespace gd3d.framework
                             {
                                 return b.type - a.type;
                             })
-                            while (lastHandle.length > 0){
-                                let iitem = lastHandle.shift();
-                                // console.log(`abname: ${this.name} iitem:${AssetTypeEnum[iitem.type]}`);
-                                iitem.handle();
+                            while (lastHandle.length > 0)
+                            {
+                                lastHandle.shift().handle();
+                                // let iitem = lastHandle.shift();                             
+                                // iitem.handle();
                             }
                             waitArrs = [];
                             finish();
@@ -528,7 +530,11 @@ namespace gd3d.framework
                 }
             }
             if (waitArrs.length < 1)
+            {
+                while (lastHandle.length > 0)
+                    lastHandle.shift().handle();
                 finish();
+            }
 
         }
 

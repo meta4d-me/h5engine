@@ -149,6 +149,8 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         fog: Fog;
+
+        onLateUpdate:(delta:number)=>any;
         /**
          * @public
          * @language zh_CN
@@ -174,7 +176,8 @@ namespace gd3d.framework
 
             //递归的更新与填充渲染列表
             this.updateScene(this.rootNode, delta);
-
+            if(this.onLateUpdate)
+                this.onLateUpdate(delta);
 
             //排序
             //排序camera 并绘制
