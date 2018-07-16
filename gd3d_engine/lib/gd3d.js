@@ -5989,7 +5989,7 @@ var gd3d;
                                 break;
                         }
                         if (type != framework.AssetTypeEnum.GLVertexShader && type != framework.AssetTypeEnum.GLFragmentShader && type != framework.AssetTypeEnum.Shader
-                            && type != framework.AssetTypeEnum.PackBin && type != framework.AssetTypeEnum.PackTxt) {
+                            && type != framework.AssetTypeEnum.PackBin && type != framework.AssetTypeEnum.PackTxt && type != framework.AssetTypeEnum.Prefab) {
                             if (!asset)
                                 continue;
                             this.mapNamed[fileName] = asset.getGUID();
@@ -6023,7 +6023,7 @@ var gd3d;
                         packlist.push({ surl: surl, type: type, asset: asset, loadstate: loadstate });
                         delete tempMap[surl];
                         if (this_1.mapIsNull(tempMap))
-                            this_1.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr);
+                            this_1.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
                     }
                     else {
                         if (type == framework.AssetTypeEnum.PackBin) {
@@ -6053,7 +6053,7 @@ var gd3d;
                                     state.bundleLoadState |= loadstate;
                                 delete tempMap[surl];
                                 if (_this.mapIsNull(tempMap))
-                                    _this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr);
+                                    _this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
                             }, function (loadedLength, totalLength) {
                                 state.compressBinLoaded = loadedLength;
                                 onstate(state);
@@ -6077,7 +6077,7 @@ var gd3d;
                                 list[handles[data.url]].handle = data.handle;
                                 delete tempMap[data.url];
                                 if (_this.mapIsNull(tempMap))
-                                    _this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr);
+                                    _this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
                             });
                         }
                     }
@@ -6088,7 +6088,7 @@ var gd3d;
                     _loop_1(item);
                 }
             };
-            assetBundle.prototype.downloadFinsih = function (state, list, haveBin, onstate, packlist, mapPackes, assetmgr) {
+            assetBundle.prototype.downloadFinsih = function (state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles) {
                 var _this = this;
                 if (haveBin) {
                     var respackCall = function (fcall) {
@@ -6111,9 +6111,11 @@ var gd3d;
                                 }
                                 if (state != undefined)
                                     state.bundleLoadState |= uitem.loadstate;
+                            }, state, uitem.asset, function (data) {
+                                list[handles[data.url]].handle = data.handle;
                                 if (++count >= packlist.length)
                                     fcall();
-                            }, state, uitem.asset);
+                            });
                         };
                         for (var _i = 0, packlist_1 = packlist; _i < packlist_1.length; _i++) {
                             var uitem = packlist_1[_i];
@@ -6128,16 +6130,42 @@ var gd3d;
                     this.NextHandle(list, state, onstate);
             };
             assetBundle.prototype.NextHandle = function (list, state, onstate) {
+                var waitArrs = [];
+                var count = 0;
+                var lastHandle = [];
+                var finish = function () {
+                    state.isfinish = true;
+                    onstate(state);
+                };
                 for (var _i = 0, list_2 = list; _i < list_2.length; _i++) {
                     var hitem = list_2[_i];
                     if (!hitem.handle)
                         continue;
-                    hitem.handle();
+                    if (hitem.type == framework.AssetTypeEnum.Prefab || hitem.type == framework.AssetTypeEnum.F14Effect) {
+                        lastHandle.push(hitem);
+                        continue;
+                    }
+                    var waiting = hitem.handle();
+                    if (waiting instanceof gd3d.threading.gdPromise) {
+                        waitArrs.push(waiting);
+                        waiting.then(function () {
+                            if (++count >= waitArrs.length) {
+                                lastHandle.sort(function (a, b) {
+                                    return b.type - a.type;
+                                });
+                                while (lastHandle.length > 0)
+                                    lastHandle.shift().handle();
+                                waitArrs = [];
+                                finish();
+                            }
+                        });
+                    }
                 }
-                setTimeout(function () {
-                    state.isfinish = true;
-                    onstate(state);
-                }, 10);
+                if (waitArrs.length < 1) {
+                    while (lastHandle.length > 0)
+                        lastHandle.shift().handle();
+                    finish();
+                }
             };
             assetBundle.prototype.mapIsNull = function (map) {
                 if (!map)
@@ -6484,10 +6512,23 @@ var gd3d;
             assetMgr.prototype.getAssetUrl = function (asset) {
                 return this.assetUrlDic[asset.getGUID()];
             };
-            assetMgr.prototype.loadResByPack = function (respack, url, type, onstate, state, asset) {
+            assetMgr.prototype.loadSingleRes = function (url, type, onstate, state, asset, call) {
                 var assetFactory = this.getAssetFactory(type);
                 if (assetFactory != null) {
-                    assetFactory.loadByPack(respack, url, onstate, state, this, asset);
+                    assetFactory.load(url, onstate, state, this, asset, function (chandle) {
+                        call({ url: url, handle: chandle });
+                    });
+                }
+                else {
+                    throw new Error("cant use the type:" + type);
+                }
+            };
+            assetMgr.prototype.loadResByPack = function (respack, url, type, onstate, state, asset, call) {
+                var assetFactory = this.getAssetFactory(type);
+                if (assetFactory != null) {
+                    assetFactory.loadByPack(respack, url, onstate, state, this, asset, (function (chandle) {
+                        call({ url: url, handle: chandle });
+                    }));
                 }
                 else {
                     throw new Error("cant use the type:" + type);
@@ -6518,17 +6559,6 @@ var gd3d;
                 this.regAssetFactory(AssetTypeEnum.F14Effect, new framework.AssetFactory_f14eff());
                 this.regAssetFactory(AssetTypeEnum.DDS, new framework.AssetFactory_DDS());
                 this.regAssetFactory(AssetTypeEnum.KeyFrameAniclip, new framework.assetfactory_keyFrameAniClip());
-            };
-            assetMgr.prototype.loadSingleRes = function (url, type, onstate, state, asset, call) {
-                var assetFactory = this.getAssetFactory(type);
-                if (assetFactory != null) {
-                    assetFactory.load(url, onstate, state, this, asset, function (chandle) {
-                        call({ url: url, handle: chandle });
-                    });
-                }
-                else {
-                    throw new Error("cant use the type:" + type);
-                }
             };
             assetMgr.prototype.doWaitState = function (name, state) {
                 if (this.waitStateDic[name] == null)
@@ -7387,7 +7417,7 @@ var gd3d;
                     p.state_ztest = false;
                     p.state_zwrite = false;
                     p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
-                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend_PreMultiply);
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend);
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
                 {
@@ -7403,7 +7433,7 @@ var gd3d;
                     p.state_ztest = false;
                     p.state_zwrite = false;
                     p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
-                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend_PreMultiply);
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend);
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
             };
@@ -7800,7 +7830,7 @@ var gd3d;
                         if (framework.AssetFactoryTools.catchError(err, onstate, state))
                             return;
                         var _clip = asset ? asset : new framework.animationClip(filename);
-                        _clip.Parse(_buffer).then(function () {
+                        return _clip.Parse(_buffer).then(function () {
                             framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
                         });
                     });
@@ -7808,13 +7838,15 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Aniclip.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
+            AssetFactory_Aniclip.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
                 var _buffer = respack[filename];
                 var _clip = asset ? asset : new framework.animationClip(filename);
-                _clip.Parse(_buffer).then(function () {
-                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                call(function () {
+                    return _clip.Parse(_buffer).then(function () {
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                    });
                 });
             };
             return AssetFactory_Aniclip;
@@ -7848,13 +7880,15 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Atlas.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _atlas = asset ? asset : new framework.atlas(filename);
-                _atlas.Parse(txt, assetMgr);
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
+            AssetFactory_Atlas.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _atlas = asset ? asset : new framework.atlas(filename);
+                    _atlas.Parse(txt, assetMgr);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
+                });
             };
             return AssetFactory_Atlas;
         }());
@@ -7871,7 +7905,8 @@ var gd3d;
             AssetFactory_DDS.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_DDS.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
+            AssetFactory_DDS.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () { });
             };
             AssetFactory_DDS.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
@@ -7929,15 +7964,17 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_f14eff.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var bundlename = framework.getFileName(state.url);
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _f14eff = asset ? asset : new framework.f14eff(filename);
-                _f14eff.assetbundle = bundlename;
-                _f14eff.Parse(txt, assetMgr);
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
+            AssetFactory_f14eff.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var bundlename = framework.getFileName(state.url);
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _f14eff = asset ? asset : new framework.f14eff(filename);
+                    _f14eff.assetbundle = bundlename;
+                    _f14eff.Parse(txt, assetMgr);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
+                });
             };
             return AssetFactory_f14eff;
         }());
@@ -7970,13 +8007,15 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Font.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _font = asset ? asset : new framework.font(filename);
-                _font.Parse(txt, assetMgr);
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _font, url);
+            AssetFactory_Font.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _font = asset ? asset : new framework.font(filename);
+                    _font.Parse(txt, assetMgr);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _font, url);
+                });
             };
             return AssetFactory_Font;
         }());
@@ -8011,16 +8050,18 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_GLFragmentShader.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                var name = filename.substring(0, filename.indexOf("."));
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                txt = decodeURI(txt);
-                state.resstate[filename].state = 1;
-                state.logs.push("load a glshader:" + filename);
-                assetMgr.shaderPool.mapFSString[name] = txt;
-                onstate(state);
+            AssetFactory_GLFragmentShader.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    var name = filename.substring(0, filename.indexOf("."));
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    txt = decodeURI(txt);
+                    state.resstate[filename].state = 1;
+                    state.logs.push("load a glshader:" + filename);
+                    assetMgr.shaderPool.mapFSString[name] = txt;
+                    onstate(state);
+                });
             };
             return AssetFactory_GLFragmentShader;
         }());
@@ -8055,16 +8096,18 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_GLVertexShader.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                var name = filename.substring(0, filename.indexOf("."));
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                txt = decodeURI(txt);
-                state.resstate[filename].state = 1;
-                state.logs.push("load a glshader:" + filename);
-                assetMgr.shaderPool.mapVSString[name] = txt;
-                onstate(state);
+            AssetFactory_GLVertexShader.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    var name = filename.substring(0, filename.indexOf("."));
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    txt = decodeURI(txt);
+                    state.resstate[filename].state = 1;
+                    state.logs.push("load a glshader:" + filename);
+                    assetMgr.shaderPool.mapVSString[name] = txt;
+                    onstate(state);
+                });
             };
             return AssetFactory_GLVertexShader;
         }());
@@ -8143,13 +8186,15 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            assetfactory_keyFrameAniClip.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var _buffer = respack[filename];
-                var _clip = asset ? asset : new framework.keyFrameAniClip(filename);
-                _clip.Parse(_buffer);
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+            assetfactory_keyFrameAniClip.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var _buffer = respack[filename];
+                    var _clip = asset ? asset : new framework.keyFrameAniClip(filename);
+                    _clip.Parse(_buffer);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                });
             };
             return assetfactory_keyFrameAniClip;
         }());
@@ -8183,14 +8228,16 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Material.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                var assetbundleName = framework.getFileName(state.url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _material = asset ? asset : new framework.material(filename);
-                _material.Parse(assetMgr, JSON.parse(txt), assetbundleName);
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
+            AssetFactory_Material.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    var assetbundleName = framework.getFileName(state.url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _material = asset ? asset : new framework.material(filename);
+                    _material.Parse(assetMgr, JSON.parse(txt), assetbundleName);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
+                });
             };
             return AssetFactory_Material;
         }());
@@ -8216,7 +8263,7 @@ var gd3d;
                         if (framework.AssetFactoryTools.catchError(err, onstate, state))
                             return;
                         var _mesh = asset ? asset : new framework.mesh(filename);
-                        _mesh.Parse(_buffer, assetMgr.webgl).then(function () {
+                        return _mesh.Parse(_buffer, assetMgr.webgl).then(function () {
                             framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
                         });
                     });
@@ -8224,13 +8271,15 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Mesh.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
+            AssetFactory_Mesh.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
                 var _buffer = respack[filename];
                 var _mesh = asset ? asset : new framework.mesh(filename);
-                _mesh.Parse(_buffer, assetMgr.webgl).then(function () {
-                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                call(function () {
+                    return _mesh.Parse(_buffer, assetMgr.webgl).then(function () {
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                    });
                 });
             };
             return AssetFactory_Mesh;
@@ -8264,13 +8313,15 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_PathAsset.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _path = asset ? asset : new framework.pathasset(filename);
-                _path.Parse(JSON.parse(txt));
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _path, url);
+            AssetFactory_PathAsset.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _path = asset ? asset : new framework.pathasset(filename);
+                    _path.Parse(JSON.parse(txt));
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _path, url);
+                });
             };
             return AssetFactory_PathAsset;
         }());
@@ -8305,15 +8356,17 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Prefab.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var bundlename = framework.getFileName(state.url);
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _prefab = asset ? asset : new framework.prefab(filename);
-                _prefab.assetbundle = bundlename;
-                _prefab.Parse(txt, assetMgr);
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+            AssetFactory_Prefab.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var bundlename = framework.getFileName(state.url);
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _prefab = asset ? asset : new framework.prefab(filename);
+                    _prefab.assetbundle = bundlename;
+                    _prefab.Parse(txt, assetMgr);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+                });
             };
             return AssetFactory_Prefab;
         }());
@@ -8347,7 +8400,8 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_PVR.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
+            AssetFactory_PVR.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () { });
             };
             return AssetFactory_PVR;
         }());
@@ -8382,15 +8436,17 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Scene.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var bundlename = framework.getFileName(state.url);
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _scene = asset ? asset : new framework.rawscene(filename);
-                _scene.assetbundle = bundlename;
-                _scene.Parse(txt, assetMgr);
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
+            AssetFactory_Scene.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var bundlename = framework.getFileName(state.url);
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _scene = asset ? asset : new framework.rawscene(filename);
+                    _scene.assetbundle = bundlename;
+                    _scene.Parse(txt, assetMgr);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
+                });
             };
             return AssetFactory_Scene;
         }());
@@ -8432,23 +8488,25 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Shader.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                var name = filename.substring(0, filename.indexOf("."));
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                state.resstate[filename].state = 1;
-                var _shader = new framework.shader(filename);
-                try {
-                    _shader.parse(assetMgr, JSON.parse(txt));
-                }
-                catch (e) {
-                    console.error("error  filename :" + filename);
-                    throw new Error("shader on parse");
-                }
-                assetMgr.setAssetUrl(_shader, url);
-                assetMgr.mapShader[filename] = _shader;
-                onstate(state);
+            AssetFactory_Shader.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    var name = filename.substring(0, filename.indexOf("."));
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    state.resstate[filename].state = 1;
+                    var _shader = new framework.shader(filename);
+                    try {
+                        _shader.parse(assetMgr, JSON.parse(txt));
+                    }
+                    catch (e) {
+                        console.error("error  filename :" + filename);
+                        throw new Error("shader on parse");
+                    }
+                    assetMgr.setAssetUrl(_shader, url);
+                    assetMgr.mapShader[filename] = _shader;
+                    onstate(state);
+                });
             };
             return AssetFactory_Shader;
         }());
@@ -8481,13 +8539,15 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_TextAsset.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _textasset = asset ? asset : new framework.textasset(filename);
-                _textasset.content = txt;
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _textasset, url);
+            AssetFactory_TextAsset.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _textasset = asset ? asset : new framework.textasset(filename);
+                    _textasset.content = txt;
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _textasset, url);
+                });
             };
             return AssetFactory_TextAsset;
         }());
@@ -8523,7 +8583,9 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Texture.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
+            AssetFactory_Texture.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                });
             };
             return AssetFactory_Texture;
         }());
@@ -8623,7 +8685,7 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_TextureDesc.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
+            AssetFactory_TextureDesc.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 var txt = respack[filename];
                 var _texturedesc = JSON.parse(txt);
@@ -8655,45 +8717,51 @@ var gd3d;
                 state.resstate[filename] = new framework.ResourceState();
                 if (_textureSrc.indexOf(".pvr.bin") >= 0) {
                     gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
-                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                            return;
-                        var _texture = asset ? asset : new framework.texture(filename);
-                        var pvr = new PvrParse(assetMgr.webgl);
-                        console.log(_textureSrc);
-                        _texture.glTexture = pvr.parse(_buffer);
-                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                        call(function () {
+                            if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                                return;
+                            var _texture = asset ? asset : new framework.texture(filename);
+                            var pvr = new PvrParse(assetMgr.webgl);
+                            console.log(_textureSrc);
+                            _texture.glTexture = pvr.parse(_buffer);
+                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                        });
                     }, function (loadedLength, totalLength) {
                         framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                     });
                 }
                 else if (_textureSrc.indexOf(".dds.bin") >= 0) {
                     gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
-                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                            return;
-                        var _texture = asset ? asset : new framework.texture(filename);
-                        assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
-                        var textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
-                        textureUtil.loadDDS(_textureSrc, null, function (texture, error, stats) {
-                            var t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
-                            t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
-                            t2d.texture = texture;
-                            _texture.glTexture = t2d;
+                        call(function () {
+                            if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                                return;
+                            var _texture = asset ? asset : new framework.texture(filename);
+                            assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+                            var textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
+                            textureUtil.loadDDS(_textureSrc, null, function (texture, error, stats) {
+                                var t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
+                                t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
+                                t2d.texture = texture;
+                                _texture.glTexture = t2d;
+                            });
+                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                         });
-                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                     }, function (loadedLength, totalLength) {
                         framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                     });
                 }
                 else {
                     gd3d.io.loadImg(_textureSrc, function (_tex, _err) {
-                        if (framework.AssetFactoryTools.catchError(_err, onstate, state))
-                            return;
-                        var _texture = asset ? asset : new framework.texture(filename);
-                        _texture.realName = _name;
-                        var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
-                        t2d.uploadImage(_tex, _mipmap, _linear, _premultiplyAlpha, _repeat);
-                        _texture.glTexture = t2d;
-                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                        call(function () {
+                            if (framework.AssetFactoryTools.catchError(_err, onstate, state))
+                                return;
+                            var _texture = asset ? asset : new framework.texture(filename);
+                            _texture.realName = _name;
+                            var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
+                            t2d.uploadImage(_tex, _mipmap, _linear, _premultiplyAlpha, _repeat);
+                            _texture.glTexture = t2d;
+                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                        });
                     }, function (loadedLength, totalLength) {
                         framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                     });
@@ -11380,15 +11448,22 @@ var gd3d;
             mesh.prototype.Parse = function (buf, webgl) {
                 var _this = this;
                 return new gd3d.threading.gdPromise(function (reslove) {
-                    var objVF = { vf: 0 };
-                    var data = new gd3d.render.meshData();
-                    var read = new gd3d.io.binReader(buf);
-                    var meshName = read.readStringAnsi();
-                    read.position = read.position + 24;
-                    var vcount = read.readUInt32();
-                    var vec10tpose = [];
-                    _this.readProcess(read, data, objVF, vcount, vec10tpose, function () {
-                        _this.readFinish(read, data, buf, objVF, webgl);
+                    gd3d.threading.thread.Instance.Call("meshDataHandle", buf, function (result) {
+                        var objVF = result.objVF;
+                        var data = result.meshData;
+                        data.originVF = objVF.vf;
+                        _this.data = new gd3d.render.meshData();
+                        for (var k in data)
+                            _this.data[k] = data[k];
+                        _this.submesh = result.subMesh;
+                        _this.glMesh = new gd3d.render.glMesh();
+                        var vertexs = _this.data.genVertexDataArray(objVF.vf);
+                        var indices = _this.data.genIndexDataArray();
+                        var __webgl = framework.sceneMgr.app.getAssetMgr().webgl;
+                        _this.glMesh.initBuffer(webgl, objVF.vf, _this.data.pos.length);
+                        _this.glMesh.uploadVertexData(webgl, vertexs);
+                        _this.glMesh.addIndex(webgl, indices.length);
+                        _this.glMesh.uploadIndexData(webgl, 0, indices);
                         reslove();
                     });
                 });
@@ -16502,17 +16577,14 @@ var gd3d;
                 this.layers = [];
             }
             F14EffectData.prototype.parsejson = function (json, assetmgr, assetbundle) {
-                var _this = this;
-                return new gd3d.threading.gdPromise(function (resolve) {
-                    _this.beloop = json.beloop;
-                    _this.lifeTime = json.lifeTime;
-                    var jsonlayer = json.layers;
-                    for (var i = 0, len = jsonlayer.length; i < len; ++i) {
-                        var layer = new F14LayerData();
-                        layer.parse(jsonlayer[i], assetmgr, assetbundle);
-                        _this.layers.push(layer);
-                    }
-                });
+                this.beloop = json.beloop;
+                this.lifeTime = json.lifeTime;
+                var jsonlayer = json.layers;
+                for (var i = 0, len = jsonlayer.length; i < len; ++i) {
+                    var layer = new F14LayerData();
+                    layer.parse(jsonlayer[i], assetmgr, assetbundle);
+                    this.layers.push(layer);
+                }
             };
             return F14EffectData;
         }());
@@ -28943,7 +29015,7 @@ var gd3d;
         var renderList = (function () {
             function renderList() {
                 this.renderLayers = [];
-                var common = new renderLayer(true);
+                var common = new renderLayer(false);
                 var transparent = new renderLayer(true);
                 var overlay = new renderLayer(true);
                 this.renderLayers.push(common);
@@ -29042,6 +29114,8 @@ var gd3d;
                 this.renderLights.length = 0;
                 this.renderList.clear();
                 this.updateScene(this.rootNode, delta);
+                if (this.onLateUpdate)
+                    this.onLateUpdate(delta);
                 if (this.renderCameras.length > 1) {
                     this.renderCameras.sort(function (a, b) {
                         return a.order - b.order;
@@ -29511,14 +29585,15 @@ var gd3d;
         var gdPromise = (function () {
             function gdPromise(executor) {
                 var _this = this;
+                this.execQueue = new Array();
                 setTimeout(function () {
                     executor(_this.resolve.bind(_this), _this.reject.bind(_this));
                 }, 0);
             }
             gdPromise.prototype.resolve = function (value) {
                 try {
-                    if (this.thenCall)
-                        this.thenCall(value);
+                    while (this.execQueue.length > 0)
+                        this.execQueue.shift()(value);
                 }
                 catch (e) {
                     this.reject(e);
@@ -29530,11 +29605,12 @@ var gd3d;
                     return this.catchMethod(reason);
             };
             gdPromise.prototype.then = function (thenCall) {
-                this.thenCall = thenCall;
+                this.execQueue.push(thenCall);
                 return this;
             };
             gdPromise.prototype.catch = function (callbcack) {
                 this.catchMethod = callbcack;
+                return this;
             };
             return gdPromise;
         }());
