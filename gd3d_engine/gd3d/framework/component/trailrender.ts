@@ -94,9 +94,13 @@ namespace gd3d.framework
         update(delta: number)
         {
             if (!this.active) return;
+
+            if(!this.inited){
+                this.intidata();
+            }
             if (this.reInit)
             {
-                this.intidata();
+                this.reInitdata();
                 this.reInit = false;
             }
             var targetpos = this.gameObject.transform.getWorldTranslate();
@@ -300,6 +304,20 @@ namespace gd3d.framework
             //this.intidata();
         }
 
+        private reInitdata(){
+            if(!this.inited) return;
+
+            length = this.vertexcount / 2;
+            for (var i = 0; i < length; i++)
+            {
+                let sti = this.sticks[i];
+                gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), sti.location);
+                this.gameObject.transform.getUpInWorld(sti.updir);
+                gd3d.math.vec3ScaleByNum(sti.updir, this.width, sti.updir);
+            }
+        }
+
+        private inited = false;
         private intidata()
         {
             //用棍子去刷顶点
@@ -373,6 +391,8 @@ namespace gd3d.framework
             gd3d.math.pool.delete_vector3(pos);
             gd3d.math.pool.delete_vector3(uppos);
             gd3d.math.pool.delete_vector3(downpos);
+
+            this.inited = true;
         }
 
         private speed: number = 0.5;

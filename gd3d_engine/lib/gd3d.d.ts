@@ -2525,6 +2525,8 @@ declare namespace gd3d.framework {
         stop(): void;
         lookAtCamera: boolean;
         private initmesh();
+        private reInitdata();
+        private inited;
         private intidata();
         private speed;
         private updateTrailData();

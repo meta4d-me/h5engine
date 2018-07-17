@@ -15468,6 +15468,7 @@ var gd3d;
                 this.reInit = false;
                 this.extenedOneSide = true;
                 this.lookAtCamera = false;
+                this.inited = false;
                 this.speed = 0.5;
             }
             Object.defineProperty(trailRender.prototype, "renderLayer", {
@@ -15488,8 +15489,11 @@ var gd3d;
             trailRender.prototype.update = function (delta) {
                 if (!this.active)
                     return;
-                if (this.reInit) {
+                if (!this.inited) {
                     this.intidata();
+                }
+                if (this.reInit) {
+                    this.reInitdata();
                     this.reInit = false;
                 }
                 var targetpos = this.gameObject.transform.getWorldTranslate();
@@ -15597,6 +15601,17 @@ var gd3d;
                     this.mesh.submesh.push(sm);
                 }
             };
+            trailRender.prototype.reInitdata = function () {
+                if (!this.inited)
+                    return;
+                length = this.vertexcount / 2;
+                for (var i = 0; i < length; i++) {
+                    var sti = this.sticks[i];
+                    gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), sti.location);
+                    this.gameObject.transform.getUpInWorld(sti.updir);
+                    gd3d.math.vec3ScaleByNum(sti.updir, this.width, sti.updir);
+                }
+            };
             trailRender.prototype.intidata = function () {
                 this.sticks = [];
                 for (var i = 0; i < this.vertexcount / 2; i++) {
@@ -15652,6 +15667,7 @@ var gd3d;
                 gd3d.math.pool.delete_vector3(pos);
                 gd3d.math.pool.delete_vector3(uppos);
                 gd3d.math.pool.delete_vector3(downpos);
+                this.inited = true;
             };
             trailRender.prototype.updateTrailData = function () {
                 var length = this.vertexcount / 2;
