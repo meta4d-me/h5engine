@@ -2526,6 +2526,7 @@ declare namespace gd3d.framework {
         lookAtCamera: boolean;
         private initmesh();
         private reInitdata();
+        isAlphaGradual: boolean;
         private inited;
         private intidata();
         private speed;

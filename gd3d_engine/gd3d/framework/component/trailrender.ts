@@ -317,6 +317,8 @@ namespace gd3d.framework
             }
         }
 
+        //透明渐变
+        isAlphaGradual = false; 
         private inited = false;
         private intidata()
         {
@@ -349,16 +351,16 @@ namespace gd3d.framework
             var downpos = gd3d.math.pool.new_vector3();
             gd3d.math.vec3Subtract(pos, updir, downpos);
 
-
             for (var i = 0; i < length; i++)
             {
+                let tempA = this.isAlphaGradual ? (length - i -1)/length: 1;
                 this.dataForVbo[i * 2 * 9] = uppos.x;
                 this.dataForVbo[i * 2 * 9 + 1] = uppos.y;
                 this.dataForVbo[i * 2 * 9 + 2] = uppos.z;
                 this.dataForVbo[i * 2 * 9 + 3] = this.color.r;
                 this.dataForVbo[i * 2 * 9 + 4] = this.color.g;
                 this.dataForVbo[i * 2 * 9 + 5] = this.color.b;
-                this.dataForVbo[i * 2 * 9 + 6] = this.color.a;
+                this.dataForVbo[i * 2 * 9 + 6] = this.color.a * tempA;
                 this.dataForVbo[i * 2 * 9 + 7] = i / (length - 1);
                 this.dataForVbo[i * 2 * 9 + 8] = 0;
 
@@ -368,7 +370,7 @@ namespace gd3d.framework
                 this.dataForVbo[(i * 2 + 1) * 9 + 3] = this.color.r;
                 this.dataForVbo[(i * 2 + 1) * 9 + 4] = this.color.g;
                 this.dataForVbo[(i * 2 + 1) * 9 + 5] = this.color.b;
-                this.dataForVbo[(i * 2 + 1) * 9 + 6] = this.color.a;
+                this.dataForVbo[(i * 2 + 1) * 9 + 6] = this.color.a * tempA;
                 this.dataForVbo[(i * 2 + 1) * 9 + 7] = i / (length - 1);
                 this.dataForVbo[(i * 2 + 1) * 9 + 8] = 1;
 
