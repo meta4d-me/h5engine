@@ -1314,7 +1314,7 @@ var test_anim = (function () {
                         var ap = prefabObj.gameObject.getComponent("aniplayer");
                         document.onkeydown = function (ev) {
                         };
-                        var wingroot = prefabObj.find("Bip001 Xtra17Nub");
+                        var wingroot = prefabObj.find("Bip001 R Toe0");
                         if (wingroot) {
                             wingroot.gameObject.addComponent("asbone");
                             var trans = new gd3d.framework.transform();
@@ -2487,8 +2487,6 @@ var test_loadScene = (function () {
         var x2 = Math.sin(this.timer * 0.5);
         var z2 = Math.cos(this.timer * 0.5);
         var objCam = this.camera.gameObject.transform;
-        objCam.localTranslate = new gd3d.math.vector3(x2 * 10, 30, z2 * 10);
-        objCam.markDirty();
     };
     return test_loadScene;
 }());
@@ -3459,7 +3457,6 @@ var test_pick = (function () {
         mesh.mesh = (this.app.getAssetMgr().getDefaultMesh("cube"));
         var renderer = cube.gameObject.addComponent("meshRenderer");
         cube.gameObject.addComponent("boxcollider");
-        cube.markDirty();
         cuber = renderer;
         this.cube = cube;
         {
@@ -3535,6 +3532,7 @@ var test_pick = (function () {
         }
         this.timer += delta;
         this.cube3.localTranslate.x += delta;
+        this.cube3.localTranslate = this.cube3.localTranslate;
         this.cube3.markDirty();
         var x = Math.sin(this.timer);
         var z = Math.cos(this.timer);
@@ -4641,9 +4639,7 @@ var test_ShadowMap = (function () {
                         var assetmgr = _this.app.getAssetMgr();
                         _this.scene.addChild(_root);
                         _root.markDirty();
-                        _root.updateTran(false);
-                        _root.updateAABBChild();
-                        var _aabb = _root.aabbchild;
+                        var _aabb = _root.aabb;
                         console.log(_aabb.maximum + " : " + _aabb.minimum);
                         _this.FitToScene(_this.lightcamera, _aabb);
                         _this.ShowCameraInfo(_this.lightcamera);

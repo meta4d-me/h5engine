@@ -108,39 +108,41 @@ namespace gd3d.framework
 
         }
 
-        private aabbdirty: boolean = true;
+        // private aabbdirty: boolean = true;
 
-        /**
-        * @private
-        * @language zh_CN
-        * 标记aabb已修改
-        * @version egret-gd3d 1.0
-        */
-        markAABBDirty()
-        {
-            this.aabbdirty = true;
-            this.markAABBChildDirty();//自己AABB变化了 整体的AABB（即包含所有子节点的AABB）肯定也需要改变
+        // /**
+        // * @private
+        // * @language zh_CN
+        // * 标记aabb已修改
+        // * @version egret-gd3d 1.0
+        // */
+        // markAABBDirty()
+        // {
+        //     this.aabbdirty = true;
+        //     this.markAABBChildDirty();//自己AABB变化了 整体的AABB（即包含所有子节点的AABB）肯定也需要改变
 
-            //自己的AABB变化了 ，包含自己节点的总AABB也需要改变
-            var p = this._parent;
-            while (p != null)
-            {
-                p.markAABBChildDirty();
-                p = p._parent;
-            }
-        }
+        //     //自己的AABB变化了 ，包含自己节点的总AABB也需要改变
+        //     var p = this._parent;
+        //     while (p != null)
+        //     {
+        //         p.markAABBChildDirty();
+        //         p = p._parent;
+        //     }
+        // }
 
-        private aabbchilddirty: boolean = true;
-        /**
-        * @private
-        * @language zh_CN
-        * 标记aabb集合已修改
-        * @version egret-gd3d 1.0
-        */
-        markAABBChildDirty()
-        {
-            this.aabbchilddirty = true;
-        }
+        // private aabbchilddirty: boolean = true;
+        // /**
+        // * @private
+        // * @language zh_CN
+        // * 标记aabb集合已修改
+        // * @version egret-gd3d 1.0
+        // */
+        // markAABBChildDirty()
+        // {
+        //     this.aabbchilddirty = true;
+        // }
+
+        private _dirtyAABB: boolean = true;
 
         private _aabb: aabb;
         /**
@@ -151,26 +153,35 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         get aabb(){
-            if (this.aabbdirty)   //没考虑 aabb 阶段 改
-            {
-                //transform里只更新自己的aabb
-                this.caclAABB();
-                this.aabbdirty = false;
+            // if (this.aabbdirty)   //没考虑 aabb 阶段 改
+            // {
+            //     //transform里只更新自己的aabb
+            //     this.caclAABB();
+            //     this.aabbdirty = false;
+            // }
+            // return this._aabb;
+
+            if (!this._aabb) {
+                this._aabb = this._buildAABB();
+            }
+            if(this._dirtyAABB) {
+                this._aabb.update(this.getWorldMatrix());
+                this._dirtyAABB = false;
             }
             return this._aabb;
         }
 
-        private _aabbchild: aabb=new gd3d.framework.aabb(math.pool.vector3_zero,math.pool.vector3_zero);
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 包含自己和所有子物体的aabb
-         * @version egret-gd3d 1.0
-         */
-        get aabbchild(){
-            return this._aabbchild;
-        }
+        // private _aabbchild: aabb=new gd3d.framework.aabb(math.pool.vector3_zero,math.pool.vector3_zero);
+        // /**
+        //  * @public
+        //  * @language zh_CN
+        //  * @classdesc
+        //  * 包含自己和所有子物体的aabb
+        //  * @version egret-gd3d 1.0
+        //  */
+        // get aabbchild(){
+        //     return this._aabbchild;
+        // }
 
         /**
         * @private
@@ -178,38 +189,38 @@ namespace gd3d.framework
         * 计算aabb
         * @version egret-gd3d 1.0
         */
-        caclAABB()
-        {
-            if (this.gameObject.components == null) return;
-            if (this._aabb == null)
-            {
-                this._aabb = this.buildAABB();
-                //this.aabbchild = this.aabb.clone();
-                this._aabb.cloneTo(this._aabbchild);
-            }
-            this._aabb.update(this.worldMatrix);
-        }
+        // caclAABB()
+        // {
+        //     if (this.gameObject.components == null) return;
+        //     if (this._aabb == null)
+        //     {
+        //         this._aabb = this.buildAABB();
+        //         //this.aabbchild = this.aabb.clone();
+        //         this._aabb.cloneTo(this._aabbchild);
+        //     }
+        //     this._aabb.update(this.worldMatrix);
+        // }
 
-        /**
-        * @private
-        * @language zh_CN
-        * 计算aabb集合
-        * @version egret-gd3d 1.0
-        */
-        caclAABBChild()
-        {
-            if (this._aabb == null) return;
-            //this.aabbchild = this.aabb.clone();
-            this._aabb.cloneTo(this._aabbchild);
+        // /**
+        // * @private
+        // * @language zh_CN
+        // * 计算aabb集合
+        // * @version egret-gd3d 1.0
+        // */
+        // caclAABBChild()
+        // {
+        //     if (this._aabb == null) return;
+        //     //this.aabbchild = this.aabb.clone();
+        //     this._aabb.cloneTo(this._aabbchild);
             
-            if (this._children != null)
-            {
-                for (var i = 0; i < this._children.length; i++)
-                {
-                    this._aabbchild.addAABB(this._children[i]._aabbchild);
-                }
-            }
-        }
+        //     if (this._children != null)
+        //     {
+        //         for (var i = 0; i < this._children.length; i++)
+        //         {
+        //             this._aabbchild.addAABB(this._children[i]._aabbchild);
+        //         }
+        //     }
+        // }
 
         /**
         * @private
@@ -217,7 +228,7 @@ namespace gd3d.framework
         * 构建aabb
         * @version egret-gd3d 1.0
         */
-        buildAABB(): aabb  
+        private _buildAABB(): aabb  
         {
             var minimum = new math.vector3();
             var maximum = new math.vector3();
@@ -478,7 +489,8 @@ namespace gd3d.framework
             }
 
             //----------------------------------------
-            this.markAABBDirty(); //下阶段修改
+            //this.markAABBDirty(); //下阶段修改
+            this._dirtyAABB = true;
         }
 
         //同步自己的 W 、L 矩阵
@@ -538,28 +550,29 @@ namespace gd3d.framework
                 p = p._parent;
             }
         }
-        /**
-        * @private
-        * @language zh_CN
-        * @classdesc
-        * 刷新自己的aabb集合
-        * @version egret-gd3d 1.0
-        */
-        updateAABBChild()
-        {
-            if (this.aabbchilddirty)
-            {
-                if (this._children != null)
-                {
-                    for (var i = 0; i < this._children.length; i++)
-                    {
-                        this._children[i].updateAABBChild();
-                    }
-                }
-                this.caclAABBChild();
-                this.aabbchilddirty = false;
-            }
-        }
+
+        // /**
+        // * @private
+        // * @language zh_CN
+        // * @classdesc
+        // * 刷新自己的aabb集合
+        // * @version egret-gd3d 1.0
+        // */
+        // updateAABBChild()
+        // {
+        //     if (this.aabbchilddirty)
+        //     {
+        //         if (this._children != null)
+        //         {
+        //             for (var i = 0; i < this._children.length; i++)
+        //             {
+        //                 this._children[i].updateAABBChild();
+        //             }
+        //         }
+        //         this.caclAABBChild();
+        //         this.aabbchilddirty = false;
+        //     }
+        // }
 
         public hasComponent: boolean = false; //自己是否有组件
         public hasComponentChild: boolean = false;  //子对象是否有组件

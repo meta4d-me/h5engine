@@ -29,9 +29,9 @@ class test_ShadowMap implements IState
                             // this.scene.getRoot().markDirty();
                             _root.markDirty();
                             //_root.updateTran(false);
-                            _root.updateAABBChild();
+                            //_root.updateAABBChild();
 
-                            let _aabb = _root.aabbchild;
+                            let _aabb = _root.aabb;
                             console.log(_aabb.maximum + " : " + _aabb.minimum);
                             this.FitToScene(this.lightcamera,_aabb);
                             this.ShowCameraInfo(this.lightcamera);
