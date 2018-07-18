@@ -94,9 +94,13 @@ namespace gd3d.framework
         update(delta: number)
         {
             if (!this.active) return;
+
+            if(!this.inited){
+                this.intidata();
+            }
             if (this.reInit)
             {
-                this.intidata();
+                this.reInitdata();
                 this.reInit = false;
             }
             var targetpos = this.gameObject.transform.getWorldTranslate();
@@ -300,6 +304,22 @@ namespace gd3d.framework
             //this.intidata();
         }
 
+        private reInitdata(){
+            if(!this.inited) return;
+
+            length = this.vertexcount / 2;
+            for (var i = 0; i < length; i++)
+            {
+                let sti = this.sticks[i];
+                gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), sti.location);
+                this.gameObject.transform.getUpInWorld(sti.updir);
+                gd3d.math.vec3ScaleByNum(sti.updir, this.width, sti.updir);
+            }
+        }
+
+        //透明渐变
+        isAlphaGradual = false; 
+        private inited = false;
         private intidata()
         {
             //用棍子去刷顶点
@@ -331,16 +351,16 @@ namespace gd3d.framework
             var downpos = gd3d.math.pool.new_vector3();
             gd3d.math.vec3Subtract(pos, updir, downpos);
 
-
             for (var i = 0; i < length; i++)
             {
+                let tempA = this.isAlphaGradual ? (length - i -1)/length: 1;
                 this.dataForVbo[i * 2 * 9] = uppos.x;
                 this.dataForVbo[i * 2 * 9 + 1] = uppos.y;
                 this.dataForVbo[i * 2 * 9 + 2] = uppos.z;
                 this.dataForVbo[i * 2 * 9 + 3] = this.color.r;
                 this.dataForVbo[i * 2 * 9 + 4] = this.color.g;
                 this.dataForVbo[i * 2 * 9 + 5] = this.color.b;
-                this.dataForVbo[i * 2 * 9 + 6] = this.color.a;
+                this.dataForVbo[i * 2 * 9 + 6] = this.color.a * tempA;
                 this.dataForVbo[i * 2 * 9 + 7] = i / (length - 1);
                 this.dataForVbo[i * 2 * 9 + 8] = 0;
 
@@ -350,7 +370,7 @@ namespace gd3d.framework
                 this.dataForVbo[(i * 2 + 1) * 9 + 3] = this.color.r;
                 this.dataForVbo[(i * 2 + 1) * 9 + 4] = this.color.g;
                 this.dataForVbo[(i * 2 + 1) * 9 + 5] = this.color.b;
-                this.dataForVbo[(i * 2 + 1) * 9 + 6] = this.color.a;
+                this.dataForVbo[(i * 2 + 1) * 9 + 6] = this.color.a * tempA;
                 this.dataForVbo[(i * 2 + 1) * 9 + 7] = i / (length - 1);
                 this.dataForVbo[(i * 2 + 1) * 9 + 8] = 1;
 
@@ -373,6 +393,8 @@ namespace gd3d.framework
             gd3d.math.pool.delete_vector3(pos);
             gd3d.math.pool.delete_vector3(uppos);
             gd3d.math.pool.delete_vector3(downpos);
+
+            this.inited = true;
         }
 
         private speed: number = 0.5;

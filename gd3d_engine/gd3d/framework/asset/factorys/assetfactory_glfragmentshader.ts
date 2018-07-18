@@ -7,23 +7,27 @@ namespace gd3d.framework
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset)
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void)
         {
             let filename = getFileName(url);
             let name = filename.substring(0, filename.indexOf("."));
 
             state.resstate[filename] = new ResourceState();
-            gd3d.io.loadText(url, (txt, err) =>
+            gd3d.io.loadText(url, (txt, err, isloadFail) =>
             {
-                if (AssetFactoryTools.catchError(err, onstate, state))
-                    return;
+                call(() =>
+                {
+                    state.isloadFail = isloadFail ? true : false;
+                    if (AssetFactoryTools.catchError(err, onstate, state))
+                        return;
 
-                state.resstate[filename].state = 1;//完成
+                    state.resstate[filename].state = 1;//完成
 
-                state.logs.push("load a glshader:" + filename);
-                assetMgr.shaderPool.mapFSString[name]=txt;
-                // assetMgr.shaderPool.compileFS(assetMgr.webgl, name, txt);
-                onstate(state);
+                    state.logs.push("load a glshader:" + filename);
+                    assetMgr.shaderPool.mapFSString[name] = txt;
+                    // assetMgr.shaderPool.compileFS(assetMgr.webgl, name, txt);
+                    onstate(state);
+                });
             },
                 (loadedLength, totalLength) =>
                 {
@@ -31,20 +35,23 @@ namespace gd3d.framework
                 });
         }
 
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void)
         {
-            let filename = getFileName(url);
-            let name = filename.substring(0, filename.indexOf("."));
+            call(() =>
+            {
+                let filename = getFileName(url);
+                let name = filename.substring(0, filename.indexOf("."));
 
-            state.resstate[filename] = new ResourceState();
-            let txt = respack[filename];
-            txt = decodeURI(txt);
-            state.resstate[filename].state = 1;//完成
+                state.resstate[filename] = new ResourceState();
+                let txt = respack[filename];
+                txt = decodeURI(txt);
+                state.resstate[filename].state = 1;//完成
 
-            state.logs.push("load a glshader:" + filename);
-            assetMgr.shaderPool.mapFSString[name]=txt;
-            //assetMgr.shaderPool.compileFS(assetMgr.webgl, name, txt);
-            onstate(state);
+                state.logs.push("load a glshader:" + filename);
+                assetMgr.shaderPool.mapFSString[name] = txt;
+                //assetMgr.shaderPool.compileFS(assetMgr.webgl, name, txt);
+                onstate(state);
+            });
         }
     }
 }

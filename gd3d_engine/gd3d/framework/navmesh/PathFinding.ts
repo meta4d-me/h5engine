@@ -173,9 +173,12 @@ namespace gd3d.framework {
             if (polyPath.length == 0 || startPos == null || endPos == null) {
                 return null;
             }
-
+            let lastPoint:navVec3=startPos;
+            let groupborder:navBorder[]=[];
             // 保证从起点到终点的顺序
             var triPathList: number[] = polyPath.reverse();
+            startPos.realy=startPos.y;
+            endPos.realy=endPos.y;
             wayPoints.push(startPos);
 
             var ipoly: number = 0;//从第0个poly 开始检查
@@ -186,6 +189,7 @@ namespace gd3d.framework {
             var breakDir: number = 0;
             var posLeft: navVec3 = null;
             var posRight: navVec3 = null;
+            // let center:navVec3=null;
             var posNow: navVec3 = startPos.clone();
 
             for (var c: number = 0; c < 100; c++)//最多循环100次
@@ -292,11 +296,15 @@ namespace gd3d.framework {
                                 dirLeft = ndirLeft;
                                 posLeft = pointA;
                                 ipolyLeft = i;
+
+                                //groupborder.push(border);
                             }
                             if (aLR > 0.0 && aRR < 0.0) {
                                 dirRight = ndirRight;
                                 posRight = pointB;
                                 ipolyRight = i;
+
+                                //groupborder.push(border);
                             }
                         }
 
@@ -308,11 +316,40 @@ namespace gd3d.framework {
                 }
                 else {
                     if (breakDir == -1) {
+                        // for(let key in groupborder)
+                        // {
+                        //     let bor=groupborder[key];
+                        //     let point=this.intersectBorder(info.vecs[bor.pointA],info.vecs[bor.pointB],posLeft,lastPoint);
+                        //     if(point)
+                        //     {
+                        //         point.realy=point.y;
+                        //         wayPoints.push(point);
+                        //     }
+                        // }
+                        // lastPoint=posLeft;
+                        // groupborder=[];
+
+
+
                         wayPoints.push(posLeft.clone());
                         posNow = posLeft;
                         ipoly = ipolyLeft;
+
                     }
                     else {
+                        // for(let key in groupborder)
+                        // {
+                        //     let bor=groupborder[key];
+                        //     let point=this.intersectBorder(info.vecs[bor.pointA],info.vecs[bor.pointB],posLeft,lastPoint);
+                        //     if(point)
+                        //     {
+                        //         point.realy=point.y;
+                        //         wayPoints.push(point);
+                        //     }
+                        // }
+                        // lastPoint=posLeft;
+                        // groupborder=[];
+
                         wayPoints.push(posRight.clone());
                         posNow = posRight;
                         ipoly = ipolyRight;
@@ -326,6 +363,53 @@ namespace gd3d.framework {
             wayPoints.push(endPos);
 
             return wayPoints;
+        }
+
+        static intersectBorder(a:navVec3, b:navVec3, c:navVec3, d:navVec3):navVec3{  
+
+            //线段ab的法线N1  
+            var nx1 = (b.z - a.z), ny1 = (a.x - b.x);  
+         
+            //线段cd的法线N2  
+            var nx2 = (d.z - c.z), ny2 = (c.x - d.x);  
+         
+            //两条法线做叉乘, 如果结果为0, 说明线段ab和线段cd平行或共线,不相交  
+            var denominator = nx1*ny2 - ny1*nx2;  
+            if (denominator==0) {  
+                return null;  
+            }  
+         
+            //在法线N2上的投影  
+            var distC_N2=nx2 * c.x + ny2 * c.z;  
+            var distA_N2=nx2 * a.x + ny2 * a.z-distC_N2;  
+            var distB_N2=nx2 * b.x + ny2 * b.z-distC_N2;  
+         
+            // 点a投影和点b投影在点c投影同侧 (对点在线段上的情况,本例当作不相交处理);  
+            if ( distA_N2*distB_N2>=0  ) {  
+                return null;  
+            }  
+         
+            //  
+            //判断点c点d 和线段ab的关系, 原理同上  
+            //  
+            //在法线N1上的投影  
+            var distA_N1=nx1 * a.x + ny1 * a.z;  
+            var distC_N1=nx1 * c.x + ny1 * c.z-distA_N1;  
+            var distD_N1=nx1 * d.x + ny1 * d.z-distA_N1;  
+            if ( distC_N1*distD_N1>=0  ) {  
+                return null;  
+            }  
+         
+            //计算交点坐标  
+            var fraction= distA_N2 / denominator;  
+            var dx= fraction * ny1,  
+                dz= -fraction * nx1;
+            
+            let newpoint=new navVec3();
+
+            navVec3.lerp(a,b,-fraction,newpoint);
+            return newpoint;
+            //return { x: a.x + dx , y: a.z + dz };  
         }
 
     }

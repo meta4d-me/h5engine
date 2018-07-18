@@ -7,21 +7,25 @@ namespace gd3d.framework
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: font)
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: font, call: (handle: () => void) => void)
         {
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
             gd3d.io.loadText(url,
-                (txt, err) =>
+                (txt, err, isloadFail) =>
                 {
-                    if (AssetFactoryTools.catchError(err, onstate, state))
-                        return;
+                    call(() =>
+                    {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (AssetFactoryTools.catchError(err, onstate, state))
+                            return;
 
-                    let _font = asset ? asset : new font(filename);
-                    _font.Parse(txt, assetMgr);
+                        let _font = asset ? asset : new font(filename);
+                        _font.Parse(txt, assetMgr);
 
-                    AssetFactoryTools.useAsset(assetMgr, onstate, state, _font, url);
+                        AssetFactoryTools.useAsset(assetMgr, onstate, state, _font, url);
+                    });
                 },
                 (loadedLength, totalLength) =>
                 {
@@ -29,16 +33,19 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: font)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: font, call: (handle: () => void) => void)
         {
-            let filename = getFileName(url);
+            call(() =>
+            {
+                let filename = getFileName(url);
 
-            state.resstate[filename] = new ResourceState();
-            let txt = respack[filename];
-            let _font = asset ? asset : new font(filename);
-            _font.Parse(txt, assetMgr);
+                state.resstate[filename] = new ResourceState();
+                let txt = respack[filename];
+                let _font = asset ? asset : new font(filename);
+                _font.Parse(txt, assetMgr);
 
-            AssetFactoryTools.useAsset(assetMgr, onstate, state, _font, url);
+                AssetFactoryTools.useAsset(assetMgr, onstate, state, _font, url);
+            });
         }
     }
 }

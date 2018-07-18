@@ -55,7 +55,7 @@ namespace demo
             if(this.count * this.count > this.all){
                 this.tryadd();
             }else{
-                console.error(` 所有 trans 加載完畢  new  `);
+                console.error(` 所有 trans 加載完畢  old  `);
             }
 
             let c =0;
@@ -79,7 +79,7 @@ namespace demo
             cube.setWorldPosition(temp);
             cube.localEulerAngles.x = Math.random()  * 10;
             cube.localEulerAngles = cube.localEulerAngles;
-            cube.setWorldRotate(cube.getWorldRotate());
+            cube.getWorldRotate();
             cube.markDirty();
             
         }

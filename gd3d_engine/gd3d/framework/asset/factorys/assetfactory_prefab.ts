@@ -7,24 +7,30 @@ namespace gd3d.framework
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: prefab)
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: prefab, call: (handle: () => void) => void)
         {
             let bundlename = getFileName(state.url);
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
-            gd3d.io.loadText(url, (txt, err) =>
+            gd3d.io.loadText(url, (txt, err, isloadFail) =>
             {
-                if (AssetFactoryTools.catchError(err, onstate, state))
-                    return;
-
-                let _prefab = asset ? asset : new prefab(filename);
-                _prefab.assetbundle = bundlename;
-                _prefab.Parse(txt, assetMgr);
-                _prefab.Parse(txt, assetMgr).then(() =>
+                call(() =>
                 {
+                    state.isloadFail = isloadFail ? true : false;
+                    if (AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+
+                    let _prefab = asset ? asset : new prefab(filename);
+                    _prefab.assetbundle = bundlename;
+                    _prefab.Parse(txt, assetMgr);                  
                     AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+                    // _prefab.Parse(txt, assetMgr).then(() =>
+                    // {
+                    //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+                    // });
                 });
+
 
                 // AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
             },
@@ -34,22 +40,25 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: prefab)
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: prefab, call: (handle: () => void) => void)
         {
-            let bundlename = getFileName(state.url);
-            let filename = getFileName(url);
-
-            state.resstate[filename] = new ResourceState();
-            let txt = respack[filename];
-            let _prefab = asset ? asset : new prefab(filename);
-            _prefab.assetbundle = bundlename;
-
-            _prefab.Parse(txt, assetMgr).then(() =>
+            call(() =>
             {
+                let bundlename = getFileName(state.url);
+                let filename = getFileName(url);
+
+                state.resstate[filename] = new ResourceState();
+                let txt = respack[filename];
+                let _prefab = asset ? asset : new prefab(filename);
+                _prefab.assetbundle = bundlename;
+
+                // _prefab.Parse(txt, assetMgr).then(() =>
+                // {
+                //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+                // });
+                _prefab.Parse(txt, assetMgr);
                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
             });
-            // _prefab.Parse(txt, assetMgr);
-            // AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
         }
     }
 }

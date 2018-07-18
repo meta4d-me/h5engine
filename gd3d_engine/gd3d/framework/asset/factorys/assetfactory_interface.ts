@@ -3,8 +3,8 @@ namespace gd3d.framework
     export interface IAssetFactory
     {
         newAsset(assetName?: string): IAsset;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: IAsset): void;
-        loadByPack(respack:any, url: string, onstate: (state: stateLoad) => void, state: stateLoad,assetMgr: assetMgr, asset?: IAsset):void;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
     }
 
     export class AssetFactoryTools
@@ -24,7 +24,7 @@ namespace gd3d.framework
         static useAsset(assetMgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad, asset: IAsset, url: string)
         {
             let fileName = getFileName(url);
-            
+
             assetMgr.setAssetUrl(asset, url);
             assetMgr.use(asset);
             state.resstate[fileName].state = 1;
@@ -32,7 +32,7 @@ namespace gd3d.framework
             onstate(state);
         }
 
-        static onProgress(loadedLength: number, totalLength: number, onstate: (state: stateLoad) => void, state: stateLoad,filename:string)
+        static onProgress(loadedLength: number, totalLength: number, onstate: (state: stateLoad) => void, state: stateLoad, filename: string)
         {
             state.resstate[filename].loadedLength = loadedLength;
             // state.resstate[filename].totalLength = totalLength;
@@ -40,7 +40,7 @@ namespace gd3d.framework
             onstate(state);
         }
 
-        static onRefProgress(loadedLength: number, totalLength: number, onstate: (state: stateLoad) => void, state: stateLoad,filename:string)
+        static onRefProgress(loadedLength: number, totalLength: number, onstate: (state: stateLoad) => void, state: stateLoad, filename: string)
         {
             let _restate = state.resstate[filename] as RefResourceState;
             _restate.refLoadedLength = loadedLength;

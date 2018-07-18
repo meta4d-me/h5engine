@@ -88,10 +88,10 @@ class test_multipleplayer_anim implements IState
         cacheOpenCheckBox.checked = false;
         cacheOpenCheckBox.onchange = () =>
         {
-            for(let key in this.aniplayers)
-            {
-                this.aniplayers[key].isCache = cacheOpenCheckBox.checked;
-            }
+            // for(let key in this.aniplayers)
+            // {
+            //     this.aniplayers[key].isCache = cacheOpenCheckBox.checked;
+            // }
         }
         cacheOpenCheckBox.style.top = "350px";
         cacheOpenCheckBox.style.position = "absolute";

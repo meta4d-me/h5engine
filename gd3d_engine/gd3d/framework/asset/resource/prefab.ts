@@ -21,7 +21,7 @@
          */
         defaultAsset: boolean = false;
 
-       
+
         constructor(assetName: string = null)
         {
             if (!assetName)
@@ -117,6 +117,7 @@
          */
         getCloneTrans(): transform 
         {
+         
             let temp = io.cloneObj(this.trans);
             if (temp instanceof transform)
                 return temp;
@@ -131,6 +132,7 @@
          */
         getCloneTrans2D(): transform2D 
         {
+            
             let temp = io.cloneObj(this.trans);
             if (temp instanceof transform2D)
                 return temp;
@@ -167,21 +169,21 @@
          */
         Parse(jsonStr: string, assetmgr: assetMgr)
         {
-           return new threading.gdPromise((resolve) =>
+            //    return new threading.gdPromise((resolve) =>
+            //     {
+            this.jsonstr = jsonStr;
+            let jsonObj = JSON.parse(jsonStr);
+            let type = jsonObj["type"];
+            switch (type)
             {
-                this.jsonstr = jsonStr;
-                let jsonObj = JSON.parse(jsonStr);
-                let type = jsonObj["type"];
-                switch (type)
-                {
-                    case "transform": this.trans = new transform; break;
-                    case "transform2D": this.trans = new transform2D; break;
-                }
+                case "transform": this.trans = new transform; break;
+                case "transform2D": this.trans = new transform2D; break;
+            }
 
-                if (type != null)
-                    io.deSerialize(jsonObj, this.trans, assetmgr, this.assetbundle);
-                resolve();
-            });
+            if (type != null)
+                io.deSerialize(jsonObj, this.trans, assetmgr, this.assetbundle);
+            //     resolve();
+            // });
         }
     }
 }

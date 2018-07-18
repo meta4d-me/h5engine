@@ -61,15 +61,15 @@ class dome_loadaniplayer implements IState {
 
     private loadSkill(name: string) {
         this.assetmgr.load(`res/prefabs/roles/${this.roleName}/Resources/${name}`, gd3d.framework.AssetTypeEnum.Auto, (s) => {
-            if (s.isfinish) {
-                let skill = this.assetmgr.getAssetByName(name) as gd3d.framework.animationClip;
-                //在aniplayer控件的 clipnames 中找到动作名为name动作的id
-                let j = this.ani.clipnames[name];
-                if (j != null) {
-                    //把动作的索引付给clips中与name对应的id中
-                    this.ani.clips[j] = skill;
-                }
-            }
+            // if (s.isfinish) {
+            //     let skill = this.assetmgr.getAssetByName(name) as gd3d.framework.animationClip;
+            //     //在aniplayer控件的 clipnames 中找到动作名为name动作的id
+            //     let j = this.ani.clipnames[name];
+            //     if (j != null) {
+            //         //把动作的索引付给clips中与name对应的id中
+            //         this.ani.clips[j] = skill;
+            //     }
+            // }
         });
     }
 
@@ -156,7 +156,7 @@ class dome_loadaniplayer implements IState {
 
         play.onclick = () => {
             this.ani.stop();
-            this.ani.play(this.skillName, speed);
+            // this.ani.play(this.skillName, speed);
         }
 
         stop.onclick = () => {

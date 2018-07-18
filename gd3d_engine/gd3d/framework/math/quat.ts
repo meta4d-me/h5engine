@@ -191,6 +191,7 @@
         out.z *= len;
     }
 
+
     export function quatFromAxisAngle(axis: vector3, angle: number, out: quaternion) {
         angle *= Math.PI / 180.0;
         var halfAngle: number = angle * 0.5;

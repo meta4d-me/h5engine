@@ -132,6 +132,5 @@ namespace gd3d.framework
         {
             this._realName = name;
         }
-        
     }
 }

@@ -45,35 +45,35 @@ class test_loadprefab implements IState
     }
     refreshAniclip(tran:gd3d.framework.transform, name:string)
     {
-        let anipalyer = tran.gameObject.getComponentsInChildren("aniplayer") as gd3d.framework.aniplayer[];
-        for(let i=0; i<anipalyer.length; i++)
-        {
-            for (let key in anipalyer[i].clipnames){
-                let j = anipalyer[i].clipnames[key];
-                let v = anipalyer[i].clips[j]
-                let clip = this.app.getAssetMgr().getAssetByName("gs_chuangjue_01_" + v.getName()) as gd3d.framework.animationClip;
-                if (clip){
-                    anipalyer[i].clips[j] = clip;
-                    if (anipalyer[i].clipnames[clip.getName()]){
+        // let anipalyer = tran.gameObject.getComponentsInChildren("aniplayer") as gd3d.framework.aniplayer[];
+        // for(let i=0; i<anipalyer.length; i++)
+        // {
+        //     for (let key in anipalyer[i].clipnames){
+        //         let j = anipalyer[i].clipnames[key];
+        //         let v = anipalyer[i].clips[j]
+        //         let clip = this.app.getAssetMgr().getAssetByName("gs_chuangjue_01_" + v.getName()) as gd3d.framework.animationClip;
+        //         if (clip){
+        //             anipalyer[i].clips[j] = clip;
+        //             if (anipalyer[i].clipnames[clip.getName()]){
 
-                    }else{
-                        anipalyer[i].clipnames[clip.getName()] = j;
-                    }
-                }                
-            }
-            // for(let j=0; j<anipalyer[i].clips.length; j++)
-            // {
-            //     let v = anipalyer[i].clips[j];
+        //             }else{
+        //                 anipalyer[i].clipnames[clip.getName()] = j;
+        //             }
+        //         }                
+        //     }
+        //     // for(let j=0; j<anipalyer[i].clips.length; j++)
+        //     // {
+        //     //     let v = anipalyer[i].clips[j];
                 
-            //     let clip = this.app.getAssetMgr().getAssetByName(v.getName()) as gd3d.framework.animationClip;
-            //     if (clip){
-            //         anipalyer[i].clips[j] = clip;
-            //     }
-            // }
-            anipalyer[i].playCross(name,0.2);      
+        //     //     let clip = this.app.getAssetMgr().getAssetByName(v.getName()) as gd3d.framework.animationClip;
+        //     //     if (clip){
+        //     //         anipalyer[i].clips[j] = clip;
+        //     //     }
+        //     // }
+        //     anipalyer[i].playCross(name,0.2);      
             
-            anipalyer[i].playCross("gs_chuangjue_01_" + name,0.2); 
-        }
+        //     anipalyer[i].playCross("gs_chuangjue_01_" + name,0.2); 
+        // }
     }
     start(app: gd3d.framework.application)
     {

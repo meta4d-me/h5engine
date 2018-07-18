@@ -7,20 +7,24 @@ namespace gd3d.framework
             return null;
         }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset?: keyFrameAniClip)
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: keyFrameAniClip, call: (handle: () => void) => void)
         {
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
             gd3d.io.loadText(url,
-                (text, err) =>
+                (text, err, isloadFail) =>
                 {
-                    if (AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    let _clip = asset ? asset : new keyFrameAniClip(filename);
-                    _clip.Parse(text);
+                    call(() =>
+                    {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        let _clip = asset ? asset : new keyFrameAniClip(filename);
+                        _clip.Parse(text);
 
-                    AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                        AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                    });
                 },
                 (loadedLength, totalLength) =>
                 {
@@ -28,9 +32,11 @@ namespace gd3d.framework
                 })
         }
 
-        loadByPack(respack, url: string, onstate: (state: stateLoad) => void, state: stateLoad,assetMgr: assetMgr,asset?: keyFrameAniClip)
+        loadByPack(respack, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: keyFrameAniClip, call: (handle: () => void) => void)
         {
-            let filename = getFileName(url);
+            call(() =>
+            {
+                let filename = getFileName(url);
 
                 state.resstate[filename] = new ResourceState();
                 let _buffer = respack[filename];
@@ -38,6 +44,7 @@ namespace gd3d.framework
                 _clip.Parse(_buffer);
 
                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+            });
         }
     }
 }

@@ -149,6 +149,8 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         fog: Fog;
+
+        onLateUpdate:(delta:number)=>any;
         /**
          * @public
          * @language zh_CN
@@ -170,11 +172,12 @@ namespace gd3d.framework
             this.renderLights.length = 0;
             this.renderList.clear();
 
-            aniplayer.playerCaches = [];
+            // aniplayer.playerCaches = [];
 
             //递归的更新与填充渲染列表
             this.updateScene(this.rootNode, delta);
-
+            if(this.onLateUpdate)
+                this.onLateUpdate(delta);
 
             //排序
             //排序camera 并绘制
@@ -343,17 +346,11 @@ namespace gd3d.framework
             });
         }
 
-        private hasPlayed = false;
-        private playDirty = false;
-
         private updateScene(node: transform, delta)
         {
             if (this.app.bePlay)
             {
-                if (!this.hasPlayed) this.playDirty = true;
                 this.objupdate(node, delta);
-                this.playDirty = false;
-                this.hasPlayed = true;
             }
             else
             {
@@ -388,7 +385,7 @@ namespace gd3d.framework
         {
             if (node.hasComponent == false && node.hasComponentChild == false)
                 return;
-            node.gameObject.init(this.playDirty);//组件还未初始化的初始化
+            node.gameObject.init(this.app.bePlay);//组件还未初始化的初始化
             if (node.gameObject.components.length > 0)
             {
                 node.gameObject.update(delta);

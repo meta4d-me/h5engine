@@ -1183,8 +1183,6 @@ var gd3d;
         var canvas = (function () {
             function canvas() {
                 this.is2dUI = true;
-                this.hasPlayed = false;
-                this.playDirty = false;
                 this.pointDown = false;
                 this.pointSelect = null;
                 this.pointEvent = new framework.PointEvent();
@@ -1262,15 +1260,11 @@ var gd3d;
                     }
                 }
                 if (this.scene.app.bePlay) {
-                    if (!this.hasPlayed)
-                        this.playDirty = true;
                     this.objupdate(this.rootNode, delta);
-                    this.playDirty = false;
-                    this.hasPlayed = true;
                 }
             };
             canvas.prototype.objupdate = function (node, delta) {
-                node.init(this.playDirty);
+                node.init(this.scene.app.bePlay);
                 if (node.components.length > 0) {
                     node.update(delta);
                 }
@@ -2570,6 +2564,7 @@ var gd3d;
                 this.worldScale = new gd3d.math.vector2(1, 1);
                 this.components = [];
                 this.componentsInit = [];
+                this.componentplayed = [];
                 this.optionArr = [layoutOption.LEFT, layoutOption.TOP, layoutOption.RIGHT, layoutOption.BOTTOM, layoutOption.H_CENTER, layoutOption.V_CENTER];
                 this._layoutState = 0;
                 this.layoutValueMap = {};
@@ -2906,16 +2901,24 @@ var gd3d;
                     this.components[i].comp.update(delta);
                 }
             };
-            transform2D.prototype.init = function (onPlay) {
-                if (onPlay === void 0) { onPlay = false; }
+            transform2D.prototype.init = function (bePlayed) {
+                if (bePlayed === void 0) { bePlayed = false; }
                 if (this.componentsInit.length > 0) {
                     for (var i = 0; i < this.componentsInit.length; i++) {
                         this.componentsInit[i].comp.start();
                         this.componentsInit[i].init = true;
-                        if (onPlay)
+                        if (bePlayed)
                             this.componentsInit[i].comp.onPlay();
+                        else
+                            this.componentplayed.push(this.componentsInit[i]);
                     }
                     this.componentsInit.length = 0;
+                }
+                if (this.componentplayed.length > 0 && bePlayed) {
+                    this.componentplayed.forEach(function (item) {
+                        item.comp.onPlay();
+                    });
+                    this.componentplayed.length = 0;
                 }
             };
             transform2D.prototype.addComponent = function (type) {
@@ -5799,6 +5802,387 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var assetBundle = (function () {
+            function assetBundle(url) {
+                this.files = [];
+                this.packages = [];
+                this.bundlePackBin = {};
+                this.totalLength = 0;
+                this.loadLightMap = true;
+                this.mapNamed = {};
+                this.url = url;
+                var i = url.lastIndexOf("/");
+                this.path = url.substring(0, i);
+                this.assetmgr = gd3d.framework.sceneMgr.app.getAssetMgr();
+                if (this.assetmgr.waitlightmapScene[url]) {
+                    this.loadLightMap = false;
+                }
+            }
+            assetBundle.prototype.loadCompressBundle = function (url, onstate, state, assetmgr) {
+                var _this = this;
+                state.totalByteLength = this.totalLength;
+                gd3d.io.loadText(url, function (txt, err) {
+                    if (err != null) {
+                        state.iserror = true;
+                        state.errs.push(new Error(err.message));
+                        onstate(state);
+                        return;
+                    }
+                    var json = JSON.parse(txt);
+                    _this.bundlePackJson = json;
+                    _this.parse(json["bundleinfo"], _this.totalLength);
+                    _this.load(assetmgr, onstate, state);
+                    assetmgr.mapBundle[_this.name] = _this;
+                }, function (loadedLength, totalLength) {
+                    state.compressTextLoaded = loadedLength;
+                    onstate(state);
+                });
+            };
+            assetBundle.prototype.parse = function (json, totalLength) {
+                if (totalLength === void 0) { totalLength = 0; }
+                var files = json["files"];
+                for (var i = 0; i < files.length; i++) {
+                    var item = files[i];
+                    var packes = -1;
+                    if (item.packes != undefined)
+                        packes = item.packes;
+                    if (!this.loadLightMap && item.name.indexOf("LightmapFar-") >= 0) {
+                        this.assetmgr.waitlightmapScene[this.url].push(this.path + "/" + item.name);
+                        continue;
+                    }
+                    this.files.push({ name: item.name, length: item.length, packes: packes });
+                }
+                if (json["packes"] != undefined) {
+                    var packes = json["packes"];
+                    for (var i = 0; i < packes.length; i++) {
+                        this.packages.push(packes[i]);
+                    }
+                }
+                else {
+                    if (json["totalLength"] != undefined) {
+                        if (totalLength == 0) {
+                            this.totalLength = json["totalLength"];
+                        }
+                    }
+                }
+            };
+            assetBundle.prototype.unload = function () {
+                for (var key in this.mapNamed) {
+                    var asset = this.assetmgr.getAssetByName(key, this.name);
+                    if (asset) {
+                        this.assetmgr.unuse(asset);
+                    }
+                }
+                this.assetmgr.removeAssetBundle(this.name);
+            };
+            assetBundle.prototype.load = function (assetmgr, onstate, state) {
+                var _this = this;
+                state.totalByteLength = this.totalLength;
+                var total = this.files.length;
+                this.assetmgr = assetmgr;
+                this.curLoadState = framework.AssetBundleLoadState.None;
+                var glvshaders = [];
+                var glfshaders = [];
+                var shaders = [];
+                var meshs = [];
+                var textures = [];
+                var texturedescs = [];
+                var materials = [];
+                var anclips = [];
+                var prefabs = [];
+                var scenes = [];
+                var textassets = [];
+                var pvrs = [];
+                var packs = [];
+                var f14effs = [];
+                var fonts = [];
+                var atlass = [];
+                var ddss = [];
+                var kfaniclips = [];
+                var asslist = [];
+                var assstatelist = [];
+                asslist.push(packs, glvshaders, glfshaders, shaders, textassets, meshs, textures, pvrs, ddss, texturedescs, fonts, atlass, materials, anclips, kfaniclips, f14effs, prefabs, scenes);
+                assstatelist.push(framework.AssetBundleLoadState.None, framework.AssetBundleLoadState.None, framework.AssetBundleLoadState.None, framework.AssetBundleLoadState.Shader, framework.AssetBundleLoadState.Prefab, framework.AssetBundleLoadState.Mesh, framework.AssetBundleLoadState.Material, framework.AssetBundleLoadState.Scene, framework.AssetBundleLoadState.None, framework.AssetBundleLoadState.Texture, framework.AssetBundleLoadState.Anclip, framework.AssetBundleLoadState.Textasset, framework.AssetBundleLoadState.Pvr, framework.AssetBundleLoadState.f14eff, framework.AssetBundleLoadState.Dds);
+                var mapPackes = {};
+                for (var _i = 0, _a = this.packages; _i < _a.length; _i++) {
+                    var pack = _a[_i];
+                    var type = assetmgr.calcType(pack);
+                    var url = this.path + "/" + pack;
+                    packs.push({ url: url, type: type, asset: null });
+                }
+                for (var _b = 0, _c = this.files; _b < _c.length; _b++) {
+                    var fitem = _c[_b];
+                    var type = assetmgr.calcType(fitem.name);
+                    var url = this.path + "/" + fitem.name;
+                    var fileName = assetmgr.getFileName(url);
+                    if (fitem.packes != -1) {
+                        mapPackes[url] = fitem.packes;
+                    }
+                    {
+                        var asset = null;
+                        switch (type) {
+                            case framework.AssetTypeEnum.GLFragmentShader:
+                                glfshaders.push({ url: url, type: type, asset: null });
+                                break;
+                            case framework.AssetTypeEnum.GLVertexShader:
+                                glvshaders.push({ url: url, type: type, asset: null });
+                                break;
+                            case framework.AssetTypeEnum.Shader:
+                                asset = new framework.shader(fileName);
+                                shaders.push({ url: url, type: type, asset: asset });
+                                break;
+                            case framework.AssetTypeEnum.Texture:
+                                asset = new framework.texture(fileName);
+                                textures.push({ url: url, type: type, asset: asset });
+                                break;
+                            case framework.AssetTypeEnum.TextureDesc:
+                                asset = new framework.texture(fileName);
+                                texturedescs.push({ url: url, type: type, asset: asset });
+                                break;
+                            case framework.AssetTypeEnum.Mesh:
+                                asset = new framework.mesh(fileName);
+                                meshs.push({ url: url, type: type, asset: asset });
+                                break;
+                            case framework.AssetTypeEnum.Material:
+                                asset = new framework.material(fileName);
+                                materials.push({ url: url, type: type, asset: asset });
+                                break;
+                            case framework.AssetTypeEnum.Aniclip:
+                                asset = new framework.animationClip(fileName);
+                                anclips.push({ url: url, type: type, asset: asset });
+                                break;
+                            case framework.AssetTypeEnum.Prefab:
+                                asset = new framework.prefab(fileName);
+                                prefabs.push({ url: url, type: type, asset: asset });
+                                break;
+                            case framework.AssetTypeEnum.Scene:
+                                asset = new framework.rawscene(fileName);
+                                scenes.push({ url: url, type: type, asset: asset });
+                                break;
+                            case framework.AssetTypeEnum.TextAsset:
+                                asset = new framework.textasset(fileName);
+                                textassets.push({ url: url, type: type, asset: asset });
+                                break;
+                            case framework.AssetTypeEnum.PVR:
+                                asset = new framework.texture(fileName);
+                                pvrs.push({ url: url, type: type, asset: asset });
+                                break;
+                            case framework.AssetTypeEnum.F14Effect:
+                                asset = new framework.f14eff(fileName);
+                                f14effs.push({ url: url, type: type, asset: asset });
+                                break;
+                            case framework.AssetTypeEnum.DDS:
+                                asset = new framework.texture(fileName);
+                                ddss.push({ url: url, type: type, asset: asset });
+                                break;
+                            case framework.AssetTypeEnum.Font:
+                                asset = new framework.font(fileName);
+                                fonts.push({ url: url, type: type, asset: asset });
+                                break;
+                            case framework.AssetTypeEnum.Atlas:
+                                asset = new framework.atlas(fileName);
+                                atlass.push({ url: url, type: type, asset: asset });
+                                break;
+                            case framework.AssetTypeEnum.KeyFrameAniclip:
+                                asset = new framework.keyFrameAniClip(fileName);
+                                kfaniclips.push({ url: url, type: type, asset: asset });
+                                break;
+                        }
+                        if (type != framework.AssetTypeEnum.GLVertexShader && type != framework.AssetTypeEnum.GLFragmentShader && type != framework.AssetTypeEnum.Shader
+                            && type != framework.AssetTypeEnum.PackBin && type != framework.AssetTypeEnum.PackTxt && type != framework.AssetTypeEnum.Prefab) {
+                            if (!asset)
+                                continue;
+                            this.mapNamed[fileName] = asset.getGUID();
+                            assetmgr.regRes(fileName, asset);
+                        }
+                    }
+                }
+                var list = [];
+                var handles = {};
+                for (var i = 0, len = asslist.length; i < len; ++i) {
+                    for (var j = 0, clen = asslist[i].length; j < clen; ++j) {
+                        var item = asslist[i][j];
+                        var state_1 = null;
+                        if (j == item.length - 1)
+                            state_1 = assstatelist[i];
+                        handles[item.url] = list.length;
+                        list.push({ url: item.url, type: item.type, asset: item.asset, state: state_1, handle: undefined });
+                    }
+                }
+                state.bundleLoadState = framework.AssetBundleLoadState.None;
+                var packlist = [];
+                var haveBin = false;
+                var tempMap = {};
+                var _loop_1 = function (item) {
+                    var surl = item.url;
+                    var type = item.type;
+                    var asset = item.asset;
+                    tempMap[surl] = 1;
+                    var loadstate = item.state;
+                    if (mapPackes[surl] != undefined) {
+                        packlist.push({ surl: surl, type: type, asset: asset, loadstate: loadstate });
+                        delete tempMap[surl];
+                        if (this_1.mapIsNull(tempMap))
+                            this_1.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
+                    }
+                    else {
+                        if (type == framework.AssetTypeEnum.PackBin) {
+                            haveBin = true;
+                            gd3d.io.loadArrayBuffer(surl, function (_buffer, err) {
+                                if (err != null) {
+                                    state.iserror = true;
+                                    state.errs.push(new Error(err.message));
+                                    onstate(state);
+                                    return;
+                                }
+                                var read = new gd3d.io.binReader(_buffer);
+                                var index = read.readInt32();
+                                read.position = index;
+                                while (read.canread()) {
+                                    var indindex = read.readInt32();
+                                    if (index == 0)
+                                        break;
+                                    var key = read.readStringUtf8FixLength(indindex);
+                                    var strs = key.split('|');
+                                    var start = parseInt(strs[1]);
+                                    var len = parseInt(strs[2]);
+                                    var bufs = _buffer.slice(start, start + len);
+                                    _this.bundlePackBin[strs[0]] = bufs;
+                                }
+                                if (state != undefined)
+                                    state.bundleLoadState |= loadstate;
+                                delete tempMap[surl];
+                                if (_this.mapIsNull(tempMap))
+                                    _this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
+                            }, function (loadedLength, totalLength) {
+                                state.compressBinLoaded = loadedLength;
+                                onstate(state);
+                            });
+                        }
+                        else {
+                            assetmgr.loadSingleRes(surl, type, function (s) {
+                                if (s.iserror) {
+                                    state.isfinish = true;
+                                    onstate(state);
+                                    return;
+                                }
+                                if (s.progressCall) {
+                                    s.progressCall = false;
+                                    onstate(state);
+                                    return;
+                                }
+                                if (state != undefined)
+                                    state.bundleLoadState |= loadstate;
+                            }, state, asset, function (data) {
+                                list[handles[data.url]].handle = data.handle;
+                                delete tempMap[data.url];
+                                if (_this.mapIsNull(tempMap))
+                                    _this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
+                            });
+                        }
+                    }
+                };
+                var this_1 = this;
+                for (var _d = 0, list_1 = list; _d < list_1.length; _d++) {
+                    var item = list_1[_d];
+                    _loop_1(item);
+                }
+            };
+            assetBundle.prototype.downloadFinsih = function (state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles) {
+                var _this = this;
+                if (haveBin) {
+                    var respackCall = function (fcall) {
+                        if (packlist.length < 1)
+                            fcall();
+                        var count = 0;
+                        var _loop_2 = function (uitem) {
+                            var respack = void 0;
+                            if (mapPackes[uitem.surl] == 0)
+                                respack = _this.bundlePackJson;
+                            else if (mapPackes[uitem.surl] == 1)
+                                respack = _this.bundlePackBin;
+                            else
+                                console.log("未识别的packnum: " + mapPackes[uitem.surl]);
+                            assetmgr.loadResByPack(respack, uitem.surl, uitem.type, function (s) {
+                                if (s.progressCall) {
+                                    s.progressCall = false;
+                                    onstate(state);
+                                    return;
+                                }
+                                if (state != undefined)
+                                    state.bundleLoadState |= uitem.loadstate;
+                            }, state, uitem.asset, function (data) {
+                                list[handles[data.url]].handle = data.handle;
+                                if (++count >= packlist.length)
+                                    fcall();
+                            });
+                        };
+                        for (var _i = 0, packlist_1 = packlist; _i < packlist_1.length; _i++) {
+                            var uitem = packlist_1[_i];
+                            _loop_2(uitem);
+                        }
+                    };
+                    respackCall(function () {
+                        _this.NextHandle(list, state, onstate);
+                    });
+                }
+                else
+                    this.NextHandle(list, state, onstate);
+            };
+            assetBundle.prototype.NextHandle = function (list, state, onstate) {
+                var waitArrs = [];
+                var count = 0;
+                var lastHandle = [];
+                var finish = function () {
+                    state.isfinish = true;
+                    onstate(state);
+                };
+                for (var _i = 0, list_2 = list; _i < list_2.length; _i++) {
+                    var hitem = list_2[_i];
+                    if (!hitem.handle)
+                        continue;
+                    if (hitem.type == framework.AssetTypeEnum.Prefab || hitem.type == framework.AssetTypeEnum.F14Effect) {
+                        lastHandle.push(hitem);
+                        continue;
+                    }
+                    var waiting = hitem.handle();
+                    if (waiting instanceof gd3d.threading.gdPromise) {
+                        waitArrs.push(waiting);
+                        waiting.then(function () {
+                            if (++count >= waitArrs.length) {
+                                lastHandle.sort(function (a, b) {
+                                    return b.type - a.type;
+                                });
+                                while (lastHandle.length > 0)
+                                    lastHandle.shift().handle();
+                                waitArrs = [];
+                                finish();
+                            }
+                        });
+                    }
+                }
+                if (waitArrs.length < 1) {
+                    while (lastHandle.length > 0)
+                        lastHandle.shift().handle();
+                    finish();
+                }
+            };
+            assetBundle.prototype.mapIsNull = function (map) {
+                if (!map)
+                    return true;
+                for (var k in map)
+                    return false;
+                return true;
+            };
+            return assetBundle;
+        }());
+        framework.assetBundle = assetBundle;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var AssetTypeEnum;
         (function (AssetTypeEnum) {
             AssetTypeEnum[AssetTypeEnum["Unknown"] = 0] = "Unknown";
@@ -5862,6 +6246,7 @@ var gd3d;
         framework.RefResourceState = RefResourceState;
         var stateLoad = (function () {
             function stateLoad() {
+                this.isloadFail = false;
                 this.iserror = false;
                 this.isfinish = false;
                 this.resstate = {};
@@ -5908,327 +6293,6 @@ var gd3d;
             return stateLoad;
         }());
         framework.stateLoad = stateLoad;
-        var assetBundle = (function () {
-            function assetBundle(url) {
-                this.files = [];
-                this.packages = [];
-                this.bundlePackBin = {};
-                this.totalLength = 0;
-                this.mapNamed = {};
-                this.url = url;
-                var i = url.lastIndexOf("/");
-                this.path = url.substring(0, i);
-            }
-            assetBundle.prototype.loadCompressBundle = function (url, onstate, state, assetmgr) {
-                var _this = this;
-                state.totalByteLength = this.totalLength;
-                gd3d.io.loadText(url, function (txt, err) {
-                    if (err != null) {
-                        state.iserror = true;
-                        state.errs.push(new Error(err.message));
-                        onstate(state);
-                        return;
-                    }
-                    var json = JSON.parse(txt);
-                    _this.bundlePackJson = json;
-                    _this.parse(json["bundleinfo"], _this.totalLength);
-                    _this.load(assetmgr, onstate, state);
-                    assetmgr.mapBundle[_this.name] = _this;
-                }, function (loadedLength, totalLength) {
-                    state.compressTextLoaded = loadedLength;
-                    onstate(state);
-                });
-            };
-            assetBundle.prototype.parse = function (json, totalLength) {
-                if (totalLength === void 0) { totalLength = 0; }
-                var files = json["files"];
-                for (var i = 0; i < files.length; i++) {
-                    var item = files[i];
-                    var packes = -1;
-                    if (item.packes != undefined)
-                        packes = item.packes;
-                    this.files.push({ name: item.name, length: item.length, packes: packes });
-                }
-                if (json["packes"] != undefined) {
-                    var packes = json["packes"];
-                    for (var i = 0; i < packes.length; i++) {
-                        this.packages.push(packes[i]);
-                    }
-                }
-                else {
-                    if (json["totalLength"] != undefined) {
-                        if (totalLength == 0) {
-                            this.totalLength = json["totalLength"];
-                        }
-                    }
-                }
-            };
-            assetBundle.prototype.unload = function () {
-                for (var key in this.mapNamed) {
-                    var asset = this.assetmgr.getAssetByName(key, this.name);
-                    if (asset) {
-                        this.assetmgr.unuse(asset);
-                    }
-                }
-                this.assetmgr.removeAssetBundle(this.name);
-            };
-            assetBundle.prototype.load = function (assetmgr, onstate, state) {
-                var _this = this;
-                state.totalByteLength = this.totalLength;
-                var totoal = this.files.length;
-                this.assetmgr = assetmgr;
-                this.curLoadState = AssetBundleLoadState.None;
-                var glvshaders = [];
-                var glfshaders = [];
-                var shaders = [];
-                var meshs = [];
-                var textures = [];
-                var texturedescs = [];
-                var materials = [];
-                var anclips = [];
-                var prefabs = [];
-                var scenes = [];
-                var textassets = [];
-                var pvrs = [];
-                var packs = [];
-                var f14effs = [];
-                var fonts = [];
-                var atlass = [];
-                var ddss = [];
-                var kfaniclips = [];
-                var asslist = [];
-                var assstatelist = [];
-                asslist.push(packs, glvshaders, glfshaders, shaders, textassets, meshs, textures, pvrs, ddss, texturedescs, fonts, atlass, materials, anclips, kfaniclips, f14effs, prefabs, scenes);
-                assstatelist.push(AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.None, AssetBundleLoadState.Shader, AssetBundleLoadState.Prefab, AssetBundleLoadState.Mesh, AssetBundleLoadState.Material, AssetBundleLoadState.Scene, AssetBundleLoadState.None, AssetBundleLoadState.Texture, AssetBundleLoadState.Anclip, AssetBundleLoadState.Textasset, AssetBundleLoadState.Pvr, AssetBundleLoadState.f14eff, AssetBundleLoadState.Dds);
-                var realTotal = 0;
-                var mapPackes = {};
-                for (var i = 0; i < this.packages.length; i++) {
-                    var pack = this.packages[i];
-                    var type_1 = assetmgr.calcType(pack);
-                    var url = this.path + "/" + pack;
-                    packs.push({ url: url, type: type_1, asset: null });
-                }
-                for (var i = 0; i < this.files.length; i++) {
-                    var fitem = this.files[i];
-                    var type = assetmgr.calcType(fitem.name);
-                    var url = this.path + "/" + fitem.name;
-                    var fileName = assetmgr.getFileName(url);
-                    if (fitem.packes != -1) {
-                        mapPackes[url] = fitem.packes;
-                    }
-                    {
-                        var asset = null;
-                        switch (type) {
-                            case AssetTypeEnum.GLFragmentShader:
-                                glfshaders.push({ url: url, type: type, asset: null });
-                                break;
-                            case AssetTypeEnum.GLVertexShader:
-                                glvshaders.push({ url: url, type: type, asset: null });
-                                break;
-                            case AssetTypeEnum.Shader:
-                                asset = new framework.shader(fileName);
-                                shaders.push({ url: url, type: type, asset: asset });
-                                break;
-                            case AssetTypeEnum.Texture:
-                                asset = new framework.texture(fileName);
-                                textures.push({ url: url, type: type, asset: asset });
-                                break;
-                            case AssetTypeEnum.TextureDesc:
-                                asset = new framework.texture(fileName);
-                                texturedescs.push({ url: url, type: type, asset: asset });
-                                break;
-                            case AssetTypeEnum.Mesh:
-                                asset = new framework.mesh(fileName);
-                                meshs.push({ url: url, type: type, asset: asset });
-                                break;
-                            case AssetTypeEnum.Material:
-                                asset = new framework.material(fileName);
-                                materials.push({ url: url, type: type, asset: asset });
-                                break;
-                            case AssetTypeEnum.Aniclip:
-                                asset = new framework.animationClip(fileName);
-                                anclips.push({ url: url, type: type, asset: asset });
-                                break;
-                            case AssetTypeEnum.Prefab:
-                                asset = new framework.prefab(fileName);
-                                prefabs.push({ url: url, type: type, asset: asset });
-                                break;
-                            case AssetTypeEnum.Scene:
-                                asset = new framework.rawscene(fileName);
-                                scenes.push({ url: url, type: type, asset: asset });
-                                break;
-                            case AssetTypeEnum.TextAsset:
-                                asset = new framework.textasset(fileName);
-                                textassets.push({ url: url, type: type, asset: asset });
-                                break;
-                            case AssetTypeEnum.PVR:
-                                asset = new framework.texture(fileName);
-                                pvrs.push({ url: url, type: type, asset: asset });
-                                break;
-                            case AssetTypeEnum.F14Effect:
-                                asset = new framework.f14eff(fileName);
-                                f14effs.push({ url: url, type: type, asset: asset });
-                                break;
-                            case AssetTypeEnum.DDS:
-                                asset = new framework.texture(fileName);
-                                ddss.push({ url: url, type: type, asset: asset });
-                                break;
-                            case AssetTypeEnum.Font:
-                                asset = new framework.font(fileName);
-                                fonts.push({ url: url, type: type, asset: asset });
-                                break;
-                            case AssetTypeEnum.Atlas:
-                                asset = new framework.atlas(fileName);
-                                atlass.push({ url: url, type: type, asset: asset });
-                                break;
-                            case AssetTypeEnum.KeyFrameAniclip:
-                                asset = new framework.keyFrameAniClip(fileName);
-                                kfaniclips.push({ url: url, type: type, asset: asset });
-                                break;
-                        }
-                        if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
-                            && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt) {
-                            if (!asset)
-                                continue;
-                            this.mapNamed[fileName] = asset.getGUID();
-                            assetmgr.regRes(fileName, asset);
-                        }
-                    }
-                }
-                var list = [];
-                for (var i_1 = 0; i_1 < asslist.length; i_1++) {
-                    for (var j = 0; j < asslist[i_1].length; j++) {
-                        var url = asslist[i_1][j].url;
-                        var type_2 = asslist[i_1][j].type;
-                        var asset = asslist[i_1][j].asset;
-                        var state_1 = null;
-                        if (j == asslist[i_1].length - 1)
-                            state_1 = assstatelist[i_1];
-                        list.push({ url: url, type: type_2, asset: asset, state: state_1 });
-                    }
-                }
-                realTotal = list.length;
-                if (totoal > realTotal) {
-                    console.log("assetBundle中某个file不是资源或后缀有问题");
-                }
-                state.totaltask = realTotal + 1;
-                state.curtask = 1;
-                onstate(state);
-                assetmgr.doWaitState(this.url, state);
-                state.bundleLoadState = AssetBundleLoadState.None;
-                var loadcall = function () {
-                    var surl = list[state.curtask - 1].url;
-                    var type = list[state.curtask - 1].type;
-                    var asset = list[state.curtask - 1].asset;
-                    var _fileName = assetmgr.getFileName(surl);
-                    var loadstate = list[state.curtask - 1].state;
-                    if (mapPackes[surl] != undefined) {
-                        var respack = void 0;
-                        if (mapPackes[surl] == 0)
-                            respack = _this.bundlePackJson;
-                        else if (mapPackes[surl] == 1)
-                            respack = _this.bundlePackBin;
-                        else
-                            console.log("未识别的packnum: " + mapPackes[surl]);
-                        assetmgr.loadResByPack(respack, surl, type, function (s) {
-                            if (s.progressCall) {
-                                s.progressCall = false;
-                                onstate(state);
-                                return;
-                            }
-                            if (state != undefined)
-                                state.bundleLoadState |= loadstate;
-                            realTotal--;
-                            state.curtask++;
-                            if (realTotal === 0) {
-                                state.isfinish = true;
-                                onstate(state);
-                                assetmgr.loadByMulQueue();
-                            }
-                            else {
-                                onstate(state);
-                                loadcall();
-                            }
-                            assetmgr.doWaitState(_this.url, state);
-                        }, state, asset);
-                    }
-                    else {
-                        if (type == AssetTypeEnum.PackBin) {
-                            gd3d.io.loadArrayBuffer(surl, function (_buffer, err) {
-                                if (err != null) {
-                                    state.iserror = true;
-                                    state.errs.push(new Error(err.message));
-                                    onstate(state);
-                                    assetmgr.loadByMulQueue();
-                                    return;
-                                }
-                                var read = new gd3d.io.binReader(_buffer);
-                                var index = read.readInt32();
-                                read.position = index;
-                                while (read.canread()) {
-                                    var indindex = read.readInt32();
-                                    if (index == 0)
-                                        break;
-                                    var key = read.readStringUtf8FixLength(indindex);
-                                    var strs = key.split('|');
-                                    var start = parseInt(strs[1]);
-                                    var len = parseInt(strs[2]);
-                                    var bufs = _buffer.slice(start, start + len);
-                                    _this.bundlePackBin[strs[0]] = bufs;
-                                }
-                                if (state != undefined)
-                                    state.bundleLoadState |= loadstate;
-                                realTotal--;
-                                state.curtask++;
-                                if (realTotal === 0) {
-                                    state.isfinish = true;
-                                    onstate(state);
-                                    assetmgr.loadByMulQueue();
-                                }
-                                else {
-                                    onstate(state);
-                                    loadcall();
-                                }
-                            }, function (loadedLength, totalLength) {
-                                state.compressBinLoaded = loadedLength;
-                                onstate(state);
-                            });
-                        }
-                        else {
-                            assetmgr.loadSingleRes(surl, type, function (s) {
-                                if (s.iserror) {
-                                    onstate(state);
-                                    assetmgr.loadByMulQueue();
-                                    return;
-                                }
-                                if (s.progressCall) {
-                                    s.progressCall = false;
-                                    onstate(state);
-                                    return;
-                                }
-                                if (state != undefined)
-                                    state.bundleLoadState |= loadstate;
-                                realTotal--;
-                                state.curtask++;
-                                if (realTotal === 0) {
-                                    state.isfinish = true;
-                                    onstate(state);
-                                    assetmgr.loadByMulQueue();
-                                }
-                                else {
-                                    onstate(state);
-                                    loadcall();
-                                }
-                                assetmgr.doWaitState(_this.url, state);
-                            }, state, asset);
-                        }
-                    }
-                };
-                loadcall();
-            };
-            return assetBundle;
-        }());
-        framework.assetBundle = assetBundle;
         var assetMgr = (function () {
             function assetMgr(app) {
                 this.mapShader = {};
@@ -6247,7 +6311,8 @@ var gd3d;
                 this.waitStateDic = {};
                 this.waitQueueState = [];
                 this.loadingQueueState = [];
-                this.loadingCountLimit = 2;
+                this.loadingCountLimit = 10;
+                this.waitlightmapScene = {};
                 this.app = app;
                 this.webgl = app.webgl;
                 this.shaderPool = new gd3d.render.shaderPool();
@@ -6298,7 +6363,7 @@ var gd3d;
                 var flag = true;
                 if (id != null) {
                     var r = this.mapRes[id];
-                    if (r != null && !r[this._loadingTag])
+                    if (r != null)
                         return r.asset;
                 }
                 if (flag) {
@@ -6314,6 +6379,28 @@ var gd3d;
                 if (this.mapBundle[bundlename])
                     return this.mapBundle[bundlename];
                 return null;
+            };
+            assetMgr.correctFileName = function (name) {
+                if (name.indexOf(this.bin) < 0) {
+                    return name;
+                }
+                var binlen = this.bin.length;
+                var substr = name.substring(name.length - binlen);
+                if (substr == this.bin) {
+                    return name + ".js";
+                }
+                return name;
+            };
+            assetMgr.correctTxtFileName = function (name) {
+                if (name.indexOf(this.txt) < 0) {
+                    return name;
+                }
+                var len = this.txt.length;
+                var substr = name.substring(name.length - len);
+                if (substr == this.txt) {
+                    return name + ".js";
+                }
+                return name;
             };
             assetMgr.prototype.unuse = function (res, disposeNow) {
                 if (disposeNow === void 0) { disposeNow = false; }
@@ -6425,10 +6512,23 @@ var gd3d;
             assetMgr.prototype.getAssetUrl = function (asset) {
                 return this.assetUrlDic[asset.getGUID()];
             };
-            assetMgr.prototype.loadResByPack = function (respack, url, type, onstate, state, asset) {
+            assetMgr.prototype.loadSingleRes = function (url, type, onstate, state, asset, call) {
                 var assetFactory = this.getAssetFactory(type);
                 if (assetFactory != null) {
-                    assetFactory.loadByPack(respack, url, onstate, state, this, asset);
+                    assetFactory.load(url, onstate, state, this, asset, function (chandle) {
+                        call({ url: url, handle: chandle });
+                    });
+                }
+                else {
+                    throw new Error("cant use the type:" + type);
+                }
+            };
+            assetMgr.prototype.loadResByPack = function (respack, url, type, onstate, state, asset, call) {
+                var assetFactory = this.getAssetFactory(type);
+                if (assetFactory != null) {
+                    assetFactory.loadByPack(respack, url, onstate, state, this, asset, (function (chandle) {
+                        call({ url: url, handle: chandle });
+                    }));
                 }
                 else {
                     throw new Error("cant use the type:" + type);
@@ -6459,17 +6559,6 @@ var gd3d;
                 this.regAssetFactory(AssetTypeEnum.F14Effect, new framework.AssetFactory_f14eff());
                 this.regAssetFactory(AssetTypeEnum.DDS, new framework.AssetFactory_DDS());
                 this.regAssetFactory(AssetTypeEnum.KeyFrameAniclip, new framework.assetfactory_keyFrameAniClip());
-            };
-            assetMgr.prototype.loadSingleRes = function (url, type, onstate, state, asset) {
-                if (url.indexOf("glsl") == -1 && url.indexOf(".shader.json") == -1) {
-                }
-                var assetFactory = this.getAssetFactory(type);
-                if (assetFactory != null) {
-                    assetFactory.load(url, onstate, state, this, asset);
-                }
-                else {
-                    throw new Error("cant use the type:" + type);
-                }
             };
             assetMgr.prototype.doWaitState = function (name, state) {
                 if (this.waitStateDic[name] == null)
@@ -6502,24 +6591,13 @@ var gd3d;
                 }
                 return freechannel;
             };
-            assetMgr.prototype.loadByMulQueue = function () {
+            assetMgr.prototype.unPkg = function (type, url, state, onstate) {
                 var _this = this;
-                if (this.waitQueueState.length == 0)
-                    return;
-                var freechannel = this.checkFreeChannel();
-                if (freechannel == -1)
-                    return;
-                var curloadinfo = this.waitQueueState.shift();
-                this.loadingQueueState[freechannel] = curloadinfo;
-                var state = curloadinfo.state;
-                var url = state.url;
-                var type = curloadinfo.type;
-                var onstate = curloadinfo.onstate;
                 if (type == AssetTypeEnum.Bundle) {
                     gd3d.io.loadText(url, function (txt, err) {
                         if (err != null) {
-                            curloadinfo.state.iserror = true;
-                            curloadinfo.state.errs.push(new Error(err.message));
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
                             onstate(state);
                             return;
                         }
@@ -6527,7 +6605,7 @@ var gd3d;
                         var filename = "";
                         if (json["files"]) {
                             filename = _this.getFileName(url);
-                            var ab = new assetBundle(url);
+                            var ab = new framework.assetBundle(url);
                             ab.name = filename;
                             ab.parse(JSON.parse(txt));
                             ab.load(_this, onstate, state);
@@ -6535,7 +6613,7 @@ var gd3d;
                         else {
                             var loadurl = url.replace(".assetbundle.json", ".packs.txt");
                             filename = _this.getFileName(url);
-                            var ab = new assetBundle(url);
+                            var ab = new framework.assetBundle(url);
                             ab.name = filename;
                             ab.totalLength = json["totalLength"];
                             ab.loadCompressBundle(loadurl, onstate, state, _this);
@@ -6546,15 +6624,15 @@ var gd3d;
                 else if (type == AssetTypeEnum.CompressBundle) {
                     gd3d.io.loadText(url, function (txt, err) {
                         if (err != null) {
-                            curloadinfo.state.iserror = true;
-                            curloadinfo.state.errs.push(new Error(err.message));
+                            state.iserror = true;
+                            state.errs.push(new Error(err.message));
                             onstate(state);
                             return;
                         }
                         var loadurl = url.replace(".assetbundle.json", ".packs.txt");
                         var filename = _this.getFileName(url);
                         var json = JSON.parse(txt);
-                        var ab = new assetBundle(url);
+                        var ab = new framework.assetBundle(url);
                         ab.name = filename;
                         ab.totalLength = json["totalLength"];
                         ab.loadCompressBundle(loadurl, onstate, state, _this);
@@ -6565,7 +6643,6 @@ var gd3d;
                     this.loadSingleRes(url, type, function (s) {
                         if (s.iserror) {
                             onstate(state);
-                            _this.loadByMulQueue();
                             return;
                         }
                         if (s.progressCall) {
@@ -6577,8 +6654,10 @@ var gd3d;
                         s.isfinish = true;
                         onstate(s);
                         _this.doWaitState(url, s);
-                        _this.loadByMulQueue();
-                    }, state);
+                    }, state, null, function (data) {
+                        if (data.handle)
+                            data.handle();
+                    });
                 }
             };
             assetMgr.prototype.loadCompressBundle = function (url, onstate) {
@@ -6596,8 +6675,7 @@ var gd3d;
                     return;
                 }
                 type = AssetTypeEnum.CompressBundle;
-                this.waitQueueState.push({ state: state, type: type, onstate: onstate });
-                this.loadByMulQueue();
+                this.unPkg(type, url, state, onstate);
             };
             assetMgr.prototype.load = function (url, type, onstate) {
                 if (type === void 0) { type = AssetTypeEnum.Auto; }
@@ -6609,11 +6687,6 @@ var gd3d;
                     var _state = this.mapInLoad[name];
                     if (_state.isfinish) {
                         onstate(this.mapInLoad[name]);
-                    }
-                    else {
-                        if (this.waitStateDic[name] == null)
-                            this.waitStateDic[name] = [];
-                        this.waitStateDic[name].push(onstate);
                     }
                     return;
                 }
@@ -6627,11 +6700,30 @@ var gd3d;
                     state.errs.push(new Error("can not sure about type:" + url));
                     state.iserror = true;
                     onstate(state);
+                    return;
+                }
+                this.unPkg(type, url, state, onstate);
+            };
+            assetMgr.prototype.loadForNoCache = function (url, type, onstate) {
+                if (type === void 0) { type = AssetTypeEnum.Auto; }
+                if (onstate === void 0) { onstate = null; }
+                if (onstate == null)
+                    onstate = function () { };
+                var name = this.getFileName(url);
+                var state = new stateLoad();
+                this.mapInLoad[name] = state;
+                state.url = url;
+                if (type == AssetTypeEnum.Auto) {
+                    type = this.calcType(url);
+                }
+                if (type == AssetTypeEnum.Unknown) {
+                    state.errs.push(new Error("can not sure about type:" + url));
+                    state.iserror = true;
+                    onstate(state);
                     this.doWaitState(url, state);
                     return;
                 }
-                this.waitQueueState.push({ state: state, type: type, onstate: onstate });
-                this.loadByMulQueue();
+                this.unPkg(type, url, state, onstate);
             };
             assetMgr.prototype.unload = function (url, onstate) {
                 if (onstate === void 0) { onstate = null; }
@@ -6643,6 +6735,45 @@ var gd3d;
                     state.resstate[key].res.unuse();
                 }
                 delete this.mapInLoad[name];
+            };
+            assetMgr.prototype.loadSceneAssetbundleWithoutLightMap = function (url, type, onstate) {
+                if (type === void 0) { type = AssetTypeEnum.Auto; }
+                if (onstate === void 0) { onstate = null; }
+                this.waitlightmapScene[url] = [];
+                this.load(url, type, onstate);
+            };
+            assetMgr.prototype.loadSceneLightmap = function (sceneurl) {
+                var _this = this;
+                var arr = this.waitlightmapScene[sceneurl];
+                var scenename = this.getFileName(sceneurl).replace(".assetbundle.json", ".scene.json");
+                var scene = this.getAssetByName(scenename);
+                if (scene == null)
+                    return;
+                scene["lightmaps"] = [];
+                var texarr = [];
+                var texcount = 0;
+                if (arr) {
+                    for (var key in arr) {
+                        var texurl = arr[key].replace(".imgdesc.json", ".png");
+                        texarr.push(texurl);
+                        this.loadForNoCache(texurl, AssetTypeEnum.Texture, function (state) {
+                            if (state.isfinish) {
+                                texcount++;
+                                if (texcount == arr.length) {
+                                    for (var item in texarr) {
+                                        var texname = _this.getFileName(texarr[item]);
+                                        var tex = _this.getAssetByName(texname);
+                                        if (tex) {
+                                            scene["lightmaps"].push(tex);
+                                            tex.use();
+                                        }
+                                    }
+                                    scene.useLightMap(_this.app.getScene());
+                                }
+                            }
+                        });
+                    }
+                }
             };
             assetMgr.prototype.loadScene = function (sceneName, onComplete) {
                 var firstChilds = new Array();
@@ -6785,7 +6916,7 @@ var gd3d;
                     throw new Error("unknown format");
                 }
                 else if (type == AssetTypeEnum.Bundle) {
-                    result = new assetBundle(url);
+                    result = new framework.assetBundle(url);
                     gd3d.io.loadText(url, function (txt, err) {
                         result.parse(JSON.parse(txt));
                     });
@@ -6822,7 +6953,7 @@ var gd3d;
                     else if (extname == ".png" || extname == ".jpg") {
                         return AssetTypeEnum.Texture;
                     }
-                    else if (extname == ".pvr.bin" || extname == ".pvr") {
+                    else if (extname == ".pvr.bin" || extname == ".pvr" || extname == ".pvr.bin.js") {
                         return AssetTypeEnum.PVR;
                     }
                     else if (extname == ".imgdesc.json") {
@@ -6831,10 +6962,10 @@ var gd3d;
                     else if (extname == ".mat.json") {
                         return AssetTypeEnum.Material;
                     }
-                    else if (extname == ".mesh.bin") {
+                    else if (extname == ".mesh.bin" || extname == ".mesh.bin.js") {
                         return AssetTypeEnum.Mesh;
                     }
-                    else if (extname == ".aniclip.bin") {
+                    else if (extname == ".aniclip.bin" || extname == ".aniclip.bin.js") {
                         return AssetTypeEnum.Aniclip;
                     }
                     else if (extname == ".prefab.json") {
@@ -6852,7 +6983,7 @@ var gd3d;
                     else if (extname == ".json" || extname == ".txt" || extname == ".effect.json") {
                         return AssetTypeEnum.TextAsset;
                     }
-                    else if (extname == ".packs.bin") {
+                    else if (extname == ".packs.bin" || extname == ".packs.bin.js") {
                         return AssetTypeEnum.PackBin;
                     }
                     else if (extname == ".packs.txt") {
@@ -6888,6 +7019,9 @@ var gd3d;
                 }
                 return this.particlemat;
             };
+            assetMgr.useBinJs = false;
+            assetMgr.bin = ".bin";
+            assetMgr.txt = ".txt";
             return assetMgr;
         }());
         framework.assetMgr = assetMgr;
@@ -7283,7 +7417,7 @@ var gd3d;
                     p.state_ztest = false;
                     p.state_zwrite = false;
                     p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
-                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend_PreMultiply);
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend);
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
                 {
@@ -7299,7 +7433,7 @@ var gd3d;
                     p.state_ztest = false;
                     p.state_zwrite = false;
                     p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
-                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend_PreMultiply);
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend);
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
             };
@@ -7687,27 +7821,32 @@ var gd3d;
             AssetFactory_Aniclip.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_Aniclip.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_Aniclip.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    var _clip = asset ? asset : new framework.animationClip(filename);
-                    _clip.Parse(_buffer).then(function () {
-                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                gd3d.io.loadArrayBuffer(url, function (_buffer, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _clip = asset ? asset : new framework.animationClip(filename);
+                        return _clip.Parse(_buffer).then(function () {
+                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                        });
                     });
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Aniclip.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
+            AssetFactory_Aniclip.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
                 var _buffer = respack[filename];
                 var _clip = asset ? asset : new framework.animationClip(filename);
-                _clip.Parse(_buffer).then(function () {
-                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                call(function () {
+                    return _clip.Parse(_buffer).then(function () {
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                    });
                 });
             };
             return AssetFactory_Aniclip;
@@ -7725,26 +7864,31 @@ var gd3d;
             AssetFactory_Atlas.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_Atlas.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_Atlas.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadText(url, function (txt, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    var _atlas = asset ? asset : new framework.atlas(filename);
-                    _atlas.Parse(txt, assetMgr);
-                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
+                gd3d.io.loadText(url, function (txt, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _atlas = asset ? asset : new framework.atlas(filename);
+                        _atlas.Parse(txt, assetMgr);
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
+                    });
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Atlas.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _atlas = asset ? asset : new framework.atlas(filename);
-                _atlas.Parse(txt, assetMgr);
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
+            AssetFactory_Atlas.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _atlas = asset ? asset : new framework.atlas(filename);
+                    _atlas.Parse(txt, assetMgr);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
+                });
             };
             return AssetFactory_Atlas;
         }());
@@ -7761,24 +7905,28 @@ var gd3d;
             AssetFactory_DDS.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_DDS.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
+            AssetFactory_DDS.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () { });
             };
-            AssetFactory_DDS.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_DDS.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    var _texture = asset ? asset : new framework.texture(filename);
-                    assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
-                    var textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
-                    textureUtil.loadDDS(url, null, function (texture, error, stats) {
-                        var t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
-                        t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
-                        t2d.texture = texture;
-                        _texture.glTexture = t2d;
+                gd3d.io.loadArrayBuffer(url, function (_buffer, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _texture = asset ? asset : new framework.texture(filename);
+                        assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+                        var textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
+                        textureUtil.loadDDS(url, null, function (texture, error, stats) {
+                            var t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
+                            t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
+                            t2d.texture = texture;
+                            _texture.glTexture = t2d;
+                        });
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                     });
-                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
@@ -7798,30 +7946,33 @@ var gd3d;
             AssetFactory_f14eff.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_f14eff.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_f14eff.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var bundlename = framework.getFileName(state.url);
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadText(url, function (txt, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    var _f14eff = asset ? asset : new framework.f14eff(filename);
-                    _f14eff.assetbundle = bundlename;
-                    _f14eff.Parse(txt, assetMgr).then(function () {
+                gd3d.io.loadText(url, function (txt, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _f14eff = asset ? asset : new framework.f14eff(filename);
+                        _f14eff.assetbundle = bundlename;
+                        _f14eff.Parse(txt, assetMgr);
                         framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
                     });
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_f14eff.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var bundlename = framework.getFileName(state.url);
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _f14eff = asset ? asset : new framework.f14eff(filename);
-                _f14eff.assetbundle = bundlename;
-                _f14eff.Parse(txt, assetMgr).then(function () {
+            AssetFactory_f14eff.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var bundlename = framework.getFileName(state.url);
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _f14eff = asset ? asset : new framework.f14eff(filename);
+                    _f14eff.assetbundle = bundlename;
+                    _f14eff.Parse(txt, assetMgr);
                     framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
                 });
             };
@@ -7840,26 +7991,31 @@ var gd3d;
             AssetFactory_Font.prototype.newAsset = function (filename) {
                 return null;
             };
-            AssetFactory_Font.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_Font.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadText(url, function (txt, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    var _font = asset ? asset : new framework.font(filename);
-                    _font.Parse(txt, assetMgr);
-                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _font, url);
+                gd3d.io.loadText(url, function (txt, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _font = asset ? asset : new framework.font(filename);
+                        _font.Parse(txt, assetMgr);
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _font, url);
+                    });
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Font.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _font = asset ? asset : new framework.font(filename);
-                _font.Parse(txt, assetMgr);
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _font, url);
+            AssetFactory_Font.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _font = asset ? asset : new framework.font(filename);
+                    _font.Parse(txt, assetMgr);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _font, url);
+                });
             };
             return AssetFactory_Font;
         }());
@@ -7876,31 +8032,36 @@ var gd3d;
             AssetFactory_GLFragmentShader.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_GLFragmentShader.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_GLFragmentShader.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 var name = filename.substring(0, filename.indexOf("."));
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadText(url, function (txt, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    state.resstate[filename].state = 1;
-                    state.logs.push("load a glshader:" + filename);
-                    assetMgr.shaderPool.mapFSString[name] = txt;
-                    onstate(state);
+                gd3d.io.loadText(url, function (txt, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        state.resstate[filename].state = 1;
+                        state.logs.push("load a glshader:" + filename);
+                        assetMgr.shaderPool.mapFSString[name] = txt;
+                        onstate(state);
+                    });
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_GLFragmentShader.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                var name = filename.substring(0, filename.indexOf("."));
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                txt = decodeURI(txt);
-                state.resstate[filename].state = 1;
-                state.logs.push("load a glshader:" + filename);
-                assetMgr.shaderPool.mapFSString[name] = txt;
-                onstate(state);
+            AssetFactory_GLFragmentShader.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    var name = filename.substring(0, filename.indexOf("."));
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    txt = decodeURI(txt);
+                    state.resstate[filename].state = 1;
+                    state.logs.push("load a glshader:" + filename);
+                    assetMgr.shaderPool.mapFSString[name] = txt;
+                    onstate(state);
+                });
             };
             return AssetFactory_GLFragmentShader;
         }());
@@ -7917,31 +8078,36 @@ var gd3d;
             AssetFactory_GLVertexShader.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_GLVertexShader.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_GLVertexShader.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 var name = filename.substring(0, filename.indexOf("."));
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadText(url, function (txt, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    state.resstate[filename].state = 1;
-                    state.logs.push("load a glshader:" + filename);
-                    assetMgr.shaderPool.mapVSString[name] = txt;
-                    onstate(state);
+                gd3d.io.loadText(url, function (txt, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        state.resstate[filename].state = 1;
+                        state.logs.push("load a glshader:" + filename);
+                        assetMgr.shaderPool.mapVSString[name] = txt;
+                        onstate(state);
+                    });
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_GLVertexShader.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                var name = filename.substring(0, filename.indexOf("."));
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                txt = decodeURI(txt);
-                state.resstate[filename].state = 1;
-                state.logs.push("load a glshader:" + filename);
-                assetMgr.shaderPool.mapVSString[name] = txt;
-                onstate(state);
+            AssetFactory_GLVertexShader.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    var name = filename.substring(0, filename.indexOf("."));
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    txt = decodeURI(txt);
+                    state.resstate[filename].state = 1;
+                    state.logs.push("load a glshader:" + filename);
+                    assetMgr.shaderPool.mapVSString[name] = txt;
+                    onstate(state);
+                });
             };
             return AssetFactory_GLVertexShader;
         }());
@@ -8004,26 +8170,31 @@ var gd3d;
             assetfactory_keyFrameAniClip.prototype.newAsset = function () {
                 return null;
             };
-            assetfactory_keyFrameAniClip.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            assetfactory_keyFrameAniClip.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadText(url, function (text, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    var _clip = asset ? asset : new framework.keyFrameAniClip(filename);
-                    _clip.Parse(text);
-                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                gd3d.io.loadText(url, function (text, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _clip = asset ? asset : new framework.keyFrameAniClip(filename);
+                        _clip.Parse(text);
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                    });
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            assetfactory_keyFrameAniClip.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var _buffer = respack[filename];
-                var _clip = asset ? asset : new framework.keyFrameAniClip(filename);
-                _clip.Parse(_buffer);
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+            assetfactory_keyFrameAniClip.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var _buffer = respack[filename];
+                    var _clip = asset ? asset : new framework.keyFrameAniClip(filename);
+                    _clip.Parse(_buffer);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
+                });
             };
             return assetfactory_keyFrameAniClip;
         }());
@@ -8040,28 +8211,33 @@ var gd3d;
             AssetFactory_Material.prototype.newAsset = function (filename) {
                 return null;
             };
-            AssetFactory_Material.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_Material.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 var assetbundleName = framework.getFileName(state.url);
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadText(url, function (txt, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    var _material = asset ? asset : new framework.material(filename);
-                    _material.Parse(assetMgr, JSON.parse(txt), assetbundleName);
-                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
+                gd3d.io.loadText(url, function (txt, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _material = asset ? asset : new framework.material(filename);
+                        _material.Parse(assetMgr, JSON.parse(txt), assetbundleName);
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
+                    });
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Material.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                var assetbundleName = framework.getFileName(state.url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _material = asset ? asset : new framework.material(filename);
-                _material.Parse(assetMgr, JSON.parse(txt), assetbundleName);
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
+            AssetFactory_Material.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    var assetbundleName = framework.getFileName(state.url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _material = asset ? asset : new framework.material(filename);
+                    _material.Parse(assetMgr, JSON.parse(txt), assetbundleName);
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _material, url);
+                });
             };
             return AssetFactory_Material;
         }());
@@ -8078,27 +8254,32 @@ var gd3d;
             AssetFactory_Mesh.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_Mesh.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_Mesh.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    var _mesh = asset ? asset : new framework.mesh(filename);
-                    _mesh.Parse(_buffer, assetMgr.webgl).then(function () {
-                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                gd3d.io.loadArrayBuffer(url, function (_buffer, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _mesh = asset ? asset : new framework.mesh(filename);
+                        return _mesh.Parse(_buffer, assetMgr.webgl).then(function () {
+                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                        });
                     });
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Mesh.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
+            AssetFactory_Mesh.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
                 var _buffer = respack[filename];
                 var _mesh = asset ? asset : new framework.mesh(filename);
-                _mesh.Parse(_buffer, assetMgr.webgl).then(function () {
-                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                call(function () {
+                    return _mesh.Parse(_buffer, assetMgr.webgl).then(function () {
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                    });
                 });
             };
             return AssetFactory_Mesh;
@@ -8116,26 +8297,31 @@ var gd3d;
             AssetFactory_PathAsset.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_PathAsset.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_PathAsset.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadText(url, function (txt, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    var _path = asset ? asset : new framework.pathasset(filename);
-                    _path.Parse(JSON.parse(txt));
-                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _path, url);
+                gd3d.io.loadText(url, function (txt, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _path = asset ? asset : new framework.pathasset(filename);
+                        _path.Parse(JSON.parse(txt));
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _path, url);
+                    });
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_PathAsset.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _path = asset ? asset : new framework.pathasset(filename);
-                _path.Parse(JSON.parse(txt));
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _path, url);
+            AssetFactory_PathAsset.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _path = asset ? asset : new framework.pathasset(filename);
+                    _path.Parse(JSON.parse(txt));
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _path, url);
+                });
             };
             return AssetFactory_PathAsset;
         }());
@@ -8152,31 +8338,33 @@ var gd3d;
             AssetFactory_Prefab.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_Prefab.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_Prefab.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var bundlename = framework.getFileName(state.url);
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadText(url, function (txt, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    var _prefab = asset ? asset : new framework.prefab(filename);
-                    _prefab.assetbundle = bundlename;
-                    _prefab.Parse(txt, assetMgr);
-                    _prefab.Parse(txt, assetMgr).then(function () {
+                gd3d.io.loadText(url, function (txt, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _prefab = asset ? asset : new framework.prefab(filename);
+                        _prefab.assetbundle = bundlename;
+                        _prefab.Parse(txt, assetMgr);
                         framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
                     });
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Prefab.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var bundlename = framework.getFileName(state.url);
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _prefab = asset ? asset : new framework.prefab(filename);
-                _prefab.assetbundle = bundlename;
-                _prefab.Parse(txt, assetMgr).then(function () {
+            AssetFactory_Prefab.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var bundlename = framework.getFileName(state.url);
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _prefab = asset ? asset : new framework.prefab(filename);
+                    _prefab.assetbundle = bundlename;
+                    _prefab.Parse(txt, assetMgr);
                     framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
                 });
             };
@@ -8195,21 +8383,25 @@ var gd3d;
             AssetFactory_PVR.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_PVR.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_PVR.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadArrayBuffer(url, function (_buffer, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    var _texture = asset ? asset : new framework.texture(filename);
-                    var pvr = new PvrParse(assetMgr.webgl);
-                    _texture.glTexture = pvr.parse(_buffer);
-                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                gd3d.io.loadArrayBuffer(url, function (_buffer, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _texture = asset ? asset : new framework.texture(filename);
+                        var pvr = new PvrParse(assetMgr.webgl);
+                        _texture.glTexture = pvr.parse(_buffer);
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                    });
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_PVR.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
+            AssetFactory_PVR.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () { });
             };
             return AssetFactory_PVR;
         }());
@@ -8226,30 +8418,33 @@ var gd3d;
             AssetFactory_Scene.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_Scene.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_Scene.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var bundlename = framework.getFileName(state.url);
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadText(url, function (txt, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    var _scene = asset ? asset : new framework.rawscene(filename);
-                    _scene.assetbundle = bundlename;
-                    _scene.Parse(txt, assetMgr).then(function () {
+                gd3d.io.loadText(url, function (txt, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _scene = asset ? asset : new framework.rawscene(filename);
+                        _scene.assetbundle = bundlename;
+                        _scene.Parse(txt, assetMgr);
                         framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
                     });
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Scene.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var bundlename = framework.getFileName(state.url);
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _scene = asset ? asset : new framework.rawscene(filename);
-                _scene.assetbundle = bundlename;
-                _scene.Parse(txt, assetMgr).then(function () {
+            AssetFactory_Scene.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var bundlename = framework.getFileName(state.url);
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _scene = asset ? asset : new framework.rawscene(filename);
+                    _scene.assetbundle = bundlename;
+                    _scene.Parse(txt, assetMgr);
                     framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _scene, url);
                 });
             };
@@ -8268,12 +8463,38 @@ var gd3d;
             AssetFactory_Shader.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_Shader.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_Shader.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadText(url, function (txt, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
+                gd3d.io.loadText(url, function (txt, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _shader = new framework.shader(filename);
+                        try {
+                            _shader.parse(assetMgr, JSON.parse(txt));
+                        }
+                        catch (e) {
+                            console.error("error  filename :" + filename);
+                            throw new Error("shader on parse");
+                        }
+                        assetMgr.setAssetUrl(_shader, url);
+                        assetMgr.mapShader[filename] = _shader;
+                        state.resstate[filename].state = 1;
+                        onstate(state);
+                    });
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_Shader.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    var name = filename.substring(0, filename.indexOf("."));
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    state.resstate[filename].state = 1;
                     var _shader = new framework.shader(filename);
                     try {
                         _shader.parse(assetMgr, JSON.parse(txt));
@@ -8284,29 +8505,8 @@ var gd3d;
                     }
                     assetMgr.setAssetUrl(_shader, url);
                     assetMgr.mapShader[filename] = _shader;
-                    state.resstate[filename].state = 1;
                     onstate(state);
-                }, function (loadedLength, totalLength) {
-                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
-            };
-            AssetFactory_Shader.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                var name = filename.substring(0, filename.indexOf("."));
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                state.resstate[filename].state = 1;
-                var _shader = new framework.shader(filename);
-                try {
-                    _shader.parse(assetMgr, JSON.parse(txt));
-                }
-                catch (e) {
-                    console.error("error  filename :" + filename);
-                    throw new Error("shader on parse");
-                }
-                assetMgr.setAssetUrl(_shader, url);
-                assetMgr.mapShader[filename] = _shader;
-                onstate(state);
             };
             return AssetFactory_Shader;
         }());
@@ -8323,26 +8523,31 @@ var gd3d;
             AssetFactory_TextAsset.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_TextAsset.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_TextAsset.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadText(url, function (txt, err) {
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    var _textasset = asset ? asset : new framework.textasset(filename);
-                    _textasset.content = txt;
-                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _textasset, url);
+                gd3d.io.loadText(url, function (txt, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _textasset = asset ? asset : new framework.textasset(filename);
+                        _textasset.content = txt;
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _textasset, url);
+                    });
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_TextAsset.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
-                var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.ResourceState();
-                var txt = respack[filename];
-                var _textasset = asset ? asset : new framework.textasset(filename);
-                _textasset.content = txt;
-                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _textasset, url);
+            AssetFactory_TextAsset.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                    var filename = framework.getFileName(url);
+                    state.resstate[filename] = new framework.ResourceState();
+                    var txt = respack[filename];
+                    var _textasset = asset ? asset : new framework.textasset(filename);
+                    _textasset.content = txt;
+                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _textasset, url);
+                });
             };
             return AssetFactory_TextAsset;
         }());
@@ -8359,23 +8564,28 @@ var gd3d;
             AssetFactory_Texture.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_Texture.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_Texture.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
-                gd3d.io.loadImg(url, function (_tex, _err) {
-                    if (framework.AssetFactoryTools.catchError(_err, onstate, state))
-                        return;
-                    var _texture = asset ? asset : new framework.texture(filename);
-                    var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
-                    var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
-                    t2d.uploadImage(_tex, true, true, true, true);
-                    _texture.glTexture = t2d;
-                    framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                gd3d.io.loadImg(url, function (_tex, _err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(_err, onstate, state))
+                            return;
+                        var _texture = asset ? asset : new framework.texture(filename);
+                        var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
+                        var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
+                        t2d.uploadImage(_tex, false, true, true, false);
+                        _texture.glTexture = t2d;
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                    });
                 }, function (loadedLength, totalLength) {
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_Texture.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
+            AssetFactory_Texture.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                call(function () {
+                });
             };
             return AssetFactory_Texture;
         }());
@@ -8392,10 +8602,11 @@ var gd3d;
             AssetFactory_TextureDesc.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_TextureDesc.prototype.load = function (url, onstate, state, assetMgr, asset) {
+            AssetFactory_TextureDesc.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.RefResourceState();
-                gd3d.io.loadText(url, function (txt, err) {
+                gd3d.io.loadText(url, function (txt, err, isloadFail) {
+                    state.isloadFail = isloadFail ? true : false;
                     if (framework.AssetFactoryTools.catchError(err, onstate, state))
                         return;
                     var _texturedesc = JSON.parse(txt);
@@ -8422,44 +8633,50 @@ var gd3d;
                     var _textureSrc = url.replace(filename, _name);
                     if (_textureSrc.indexOf(".pvr.bin") >= 0) {
                         gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
-                            if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                                return;
-                            var _texture = asset ? asset : new framework.texture(filename);
-                            var pvr = new PvrParse(assetMgr.webgl);
-                            _texture.glTexture = pvr.parse(_buffer);
-                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                            call(function () {
+                                if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                                    return;
+                                var _texture = asset ? asset : new framework.texture(filename);
+                                var pvr = new PvrParse(assetMgr.webgl);
+                                _texture.glTexture = pvr.parse(_buffer);
+                                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                            });
                         }, function (loadedLength, totalLength) {
                             framework.AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
                         });
                     }
                     else if (_textureSrc.indexOf(".dds.bin") >= 0) {
                         gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
-                            if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                                return;
-                            var _texture = asset ? asset : new framework.texture(filename);
-                            assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
-                            var textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
-                            textureUtil.loadDDS(_textureSrc, null, function (texture, error, stats) {
-                                var t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
-                                t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
-                                t2d.texture = texture;
-                                _texture.glTexture = t2d;
+                            call(function () {
+                                if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                                    return;
+                                var _texture = asset ? asset : new framework.texture(filename);
+                                assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+                                var textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
+                                textureUtil.loadDDS(_textureSrc, null, function (texture, error, stats) {
+                                    var t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
+                                    t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
+                                    t2d.texture = texture;
+                                    _texture.glTexture = t2d;
+                                });
+                                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                             });
-                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                         }, function (loadedLength, totalLength) {
                             framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                         });
                     }
                     else {
                         gd3d.io.loadImg(_textureSrc, function (_tex, _err) {
-                            if (framework.AssetFactoryTools.catchError(_err, onstate, state))
-                                return;
-                            var _texture = asset ? asset : new framework.texture(filename);
-                            _texture.realName = _name;
-                            var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
-                            t2d.uploadImage(_tex, _mipmap, _linear, _premultiplyAlpha, _repeat);
-                            _texture.glTexture = t2d;
-                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                            call(function () {
+                                if (framework.AssetFactoryTools.catchError(_err, onstate, state))
+                                    return;
+                                var _texture = asset ? asset : new framework.texture(filename);
+                                _texture.realName = _name;
+                                var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
+                                t2d.uploadImage(_tex, _mipmap, _linear, _premultiplyAlpha, _repeat);
+                                _texture.glTexture = t2d;
+                                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                            });
                         }, function (loadedLength, totalLength) {
                             framework.AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
                         });
@@ -8468,7 +8685,7 @@ var gd3d;
                     framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                 });
             };
-            AssetFactory_TextureDesc.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset) {
+            AssetFactory_TextureDesc.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 var txt = respack[filename];
                 var _texturedesc = JSON.parse(txt);
@@ -8500,45 +8717,51 @@ var gd3d;
                 state.resstate[filename] = new framework.ResourceState();
                 if (_textureSrc.indexOf(".pvr.bin") >= 0) {
                     gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
-                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                            return;
-                        var _texture = asset ? asset : new framework.texture(filename);
-                        var pvr = new PvrParse(assetMgr.webgl);
-                        console.log(_textureSrc);
-                        _texture.glTexture = pvr.parse(_buffer);
-                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                        call(function () {
+                            if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                                return;
+                            var _texture = asset ? asset : new framework.texture(filename);
+                            var pvr = new PvrParse(assetMgr.webgl);
+                            console.log(_textureSrc);
+                            _texture.glTexture = pvr.parse(_buffer);
+                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                        });
                     }, function (loadedLength, totalLength) {
                         framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                     });
                 }
                 else if (_textureSrc.indexOf(".dds.bin") >= 0) {
                     gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
-                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                            return;
-                        var _texture = asset ? asset : new framework.texture(filename);
-                        assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
-                        var textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
-                        textureUtil.loadDDS(_textureSrc, null, function (texture, error, stats) {
-                            var t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
-                            t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
-                            t2d.texture = texture;
-                            _texture.glTexture = t2d;
+                        call(function () {
+                            if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                                return;
+                            var _texture = asset ? asset : new framework.texture(filename);
+                            assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+                            var textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
+                            textureUtil.loadDDS(_textureSrc, null, function (texture, error, stats) {
+                                var t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
+                                t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
+                                t2d.texture = texture;
+                                _texture.glTexture = t2d;
+                            });
+                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                         });
-                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
                     }, function (loadedLength, totalLength) {
                         framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                     });
                 }
                 else {
                     gd3d.io.loadImg(_textureSrc, function (_tex, _err) {
-                        if (framework.AssetFactoryTools.catchError(_err, onstate, state))
-                            return;
-                        var _texture = asset ? asset : new framework.texture(filename);
-                        _texture.realName = _name;
-                        var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
-                        t2d.uploadImage(_tex, _mipmap, _linear, _premultiplyAlpha, _repeat);
-                        _texture.glTexture = t2d;
-                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                        call(function () {
+                            if (framework.AssetFactoryTools.catchError(_err, onstate, state))
+                                return;
+                            var _texture = asset ? asset : new framework.texture(filename);
+                            _texture.realName = _name;
+                            var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
+                            t2d.uploadImage(_tex, _mipmap, _linear, _premultiplyAlpha, _repeat);
+                            _texture.glTexture = t2d;
+                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                        });
                     }, function (loadedLength, totalLength) {
                         framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                     });
@@ -8558,6 +8781,7 @@ var gd3d;
                 if (assetName === void 0) { assetName = null; }
                 this.id = new framework.resID();
                 this.defaultAsset = false;
+                this.indexDic = {};
                 this.frames = {};
                 if (!assetName) {
                     assetName = "animationClip_" + this.getGUID();
@@ -8597,11 +8821,47 @@ var gd3d;
             animationClip.prototype.Parse = function (buf) {
                 var _this = this;
                 return new gd3d.threading.gdPromise(function (resolve) {
-                    gd3d.threading.thread.Instance.Call("animiclipHandle", buf, function (result) {
-                        for (var key in result)
-                            _this[key] = result[key];
-                        resolve();
-                    });
+                    var read = new gd3d.io.binReader(buf);
+                    var _name = read.readStringAnsi();
+                    _this.fps = read.readFloat();
+                    _this.loop = read.readBoolean();
+                    _this.boneCount = read.readInt();
+                    _this.bones = [];
+                    for (var i = 0; i < _this.boneCount; i++) {
+                        var bonename = read.readStringAnsi();
+                        _this.bones.push(bonename);
+                        _this.indexDic[bonename] = i;
+                    }
+                    _this.indexDic["len"] = _this.boneCount;
+                    _this.subclipCount = read.readInt();
+                    _this.subclips = [];
+                    for (var i = 0; i < _this.subclipCount; i++) {
+                        var _subClip = new subClip();
+                        _subClip.name = read.readStringAnsi();
+                        _subClip.loop = read.readBoolean();
+                        _this.subclips.push(_subClip);
+                    }
+                    _this.frameCount = read.readInt();
+                    _this.frames = {};
+                    for (var i = 0; i < _this.frameCount; i++) {
+                        var _fid = read.readInt().toString();
+                        var _key = read.readBoolean();
+                        var _frame = new Float32Array(_this.boneCount * 7 + 1);
+                        _frame[0] = _key ? 1 : 0;
+                        var _boneInfo = new PoseBoneMatrix();
+                        for (var i_1 = 0; i_1 < _this.boneCount; i_1++) {
+                            _boneInfo.load(read);
+                            _frame[i_1 * 7 + 1] = _boneInfo.r.x;
+                            _frame[i_1 * 7 + 2] = _boneInfo.r.y;
+                            _frame[i_1 * 7 + 3] = _boneInfo.r.z;
+                            _frame[i_1 * 7 + 4] = _boneInfo.r.w;
+                            _frame[i_1 * 7 + 5] = _boneInfo.t.x;
+                            _frame[i_1 * 7 + 6] = _boneInfo.t.y;
+                            _frame[i_1 * 7 + 7] = _boneInfo.t.z;
+                        }
+                        _this.frames[_fid] = _frame;
+                    }
+                    resolve();
                 });
             };
             Object.defineProperty(animationClip.prototype, "time", {
@@ -8713,6 +8973,22 @@ var gd3d;
                 gd3d.math.pool.delete_vector3(dirtran);
                 return target;
             };
+            PoseBoneMatrix.sMultiplytpose = function (left, right, target) {
+                if (target === void 0) { target = null; }
+                if (target == null)
+                    target = PoseBoneMatrix_1.createDefault();
+                var dir = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Clone(right.tposep, dir);
+                var dirtran = gd3d.math.pool.new_vector3();
+                gd3d.math.quatTransformVector(left.r, dir, dirtran);
+                target.t.x = dirtran.x + left.t.x;
+                target.t.y = dirtran.y + left.t.y;
+                target.t.z = dirtran.z + left.t.z;
+                gd3d.math.quatMultiply(left.r, right.tposeq, target.r);
+                gd3d.math.pool.delete_vector3(dir);
+                gd3d.math.pool.delete_vector3(dirtran);
+                return target;
+            };
             PoseBoneMatrix.sMultiplyDataAndMatrix = function (leftdata, leftseek, right, target) {
                 if (target === void 0) { target = null; }
                 if (target == null)
@@ -8739,6 +9015,20 @@ var gd3d;
                 gd3d.math.quatLerp(left.r, right.r, target.r, v);
                 return target;
             };
+            PoseBoneMatrix.recycle = function (mat) {
+                this.poolmats.push(mat);
+            };
+            PoseBoneMatrix.create = function () {
+                var item = this.poolmats.pop();
+                if (item) {
+                    return item;
+                }
+                else {
+                    item = PoseBoneMatrix_1.createDefault();
+                    return item;
+                }
+            };
+            PoseBoneMatrix.poolmats = [];
             __decorate([
                 gd3d.reflect.Field("vector3"),
                 __metadata("design:type", gd3d.math.vector3)
@@ -9056,58 +9346,39 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var helpVec3 = new gd3d.math.vector3();
-        var helpVec3_1 = new gd3d.math.vector3();
-        var helpMtx4 = new gd3d.math.matrix();
-        var helpQuat = new gd3d.math.quaternion();
-        var helpQuat_1 = new gd3d.math.quaternion();
-        var helpUp = new gd3d.math.vector3(0, 1, 0);
-        var helpRight = new gd3d.math.vector3(1, 0, 0);
-        var helpFoward = new gd3d.math.vector3(0, 0, 1);
         var transform = (function () {
             function transform() {
-                this.helpLRotate = new gd3d.math.quaternion();
-                this.helpLPos = new gd3d.math.vector3();
-                this.helpLScale = new gd3d.math.vector3(1, 1, 1);
                 this.name = "noname";
                 this.insId = new insID();
                 this.prefab = "";
                 this.aabbdirty = true;
                 this.aabbchilddirty = true;
-                this._aabbchild = new gd3d.framework.aabb(gd3d.math.pool.vector3_zero, gd3d.math.pool.vector3_zero);
-                this._children = [];
-                this.dirtyLocal = false;
-                this.dirtyWorld = false;
+                this.aabbchild = new gd3d.framework.aabb(gd3d.math.pool.vector3_zero, gd3d.math.pool.vector3_zero);
+                this.dirty = true;
+                this.dirtyChild = true;
                 this.hasComponent = false;
                 this.hasComponentChild = false;
                 this.hasRendererComp = false;
                 this.hasRendererCompChild = false;
-                this._localRotate = new gd3d.math.quaternion();
-                this._localTranslate = new gd3d.math.vector3(0, 0, 0);
-                this._localScale = new gd3d.math.vector3(1, 1, 1);
+                this.dirtyWorldDecompose = false;
+                this.localRotate = new gd3d.math.quaternion();
+                this.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                this.localScale = new gd3d.math.vector3(1, 1, 1);
                 this.localMatrix = new gd3d.math.matrix();
                 this._localEulerAngles = new gd3d.math.vector3(0, 0, 0);
                 this.worldMatrix = new gd3d.math.matrix();
                 this.worldRotate = new gd3d.math.quaternion();
                 this.worldTranslate = new gd3d.math.vector3(0, 0, 0);
                 this.worldScale = new gd3d.math.vector3(1, 1, 1);
+                this.tempWorldMatrix = new gd3d.math.matrix();
                 this._beDispose = false;
             }
-            transform.prototype.checkLRTSChange = function () {
-                if (!gd3d.math.vec3Equal(this.helpLPos, this._localTranslate, Number.MIN_VALUE))
-                    return true;
-                if (!gd3d.math.quatEqual(this.helpLRotate, this._localRotate, Number.MIN_VALUE))
-                    return true;
-                if (!gd3d.math.vec3Equal(this.helpLScale, this._localScale, Number.MIN_VALUE))
-                    return true;
-                return false;
-            };
             Object.defineProperty(transform.prototype, "scene", {
                 get: function () {
                     if (this._scene == null) {
-                        if (this._parent == null)
+                        if (this.parent == null)
                             return null;
-                        this._scene = this._parent.scene;
+                        this._scene = this.parent.scene;
                     }
                     return this._scene;
                 },
@@ -9117,56 +9388,34 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            transform.prototype.updateWorldTran = function () {
-            };
-            transform.prototype.updateTran = function (bool) {
-            };
             transform.prototype.markAABBDirty = function () {
                 this.aabbdirty = true;
                 this.markAABBChildDirty();
-                var p = this._parent;
+                var p = this.parent;
                 while (p != null) {
                     p.markAABBChildDirty();
-                    p = p._parent;
+                    p = p.parent;
                 }
             };
             transform.prototype.markAABBChildDirty = function () {
                 this.aabbchilddirty = true;
             };
-            Object.defineProperty(transform.prototype, "aabb", {
-                get: function () {
-                    if (this.aabbdirty) {
-                        this.caclAABB();
-                        this.aabbdirty = false;
-                    }
-                    return this._aabb;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(transform.prototype, "aabbchild", {
-                get: function () {
-                    return this._aabbchild;
-                },
-                enumerable: true,
-                configurable: true
-            });
             transform.prototype.caclAABB = function () {
                 if (this.gameObject.components == null)
                     return;
-                if (this._aabb == null) {
-                    this._aabb = this.buildAABB();
-                    this._aabb.cloneTo(this._aabbchild);
+                if (this.aabb == null) {
+                    this.aabb = this.buildAABB();
+                    this.aabb.cloneTo(this.aabbchild);
                 }
-                this._aabb.update(this.worldMatrix);
+                this.aabb.update(this.worldMatrix);
             };
             transform.prototype.caclAABBChild = function () {
-                if (this._aabb == null)
+                if (this.aabb == null)
                     return;
-                this._aabb.cloneTo(this._aabbchild);
-                if (this._children != null) {
-                    for (var i = 0; i < this._children.length; i++) {
-                        this._aabbchild.addAABB(this._children[i]._aabbchild);
+                this.aabb.cloneTo(this.aabbchild);
+                if (this.children != null) {
+                    for (var i = 0; i < this.children.length; i++) {
+                        this.aabbchild.addAABB(this.children[i].aabbchild);
                     }
                 }
             };
@@ -9206,69 +9455,63 @@ var gd3d;
                 var _aabb = new framework.aabb(minimum, maximum);
                 return _aabb;
             };
-            Object.defineProperty(transform.prototype, "children", {
-                get: function () {
-                    return this._children;
-                },
-                set: function (children) {
-                    this._children = children;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(transform.prototype, "parent", {
-                get: function () {
-                    return this._parent;
-                },
-                enumerable: true,
-                configurable: true
-            });
             transform.prototype.addChild = function (node) {
-                this.addChildAt(node, this._children.length);
-            };
-            transform.prototype.addChildAt = function (node, index) {
-                if (index < 0)
-                    return;
-                if (node._parent != null) {
-                    node._parent.removeChild(node);
+                if (node.parent != null) {
+                    node.parent.removeChild(node);
                 }
-                if (this._children == null)
-                    this._children = [];
-                this._children.splice(index, 0, node);
+                if (this.children == null)
+                    this.children = [];
+                this.children.push(node);
                 node.scene = this.scene;
-                node._parent = this;
+                node.parent = this;
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
                 if (node.hasComponent || node.hasComponentChild)
                     this.markHaveComponent();
                 if (node.hasRendererComp || node.hasRendererCompChild)
                     this.markHaveRendererComp();
-                node.dirtify(true);
+            };
+            transform.prototype.addChildAt = function (node, index) {
+                if (index < 0)
+                    return;
+                if (node.parent != null) {
+                    node.parent.removeChild(node);
+                }
+                if (this.children == null)
+                    this.children = [];
+                this.children.splice(index, 0, node);
+                node.scene = this.scene;
+                node.parent = this;
+                framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
+                if (node.hasComponent || node.hasComponentChild)
+                    this.markHaveComponent();
+                if (node.hasRendererComp || node.hasRendererCompChild)
+                    this.markHaveRendererComp();
             };
             transform.prototype.removeAllChild = function () {
-                if (this._children == undefined)
+                if (this.children == undefined)
                     return;
-                while (this._children.length > 0) {
-                    this.removeChild(this._children[0]);
+                while (this.children.length > 0) {
+                    this.removeChild(this.children[0]);
                 }
             };
             transform.prototype.removeChild = function (node) {
-                if (node._parent != this || this._children == null) {
+                if (node.parent != this || this.children == null) {
                     throw new Error("not my child.");
                 }
-                var i = this._children.indexOf(node);
+                var i = this.children.indexOf(node);
                 if (i >= 0) {
-                    this._children.splice(i, 1);
+                    this.children.splice(i, 1);
                     framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
-                    node._parent = null;
+                    node.parent = null;
                 }
             };
             transform.prototype.find = function (name) {
                 if (this.name == name)
                     return this;
                 else {
-                    if (this._children != undefined) {
-                        for (var i in this._children) {
-                            var res = this._children[i].find(name);
+                    if (this.children != undefined) {
+                        for (var i in this.children) {
+                            var res = this.children[i].find(name);
                             if (res != null)
                                 return res;
                             else {
@@ -9297,273 +9540,250 @@ var gd3d;
                         impacted.push(tran);
                     }
                 }
-                if (tran._children != null) {
-                    for (var i = 0; i < tran._children.length; i++) {
-                        this.doImpact(tran._children[i], impacted);
+                if (tran.children != null) {
+                    for (var i = 0; i < tran.children.length; i++) {
+                        this.doImpact(tran.children[i], impacted);
                     }
-                }
-            };
-            transform.prototype.dirtify = function (local) {
-                if (local === void 0) { local = false; }
-                if ((!local || (local && this.dirtyLocal)) && this.dirtyWorld) {
-                    return;
-                }
-                if (local) {
-                    this.dirtyLocal = true;
-                }
-                if (!this.dirtyWorld) {
-                    this.dirtyWorld = true;
-                    var i = this.children.length;
-                    while (i--) {
-                        if (this.children[i].dirtyWorld) {
-                            continue;
-                        }
-                        this.children[i].dirtify();
-                    }
-                }
-                this.markAABBDirty();
-            };
-            transform.prototype.sync = function () {
-                if (this.dirtyLocal) {
-                    gd3d.math.matrixMakeTransformRTS(this._localTranslate, this._localScale, this._localRotate, this.localMatrix);
-                    gd3d.math.vec3Clone(this._localTranslate, this.helpLPos);
-                    gd3d.math.vec3Clone(this._localScale, this.helpLScale);
-                    gd3d.math.quatClone(this._localRotate, this.helpLRotate);
-                    this.dirtyLocal = false;
-                }
-                if (this.dirtyWorld) {
-                    if (!this._parent) {
-                        gd3d.math.matrixClone(this.localMatrix, this.worldMatrix);
-                    }
-                    else {
-                        gd3d.math.matrixMultiply(this._parent.worldMatrix, this.localMatrix, this.worldMatrix);
-                    }
-                    this.dirtyWorld = false;
                 }
             };
             transform.prototype.markDirty = function () {
+                this.dirty = true;
+                var p = this.parent;
+                while (p != null) {
+                    p.dirtyChild = true;
+                    p = p.parent;
+                }
             };
             transform.prototype.markHaveComponent = function () {
                 this.hasComponent = true;
-                var p = this._parent;
+                var p = this.parent;
                 while (p != null) {
+                    p.dirtyChild = true;
                     p.hasComponentChild = true;
-                    p = p._parent;
+                    p = p.parent;
                 }
             };
             transform.prototype.markHaveRendererComp = function () {
                 this.hasRendererComp = true;
-                var p = this._parent;
+                var p = this.parent;
                 while (p != null) {
+                    p.dirtyChild = true;
                     p.hasRendererCompChild = true;
-                    p = p._parent;
+                    p = p.parent;
                 }
+            };
+            transform.prototype.updateTran = function (parentChange) {
+                if (this.dirtyChild == false && this.dirty == false && parentChange == false)
+                    return;
+                if (this.dirty) {
+                    gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
+                }
+                if (this.dirty || parentChange) {
+                    if (this.parent == null) {
+                        gd3d.math.matrixClone(this.localMatrix, this.worldMatrix);
+                    }
+                    else {
+                        gd3d.math.matrixMultiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
+                    }
+                    this.dirtyWorldDecompose = true;
+                    this.markAABBDirty();
+                }
+                if (this.children != null) {
+                    for (var i = 0; i < this.children.length; i++) {
+                        this.children[i].updateTran(parentChange || this.dirty);
+                    }
+                }
+                this.dirty = false;
+                this.dirtyChild = false;
+                if (this.aabbdirty) {
+                    this.caclAABB();
+                    this.aabbdirty = false;
+                }
+            };
+            transform.prototype.updateWorldTran = function () {
+                var p = this.parent;
+                var dirtylist = [];
+                dirtylist.push(this);
+                while (p != null) {
+                    if (p.dirty)
+                        dirtylist.push(p);
+                    p = p.parent;
+                }
+                var top = dirtylist.pop();
+                top.updateTran(false);
             };
             transform.prototype.updateAABBChild = function () {
                 if (this.aabbchilddirty) {
-                    if (this._children != null) {
-                        for (var i = 0; i < this._children.length; i++) {
-                            this._children[i].updateAABBChild();
+                    if (this.children != null) {
+                        for (var i = 0; i < this.children.length; i++) {
+                            this.children[i].updateAABBChild();
                         }
                     }
                     this.caclAABBChild();
                     this.aabbchilddirty = false;
                 }
             };
-            Object.defineProperty(transform.prototype, "localRotate", {
-                get: function () {
-                    return this._localRotate;
-                },
-                set: function (rotate) {
-                    gd3d.math.quatClone(rotate, this._localRotate);
-                    if (!this.dirtyLocal) {
-                        this.dirtify(true);
-                    }
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(transform.prototype, "localTranslate", {
-                get: function () {
-                    return this._localTranslate;
-                },
-                set: function (position) {
-                    gd3d.math.vec3Clone(position, this._localTranslate);
-                    if (!this.dirtyLocal) {
-                        this.dirtify(true);
-                    }
-                },
-                enumerable: true,
-                configurable: true
-            });
             Object.defineProperty(transform.prototype, "localPosition", {
                 get: function () {
-                    return this._localTranslate;
+                    return this.localTranslate;
                 },
                 set: function (position) {
-                    gd3d.math.vec3Clone(position, this._localTranslate);
-                    if (!this.dirtyLocal) {
-                        this.dirtify(true);
-                    }
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(transform.prototype, "localScale", {
-                get: function () {
-                    return this._localScale;
-                },
-                set: function (scale) {
-                    gd3d.math.vec3Clone(scale, this._localScale);
-                    if (!this.dirtyLocal) {
-                        this.dirtify(true);
-                    }
+                    this.localTranslate = position;
                 },
                 enumerable: true,
                 configurable: true
             });
             Object.defineProperty(transform.prototype, "localEulerAngles", {
                 get: function () {
-                    gd3d.math.quatToEulerAngles(this._localRotate, this._localEulerAngles);
+                    gd3d.math.quatToEulerAngles(this.localRotate, this._localEulerAngles);
                     return this._localEulerAngles;
                 },
-                set: function (angles) {
-                    gd3d.math.quatFromEulerAngles(angles.x, angles.y, angles.z, this._localRotate);
-                    if (!this.dirtyLocal) {
-                        this.dirtify(true);
-                    }
+                set: function (angle) {
+                    gd3d.math.quatFromEulerAngles(angle.x, angle.y, angle.z, this.localRotate);
                 },
                 enumerable: true,
                 configurable: true
             });
-            transform.prototype.getWorldRotate = function () {
-                gd3d.math.matrixGetRotation(this.getWorldMatrix(), this.worldRotate);
-                return this.worldRotate;
-            };
-            transform.prototype.setWorldRotate = function (rotate) {
-                if (!this._parent) {
-                    gd3d.math.quatClone(rotate, this._localRotate);
-                }
-                else {
-                    gd3d.math.quatClone(this._parent.getWorldRotate(), helpQuat);
-                    gd3d.math.quatInverse(helpQuat, helpQuat_1);
-                    gd3d.math.quatMultiply(helpQuat_1, rotate, this._localRotate);
-                }
-                if (!this.dirtyLocal) {
-                    this.dirtify(true);
-                }
-            };
             transform.prototype.getWorldTranslate = function () {
-                gd3d.math.matrixGetTranslation(this.getWorldMatrix(), this.worldTranslate);
+                if (this.dirtyWorldDecompose) {
+                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                    this.dirtyWorldDecompose = false;
+                }
                 return this.worldTranslate;
-            };
-            transform.prototype.getWorldPosition = function () {
-                gd3d.math.matrixGetTranslation(this.getWorldMatrix(), this.worldTranslate);
-                return this.worldTranslate;
-            };
-            transform.prototype.setWorldPosition = function (pos) {
-                if (!this._parent) {
-                    gd3d.math.vec3Clone(pos, this._localTranslate);
-                }
-                else {
-                    gd3d.math.matrixInverse(this._parent.getWorldMatrix(), helpMtx4);
-                    gd3d.math.matrixTransformVector3(pos, helpMtx4, this._localTranslate);
-                }
-                if (!this.dirtyLocal) {
-                    this.dirtify(true);
-                }
             };
             transform.prototype.getWorldScale = function () {
-                gd3d.math.matrixGetScale(this.getWorldMatrix(), this.worldScale);
+                if (this.dirtyWorldDecompose) {
+                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                    this.dirtyWorldDecompose = false;
+                }
                 return this.worldScale;
             };
-            transform.prototype.setWorldScale = function (scale) {
-                if (!this._parent) {
-                    gd3d.math.vec3Clone(scale, this._localScale);
+            transform.prototype.getWorldRotate = function () {
+                if (this.dirtyWorldDecompose) {
+                    gd3d.math.matrixDecompose(this.worldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
+                    this.dirtyWorldDecompose = false;
                 }
-                else {
-                    gd3d.math.vec3Clone(this._parent.getWorldScale(), helpVec3);
-                    this._localScale.x = scale.x / helpVec3.x;
-                    this._localScale.y = scale.y / helpVec3.y;
-                    this._localScale.z = scale.z / helpVec3.z;
-                }
-                if (!this.dirtyLocal) {
-                    this.dirtify(true);
-                }
+                return this.worldRotate;
             };
             transform.prototype.getLocalMatrix = function () {
-                if (this.dirtyLocal) {
-                    gd3d.math.matrixMakeTransformRTS(this._localTranslate, this._localScale, this._localRotate, this.localMatrix);
-                    gd3d.math.vec3Clone(this._localTranslate, this.helpLPos);
-                    gd3d.math.vec3Clone(this._localScale, this.helpLScale);
-                    gd3d.math.quatClone(this._localRotate, this.helpLRotate);
-                    this.dirtyLocal = false;
-                }
+                if (this.dirty)
+                    gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
                 return this.localMatrix;
             };
             transform.prototype.getWorldMatrix = function () {
-                if (!this.dirtyLocal && !this.dirtyWorld) {
-                    this.checkToTop();
+                if (this.dirty) {
+                    if (!this.parent)
+                        gd3d.math.matrixMultiply(this.parent.worldMatrix, this.getLocalMatrix(), this.tempWorldMatrix);
+                    else
+                        gd3d.math.matrixClone(this.getLocalMatrix(), this.tempWorldMatrix);
+                    return this.tempWorldMatrix;
                 }
-                if (!this.dirtyLocal && !this.dirtyWorld) {
+                else
                     return this.worldMatrix;
-                }
-                if (this._parent) {
-                    this._parent.getWorldMatrix();
-                }
-                this.sync();
-                return this.worldMatrix;
-            };
-            transform.prototype.checkToTop = function () {
-                var top;
-                var temp = this;
-                while (true) {
-                    if (temp.checkLRTSChange()) {
-                        temp.dirtyLocal = true;
-                        top = temp;
-                    }
-                    if (!temp._parent)
-                        break;
-                    temp = temp._parent;
-                }
-                if (top) {
-                    top.dirtify(true);
-                }
             };
             transform.prototype.getForwardInWorld = function (out) {
-                gd3d.math.matrixTransformNormal(helpFoward, this.getWorldMatrix(), out);
+                var forward = gd3d.math.pool.new_vector3();
+                forward.x = 0;
+                forward.y = 0;
+                forward.z = 1;
+                gd3d.math.matrixTransformNormal(forward, this.getWorldMatrix(), out);
                 gd3d.math.vec3Normalize(out, out);
+                gd3d.math.pool.delete_vector3(forward);
             };
             transform.prototype.getRightInWorld = function (out) {
-                gd3d.math.matrixTransformNormal(helpRight, this.getWorldMatrix(), out);
+                var right = gd3d.math.pool.new_vector3();
+                right.x = 1;
+                right.y = 0;
+                right.z = 0;
+                gd3d.math.matrixTransformNormal(right, this.getWorldMatrix(), out);
                 gd3d.math.vec3Normalize(out, out);
+                gd3d.math.pool.delete_vector3(right);
             };
             transform.prototype.getUpInWorld = function (out) {
-                gd3d.math.matrixTransformNormal(helpUp, this.getWorldMatrix(), out);
+                var up = gd3d.math.pool.new_vector3();
+                up.x = 0;
+                up.y = 1;
+                up.z = 0;
+                gd3d.math.matrixTransformNormal(up, this.getWorldMatrix(), out);
                 gd3d.math.vec3Normalize(out, out);
+                gd3d.math.pool.delete_vector3(up);
             };
             transform.prototype.setWorldMatrix = function (mat) {
-                if (!this._parent) {
-                    gd3d.math.matrixDecompose(mat, this._localScale, this._localRotate, this._localTranslate);
+                this.dirty = true;
+                this.updateWorldTran();
+                var pworld = gd3d.math.pool.new_matrix();
+                if (this.parent != null) {
+                    gd3d.math.matrixClone(this.parent.worldMatrix, pworld);
                 }
                 else {
-                    gd3d.math.matrixInverse(this._parent.getWorldMatrix(), helpMtx4);
-                    gd3d.math.matrixMultiply(helpMtx4, mat, this.localMatrix);
-                    gd3d.math.matrixDecompose(this.localMatrix, this._localScale, this._localRotate, this._localTranslate);
+                    gd3d.math.matrixMakeIdentity(pworld);
                 }
-                if (!this.dirtyLocal) {
-                    this.dirtify(true);
+                var invparentworld = gd3d.math.pool.new_matrix();
+                gd3d.math.matrixInverse(pworld, invparentworld);
+                gd3d.math.matrixClone(mat, this.worldMatrix);
+                this.dirtyWorldDecompose = true;
+                gd3d.math.matrixMultiply(invparentworld, this.worldMatrix, this.localMatrix);
+                gd3d.math.matrixDecompose(this.localMatrix, this.localScale, this.localRotate, this.localTranslate);
+                this.markDirty();
+                gd3d.math.pool.delete_matrix(pworld);
+                gd3d.math.pool.delete_matrix(invparentworld);
+            };
+            transform.prototype.setWorldPosition = function (pos) {
+                this.dirty = true;
+                this.updateWorldTran();
+                var pworld = gd3d.math.pool.new_matrix();
+                if (this.parent != null) {
+                    gd3d.math.matrixClone(this.parent.worldMatrix, pworld);
                 }
+                else {
+                    gd3d.math.matrixMakeIdentity(pworld);
+                }
+                var invparentworld = gd3d.math.pool.new_matrix();
+                gd3d.math.matrixInverse(pworld, invparentworld);
+                this.worldMatrix.rawData[12] = pos.x;
+                this.worldMatrix.rawData[13] = pos.y;
+                this.worldMatrix.rawData[14] = pos.z;
+                gd3d.math.matrixMultiply(invparentworld, this.worldMatrix, this.localMatrix);
+                gd3d.math.matrixDecompose(this.localMatrix, this.localScale, this.localRotate, this.localTranslate);
+                this.markDirty();
+                gd3d.math.pool.delete_matrix(pworld);
+                gd3d.math.pool.delete_matrix(invparentworld);
             };
             transform.prototype.lookat = function (trans) {
-                this.calcLookAt(trans.getWorldTranslate());
+                this.dirty = true;
+                trans.updateWorldTran();
+                this.updateWorldTran();
+                var p0 = this.getWorldTranslate();
+                var p1 = trans.getWorldTranslate();
+                var d = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(p1, p0, d);
+                var quatworld = gd3d.math.pool.new_quaternion();
+                var quat = gd3d.math.pool.new_quaternion();
+                gd3d.math.quatLookat(p0, p1, quatworld);
+                var quatworldCur = this.parent.getWorldRotate();
+                gd3d.math.quatInverse(quatworldCur, quat);
+                gd3d.math.quatMultiply(quat, quatworld, this.localRotate);
+                gd3d.math.pool.delete_vector3(d);
+                gd3d.math.pool.delete_quaternion(quatworld);
+                gd3d.math.pool.delete_quaternion(quat);
             };
             transform.prototype.lookatPoint = function (point) {
-                this.calcLookAt(point);
-            };
-            transform.prototype.calcLookAt = function (point) {
-                gd3d.math.quatLookat(this.getWorldTranslate(), point, this.worldRotate);
-                this.setWorldRotate(this.worldRotate);
+                this.dirty = true;
+                this.updateWorldTran();
+                var p0 = this.getWorldTranslate();
+                var p1 = point;
+                var d = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Subtract(p1, p0, d);
+                var quatworld = gd3d.math.pool.new_quaternion();
+                var quat = gd3d.math.pool.new_quaternion();
+                gd3d.math.quatLookat(p0, p1, quatworld);
+                var quatworldCur = this.parent.getWorldRotate();
+                gd3d.math.quatInverse(quatworldCur, quat);
+                gd3d.math.quatMultiply(quat, quatworld, this.localRotate);
+                this.markDirty();
+                gd3d.math.pool.delete_vector3(d);
+                gd3d.math.pool.delete_quaternion(quatworld);
+                gd3d.math.pool.delete_quaternion(quat);
             };
             Object.defineProperty(transform.prototype, "gameObject", {
                 get: function () {
@@ -9589,18 +9809,21 @@ var gd3d;
             transform.prototype.dispose = function () {
                 if (this._beDispose)
                     return;
-                if (this._parent) {
-                    this._parent.removeChild(this);
+                if (this.parent) {
+                    this.parent.removeChild(this);
                 }
-                if (this._children) {
-                    for (var k in this._children) {
-                        this._children[k].dispose();
+                if (this.children) {
+                    for (var k in this.children) {
+                        this.children[k].dispose();
                     }
                 }
                 this._gameObject.dispose();
                 this._beDispose = true;
                 if (this.onDispose)
                     this.onDispose();
+            };
+            transform.prototype.destroy = function () {
+                this.dispose();
             };
             __decorate([
                 gd3d.reflect.Field("string"),
@@ -9612,24 +9835,20 @@ var gd3d;
             ], transform.prototype, "prefab", void 0);
             __decorate([
                 gd3d.reflect.Field("transform[]"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Array])
-            ], transform.prototype, "children", null);
+                __metadata("design:type", Array)
+            ], transform.prototype, "children", void 0);
             __decorate([
                 gd3d.reflect.Field("quaternion"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [gd3d.math.quaternion])
-            ], transform.prototype, "localRotate", null);
+                __metadata("design:type", gd3d.math.quaternion)
+            ], transform.prototype, "localRotate", void 0);
             __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [gd3d.math.vector3])
-            ], transform.prototype, "localTranslate", null);
+                gd3d.reflect.Field("vector3", new gd3d.math.vector3(0, 0, 0)),
+                __metadata("design:type", gd3d.math.vector3)
+            ], transform.prototype, "localTranslate", void 0);
             __decorate([
-                gd3d.reflect.Field("vector3"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [gd3d.math.vector3])
-            ], transform.prototype, "localScale", null);
+                gd3d.reflect.Field("vector3", new gd3d.math.vector3(1, 1, 1)),
+                __metadata("design:type", gd3d.math.vector3)
+            ], transform.prototype, "localScale", void 0);
             __decorate([
                 gd3d.reflect.Field("gameObject"),
                 __metadata("design:type", Object),
@@ -9752,6 +9971,7 @@ var gd3d;
                 this.gameObject.transform.addChild(this.subTran);
                 this.gameObject.transform.markDirty();
                 this.subTran.markDirty();
+                this.gameObject.transform.updateWorldTran();
             };
             boxcollider.prototype.getColliderMesh = function () {
                 var _mesh = new framework.mesh();
@@ -10024,7 +10244,7 @@ var gd3d;
                 context.updateModel(this.gameObject.transform);
                 if (this.filter != null) {
                     var mesh = this.filter.getMeshOutput();
-                    if (mesh != null) {
+                    if (mesh != null && mesh.glMesh) {
                         mesh.glMesh.bindVboBuffer(context.webgl);
                         if (mesh.submesh != null) {
                             for (var i = 0; i < mesh.submesh.length; i++) {
@@ -10032,7 +10252,7 @@ var gd3d;
                                 var mid = mesh.submesh[i].matIndex;
                                 var usemat = this.materials[mid];
                                 var drawtype = this.gameObject.transform.scene.fog ? "base_fog" : "base";
-                                if (this.lightmapIndex >= 0) {
+                                if (this.lightmapIndex >= 0 && this.gameObject.transform.scene.lightmaps.length > 0) {
                                     drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
                                     if (this.gameObject.transform.scene.lightmaps.length > this.lightmapIndex) {
                                         context.lightmap = this.gameObject.transform.scene.lightmaps[this.lightmapIndex];
@@ -10102,11 +10322,9 @@ var gd3d;
                 this.layer = framework.RenderLayerEnum.Common;
                 this.issetq = false;
                 this._queue = 0;
-                this.maxBoneCount = 0;
-                this._skintype = 0;
+                this.maxBoneCount = 55;
                 this._efficient = true;
             }
-            skinnedMeshRenderer_1 = skinnedMeshRenderer;
             Object.defineProperty(skinnedMeshRenderer.prototype, "renderLayer", {
                 get: function () { return this.gameObject.layer; },
                 set: function (layer) {
@@ -10308,17 +10526,8 @@ var gd3d;
             };
             skinnedMeshRenderer.prototype.update = function (delta) {
                 if (this._skeletonMatrixData == null) {
-                    this._skintype = this.useBoneShader(this.materials[0]);
-                    if (this._skintype == 1) {
-                        this.maxBoneCount = 24;
-                        this._skeletonMatrixData = new Float32Array(16 * this.maxBoneCount);
-                        this._efficient = false;
-                    }
-                    else if (this._skintype == 2) {
-                        this.maxBoneCount = 55;
-                        this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
-                        this._efficient = true;
-                    }
+                    this.maxBoneCount = 55;
+                    this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
                 }
                 if (this.materials != null && this.materials.length > 0) {
                     var _mat = this.materials[0];
@@ -10329,29 +10538,7 @@ var gd3d;
                     }
                 }
                 if (this.player != null) {
-                    if (this.player.isCache && !this.player.mix) {
-                        var cacheKey = this.player.cacheKey + "_" + this.mesh.getGUID();
-                        var data = skinnedMeshRenderer_1.dataCaches[cacheKey];
-                        if (!data) {
-                            var _cachePlayer = framework.aniplayer.playerCaches[this.player.cacheKey];
-                            if (_cachePlayer) {
-                                var baseSize = this._efficient ? 8 : 16;
-                                data = new Float32Array(this.maxBoneCount * baseSize);
-                                _cachePlayer.fillPoseData(data, this.bones, this._efficient);
-                                skinnedMeshRenderer_1.dataCaches[cacheKey] = data;
-                                this.cacheData = data;
-                                return;
-                            }
-                        }
-                        else {
-                            this.cacheData = data;
-                            return;
-                        }
-                    }
-                    this.cacheData = null;
-                    if (this._skeletonMatrixData != null) {
-                        this.player.fillPoseData(this._skeletonMatrixData, this.bones, this._efficient);
-                    }
+                    this.player.fillPoseData(this._skeletonMatrixData, this.bones);
                 }
             };
             skinnedMeshRenderer.prototype.render = function (context, assetmgr, camera) {
@@ -10360,27 +10547,7 @@ var gd3d;
                     context.updateLightMask(this.gameObject.layer);
                     context.updateModel(this.player.gameObject.transform);
                 }
-                for (var i_2 = 0; i_2 < this.materials.length; i_2++) {
-                    if (this.materials[i_2] == null)
-                        continue;
-                    if (this.cacheData != null && this._skintype > 0) {
-                        if (this._efficient) {
-                            context.vec4_bones = this.cacheData;
-                        }
-                        else {
-                            context.matrix_bones = this.cacheData;
-                        }
-                        continue;
-                    }
-                    if (this._skeletonMatrixData != null && this._skintype > 0) {
-                        if (this._efficient) {
-                            context.vec4_bones = this._skeletonMatrixData;
-                        }
-                        else {
-                            context.matrix_bones = this._skeletonMatrixData;
-                        }
-                    }
-                }
+                context.vec4_bones = this._skeletonMatrixData;
                 if (this._mesh && this.mesh.glMesh) {
                     this._mesh.glMesh.bindVboBuffer(context.webgl);
                     if (this._mesh.submesh != null) {
@@ -10409,20 +10576,10 @@ var gd3d;
                 if (this.mesh)
                     this.mesh.unuse(true);
                 this.bones.length = 0;
+                this._skeletonMatrixData = null;
             };
             skinnedMeshRenderer.prototype.clone = function () {
             };
-            skinnedMeshRenderer.prototype.useBoneShader = function (mat) {
-                var matpasses = mat.getShader().passes["skin"];
-                if (matpasses == null || matpasses.length == 0)
-                    return 0;
-                if (matpasses[0].mapuniforms["glstate_vec4_bones"] != null)
-                    return 2;
-                else if (matpasses[0].mapuniforms["glstate_matrix_bones"] != null)
-                    return 1;
-                return 0;
-            };
-            skinnedMeshRenderer.dataCaches = [];
             __decorate([
                 gd3d.reflect.Field("material[]"),
                 __metadata("design:type", Array)
@@ -10440,13 +10597,12 @@ var gd3d;
                 gd3d.reflect.Field("transform"),
                 __metadata("design:type", framework.transform)
             ], skinnedMeshRenderer.prototype, "rootBone", void 0);
-            skinnedMeshRenderer = skinnedMeshRenderer_1 = __decorate([
+            skinnedMeshRenderer = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
                 __metadata("design:paramtypes", [])
             ], skinnedMeshRenderer);
             return skinnedMeshRenderer;
-            var skinnedMeshRenderer_1;
         }());
         framework.skinnedMeshRenderer = skinnedMeshRenderer;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -11074,6 +11230,7 @@ var gd3d;
                 this.defaultAsset = false;
                 this.updateByEffect = false;
                 this.submesh = [];
+                this.reading = false;
                 if (!assetName) {
                     assetName = "mesh_" + this.getGUID();
                 }
@@ -11108,6 +11265,185 @@ var gd3d;
                     total += this.data.caclByteLength();
                 }
                 return total;
+            };
+            mesh.prototype.readProcess = function (read, data, objVF, vcount, vec10tpose, callback) {
+                var _this = this;
+                if (this.reading)
+                    return;
+                var tag = read.readUInt8();
+                if (tag == 255) {
+                    callback();
+                    return;
+                }
+                if (tag == 1) {
+                    if (data.pos == undefined) {
+                        data.pos = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.Position;
+                    }
+                    for (var i = 0; i < vcount; i++) {
+                        var _position = new gd3d.math.vector3();
+                        _position.x = read.readSingle();
+                        _position.y = read.readSingle();
+                        _position.z = read.readSingle();
+                        data.pos.push(_position);
+                    }
+                }
+                else if (tag == 2) {
+                    if (data.color == undefined) {
+                        data.color = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.Color;
+                    }
+                    for (var i = 0; i < vcount; i++) {
+                        var _color = new gd3d.math.color();
+                        _color.a = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
+                        _color.r = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
+                        _color.g = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
+                        _color.b = gd3d.math.floatClamp(read.readUInt8() / 255, 0, 1.0);
+                        data.color.push(_color);
+                    }
+                }
+                else if (tag == 3) {
+                    if (data.normal == undefined) {
+                        data.normal = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.Normal;
+                    }
+                    for (var i = 0; i < vcount; i++) {
+                        var _normal = new gd3d.math.vector3();
+                        _normal.x = read.readSingle();
+                        _normal.y = read.readSingle();
+                        _normal.z = read.readSingle();
+                        data.normal.push(_normal);
+                    }
+                }
+                else if (tag == 4) {
+                    if (data.uv == undefined) {
+                        data.uv = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.UV0;
+                    }
+                    for (var i = 0; i < vcount; i++) {
+                        var uv = new gd3d.math.vector2();
+                        uv.x = read.readSingle();
+                        uv.y = read.readSingle();
+                        data.uv.push(uv);
+                    }
+                }
+                else if (tag == 5) {
+                    if (data.uv2 == undefined) {
+                        data.uv2 = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.UV1;
+                    }
+                    for (var i = 0; i < vcount; i++) {
+                        var uv = new gd3d.math.vector2();
+                        uv.x = read.readSingle();
+                        uv.y = read.readSingle();
+                        data.uv2.push(uv);
+                    }
+                }
+                else if (tag == 6) {
+                    for (var i = 0; i < vcount; i++) {
+                        read.readSingle();
+                        read.readSingle();
+                    }
+                }
+                else if (tag == 7) {
+                    if (data.tangent == undefined) {
+                        data.tangent = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.Tangent;
+                    }
+                    for (var i = 0; i < vcount; i++) {
+                        var tangent = new gd3d.math.vector3();
+                        var x = read.readSingle();
+                        var y = read.readSingle();
+                        var z = read.readSingle();
+                        var w = read.readSingle();
+                        tangent.x = x / w;
+                        tangent.y = y / w;
+                        tangent.z = z / w;
+                        data.tangent.push(tangent);
+                    }
+                }
+                else if (tag == 8) {
+                    for (var i = 0; i < vcount; i++) {
+                        read.readSingle();
+                        read.readSingle();
+                    }
+                }
+                else if (tag == 16) {
+                    var tposelen = read.readUInt8();
+                    for (var i = 0; i < tposelen; i++) {
+                        vec10tpose[i * 10 + 0] = read.readSingle();
+                        vec10tpose[i * 10 + 1] = read.readSingle();
+                        vec10tpose[i * 10 + 2] = read.readSingle();
+                        vec10tpose[i * 10 + 3] = read.readSingle();
+                        vec10tpose[i * 10 + 4] = read.readSingle();
+                        vec10tpose[i * 10 + 5] = read.readSingle();
+                        vec10tpose[i * 10 + 6] = read.readSingle();
+                        vec10tpose[i * 10 + 7] = read.readSingle();
+                        vec10tpose[i * 10 + 8] = read.readSingle();
+                        vec10tpose[i * 10 + 9] = read.readSingle();
+                    }
+                }
+                else if (tag == 17) {
+                    if (data.blendIndex == undefined) {
+                        data.blendIndex = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.BlendIndex4;
+                    }
+                    if (data.blendWeight == undefined) {
+                        data.blendWeight = [];
+                        objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.BlendWeight4;
+                    }
+                    for (var i = 0; i < vcount; i++) {
+                        var _boneIndex = new gd3d.render.number4();
+                        _boneIndex.v0 = read.readUInt32();
+                        _boneIndex.v1 = read.readUInt32();
+                        _boneIndex.v2 = read.readUInt32();
+                        _boneIndex.v3 = read.readUInt32();
+                        var _boneWeight = new gd3d.render.number4();
+                        _boneWeight.v0 = read.readSingle();
+                        _boneWeight.v1 = read.readSingle();
+                        _boneWeight.v2 = read.readSingle();
+                        _boneWeight.v3 = read.readSingle();
+                        data.blendIndex.push(_boneIndex);
+                        data.blendWeight.push(_boneWeight);
+                    }
+                }
+                else {
+                    throw "notwrite" + tag;
+                }
+                this.reading = false;
+                setTimeout(function () {
+                    _this.readProcess(read, data, objVF, vcount, vec10tpose, function () {
+                        callback();
+                    });
+                });
+            };
+            mesh.prototype.readFinish = function (read, data, buf, objVF, webgl) {
+                var subcount = read.readUInt8();
+                data.trisindex = [];
+                this.submesh = [];
+                for (var i = 0; i < subcount; i++) {
+                    var _submeshinfo = new subMeshInfo();
+                    var tv = read.readUInt32();
+                    var sublen = read.readUInt32();
+                    _submeshinfo.start = data.trisindex.length;
+                    _submeshinfo.size = sublen;
+                    _submeshinfo.matIndex = i;
+                    this.submesh.push(_submeshinfo);
+                    for (var j = 0; j < sublen; j++) {
+                        var index = read.readUInt32();
+                        data.trisindex.push(index);
+                    }
+                }
+                buf = null;
+                data.originVF = objVF.vf;
+                this.data = data;
+                this.glMesh = new gd3d.render.glMesh();
+                var vertexs = this.data.genVertexDataArray(objVF.vf);
+                var indices = this.data.genIndexDataArray();
+                this.glMesh.initBuffer(webgl, objVF.vf, this.data.pos.length);
+                this.glMesh.uploadVertexData(webgl, vertexs);
+                this.glMesh.addIndex(webgl, indices.length);
+                this.glMesh.uploadIndexData(webgl, 0, indices);
             };
             mesh.prototype.Parse = function (buf, webgl) {
                 var _this = this;
@@ -11242,8 +11578,8 @@ var gd3d;
                 }
                 if (this.data.blendIndex != undefined) {
                     data.blendIndex = [];
-                    for (var i_3 = 0, len = this.data.blendIndex.length; i_3 < len; ++i_3) {
-                        var item = this.data.blendIndex[i_3];
+                    for (var i_2 = 0, len = this.data.blendIndex.length; i_2 < len; ++i_2) {
+                        var item = this.data.blendIndex[i_2];
                         var _boneIndex = new gd3d.render.number4();
                         _boneIndex.v0 = item.v0;
                         _boneIndex.v1 = item.v1;
@@ -11254,8 +11590,8 @@ var gd3d;
                 }
                 if (this.data.blendWeight != undefined) {
                     data.blendWeight = [];
-                    for (var i_4 = 0, len = this.data.blendWeight.length; i_4 < len; ++i_4) {
-                        var item = this.data.blendWeight[i_4];
+                    for (var i_3 = 0, len = this.data.blendWeight.length; i_3 < len; ++i_3) {
+                        var item = this.data.blendWeight[i_3];
                         var _boneWeight = new gd3d.render.number4();
                         _boneWeight.v0 = item.v0;
                         _boneWeight.v1 = item.v1;
@@ -11549,23 +11885,19 @@ var gd3d;
                 this.trans = trans;
             };
             prefab.prototype.Parse = function (jsonStr, assetmgr) {
-                var _this = this;
-                return new gd3d.threading.gdPromise(function (resolve) {
-                    _this.jsonstr = jsonStr;
-                    var jsonObj = JSON.parse(jsonStr);
-                    var type = jsonObj["type"];
-                    switch (type) {
-                        case "transform":
-                            _this.trans = new framework.transform;
-                            break;
-                        case "transform2D":
-                            _this.trans = new framework.transform2D;
-                            break;
-                    }
-                    if (type != null)
-                        gd3d.io.deSerialize(jsonObj, _this.trans, assetmgr, _this.assetbundle);
-                    resolve();
-                });
+                this.jsonstr = jsonStr;
+                var jsonObj = JSON.parse(jsonStr);
+                var type = jsonObj["type"];
+                switch (type) {
+                    case "transform":
+                        this.trans = new framework.transform;
+                        break;
+                    case "transform2D":
+                        this.trans = new framework.transform2D;
+                        break;
+                }
+                if (type != null)
+                    gd3d.io.deSerialize(jsonObj, this.trans, assetmgr, this.assetbundle);
             };
             prefab = __decorate([
                 gd3d.reflect.SerializeType,
@@ -11625,47 +11957,44 @@ var gd3d;
                 }
             };
             rawscene.prototype.Parse = function (txt, assetmgr) {
-                var _this = this;
-                return new gd3d.threading.gdPromise(function (resolve) {
-                    var _json = JSON.parse(txt);
-                    _this.rootNode = new framework.transform();
-                    _this.rootNode.name = _this.getName();
-                    gd3d.io.deSerialize(_json["rootNode"], _this.rootNode, assetmgr, _this.assetbundle);
-                    _this.lightmaps = [];
-                    _this.lightmapData = _json["lightmap"];
-                    var lightmapCount = _this.lightmapData.length;
-                    for (var i = 0; i < lightmapCount; i++) {
-                        if (_this.lightmapData[i] == null) {
-                            _this.lightmaps.push(null);
-                        }
-                        else {
-                            var lightmapName = _this.lightmapData[i].name;
-                            var lightmap = assetmgr.getAssetByName(lightmapName, _this.assetbundle);
-                            if (lightmap)
-                                lightmap.use();
-                            _this.lightmaps.push(lightmap);
+                var _json = JSON.parse(txt);
+                this.rootNode = new framework.transform();
+                this.rootNode.name = this.getName();
+                gd3d.io.deSerialize(_json["rootNode"], this.rootNode, assetmgr, this.assetbundle);
+                this.lightmaps = [];
+                this.lightmapData = _json["lightmap"];
+                var lightmapCount = this.lightmapData.length;
+                for (var i = 0; i < lightmapCount; i++) {
+                    if (this.lightmapData[i] == null) {
+                        this.lightmaps.push(null);
+                    }
+                    else {
+                        var lightmapName = this.lightmapData[i].name;
+                        var lightmap = assetmgr.getAssetByName(lightmapName, this.assetbundle);
+                        if (lightmap) {
+                            lightmap.use();
+                            this.lightmaps.push(lightmap);
                         }
                     }
-                    var fogData = _json["fog"];
-                    if (fogData != undefined) {
-                        _this.fog = new Fog();
-                        _this.fog._Start = fogData["_Start"];
-                        _this.fog._End = fogData["_End"];
-                        var cor = fogData["_Color"];
-                        if (typeof (cor) == "string") {
-                            var array = cor.split(",");
-                            _this.fog._Color = new gd3d.math.vector4(parseFloat(array[0]), parseFloat(array[1]), parseFloat(array[2]), parseFloat(array[3]));
-                        }
-                        else
-                            _this.fog._Color = cor;
-                        _this.fog._Density = fogData["_Density"];
+                }
+                var fogData = _json["fog"];
+                if (fogData != undefined) {
+                    this.fog = new Fog();
+                    this.fog._Start = fogData["_Start"];
+                    this.fog._End = fogData["_End"];
+                    var cor = fogData["_Color"];
+                    if (typeof (cor) == "string") {
+                        var array = cor.split(",");
+                        this.fog._Color = new gd3d.math.vector4(parseFloat(array[0]), parseFloat(array[1]), parseFloat(array[2]), parseFloat(array[3]));
                     }
-                    var nav = _json["navmesh"];
-                    if (nav != undefined && nav.data != null) {
-                        _this.navMeshJson = nav.data;
-                    }
-                    resolve();
-                });
+                    else
+                        this.fog._Color = cor;
+                    this.fog._Density = fogData["_Density"];
+                }
+                var nav = _json["navmesh"];
+                if (nav != undefined && nav.data != null) {
+                    this.navMeshJson = nav.data;
+                }
             };
             rawscene.prototype.getSceneRoot = function () {
                 return gd3d.io.cloneObj(this.rootNode);
@@ -12271,56 +12600,52 @@ var gd3d;
     (function (framework) {
         var aniplayer = (function () {
             function aniplayer() {
-                this._clipnameCount = 0;
-                this._clipnames = null;
                 this.autoplay = true;
-                this.playIndex = 0;
                 this._playClip = null;
-                this.tpose = {};
-                this.nowpose = {};
-                this.lerppose = {};
-                this.carelist = {};
-                this._playFrameid = 0;
-                this._playTimer = 0;
+                this.clipnames = {};
+                this.bePlay = false;
                 this.speed = 1.0;
-                this.crossdelta = 0;
-                this.crossspeed = 0;
+                this.beCross = false;
                 this.beRevert = false;
-                this.playStyle = PlayStyle.NormalPlay;
-                this.percent = 0;
-                this.mix = false;
-                this.isCache = false;
+                this._playTimer = 0;
+                this._playFrameid = 0;
                 this._playCount = 0;
-                this.clipHasPlay = false;
+                this.crossTotalTime = 0;
+                this.crossRestTimer = 0;
+                this.crossPercentage = 0;
+                this.carelist = {};
+                this.careBoneMat = {};
+                this.inversTpos = {};
+                this.startepose = {};
+                this.temptMat = gd3d.math.pool.new_matrix();
+                this.playEndDic = {};
+                this.beActivedEndFrame = false;
+                this.endFrame = 0;
+                this.beActived = false;
+                this.boneCache = {};
             }
-            aniplayer_1 = aniplayer;
-            Object.defineProperty(aniplayer.prototype, "clipnames", {
-                get: function () {
-                    if (this._clipnames == null || this._clipnameCount != this.clips.length) {
-                        this._clipnameCount = this.clips.length;
-                        this._clipnames = {};
-                        for (var key in this.clips) {
-                            if (this.clips[key])
-                                this.clipnames[this.clips[key].getName()] = parseInt(key);
-                        }
-                    }
-                    return this._clipnames;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(aniplayer.prototype, "playingClip", {
-                get: function () {
-                    if (!this._playClip)
-                        return "";
-                    return this._playClip.getName();
-                },
-                enumerable: true,
-                configurable: true
-            });
             Object.defineProperty(aniplayer.prototype, "PlayFrameID", {
                 get: function () {
                     return this._playFrameid;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(aniplayer.prototype, "currentAniclipName", {
+                get: function () {
+                    if (this._playClip) {
+                        return this._playClip.getName();
+                    }
+                    else {
+                        return null;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(aniplayer.prototype, "currentAniclip", {
+                get: function () {
+                    return this._playClip;
                 },
                 enumerable: true,
                 configurable: true
@@ -12330,33 +12655,41 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(aniplayer.prototype, "cacheKey", {
-                get: function () {
-                    if (this._playClip)
-                        return this._playClip.getGUID() + "_" + this._playFrameid;
-                    return this._playFrameid;
-                },
-                enumerable: true,
-                configurable: true
-            });
             aniplayer.prototype.init = function () {
                 for (var i = 0; i < this.bones.length; i++) {
                     var _info = this.bones[i];
                     var name_2 = _info.name;
-                    var nb = new framework.PoseBoneMatrix();
+                    var nb = framework.PoseBoneMatrix.create();
                     nb.r = _info.tposeq;
                     nb.t = _info.tposep;
                     nb.invert();
-                    this.tpose[name_2] = nb;
-                    this.nowpose[name_2] = this.startPos[i].Clone();
+                    this.inversTpos[name_2] = nb;
+                    this.startepose[name_2] = this.startPos[i];
                 }
                 var asbones = this.gameObject.getComponentsInChildren("asbone");
                 for (var key in asbones) {
-                    this.care(asbones[key].gameObject.transform);
+                    var trans = asbones[key].gameObject.transform;
+                    this.carelist[trans.name] = trans;
+                    this.careBoneMat[trans.name] = framework.PoseBoneMatrix.create();
+                    this.careBoneMat[trans.name].r = gd3d.math.pool.new_quaternion();
+                    this.careBoneMat[trans.name].t = gd3d.math.pool.new_vector3();
                 }
-                if (this.autoplay && this.clips != null && this.clips.length > 0) {
-                    this.playByIndex(this.playIndex);
+            };
+            aniplayer.prototype.addToCareList = function (bone) {
+                if (this.carelist[bone.name] != null)
+                    return;
+                this.carelist[bone.name] = bone;
+                this.careBoneMat[bone.name] = framework.PoseBoneMatrix.create();
+                this.careBoneMat[bone.name].r = gd3d.math.pool.new_quaternion();
+                this.careBoneMat[bone.name].t = gd3d.math.pool.new_vector3();
+            };
+            aniplayer.prototype.addClip = function (clip) {
+                if (clip != null) {
+                    this.clipnames[clip.getName()] = clip;
                 }
+            };
+            aniplayer.prototype.haveClip = function (name) {
+                return this.clipnames[name] != null;
             };
             aniplayer.prototype.start = function () {
                 if (this.bones != null) {
@@ -12366,200 +12699,162 @@ var gd3d;
             aniplayer.prototype.onPlay = function () {
             };
             aniplayer.prototype.update = function (delta) {
-                if (this._playClip == null)
+                if (!this.bePlay)
                     return;
                 this.checkFrameId(delta);
-                if (!this._playClip)
+                if (!this.bePlay)
                     return;
-                this.clipHasPlay = true;
-                this.mix = false;
-                if (this.crossdelta > 0) {
-                    this.crossdelta -= delta / this.speed * this.crossspeed;
-                    this.mix = true;
-                }
-                var cached = false;
-                if (this.isCache && !this.mix && aniplayer_1.playerCaches[this.cacheKey]) {
-                    cached = true;
-                    if (framework.StringUtil.isNullOrEmptyObject(this.carelist))
-                        return;
-                }
-                for (var i = 0; i < this._playClip.boneCount; i++) {
-                    var bone = this._playClip.bones[i];
-                    if (cached && !this.carelist[bone])
-                        continue;
-                    var frame;
-                    if (this._playClip != null && this._playClip.frames != null) {
-                        frame = this._playClip.frames[this._playFrameid];
+                if (this.beCross) {
+                    this.crossRestTimer -= delta * this.speed;
+                    this.crossPercentage = this.crossRestTimer / this.crossTotalTime;
+                    if (this.crossRestTimer <= 0) {
+                        this.beCross = false;
                     }
-                    else {
-                        console.warn("is null of animationclip.frames! ");
-                        return;
-                    }
-                    var nextseek = i * 7 + 1;
-                    var outb = this.nowpose[bone];
-                    var tpose = this.tpose[bone];
-                    if (outb != undefined || frame == null) {
-                        if (this.mix) {
-                            var last = this.lerppose[bone];
-                            if (last != undefined) {
-                                outb.lerpInWorldWithData(tpose, last, frame, nextseek, 1 - this.crossdelta);
+                }
+                this.curFrame = this._playClip.frames[this._playFrameid];
+                if (this._playClip.indexDic.len)
+                    for (var bonename in this.carelist) {
+                        var trans = this.carelist[bonename];
+                        var transMat = this.careBoneMat[bonename];
+                        var index = this._playClip.indexDic[bonename];
+                        if (index) {
+                            if (this.beCross && this.lastFrame) {
+                                transMat.lerpInWorldWithData(this.inversTpos[bonename], this.lastFrame[bonename], this.curFrame, index * 7 + 1, 1 - this.crossPercentage);
                             }
                             else {
-                                outb.copyFromData(frame, nextseek);
+                                transMat.r.x = this.curFrame[index * 7 + 1];
+                                transMat.r.y = this.curFrame[index * 7 + 2];
+                                transMat.r.z = this.curFrame[index * 7 + 3];
+                                transMat.r.w = this.curFrame[index * 7 + 4];
+                                transMat.t.x = this.curFrame[index * 7 + 5];
+                                transMat.t.y = this.curFrame[index * 7 + 6];
+                                transMat.t.z = this.curFrame[index * 7 + 7];
                             }
+                            var fmat = framework.PoseBoneMatrix.sMultiply(transMat, this.inversTpos[bonename]);
+                            gd3d.math.matrixMakeTransformRTS(fmat.t, gd3d.math.pool.vector3_one, fmat.r, this.temptMat);
+                            gd3d.math.matrixMultiply(this.gameObject.transform.getWorldMatrix(), this.temptMat, this.temptMat);
+                            trans.setWorldMatrix(this.temptMat);
                         }
                         else {
-                            outb.copyFromData(frame, nextseek);
+                            console.error("Bone: " + bonename + " Not Record in Aniclip(" + this._playClip.getName() + ").");
                         }
                     }
-                    var careobj = this.carelist[bone];
-                    if (careobj != undefined) {
-                        var fmat = framework.PoseBoneMatrix.sMultiply(outb, tpose);
-                        var _matrix = gd3d.math.pool.new_matrix();
-                        gd3d.math.matrixMakeTransformRTS(fmat.t, gd3d.math.pool.vector3_one, fmat.r, _matrix);
-                        var _newmatrix = gd3d.math.pool.new_matrix();
-                        gd3d.math.matrixMultiply(this.gameObject.transform.getWorldMatrix(), _matrix, _newmatrix);
-                        careobj.setWorldMatrix(_newmatrix);
-                        gd3d.math.pool.delete_matrix(_matrix);
-                        gd3d.math.pool.delete_matrix(_newmatrix);
+                this.recyclecache();
+            };
+            aniplayer.prototype.play = function (animName, onPlayEnd, speed, beRevert) {
+                if (onPlayEnd === void 0) { onPlayEnd = null; }
+                if (speed === void 0) { speed = 1.0; }
+                if (beRevert === void 0) { beRevert = false; }
+                var clip = this.clipnames[animName];
+                if (clip == null) {
+                    console.error("animclip " + this.gameObject.transform.name + "  " + animName + " is not exist");
+                    return;
+                }
+                if (this.bePlay) {
+                    this.OnClipPlayEnd();
+                }
+                this.beCross = false;
+                this.beActivedEndFrame = false;
+                this.playAniclip(clip, onPlayEnd, speed, beRevert);
+            };
+            aniplayer.prototype.playCross = function (animName, crosstimer, onPlayEnd, speed, beRevert) {
+                if (onPlayEnd === void 0) { onPlayEnd = null; }
+                if (speed === void 0) { speed = 1.0; }
+                if (beRevert === void 0) { beRevert = false; }
+                var clip = this.clipnames[animName];
+                if (clip == null) {
+                    console.error("animclip " + this.gameObject.transform.name + "  " + animName + " is not exist");
+                    return;
+                }
+                if (this.bePlay) {
+                    if (crosstimer > 0 && this.curFrame) {
+                        this.recordeLastFrameData();
+                        this.beCross = true;
+                        this.crossTotalTime = crosstimer;
+                        this.crossRestTimer = crosstimer;
                     }
+                    else {
+                        this.beCross = false;
+                    }
+                    this.OnClipPlayEnd();
                 }
-                if (!cached) {
-                    aniplayer_1.playerCaches[this.cacheKey] = this;
-                }
+                this.beActivedEndFrame = false;
+                this.playAniclip(clip, onPlayEnd, speed, beRevert);
             };
-            aniplayer.prototype.playByIndex = function (animIndex, speed, beRevert) {
+            aniplayer.prototype.playToXFrame = function (animName, endframe, crosstimer, onPlayEnd, speed) {
+                if (crosstimer === void 0) { crosstimer = 0; }
+                if (onPlayEnd === void 0) { onPlayEnd = null; }
                 if (speed === void 0) { speed = 1.0; }
-                if (beRevert === void 0) { beRevert = false; }
-                this.playIndex = animIndex;
-                if (this.clips.length <= animIndex) {
-                    console.error("animIndex out Array of clips");
-                    return;
-                }
-                this.playAniamtion(animIndex.toString(), speed, beRevert);
-                this.crossdelta = 0;
-            };
-            aniplayer.prototype.playCrossByIndex = function (animIndex, crosstimer, speed, beRevert) {
-                if (speed === void 0) { speed = 1.0; }
-                if (beRevert === void 0) { beRevert = false; }
-                this.playIndex = animIndex;
-                if (this.clips.length <= animIndex) {
-                    console.error("animIndex out Array of clips");
-                    return;
-                }
-                this.playAniamtion(animIndex.toString(), speed, beRevert);
-                this.crossspeed = 1.0 / crosstimer;
-                this.crossdelta = 1;
-            };
-            aniplayer.prototype.play = function (animName, speed, beRevert) {
-                if (speed === void 0) { speed = 1.0; }
-                if (beRevert === void 0) { beRevert = false; }
-                if (this.clipnames[animName] == null) {
+                var clip = this.clipnames[animName];
+                if (clip == null) {
                     console.error("animclip " + this.gameObject.transform.name + "  " + animName + " is not exist");
                     return;
                 }
-                this.playByIndex(this.clipnames[animName], speed, beRevert);
-            };
-            aniplayer.prototype.getPlayName = function () {
-                if (this.isPlay())
-                    return this._playClip.getName();
-            };
-            aniplayer.prototype.playCross = function (animName, crosstimer, speed, beRevert) {
-                if (speed === void 0) { speed = 1.0; }
-                if (beRevert === void 0) { beRevert = false; }
-                if (this.clipnames[animName] == null) {
-                    console.error("animclip " + this.gameObject.transform.name + "  " + animName + " is not exist");
-                    return;
+                if (this.bePlay) {
+                    if (crosstimer > 0 && this.curFrame) {
+                        this.recordeLastFrameData();
+                        this.beCross = true;
+                        this.crossTotalTime = crosstimer;
+                        this.crossRestTimer = crosstimer;
+                    }
+                    else {
+                        this.beCross = false;
+                    }
+                    this.OnClipPlayEnd();
                 }
-                if (crosstimer <= 0) {
-                    this.playByIndex(this.clipnames[animName], speed, beRevert);
+                if (endframe >= 0) {
+                    this.beActivedEndFrame = true;
+                    this.endFrame = endframe;
                 }
                 else {
-                    this.playCrossByIndex(this.clipnames[animName], crosstimer, speed, beRevert);
+                    this.beActivedEndFrame = false;
+                }
+                this.playAniclip(clip, onPlayEnd, speed, false);
+            };
+            aniplayer.prototype.recordeLastFrameData = function () {
+                if (this.lastFrame == null)
+                    this.lastFrame = {};
+                for (var key in this._playClip.bones) {
+                    var bonename = this._playClip.bones[key];
+                    if (!this.lastFrame[bonename]) {
+                        this.lastFrame[bonename] = framework.PoseBoneMatrix.create();
+                    }
+                    var index = this._playClip.indexDic[bonename];
+                    this.lastFrame[bonename].copyFromData(this.curFrame, index * 7 + 1);
                 }
             };
-            aniplayer.prototype.playAniamtion = function (index, speed, beRevert) {
+            aniplayer.prototype.playAniclip = function (aniclip, onPlayEnd, speed, beRevert) {
+                if (onPlayEnd === void 0) { onPlayEnd = null; }
                 if (speed === void 0) { speed = 1.0; }
                 if (beRevert === void 0) { beRevert = false; }
-                if (this.clips[index] == undefined)
-                    return;
-                var isp = this.isPlay();
-                var cname = isp ? this._playClip.getName() : "";
-                this._playClip = null;
-                if (this.onPlayEnd && isp) {
-                    this.clipHasPlay = false;
-                    this.onPlayEnd(cname);
-                }
-                this._playClip = this.clips[index];
+                this.beActived = true;
+                this.bePlay = true;
                 this._playTimer = 0;
                 this._playFrameid = 0;
-                this._playCount;
+                this._playCount = 0;
+                this._playClip = aniclip;
+                this.playEndDic[aniclip.getName()] = onPlayEnd;
                 this.speed = speed;
                 this.beRevert = beRevert;
-                this.playStyle = PlayStyle.NormalPlay;
-                this.speed = speed;
-                this.lerppose = {};
-                for (var key in this.nowpose) {
-                    var src = this.nowpose[key];
-                    this.lerppose[key] = src.Clone();
-                }
-                this.clipHasPlay = false;
-            };
-            aniplayer.prototype.updateAnimation = function (animIndex, _frame) {
-                if (!this.clips)
-                    return;
-                if (animIndex >= this.clips.length)
-                    return;
-                var _clip = this.clips[animIndex];
-                if (!_clip)
-                    return;
-                for (var i = 0; i < _clip.boneCount; i++) {
-                    var bone = _clip.bones[i];
-                    var frame = _clip.frames[_frame];
-                    var nextseek = i * 7 + 1;
-                    var outb = this.nowpose[bone];
-                    var tpose = this.tpose[bone];
-                    if (outb != undefined) {
-                        outb.copyFromData(frame, nextseek);
-                    }
-                    var careobj = this.carelist[bone];
-                    if (careobj != undefined) {
-                        var fmat = framework.PoseBoneMatrix.sMultiply(outb, tpose);
-                        var _matrix = gd3d.math.pool.new_matrix();
-                        gd3d.math.matrixMakeTransformRTS(fmat.t, gd3d.math.pool.vector3_one, fmat.r, _matrix);
-                        var _newmatrix = gd3d.math.pool.new_matrix();
-                        gd3d.math.matrixMultiply(this.gameObject.transform.getWorldMatrix(), _matrix, _newmatrix);
-                        careobj.setWorldMatrix(_newmatrix);
-                        gd3d.math.pool.delete_matrix(_matrix);
-                        gd3d.math.pool.delete_matrix(_newmatrix);
-                    }
-                }
-                var renders = this.gameObject.getComponentsInChildren(framework.StringUtil.COMPONENT_SKINMESHRENDER);
-                for (var key in renders) {
-                    var _render = renders[key];
-                    _render.update(0);
-                }
             };
             aniplayer.prototype.stop = function () {
-                var isp = this.isPlay();
-                var cname = isp ? this._playClip.getName() : "";
-                this._playClip = null;
-                if (this.onPlayEnd && isp)
-                    this.onPlayEnd(cname);
+                if (this.bePlay) {
+                    this.OnClipPlayEnd();
+                }
+            };
+            aniplayer.prototype.pause = function () {
+                if (this.bePlay) {
+                    this.bePlay = false;
+                }
+                else if (!this.bePlay && this._playClip) {
+                    this.bePlay = true;
+                }
             };
             aniplayer.prototype.isPlay = function () {
-                return this._playClip && this.clipHasPlay;
+                return this.bePlay;
             };
             aniplayer.prototype.isStop = function () {
-                if (this._playClip == null)
-                    return true;
-                if (this.playStyle != PlayStyle.NormalPlay)
-                    return false;
-                if (this._playClip.loop)
-                    return false;
-                if (this._playFrameid == this._playClip.frameCount - 1)
-                    return true;
-                return false;
+                return !this.bePlay;
             };
             aniplayer.prototype.remove = function () {
                 if (this.clips)
@@ -12567,133 +12862,127 @@ var gd3d;
                         if (temp)
                             temp.unuse();
                     });
+                for (var key in this.lastFrame) {
+                    framework.PoseBoneMatrix.recycle(this.lastFrame[key]);
+                }
+                for (var key in this.careBoneMat) {
+                    framework.PoseBoneMatrix.recycle(this.careBoneMat[key]);
+                }
+                for (var key in this.boneCache) {
+                    framework.PoseBoneMatrix.recycle(this.boneCache[key]);
+                }
                 this.clips.length = 0;
                 this.bones.length = 0;
                 this.startPos.length = 0;
+                this.startepose = null;
                 this._playClip = null;
-                delete this.tpose;
-                delete this.nowpose;
-                delete this.lerppose;
+                this.curFrame = null;
+                this.lastFrame = null;
+                this.careBoneMat = null;
+                this.boneCache = null;
+                delete this.inversTpos;
                 delete this.carelist;
-                delete this._clipnames;
             };
             aniplayer.prototype.clone = function () {
             };
-            aniplayer.prototype.addFinishedEventListener = function (finishCallBack, thisObject) {
-                this.finishCallBack = finishCallBack;
-                this.thisObject = thisObject;
-            };
             aniplayer.prototype.checkFrameId = function (delay) {
-                if (this.playStyle == PlayStyle.NormalPlay) {
-                    this._playTimer += delay * this.speed;
-                    this._playFrameid = (this._playClip.fps * this._playTimer) | 0;
-                    if (this._playClip.loop) {
-                        this._playCount += Math.floor(this._playFrameid / this._playClip.frameCount);
-                        this._playFrameid %= this._playClip.frameCount;
+                this._playTimer += delay * this.speed;
+                this._playFrameid = (this._playClip.fps * this._playTimer) | 0;
+                if (this._playClip.loop) {
+                    this._playCount = Math.floor(this._playFrameid / this._playClip.frameCount);
+                    this._playFrameid %= this._playClip.frameCount;
+                }
+                else {
+                    if (this.beActivedEndFrame && this._playFrameid >= this.endFrame) {
+                        this._playFrameid = this.endFrame;
+                        this.OnClipPlayEnd();
                     }
                     else if (this._playFrameid > this._playClip.frameCount - 1) {
                         this._playFrameid = this._playClip.frameCount - 1;
-                    }
-                    if (this.beRevert) {
-                        this._playFrameid = this._playClip.frameCount - this._playFrameid - 1;
+                        this.OnClipPlayEnd();
                     }
                 }
-                else if (this.playStyle == PlayStyle.FramePlay) {
-                    this._playFrameid = (this._playClip.frameCount * this.percent) - 1;
-                    this._playFrameid = Math.round(this._playFrameid);
-                }
-                if (this._playFrameid < 0) {
-                    this._playFrameid = 0;
-                }
-                if (this._playFrameid > this._playClip.frameCount - 1) {
-                    this._playFrameid = this._playClip.frameCount - 1;
-                }
-                if (this.isStop()) {
-                    var isp = this.isPlay();
-                    var cname = isp ? this._playClip.getName() : "";
-                    this._playClip = null;
-                    if (this.onPlayEnd && isp)
-                        this.onPlayEnd(cname);
-                    if (this.finishCallBack) {
-                        this.finishCallBack(this.thisObject);
-                        this.finishCallBack = null;
-                        this.thisObject = null;
-                    }
+                if (this.beRevert) {
+                    this._playFrameid = this._playClip.frameCount - this._playFrameid - 1;
                 }
             };
-            aniplayer.prototype.fillPoseData = function (data, bones, efficient) {
-                if (efficient === void 0) { efficient = true; }
-                var seek = 0;
-                for (var i in bones) {
-                    var key = bones[i].name;
-                    var obj = this.nowpose[key];
-                    if (obj == undefined) {
-                        if (efficient) {
-                            data[seek * 8 + 0] = 0;
-                            data[seek * 8 + 1] = 0;
-                            data[seek * 8 + 2] = 0;
-                            data[seek * 8 + 3] = 1;
-                            data[seek * 8 + 4] = 0;
-                            data[seek * 8 + 5] = 0;
-                            data[seek * 8 + 6] = 0;
-                            data[seek * 8 + 7] = 1;
-                        }
-                        else {
-                            data[seek * 16 + 0] = 1;
-                            data[seek * 16 + 1] = 0;
-                            data[seek * 16 + 2] = 0;
-                            data[seek * 16 + 3] = 0;
-                            data[seek * 16 + 4] = 0;
-                            data[seek * 16 + 5] = 1;
-                            data[seek * 16 + 6] = 0;
-                            data[seek * 16 + 7] = 0;
-                            data[seek * 16 + 8] = 0;
-                            data[seek * 16 + 9] = 0;
-                            data[seek * 16 + 10] = 1;
-                            data[seek * 16 + 11] = 0;
-                            data[seek * 16 + 12] = 0;
-                            data[seek * 16 + 13] = 0;
-                            data[seek * 16 + 14] = 0;
-                            data[seek * 16 + 15] = 1;
-                        }
+            aniplayer.prototype.OnClipPlayEnd = function () {
+                var Clipame = this._playClip.getName();
+                this._playClip = null;
+                var endFunc = this.playEndDic[Clipame];
+                if (endFunc) {
+                    endFunc();
+                }
+                this.bePlay = false;
+                this.beCross = false;
+            };
+            aniplayer.prototype.recyclecache = function () {
+                for (var key in this.boneCache) {
+                    framework.PoseBoneMatrix.recycle(this.boneCache[key]);
+                }
+                this.boneCache = {};
+            };
+            aniplayer.prototype.fillPoseData = function (data, bones) {
+                if (!this.bePlay) {
+                    if (this.beActived)
+                        return;
+                    for (var i = 0, len = bones.length; i < len; i++) {
+                        var bonename = bones[i].name;
+                        var boneMat = this.startepose[bonename];
+                        data[i * 8 + 0] = boneMat.r.x;
+                        data[i * 8 + 1] = boneMat.r.y;
+                        data[i * 8 + 2] = boneMat.r.z;
+                        data[i * 8 + 3] = boneMat.r.w;
+                        data[i * 8 + 4] = boneMat.t.x;
+                        data[i * 8 + 5] = boneMat.t.y;
+                        data[i * 8 + 6] = boneMat.t.z;
+                        data[i * 8 + 7] = 1;
                     }
-                    else {
-                        var _mat = gd3d.math.pool.new_matrix();
-                        if (efficient) {
-                            data[seek * 8 + 0] = obj.r.x;
-                            data[seek * 8 + 1] = obj.r.y;
-                            data[seek * 8 + 2] = obj.r.z;
-                            data[seek * 8 + 3] = obj.r.w;
-                            data[seek * 8 + 4] = obj.t.x;
-                            data[seek * 8 + 5] = obj.t.y;
-                            data[seek * 8 + 6] = obj.t.z;
-                            data[seek * 8 + 7] = 1;
-                        }
-                        else {
-                            gd3d.math.matrixMakeTransformRTS(obj.t, gd3d.math.pool.vector3_one, obj.r, _mat);
-                            for (var j = 0; j < 16; j++) {
-                                data[seek * 16 + j] = _mat.rawData[j];
+                    return;
+                }
+                if (this._playClip.indexDic.len)
+                    for (var i = 0, len = bones.length; i < len; i++) {
+                        var bonename = bones[i].name;
+                        var index = this._playClip.indexDic[bonename];
+                        if (index != null) {
+                            if (this.beCross && this.lastFrame) {
+                                var boneMat = void 0;
+                                if (this.careBoneMat[bonename]) {
+                                    boneMat = this.careBoneMat[bonename];
+                                }
+                                else if (this.boneCache[bonename]) {
+                                    boneMat = this.boneCache[bonename];
+                                }
+                                else {
+                                    var mat = framework.PoseBoneMatrix.create();
+                                    mat.lerpInWorldWithData(this.inversTpos[bonename], this.lastFrame[bonename], this.curFrame, index * 7 + 1, 1 - this.crossPercentage);
+                                    this.boneCache[bonename] = mat;
+                                }
+                                data[i * 8 + 0] = boneMat.r.x;
+                                data[i * 8 + 1] = boneMat.r.y;
+                                data[i * 8 + 2] = boneMat.r.z;
+                                data[i * 8 + 3] = boneMat.r.w;
+                                data[i * 8 + 4] = boneMat.t.x;
+                                data[i * 8 + 5] = boneMat.t.y;
+                                data[i * 8 + 6] = boneMat.t.z;
+                                data[i * 8 + 7] = 1;
+                            }
+                            else {
+                                data[i * 8 + 0] = this.curFrame[index * 7 + 1];
+                                data[i * 8 + 1] = this.curFrame[index * 7 + 2];
+                                data[i * 8 + 2] = this.curFrame[index * 7 + 3];
+                                data[i * 8 + 3] = this.curFrame[index * 7 + 4];
+                                data[i * 8 + 4] = this.curFrame[index * 7 + 5];
+                                data[i * 8 + 5] = this.curFrame[index * 7 + 6];
+                                data[i * 8 + 6] = this.curFrame[index * 7 + 7];
+                                data[i * 8 + 7] = 1;
                             }
                         }
-                        gd3d.math.pool.delete_matrix(_mat);
+                        else {
+                            console.error("Bone: " + bonename + " Not Record in Aniclip(" + this._playClip.getName() + ").");
+                        }
                     }
-                    seek++;
-                }
             };
-            aniplayer.prototype.care = function (node) {
-                var pnode = node;
-                while (true) {
-                    if (this.nowpose[pnode.name] != undefined) {
-                        this.carelist[pnode.name] = pnode;
-                        return;
-                    }
-                    if (pnode.parent)
-                        pnode = pnode.parent;
-                    else
-                        return;
-                }
-            };
-            aniplayer.playerCaches = [];
             __decorate([
                 gd3d.reflect.Field("animationClip[]"),
                 __metadata("design:type", Array)
@@ -12710,13 +12999,18 @@ var gd3d;
                 gd3d.reflect.Field("PoseBoneMatrix[]"),
                 __metadata("design:type", Array)
             ], aniplayer.prototype, "startPos", void 0);
-            aniplayer = aniplayer_1 = __decorate([
+            aniplayer = __decorate([
                 gd3d.reflect.nodeComponent
             ], aniplayer);
             return aniplayer;
-            var aniplayer_1;
         }());
         framework.aniplayer = aniplayer;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var tPoseInfo = (function () {
             function tPoseInfo() {
             }
@@ -13568,9 +13862,6 @@ var gd3d;
                                     var matrixView = context.matrixView;
                                     var az = gd3d.math.pool.new_vector3();
                                     var bz = gd3d.math.pool.new_vector3();
-                                    if (a.gameObject.transform.name == "pasted__default001") {
-                                        a.gameObject.transform.getWorldTranslate();
-                                    }
                                     gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                     gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
                                     var result = bz.z - az.z;
@@ -14126,9 +14417,9 @@ var gd3d;
                     return;
                 var index = -1;
                 if (_initFrameData.attrsData.mat != null) {
-                    for (var i_5 = 0; i_5 < this.matDataGroups.length; i_5++) {
-                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_5], _initFrameData.attrsData.mat)) {
-                            index = i_5;
+                    for (var i_4 = 0; i_4 < this.matDataGroups.length; i_4++) {
+                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_4], _initFrameData.attrsData.mat)) {
+                            index = i_4;
                             break;
                         }
                     }
@@ -14186,41 +14477,41 @@ var gd3d;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
                 element.update();
                 subEffectBatcher.effectElements.push(element);
-                for (var i_6 = 0; i_6 < vertexCount; i_6++) {
+                for (var i_5 = 0; i_5 < vertexCount; i_5++) {
                     {
                         var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = vertexArr[i_6 * vertexSize + 0];
-                        vertex.y = vertexArr[i_6 * vertexSize + 1];
-                        vertex.z = vertexArr[i_6 * vertexSize + 2];
+                        vertex.x = vertexArr[i_5 * vertexSize + 0];
+                        vertex.y = vertexArr[i_5 * vertexSize + 1];
+                        vertex.z = vertexArr[i_5 * vertexSize + 2];
                         gd3d.math.matrixTransformVector3(vertex, element.curAttrData.matrix, vertex);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 0] = vertex.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 1] = vertex.y;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 2] = vertex.z;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 0] = vertex.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 1] = vertex.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 2] = vertex.z;
                         gd3d.math.pool.delete_vector3(vertex);
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 3] = vertexArr[i_6 * vertexSize + 3];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 4] = vertexArr[i_6 * vertexSize + 4];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 5] = vertexArr[i_6 * vertexSize + 5];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 3] = vertexArr[i_5 * vertexSize + 3];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 4] = vertexArr[i_5 * vertexSize + 4];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 5] = vertexArr[i_5 * vertexSize + 5];
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 6] = vertexArr[i_6 * vertexSize + 6];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 7] = vertexArr[i_6 * vertexSize + 7];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 8] = vertexArr[i_6 * vertexSize + 8];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 6] = vertexArr[i_5 * vertexSize + 6];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 7] = vertexArr[i_5 * vertexSize + 7];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 8] = vertexArr[i_5 * vertexSize + 8];
                     }
                     {
                         var r = gd3d.math.floatClamp(element.curAttrData.color.x, 0, 1);
                         var g = gd3d.math.floatClamp(element.curAttrData.color.y, 0, 1);
                         var b = gd3d.math.floatClamp(element.curAttrData.color.z, 0, 1);
-                        var a = gd3d.math.floatClamp(vertexArr[i_6 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 9] = r;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 10] = g;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 11] = b;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 12] = a;
+                        var a = gd3d.math.floatClamp(vertexArr[i_5 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 9] = r;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 10] = g;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 11] = b;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 12] = a;
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 13] = vertexArr[i_6 * vertexSize + 13] * element.curAttrData.tilling.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 14] = vertexArr[i_6 * vertexSize + 14] * element.curAttrData.tilling.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 13] = vertexArr[i_5 * vertexSize + 13] * element.curAttrData.tilling.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 14] = vertexArr[i_5 * vertexSize + 14] * element.curAttrData.tilling.y;
                     }
                 }
                 var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
@@ -14390,11 +14681,11 @@ var gd3d;
                 if (this.delayElements.length > 0) {
                     if (this.refElements.length > 0)
                         this.refElements = [];
-                    for (var i_7 = this.delayElements.length - 1; i_7 >= 0; i_7--) {
-                        var data = this.delayElements[i_7];
+                    for (var i_6 = this.delayElements.length - 1; i_6 >= 0; i_6--) {
+                        var data = this.delayElements[i_6];
                         if (data.delayTime <= this.playTimer) {
-                            this.addElement(this.delayElements[i_7]);
-                            this.delayElements.splice(i_7, 1);
+                            this.addElement(this.delayElements[i_6]);
+                            this.delayElements.splice(i_6, 1);
                         }
                     }
                 }
@@ -14625,6 +14916,7 @@ var gd3d;
                 this.paths = pathasset.paths;
                 if (this.paths[0] != null) {
                     gd3d.math.vec3Clone(this.paths[0], this.gameObject.transform.localTranslate);
+                    this.gameObject.transform.markDirty();
                     this.datasafe = true;
                 }
                 this.mystrans = this.gameObject.transform;
@@ -14648,6 +14940,7 @@ var gd3d;
                         gd3d.math.vec3Clone(this.paths[this.folowindex], this.mystrans.localTranslate);
                         this.folowindex++;
                         this.adjustDir = true;
+                        this.mystrans.markDirty();
                     }
                     else {
                         this.folowindex = 0;
@@ -15175,6 +15468,8 @@ var gd3d;
                 this.reInit = false;
                 this.extenedOneSide = true;
                 this.lookAtCamera = false;
+                this.isAlphaGradual = false;
+                this.inited = false;
                 this.speed = 0.5;
             }
             Object.defineProperty(trailRender.prototype, "renderLayer", {
@@ -15195,8 +15490,11 @@ var gd3d;
             trailRender.prototype.update = function (delta) {
                 if (!this.active)
                     return;
-                if (this.reInit) {
+                if (!this.inited) {
                     this.intidata();
+                }
+                if (this.reInit) {
+                    this.reInitdata();
                     this.reInit = false;
                 }
                 var targetpos = this.gameObject.transform.getWorldTranslate();
@@ -15304,6 +15602,17 @@ var gd3d;
                     this.mesh.submesh.push(sm);
                 }
             };
+            trailRender.prototype.reInitdata = function () {
+                if (!this.inited)
+                    return;
+                length = this.vertexcount / 2;
+                for (var i = 0; i < length; i++) {
+                    var sti = this.sticks[i];
+                    gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), sti.location);
+                    this.gameObject.transform.getUpInWorld(sti.updir);
+                    gd3d.math.vec3ScaleByNum(sti.updir, this.width, sti.updir);
+                }
+            };
             trailRender.prototype.intidata = function () {
                 this.sticks = [];
                 for (var i = 0; i < this.vertexcount / 2; i++) {
@@ -15326,13 +15635,14 @@ var gd3d;
                 var downpos = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Subtract(pos, updir, downpos);
                 for (var i = 0; i < length; i++) {
+                    var tempA = this.isAlphaGradual ? (length - i - 1) / length : 1;
                     this.dataForVbo[i * 2 * 9] = uppos.x;
                     this.dataForVbo[i * 2 * 9 + 1] = uppos.y;
                     this.dataForVbo[i * 2 * 9 + 2] = uppos.z;
                     this.dataForVbo[i * 2 * 9 + 3] = this.color.r;
                     this.dataForVbo[i * 2 * 9 + 4] = this.color.g;
                     this.dataForVbo[i * 2 * 9 + 5] = this.color.b;
-                    this.dataForVbo[i * 2 * 9 + 6] = this.color.a;
+                    this.dataForVbo[i * 2 * 9 + 6] = this.color.a * tempA;
                     this.dataForVbo[i * 2 * 9 + 7] = i / (length - 1);
                     this.dataForVbo[i * 2 * 9 + 8] = 0;
                     this.dataForVbo[(i * 2 + 1) * 9] = downpos.x;
@@ -15341,7 +15651,7 @@ var gd3d;
                     this.dataForVbo[(i * 2 + 1) * 9 + 3] = this.color.r;
                     this.dataForVbo[(i * 2 + 1) * 9 + 4] = this.color.g;
                     this.dataForVbo[(i * 2 + 1) * 9 + 5] = this.color.b;
-                    this.dataForVbo[(i * 2 + 1) * 9 + 6] = this.color.a;
+                    this.dataForVbo[(i * 2 + 1) * 9 + 6] = this.color.a * tempA;
                     this.dataForVbo[(i * 2 + 1) * 9 + 7] = i / (length - 1);
                     this.dataForVbo[(i * 2 + 1) * 9 + 8] = 1;
                 }
@@ -15359,6 +15669,7 @@ var gd3d;
                 gd3d.math.pool.delete_vector3(pos);
                 gd3d.math.pool.delete_vector3(uppos);
                 gd3d.math.pool.delete_vector3(downpos);
+                this.inited = true;
             };
             trailRender.prototype.updateTrailData = function () {
                 var length = this.vertexcount / 2;
@@ -16284,24 +16595,14 @@ var gd3d;
                 this.layers = [];
             }
             F14EffectData.prototype.parsejson = function (json, assetmgr, assetbundle) {
-                var _this = this;
-                return new gd3d.threading.gdPromise(function (resolve) {
-                    _this.beloop = json.beloop;
-                    _this.lifeTime = json.lifeTime;
-                    var jsonlayer = json.layers;
-                    var total = 0;
-                    var _loop_1 = function (i, len) {
-                        var layer = new F14LayerData();
-                        layer.parse(jsonlayer[i], assetmgr, assetbundle).then(function () {
-                            if (++total >= len)
-                                resolve();
-                        });
-                        _this.layers.push(layer);
-                    };
-                    for (var i = 0, len = jsonlayer.length; i < len; ++i) {
-                        _loop_1(i, len);
-                    }
-                });
+                this.beloop = json.beloop;
+                this.lifeTime = json.lifeTime;
+                var jsonlayer = json.layers;
+                for (var i = 0, len = jsonlayer.length; i < len; ++i) {
+                    var layer = new F14LayerData();
+                    layer.parse(jsonlayer[i], assetmgr, assetbundle);
+                    this.layers.push(layer);
+                }
             };
             return F14EffectData;
         }());
@@ -16313,66 +16614,62 @@ var gd3d;
                 this.frames = {};
             }
             F14LayerData.prototype.parse = function (json, assetmgr, assetbundle) {
-                var _this = this;
-                return new gd3d.threading.gdPromise(function (resolve) {
-                    _this.Name = json.Name;
-                    switch (json.type) {
-                        case "particlesType":
-                            _this.type = framework.F14TypeEnum.particlesType;
-                            _this.elementdata = new framework.F14EmissionBaseData();
-                            _this.elementdata.parse(json.emissiondata, assetmgr, assetbundle);
+                this.Name = json.Name;
+                switch (json.type) {
+                    case "particlesType":
+                        this.type = framework.F14TypeEnum.particlesType;
+                        this.elementdata = new framework.F14EmissionBaseData();
+                        this.elementdata.parse(json.emissiondata, assetmgr, assetbundle);
+                        break;
+                    case "SingleMeshType":
+                        this.type = framework.F14TypeEnum.SingleMeshType;
+                        this.elementdata = new framework.F14SingleMeshBaseData(json.frames[0].frameindex);
+                        this.elementdata.parse(json.singlemeshdata, assetmgr, assetbundle);
+                        break;
+                    case "RefType":
+                        this.type = framework.F14TypeEnum.RefType;
+                        this.elementdata = new framework.F14RefBaseData();
+                        this.elementdata.parse(json.RefData, assetmgr, assetbundle);
+                        break;
+                    default:
+                        console.log("f14Eff parse layerjson error!");
+                        return;
+                }
+                for (var i = 0; i < json.frames.length; i++) {
+                    var framejson = json.frames[i];
+                    var frameindex = framejson.frameindex;
+                    var frameitem = new F14FrameData(frameindex, this.type);
+                    this.frames[frameindex] = frameitem;
+                    switch (this.type) {
+                        case framework.F14TypeEnum.SingleMeshType:
+                            for (var k = 0; k < framejson.vec3Atts.length; k++) {
+                                var name_6 = framejson.vec3Atts[k].name;
+                                var strValue = framejson.vec3Atts[k].value;
+                                var v3 = new gd3d.math.vector3();
+                                gd3d.math.vec3FormJson(strValue, v3);
+                                frameitem.singlemeshAttDic[name_6] = v3;
+                            }
+                            for (var k = 0; k < framejson.vec4Atts.length; k++) {
+                                var name_7 = framejson.vec4Atts[k].name;
+                                var strValue = framejson.vec4Atts[k].value;
+                                var v4 = new gd3d.math.vector4();
+                                gd3d.math.vec4FormJson(strValue, v4);
+                                frameitem.singlemeshAttDic[name_7] = v4;
+                            }
+                            for (var k = 0; k < framejson.colorAtts.length; k++) {
+                                var name_8 = framejson.colorAtts[k].name;
+                                var strValue = framejson.colorAtts[k].value;
+                                var color = new gd3d.math.color();
+                                gd3d.math.colorFormJson(strValue, color);
+                                frameitem.singlemeshAttDic[name_8] = color;
+                            }
                             break;
-                        case "SingleMeshType":
-                            _this.type = framework.F14TypeEnum.SingleMeshType;
-                            _this.elementdata = new framework.F14SingleMeshBaseData(json.frames[0].frameindex);
-                            _this.elementdata.parse(json.singlemeshdata, assetmgr, assetbundle);
-                            break;
-                        case "RefType":
-                            _this.type = framework.F14TypeEnum.RefType;
-                            _this.elementdata = new framework.F14RefBaseData();
-                            _this.elementdata.parse(json.RefData, assetmgr, assetbundle);
-                            break;
-                        default:
-                            console.log("f14Eff parse layerjson error!");
-                            return;
+                        case framework.F14TypeEnum.particlesType:
+                            var data = new framework.F14EmissionBaseData();
+                            data.parse(framejson.emissionData, assetmgr, assetbundle);
+                            frameitem.EmissionData = data;
                     }
-                    for (var i = 0; i < json.frames.length; i++) {
-                        var framejson = json.frames[i];
-                        var frameindex = framejson.frameindex;
-                        var frameitem = new F14FrameData(frameindex, _this.type);
-                        _this.frames[frameindex] = frameitem;
-                        switch (_this.type) {
-                            case framework.F14TypeEnum.SingleMeshType:
-                                for (var k = 0; k < framejson.vec3Atts.length; k++) {
-                                    var name_6 = framejson.vec3Atts[k].name;
-                                    var strValue = framejson.vec3Atts[k].value;
-                                    var v3 = new gd3d.math.vector3();
-                                    gd3d.math.vec3FormJson(strValue, v3);
-                                    frameitem.singlemeshAttDic[name_6] = v3;
-                                }
-                                for (var k = 0; k < framejson.vec4Atts.length; k++) {
-                                    var name_7 = framejson.vec4Atts[k].name;
-                                    var strValue = framejson.vec4Atts[k].value;
-                                    var v4 = new gd3d.math.vector4();
-                                    gd3d.math.vec4FormJson(strValue, v4);
-                                    frameitem.singlemeshAttDic[name_7] = v4;
-                                }
-                                for (var k = 0; k < framejson.colorAtts.length; k++) {
-                                    var name_8 = framejson.colorAtts[k].name;
-                                    var strValue = framejson.colorAtts[k].value;
-                                    var color = new gd3d.math.color();
-                                    gd3d.math.colorFormJson(strValue, color);
-                                    frameitem.singlemeshAttDic[name_8] = color;
-                                }
-                                break;
-                            case framework.F14TypeEnum.particlesType:
-                                var data = new framework.F14EmissionBaseData();
-                                data.parse(framejson.emissionData, assetmgr, assetbundle);
-                                frameitem.EmissionData = data;
-                        }
-                    }
-                    resolve();
-                });
+                }
             };
             return F14LayerData;
         }());
@@ -16530,13 +16827,22 @@ var gd3d;
                 this.currentData = this.baseddata;
                 this.newStartDataTime = this.baseddata.delayTime;
                 this.initBycurrentdata();
-                this.vertexCount = this.currentData.mesh.data.pos.length;
-                this.posArr = this.currentData.mesh.data.pos;
-                this.colorArr = this.currentData.mesh.data.color;
-                this.uvArr = this.currentData.mesh.data.uv;
-                this.dataforebo = this.currentData.mesh.data.genIndexDataArray();
-                this.vertexLength = gd3d.render.meshData.calcByteSize(this.effect.VF) / 4;
-                this.dataforvboLen = this.vertexCount * this.vertexLength;
+                if (this.currentData.mesh.data) {
+                    this.vertexCount = this.currentData.mesh.data.pos.length;
+                    this.posArr = this.currentData.mesh.data.pos;
+                    this.colorArr = this.currentData.mesh.data.color;
+                    this.uvArr = this.currentData.mesh.data.uv;
+                    this.dataforebo = this.currentData.mesh.data.genIndexDataArray();
+                    this.vertexLength = gd3d.render.meshData.calcByteSize(this.effect.VF) / 4;
+                    this.dataforvboLen = this.vertexCount * this.vertexLength;
+                }
+                else {
+                    this.vertexCount = 0;
+                    this.posArr = [];
+                    this.colorArr = [];
+                    this.uvArr = [];
+                    this.dataforebo = new Uint16Array(0);
+                }
             }
             F14Emission.prototype.update = function (deltaTime, frame, fps) {
                 this.TotalTime += deltaTime;
@@ -16997,7 +17303,7 @@ var gd3d;
                 var basrat = this.emission.baseddata.rateOverTime;
                 maxrate = basrat.isRandom ? basrat._valueLimitMax : basrat._value;
                 var liftime = this.emission.baseddata.lifeTime;
-                var maxlife = liftime.isRandom ? liftime._valueLimitMax : liftime._value;
+                var maxlife = liftime.isRandom ? Math.max(liftime._valueLimitMax, liftime._valueLimitMin) : liftime._value;
                 if (!this.emission.baseddata.beloop) {
                     var duration = this.emission.baseddata.duration;
                     if (duration < maxlife) {
@@ -18731,7 +19037,7 @@ var gd3d;
                 }
                 if (this.hasPointUP && this.hasPointDown) {
                     var isMoveTolerance = (Math.abs(this.downPoint.x - pt.x) > this.moveTolerance || Math.abs(this.downPoint.y - pt.y) > this.moveTolerance);
-                    if (isMoveTolerance) {
+                    if (!isMoveTolerance) {
                         this.hasPointDown = this.hasPointUP = false;
                         this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointClick, pt.x, pt.y);
                     }
@@ -20519,10 +20825,8 @@ var gd3d;
                         _newInstance = gd3d.reflect.createInstance(componentType, null);
                         if (_isArray)
                             instanceObj.push(_newInstance);
-                        else {
+                        else
                             instanceObj[key] = _newInstance;
-                            _newInstance = instanceObj[key];
-                        }
                     }
                     deSerializeObj(serializedObj[key].value, _newInstance, assetMgr, bundlename);
                     var insid = serializedObj[key].insid;
@@ -20593,6 +20897,7 @@ var gd3d;
             function referenceInfo() {
             }
             referenceInfo.regDefaultType = function () {
+                referenceInfo.regType("vector3");
                 referenceInfo.regType("vector4");
                 referenceInfo.regType("color");
                 referenceInfo.regType("border");
@@ -21136,7 +21441,9 @@ var gd3d;
     var math;
     (function (math) {
         function matrixGetTranslation(src, out) {
-            out.rawData.set(src.rawData.subarray(12, 15));
+            out.x = src.rawData[12];
+            out.y = src.rawData[13];
+            out.z = src.rawData[14];
         }
         math.matrixGetTranslation = matrixGetTranslation;
         function matrixTranspose(src, out) {
@@ -21183,7 +21490,6 @@ var gd3d;
             mat.rawData[10] = src.rawData[10] / scale.z;
             mat.rawData[11] = 0;
             matrix2Quaternion(mat, rotation);
-            math.pool.delete_matrix(mat);
             return true;
         }
         math.matrixDecompose = matrixDecompose;
@@ -21213,30 +21519,6 @@ var gd3d;
             return true;
         }
         math.matrix3x2Decompose = matrix3x2Decompose;
-        function matrixGetRotation(src, result) {
-            var xs = math.sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
-            var ys = math.sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
-            var zs = math.sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
-            var scale_x = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
-            var scale_y = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
-            var scale_z = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
-            var mat = math.pool.new_matrix();
-            mat.rawData[0] = src.rawData[0] / scale_x;
-            mat.rawData[1] = src.rawData[1] / scale_x;
-            mat.rawData[2] = src.rawData[2] / scale_x;
-            mat.rawData[3] = 0;
-            mat.rawData[4] = src.rawData[4] / scale_y;
-            mat.rawData[5] = src.rawData[5] / scale_y;
-            mat.rawData[6] = src.rawData[6] / scale_y;
-            mat.rawData[7] = 0;
-            mat.rawData[8] = src.rawData[8] / scale_z;
-            mat.rawData[9] = src.rawData[9] / scale_z;
-            mat.rawData[10] = src.rawData[10] / scale_z;
-            mat.rawData[11] = 0;
-            matrix2Quaternion(mat, result);
-            math.pool.delete_matrix(mat);
-        }
-        math.matrixGetRotation = matrixGetRotation;
         function matrix2Quaternion(matrix, result) {
             var data = matrix.rawData;
             var m11 = data[0], m12 = data[4], m13 = data[8];
@@ -21476,12 +21758,9 @@ var gd3d;
         }
         math.matrix3x2MakeTranslate = matrix3x2MakeTranslate;
         function matrixGetScale(src, scale) {
-            var xs = math.sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
-            var ys = math.sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
-            var zs = math.sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
-            scale.rawData[0] = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
-            scale.rawData[1] = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
-            scale.rawData[2] = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
+            scale.x = src.rawData[0];
+            scale.y = src.rawData[5];
+            scale.z = src.rawData[10];
         }
         math.matrixGetScale = matrixGetScale;
         function matrixMakeScale(xScale, yScale, zScale, out) {
@@ -21760,24 +22039,24 @@ var gd3d;
             var y = (vector.x * transformation.rawData[1]) + (vector.y * transformation.rawData[5]) + (vector.z * transformation.rawData[9]) + transformation.rawData[13];
             var z = (vector.x * transformation.rawData[2]) + (vector.y * transformation.rawData[6]) + (vector.z * transformation.rawData[10]) + transformation.rawData[14];
             var w = (vector.x * transformation.rawData[3]) + (vector.y * transformation.rawData[7]) + (vector.z * transformation.rawData[11]) + transformation.rawData[15];
-            result.rawData[0] = x / w;
-            result.rawData[1] = y / w;
-            result.rawData[2] = z / w;
+            result.x = x / w;
+            result.y = y / w;
+            result.z = z / w;
         }
         math.matrixTransformVector3 = matrixTransformVector3;
         function matrixTransformNormal(vector, transformation, result) {
             var x = (vector.x * transformation.rawData[0]) + (vector.y * transformation.rawData[4]) + (vector.z * transformation.rawData[8]);
             var y = (vector.x * transformation.rawData[1]) + (vector.y * transformation.rawData[5]) + (vector.z * transformation.rawData[9]);
             var z = (vector.x * transformation.rawData[2]) + (vector.y * transformation.rawData[6]) + (vector.z * transformation.rawData[10]);
-            result.rawData[0] = x;
-            result.rawData[1] = y;
-            result.rawData[2] = z;
+            result.x = x;
+            result.y = y;
+            result.z = z;
         }
         math.matrixTransformNormal = matrixTransformNormal;
         function matrixGetVector3ByOffset(src, offset, result) {
-            result.rawData[0] = src.rawData[offset];
-            result.rawData[1] = src.rawData[offset + 1];
-            result.rawData[2] = src.rawData[offset + 2];
+            result.x = src.rawData[offset];
+            result.y = src.rawData[offset + 1];
+            result.z = src.rawData[offset + 2];
         }
         math.matrixGetVector3ByOffset = matrixGetVector3ByOffset;
         function matrixReset(mat) {
@@ -22531,21 +22810,21 @@ var gd3d;
         }
         math.vec3ToString = vec3ToString;
         function vec3Add(a, b, out) {
-            out.rawData[0] = a.x + b.x;
-            out.rawData[1] = a.y + b.y;
-            out.rawData[2] = a.z + b.z;
+            out.x = a.x + b.x;
+            out.y = a.y + b.y;
+            out.z = a.z + b.z;
         }
         math.vec3Add = vec3Add;
         function vec3Subtract(a, b, out) {
-            out.rawData[0] = a.x - b.x;
-            out.rawData[1] = a.y - b.y;
-            out.rawData[2] = a.z - b.z;
+            out.x = a.x - b.x;
+            out.y = a.y - b.y;
+            out.z = a.z - b.z;
         }
         math.vec3Subtract = vec3Subtract;
         function vec3Minus(a, out) {
-            out.rawData[0] = -a.x;
-            out.rawData[1] = -a.y;
-            out.rawData[2] = -a.z;
+            out.x = -a.x;
+            out.y = -a.y;
+            out.z = -a.z;
         }
         math.vec3Minus = vec3Minus;
         function vec3Length(a) {
@@ -22556,76 +22835,76 @@ var gd3d;
             return value.x * value.x + value.y * value.y + value.z * value.z;
         }
         math.vec3SqrLength = vec3SqrLength;
-        function vec3Set_One(out) {
-            out.rawData[0] = out.rawData[1] = out.rawData[2] = 1;
+        function vec3Set_One(value) {
+            value.x = value.y = value.z = 1;
         }
         math.vec3Set_One = vec3Set_One;
-        function vec3Set_Forward(out) {
-            out.rawData[0] = out.rawData[1] = 0;
-            out.rawData[2] = 1;
+        function vec3Set_Forward(value) {
+            value.x = value.y = 0;
+            value.z = 1;
         }
         math.vec3Set_Forward = vec3Set_Forward;
-        function vec3Set_Back(out) {
-            out.rawData[0] = out.rawData[1] = 0;
-            out.rawData[2] = -1;
+        function vec3Set_Back(value) {
+            value.x = value.y = 0;
+            value.z = -1;
         }
         math.vec3Set_Back = vec3Set_Back;
-        function vec3Set_Up(out) {
-            out.rawData[0] = out.rawData[2] = 0;
-            out.rawData[1] = 1;
+        function vec3Set_Up(value) {
+            value.x = value.z = 0;
+            value.y = 1;
         }
         math.vec3Set_Up = vec3Set_Up;
-        function vec3Set_Down(out) {
-            out.rawData[0] = out.rawData[2] = 0;
-            out.rawData[1] = -1;
+        function vec3Set_Down(value) {
+            value.x = value.z = 0;
+            value.y = -1;
         }
         math.vec3Set_Down = vec3Set_Down;
-        function vec3Set_Left(out) {
-            out.rawData[0] = -1;
-            out.rawData[1] = out.rawData[2] = 0;
+        function vec3Set_Left(value) {
+            value.x = -1;
+            value.y = value.z = 0;
         }
         math.vec3Set_Left = vec3Set_Left;
-        function vec3Set_Right(out) {
-            out.rawData[0] = 1;
-            out.rawData[1] = out.rawData[2] = 0;
+        function vec3Set_Right(value) {
+            value.x = 1;
+            value.y = value.z = 0;
         }
         math.vec3Set_Right = vec3Set_Right;
         function vec3Normalize(value, out) {
             var num = vec3Length(value);
             if (num > Number.MIN_VALUE) {
-                out.rawData[0] = value.x / num;
-                out.rawData[1] = value.y / num;
-                out.rawData[2] = value.z / num;
+                out.x = value.x / num;
+                out.y = value.y / num;
+                out.z = value.z / num;
             }
             else {
-                out.rawData[0] = 0;
-                out.rawData[1] = 0;
-                out.rawData[2] = 0;
+                out.x = 0;
+                out.y = 0;
+                out.z = 0;
             }
         }
         math.vec3Normalize = vec3Normalize;
         function vec3ScaleByVec3(from, scale, out) {
-            out.rawData[0] = from.x * scale.x;
-            out.rawData[1] = from.y * scale.y;
-            out.rawData[2] = from.z * scale.z;
+            out.x = from.x * scale.x;
+            out.y = from.y * scale.y;
+            out.z = from.z * scale.z;
         }
         math.vec3ScaleByVec3 = vec3ScaleByVec3;
         function vec3ScaleByNum(from, scale, out) {
-            out.rawData[0] = from.x * scale;
-            out.rawData[1] = from.y * scale;
-            out.rawData[2] = from.z * scale;
+            out.x = from.x * scale;
+            out.y = from.y * scale;
+            out.z = from.z * scale;
         }
         math.vec3ScaleByNum = vec3ScaleByNum;
         function vec3Product(a, b, out) {
-            out.rawData[0] = a.x * b.x;
-            out.rawData[1] = a.y * b.y;
-            out.rawData[2] = a.z * b.z;
+            out.x = a.x * b.x;
+            out.y = a.y * b.y;
+            out.z = a.z * b.z;
         }
         math.vec3Product = vec3Product;
         function vec3Cross(lhs, rhs, out) {
-            out.rawData[0] = lhs.y * rhs.z - lhs.z * rhs.y;
-            out.rawData[1] = lhs.z * rhs.x - lhs.x * rhs.z;
-            out.rawData[2] = lhs.x * rhs.y - lhs.y * rhs.x;
+            out.x = lhs.y * rhs.z - lhs.z * rhs.y;
+            out.y = lhs.z * rhs.x - lhs.x * rhs.z;
+            out.z = lhs.x * rhs.y - lhs.y * rhs.x;
         }
         math.vec3Cross = vec3Cross;
         function vec3Reflect(inDirection, inNormal, out) {
@@ -22643,7 +22922,7 @@ var gd3d;
             var num = 0;
             num = vec3Dot(onNormal, onNormal);
             if (num < Number.MIN_VALUE) {
-                out.rawData[0] = out.rawData[1] = out.rawData[2] = 0;
+                out.x = out.y = out.z = 0;
             }
             else {
                 var num2 = 0;
@@ -22690,19 +22969,19 @@ var gd3d;
                 vec3Normalize(vector, out);
                 vec3ScaleByNum(out, maxLength, out);
             }
-            out.rawData.set(vector.rawData);
+            out = vector;
         }
         math.vec3ClampLength = vec3ClampLength;
         function vec3Min(lhs, rhs, out) {
-            out.rawData[0] = Math.min(lhs.x, rhs.x);
-            out.rawData[1] = Math.min(lhs.y, rhs.y);
-            out.rawData[2] = Math.min(lhs.z, rhs.z);
+            out.x = Math.min(lhs.x, rhs.x);
+            out.y = Math.min(lhs.y, rhs.y);
+            out.z = Math.min(lhs.z, rhs.z);
         }
         math.vec3Min = vec3Min;
         function vec3Max(lhs, rhs, out) {
-            out.rawData[0] = Math.max(lhs.x, rhs.x);
-            out.rawData[1] = Math.max(lhs.y, rhs.y);
-            out.rawData[2] = Math.max(lhs.z, rhs.z);
+            out.x = Math.max(lhs.x, rhs.x);
+            out.y = Math.max(lhs.y, rhs.y);
+            out.z = Math.max(lhs.z, rhs.z);
         }
         math.vec3Max = vec3Max;
         function vec3AngleBetween(from, to) {
@@ -22714,35 +22993,35 @@ var gd3d;
             return result;
         }
         math.vec3AngleBetween = vec3AngleBetween;
-        function vec3Reset(out) {
-            out.rawData[0] = 0;
-            out.rawData[1] = 0;
-            out.rawData[2] = 0;
+        function vec3Reset(val) {
+            val.x = 0;
+            val.y = 0;
+            val.z = 0;
         }
         math.vec3Reset = vec3Reset;
         function vec3SLerp(vector, vector2, v, out) {
-            out.rawData[0] = vector.x * (1 - v) + vector2.x * v;
-            out.rawData[1] = vector.y * (1 - v) + vector2.y * v;
-            out.rawData[2] = vector.z * (1 - v) + vector2.z * v;
+            out.x = vector.x * (1 - v) + vector2.x * v;
+            out.y = vector.y * (1 - v) + vector2.y * v;
+            out.z = vector.z * (1 - v) + vector2.z * v;
         }
         math.vec3SLerp = vec3SLerp;
         function vec3SetByFloat(x, y, z, out) {
-            out.rawData[0] = x;
-            out.rawData[1] = y;
-            out.rawData[2] = z;
+            out.x = x;
+            out.y = y;
+            out.z = z;
         }
         math.vec3SetByFloat = vec3SetByFloat;
         function vec3Format(vector, maxDot, out) {
-            out.rawData[0] = floatFormat(vector.x, maxDot);
-            out.rawData[1] = floatFormat(vector.y, maxDot);
-            out.rawData[2] = floatFormat(vector.z, maxDot);
+            out.x = floatFormat(vector.x, maxDot);
+            out.y = floatFormat(vector.y, maxDot);
+            out.z = floatFormat(vector.z, maxDot);
         }
         math.vec3Format = vec3Format;
         function quaternionFormat(vector, maxDot, out) {
-            out.rawData[0] = floatFormat(vector.x, maxDot);
-            out.rawData[1] = floatFormat(vector.y, maxDot);
-            out.rawData[2] = floatFormat(vector.z, maxDot);
-            out.rawData[3] = floatFormat(vector.w, maxDot);
+            out.x = floatFormat(vector.x, maxDot);
+            out.y = floatFormat(vector.y, maxDot);
+            out.z = floatFormat(vector.z, maxDot);
+            out.w = floatFormat(vector.w, maxDot);
         }
         math.quaternionFormat = quaternionFormat;
         function floatFormat(num, maxDot) {
@@ -22772,12 +23051,14 @@ var gd3d;
                 this.x = 0;
                 this.y = 0;
                 this.z = 0;
+                this.realy = 0;
             }
             navVec3.prototype.clone = function () {
                 var navVec = new navVec3();
                 navVec.x = this.x;
                 navVec.y = this.y;
                 navVec.z = this.z;
+                navVec.realy = this.realy;
                 return navVec;
             };
             navVec3.DistAZ = function (start, end) {
@@ -22821,7 +23102,18 @@ var gd3d;
                 navVec2.x = start.x + navVec.x * dist;
                 navVec2.y = start.y + navVec.y * dist;
                 navVec2.z = start.z + navVec.z * dist;
+                if (end.x == start.x) {
+                    navVec2.realy = start.y;
+                }
+                else {
+                    navVec2.realy = start.y + navVec.x * (end.y - start.y) / (end.x - start.x);
+                }
                 return navVec2;
+            };
+            navVec3.lerp = function (from, to, lerp, out) {
+                out.x = (to.x - from.x) * lerp + from.x;
+                out.y = (to.y - from.y) * lerp + from.y;
+                out.z = (to.z - from.z) * lerp + from.z;
             };
             return navVec3;
         }());
@@ -23159,7 +23451,7 @@ var gd3d;
                     var wayPoints = gd3d.framework.pathFinding.calcWayPoints(this.navinfo, startVec, endVec, polyPath);
                     var navmeshWayPoints = [];
                     for (var i = 0; i < wayPoints.length; i++) {
-                        navmeshWayPoints[i] = new gd3d.math.vector3(wayPoints[i].x, wayPoints[i].y, wayPoints[i].z);
+                        navmeshWayPoints[i] = new gd3d.math.vector3(wayPoints[i].x, wayPoints[i].realy, wayPoints[i].z);
                     }
                     return navmeshWayPoints;
                 }
@@ -23544,7 +23836,11 @@ var gd3d;
                 if (polyPath.length == 0 || startPos == null || endPos == null) {
                     return null;
                 }
+                var lastPoint = startPos;
+                var groupborder = [];
                 var triPathList = polyPath.reverse();
+                startPos.realy = startPos.y;
+                endPos.realy = endPos.y;
                 wayPoints.push(startPos);
                 var ipoly = 0;
                 var dirLeft = null;
@@ -23677,6 +23973,31 @@ var gd3d;
                 }
                 wayPoints.push(endPos);
                 return wayPoints;
+            };
+            pathFinding.intersectBorder = function (a, b, c, d) {
+                var nx1 = (b.z - a.z), ny1 = (a.x - b.x);
+                var nx2 = (d.z - c.z), ny2 = (c.x - d.x);
+                var denominator = nx1 * ny2 - ny1 * nx2;
+                if (denominator == 0) {
+                    return null;
+                }
+                var distC_N2 = nx2 * c.x + ny2 * c.z;
+                var distA_N2 = nx2 * a.x + ny2 * a.z - distC_N2;
+                var distB_N2 = nx2 * b.x + ny2 * b.z - distC_N2;
+                if (distA_N2 * distB_N2 >= 0) {
+                    return null;
+                }
+                var distA_N1 = nx1 * a.x + ny1 * a.z;
+                var distC_N1 = nx1 * c.x + ny1 * c.z - distA_N1;
+                var distD_N1 = nx1 * d.x + ny1 * d.z - distA_N1;
+                if (distC_N1 * distD_N1 >= 0) {
+                    return null;
+                }
+                var fraction = distA_N2 / denominator;
+                var dx = fraction * ny1, dz = -fraction * nx1;
+                var newpoint = new framework.navVec3();
+                framework.navVec3.lerp(a, b, -fraction, newpoint);
+                return newpoint;
             };
             return pathFinding;
         }());
@@ -28322,6 +28643,7 @@ var gd3d;
                 this.isStatic = false;
                 this.components = [];
                 this.componentsInit = [];
+                this.componentsPlayed = [];
                 this._visible = true;
             }
             gameObject.prototype.getScene = function () {
@@ -28355,16 +28677,24 @@ var gd3d;
             gameObject.prototype.getName = function () {
                 return this.transform.name;
             };
-            gameObject.prototype.init = function (onPlay) {
-                if (onPlay === void 0) { onPlay = false; }
+            gameObject.prototype.init = function (bePlay) {
+                if (bePlay === void 0) { bePlay = false; }
                 if (this.componentsInit.length > 0) {
                     for (var i = 0; i < this.componentsInit.length; i++) {
                         this.componentsInit[i].comp.start();
                         this.componentsInit[i].init = true;
-                        if (onPlay && this.componentsInit[i].comp.onPlay)
+                        if (bePlay)
                             this.componentsInit[i].comp.onPlay();
+                        else
+                            this.componentsPlayed.push(this.componentsInit[i]);
                     }
                     this.componentsInit.length = 0;
+                }
+                if (this.componentsPlayed.length > 0 && bePlay) {
+                    this.componentsPlayed.forEach(function (item) {
+                        item.comp.onPlay();
+                    });
+                    this.componentsPlayed.length = 0;
                 }
             };
             gameObject.prototype.update = function (delta) {
@@ -28457,8 +28787,8 @@ var gd3d;
                         array.push(obj.components[i].comp);
                     }
                 }
-                for (var i_8 = 0; obj.transform.children != undefined && i_8 < obj.transform.children.length; i_8++) {
-                    var _obj = obj.transform.children[i_8].gameObject;
+                for (var i_7 = 0; obj.transform.children != undefined && i_7 < obj.transform.children.length; i_7++) {
+                    var _obj = obj.transform.children[i_7].gameObject;
                     this._getComponentsInChildren(type, _obj, array);
                 }
             };
@@ -28703,7 +29033,7 @@ var gd3d;
         var renderList = (function () {
             function renderList() {
                 this.renderLayers = [];
-                var common = new renderLayer(true);
+                var common = new renderLayer(false);
                 var transparent = new renderLayer(true);
                 var overlay = new renderLayer(true);
                 this.renderLayers.push(common);
@@ -28753,8 +29083,6 @@ var gd3d;
                 this.renderLights = [];
                 this.lightmaps = [];
                 this.RealCameraNumber = 0;
-                this.hasPlayed = false;
-                this.playDirty = false;
                 this.app = app;
                 this.webgl = app.webgl;
                 this.assetmgr = app.getAssetMgr();
@@ -28798,12 +29126,14 @@ var gd3d;
                 configurable: true
             });
             scene.prototype.update = function (delta) {
+                this.rootNode.updateTran(false);
                 this.rootNode.updateAABBChild();
                 this.renderCameras.length = 0;
                 this.renderLights.length = 0;
                 this.renderList.clear();
-                framework.aniplayer.playerCaches = [];
                 this.updateScene(this.rootNode, delta);
+                if (this.onLateUpdate)
+                    this.onLateUpdate(delta);
                 if (this.renderCameras.length > 1) {
                     this.renderCameras.sort(function (a, b) {
                         return a.order - b.order;
@@ -28914,11 +29244,7 @@ var gd3d;
             };
             scene.prototype.updateScene = function (node, delta) {
                 if (this.app.bePlay) {
-                    if (!this.hasPlayed)
-                        this.playDirty = true;
                     this.objupdate(node, delta);
-                    this.playDirty = false;
-                    this.hasPlayed = true;
                 }
                 else {
                     this.objupdateInEditor(node, delta);
@@ -28943,7 +29269,7 @@ var gd3d;
             scene.prototype.objupdate = function (node, delta) {
                 if (node.hasComponent == false && node.hasComponentChild == false)
                     return;
-                node.gameObject.init(this.playDirty);
+                node.gameObject.init(this.app.bePlay);
                 if (node.gameObject.components.length > 0) {
                     node.gameObject.update(delta);
                     this.collectCameraAndLight(node);
@@ -29277,14 +29603,15 @@ var gd3d;
         var gdPromise = (function () {
             function gdPromise(executor) {
                 var _this = this;
+                this.execQueue = new Array();
                 setTimeout(function () {
                     executor(_this.resolve.bind(_this), _this.reject.bind(_this));
                 }, 0);
             }
             gdPromise.prototype.resolve = function (value) {
                 try {
-                    if (this.thenCall)
-                        this.thenCall(value);
+                    while (this.execQueue.length > 0)
+                        this.execQueue.shift()(value);
                 }
                 catch (e) {
                     this.reject(e);
@@ -29296,11 +29623,12 @@ var gd3d;
                     return this.catchMethod(reason);
             };
             gdPromise.prototype.then = function (thenCall) {
-                this.thenCall = thenCall;
+                this.execQueue.push(thenCall);
                 return this;
             };
             gdPromise.prototype.catch = function (callbcack) {
                 this.catchMethod = callbcack;
+                return this;
             };
             return gdPromise;
         }());
@@ -29317,7 +29645,7 @@ var gd3d;
                 this.callID = 0;
                 this.callMap = {};
                 if (!thread.workerInstance) {
-                    this.worker = new Worker("lib/gd3d.thread.js");
+                    this.worker = new Worker("lib/th.js");
                     this.worker.onmessage = function (e) {
                         _this.OnMessage(e);
                     };
@@ -31327,6 +31655,9 @@ var gd3d;
         io.xhrLoad = xhrLoad;
         function loadText(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
+            if (gd3d.framework.assetMgr.useBinJs) {
+                url = gd3d.framework.assetMgr.correctTxtFileName(url);
+            }
             gd3d.io.xhrLoad(url, fun, onprocess, "text", function (req) {
                 fun(req.responseText, null);
             });
@@ -31334,6 +31665,9 @@ var gd3d;
         io.loadText = loadText;
         function loadArrayBuffer(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
+            if (gd3d.framework.assetMgr.useBinJs) {
+                url = gd3d.framework.assetMgr.correctFileName(url);
+            }
             gd3d.io.xhrLoad(url, fun, onprocess, "arraybuffer", function (req) {
                 fun(req.response, null);
             });

@@ -487,7 +487,7 @@ namespace gd3d.framework
                 p.state_ztest = false;
                 p.state_zwrite = false;
                 p.state_ztest_method = render.webglkit.LEQUAL;
-                p.setAlphaBlend(render.BlendModeEnum.Blend_PreMultiply);
+                p.setAlphaBlend(render.BlendModeEnum.Blend);
                 assetmgr.mapShader[sh.getName()] = sh;
             }
             {
@@ -504,7 +504,7 @@ namespace gd3d.framework
                 p.state_ztest = false;
                 p.state_zwrite = false;
                 p.state_ztest_method = render.webglkit.LEQUAL;
-                p.setAlphaBlend(render.BlendModeEnum.Blend_PreMultiply);
+                p.setAlphaBlend(render.BlendModeEnum.Blend);
                 assetmgr.mapShader[sh.getName()] = sh;
             }
         }

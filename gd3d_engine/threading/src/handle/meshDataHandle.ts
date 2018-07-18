@@ -50,6 +50,7 @@ namespace gd3d.threading
                     {
                         data.pos = [];
                         objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.Position;
+                        //data.posview=new Float32Array(buf,read.peek(),vcount*3);
                     }
                     for (var i = 0; i < vcount; i++)
                     {
@@ -66,6 +67,7 @@ namespace gd3d.threading
                     {
                         data.color = [];
                         objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.Color;
+                        //data.colorview=new Uint8Array(buf,read.peek(),vcount*4);
                     }
                     for (var i = 0; i < vcount; i++)
                     {
@@ -83,6 +85,7 @@ namespace gd3d.threading
                     {
                         data.normal = [];
                         objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.Normal;
+                        //data.normalview=new Float32Array(buf,read.peek(),vcount*3);
                     }
                     for (var i = 0; i < vcount; i++)
                     {
@@ -99,6 +102,7 @@ namespace gd3d.threading
                     {
                         data.uv = [];
                         objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.UV0;
+                        //data.uvview=new Float32Array(buf,read.peek(),vcount*2);
                     }
                     for (var i = 0; i < vcount; i++)
                     {
@@ -114,6 +118,7 @@ namespace gd3d.threading
                     {
                         data.uv2 = [];
                         objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.UV1;
+                        //data.uv2view=new Float32Array(buf,read.peek(),vcount*2);
                     }
                     for (var i = 0; i < vcount; i++)
                     {
@@ -142,6 +147,7 @@ namespace gd3d.threading
                     {
                         data.tangent = [];
                         objVF.vf = objVF.vf | gd3d.render.VertexFormatMask.Tangent;
+                        //data.tangentview=new Float32Array(buf,read.peek(),vcount*4);
                     }
                     for (var i = 0; i < vcount; i++)
                     {

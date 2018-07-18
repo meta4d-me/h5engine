@@ -110,5 +110,6 @@ namespace gd3d.framework
                 return math.caclStringByteLength(this.content);
             }
         }
+        
     }
 }
