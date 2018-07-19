@@ -469,11 +469,14 @@ namespace gd3d.framework
         render(canvas: canvas)
         {
             if(this._font == null ){
-                let temp = canvas.assetmgr.mapNamed[this._fontName];
-                if(!temp)
-                    temp = canvas.assetmgr.mapNamed[`${this._fontName}.font.json`];
+                let resName = this._fontName;
+                let temp = canvas.assetmgr.mapNamed[resName];
+                if(temp == undefined){
+                    resName = `${this._fontName}.font.json`
+                    temp = canvas.assetmgr.mapNamed[resName];
+                }
                 if(temp != null){
-                    let tfont = canvas.assetmgr.getAssetByName(this._fontName) as gd3d.framework.font;
+                    let tfont = canvas.assetmgr.getAssetByName(resName) as gd3d.framework.font;
                     if(tfont){
                         this.font = tfont;
                         this.needRefreshFont = true;
