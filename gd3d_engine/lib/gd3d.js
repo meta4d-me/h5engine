@@ -5208,9 +5208,14 @@ var gd3d;
             });
             label.prototype.render = function (canvas) {
                 if (this._font == null) {
-                    var temp = canvas.assetmgr.mapNamed[this._fontName];
+                    var resName = this._fontName;
+                    var temp = canvas.assetmgr.mapNamed[resName];
+                    if (temp == undefined) {
+                        resName = this._fontName + ".font.json";
+                        temp = canvas.assetmgr.mapNamed[resName];
+                    }
                     if (temp != null) {
-                        var tfont = canvas.assetmgr.getAssetByName(this._fontName);
+                        var tfont = canvas.assetmgr.getAssetByName(resName);
                         if (tfont) {
                             this.font = tfont;
                             this.needRefreshFont = true;
@@ -6363,7 +6368,7 @@ var gd3d;
                 var flag = true;
                 if (id != null) {
                     var r = this.mapRes[id];
-                    if (r != null)
+                    if (r != null && !r[this._loadingTag])
                         return r.asset;
                 }
                 if (flag) {
