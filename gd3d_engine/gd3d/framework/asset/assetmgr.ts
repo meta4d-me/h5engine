@@ -610,7 +610,7 @@ namespace gd3d.framework
             if (id != null)
             {
                 var r = this.mapRes[id];
-                if (r != null)//&& !r[this._loadingTag])
+                if (r != null && !r[this._loadingTag] )//)
                     return r.asset;
             }
             if (flag)
