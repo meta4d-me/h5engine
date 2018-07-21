@@ -1183,6 +1183,8 @@ namespace gd3d.framework {
         }
 
         private layoutDirty = false;
+        private lastWidth = 0;
+        private lastHeight = 0;
         private lastParentWidth = 0;
         private lastParentHeight = 0;
         private lastParentPivot = new math.vector2(0, 0);
@@ -1191,7 +1193,7 @@ namespace gd3d.framework {
         private refreshLayout() {
             let parent = this.parent;
             if (!parent) return;
-            if (parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
+            if (this.width != this.lastWidth || this.height != this.lastHeight || parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
                 || parent.pivot.y != this.lastParentPivot.y || this.pivot.x != this.lastPivot.x || this.pivot.y != this.lastPivot.y)
                 this.layoutDirty = true;
 
@@ -1230,6 +1232,8 @@ namespace gd3d.framework {
             this.layoutDirty = false;
             this.lastParentWidth = parent.width;
             this.lastParentHeight = parent.height;
+            this.lastWidth = this.width;
+            this.lastHeight = this.height;
             this.lastParentPivot.x = parent.pivot.x;
             this.lastParentPivot.y = parent.pivot.y;
             this.lastPivot.x = this.pivot.x;
