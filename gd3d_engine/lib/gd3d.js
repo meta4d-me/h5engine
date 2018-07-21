@@ -9387,13 +9387,24 @@ var gd3d;
                 this._beDispose = false;
             }
             transform.prototype.checkLRTSChange = function () {
-                if (!gd3d.math.vec3Equal(this.helpLPos, this._localTranslate, Number.MIN_VALUE))
+                if (!this.fastEqual(this.helpLPos.rawData, this._localTranslate.rawData))
                     return true;
-                if (!gd3d.math.quatEqual(this.helpLRotate, this._localRotate, Number.MIN_VALUE))
+                if (!this.fastEqual(this.helpLRotate.rawData, this._localRotate.rawData))
                     return true;
-                if (!gd3d.math.vec3Equal(this.helpLScale, this._localScale, Number.MIN_VALUE))
+                if (!this.fastEqual(this.helpLScale.rawData, this._localScale.rawData))
                     return true;
                 return false;
+            };
+            transform.prototype.fastEqual = function (d_0, d_1) {
+                if (d_0[0] != d_1[0])
+                    return false;
+                if (d_0[1] != d_1[1])
+                    return false;
+                if (d_0[2] != d_1[2])
+                    return false;
+                if (d_0.length == 4 && d_0[3] != d_1[3])
+                    return false;
+                return true;
             };
             Object.defineProperty(transform.prototype, "scene", {
                 get: function () {

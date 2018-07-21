@@ -1471,6 +1471,7 @@ declare namespace gd3d.framework {
         private helpLPos;
         private helpLScale;
         private checkLRTSChange();
+        private fastEqual(d_0, d_1);
         private _scene;
         scene: scene;
         name: string;
