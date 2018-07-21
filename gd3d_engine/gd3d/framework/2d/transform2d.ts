@@ -220,6 +220,7 @@ namespace gd3d.framework {
          */
         hideFlags: HideFlags = HideFlags.None;
 
+        @gd3d.reflect.Field("boolean")
         private _visible = true;
 
         /**
