@@ -438,6 +438,18 @@ namespace gd3d.framework
 
         private _shaderDirty = false;
 
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置rander Shader名字
+         * @version egret-gd3d 1.0
+         */
+        setShaderByName(shaderName:string){
+            this._shaderName = shaderName;
+            this._shaderDirty = true;
+        }
+
        /**
          * @private
          * ui默认材质

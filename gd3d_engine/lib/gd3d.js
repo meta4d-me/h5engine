@@ -2570,6 +2570,8 @@ var gd3d;
                 this.layoutValueMap = {};
                 this._layoutPercentState = 0;
                 this.layoutDirty = false;
+                this.lastWidth = 0;
+                this.lastHeight = 0;
                 this.lastParentWidth = 0;
                 this.lastParentHeight = 0;
                 this.lastParentPivot = new gd3d.math.vector2(0, 0);
@@ -3139,7 +3141,7 @@ var gd3d;
                 var parent = this.parent;
                 if (!parent)
                     return;
-                if (parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
+                if (this.width != this.lastWidth || this.height != this.lastHeight || parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
                     || parent.pivot.y != this.lastParentPivot.y || this.pivot.x != this.lastPivot.x || this.pivot.y != this.lastPivot.y)
                     this.layoutDirty = true;
                 if (!this.layoutDirty)
@@ -3175,6 +3177,8 @@ var gd3d;
                 this.layoutDirty = false;
                 this.lastParentWidth = parent.width;
                 this.lastParentHeight = parent.height;
+                this.lastWidth = this.width;
+                this.lastHeight = this.height;
                 this.lastParentPivot.x = parent.pivot.x;
                 this.lastParentPivot.y = parent.pivot.y;
                 this.lastPivot.x = this.pivot.x;
@@ -3245,6 +3249,10 @@ var gd3d;
                 gd3d.reflect.Field("vector2"),
                 __metadata("design:type", gd3d.math.vector2)
             ], transform2D.prototype, "pivot", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Object)
+            ], transform2D.prototype, "_visible", void 0);
             __decorate([
                 gd3d.reflect.Field("vector2"),
                 __metadata("design:type", gd3d.math.vector2)
@@ -3662,6 +3670,9 @@ var gd3d;
                 ];
                 this.needRefreshImg = false;
                 this.color = new gd3d.math.color(1.0, 1.0, 1.0, 1.0);
+                this._shaderName = "shader/defmaskui";
+                this._shaderDirty = false;
+                this._lastMask = false;
                 this._imageType = ImageType.Simple;
                 this._fillMethod = FillMethod.Horizontal;
                 this._fillAmmount = 1;
@@ -3670,28 +3681,42 @@ var gd3d;
                 gd3d.io.enumMgr.enumMap["ImageType"] = ImageType;
                 gd3d.io.enumMgr.enumMap["FillMethod"] = FillMethod;
             }
+            image2D_1 = image2D;
+            image2D.prototype.setShaderByName = function (shaderName) {
+                this._shaderName = shaderName;
+                this._shaderDirty = true;
+            };
             Object.defineProperty(image2D.prototype, "uimat", {
                 get: function () {
                     if (this._sprite && this._sprite.texture) {
-                        var rectPostfix = this.transform.parentIsMask ? "_(" + this.transform.insId + ")" : "";
-                        var matName = this._sprite.texture.getName() + "_uimask" + rectPostfix;
                         var canvas_1 = this.transform.canvas;
                         if (!canvas_1.assetmgr)
                             return;
+                        var assetmgr = canvas_1.assetmgr;
+                        var pMask = this.transform.parentIsMask;
                         var mat = this._uimat;
+                        var rectPostfix = pMask ? "_(" + this.transform.parent.insId + ")" : "";
+                        var matName = this._sprite.texture.getName() + "_uimask" + rectPostfix;
+                        var matChanged = false;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
                                 mat.unuse();
-                            mat = canvas_1.assetmgr.getAssetByName(matName);
+                            mat = assetmgr.getAssetByName(matName);
                             if (mat)
                                 mat.use();
                         }
                         if (mat == null) {
                             mat = new framework.material(matName);
-                            mat.setShader(canvas_1.assetmgr.getShader("shader/defmaskui"));
+                            var sh = assetmgr.getShader(this._shaderName);
+                            sh = !sh ? assetmgr.getShader(image2D_1.defUIShader) : sh;
+                            mat.setShader(sh);
                             mat.use();
+                            matChanged = true;
                         }
-                        mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
+                        if (matChanged || this._lastMask != pMask) {
+                            mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
+                            this._lastMask = pMask;
+                        }
                         this._uimat = mat;
                     }
                     return this._uimat;
@@ -4596,6 +4621,7 @@ var gd3d;
                     dindex++;
                 }
             };
+            image2D.defUIShader = "shader/defmaskui";
             __decorate([
                 gd3d.reflect.Field("color"),
                 gd3d.reflect.UIStyle("color"),
@@ -4626,12 +4652,13 @@ var gd3d;
                 gd3d.reflect.Field("border"),
                 __metadata("design:type", Object)
             ], image2D.prototype, "_imageBorder", void 0);
-            image2D = __decorate([
+            image2D = image2D_1 = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender,
                 __metadata("design:paramtypes", [])
             ], image2D);
             return image2D;
+            var image2D_1;
         }());
         framework.image2D = image2D;
         var ImageType;
@@ -4998,8 +5025,12 @@ var gd3d;
                 this.datar = [];
                 this.color = new gd3d.math.color(1, 1, 1, 1);
                 this.color2 = new gd3d.math.color(0, 0, 0.5, 0.5);
+                this._shaderName = label_1.defUIShader;
+                this._shaderDirty = false;
+                this._lastMask = false;
                 this.dirtyData = true;
             }
+            label_1 = label;
             Object.defineProperty(label.prototype, "text", {
                 get: function () {
                     return this._text;
@@ -5177,28 +5208,41 @@ var gd3d;
                     yadd += this._fontsize * this.linespace;
                 }
             };
+            label.prototype.setShaderByName = function (shaderName) {
+                this._shaderName = shaderName;
+                this._shaderDirty = true;
+            };
             Object.defineProperty(label.prototype, "uimat", {
                 get: function () {
                     if (this.font && this.font.texture) {
-                        var rectPostfix = this.transform.parentIsMask ? "_(" + this.transform.insId + ")" : "";
-                        var matName = this.font.texture.getName() + "_fontmask" + rectPostfix;
                         var canvas_2 = this.transform.canvas;
                         if (!canvas_2.assetmgr)
                             return;
+                        var assetmgr = canvas_2.assetmgr;
+                        var pMask = this.transform.parentIsMask;
                         var mat = this._uimat;
+                        var rectPostfix = pMask ? "_(" + this.transform.parent.insId + ")" : "";
+                        var matName = this.font.texture.getName() + "_uimask" + rectPostfix;
+                        var matChanged = false;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
                                 mat.unuse();
-                            mat = canvas_2.assetmgr.getAssetByName(matName);
+                            mat = assetmgr.getAssetByName(matName);
                             if (mat)
                                 mat.use();
                         }
                         if (mat == null) {
                             mat = new framework.material(matName);
-                            mat.setShader(canvas_2.assetmgr.getShader("shader/defmaskfont"));
+                            var sh = assetmgr.getShader(this._shaderName);
+                            sh = !sh ? assetmgr.getShader(label_1.defUIShader) : sh;
+                            mat.setShader(sh);
                             mat.use();
+                            matChanged = true;
                         }
-                        mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
+                        if (matChanged || this._lastMask != pMask) {
+                            mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
+                            this._lastMask = pMask;
+                        }
                         this._uimat = mat;
                     }
                     return this._uimat;
@@ -5283,6 +5327,7 @@ var gd3d;
             };
             label.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
+            label.defUIShader = "shader/defmaskfont";
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String),
@@ -5327,11 +5372,12 @@ var gd3d;
                 gd3d.reflect.UIStyle("color"),
                 __metadata("design:type", gd3d.math.color)
             ], label.prototype, "color2", void 0);
-            label = __decorate([
+            label = label_1 = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender
             ], label);
             return label;
+            var label_1;
         }());
         framework.label = label;
         var HorizontalType;
@@ -5477,7 +5523,11 @@ var gd3d;
                 ];
                 this.needRefreshImg = false;
                 this.color = new gd3d.math.color(1.0, 1.0, 1.0, 1.0);
+                this._shaderName = "shader/defmaskui";
+                this._shaderDirty = false;
+                this._lastMask = false;
             }
+            rawImage2D_1 = rawImage2D;
             Object.defineProperty(rawImage2D.prototype, "image", {
                 get: function () {
                     return this._image;
@@ -5497,28 +5547,41 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            rawImage2D.prototype.setShaderByName = function (shaderName) {
+                this._shaderName = shaderName;
+                this._shaderDirty = true;
+            };
             Object.defineProperty(rawImage2D.prototype, "uimat", {
                 get: function () {
-                    if (this.image != null) {
-                        var rectPostfix = this.transform.parentIsMask ? "_(" + this.transform.insId + ")" : "";
-                        var matName = this._image.getName() + "_uimask" + rectPostfix;
+                    if (this._image) {
                         var canvas_3 = this.transform.canvas;
                         if (!canvas_3.assetmgr)
                             return;
+                        var assetmgr = canvas_3.assetmgr;
+                        var pMask = this.transform.parentIsMask;
                         var mat = this._uimat;
+                        var rectPostfix = pMask ? "_(" + this.transform.parent.insId + ")" : "";
+                        var matName = this._image.getName() + "_uimask" + rectPostfix;
+                        var matChanged = false;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
                                 mat.unuse();
-                            mat = canvas_3.assetmgr.getAssetByName(matName);
+                            mat = assetmgr.getAssetByName(matName);
                             if (mat)
                                 mat.use();
                         }
                         if (mat == null) {
                             mat = new framework.material(matName);
-                            mat.setShader(canvas_3.assetmgr.getShader("shader/defmaskui"));
+                            var sh = assetmgr.getShader(this._shaderName);
+                            sh = !sh ? assetmgr.getShader(rawImage2D_1.defUIShader) : sh;
+                            mat.setShader(sh);
                             mat.use();
+                            matChanged = true;
                         }
-                        mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
+                        if (matChanged || this._lastMask != pMask) {
+                            mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
+                            this._lastMask = pMask;
+                        }
                         this._uimat = mat;
                     }
                     return this._uimat;
@@ -5602,6 +5665,7 @@ var gd3d;
             };
             rawImage2D.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
+            rawImage2D.defUIShader = "shader/defmaskui";
             __decorate([
                 gd3d.reflect.Field("texture"),
                 __metadata("design:type", Object),
@@ -5612,11 +5676,12 @@ var gd3d;
                 gd3d.reflect.UIStyle("vector4"),
                 __metadata("design:type", gd3d.math.color)
             ], rawImage2D.prototype, "color", void 0);
-            rawImage2D = __decorate([
+            rawImage2D = rawImage2D_1 = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender
             ], rawImage2D);
             return rawImage2D;
+            var rawImage2D_1;
         }());
         framework.rawImage2D = rawImage2D;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -13900,9 +13965,6 @@ var gd3d;
                                     var matrixView = context.matrixView;
                                     var az = gd3d.math.pool.new_vector3();
                                     var bz = gd3d.math.pool.new_vector3();
-                                    if (a.gameObject.transform.name == "pasted__default001") {
-                                        a.gameObject.transform.getWorldTranslate();
-                                    }
                                     gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                     gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
                                     var result = bz.z - az.z;
