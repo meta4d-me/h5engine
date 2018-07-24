@@ -2773,11 +2773,11 @@ var gd3d;
                     else {
                         gd3d.math.matrix3x2Multiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
                     }
+                    this.dirtyWorldDecompose = true;
                     this.updateMaskRect();
                     if (this.renderer != null) {
                         this.renderer.updateTran();
                     }
-                    this.dirtyWorldDecompose = true;
                 }
                 if (this.children != null) {
                     for (var i = 0; i < this.children.length; i++) {
