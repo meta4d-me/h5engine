@@ -29984,6 +29984,7 @@ var gd3d;
         var obb = (function () {
             function obb() {
                 this.vectors = new Array();
+                this.worldCenter = new gd3d.math.vector3();
             }
             obb.prototype.buildByMaxMin = function (minimum, maximum) {
                 this.vectors[0] = gd3d.math.pool.clone_vector3(minimum);
@@ -30029,7 +30030,7 @@ var gd3d;
                 this.directions = [new gd3d.math.vector3(), new gd3d.math.vector3(), new gd3d.math.vector3()];
             };
             obb.prototype.update = function (worldmatrix) {
-                gd3d.math.matrixGetTranslation(worldmatrix, this.center);
+                gd3d.math.matrixTransformVector3(this.center, worldmatrix, this.worldCenter);
                 gd3d.math.matrixGetVector3ByOffset(worldmatrix, 0, this.directions[0]);
                 gd3d.math.matrixGetVector3ByOffset(worldmatrix, 4, this.directions[1]);
                 gd3d.math.matrixGetVector3ByOffset(worldmatrix, 8, this.directions[2]);
@@ -30088,7 +30089,7 @@ var gd3d;
                 return true;
             };
             obb.prototype.computeBoxExtents = function (axis, box) {
-                var p = gd3d.math.vec3Dot(box.center, axis);
+                var p = gd3d.math.vec3Dot(box.worldCenter, axis);
                 var r0 = Math.abs(gd3d.math.vec3Dot(box.directions[0], axis)) * box.halfsize.x;
                 var r1 = Math.abs(gd3d.math.vec3Dot(box.directions[1], axis)) * box.halfsize.y;
                 var r2 = Math.abs(gd3d.math.vec3Dot(box.directions[2], axis)) * box.halfsize.z;
