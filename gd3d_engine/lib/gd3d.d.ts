@@ -20,6 +20,7 @@ declare namespace gd3d.framework {
         stats: Stats.Stats;
         container: HTMLDivElement;
         outcontainer: HTMLDivElement;
+        edModel: boolean;
         readonly width: number;
         readonly height: number;
         limitFrame: boolean;
@@ -5411,6 +5412,7 @@ declare namespace gd3d.framework {
         vectors: gd3d.math.vector3[];
         buildByMaxMin(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): void;
         buildByCenterSize(center: gd3d.math.vector3, size: gd3d.math.vector3): void;
+        protected worldCenter: math.vector3;
         update(worldmatrix: gd3d.math.matrix): void;
         caclWorldVecs(vecs: gd3d.math.vector3[], worldmatrix: gd3d.math.matrix): void;
         intersects(_obb: obb): boolean;
