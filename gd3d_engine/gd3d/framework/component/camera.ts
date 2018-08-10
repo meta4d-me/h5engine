@@ -27,11 +27,11 @@ namespace gd3d.framework
             context.webgl.depthMask(true);//zwrite 會影響clear depth，這個查了好一陣
             gd3d.render.glDrawPass.lastZWrite = true;
 
-            camera._renderOnce(scene, context, "_depth");
 
             context.webgl.clearColor(0, 0, 0, 0);
             context.webgl.clearDepth(1.0);
             context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
+            camera._renderOnce(scene, context, "_depth");
 
             render.glRenderTarget.useNull(context.webgl);
         }
@@ -812,7 +812,7 @@ namespace gd3d.framework
                     this._targetAndViewport(this.renderTarget, scene, context, false);
                     this._renderOnce(scene, context, "");
                 // });
-                
+
                 //context.webgl.flush();
             }
             else
