@@ -609,7 +609,7 @@ namespace gd3d.math
             var v: matrix = pool.new_matrix();
             // for (var i = 0; i < 16; i++)
             //     v.rawData[i] = src.rawData[i];
-            v.rawData.set(v.rawData);
+            v.rawData.set(src.rawData);
             return v;
         }
         static readonly identityMat: matrix = new matrix();
