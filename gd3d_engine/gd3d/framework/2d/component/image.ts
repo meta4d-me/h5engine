@@ -82,6 +82,7 @@ namespace gd3d.framework
                 let matName =this._sprite.texture.getName() + "_uimask" + rectPostfix;
                 let matChanged = false;
                 if(!mat || mat.getName() != matName){
+                    this.needRefreshImg = true;
                     if(mat) mat.unuse(); 
                     mat = assetmgr.getAssetByName(matName) as gd3d.framework.material;
                     if(mat) mat.use();
@@ -216,12 +217,15 @@ namespace gd3d.framework
         public set sprite(sprite: sprite)
         {
             if(sprite == this._sprite) return;
-
-            this.needRefreshImg = true;
+            
             if(this._sprite)
             {
                 this._sprite.unuse();
             }
+            if(!this._sprite || this._sprite.texture != sprite.texture ){
+                this.needRefreshImg = true;
+            }
+            
             this._sprite = sprite;
             if(sprite){
                 // this._imageBorder.l = sprite.border.l;
