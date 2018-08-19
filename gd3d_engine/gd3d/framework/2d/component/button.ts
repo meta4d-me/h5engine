@@ -240,6 +240,7 @@ namespace gd3d.framework
                     {
                         this._downInThis = true;
                         this.showPress();
+                        this.UIEventer.EmitEnum(event.UIEventEnum.PointerDown);
                     }
                     else if (ev.type == event.PointEventEnum.PointHold && this._downInThis)
                     {
@@ -253,6 +254,7 @@ namespace gd3d.framework
                     {
                         this._downInThis = false;
                         this.showNormal();
+                        this.UIEventer.EmitEnum(event.UIEventEnum.PointerUp);
                         this.UIEventer.EmitEnum(event.UIEventEnum.PointerClick);
                         //this.onClick.excute();
                     }
