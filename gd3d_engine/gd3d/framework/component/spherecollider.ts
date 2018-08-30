@@ -1,3 +1,4 @@
+let helpMat  : gd3d.framework.material = null;
 namespace gd3d.framework
 {
     /**
@@ -16,7 +17,7 @@ namespace gd3d.framework
          * 球形碰撞盒中心点
          * @version egret-gd3d 1.0
          */
-        public center:gd3d.math.vector3;
+        public center:gd3d.math.vector3 = new math.vector3();
         /**
          * @public
          * @language zh_CN
@@ -33,16 +34,18 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         public srcradius:number;//collider定义的源半径
-        private tempScale:gd3d.math.vector3;
+        private tempScale:gd3d.math.vector3 = new gd3d.math.vector3();
+        private srcCenter : gd3d.math.vector3 = new gd3d.math.vector3();
         constructor(_center:math.vector3, _r:number)
         {
-            this.center = math.pool.clone_vector3(_center);
+            math.vec3Clone(_center,this.srcCenter);
+            math.vec3Clone(_center,this.center);
             this.srcradius = _r;
-            this.tempScale = new gd3d.math.vector3();
         }
         public update(worldmatrix:math.matrix)
         {
-            gd3d.math.matrixGetTranslation(worldmatrix, this.center);
+            gd3d.math.matrixTransformVector3(this.srcCenter,worldmatrix,this.center);
+            // gd3d.math.matrixGetTranslation(worldmatrix, this.center);
             gd3d.math.matrixGetScale(worldmatrix, this.tempScale);
             if(this.tempScale.x < this.tempScale.y) this.tempScale.x = this.tempScale.y;
             if(this.tempScale.x < this.tempScale.z) this.tempScale.x = this.tempScale.z;
@@ -117,7 +120,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("vector3")
-        center: math.vector3;
+        center: math.vector3 = new math.vector3();
         /**
          * @public
          * @language zh_CN
@@ -126,7 +129,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("number")
-        radius: number;
+        radius: number = 0.5;
         /**
          * @private
          */
@@ -184,6 +187,14 @@ namespace gd3d.framework
             if (this.spherestruct)
             {
                 this.spherestruct.update(this.matrix);
+                if(this.subTran && this.subTran.gameObject.components.length >0){
+                    let r = this.spherestruct.radius;
+                    let sc = gd3d.math.pool.new_vector3(r,r,r);
+                    this.subTran.setWorldScale(sc);
+                    gd3d.math.pool.delete_vector3(sc);
+
+                    this.subTran.setWorldPosition(this.spherestruct.center);
+                }
             }
         }
          /**
@@ -211,11 +222,14 @@ namespace gd3d.framework
         set colliderVisible(value: boolean)
         {
             this._colliderVisible = value;
-            if (this.subTran)
-            {
+            if(this._colliderVisible){
+                if(this.subTran && this.subTran.gameObject.components.length<1){
+                    this.setMeshRenderer();
+                }
+            }
+            if(this.subTran){
                 this.subTran.gameObject.visible = this._colliderVisible;
             }
-
         }
          /**
          * @private
@@ -229,9 +243,9 @@ namespace gd3d.framework
             math.vec3Subtract(v1, v0, subv0);
             math.vec3Subtract(v2, v1, subv1);
             math.vec3Cross(subv0, subv1, cro0);
-  
+
             math.calPlaneLineIntersectPoint(cro0, v0, cro0, this.worldCenter, point);
-            
+
             let sublp = math.pool.new_vector3();
             math.vec3Subtract(point, this.worldCenter, sublp);
             let val = math.vec3Dot(cro0, sublp);
@@ -275,7 +289,8 @@ namespace gd3d.framework
             {
                 this.spherestruct = new spherestruct(this.center, this.radius);
             }
-            // this.buildMesh();
+
+            this.buildMesh();
         }
         /**
         * @private
@@ -287,12 +302,29 @@ namespace gd3d.framework
         private buildMesh()
         {
             this.subTran = new gd3d.framework.transform();
-            this.subTran.gameObject.hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy;
-            this.subTran.name = "spherecollider";
-            var mesh = this.subTran.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+            this.subTran.gameObject.hideFlags = HideFlags.DontSave | HideFlags.HideInHierarchy | HideFlags.NotEditable;
+            this.subTran.name = "sphereCollider";
+            if(this._colliderVisible){
+                this.setMeshRenderer();
+            }
+        }
 
-            mesh.mesh = this.getColliderMesh();
-            var renderer = this.subTran.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+        private setMeshRenderer(){
+            let mesh = this.subTran.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+            mesh.mesh = this.gameObject.getScene().app.getAssetMgr().getDefaultMesh("sphere");
+            let renderer = this.subTran.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+            //
+            renderer.materials = [];
+            if(!helpMat){
+                let ass = this.gameObject.getScene().app.getAssetMgr();
+                helpMat = new material("sphereCMat");
+                helpMat.defaultAsset = true;
+                helpMat.setShader(ass.getShader("shader/materialcolor"));
+                let color = new gd3d.math.vector4(0,1,0,1);
+                helpMat.setVector4("_Color",color);
+                helpMat.setFloat("_Alpha",0.3);
+            }
+            renderer.materials[0] = helpMat;
 
             this.subTran.gameObject.visible = this._colliderVisible;
 
@@ -301,6 +333,7 @@ namespace gd3d.framework
             this.subTran.markDirty();//要标记自己脏了，才会更新
             this.gameObject.transform.updateWorldTran();
         }
+
         /**
         * @private
         * @language zh_CN
