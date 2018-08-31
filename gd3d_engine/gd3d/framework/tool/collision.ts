@@ -1,0 +1,117 @@
+namespace gd3d.framework
+{
+    let helpV2_0 =new gd3d.math.vector2();
+    let helpV2_1 =new gd3d.math.vector2();
+    let helpV3_0 =new gd3d.math.vector3();
+    
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 碰撞检测Tool
+     * @version egret-gd3d 1.0
+     */
+    export class collision{ 
+        //obb-mesh  obb-obb  mesh-mesh
+        
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * obb 碰 obb
+        * @version egret-gd3d 1.0
+        */
+        static obbVsObb(a:obb,b:obb):boolean{
+            if (!a || !b) return false;
+            var box0 = a;
+            var box1 = b;
+
+            if (!this.obbOverLap(box0.directions[0], box0, box1)) return false;
+            if (!this.obbOverLap(box0.directions[1], box0, box1)) return false;
+            if (!this.obbOverLap(box0.directions[2], box0, box1)) return false;
+            if (!this.obbOverLap(box1.directions[0], box0, box1)) return false;
+            if (!this.obbOverLap(box1.directions[1], box0, box1)) return false;
+            if (!this.obbOverLap(box1.directions[2], box0, box1)) return false;
+
+            gd3d.math.vec3Cross(box0.directions[0], box1.directions[0], helpV3_0);
+            if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
+            gd3d.math.vec3Cross(box0.directions[0], box1.directions[1], helpV3_0);
+            if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
+            gd3d.math.vec3Cross(box0.directions[0], box1.directions[2], helpV3_0);
+            if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
+            gd3d.math.vec3Cross(box0.directions[1], box1.directions[0], helpV3_0);
+            if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
+            gd3d.math.vec3Cross(box0.directions[1], box1.directions[1], helpV3_0);
+            if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
+            gd3d.math.vec3Cross(box0.directions[1], box1.directions[2], helpV3_0);
+            if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
+            gd3d.math.vec3Cross(box0.directions[2], box1.directions[0], helpV3_0);
+            if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
+            gd3d.math.vec3Cross(box0.directions[2], box1.directions[1], helpV3_0);
+            if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
+            gd3d.math.vec3Cross(box0.directions[2], box1.directions[2], helpV3_0);
+            if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
+
+            return true;
+        }
+
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * sphere 碰 sphere
+        * @version egret-gd3d 1.0
+        */
+        static sphereVsSphere(a:spherestruct,b:spherestruct){
+            if(!a || !b)    return false;
+            let dis = math.vec3Distance(a.center, b.center);
+            return dis <= a.radius + b.radius;
+        }
+
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * obb 碰 sphere
+        * @version egret-gd3d 1.0
+        */
+        static obbVsSphere(a:obb,b:spherestruct):boolean{
+            if(!a || !b)    return false;
+            if (!this.obb_SphereOverLap(a.directions[0], a, b)) return false;
+            if (!this.obb_SphereOverLap(a.directions[1], a, b)) return false;
+            if (!this.obb_SphereOverLap(a.directions[2], a, b)) return false;
+
+            let axis = helpV3_0;
+            gd3d.math.vec3Subtract(a.worldCenter,b.center,axis); //obb 上 到圆心最近点 的轴
+            gd3d.math.vec3Normalize(axis,axis);
+            if (!this.obb_SphereOverLap(axis, a, b)) return false;
+
+            return true;
+        }
+
+        //MeshVsMesh
+
+        //obbVsMesh
+
+        //SphereVsMesh
+
+        //tool fun
+
+        private static obb_SphereOverLap(axis: gd3d.math.vector3, box0: obb, sphere: spherestruct){
+            box0.computeExtentsByAxis(axis,helpV2_0);
+            sphere.computeExtentsByAxis(axis,helpV2_1);
+            return this.extentsOverlap(helpV2_0,helpV2_1);
+        }
+
+        private static obbOverLap(axis: gd3d.math.vector3, box0: obb, box1: obb){
+            box0.computeExtentsByAxis(axis,helpV2_0);
+            box1.computeExtentsByAxis(axis,helpV2_1);
+            return this.extentsOverlap(helpV2_0,helpV2_1);
+        }
+
+        private static extentsOverlap(a:math.vector2,b:math.vector2): boolean
+        {
+            return !(a.x > b.y || b.x > a.y);
+        }
+    }
+}
