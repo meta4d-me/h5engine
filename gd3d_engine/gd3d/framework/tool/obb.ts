@@ -24,7 +24,14 @@
         * @version egret-gd3d 1.0
         */
         halfsize: gd3d.math.vector3;
-        private directions: gd3d.math.vector3[];
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * x,y,z 轴方向 
+        * @version egret-gd3d 1.0
+        */
+        directions: gd3d.math.vector3[];
         /**
         * @public
         * @language zh_CN
@@ -101,7 +108,14 @@
             this.directions = [new gd3d.math.vector3(), new gd3d.math.vector3(), new gd3d.math.vector3()];
         }
 
-        protected worldCenter = new gd3d.math.vector3();
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 在世界空间的中心点
+        * @version egret-gd3d 1.0
+        */
+        worldCenter = new gd3d.math.vector3();
         /**
         * @public
         * @language zh_CN
@@ -139,76 +153,44 @@
         }
 
         /**
-        * @public
-        * @language zh_CN
-        * @classdesc
-        * obb的碰撞检测
-        * @param _obb 待检测obb
-        * @version egret-gd3d 1.0
-        */
-        public intersects(_obb: obb)
+         * @public
+         * @language zh_CN
+         * @param bound 碰撞体
+         * @classdesc
+         * 碰撞体检测碰撞
+         * @version egret-gd3d 1.0
+         */
+        public intersects(bound: any)
         {
-            if (_obb == null) return false;
+            if (!bound) return false;
+            if(bound instanceof obb)
+            {
+                return collision.obbVsObb(bound,this);
+            }else if(bound instanceof spherestruct)
+            {
+                return collision.obbVsSphere(this,bound);
+            }
 
-            var box0 = this;
-            var box1 = _obb;
-
-            if (!this.axisOverlap(box0.directions[0], box0, box1)) return false;
-            if (!this.axisOverlap(box0.directions[1], box0, box1)) return false;
-            if (!this.axisOverlap(box0.directions[2], box0, box1)) return false;
-            if (!this.axisOverlap(box1.directions[0], box0, box1)) return false;
-            if (!this.axisOverlap(box1.directions[1], box0, box1)) return false;
-            if (!this.axisOverlap(box1.directions[2], box0, box1)) return false;
-
-            var crossresult = gd3d.math.pool.new_vector3();
-
-            gd3d.math.vec3Cross(box0.directions[0], box1.directions[0], crossresult);
-            if (!this.axisOverlap(crossresult, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[0], box1.directions[1], crossresult);
-            if (!this.axisOverlap(crossresult, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[0], box1.directions[2], crossresult);
-            if (!this.axisOverlap(crossresult, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[1], box1.directions[0], crossresult);
-            if (!this.axisOverlap(crossresult, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[1], box1.directions[1], crossresult);
-            if (!this.axisOverlap(crossresult, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[1], box1.directions[2], crossresult);
-            if (!this.axisOverlap(crossresult, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[2], box1.directions[0], crossresult);
-            if (!this.axisOverlap(crossresult, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[2], box1.directions[1], crossresult);
-            if (!this.axisOverlap(crossresult, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[2], box1.directions[2], crossresult);
-            if (!this.axisOverlap(crossresult, box0, box1)) return false;
-
-            return true;
         }
-        
-        private computeBoxExtents(axis: gd3d.math.vector3, box: obb)
-        {
-            var p = gd3d.math.vec3Dot(box.worldCenter, axis);
 
-            var r0 = Math.abs(gd3d.math.vec3Dot(box.directions[0], axis)) * box.halfsize.x;
-            var r1 = Math.abs(gd3d.math.vec3Dot(box.directions[1], axis)) * box.halfsize.y;
-            var r2 = Math.abs(gd3d.math.vec3Dot(box.directions[2], axis)) * box.halfsize.z;
+        /**
+         * @public
+         * @language zh_CN
+         * @param axis 指定轴
+         * @param out 长度范围
+         * @classdesc
+         * 计算到指定轴上投影的长度
+         * @version egret-gd3d 1.0
+         */
+        computeExtentsByAxis(axis: math.vector3 , out : math.vector2){
+            let p = gd3d.math.vec3Dot(this.worldCenter, axis);
 
-            var r = r0 + r1 + r2;
-            var result = gd3d.math.pool.new_vector3();
-            result.x = p - r;
-            result.y = p + r;
-            return result;
-        }
-        
-        private axisOverlap(axis: gd3d.math.vector3, box0: obb, box1: obb): boolean
-        {
-            var result0 = this.computeBoxExtents(axis, box0);
-            var result1 = this.computeBoxExtents(axis, box1);
-            return this.extentsOverlap(result0.x, result0.y, result1.x, result1.y);
-        }
-        
-        private extentsOverlap(min0: number, max0: number, min1: number, max1: number): boolean
-        {
-            return !(min0 > max1 || min1 > max0);
+            let r0 = Math.abs(gd3d.math.vec3Dot(this.directions[0], axis)) * this.halfsize.x;
+            let r1 = Math.abs(gd3d.math.vec3Dot(this.directions[1], axis)) * this.halfsize.y;
+            let r2 = Math.abs(gd3d.math.vec3Dot(this.directions[2], axis)) * this.halfsize.z;
+            let r = r0 + r1 + r2;
+            out.x = p - r;
+            out.y = p + r;
         }
 
         /**

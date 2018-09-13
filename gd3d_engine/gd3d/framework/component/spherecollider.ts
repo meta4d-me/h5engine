@@ -54,23 +54,40 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
-         * @param bound 球形碰撞盒结构体
+         * @param bound 碰撞体
          * @classdesc
-         * 球形碰撞盒结构体互相检测碰撞
+         * 碰撞体检测碰撞
          * @version egret-gd3d 1.0
          */
         public intersects(bound:any)
         {
+            if(!bound)  return false;
             if(bound instanceof spherestruct)
             {
-                let dis = math.vec3Distance(this.center, bound.center);
-                if(dis > this.radius + bound.radius)    return false;
-                return true;
+                return collision.sphereVsSphere(this,bound);
+                // let dis = math.vec3Distance(this.center, bound.center);
+                // if(dis > this.radius + bound.radius)    return false;
+                // return true;
             }
             else if(bound instanceof obb)
             {
-
+                return collision.obbVsSphere(bound,this);
             }
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @param axis 指定轴
+         * @param out 长度范围
+         * @classdesc
+         * 计算到指定轴上投影的长度
+         * @version egret-gd3d 1.0
+         */
+        computeExtentsByAxis (axis: math.vector3 , out : math.vector2){
+            let p = gd3d.math.vec3Dot(this.center, axis);
+            out.x = p - this.radius;
+            out.y = p + this.radius;
         }
     }
     /**
