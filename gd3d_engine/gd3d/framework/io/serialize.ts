@@ -20,8 +20,12 @@ namespace gd3d.io
         {
             let data: any = {};
             if (asset instanceof gd3d.framework.material){
-                let names = asset.getName().split(".");
-                return { "name": names[0] + ".mat.json", "value": (asset as gd3d.framework.material).save(), "type": SaveAssetType.NameAndContent };
+                let t = asset.getName();
+                let names = t.split(".");
+                if(t.lastIndexOf('.mat.json') == -1) {
+                    return { "name": names[0] + ".mat.json", "value": (asset as gd3d.framework.material).save(), "type": SaveAssetType.NameAndContent };
+                }
+                return { "name": t, "value": (asset as gd3d.framework.material).save(), "type": SaveAssetType.NameAndContent };
             }
             // if (asset instanceof gd3d.framework.mesh)
             //     return { "name": asset.getName() + "_enginedefault.mesh.bin", "type": SaveAssetType.DefaultAssets };
@@ -50,7 +54,7 @@ namespace gd3d.io
                                     SerializeDependent.resourseDatas.push({ "url": url, "type": SaveAssetType.FullUrl });
                                     if(asset instanceof framework.texture && asset.realName && asset.realName != ""){
                                         asset;
-                                        let idx = url.lastIndexOf("/"); 
+                                        let idx = url.lastIndexOf("/");
                                         if(idx != -1){
                                             let haed = url.substring(0,idx+1);
                                             SerializeDependent.resourseDatas.push({ "url": haed + asset.realName , "type": SaveAssetType.FullUrl });
@@ -839,7 +843,7 @@ namespace gd3d.io
         {
 
         }
-        else 
+        else
         {
             if (serializedObj[key].parse == "reference")
             {
@@ -1091,7 +1095,7 @@ namespace gd3d.io
                 }
             }
         }
-        else 
+        else
         {
             if (serializedObj[key].parse == "reference")
             {
