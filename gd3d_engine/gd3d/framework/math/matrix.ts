@@ -2,10 +2,10 @@
 {
     export function matrixGetTranslation(src: matrix, out: vector3)
     {
-        // out.rawData[0] = src.rawData[12];
-        // out.rawData[1] = src.rawData[13];
-        // out.rawData[2] = src.rawData[14];
-        out.rawData.set(src.rawData.subarray(12, 15));
+        out.rawData[0] = src.rawData[12];
+        out.rawData[1] = src.rawData[13];
+        out.rawData[2] = src.rawData[14];
+        //out.rawData.set(src.rawData.subarray(12, 15));
     }
 
     /**

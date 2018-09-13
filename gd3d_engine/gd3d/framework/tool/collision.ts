@@ -3,6 +3,7 @@ namespace gd3d.framework
     let helpV2_0 =new gd3d.math.vector2();
     let helpV2_1 =new gd3d.math.vector2();
     let helpV3_0 =new gd3d.math.vector3();
+    let helpV3_1 =new gd3d.math.vector3();
     
     /**
      * @public
@@ -85,6 +86,13 @@ namespace gd3d.framework
             gd3d.math.vec3Subtract(a.worldCenter,b.center,axis); //obb 上 到圆心最近点 的轴
             gd3d.math.vec3Normalize(axis,axis);
             if (!this.obb_SphereOverLap(axis, a, b)) return false;
+
+            gd3d.math.vec3Cross(a.directions[0], axis, helpV3_1);
+            if (!this.obb_SphereOverLap(helpV3_1, a, b)) return false;
+            gd3d.math.vec3Cross(a.directions[1], axis, helpV3_1);
+            if (!this.obb_SphereOverLap(helpV3_1, a, b)) return false;
+            gd3d.math.vec3Cross(a.directions[2], axis, helpV3_1);
+            if (!this.obb_SphereOverLap(helpV3_1, a, b)) return false;
 
             return true;
         }

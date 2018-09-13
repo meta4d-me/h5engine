@@ -1,4 +1,6 @@
 /// <reference path="../../io/reflect.ts" />
+let helpv3 = new gd3d.math.vector3();
+let helpv3_1 = new gd3d.math.vector3();
 
 namespace gd3d.framework
 {
@@ -791,15 +793,12 @@ namespace gd3d.framework
                                 // this.calcViewMatrix(matrixView);
                                 let matrixView = context.matrixView;
 
-                                let az = math.pool.new_vector3();
-                                let bz = math.pool.new_vector3();
+                                let az = helpv3;
+                                let bz = helpv3_1;
 
                                 gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                 gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
-                                let result = bz.z - az.z;
-                                math.pool.delete_vector3(az);
-                                math.pool.delete_vector3(bz);
-                                return result;
+                                return bz.z - az.z;
                             }
                         })
                     }
