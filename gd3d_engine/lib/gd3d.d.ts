@@ -624,6 +624,7 @@ declare namespace gd3d.framework {
         remove(): void;
     }
 }
+declare let helpV2: gd3d.math.vector2;
 declare namespace gd3d.framework {
     enum TransitionType {
         None = 0,
@@ -654,6 +655,9 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         transform: transform2D;
         remove(): void;
+        private downPointV2;
+        private isMovedLimit;
+        private readonly movedLimit;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         private UIEventer;
         addListener(eventEnum: event.UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
@@ -2180,6 +2184,8 @@ declare namespace gd3d.framework {
         clone(): void;
     }
 }
+declare let helpv3: gd3d.math.vector3;
+declare let helpv3_1: gd3d.math.vector3;
 declare namespace gd3d.framework {
     interface ICameraPostQueue {
         render(scene: scene, context: renderContext, camera: camera): any;
@@ -3232,6 +3238,7 @@ declare namespace gd3d {
         Emit(event: string, ...args: Array<any>): void;
         RemoveListener(event: string, func: Function, thisArg: any): void;
         RemoveListenerAll(): void;
+        listenerCount(event: string): number;
     }
 }
 declare namespace gd3d.event {
@@ -5430,10 +5437,7 @@ declare namespace gd3d.framework {
         update(worldmatrix: gd3d.math.matrix): void;
         caclWorldVecs(vecs: gd3d.math.vector3[], worldmatrix: gd3d.math.matrix): void;
         intersects(bound: any): boolean;
-        private computeBoxExtents(axis, box);
         computeExtentsByAxis(axis: math.vector3, out: math.vector2): void;
-        private axisOverlap(axis, box0, box1);
-        private extentsOverlap(min0, max0, min1, max1);
         clone(): obb;
         dispose(): void;
     }
@@ -6185,6 +6189,7 @@ declare namespace gd3d.render {
         genIndexDataArray(): Uint16Array;
         genIndexDataArrayTri2Line(): Uint16Array;
         genIndexDataArrayQuad2Line(): Uint16Array;
+        static cloneByObj(target: meshData): meshData;
     }
 }
 declare namespace gd3d.render {

@@ -3389,6 +3389,7 @@ var gd3d;
         framework.boxcollider2d = boxcollider2d;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
+var helpV2 = new gd3d.math.vector2();
 var gd3d;
 (function (gd3d) {
     var framework;
@@ -3407,6 +3408,9 @@ var gd3d;
                 this._normalColor = new gd3d.math.color(1, 1, 1, 1);
                 this._pressedColor = new gd3d.math.color(0.5, 0.5, 0.5, 1);
                 this._fadeDuration = 0.1;
+                this.downPointV2 = new gd3d.math.vector2();
+                this.isMovedLimit = false;
+                this.movedLimit = 0.005;
                 this.UIEventer = new gd3d.event.UIEvent();
                 this._downInThis = false;
                 this._dragOut = false;
@@ -3524,23 +3528,47 @@ var gd3d;
                 if (oncap == false) {
                     var b = this.transform.ContainsCanvasPoint(new gd3d.math.vector2(ev.x, ev.y));
                     if (b) {
-                        ev.eated = true;
                         if (ev.type == gd3d.event.PointEventEnum.PointDown) {
                             this._downInThis = true;
                             this.showPress();
-                            this.UIEventer.EmitEnum(gd3d.event.UIEventEnum.PointerDown);
+                            var pd = gd3d.event.UIEventEnum.PointerDown;
+                            if (this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pd]) > 0) {
+                                this.UIEventer.EmitEnum(pd);
+                                ev.eated = true;
+                            }
+                            this.downPointV2.x = ev.x;
+                            this.downPointV2.y = ev.y;
+                            this.isMovedLimit = false;
                         }
                         else if (ev.type == gd3d.event.PointEventEnum.PointHold && this._downInThis) {
                             if (this._dragOut == true) {
                                 this._dragOut = false;
                                 this.showPress();
                             }
+                            if (!this.isMovedLimit) {
+                                helpV2.x = ev.x;
+                                helpV2.y = ev.y;
+                                this.isMovedLimit = gd3d.math.vec2Distance(helpV2, this.downPointV2) > this.movedLimit;
+                            }
+                            else {
+                                var c = 0;
+                                c;
+                            }
                         }
                         else if (ev.type == gd3d.event.PointEventEnum.PointUp && this._downInThis) {
                             this._downInThis = false;
                             this.showNormal();
-                            this.UIEventer.EmitEnum(gd3d.event.UIEventEnum.PointerUp);
+                            var pu = gd3d.event.UIEventEnum.PointerUp;
+                            if (this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pu]) > 0) {
+                                this.UIEventer.EmitEnum(pu);
+                                ev.eated = true;
+                            }
                             this.UIEventer.EmitEnum(gd3d.event.UIEventEnum.PointerClick);
+                            var pc = gd3d.event.UIEventEnum.PointerClick;
+                            if (!this.isMovedLimit && this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pc]) > 0) {
+                                this.UIEventer.EmitEnum(pc);
+                                ev.eated = true;
+                            }
                         }
                     }
                     else {
@@ -11560,9 +11588,7 @@ var gd3d;
                         var objVF = result.objVF;
                         var data = result.meshData;
                         data.originVF = objVF.vf;
-                        _this.data = new gd3d.render.meshData();
-                        for (var k in data)
-                            _this.data[k] = data[k];
+                        _this.data = gd3d.render.meshData.cloneByObj(data);
                         _this.submesh = result.subMesh;
                         _this.glMesh = new gd3d.render.glMesh();
                         var vertexs = _this.data.genVertexDataArray(objVF.vf);
@@ -11629,94 +11655,7 @@ var gd3d;
             mesh.prototype.clone = function () {
                 var _result = new mesh_1(this.getName());
                 var vf = this.glMesh.vertexFormat;
-                var data = new gd3d.render.meshData();
-                if (this.data.pos != undefined) {
-                    data.pos = [];
-                    for (var _i = 0, _a = this.data.pos; _i < _a.length; _i++) {
-                        var item = _a[_i];
-                        var _position = new gd3d.math.vector3();
-                        _position.rawData.set(item.rawData);
-                        data.pos.push(_position);
-                    }
-                }
-                if (this.data.color != undefined) {
-                    data.color = [];
-                    for (var _b = 0, _c = this.data.color; _b < _c.length; _b++) {
-                        var item = _c[_b];
-                        var _color = new gd3d.math.color();
-                        _color.rawData.set(item.rawData);
-                        data.color.push(_color);
-                    }
-                }
-                if (this.data.normal != undefined) {
-                    data.normal = [];
-                    for (var _d = 0, _e = this.data.normal; _d < _e.length; _d++) {
-                        var item = _e[_d];
-                        var _normal = new gd3d.math.vector3();
-                        _normal.rawData.set(item.rawData);
-                        data.normal.push(_normal);
-                    }
-                }
-                if (this.data.uv != undefined) {
-                    data.uv = [];
-                    for (var _f = 0, _g = this.data.uv; _f < _g.length; _f++) {
-                        var item = _g[_f];
-                        var uv = new gd3d.math.vector2();
-                        uv.rawData.set(item.rawData);
-                        data.uv.push(uv);
-                    }
-                }
-                if (this.data.uv2 != undefined) {
-                    data.uv2 = [];
-                    for (var _h = 0, _j = this.data.uv2; _h < _j.length; _h++) {
-                        var item = _j[_h];
-                        var uv = new gd3d.math.vector2();
-                        uv.rawData.set(uv.rawData);
-                        data.uv2.push(uv);
-                    }
-                }
-                if (this.data.tangent != undefined) {
-                    data.tangent = [];
-                    for (var _k = 0, _l = this.data.tangent; _k < _l.length; _k++) {
-                        var item = _l[_k];
-                        var tangent = new gd3d.math.vector3();
-                        tangent.rawData.set(item.rawData);
-                        data.tangent.push(tangent);
-                    }
-                }
-                if (this.data.blendIndex != undefined) {
-                    data.blendIndex = [];
-                    for (var i_2 = 0, len = this.data.blendIndex.length; i_2 < len; ++i_2) {
-                        var item = this.data.blendIndex[i_2];
-                        var _boneIndex = new gd3d.render.number4();
-                        _boneIndex.v0 = item.v0;
-                        _boneIndex.v1 = item.v1;
-                        _boneIndex.v2 = item.v2;
-                        _boneIndex.v3 = item.v3;
-                        data.blendIndex.push(_boneIndex);
-                    }
-                }
-                if (this.data.blendWeight != undefined) {
-                    data.blendWeight = [];
-                    for (var i_3 = 0, len = this.data.blendWeight.length; i_3 < len; ++i_3) {
-                        var item = this.data.blendWeight[i_3];
-                        var _boneWeight = new gd3d.render.number4();
-                        _boneWeight.v0 = item.v0;
-                        _boneWeight.v1 = item.v1;
-                        _boneWeight.v2 = item.v2;
-                        _boneWeight.v3 = item.v3;
-                        data.blendWeight.push(_boneWeight);
-                    }
-                }
-                _result.submesh = [];
-                for (var i = 0; i < this.submesh.length; i++) {
-                    var _submeshinfo = new subMeshInfo();
-                    _submeshinfo.start = this.submesh[i].start;
-                    _submeshinfo.size = this.submesh[i].size;
-                    _submeshinfo.matIndex = i;
-                    _result.submesh.push(_submeshinfo);
-                }
-                data.trisindex = this.data.trisindex.slice();
+                var data = gd3d.render.meshData.cloneByObj(this.data);
                 _result.data = data;
                 _result.glMesh = new gd3d.render.glMesh();
                 var vertexs = _result.data.genVertexDataArray(vf);
@@ -13551,6 +13490,8 @@ var gd3d;
         framework.bloomctr = bloomctr;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
+var helpv3 = new gd3d.math.vector3();
+var helpv3_1 = new gd3d.math.vector3();
 var gd3d;
 (function (gd3d) {
     var framework;
@@ -13968,14 +13909,11 @@ var gd3d;
                                 }
                                 else {
                                     var matrixView = context.matrixView;
-                                    var az = gd3d.math.pool.new_vector3();
-                                    var bz = gd3d.math.pool.new_vector3();
+                                    var az = helpv3;
+                                    var bz = helpv3_1;
                                     gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                     gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
-                                    var result = bz.z - az.z;
-                                    gd3d.math.pool.delete_vector3(az);
-                                    gd3d.math.pool.delete_vector3(bz);
-                                    return result;
+                                    return bz.z - az.z;
                                 }
                             });
                         }
@@ -14525,9 +14463,9 @@ var gd3d;
                     return;
                 var index = -1;
                 if (_initFrameData.attrsData.mat != null) {
-                    for (var i_4 = 0; i_4 < this.matDataGroups.length; i_4++) {
-                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_4], _initFrameData.attrsData.mat)) {
-                            index = i_4;
+                    for (var i_2 = 0; i_2 < this.matDataGroups.length; i_2++) {
+                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_2], _initFrameData.attrsData.mat)) {
+                            index = i_2;
                             break;
                         }
                     }
@@ -14585,41 +14523,41 @@ var gd3d;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
                 element.update();
                 subEffectBatcher.effectElements.push(element);
-                for (var i_5 = 0; i_5 < vertexCount; i_5++) {
+                for (var i_3 = 0; i_3 < vertexCount; i_3++) {
                     {
                         var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = vertexArr[i_5 * vertexSize + 0];
-                        vertex.y = vertexArr[i_5 * vertexSize + 1];
-                        vertex.z = vertexArr[i_5 * vertexSize + 2];
+                        vertex.x = vertexArr[i_3 * vertexSize + 0];
+                        vertex.y = vertexArr[i_3 * vertexSize + 1];
+                        vertex.z = vertexArr[i_3 * vertexSize + 2];
                         gd3d.math.matrixTransformVector3(vertex, element.curAttrData.matrix, vertex);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 0] = vertex.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 1] = vertex.y;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 2] = vertex.z;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 0] = vertex.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 1] = vertex.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 2] = vertex.z;
                         gd3d.math.pool.delete_vector3(vertex);
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 3] = vertexArr[i_5 * vertexSize + 3];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 4] = vertexArr[i_5 * vertexSize + 4];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 5] = vertexArr[i_5 * vertexSize + 5];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 3] = vertexArr[i_3 * vertexSize + 3];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 4] = vertexArr[i_3 * vertexSize + 4];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 5] = vertexArr[i_3 * vertexSize + 5];
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 6] = vertexArr[i_5 * vertexSize + 6];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 7] = vertexArr[i_5 * vertexSize + 7];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 8] = vertexArr[i_5 * vertexSize + 8];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 6] = vertexArr[i_3 * vertexSize + 6];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 7] = vertexArr[i_3 * vertexSize + 7];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 8] = vertexArr[i_3 * vertexSize + 8];
                     }
                     {
                         var r = gd3d.math.floatClamp(element.curAttrData.color.x, 0, 1);
                         var g = gd3d.math.floatClamp(element.curAttrData.color.y, 0, 1);
                         var b = gd3d.math.floatClamp(element.curAttrData.color.z, 0, 1);
-                        var a = gd3d.math.floatClamp(vertexArr[i_5 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 9] = r;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 10] = g;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 11] = b;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 12] = a;
+                        var a = gd3d.math.floatClamp(vertexArr[i_3 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 9] = r;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 10] = g;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 11] = b;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 12] = a;
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 13] = vertexArr[i_5 * vertexSize + 13] * element.curAttrData.tilling.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 14] = vertexArr[i_5 * vertexSize + 14] * element.curAttrData.tilling.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 13] = vertexArr[i_3 * vertexSize + 13] * element.curAttrData.tilling.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 14] = vertexArr[i_3 * vertexSize + 14] * element.curAttrData.tilling.y;
                     }
                 }
                 var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
@@ -14789,11 +14727,11 @@ var gd3d;
                 if (this.delayElements.length > 0) {
                     if (this.refElements.length > 0)
                         this.refElements = [];
-                    for (var i_6 = this.delayElements.length - 1; i_6 >= 0; i_6--) {
-                        var data = this.delayElements[i_6];
+                    for (var i_4 = this.delayElements.length - 1; i_4 >= 0; i_4--) {
+                        var data = this.delayElements[i_4];
                         if (data.delayTime <= this.playTimer) {
-                            this.addElement(this.delayElements[i_6]);
-                            this.delayElements.splice(i_6, 1);
+                            this.addElement(this.delayElements[i_4]);
+                            this.delayElements.splice(i_4, 1);
                         }
                     }
                 }
@@ -18544,6 +18482,9 @@ var gd3d;
         AEvent.prototype.RemoveListenerAll = function () {
             this.events = {};
         };
+        AEvent.prototype.listenerCount = function (event) {
+            return this.events[event] ? this.events[event].length : 0;
+        };
         return AEvent;
     }());
     gd3d.AEvent = AEvent;
@@ -20161,8 +20102,12 @@ var gd3d;
             SerializeDependent.GetAssetContent = function (asset) {
                 var data = {};
                 if (asset instanceof gd3d.framework.material) {
-                    var names = asset.getName().split(".");
-                    return { "name": names[0] + ".mat.json", "value": asset.save(), "type": SaveAssetType.NameAndContent };
+                    var t = asset.getName();
+                    var names = t.split(".");
+                    if (t.lastIndexOf('.mat.json') == -1) {
+                        return { "name": names[0] + ".mat.json", "value": asset.save(), "type": SaveAssetType.NameAndContent };
+                    }
+                    return { "name": t, "value": asset.save(), "type": SaveAssetType.NameAndContent };
                 }
             };
             SerializeDependent.GetAssetUrl = function (asset, assetMgr) {
@@ -21588,7 +21533,9 @@ var gd3d;
     var math;
     (function (math) {
         function matrixGetTranslation(src, out) {
-            out.rawData.set(src.rawData.subarray(12, 15));
+            out.rawData[0] = src.rawData[12];
+            out.rawData[1] = src.rawData[13];
+            out.rawData[2] = src.rawData[14];
         }
         math.matrixGetTranslation = matrixGetTranslation;
         function matrixTranspose(src, out) {
@@ -28960,8 +28907,8 @@ var gd3d;
                         array.push(obj.components[i].comp);
                     }
                 }
-                for (var i_7 = 0; obj.transform.children != undefined && i_7 < obj.transform.children.length; i_7++) {
-                    var _obj = obj.transform.children[i_7].gameObject;
+                for (var i_5 = 0; obj.transform.children != undefined && i_5 < obj.transform.children.length; i_5++) {
+                    var _obj = obj.transform.children[i_5].gameObject;
                     this._getComponentsInChildren(type, _obj, array);
                 }
             };
@@ -30029,6 +29976,7 @@ var gd3d;
         var helpV2_0 = new gd3d.math.vector2();
         var helpV2_1 = new gd3d.math.vector2();
         var helpV3_0 = new gd3d.math.vector3();
+        var helpV3_1 = new gd3d.math.vector3();
         var collision = (function () {
             function collision() {
             }
@@ -30097,6 +30045,15 @@ var gd3d;
                 gd3d.math.vec3Subtract(a.worldCenter, b.center, axis);
                 gd3d.math.vec3Normalize(axis, axis);
                 if (!this.obb_SphereOverLap(axis, a, b))
+                    return false;
+                gd3d.math.vec3Cross(a.directions[0], axis, helpV3_1);
+                if (!this.obb_SphereOverLap(helpV3_1, a, b))
+                    return false;
+                gd3d.math.vec3Cross(a.directions[1], axis, helpV3_1);
+                if (!this.obb_SphereOverLap(helpV3_1, a, b))
+                    return false;
+                gd3d.math.vec3Cross(a.directions[2], axis, helpV3_1);
+                if (!this.obb_SphereOverLap(helpV3_1, a, b))
                     return false;
                 return true;
             };
@@ -30192,17 +30149,6 @@ var gd3d;
                     return framework.collision.obbVsSphere(this, bound);
                 }
             };
-            obb.prototype.computeBoxExtents = function (axis, box) {
-                var p = gd3d.math.vec3Dot(box.worldCenter, axis);
-                var r0 = Math.abs(gd3d.math.vec3Dot(box.directions[0], axis)) * box.halfsize.x;
-                var r1 = Math.abs(gd3d.math.vec3Dot(box.directions[1], axis)) * box.halfsize.y;
-                var r2 = Math.abs(gd3d.math.vec3Dot(box.directions[2], axis)) * box.halfsize.z;
-                var r = r0 + r1 + r2;
-                var result = gd3d.math.pool.new_vector3();
-                result.x = p - r;
-                result.y = p + r;
-                return result;
-            };
             obb.prototype.computeExtentsByAxis = function (axis, out) {
                 var p = gd3d.math.vec3Dot(this.worldCenter, axis);
                 var r0 = Math.abs(gd3d.math.vec3Dot(this.directions[0], axis)) * this.halfsize.x;
@@ -30211,14 +30157,6 @@ var gd3d;
                 var r = r0 + r1 + r2;
                 out.x = p - r;
                 out.y = p + r;
-            };
-            obb.prototype.axisOverlap = function (axis, box0, box1) {
-                var result0 = this.computeBoxExtents(axis, box0);
-                var result1 = this.computeBoxExtents(axis, box1);
-                return this.extentsOverlap(result0.x, result0.y, result1.x, result1.y);
-            };
-            obb.prototype.extentsOverlap = function (min0, max0, min1, max1) {
-                return !(min0 > max1 || min1 > max0);
             };
             obb.prototype.clone = function () {
                 var _obb = new obb();
@@ -33733,6 +33671,100 @@ var gd3d;
                     line.push(this.trisindex[i * 4 + 3]);
                 }
                 return new Uint16Array(line);
+            };
+            meshData.cloneByObj = function (target) {
+                var md = new meshData();
+                target.originVF = md.originVF;
+                if (target.pos) {
+                    md.pos = [];
+                    target.pos.forEach(function (element, idx) {
+                        md.pos[idx] = new gd3d.math.vector3();
+                        md.pos[idx].x = element.x;
+                        md.pos[idx].y = element.y;
+                        md.pos[idx].z = element.z;
+                    });
+                }
+                if (target.color) {
+                    md.color = [];
+                    target.color.forEach(function (element, idx) {
+                        md.color[idx] = new gd3d.math.color();
+                        md.color[idx].r = element.r;
+                        md.color[idx].g = element.g;
+                        md.color[idx].b = element.b;
+                        md.color[idx].a = element.a;
+                    });
+                }
+                if (target.colorex) {
+                    md.colorex = [];
+                    target.colorex.forEach(function (element, idx) {
+                        md.colorex[idx] = new gd3d.math.color();
+                        md.colorex[idx].r = element.r;
+                        md.colorex[idx].g = element.g;
+                        md.colorex[idx].b = element.b;
+                        md.colorex[idx].a = element.a;
+                    });
+                }
+                if (target.uv) {
+                    md.uv = [];
+                    target.uv.forEach(function (element, idx) {
+                        md.uv[idx] = new gd3d.math.vector2();
+                        md.uv[idx].x = element.x;
+                        md.uv[idx].y = element.y;
+                    });
+                }
+                if (target.uv2) {
+                    md.uv2 = [];
+                    target.uv2.forEach(function (element, idx) {
+                        md.uv2[idx] = new gd3d.math.vector2();
+                        md.uv2[idx].x = element.x;
+                        md.uv2[idx].y = element.y;
+                    });
+                }
+                if (target.normal) {
+                    md.normal = [];
+                    target.normal.forEach(function (element, idx) {
+                        md.normal[idx] = new gd3d.math.vector3();
+                        md.normal[idx].x = element.x;
+                        md.normal[idx].y = element.y;
+                        md.normal[idx].z = element.z;
+                    });
+                }
+                if (target.tangent) {
+                    md.tangent = [];
+                    target.tangent.forEach(function (element, idx) {
+                        md.tangent[idx] = new gd3d.math.vector3();
+                        md.tangent[idx].x = element.x;
+                        md.tangent[idx].y = element.y;
+                        md.tangent[idx].z = element.z;
+                    });
+                }
+                if (target.blendIndex) {
+                    md.blendIndex = [];
+                    target.blendIndex.forEach(function (element, idx) {
+                        md.blendIndex[idx] = new render.number4();
+                        md.blendIndex[idx].v0 = element.v0;
+                        md.blendIndex[idx].v1 = element.v1;
+                        md.blendIndex[idx].v2 = element.v2;
+                        md.blendIndex[idx].v3 = element.v3;
+                    });
+                }
+                if (target.blendWeight) {
+                    md.blendWeight = [];
+                    target.blendWeight.forEach(function (element, idx) {
+                        md.blendWeight[idx] = new render.number4();
+                        md.blendWeight[idx].v0 = element.v0;
+                        md.blendWeight[idx].v1 = element.v1;
+                        md.blendWeight[idx].v2 = element.v2;
+                        md.blendWeight[idx].v3 = element.v3;
+                    });
+                }
+                if (target.trisindex) {
+                    md.trisindex = [];
+                    target.trisindex.forEach(function (element) {
+                        md.trisindex.push(element);
+                    });
+                }
+                return md;
             };
             return meshData;
         }());

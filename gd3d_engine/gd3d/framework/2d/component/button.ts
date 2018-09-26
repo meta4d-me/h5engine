@@ -1,4 +1,5 @@
 ﻿/// <reference path="../../../io/reflect.ts" />
+let helpV2 = new gd3d.math.vector2();
 
 namespace gd3d.framework
 {
@@ -223,6 +224,10 @@ namespace gd3d.framework
             this._pressedColor = null;
             if(this.pressedGraphic) this.pressedGraphic.unuse(true);
         }
+
+        private downPointV2 = new gd3d.math.vector2();
+        private isMovedLimit = false; //point 移动范围是否超出限制值
+        private readonly movedLimit = 0.005; //point 移动范围限制值
         /**
          * @private
          */
@@ -235,12 +240,18 @@ namespace gd3d.framework
 
                 if (b)
                 {
-                    ev.eated = true;
                     if (ev.type == event.PointEventEnum.PointDown)
                     {
                         this._downInThis = true;
                         this.showPress();
-                        this.UIEventer.EmitEnum(event.UIEventEnum.PointerDown);
+                        let pd = event.UIEventEnum.PointerDown;
+                        if(this.UIEventer.listenerCount(event.UIEventEnum[pd]) > 0){
+                            this.UIEventer.EmitEnum(pd);
+                            ev.eated = true;
+                        }
+                        this.downPointV2.x = ev.x;
+                        this.downPointV2.y = ev.y;
+                        this.isMovedLimit = false;
                     }
                     else if (ev.type == event.PointEventEnum.PointHold && this._downInThis)
                     {
@@ -249,14 +260,32 @@ namespace gd3d.framework
                             this._dragOut = false;
                             this.showPress();
                         }
+                        if(!this.isMovedLimit){
+                            helpV2.x = ev.x;
+                            helpV2.y = ev.y;
+                            this.isMovedLimit = gd3d.math.vec2Distance(helpV2,this.downPointV2) > this.movedLimit;
+                        }else{
+                            let c = 0;
+                            c;
+                        }
+
                     }
                     else if (ev.type == event.PointEventEnum.PointUp && this._downInThis)
                     {
                         this._downInThis = false;
                         this.showNormal();
-                        this.UIEventer.EmitEnum(event.UIEventEnum.PointerUp);
+                        let pu = event.UIEventEnum.PointerUp;
+                        if(this.UIEventer.listenerCount(event.UIEventEnum[pu]) > 0){
+                            this.UIEventer.EmitEnum(pu);
+                            ev.eated = true;
+                        }
                         this.UIEventer.EmitEnum(event.UIEventEnum.PointerClick);
                         //this.onClick.excute();
+                        let pc = event.UIEventEnum.PointerClick;
+                        if(!this.isMovedLimit && this.UIEventer.listenerCount(event.UIEventEnum[pc]) > 0){
+                            this.UIEventer.EmitEnum(pc);
+                            ev.eated = true;
+                        }
                     }
                 }
                 else
