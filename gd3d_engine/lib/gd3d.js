@@ -17640,8 +17640,14 @@ var gd3d;
                 else if (this.data.rendermodel == framework.RenderModelEnum.BillBoard) {
                     this.emissionMatToWorld = this.getEmissionMatToWorld();
                     gd3d.math.matrixTransformVector3(this.localTranslate, this.emissionMatToWorld, this.worldpos);
-                    this.tarWorldpos = this.element.effect.renderCamera.gameObject.transform.getWorldTranslate();
-                    gd3d.math.quatLookat(this.worldpos, this.tarWorldpos, this.worldRotation);
+                    var targetTrans = this.element.effect.renderCamera.gameObject.transform;
+                    this.tarWorldpos = targetTrans.getWorldTranslate();
+                    targetTrans.getRightInWorld(this.temptx);
+                    gd3d.math.vec3ScaleByNum(this.temptx, -1, this.temptx);
+                    gd3d.math.vec3Subtract(this.tarWorldpos, this.worldpos, this.lookDir);
+                    gd3d.math.vec3Normalize(this.lookDir, this.lookDir);
+                    gd3d.math.vec3Cross(this.lookDir, this.temptx, this.worldspeeddir);
+                    gd3d.math.unitxyzToRotation(this.temptx, this.worldspeeddir, this.lookDir, this.worldRotation);
                     this.emissionWorldRotation = this.getemissionWorldRotation();
                     gd3d.math.quatInverse(this.emissionWorldRotation, this.invParWorldRot);
                     gd3d.math.quatMultiply(this.invParWorldRot, this.worldRotation, this.localRotation);
