@@ -279,7 +279,7 @@ namespace gd3d.framework
                             this.UIEventer.EmitEnum(pu);
                             ev.eated = true;
                         }
-                        this.UIEventer.EmitEnum(event.UIEventEnum.PointerClick);
+                        
                         //this.onClick.excute();
                         let pc = event.UIEventEnum.PointerClick;
                         if(!this.isMovedLimit && this.UIEventer.listenerCount(event.UIEventEnum[pc]) > 0){

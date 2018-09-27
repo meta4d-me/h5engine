@@ -3563,7 +3563,6 @@ var gd3d;
                                 this.UIEventer.EmitEnum(pu);
                                 ev.eated = true;
                             }
-                            this.UIEventer.EmitEnum(gd3d.event.UIEventEnum.PointerClick);
                             var pc = gd3d.event.UIEventEnum.PointerClick;
                             if (!this.isMovedLimit && this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pc]) > 0) {
                                 this.UIEventer.EmitEnum(pc);
