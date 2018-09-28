@@ -3410,7 +3410,7 @@ var gd3d;
                 this._fadeDuration = 0.1;
                 this.downPointV2 = new gd3d.math.vector2();
                 this.isMovedLimit = false;
-                this.movedLimit = 0.005;
+                this.movedLimit = 0.02;
                 this.UIEventer = new gd3d.event.UIEvent();
                 this._downInThis = false;
                 this._dragOut = false;
@@ -3549,10 +3549,6 @@ var gd3d;
                                 helpV2.x = ev.x;
                                 helpV2.y = ev.y;
                                 this.isMovedLimit = gd3d.math.vec2Distance(helpV2, this.downPointV2) > this.movedLimit;
-                            }
-                            else {
-                                var c = 0;
-                                c;
                             }
                         }
                         else if (ev.type == gd3d.event.PointEventEnum.PointUp && this._downInThis) {

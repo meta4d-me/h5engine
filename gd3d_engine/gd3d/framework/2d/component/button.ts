@@ -227,7 +227,7 @@ namespace gd3d.framework
 
         private downPointV2 = new gd3d.math.vector2();
         private isMovedLimit = false; //point 移动范围是否超出限制值
-        private readonly movedLimit = 0.005; //point 移动范围限制值
+        private readonly movedLimit = 0.02; //point 移动范围限制值
         /**
          * @private
          */
@@ -264,11 +264,7 @@ namespace gd3d.framework
                             helpV2.x = ev.x;
                             helpV2.y = ev.y;
                             this.isMovedLimit = gd3d.math.vec2Distance(helpV2,this.downPointV2) > this.movedLimit;
-                        }else{
-                            let c = 0;
-                            c;
                         }
-
                     }
                     else if (ev.type == event.PointEventEnum.PointUp && this._downInThis)
                     {
