@@ -1218,6 +1218,16 @@ namespace gd3d.framework
          */
         loadCompressBundle(url: string, onstate: (state: stateLoad) => void = null)
         {
+            if(this.maploaded[url])
+            {
+                if(onstate)
+                {
+                    let state = new stateLoad();
+                    state.isfinish=true;
+                    onstate(state);
+                }
+                return;
+            }
             let name = this.getFileName(url);
             let type = this.calcType(url);
             var state = new stateLoad();
@@ -1247,6 +1257,7 @@ namespace gd3d.framework
          * @param onstate 状态返回的回调
          */
         // private time: number;
+        maploaded:{[url:string]:IAsset}={};
         load(url: string, type: AssetTypeEnum = AssetTypeEnum.Auto, onstate: (state: stateLoad) => void = null)
         {
             if (onstate == null)
@@ -1257,6 +1268,16 @@ namespace gd3d.framework
             // console.log(`assetmgr:${url} ${((Date.now() - this.time))}ms ${Date.now()}`);
             // this.time = Date.now();
             // console.log(`资源包 : ${url} 开始加载`);
+            if(this.maploaded[url])
+            {
+                if(onstate)
+                {
+                    var state = new stateLoad();
+                    state.isfinish=true;
+                    onstate(state);
+                }
+                return;
+            }
             let name = this.getFileName(url);
             if (this.mapInLoad[name] != null)
             {

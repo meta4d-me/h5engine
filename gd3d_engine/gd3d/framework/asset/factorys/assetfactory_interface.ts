@@ -26,6 +26,8 @@ namespace gd3d.framework
             let fileName = getFileName(url);
 
             assetMgr.setAssetUrl(asset, url);
+            assetMgr.maploaded[url]=asset;
+            
             assetMgr.use(asset);
             state.resstate[fileName].state = 1;
             state.resstate[fileName].res = asset;
