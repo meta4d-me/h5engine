@@ -1091,6 +1091,8 @@ var main = (function () {
     main.prototype.onStart = function (app) {
         console.log("i am here.");
         this.app = app;
+        this.addBtn("f14effect", function () { return new dome.db_test_f14eff(); });
+        this.addBtn("physic2d_dome", function () { return new physic2d_dome(); });
         this.addBtn("test_ui", function () { return new t.test_ui(); });
         this.addBtn("test_load", function () { return new test_load(); });
         this.addBtn("test_loadScene", function () { return new test_loadScene(); });
@@ -10605,6 +10607,337 @@ var Test_CameraController = (function () {
     };
     return Test_CameraController;
 }());
+var physic2d_dome = (function () {
+    function physic2d_dome() {
+        this.taskmgr = new gd3d.framework.taskMgr();
+    }
+    physic2d_dome.prototype.start = function (app) {
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.assetMgr = this.app.getAssetMgr();
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 10;
+        this.rooto2d = new gd3d.framework.overlay2D();
+        this.camera.addOverLay(this.rooto2d);
+        this.scene.enable2DPhysics();
+        gd3d.framework.physic2D.setGravity(0, 0);
+        this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+        this.taskmgr.addTaskCall(this.createUI.bind(this));
+    };
+    physic2d_dome.prototype.createUI = function (astState, state) {
+        var atlasComp = this.assetMgr.getAssetByName("comp.atlas.json");
+        var tex_0 = this.assetMgr.getAssetByName("zg03_256.png");
+        this.creatbox(100, 100, 120, 120, tex_0, this.rooto2d);
+        this.creatbox(130, 300, 120, 120, tex_0, this.rooto2d);
+        var wallWidth = 1200;
+        var wallheigth = 600;
+        this.crea2dWall(0, wallheigth / 2, 50, wallheigth, tex_0, this.rooto2d);
+        this.crea2dWall(wallWidth, wallheigth / 2, 50, wallheigth, tex_0, this.rooto2d);
+        this.crea2dWall(wallWidth / 2, 0, wallWidth, 50, tex_0, this.rooto2d);
+        this.crea2dWall(wallWidth / 2, wallheigth, wallWidth, 50, tex_0, this.rooto2d);
+        state.finish = true;
+    };
+    physic2d_dome.prototype.crea2dWall = function (posx, posy, width, height, texture, root) {
+        var bound3 = new gd3d.framework.transform2D;
+        bound3.localTranslate.x = posx;
+        bound3.localTranslate.y = posy;
+        bound3.width = width;
+        bound3.height = height;
+        bound3.pivot.x = 0.5;
+        bound3.pivot.y = 0.5;
+        var boundimag3 = bound3.addComponent("rawImage2D");
+        boundimag3.image = texture;
+        var body3 = bound3.addComponent("rectBody");
+        body3.setInitData({ isStatic: true });
+        root.addChild(bound3);
+        return bound3;
+    };
+    physic2d_dome.prototype.creatbox = function (posx, posy, width, height, texture, root) {
+        var bound3 = new gd3d.framework.transform2D;
+        bound3.localTranslate.x = posx;
+        bound3.localTranslate.y = posy;
+        bound3.width = width;
+        bound3.height = height;
+        bound3.pivot.x = 0.5;
+        bound3.pivot.y = 0.5;
+        var boundimag3 = bound3.addComponent("rawImage2D");
+        boundimag3.image = texture;
+        var body3 = bound3.addComponent("rectBody");
+        setTimeout(function () {
+            body3.addForce(new gd3d.math.vector2(1, 0));
+        }, 3000);
+        root.addChild(bound3);
+        return bound3;
+    };
+    physic2d_dome.prototype.loadTexture = function (lastState, state) {
+        var _this = this;
+        this.assetMgr.load("res/comp/comp.json.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                _this.assetMgr.load("res/comp/comp.atlas.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    if (s.isfinish) {
+                        _this.assetMgr.load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                            if (s.isfinish) {
+                                _this.assetMgr.load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                    _this.assetMgr.load("res/zg03_256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                        if (s.isfinish) {
+                                            state.finish = true;
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
+    physic2d_dome.prototype.update = function (delta) {
+        this.taskmgr.move(delta);
+    };
+    return physic2d_dome;
+}());
+var dome;
+(function (dome) {
+    var db_test_f14eff = (function () {
+        function db_test_f14eff() {
+            this.timer = 0;
+            this.taskmgr = new gd3d.framework.taskMgr();
+            this.rot = new gd3d.math.quaternion();
+            this.beTrailParticle = false;
+            this.beActive = false;
+            this.boneIndex = 0;
+            this.count = 0;
+            this.beplay = false;
+            this.a = new gd3d.math.vector3(1, 12, 123);
+            this.b = new gd3d.math.vector3(1, 12, 123);
+            this.c = new gd3d.math.vector3(1, 12, 123);
+            this.enableMove = false;
+        }
+        db_test_f14eff.prototype.loadShader = function (laststate, state) {
+            var cuttime = Date.now();
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+                if (_state.isfinish) {
+                    state.finish = true;
+                    var endtime = Date.now();
+                    console.log();
+                }
+            });
+        };
+        db_test_f14eff.prototype.start = function (app) {
+            var _this = this;
+            console.log("i am here.");
+            this.app = app;
+            this.scene = this.app.getScene();
+            this.taskmgr.addTaskCall(this.loadShader.bind(this));
+            this.taskmgr.addTaskCall(this.loadRole.bind(this));
+            this.taskmgr.addTaskCall(this.loadSkill.bind(this));
+            this.taskmgr.addTaskCall(this.addcam.bind(this));
+            this.taskmgr.addTaskCall(this.addcontroll.bind(this));
+            this.taskmgr.addTaskCall(this.loadWeapon.bind(this));
+            this.taskmgr.addTaskCall(this.loadEffectPrefab.bind(this));
+            document.onkeypress = function (ev) {
+                var key = ev.keyCode;
+                var keystr = ev.key.toUpperCase();
+                console.log(keystr);
+                if (keystr == "P" && _this.role != null) {
+                    _this.rotEuler += 1;
+                    gd3d.math.quatFromEulerAngles(0, 1, 0, _this.rot);
+                    gd3d.math.quatMultiply(_this.role.localRotate, _this.rot, _this.role.localRotate);
+                    _this.role.markDirty();
+                }
+            };
+        };
+        db_test_f14eff.prototype.loadmesh = function (laststate, state) {
+            var _this = this;
+            var name = "zs_chuangjue_01";
+            name = "cwc_001";
+            name = "pc1";
+            name = "Quad_1";
+            name = "baoxiang_ceshinn";
+            name = "pc2_MergeSuit_104";
+            this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
+                    var value = _prefab.getCloneTrans();
+                    _this.model = value;
+                    var skins = _this.model.gameObject.getComponentsInChildren(gd3d.framework.StringUtil.COMPONENT_SKINMESHRENDER);
+                    var roleskins = _this.role.gameObject.getComponentsInChildren(gd3d.framework.StringUtil.COMPONENT_SKINMESHRENDER);
+                    for (var item in roleskins) {
+                        var skin = roleskins[item];
+                        var nameARR = skin.gameObject.transform.name.split('_');
+                        if (nameARR[1] != null && nameARR[1] == "MergeSuit") {
+                            _this.role.removeChild(skin.gameObject.transform);
+                            _this.role.addChild(skins[0].gameObject.transform);
+                            _this.suitTrans = skins[0].gameObject.transform;
+                            _this.suitSkin = skins[0];
+                        }
+                    }
+                    _this.model.markDirty();
+                    state.finish = true;
+                }
+            });
+        };
+        db_test_f14eff.prototype.loadWeapon = function (laststate, state) {
+            var _this = this;
+            var name = "wp_ds_001";
+            this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
+                    var rhand = _this.role.find("Bip01 Prop1");
+                    var lhand = _this.role.find("Bip01 Prop2");
+                    if (rhand) {
+                        var weapon = _prefab.getCloneTrans();
+                        rhand.addChild(weapon);
+                        weapon.localRotate = new gd3d.math.quaternion();
+                        weapon.localTranslate = new gd3d.math.vector3();
+                        weapon.localScale = new gd3d.math.vector3(1, 1, 1);
+                        weapon.markDirty();
+                    }
+                    if (lhand) {
+                        var weapon = _prefab.getCloneTrans();
+                        lhand.addChild(weapon);
+                        weapon.localRotate = new gd3d.math.quaternion();
+                        weapon.localTranslate = new gd3d.math.vector3();
+                        weapon.localScale = new gd3d.math.vector3(1, 1, 1);
+                        weapon.markDirty();
+                    }
+                    state.finish = true;
+                }
+            });
+        };
+        db_test_f14eff.prototype.loadEffectPrefab = function (laststate, state) {
+            var _this = this;
+            var name = "effprefab";
+            name = "GameObject";
+            name = "ceshi";
+            name = "fx_cg_ui";
+            name = "s_b";
+            name = "fx_zgg_Skill01_S";
+            name = "fx_wp_bj";
+            this.app.getAssetMgr().load("res/f14effprefab/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
+                    _this.effbaseprefab = _prefab;
+                    var prefab = _prefab.getCloneTrans();
+                    _this.effPrefab = prefab;
+                    var f14Effect = _this.effPrefab.gameObject.getComponent("f14EffectSystem");
+                    _this.f14eff = f14Effect;
+                    if (_this.role) {
+                        _this.role.addChild(_this.effPrefab);
+                    }
+                    else {
+                        _this.scene.addChild(_this.effPrefab);
+                    }
+                    var delayTime = f14Effect.delay;
+                    state.finish = true;
+                }
+            });
+        };
+        db_test_f14eff.prototype.loadSkill = function (laststate, state) {
+            var _this = this;
+            var name = "xc_skill1.FBAni.aniclip.bin";
+            name = "skill.FBAni.aniclip.bin";
+            name = "pc1_run.FBAni.aniclip.bin";
+            name = "pc2_run.FBAni.aniclip.bin";
+            name = "GWB02_sw_die1.FBAni.aniclip.bin";
+            name = "UIbaoxiang_no_idle.FBAni.aniclip.bin";
+            name = "gmd_xs_run.FBAni.aniclip.bin";
+            this.SkillName = name;
+            var url = "res/prefabs/" + this.RoleName + "/resources/" + this.SkillName;
+            this.app.getAssetMgr().load(url, gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var clip = _this.app.getAssetMgr().getAssetByName(_this.SkillName);
+                    _this.aniPlayer.addClip(clip);
+                    state.finish = true;
+                    console.log("加载技能完成. res name:" + clip.getName());
+                }
+            });
+        };
+        db_test_f14eff.prototype.addcontroll = function (laststate, state) {
+            this.addButton();
+            this.addButton2();
+            state.finish = true;
+        };
+        db_test_f14eff.prototype.addButton = function () {
+            var _this = this;
+            var btn = document.createElement("button");
+            btn.textContent = "Play";
+            btn.onclick = function () {
+                _this.aniPlayer.play(_this.SkillName);
+            };
+            btn.style.top = "160px";
+            btn.style.position = "absolute";
+            this.app.container.appendChild(btn);
+        };
+        db_test_f14eff.prototype.addButton2 = function () {
+            var _this = this;
+            var btn = document.createElement("button");
+            btn.textContent = "stop";
+            btn.onclick = function () {
+                _this.f14eff.stop();
+                _this.enableMove = false;
+            };
+            btn.style.top = "200px";
+            btn.style.position = "absolute";
+            this.app.container.appendChild(btn);
+        };
+        db_test_f14eff.prototype.addcam = function (laststate, state) {
+            var objCam = new gd3d.framework.transform();
+            objCam.name = "sth.";
+            this.scene.addChild(objCam);
+            this.camera = objCam.gameObject.addComponent("camera");
+            this.camera.near = 0.01;
+            this.camera.far = 2000;
+            this.camera.fov = Math.PI * 0.3;
+            this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
+            objCam.localTranslate = new gd3d.math.vector3(0, 0, -15);
+            objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+            objCam.markDirty();
+            CameraController.instance().init(this.app, this.camera);
+            state.finish = true;
+        };
+        db_test_f14eff.prototype.loadRole = function (laststate, state) {
+            var _this = this;
+            var name = "hmb";
+            name = "GWB02";
+            name = "UIbaoxiang";
+            name = "gmd";
+            this.RoleName = name;
+            this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
+                    var role = _prefab.getCloneTrans();
+                    _this.role = role;
+                    _this.aniPlayer = _this.role.gameObject.getComponent("aniplayer");
+                    _this.aniPlayer.autoplay = false;
+                    _this.aniclips = _this.aniPlayer.clips;
+                    _this.scene.addChild(_this.role);
+                    _this.role.markDirty();
+                    var skins = _this.role.gameObject.getComponentsInChildren(gd3d.framework.StringUtil.COMPONENT_SKINMESHRENDER);
+                    for (var key in skins) {
+                        skins[key].gameObject.transform.localScale = new gd3d.math.vector3(1.2, 1.2, 1.2);
+                        skins[key].gameObject.transform.markDirty();
+                    }
+                    state.finish = true;
+                }
+            });
+        };
+        db_test_f14eff.prototype.update = function (delta) {
+            this.taskmgr.move(delta);
+            CameraController.instance().update(delta);
+            if (this.enableMove) {
+                this.effPrefab.localPosition.z += 0.2;
+                this.effPrefab.markDirty();
+            }
+        };
+        return db_test_f14eff;
+    }());
+    dome.db_test_f14eff = db_test_f14eff;
+})(dome || (dome = {}));
 var test_ChangeMaterial = (function () {
     function test_ChangeMaterial() {
         this.isCube = false;
