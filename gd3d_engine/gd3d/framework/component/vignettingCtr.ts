@@ -11,6 +11,7 @@ namespace gd3d.framework
     @gd3d.reflect.nodeComponent
     export class vignettingCtr implements  INodeComponent
     {
+        static readonly ClassName:string="vignettingCtr";
 
         private app:  application;
         private scene:  scene;

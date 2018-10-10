@@ -9,6 +9,8 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class f14eff implements IAsset
     {
+        static readonly ClassName:string="f14eff";
+        
         defaultAsset: boolean = false;
         private name: constText = null;
         private id: resID = new resID();

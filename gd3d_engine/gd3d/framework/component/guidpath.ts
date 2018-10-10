@@ -10,6 +10,8 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class guidpath implements INodeComponent
     {
+        static readonly ClassName:string="guidpath";
+        
         private paths:gd3d.math.vector3[];
         private _pathasset:pathasset;
         /**

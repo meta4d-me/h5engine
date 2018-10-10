@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     @reflect.nodeComponent
     export class BeBillboard implements INodeComponent {
+        static readonly ClassName:string="BeBillboard";
+
         start() {
 
         }

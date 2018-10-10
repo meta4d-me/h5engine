@@ -110,6 +110,8 @@ namespace gd3d.framework
     @reflect.nodeCamera
     export class camera implements INodeComponent
     {
+        static readonly ClassName:string="camera";
+
         /**
          * @public
          * @language zh_CN

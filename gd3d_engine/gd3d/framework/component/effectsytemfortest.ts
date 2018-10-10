@@ -12,6 +12,8 @@ namespace gd3d.framework
     @reflect.selfClone
     export class TestEffectSystem implements IRenderer
     {
+        static readonly ClassName:string="TestEffectSystem";
+
         /**
          * @public
          * @language zh_CN

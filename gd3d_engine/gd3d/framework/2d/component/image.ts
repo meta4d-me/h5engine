@@ -13,6 +13,8 @@ namespace gd3d.framework
     @reflect.nodeRender
     export class image2D implements IRectRenderer
     {
+        static readonly ClassName:string="image2D";
+
         /**
          * @private
          */

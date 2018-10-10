@@ -69,6 +69,8 @@ namespace gd3d.framework {
      */
     @gd3d.reflect.SerializeType
     export class C2DComponent {
+        static readonly ClassName:string="C2DComponent";
+        
         @gd3d.reflect.Field("I2DComponent")
         comp: I2DComponent;
         init: boolean;
@@ -89,6 +91,8 @@ namespace gd3d.framework {
      */
     @gd3d.reflect.SerializeType
     export class transform2D {
+        static readonly ClassName:string="transform2D";
+
         // public notify: INotify;
         private _canvas: canvas;
 

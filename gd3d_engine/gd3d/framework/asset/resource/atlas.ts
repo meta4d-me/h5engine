@@ -10,6 +10,8 @@
     @gd3d.reflect.SerializeType
     export class atlas implements IAsset
     {
+        static readonly ClassName:string="atlas";
+        
         @gd3d.reflect.Field("constText")
         private name: constText;
         private id: resID = new resID();

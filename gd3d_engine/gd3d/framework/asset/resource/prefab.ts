@@ -10,6 +10,8 @@
     @gd3d.reflect.SerializeType
     export class prefab implements IAsset
     {
+        static readonly ClassName:string="prefab";
+
         private name: constText;
         private id: resID = new resID();
         /**

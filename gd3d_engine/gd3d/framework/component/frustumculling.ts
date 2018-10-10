@@ -10,6 +10,8 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class frustumculling implements INodeComponent
     {
+        static readonly ClassName:string="frustumculling";
+
         constructor()
         {
 

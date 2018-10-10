@@ -12,6 +12,8 @@ namespace gd3d.framework
     // @reflect.selfClone
     export class effectSystem implements IRenderer
     {
+        static readonly ClassName:string="effectSystem";
+
         /**
          * @public
          * @language zh_CN

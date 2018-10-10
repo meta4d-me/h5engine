@@ -20,6 +20,8 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class transform 
     {
+        static readonly ClassName:string="transform";
+        
         private helpLRotate:math.quaternion = new math.quaternion();
         private helpLPos:math.vector3 = new math.vector3();
         private helpLScale:math.vector3 = new math.vector3(1,1,1);

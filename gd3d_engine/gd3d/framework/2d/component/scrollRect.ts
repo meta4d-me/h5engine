@@ -12,6 +12,7 @@ namespace gd3d.framework
     @reflect.node2DComponent
     export class scrollRect implements I2DComponent
     {
+        static readonly ClassName:string="scrollRect";
         
         private _content : transform2D;
         /**

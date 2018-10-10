@@ -27,6 +27,8 @@ namespace gd3d.framework
     @reflect.node2DComponent
     export class button implements IRectRenderer ,event.IUIEventer
     {
+        static readonly ClassName:string="button";
+
         private _transition: TransitionType = TransitionType.ColorTint;
         /**
          * @public

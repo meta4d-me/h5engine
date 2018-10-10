@@ -22,6 +22,8 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class overlay2D implements IOverLay
     {
+        static readonly ClassName:string="overlay2D";
+
         /**
          * @public
          * @language zh_CN

@@ -11,6 +11,8 @@ namespace gd3d.framework
     @gd3d.reflect.nodeComponent
     export class bloomctr implements  INodeComponent
     {
+        static readonly ClassName:string="bloomctr";
+
         private _bloomIntensity:number = 1.4;  //rang
         private _bloomThreshold:number = 0.5;   //rang 0-1
         private _blurSpread:number = 3;

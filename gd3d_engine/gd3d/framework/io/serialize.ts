@@ -1108,6 +1108,7 @@ namespace gd3d.io
                 if (!componentType)
                 {
                     console.warn(instanceObj);
+                    console.warn(type);
                     return console.warn(`无法找到组件:${gd3d_reflect_root["__gdmeta__"][type]}`);
                 }
                 if (type == "gameObject" && key == "gameObject" && reflect.getClassName(instanceObj) == "transform")

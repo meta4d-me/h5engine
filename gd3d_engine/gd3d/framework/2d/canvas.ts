@@ -12,6 +12,8 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class canvas
     {
+        static readonly ClassName:string="canvas";
+
         /**
          * @public
          * @language zh_CN

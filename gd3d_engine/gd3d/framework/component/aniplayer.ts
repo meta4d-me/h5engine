@@ -12,6 +12,8 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class aniplayer implements INodeComponent
     {
+        static readonly ClassName:string="aniplayer";
+
         gameObject: gameObject;
 
         @reflect.Field("animationClip[]")

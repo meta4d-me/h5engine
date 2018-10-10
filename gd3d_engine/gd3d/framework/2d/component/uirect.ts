@@ -5,6 +5,8 @@ namespace gd3d.framework
     @reflect.node2DComponent
     export class uirect implements I2DComponent
     {
+        static readonly ClassName:string="uirect";
+
         canbeClick:boolean=true;
 
         start() {

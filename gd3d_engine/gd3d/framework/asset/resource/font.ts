@@ -10,6 +10,8 @@
     @gd3d.reflect.SerializeType
     export class font implements IAsset
     {
+        static readonly ClassName:string="font";
+
         private name: constText;
         private id: resID = new resID();
         /**

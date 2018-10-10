@@ -5,6 +5,8 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class AudioListener implements INodeComponent
     {
+        static readonly ClassName:string="AudioListener";
+
         private listener: any;
         start()
         {

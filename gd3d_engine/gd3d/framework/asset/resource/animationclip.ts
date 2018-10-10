@@ -12,6 +12,8 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class animationClip implements IAsset
     {
+        static readonly ClassName:string="animationClip";
+        
         @gd3d.reflect.Field("constText")
         private name: constText;
         private id: resID = new resID();
@@ -275,6 +277,8 @@ namespace gd3d.framework
     @reflect.SerializeType
     export class PoseBoneMatrix
     {
+        static readonly ClassName:string="PoseBoneMatrix";
+
         @reflect.Field("vector3")
         t: math.vector3;
         @reflect.Field("quaternion")

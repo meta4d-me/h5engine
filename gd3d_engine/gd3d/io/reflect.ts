@@ -10,7 +10,8 @@ namespace gd3d {
         /**
          * @private
          */
-        function regType(target: any, customInfo: { [id: string]: string }) {
+        function regType(constructorObj: any, customInfo: { [id: string]: string }) {
+            let target=constructorObj.prototype;
             if (target["__gdmeta__"] == undefined) target["__gdmeta__"] = {};
             if (target["__gdmeta__"]["class"] == undefined) target["__gdmeta__"]["class"] = {};
             var name = target["constructor"]["name"];
@@ -20,6 +21,9 @@ namespace gd3d {
                 var i = fs.indexOf("(");
                 name = fs.substring(9, i);
             }
+            let classname=constructorObj["ClassName"];
+            name=classname?classname:name;
+
             target["__gdmeta__"]["class"]["typename"] = name;
 
             //注册全局类型标记
@@ -160,7 +164,7 @@ namespace gd3d {
          * @private
          */
         export function attr_Class(constructorObj: any) {
-            regType(constructorObj.prototype, null);
+            regType(constructorObj, null);
         }
 
 
@@ -186,109 +190,109 @@ namespace gd3d {
          * @private
          */
         export function userCode(constructorObj: any) {
-            regType(constructorObj.prototype, { "usercode": "1" });
+            regType(constructorObj, { "usercode": "1" });
         }
         /**
          * @private
          */
         export function editorCode(constructorObj: any) {
-            regType(constructorObj.prototype, { "editorcode": "1" });
+            regType(constructorObj, { "editorcode": "1" });
         }
         /**
          * @private
          */
         export function selfClone(constructorObj: any) {
-            regType(constructorObj.prototype, { "selfclone": "1" });
+            regType(constructorObj, { "selfclone": "1" });
         }
         /**
          * @private
          */
         export function nodeComponent(constructorObj: any) {
-            regType(constructorObj.prototype, { "nodecomp": "1" });
+            regType(constructorObj, { "nodecomp": "1" });
         }
         /**
          * @private
          */
         export function nodeComponentInspector(constructorObj: any) {
-            regType(constructorObj.prototype, { "nodecomp_inspector": "1" });
+            regType(constructorObj, { "nodecomp_inspector": "1" });
         }
         /**
          * @private
          */
         export function nodeRender(constructorObj: any) {
-            regType(constructorObj.prototype, { "renderer": "1" });
+            regType(constructorObj, { "renderer": "1" });
         }
         /**
          * @private
          */
         export function nodeCamera(constructorObj: any) {
-            regType(constructorObj.prototype, { "camera": "1" });
+            regType(constructorObj, { "camera": "1" });
         }
         /**
          * @private
          */
         export function nodeLight(constructorObj: any) {
-            regType(constructorObj.prototype, { "light": "1" });
+            regType(constructorObj, { "light": "1" });
         }
         /**
          * @private
          */
         export function nodeBoxCollider(constructorObj: any) {
-            regType(constructorObj.prototype, { "boxcollider": "1" });
+            regType(constructorObj, { "boxcollider": "1" });
         }
         /**
          * @private
          */
         export function nodeBoxCollider2d(constructorObj: any) {
-            regType(constructorObj.prototype, { "boxcollider2d": "1" });
+            regType(constructorObj, { "boxcollider2d": "1" });
         }
         /**
          * @private
          */
         export function nodeSphereCollider(constructorObj: any) {
-            regType(constructorObj.prototype, { "spherecollider": "1" });
+            regType(constructorObj, { "spherecollider": "1" });
         }
         /**
          * @private
          */
         export function nodeEffectBatcher(constructorObj: any) {
-            regType(constructorObj.prototype, { "effectbatcher": "1" });
+            regType(constructorObj, { "effectbatcher": "1" });
         }
         /**
          * @private
          */
         export function nodeMeshCollider(constructorObj: any) {
-            regType(constructorObj.prototype, { "meshcollider": "1" });
+            regType(constructorObj, { "meshcollider": "1" });
         }
         /**
          * @private
          */
         export function nodeCanvasRendererCollider(constructorObj: any) {
-            regType(constructorObj.prototype, { "canvasRenderer": "1" });
+            regType(constructorObj, { "canvasRenderer": "1" });
         }
         /**
          * @private
          */
         export function node2DComponent(constructorObj: any) {
-            regType(constructorObj.prototype, { "2dcomp": "1" });
+            regType(constructorObj, { "2dcomp": "1" });
         }
         /**
          * @private
          */
         export function pluginMenuItem(constructorObj: any) {
-            regType(constructorObj.prototype, { "plugin_menuitem": "1" });
+            regType(constructorObj, { "plugin_menuitem": "1" });
         }
         /**
          * @private
          */
         export function pluginWindow(constructorObj: any) {
-            regType(constructorObj.prototype, { "plugin_window": "1" });
+            regType(constructorObj, { "plugin_window": "1" });
         }
         /**
          * @private
          */
         export function pluginExt(constructorObj: any) {
-            regType(constructorObj.prototype, { "plugin_ext": "1" });
+            regType(constructorObj, { "plugin_ext": "1" });
         }
         /**
          * @private
@@ -322,7 +326,7 @@ namespace gd3d {
          * @private
          */
         export function SerializeType(constructorObj: any) {
-            regType(constructorObj.prototype, { "SerializeType": "1" });
+            regType(constructorObj, { "SerializeType": "1" });
         }
 
         /**

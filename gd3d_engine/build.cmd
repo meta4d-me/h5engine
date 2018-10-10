@@ -8,4 +8,8 @@
 @call tsc
 @cd ..
 
+@echo mix up
+@cd lib
+@call uglifyjs gd3d.js -m -c -o gd3d.js
+
 @echo build done.

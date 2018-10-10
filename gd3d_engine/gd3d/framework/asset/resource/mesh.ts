@@ -10,6 +10,8 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class mesh implements IAsset
     {
+        static readonly ClassName:string="mesh";
+
         private name: constText;
         private id: resID = new resID();
         defaultAsset: boolean = false;

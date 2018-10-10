@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     @reflect.nodeComponent
     export class starCamCtr implements INodeComponent {
+        static readonly ClassName:string="starCamCtr";
+
         moveDuration:number=1;//移动速度
         minSpeed=5;//角速度
 

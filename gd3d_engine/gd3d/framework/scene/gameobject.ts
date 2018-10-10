@@ -46,6 +46,8 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class nodeComponent
     {
+        static readonly ClassName:string="nodeComponent";
+        
         /**
          * @public
          * @language zh_CN
@@ -81,6 +83,7 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class gameObject
     {
+        static readonly ClassName:string="gameObject";
         /**
          * @public
          * @language zh_CN

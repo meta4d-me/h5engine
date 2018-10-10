@@ -4,6 +4,7 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class f14EffectSystem implements IRenderer
     {
+        static readonly ClassName:string="f14EffectSystem";
 
         layer: RenderLayerEnum=RenderLayerEnum.Transparent;
         

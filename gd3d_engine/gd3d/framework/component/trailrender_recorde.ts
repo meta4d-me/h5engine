@@ -11,6 +11,8 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class trailRender_recorde implements IRenderer
     {
+        static readonly ClassName:string="trailRender_recorde";
+
         //記錄軌跡
         layer: RenderLayerEnum = RenderLayerEnum.Common;
         //renderLayer: gd3d.framework.CullingMask = CullingMask.default;

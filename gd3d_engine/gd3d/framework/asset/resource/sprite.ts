@@ -10,6 +10,8 @@
     @gd3d.reflect.SerializeType
     export class sprite implements IAsset
     {
+        static readonly ClassName:string="sprite";
+
         private name: constText;
         private id: resID = new resID();
         /**

@@ -101,6 +101,8 @@ namespace gd3d.framework
     @reflect.nodeSphereCollider
     export class spherecollider implements INodeComponent, ICollider
     {
+        static readonly ClassName:string="spherecollider";
+
         /**
          * @public
          * @language zh_CN

@@ -14,6 +14,8 @@ namespace gd3d.framework
     @reflect.nodeRender
     export class rawImage2D implements IRectRenderer
     {
+        static readonly ClassName:string="rawImage2D";
+
         private datar: number[] = [
             //3 pos  4 color  2 uv 4 color2
             0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1,
