@@ -248,6 +248,7 @@ declare namespace gd3d {
 }
 declare namespace gd3d.framework {
     class canvas {
+        static readonly ClassName: string;
         constructor();
         is2dUI: boolean;
         parentTrans: transform;
@@ -300,6 +301,7 @@ declare namespace gd3d.framework {
         end(webgl: WebGLRenderingContext): void;
     }
     class canvasRenderer implements IRenderer, ICollider {
+        static readonly ClassName: string;
         constructor();
         renderLayer: number;
         subTran: transform;
@@ -346,6 +348,7 @@ declare namespace gd3d.framework {
         SCALE_WITH_SCREEN_SIZE = 1,
     }
     class overlay2D implements IOverLay {
+        static readonly ClassName: string;
         constructor();
         init: boolean;
         private camera;
@@ -390,6 +393,7 @@ declare namespace gd3d.math {
     function Float(v?: number | string): float;
     function Double(v?: number | string): double;
     class vector2 {
+        static readonly ClassName: string;
         rawData: Float32Array;
         constructor(x?: float, y?: float, w?: float, h?: float);
         x: float;
@@ -397,6 +401,7 @@ declare namespace gd3d.math {
         toString(): string;
     }
     class rect {
+        static readonly ClassName: string;
         rawData: Float32Array;
         constructor(x?: float, y?: float, w?: float, h?: float);
         x: float;
@@ -406,6 +411,7 @@ declare namespace gd3d.math {
         toString(): string;
     }
     class border {
+        static readonly ClassName: string;
         rawData: Float32Array;
         constructor(l?: float, t?: float, r?: float, b?: float);
         l: float;
@@ -415,6 +421,7 @@ declare namespace gd3d.math {
         toString(): string;
     }
     class color {
+        static readonly ClassName: string;
         rawData: Float32Array;
         constructor(r?: float, g?: float, b?: float, a?: float);
         r: float;
@@ -424,6 +431,7 @@ declare namespace gd3d.math {
         toString(): string;
     }
     class vector3 {
+        static readonly ClassName: string;
         rawData: Float32Array;
         constructor(x?: float, y?: float, z?: float);
         x: float;
@@ -432,6 +440,7 @@ declare namespace gd3d.math {
         toString(): string;
     }
     class vector4 {
+        static readonly ClassName: string;
         rawData: Float32Array;
         constructor(x?: float, y?: float, z?: float, w?: float);
         x: float;
@@ -441,6 +450,7 @@ declare namespace gd3d.math {
         toString(): string;
     }
     class quaternion {
+        static readonly ClassName: string;
         rawData: Float32Array;
         constructor(x?: float, y?: float, z?: float, w?: float);
         x: float;
@@ -450,6 +460,7 @@ declare namespace gd3d.math {
         toString(): string;
     }
     class matrix {
+        static readonly ClassName: string;
         rawData: Float32Array;
         constructor(datas?: Float32Array);
         toString(): string;
@@ -491,11 +502,13 @@ declare namespace gd3d.framework {
         updateTran(): any;
     }
     class C2DComponent {
+        static readonly ClassName: string;
         comp: I2DComponent;
         init: boolean;
         constructor(comp: I2DComponent, init?: boolean);
     }
     class transform2D {
+        static readonly ClassName: string;
         private _canvas;
         prefab: string;
         canvas: canvas;
@@ -611,6 +624,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class boxcollider2d implements I2DComponent, ICollider2d {
+        static readonly ClassName: string;
         transform: transform2D;
         private _obb;
         getBound(): obb2d;
@@ -632,6 +646,7 @@ declare namespace gd3d.framework {
         SpriteSwap = 2,
     }
     class button implements IRectRenderer, event.IUIEventer {
+        static readonly ClassName: string;
         private _transition;
         transition: TransitionType;
         private _originalColor;
@@ -673,6 +688,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class image2D implements IRectRenderer {
+        static readonly ClassName: string;
         constructor();
         private _unitLen;
         private datar;
@@ -728,6 +744,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class inputField implements IRectRenderer {
+        static readonly ClassName: string;
         transform: transform2D;
         private _frameImage;
         frameImage: image2D;
@@ -776,6 +793,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class label implements IRectRenderer {
+        static readonly ClassName: string;
         private _text;
         text: string;
         private initdater();
@@ -828,6 +846,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class progressbar implements I2DComponent {
+        static readonly ClassName: string;
         private _cutPanel;
         cutPanel: transform2D;
         private _barBg;
@@ -848,6 +867,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class rawImage2D implements IRectRenderer {
+        static readonly ClassName: string;
         private datar;
         private _image;
         private needRefreshImg;
@@ -873,6 +893,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class scrollRect implements I2DComponent {
+        static readonly ClassName: string;
         private _content;
         content: transform2D;
         horizontal: boolean;
@@ -892,11 +913,116 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class uirect implements I2DComponent {
+        static readonly ClassName: string;
         canbeClick: boolean;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
         transform: transform2D;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        remove(): void;
+    }
+}
+declare namespace gd3d.framework {
+    interface I2DBody {
+        initData: IBodyData;
+        transform: transform2D;
+        body: Ibody;
+        addForce(Force: gd3d.math.vector2): any;
+        setVelocity(velocity: math.vector2): any;
+        setDesity(Desity: number): any;
+        setFrictionAir(frictionAir: number): any;
+        setFriction(friction: number): any;
+        setFrictionStatic(frictionStatic: number): any;
+        setRestitution(restitution: number): any;
+        setMass(mass: number): any;
+    }
+    interface IBodyData {
+        mass?: number;
+        desity?: number;
+        restitution?: number;
+        frictionAir?: number;
+        friction?: number;
+        isStatic?: boolean;
+    }
+    class bassBody implements I2DBody {
+        transform: transform2D;
+        body: Ibody;
+        addForce(Force: math.vector2): void;
+        setVelocity(velocity: math.vector2): void;
+        setDesity(Desity: number): void;
+        setFrictionAir(frictionAir: number): void;
+        setFriction(friction: number): void;
+        setFrictionStatic(frictionStatic: number): void;
+        setRestitution(restitution: number): void;
+        setMass(mass: number): void;
+        initData: IBodyData;
+        setInitData(att: IBodyData): void;
+        setPosition(pos: math.vector2): void;
+        update(delta: number): void;
+    }
+}
+declare namespace gd3d.framework {
+    class circleBody extends bassBody implements I2DComponent, I2DBody {
+        static readonly ClassName: string;
+        transform: transform2D;
+        radius: number;
+        start(): void;
+        onPlay(): void;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        remove(): void;
+    }
+}
+declare namespace gd3d.framework {
+    let physic2D: physicEngine2D;
+    interface Itiming {
+        timeScale?: number;
+        timestamp?: number;
+    }
+    interface IEngine2DOP {
+        constraintIterations?: number;
+        timing?: Itiming;
+        velocityIterations?: number;
+    }
+    class physicEngine2D {
+        matterEngine: any;
+        private engineWorld;
+        private matterVector;
+        constructor(op?: IEngine2DOP);
+        update(delta: number): void;
+        creatRectBodyByInitData(posx: number, posy: number, width: number, height: number, initData: IBodyData): any;
+        creatCircleBodyByInitData(posx: number, posy: number, radius: number, initData: IBodyData): any;
+        addBody(body: Ibody): void;
+        applyForce(body: Ibody, positon: math.vector2, force: math.vector2): void;
+        applyForceAtCenter(body: Ibody, force: math.vector2): void;
+        setGravity(x: number, y: number): void;
+        setVelocity(body: Ibody, velocity: math.vector2): void;
+        setPosition(body: Ibody, pos: math.vector2): void;
+        setMass(body: Ibody, mass: number): void;
+        setDesity(body: Ibody, Desity: number): void;
+        setFrictionAir(body: Ibody, frictionAir: number): void;
+        setFriction(body: Ibody, friction: number): void;
+        setFrictionStatic(body: Ibody, frictionStatic: number): void;
+        setRestitution(body: Ibody, restitution: number): void;
+        private set(body, settings, value);
+    }
+    interface Ibody {
+        angle: number;
+        position: matterVector;
+        applyForce(body: Ibody, positon: matterVector, force: matterVector): void;
+    }
+    interface matterVector {
+        x: number;
+        y: number;
+        create(x: number, y: number): matterVector;
+    }
+}
+declare namespace gd3d.framework {
+    class rectBody extends bassBody implements I2DComponent, I2DBody {
+        static readonly ClassName: string;
+        transform: transform2D;
+        start(): void;
+        onPlay(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         remove(): void;
     }
@@ -1095,6 +1221,9 @@ declare namespace gd3d.framework {
         private checkFreeChannel();
         private unPkg(type, url, state, onstate);
         loadCompressBundle(url: string, onstate?: (state: stateLoad) => void): void;
+        maploaded: {
+            [url: string]: IAsset;
+        };
         load(url: string, type?: AssetTypeEnum, onstate?: (state: stateLoad) => void): void;
         private loadForNoCache(url, type?, onstate?);
         unload(url: string, onstate?: () => void): void;
@@ -1348,6 +1477,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class animationClip implements IAsset {
+        static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
@@ -1375,6 +1505,7 @@ declare namespace gd3d.framework {
         subclips: subClip[];
     }
     class PoseBoneMatrix {
+        static readonly ClassName: string;
         t: math.vector3;
         r: math.quaternion;
         static caclByteLength(): number;
@@ -1404,6 +1535,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class atlas implements IAsset {
+        static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
@@ -1430,6 +1562,7 @@ declare namespace gd3d.framework {
         f14Effect: f14EffectSystem;
     }
     class f14eff implements IAsset {
+        static readonly ClassName: string;
         defaultAsset: boolean;
         private name;
         private id;
@@ -1450,6 +1583,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class font implements IAsset {
+        static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
@@ -1489,6 +1623,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class transform {
+        static readonly ClassName: string;
         private helpLRotate;
         private helpLPos;
         private helpLScale;
@@ -1583,6 +1718,7 @@ declare namespace gd3d.framework {
         intersectsTransform(tran: transform): boolean;
     }
     class boxcollider implements INodeComponent, ICollider {
+        static readonly ClassName: string;
         gameObject: gameObject;
         subTran: transform;
         filter: meshFilter;
@@ -1606,6 +1742,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class meshcollider implements INodeComponent, ICollider {
+        static readonly ClassName: string;
         gameObject: gameObject;
         subTran: transform;
         mesh: mesh;
@@ -1624,6 +1761,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class meshFilter implements INodeComponent {
+        static readonly ClassName: string;
         gameObject: gameObject;
         start(): void;
         onPlay(): void;
@@ -1637,6 +1775,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class meshRenderer implements IRenderer {
+        static readonly ClassName: string;
         constructor();
         gameObject: gameObject;
         materials: material[];
@@ -1660,6 +1799,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class skinnedMeshRenderer implements IRenderer {
+        static readonly ClassName: string;
         constructor();
         gameObject: gameObject;
         layer: RenderLayerEnum;
@@ -1699,6 +1839,7 @@ declare namespace gd3d.framework {
         ClampForever = 8,
     }
     class keyFrameAniClip implements IAsset {
+        static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
@@ -1742,6 +1883,7 @@ declare namespace gd3d.framework {
         constructor(type: render.UniformTypeEnum, value: any, defaultValue?: any);
     }
     class material implements IAsset {
+        static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
@@ -1788,6 +1930,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class mesh implements IAsset {
+        static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
@@ -1820,6 +1963,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class pathasset implements IAsset {
+        static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
@@ -1856,6 +2000,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class prefab implements IAsset {
+        static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
@@ -1877,6 +2022,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class rawscene implements IAsset {
+        static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
@@ -1909,6 +2055,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class shader implements IAsset {
+        static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
@@ -1940,6 +2087,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class sprite implements IAsset {
+        static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
@@ -1963,6 +2111,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class textasset implements IAsset {
+        static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
@@ -1978,6 +2127,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class texture implements IAsset {
+        static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
@@ -2017,6 +2167,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class aniplayer implements INodeComponent {
+        static readonly ClassName: string;
         gameObject: gameObject;
         clips: animationClip[];
         autoplay: boolean;
@@ -2076,6 +2227,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class tPoseInfo {
+        static readonly ClassName: string;
         name: string;
         tposep: math.vector3;
         tposeq: math.quaternion;
@@ -2088,6 +2240,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class asbone implements INodeComponent {
+        static readonly ClassName: string;
         constructor();
         gameObject: gameObject;
         start(): void;
@@ -2099,6 +2252,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AudioListener implements INodeComponent {
+        static readonly ClassName: string;
         private listener;
         start(): void;
         onPlay(): void;
@@ -2114,6 +2268,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AudioPlayer implements INodeComponent {
+        static readonly ClassName: string;
         buffer: AudioBuffer;
         beLoop: boolean;
         be3DSound: boolean;
@@ -2136,6 +2291,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class BeBillboard implements INodeComponent {
+        static readonly ClassName: string;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
@@ -2160,6 +2316,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class bloomctr implements INodeComponent {
+        static readonly ClassName: string;
         private _bloomIntensity;
         private _bloomThreshold;
         private _blurSpread;
@@ -2215,6 +2372,7 @@ declare namespace gd3d.framework {
         update(delta: number): any;
     }
     class camera implements INodeComponent {
+        static readonly ClassName: string;
         gameObject: gameObject;
         private _near;
         near: number;
@@ -2268,6 +2426,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class canvascontainer implements INodeComponent {
+        static readonly ClassName: string;
         constructor();
         gameObject: gameObject;
         readonly canvas: canvas;
@@ -2295,6 +2454,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class effectSystem implements IRenderer {
+        static readonly ClassName: string;
         gameObject: gameObject;
         layer: RenderLayerEnum;
         renderLayer: number;
@@ -2352,6 +2512,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class TestEffectSystem implements IRenderer {
+        static readonly ClassName: string;
         gameObject: gameObject;
         layer: RenderLayerEnum;
         renderLayer: number;
@@ -2403,6 +2564,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class frustumculling implements INodeComponent {
+        static readonly ClassName: string;
         constructor();
         gameObject: gameObject;
         start(): void;
@@ -2414,6 +2576,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class guidpath implements INodeComponent {
+        static readonly ClassName: string;
         private paths;
         private _pathasset;
         pathasset: pathasset;
@@ -2443,6 +2606,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class keyFrameAniPlayer implements INodeComponent {
+        static readonly ClassName: string;
         clips: keyFrameAniClip[];
         private nowClip;
         private readonly nowFrame;
@@ -2477,6 +2641,7 @@ declare namespace gd3d.framework {
         Spot = 2,
     }
     class light implements INodeComponent {
+        static readonly ClassName: string;
         gameObject: gameObject;
         type: LightTypeEnum;
         spotAngelCos: number;
@@ -2505,6 +2670,7 @@ declare namespace gd3d.framework {
         computeExtentsByAxis(axis: math.vector3, out: math.vector2): void;
     }
     class spherecollider implements INodeComponent, ICollider {
+        static readonly ClassName: string;
         gameObject: gameObject;
         subTran: transform;
         filter: meshFilter;
@@ -2532,6 +2698,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class trailRender implements IRenderer {
+        static readonly ClassName: string;
         layer: RenderLayerEnum;
         renderLayer: number;
         queue: number;
@@ -2578,6 +2745,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class trailRender_recorde implements IRenderer {
+        static readonly ClassName: string;
         layer: RenderLayerEnum;
         renderLayer: number;
         queue: number;
@@ -2629,6 +2797,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class vignettingCtr implements INodeComponent {
+        static readonly ClassName: string;
         private app;
         private scene;
         private camera;
@@ -2649,6 +2818,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class f14EffectSystem implements IRenderer {
+        static readonly ClassName: string;
         layer: RenderLayerEnum;
         renderLayer: number;
         queue: number;
@@ -3208,6 +3378,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class starCamCtr implements INodeComponent {
+        static readonly ClassName: string;
         moveDuration: number;
         minSpeed: number;
         relativelocation: math.vector3;
@@ -5192,11 +5363,13 @@ declare namespace gd3d.framework {
         clone(): any;
     }
     class nodeComponent {
+        static readonly ClassName: string;
         comp: INodeComponent;
         init: boolean;
         constructor(comp: INodeComponent, init?: boolean);
     }
     class gameObject {
+        static readonly ClassName: string;
         getScene(): scene;
         layer: number;
         tag: string;
@@ -5338,6 +5511,7 @@ declare namespace gd3d.framework {
         private doPick(ray, pickall, isPickMesh, root, out, layermask?);
         private pickMesh(ray, tran, pickedList, layermask?);
         private pickCollider(ray, tran, pickedList, layermask?);
+        enable2DPhysics(op?: IEngine2DOP): void;
     }
 }
 declare namespace gd3d.framework {

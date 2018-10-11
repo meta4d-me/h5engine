@@ -155,7 +155,7 @@ namespace gd3d.framework
         applyForce(body:Ibody,positon:matterVector,force:matterVector):void;
     }
 
-    interface matterVector
+    export interface matterVector
     {
         x:number;
         y:number;
