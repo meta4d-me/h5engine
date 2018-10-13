@@ -536,7 +536,7 @@ namespace gd3d.framework
                         }
                     } else
                     {
-                        console.error("Bone: " + bonename + " Not Record in Aniclip(" + this._playClip.getName() + ").");
+                        // console.error("Bone: " + bonename + " Not Record in Aniclip(" + this._playClip.getName() + ").");
                     }
                     //----------------------
                 }
