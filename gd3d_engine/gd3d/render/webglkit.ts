@@ -113,9 +113,9 @@ namespace gd3d.render
 
                 // Extensions
                 //这个扩展会影响bump
-                webglkit.caps.standardDerivatives = (webgl.getExtension('OES_standard_derivatives') !== null);
-                webglkit.caps.pvrtcExtension = webgl.getExtension('WEBGL_compressed_texture_pvrtc');
-                webglkit.caps.atcExtension = webgl.getExtension('WEBGL_compressed_texture_atc');
+                // webglkit.caps.standardDerivatives = (webgl.getExtension('OES_standard_derivatives') !== null);
+                // webglkit.caps.pvrtcExtension = webgl.getExtension('WEBGL_compressed_texture_pvrtc');
+                // webglkit.caps.atcExtension = webgl.getExtension('WEBGL_compressed_texture_atc');
                 //各种扩展
                 // webglkit.caps.s3tc = webgl.getExtension('WEBGL_compressed_texture_s3tc');
                 // webglkit.caps.textureFloat = (webgl.getExtension('OES_texture_float') !== null);
