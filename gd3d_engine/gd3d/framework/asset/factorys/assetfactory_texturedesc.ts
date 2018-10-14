@@ -101,10 +101,11 @@ namespace gd3d.framework
                     } else
                     {
                         gd3d.io.loadImg(_textureSrc,
-                            (_tex, _err) =>
+                            (_tex, _err,isloadFail) =>
                             {
                                 call(() =>
                                 {
+                                    state.isloadFail = isloadFail ? true : false;
                                     if (AssetFactoryTools.catchError(_err, onstate, state))
                                         return;
 
@@ -232,10 +233,11 @@ namespace gd3d.framework
             else
             {
                 gd3d.io.loadImg(_textureSrc,
-                    (_tex, _err) =>
+                    (_tex, _err,isloadFail) =>
                     {
                         call(() =>
                         {
+                            state.isloadFail = isloadFail ? true : false;
                             if (AssetFactoryTools.catchError(_err, onstate, state))
                                 return;
                             let _texture = asset ? asset : new texture(filename);
