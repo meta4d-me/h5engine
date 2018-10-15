@@ -10,6 +10,6 @@
 
 @echo mix up
 @cd lib
-@call uglifyjs gd3d.js -m -c -o gd3d.js
+@call uglifyjs gd3d.js -m -c -o gd3d.min.js
 
 @echo build done.
