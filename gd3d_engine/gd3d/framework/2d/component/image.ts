@@ -285,6 +285,7 @@ namespace gd3d.framework
                 if(tspr){
                     this.sprite = tspr;
                     this.needRefreshImg = true;
+                    return;  //捕获到目标sprite后强制 下一帧渲染 （防止 transform树同步延迟 导致 右上角ghostShadow 问题）
                 }
             }
 
