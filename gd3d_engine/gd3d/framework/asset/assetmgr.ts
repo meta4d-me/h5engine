@@ -1120,10 +1120,11 @@ namespace gd3d.framework
 
             if (type == AssetTypeEnum.Bundle)//加载包
             {
-                gd3d.io.loadText(url, (txt, err) =>
+                gd3d.io.loadText(url, (txt, err,isloadFail) =>
                 {
                     if (err != null)
                     {
+                        state.isloadFail = isloadFail ? true : false;
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1156,10 +1157,11 @@ namespace gd3d.framework
             }
             else if (type == AssetTypeEnum.CompressBundle)
             {
-                gd3d.io.loadText(url, (txt, err) =>
+                gd3d.io.loadText(url, (txt, err,isloadFail) =>
                 {
                     if (err != null)
                     {
+                        state.isloadFail = isloadFail ? true : false;
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -1185,6 +1187,7 @@ namespace gd3d.framework
                 {
                     if (s.iserror)
                     {
+                        state.iserror = true;
                         onstate(state);
                         return;
                     }
@@ -1351,7 +1354,9 @@ namespace gd3d.framework
             let state: stateLoad = this.mapInLoad[name];
             for (let key in state.resstate)
             {
-                state.resstate[key].res.unuse();
+                if(state.resstate[key] && state.resstate[key].res){
+                    state.resstate[key].res.unuse();
+                }
             }
             delete this.mapInLoad[name];
         }
