@@ -20,6 +20,7 @@ namespace gd3d.framework
         mass?:number;
         desity?:number;
         restitution?:number;
+        frictionStatic?:number;
         frictionAir?:number;
         friction?:number;
         isStatic?:boolean;
