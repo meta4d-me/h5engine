@@ -607,7 +607,8 @@
             Texture_POSITIVE_X: framework.texture ,
             Texture_POSITIVE_Y: framework.texture ,
             Texture_POSITIVE_Z: framework.texture ){
-                let wrc = WebGLRenderingContext;
+                let wrc = this.webgl;
+
                 let textures = [Texture_NEGATIVE_X,Texture_NEGATIVE_Y,Texture_NEGATIVE_Z,Texture_POSITIVE_X,Texture_POSITIVE_Y,Texture_POSITIVE_Z];
                 const typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z,wrc.TEXTURE_CUBE_MAP_POSITIVE_X,wrc.TEXTURE_CUBE_MAP_POSITIVE_Y,wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
                 for(var i=0; i<typeArr.length ;i++){
