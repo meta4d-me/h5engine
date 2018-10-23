@@ -3857,6 +3857,7 @@ var gd3d;
                     if (tspr) {
                         this.sprite = tspr;
                         this.needRefreshImg = true;
+                        return;
                     }
                 }
                 var mat = this.uimat;
