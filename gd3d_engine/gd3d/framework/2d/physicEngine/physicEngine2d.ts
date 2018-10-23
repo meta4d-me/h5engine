@@ -142,6 +142,10 @@ namespace gd3d.framework
         {
             this.set(body,"restitution",restitution);
         }
+
+        public setAngularVelocity(body:Ibody,angularVelocity:number){
+            this.set(body,"angularVelocity",angularVelocity);
+        }
         private set(body:Ibody,settings:string,value:any)
         {
             Matter.Body.set(body, settings, value)
@@ -150,8 +154,10 @@ namespace gd3d.framework
 
     export interface Ibody
     {
+
         angle:number;
         position:matterVector;
+        speed:number;
         applyForce(body:Ibody,positon:matterVector,force:matterVector):void;
     }
 

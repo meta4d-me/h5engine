@@ -45,6 +45,20 @@ namespace gd3d.framework
         setVelocity(velocity:math.vector2){
             physic2D.setVelocity(this.body,velocity);
         }
+
+        setAngularVelocity(velocity:number){
+            physic2D.setAngularVelocity(this.body,velocity);
+        }
+
+        /**
+         * 获取当前刚体的速度
+         */
+        get velocity():number{
+
+            return this.body.speed;
+
+        }
+
         /**
          * 设置密度
          * @param Desity 
@@ -53,6 +67,7 @@ namespace gd3d.framework
         {
             physic2D.setDesity(this.body,Desity);
         }
+
         /**
          * 设置空气摩擦力
          * @param frictionAir 
