@@ -670,7 +670,7 @@ namespace gd3d.framework
                 {
                     w = scene.app.width;
                     h = scene.app.height;
-                    render.glRenderTarget.useNull(context.webgl);
+                    // render.glRenderTarget.useNull(context.webgl);
                 }
                 else
                 {
