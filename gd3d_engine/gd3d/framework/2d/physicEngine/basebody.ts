@@ -18,11 +18,13 @@ namespace gd3d.framework
     export interface IBodyData
     {
         mass?:number;
-        desity?:number;
+        density?:number;
+        inertia?:number;
         restitution?:number;
         frictionStatic?:number;
         frictionAir?:number;
         friction?:number;
+        slop?:number;
         isStatic?:boolean;
     }
     
@@ -122,6 +124,9 @@ namespace gd3d.framework
             this.transform.localTranslate.y=this.body.position.y;
             this.transform.localRotate=this.body.angle;
             this.transform.markDirty();
+        }
+        remove() {
+            physic2D.removeBody(this.body);
         }
     }
 }

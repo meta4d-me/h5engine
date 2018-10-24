@@ -150,6 +150,11 @@ namespace gd3d.framework
         {
             Matter.Body.set(body, settings, value)
         }
+
+        public removeBody(body:Ibody){
+
+            Matter.World.remove(this.engineWorld,body);
+        }
     }
 
     export interface Ibody

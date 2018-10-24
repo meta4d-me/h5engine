@@ -5939,6 +5939,9 @@ var gd3d;
                 this.transform.localRotate = this.body.angle;
                 this.transform.markDirty();
             };
+            bassBody.prototype.remove = function () {
+                framework.physic2D.removeBody(this.body);
+            };
             return bassBody;
         }());
         framework.bassBody = bassBody;
@@ -5966,8 +5969,6 @@ var gd3d;
             circleBody.prototype.onPlay = function () {
             };
             circleBody.prototype.onPointEvent = function (canvas, ev, oncap) {
-            };
-            circleBody.prototype.remove = function () {
             };
             circleBody.ClassName = "circleBody";
             circleBody = __decorate([
@@ -6054,6 +6055,9 @@ var gd3d;
             physicEngine2D.prototype.set = function (body, settings, value) {
                 Matter.Body.set(body, settings, value);
             };
+            physicEngine2D.prototype.removeBody = function (body) {
+                Matter.World.remove(this.engineWorld, body);
+            };
             return physicEngine2D;
         }());
         framework.physicEngine2D = physicEngine2D;
@@ -6079,8 +6083,6 @@ var gd3d;
             rectBody.prototype.onPlay = function () {
             };
             rectBody.prototype.onPointEvent = function (canvas, ev, oncap) {
-            };
-            rectBody.prototype.remove = function () {
             };
             rectBody.ClassName = "rectBody";
             rectBody = __decorate([

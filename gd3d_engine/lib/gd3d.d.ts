@@ -939,11 +939,13 @@ declare namespace gd3d.framework {
     }
     interface IBodyData {
         mass?: number;
-        desity?: number;
+        density?: number;
+        inertia?: number;
         restitution?: number;
         frictionStatic?: number;
         frictionAir?: number;
         friction?: number;
+        slop?: number;
         isStatic?: boolean;
     }
     class bassBody implements I2DBody {
@@ -963,6 +965,7 @@ declare namespace gd3d.framework {
         setInitData(att: IBodyData): void;
         setPosition(pos: math.vector2): void;
         update(delta: number): void;
+        remove(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -973,7 +976,6 @@ declare namespace gd3d.framework {
         start(): void;
         onPlay(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
-        remove(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1009,6 +1011,7 @@ declare namespace gd3d.framework {
         setRestitution(body: Ibody, restitution: number): void;
         setAngularVelocity(body: Ibody, angularVelocity: number): void;
         private set;
+        removeBody(body: Ibody): void;
     }
     interface Ibody {
         angle: number;
@@ -1029,7 +1032,6 @@ declare namespace gd3d.framework {
         start(): void;
         onPlay(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
-        remove(): void;
     }
 }
 declare namespace gd3d.framework {
