@@ -947,6 +947,9 @@ declare namespace gd3d.framework {
         friction?: number;
         slop?: number;
         isStatic?: boolean;
+        type?: string;
+        tag?: string;
+        name?: string;
     }
     class bassBody implements I2DBody {
         transform: transform2D;
@@ -955,6 +958,9 @@ declare namespace gd3d.framework {
         setVelocity(velocity: math.vector2): void;
         setAngularVelocity(velocity: number): void;
         readonly velocity: number;
+        type: string;
+        tag: string;
+        name: string;
         setDesity(Desity: number): void;
         setFrictionAir(frictionAir: number): void;
         setFriction(friction: number): void;
@@ -1011,12 +1017,17 @@ declare namespace gd3d.framework {
         setRestitution(body: Ibody, restitution: number): void;
         setAngularVelocity(body: Ibody, angularVelocity: number): void;
         private set;
+        addEvent(eventname: string, callback: Function): void;
+        removeEvent(eventname: string, callback: Function): void;
         removeBody(body: Ibody): void;
     }
     interface Ibody {
         angle: number;
         position: matterVector;
         speed: number;
+        type: string;
+        tag: string;
+        name: string;
         applyForce(body: Ibody, positon: matterVector, force: matterVector): void;
     }
     interface matterVector {
