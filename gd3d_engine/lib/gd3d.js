@@ -5909,6 +5909,36 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(bassBody.prototype, "type", {
+                get: function () {
+                    return this.body.type;
+                },
+                set: function (value) {
+                    this.body.type = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(bassBody.prototype, "tag", {
+                get: function () {
+                    return this.body.tag;
+                },
+                set: function (value) {
+                    this.body.tag = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(bassBody.prototype, "name", {
+                get: function () {
+                    return this.body.name;
+                },
+                set: function (value) {
+                    this.body.name = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
             bassBody.prototype.setDesity = function (Desity) {
                 framework.physic2D.setDesity(this.body, Desity);
             };
@@ -5939,6 +5969,9 @@ var gd3d;
                 this.transform.localRotate = this.body.angle;
                 this.transform.markDirty();
             };
+            bassBody.prototype.remove = function () {
+                framework.physic2D.removeBody(this.body);
+            };
             return bassBody;
         }());
         framework.bassBody = bassBody;
@@ -5966,8 +5999,6 @@ var gd3d;
             circleBody.prototype.onPlay = function () {
             };
             circleBody.prototype.onPointEvent = function (canvas, ev, oncap) {
-            };
-            circleBody.prototype.remove = function () {
             };
             circleBody.ClassName = "circleBody";
             circleBody = __decorate([
@@ -6054,6 +6085,15 @@ var gd3d;
             physicEngine2D.prototype.set = function (body, settings, value) {
                 Matter.Body.set(body, settings, value);
             };
+            physicEngine2D.prototype.addEvent = function (eventname, callback) {
+                Matter.Events.on(this.matterEngine, eventname, callback);
+            };
+            physicEngine2D.prototype.removeEvent = function (eventname, callback) {
+                Matter.Events.off(this.matterEngine, eventname, callback);
+            };
+            physicEngine2D.prototype.removeBody = function (body) {
+                Matter.World.remove(this.engineWorld, body);
+            };
             return physicEngine2D;
         }());
         framework.physicEngine2D = physicEngine2D;
@@ -6079,8 +6119,6 @@ var gd3d;
             rectBody.prototype.onPlay = function () {
             };
             rectBody.prototype.onPointEvent = function (canvas, ev, oncap) {
-            };
-            rectBody.prototype.remove = function () {
             };
             rectBody.ClassName = "rectBody";
             rectBody = __decorate([
@@ -14120,7 +14158,6 @@ var gd3d;
                     if (target == null) {
                         w = scene.app.width;
                         h = scene.app.height;
-                        gd3d.render.glRenderTarget.useNull(context.webgl);
                     }
                     else {
                         w = target.width;
@@ -32943,7 +32980,6 @@ var gd3d;
         render.drawInfo = drawInfo;
         var glMesh = (function () {
             function glMesh() {
-                this.lineMode = WebGLRenderingContext.LINES;
                 this.bindIndex = -1;
                 this.vertexFormat = VertexFormatMask.Position;
             }
@@ -33155,7 +33191,7 @@ var gd3d;
                 if (count < 0)
                     count = ((this.vertexCount / 2) | 0) * 2;
                 drawInfo.ins.renderCount++;
-                webgl.drawArrays(this.lineMode, start, count);
+                webgl.drawArrays(webgl.LINES, start, count);
             };
             glMesh.prototype.drawElementTris = function (webgl, start, count) {
                 if (start === void 0) { start = 0; }
@@ -33172,7 +33208,7 @@ var gd3d;
                 if (count < 0)
                     count = ((this.indexCounts[this.bindIndex] / 2) | 0) * 2;
                 drawInfo.ins.renderCount++;
-                webgl.drawElements(this.lineMode, count, webgl.UNSIGNED_SHORT, start * 2);
+                webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);
             };
             return glMesh;
         }());
@@ -34921,7 +34957,7 @@ var gd3d;
                 this.texture = webgl.createTexture();
             }
             glTextureCube.prototype.uploadImages = function (Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z) {
-                var wrc = WebGLRenderingContext;
+                var wrc = this.webgl;
                 var textures = [Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z];
                 var typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z, wrc.TEXTURE_CUBE_MAP_POSITIVE_X, wrc.TEXTURE_CUBE_MAP_POSITIVE_Y, wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
                 for (var i = 0; i < typeArr.length; i++) {

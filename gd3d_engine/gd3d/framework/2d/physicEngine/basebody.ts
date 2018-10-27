@@ -18,12 +18,17 @@ namespace gd3d.framework
     export interface IBodyData
     {
         mass?:number;
-        desity?:number;
+        density?:number;
+        inertia?:number;
         restitution?:number;
         frictionStatic?:number;
         frictionAir?:number;
         friction?:number;
+        slop?:number;
         isStatic?:boolean;
+        type?:string;
+        tag?:string;
+        name?:string;
     }
     
     export class bassBody implements I2DBody
@@ -58,6 +63,43 @@ namespace gd3d.framework
             return this.body.speed;
 
         }
+
+        /**
+         * 刚体的类型
+         */
+        public get type() : string {
+            return  this.body.type;
+        }
+
+        public set type(value:string){
+
+            this.body.type=value;
+        }
+
+        /**
+         * 刚体的标记
+         */
+        public get tag() : string {
+            return  this.body.tag;
+        }
+
+        public set tag(value:string){
+
+            this.body.tag=value;
+        }
+
+          /**
+         * 刚体的标记
+         */
+        public get name() : string {
+            return  this.body.name;
+        }
+
+        public set name(value:string){
+
+            this.body.name=value;
+        }
+        
 
         /**
          * 设置密度
@@ -122,6 +164,9 @@ namespace gd3d.framework
             this.transform.localTranslate.y=this.body.position.y;
             this.transform.localRotate=this.body.angle;
             this.transform.markDirty();
+        }
+        remove() {
+            physic2D.removeBody(this.body);
         }
     }
 }
