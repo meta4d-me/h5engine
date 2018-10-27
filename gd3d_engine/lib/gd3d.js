@@ -1660,6 +1660,8 @@ var gd3d;
                 this.scaleMode = UIScaleMode.CONSTANT_PIXEL_SIZE;
                 this.sortOrder = 0;
                 this.viewPixelrect = new gd3d.math.rect();
+                this.helpv2 = new gd3d.math.vector2();
+                this.helpv2_1 = new gd3d.math.vector2();
                 this.canvas = new framework.canvas();
                 framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
             }
@@ -1689,20 +1691,19 @@ var gd3d;
             overlay2D.prototype.render = function (context, assetmgr, camera) {
                 if (!this.canvas.getRoot().visible || !this.camera)
                     return;
-                var vp = new gd3d.math.rect();
-                this.camera.calcViewPortPixel(assetmgr.app, vp);
+                this.camera.calcViewPortPixel(assetmgr.app, this.viewPixelrect);
                 switch (this.scaleMode) {
                     case UIScaleMode.CONSTANT_PIXEL_SIZE:
-                        if (this.canvas.pixelWidth == vp.w && this.canvas.pixelHeight == vp.h)
+                        if (this.canvas.pixelWidth == this.viewPixelrect.w && this.canvas.pixelHeight == this.viewPixelrect.h)
                             break;
-                        this.canvas.pixelWidth = vp.w;
-                        this.canvas.pixelHeight = vp.h;
+                        this.canvas.pixelWidth = this.viewPixelrect.w;
+                        this.canvas.pixelHeight = this.viewPixelrect.h;
                         this.canvas.getRoot().markDirty();
                         break;
                     case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
                         var match = this.screenMatchRate < 0 ? 0 : this.screenMatchRate;
                         match = match > 1 ? 1 : match;
-                        var asp = vp.w / vp.h;
+                        var asp = this.viewPixelrect.w / this.viewPixelrect.h;
                         var w = gd3d.math.numberLerp(this.matchReference_width, this.matchReference_height * asp, match);
                         var h = gd3d.math.numberLerp(this.matchReference_height, this.matchReference_width / asp, 1 - match);
                         if (this.canvas.pixelWidth != w || this.canvas.pixelHeight != h) {
@@ -1716,28 +1717,24 @@ var gd3d;
                 this.canvas.render(context, assetmgr);
             };
             overlay2D.prototype.update = function (delta) {
-                this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
-                var rect = this.camera.viewport;
-                var real_x = this.inputmgr.point.x - rect.x * this.app.width;
-                var real_y = this.inputmgr.point.y - rect.y * this.app.height;
-                var sx = (real_x / this.viewPixelrect.w) * 2 - 1;
-                var sy = (real_y / this.viewPixelrect.h) * -2 + 1;
-                this.canvas.update(delta, this.inputmgr.point.touch, sx, sy);
+                this.helpv2.x = this.inputmgr.point.x;
+                this.helpv2.y = this.inputmgr.point.y;
+                var sPos = this.helpv2;
+                var mPos = this.helpv2_1;
+                this.calScreenPosToModelPos(sPos, mPos);
+                this.canvas.update(delta, this.inputmgr.point.touch, mPos.x, mPos.y);
             };
             overlay2D.prototype.pick2d = function (mx, my, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
                 if (this.camera == null)
                     return null;
-                var vp = new gd3d.math.rect();
-                var app = this.camera.calcViewPortPixel(this.app, vp);
-                var sx = (mx / vp.w) * 2 - 1;
-                var sy = (my / vp.h) * -2 + 1;
-                var outv2 = gd3d.math.pool.new_vector2();
-                outv2.x = sx;
-                outv2.y = sy;
                 var root = this.canvas.getRoot();
-                var trans = this.dopick2d(outv2, root, tolerance);
-                gd3d.math.pool.delete_vector2(outv2);
+                this.helpv2.x = mx;
+                this.helpv2.y = my;
+                var sPos = this.helpv2;
+                var mPos = this.helpv2_1;
+                this.calScreenPosToModelPos(sPos, mPos);
+                var trans = this.dopick2d(mPos, root, tolerance);
                 return trans;
             };
             overlay2D.prototype.dopick2d = function (ModelPos, tran, tolerance) {
@@ -1763,16 +1760,23 @@ var gd3d;
             overlay2D.prototype.calScreenPosToCanvasPos = function (screenPos, outCanvasPos) {
                 if (!this.camera || !this.canvas)
                     return;
-                var vp = new gd3d.math.rect();
-                this.camera.calcViewPortPixel(this.app, vp);
-                var temt = gd3d.math.pool.new_vector2();
-                temt.x = (screenPos.x / vp.w) * 2 - 1;
-                temt.y = (screenPos.y / vp.h) * -2 + 1;
+                var mPos = this.helpv2;
+                this.calScreenPosToModelPos(screenPos, mPos);
                 var mat = gd3d.math.pool.new_matrix3x2();
                 gd3d.math.matrix3x2Clone(this.canvas.getRoot().getWorldMatrix(), mat);
                 gd3d.math.matrix3x2Inverse(mat, mat);
-                gd3d.math.matrix3x2TransformVector2(mat, temt, outCanvasPos);
-                gd3d.math.pool.delete_vector2(temt);
+                gd3d.math.matrix3x2TransformVector2(mat, mPos, outCanvasPos);
+                gd3d.math.pool.delete_matrix3x2(mat);
+            };
+            overlay2D.prototype.calScreenPosToModelPos = function (screenPos, outModelPos) {
+                if (!screenPos || !outModelPos || !this.camera)
+                    return;
+                this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+                var rect = this.camera.viewport;
+                var real_x = screenPos.x - rect.x * this.app.width;
+                var real_y = screenPos.y - rect.y * this.app.height;
+                outModelPos.x = (real_x / this.viewPixelrect.w) * 2 - 1;
+                outModelPos.y = (real_y / this.viewPixelrect.h) * -2 + 1;
             };
             overlay2D.ClassName = "overlay2D";
             __decorate([
@@ -1889,11 +1893,9 @@ var gd3d;
         }
         math.Double = Double;
         var vector2 = (function () {
-            function vector2(x, y, w, h) {
+            function vector2(x, y) {
                 if (x === void 0) { x = 0; }
                 if (y === void 0) { y = 0; }
-                if (w === void 0) { w = 0; }
-                if (h === void 0) { h = 0; }
                 this.rawData = new Float32Array(2);
                 this.rawData[0] = x;
                 this.rawData[1] = y;
@@ -1936,7 +1938,7 @@ var gd3d;
             ], vector2.prototype, "y", null);
             vector2 = __decorate([
                 gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
+                __metadata("design:paramtypes", [Number, Number])
             ], vector2);
             return vector2;
         }());
@@ -13847,6 +13849,7 @@ var gd3d;
                 context.drawtype = "";
                 mesh.glMesh.bindVboBuffer(context.webgl);
                 this.material.draw(context, mesh, mesh.submesh[0], "quad");
+                gd3d.render.glRenderTarget.useNull(context.webgl);
             };
             return cameraPostQueue_Quad;
         }());
@@ -16471,7 +16474,6 @@ var gd3d;
                 post0.material.setFloat("_Vignetting", 0.3);
                 post0.material.setFloat("_Blurred_Corners", 3.0);
                 post0.material.setFloat("_Chromatic_Aberration", 3.0);
-                post0.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1 / psize, 1 / psize, psize, psize));
                 this.camera.postQueues.push(post0);
                 this._init = true;
             };

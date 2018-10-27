@@ -369,10 +369,13 @@ declare namespace gd3d.framework {
         getChild(index: number): transform2D;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         private viewPixelrect;
+        private helpv2;
+        private helpv2_1;
         update(delta: number): void;
         pick2d(mx: number, my: number, tolerance?: number): transform2D;
         private dopick2d(ModelPos, tran, tolerance?);
         calScreenPosToCanvasPos(screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2): void;
+        calScreenPosToModelPos(screenPos: gd3d.math.vector2, outModelPos: gd3d.math.vector2): void;
     }
 }
 declare namespace gd3d.math {
@@ -395,7 +398,7 @@ declare namespace gd3d.math {
     class vector2 {
         static readonly ClassName: string;
         rawData: Float32Array;
-        constructor(x?: float, y?: float, w?: float, h?: float);
+        constructor(x?: float, y?: float);
         x: float;
         y: float;
         toString(): string;
@@ -947,6 +950,9 @@ declare namespace gd3d.framework {
         friction?: number;
         slop?: number;
         isStatic?: boolean;
+        type?: string;
+        tag?: string;
+        name?: string;
     }
     class bassBody implements I2DBody {
         transform: transform2D;
@@ -955,6 +961,9 @@ declare namespace gd3d.framework {
         setVelocity(velocity: math.vector2): void;
         setAngularVelocity(velocity: number): void;
         readonly velocity: number;
+        type: string;
+        tag: string;
+        name: string;
         setDesity(Desity: number): void;
         setFrictionAir(frictionAir: number): void;
         setFriction(friction: number): void;
@@ -1011,12 +1020,17 @@ declare namespace gd3d.framework {
         setRestitution(body: Ibody, restitution: number): void;
         setAngularVelocity(body: Ibody, angularVelocity: number): void;
         private set(body, settings, value);
+        addEvent(eventname: string, callback: Function): void;
+        removeEvent(eventname: string, callback: Function): void;
         removeBody(body: Ibody): void;
     }
     interface Ibody {
         angle: number;
         position: matterVector;
         speed: number;
+        type: string;
+        tag: string;
+        name: string;
         applyForce(body: Ibody, positon: matterVector, force: matterVector): void;
     }
     interface matterVector {

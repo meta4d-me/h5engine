@@ -96,7 +96,7 @@ namespace gd3d.math
         static readonly ClassName:string="vector2";
 
         public rawData = new Float32Array(2);
-        constructor(x: float = 0, y: float = 0, w: float = 0, h: float = 0)
+        constructor(x: float = 0, y: float = 0)
         {
             this.rawData[0] = x;
             this.rawData[1] = y;
