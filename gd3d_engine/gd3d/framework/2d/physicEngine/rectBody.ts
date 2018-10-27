@@ -32,8 +32,5 @@ namespace gd3d.framework
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean) {
 
         }
-        remove() {
-
-        }
     }
 }
