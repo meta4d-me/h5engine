@@ -88,7 +88,7 @@ namespace gd3d.framework
 
         //mouse
         private _mousedown(ev:MouseEvent){
-            this.CalcuPoint(ev.offsetX,ev.offsetY);
+            this.CalcuPoint(ev.offsetX,ev.offsetY,this._point);
             this._buttons[ev.button] = true;
             this._point.touch = true;
         }
@@ -97,7 +97,7 @@ namespace gd3d.framework
             this._point.touch = false;
         }
         private _mousemove(ev:MouseEvent){
-            this.CalcuPoint(ev.offsetX,ev.offsetY);
+            this.CalcuPoint(ev.offsetX,ev.offsetY,this._point);
         }
         private _mousewheel(ev:MouseWheelEvent){
             this.hasWheel = true;
@@ -111,19 +111,22 @@ namespace gd3d.framework
         }
 
         //touch
+        private tryAddTouchP(id:number){
+            if(!this._touches[id]){
+                this._touches[id] = new pointinfo();
+                this._touches[id].id = id;
+            }
+        }
+
         private _touchstart(ev:TouchEvent){
-            this.CalcuPoint(ev.touches[0].clientX,ev.touches[0].clientY);
+            this.CalcuPoint(ev.touches[0].clientX,ev.touches[0].clientY,this._point);
                 this._point.touch = true;
 
                 for (var i = 0; i < ev.changedTouches.length; i++)
                 {
                     var touch = ev.changedTouches[i];
                     var id = touch.identifier;
-                    if (this._touches[id] == null)
-                    {
-                        this._touches[id] = new pointinfo();
-                        this._touches[id].id = id;
-                    }
+                    this.tryAddTouchP(id);
                     this._touches[id].touch = true;
                     this._touches[id].x = touch.clientX;
                     this._touches[id].y = touch.clientY;
@@ -134,20 +137,15 @@ namespace gd3d.framework
                 {
                     var touch = ev.changedTouches[i];
                     var id = touch.identifier;
-
-                    if (this._touches[id] == null)
-                    {
-                        this._touches[id] = new pointinfo();
-                        this._touches[id].id = id;
-                    }
+                    this.tryAddTouchP(id);
                     this._touches[id].touch = true;
                     this._touches[id].x = touch.clientX;
                     this._touches[id].y = touch.clientY;
                 }
 
-                var count = 0;
-                var x = 0;
-                var y = 0;
+                let count = 0;
+                let x = 0;
+                let y = 0;
                 for (var key in this._touches)
                 {
                     if (this._touches[key].touch == true)
@@ -159,18 +157,14 @@ namespace gd3d.framework
                 }
                 // this.point.x = x / (count * app.scale);
                 // this.point.y = y / (count * app.scale);
-                this.CalcuPoint(x / count,y / count);
+                this.CalcuPoint(x / count,y / count,this._point);
         }
         private _touchend(ev:TouchEvent){
             for (var i = 0; i < ev.changedTouches.length; i++)
                 {
                     var touch = ev.changedTouches[i];
                     var id = touch.identifier;
-                    if (this._touches[id] == null)
-                    {
-                        this._touches[id] = new pointinfo();
-                        this._touches[id].id = id;
-                    }
+                    this.tryAddTouchP(id);
                     this._touches[id].touch = false;
                 }
 
@@ -183,26 +177,9 @@ namespace gd3d.framework
                 this._point.touch = false;
         }
         private _touchcancel(ev:TouchEvent){
-            for (var i = 0; i < ev.changedTouches.length; i++)
-                {
-                    var touch = ev.changedTouches[i];
-                    var id = touch.identifier;
-                    if (this._touches[id] == null)
-                    {
-                        this._touches[id] = new pointinfo();
-                        this._touches[id].id = id;
-                    }
-                    this._touches[id].touch = false;
-                }
-
-                //所有触点全放开，point.touch才false
-                for (var key in this._touches)
-                {
-                    if (this._touches[key].touch == true)
-                        return;
-                }
-                this._point.touch = false;
+            this._touchend(ev);
         }
+
         //key
         private _keydown(ev:KeyboardEvent){
             this.hasKeyDown = this.keyboardMap[ev.keyCode] = true;
@@ -252,6 +229,9 @@ namespace gd3d.framework
                 //on up
                 this.hasPointUP = true;
                 this.eventer.EmitEnum_point(event.PointEventEnum.PointUp,pt.x,pt.y);
+            }else {
+                //on hold
+                this.eventer.EmitEnum_point(event.PointEventEnum.PointHold,pt.x,pt.y);
             }
 
             if(this.hasPointUP && this.hasPointDown){
@@ -435,12 +415,10 @@ namespace gd3d.framework
             return count;
         }
 
-        private tempV2_0:gd3d.math.vector2;
-        private tempV2_1:gd3d.math.vector2;
-        private CalcuPoint(clientX:number,clientY:number){
-            if(!this.app || isNaN(clientX) || isNaN(clientY)) return;
-            if(!this.tempV2_0) this.tempV2_0 = gd3d.math.pool.new_vector2();
-            if(!this.tempV2_1) this.tempV2_1 = gd3d.math.pool.new_vector2();
+        private tempV2_0:gd3d.math.vector2 = new gd3d.math.vector2();
+        private tempV2_1:gd3d.math.vector2 = new gd3d.math.vector2();
+        private CalcuPoint(clientX:number,clientY:number , out:pointinfo){
+            if(!out || !this.app || isNaN(clientX) || isNaN(clientY)) return;
 
             this.tempV2_0.x = clientX / this.app.scaleFromPandding;
             this.tempV2_0.y = clientY / this.app.scaleFromPandding;
@@ -450,23 +428,23 @@ namespace gd3d.framework
                 switch (this.app.orientation){
                     case gd3d.framework.OrientationMode.PORTRAIT:
                     gd3d.math.matrix3x2TransformVector2(this.rMtr_90,this.tempV2_0,this.tempV2_1);
-                    this._point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
-                    this._point.y = this.tempV2_1.y;
+                    out.x = this.tempV2_1.x + this.app.webgl.canvas.width;
+                    out.y = this.tempV2_1.y;
                     break;
                     case gd3d.framework.OrientationMode.LANDSCAPE:
                     gd3d.math.matrix3x2TransformVector2(this.rMtr_n90,this.tempV2_0,this.tempV2_1);
-                    this._point.x = this.tempV2_1.x;
-                    this._point.y = this.tempV2_1.y + this.app.webgl.canvas.height;
+                    out.x = this.tempV2_1.x;
+                    out.y = this.tempV2_1.y + this.app.webgl.canvas.height;
                     break;
                     case gd3d.framework.OrientationMode.LANDSCAPE_FLIPPED:
                     gd3d.math.matrix3x2TransformVector2(this.rMtr_90,this.tempV2_0,this.tempV2_1);
-                    this._point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
-                    this._point.y = this.tempV2_1.y;
+                    out.x = this.tempV2_1.x + this.app.webgl.canvas.width;
+                    out.y = this.tempV2_1.y;
                     break;
                 }
             }else{
-                this._point.x = this.tempV2_0.x;
-                this._point.y = this.tempV2_0.y;
+                out.x = this.tempV2_0.x;
+                out.y = this.tempV2_0.y;
             }
             
             //console.error(`x :${this.point.x}  y :${this.point.y}  w :${this.app.webgl.canvas.width}  h :${this.app.webgl.canvas.height}`);
