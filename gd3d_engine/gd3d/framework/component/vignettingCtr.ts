@@ -17,7 +17,7 @@ namespace gd3d.framework
         private scene:  scene;
         private camera:  camera;
         private material: material;
-        private material_1:  material;
+        public material_1:  material;
         private material_2:  material;
         private material_3:  material;
         private readonly tag = "__vignettingtag__";
