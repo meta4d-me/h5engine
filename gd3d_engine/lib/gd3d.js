@@ -5909,6 +5909,36 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(bassBody.prototype, "type", {
+                get: function () {
+                    return this.body.type;
+                },
+                set: function (value) {
+                    this.body.type = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(bassBody.prototype, "tag", {
+                get: function () {
+                    return this.body.tag;
+                },
+                set: function (value) {
+                    this.body.tag = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(bassBody.prototype, "name", {
+                get: function () {
+                    return this.body.name;
+                },
+                set: function (value) {
+                    this.body.name = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
             bassBody.prototype.setDesity = function (Desity) {
                 framework.physic2D.setDesity(this.body, Desity);
             };
@@ -6054,6 +6084,12 @@ var gd3d;
             };
             physicEngine2D.prototype.set = function (body, settings, value) {
                 Matter.Body.set(body, settings, value);
+            };
+            physicEngine2D.prototype.addEvent = function (eventname, callback) {
+                Matter.Events.on(this.matterEngine, eventname, callback);
+            };
+            physicEngine2D.prototype.removeEvent = function (eventname, callback) {
+                Matter.Events.off(this.matterEngine, eventname, callback);
             };
             physicEngine2D.prototype.removeBody = function (body) {
                 Matter.World.remove(this.engineWorld, body);

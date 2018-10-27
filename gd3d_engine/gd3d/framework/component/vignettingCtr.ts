@@ -88,7 +88,7 @@ namespace gd3d.framework
             post0.material.setFloat("_Vignetting", 0.3);
             post0.material.setFloat("_Blurred_Corners", 3.0);
             post0.material.setFloat("_Chromatic_Aberration", 3.0);
-            post0.material.setVector4("_MainTex_TexelSize",new gd3d.math.vector4( 1/psize,1/psize,psize,psize));
+            // post0.material.setVector4("_MainTex_TexelSize",new gd3d.math.vector4( 1/psize,1/psize,psize,psize));
             this.camera.postQueues.push(post0);
 
 

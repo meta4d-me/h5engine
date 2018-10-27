@@ -53,8 +53,6 @@ namespace gd3d.framework
         render(scene: scene, context: renderContext, camera: camera)
         {
 
-
-
             camera._targetAndViewport(this.renderTarget, scene, context, true);
 
             context.webgl.depthMask(true);//zwrite 會影響clear depth，這個查了好一陣
@@ -67,6 +65,8 @@ namespace gd3d.framework
             context.drawtype = "";
             mesh.glMesh.bindVboBuffer(context.webgl);
             this.material.draw(context, mesh, mesh.submesh[0], "quad");
+
+            render.glRenderTarget.useNull(context.webgl);
 
         }
         renderTarget: render.glRenderTarget;
