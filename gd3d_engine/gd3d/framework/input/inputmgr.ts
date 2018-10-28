@@ -128,8 +128,9 @@ namespace gd3d.framework
                     var id = touch.identifier;
                     this.tryAddTouchP(id);
                     this._touches[id].touch = true;
-                    this._touches[id].x = touch.clientX;
-                    this._touches[id].y = touch.clientY;
+                    this.CalcuPoint(touch.clientX,touch.clientY,this._touches[id]);
+                    // this._touches[id].x = touch.clientX;
+                    // this._touches[id].y = touch.clientY;
                 }
         }
         private _touchmove(ev:TouchEvent){
@@ -139,8 +140,9 @@ namespace gd3d.framework
                     var id = touch.identifier;
                     this.tryAddTouchP(id);
                     this._touches[id].touch = true;
-                    this._touches[id].x = touch.clientX;
-                    this._touches[id].y = touch.clientY;
+                    this.CalcuPoint(touch.clientX,touch.clientY,this._touches[id]);
+                    // this._touches[id].x = touch.clientX;
+                    // this._touches[id].y = touch.clientY;
                 }
 
                 let count = 0;
@@ -229,7 +231,7 @@ namespace gd3d.framework
                 //on up
                 this.hasPointUP = true;
                 this.eventer.EmitEnum_point(event.PointEventEnum.PointUp,pt.x,pt.y);
-            }else {
+            }else if(this.lastTouch && pt.touch){
                 //on hold
                 this.eventer.EmitEnum_point(event.PointEventEnum.PointHold,pt.x,pt.y);
             }

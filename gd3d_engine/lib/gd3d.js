@@ -3408,11 +3408,11 @@ var gd3d;
         framework.boxcollider2d = boxcollider2d;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
-var helpV2 = new gd3d.math.vector2();
 var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var helpV2 = new gd3d.math.vector2();
         var TransitionType;
         (function (TransitionType) {
             TransitionType[TransitionType["None"] = 0] = "None";
@@ -3545,7 +3545,9 @@ var gd3d;
             };
             button.prototype.onPointEvent = function (canvas, ev, oncap) {
                 if (oncap == false) {
-                    var b = this.transform.ContainsCanvasPoint(new gd3d.math.vector2(ev.x, ev.y));
+                    helpV2.x = ev.x;
+                    helpV2.y = ev.y;
+                    var b = this.transform.ContainsCanvasPoint(helpV2);
                     if (b) {
                         if (ev.type == gd3d.event.PointEventEnum.PointDown) {
                             this._downInThis = true;
@@ -3565,8 +3567,6 @@ var gd3d;
                                 this.showPress();
                             }
                             if (!this.isMovedLimit) {
-                                helpV2.x = ev.x;
-                                helpV2.y = ev.y;
                                 this.isMovedLimit = gd3d.math.vec2Distance(helpV2, this.downPointV2) > this.movedLimit;
                             }
                         }
@@ -5744,6 +5744,8 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var helpV2 = new gd3d.math.vector2();
+        var helpV2_1 = new gd3d.math.vector2();
         var scrollRect = (function () {
             function scrollRect() {
                 this.horizontal = true;
@@ -5768,17 +5770,17 @@ var gd3d;
             };
             scrollRect.prototype.onPointEvent = function (canvas, ev, oncap) {
                 if (oncap == false) {
-                    var b = this.transform.ContainsCanvasPoint(new gd3d.math.vector2(ev.x, ev.y));
+                    helpV2.x = ev.x;
+                    helpV2.y = ev.y;
+                    var b = this.transform.ContainsCanvasPoint(helpV2);
                     if (b) {
                         ev.eated = true;
                         if (this._content == null)
                             return;
                         if (!this.horizontal && !this.vertical)
                             return;
-                        var temps = gd3d.math.pool.new_vector2();
-                        temps.x = ev.x;
-                        temps.y = ev.y;
-                        var tempc = gd3d.math.pool.new_vector2();
+                        var temps = helpV2;
+                        var tempc = helpV2_1;
                         this.transform.canvas.ModelPosToCanvasPos(temps, tempc);
                         if (this.strPoint == null)
                             this.strPoint = new gd3d.math.vector2();
@@ -5803,8 +5805,6 @@ var gd3d;
                                 this.SlideTo(addtransX, addtransY);
                             }
                         }
-                        gd3d.math.pool.delete_vector2(temps);
-                        gd3d.math.pool.delete_vector2(tempc);
                     }
                 }
                 if (ev.type == gd3d.event.PointEventEnum.PointUp) {
@@ -19372,8 +19372,7 @@ var gd3d;
                     var id = touch.identifier;
                     this.tryAddTouchP(id);
                     this._touches[id].touch = true;
-                    this._touches[id].x = touch.clientX;
-                    this._touches[id].y = touch.clientY;
+                    this.CalcuPoint(touch.clientX, touch.clientY, this._touches[id]);
                 }
             };
             inputMgr.prototype._touchmove = function (ev) {
@@ -19382,8 +19381,7 @@ var gd3d;
                     var id = touch.identifier;
                     this.tryAddTouchP(id);
                     this._touches[id].touch = true;
-                    this._touches[id].x = touch.clientX;
-                    this._touches[id].y = touch.clientY;
+                    this.CalcuPoint(touch.clientX, touch.clientY, this._touches[id]);
                 }
                 var count = 0;
                 var x = 0;
@@ -19447,7 +19445,7 @@ var gd3d;
                     this.hasPointUP = true;
                     this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointUp, pt.x, pt.y);
                 }
-                else {
+                else if (this.lastTouch && pt.touch) {
                     this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointHold, pt.x, pt.y);
                 }
                 if (this.hasPointUP && this.hasPointDown) {
@@ -22035,11 +22033,15 @@ var gd3d;
         }
         math.unitxyzToRotation = unitxyzToRotation;
         function matrixClone(src, out) {
-            out.rawData.set(src.rawData);
+            for (var i = 0; i < 16; i++) {
+                out.rawData[i] = src.rawData[i];
+            }
         }
         math.matrixClone = matrixClone;
         function matrix3x2Clone(src, out) {
-            out.rawData.set(src.rawData);
+            for (var i = 0; i < 6; i++) {
+                out.rawData[i] = src.rawData[i];
+            }
         }
         math.matrix3x2Clone = matrix3x2Clone;
         function matrixMakeIdentity(out) {
@@ -22356,6 +22358,16 @@ var gd3d;
             out.rawData[5] = temp_5;
         }
         math.matrix3x2Multiply = matrix3x2Multiply;
+        function matrix3x2Equal(mtx1, mtx2, threshold) {
+            if (threshold === void 0) { threshold = 0.00001; }
+            for (var i = 0; i < 6; i++) {
+                if (Math.abs(mtx1.rawData[i] - mtx2.rawData[i]) > threshold) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        math.matrix3x2Equal = matrix3x2Equal;
         function matrixProject_PerspectiveLH(fov, aspect, znear, zfar, out) {
             var tan = 1.0 / (Math.tan(fov * 0.5));
             out.rawData[0] = tan / aspect;
@@ -22580,6 +22592,16 @@ var gd3d;
             out.rawData[15] = left.rawData[15] + right.rawData[15];
         }
         math.matrixAdd = matrixAdd;
+        function matrixEqual(mtx1, mtx2, threshold) {
+            if (threshold === void 0) { threshold = 0.00001; }
+            for (var i = 0; i < 16; i++) {
+                if (Math.abs(mtx1.rawData[i] - mtx2.rawData[i]) > threshold) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        math.matrixEqual = matrixEqual;
     })(math = gd3d.math || (gd3d.math = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
