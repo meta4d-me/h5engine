@@ -16,6 +16,8 @@ class main implements gd3d.framework.IUserCode
 
         console.log("i am here.");
         this.app = app;
+        this.addBtn("paowuxian",()=>new dome.paowuxian());
+
         this.addBtn("rayTest",()=>new dome.rayTest());
         //this.addBtn("linPai",()=>new dome.font());
         //this.addBtn("newobjFromAni",()=>new dome.newObjFromAni());
