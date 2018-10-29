@@ -1,8 +1,8 @@
 ﻿/// <reference path="../../../io/reflect.ts" />
-let helpV2 = new gd3d.math.vector2();
 
 namespace gd3d.framework
 {
+    let helpV2 = new gd3d.math.vector2();
     /**
      * @public
      * @language zh_CN
@@ -226,7 +226,7 @@ namespace gd3d.framework
             this._pressedColor = null;
             if(this.pressedGraphic) this.pressedGraphic.unuse(true);
         }
-
+        
         private downPointV2 = new gd3d.math.vector2();
         private isMovedLimit = false; //point 移动范围是否超出限制值
         private readonly movedLimit = 0.02; //point 移动范围限制值
@@ -238,7 +238,9 @@ namespace gd3d.framework
             //oncap==true 是捕获阶段，一般的行为，只在pop阶段处理
             if (oncap == false)
             {
-                var b = this.transform.ContainsCanvasPoint(new math.vector2(ev.x, ev.y));
+                helpV2.x = ev.x;
+                helpV2.y = ev.y;
+                var b = this.transform.ContainsCanvasPoint(helpV2);
 
                 if (b)
                 {
@@ -263,8 +265,6 @@ namespace gd3d.framework
                             this.showPress();
                         }
                         if(!this.isMovedLimit){
-                            helpV2.x = ev.x;
-                            helpV2.y = ev.y;
                             this.isMovedLimit = gd3d.math.vec2Distance(helpV2,this.downPointV2) > this.movedLimit;
                         }
                     }
