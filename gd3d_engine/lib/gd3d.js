@@ -19365,7 +19365,6 @@ var gd3d;
                 }
             };
             inputMgr.prototype._touchstart = function (ev) {
-                this.CalcuPoint(ev.touches[0].clientX, ev.touches[0].clientY, this._point);
                 this._point.touch = true;
                 for (var i = 0; i < ev.changedTouches.length; i++) {
                     var touch = ev.changedTouches[i];
@@ -19373,9 +19372,14 @@ var gd3d;
                     this.tryAddTouchP(id);
                     this._touches[id].touch = true;
                     this.CalcuPoint(touch.clientX, touch.clientY, this._touches[id]);
+                    if (id == 0) {
+                        this._point.x = this._touches[id].x;
+                        this._point.y = this._touches[id].y;
+                    }
                 }
             };
             inputMgr.prototype._touchmove = function (ev) {
+                this._point.touch = true;
                 for (var i = 0; i < ev.changedTouches.length; i++) {
                     var touch = ev.changedTouches[i];
                     var id = touch.identifier;
@@ -19393,7 +19397,8 @@ var gd3d;
                         count++;
                     }
                 }
-                this.CalcuPoint(x / count, y / count, this._point);
+                this._point.x = x / count;
+                this._point.y = y / count;
             };
             inputMgr.prototype._touchend = function (ev) {
                 for (var i = 0; i < ev.changedTouches.length; i++) {
