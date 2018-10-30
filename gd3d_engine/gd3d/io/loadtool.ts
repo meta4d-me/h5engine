@@ -37,9 +37,9 @@
         {
             if (onprocess)  onprocess(ev.loaded, ev.total);
         }
-        req.onerror = () =>
+        req.onerror = (ev) =>
         {
-            fun(null, new Error("onerr in req:"));
+            fun(null, new Error(`URL : ${url} \n onerr on req: ` ));
         };
         req.onloadend = ()=>{
             //console.error(" is onload");
@@ -51,9 +51,11 @@
                 if(dic[url] >= 2){
                     dic[url] = 0;
                     fun(null,new Error("load this url fail  ：" + url),true);  //throw error after retry some times
+                    //console.error(`------ load this url fail URL:${url}  `);
                 }else{
                     gd3d.io.xhrLoad(url,fun,onprocess,responseType,loadedFun);
                     dic[url]++;
+                    //console.warn(` retryLoad URL:${url} \n times ${dic[url]} `);
                 }
             }
         };

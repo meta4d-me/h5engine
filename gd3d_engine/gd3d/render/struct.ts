@@ -93,8 +93,10 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class vector2
     {
+        static readonly ClassName:string="vector2";
+
         public rawData = new Float32Array(2);
-        constructor(x: float = 0, y: float = 0, w: float = 0, h: float = 0)
+        constructor(x: float = 0, y: float = 0)
         {
             this.rawData[0] = x;
             this.rawData[1] = y;
@@ -129,6 +131,8 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class rect
     {
+        static readonly ClassName:string="rect";
+
         public rawData = new Float32Array(4);
         constructor(x: float = 0, y: float = 0, w: float = 0, h: float = 0)
         {
@@ -187,6 +191,8 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class border
     {
+        static readonly ClassName:string="border";
+
         public rawData = new Float32Array(4);
         constructor(l: float = 0, t: float = 0, r: float = 0, b: float = 0)
         {
@@ -244,6 +250,8 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class color
     {
+        static readonly ClassName:string="color";
+
         public rawData = new Float32Array(4);
         constructor(r: float = 1, g: float = 1, b: float = 1, a: float = 1)
         {
@@ -300,6 +308,8 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class vector3
     {
+        static readonly ClassName:string="vector3";
+
         public rawData = new Float32Array(3);
         constructor(x: float = 0, y: float = 0, z: float = 0)
         {
@@ -347,6 +357,8 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class vector4
     {
+        static readonly ClassName:string="vector4";
+
         public rawData = new Float32Array(4);
         constructor(x: float = 0, y: float = 0, z: float = 0, w: float = 0)
         {
@@ -403,6 +415,8 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class quaternion
     {
+        static readonly ClassName:string="quaternion";
+
         public rawData = new Float32Array(4);
         constructor(x: float = 0, y: float = 0, z: float = 0, w: float = 1)
         {
@@ -458,6 +472,8 @@ namespace gd3d.math
      */
     export class matrix
     {
+        static readonly ClassName:string="matrix";
+
         public rawData: Float32Array;
         constructor(datas: Float32Array = null)
         {

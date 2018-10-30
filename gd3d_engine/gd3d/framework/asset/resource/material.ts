@@ -36,6 +36,8 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class material implements IAsset
     {
+        static readonly ClassName:string="material";
+
         @gd3d.reflect.Field("constText")
         private name: constText = null;
         private id: resID = new resID();

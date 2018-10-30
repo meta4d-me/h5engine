@@ -11,12 +11,13 @@ namespace gd3d.framework
     @gd3d.reflect.nodeComponent
     export class vignettingCtr implements  INodeComponent
     {
+        static readonly ClassName:string="vignettingCtr";
 
         private app:  application;
         private scene:  scene;
         private camera:  camera;
         private material: material;
-        private material_1:  material;
+        public material_1:  material;
         private material_2:  material;
         private material_3:  material;
         private readonly tag = "__vignettingtag__";
@@ -87,7 +88,7 @@ namespace gd3d.framework
             post0.material.setFloat("_Vignetting", 0.3);
             post0.material.setFloat("_Blurred_Corners", 3.0);
             post0.material.setFloat("_Chromatic_Aberration", 3.0);
-            post0.material.setVector4("_MainTex_TexelSize",new gd3d.math.vector4( 1/psize,1/psize,psize,psize));
+            // post0.material.setVector4("_MainTex_TexelSize",new gd3d.math.vector4( 1/psize,1/psize,psize,psize));
             this.camera.postQueues.push(post0);
 
 

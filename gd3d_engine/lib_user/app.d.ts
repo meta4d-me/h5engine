@@ -1373,6 +1373,67 @@ declare class Test_CameraController {
     private doMouseWheel(ev, isFirefox);
     remove(): void;
 }
+declare class physic2d_dome implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    taskmgr: gd3d.framework.taskMgr;
+    assetMgr: gd3d.framework.assetMgr;
+    rooto2d: gd3d.framework.overlay2D;
+    static temp: gd3d.framework.transform2D;
+    start(app: gd3d.framework.application): void;
+    private createUI(astState, state);
+    private crea2dWall(posx, posy, width, height, texture, root);
+    private creatbox(posx, posy, width, height, texture, root);
+    private loadTexture(lastState, state);
+    update(delta: number): void;
+}
+declare namespace dome {
+    class db_test_f14eff implements IState {
+        rotEuler: number;
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        camera: gd3d.framework.camera;
+        timer: number;
+        taskmgr: gd3d.framework.taskMgr;
+        label: HTMLLabelElement;
+        private loadShader(laststate, state);
+        rot: gd3d.math.quaternion;
+        start(app: gd3d.framework.application): void;
+        model: gd3d.framework.transform;
+        suitTrans: gd3d.framework.transform;
+        suitSkin: gd3d.framework.skinnedMeshRenderer;
+        private loadmesh(laststate, state);
+        private loadWeapon(laststate, state);
+        private beTrailParticle;
+        private f14eff;
+        private effPrefab;
+        effbaseprefab: gd3d.framework.prefab;
+        private loadEffectPrefab(laststate, state);
+        SkillName: string;
+        private loadSkill(laststate, state);
+        private addcontroll(laststate, state);
+        private beActive;
+        private addButton();
+        private boneIndex;
+        private testtrans;
+        private addButton2();
+        private addcam(laststate, state);
+        role: gd3d.framework.transform;
+        RoleName: string;
+        aniPlayer: gd3d.framework.aniplayer;
+        aniclips: gd3d.framework.animationClip[];
+        private loadRole(laststate, state);
+        tr: gd3d.framework.transform;
+        count: number;
+        beplay: boolean;
+        a: gd3d.math.vector3;
+        b: gd3d.math.vector3;
+        c: gd3d.math.vector3;
+        private enableMove;
+        update(delta: number): void;
+    }
+}
 declare class test_ChangeMaterial implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;

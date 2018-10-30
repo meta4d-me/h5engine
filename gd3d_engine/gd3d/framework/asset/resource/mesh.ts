@@ -10,6 +10,8 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class mesh implements IAsset
     {
+        static readonly ClassName:string="mesh";
+
         private name: constText;
         private id: resID = new resID();
         defaultAsset: boolean = false;
@@ -384,10 +386,10 @@ namespace gd3d.framework
                     let objVF = result.objVF;
                     let data = result.meshData;
                     data.originVF = objVF.vf;
-                    // this.data = data;
-                    this.data = new gd3d.render.meshData();
-                    for (let k in data)
-                        this.data[k] = data[k];
+                    // this.data = new gd3d.render.meshData();
+                    this.data = render.meshData.cloneByObj(data);
+                    // for (let k in data)
+                    //     this.data[k] = data[k];
                     this.submesh = result.subMesh;
 
                     this.glMesh = new gd3d.render.glMesh();
@@ -512,131 +514,132 @@ namespace gd3d.framework
         {
             let _result = new mesh(this.getName());
             var vf = this.glMesh.vertexFormat;//顶点属性
-            var data: gd3d.render.meshData = new gd3d.render.meshData();
+            // var data: gd3d.render.meshData = new gd3d.render.meshData();
+            var data: gd3d.render.meshData = render.meshData.cloneByObj(this.data);
 
-            if (this.data.pos != undefined)
-            {
-                data.pos = [];
-                // for (let i = 0,len = this.data.pos.length; i < len; ++i)
-                for (let item of this.data.pos)
-                {
-                    var _position = new gd3d.math.vector3();
-                    _position.rawData.set(item.rawData);
-                    // _position.x = this.data.pos[i].x;
-                    // _position.y = this.data.pos[i].y;
-                    // _position.z = this.data.pos[i].z;
-                    data.pos.push(_position);
-                }
-            }
-            if (this.data.color != undefined)
-            {
-                data.color = [];
-                // for (let i = 0, len = this.data.color.length; i < len; i++)
-                for (let item of this.data.color)
-                {
-                    let _color = new gd3d.math.color();
-                    // _color.a = this.data.color[i].a;
-                    // _color.r = this.data.color[i].r;
-                    // _color.g = this.data.color[i].g;
-                    // _color.b = this.data.color[i].b;
-                    _color.rawData.set(item.rawData);
-                    data.color.push(_color);
-                }
-            }
-            if (this.data.normal != undefined)
-            {
-                data.normal = [];
-                // for (let i = 0; i < this.data.normal.length; i++)
-                for (let item of this.data.normal)
-                {
-                    var _normal = new gd3d.math.vector3();
-                    _normal.rawData.set(item.rawData);
-                    // _normal.x = this.data.normal[i].x;
-                    // _normal.y = this.data.normal[i].y;
-                    // _normal.z = this.data.normal[i].z;
-                    data.normal.push(_normal);
-                }
-            }
-            if (this.data.uv != undefined)
-            {
-                data.uv = [];
-                // for (var i = 0; i < this.data.uv.length; i++)
-                for (let item of this.data.uv)
-                {
-                    var uv = new gd3d.math.vector2();
-                    uv.rawData.set(item.rawData);
-                    // uv.x = this.data.uv[i].x;
-                    // uv.y = this.data.uv[i].y;
-                    data.uv.push(uv);
-                }
-            }
-            if (this.data.uv2 != undefined)
-            {
-                data.uv2 = [];
-                // for (var i = 0; i < this.data.uv2.length; i++)
-                for (let item of this.data.uv2)
-                {
-                    var uv = new gd3d.math.vector2();
-                    // uv.x = this.data.uv2[i].x;
-                    // uv.y = this.data.uv2[i].y;
-                    uv.rawData.set(uv.rawData);
-                    data.uv2.push(uv);
-                }
-            }
-            if (this.data.tangent != undefined)
-            {
-                data.tangent = [];
-                // for (var i = 0; i < this.data.tangent.length; i++)
-                for (let item of this.data.tangent)
-                {
-                    var tangent = new gd3d.math.vector3();
-                    // tangent.x = this.data.tangent[i].x;
-                    // tangent.y = this.data.tangent[i].y;
-                    // tangent.z = this.data.tangent[i].z;
-                    tangent.rawData.set(item.rawData);
-                    data.tangent.push(tangent);
-                }
-            }
-            if (this.data.blendIndex != undefined)
-            {
-                data.blendIndex = [];
-                for (let i = 0, len = this.data.blendIndex.length; i < len; ++i)
-                {
-                    let item = this.data.blendIndex[i];
-                    let _boneIndex = new render.number4();
-                    _boneIndex.v0 = item.v0;
-                    _boneIndex.v1 = item.v1;
-                    _boneIndex.v2 = item.v2;
-                    _boneIndex.v3 = item.v3;
-                    data.blendIndex.push(_boneIndex);
-                }
-            }
-            if (this.data.blendWeight != undefined)
-            {
-                data.blendWeight = [];
-                for (let i = 0, len = this.data.blendWeight.length; i < len; ++i)
-                {
-                    let item = this.data.blendWeight[i];
-                    let _boneWeight = new render.number4();
-                    _boneWeight.v0 = item.v0;
-                    _boneWeight.v1 = item.v1;
-                    _boneWeight.v2 = item.v2;
-                    _boneWeight.v3 = item.v3;
-                    data.blendWeight.push(_boneWeight);
-                }
-            }
+            // if (this.data.pos != undefined)
+            // {
+            //     data.pos = [];
+            //     // for (let i = 0,len = this.data.pos.length; i < len; ++i)
+            //     for (let item of this.data.pos)
+            //     {
+            //         var _position = new gd3d.math.vector3();
+            //         _position.rawData.set(item.rawData);
+            //         // _position.x = this.data.pos[i].x;
+            //         // _position.y = this.data.pos[i].y;
+            //         // _position.z = this.data.pos[i].z;
+            //         data.pos.push(_position);
+            //     }
+            // }
+            // if (this.data.color != undefined)
+            // {
+            //     data.color = [];
+            //     // for (let i = 0, len = this.data.color.length; i < len; i++)
+            //     for (let item of this.data.color)
+            //     {
+            //         let _color = new gd3d.math.color();
+            //         // _color.a = this.data.color[i].a;
+            //         // _color.r = this.data.color[i].r;
+            //         // _color.g = this.data.color[i].g;
+            //         // _color.b = this.data.color[i].b;
+            //         _color.rawData.set(item.rawData);
+            //         data.color.push(_color);
+            //     }
+            // }
+            // if (this.data.normal != undefined)
+            // {
+            //     data.normal = [];
+            //     // for (let i = 0; i < this.data.normal.length; i++)
+            //     for (let item of this.data.normal)
+            //     {
+            //         var _normal = new gd3d.math.vector3();
+            //         _normal.rawData.set(item.rawData);
+            //         // _normal.x = this.data.normal[i].x;
+            //         // _normal.y = this.data.normal[i].y;
+            //         // _normal.z = this.data.normal[i].z;
+            //         data.normal.push(_normal);
+            //     }
+            // }
+            // if (this.data.uv != undefined)
+            // {
+            //     data.uv = [];
+            //     // for (var i = 0; i < this.data.uv.length; i++)
+            //     for (let item of this.data.uv)
+            //     {
+            //         var uv = new gd3d.math.vector2();
+            //         uv.rawData.set(item.rawData);
+            //         // uv.x = this.data.uv[i].x;
+            //         // uv.y = this.data.uv[i].y;
+            //         data.uv.push(uv);
+            //     }
+            // }
+            // if (this.data.uv2 != undefined)
+            // {
+            //     data.uv2 = [];
+            //     // for (var i = 0; i < this.data.uv2.length; i++)
+            //     for (let item of this.data.uv2)
+            //     {
+            //         var uv = new gd3d.math.vector2();
+            //         // uv.x = this.data.uv2[i].x;
+            //         // uv.y = this.data.uv2[i].y;
+            //         uv.rawData.set(uv.rawData);
+            //         data.uv2.push(uv);
+            //     }
+            // }
+            // if (this.data.tangent != undefined)
+            // {
+            //     data.tangent = [];
+            //     // for (var i = 0; i < this.data.tangent.length; i++)
+            //     for (let item of this.data.tangent)
+            //     {
+            //         var tangent = new gd3d.math.vector3();
+            //         // tangent.x = this.data.tangent[i].x;
+            //         // tangent.y = this.data.tangent[i].y;
+            //         // tangent.z = this.data.tangent[i].z;
+            //         tangent.rawData.set(item.rawData);
+            //         data.tangent.push(tangent);
+            //     }
+            // }
+            // if (this.data.blendIndex != undefined)
+            // {
+            //     data.blendIndex = [];
+            //     for (let i = 0, len = this.data.blendIndex.length; i < len; ++i)
+            //     {
+            //         let item = this.data.blendIndex[i];
+            //         let _boneIndex = new render.number4();
+            //         _boneIndex.v0 = item.v0;
+            //         _boneIndex.v1 = item.v1;
+            //         _boneIndex.v2 = item.v2;
+            //         _boneIndex.v3 = item.v3;
+            //         data.blendIndex.push(_boneIndex);
+            //     }
+            // }
+            // if (this.data.blendWeight != undefined)
+            // {
+            //     data.blendWeight = [];
+            //     for (let i = 0, len = this.data.blendWeight.length; i < len; ++i)
+            //     {
+            //         let item = this.data.blendWeight[i];
+            //         let _boneWeight = new render.number4();
+            //         _boneWeight.v0 = item.v0;
+            //         _boneWeight.v1 = item.v1;
+            //         _boneWeight.v2 = item.v2;
+            //         _boneWeight.v3 = item.v3;
+            //         data.blendWeight.push(_boneWeight);
+            //     }
+            // }
 
-            _result.submesh = [];
-            for (var i = 0; i < this.submesh.length; i++)
-            {
-                var _submeshinfo: subMeshInfo = new subMeshInfo();
+            // _result.submesh = [];
+            // for (var i = 0; i < this.submesh.length; i++)
+            // {
+            //     var _submeshinfo: subMeshInfo = new subMeshInfo();
 
-                _submeshinfo.start = this.submesh[i].start;
-                _submeshinfo.size = this.submesh[i].size;
-                _submeshinfo.matIndex = i;
-                _result.submesh.push(_submeshinfo);
-            }
-            data.trisindex = this.data.trisindex.slice();
+            //     _submeshinfo.start = this.submesh[i].start;
+            //     _submeshinfo.size = this.submesh[i].size;
+            //     _submeshinfo.matIndex = i;
+            //     _result.submesh.push(_submeshinfo);
+            // }
+            // data.trisindex = this.data.trisindex.slice();
 
             _result.data = data;
             _result.glMesh = new gd3d.render.glMesh();

@@ -13,6 +13,8 @@ namespace gd3d.framework
     @reflect.nodeRender
     export class inputField implements IRectRenderer
     {
+        static readonly ClassName:string="inputField";
+
         /**
          * @public
          * @language zh_CN

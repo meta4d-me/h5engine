@@ -12,6 +12,8 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class meshFilter implements INodeComponent
     {
+        static readonly ClassName:string="meshFilter";
+
         /**
          * @public
          * @language zh_CN

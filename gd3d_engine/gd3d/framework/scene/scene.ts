@@ -687,5 +687,10 @@ namespace gd3d.framework
             }
             return ishited;
         }
+
+        enable2DPhysics(op:IEngine2DOP=null)
+        {
+            physic2D=new physicEngine2D(op);
+        }
     }
 }

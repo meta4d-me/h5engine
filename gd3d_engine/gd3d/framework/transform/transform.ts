@@ -20,18 +20,37 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class transform 
     {
+        static readonly ClassName:string="transform";
+        
         private helpLRotate:math.quaternion = new math.quaternion();
         private helpLPos:math.vector3 = new math.vector3();
         private helpLScale:math.vector3 = new math.vector3(1,1,1);
 
         private checkLRTSChange():boolean{
-            if(!math.vec3Equal(this.helpLPos,this._localTranslate,Number.MIN_VALUE))
+            // if(!math.vec3Equal(this.helpLPos,this._localTranslate,Number.MIN_VALUE))
+            //     return true;
+            // if(!math.quatEqual(this.helpLRotate,this._localRotate,Number.MIN_VALUE))
+            //     return true;
+            // if(!math.vec3Equal(this.helpLScale,this._localScale,Number.MIN_VALUE))
+            //     return true;
+
+            if(!this.fastEqual(this.helpLPos.rawData,this._localTranslate.rawData))
                 return true;
-            if(!math.quatEqual(this.helpLRotate,this._localRotate,Number.MIN_VALUE))
+            if(!this.fastEqual(this.helpLRotate.rawData,this._localRotate.rawData))
                 return true;
-            if(!math.vec3Equal(this.helpLScale,this._localScale,Number.MIN_VALUE))
+            if(!this.fastEqual(this.helpLScale.rawData,this._localScale.rawData))
                 return true;
             return false;
+        }
+
+        private fastEqual(d_0,d_1):boolean{
+            if(d_0[0] != d_1[0])    return false;
+            if(d_0[1] != d_1[1])    return false;
+            if(d_0[2] != d_1[2])    return false;
+
+            if(d_0.length == 4 && d_0[3] != d_1[3])
+                return false;
+            return true;
         }
 
         private _scene: scene;

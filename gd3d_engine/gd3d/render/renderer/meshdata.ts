@@ -877,6 +877,102 @@
             }
             return new Uint16Array(line);
         }
+
+        static cloneByObj(target:meshData):meshData{
+            let md = new meshData();
+            target.originVF = md.originVF;
+            if(target.pos){
+                md.pos = [];
+                target.pos.forEach((element,idx) => {
+                    md.pos[idx] = new math.vector3();
+                    md.pos[idx].x = element.x;
+                    md.pos[idx].y = element.y;
+                    md.pos[idx].z = element.z;
+                });
+            }
+            if(target.color){
+                md.color = [];
+                target.color.forEach((element,idx) => {
+                    md.color[idx] = new math.color();
+                    md.color[idx].r = element.r;
+                    md.color[idx].g = element.g;
+                    md.color[idx].b = element.b;
+                    md.color[idx].a = element.a;
+                });
+            }
+            if(target.colorex){
+                md.colorex = [];
+                target.colorex.forEach((element,idx) => {
+                    md.colorex[idx] = new math.color();
+                    md.colorex[idx].r = element.r;
+                    md.colorex[idx].g = element.g;
+                    md.colorex[idx].b = element.b;
+                    md.colorex[idx].a = element.a;
+                });
+            }
+            if(target.uv){
+                md.uv = [];
+                target.uv.forEach((element,idx) => {
+                    md.uv[idx] = new math.vector2();
+                    md.uv[idx].x = element.x;
+                    md.uv[idx].y = element.y;
+                });
+            }
+            if(target.uv2){
+                md.uv2 = [];
+                target.uv2.forEach((element,idx) => {
+                    md.uv2[idx] = new math.vector2();
+                    md.uv2[idx].x = element.x;
+                    md.uv2[idx].y = element.y;
+                });
+            }
+            if(target.normal){
+                md.normal = [];
+                target.normal.forEach((element,idx) => {
+                    md.normal[idx] = new math.vector3();
+                    md.normal[idx].x = element.x;
+                    md.normal[idx].y = element.y;
+                    md.normal[idx].z = element.z;
+                });
+            }
+            if(target.tangent){
+                md.tangent = [];
+                target.tangent.forEach((element,idx) => {
+                    md.tangent[idx] = new math.vector3();
+                    md.tangent[idx].x = element.x;
+                    md.tangent[idx].y = element.y;
+                    md.tangent[idx].z = element.z;
+                });
+            }
+            if(target.blendIndex){
+                md.blendIndex = [];
+                target.blendIndex.forEach((element,idx) => {
+                    md.blendIndex[idx] = new render.number4();
+                    md.blendIndex[idx].v0 = element.v0;
+                    md.blendIndex[idx].v1 = element.v1;
+                    md.blendIndex[idx].v2 = element.v2;
+                    md.blendIndex[idx].v3 = element.v3;
+                });
+            }
+            if(target.blendWeight){
+                md.blendWeight = [];
+                target.blendWeight.forEach((element,idx) => {
+                    md.blendWeight[idx] = new render.number4();
+                    md.blendWeight[idx].v0 = element.v0;
+                    md.blendWeight[idx].v1 = element.v1;
+                    md.blendWeight[idx].v2 = element.v2;
+                    md.blendWeight[idx].v3 = element.v3;
+                });
+            }
+            if(target.trisindex){
+                md.trisindex = [];
+                target.trisindex.forEach(element=>{
+                    md.trisindex.push(element);
+                });
+            }
+
+            return md; 
+        }
     }
 
 }

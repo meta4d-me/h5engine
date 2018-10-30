@@ -74,10 +74,11 @@ namespace gd3d.framework
         {
             state.totalByteLength = this.totalLength;
             // console.log(`ab loadCompressBundle ${url}`);
-            gd3d.io.loadText(url, (txt, err) =>
+            gd3d.io.loadText(url, (txt, err,isloadFail) =>
             {
                 if (err != null)
                 {
+                    state.isloadFail = isloadFail ? true : false;
                     state.iserror = true;
                     state.errs.push(new Error(err.message));
                     onstate(state);
@@ -357,11 +358,12 @@ namespace gd3d.framework
                     if (type == AssetTypeEnum.PackBin)
                     {
                         haveBin = true;
-                        gd3d.io.loadArrayBuffer(surl, (_buffer, err) =>
+                        gd3d.io.loadArrayBuffer(surl, (_buffer, err,isloadFail) =>
                         {
 
                             if (err != null)
                             {
+                                state.isloadFail = isloadFail ? true : false;
                                 state.iserror = true;
                                 state.errs.push(new Error(err.message));
                                 onstate(state);
@@ -407,7 +409,7 @@ namespace gd3d.framework
                         {
                             if (s.iserror)
                             {
-                                state.isfinish = true;
+                                state.iserror = true;
                                 onstate(state);
                                 return;
                             }

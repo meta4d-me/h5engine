@@ -11,6 +11,8 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class trailRender implements IRenderer
     {
+        static readonly ClassName:string="trailRender";
+
         /**
          * @public
          * @language zh_CN

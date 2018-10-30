@@ -20,6 +20,8 @@ namespace gd3d.framework
     @reflect.nodeBoxCollider
     export class boxcollider implements INodeComponent, ICollider
     {
+        static readonly ClassName:string="boxcollider";
+
         /**
          * @public
          * @language zh_CN

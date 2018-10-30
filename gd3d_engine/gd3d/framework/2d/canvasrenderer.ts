@@ -151,6 +151,8 @@ namespace gd3d.framework
     @reflect.nodeCanvasRendererCollider
     export class canvasRenderer implements IRenderer, ICollider
     {
+        static readonly ClassName:string="canvasRenderer";
+
         /**
          * @private
          */

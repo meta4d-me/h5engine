@@ -754,6 +754,8 @@ namespace gd3d.framework
     @reflect.SerializeType
     export class tPoseInfo
     {
+        static readonly ClassName:string="tPoseInfo";
+
         @reflect.Field("string")
         name: string;
         @reflect.Field("vector3")

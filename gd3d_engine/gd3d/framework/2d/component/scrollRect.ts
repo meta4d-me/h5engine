@@ -1,7 +1,8 @@
 /// <reference path="../../../io/reflect.ts" />
-
 namespace gd3d.framework
 {
+    let helpV2 = new gd3d.math.vector2();
+    let helpV2_1 = new gd3d.math.vector2();
      /**
      * @public
      * @language zh_CN
@@ -12,6 +13,7 @@ namespace gd3d.framework
     @reflect.node2DComponent
     export class scrollRect implements I2DComponent
     {
+        static readonly ClassName:string="scrollRect";
         
         private _content : transform2D;
         /**
@@ -65,7 +67,9 @@ namespace gd3d.framework
             //oncap==true 是捕获阶段，一般的行为，只在pop阶段处理
             if (oncap == false)
             {
-                var b = this.transform.ContainsCanvasPoint(new math.vector2(ev.x, ev.y));
+                helpV2.x = ev.x;
+                helpV2.y = ev.y;
+                var b = this.transform.ContainsCanvasPoint(helpV2);
                 
                 if (b)
                 {
@@ -73,9 +77,8 @@ namespace gd3d.framework
                     if(this._content == null)return;
                     if(!this.horizontal && !this.vertical) return;
 
-                    let temps = math.pool.new_vector2();
-                    temps.x = ev.x; temps.y = ev.y;
-                    let tempc = math.pool.new_vector2();
+                    let temps = helpV2;
+                    let tempc = helpV2_1;
                     this.transform.canvas.ModelPosToCanvasPos(temps,tempc);
 
                     if(this.strPoint == null) this.strPoint = new math.vector2();
@@ -98,10 +101,6 @@ namespace gd3d.framework
                             
                         }
                     }
-                    
-                    
-                    math.pool.delete_vector2(temps);
-                    math.pool.delete_vector2(tempc);
                 }
             }
                 if(ev.type == event.PointEventEnum.PointUp ) {

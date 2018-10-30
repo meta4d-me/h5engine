@@ -2,6 +2,32 @@ namespace gd3d.framework
 {
     export class defShader
     {
+
+        // static vscode_test: string = "\
+        // attribute vec4 _glesVertex;   \
+        // attribute vec4 _glesColor;                  \
+        // attribute vec4 _glesMultiTexCoord0;         \
+        // uniform highp mat4 glstate_matrix_mvp;      \
+        // varying lowp vec4 xlv_COLOR;                \
+        // varying highp vec2 xlv_TEXCOORD0;           \
+        // void main()                                     \
+        // {                                               \
+        //     highp vec4 tmpvar_1;                        \
+        //     tmpvar_1.w = 1.0;                           \
+        //     tmpvar_1.xyz = _glesVertex.xyz;             \
+        //     xlv_COLOR = _glesColor;                     \
+        //     xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
+        //     gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
+        // }";
+
+        // static fscode_test: string = "         \
+        // varying lowp vec4 xlv_COLOR;                                                 \
+        // varying highp vec2 xlv_TEXCOORD0;   \
+        // void main() \
+        // {\
+        //     gl_FragData[0] = xlv_COLOR;\
+        // }\
+        // ";
         static shader0: string = "{\
             \"properties\": [\
               \"_MainTex('MainTex',Texture)='white'{}\"\
@@ -330,6 +356,10 @@ namespace gd3d.framework
         {
             var pool = assetmgr.shaderPool;
             //鍙戠幇鏄簳灞備竴涓紩鐢ㄤ贡浜嗭紝鍘熺粨鏋勬病闂
+
+            // pool.compileVS(assetmgr.webgl, "test", defShader.vscode_test);
+            // pool.compileFS(assetmgr.webgl, "test", defShader.fscode_test);
+
             pool.compileVS(assetmgr.webgl, "def", defShader.vscode);
             pool.compileFS(assetmgr.webgl, "def", defShader.fscode);
 
@@ -353,6 +383,8 @@ namespace gd3d.framework
             pool.compileVS(assetmgr.webgl, "defuifontMaskVS", defShader.vscodeuifontmask);
             pool.compileFS(assetmgr.webgl, "defuifontMaskFS", defShader.fscodeuifontmask);
 
+            // var program_test = pool.linkProgram(assetmgr.webgl, "test", "test");
+
             var program = pool.linkProgram(assetmgr.webgl, "def", "def");
             var program2 = pool.linkProgram(assetmgr.webgl, "def", "defui");
             var programuifont = pool.linkProgram(assetmgr.webgl, "defuifont", "defuifont");
@@ -361,6 +393,24 @@ namespace gd3d.framework
             var programmaterialcolor = pool.linkProgram(assetmgr.webgl, "materialcolor", "line");
             var programMaskUI = pool.linkProgram(assetmgr.webgl,"defUIMaskVS","defUIMaskFS");
             var programMaskfont = pool.linkProgram(assetmgr.webgl,"defuifontMaskVS","defuifontMaskFS");
+            // {
+            //     var sh = new shader("shader/test");
+            //     sh.defaultAsset = true;
+            //     sh.passes["base"] = [];
+            //     var p = new render.glDrawPass();
+            //     p.setProgram(program_test);
+            //     sh.passes["base"].push(p);
+            //     sh.fillUnDefUniform(p);
+            //     //sh._parseProperties(assetmgr,JSON.parse(this.shader0).properties);
+            //     p.state_ztest = true;
+            //     p.state_ztest_method = render.webglkit.LEQUAL;
+            //     p.state_zwrite = false;
+            //     p.state_showface = render.ShowFaceStateEnum.ALL;
+            //     p.setAlphaBlend(render.BlendModeEnum.Close);
+            //     //p.uniformTexture("_MainTex", null);
+            //     assetmgr.mapShader[sh.getName()] = sh;
+            // }
+
             {
                 var sh = new shader("shader/def");
                 sh.defaultAsset = true;

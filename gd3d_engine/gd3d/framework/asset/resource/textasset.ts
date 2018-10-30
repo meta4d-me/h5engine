@@ -12,6 +12,8 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class textasset implements IAsset
     {
+        static readonly ClassName:string="textasset";
+
         @gd3d.reflect.Field("constText")
         private name: constText;
         private id: resID = new resID();

@@ -3,6 +3,8 @@
 namespace gd3d.framework {
     @reflect.nodeComponent
     export class keyFrameAniPlayer implements INodeComponent {
+        static readonly ClassName:string="keyFrameAniPlayer";
+
         /**
          * @public
          * @language zh_CN

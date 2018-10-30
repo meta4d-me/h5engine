@@ -11,6 +11,8 @@
     @reflect.nodeMeshCollider
     export class meshcollider implements INodeComponent, ICollider
     {
+        static readonly ClassName:string="meshcollider";
+
          /**
          * @public
          * @language zh_CN

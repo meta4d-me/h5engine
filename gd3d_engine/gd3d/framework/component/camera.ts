@@ -1,4 +1,6 @@
 /// <reference path="../../io/reflect.ts" />
+let helpv3 = new gd3d.math.vector3();
+let helpv3_1 = new gd3d.math.vector3();
 
 namespace gd3d.framework
 {
@@ -27,11 +29,11 @@ namespace gd3d.framework
             context.webgl.depthMask(true);//zwrite 會影響clear depth，這個查了好一陣
             gd3d.render.glDrawPass.lastZWrite = true;
 
-            camera._renderOnce(scene, context, "_depth");
 
             context.webgl.clearColor(0, 0, 0, 0);
             context.webgl.clearDepth(1.0);
             context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
+            camera._renderOnce(scene, context, "_depth");
 
             render.glRenderTarget.useNull(context.webgl);
         }
@@ -51,8 +53,6 @@ namespace gd3d.framework
         render(scene: scene, context: renderContext, camera: camera)
         {
 
-
-
             camera._targetAndViewport(this.renderTarget, scene, context, true);
 
             context.webgl.depthMask(true);//zwrite 會影響clear depth，這個查了好一陣
@@ -65,6 +65,8 @@ namespace gd3d.framework
             context.drawtype = "";
             mesh.glMesh.bindVboBuffer(context.webgl);
             this.material.draw(context, mesh, mesh.submesh[0], "quad");
+
+            render.glRenderTarget.useNull(context.webgl);
 
         }
         renderTarget: render.glRenderTarget;
@@ -108,6 +110,8 @@ namespace gd3d.framework
     @reflect.nodeCamera
     export class camera implements INodeComponent
     {
+        static readonly ClassName:string="camera";
+
         /**
          * @public
          * @language zh_CN
@@ -666,7 +670,7 @@ namespace gd3d.framework
                 {
                     w = scene.app.width;
                     h = scene.app.height;
-                    render.glRenderTarget.useNull(context.webgl);
+                    // render.glRenderTarget.useNull(context.webgl);
                 }
                 else
                 {
@@ -791,20 +795,12 @@ namespace gd3d.framework
                                 // this.calcViewMatrix(matrixView);
                                 let matrixView = context.matrixView;
 
-                                let az = math.pool.new_vector3();
-                                let bz = math.pool.new_vector3();
-
-                                if(a.gameObject.transform.name == "pasted__default001"){
-                                    a.gameObject.transform.getWorldTranslate();
-                                }
-
+                                let az = helpv3;
+                                let bz = helpv3_1;
 
                                 gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                 gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
-                                let result = bz.z - az.z;
-                                math.pool.delete_vector3(az);
-                                math.pool.delete_vector3(bz);
-                                return result;
+                                return bz.z - az.z;
                             }
                         })
                     }
@@ -817,7 +813,7 @@ namespace gd3d.framework
                     this._targetAndViewport(this.renderTarget, scene, context, false);
                     this._renderOnce(scene, context, "");
                 // });
-                
+
                 //context.webgl.flush();
             }
             else

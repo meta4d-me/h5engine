@@ -10,6 +10,8 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class rawscene implements IAsset
     {
+        static readonly ClassName:string="rawscene";
+
         private name: constText;
         private id: resID = new resID();
         /**

@@ -908,7 +908,8 @@ var gd3d;
     gd3d.gd3d_reflect_root = {};
     var reflect;
     (function (reflect) {
-        function regType(target, customInfo) {
+        function regType(constructorObj, customInfo) {
+            var target = constructorObj.prototype;
             if (target["__gdmeta__"] == undefined)
                 target["__gdmeta__"] = {};
             if (target["__gdmeta__"]["class"] == undefined)
@@ -919,6 +920,8 @@ var gd3d;
                 var i = fs.indexOf("(");
                 name = fs.substring(9, i);
             }
+            var classname = constructorObj["ClassName"];
+            name = classname ? classname : name;
             target["__gdmeta__"]["class"]["typename"] = name;
             if (gd3d.gd3d_reflect_root["__gdmeta__"] == null)
                 gd3d.gd3d_reflect_root["__gdmeta__"] = {};
@@ -1008,7 +1011,7 @@ var gd3d;
         }
         reflect.getMeta = getMeta;
         function attr_Class(constructorObj) {
-            regType(constructorObj.prototype, null);
+            regType(constructorObj, null);
         }
         reflect.attr_Class = attr_Class;
         function attr_Func(customInfo) {
@@ -1026,75 +1029,75 @@ var gd3d;
         }
         reflect.attr_Field = attr_Field;
         function userCode(constructorObj) {
-            regType(constructorObj.prototype, { "usercode": "1" });
+            regType(constructorObj, { "usercode": "1" });
         }
         reflect.userCode = userCode;
         function editorCode(constructorObj) {
-            regType(constructorObj.prototype, { "editorcode": "1" });
+            regType(constructorObj, { "editorcode": "1" });
         }
         reflect.editorCode = editorCode;
         function selfClone(constructorObj) {
-            regType(constructorObj.prototype, { "selfclone": "1" });
+            regType(constructorObj, { "selfclone": "1" });
         }
         reflect.selfClone = selfClone;
         function nodeComponent(constructorObj) {
-            regType(constructorObj.prototype, { "nodecomp": "1" });
+            regType(constructorObj, { "nodecomp": "1" });
         }
         reflect.nodeComponent = nodeComponent;
         function nodeComponentInspector(constructorObj) {
-            regType(constructorObj.prototype, { "nodecomp_inspector": "1" });
+            regType(constructorObj, { "nodecomp_inspector": "1" });
         }
         reflect.nodeComponentInspector = nodeComponentInspector;
         function nodeRender(constructorObj) {
-            regType(constructorObj.prototype, { "renderer": "1" });
+            regType(constructorObj, { "renderer": "1" });
         }
         reflect.nodeRender = nodeRender;
         function nodeCamera(constructorObj) {
-            regType(constructorObj.prototype, { "camera": "1" });
+            regType(constructorObj, { "camera": "1" });
         }
         reflect.nodeCamera = nodeCamera;
         function nodeLight(constructorObj) {
-            regType(constructorObj.prototype, { "light": "1" });
+            regType(constructorObj, { "light": "1" });
         }
         reflect.nodeLight = nodeLight;
         function nodeBoxCollider(constructorObj) {
-            regType(constructorObj.prototype, { "boxcollider": "1" });
+            regType(constructorObj, { "boxcollider": "1" });
         }
         reflect.nodeBoxCollider = nodeBoxCollider;
         function nodeBoxCollider2d(constructorObj) {
-            regType(constructorObj.prototype, { "boxcollider2d": "1" });
+            regType(constructorObj, { "boxcollider2d": "1" });
         }
         reflect.nodeBoxCollider2d = nodeBoxCollider2d;
         function nodeSphereCollider(constructorObj) {
-            regType(constructorObj.prototype, { "spherecollider": "1" });
+            regType(constructorObj, { "spherecollider": "1" });
         }
         reflect.nodeSphereCollider = nodeSphereCollider;
         function nodeEffectBatcher(constructorObj) {
-            regType(constructorObj.prototype, { "effectbatcher": "1" });
+            regType(constructorObj, { "effectbatcher": "1" });
         }
         reflect.nodeEffectBatcher = nodeEffectBatcher;
         function nodeMeshCollider(constructorObj) {
-            regType(constructorObj.prototype, { "meshcollider": "1" });
+            regType(constructorObj, { "meshcollider": "1" });
         }
         reflect.nodeMeshCollider = nodeMeshCollider;
         function nodeCanvasRendererCollider(constructorObj) {
-            regType(constructorObj.prototype, { "canvasRenderer": "1" });
+            regType(constructorObj, { "canvasRenderer": "1" });
         }
         reflect.nodeCanvasRendererCollider = nodeCanvasRendererCollider;
         function node2DComponent(constructorObj) {
-            regType(constructorObj.prototype, { "2dcomp": "1" });
+            regType(constructorObj, { "2dcomp": "1" });
         }
         reflect.node2DComponent = node2DComponent;
         function pluginMenuItem(constructorObj) {
-            regType(constructorObj.prototype, { "plugin_menuitem": "1" });
+            regType(constructorObj, { "plugin_menuitem": "1" });
         }
         reflect.pluginMenuItem = pluginMenuItem;
         function pluginWindow(constructorObj) {
-            regType(constructorObj.prototype, { "plugin_window": "1" });
+            regType(constructorObj, { "plugin_window": "1" });
         }
         reflect.pluginWindow = pluginWindow;
         function pluginExt(constructorObj) {
-            regType(constructorObj.prototype, { "plugin_ext": "1" });
+            regType(constructorObj, { "plugin_ext": "1" });
         }
         reflect.pluginExt = pluginExt;
         function compValue(integer, defvalue, min, max) {
@@ -1122,7 +1125,7 @@ var gd3d;
         }
         reflect.compCall = compCall;
         function SerializeType(constructorObj) {
-            regType(constructorObj.prototype, { "SerializeType": "1" });
+            regType(constructorObj, { "SerializeType": "1" });
         }
         reflect.SerializeType = SerializeType;
         function Field(valueType, defaultValue, referenceType) {
@@ -1347,6 +1350,7 @@ var gd3d;
                 outP.x = scalx * this.pixelWidth;
                 outP.y = scaly * this.pixelHeight;
             };
+            canvas.ClassName = "canvas";
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
@@ -1609,6 +1613,7 @@ var gd3d;
             };
             canvasRenderer.prototype.clone = function () {
             };
+            canvasRenderer.ClassName = "canvasRenderer";
             __decorate([
                 gd3d.reflect.Field("canvas"),
                 __metadata("design:type", framework.canvas)
@@ -1655,6 +1660,8 @@ var gd3d;
                 this.scaleMode = UIScaleMode.CONSTANT_PIXEL_SIZE;
                 this.sortOrder = 0;
                 this.viewPixelrect = new gd3d.math.rect();
+                this.helpv2 = new gd3d.math.vector2();
+                this.helpv2_1 = new gd3d.math.vector2();
                 this.canvas = new framework.canvas();
                 framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
             }
@@ -1684,20 +1691,19 @@ var gd3d;
             overlay2D.prototype.render = function (context, assetmgr, camera) {
                 if (!this.canvas.getRoot().visible || !this.camera)
                     return;
-                var vp = new gd3d.math.rect();
-                this.camera.calcViewPortPixel(assetmgr.app, vp);
+                this.camera.calcViewPortPixel(assetmgr.app, this.viewPixelrect);
                 switch (this.scaleMode) {
                     case UIScaleMode.CONSTANT_PIXEL_SIZE:
-                        if (this.canvas.pixelWidth == vp.w && this.canvas.pixelHeight == vp.h)
+                        if (this.canvas.pixelWidth == this.viewPixelrect.w && this.canvas.pixelHeight == this.viewPixelrect.h)
                             break;
-                        this.canvas.pixelWidth = vp.w;
-                        this.canvas.pixelHeight = vp.h;
+                        this.canvas.pixelWidth = this.viewPixelrect.w;
+                        this.canvas.pixelHeight = this.viewPixelrect.h;
                         this.canvas.getRoot().markDirty();
                         break;
                     case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
                         var match = this.screenMatchRate < 0 ? 0 : this.screenMatchRate;
                         match = match > 1 ? 1 : match;
-                        var asp = vp.w / vp.h;
+                        var asp = this.viewPixelrect.w / this.viewPixelrect.h;
                         var w = gd3d.math.numberLerp(this.matchReference_width, this.matchReference_height * asp, match);
                         var h = gd3d.math.numberLerp(this.matchReference_height, this.matchReference_width / asp, 1 - match);
                         if (this.canvas.pixelWidth != w || this.canvas.pixelHeight != h) {
@@ -1711,28 +1717,24 @@ var gd3d;
                 this.canvas.render(context, assetmgr);
             };
             overlay2D.prototype.update = function (delta) {
-                this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
-                var rect = this.camera.viewport;
-                var real_x = this.inputmgr.point.x - rect.x * this.app.width;
-                var real_y = this.inputmgr.point.y - rect.y * this.app.height;
-                var sx = (real_x / this.viewPixelrect.w) * 2 - 1;
-                var sy = (real_y / this.viewPixelrect.h) * -2 + 1;
-                this.canvas.update(delta, this.inputmgr.point.touch, sx, sy);
+                this.helpv2.x = this.inputmgr.point.x;
+                this.helpv2.y = this.inputmgr.point.y;
+                var sPos = this.helpv2;
+                var mPos = this.helpv2_1;
+                this.calScreenPosToModelPos(sPos, mPos);
+                this.canvas.update(delta, this.inputmgr.point.touch, mPos.x, mPos.y);
             };
             overlay2D.prototype.pick2d = function (mx, my, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
                 if (this.camera == null)
                     return null;
-                var vp = new gd3d.math.rect();
-                var app = this.camera.calcViewPortPixel(this.app, vp);
-                var sx = (mx / vp.w) * 2 - 1;
-                var sy = (my / vp.h) * -2 + 1;
-                var outv2 = gd3d.math.pool.new_vector2();
-                outv2.x = sx;
-                outv2.y = sy;
                 var root = this.canvas.getRoot();
-                var trans = this.dopick2d(outv2, root, tolerance);
-                gd3d.math.pool.delete_vector2(outv2);
+                this.helpv2.x = mx;
+                this.helpv2.y = my;
+                var sPos = this.helpv2;
+                var mPos = this.helpv2_1;
+                this.calScreenPosToModelPos(sPos, mPos);
+                var trans = this.dopick2d(mPos, root, tolerance);
                 return trans;
             };
             overlay2D.prototype.dopick2d = function (ModelPos, tran, tolerance) {
@@ -1758,17 +1760,25 @@ var gd3d;
             overlay2D.prototype.calScreenPosToCanvasPos = function (screenPos, outCanvasPos) {
                 if (!this.camera || !this.canvas)
                     return;
-                var vp = new gd3d.math.rect();
-                this.camera.calcViewPortPixel(this.app, vp);
-                var temt = gd3d.math.pool.new_vector2();
-                temt.x = (screenPos.x / vp.w) * 2 - 1;
-                temt.y = (screenPos.y / vp.h) * -2 + 1;
+                var mPos = this.helpv2;
+                this.calScreenPosToModelPos(screenPos, mPos);
                 var mat = gd3d.math.pool.new_matrix3x2();
                 gd3d.math.matrix3x2Clone(this.canvas.getRoot().getWorldMatrix(), mat);
                 gd3d.math.matrix3x2Inverse(mat, mat);
-                gd3d.math.matrix3x2TransformVector2(mat, temt, outCanvasPos);
-                gd3d.math.pool.delete_vector2(temt);
+                gd3d.math.matrix3x2TransformVector2(mat, mPos, outCanvasPos);
+                gd3d.math.pool.delete_matrix3x2(mat);
             };
+            overlay2D.prototype.calScreenPosToModelPos = function (screenPos, outModelPos) {
+                if (!screenPos || !outModelPos || !this.camera)
+                    return;
+                this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+                var rect = this.camera.viewport;
+                var real_x = screenPos.x - rect.x * this.app.width;
+                var real_y = screenPos.y - rect.y * this.app.height;
+                outModelPos.x = (real_x / this.viewPixelrect.w) * 2 - 1;
+                outModelPos.y = (real_y / this.viewPixelrect.h) * -2 + 1;
+            };
+            overlay2D.ClassName = "overlay2D";
             __decorate([
                 gd3d.reflect.Field("canvas"),
                 __metadata("design:type", framework.canvas)
@@ -1883,11 +1893,9 @@ var gd3d;
         }
         math.Double = Double;
         var vector2 = (function () {
-            function vector2(x, y, w, h) {
+            function vector2(x, y) {
                 if (x === void 0) { x = 0; }
                 if (y === void 0) { y = 0; }
-                if (w === void 0) { w = 0; }
-                if (h === void 0) { h = 0; }
                 this.rawData = new Float32Array(2);
                 this.rawData[0] = x;
                 this.rawData[1] = y;
@@ -1917,6 +1925,7 @@ var gd3d;
             vector2.prototype.toString = function () {
                 return this.x + "," + this.y;
             };
+            vector2.ClassName = "vector2";
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number),
@@ -1929,7 +1938,7 @@ var gd3d;
             ], vector2.prototype, "y", null);
             vector2 = __decorate([
                 gd3d.reflect.SerializeType,
-                __metadata("design:paramtypes", [Number, Number, Number, Number])
+                __metadata("design:paramtypes", [Number, Number])
             ], vector2);
             return vector2;
         }());
@@ -1993,6 +2002,7 @@ var gd3d;
             rect.prototype.toString = function () {
                 return this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "," + this.rawData[3];
             };
+            rect.ClassName = "rect";
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number),
@@ -2079,6 +2089,7 @@ var gd3d;
             border.prototype.toString = function () {
                 return this.r + "," + this.t + "," + this.r + "," + this.b;
             };
+            border.ClassName = "border";
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number),
@@ -2165,6 +2176,7 @@ var gd3d;
             color.prototype.toString = function () {
                 return this.r + "," + this.g + "," + this.b + "," + this.a;
             };
+            color.ClassName = "color";
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number),
@@ -2238,6 +2250,7 @@ var gd3d;
             vector3.prototype.toString = function () {
                 return this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2];
             };
+            vector3.ClassName = "vector3";
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number),
@@ -2319,6 +2332,7 @@ var gd3d;
             vector4.prototype.toString = function () {
                 return this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "," + this.rawData[3];
             };
+            vector4.ClassName = "vector4";
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number),
@@ -2405,6 +2419,7 @@ var gd3d;
             quaternion.prototype.toString = function () {
                 return this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "," + this.rawData[3];
             };
+            quaternion.ClassName = "quaternion";
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number),
@@ -2447,6 +2462,7 @@ var gd3d;
                     + "[" + this.rawData[8] + "," + this.rawData[9] + "," + this.rawData[10] + "," + this.rawData[11] + "],"
                     + "[" + this.rawData[12] + "," + this.rawData[13] + "," + this.rawData[14] + "," + this.rawData[15] + "]";
             };
+            matrix.ClassName = "matrix";
             return matrix;
         }());
         math.matrix = matrix;
@@ -2524,6 +2540,7 @@ var gd3d;
                 this.comp = comp;
                 this.init = init;
             }
+            C2DComponent.ClassName = "C2DComponent";
             __decorate([
                 gd3d.reflect.Field("I2DComponent"),
                 __metadata("design:type", Object)
@@ -2570,6 +2587,8 @@ var gd3d;
                 this.layoutValueMap = {};
                 this._layoutPercentState = 0;
                 this.layoutDirty = false;
+                this.lastWidth = 0;
+                this.lastHeight = 0;
                 this.lastParentWidth = 0;
                 this.lastParentHeight = 0;
                 this.lastParentPivot = new gd3d.math.vector2(0, 0);
@@ -2771,11 +2790,11 @@ var gd3d;
                     else {
                         gd3d.math.matrix3x2Multiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
                     }
+                    this.dirtyWorldDecompose = true;
                     this.updateMaskRect();
                     if (this.renderer != null) {
                         this.renderer.updateTran();
                     }
-                    this.dirtyWorldDecompose = true;
                 }
                 if (this.children != null) {
                     for (var i = 0; i < this.children.length; i++) {
@@ -3139,7 +3158,7 @@ var gd3d;
                 var parent = this.parent;
                 if (!parent)
                     return;
-                if (parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
+                if (this.width != this.lastWidth || this.height != this.lastHeight || parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
                     || parent.pivot.y != this.lastParentPivot.y || this.pivot.x != this.lastPivot.x || this.pivot.y != this.lastPivot.y)
                     this.layoutDirty = true;
                 if (!this.layoutDirty)
@@ -3175,6 +3194,8 @@ var gd3d;
                 this.layoutDirty = false;
                 this.lastParentWidth = parent.width;
                 this.lastParentHeight = parent.height;
+                this.lastWidth = this.width;
+                this.lastHeight = this.height;
                 this.lastParentPivot.x = parent.pivot.x;
                 this.lastParentPivot.y = parent.pivot.y;
                 this.lastPivot.x = this.pivot.x;
@@ -3208,6 +3229,7 @@ var gd3d;
             transform2D.prototype.clone = function () {
                 return gd3d.io.cloneObj(this);
             };
+            transform2D.ClassName = "transform2D";
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
@@ -3245,6 +3267,10 @@ var gd3d;
                 gd3d.reflect.Field("vector2"),
                 __metadata("design:type", gd3d.math.vector2)
             ], transform2D.prototype, "pivot", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Object)
+            ], transform2D.prototype, "_visible", void 0);
             __decorate([
                 gd3d.reflect.Field("vector2"),
                 __metadata("design:type", gd3d.math.vector2)
@@ -3372,6 +3398,7 @@ var gd3d;
                     this._obb.dispose();
                 this._obb = null;
             };
+            boxcollider2d.ClassName = "boxcollider2d";
             boxcollider2d = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeBoxCollider2d
@@ -3385,6 +3412,7 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var helpV2 = new gd3d.math.vector2();
         var TransitionType;
         (function (TransitionType) {
             TransitionType[TransitionType["None"] = 0] = "None";
@@ -3399,6 +3427,9 @@ var gd3d;
                 this._normalColor = new gd3d.math.color(1, 1, 1, 1);
                 this._pressedColor = new gd3d.math.color(0.5, 0.5, 0.5, 1);
                 this._fadeDuration = 0.1;
+                this.downPointV2 = new gd3d.math.vector2();
+                this.isMovedLimit = false;
+                this.movedLimit = 0.02;
                 this.UIEventer = new gd3d.event.UIEvent();
                 this._downInThis = false;
                 this._dragOut = false;
@@ -3514,23 +3545,44 @@ var gd3d;
             };
             button.prototype.onPointEvent = function (canvas, ev, oncap) {
                 if (oncap == false) {
-                    var b = this.transform.ContainsCanvasPoint(new gd3d.math.vector2(ev.x, ev.y));
+                    helpV2.x = ev.x;
+                    helpV2.y = ev.y;
+                    var b = this.transform.ContainsCanvasPoint(helpV2);
                     if (b) {
-                        ev.eated = true;
                         if (ev.type == gd3d.event.PointEventEnum.PointDown) {
                             this._downInThis = true;
                             this.showPress();
+                            var pd = gd3d.event.UIEventEnum.PointerDown;
+                            if (this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pd]) > 0) {
+                                this.UIEventer.EmitEnum(pd);
+                                ev.eated = true;
+                            }
+                            this.downPointV2.x = ev.x;
+                            this.downPointV2.y = ev.y;
+                            this.isMovedLimit = false;
                         }
                         else if (ev.type == gd3d.event.PointEventEnum.PointHold && this._downInThis) {
                             if (this._dragOut == true) {
                                 this._dragOut = false;
                                 this.showPress();
                             }
+                            if (!this.isMovedLimit) {
+                                this.isMovedLimit = gd3d.math.vec2Distance(helpV2, this.downPointV2) > this.movedLimit;
+                            }
                         }
                         else if (ev.type == gd3d.event.PointEventEnum.PointUp && this._downInThis) {
                             this._downInThis = false;
                             this.showNormal();
-                            this.UIEventer.EmitEnum(gd3d.event.UIEventEnum.PointerClick);
+                            var pu = gd3d.event.UIEventEnum.PointerUp;
+                            if (this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pu]) > 0) {
+                                this.UIEventer.EmitEnum(pu);
+                                ev.eated = true;
+                            }
+                            var pc = gd3d.event.UIEventEnum.PointerClick;
+                            if (!this.isMovedLimit && this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pc]) > 0) {
+                                this.UIEventer.EmitEnum(pc);
+                                ev.eated = true;
+                            }
                         }
                     }
                     else {
@@ -3602,6 +3654,7 @@ var gd3d;
                     this._targetImage.transform.markDirty();
                 }
             };
+            button.ClassName = "button";
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Object),
@@ -3662,6 +3715,9 @@ var gd3d;
                 ];
                 this.needRefreshImg = false;
                 this.color = new gd3d.math.color(1.0, 1.0, 1.0, 1.0);
+                this._shaderName = "shader/defmaskui";
+                this._shaderDirty = false;
+                this._lastMask = false;
                 this._imageType = ImageType.Simple;
                 this._fillMethod = FillMethod.Horizontal;
                 this._fillAmmount = 1;
@@ -3670,28 +3726,43 @@ var gd3d;
                 gd3d.io.enumMgr.enumMap["ImageType"] = ImageType;
                 gd3d.io.enumMgr.enumMap["FillMethod"] = FillMethod;
             }
+            image2D_1 = image2D;
+            image2D.prototype.setShaderByName = function (shaderName) {
+                this._shaderName = shaderName;
+                this._shaderDirty = true;
+            };
             Object.defineProperty(image2D.prototype, "uimat", {
                 get: function () {
                     if (this._sprite && this._sprite.texture) {
-                        var rectPostfix = this.transform.parentIsMask ? "_(" + this.transform.insId + ")" : "";
-                        var matName = this._sprite.texture.getName() + "_uimask" + rectPostfix;
                         var canvas_1 = this.transform.canvas;
                         if (!canvas_1.assetmgr)
                             return;
+                        var assetmgr = canvas_1.assetmgr;
+                        var pMask = this.transform.parentIsMask;
                         var mat = this._uimat;
+                        var rectPostfix = pMask ? "_(" + this.transform.parent.insId + ")" : "";
+                        var matName = this._sprite.texture.getName() + "_uimask" + rectPostfix;
+                        var matChanged = false;
                         if (!mat || mat.getName() != matName) {
+                            this.needRefreshImg = true;
                             if (mat)
                                 mat.unuse();
-                            mat = canvas_1.assetmgr.getAssetByName(matName);
+                            mat = assetmgr.getAssetByName(matName);
                             if (mat)
                                 mat.use();
                         }
                         if (mat == null) {
                             mat = new framework.material(matName);
-                            mat.setShader(canvas_1.assetmgr.getShader("shader/defmaskui"));
+                            var sh = assetmgr.getShader(this._shaderName);
+                            sh = !sh ? assetmgr.getShader(image2D_1.defUIShader) : sh;
+                            mat.setShader(sh);
                             mat.use();
+                            matChanged = true;
                         }
-                        mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
+                        if (matChanged || this._lastMask != pMask) {
+                            mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
+                            this._lastMask = pMask;
+                        }
                         this._uimat = mat;
                     }
                     return this._uimat;
@@ -3744,9 +3815,11 @@ var gd3d;
                 set: function (sprite) {
                     if (sprite == this._sprite)
                         return;
-                    this.needRefreshImg = true;
                     if (this._sprite) {
                         this._sprite.unuse();
+                    }
+                    if (!this._sprite || this._sprite.texture != sprite.texture) {
+                        this.needRefreshImg = true;
                     }
                     this._sprite = sprite;
                     if (sprite) {
@@ -3786,6 +3859,7 @@ var gd3d;
                     if (tspr) {
                         this.sprite = tspr;
                         this.needRefreshImg = true;
+                        return;
                     }
                 }
                 var mat = this.uimat;
@@ -4596,6 +4670,8 @@ var gd3d;
                     dindex++;
                 }
             };
+            image2D.ClassName = "image2D";
+            image2D.defUIShader = "shader/defmaskui";
             __decorate([
                 gd3d.reflect.Field("color"),
                 gd3d.reflect.UIStyle("color"),
@@ -4626,12 +4702,13 @@ var gd3d;
                 gd3d.reflect.Field("border"),
                 __metadata("design:type", Object)
             ], image2D.prototype, "_imageBorder", void 0);
-            image2D = __decorate([
+            image2D = image2D_1 = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender,
                 __metadata("design:paramtypes", [])
             ], image2D);
             return image2D;
+            var image2D_1;
         }());
         framework.image2D = image2D;
         var ImageType;
@@ -4922,6 +4999,7 @@ var gd3d;
                     }
                 }
             };
+            inputField.ClassName = "inputField";
             __decorate([
                 gd3d.reflect.Field("reference", null, "image2D"),
                 __metadata("design:type", Object),
@@ -4998,8 +5076,12 @@ var gd3d;
                 this.datar = [];
                 this.color = new gd3d.math.color(1, 1, 1, 1);
                 this.color2 = new gd3d.math.color(0, 0, 0.5, 0.5);
+                this._shaderName = label_1.defUIShader;
+                this._shaderDirty = false;
+                this._lastMask = false;
                 this.dirtyData = true;
             }
+            label_1 = label;
             Object.defineProperty(label.prototype, "text", {
                 get: function () {
                     return this._text;
@@ -5177,28 +5259,41 @@ var gd3d;
                     yadd += this._fontsize * this.linespace;
                 }
             };
+            label.prototype.setShaderByName = function (shaderName) {
+                this._shaderName = shaderName;
+                this._shaderDirty = true;
+            };
             Object.defineProperty(label.prototype, "uimat", {
                 get: function () {
                     if (this.font && this.font.texture) {
-                        var rectPostfix = this.transform.parentIsMask ? "_(" + this.transform.insId + ")" : "";
-                        var matName = this.font.texture.getName() + "_fontmask" + rectPostfix;
                         var canvas_2 = this.transform.canvas;
                         if (!canvas_2.assetmgr)
                             return;
+                        var assetmgr = canvas_2.assetmgr;
+                        var pMask = this.transform.parentIsMask;
                         var mat = this._uimat;
+                        var rectPostfix = pMask ? "_(" + this.transform.parent.insId + ")" : "";
+                        var matName = this.font.texture.getName() + "_uimask" + rectPostfix;
+                        var matChanged = false;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
                                 mat.unuse();
-                            mat = canvas_2.assetmgr.getAssetByName(matName);
+                            mat = assetmgr.getAssetByName(matName);
                             if (mat)
                                 mat.use();
                         }
                         if (mat == null) {
                             mat = new framework.material(matName);
-                            mat.setShader(canvas_2.assetmgr.getShader("shader/defmaskfont"));
+                            var sh = assetmgr.getShader(this._shaderName);
+                            sh = !sh ? assetmgr.getShader(label_1.defUIShader) : sh;
+                            mat.setShader(sh);
                             mat.use();
+                            matChanged = true;
                         }
-                        mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
+                        if (matChanged || this._lastMask != pMask) {
+                            mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
+                            this._lastMask = pMask;
+                        }
                         this._uimat = mat;
                     }
                     return this._uimat;
@@ -5208,9 +5303,14 @@ var gd3d;
             });
             label.prototype.render = function (canvas) {
                 if (this._font == null) {
-                    var temp = canvas.assetmgr.mapNamed[this._fontName];
+                    var resName = this._fontName;
+                    var temp = canvas.assetmgr.mapNamed[resName];
+                    if (temp == undefined) {
+                        resName = this._fontName + ".font.json";
+                        temp = canvas.assetmgr.mapNamed[resName];
+                    }
                     if (temp != null) {
-                        var tfont = canvas.assetmgr.getAssetByName(this._fontName);
+                        var tfont = canvas.assetmgr.getAssetByName(resName);
                         if (tfont) {
                             this.font = tfont;
                             this.needRefreshFont = true;
@@ -5278,6 +5378,8 @@ var gd3d;
             };
             label.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
+            label.ClassName = "label";
+            label.defUIShader = "shader/defmaskfont";
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String),
@@ -5322,11 +5424,12 @@ var gd3d;
                 gd3d.reflect.UIStyle("color"),
                 __metadata("design:type", gd3d.math.color)
             ], label.prototype, "color2", void 0);
-            label = __decorate([
+            label = label_1 = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender
             ], label);
             return label;
+            var label_1;
         }());
         framework.label = label;
         var HorizontalType;
@@ -5428,6 +5531,7 @@ var gd3d;
             };
             progressbar.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
+            progressbar.ClassName = "progressbar";
             __decorate([
                 gd3d.reflect.Field("reference", null, "transform2D"),
                 __metadata("design:type", Object),
@@ -5472,7 +5576,11 @@ var gd3d;
                 ];
                 this.needRefreshImg = false;
                 this.color = new gd3d.math.color(1.0, 1.0, 1.0, 1.0);
+                this._shaderName = "shader/defmaskui";
+                this._shaderDirty = false;
+                this._lastMask = false;
             }
+            rawImage2D_1 = rawImage2D;
             Object.defineProperty(rawImage2D.prototype, "image", {
                 get: function () {
                     return this._image;
@@ -5492,28 +5600,41 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            rawImage2D.prototype.setShaderByName = function (shaderName) {
+                this._shaderName = shaderName;
+                this._shaderDirty = true;
+            };
             Object.defineProperty(rawImage2D.prototype, "uimat", {
                 get: function () {
-                    if (this.image != null) {
-                        var rectPostfix = this.transform.parentIsMask ? "_(" + this.transform.insId + ")" : "";
-                        var matName = this._image.getName() + "_uimask" + rectPostfix;
+                    if (this._image) {
                         var canvas_3 = this.transform.canvas;
                         if (!canvas_3.assetmgr)
                             return;
+                        var assetmgr = canvas_3.assetmgr;
+                        var pMask = this.transform.parentIsMask;
                         var mat = this._uimat;
+                        var rectPostfix = pMask ? "_(" + this.transform.parent.insId + ")" : "";
+                        var matName = this._image.getName() + "_uimask" + rectPostfix;
+                        var matChanged = false;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
                                 mat.unuse();
-                            mat = canvas_3.assetmgr.getAssetByName(matName);
+                            mat = assetmgr.getAssetByName(matName);
                             if (mat)
                                 mat.use();
                         }
                         if (mat == null) {
                             mat = new framework.material(matName);
-                            mat.setShader(canvas_3.assetmgr.getShader("shader/defmaskui"));
+                            var sh = assetmgr.getShader(this._shaderName);
+                            sh = !sh ? assetmgr.getShader(rawImage2D_1.defUIShader) : sh;
+                            mat.setShader(sh);
                             mat.use();
+                            matChanged = true;
                         }
-                        mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
+                        if (matChanged || this._lastMask != pMask) {
+                            mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
+                            this._lastMask = pMask;
+                        }
                         this._uimat = mat;
                     }
                     return this._uimat;
@@ -5597,6 +5718,8 @@ var gd3d;
             };
             rawImage2D.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
+            rawImage2D.ClassName = "rawImage2D";
+            rawImage2D.defUIShader = "shader/defmaskui";
             __decorate([
                 gd3d.reflect.Field("texture"),
                 __metadata("design:type", Object),
@@ -5607,11 +5730,12 @@ var gd3d;
                 gd3d.reflect.UIStyle("vector4"),
                 __metadata("design:type", gd3d.math.color)
             ], rawImage2D.prototype, "color", void 0);
-            rawImage2D = __decorate([
+            rawImage2D = rawImage2D_1 = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender
             ], rawImage2D);
             return rawImage2D;
+            var rawImage2D_1;
         }());
         framework.rawImage2D = rawImage2D;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -5620,6 +5744,8 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var helpV2 = new gd3d.math.vector2();
+        var helpV2_1 = new gd3d.math.vector2();
         var scrollRect = (function () {
             function scrollRect() {
                 this.horizontal = true;
@@ -5644,17 +5770,17 @@ var gd3d;
             };
             scrollRect.prototype.onPointEvent = function (canvas, ev, oncap) {
                 if (oncap == false) {
-                    var b = this.transform.ContainsCanvasPoint(new gd3d.math.vector2(ev.x, ev.y));
+                    helpV2.x = ev.x;
+                    helpV2.y = ev.y;
+                    var b = this.transform.ContainsCanvasPoint(helpV2);
                     if (b) {
                         ev.eated = true;
                         if (this._content == null)
                             return;
                         if (!this.horizontal && !this.vertical)
                             return;
-                        var temps = gd3d.math.pool.new_vector2();
-                        temps.x = ev.x;
-                        temps.y = ev.y;
-                        var tempc = gd3d.math.pool.new_vector2();
+                        var temps = helpV2;
+                        var tempc = helpV2_1;
                         this.transform.canvas.ModelPosToCanvasPos(temps, tempc);
                         if (this.strPoint == null)
                             this.strPoint = new gd3d.math.vector2();
@@ -5679,8 +5805,6 @@ var gd3d;
                                 this.SlideTo(addtransX, addtransY);
                             }
                         }
-                        gd3d.math.pool.delete_vector2(temps);
-                        gd3d.math.pool.delete_vector2(tempc);
                     }
                 }
                 if (ev.type == gd3d.event.PointEventEnum.PointUp) {
@@ -5714,6 +5838,7 @@ var gd3d;
                 this._content = null;
                 this.transform = null;
             };
+            scrollRect.ClassName = "scrollRect";
             __decorate([
                 gd3d.reflect.Field("reference", null, "transform2D"),
                 __metadata("design:type", framework.transform2D),
@@ -5754,12 +5879,256 @@ var gd3d;
             uirect.prototype.remove = function () {
                 this.transform = null;
             };
+            uirect.ClassName = "uirect";
             uirect = __decorate([
                 gd3d.reflect.node2DComponent
             ], uirect);
             return uirect;
         }());
         framework.uirect = uirect;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var bassBody = (function () {
+            function bassBody() {
+            }
+            bassBody.prototype.addForce = function (Force) {
+                framework.physic2D.applyForceAtCenter(this.body, Force);
+            };
+            bassBody.prototype.setVelocity = function (velocity) {
+                framework.physic2D.setVelocity(this.body, velocity);
+            };
+            bassBody.prototype.setAngularVelocity = function (velocity) {
+                framework.physic2D.setAngularVelocity(this.body, velocity);
+            };
+            Object.defineProperty(bassBody.prototype, "velocity", {
+                get: function () {
+                    return this.body.speed;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(bassBody.prototype, "type", {
+                get: function () {
+                    return this.body.type;
+                },
+                set: function (value) {
+                    this.body.type = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(bassBody.prototype, "tag", {
+                get: function () {
+                    return this.body.tag;
+                },
+                set: function (value) {
+                    this.body.tag = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(bassBody.prototype, "name", {
+                get: function () {
+                    return this.body.name;
+                },
+                set: function (value) {
+                    this.body.name = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            bassBody.prototype.setDesity = function (Desity) {
+                framework.physic2D.setDesity(this.body, Desity);
+            };
+            bassBody.prototype.setFrictionAir = function (frictionAir) {
+                framework.physic2D.setFrictionAir(this.body, frictionAir);
+            };
+            bassBody.prototype.setFriction = function (friction) {
+                framework.physic2D.setFriction(this.body, friction);
+            };
+            bassBody.prototype.setFrictionStatic = function (frictionStatic) {
+                framework.physic2D.setFrictionStatic(this.body, frictionStatic);
+            };
+            bassBody.prototype.setRestitution = function (restitution) {
+                framework.physic2D.setRestitution(this.body, restitution);
+            };
+            bassBody.prototype.setMass = function (mass) {
+                framework.physic2D.setMass(this.body, mass);
+            };
+            bassBody.prototype.setInitData = function (att) {
+                this.initData = att;
+            };
+            bassBody.prototype.setPosition = function (pos) {
+                framework.physic2D.setPosition(this.body, pos);
+            };
+            bassBody.prototype.update = function (delta) {
+                this.transform.localTranslate.x = this.body.position.x;
+                this.transform.localTranslate.y = this.body.position.y;
+                this.transform.localRotate = this.body.angle;
+                this.transform.markDirty();
+            };
+            bassBody.prototype.remove = function () {
+                framework.physic2D.removeBody(this.body);
+            };
+            return bassBody;
+        }());
+        framework.bassBody = bassBody;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var circleBody = (function (_super) {
+            __extends(circleBody, _super);
+            function circleBody() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.radius = 1;
+                return _this;
+            }
+            circleBody.prototype.start = function () {
+                if (this.initData != null) {
+                    this.body = framework.physic2D.creatCircleBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.radius, this.initData);
+                }
+                else {
+                    this.body = framework.physic2D.creatCircleBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.radius, {});
+                }
+            };
+            circleBody.prototype.onPlay = function () {
+            };
+            circleBody.prototype.onPointEvent = function (canvas, ev, oncap) {
+            };
+            circleBody.ClassName = "circleBody";
+            circleBody = __decorate([
+                gd3d.reflect.node2DComponent
+            ], circleBody);
+            return circleBody;
+        }(framework.bassBody));
+        framework.circleBody = circleBody;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var physicEngine2D = (function () {
+            function physicEngine2D(op) {
+                if (op === void 0) { op = null; }
+                if (Matter == undefined) {
+                    console.error("2d physic not supportted");
+                }
+                if (op != null) {
+                    this.matterEngine = Matter.Engine.create(op);
+                }
+                else {
+                    this.matterEngine = Matter.Engine.create();
+                }
+                this.engineWorld = this.matterEngine.world;
+                this.matterVector = Matter.Vector;
+                Matter.Engine.run(this.matterEngine);
+            }
+            physicEngine2D.prototype.update = function (delta) {
+                Matter.Engine.update(this.matterEngine, delta);
+            };
+            physicEngine2D.prototype.creatRectBodyByInitData = function (posx, posy, width, height, initData) {
+                var body = Matter.Bodies.rectangle(posx, posy, width, height, initData);
+                this.addBody(body);
+                return body;
+            };
+            physicEngine2D.prototype.creatCircleBodyByInitData = function (posx, posy, radius, initData) {
+                var body = Matter.Bodies.circle(posx, posy, radius, initData);
+                this.addBody(body);
+                return body;
+            };
+            physicEngine2D.prototype.addBody = function (body) {
+                Matter.World.add(this.engineWorld, body);
+            };
+            physicEngine2D.prototype.applyForce = function (body, positon, force) {
+                Matter.Body.applyForce(body, this.matterVector.create(positon.x, positon.y), this.matterVector.create(force.x, force.y));
+            };
+            physicEngine2D.prototype.applyForceAtCenter = function (body, force) {
+                Matter.Body.applyForce(body, body.position, this.matterVector.create(force.x, force.y));
+            };
+            physicEngine2D.prototype.setGravity = function (x, y) {
+                this.engineWorld.gravity.x = x;
+                this.engineWorld.gravity.y = y;
+            };
+            physicEngine2D.prototype.setVelocity = function (body, velocity) {
+                Matter.Body.setVelocity(body, this.matterVector.create(velocity.x, velocity.y));
+            };
+            physicEngine2D.prototype.setPosition = function (body, pos) {
+                Matter.Body.setPosition(body, this.matterVector.create(pos.x, pos.y));
+            };
+            physicEngine2D.prototype.setMass = function (body, mass) {
+                Matter.Body.setMass(body, mass);
+            };
+            physicEngine2D.prototype.setDesity = function (body, Desity) {
+                this.set(body, "desity", Desity);
+            };
+            physicEngine2D.prototype.setFrictionAir = function (body, frictionAir) {
+                this.set(body, "frictionAir", frictionAir);
+            };
+            physicEngine2D.prototype.setFriction = function (body, friction) {
+                this.set(body, "friction", friction);
+            };
+            physicEngine2D.prototype.setFrictionStatic = function (body, frictionStatic) {
+                this.set(body, "frictionStatic", frictionStatic);
+            };
+            physicEngine2D.prototype.setRestitution = function (body, restitution) {
+                this.set(body, "restitution", restitution);
+            };
+            physicEngine2D.prototype.setAngularVelocity = function (body, angularVelocity) {
+                this.set(body, "angularVelocity", angularVelocity);
+            };
+            physicEngine2D.prototype.set = function (body, settings, value) {
+                Matter.Body.set(body, settings, value);
+            };
+            physicEngine2D.prototype.addEvent = function (eventname, callback) {
+                Matter.Events.on(this.matterEngine, eventname, callback);
+            };
+            physicEngine2D.prototype.removeEvent = function (eventname, callback) {
+                Matter.Events.off(this.matterEngine, eventname, callback);
+            };
+            physicEngine2D.prototype.removeBody = function (body) {
+                Matter.World.remove(this.engineWorld, body);
+            };
+            return physicEngine2D;
+        }());
+        framework.physicEngine2D = physicEngine2D;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var rectBody = (function (_super) {
+            __extends(rectBody, _super);
+            function rectBody() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            rectBody.prototype.start = function () {
+                if (this.initData != null) {
+                    this.body = framework.physic2D.creatRectBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.transform.width, this.transform.height, this.initData);
+                }
+                else {
+                    this.body = framework.physic2D.creatRectBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.transform.width, this.transform.height, {});
+                }
+            };
+            rectBody.prototype.onPlay = function () {
+            };
+            rectBody.prototype.onPointEvent = function (canvas, ev, oncap) {
+            };
+            rectBody.ClassName = "rectBody";
+            rectBody = __decorate([
+                gd3d.reflect.node2DComponent
+            ], rectBody);
+            return rectBody;
+        }(framework.bassBody));
+        framework.rectBody = rectBody;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -5821,8 +6190,9 @@ var gd3d;
             assetBundle.prototype.loadCompressBundle = function (url, onstate, state, assetmgr) {
                 var _this = this;
                 state.totalByteLength = this.totalLength;
-                gd3d.io.loadText(url, function (txt, err) {
+                gd3d.io.loadText(url, function (txt, err, isloadFail) {
                     if (err != null) {
+                        state.isloadFail = isloadFail ? true : false;
                         state.iserror = true;
                         state.errs.push(new Error(err.message));
                         onstate(state);
@@ -6028,8 +6398,9 @@ var gd3d;
                     else {
                         if (type == framework.AssetTypeEnum.PackBin) {
                             haveBin = true;
-                            gd3d.io.loadArrayBuffer(surl, function (_buffer, err) {
+                            gd3d.io.loadArrayBuffer(surl, function (_buffer, err, isloadFail) {
                                 if (err != null) {
+                                    state.isloadFail = isloadFail ? true : false;
                                     state.iserror = true;
                                     state.errs.push(new Error(err.message));
                                     onstate(state);
@@ -6062,7 +6433,7 @@ var gd3d;
                         else {
                             assetmgr.loadSingleRes(surl, type, function (s) {
                                 if (s.iserror) {
-                                    state.isfinish = true;
+                                    state.iserror = true;
                                     onstate(state);
                                     return;
                                 }
@@ -6312,6 +6683,7 @@ var gd3d;
                 this.waitQueueState = [];
                 this.loadingQueueState = [];
                 this.loadingCountLimit = 10;
+                this.maploaded = {};
                 this.waitlightmapScene = {};
                 this.app = app;
                 this.webgl = app.webgl;
@@ -6594,8 +6966,9 @@ var gd3d;
             assetMgr.prototype.unPkg = function (type, url, state, onstate) {
                 var _this = this;
                 if (type == AssetTypeEnum.Bundle) {
-                    gd3d.io.loadText(url, function (txt, err) {
+                    gd3d.io.loadText(url, function (txt, err, isloadFail) {
                         if (err != null) {
+                            state.isloadFail = isloadFail ? true : false;
                             state.iserror = true;
                             state.errs.push(new Error(err.message));
                             onstate(state);
@@ -6622,8 +6995,9 @@ var gd3d;
                     });
                 }
                 else if (type == AssetTypeEnum.CompressBundle) {
-                    gd3d.io.loadText(url, function (txt, err) {
+                    gd3d.io.loadText(url, function (txt, err, isloadFail) {
                         if (err != null) {
+                            state.isloadFail = isloadFail ? true : false;
                             state.iserror = true;
                             state.errs.push(new Error(err.message));
                             onstate(state);
@@ -6642,6 +7016,7 @@ var gd3d;
                     state.totaltask = 1;
                     this.loadSingleRes(url, type, function (s) {
                         if (s.iserror) {
+                            state.iserror = true;
                             onstate(state);
                             return;
                         }
@@ -6662,6 +7037,14 @@ var gd3d;
             };
             assetMgr.prototype.loadCompressBundle = function (url, onstate) {
                 if (onstate === void 0) { onstate = null; }
+                if (this.maploaded[url]) {
+                    if (onstate) {
+                        var state_2 = new stateLoad();
+                        state_2.isfinish = true;
+                        onstate(state_2);
+                    }
+                    return;
+                }
                 var name = this.getFileName(url);
                 var type = this.calcType(url);
                 var state = new stateLoad();
@@ -6682,6 +7065,14 @@ var gd3d;
                 if (onstate === void 0) { onstate = null; }
                 if (onstate == null)
                     onstate = function () { };
+                if (this.maploaded[url]) {
+                    if (onstate) {
+                        var state = new stateLoad();
+                        state.isfinish = true;
+                        onstate(state);
+                    }
+                    return;
+                }
                 var name = this.getFileName(url);
                 if (this.mapInLoad[name] != null) {
                     var _state = this.mapInLoad[name];
@@ -6732,7 +7123,9 @@ var gd3d;
                     return;
                 var state = this.mapInLoad[name];
                 for (var key in state.resstate) {
-                    state.resstate[key].res.unuse();
+                    if (state.resstate[key] && state.resstate[key].res) {
+                        state.resstate[key].res.unuse();
+                    }
                 }
                 delete this.mapInLoad[name];
             };
@@ -7230,7 +7623,7 @@ var gd3d;
             }
             defMesh.initDefaultMesh = function (assetmgr) {
                 assetmgr.mapDefaultMesh["cube"] = gd3d.framework.defMesh.createDefaultMesh("cube", gd3d.render.meshData.genBoxCCW(1.0), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["quad"] = gd3d.framework.defMesh.createDefaultMesh("circleline", gd3d.render.meshData.genQuad(1.0), assetmgr.webgl);
+                assetmgr.mapDefaultMesh["quad"] = gd3d.framework.defMesh.createDefaultMesh("quad", gd3d.render.meshData.genQuad(1.0), assetmgr.webgl);
                 assetmgr.mapDefaultMesh["quad_particle"] = gd3d.framework.defMesh.createDefaultMesh("quad_particle", gd3d.render.meshData.genQuad_forparticle(1.0), assetmgr.webgl);
                 assetmgr.mapDefaultMesh["plane"] = gd3d.framework.defMesh.createDefaultMesh("plane", gd3d.render.meshData.genPlaneCCW(10), assetmgr.webgl);
                 assetmgr.mapDefaultMesh["sphere"] = gd3d.framework.defMesh.createDefaultMesh("sphere", gd3d.render.meshData.genSphereCCW(), assetmgr.webgl);
@@ -8133,6 +8526,7 @@ var gd3d;
             AssetFactoryTools.useAsset = function (assetMgr, onstate, state, asset, url) {
                 var fileName = getFileName(url);
                 assetMgr.setAssetUrl(asset, url);
+                assetMgr.maploaded[url] = asset;
                 assetMgr.use(asset);
                 state.resstate[fileName].state = 1;
                 state.resstate[fileName].res = asset;
@@ -8666,8 +9060,9 @@ var gd3d;
                         });
                     }
                     else {
-                        gd3d.io.loadImg(_textureSrc, function (_tex, _err) {
+                        gd3d.io.loadImg(_textureSrc, function (_tex, _err, isloadFail) {
                             call(function () {
+                                state.isloadFail = isloadFail ? true : false;
                                 if (framework.AssetFactoryTools.catchError(_err, onstate, state))
                                     return;
                                 var _texture = asset ? asset : new framework.texture(filename);
@@ -8751,8 +9146,9 @@ var gd3d;
                     });
                 }
                 else {
-                    gd3d.io.loadImg(_textureSrc, function (_tex, _err) {
+                    gd3d.io.loadImg(_textureSrc, function (_tex, _err, isloadFail) {
                         call(function () {
+                            state.isloadFail = isloadFail ? true : false;
                             if (framework.AssetFactoryTools.catchError(_err, onstate, state))
                                 return;
                             var _texture = asset ? asset : new framework.texture(filename);
@@ -8873,6 +9269,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            animationClip.ClassName = "animationClip";
             __decorate([
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
@@ -9028,6 +9425,7 @@ var gd3d;
                     return item;
                 }
             };
+            PoseBoneMatrix.ClassName = "PoseBoneMatrix";
             PoseBoneMatrix.poolmats = [];
             __decorate([
                 gd3d.reflect.Field("vector3"),
@@ -9139,6 +9537,7 @@ var gd3d;
                     this.sprites[spriteName] = r;
                 }
             };
+            atlas.ClassName = "atlas";
             __decorate([
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
@@ -9226,6 +9625,7 @@ var gd3d;
                     }
                 }
             };
+            f14eff.ClassName = "f14eff";
             f14eff = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
@@ -9322,6 +9722,7 @@ var gd3d;
                 var d2 = new Date().valueOf();
                 var n = d2 - d1;
             };
+            font.ClassName = "font";
             font = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
@@ -9382,13 +9783,24 @@ var gd3d;
                 this._beDispose = false;
             }
             transform.prototype.checkLRTSChange = function () {
-                if (!gd3d.math.vec3Equal(this.helpLPos, this._localTranslate, Number.MIN_VALUE))
+                if (!this.fastEqual(this.helpLPos.rawData, this._localTranslate.rawData))
                     return true;
-                if (!gd3d.math.quatEqual(this.helpLRotate, this._localRotate, Number.MIN_VALUE))
+                if (!this.fastEqual(this.helpLRotate.rawData, this._localRotate.rawData))
                     return true;
-                if (!gd3d.math.vec3Equal(this.helpLScale, this._localScale, Number.MIN_VALUE))
+                if (!this.fastEqual(this.helpLScale.rawData, this._localScale.rawData))
                     return true;
                 return false;
+            };
+            transform.prototype.fastEqual = function (d_0, d_1) {
+                if (d_0[0] != d_1[0])
+                    return false;
+                if (d_0[1] != d_1[1])
+                    return false;
+                if (d_0[2] != d_1[2])
+                    return false;
+                if (d_0.length == 4 && d_0[3] != d_1[3])
+                    return false;
+                return true;
             };
             Object.defineProperty(transform.prototype, "scene", {
                 get: function () {
@@ -9844,6 +10256,7 @@ var gd3d;
                 if (this.onDispose)
                     this.onDispose();
             };
+            transform.ClassName = "transform";
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
@@ -10029,6 +10442,7 @@ var gd3d;
             };
             boxcollider.prototype.clone = function () {
             };
+            boxcollider.ClassName = "boxcollider";
             __decorate([
                 gd3d.reflect.Field("vector3"),
                 __metadata("design:type", gd3d.math.vector3)
@@ -10128,6 +10542,7 @@ var gd3d;
             };
             meshcollider.prototype.clone = function () {
             };
+            meshcollider.ClassName = "meshcollider";
             __decorate([
                 gd3d.reflect.Field("boolean"),
                 __metadata("design:type", Boolean)
@@ -10179,6 +10594,7 @@ var gd3d;
             };
             meshFilter.prototype.clone = function () {
             };
+            meshFilter.ClassName = "meshFilter";
             __decorate([
                 gd3d.reflect.Field("mesh"),
                 gd3d.reflect.UIStyle("WidgetDragSelect"),
@@ -10309,6 +10725,7 @@ var gd3d;
             };
             meshRenderer.prototype.clone = function () {
             };
+            meshRenderer.ClassName = "meshRenderer";
             __decorate([
                 gd3d.reflect.Field("material[]"),
                 __metadata("design:type", Array)
@@ -10602,6 +11019,7 @@ var gd3d;
             };
             skinnedMeshRenderer.prototype.clone = function () {
             };
+            skinnedMeshRenderer.ClassName = "skinnedMeshRenderer";
             __decorate([
                 gd3d.reflect.Field("material[]"),
                 __metadata("design:type", Array)
@@ -10732,6 +11150,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            keyFrameAniClip.ClassName = "keyFrameAniClip";
             __decorate([
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
@@ -11223,6 +11642,7 @@ var gd3d;
                 }
                 return JSON.stringify(obj);
             };
+            material.ClassName = "material";
             __decorate([
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
@@ -11474,9 +11894,7 @@ var gd3d;
                         var objVF = result.objVF;
                         var data = result.meshData;
                         data.originVF = objVF.vf;
-                        _this.data = new gd3d.render.meshData();
-                        for (var k in data)
-                            _this.data[k] = data[k];
+                        _this.data = gd3d.render.meshData.cloneByObj(data);
                         _this.submesh = result.subMesh;
                         _this.glMesh = new gd3d.render.glMesh();
                         var vertexs = _this.data.genVertexDataArray(objVF.vf);
@@ -11543,94 +11961,7 @@ var gd3d;
             mesh.prototype.clone = function () {
                 var _result = new mesh_1(this.getName());
                 var vf = this.glMesh.vertexFormat;
-                var data = new gd3d.render.meshData();
-                if (this.data.pos != undefined) {
-                    data.pos = [];
-                    for (var _i = 0, _a = this.data.pos; _i < _a.length; _i++) {
-                        var item = _a[_i];
-                        var _position = new gd3d.math.vector3();
-                        _position.rawData.set(item.rawData);
-                        data.pos.push(_position);
-                    }
-                }
-                if (this.data.color != undefined) {
-                    data.color = [];
-                    for (var _b = 0, _c = this.data.color; _b < _c.length; _b++) {
-                        var item = _c[_b];
-                        var _color = new gd3d.math.color();
-                        _color.rawData.set(item.rawData);
-                        data.color.push(_color);
-                    }
-                }
-                if (this.data.normal != undefined) {
-                    data.normal = [];
-                    for (var _d = 0, _e = this.data.normal; _d < _e.length; _d++) {
-                        var item = _e[_d];
-                        var _normal = new gd3d.math.vector3();
-                        _normal.rawData.set(item.rawData);
-                        data.normal.push(_normal);
-                    }
-                }
-                if (this.data.uv != undefined) {
-                    data.uv = [];
-                    for (var _f = 0, _g = this.data.uv; _f < _g.length; _f++) {
-                        var item = _g[_f];
-                        var uv = new gd3d.math.vector2();
-                        uv.rawData.set(item.rawData);
-                        data.uv.push(uv);
-                    }
-                }
-                if (this.data.uv2 != undefined) {
-                    data.uv2 = [];
-                    for (var _h = 0, _j = this.data.uv2; _h < _j.length; _h++) {
-                        var item = _j[_h];
-                        var uv = new gd3d.math.vector2();
-                        uv.rawData.set(uv.rawData);
-                        data.uv2.push(uv);
-                    }
-                }
-                if (this.data.tangent != undefined) {
-                    data.tangent = [];
-                    for (var _k = 0, _l = this.data.tangent; _k < _l.length; _k++) {
-                        var item = _l[_k];
-                        var tangent = new gd3d.math.vector3();
-                        tangent.rawData.set(item.rawData);
-                        data.tangent.push(tangent);
-                    }
-                }
-                if (this.data.blendIndex != undefined) {
-                    data.blendIndex = [];
-                    for (var i_2 = 0, len = this.data.blendIndex.length; i_2 < len; ++i_2) {
-                        var item = this.data.blendIndex[i_2];
-                        var _boneIndex = new gd3d.render.number4();
-                        _boneIndex.v0 = item.v0;
-                        _boneIndex.v1 = item.v1;
-                        _boneIndex.v2 = item.v2;
-                        _boneIndex.v3 = item.v3;
-                        data.blendIndex.push(_boneIndex);
-                    }
-                }
-                if (this.data.blendWeight != undefined) {
-                    data.blendWeight = [];
-                    for (var i_3 = 0, len = this.data.blendWeight.length; i_3 < len; ++i_3) {
-                        var item = this.data.blendWeight[i_3];
-                        var _boneWeight = new gd3d.render.number4();
-                        _boneWeight.v0 = item.v0;
-                        _boneWeight.v1 = item.v1;
-                        _boneWeight.v2 = item.v2;
-                        _boneWeight.v3 = item.v3;
-                        data.blendWeight.push(_boneWeight);
-                    }
-                }
-                _result.submesh = [];
-                for (var i = 0; i < this.submesh.length; i++) {
-                    var _submeshinfo = new subMeshInfo();
-                    _submeshinfo.start = this.submesh[i].start;
-                    _submeshinfo.size = this.submesh[i].size;
-                    _submeshinfo.matIndex = i;
-                    _result.submesh.push(_submeshinfo);
-                }
-                data.trisindex = this.data.trisindex.slice();
+                var data = gd3d.render.meshData.cloneByObj(this.data);
                 _result.data = data;
                 _result.glMesh = new gd3d.render.glMesh();
                 var vertexs = _result.data.genVertexDataArray(vf);
@@ -11641,6 +11972,7 @@ var gd3d;
                 _result.glMesh.uploadIndexData(framework.sceneMgr.app.getAssetMgr().webgl, 0, indices);
                 return _result;
             };
+            mesh.ClassName = "mesh";
             mesh = mesh_1 = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
@@ -11827,6 +12159,7 @@ var gd3d;
                 gd3d.math.vec3ScaleByNum(out, lerp, out);
                 gd3d.math.vec3Add(start, out, out);
             };
+            pathasset.ClassName = "pathasset";
             __decorate([
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
@@ -11921,6 +12254,7 @@ var gd3d;
                 if (type != null)
                     gd3d.io.deSerialize(jsonObj, this.trans, assetmgr, this.assetbundle);
             };
+            prefab.ClassName = "prefab";
             prefab = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
@@ -12047,6 +12381,7 @@ var gd3d;
                     this.lightmaps[key].unuse(true);
                 }
             };
+            rawscene.ClassName = "rawscene";
             rawscene = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
@@ -12294,6 +12629,7 @@ var gd3d;
                     }
                 }
             };
+            shader.ClassName = "shader";
             __decorate([
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
@@ -12384,6 +12720,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            sprite.ClassName = "sprite";
             sprite = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
@@ -12427,6 +12764,7 @@ var gd3d;
                     return gd3d.math.caclStringByteLength(this.content);
                 }
             };
+            textasset.ClassName = "textasset";
             __decorate([
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
@@ -12487,6 +12825,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            texture.ClassName = "texture";
             __decorate([
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
@@ -13001,10 +13340,10 @@ var gd3d;
                             }
                         }
                         else {
-                            console.error("Bone: " + bonename + " Not Record in Aniclip(" + this._playClip.getName() + ").");
                         }
                     }
             };
+            aniplayer.ClassName = "aniplayer";
             __decorate([
                 gd3d.reflect.Field("animationClip[]"),
                 __metadata("design:type", Array)
@@ -13036,6 +13375,7 @@ var gd3d;
         var tPoseInfo = (function () {
             function tPoseInfo() {
             }
+            tPoseInfo.ClassName = "tPoseInfo";
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
@@ -13079,6 +13419,7 @@ var gd3d;
             };
             asbone.prototype.clone = function () {
             };
+            asbone.ClassName = "asbone";
             asbone = __decorate([
                 gd3d.reflect.nodeComponent,
                 __metadata("design:paramtypes", [])
@@ -13116,6 +13457,7 @@ var gd3d;
             };
             AudioListener.prototype.clone = function () {
             };
+            AudioListener.ClassName = "AudioListener";
             AudioListener = __decorate([
                 gd3d.reflect.nodeComponent
             ], AudioListener);
@@ -13199,6 +13541,7 @@ var gd3d;
             };
             AudioPlayer.prototype.clone = function () {
             };
+            AudioPlayer.ClassName = "AudioPlayer";
             AudioPlayer = __decorate([
                 gd3d.reflect.nodeComponent
             ], AudioPlayer);
@@ -13235,6 +13578,7 @@ var gd3d;
             BeBillboard.prototype.setTarget = function (trans) {
                 this.target = trans;
             };
+            BeBillboard.ClassName = "BeBillboard";
             BeBillboard = __decorate([
                 gd3d.reflect.nodeComponent
             ], BeBillboard);
@@ -13447,6 +13791,7 @@ var gd3d;
             };
             bloomctr.prototype.clone = function () {
             };
+            bloomctr.ClassName = "bloomctr";
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Object),
@@ -13465,6 +13810,8 @@ var gd3d;
         framework.bloomctr = bloomctr;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
+var helpv3 = new gd3d.math.vector3();
+var helpv3_1 = new gd3d.math.vector3();
 var gd3d;
 (function (gd3d) {
     var framework;
@@ -13477,10 +13824,10 @@ var gd3d;
                 camera._targetAndViewport(this.renderTarget, scene, context, true);
                 context.webgl.depthMask(true);
                 gd3d.render.glDrawPass.lastZWrite = true;
-                camera._renderOnce(scene, context, "_depth");
                 context.webgl.clearColor(0, 0, 0, 0);
                 context.webgl.clearDepth(1.0);
                 context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
+                camera._renderOnce(scene, context, "_depth");
                 gd3d.render.glRenderTarget.useNull(context.webgl);
             };
             return cameraPostQueue_Depth;
@@ -13502,6 +13849,7 @@ var gd3d;
                 context.drawtype = "";
                 mesh.glMesh.bindVboBuffer(context.webgl);
                 this.material.draw(context, mesh, mesh.submesh[0], "quad");
+                gd3d.render.glRenderTarget.useNull(context.webgl);
             };
             return cameraPostQueue_Quad;
         }());
@@ -13813,7 +14161,6 @@ var gd3d;
                     if (target == null) {
                         w = scene.app.width;
                         h = scene.app.height;
-                        gd3d.render.glRenderTarget.useNull(context.webgl);
                     }
                     else {
                         w = target.width;
@@ -13882,17 +14229,11 @@ var gd3d;
                                 }
                                 else {
                                     var matrixView = context.matrixView;
-                                    var az = gd3d.math.pool.new_vector3();
-                                    var bz = gd3d.math.pool.new_vector3();
-                                    if (a.gameObject.transform.name == "pasted__default001") {
-                                        a.gameObject.transform.getWorldTranslate();
-                                    }
+                                    var az = helpv3;
+                                    var bz = helpv3_1;
                                     gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                     gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
-                                    var result = bz.z - az.z;
-                                    gd3d.math.pool.delete_vector3(az);
-                                    gd3d.math.pool.delete_vector3(bz);
-                                    return result;
+                                    return bz.z - az.z;
                                 }
                             });
                         }
@@ -13914,6 +14255,7 @@ var gd3d;
             };
             camera.prototype.clone = function () {
             };
+            camera.ClassName = "camera";
             __decorate([
                 gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 2),
                 gd3d.reflect.Field("number"),
@@ -14044,6 +14386,7 @@ var gd3d;
             };
             canvascontainer.prototype.clone = function () {
             };
+            canvascontainer.ClassName = "canvascontainer";
             __decorate([
                 gd3d.reflect.Field("reference"),
                 __metadata("design:type", framework.overlay2D)
@@ -14442,9 +14785,9 @@ var gd3d;
                     return;
                 var index = -1;
                 if (_initFrameData.attrsData.mat != null) {
-                    for (var i_4 = 0; i_4 < this.matDataGroups.length; i_4++) {
-                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_4], _initFrameData.attrsData.mat)) {
-                            index = i_4;
+                    for (var i_2 = 0; i_2 < this.matDataGroups.length; i_2++) {
+                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_2], _initFrameData.attrsData.mat)) {
+                            index = i_2;
                             break;
                         }
                     }
@@ -14502,41 +14845,41 @@ var gd3d;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
                 element.update();
                 subEffectBatcher.effectElements.push(element);
-                for (var i_5 = 0; i_5 < vertexCount; i_5++) {
+                for (var i_3 = 0; i_3 < vertexCount; i_3++) {
                     {
                         var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = vertexArr[i_5 * vertexSize + 0];
-                        vertex.y = vertexArr[i_5 * vertexSize + 1];
-                        vertex.z = vertexArr[i_5 * vertexSize + 2];
+                        vertex.x = vertexArr[i_3 * vertexSize + 0];
+                        vertex.y = vertexArr[i_3 * vertexSize + 1];
+                        vertex.z = vertexArr[i_3 * vertexSize + 2];
                         gd3d.math.matrixTransformVector3(vertex, element.curAttrData.matrix, vertex);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 0] = vertex.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 1] = vertex.y;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 2] = vertex.z;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 0] = vertex.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 1] = vertex.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 2] = vertex.z;
                         gd3d.math.pool.delete_vector3(vertex);
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 3] = vertexArr[i_5 * vertexSize + 3];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 4] = vertexArr[i_5 * vertexSize + 4];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 5] = vertexArr[i_5 * vertexSize + 5];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 3] = vertexArr[i_3 * vertexSize + 3];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 4] = vertexArr[i_3 * vertexSize + 4];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 5] = vertexArr[i_3 * vertexSize + 5];
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 6] = vertexArr[i_5 * vertexSize + 6];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 7] = vertexArr[i_5 * vertexSize + 7];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 8] = vertexArr[i_5 * vertexSize + 8];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 6] = vertexArr[i_3 * vertexSize + 6];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 7] = vertexArr[i_3 * vertexSize + 7];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 8] = vertexArr[i_3 * vertexSize + 8];
                     }
                     {
                         var r = gd3d.math.floatClamp(element.curAttrData.color.x, 0, 1);
                         var g = gd3d.math.floatClamp(element.curAttrData.color.y, 0, 1);
                         var b = gd3d.math.floatClamp(element.curAttrData.color.z, 0, 1);
-                        var a = gd3d.math.floatClamp(vertexArr[i_5 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 9] = r;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 10] = g;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 11] = b;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 12] = a;
+                        var a = gd3d.math.floatClamp(vertexArr[i_3 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 9] = r;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 10] = g;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 11] = b;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 12] = a;
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 13] = vertexArr[i_5 * vertexSize + 13] * element.curAttrData.tilling.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 14] = vertexArr[i_5 * vertexSize + 14] * element.curAttrData.tilling.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 13] = vertexArr[i_3 * vertexSize + 13] * element.curAttrData.tilling.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 14] = vertexArr[i_3 * vertexSize + 14] * element.curAttrData.tilling.y;
                     }
                 }
                 var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
@@ -14592,6 +14935,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            effectSystem.ClassName = "effectSystem";
             effectSystem.fps = 30;
             __decorate([
                 gd3d.reflect.Field("boolean"),
@@ -14706,11 +15050,11 @@ var gd3d;
                 if (this.delayElements.length > 0) {
                     if (this.refElements.length > 0)
                         this.refElements = [];
-                    for (var i_6 = this.delayElements.length - 1; i_6 >= 0; i_6--) {
-                        var data = this.delayElements[i_6];
+                    for (var i_4 = this.delayElements.length - 1; i_4 >= 0; i_4--) {
+                        var data = this.delayElements[i_4];
                         if (data.delayTime <= this.playTimer) {
-                            this.addElement(this.delayElements[i_6]);
-                            this.delayElements.splice(i_6, 1);
+                            this.addElement(this.delayElements[i_4]);
+                            this.delayElements.splice(i_4, 1);
                         }
                     }
                 }
@@ -14832,6 +15176,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            TestEffectSystem.ClassName = "TestEffectSystem";
             TestEffectSystem.fps = 30;
             __decorate([
                 gd3d.reflect.Field("boolean"),
@@ -14872,6 +15217,7 @@ var gd3d;
             };
             frustumculling.prototype.clone = function () {
             };
+            frustumculling.ClassName = "frustumculling";
             frustumculling = __decorate([
                 gd3d.reflect.nodeComponent,
                 __metadata("design:paramtypes", [])
@@ -15006,6 +15352,7 @@ var gd3d;
             };
             guidpath.prototype.clone = function () {
             };
+            guidpath.ClassName = "guidpath";
             guidpath = __decorate([
                 gd3d.reflect.nodeComponent
             ], guidpath);
@@ -15214,6 +15561,7 @@ var gd3d;
             };
             keyFrameAniPlayer.prototype.remove = function () {
             };
+            keyFrameAniPlayer.ClassName = "keyFrameAniPlayer";
             __decorate([
                 gd3d.reflect.Field("keyFrameAniClip[]"),
                 __metadata("design:type", Array)
@@ -15289,6 +15637,7 @@ var gd3d;
             };
             light.prototype.clone = function () {
             };
+            light.ClassName = "light";
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
@@ -15318,18 +15667,22 @@ var gd3d;
         framework.light = light;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
+var helpMat = null;
 var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
         var spherestruct = (function () {
             function spherestruct(_center, _r) {
-                this.center = gd3d.math.pool.clone_vector3(_center);
-                this.srcradius = _r;
+                this.center = new gd3d.math.vector3();
                 this.tempScale = new gd3d.math.vector3();
+                this.srcCenter = new gd3d.math.vector3();
+                gd3d.math.vec3Clone(_center, this.srcCenter);
+                gd3d.math.vec3Clone(_center, this.center);
+                this.srcradius = _r;
             }
             spherestruct.prototype.update = function (worldmatrix) {
-                gd3d.math.matrixGetTranslation(worldmatrix, this.center);
+                gd3d.math.matrixTransformVector3(this.srcCenter, worldmatrix, this.center);
                 gd3d.math.matrixGetScale(worldmatrix, this.tempScale);
                 if (this.tempScale.x < this.tempScale.y)
                     this.tempScale.x = this.tempScale.y;
@@ -15338,20 +15691,27 @@ var gd3d;
                 this.radius = this.srcradius * this.tempScale.x;
             };
             spherestruct.prototype.intersects = function (bound) {
+                if (!bound)
+                    return false;
                 if (bound instanceof spherestruct) {
-                    var dis = gd3d.math.vec3Distance(this.center, bound.center);
-                    if (dis > this.radius + bound.radius)
-                        return false;
-                    return true;
+                    return framework.collision.sphereVsSphere(this, bound);
                 }
                 else if (bound instanceof framework.obb) {
+                    return framework.collision.obbVsSphere(bound, this);
                 }
+            };
+            spherestruct.prototype.computeExtentsByAxis = function (axis, out) {
+                var p = gd3d.math.vec3Dot(this.center, axis);
+                out.x = p - this.radius;
+                out.y = p + this.radius;
             };
             return spherestruct;
         }());
         framework.spherestruct = spherestruct;
         var spherecollider = (function () {
             function spherecollider() {
+                this.center = new gd3d.math.vector3();
+                this.radius = 0.5;
                 this._worldCenter = new gd3d.math.vector3();
                 this._colliderVisible = false;
             }
@@ -15385,6 +15745,13 @@ var gd3d;
             spherecollider.prototype.update = function (delta) {
                 if (this.spherestruct) {
                     this.spherestruct.update(this.matrix);
+                    if (this.subTran && this.subTran.gameObject.components.length > 0) {
+                        var r = this.spherestruct.radius;
+                        var sc = gd3d.math.pool.new_vector3(r, r, r);
+                        this.subTran.setWorldScale(sc);
+                        gd3d.math.pool.delete_vector3(sc);
+                        this.subTran.setWorldPosition(this.spherestruct.center);
+                    }
                 }
             };
             Object.defineProperty(spherecollider.prototype, "colliderVisible", {
@@ -15393,6 +15760,11 @@ var gd3d;
                 },
                 set: function (value) {
                     this._colliderVisible = value;
+                    if (this._colliderVisible) {
+                        if (this.subTran && this.subTran.gameObject.components.length < 1) {
+                            this.setMeshRenderer();
+                        }
+                    }
                     if (this.subTran) {
                         this.subTran.gameObject.visible = this._colliderVisible;
                     }
@@ -15435,14 +15807,31 @@ var gd3d;
                 if (this.center && this.radius) {
                     this.spherestruct = new spherestruct(this.center, this.radius);
                 }
+                this.buildMesh();
             };
             spherecollider.prototype.buildMesh = function () {
                 this.subTran = new gd3d.framework.transform();
-                this.subTran.gameObject.hideFlags = framework.HideFlags.DontSave | framework.HideFlags.HideInHierarchy;
-                this.subTran.name = "spherecollider";
+                this.subTran.gameObject.hideFlags = framework.HideFlags.DontSave | framework.HideFlags.HideInHierarchy | framework.HideFlags.NotEditable;
+                this.subTran.name = "sphereCollider";
+                if (this._colliderVisible) {
+                    this.setMeshRenderer();
+                }
+            };
+            spherecollider.prototype.setMeshRenderer = function () {
                 var mesh = this.subTran.gameObject.addComponent("meshFilter");
-                mesh.mesh = this.getColliderMesh();
+                mesh.mesh = this.gameObject.getScene().app.getAssetMgr().getDefaultMesh("sphere");
                 var renderer = this.subTran.gameObject.addComponent("meshRenderer");
+                renderer.materials = [];
+                if (!helpMat) {
+                    var ass = this.gameObject.getScene().app.getAssetMgr();
+                    helpMat = new framework.material("sphereCMat");
+                    helpMat.defaultAsset = true;
+                    helpMat.setShader(ass.getShader("shader/materialcolor"));
+                    var color = new gd3d.math.vector4(0, 1, 0, 1);
+                    helpMat.setVector4("_Color", color);
+                    helpMat.setFloat("_Alpha", 0.3);
+                }
+                renderer.materials[0] = helpMat;
                 this.subTran.gameObject.visible = this._colliderVisible;
                 this.gameObject.transform.addChild(this.subTran);
                 this.gameObject.transform.markDirty();
@@ -15460,6 +15849,7 @@ var gd3d;
             };
             spherecollider.prototype.clone = function () {
             };
+            spherecollider.ClassName = "spherecollider";
             __decorate([
                 gd3d.reflect.Field("vector3"),
                 __metadata("design:type", gd3d.math.vector3)
@@ -15738,6 +16128,7 @@ var gd3d;
             };
             trailRender.prototype.remove = function () {
             };
+            trailRender.ClassName = "trailRender";
             trailRender = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent
@@ -16012,6 +16403,7 @@ var gd3d;
             };
             trailRender_recorde.prototype.clone = function () {
             };
+            trailRender_recorde.ClassName = "trailRender_recorde";
             trailRender_recorde = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent
@@ -16082,7 +16474,6 @@ var gd3d;
                 post0.material.setFloat("_Vignetting", 0.3);
                 post0.material.setFloat("_Blurred_Corners", 3.0);
                 post0.material.setFloat("_Chromatic_Aberration", 3.0);
-                post0.material.setVector4("_MainTex_TexelSize", new gd3d.math.vector4(1 / psize, 1 / psize, psize, psize));
                 this.camera.postQueues.push(post0);
                 this._init = true;
             };
@@ -16139,6 +16530,7 @@ var gd3d;
             };
             vignettingCtr.prototype.clone = function () {
             };
+            vignettingCtr.ClassName = "vignettingCtr";
             vignettingCtr = __decorate([
                 gd3d.reflect.nodeComponent
             ], vignettingCtr);
@@ -16426,6 +16818,7 @@ var gd3d;
                 delete this.elements;
                 delete this.renderBatch;
             };
+            f14EffectSystem.ClassName = "f14EffectSystem";
             __decorate([
                 gd3d.reflect.Field("f14eff"),
                 gd3d.reflect.UIStyle("WidgetDragSelect"),
@@ -17579,8 +17972,14 @@ var gd3d;
                 else if (this.data.rendermodel == framework.RenderModelEnum.BillBoard) {
                     this.emissionMatToWorld = this.getEmissionMatToWorld();
                     gd3d.math.matrixTransformVector3(this.localTranslate, this.emissionMatToWorld, this.worldpos);
-                    this.tarWorldpos = this.element.effect.renderCamera.gameObject.transform.getWorldTranslate();
-                    gd3d.math.quatLookat(this.worldpos, this.tarWorldpos, this.worldRotation);
+                    var targetTrans = this.element.effect.renderCamera.gameObject.transform;
+                    this.tarWorldpos = targetTrans.getWorldTranslate();
+                    targetTrans.getRightInWorld(this.temptx);
+                    gd3d.math.vec3ScaleByNum(this.temptx, -1, this.temptx);
+                    gd3d.math.vec3Subtract(this.tarWorldpos, this.worldpos, this.lookDir);
+                    gd3d.math.vec3Normalize(this.lookDir, this.lookDir);
+                    gd3d.math.vec3Cross(this.lookDir, this.temptx, this.worldspeeddir);
+                    gd3d.math.unitxyzToRotation(this.temptx, this.worldspeeddir, this.lookDir, this.worldRotation);
                     this.emissionWorldRotation = this.getemissionWorldRotation();
                     gd3d.math.quatInverse(this.emissionWorldRotation, this.invParWorldRot);
                     gd3d.math.quatMultiply(this.invParWorldRot, this.worldRotation, this.localRotation);
@@ -18347,6 +18746,7 @@ var gd3d;
                 gd3d.math.pool.delete_vector3(distanc);
                 this.active = true;
             };
+            starCamCtr.ClassName = "starCamCtr";
             starCamCtr = __decorate([
                 gd3d.reflect.nodeComponent
             ], starCamCtr);
@@ -18420,6 +18820,9 @@ var gd3d;
         };
         AEvent.prototype.RemoveListenerAll = function () {
             this.events = {};
+        };
+        AEvent.prototype.listenerCount = function (event) {
+            return this.events[event] ? this.events[event].length : 0;
         };
         return AEvent;
     }());
@@ -18872,6 +19275,8 @@ var gd3d;
                 this.hasWheel = false;
                 this.lastWheel = 0;
                 this._contextMenu = function (ev) { ev.preventDefault(); };
+                this.tempV2_0 = new gd3d.math.vector2();
+                this.tempV2_1 = new gd3d.math.vector2();
                 this.app = app;
                 gd3d.math.matrix3x2MakeRotate(Math.PI * 90 / 180, this.rMtr_90);
                 gd3d.math.matrix3x2MakeRotate(Math.PI * -90 / 180, this.rMtr_n90);
@@ -18930,7 +19335,7 @@ var gd3d;
                 this._element = null;
             };
             inputMgr.prototype._mousedown = function (ev) {
-                this.CalcuPoint(ev.offsetX, ev.offsetY);
+                this.CalcuPoint(ev.offsetX, ev.offsetY, this._point);
                 this._buttons[ev.button] = true;
                 this._point.touch = true;
             };
@@ -18939,7 +19344,7 @@ var gd3d;
                 this._point.touch = false;
             };
             inputMgr.prototype._mousemove = function (ev) {
-                this.CalcuPoint(ev.offsetX, ev.offsetY);
+                this.CalcuPoint(ev.offsetX, ev.offsetY, this._point);
             };
             inputMgr.prototype._mousewheel = function (ev) {
                 this.hasWheel = true;
@@ -18953,32 +19358,34 @@ var gd3d;
                     this.lastWheel = 0;
                 }
             };
+            inputMgr.prototype.tryAddTouchP = function (id) {
+                if (!this._touches[id]) {
+                    this._touches[id] = new pointinfo();
+                    this._touches[id].id = id;
+                }
+            };
             inputMgr.prototype._touchstart = function (ev) {
-                this.CalcuPoint(ev.touches[0].clientX, ev.touches[0].clientY);
                 this._point.touch = true;
                 for (var i = 0; i < ev.changedTouches.length; i++) {
                     var touch = ev.changedTouches[i];
                     var id = touch.identifier;
-                    if (this._touches[id] == null) {
-                        this._touches[id] = new pointinfo();
-                        this._touches[id].id = id;
-                    }
+                    this.tryAddTouchP(id);
                     this._touches[id].touch = true;
-                    this._touches[id].x = touch.clientX;
-                    this._touches[id].y = touch.clientY;
+                    this.CalcuPoint(touch.clientX, touch.clientY, this._touches[id]);
+                    if (id == 0) {
+                        this._point.x = this._touches[id].x;
+                        this._point.y = this._touches[id].y;
+                    }
                 }
             };
             inputMgr.prototype._touchmove = function (ev) {
+                this._point.touch = true;
                 for (var i = 0; i < ev.changedTouches.length; i++) {
                     var touch = ev.changedTouches[i];
                     var id = touch.identifier;
-                    if (this._touches[id] == null) {
-                        this._touches[id] = new pointinfo();
-                        this._touches[id].id = id;
-                    }
+                    this.tryAddTouchP(id);
                     this._touches[id].touch = true;
-                    this._touches[id].x = touch.clientX;
-                    this._touches[id].y = touch.clientY;
+                    this.CalcuPoint(touch.clientX, touch.clientY, this._touches[id]);
                 }
                 var count = 0;
                 var x = 0;
@@ -18990,16 +19397,14 @@ var gd3d;
                         count++;
                     }
                 }
-                this.CalcuPoint(x / count, y / count);
+                this._point.x = x / count;
+                this._point.y = y / count;
             };
             inputMgr.prototype._touchend = function (ev) {
                 for (var i = 0; i < ev.changedTouches.length; i++) {
                     var touch = ev.changedTouches[i];
                     var id = touch.identifier;
-                    if (this._touches[id] == null) {
-                        this._touches[id] = new pointinfo();
-                        this._touches[id].id = id;
-                    }
+                    this.tryAddTouchP(id);
                     this._touches[id].touch = false;
                 }
                 for (var key in this._touches) {
@@ -19009,20 +19414,7 @@ var gd3d;
                 this._point.touch = false;
             };
             inputMgr.prototype._touchcancel = function (ev) {
-                for (var i = 0; i < ev.changedTouches.length; i++) {
-                    var touch = ev.changedTouches[i];
-                    var id = touch.identifier;
-                    if (this._touches[id] == null) {
-                        this._touches[id] = new pointinfo();
-                        this._touches[id].id = id;
-                    }
-                    this._touches[id].touch = false;
-                }
-                for (var key in this._touches) {
-                    if (this._touches[key].touch == true)
-                        return;
-                }
-                this._point.touch = false;
+                this._touchend(ev);
             };
             inputMgr.prototype._keydown = function (ev) {
                 this.hasKeyDown = this.keyboardMap[ev.keyCode] = true;
@@ -19057,6 +19449,9 @@ var gd3d;
                 else if (this.lastTouch && !pt.touch) {
                     this.hasPointUP = true;
                     this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointUp, pt.x, pt.y);
+                }
+                else if (this.lastTouch && pt.touch) {
+                    this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointHold, pt.x, pt.y);
                 }
                 if (this.hasPointUP && this.hasPointDown) {
                     var isMoveTolerance = (Math.abs(this.downPoint.x - pt.x) > this.moveTolerance || Math.abs(this.downPoint.y - pt.y) > this.moveTolerance);
@@ -19160,13 +19555,9 @@ var gd3d;
                 }
                 return count;
             };
-            inputMgr.prototype.CalcuPoint = function (clientX, clientY) {
-                if (!this.app || isNaN(clientX) || isNaN(clientY))
+            inputMgr.prototype.CalcuPoint = function (clientX, clientY, out) {
+                if (!out || !this.app || isNaN(clientX) || isNaN(clientY))
                     return;
-                if (!this.tempV2_0)
-                    this.tempV2_0 = gd3d.math.pool.new_vector2();
-                if (!this.tempV2_1)
-                    this.tempV2_1 = gd3d.math.pool.new_vector2();
                 this.tempV2_0.x = clientX / this.app.scaleFromPandding;
                 this.tempV2_0.y = clientY / this.app.scaleFromPandding;
                 gd3d.math.vec2Clone(this.tempV2_0, this.tempV2_1);
@@ -19174,24 +19565,24 @@ var gd3d;
                     switch (this.app.orientation) {
                         case gd3d.framework.OrientationMode.PORTRAIT:
                             gd3d.math.matrix3x2TransformVector2(this.rMtr_90, this.tempV2_0, this.tempV2_1);
-                            this._point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
-                            this._point.y = this.tempV2_1.y;
+                            out.x = this.tempV2_1.x + this.app.webgl.canvas.width;
+                            out.y = this.tempV2_1.y;
                             break;
                         case gd3d.framework.OrientationMode.LANDSCAPE:
                             gd3d.math.matrix3x2TransformVector2(this.rMtr_n90, this.tempV2_0, this.tempV2_1);
-                            this._point.x = this.tempV2_1.x;
-                            this._point.y = this.tempV2_1.y + this.app.webgl.canvas.height;
+                            out.x = this.tempV2_1.x;
+                            out.y = this.tempV2_1.y + this.app.webgl.canvas.height;
                             break;
                         case gd3d.framework.OrientationMode.LANDSCAPE_FLIPPED:
                             gd3d.math.matrix3x2TransformVector2(this.rMtr_90, this.tempV2_0, this.tempV2_1);
-                            this._point.x = this.tempV2_1.x + this.app.webgl.canvas.width;
-                            this._point.y = this.tempV2_1.y;
+                            out.x = this.tempV2_1.x + this.app.webgl.canvas.width;
+                            out.y = this.tempV2_1.y;
                             break;
                     }
                 }
                 else {
-                    this._point.x = this.tempV2_0.x;
-                    this._point.y = this.tempV2_0.y;
+                    out.x = this.tempV2_0.x;
+                    out.y = this.tempV2_0.y;
                 }
             };
             return inputMgr;
@@ -20038,8 +20429,12 @@ var gd3d;
             SerializeDependent.GetAssetContent = function (asset) {
                 var data = {};
                 if (asset instanceof gd3d.framework.material) {
-                    var names = asset.getName().split(".");
-                    return { "name": names[0] + ".mat.json", "value": asset.save(), "type": SaveAssetType.NameAndContent };
+                    var t = asset.getName();
+                    var names = t.split(".");
+                    if (t.lastIndexOf('.mat.json') == -1) {
+                        return { "name": names[0] + ".mat.json", "value": asset.save(), "type": SaveAssetType.NameAndContent };
+                    }
+                    return { "name": t, "value": asset.save(), "type": SaveAssetType.NameAndContent };
                 }
             };
             SerializeDependent.GetAssetUrl = function (asset, assetMgr) {
@@ -20834,6 +21229,7 @@ var gd3d;
                     var componentType = gd3d.gd3d_reflect_root["__gdmeta__"][type];
                     if (!componentType) {
                         console.warn(instanceObj);
+                        console.warn(type);
                         return console.warn("\u65E0\u6CD5\u627E\u5230\u7EC4\u4EF6:" + gd3d.gd3d_reflect_root["__gdmeta__"][type]);
                     }
                     if (type == "gameObject" && key == "gameObject" && gd3d.reflect.getClassName(instanceObj) == "transform") {
@@ -21465,7 +21861,9 @@ var gd3d;
     var math;
     (function (math) {
         function matrixGetTranslation(src, out) {
-            out.rawData.set(src.rawData.subarray(12, 15));
+            out.rawData[0] = src.rawData[12];
+            out.rawData[1] = src.rawData[13];
+            out.rawData[2] = src.rawData[14];
         }
         math.matrixGetTranslation = matrixGetTranslation;
         function matrixTranspose(src, out) {
@@ -21640,11 +22038,15 @@ var gd3d;
         }
         math.unitxyzToRotation = unitxyzToRotation;
         function matrixClone(src, out) {
-            out.rawData.set(src.rawData);
+            for (var i = 0; i < 16; i++) {
+                out.rawData[i] = src.rawData[i];
+            }
         }
         math.matrixClone = matrixClone;
         function matrix3x2Clone(src, out) {
-            out.rawData.set(src.rawData);
+            for (var i = 0; i < 6; i++) {
+                out.rawData[i] = src.rawData[i];
+            }
         }
         math.matrix3x2Clone = matrix3x2Clone;
         function matrixMakeIdentity(out) {
@@ -21961,6 +22363,16 @@ var gd3d;
             out.rawData[5] = temp_5;
         }
         math.matrix3x2Multiply = matrix3x2Multiply;
+        function matrix3x2Equal(mtx1, mtx2, threshold) {
+            if (threshold === void 0) { threshold = 0.00001; }
+            for (var i = 0; i < 6; i++) {
+                if (Math.abs(mtx1.rawData[i] - mtx2.rawData[i]) > threshold) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        math.matrix3x2Equal = matrix3x2Equal;
         function matrixProject_PerspectiveLH(fov, aspect, znear, zfar, out) {
             var tan = 1.0 / (Math.tan(fov * 0.5));
             out.rawData[0] = tan / aspect;
@@ -22185,6 +22597,16 @@ var gd3d;
             out.rawData[15] = left.rawData[15] + right.rawData[15];
         }
         math.matrixAdd = matrixAdd;
+        function matrixEqual(mtx1, mtx2, threshold) {
+            if (threshold === void 0) { threshold = 0.00001; }
+            for (var i = 0; i < 16; i++) {
+                if (Math.abs(mtx1.rawData[i] - mtx2.rawData[i]) > threshold) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        math.matrixEqual = matrixEqual;
     })(math = gd3d.math || (gd3d.math = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -28674,6 +29096,7 @@ var gd3d;
                 this.comp = comp;
                 this.init = init;
             }
+            nodeComponent.ClassName = "nodeComponent";
             __decorate([
                 gd3d.reflect.Field("INodeComponent"),
                 __metadata("design:type", Object)
@@ -28790,7 +29213,7 @@ var gd3d;
                         console.warn("已经有一个灯光的组件了，不能俩");
                     }
                 }
-                if (gd3d.reflect.getClassTag(comp["__proto__"], "boxcollider") == "1" || gd3d.reflect.getClassTag(comp["__proto__"], "meshcollider") == "1" || gd3d.reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1") {
+                if (gd3d.reflect.getClassTag(comp["__proto__"], "boxcollider") == "1" || gd3d.reflect.getClassTag(comp["__proto__"], "meshcollider") == "1" || gd3d.reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1" || gd3d.reflect.getClassTag(comp["__proto__"], "spherecollider") == "1") {
                     if (this.collider == null) {
                         this.collider = comp;
                     }
@@ -28837,8 +29260,8 @@ var gd3d;
                         array.push(obj.components[i].comp);
                     }
                 }
-                for (var i_7 = 0; obj.transform.children != undefined && i_7 < obj.transform.children.length; i_7++) {
-                    var _obj = obj.transform.children[i_7].gameObject;
+                for (var i_5 = 0; obj.transform.children != undefined && i_5 < obj.transform.children.length; i_5++) {
+                    var _obj = obj.transform.children[i_5].gameObject;
                     this._getComponentsInChildren(type, _obj, array);
                 }
             };
@@ -28912,6 +29335,7 @@ var gd3d;
             gameObject.prototype.dispose = function () {
                 this.removeAllComponents();
             };
+            gameObject.ClassName = "gameObject";
             __decorate([
                 gd3d.reflect.Field("number"),
                 gd3d.reflect.UIStyle("enum"),
@@ -29493,6 +29917,10 @@ var gd3d;
                 }
                 return ishited;
             };
+            scene.prototype.enable2DPhysics = function (op) {
+                if (op === void 0) { op = null; }
+                framework.physic2D = new framework.physicEngine2D(op);
+            };
             return scene;
         }());
         framework.scene = scene;
@@ -29903,9 +30331,116 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var helpV2_0 = new gd3d.math.vector2();
+        var helpV2_1 = new gd3d.math.vector2();
+        var helpV3_0 = new gd3d.math.vector3();
+        var helpV3_1 = new gd3d.math.vector3();
+        var collision = (function () {
+            function collision() {
+            }
+            collision.obbVsObb = function (a, b) {
+                if (!a || !b)
+                    return false;
+                var box0 = a;
+                var box1 = b;
+                if (!this.obbOverLap(box0.directions[0], box0, box1))
+                    return false;
+                if (!this.obbOverLap(box0.directions[1], box0, box1))
+                    return false;
+                if (!this.obbOverLap(box0.directions[2], box0, box1))
+                    return false;
+                if (!this.obbOverLap(box1.directions[0], box0, box1))
+                    return false;
+                if (!this.obbOverLap(box1.directions[1], box0, box1))
+                    return false;
+                if (!this.obbOverLap(box1.directions[2], box0, box1))
+                    return false;
+                gd3d.math.vec3Cross(box0.directions[0], box1.directions[0], helpV3_0);
+                if (!this.obbOverLap(helpV3_0, box0, box1))
+                    return false;
+                gd3d.math.vec3Cross(box0.directions[0], box1.directions[1], helpV3_0);
+                if (!this.obbOverLap(helpV3_0, box0, box1))
+                    return false;
+                gd3d.math.vec3Cross(box0.directions[0], box1.directions[2], helpV3_0);
+                if (!this.obbOverLap(helpV3_0, box0, box1))
+                    return false;
+                gd3d.math.vec3Cross(box0.directions[1], box1.directions[0], helpV3_0);
+                if (!this.obbOverLap(helpV3_0, box0, box1))
+                    return false;
+                gd3d.math.vec3Cross(box0.directions[1], box1.directions[1], helpV3_0);
+                if (!this.obbOverLap(helpV3_0, box0, box1))
+                    return false;
+                gd3d.math.vec3Cross(box0.directions[1], box1.directions[2], helpV3_0);
+                if (!this.obbOverLap(helpV3_0, box0, box1))
+                    return false;
+                gd3d.math.vec3Cross(box0.directions[2], box1.directions[0], helpV3_0);
+                if (!this.obbOverLap(helpV3_0, box0, box1))
+                    return false;
+                gd3d.math.vec3Cross(box0.directions[2], box1.directions[1], helpV3_0);
+                if (!this.obbOverLap(helpV3_0, box0, box1))
+                    return false;
+                gd3d.math.vec3Cross(box0.directions[2], box1.directions[2], helpV3_0);
+                if (!this.obbOverLap(helpV3_0, box0, box1))
+                    return false;
+                return true;
+            };
+            collision.sphereVsSphere = function (a, b) {
+                if (!a || !b)
+                    return false;
+                var dis = gd3d.math.vec3Distance(a.center, b.center);
+                return dis <= a.radius + b.radius;
+            };
+            collision.obbVsSphere = function (a, b) {
+                if (!a || !b)
+                    return false;
+                if (!this.obb_SphereOverLap(a.directions[0], a, b))
+                    return false;
+                if (!this.obb_SphereOverLap(a.directions[1], a, b))
+                    return false;
+                if (!this.obb_SphereOverLap(a.directions[2], a, b))
+                    return false;
+                var axis = helpV3_0;
+                gd3d.math.vec3Subtract(a.worldCenter, b.center, axis);
+                gd3d.math.vec3Normalize(axis, axis);
+                if (!this.obb_SphereOverLap(axis, a, b))
+                    return false;
+                gd3d.math.vec3Cross(a.directions[0], axis, helpV3_1);
+                if (!this.obb_SphereOverLap(helpV3_1, a, b))
+                    return false;
+                gd3d.math.vec3Cross(a.directions[1], axis, helpV3_1);
+                if (!this.obb_SphereOverLap(helpV3_1, a, b))
+                    return false;
+                gd3d.math.vec3Cross(a.directions[2], axis, helpV3_1);
+                if (!this.obb_SphereOverLap(helpV3_1, a, b))
+                    return false;
+                return true;
+            };
+            collision.obb_SphereOverLap = function (axis, box0, sphere) {
+                box0.computeExtentsByAxis(axis, helpV2_0);
+                sphere.computeExtentsByAxis(axis, helpV2_1);
+                return this.extentsOverlap(helpV2_0, helpV2_1);
+            };
+            collision.obbOverLap = function (axis, box0, box1) {
+                box0.computeExtentsByAxis(axis, helpV2_0);
+                box1.computeExtentsByAxis(axis, helpV2_1);
+                return this.extentsOverlap(helpV2_0, helpV2_1);
+            };
+            collision.extentsOverlap = function (a, b) {
+                return !(a.x > b.y || b.x > a.y);
+            };
+            return collision;
+        }());
+        framework.collision = collision;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var obb = (function () {
             function obb() {
                 this.vectors = new Array();
+                this.worldCenter = new gd3d.math.vector3();
             }
             obb.prototype.buildByMaxMin = function (minimum, maximum) {
                 this.vectors[0] = gd3d.math.pool.clone_vector3(minimum);
@@ -29951,7 +30486,7 @@ var gd3d;
                 this.directions = [new gd3d.math.vector3(), new gd3d.math.vector3(), new gd3d.math.vector3()];
             };
             obb.prototype.update = function (worldmatrix) {
-                gd3d.math.matrixGetTranslation(worldmatrix, this.center);
+                gd3d.math.matrixTransformVector3(this.center, worldmatrix, this.worldCenter);
                 gd3d.math.matrixGetVector3ByOffset(worldmatrix, 0, this.directions[0]);
                 gd3d.math.matrixGetVector3ByOffset(worldmatrix, 4, this.directions[1]);
                 gd3d.math.matrixGetVector3ByOffset(worldmatrix, 8, this.directions[2]);
@@ -29962,71 +30497,24 @@ var gd3d;
                     gd3d.math.matrixTransformVector3(this.vectors[index], worldmatrix, vecs[index]);
                 }
             };
-            obb.prototype.intersects = function (_obb) {
-                if (_obb == null)
+            obb.prototype.intersects = function (bound) {
+                if (!bound)
                     return false;
-                var box0 = this;
-                var box1 = _obb;
-                if (!this.axisOverlap(box0.directions[0], box0, box1))
-                    return false;
-                if (!this.axisOverlap(box0.directions[1], box0, box1))
-                    return false;
-                if (!this.axisOverlap(box0.directions[2], box0, box1))
-                    return false;
-                if (!this.axisOverlap(box1.directions[0], box0, box1))
-                    return false;
-                if (!this.axisOverlap(box1.directions[1], box0, box1))
-                    return false;
-                if (!this.axisOverlap(box1.directions[2], box0, box1))
-                    return false;
-                var crossresult = gd3d.math.pool.new_vector3();
-                gd3d.math.vec3Cross(box0.directions[0], box1.directions[0], crossresult);
-                if (!this.axisOverlap(crossresult, box0, box1))
-                    return false;
-                gd3d.math.vec3Cross(box0.directions[0], box1.directions[1], crossresult);
-                if (!this.axisOverlap(crossresult, box0, box1))
-                    return false;
-                gd3d.math.vec3Cross(box0.directions[0], box1.directions[2], crossresult);
-                if (!this.axisOverlap(crossresult, box0, box1))
-                    return false;
-                gd3d.math.vec3Cross(box0.directions[1], box1.directions[0], crossresult);
-                if (!this.axisOverlap(crossresult, box0, box1))
-                    return false;
-                gd3d.math.vec3Cross(box0.directions[1], box1.directions[1], crossresult);
-                if (!this.axisOverlap(crossresult, box0, box1))
-                    return false;
-                gd3d.math.vec3Cross(box0.directions[1], box1.directions[2], crossresult);
-                if (!this.axisOverlap(crossresult, box0, box1))
-                    return false;
-                gd3d.math.vec3Cross(box0.directions[2], box1.directions[0], crossresult);
-                if (!this.axisOverlap(crossresult, box0, box1))
-                    return false;
-                gd3d.math.vec3Cross(box0.directions[2], box1.directions[1], crossresult);
-                if (!this.axisOverlap(crossresult, box0, box1))
-                    return false;
-                gd3d.math.vec3Cross(box0.directions[2], box1.directions[2], crossresult);
-                if (!this.axisOverlap(crossresult, box0, box1))
-                    return false;
-                return true;
+                if (bound instanceof obb) {
+                    return framework.collision.obbVsObb(bound, this);
+                }
+                else if (bound instanceof framework.spherestruct) {
+                    return framework.collision.obbVsSphere(this, bound);
+                }
             };
-            obb.prototype.computeBoxExtents = function (axis, box) {
-                var p = gd3d.math.vec3Dot(box.center, axis);
-                var r0 = Math.abs(gd3d.math.vec3Dot(box.directions[0], axis)) * box.halfsize.x;
-                var r1 = Math.abs(gd3d.math.vec3Dot(box.directions[1], axis)) * box.halfsize.y;
-                var r2 = Math.abs(gd3d.math.vec3Dot(box.directions[2], axis)) * box.halfsize.z;
+            obb.prototype.computeExtentsByAxis = function (axis, out) {
+                var p = gd3d.math.vec3Dot(this.worldCenter, axis);
+                var r0 = Math.abs(gd3d.math.vec3Dot(this.directions[0], axis)) * this.halfsize.x;
+                var r1 = Math.abs(gd3d.math.vec3Dot(this.directions[1], axis)) * this.halfsize.y;
+                var r2 = Math.abs(gd3d.math.vec3Dot(this.directions[2], axis)) * this.halfsize.z;
                 var r = r0 + r1 + r2;
-                var result = gd3d.math.pool.new_vector3();
-                result.x = p - r;
-                result.y = p + r;
-                return result;
-            };
-            obb.prototype.axisOverlap = function (axis, box0, box1) {
-                var result0 = this.computeBoxExtents(axis, box0);
-                var result1 = this.computeBoxExtents(axis, box1);
-                return this.extentsOverlap(result0.x, result0.y, result1.x, result1.y);
-            };
-            obb.prototype.extentsOverlap = function (min0, max0, min1, max1) {
-                return !(min0 > max1 || min1 > max0);
+                out.x = p - r;
+                out.y = p + r;
             };
             obb.prototype.clone = function () {
                 var _obb = new obb();
@@ -31674,8 +32162,8 @@ var gd3d;
                 if (onprocess)
                     onprocess(ev.loaded, ev.total);
             };
-            req.onerror = function () {
-                fun(null, new Error("onerr in req:"));
+            req.onerror = function (ev) {
+                fun(null, new Error("URL : " + url + " \n onerr on req: "));
             };
             req.onloadend = function () {
                 if (!isLoaded) {
@@ -32078,7 +32566,7 @@ var gd3d;
             };
             pool.clone_matrix = function (src) {
                 var v = pool.new_matrix();
-                v.rawData.set(v.rawData);
+                v.rawData.set(src.rawData);
                 return v;
             };
             pool.delete_matrix = function (v) {
@@ -32506,7 +32994,6 @@ var gd3d;
         render.drawInfo = drawInfo;
         var glMesh = (function () {
             function glMesh() {
-                this.lineMode = WebGLRenderingContext.LINES;
                 this.bindIndex = -1;
                 this.vertexFormat = VertexFormatMask.Position;
             }
@@ -32718,7 +33205,7 @@ var gd3d;
                 if (count < 0)
                     count = ((this.vertexCount / 2) | 0) * 2;
                 drawInfo.ins.renderCount++;
-                webgl.drawArrays(this.lineMode, start, count);
+                webgl.drawArrays(webgl.LINES, start, count);
             };
             glMesh.prototype.drawElementTris = function (webgl, start, count) {
                 if (start === void 0) { start = 0; }
@@ -32735,7 +33222,7 @@ var gd3d;
                 if (count < 0)
                     count = ((this.indexCounts[this.bindIndex] / 2) | 0) * 2;
                 drawInfo.ins.renderCount++;
-                webgl.drawElements(this.lineMode, count, webgl.UNSIGNED_SHORT, start * 2);
+                webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);
             };
             return glMesh;
         }());
@@ -33541,6 +34028,100 @@ var gd3d;
                     line.push(this.trisindex[i * 4 + 3]);
                 }
                 return new Uint16Array(line);
+            };
+            meshData.cloneByObj = function (target) {
+                var md = new meshData();
+                target.originVF = md.originVF;
+                if (target.pos) {
+                    md.pos = [];
+                    target.pos.forEach(function (element, idx) {
+                        md.pos[idx] = new gd3d.math.vector3();
+                        md.pos[idx].x = element.x;
+                        md.pos[idx].y = element.y;
+                        md.pos[idx].z = element.z;
+                    });
+                }
+                if (target.color) {
+                    md.color = [];
+                    target.color.forEach(function (element, idx) {
+                        md.color[idx] = new gd3d.math.color();
+                        md.color[idx].r = element.r;
+                        md.color[idx].g = element.g;
+                        md.color[idx].b = element.b;
+                        md.color[idx].a = element.a;
+                    });
+                }
+                if (target.colorex) {
+                    md.colorex = [];
+                    target.colorex.forEach(function (element, idx) {
+                        md.colorex[idx] = new gd3d.math.color();
+                        md.colorex[idx].r = element.r;
+                        md.colorex[idx].g = element.g;
+                        md.colorex[idx].b = element.b;
+                        md.colorex[idx].a = element.a;
+                    });
+                }
+                if (target.uv) {
+                    md.uv = [];
+                    target.uv.forEach(function (element, idx) {
+                        md.uv[idx] = new gd3d.math.vector2();
+                        md.uv[idx].x = element.x;
+                        md.uv[idx].y = element.y;
+                    });
+                }
+                if (target.uv2) {
+                    md.uv2 = [];
+                    target.uv2.forEach(function (element, idx) {
+                        md.uv2[idx] = new gd3d.math.vector2();
+                        md.uv2[idx].x = element.x;
+                        md.uv2[idx].y = element.y;
+                    });
+                }
+                if (target.normal) {
+                    md.normal = [];
+                    target.normal.forEach(function (element, idx) {
+                        md.normal[idx] = new gd3d.math.vector3();
+                        md.normal[idx].x = element.x;
+                        md.normal[idx].y = element.y;
+                        md.normal[idx].z = element.z;
+                    });
+                }
+                if (target.tangent) {
+                    md.tangent = [];
+                    target.tangent.forEach(function (element, idx) {
+                        md.tangent[idx] = new gd3d.math.vector3();
+                        md.tangent[idx].x = element.x;
+                        md.tangent[idx].y = element.y;
+                        md.tangent[idx].z = element.z;
+                    });
+                }
+                if (target.blendIndex) {
+                    md.blendIndex = [];
+                    target.blendIndex.forEach(function (element, idx) {
+                        md.blendIndex[idx] = new render.number4();
+                        md.blendIndex[idx].v0 = element.v0;
+                        md.blendIndex[idx].v1 = element.v1;
+                        md.blendIndex[idx].v2 = element.v2;
+                        md.blendIndex[idx].v3 = element.v3;
+                    });
+                }
+                if (target.blendWeight) {
+                    md.blendWeight = [];
+                    target.blendWeight.forEach(function (element, idx) {
+                        md.blendWeight[idx] = new render.number4();
+                        md.blendWeight[idx].v0 = element.v0;
+                        md.blendWeight[idx].v1 = element.v1;
+                        md.blendWeight[idx].v2 = element.v2;
+                        md.blendWeight[idx].v3 = element.v3;
+                    });
+                }
+                if (target.trisindex) {
+                    md.trisindex = [];
+                    target.trisindex.forEach(function (element) {
+                        md.trisindex.push(element);
+                    });
+                }
+                return md;
             };
             return meshData;
         }());
@@ -34390,7 +34971,7 @@ var gd3d;
                 this.texture = webgl.createTexture();
             }
             glTextureCube.prototype.uploadImages = function (Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z) {
-                var wrc = WebGLRenderingContext;
+                var wrc = this.webgl;
                 var textures = [Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z];
                 var typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z, wrc.TEXTURE_CUBE_MAP_POSITIVE_X, wrc.TEXTURE_CUBE_MAP_POSITIVE_Y, wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
                 for (var i = 0; i < typeArr.length; i++) {

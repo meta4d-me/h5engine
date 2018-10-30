@@ -2,6 +2,7 @@
 
 namespace gd3d.framework
 {
+    let helpV2 = new gd3d.math.vector2();
     /**
      * @public
      * @language zh_CN
@@ -26,6 +27,8 @@ namespace gd3d.framework
     @reflect.node2DComponent
     export class button implements IRectRenderer ,event.IUIEventer
     {
+        static readonly ClassName:string="button";
+
         private _transition: TransitionType = TransitionType.ColorTint;
         /**
          * @public
@@ -223,6 +226,10 @@ namespace gd3d.framework
             this._pressedColor = null;
             if(this.pressedGraphic) this.pressedGraphic.unuse(true);
         }
+        
+        private downPointV2 = new gd3d.math.vector2();
+        private isMovedLimit = false; //point 移动范围是否超出限制值
+        private readonly movedLimit = 0.02; //point 移动范围限制值
         /**
          * @private
          */
@@ -231,15 +238,24 @@ namespace gd3d.framework
             //oncap==true 是捕获阶段，一般的行为，只在pop阶段处理
             if (oncap == false)
             {
-                var b = this.transform.ContainsCanvasPoint(new math.vector2(ev.x, ev.y));
+                helpV2.x = ev.x;
+                helpV2.y = ev.y;
+                var b = this.transform.ContainsCanvasPoint(helpV2);
 
                 if (b)
                 {
-                    ev.eated = true;
                     if (ev.type == event.PointEventEnum.PointDown)
                     {
                         this._downInThis = true;
                         this.showPress();
+                        let pd = event.UIEventEnum.PointerDown;
+                        if(this.UIEventer.listenerCount(event.UIEventEnum[pd]) > 0){
+                            this.UIEventer.EmitEnum(pd);
+                            ev.eated = true;
+                        }
+                        this.downPointV2.x = ev.x;
+                        this.downPointV2.y = ev.y;
+                        this.isMovedLimit = false;
                     }
                     else if (ev.type == event.PointEventEnum.PointHold && this._downInThis)
                     {
@@ -248,13 +264,26 @@ namespace gd3d.framework
                             this._dragOut = false;
                             this.showPress();
                         }
+                        if(!this.isMovedLimit){
+                            this.isMovedLimit = gd3d.math.vec2Distance(helpV2,this.downPointV2) > this.movedLimit;
+                        }
                     }
                     else if (ev.type == event.PointEventEnum.PointUp && this._downInThis)
                     {
                         this._downInThis = false;
                         this.showNormal();
-                        this.UIEventer.EmitEnum(event.UIEventEnum.PointerClick);
+                        let pu = event.UIEventEnum.PointerUp;
+                        if(this.UIEventer.listenerCount(event.UIEventEnum[pu]) > 0){
+                            this.UIEventer.EmitEnum(pu);
+                            ev.eated = true;
+                        }
+                        
                         //this.onClick.excute();
+                        let pc = event.UIEventEnum.PointerClick;
+                        if(!this.isMovedLimit && this.UIEventer.listenerCount(event.UIEventEnum[pc]) > 0){
+                            this.UIEventer.EmitEnum(pc);
+                            ev.eated = true;
+                        }
                     }
                 }
                 else

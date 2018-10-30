@@ -12,6 +12,8 @@ namespace gd3d.framework
     @reflect.node2DComponent
     export class progressbar implements I2DComponent
     {
+        static readonly ClassName:string="progressbar";
+
         private _cutPanel:transform2D;
         /**
          * 裁切容器

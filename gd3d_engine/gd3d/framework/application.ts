@@ -59,6 +59,7 @@ namespace gd3d.framework
         stats: Stats.Stats;
         container: HTMLDivElement;
         outcontainer: HTMLDivElement;
+        edModel:boolean;
         /**
          * @public
          * @language zh_CN

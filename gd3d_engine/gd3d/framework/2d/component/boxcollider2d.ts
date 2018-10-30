@@ -13,6 +13,8 @@ namespace gd3d.framework
     @reflect.nodeBoxCollider2d
     export class boxcollider2d implements I2DComponent , ICollider2d
     {
+        static readonly ClassName:string="boxcollider2d";
+        
         transform: transform2D;
 
         private _obb: obb2d;

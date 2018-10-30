@@ -13,6 +13,8 @@ namespace gd3d.framework
     @reflect.nodeRender
     export class label implements IRectRenderer
     {
+        static readonly ClassName:string="label";
+
         private _text: string;
         /**
          * @public
@@ -432,29 +434,57 @@ namespace gd3d.framework
         @reflect.UIStyle("color")
         color2: math.color = new math.color(0, 0, 0.5, 0.5);
         
+        private static readonly defUIShader = `shader/defmaskfont`;
+
+        private _shaderName = label.defUIShader;
+
+        private _shaderDirty = false;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置rander Shader名字
+         * @version egret-gd3d 1.0
+         */
+        setShaderByName(shaderName:string){
+            this._shaderName = shaderName;
+            this._shaderDirty = true;
+        }
+
        /**
          * @private
          * ui默认材质
          */
-        _uimat: material;
+        private _uimat: material;
+        private _lastMask = false;
         private get uimat(){
             if (this.font  && this.font.texture ){
-                let rectPostfix = this.transform.parentIsMask? `_(${this.transform.insId})`: ""; //when parentIsMask,can't multiplexing material
-                let matName = this.font.texture.getName()+"_fontmask" + rectPostfix;
                 let canvas = this.transform.canvas;
                 if(!canvas.assetmgr) return;
+                let assetmgr = canvas.assetmgr;
+                let pMask = this.transform.parentIsMask;
                 let mat = this._uimat;
+                let rectPostfix = pMask ? `_(${this.transform.parent.insId})`: ""; //when parentIsMask,can't multiplexing material , can be multiplexing when parent equal
+                let matName =this.font.texture.getName() + "_uimask" + rectPostfix;
+                let matChanged = false;
                 if(!mat || mat.getName() != matName){
                     if(mat) mat.unuse(); 
-                    mat = canvas.assetmgr.getAssetByName(matName) as gd3d.framework.material;
+                    mat = assetmgr.getAssetByName(matName) as gd3d.framework.material;
                     if(mat) mat.use();
                 }
                 if(mat == null){
                     mat = new material(matName);
-                    mat.setShader(canvas.assetmgr.getShader("shader/defmaskfont"));
+                    let sh = assetmgr.getShader(this._shaderName);
+                    sh = !sh? assetmgr.getShader(label.defUIShader) : sh;
+                    mat.setShader(sh);
                     mat.use();
+                    matChanged = true;
                 }
-                mat.setFloat("MaskState", this.transform.parentIsMask? 1 : 0);
+                if(matChanged || this._lastMask != pMask){
+                    mat.setFloat("MaskState", this.transform.parentIsMask? 1 : 0);
+                    this._lastMask = pMask;
+                }
                 this._uimat = mat;
             }
             return this._uimat;
@@ -469,9 +499,14 @@ namespace gd3d.framework
         render(canvas: canvas)
         {
             if(this._font == null ){
-                let temp = canvas.assetmgr.mapNamed[this._fontName];
+                let resName = this._fontName;
+                let temp = canvas.assetmgr.mapNamed[resName];
+                if(temp == undefined){
+                    resName = `${this._fontName}.font.json`
+                    temp = canvas.assetmgr.mapNamed[resName];
+                }
                 if(temp != null){
-                    let tfont = canvas.assetmgr.getAssetByName(this._fontName) as gd3d.framework.font;
+                    let tfont = canvas.assetmgr.getAssetByName(resName) as gd3d.framework.font;
                     if(tfont){
                         this.font = tfont;
                         this.needRefreshFont = true;

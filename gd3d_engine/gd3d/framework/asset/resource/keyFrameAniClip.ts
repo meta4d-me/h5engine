@@ -25,6 +25,8 @@ namespace gd3d.framework {
      */
     @gd3d.reflect.SerializeType
     export class keyFrameAniClip implements IAsset {
+        static readonly ClassName:string="keyFrameAniClip";
+
         @gd3d.reflect.Field("constText")
         private name: constText;
         private id: resID = new resID();

@@ -69,6 +69,8 @@ namespace gd3d.framework {
      */
     @gd3d.reflect.SerializeType
     export class C2DComponent {
+        static readonly ClassName:string="C2DComponent";
+        
         @gd3d.reflect.Field("I2DComponent")
         comp: I2DComponent;
         init: boolean;
@@ -89,6 +91,8 @@ namespace gd3d.framework {
      */
     @gd3d.reflect.SerializeType
     export class transform2D {
+        static readonly ClassName:string="transform2D";
+
         // public notify: INotify;
         private _canvas: canvas;
 
@@ -220,6 +224,7 @@ namespace gd3d.framework {
          */
         hideFlags: HideFlags = HideFlags.None;
 
+        @gd3d.reflect.Field("boolean")
         private _visible = true;
 
         /**
@@ -518,11 +523,12 @@ namespace gd3d.framework {
                 else {
                     gd3d.math.matrix3x2Multiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
                 }
+                
+                this.dirtyWorldDecompose = true;
                 this.updateMaskRect();
                 if (this.renderer != null) {
                     this.renderer.updateTran();
                 }
-                this.dirtyWorldDecompose = true;
             }
 
             if (this.children != null) {
@@ -1182,6 +1188,8 @@ namespace gd3d.framework {
         }
 
         private layoutDirty = false;
+        private lastWidth = 0;
+        private lastHeight = 0;
         private lastParentWidth = 0;
         private lastParentHeight = 0;
         private lastParentPivot = new math.vector2(0, 0);
@@ -1190,7 +1198,7 @@ namespace gd3d.framework {
         private refreshLayout() {
             let parent = this.parent;
             if (!parent) return;
-            if (parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
+            if (this.width != this.lastWidth || this.height != this.lastHeight || parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
                 || parent.pivot.y != this.lastParentPivot.y || this.pivot.x != this.lastPivot.x || this.pivot.y != this.lastPivot.y)
                 this.layoutDirty = true;
 
@@ -1229,6 +1237,8 @@ namespace gd3d.framework {
             this.layoutDirty = false;
             this.lastParentWidth = parent.width;
             this.lastParentHeight = parent.height;
+            this.lastWidth = this.width;
+            this.lastHeight = this.height;
             this.lastParentPivot.x = parent.pivot.x;
             this.lastParentPivot.y = parent.pivot.y;
             this.lastPivot.x = this.pivot.x;

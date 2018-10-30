@@ -19,6 +19,8 @@ namespace gd3d.framework
     @reflect.nodeLight
     export class light implements INodeComponent
     {
+        static readonly ClassName:string="light";
+
          /**
          * @public
          * @language zh_CN

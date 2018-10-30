@@ -84,6 +84,13 @@ namespace gd3d
         {
             this.events = {};
         }
+
+        /**
+         * 指定事件监听者的数量
+         */
+        public listenerCount(event: string){
+            return this.events[event] ? this.events[event].length: 0;
+        }
     }
 
 }

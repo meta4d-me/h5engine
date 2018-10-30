@@ -5,6 +5,8 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class AudioPlayer implements INodeComponent
     {
+        static readonly ClassName:string="AudioPlayer";
+
         public buffer: AudioBuffer;
         public beLoop: boolean;
         public be3DSound: boolean = true;

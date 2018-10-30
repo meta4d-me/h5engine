@@ -13,6 +13,8 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class skinnedMeshRenderer implements IRenderer
     {
+        static readonly ClassName:string="skinnedMeshRenderer";
+
         constructor()
         {
         }

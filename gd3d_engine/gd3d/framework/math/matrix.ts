@@ -2,10 +2,10 @@
 {
     export function matrixGetTranslation(src: matrix, out: vector3)
     {
-        // out.rawData[0] = src.rawData[12];
-        // out.rawData[1] = src.rawData[13];
-        // out.rawData[2] = src.rawData[14];
-        out.rawData.set(src.rawData.subarray(12, 15));
+        out.rawData[0] = src.rawData[12];
+        out.rawData[1] = src.rawData[13];
+        out.rawData[2] = src.rawData[14];
+        //out.rawData.set(src.rawData.subarray(12, 15));
     }
 
     /**
@@ -251,19 +251,19 @@
 
     export function matrixClone(src: matrix, out: matrix)
     {
-        // for (var i = 0; i < 16; i++)
-        // {
-        //     out.rawData[i] = src.rawData[i];
-        // }
-        out.rawData.set(src.rawData);
+        for (var i = 0; i < 16; i++)
+        {
+            out.rawData[i] = src.rawData[i];
+        }
+        // out.rawData.set(src.rawData);
     }
     export function matrix3x2Clone(src: matrix3x2, out: matrix3x2)
     {
-        // for (var i = 0; i < 6; i++)
-        // {
-        //     out.rawData[i] = src.rawData[i];
-        // }
-        out.rawData.set(src.rawData);
+        for (var i = 0; i < 6; i++)
+        {
+            out.rawData[i] = src.rawData[i];
+        }
+        // out.rawData.set(src.rawData);
     }
     export function matrixMakeIdentity(out: matrix)
     {
@@ -668,6 +668,15 @@
         out.rawData[4] = temp_4;
         out.rawData[5] = temp_5;
     }
+    
+    export function matrix3x2Equal(mtx1: matrix3x2, mtx2: matrix3x2, threshold = 0.00001): boolean {
+        for(let i = 0;i < 6 ;i++){
+            if(Math.abs(mtx1.rawData[i] - mtx2.rawData[i]) > threshold){
+                return false;
+            }
+        }
+        return true;
+     }
     export function matrixProject_PerspectiveLH(fov: number, aspect: number, znear: number, zfar: number, out: matrix)
     {
         var tan = 1.0 / (Math.tan(fov * 0.5));
@@ -951,4 +960,13 @@
         out.rawData[14] = left.rawData[14] + right.rawData[14];
         out.rawData[15] = left.rawData[15] + right.rawData[15];
     }
+
+    export function matrixEqual(mtx1: matrix, mtx2: matrix, threshold = 0.00001): boolean {
+        for(let i = 0;i < 16 ;i++){
+            if(Math.abs(mtx1.rawData[i] - mtx2.rawData[i]) > threshold){
+                return false;
+            }
+        }
+        return true;
+     }
 }

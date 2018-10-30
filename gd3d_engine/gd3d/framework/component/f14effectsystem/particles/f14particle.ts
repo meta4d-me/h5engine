@@ -299,8 +299,16 @@ namespace gd3d.framework
             {
                 this.emissionMatToWorld=this.getEmissionMatToWorld();
                 math.matrixTransformVector3(this.localTranslate,this.emissionMatToWorld,this.worldpos);
-                this.tarWorldpos=this.element.effect.renderCamera.gameObject.transform.getWorldTranslate();
-                gd3d.math.quatLookat(this.worldpos, this.tarWorldpos, this.worldRotation);
+                let targetTrans=this.element.effect.renderCamera.gameObject.transform;
+                this.tarWorldpos=targetTrans.getWorldTranslate();
+                //gd3d.math.quatLookat(this.worldpos, this.tarWorldpos, this.worldRotation);
+
+                targetTrans.getRightInWorld(this.temptx);
+                math.vec3ScaleByNum(this.temptx,-1,this.temptx);
+                math.vec3Subtract(this.tarWorldpos,this.worldpos,this.lookDir);
+                math.vec3Normalize(this.lookDir,this.lookDir);
+                math.vec3Cross(this.lookDir,this.temptx,this.worldspeeddir);
+                math.unitxyzToRotation(this.temptx,this.worldspeeddir,this.lookDir,this.worldRotation);
 
                 this.emissionWorldRotation=this.getemissionWorldRotation();
                 math.quatInverse(this.emissionWorldRotation,this.invParWorldRot);

@@ -46,6 +46,8 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class nodeComponent
     {
+        static readonly ClassName:string="nodeComponent";
+        
         /**
          * @public
          * @language zh_CN
@@ -81,6 +83,7 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class gameObject
     {
+        static readonly ClassName:string="gameObject";
         /**
          * @public
          * @language zh_CN
@@ -385,7 +388,7 @@ namespace gd3d.framework
                     //throw new Error("已经有一个灯光的组件了，不能俩");
                 }
             }
-            if (reflect.getClassTag(comp["__proto__"], "boxcollider") == "1" || reflect.getClassTag(comp["__proto__"], "meshcollider") == "1" || reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1")
+            if (reflect.getClassTag(comp["__proto__"], "boxcollider") == "1" || reflect.getClassTag(comp["__proto__"], "meshcollider") == "1" || reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1" || reflect.getClassTag(comp["__proto__"], "spherecollider") == "1")
             {//comp是个collider
                 if (this.collider == null)
                 {

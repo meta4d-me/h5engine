@@ -12,6 +12,8 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class aniplayer implements INodeComponent
     {
+        static readonly ClassName:string="aniplayer";
+
         gameObject: gameObject;
 
         @reflect.Field("animationClip[]")
@@ -534,7 +536,7 @@ namespace gd3d.framework
                         }
                     } else
                     {
-                        console.error("Bone: " + bonename + " Not Record in Aniclip(" + this._playClip.getName() + ").");
+                        // console.error("Bone: " + bonename + " Not Record in Aniclip(" + this._playClip.getName() + ").");
                     }
                     //----------------------
                 }
