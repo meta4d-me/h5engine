@@ -12,6 +12,8 @@ namespace dome
         private paojia:gd3d.framework.transform;
         private paodan:gd3d.framework.transform;
         private guiji:gd3d.framework.transform;
+        private guanghuan:gd3d.framework.transform;
+
         private orgPos:gd3d.math.vector3=new gd3d.math.vector3(0,0,-10);
         rotEuler:gd3d.math.vector3=new gd3d.math.vector3(-90,0,0);
         gravity:number=10;
@@ -54,6 +56,7 @@ namespace dome
         private paoKouPos:gd3d.math.vector3=new gd3d.math.vector3();
 
         private timer:number=0;
+        private forward:gd3d.math.vector3=new gd3d.math.vector3();
         update(delta: number) {
             this.taskmgr.move(delta);
             CameraController.instance().update(delta);
@@ -75,6 +78,13 @@ namespace dome
                 //gd3d.math.vec3ScaleByNum(this.dir,this.paoLen,this.paoKouPos);
 
                 meshf.mesh=this.getMeshData(-this.rotEuler.x,this.gravity,this.speed,this.paoLen);
+
+
+                //------------------
+                this.guiji.getForwardInWorld(this.forward);
+                gd3d.math.vec3ScaleByNum(this.forward,this.guanghuantoPaoJia,this.forward);
+                gd3d.math.vec3Add(this.guiji.getWorldPosition(),this.forward,this.guanghuan.localPosition);
+                this.guanghuan.markDirty();
             }
 
 
@@ -158,6 +168,13 @@ namespace dome
             mat.setShader(shader);
             meshr3.materials=[mat];
 
+            let cube4=new gd3d.framework.transform();
+            this.guanghuan=cube4;
+            this.scene.addChild(cube4);
+            let meshf4=cube4.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+            cube4.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+            meshf4.mesh=this.assetmgr.getDefaultMesh("cube");
+
         }
 
         getDirByRotAngle(euler:gd3d.math.vector3,dir:gd3d.math.vector3)
@@ -178,6 +195,7 @@ namespace dome
 
         private mesh:gd3d.framework.mesh;
         private lerpCount:number=50;
+        private guanghuantoPaoJia:number;
         getMeshData(anglex:number,gravity:number,speed:number,paoLen:number,paojiaPosY:number=0):gd3d.framework.mesh
         {
             if(this.mesh==null)
@@ -205,6 +223,10 @@ namespace dome
                     posarr.push(newpos1);
                     posarr.push(newpos2);
                     
+                    if(i==count)
+                    {
+                        this.guanghuantoPaoJia=speedz*counttime+paokouz;
+                    }
                 }
                 this.mesh.data.pos=posarr;
                 var vf = gd3d.render.VertexFormatMask.Position| gd3d.render.VertexFormatMask.UV0;
