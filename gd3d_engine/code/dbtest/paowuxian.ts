@@ -82,6 +82,9 @@ namespace dome
             {
                 this.timer+=delta*0.1;
                 let move=new gd3d.math.vector3();
+                this.getDirByRotAngle(this.rotEuler,this.dir);
+                gd3d.math.vec3ScaleByNum(this.dir,this.paoLen,this.paoKouPos);
+
                 gd3d.math.vec3ScaleByNum(this.dir,this.speed,move);
                 gd3d.math.vec3ScaleByNum(move,this.timer,move);
                 move.y-=0.5*this.gravity*this.timer*this.timer;
