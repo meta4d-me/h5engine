@@ -6363,7 +6363,7 @@ var gd3d;
                 var flag = true;
                 if (id != null) {
                     var r = this.mapRes[id];
-                    if (r != null)
+                    if (r != null && !r[this._loadingTag])
                         return r.asset;
                 }
                 if (flag) {
