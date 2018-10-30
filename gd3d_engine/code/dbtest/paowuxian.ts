@@ -13,7 +13,7 @@ namespace dome
         private paodan:gd3d.framework.transform;
         private guiji:gd3d.framework.transform;
         private orgPos:gd3d.math.vector3=new gd3d.math.vector3(0,0,-10);
-        rotEuler:gd3d.math.vector3=new gd3d.math.vector3(-30,30,0);
+        rotEuler:gd3d.math.vector3=new gd3d.math.vector3(-90,0,0);
         gravity:number=10;
         speed:number=10;
 
@@ -60,6 +60,8 @@ namespace dome
 
             if(this.paojia)
             {
+                this.rotEuler.x= gd3d.math.floatClamp(this.rotEuler.x,-90,0);
+
                 this.paojia.localEulerAngles=this.rotEuler;
                 this.paojia.markDirty();
     
@@ -67,10 +69,12 @@ namespace dome
                 this.guiji.markDirty();
     
                 let meshf=this.guiji.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
-                this.getDirByRotAngle(this.rotEuler,this.dir);
+                // this.getDirByRotAngle(this.rotEuler,this.dir);
+                // gd3d.math.vec3Normalize(this.dir,this.dir);
                 //------------炮口位置
-                gd3d.math.vec3ScaleByNum(this.dir,this.paoLen,this.paoKouPos);
-                meshf.mesh=this.getMeshData(this.dir,this.gravity,this.speed,this.paoKouPos);
+                //gd3d.math.vec3ScaleByNum(this.dir,this.paoLen,this.paoKouPos);
+
+                meshf.mesh=this.getMeshData(-this.rotEuler.x,this.gravity,this.speed,this.paoLen);
             }
 
 
@@ -169,8 +173,48 @@ namespace dome
             // meshf2.mesh=this.assetmgr.getDefaultMesh("cube");
         }
 
-        getMeshData(dir:gd3d.math.vector3,gravity:number,speed:number,pos:gd3d.math.vector3):gd3d.framework.mesh
+        private mesh:gd3d.framework.mesh;
+        private lerpCount:number=50;
+        getMeshData(anglex:number,gravity:number,speed:number,paoLen:number,paojiaPosY:number=0):gd3d.framework.mesh
         {
+            if(this.mesh==null)
+            {
+               this.mesh=this.initmesh(anglex,gravity,speed,paoLen,paojiaPosY);
+            }else
+            {
+                anglex=anglex*Math.PI/180;
+                let halfwidth:number=0.1;
+                let posarr:gd3d.math.vector3[]=[];
+                let paokouy=paoLen*Math.sin(anglex);
+                let paokouz=paoLen*Math.cos(anglex);
+                
+                let speedy=Math.sin(anglex)*speed;
+                let speedz=Math.cos(anglex)*speed;
+                let totalTime=speedy/gravity+Math.sqrt(2*(paojiaPosY+paokouy)/gravity+Math.pow(speedy/gravity,2));
+                //
+                let count=this.lerpCount;
+                let deltaTime=totalTime/count;
+                for(let i=0;i<=count;i++)
+                {
+                    let counttime=deltaTime*i;
+                    let newpos1=new gd3d.math.vector3(halfwidth,speedy*counttime-0.5*gravity*Math.pow(counttime,2)+paokouy,speedz*counttime+paokouz);
+                    let newpos2=new gd3d.math.vector3(-halfwidth,speedy*counttime-0.5*gravity*Math.pow(counttime,2)+paokouy,speedz*counttime+paokouz);
+                    posarr.push(newpos1);
+                    posarr.push(newpos2);
+                    
+                }
+                this.mesh.data.pos=posarr;
+                var vf = gd3d.render.VertexFormatMask.Position| gd3d.render.VertexFormatMask.UV0;
+                var v32 = this.mesh.data.genVertexDataArray(vf);
+                this.mesh.glMesh.uploadVertexData(this.app.webgl, v32);
+            }
+            
+            return this.mesh
+        }
+
+        private initmesh(anglex:number,gravity:number,speed:number,paoLen:number,paojiaPosY:number=0):gd3d.framework.mesh
+        {
+            anglex=anglex*Math.PI/180;
             let halfwidth:number=0.1;
             let posarr:gd3d.math.vector3[]=[];
             let uvArr:gd3d.math.vector2[]=[];
@@ -180,22 +224,20 @@ namespace dome
             data.uv=uvArr;
             data.trisindex=trisindex;
 
-            let newdir=new gd3d.math.vector3(dir.x,0,dir.z);
-            // let totalTime=dir.y*speed*2/gravity;
-            let speedy=dir.y*speed;
-            let totalTime=speedy/gravity+Math.sqrt(2*pos.y/gravity+Math.pow(speedy/gravity,2));
-            let newsped=new gd3d.math.vector3();
-            gd3d.math.vec3ScaleByNum(newdir,speed,newsped);
-            let sped=gd3d.math.vec3Length(newsped);
-            let spedy=dir.y*speed;
+            let paokouy=paoLen*Math.sin(anglex);
+            let paokouz=paoLen*Math.cos(anglex);
+            
+            let speedy=Math.sin(anglex)*speed;
+            let speedz=Math.cos(anglex)*speed;
+            let totalTime=speedy/gravity+Math.sqrt(2*(paojiaPosY+paokouy)/gravity+Math.pow(speedy/gravity,2));
             //
-            let count=100;
+            let count=this.lerpCount;
             let deltaTime=totalTime/count;
-            let counttime:number=0;
-            for(let i=0;i<count;i++)
+            for(let i=0;i<=count;i++)
             {
-                let newpos1=new gd3d.math.vector3(halfwidth,spedy*counttime-0.5*gravity*Math.pow(counttime,2)+pos.y,sped*counttime+pos.z);
-                let newpos2=new gd3d.math.vector3(-halfwidth,spedy*counttime-0.5*gravity*Math.pow(counttime,2)+pos.y,sped*counttime+pos.z);
+                let counttime=deltaTime*i;
+                let newpos1=new gd3d.math.vector3(halfwidth,speedy*counttime-0.5*gravity*Math.pow(counttime,2)+paokouy,speedz*counttime+paokouz);
+                let newpos2=new gd3d.math.vector3(-halfwidth,speedy*counttime-0.5*gravity*Math.pow(counttime,2)+paokouy,speedz*counttime+paokouz);
                 posarr.push(newpos1);
                 posarr.push(newpos2);
 
@@ -205,10 +247,8 @@ namespace dome
                 uvArr.push(newUv2);
 
                 trisindex.push();
-
-                counttime+=deltaTime;
             }
-            for(let i=0;i<count-1;i++)
+            for(let i=0;i<count;i++)
             {
                 trisindex.push(2*i+0,2*i+2,2*i+1,2*i+1,2*i+2,2*i+3);
             }
@@ -221,7 +261,7 @@ namespace dome
             var i16 = _mesh.data.genIndexDataArray();
 
             _mesh.glMesh = new gd3d.render.glMesh();
-            _mesh.glMesh.initBuffer(this.app.webgl, vf, _mesh.data.pos.length);
+            _mesh.glMesh.initBuffer(this.app.webgl, vf, _mesh.data.pos.length,gd3d.render.MeshTypeEnum.Dynamic);
             _mesh.glMesh.uploadVertexData(this.app.webgl, v32);
 
             _mesh.glMesh.addIndex(this.app.webgl, i16.length);
