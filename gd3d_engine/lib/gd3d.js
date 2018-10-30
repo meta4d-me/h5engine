@@ -1278,6 +1278,7 @@ var gd3d;
                 }
             };
             canvas.prototype.render = function (context, assetmgr) {
+                framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.UI;
                 this.context = context;
                 this.assetmgr = assetmgr;
                 this.lastMat = null;
@@ -1291,7 +1292,6 @@ var gd3d;
                     this.beforeRender();
                 this.drawScene(this.rootNode, context, assetmgr);
                 this.batcher.end(context.webgl);
-                framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.UI;
                 if (this.afterRender != null)
                     this.afterRender();
             };
@@ -1441,6 +1441,7 @@ var gd3d;
                 var vertexcount = (this.vboCount / (this.mesh.vertexByteSize / 4)) | 0;
                 this.curPass.use(webgl);
                 this.mesh.bind(webgl, this.curPass.program, (this.drawMode == gd3d.render.DrawModeEnum.EboLine || this.drawMode == gd3d.render.DrawModeEnum.EboTri) ? 0 : -1);
+                framework.DrawCallInfo.inc.add();
                 if (this.drawMode == gd3d.render.DrawModeEnum.EboLine) {
                     this.mesh.drawElementLines(webgl, 0, this.eboCount);
                 }

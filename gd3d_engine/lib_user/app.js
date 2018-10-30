@@ -1091,6 +1091,8 @@ var main = (function () {
     main.prototype.onStart = function (app) {
         console.log("i am here.");
         this.app = app;
+        this.addBtn("paowuxian", function () { return new dome.paowuxian(); });
+        this.addBtn("rayTest", function () { return new dome.rayTest(); });
         this.addBtn("f14effect", function () { return new dome.db_test_f14eff(); });
         this.addBtn("physic2d_dome", function () { return new physic2d_dome(); });
         this.addBtn("test_ui", function () { return new t.test_ui(); });
@@ -10607,6 +10609,242 @@ var Test_CameraController = (function () {
     };
     return Test_CameraController;
 }());
+var dome;
+(function (dome) {
+    var paowuxian = (function () {
+        function paowuxian() {
+            this.taskmgr = new gd3d.framework.taskMgr();
+            this.paoLen = 2;
+            this.orgPos = new gd3d.math.vector3(0, 0, -10);
+            this.rotEuler = new gd3d.math.vector3(-90, 0, 0);
+            this.gravity = 10;
+            this.speed = 10;
+            this.dir = new gd3d.math.vector3();
+            this.paoKouPos = new gd3d.math.vector3();
+            this.timer = 0;
+            this.lerpCount = 50;
+            this.actived = false;
+        }
+        paowuxian.prototype.start = function (app) {
+            this.app = app;
+            this.scene = app.getScene();
+            this.assetmgr = app.getAssetMgr();
+            this.taskmgr.addTaskCall(this.loadShader.bind(this));
+            this.taskmgr.addTaskCall(this.gamerun.bind(this));
+        };
+        paowuxian.prototype.loadShader = function (laststate, state) {
+            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+                if (_state.isfinish) {
+                    state.finish = true;
+                }
+            });
+        };
+        paowuxian.prototype.gamerun = function (laststate, state) {
+            this.addcam();
+            this.addcube();
+            this.addUI();
+            state.finish = true;
+        };
+        paowuxian.prototype.update = function (delta) {
+            this.taskmgr.move(delta);
+            CameraController.instance().update(delta);
+            if (this.paojia) {
+                this.rotEuler.x = gd3d.math.floatClamp(this.rotEuler.x, -90, 0);
+                this.paojia.localEulerAngles = this.rotEuler;
+                this.paojia.markDirty();
+                this.guiji.localEulerAngles = new gd3d.math.vector3(0, this.rotEuler.y, 0);
+                this.guiji.markDirty();
+                var meshf = this.guiji.gameObject.getComponent("meshFilter");
+                meshf.mesh = this.getMeshData(-this.rotEuler.x, this.gravity, this.speed, this.paoLen);
+            }
+            if (this.actived) {
+                this.timer += delta * 0.1;
+                var move = new gd3d.math.vector3();
+                this.getDirByRotAngle(this.rotEuler, this.dir);
+                gd3d.math.vec3ScaleByNum(this.dir, this.paoLen, this.paoKouPos);
+                gd3d.math.vec3ScaleByNum(this.dir, this.speed, move);
+                gd3d.math.vec3ScaleByNum(move, this.timer, move);
+                move.y -= 0.5 * this.gravity * this.timer * this.timer;
+                gd3d.math.vec3Add(this.paoKouPos, move, this.paodan.localPosition);
+                gd3d.math.vec3Add(this.paodan.localPosition, this.paojia.getWorldPosition(), this.paodan.localPosition);
+                this.paodan.markDirty();
+                if (this.paodan.localPosition.y < 0) {
+                    this.actived = false;
+                }
+            }
+        };
+        paowuxian.prototype.addcam = function () {
+            var objCam = new gd3d.framework.transform();
+            objCam.name = "sth.";
+            this.scene.addChild(objCam);
+            this.camera = objCam.gameObject.addComponent("camera");
+            this.camera.near = 0.01;
+            this.camera.far = 2000;
+            this.camera.fov = Math.PI * 0.3;
+            this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
+            objCam.localTranslate = new gd3d.math.vector3(0, 0, -15);
+            objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+            objCam.markDirty();
+            CameraController.instance().init(this.app, this.camera);
+        };
+        paowuxian.prototype.addcube = function () {
+            var cube0 = new gd3d.framework.transform();
+            cube0.localScale = new gd3d.math.vector3(1000, 0.01, 1000);
+            this.scene.addChild(cube0);
+            var meshf0 = cube0.gameObject.addComponent("meshFilter");
+            var meshr0 = cube0.gameObject.addComponent("meshRenderer");
+            meshf0.mesh = this.assetmgr.getDefaultMesh("cube");
+            var cube1 = new gd3d.framework.transform();
+            this.paojia = cube1;
+            cube1.localPosition = this.orgPos;
+            cube1.localScale = new gd3d.math.vector3(0.5, 0.5, this.paoLen * 2);
+            this.scene.addChild(cube1);
+            var meshf1 = cube1.gameObject.addComponent("meshFilter");
+            var meshr1 = cube1.gameObject.addComponent("meshRenderer");
+            meshf1.mesh = this.assetmgr.getDefaultMesh("cube");
+            var cube2 = new gd3d.framework.transform();
+            cube2.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
+            this.paodan = cube2;
+            this.scene.addChild(cube2);
+            var meshf2 = cube2.gameObject.addComponent("meshFilter");
+            var meshr2 = cube2.gameObject.addComponent("meshRenderer");
+            meshf2.mesh = this.assetmgr.getDefaultMesh("cube");
+            var cube3 = new gd3d.framework.transform();
+            this.guiji = cube3;
+            cube3.localPosition = this.orgPos;
+            this.scene.addChild(cube3);
+            var meshf3 = cube3.gameObject.addComponent("meshFilter");
+            var meshr3 = cube3.gameObject.addComponent("meshRenderer");
+            var mat = new gd3d.framework.material();
+            var shader = this.assetmgr.getShader("diffuse_bothside.shader.json");
+            mat.setShader(shader);
+            meshr3.materials = [mat];
+        };
+        paowuxian.prototype.getDirByRotAngle = function (euler, dir) {
+            var rot = new gd3d.math.quaternion();
+            gd3d.math.quatFromEulerAngles(euler.x, euler.y, euler.z, rot);
+            gd3d.math.quatTransformVector(rot, gd3d.math.pool.vector3_forward, dir);
+        };
+        paowuxian.prototype.getMeshData = function (anglex, gravity, speed, paoLen, paojiaPosY) {
+            if (paojiaPosY === void 0) { paojiaPosY = 0; }
+            if (this.mesh == null) {
+                this.mesh = this.initmesh(anglex, gravity, speed, paoLen, paojiaPosY);
+            }
+            else {
+                anglex = anglex * Math.PI / 180;
+                var halfwidth = 0.1;
+                var posarr = [];
+                var paokouy = paoLen * Math.sin(anglex);
+                var paokouz = paoLen * Math.cos(anglex);
+                var speedy = Math.sin(anglex) * speed;
+                var speedz = Math.cos(anglex) * speed;
+                var totalTime = speedy / gravity + Math.sqrt(2 * (paojiaPosY + paokouy) / gravity + Math.pow(speedy / gravity, 2));
+                var count = this.lerpCount;
+                var deltaTime = totalTime / count;
+                for (var i = 0; i <= count; i++) {
+                    var counttime = deltaTime * i;
+                    var newpos1 = new gd3d.math.vector3(halfwidth, speedy * counttime - 0.5 * gravity * Math.pow(counttime, 2) + paokouy, speedz * counttime + paokouz);
+                    var newpos2 = new gd3d.math.vector3(-halfwidth, speedy * counttime - 0.5 * gravity * Math.pow(counttime, 2) + paokouy, speedz * counttime + paokouz);
+                    posarr.push(newpos1);
+                    posarr.push(newpos2);
+                }
+                this.mesh.data.pos = posarr;
+                var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.UV0;
+                var v32 = this.mesh.data.genVertexDataArray(vf);
+                this.mesh.glMesh.uploadVertexData(this.app.webgl, v32);
+            }
+            return this.mesh;
+        };
+        paowuxian.prototype.initmesh = function (anglex, gravity, speed, paoLen, paojiaPosY) {
+            if (paojiaPosY === void 0) { paojiaPosY = 0; }
+            anglex = anglex * Math.PI / 180;
+            var halfwidth = 0.1;
+            var posarr = [];
+            var uvArr = [];
+            var trisindex = [];
+            var data = new gd3d.render.meshData();
+            data.pos = posarr;
+            data.uv = uvArr;
+            data.trisindex = trisindex;
+            var paokouy = paoLen * Math.sin(anglex);
+            var paokouz = paoLen * Math.cos(anglex);
+            var speedy = Math.sin(anglex) * speed;
+            var speedz = Math.cos(anglex) * speed;
+            var totalTime = speedy / gravity + Math.sqrt(2 * (paojiaPosY + paokouy) / gravity + Math.pow(speedy / gravity, 2));
+            var count = this.lerpCount;
+            var deltaTime = totalTime / count;
+            for (var i = 0; i <= count; i++) {
+                var counttime = deltaTime * i;
+                var newpos1 = new gd3d.math.vector3(halfwidth, speedy * counttime - 0.5 * gravity * Math.pow(counttime, 2) + paokouy, speedz * counttime + paokouz);
+                var newpos2 = new gd3d.math.vector3(-halfwidth, speedy * counttime - 0.5 * gravity * Math.pow(counttime, 2) + paokouy, speedz * counttime + paokouz);
+                posarr.push(newpos1);
+                posarr.push(newpos2);
+                var newUv1 = new gd3d.math.vector2(i / count, 0);
+                var newUv2 = new gd3d.math.vector2(i / count, 1);
+                uvArr.push(newUv1);
+                uvArr.push(newUv2);
+                trisindex.push();
+            }
+            for (var i = 0; i < count; i++) {
+                trisindex.push(2 * i + 0, 2 * i + 2, 2 * i + 1, 2 * i + 1, 2 * i + 2, 2 * i + 3);
+            }
+            var _mesh = new gd3d.framework.mesh(".mesh.bin");
+            _mesh.data = data;
+            var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.UV0;
+            _mesh.data.originVF = vf;
+            var v32 = _mesh.data.genVertexDataArray(vf);
+            var i16 = _mesh.data.genIndexDataArray();
+            _mesh.glMesh = new gd3d.render.glMesh();
+            _mesh.glMesh.initBuffer(this.app.webgl, vf, _mesh.data.pos.length, gd3d.render.MeshTypeEnum.Dynamic);
+            _mesh.glMesh.uploadVertexData(this.app.webgl, v32);
+            _mesh.glMesh.addIndex(this.app.webgl, i16.length);
+            _mesh.glMesh.uploadIndexData(this.app.webgl, 0, i16);
+            _mesh.submesh = [];
+            {
+                var sm = new gd3d.framework.subMeshInfo();
+                sm.matIndex = 0;
+                sm.useVertexIndex = 0;
+                sm.start = 0;
+                sm.size = i16.length;
+                sm.line = false;
+                _mesh.submesh.push(sm);
+            }
+            return _mesh;
+        };
+        paowuxian.prototype.addUI = function () {
+            var _this = this;
+            var deltaangle = 3;
+            this.addBtn("左转", 30, 300, function () {
+                _this.rotEuler.y -= deltaangle;
+            });
+            this.addBtn("右转", 100, 300, function () {
+                _this.rotEuler.y += deltaangle;
+            });
+            this.addBtn("上转", 30, 400, function () {
+                _this.rotEuler.x -= deltaangle;
+            });
+            this.addBtn("下转", 100, 400, function () {
+                _this.rotEuler.x += deltaangle;
+            });
+            this.addBtn("发射", 60, 500, function () {
+                _this.actived = true;
+            });
+        };
+        paowuxian.prototype.addBtn = function (text, x, y, func) {
+            var btn = document.createElement("button");
+            btn.textContent = text;
+            btn.onclick = function () {
+                func();
+            };
+            btn.style.top = y + "px";
+            btn.style.left = x + "px";
+            btn.style.position = "absolute";
+            this.app.container.appendChild(btn);
+        };
+        return paowuxian;
+    }());
+    dome.paowuxian = paowuxian;
+})(dome || (dome = {}));
 var physic2d_dome = (function () {
     function physic2d_dome() {
         this.taskmgr = new gd3d.framework.taskMgr();
