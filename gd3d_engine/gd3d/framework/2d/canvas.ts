@@ -275,6 +275,7 @@ namespace gd3d.framework
          */
         render(context: renderContext, assetmgr: assetMgr)
         {
+            DrawCallInfo.inc.currentState=DrawCallEnum.UI;
             this.context = context;
             this.assetmgr = assetmgr;
             // context.updateModel(this.gameObject.transform);
@@ -304,7 +305,7 @@ namespace gd3d.framework
             this.drawScene(this.rootNode, context, assetmgr);
             this.batcher.end(context.webgl);
 
-            DrawCallInfo.inc.currentState=DrawCallEnum.UI;
+            
             if (this.afterRender != null)
                 this.afterRender();
         }

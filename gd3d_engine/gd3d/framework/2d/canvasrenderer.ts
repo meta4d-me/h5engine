@@ -116,6 +116,7 @@ namespace gd3d.framework
             var vertexcount = (this.vboCount / (this.mesh.vertexByteSize / 4)) | 0;
             this.curPass.use(webgl);
             this.mesh.bind(webgl, this.curPass.program, (this.drawMode == render.DrawModeEnum.EboLine || this.drawMode == render.DrawModeEnum.EboTri) ? 0 : -1);
+            DrawCallInfo.inc.add();
             if (this.drawMode == render.DrawModeEnum.EboLine)
             {
                 this.mesh.drawElementLines(webgl, 0, this.eboCount);
