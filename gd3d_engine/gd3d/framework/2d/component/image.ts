@@ -80,7 +80,11 @@ namespace gd3d.framework
                 let assetmgr = canvas.assetmgr;
                 let pMask = this.transform.parentIsMask;
                 let mat = this._uimat;
-                let rectPostfix = pMask ? `_(${this.transform.parent.insId})`: ""; //when parentIsMask,can't multiplexing material , can be multiplexing when parent equal
+                let rectPostfix = "";
+                if(pMask){
+                    let prect = this.transform.maskRect;
+                    rectPostfix = `_(${prect.x}_${prect.y}_${prect.w}_${prect.h})`; //when parentIsMask,can't multiplexing material , can be multiplexing when parent equal
+                }
                 let matName =this._sprite.texture.getName() + "_uimask" + rectPostfix;
                 let matChanged = false;
                 if(!mat || mat.getName() != matName){

@@ -50,64 +50,64 @@ namespace gd3d.framework
             gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
         }";
 
-        static vsUiMaskCode:string = "\
-        attribute vec4 _glesVertex;   \
-        attribute vec4 _glesColor;                  \
-        attribute vec4 _glesMultiTexCoord0;         \
-        uniform highp mat4 glstate_matrix_mvp;      \
-        uniform lowp float MaskState;      \
-        varying lowp vec4 xlv_COLOR;                \
-        varying highp vec2 xlv_TEXCOORD0;           \
-        varying highp vec2 mask_TEXCOORD;           \
-        void main()                                     \
-        {                                               \
-            highp vec4 tmpvar_1;                        \
-            tmpvar_1.w = 1.0;                           \
-            tmpvar_1.xyz = _glesVertex.xyz;             \
-            xlv_COLOR = _glesColor;                     \
-            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);     \
-            if(MaskState != 0.0){    \
-                mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0;\
-                mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0;\
-            }\
-            gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
-        }";
+        static vsUiMaskCode:string = ` 
+        attribute vec4 _glesVertex;    
+        attribute vec4 _glesColor;                   
+        attribute vec4 _glesMultiTexCoord0;          
+        uniform highp mat4 glstate_matrix_mvp;       
+        uniform lowp float MaskState;       
+        varying lowp vec4 xlv_COLOR;                 
+        varying highp vec2 xlv_TEXCOORD0;            
+        varying highp vec2 mask_TEXCOORD;            
+        void main()                                      
+        {                                                
+            highp vec4 tmpvar_1;                         
+            tmpvar_1.w = 1.0;                            
+            tmpvar_1.xyz = _glesVertex.xyz;              
+            xlv_COLOR = _glesColor;                      
+            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      
+            if(MaskState != 0.0){     
+                mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0; 
+                mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0; 
+            } 
+            gl_Position = (glstate_matrix_mvp * tmpvar_1);   
+        }`;
 
-        static fscodeMaskUi:string = "         \
-        uniform sampler2D _MainTex;                                                 \
-        uniform highp vec4 _maskRect;                                                 \
-        uniform lowp float MaskState;      \
-        varying lowp vec4 xlv_COLOR;                                                 \
-        varying highp vec2 xlv_TEXCOORD0;   \
-        varying highp vec2 mask_TEXCOORD;           \
-        bool CalcuCut(){   \
-            highp float l;\
-            highp float t;\
-            highp float r;\
-            highp float b;\
-            highp vec2 texc1;\
-            bool beCut;\
-            l = _maskRect.x;\
-            t = _maskRect.y;\
-            r = _maskRect.z + l;\
-            b = _maskRect.w + t;\
-            texc1 = mask_TEXCOORD;\
-            if(texc1.x >(1.0 - l) || texc1.x <(1.0 - r) || texc1.y <t || texc1.y>b){ \
-                beCut = true; \
-            }else{\
-                beCut = false;\
-            }\
-            return beCut;\
-        }\
-           \
-        void main() \
-        {\
-            if(MaskState != 0.0 && CalcuCut()) discard;\
-            lowp vec4 tmpvar_3;\
-            tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\
-            gl_FragData[0] = tmpvar_3 ;\
-        }\
-        ";
+        static fscodeMaskUi:string = `          
+        uniform sampler2D _MainTex;                                                  
+        uniform highp vec4 _maskRect;                                                  
+        uniform lowp float MaskState;       
+        varying lowp vec4 xlv_COLOR;                                                  
+        varying highp vec2 xlv_TEXCOORD0;    
+        varying highp vec2 mask_TEXCOORD;            
+        bool CalcuCut(){    
+            highp float l; 
+            highp float t; 
+            highp float r; 
+            highp float b; 
+            highp vec2 texc1; 
+            bool beCut; 
+            l = _maskRect.x; 
+            t = _maskRect.y; 
+            r = _maskRect.z + l; 
+            b = _maskRect.w + t; 
+            texc1 = mask_TEXCOORD; 
+            if(texc1.x >(1.0 - l) || texc1.x <(1.0 - r) || texc1.y <t || texc1.y>b){  
+                beCut = true;  
+            }else{ 
+                beCut = false; 
+            } 
+            return beCut; 
+        } 
+            
+        void main()  
+        { 
+            if(MaskState != 0.0 && CalcuCut()) discard; 
+            lowp vec4 tmpvar_3; 
+            tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0)); 
+            gl_FragData[0] = tmpvar_3 ; 
+        } 
+        `;
 
         static fscode: string = "         \
         uniform sampler2D _MainTex;                                                 \

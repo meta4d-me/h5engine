@@ -1183,6 +1183,91 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var batcher2D = (function () {
+            function batcher2D() {
+                this.vboCount = 0;
+                this.eboCount = 0;
+            }
+            batcher2D.prototype.initBuffer = function (webgl, vf, drawMode) {
+                this.mesh = new gd3d.render.glMesh();
+                this.mesh.initBuffer(webgl, vf, 128, gd3d.render.MeshTypeEnum.Dynamic);
+                this.dataForVbo = new Float32Array(128);
+                this.drawMode = drawMode;
+                if (drawMode == gd3d.render.DrawModeEnum.EboLine || drawMode == gd3d.render.DrawModeEnum.EboTri) {
+                    this.mesh.addIndex(webgl, 128);
+                    this.dataForEbo = new Uint16Array(128);
+                }
+            };
+            batcher2D.prototype.begin = function (webgl, pass) {
+                if (this.vboCount > 0)
+                    this.end(webgl);
+                this.curPass = pass;
+            };
+            batcher2D.prototype.push = function (webgl, vbodata, ebodata) {
+                if (this.vboCount + vbodata.length > batcher2D.limitCount
+                    ||
+                        (ebodata != null && this.eboCount + ebodata.length > batcher2D.limitCount)) {
+                    this.end(webgl);
+                }
+                if (this.vboCount + vbodata.length > this.dataForVbo.length) {
+                    var narr = new Float32Array(this.dataForVbo.length * 2);
+                    for (var i = 0; i < this.dataForVbo.length; i++) {
+                        narr[i] = this.dataForVbo[i];
+                    }
+                    this.dataForVbo = narr;
+                    this.mesh.resetVboSize(webgl, this.dataForVbo.length);
+                }
+                for (var i = 0; i < vbodata.length; i++) {
+                    this.dataForVbo[this.vboCount + i] = vbodata[i];
+                }
+                this.vboCount += vbodata.length;
+                if (this.drawMode == gd3d.render.DrawModeEnum.VboLine || this.drawMode == gd3d.render.DrawModeEnum.VboTri)
+                    return;
+                if (ebodata != null) {
+                    if (this.eboCount + ebodata.length > this.dataForEbo.length) {
+                        var narr = new Uint16Array(this.dataForEbo.length * 2);
+                        for (var i = 0; i < this.dataForEbo.length; i++) {
+                            narr[i] = this.dataForEbo[i];
+                        }
+                        this.dataForEbo = narr;
+                        this.mesh.resetEboSize(webgl, 0, this.dataForEbo.length);
+                    }
+                    for (var i = 0; i < ebodata.length; i++) {
+                        this.dataForEbo[this.eboCount + i] = ebodata[i];
+                    }
+                    this.eboCount += ebodata.length;
+                }
+            };
+            batcher2D.prototype.end = function (webgl) {
+                if (this.vboCount == 0)
+                    return;
+                this.mesh.uploadVertexData(webgl, this.dataForVbo);
+                if (this.eboCount > 0) {
+                    this.mesh.uploadIndexData(webgl, 0, this.dataForEbo);
+                }
+                var vertexcount = (this.vboCount / (this.mesh.vertexByteSize / 4)) | 0;
+                this.curPass.use(webgl);
+                this.mesh.bind(webgl, this.curPass.program, (this.drawMode == gd3d.render.DrawModeEnum.EboLine || this.drawMode == gd3d.render.DrawModeEnum.EboTri) ? 0 : -1);
+                framework.DrawCallInfo.inc.add();
+                if (this.drawMode == gd3d.render.DrawModeEnum.EboLine) {
+                    this.mesh.drawElementLines(webgl, 0, this.eboCount);
+                }
+                else if (this.drawMode == gd3d.render.DrawModeEnum.EboTri) {
+                    this.mesh.drawElementTris(webgl, 0, this.eboCount);
+                }
+                else if (this.drawMode == gd3d.render.DrawModeEnum.VboLine) {
+                    this.mesh.drawArrayLines(webgl, 0, vertexcount);
+                }
+                else if (this.drawMode == gd3d.render.DrawModeEnum.VboTri) {
+                    this.mesh.drawArrayTris(webgl, 0, vertexcount);
+                }
+                this.vboCount = 0;
+                this.eboCount = 0;
+            };
+            batcher2D.limitCount = 2048;
+            return batcher2D;
+        }());
+        framework.batcher2D = batcher2D;
         var canvas = (function () {
             function canvas() {
                 this.is2dUI = true;
@@ -1282,7 +1367,7 @@ var gd3d;
                 this.lastMat = null;
                 if (this.batcher == null) {
                     this.webgl = context.webgl;
-                    this.batcher = new framework.batcher2D();
+                    this.batcher = new batcher2D();
                     var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0 | gd3d.render.VertexFormatMask.ColorEX;
                     this.batcher.initBuffer(context.webgl, vf, gd3d.render.DrawModeEnum.VboTri);
                 }
@@ -1374,90 +1459,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var batcher2D = (function () {
-            function batcher2D() {
-                this.vboCount = 0;
-                this.eboCount = 0;
-            }
-            batcher2D.prototype.initBuffer = function (webgl, vf, drawMode) {
-                this.mesh = new gd3d.render.glMesh();
-                this.mesh.initBuffer(webgl, vf, 128, gd3d.render.MeshTypeEnum.Dynamic);
-                this.dataForVbo = new Float32Array(128);
-                this.drawMode = drawMode;
-                if (drawMode == gd3d.render.DrawModeEnum.EboLine || drawMode == gd3d.render.DrawModeEnum.EboTri) {
-                    this.mesh.addIndex(webgl, 128);
-                    this.dataForEbo = new Uint16Array(128);
-                }
-            };
-            batcher2D.prototype.begin = function (webgl, pass) {
-                if (this.vboCount > 0)
-                    this.end(webgl);
-                this.curPass = pass;
-            };
-            batcher2D.prototype.push = function (webgl, vbodata, ebodata) {
-                if (this.vboCount + vbodata.length > 2048
-                    ||
-                        (ebodata != null && this.eboCount + ebodata.length > 2048)) {
-                    this.end(webgl);
-                }
-                if (this.vboCount + vbodata.length > this.dataForVbo.length) {
-                    var narr = new Float32Array(this.dataForVbo.length * 2);
-                    for (var i = 0; i < this.dataForVbo.length; i++) {
-                        narr[i] = this.dataForVbo[i];
-                    }
-                    this.dataForVbo = narr;
-                    this.mesh.resetVboSize(webgl, this.dataForVbo.length);
-                }
-                for (var i = 0; i < vbodata.length; i++) {
-                    this.dataForVbo[this.vboCount + i] = vbodata[i];
-                }
-                this.vboCount += vbodata.length;
-                if (this.drawMode == gd3d.render.DrawModeEnum.VboLine || this.drawMode == gd3d.render.DrawModeEnum.VboTri)
-                    return;
-                if (ebodata != null) {
-                    if (this.eboCount + ebodata.length > this.dataForEbo.length) {
-                        var narr = new Uint16Array(this.dataForEbo.length * 2);
-                        for (var i = 0; i < this.dataForEbo.length; i++) {
-                            narr[i] = this.dataForEbo[i];
-                        }
-                        this.dataForEbo = narr;
-                        this.mesh.resetEboSize(webgl, 0, this.dataForEbo.length);
-                    }
-                    for (var i = 0; i < ebodata.length; i++) {
-                        this.dataForEbo[this.eboCount + i] = ebodata[i];
-                    }
-                    this.eboCount += ebodata.length;
-                }
-            };
-            batcher2D.prototype.end = function (webgl) {
-                if (this.vboCount == 0)
-                    return;
-                this.mesh.uploadVertexData(webgl, this.dataForVbo);
-                if (this.eboCount > 0) {
-                    this.mesh.uploadIndexData(webgl, 0, this.dataForEbo);
-                }
-                var vertexcount = (this.vboCount / (this.mesh.vertexByteSize / 4)) | 0;
-                this.curPass.use(webgl);
-                this.mesh.bind(webgl, this.curPass.program, (this.drawMode == gd3d.render.DrawModeEnum.EboLine || this.drawMode == gd3d.render.DrawModeEnum.EboTri) ? 0 : -1);
-                framework.DrawCallInfo.inc.add();
-                if (this.drawMode == gd3d.render.DrawModeEnum.EboLine) {
-                    this.mesh.drawElementLines(webgl, 0, this.eboCount);
-                }
-                else if (this.drawMode == gd3d.render.DrawModeEnum.EboTri) {
-                    this.mesh.drawElementTris(webgl, 0, this.eboCount);
-                }
-                else if (this.drawMode == gd3d.render.DrawModeEnum.VboLine) {
-                    this.mesh.drawArrayLines(webgl, 0, vertexcount);
-                }
-                else if (this.drawMode == gd3d.render.DrawModeEnum.VboTri) {
-                    this.mesh.drawArrayTris(webgl, 0, vertexcount);
-                }
-                this.vboCount = 0;
-                this.eboCount = 0;
-            };
-            return batcher2D;
-        }());
-        framework.batcher2D = batcher2D;
         var canvasRenderer = (function () {
             function canvasRenderer() {
                 this.layer = framework.RenderLayerEnum.Common;
@@ -3739,7 +3740,11 @@ var gd3d;
                         var assetmgr = canvas_1.assetmgr;
                         var pMask = this.transform.parentIsMask;
                         var mat = this._uimat;
-                        var rectPostfix = pMask ? "_(" + this.transform.parent.insId + ")" : "";
+                        var rectPostfix = "";
+                        if (pMask) {
+                            var prect = this.transform.maskRect;
+                            rectPostfix = "_(" + prect.x + "_" + prect.y + "_" + prect.w + "_" + prect.h + ")";
+                        }
                         var matName = this._sprite.texture.getName() + "_uimask" + rectPostfix;
                         var matChanged = false;
                         if (!mat || mat.getName() != matName) {
@@ -5271,7 +5276,11 @@ var gd3d;
                         var assetmgr = canvas_2.assetmgr;
                         var pMask = this.transform.parentIsMask;
                         var mat = this._uimat;
-                        var rectPostfix = pMask ? "_(" + this.transform.parent.insId + ")" : "";
+                        var rectPostfix = "";
+                        if (pMask) {
+                            var prect = this.transform.maskRect;
+                            rectPostfix = "_(" + prect.x + "_" + prect.y + "_" + prect.w + "_" + prect.h + ")";
+                        }
                         var matName = this.font.texture.getName() + "_uimask" + rectPostfix;
                         var matChanged = false;
                         if (!mat || mat.getName() != matName) {
@@ -5612,7 +5621,11 @@ var gd3d;
                         var assetmgr = canvas_3.assetmgr;
                         var pMask = this.transform.parentIsMask;
                         var mat = this._uimat;
-                        var rectPostfix = pMask ? "_(" + this.transform.parent.insId + ")" : "";
+                        var rectPostfix = "";
+                        if (pMask) {
+                            var prect = this.transform.maskRect;
+                            rectPostfix = "_(" + prect.x + "_" + prect.y + "_" + prect.w + "_" + prect.h + ")";
+                        }
                         var matName = this._image.getName() + "_uimask" + rectPostfix;
                         var matChanged = false;
                         if (!mat || mat.getName() != matName) {
@@ -5629,6 +5642,7 @@ var gd3d;
                             mat.setShader(sh);
                             mat.use();
                             matChanged = true;
+                            this.needRefreshImg = true;
                         }
                         if (matChanged || this._lastMask != pMask) {
                             mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
@@ -7850,63 +7864,8 @@ var gd3d;
             xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
             gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
         }";
-            defShader.vsUiMaskCode = "\
-        attribute vec4 _glesVertex;   \
-        attribute vec4 _glesColor;                  \
-        attribute vec4 _glesMultiTexCoord0;         \
-        uniform highp mat4 glstate_matrix_mvp;      \
-        uniform lowp float MaskState;      \
-        varying lowp vec4 xlv_COLOR;                \
-        varying highp vec2 xlv_TEXCOORD0;           \
-        varying highp vec2 mask_TEXCOORD;           \
-        void main()                                     \
-        {                                               \
-            highp vec4 tmpvar_1;                        \
-            tmpvar_1.w = 1.0;                           \
-            tmpvar_1.xyz = _glesVertex.xyz;             \
-            xlv_COLOR = _glesColor;                     \
-            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);     \
-            if(MaskState != 0.0){    \
-                mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0;\
-                mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0;\
-            }\
-            gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
-        }";
-            defShader.fscodeMaskUi = "         \
-        uniform sampler2D _MainTex;                                                 \
-        uniform highp vec4 _maskRect;                                                 \
-        uniform lowp float MaskState;      \
-        varying lowp vec4 xlv_COLOR;                                                 \
-        varying highp vec2 xlv_TEXCOORD0;   \
-        varying highp vec2 mask_TEXCOORD;           \
-        bool CalcuCut(){   \
-            highp float l;\
-            highp float t;\
-            highp float r;\
-            highp float b;\
-            highp vec2 texc1;\
-            bool beCut;\
-            l = _maskRect.x;\
-            t = _maskRect.y;\
-            r = _maskRect.z + l;\
-            b = _maskRect.w + t;\
-            texc1 = mask_TEXCOORD;\
-            if(texc1.x >(1.0 - l) || texc1.x <(1.0 - r) || texc1.y <t || texc1.y>b){ \
-                beCut = true; \
-            }else{\
-                beCut = false;\
-            }\
-            return beCut;\
-        }\
-           \
-        void main() \
-        {\
-            if(MaskState != 0.0 && CalcuCut()) discard;\
-            lowp vec4 tmpvar_3;\
-            tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\
-            gl_FragData[0] = tmpvar_3 ;\
-        }\
-        ";
+            defShader.vsUiMaskCode = " \n        attribute vec4 _glesVertex;    \n        attribute vec4 _glesColor;                   \n        attribute vec4 _glesMultiTexCoord0;          \n        uniform highp mat4 glstate_matrix_mvp;       \n        uniform lowp float MaskState;       \n        varying lowp vec4 xlv_COLOR;                 \n        varying highp vec2 xlv_TEXCOORD0;            \n        varying highp vec2 mask_TEXCOORD;            \n        void main()                                      \n        {                                                \n            highp vec4 tmpvar_1;                         \n            tmpvar_1.w = 1.0;                            \n            tmpvar_1.xyz = _glesVertex.xyz;              \n            xlv_COLOR = _glesColor;                      \n            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      \n            if(MaskState != 0.0){     \n                mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0; \n                mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0; \n            } \n            gl_Position = (glstate_matrix_mvp * tmpvar_1);   \n        }";
+            defShader.fscodeMaskUi = "          \n        uniform sampler2D _MainTex;                                                  \n        uniform highp vec4 _maskRect;                                                  \n        uniform lowp float MaskState;       \n        varying lowp vec4 xlv_COLOR;                                                  \n        varying highp vec2 xlv_TEXCOORD0;    \n        varying highp vec2 mask_TEXCOORD;            \n        bool CalcuCut(){    \n            highp float l; \n            highp float t; \n            highp float r; \n            highp float b; \n            highp vec2 texc1; \n            bool beCut; \n            l = _maskRect.x; \n            t = _maskRect.y; \n            r = _maskRect.z + l; \n            b = _maskRect.w + t; \n            texc1 = mask_TEXCOORD; \n            if(texc1.x >(1.0 - l) || texc1.x <(1.0 - r) || texc1.y <t || texc1.y>b){  \n                beCut = true;  \n            }else{ \n                beCut = false; \n            } \n            return beCut; \n        } \n            \n        void main()  \n        { \n            if(MaskState != 0.0 && CalcuCut()) discard; \n            lowp vec4 tmpvar_3; \n            tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0)); \n            gl_FragData[0] = tmpvar_3 ; \n        } \n        ";
             defShader.fscode = "         \
         uniform sampler2D _MainTex;                                                 \
         varying lowp vec4 xlv_COLOR;                                                 \

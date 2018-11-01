@@ -247,6 +247,20 @@ declare namespace gd3d {
     }
 }
 declare namespace gd3d.framework {
+    class batcher2D {
+        private mesh;
+        private drawMode;
+        private vboCount;
+        private curPass;
+        private eboCount;
+        private dataForVbo;
+        private dataForEbo;
+        initBuffer(webgl: WebGLRenderingContext, vf: render.VertexFormatMask, drawMode: render.DrawModeEnum): void;
+        begin(webgl: WebGLRenderingContext, pass: render.glDrawPass): void;
+        private static limitCount;
+        push(webgl: WebGLRenderingContext, vbodata: number[], ebodata: number[]): void;
+        end(webgl: WebGLRenderingContext): void;
+    }
     class canvas {
         static readonly ClassName: string;
         constructor();
@@ -286,19 +300,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class batcher2D {
-        private mesh;
-        private drawMode;
-        private vboCount;
-        private curPass;
-        private eboCount;
-        private dataForVbo;
-        private dataForEbo;
-        initBuffer(webgl: WebGLRenderingContext, vf: render.VertexFormatMask, drawMode: render.DrawModeEnum): void;
-        begin(webgl: WebGLRenderingContext, pass: render.glDrawPass): void;
-        push(webgl: WebGLRenderingContext, vbodata: number[], ebodata: number[]): void;
-        end(webgl: WebGLRenderingContext): void;
-    }
     class canvasRenderer implements IRenderer, ICollider {
         static readonly ClassName: string;
         constructor();

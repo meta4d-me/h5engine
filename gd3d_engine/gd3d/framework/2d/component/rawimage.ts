@@ -98,7 +98,11 @@ namespace gd3d.framework
                 let assetmgr = canvas.assetmgr;
                 let pMask = this.transform.parentIsMask;
                 let mat = this._uimat;
-                let rectPostfix = pMask ? `_(${this.transform.parent.insId})`: ""; //when parentIsMask,can't multiplexing material , can be multiplexing when parent equal
+                let rectPostfix = "";
+                if(pMask){
+                    let prect = this.transform.maskRect;
+                    rectPostfix = `_(${prect.x}_${prect.y}_${prect.w}_${prect.h})`; //when parentIsMask,can't multiplexing material , can be multiplexing when parent equal
+                }
                 let matName =this._image.getName() + "_uimask" + rectPostfix;
                 let matChanged = false;
                 if(!mat || mat.getName() != matName){
@@ -113,6 +117,7 @@ namespace gd3d.framework
                     mat.setShader(sh);
                     mat.use();
                     matChanged = true;
+                    this.needRefreshImg = true;
                 }
                 if(matChanged || this._lastMask != pMask){
                     mat.setFloat("MaskState", this.transform.parentIsMask? 1 : 0);
