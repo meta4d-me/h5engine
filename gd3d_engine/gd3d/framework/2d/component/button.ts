@@ -250,8 +250,8 @@ namespace gd3d.framework
                         this.showPress();
                         let pd = event.UIEventEnum.PointerDown;
                         if(this.UIEventer.listenerCount(event.UIEventEnum[pd]) > 0){
-                            this.UIEventer.EmitEnum(pd);
                             ev.eated = true;
+                            this.UIEventer.EmitEnum(pd,ev);
                         }
                         this.downPointV2.x = ev.x;
                         this.downPointV2.y = ev.y;
@@ -274,15 +274,15 @@ namespace gd3d.framework
                         this.showNormal();
                         let pu = event.UIEventEnum.PointerUp;
                         if(this.UIEventer.listenerCount(event.UIEventEnum[pu]) > 0){
-                            this.UIEventer.EmitEnum(pu);
                             ev.eated = true;
+                            this.UIEventer.EmitEnum(pu,ev);
                         }
                         
                         //this.onClick.excute();
                         let pc = event.UIEventEnum.PointerClick;
                         if(!this.isMovedLimit && this.UIEventer.listenerCount(event.UIEventEnum[pc]) > 0){
-                            this.UIEventer.EmitEnum(pc);
                             ev.eated = true;
+                            this.UIEventer.EmitEnum(pc,ev);
                         }
                     }
                 }

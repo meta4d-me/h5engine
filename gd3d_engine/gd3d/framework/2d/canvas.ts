@@ -137,7 +137,6 @@ namespace gd3d.framework
         }
 
         private pointDown: Boolean = false;
-        private pointSelect: transform2D = null;//当前选中的UI
         private pointEvent: PointEvent = new PointEvent();
         private pointX: number = 0;
         private pointY: number = 0;
@@ -182,7 +181,7 @@ namespace gd3d.framework
                 this.pointEvent.eated = false;
                 this.pointEvent.x = XOnModelSpace;
                 this.pointEvent.y = YOnModelSpace;
-                this.pointEvent.selected = this.pointSelect;
+                this.pointEvent.selected = null;
                 var skip = false;
                 if (this.pointDown == false && touch == false)//nothing
                 {
@@ -212,7 +211,6 @@ namespace gd3d.framework
                         this.rootNode.onCapturePointEvent(this, this.pointEvent);
                         this.rootNode.onPointEvent(this, this.pointEvent);
                     }
-                    this.pointSelect = this.pointEvent.selected;//选中了啥，同步回来
                     this.pointDown = touch;
                     this.pointX = this.pointEvent.x;
                     this.pointY = this.pointEvent.y;

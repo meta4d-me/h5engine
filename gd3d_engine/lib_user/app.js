@@ -10622,6 +10622,7 @@ var dome;
             this.dir = new gd3d.math.vector3();
             this.paoKouPos = new gd3d.math.vector3();
             this.timer = 0;
+            this.forward = new gd3d.math.vector3();
             this.lerpCount = 50;
             this.actived = false;
         }
@@ -10656,6 +10657,10 @@ var dome;
                 this.guiji.markDirty();
                 var meshf = this.guiji.gameObject.getComponent("meshFilter");
                 meshf.mesh = this.getMeshData(-this.rotEuler.x, this.gravity, this.speed, this.paoLen);
+                this.guiji.getForwardInWorld(this.forward);
+                gd3d.math.vec3ScaleByNum(this.forward, this.guanghuantoPaoJia, this.forward);
+                gd3d.math.vec3Add(this.guiji.getWorldPosition(), this.forward, this.guanghuan.localPosition);
+                this.guanghuan.markDirty();
             }
             if (this.actived) {
                 this.timer += delta * 0.1;
@@ -10719,6 +10724,12 @@ var dome;
             var shader = this.assetmgr.getShader("diffuse_bothside.shader.json");
             mat.setShader(shader);
             meshr3.materials = [mat];
+            var cube4 = new gd3d.framework.transform();
+            this.guanghuan = cube4;
+            this.scene.addChild(cube4);
+            var meshf4 = cube4.gameObject.addComponent("meshFilter");
+            cube4.gameObject.addComponent("meshRenderer");
+            meshf4.mesh = this.assetmgr.getDefaultMesh("cube");
         };
         paowuxian.prototype.getDirByRotAngle = function (euler, dir) {
             var rot = new gd3d.math.quaternion();
@@ -10747,6 +10758,9 @@ var dome;
                     var newpos2 = new gd3d.math.vector3(-halfwidth, speedy * counttime - 0.5 * gravity * Math.pow(counttime, 2) + paokouy, speedz * counttime + paokouz);
                     posarr.push(newpos1);
                     posarr.push(newpos2);
+                    if (i == count) {
+                        this.guanghuantoPaoJia = speedz * counttime + paokouz;
+                    }
                 }
                 this.mesh.data.pos = posarr;
                 var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.UV0;

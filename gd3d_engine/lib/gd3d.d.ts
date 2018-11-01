@@ -261,7 +261,6 @@ declare namespace gd3d.framework {
         getChildCount(): number;
         getChild(index: number): transform2D;
         private pointDown;
-        private pointSelect;
         private pointEvent;
         private pointX;
         private pointY;
@@ -3828,6 +3827,7 @@ declare namespace gd3d.framework {
         private _mousemove(ev);
         private _mousewheel(ev);
         private tryAddTouchP(id);
+        private syncPointByTouches();
         private _touchstart(ev);
         private _touchmove(ev);
         private _touchend(ev);

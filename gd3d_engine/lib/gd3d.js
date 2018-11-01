@@ -1187,7 +1187,6 @@ var gd3d;
             function canvas() {
                 this.is2dUI = true;
                 this.pointDown = false;
-                this.pointSelect = null;
                 this.pointEvent = new framework.PointEvent();
                 this.pointX = 0;
                 this.pointY = 0;
@@ -1234,7 +1233,7 @@ var gd3d;
                     this.pointEvent.eated = false;
                     this.pointEvent.x = XOnModelSpace;
                     this.pointEvent.y = YOnModelSpace;
-                    this.pointEvent.selected = this.pointSelect;
+                    this.pointEvent.selected = null;
                     var skip = false;
                     if (this.pointDown == false && touch == false) {
                         skip = true;
@@ -1256,7 +1255,6 @@ var gd3d;
                             this.rootNode.onCapturePointEvent(this, this.pointEvent);
                             this.rootNode.onPointEvent(this, this.pointEvent);
                         }
-                        this.pointSelect = this.pointEvent.selected;
                         this.pointDown = touch;
                         this.pointX = this.pointEvent.x;
                         this.pointY = this.pointEvent.y;
@@ -3555,8 +3553,8 @@ var gd3d;
                             this.showPress();
                             var pd = gd3d.event.UIEventEnum.PointerDown;
                             if (this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pd]) > 0) {
-                                this.UIEventer.EmitEnum(pd);
                                 ev.eated = true;
+                                this.UIEventer.EmitEnum(pd, ev);
                             }
                             this.downPointV2.x = ev.x;
                             this.downPointV2.y = ev.y;
@@ -3576,13 +3574,13 @@ var gd3d;
                             this.showNormal();
                             var pu = gd3d.event.UIEventEnum.PointerUp;
                             if (this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pu]) > 0) {
-                                this.UIEventer.EmitEnum(pu);
                                 ev.eated = true;
+                                this.UIEventer.EmitEnum(pu, ev);
                             }
                             var pc = gd3d.event.UIEventEnum.PointerClick;
                             if (!this.isMovedLimit && this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pc]) > 0) {
-                                this.UIEventer.EmitEnum(pc);
                                 ev.eated = true;
+                                this.UIEventer.EmitEnum(pc, ev);
                             }
                         }
                     }
@@ -19365,6 +19363,20 @@ var gd3d;
                     this._touches[id].id = id;
                 }
             };
+            inputMgr.prototype.syncPointByTouches = function () {
+                var count = 0;
+                var xs = 0;
+                var ys = 0;
+                for (var key in this._touches) {
+                    if (this._touches[key].touch == true) {
+                        xs += this._touches[key].x;
+                        ys += this._touches[key].y;
+                        count++;
+                    }
+                }
+                this._point.x = xs / count;
+                this._point.y = ys / count;
+            };
             inputMgr.prototype._touchstart = function (ev) {
                 this._point.touch = true;
                 for (var i = 0; i < ev.changedTouches.length; i++) {
@@ -19373,11 +19385,8 @@ var gd3d;
                     this.tryAddTouchP(id);
                     this._touches[id].touch = true;
                     this.CalcuPoint(touch.clientX, touch.clientY, this._touches[id]);
-                    if (id == 0) {
-                        this._point.x = this._touches[id].x;
-                        this._point.y = this._touches[id].y;
-                    }
                 }
+                this.syncPointByTouches();
             };
             inputMgr.prototype._touchmove = function (ev) {
                 this._point.touch = true;
@@ -19388,18 +19397,7 @@ var gd3d;
                     this._touches[id].touch = true;
                     this.CalcuPoint(touch.clientX, touch.clientY, this._touches[id]);
                 }
-                var count = 0;
-                var x = 0;
-                var y = 0;
-                for (var key in this._touches) {
-                    if (this._touches[key].touch == true) {
-                        x += this._touches[key].x;
-                        y += this._touches[key].y;
-                        count++;
-                    }
-                }
-                this._point.x = x / count;
-                this._point.y = y / count;
+                this.syncPointByTouches();
             };
             inputMgr.prototype._touchend = function (ev) {
                 for (var i = 0; i < ev.changedTouches.length; i++) {

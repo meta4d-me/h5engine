@@ -1384,6 +1384,7 @@ declare namespace dome {
         private paojia;
         private paodan;
         private guiji;
+        private guanghuan;
         private orgPos;
         rotEuler: gd3d.math.vector3;
         gravity: number;
@@ -1394,12 +1395,14 @@ declare namespace dome {
         private gamerun(laststate, state);
         private paoKouPos;
         private timer;
+        private forward;
         update(delta: number): void;
         private addcam();
         private addcube();
         getDirByRotAngle(euler: gd3d.math.vector3, dir: gd3d.math.vector3): void;
         private mesh;
         private lerpCount;
+        private guanghuantoPaoJia;
         getMeshData(anglex: number, gravity: number, speed: number, paoLen: number, paojiaPosY?: number): gd3d.framework.mesh;
         private initmesh(anglex, gravity, speed, paoLen, paojiaPosY?);
         private actived;
