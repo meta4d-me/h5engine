@@ -118,6 +118,26 @@ namespace gd3d.framework
             }
         }
 
+        private syncPointByTouches(){
+            let count = 0;
+            let xs = 0;
+            let ys = 0;
+            for (var key in this._touches)
+            {
+                if (this._touches[key].touch == true)
+                {
+                    xs += this._touches[key].x;
+                    ys += this._touches[key].y;
+                    count++;
+                }
+            }
+            // this.point.x = x / (count * app.scale);
+            // this.point.y = y / (count * app.scale);
+            //this.CalcuPoint(x / count,y / count,this._point);
+            this._point.x = xs/count;
+            this._point.y = ys/count;
+        }
+
         private _touchstart(ev:TouchEvent){
             // this.CalcuPoint(ev.touches[0].clientX,ev.touches[0].clientY,this._point);
                 this._point.touch = true;
@@ -129,13 +149,12 @@ namespace gd3d.framework
                     this.tryAddTouchP(id);
                     this._touches[id].touch = true;
                     this.CalcuPoint(touch.clientX,touch.clientY,this._touches[id]);
-                    if(id == 0){
-                        this._point.x = this._touches[id].x;
-                        this._point.y = this._touches[id].y;
-                    }
+                    
                     // this._touches[id].x = touch.clientX;
                     // this._touches[id].y = touch.clientY;
                 }
+
+                this.syncPointByTouches();
         }
         private _touchmove(ev:TouchEvent){
             this._point.touch = true;
@@ -150,23 +169,7 @@ namespace gd3d.framework
                     // this._touches[id].y = touch.clientY;
                 }
 
-                let count = 0;
-                let x = 0;
-                let y = 0;
-                for (var key in this._touches)
-                {
-                    if (this._touches[key].touch == true)
-                    {
-                        x += this._touches[key].x;
-                        y += this._touches[key].y;
-                        count++;
-                    }
-                }
-                // this.point.x = x / (count * app.scale);
-                // this.point.y = y / (count * app.scale);
-                //this.CalcuPoint(x / count,y / count,this._point);
-                this._point.x = x/count;
-                this._point.y = y/count;
+                this.syncPointByTouches();
         }
         private _touchend(ev:TouchEvent){
             for (var i = 0; i < ev.changedTouches.length; i++)

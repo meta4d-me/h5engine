@@ -247,6 +247,20 @@ declare namespace gd3d {
     }
 }
 declare namespace gd3d.framework {
+    class batcher2D {
+        private mesh;
+        private drawMode;
+        private vboCount;
+        private curPass;
+        private eboCount;
+        private dataForVbo;
+        private dataForEbo;
+        initBuffer(webgl: WebGLRenderingContext, vf: render.VertexFormatMask, drawMode: render.DrawModeEnum): void;
+        begin(webgl: WebGLRenderingContext, pass: render.glDrawPass): void;
+        private static limitCount;
+        push(webgl: WebGLRenderingContext, vbodata: number[], ebodata: number[]): void;
+        end(webgl: WebGLRenderingContext): void;
+    }
     class canvas {
         static readonly ClassName: string;
         constructor();
@@ -261,7 +275,6 @@ declare namespace gd3d.framework {
         getChildCount(): number;
         getChild(index: number): transform2D;
         private pointDown;
-        private pointSelect;
         private pointEvent;
         private pointX;
         private pointY;
@@ -287,19 +300,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class batcher2D {
-        private mesh;
-        private drawMode;
-        private vboCount;
-        private curPass;
-        private eboCount;
-        private dataForVbo;
-        private dataForEbo;
-        initBuffer(webgl: WebGLRenderingContext, vf: render.VertexFormatMask, drawMode: render.DrawModeEnum): void;
-        begin(webgl: WebGLRenderingContext, pass: render.glDrawPass): void;
-        push(webgl: WebGLRenderingContext, vbodata: number[], ebodata: number[]): void;
-        end(webgl: WebGLRenderingContext): void;
-    }
     class canvasRenderer implements IRenderer, ICollider {
         static readonly ClassName: string;
         constructor();
@@ -698,11 +698,10 @@ declare namespace gd3d.framework {
         private needRefreshImg;
         color: math.color;
         private static readonly defUIShader;
-        private _shaderName;
-        private _shaderDirty;
+        private static readonly defMaskUIShader;
+        private _CustomShaderName;
         setShaderByName(shaderName: string): void;
         private _uimat;
-        private _lastMask;
         private readonly uimat;
         private _imageType;
         imageType: ImageType;
@@ -818,11 +817,10 @@ declare namespace gd3d.framework {
         color: math.color;
         color2: math.color;
         private static readonly defUIShader;
-        private _shaderName;
-        private _shaderDirty;
+        private static readonly defMaskUIShader;
+        private _CustomShaderName;
         setShaderByName(shaderName: string): void;
         private _uimat;
-        private _lastMask;
         private readonly uimat;
         private dirtyData;
         render(canvas: canvas): void;
@@ -876,11 +874,10 @@ declare namespace gd3d.framework {
         image: texture;
         color: math.color;
         private static readonly defUIShader;
-        private _shaderName;
-        private _shaderDirty;
+        private static readonly defMaskUIShader;
+        private _CustomShaderName;
         setShaderByName(shaderName: string): void;
         private _uimat;
-        private _lastMask;
         private readonly uimat;
         render(canvas: canvas): void;
         private _cacheMaskV4;
@@ -1322,15 +1319,16 @@ declare namespace gd3d.framework {
     class defShader {
         static shader0: string;
         static vscode: string;
-        static vsUiMaskCode: string;
-        static fscodeMaskUi: string;
         static fscode: string;
         static fscode2: string;
         static uishader: string;
-        static fscodeui: string;
+        static fscodeUI: string;
+        static vscodeUI: string;
+        static vscodeMaskUI: string;
+        static fscodeMaskUI: string;
         static shaderuifront: string;
-        static vscodeuifont: string;
-        static fscodeuifont: string;
+        static vscodefontUI: string;
+        static fscodefontUI: string;
         static vscodeuifontmask: string;
         static fscodeuifontmask: string;
         static diffuseShader: string;
@@ -3828,6 +3826,7 @@ declare namespace gd3d.framework {
         private _mousemove(ev);
         private _mousewheel(ev);
         private tryAddTouchP(id);
+        private syncPointByTouches();
         private _touchstart(ev);
         private _touchmove(ev);
         private _touchend(ev);

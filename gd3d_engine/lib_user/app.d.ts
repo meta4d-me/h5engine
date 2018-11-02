@@ -1373,6 +1373,43 @@ declare class Test_CameraController {
     private doMouseWheel(ev, isFirefox);
     remove(): void;
 }
+declare namespace dome {
+    class paowuxian implements IState {
+        camera: gd3d.framework.camera;
+        scene: gd3d.framework.scene;
+        app: gd3d.framework.application;
+        assetmgr: gd3d.framework.assetMgr;
+        taskmgr: gd3d.framework.taskMgr;
+        private paoLen;
+        private paojia;
+        private paodan;
+        private guiji;
+        private guanghuan;
+        private orgPos;
+        rotEuler: gd3d.math.vector3;
+        gravity: number;
+        speed: number;
+        dir: gd3d.math.vector3;
+        start(app: gd3d.framework.application): void;
+        private loadShader(laststate, state);
+        private gamerun(laststate, state);
+        private paoKouPos;
+        private timer;
+        private forward;
+        update(delta: number): void;
+        private addcam();
+        private addcube();
+        getDirByRotAngle(euler: gd3d.math.vector3, dir: gd3d.math.vector3): void;
+        private mesh;
+        private lerpCount;
+        private guanghuantoPaoJia;
+        getMeshData(anglex: number, gravity: number, speed: number, paoLen: number, paojiaPosY?: number): gd3d.framework.mesh;
+        private initmesh(anglex, gravity, speed, paoLen, paojiaPosY?);
+        private actived;
+        private addUI();
+        private addBtn(text, x, y, func);
+    }
+}
 declare class physic2d_dome implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
