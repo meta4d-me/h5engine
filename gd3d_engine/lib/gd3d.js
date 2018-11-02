@@ -3762,6 +3762,7 @@ var gd3d;
                             mat.setShader(sh);
                             mat.use();
                             matChanged = true;
+                            this.needRefreshImg = true;
                         }
                         if (matChanged || this._lastMask != pMask) {
                             mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
@@ -5296,6 +5297,7 @@ var gd3d;
                             sh = !sh ? assetmgr.getShader(label_1.defUIShader) : sh;
                             mat.setShader(sh);
                             mat.use();
+                            this.needRefreshFont = true;
                             matChanged = true;
                         }
                         if (matChanged || this._lastMask != pMask) {

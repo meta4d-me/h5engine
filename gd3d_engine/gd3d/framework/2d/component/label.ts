@@ -483,6 +483,7 @@ namespace gd3d.framework
                     sh = !sh? assetmgr.getShader(label.defUIShader) : sh;
                     mat.setShader(sh);
                     mat.use();
+                    this.needRefreshFont = true;
                     matChanged = true;
                 }
                 if(matChanged || this._lastMask != pMask){
