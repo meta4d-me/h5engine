@@ -49,7 +49,8 @@ namespace gd3d.framework
         @reflect.UIStyle("color")
         color: math.color = new math.color(1.0, 1.0, 1.0, 1.0);
 
-        private static readonly defUIShader = `shader/defmaskui`;
+        private static readonly defUIShader = `shader/defui`;  //非mask 使用shader
+        private static readonly defMaskUIShader = `shader/defmaskui`; //mask 使用shader
 
         private _shaderName = `shader/defmaskui`;
 
@@ -96,13 +97,13 @@ namespace gd3d.framework
                 if(mat == null){
                     mat = new material(matName);
                     let sh = assetmgr.getShader(this._shaderName);
-                    sh = !sh? assetmgr.getShader(image2D.defUIShader) : sh;
+                    sh = !sh? assetmgr.getShader(pMask? image2D.defMaskUIShader : image2D.defUIShader) : sh;
                     mat.setShader(sh);
                     mat.use();
                     matChanged = true;
                 }
                 if(matChanged || this._lastMask != pMask){
-                    mat.setFloat("MaskState", this.transform.parentIsMask? 1 : 0);
+                    mat.setFloat("MaskState", pMask? 1 : 0);
                     this._lastMask = pMask;
                 }
                 this._uimat = mat;

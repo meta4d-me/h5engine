@@ -434,7 +434,8 @@ namespace gd3d.framework
         @reflect.UIStyle("color")
         color2: math.color = new math.color(0, 0, 0.5, 0.5);
         
-        private static readonly defUIShader = `shader/defmaskfont`;
+        private static readonly defUIShader = `shader/defuifont`;
+        private static readonly defMaskUIShader = `shader/defmaskfont`;
 
         private _shaderName = label.defUIShader;
 
@@ -480,13 +481,13 @@ namespace gd3d.framework
                 if(mat == null){
                     mat = new material(matName);
                     let sh = assetmgr.getShader(this._shaderName);
-                    sh = !sh? assetmgr.getShader(label.defUIShader) : sh;
+                    sh = !sh? assetmgr.getShader(pMask ? label.defMaskUIShader : label.defUIShader) : sh;
                     mat.setShader(sh);
                     mat.use();
                     matChanged = true;
                 }
                 if(matChanged || this._lastMask != pMask){
-                    mat.setFloat("MaskState", this.transform.parentIsMask? 1 : 0);
+                    mat.setFloat("MaskState", pMask? 1 : 0);
                     this._lastMask = pMask;
                 }
                 this._uimat = mat;
