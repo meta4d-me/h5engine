@@ -101,6 +101,7 @@ namespace gd3d.framework
                     mat.setShader(sh);
                     mat.use();
                     matChanged = true;
+                    this.needRefreshImg = true;
                 }
                 if(matChanged || this._lastMask != pMask){
                     mat.setFloat("MaskState", pMask? 1 : 0);
