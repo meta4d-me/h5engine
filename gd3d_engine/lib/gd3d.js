@@ -3715,9 +3715,7 @@ var gd3d;
                 ];
                 this.needRefreshImg = false;
                 this.color = new gd3d.math.color(1.0, 1.0, 1.0, 1.0);
-                this._shaderName = "shader/defmaskui";
-                this._shaderDirty = false;
-                this._lastMask = false;
+                this._CustomShaderName = "";
                 this._imageType = ImageType.Simple;
                 this._fillMethod = FillMethod.Horizontal;
                 this._fillAmmount = 1;
@@ -3728,45 +3726,37 @@ var gd3d;
             }
             image2D_1 = image2D;
             image2D.prototype.setShaderByName = function (shaderName) {
-                this._shaderName = shaderName;
-                this._shaderDirty = true;
+                this._CustomShaderName = shaderName;
             };
             Object.defineProperty(image2D.prototype, "uimat", {
                 get: function () {
                     if (this._sprite && this._sprite.texture) {
-                        var canvas_1 = this.transform.canvas;
-                        if (!canvas_1.assetmgr)
-                            return;
-                        var assetmgr = canvas_1.assetmgr;
+                        var assetmgr = this.transform.canvas.assetmgr;
+                        if (!assetmgr)
+                            return this._uimat;
                         var pMask = this.transform.parentIsMask;
                         var mat = this._uimat;
-                        var rectPostfix = "";
+                        var rectTag = "";
+                        var uiTag = "_ui";
                         if (pMask) {
                             var prect = this.transform.maskRect;
-                            rectPostfix = "_(" + prect.x + "_" + prect.y + "_" + prect.w + "_" + prect.h + ")";
+                            rectTag = "mask(" + prect.x + "_" + prect.y + "_" + prect.w + "_" + prect.h + ")";
                         }
-                        var matName = this._sprite.texture.getName() + "_uimask" + rectPostfix;
-                        var matChanged = false;
+                        var matName = this._sprite.texture.getName() + uiTag + rectTag;
                         if (!mat || mat.getName() != matName) {
-                            this.needRefreshImg = true;
                             if (mat)
                                 mat.unuse();
                             mat = assetmgr.getAssetByName(matName);
                             if (mat)
                                 mat.use();
                         }
-                        if (mat == null) {
+                        if (!mat) {
                             mat = new framework.material(matName);
-                            var sh = assetmgr.getShader(this._shaderName);
-                            sh = !sh ? assetmgr.getShader(image2D_1.defUIShader) : sh;
+                            var sh = assetmgr.getShader(this._CustomShaderName);
+                            sh = sh ? sh : assetmgr.getShader(pMask ? image2D_1.defMaskUIShader : image2D_1.defUIShader);
                             mat.setShader(sh);
                             mat.use();
-                            matChanged = true;
                             this.needRefreshImg = true;
-                        }
-                        if (matChanged || this._lastMask != pMask) {
-                            mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
-                            this._lastMask = pMask;
                         }
                         this._uimat = mat;
                     }
@@ -4676,7 +4666,8 @@ var gd3d;
                 }
             };
             image2D.ClassName = "image2D";
-            image2D.defUIShader = "shader/defmaskui";
+            image2D.defUIShader = "shader/defui";
+            image2D.defMaskUIShader = "shader/defmaskui";
             __decorate([
                 gd3d.reflect.Field("color"),
                 gd3d.reflect.UIStyle("color"),
@@ -5081,9 +5072,7 @@ var gd3d;
                 this.datar = [];
                 this.color = new gd3d.math.color(1, 1, 1, 1);
                 this.color2 = new gd3d.math.color(0, 0, 0.5, 0.5);
-                this._shaderName = label_1.defUIShader;
-                this._shaderDirty = false;
-                this._lastMask = false;
+                this._CustomShaderName = "";
                 this.dirtyData = true;
             }
             label_1 = label;
@@ -5265,25 +5254,23 @@ var gd3d;
                 }
             };
             label.prototype.setShaderByName = function (shaderName) {
-                this._shaderName = shaderName;
-                this._shaderDirty = true;
+                this._CustomShaderName = shaderName;
             };
             Object.defineProperty(label.prototype, "uimat", {
                 get: function () {
                     if (this.font && this.font.texture) {
-                        var canvas_2 = this.transform.canvas;
-                        if (!canvas_2.assetmgr)
-                            return;
-                        var assetmgr = canvas_2.assetmgr;
+                        var assetmgr = this.transform.canvas.assetmgr;
+                        if (!assetmgr)
+                            return this._uimat;
                         var pMask = this.transform.parentIsMask;
                         var mat = this._uimat;
-                        var rectPostfix = "";
+                        var rectTag = "";
+                        var uiTag = "_ui";
                         if (pMask) {
                             var prect = this.transform.maskRect;
-                            rectPostfix = "_(" + prect.x + "_" + prect.y + "_" + prect.w + "_" + prect.h + ")";
+                            rectTag = "mask(" + prect.x + "_" + prect.y + "_" + prect.w + "_" + prect.h + ")";
                         }
-                        var matName = this.font.texture.getName() + "_uimask" + rectPostfix;
-                        var matChanged = false;
+                        var matName = this.font.texture.getName() + uiTag + rectTag;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
                                 mat.unuse();
@@ -5291,18 +5278,13 @@ var gd3d;
                             if (mat)
                                 mat.use();
                         }
-                        if (mat == null) {
+                        if (!mat) {
                             mat = new framework.material(matName);
-                            var sh = assetmgr.getShader(this._shaderName);
-                            sh = !sh ? assetmgr.getShader(label_1.defUIShader) : sh;
+                            var sh = assetmgr.getShader(this._CustomShaderName);
+                            sh = sh ? sh : assetmgr.getShader(pMask ? label_1.defMaskUIShader : label_1.defUIShader);
                             mat.setShader(sh);
                             mat.use();
                             this.needRefreshFont = true;
-                            matChanged = true;
-                        }
-                        if (matChanged || this._lastMask != pMask) {
-                            mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
-                            this._lastMask = pMask;
                         }
                         this._uimat = mat;
                     }
@@ -5389,7 +5371,8 @@ var gd3d;
             label.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             label.ClassName = "label";
-            label.defUIShader = "shader/defmaskfont";
+            label.defUIShader = "shader/defuifont";
+            label.defMaskUIShader = "shader/defmaskfont";
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String),
@@ -5586,9 +5569,7 @@ var gd3d;
                 ];
                 this.needRefreshImg = false;
                 this.color = new gd3d.math.color(1.0, 1.0, 1.0, 1.0);
-                this._shaderName = "shader/defmaskui";
-                this._shaderDirty = false;
-                this._lastMask = false;
+                this._CustomShaderName = "";
             }
             rawImage2D_1 = rawImage2D;
             Object.defineProperty(rawImage2D.prototype, "image", {
@@ -5611,25 +5592,23 @@ var gd3d;
                 configurable: true
             });
             rawImage2D.prototype.setShaderByName = function (shaderName) {
-                this._shaderName = shaderName;
-                this._shaderDirty = true;
+                this._CustomShaderName = shaderName;
             };
             Object.defineProperty(rawImage2D.prototype, "uimat", {
                 get: function () {
                     if (this._image) {
-                        var canvas_3 = this.transform.canvas;
-                        if (!canvas_3.assetmgr)
-                            return;
-                        var assetmgr = canvas_3.assetmgr;
+                        var assetmgr = this.transform.canvas.assetmgr;
+                        if (!assetmgr)
+                            return this._uimat;
                         var pMask = this.transform.parentIsMask;
                         var mat = this._uimat;
-                        var rectPostfix = "";
+                        var rectTag = "";
+                        var uiTag = "_ui";
                         if (pMask) {
                             var prect = this.transform.maskRect;
-                            rectPostfix = "_(" + prect.x + "_" + prect.y + "_" + prect.w + "_" + prect.h + ")";
+                            rectTag = "mask(" + prect.x + "_" + prect.y + "_" + prect.w + "_" + prect.h + ")";
                         }
-                        var matName = this._image.getName() + "_uimask" + rectPostfix;
-                        var matChanged = false;
+                        var matName = this._image.getName() + uiTag + rectTag;
                         if (!mat || mat.getName() != matName) {
                             if (mat)
                                 mat.unuse();
@@ -5637,18 +5616,13 @@ var gd3d;
                             if (mat)
                                 mat.use();
                         }
-                        if (mat == null) {
+                        if (!mat) {
                             mat = new framework.material(matName);
-                            var sh = assetmgr.getShader(this._shaderName);
-                            sh = !sh ? assetmgr.getShader(rawImage2D_1.defUIShader) : sh;
+                            var sh = assetmgr.getShader(this._CustomShaderName);
+                            sh = sh ? sh : assetmgr.getShader(pMask ? rawImage2D_1.defMaskUIShader : rawImage2D_1.defUIShader);
                             mat.setShader(sh);
                             mat.use();
-                            matChanged = true;
                             this.needRefreshImg = true;
-                        }
-                        if (matChanged || this._lastMask != pMask) {
-                            mat.setFloat("MaskState", this.transform.parentIsMask ? 1 : 0);
-                            this._lastMask = pMask;
                         }
                         this._uimat = mat;
                     }
@@ -5734,7 +5708,8 @@ var gd3d;
             rawImage2D.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             rawImage2D.ClassName = "rawImage2D";
-            rawImage2D.defUIShader = "shader/defmaskui";
+            rawImage2D.defUIShader = "shader/defui";
+            rawImage2D.defMaskUIShader = "shader/defmaskui";
             __decorate([
                 gd3d.reflect.Field("texture"),
                 __metadata("design:type", Object),
@@ -7689,20 +7664,21 @@ var gd3d;
                 pool.compileVS(assetmgr.webgl, "def", defShader.vscode);
                 pool.compileFS(assetmgr.webgl, "def", defShader.fscode);
                 pool.compileFS(assetmgr.webgl, "def2", defShader.fscode2);
-                pool.compileFS(assetmgr.webgl, "defui", defShader.fscodeui);
-                pool.compileVS(assetmgr.webgl, "defuifont", defShader.vscodeuifont);
-                pool.compileFS(assetmgr.webgl, "defuifont", defShader.fscodeuifont);
+                pool.compileVS(assetmgr.webgl, "defui", defShader.vscodeUI);
+                pool.compileFS(assetmgr.webgl, "defui", defShader.fscodeUI);
+                pool.compileVS(assetmgr.webgl, "defuifont", defShader.vscodefontUI);
+                pool.compileFS(assetmgr.webgl, "defuifont", defShader.fscodefontUI);
                 pool.compileVS(assetmgr.webgl, "diffuse", defShader.vsdiffuse);
                 pool.compileFS(assetmgr.webgl, "diffuse", defShader.fsdiffuse);
                 pool.compileVS(assetmgr.webgl, "line", defShader.vsline);
                 pool.compileFS(assetmgr.webgl, "line", defShader.fsline);
                 pool.compileVS(assetmgr.webgl, "materialcolor", defShader.vsmaterialcolor);
-                pool.compileVS(assetmgr.webgl, "defUIMaskVS", defShader.vsUiMaskCode);
-                pool.compileFS(assetmgr.webgl, "defUIMaskFS", defShader.fscodeMaskUi);
+                pool.compileVS(assetmgr.webgl, "defUIMaskVS", defShader.vscodeMaskUI);
+                pool.compileFS(assetmgr.webgl, "defUIMaskFS", defShader.fscodeMaskUI);
                 pool.compileVS(assetmgr.webgl, "defuifontMaskVS", defShader.vscodeuifontmask);
                 pool.compileFS(assetmgr.webgl, "defuifontMaskFS", defShader.fscodeuifontmask);
                 var program = pool.linkProgram(assetmgr.webgl, "def", "def");
-                var program2 = pool.linkProgram(assetmgr.webgl, "def", "defui");
+                var program2 = pool.linkProgram(assetmgr.webgl, "defui", "defui");
                 var programuifont = pool.linkProgram(assetmgr.webgl, "defuifont", "defuifont");
                 var programdiffuse = pool.linkProgram(assetmgr.webgl, "diffuse", "diffuse");
                 var programline = pool.linkProgram(assetmgr.webgl, "line", "line");
@@ -7866,8 +7842,6 @@ var gd3d;
             xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;     \
             gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
         }";
-            defShader.vsUiMaskCode = " \n        attribute vec4 _glesVertex;    \n        attribute vec4 _glesColor;                   \n        attribute vec4 _glesMultiTexCoord0;          \n        uniform highp mat4 glstate_matrix_mvp;       \n        uniform lowp float MaskState;       \n        varying lowp vec4 xlv_COLOR;                 \n        varying highp vec2 xlv_TEXCOORD0;            \n        varying highp vec2 mask_TEXCOORD;            \n        void main()                                      \n        {                                                \n            highp vec4 tmpvar_1;                         \n            tmpvar_1.w = 1.0;                            \n            tmpvar_1.xyz = _glesVertex.xyz;              \n            xlv_COLOR = _glesColor;                      \n            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      \n            if(MaskState != 0.0){     \n                mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0; \n                mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0; \n            } \n            gl_Position = (glstate_matrix_mvp * tmpvar_1);   \n        }";
-            defShader.fscodeMaskUi = "          \n        uniform sampler2D _MainTex;                                                  \n        uniform highp vec4 _maskRect;                                                  \n        uniform lowp float MaskState;       \n        varying lowp vec4 xlv_COLOR;                                                  \n        varying highp vec2 xlv_TEXCOORD0;    \n        varying highp vec2 mask_TEXCOORD;            \n        bool CalcuCut(){    \n            highp float l; \n            highp float t; \n            highp float r; \n            highp float b; \n            highp vec2 texc1; \n            bool beCut; \n            l = _maskRect.x; \n            t = _maskRect.y; \n            r = _maskRect.z + l; \n            b = _maskRect.w + t; \n            texc1 = mask_TEXCOORD; \n            if(texc1.x >(1.0 - l) || texc1.x <(1.0 - r) || texc1.y <t || texc1.y>b){  \n                beCut = true;  \n            }else{ \n                beCut = false; \n            } \n            return beCut; \n        } \n            \n        void main()  \n        { \n            if(MaskState != 0.0 && CalcuCut()) discard; \n            lowp vec4 tmpvar_3; \n            tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0)); \n            gl_FragData[0] = tmpvar_3 ; \n        } \n        ";
             defShader.fscode = "         \
         uniform sampler2D _MainTex;                                                 \
         varying lowp vec4 xlv_COLOR;                                                 \
@@ -7899,23 +7873,16 @@ var gd3d;
               \"_MaskTex('MaskTex',Texture)='white'{}\"\
             ]\
             }";
-            defShader.fscodeui = "         \
-        uniform sampler2D _MainTex;                                                 \
-        varying lowp vec4 xlv_COLOR;                                                 \
-        varying highp vec2 xlv_TEXCOORD0;   \
-        void main() \
-        {\
-            lowp vec4 tmpvar_3;\
-            tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\
-            gl_FragData[0] = tmpvar_3;\
-        }\
-        ";
+            defShader.fscodeUI = "\n            uniform sampler2D _MainTex;\n            varying lowp vec4 xlv_COLOR;\n            varying highp vec2 xlv_TEXCOORD0;\n            void main()\n            {\n                lowp vec4 tmpvar_3;\n                tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\n                gl_FragData[0] = tmpvar_3;\n            }";
+            defShader.vscodeUI = "\n            attribute vec4 _glesVertex;    \n            attribute vec4 _glesColor;                   \n            attribute vec4 _glesMultiTexCoord0;          \n            uniform highp mat4 glstate_matrix_mvp;       \n            varying lowp vec4 xlv_COLOR;                 \n            varying highp vec2 xlv_TEXCOORD0;            \n            void main()                                      \n            {                                                \n                highp vec4 tmpvar_1;                         \n                tmpvar_1.w = 1.0;                            \n                tmpvar_1.xyz = _glesVertex.xyz;              \n                xlv_COLOR = _glesColor;                      \n                xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      \n                gl_Position = (glstate_matrix_mvp * tmpvar_1);   \n            }\n        ";
+            defShader.vscodeMaskUI = " \n        attribute vec4 _glesVertex;    \n        attribute vec4 _glesColor;                   \n        attribute vec4 _glesMultiTexCoord0;          \n        uniform highp mat4 glstate_matrix_mvp;       \n        varying lowp vec4 xlv_COLOR;                 \n        varying highp vec2 xlv_TEXCOORD0;            \n        varying highp vec2 mask_TEXCOORD;            \n        void main()                                      \n        {                                                \n            highp vec4 tmpvar_1;                         \n            tmpvar_1.w = 1.0;                            \n            tmpvar_1.xyz = _glesVertex.xyz;              \n            xlv_COLOR = _glesColor;                      \n            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      \n            mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0; \n            mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0; \n            gl_Position = (glstate_matrix_mvp * tmpvar_1);   \n        }";
+            defShader.fscodeMaskUI = "          \n        uniform sampler2D _MainTex;                                                  \n        uniform highp vec4 _maskRect;                                                  \n        varying lowp vec4 xlv_COLOR;                                                  \n        varying highp vec2 xlv_TEXCOORD0;    \n        varying highp vec2 mask_TEXCOORD;            \n        bool CalcuCut(){    \n            highp float l; \n            highp float t; \n            highp float r; \n            highp float b; \n            highp vec2 texc1; \n            bool beCut; \n            l = _maskRect.x; \n            t = _maskRect.y; \n            r = _maskRect.z + l; \n            b = _maskRect.w + t; \n            texc1 = mask_TEXCOORD; \n            if(texc1.x >(1.0 - l) || texc1.x <(1.0 - r) || texc1.y <t || texc1.y>b){  \n                beCut = true;  \n            }else{ \n                beCut = false; \n            } \n            return beCut; \n        } \n            \n        void main()  \n        { \n            if(CalcuCut()) discard; \n            lowp vec4 tmpvar_3; \n            tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0)); \n            gl_FragData[0] = tmpvar_3 ; \n        } \n        ";
             defShader.shaderuifront = "{\
             \"properties\": [\
               \"_MainTex('MainTex',Texture)='white'{}\"\
             ]\
             }";
-            defShader.vscodeuifont = "\
+            defShader.vscodefontUI = "\
         attribute vec4 _glesVertex;   \
         attribute vec4 _glesColor;                  \
         attribute vec4 _glesColorEx;                  \
@@ -7934,93 +7901,28 @@ var gd3d;
             xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);     \
             gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
         }";
-            defShader.fscodeuifont = "\
-        precision mediump float ;\
-        uniform sampler2D _MainTex;\
-        varying lowp vec4 xlv_COLOR;\
-        varying lowp vec4 xlv_COLOREx;\
-        varying highp vec2 xlv_TEXCOORD0;    \
-        void main()  \
-        { \
-            float scale = 10.0;   \
-            float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;   \
-        float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;   \
-        \
-        float c=xlv_COLOR.a * clamp ( d,0.0,1.0);  \
-        float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);  \
-        bc =min(1.0-c,bc); \
-        \
-        \
-        \
-        gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc; \
-    }";
-            defShader.vscodeuifontmask = "\
-        attribute vec4 _glesVertex;   \
-        attribute vec4 _glesColor;                  \
-        attribute vec4 _glesColorEx;                  \
-        attribute vec4 _glesMultiTexCoord0;         \
-        uniform highp mat4 glstate_matrix_mvp;      \
-        uniform lowp float MaskState;      \
-        varying lowp vec4 xlv_COLOR;                \
-        varying lowp vec4 xlv_COLOREx;                                                 \
-        varying highp vec2 xlv_TEXCOORD0;           \
-        varying highp vec2 mask_TEXCOORD;           \
-        void main()                                     \
-        {                                               \
-            highp vec4 tmpvar_1;                        \
-            tmpvar_1.w = 1.0;                           \
-            tmpvar_1.xyz = _glesVertex.xyz;             \
-            xlv_COLOR = _glesColor;                     \
-            xlv_COLOREx = _glesColorEx;                     \
-            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);     \
-            if(MaskState != 0.0){    \
-                mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0;\
-                mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0;\
-            }\
-            gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
-        }";
-            defShader.fscodeuifontmask = "\
-        precision mediump float;\
-            uniform sampler2D _MainTex;  \
-            uniform lowp float MaskState;      \
-            uniform highp vec4 _maskRect;       \
-            varying lowp vec4 xlv_COLOR; \
-            varying lowp vec4 xlv_COLOREx; \
+            defShader.fscodefontUI = "\
+            precision mediump float ;\
+            uniform sampler2D _MainTex;\
+            varying lowp vec4 xlv_COLOR;\
+            varying lowp vec4 xlv_COLOREx;\
             varying highp vec2 xlv_TEXCOORD0;    \
-            varying highp vec2 mask_TEXCOORD;     \
-            bool CalcuCut(){   \
-                highp float l;\
-                highp float t;\
-                highp float r;\
-                highp float b;\
-                highp vec2 texc1;\
-                bool beCut;\
-                l = _maskRect.x;\
-                t = _maskRect.y;\
-                r = _maskRect.z + l;\
-                b = _maskRect.w + t;\
-                texc1 = mask_TEXCOORD;\
-                if(texc1.x >(1.0 - l) || texc1.x <(1.0 - r) || texc1.y <t || texc1.y>b){ \
-                    beCut = true; \
-                }else{\
-                    beCut = false;\
-                }\
-                return beCut;\
-            }\
-            \
             void main()  \
             { \
-                if(MaskState != 0.0 && CalcuCut())  discard;\
-            float scale = 10.0;   \
-            float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;  \
-            float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;  \
+                float scale = 10.0;   \
+                float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;   \
+            float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;   \
             \
             float c=xlv_COLOR.a * clamp ( d,0.0,1.0);  \
             float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);  \
             bc =min(1.0-c,bc); \
-            lowp vec4 final =  xlv_COLOR*c + xlv_COLOREx*bc ;\
-            gl_FragData[0] = final ;\
-            }";
+            \
+            \
+            \
+            gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc; \
+        }";
+            defShader.vscodeuifontmask = " \n            attribute vec4 _glesVertex;    \n            attribute vec4 _glesColor;                   \n            attribute vec4 _glesColorEx;                   \n            attribute vec4 _glesMultiTexCoord0;          \n            uniform highp mat4 glstate_matrix_mvp;       \n            varying lowp vec4 xlv_COLOR;                 \n            varying lowp vec4 xlv_COLOREx;                                                  \n            varying highp vec2 xlv_TEXCOORD0;            \n            varying highp vec2 mask_TEXCOORD;            \n            void main()                                      \n            {                                                \n                highp vec4 tmpvar_1;                         \n                tmpvar_1.w = 1.0;                            \n                tmpvar_1.xyz = _glesVertex.xyz;              \n                xlv_COLOR = _glesColor;                      \n                xlv_COLOREx = _glesColorEx;                      \n                xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      \n                mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0; \n                mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0; \n                gl_Position = (glstate_matrix_mvp * tmpvar_1);   \n            }";
+            defShader.fscodeuifontmask = " \n            precision mediump float; \n            uniform sampler2D _MainTex;   \n            uniform highp vec4 _maskRect;        \n            varying lowp vec4 xlv_COLOR;  \n            varying lowp vec4 xlv_COLOREx;  \n            varying highp vec2 xlv_TEXCOORD0;     \n            varying highp vec2 mask_TEXCOORD;      \n            bool CalcuCut(){    \n                highp float l; \n                highp float t; \n                highp float r; \n                highp float b; \n                highp vec2 texc1; \n                bool beCut; \n                l = _maskRect.x; \n                t = _maskRect.y; \n                r = _maskRect.z + l; \n                b = _maskRect.w + t; \n                texc1 = mask_TEXCOORD; \n                if(texc1.x >(1.0 - l) || texc1.x <(1.0 - r) || texc1.y <t || texc1.y>b){  \n                    beCut = true;  \n                }else{ \n                    beCut = false; \n                } \n                return beCut; \n            } \n             \n            void main()   \n            {  \n                if(CalcuCut())  discard; \n                float scale = 10.0;    \n                float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;   \n                float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;   \n                \n                float c=xlv_COLOR.a * clamp ( d,0.0,1.0);   \n                float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);   \n                bc =min(1.0-c,bc);  \n                lowp vec4 final =  xlv_COLOR*c + xlv_COLOREx*bc ; \n                gl_FragData[0] = final ; \n            }";
             defShader.diffuseShader = "{\
             \"properties\": [\
               \"_MainTex('MainTex',Texture)='white'{}\",\

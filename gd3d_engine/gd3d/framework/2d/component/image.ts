@@ -52,10 +52,7 @@ namespace gd3d.framework
         private static readonly defUIShader = `shader/defui`;  //非mask 使用shader
         private static readonly defMaskUIShader = `shader/defmaskui`; //mask 使用shader
 
-        private _shaderName = `shader/defmaskui`;
-
-        private _shaderDirty = false;
-
+        private _CustomShaderName = ``;//自定义UIshader
         /**
          * @public
          * @language zh_CN
@@ -64,8 +61,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         setShaderByName(shaderName:string){
-            this._shaderName = shaderName;
-            this._shaderDirty = true;
+            this._CustomShaderName = shaderName;
         }
 
         /**
@@ -73,39 +69,31 @@ namespace gd3d.framework
          * ui默认材质
          */
         private _uimat: material;
-        private _lastMask = false;
         private get uimat(){
             if (this._sprite  && this._sprite.texture){
-                let canvas = this.transform.canvas;
-                if(!canvas.assetmgr) return;
-                let assetmgr = canvas.assetmgr;
+                let assetmgr = this.transform.canvas.assetmgr;
+                if(!assetmgr) return this._uimat;
                 let pMask = this.transform.parentIsMask;
                 let mat = this._uimat;
-                let rectPostfix = "";
+                let rectTag = "";
+                let uiTag = "_ui";
                 if(pMask){
                     let prect = this.transform.maskRect;
-                    rectPostfix = `_(${prect.x}_${prect.y}_${prect.w}_${prect.h})`; //when parentIsMask,can't multiplexing material , can be multiplexing when parent equal
+                    rectTag = `mask(${prect.x}_${prect.y}_${prect.w}_${prect.h})`; //when parentIsMask,can't multiplexing material , can be multiplexing when parent equal
                 }
-                let matName =this._sprite.texture.getName() + "_uimask" + rectPostfix;
-                let matChanged = false;
+                let matName =this._sprite.texture.getName() + uiTag + rectTag;
                 if(!mat || mat.getName() != matName){
-                    this.needRefreshImg = true;
                     if(mat) mat.unuse(); 
                     mat = assetmgr.getAssetByName(matName) as gd3d.framework.material;
                     if(mat) mat.use();
                 }
-                if(mat == null){
+                if(!mat){
                     mat = new material(matName);
-                    let sh = assetmgr.getShader(this._shaderName);
-                    sh = !sh? assetmgr.getShader(pMask? image2D.defMaskUIShader : image2D.defUIShader) : sh;
+                    let sh = assetmgr.getShader(this._CustomShaderName);
+                    sh = sh? sh : assetmgr.getShader(pMask? image2D.defMaskUIShader : image2D.defUIShader);
                     mat.setShader(sh);
                     mat.use();
-                    matChanged = true;
                     this.needRefreshImg = true;
-                }
-                if(matChanged || this._lastMask != pMask){
-                    mat.setFloat("MaskState", pMask? 1 : 0);
-                    this._lastMask = pMask;
                 }
                 this._uimat = mat;
             }
