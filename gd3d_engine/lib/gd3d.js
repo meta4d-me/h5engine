@@ -7737,11 +7737,12 @@ var gd3d;
                     p.setProgram(program2);
                     sh.passes["base"].push(p);
                     sh.fillUnDefUniform(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.uishader).properties);
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
                     p.state_ztest = false;
                     p.state_zwrite = false;
                     p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
-                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend_PreMultiply);
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend);
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
                 {
@@ -7752,11 +7753,12 @@ var gd3d;
                     p.setProgram(programuifont);
                     sh.passes["base"].push(p);
                     sh.fillUnDefUniform(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.shaderuifront).properties);
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
                     p.state_ztest = false;
                     p.state_zwrite = false;
                     p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
-                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend_PreMultiply);
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend);
                     assetmgr.mapShader[sh.getName()] = sh;
                 }
                 {
@@ -7882,47 +7884,10 @@ var gd3d;
               \"_MainTex('MainTex',Texture)='white'{}\"\
             ]\
             }";
-            defShader.vscodefontUI = "\
-        attribute vec4 _glesVertex;   \
-        attribute vec4 _glesColor;                  \
-        attribute vec4 _glesColorEx;                  \
-        attribute vec4 _glesMultiTexCoord0;         \
-        uniform highp mat4 glstate_matrix_mvp;      \
-        varying lowp vec4 xlv_COLOR;                \
-        varying lowp vec4 xlv_COLOREx;                                                 \
-        varying highp vec2 xlv_TEXCOORD0;           \
-        void main()                                     \
-        {                                               \
-            highp vec4 tmpvar_1;                        \
-            tmpvar_1.w = 1.0;                           \
-            tmpvar_1.xyz = _glesVertex.xyz;             \
-            xlv_COLOR = _glesColor;                     \
-            xlv_COLOREx = _glesColorEx;                     \
-            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);     \
-            gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
-        }";
-            defShader.fscodefontUI = "\
-            precision mediump float ;\
-            uniform sampler2D _MainTex;\
-            varying lowp vec4 xlv_COLOR;\
-            varying lowp vec4 xlv_COLOREx;\
-            varying highp vec2 xlv_TEXCOORD0;    \
-            void main()  \
-            { \
-                float scale = 10.0;   \
-                float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;   \
-            float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;   \
-            \
-            float c=xlv_COLOR.a * clamp ( d,0.0,1.0);  \
-            float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);  \
-            bc =min(1.0-c,bc); \
-            \
-            \
-            \
-            gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc; \
-        }";
+            defShader.vscodefontUI = " \n        attribute vec4 _glesVertex;    \n        attribute vec4 _glesColor;                   \n        attribute vec4 _glesColorEx;                   \n        attribute vec4 _glesMultiTexCoord0;          \n        uniform highp mat4 glstate_matrix_mvp;       \n        varying lowp vec4 xlv_COLOR;                 \n        varying lowp vec4 xlv_COLOREx;                                                  \n        varying highp vec2 xlv_TEXCOORD0;            \n        void main()                                      \n        {                                                \n            highp vec4 tmpvar_1;                         \n            tmpvar_1.w = 1.0;                            \n            tmpvar_1.xyz = _glesVertex.xyz;              \n            xlv_COLOR = _glesColor;                      \n            xlv_COLOREx = _glesColorEx;                      \n            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      \n            gl_Position = (glstate_matrix_mvp * tmpvar_1);   \n        }";
+            defShader.fscodefontUI = " \n            precision mediump float ; \n            uniform sampler2D _MainTex; \n            varying lowp vec4 xlv_COLOR; \n            varying lowp vec4 xlv_COLOREx; \n            varying highp vec2 xlv_TEXCOORD0;     \n            void main()   \n            {  \n                float scale = 10.0;    \n                float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.47)*scale;    \n                float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.4)*scale;    \n                \n                float c=xlv_COLOR.a * clamp ( d,0.0,1.0);   \n                float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);   \n                bc =min(1.0-c,bc);  \n            gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;  \n        }";
             defShader.vscodeuifontmask = " \n            attribute vec4 _glesVertex;    \n            attribute vec4 _glesColor;                   \n            attribute vec4 _glesColorEx;                   \n            attribute vec4 _glesMultiTexCoord0;          \n            uniform highp mat4 glstate_matrix_mvp;       \n            varying lowp vec4 xlv_COLOR;                 \n            varying lowp vec4 xlv_COLOREx;                                                  \n            varying highp vec2 xlv_TEXCOORD0;            \n            varying highp vec2 mask_TEXCOORD;            \n            void main()                                      \n            {                                                \n                highp vec4 tmpvar_1;                         \n                tmpvar_1.w = 1.0;                            \n                tmpvar_1.xyz = _glesVertex.xyz;              \n                xlv_COLOR = _glesColor;                      \n                xlv_COLOREx = _glesColorEx;                      \n                xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      \n                mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0; \n                mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0; \n                gl_Position = (glstate_matrix_mvp * tmpvar_1);   \n            }";
-            defShader.fscodeuifontmask = " \n            precision mediump float; \n            uniform sampler2D _MainTex;   \n            uniform highp vec4 _maskRect;        \n            varying lowp vec4 xlv_COLOR;  \n            varying lowp vec4 xlv_COLOREx;  \n            varying highp vec2 xlv_TEXCOORD0;     \n            varying highp vec2 mask_TEXCOORD;      \n            bool CalcuCut(){    \n                highp float l; \n                highp float t; \n                highp float r; \n                highp float b; \n                highp vec2 texc1; \n                bool beCut; \n                l = _maskRect.x; \n                t = _maskRect.y; \n                r = _maskRect.z + l; \n                b = _maskRect.w + t; \n                texc1 = mask_TEXCOORD; \n                if(texc1.x >(1.0 - l) || texc1.x <(1.0 - r) || texc1.y <t || texc1.y>b){  \n                    beCut = true;  \n                }else{ \n                    beCut = false; \n                } \n                return beCut; \n            } \n             \n            void main()   \n            {  \n                if(CalcuCut())  discard; \n                float scale = 10.0;    \n                float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;   \n                float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;   \n                \n                float c=xlv_COLOR.a * clamp ( d,0.0,1.0);   \n                float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);   \n                bc =min(1.0-c,bc);  \n                lowp vec4 final =  xlv_COLOR*c + xlv_COLOREx*bc ; \n                gl_FragData[0] = final ; \n            }";
+            defShader.fscodeuifontmask = " \n            precision mediump float; \n            uniform sampler2D _MainTex;   \n            uniform highp vec4 _maskRect;        \n            varying lowp vec4 xlv_COLOR;  \n            varying lowp vec4 xlv_COLOREx;  \n            varying highp vec2 xlv_TEXCOORD0;     \n            varying highp vec2 mask_TEXCOORD;      \n            bool CalcuCut(){    \n                highp float l; \n                highp float t; \n                highp float r; \n                highp float b; \n                highp vec2 texc1; \n                bool beCut; \n                l = _maskRect.x; \n                t = _maskRect.y; \n                r = _maskRect.z + l; \n                b = _maskRect.w + t; \n                texc1 = mask_TEXCOORD; \n                if(texc1.x >(1.0 - l) || texc1.x <(1.0 - r) || texc1.y <t || texc1.y>b){  \n                    beCut = true;  \n                }else{ \n                    beCut = false; \n                } \n                return beCut; \n            } \n             \n            void main()   \n            {  \n                if(CalcuCut())  discard; \n                float scale = 10.0;    \n                float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.47)*scale;   \n                float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.4)*scale;   \n                \n                float c=xlv_COLOR.a * clamp ( d,0.0,1.0);   \n                float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);   \n                bc =min(1.0-c,bc);  \n                lowp vec4 final =  xlv_COLOR*c + xlv_COLOREx*bc ; \n                gl_FragData[0] = final ; \n            }";
             defShader.diffuseShader = "{\
             \"properties\": [\
               \"_MainTex('MainTex',Texture)='white'{}\",\
