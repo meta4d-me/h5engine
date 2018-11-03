@@ -170,47 +170,44 @@ namespace gd3d.framework
             ]\
             }";
 
-        static vscodefontUI: string = "\
-        attribute vec4 _glesVertex;   \
-        attribute vec4 _glesColor;                  \
-        attribute vec4 _glesColorEx;                  \
-        attribute vec4 _glesMultiTexCoord0;         \
-        uniform highp mat4 glstate_matrix_mvp;      \
-        varying lowp vec4 xlv_COLOR;                \
-        varying lowp vec4 xlv_COLOREx;                                                 \
-        varying highp vec2 xlv_TEXCOORD0;           \
-        void main()                                     \
-        {                                               \
-            highp vec4 tmpvar_1;                        \
-            tmpvar_1.w = 1.0;                           \
-            tmpvar_1.xyz = _glesVertex.xyz;             \
-            xlv_COLOR = _glesColor;                     \
-            xlv_COLOREx = _glesColorEx;                     \
-            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);     \
-            gl_Position = (glstate_matrix_mvp * tmpvar_1);  \
-        }";
+        static vscodefontUI: string = ` 
+        attribute vec4 _glesVertex;    
+        attribute vec4 _glesColor;                   
+        attribute vec4 _glesColorEx;                   
+        attribute vec4 _glesMultiTexCoord0;          
+        uniform highp mat4 glstate_matrix_mvp;       
+        varying lowp vec4 xlv_COLOR;                 
+        varying lowp vec4 xlv_COLOREx;                                                  
+        varying highp vec2 xlv_TEXCOORD0;            
+        void main()                                      
+        {                                                
+            highp vec4 tmpvar_1;                         
+            tmpvar_1.w = 1.0;                            
+            tmpvar_1.xyz = _glesVertex.xyz;              
+            xlv_COLOR = _glesColor;                      
+            xlv_COLOREx = _glesColorEx;                      
+            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      
+            gl_Position = (glstate_matrix_mvp * tmpvar_1);   
+        }`;
 
         
-        static fscodefontUI: string = "\
-            precision mediump float ;\
-            uniform sampler2D _MainTex;\
-            varying lowp vec4 xlv_COLOR;\
-            varying lowp vec4 xlv_COLOREx;\
-            varying highp vec2 xlv_TEXCOORD0;    \
-            void main()  \
-            { \
-                float scale = 10.0;   \
-                float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;   \
-            float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;   \
-            \
-            float c=xlv_COLOR.a * clamp ( d,0.0,1.0);  \
-            float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);  \
-            bc =min(1.0-c,bc); \
-            \
-            \
-            \
-            gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc; \
-        }";
+        static fscodefontUI: string = ` 
+            precision mediump float ; 
+            uniform sampler2D _MainTex; 
+            varying lowp vec4 xlv_COLOR; 
+            varying lowp vec4 xlv_COLOREx; 
+            varying highp vec2 xlv_TEXCOORD0;     
+            void main()   
+            {  
+                float scale = 10.0;    
+                float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.47)*scale;    
+                float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.4)*scale;    
+                
+                float c=xlv_COLOR.a * clamp ( d,0.0,1.0);   
+                float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);   
+                bc =min(1.0-c,bc);  
+            gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;  
+        }`;
     
         static vscodeuifontmask: string = ` 
             attribute vec4 _glesVertex;    
@@ -267,8 +264,8 @@ namespace gd3d.framework
             {  
                 if(CalcuCut())  discard; 
                 float scale = 10.0;    
-                float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.5)*scale;   
-                float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.34)*scale;   
+                float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.47)*scale;   
+                float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.4)*scale;   
                 
                 float c=xlv_COLOR.a * clamp ( d,0.0,1.0);   
                 float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);   
@@ -474,12 +471,12 @@ namespace gd3d.framework
                 p.setProgram(program2);
                 sh.passes["base"].push(p);
                 sh.fillUnDefUniform(p);
-                //sh._parseProperties(assetmgr,JSON.parse(this.uishader).properties);
+                sh._parseProperties(assetmgr,JSON.parse(this.uishader).properties);
                 p.state_showface = render.ShowFaceStateEnum.ALL;
                 p.state_ztest = false;
                 p.state_zwrite = false;
                 p.state_ztest_method = render.webglkit.LEQUAL;
-                p.setAlphaBlend(render.BlendModeEnum.Blend_PreMultiply);
+                p.setAlphaBlend(render.BlendModeEnum.Blend);
                 assetmgr.mapShader[sh.getName()] = sh;
             }
             {
@@ -490,12 +487,12 @@ namespace gd3d.framework
                 p.setProgram(programuifont);
                 sh.passes["base"].push(p);
                 sh.fillUnDefUniform(p);
-                //sh._parseProperties(assetmgr,JSON.parse(this.shaderuifront).properties); 
+                sh._parseProperties(assetmgr,JSON.parse(this.shaderuifront).properties); 
                 p.state_showface = render.ShowFaceStateEnum.ALL;
                 p.state_ztest = false;
                 p.state_zwrite = false;
                 p.state_ztest_method = render.webglkit.LEQUAL;
-                p.setAlphaBlend(render.BlendModeEnum.Blend_PreMultiply);
+                p.setAlphaBlend(render.BlendModeEnum.Blend);
                 assetmgr.mapShader[sh.getName()] = sh;
             }
             {
