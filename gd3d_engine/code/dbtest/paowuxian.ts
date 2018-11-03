@@ -15,7 +15,7 @@ namespace dome
         private guanghuan:gd3d.framework.transform;
 
         private orgPos:gd3d.math.vector3=new gd3d.math.vector3(0,0,-10);
-        rotEuler:gd3d.math.vector3=new gd3d.math.vector3(-90,0,0);
+        rotEuler:gd3d.math.vector3=new gd3d.math.vector3(-30,30,0);
         gravity:number=10;
         speed:number=10;
 
@@ -47,7 +47,6 @@ namespace dome
         {
             this.addcam();
             this.addcube();
-
             this.addUI();
             state.finish=true;
         }
@@ -79,12 +78,33 @@ namespace dome
 
                 meshf.mesh=this.getMeshData(-this.rotEuler.x,this.gravity,this.speed,this.paoLen);
 
+                //------------------------
+                let mat=this.guiji.getWorldMatrix();
+                gd3d.math.matrixTransformVector3(this.startPos,mat,this.worldStart);
+                gd3d.math.matrixTransformVector3(this.hPos,mat,this.worldMiddle);
+                gd3d.math.matrixTransformVector3(this.endpos,mat,this.worldEnd);
 
-                //------------------
-                this.guiji.getForwardInWorld(this.forward);
-                gd3d.math.vec3ScaleByNum(this.forward,this.guanghuantoPaoJia,this.forward);
-                gd3d.math.vec3Add(this.guiji.getWorldPosition(),this.forward,this.guanghuan.localPosition);
-                this.guanghuan.markDirty();
+
+                gd3d.math.vec3Clone(this.worldStart,this.startTrans.localTranslate);
+                gd3d.math.vec3Clone(this.worldMiddle,this.middleTrans.localTranslate);
+                gd3d.math.vec3Clone(this.worldEnd,this.endTrans.localTranslate);
+                this.startTrans.markDirty();
+                this.middleTrans.markDirty();
+                this.endTrans.markDirty();
+
+                //------------
+                let info:gd3d.framework.pickinfo=new gd3d.framework.pickinfo();
+                //------------------障碍物集合
+                let targets:gd3d.framework.transform[]=[];
+                if(this.detectTarget(targets,info))
+                {
+                    gd3d.math.vec3Clone(info.hitposition,this.guanghuan.localPosition);
+                    this.guanghuan.markDirty();
+                }else
+                {
+                    gd3d.math.vec3Clone(this.worldEnd,this.guanghuan.localPosition);
+                    this.guanghuan.markDirty();
+                }
             }
 
 
@@ -100,8 +120,8 @@ namespace dome
                 move.y-=0.5*this.gravity*this.timer*this.timer;
 
 
+                gd3d.math.vec3Add(this.paoKouPos,this.paojia.getWorldPosition(),this.paoKouPos);
                 gd3d.math.vec3Add(this.paoKouPos,move,this.paodan.localPosition);
-                gd3d.math.vec3Add(this.paodan.localPosition,this.paojia.getWorldPosition(),this.paodan.localPosition);
 
                 this.paodan.markDirty();
 
@@ -109,6 +129,86 @@ namespace dome
                 {
                     this.actived=false;
                 }
+            }
+        }
+        private worldStart:gd3d.math.vector3=new gd3d.math.vector3();
+        private startTrans:gd3d.framework.transform;
+        private worldEnd:gd3d.math.vector3=new gd3d.math.vector3();
+        private endTrans:gd3d.framework.transform;
+        private worldMiddle:gd3d.math.vector3=new gd3d.math.vector3();
+        private middleTrans:gd3d.framework.transform;
+
+        private detectTarget(targets:gd3d.framework.transform[],info:gd3d.framework.pickinfo):boolean
+        {
+            if(this.linedetectcollider(this.worldStart,this.worldMiddle,targets,info))
+            {
+                if(this.detectSecond(info.pickedtran,info))
+                {
+                    return true;
+                }
+            }
+            if(this.linedetectcollider(this.worldMiddle,this.worldEnd,targets,info))
+            {
+                if(this.detectSecond(info.pickedtran,info))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private detectSecond(target:gd3d.framework.transform,info:gd3d.framework.pickinfo):boolean
+        {
+            for(let i=0;i<this.pointArr.length-1;i++)
+            {
+               if(this.lineDetectMesh(this.pointArr[i],this.pointArr[i+1],target,info))
+               {
+                   return true;
+               } 
+            }
+            return false;
+        }
+
+        private linedetectcollider(start:gd3d.math.vector3,end:gd3d.math.vector3,targets:gd3d.framework.transform[],info:gd3d.framework.pickinfo):boolean
+        {
+            let dir=new gd3d.math.vector3();
+            gd3d.math.vec3Subtract(this.worldMiddle,this.worldStart,dir);
+            let len=gd3d.math.vec3Length(dir);
+            gd3d.math.vec3Normalize(dir,dir);
+            let ray=new gd3d.framework.ray(this.worldStart,dir);
+            //--------------
+            let transArr:gd3d.framework.transform[]=[];
+            for(let key in transArr)
+            {
+                if(ray.intersectCollider(transArr[key],info))
+                {
+                    if(info.distance<len)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        private lineDetectMesh(start:gd3d.math.vector3,end:gd3d.math.vector3,target:gd3d.framework.transform,info:gd3d.framework.pickinfo):boolean
+        {
+            let dir=new gd3d.math.vector3();
+            gd3d.math.vec3Subtract(this.worldMiddle,this.worldStart,dir);
+            let len=gd3d.math.vec3Length(dir);
+            gd3d.math.vec3Normalize(dir,dir);
+            let ray=new gd3d.framework.ray(this.worldStart,dir);
+            
+            let meshf=target.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
+            let mesh=meshf.getMeshOutput();
+            if(mesh!=null)
+            {
+               if(mesh.intersects(ray,target.getWorldMatrix(),info))
+               {
+                    if(info.distance<len)
+                    {
+                        return true;
+                    }
+               }
             }
         }
 
@@ -167,14 +267,32 @@ namespace dome
             let shader=this.assetmgr.getShader("diffuse_bothside.shader.json");
             mat.setShader(shader);
             meshr3.materials=[mat];
-
+  
             let cube4=new gd3d.framework.transform();
             this.guanghuan=cube4;
+            cube4.localScale=new gd3d.math.vector3(1,0.1,1);
             this.scene.addChild(cube4);
             let meshf4=cube4.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
             cube4.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
             meshf4.mesh=this.assetmgr.getDefaultMesh("cube");
 
+            this.startTrans= this.addscaledCube(0.3);
+            this.middleTrans= this.addscaledCube(0.3);
+            this.endTrans= this.addscaledCube(0.3);
+
+        }
+
+        private cubes:gd3d.framework.transform[]=[];
+        private addscaledCube(scale:number):gd3d.framework.transform
+        {
+            let cube4=new gd3d.framework.transform();
+            this.cubes.push(cube4);
+            cube4.localScale=new gd3d.math.vector3(scale,scale,scale);
+            this.scene.addChild(cube4);
+            let meshf4=cube4.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+            cube4.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+            meshf4.mesh=this.assetmgr.getDefaultMesh("cube");
+            return cube4;
         }
 
         getDirByRotAngle(euler:gd3d.math.vector3,dir:gd3d.math.vector3)
@@ -183,19 +301,17 @@ namespace dome
             gd3d.math.quatFromEulerAngles(euler.x,euler.y,euler.z,rot);
             gd3d.math.quatTransformVector(rot,gd3d.math.pool.vector3_forward,dir);
 
-            // gd3d.math.vec3ScaleByNum(dir,3,dir);
-
-            // let cube2=new gd3d.framework.transform();
-            // cube2.localPosition=dir;
-            // this.scene.addChild(cube2);
-            // let meshf2=cube2.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-            // let meshr2=cube2.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-            // meshf2.mesh=this.assetmgr.getDefaultMesh("cube");
         }
 
         private mesh:gd3d.framework.mesh;
         private lerpCount:number=50;
         private guanghuantoPaoJia:number;
+
+        private pointArr:gd3d.math.vector3[];
+        private endpos:gd3d.math.vector3=new gd3d.math.vector3();
+        private hPos:gd3d.math.vector3=new gd3d.math.vector3();
+        private startPos:gd3d.math.vector3=new gd3d.math.vector3();
+
         getMeshData(anglex:number,gravity:number,speed:number,paoLen:number,paojiaPosY:number=0):gd3d.framework.mesh
         {
             if(this.mesh==null)
@@ -229,9 +345,18 @@ namespace dome
                     }
                 }
                 this.mesh.data.pos=posarr;
+                this.pointArr=posarr;
                 var vf = gd3d.render.VertexFormatMask.Position| gd3d.render.VertexFormatMask.UV0;
                 var v32 = this.mesh.data.genVertexDataArray(vf);
                 this.mesh.glMesh.uploadVertexData(this.app.webgl, v32);
+
+                //-------------------------计算三点---------------------
+                this.startPos.y=paokouy;
+                this.startPos.z=paokouz;
+                let time=speedy/gravity;
+                this.hPos.y=speedy*time-0.5*gravity*Math.pow(time,2)+paokouy;
+                this.hPos.z=speedz*time+paokouz;
+                this.endpos.z=speedz*totalTime+paokouz;
             }
             
             return this.mesh
