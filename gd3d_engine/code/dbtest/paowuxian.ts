@@ -17,7 +17,7 @@ namespace dome
         private orgPos:gd3d.math.vector3=new gd3d.math.vector3(0,0,-10);
         rotEuler:gd3d.math.vector3=new gd3d.math.vector3(-30,30,0);
         gravity:number=10;
-        speed:number=10;
+        speed:number=50;
 
 
         dir:gd3d.math.vector3=new gd3d.math.vector3();
@@ -27,8 +27,8 @@ namespace dome
             this.assetmgr=app.getAssetMgr();
 
             this.taskmgr.addTaskCall(this.loadShader.bind(this));
+            this.taskmgr.addTaskCall(this.loadmesh.bind(this));
             this.taskmgr.addTaskCall(this.gamerun.bind(this));
-
         }
 
         private loadShader(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
@@ -95,10 +95,19 @@ namespace dome
                 //------------
                 let info:gd3d.framework.pickinfo=new gd3d.framework.pickinfo();
                 //------------------障碍物集合
-                let targets:gd3d.framework.transform[]=[];
+                let targets:gd3d.framework.transform[]=this.targets;
+                this.beNeedRecompute=true;
                 if(this.detectTarget(targets,info))
                 {
                     gd3d.math.vec3Clone(info.hitposition,this.guanghuan.localPosition);
+                    let axis=new gd3d.math.vector3();
+                    // let mat=info.pickedtran.getWorldMatrix();
+                    // gd3d.math.matrixTransformNormal(info.normal,mat,info.normal);
+                    gd3d.math.vec3Normalize(info.normal,info.normal)
+                    gd3d.math.vec3Cross(info.normal,gd3d.math.pool.vector3_up,axis);
+                    let dot=gd3d.math.vec3Dot(info.normal,gd3d.math.pool.vector3_up);
+                    let angle=Math.acos(dot)*180/Math.PI;
+                    gd3d.math.quatFromAxisAngle(axis,angle,this.guanghuan.localRotate);
                     this.guanghuan.markDirty();
                 }else
                 {
@@ -131,6 +140,9 @@ namespace dome
                 }
             }
         }
+        private beNeedRecompute:boolean=true;
+        private worldPoints:gd3d.math.vector3[]=[];
+        private targets:gd3d.framework.transform[]=[];
         private worldStart:gd3d.math.vector3=new gd3d.math.vector3();
         private startTrans:gd3d.framework.transform;
         private worldEnd:gd3d.math.vector3=new gd3d.math.vector3();
@@ -159,10 +171,20 @@ namespace dome
 
         private detectSecond(target:gd3d.framework.transform,info:gd3d.framework.pickinfo):boolean
         {
+            if(this.beNeedRecompute)
+            {
+                this.beNeedRecompute=false;
+                let mat=this.guiji.getWorldMatrix();
+                for(let i=0;i<this.pointArr.length;i++)
+                {
+                    gd3d.math.matrixTransformVector3(this.pointArr[i],mat,this.pointArr[i]);
+                }
+            }
             for(let i=0;i<this.pointArr.length-1;i++)
             {
                if(this.lineDetectMesh(this.pointArr[i],this.pointArr[i+1],target,info))
                {
+                   info.pickedtran=target;
                    return true;
                } 
             }
@@ -172,15 +194,14 @@ namespace dome
         private linedetectcollider(start:gd3d.math.vector3,end:gd3d.math.vector3,targets:gd3d.framework.transform[],info:gd3d.framework.pickinfo):boolean
         {
             let dir=new gd3d.math.vector3();
-            gd3d.math.vec3Subtract(this.worldMiddle,this.worldStart,dir);
+            gd3d.math.vec3Subtract(end,start,dir);
             let len=gd3d.math.vec3Length(dir);
             gd3d.math.vec3Normalize(dir,dir);
-            let ray=new gd3d.framework.ray(this.worldStart,dir);
+            let ray=new gd3d.framework.ray(start,dir);
             //--------------
-            let transArr:gd3d.framework.transform[]=[];
-            for(let key in transArr)
+            for(let key in targets)
             {
-                if(ray.intersectCollider(transArr[key],info))
+                if(ray.intersectCollider(targets[key],info))
                 {
                     if(info.distance<len)
                     {
@@ -193,10 +214,10 @@ namespace dome
         private lineDetectMesh(start:gd3d.math.vector3,end:gd3d.math.vector3,target:gd3d.framework.transform,info:gd3d.framework.pickinfo):boolean
         {
             let dir=new gd3d.math.vector3();
-            gd3d.math.vec3Subtract(this.worldMiddle,this.worldStart,dir);
+            gd3d.math.vec3Subtract(end,start,dir);
             let len=gd3d.math.vec3Length(dir);
             gd3d.math.vec3Normalize(dir,dir);
-            let ray=new gd3d.framework.ray(this.worldStart,dir);
+            let ray=new gd3d.framework.ray(start,dir);
             
             let meshf=target.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
             let mesh=meshf.getMeshOutput();
@@ -233,12 +254,12 @@ namespace dome
 
         private addcube()
         {
-            let cube0=new gd3d.framework.transform();
-            cube0.localScale=new gd3d.math.vector3(1000,0.01,1000);
-            this.scene.addChild(cube0);
-            let meshf0=cube0.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-            let meshr0=cube0.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-            meshf0.mesh=this.assetmgr.getDefaultMesh("cube");
+            // let cube0=new gd3d.framework.transform();
+            // cube0.localScale=new gd3d.math.vector3(1000,0.01,1000);
+            // this.scene.addChild(cube0);
+            // let meshf0=cube0.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+            // let meshr0=cube0.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+            // meshf0.mesh=this.assetmgr.getDefaultMesh("cube");
 
             let cube1=new gd3d.framework.transform();
             this.paojia=cube1;
@@ -464,6 +485,39 @@ namespace dome
             btn.style.left = x + "px";
             btn.style.position = "absolute";
             this.app.container.appendChild(btn);
+        }
+
+        private loadmesh(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
+        {
+            var name="box";
+            this.app.getAssetMgr().load("res/prefabs/"+name+"/"+name+".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s) =>
+            {
+                if (s.isfinish)
+                {
+                    var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(name+".prefab.json") as gd3d.framework.prefab;
+                    let item= _prefab.getCloneTrans();
+                    this.scene.addChild(item);
+
+                    //---------------showbox
+                    let showColider=(trans:gd3d.framework.transform)=>{
+                        let collider=trans.gameObject.getComponent("boxcollider") as gd3d.framework.boxcollider;
+                        if(collider!=null)
+                        {
+                            collider.colliderVisible=true;
+                        }
+                        if(trans.children!=null)
+                        {
+                            for(let key in trans.children)
+                            {
+                                showColider(trans.children[key]);
+                                this.targets.push(trans.children[key]);
+                            }
+                        }
+                    }
+                    showColider(item);
+                    state.finish = true;
+                }
+            });
         }
 
     }

@@ -137,6 +137,7 @@
                         {
                             ishided = true;
                             outInfo.cloneFrom(tempinfo);
+                            outInfo.pickedtran=tran;
                             lastDistance = outInfo.distance;
                             var tdir = gd3d.math.pool.new_vector3();
                             gd3d.math.vec3ScaleByNum(this.direction, outInfo.distance, tdir);
@@ -365,17 +366,21 @@
             var distance = gd3d.math.vec3Dot(_edge2, _qvec) * invdet;
 
 
+            outInfo.init();
+            outInfo.bu = bu;
+            outInfo.bv = bv;
+            outInfo.distance = distance;
+            //return new pickinfo(bu, bv, distance);
+
+            math.vec3Cross(_edge1,_edge2,outInfo.normal);
+            math.vec3Normalize(outInfo.normal,outInfo.normal);
+
             gd3d.math.pool.delete_vector3(_edge1);
             gd3d.math.pool.delete_vector3(_edge2);
             gd3d.math.pool.delete_vector3(_pvec);
             gd3d.math.pool.delete_vector3(_tvec);
             gd3d.math.pool.delete_vector3(_qvec);
 
-            outInfo.init();
-            outInfo.bu = bu;
-            outInfo.bv = bv;
-            outInfo.distance = distance;
-            //return new pickinfo(bu, bv, distance);
             return true;
         }
     }

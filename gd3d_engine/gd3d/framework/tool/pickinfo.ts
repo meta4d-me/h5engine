@@ -9,6 +9,7 @@
     */
     export class pickinfo
     {
+        normal:math.vector3=new math.vector3();
         public pickedtran: transform;
         public distance: number = 0;
         public hitposition: math.vector3 = new math.vector3();
@@ -28,6 +29,7 @@
             this.faceId = -1;
         }
         cloneFrom(from:pickinfo){
+            math.vec3Clone(from.normal,this.normal);
             this.pickedtran = from.pickedtran;
             math.vec3Clone(from.hitposition,this.hitposition);
             this.distance = from.distance;
