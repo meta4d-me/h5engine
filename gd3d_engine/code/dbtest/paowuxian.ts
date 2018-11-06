@@ -95,9 +95,12 @@ namespace dome
                 //------------
                 let info:gd3d.framework.pickinfo=new gd3d.framework.pickinfo();
                 //------------------障碍物集合
-                let targets:gd3d.framework.transform[]=this.targets;
+                //炮车集合
+                let targets1:gd3d.framework.transform[]=[];
+                //障碍物集合
+                let targets2:gd3d.framework.transform[]=this.targets;
                 this.beNeedRecompute=true;
-                if(this.detectTarget(targets,info))
+                if(this.detectTarget_2(targets1,targets2,info))
                 {
                     gd3d.math.vec3Clone(info.hitposition,this.guanghuan.localPosition);
                     let axis=new gd3d.math.vector3();
@@ -112,7 +115,8 @@ namespace dome
                     this.guanghuan.markDirty();
                 }else
                 {
-                    this.guanghuan.localEulerAngles=new gd3d.math.vector3();
+                    // this.guanghuan.localEulerAngles=new gd3d.math.vector3();
+                    gd3d.math.quatIdentity(this.guanghuan.localRotate);
                     gd3d.math.vec3Clone(this.worldEnd,this.guanghuan.localPosition);
                     this.guanghuan.markDirty();
                 }
@@ -162,6 +166,42 @@ namespace dome
                 }
             }
             if(this.linedetectcollider(this.worldMiddle,this.worldEnd,targets,info))
+            {
+                if(this.detectSecond_2(info.pickedtran,info))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+        /**
+         * 
+         * @param targets1 仅仅碰撞 碰撞盒子
+         * @param targets2 先碰撞盒子再碰mesh
+         * @param info 
+         */
+        private detectTarget_2(targets1:gd3d.framework.transform[],targets2:gd3d.framework.transform[],info:gd3d.framework.pickinfo):boolean
+        {
+
+            if(this.linedetectcollider(this.worldStart,this.worldMiddle,targets1,info))
+            {
+                return true;
+            }
+            if(this.linedetectcollider(this.worldMiddle,this.worldEnd,targets1,info))
+            {
+                if(this.detectSecond_2(info.pickedtran,info))
+                {
+                    return true;
+                }
+            }
+            if(this.linedetectcollider(this.worldStart,this.worldMiddle,targets2,info))
+            {
+                if(this.detectSecond_2(info.pickedtran,info))
+                {
+                    return true;
+                }
+            }
+            if(this.linedetectcollider(this.worldMiddle,this.worldEnd,targets2,info))
             {
                 if(this.detectSecond_2(info.pickedtran,info))
                 {
