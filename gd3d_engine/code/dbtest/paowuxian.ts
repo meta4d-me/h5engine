@@ -112,6 +112,7 @@ namespace dome
                     this.guanghuan.markDirty();
                 }else
                 {
+                    this.guanghuan.localEulerAngles=new gd3d.math.vector3();
                     gd3d.math.vec3Clone(this.worldEnd,this.guanghuan.localPosition);
                     this.guanghuan.markDirty();
                 }
@@ -589,37 +590,12 @@ namespace dome
 
                             if(dist<lastDistance)
                             {
-
-                                // let trans1= this.addscaledCube(0.1);
-                                // let trans2= this.addscaledCube(0.2);
-                                // let trans3= this.addscaledCube(0.3);
-
-                                // trans1.localPosition=t0;
-                                // trans2.localPosition=t1;
-                                // trans3.localPosition=t2;
-
-                                // trans1.markDirty();
-                                // trans2.markDirty();
-                                // trans3.markDirty();
-
-
-
                                 ishided = true;
                                 outInfo.cloneFrom(tempinfo);
                                 outInfo.faceId = index / 3;
                                 outInfo.subMeshId = j;
-                                // var tdir = gd3d.math.pool.new_vector3();
-                                // gd3d.math.vec3ScaleByNum(ray.direction, outInfo.distance, tdir);
-                                // gd3d.math.vec3Add(ray.origin, tdir, outInfo.hitposition);
+
                                 gd3d.math.vec3Clone(hitpos,outInfo.hitposition);
-
-                                // let edge1=gd3d.math.pool.new_vector3();
-                                // let edge2=gd3d.math.pool.new_vector3();
-                                // gd3d.math.vec3Subtract(t1,t0,edge1);
-                                // gd3d.math.vec3Subtract(t2,t0,edge2);
-                                // gd3d.math.vec3Cross(edge2,edge1,outInfo.normal);
-                                // gd3d.math.vec3Normalize(outInfo.normal,outInfo.normal);
-
                                 lastDistance = dist;
                             }
                             gd3d.math.pool.delete_vector3(hitpos);
@@ -628,7 +604,7 @@ namespace dome
                     }
                 }
             }
-            // gd3d.math.pool.delete_vector3Array(worldPosArr);
+            gd3d.math.pool.delete_vector3Array(worldPosArr);
             return ishided;
         }
 
