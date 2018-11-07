@@ -411,8 +411,10 @@ namespace dome
             }else
             {
                 anglex=anglex*Math.PI/180;
-                let halfwidth:number=0.1;
+                let halfwidth:number=1;
                 let posarr:gd3d.math.vector3[]=[];
+                let Middleposarr:gd3d.math.vector3[]=[];
+
                 let paokouy=paoLen*Math.sin(anglex);
                 let paokouz=paoLen*Math.cos(anglex);
                 
@@ -430,13 +432,15 @@ namespace dome
                     posarr.push(newpos1);
                     posarr.push(newpos2);
                     
+                    let middlepos=new gd3d.math.vector3(0,speedy*counttime-0.5*gravity*Math.pow(counttime,2)+paokouy,speedz*counttime+paokouz);
+                    Middleposarr.push(middlepos);
                     if(i==count)
                     {
                         this.guanghuantoPaoJia=speedz*counttime+paokouz;
                     }
                 }
                 this.mesh.data.pos=posarr;
-                this.pointArr=posarr;
+                this.pointArr=Middleposarr;
                 var vf = gd3d.render.VertexFormatMask.Position| gd3d.render.VertexFormatMask.UV0;
                 var v32 = this.mesh.data.genVertexDataArray(vf);
                 this.mesh.glMesh.uploadVertexData(this.app.webgl, v32);
@@ -456,7 +460,7 @@ namespace dome
         private initmesh(anglex:number,gravity:number,speed:number,paoLen:number,paojiaPosY:number=0):gd3d.framework.mesh
         {
             anglex=anglex*Math.PI/180;
-            let halfwidth:number=0.1;
+            let halfwidth:number=1;
             let posarr:gd3d.math.vector3[]=[];
             let uvArr:gd3d.math.vector2[]=[];
             let trisindex: number[]=[];
