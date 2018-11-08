@@ -25,7 +25,7 @@ namespace gd3d.framework
      * @version egret-gd3d 1.0
      */
     @reflect.node2DComponent
-    export class button implements IRectRenderer ,event.IUIEventer
+    export class button implements I2DComponent ,event.IUIEventer
     {
         static readonly ClassName:string="button";
 
@@ -184,18 +184,6 @@ namespace gd3d.framework
             this._fadeDuration = duration;
         }
 
-        /**
-         * @private
-         */
-        render(canvas: canvas)
-        {
-        }
-        /**
-         * @private
-         */
-        updateTran()
-        {
-        }
         /**
          * @private
          */
