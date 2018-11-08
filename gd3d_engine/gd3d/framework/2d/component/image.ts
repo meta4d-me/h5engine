@@ -65,14 +65,43 @@ namespace gd3d.framework
         }
 
         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取rander 的材质
+         * @version egret-gd3d 1.0
+         */
+        getMaterial(){
+            if(!this._uimat){
+                return this.uimat;
+            }
+            return this._uimat;
+        }
+
+        private _darwRect : gd3d.math.rect = new gd3d.math.rect();
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取渲染绘制矩形边界
+         * @version egret-gd3d 1.0
+         */
+        getDrawBounds(){
+            return this._darwRect;
+        }
+
+        /**
          * @private
          * ui默认材质
          */
         private _uimat: material;
         private get uimat(){
+            let assetmgr = this.transform.canvas.assetmgr;
+            if(!assetmgr) return this._uimat;
+
+            this.searchTexture();
             if (this._sprite  && this._sprite.texture){
-                let assetmgr = this.transform.canvas.assetmgr;
-                if(!assetmgr) return this._uimat;
                 let pMask = this.transform.parentIsMask;
                 let mat = this._uimat;
                 let rectTag = "";
@@ -267,44 +296,24 @@ namespace gd3d.framework
          */
         render(canvas: canvas)
         {
-            if(this._sprite == null){
-                let temp = canvas.assetmgr.mapNamed[this._spriteName];
-                let tspr:sprite;
-                if(temp != null){
-                    tspr = canvas.assetmgr.getAssetByName(this._spriteName) as gd3d.framework.sprite;
-                }else{
-                    if(canvas.assetmgr.mapDefaultSprite[this._spriteName]) //找默认资源
-                        tspr = canvas.assetmgr.getDefaultSprite(this._spriteName);
-                }
-                if(tspr){
-                    this.sprite = tspr;
-                    this.needRefreshImg = true;
-                    return;  //捕获到目标sprite后强制 下一帧渲染 （防止 transform树同步延迟 导致 右上角ghostShadow 问题）
-                }
-            }
-
             let mat = this.uimat;
             if(!mat) return;
 
-            var img = null;
-            if (this._sprite != null && this._sprite.texture != null)
+            let img ;
+            if (this._sprite  && this._sprite.texture )
             {
                 img = this._sprite.texture;
             }
 
-            // if (img == null)
-            // {
-            //     var scene = this.transform.canvas.scene;
-            //     img = scene.app.getAssetMgr().getDefaultTexture("grid");
-            // }
-            if(img != null){
+
+            if(img){
                 if(this.needRefreshImg){
                     mat.setTexture("_MainTex", img);
                     this.needRefreshImg = false;
                 }
                 
                 if(this.transform.parentIsMask){
-                    if(this._cacheMaskV4 == null) this._cacheMaskV4 = new math.vector4();
+                    if(!this._cacheMaskV4 ) this._cacheMaskV4 = new math.vector4();
                     let rect = this.transform.maskRect;
                     if(this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h){
                         this._cacheMaskV4.x = rect.x; this._cacheMaskV4.y = rect.y;this._cacheMaskV4.z = rect.w;this._cacheMaskV4.w = rect.h;
@@ -315,6 +324,25 @@ namespace gd3d.framework
                 canvas.pushRawData(mat, this.datar);
             }
 
+        }
+
+        //资源管理器中寻找 指定的贴图资源
+        private searchTexture(){
+            if(this._sprite) return;
+            let assetmgr = this.transform.canvas.assetmgr;
+            let temp = assetmgr.mapNamed[this._spriteName];
+            let tspr:sprite;
+            if(temp != null){
+                tspr = assetmgr.getAssetByName(this._spriteName) as gd3d.framework.sprite;
+            }else{
+                if(assetmgr.mapDefaultSprite[this._spriteName]) //找默认资源
+                    tspr = assetmgr.getDefaultSprite(this._spriteName);
+            }
+            if(tspr){
+                this.sprite = tspr;
+                this.needRefreshImg = true;
+                return;  //捕获到目标sprite后强制 下一帧渲染 （防止 transform树同步延迟 导致 右上角ghostShadow 问题）
+            }
         }
 
         private _cacheMaskV4:math.vector4;
@@ -336,7 +364,6 @@ namespace gd3d.framework
          */
         update(delta: number)
         {
-
         }
 
         /**
@@ -531,7 +558,7 @@ namespace gd3d.framework
             }
 
         }
-        
+
         /**
          * @private
          */
@@ -579,6 +606,41 @@ namespace gd3d.framework
                 this.datar[i * this._unitLen + 5] = this.color.b;
                 this.datar[i * this._unitLen + 6] = this.color.a;
             }
+
+            //drawRect 
+            this.min_x = Math.min(x0,x1,x2,x3,this.min_x);
+            this.min_y = Math.min(y0,y1,y2,y3,this.min_y);
+            this.max_x = Math.max(x0,x1,x2,x3,this.max_x);
+            this.max_y = Math.max(y0,y1,y2,y3,this.max_y);
+            this.calcDrawRect();
+        }
+
+        private min_x : number = Number.MAX_VALUE;
+        private max_x : number = Number.MAX_VALUE * -1;
+        private min_y : number = Number.MAX_VALUE;
+        private max_y : number = Number.MAX_VALUE * -1;
+        /** 计算drawRect */
+        private calcDrawRect(){
+            //drawBounds (y 轴反向)
+            let canvas = this.transform.canvas;
+            if(!canvas)return;
+            let minPos = helpv2;
+            minPos.x = this.min_x;
+            minPos.y = this.max_y;
+            canvas.ModelPosToCanvasPos(minPos,minPos);
+
+            let maxPos = helpv2_1;
+            maxPos.x = this.max_x;
+            maxPos.y = this.min_y;
+            canvas.ModelPosToCanvasPos(maxPos,maxPos);
+
+            this._darwRect.x = minPos.x;
+            this._darwRect.y = minPos.y;
+            this._darwRect.w = maxPos.x - minPos.x;
+            this._darwRect.h = maxPos.y - minPos.y;
+
+            this.min_x = this.min_y = Number.MAX_VALUE;
+            this.max_x = this.max_y = Number.MAX_VALUE * -1;
         }
 
         

@@ -2,6 +2,8 @@
 let helpv3 = new gd3d.math.vector3();
 let helpv3_1 = new gd3d.math.vector3();
 
+let helpv2 = new gd3d.math.vector2();
+let helpv2_1 = new gd3d.math.vector2();
 namespace gd3d.framework
 {
     /**

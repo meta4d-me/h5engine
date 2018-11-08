@@ -1317,6 +1317,7 @@ declare class test_UI_Component implements IState {
     private createUI(astState, state);
     private loadTexture(lastState, state);
     update(delta: number): void;
+    testFun(): void;
 }
 declare class CameraController {
     private static g_this;
@@ -1397,12 +1398,28 @@ declare namespace dome {
         private timer;
         private forward;
         update(delta: number): void;
+        private worldStart;
+        private startTrans;
+        private worldEnd;
+        private endTrans;
+        private worldMiddle;
+        private middleTrans;
+        private detectTarget(targets, info);
+        private detectSecond(target, info);
+        private linedetectcollider(start, end, targets, info);
+        private lineDetectMesh(start, end, target, info);
         private addcam();
         private addcube();
+        private cubes;
+        private addscaledCube(scale);
         getDirByRotAngle(euler: gd3d.math.vector3, dir: gd3d.math.vector3): void;
         private mesh;
         private lerpCount;
         private guanghuantoPaoJia;
+        private pointArr;
+        private endpos;
+        private hPos;
+        private startPos;
         getMeshData(anglex: number, gravity: number, speed: number, paoLen: number, paojiaPosY?: number): gd3d.framework.mesh;
         private initmesh(anglex, gravity, speed, paoLen, paojiaPosY?);
         private actived;

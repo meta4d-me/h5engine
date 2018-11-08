@@ -265,6 +265,7 @@ declare namespace gd3d.framework {
         static readonly ClassName: string;
         constructor();
         is2dUI: boolean;
+        isDrawByDepth: boolean;
         parentTrans: transform;
         batcher: batcher2D;
         webgl: WebGLRenderingContext;
@@ -292,6 +293,21 @@ declare namespace gd3d.framework {
         private lastMaskV4;
         assetmgr: assetMgr;
         drawScene(node: transform2D, context: renderContext, assetmgr: assetMgr): void;
+        static readonly depthTag: string;
+        static readonly flowIndexTag: string;
+        private rendererDic;
+        private depthList;
+        private sortedList;
+        private canvasBounds;
+        private readonly qt_maxObjNum;
+        private readonly qt_maxlevel;
+        private depthQTree;
+        private drawSceneByDepth(node, context, assetmgr);
+        private helpMap;
+        private sortDepthList();
+        private flowCount;
+        private collectToDepthL(node);
+        private checkBottomUI(rd);
         pixelWidth: number;
         pixelHeight: number;
         private rootNode;
@@ -503,6 +519,8 @@ declare namespace gd3d.framework {
     interface IRectRenderer extends I2DComponent {
         render(canvas: canvas): any;
         updateTran(): any;
+        getMaterial(): gd3d.framework.material;
+        getDrawBounds(): gd3d.math.rect;
     }
     class C2DComponent {
         static readonly ClassName: string;
@@ -604,6 +622,8 @@ declare namespace gd3d.framework {
         private lastPivot;
         private refreshLayout();
         private getLayValue(option);
+        setSiblingIndex(siblingIndex: number): void;
+        getSiblingIndex(): number;
         clone(): transform2D;
     }
     class t2dInfo {
@@ -647,7 +667,7 @@ declare namespace gd3d.framework {
         ColorTint = 1,
         SpriteSwap = 2,
     }
-    class button implements IRectRenderer, event.IUIEventer {
+    class button implements I2DComponent, event.IUIEventer {
         static readonly ClassName: string;
         private _transition;
         transition: TransitionType;
@@ -665,8 +685,6 @@ declare namespace gd3d.framework {
         pressedColor: math.color;
         private _fadeDuration;
         fadeDuration: number;
-        render(canvas: canvas): void;
-        updateTran(): void;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
@@ -701,6 +719,9 @@ declare namespace gd3d.framework {
         private static readonly defMaskUIShader;
         private _CustomShaderName;
         setShaderByName(shaderName: string): void;
+        getMaterial(): material;
+        private _darwRect;
+        getDrawBounds(): math.rect;
         private _uimat;
         private readonly uimat;
         private _imageType;
@@ -715,6 +736,7 @@ declare namespace gd3d.framework {
         private _imageBorder;
         readonly imageBorder: math.border;
         render(canvas: canvas): void;
+        private searchTexture();
         private _cacheMaskV4;
         start(): void;
         onPlay(): void;
@@ -723,6 +745,11 @@ declare namespace gd3d.framework {
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         private prepareData();
         updateTran(): void;
+        private min_x;
+        private max_x;
+        private min_y;
+        private max_y;
+        private calcDrawRect();
         private updateQuadData(x0, y0, x1, y1, x2, y2, x3, y3, quadIndex?, mirror?);
         private updateSimpleData(x0, y0, x1, y1, x2, y2, x3, y3);
         private updateSlicedData(x0, y0, x1, y1, x2, y2, x3, y3);
@@ -744,7 +771,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class inputField implements IRectRenderer {
+    class inputField implements I2DComponent {
         static readonly ClassName: string;
         transform: transform2D;
         private _frameImage;
@@ -764,9 +791,7 @@ declare namespace gd3d.framework {
         TextLabel: label;
         private _placeholderLabel;
         PlaceholderLabel: label;
-        updateData(_font: gd3d.framework.font): void;
-        render(canvas: canvas): void;
-        updateTran(): void;
+        private layoutRefresh();
         start(): void;
         onPlay(): void;
         private inputElmLayout();
@@ -820,12 +845,21 @@ declare namespace gd3d.framework {
         private static readonly defMaskUIShader;
         private _CustomShaderName;
         setShaderByName(shaderName: string): void;
+        getMaterial(): material;
+        private _darwRect;
+        getDrawBounds(): math.rect;
         private _uimat;
         private readonly uimat;
         private dirtyData;
         render(canvas: canvas): void;
+        private searchTexture();
         private _cacheMaskV4;
         updateTran(): void;
+        private min_x;
+        private max_x;
+        private min_y;
+        private max_y;
+        private calcDrawRect();
         start(): void;
         onPlay(): void;
         update(delta: number): void;
@@ -877,11 +911,19 @@ declare namespace gd3d.framework {
         private static readonly defMaskUIShader;
         private _CustomShaderName;
         setShaderByName(shaderName: string): void;
+        getMaterial(): material;
+        private _darwRect;
+        getDrawBounds(): math.rect;
         private _uimat;
         private readonly uimat;
         render(canvas: canvas): void;
         private _cacheMaskV4;
         updateTran(): void;
+        private min_x;
+        private max_x;
+        private min_y;
+        private max_y;
+        private calcDrawRect();
         start(): void;
         onPlay(): void;
         update(delta: number): void;
@@ -2361,6 +2403,8 @@ declare namespace gd3d.framework {
 }
 declare let helpv3: gd3d.math.vector3;
 declare let helpv3_1: gd3d.math.vector3;
+declare let helpv2: gd3d.math.vector2;
+declare let helpv2_1: gd3d.math.vector2;
 declare namespace gd3d.framework {
     interface ICameraPostQueue {
         render(scene: scene, context: renderContext, camera: camera): any;
@@ -4195,6 +4239,7 @@ declare namespace gd3d.math {
     function rectSet_Zero(out: rect): void;
     function rectEqul(src1: rect, src2: rect): boolean;
     function rectInner(x: number, y: number, src: rect): boolean;
+    function rectCollided(r1: rect, r2: rect): boolean;
 }
 declare namespace gd3d.math {
     function caclStringByteLength(value: string): number;
@@ -5674,6 +5719,18 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class quadTree {
+        private rootNode;
+        private readonly MAX_OBJECTS;
+        private readonly MAX_LEVELS;
+        constructor(bounds: math.rect, maxObjNum?: number, maxLevel?: number);
+        insert(rect: math.rect): void;
+        private cacheArr;
+        retrieve(bounds: math.rect, outRects: math.rect[]): void;
+        clear(): void;
+    }
+}
+declare namespace gd3d.framework {
     class ray {
         origin: gd3d.math.vector3;
         direction: gd3d.math.vector3;
@@ -6183,7 +6240,7 @@ declare namespace gd3d.math {
         static delete_matrix(v: matrix): void;
         static collect_matrix(): void;
         private static unused_quaternion;
-        static new_quaternion(): quaternion;
+        static new_quaternion(x?: number, y?: number, z?: number, w?: number): quaternion;
         static clone_quaternion(src: quaternion): quaternion;
         static delete_quaternion(v: quaternion): void;
         static collect_quaternion(): void;
@@ -6191,6 +6248,11 @@ declare namespace gd3d.math {
         static new_pickInfo(bu?: number, bv?: number, distance?: number): framework.pickinfo;
         static delete_pickInfo(v: framework.pickinfo): void;
         static collect_pickInfo(): void;
+        private static unused_rect;
+        static new_rect(x?: number, y?: number, w?: number, h?: number): rect;
+        static clone_rect(src: rect): rect;
+        static delete_rect(v: rect): void;
+        static collect_rect(): void;
     }
 }
 declare namespace gd3d.render {

@@ -1092,7 +1092,6 @@ var main = (function () {
         console.log("i am here.");
         this.app = app;
         this.addBtn("paowuxian", function () { return new dome.paowuxian(); });
-        this.addBtn("rayTest", function () { return new dome.rayTest(); });
         this.addBtn("f14effect", function () { return new dome.db_test_f14eff(); });
         this.addBtn("physic2d_dome", function () { return new physic2d_dome(); });
         this.addBtn("test_ui", function () { return new t.test_ui(); });
@@ -10108,6 +10107,7 @@ var test_UI_Component = (function () {
         var atlasComp = this.assetMgr.getAssetByName("comp.atlas.json");
         var tex_0 = this.assetMgr.getAssetByName("zg03_256.png");
         var bg_t = new gd3d.framework.transform2D;
+        bg_t.name = "框底图";
         bg_t.width = 400;
         bg_t.height = 260;
         bg_t.pivot.x = 0;
@@ -10127,17 +10127,21 @@ var test_UI_Component = (function () {
         bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT, 60);
         bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM, 60);
         var lab_t = new gd3d.framework.transform2D;
+        lab_t.name = "我是段文本_lable";
         lab_t.width = 120;
         lab_t.height = 24;
-        lab_t.localTranslate.x = 10;
-        lab_t.localTranslate.y = 30;
+        lab_t.localTranslate.x = -10;
+        lab_t.localTranslate.y = -10;
         bg_t.addChild(lab_t);
         var lab_l = lab_t.addComponent("label");
+        test_UI_Component["lab"] = lab_l;
         lab_l.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
         lab_l.fontsize = 24;
         lab_l.text = "我是段文本";
         lab_l.color = new gd3d.math.color(0.2, 0.2, 0.2, 1);
+        test_UI_Component["obj"] = this;
         var btn_t = new gd3d.framework.transform2D;
+        btn_t.name = "btn_按鈕";
         btn_t.width = 100;
         btn_t.height = 36;
         btn_t.pivot.x = 0;
@@ -10252,6 +10256,7 @@ var test_UI_Component = (function () {
         scroll_.horizontal = true;
         scroll_.vertical = true;
         var raw_t2 = new gd3d.framework.transform2D;
+        raw_t2.name = "滑动卷轴框png";
         raw_t2.width = 120;
         raw_t2.height = 120;
         var raw_i2 = raw_t2.addComponent("rawImage2D");
@@ -10289,6 +10294,20 @@ var test_UI_Component = (function () {
     };
     test_UI_Component.prototype.update = function (delta) {
         this.taskmgr.move(delta);
+    };
+    test_UI_Component.prototype.testFun = function () {
+        var lab = test_UI_Component["lab"];
+        var datater = lab["datar"];
+        var frist = new gd3d.math.vector2(datater[0], datater[1]);
+        var endIdx_0 = datater.length - 13;
+        var endIdx_1 = datater.length - 12;
+        var end = new gd3d.math.vector2(datater[endIdx_0], datater[endIdx_1]);
+        var canvas = lab.transform.canvas;
+        var temp = new gd3d.math.vector2();
+        canvas.ModelPosToCanvasPos(frist, temp);
+        console.error("frist:" + temp.toString());
+        canvas.ModelPosToCanvasPos(end, temp);
+        console.error("end:" + temp.toString());
     };
     return test_UI_Component;
 }());
@@ -10616,14 +10635,21 @@ var dome;
             this.taskmgr = new gd3d.framework.taskMgr();
             this.paoLen = 2;
             this.orgPos = new gd3d.math.vector3(0, 0, -10);
-            this.rotEuler = new gd3d.math.vector3(-90, 0, 0);
+            this.rotEuler = new gd3d.math.vector3(-30, 30, 0);
             this.gravity = 10;
             this.speed = 10;
             this.dir = new gd3d.math.vector3();
             this.paoKouPos = new gd3d.math.vector3();
             this.timer = 0;
             this.forward = new gd3d.math.vector3();
+            this.worldStart = new gd3d.math.vector3();
+            this.worldEnd = new gd3d.math.vector3();
+            this.worldMiddle = new gd3d.math.vector3();
+            this.cubes = [];
             this.lerpCount = 50;
+            this.endpos = new gd3d.math.vector3();
+            this.hPos = new gd3d.math.vector3();
+            this.startPos = new gd3d.math.vector3();
             this.actived = false;
         }
         paowuxian.prototype.start = function (app) {
@@ -10657,10 +10683,26 @@ var dome;
                 this.guiji.markDirty();
                 var meshf = this.guiji.gameObject.getComponent("meshFilter");
                 meshf.mesh = this.getMeshData(-this.rotEuler.x, this.gravity, this.speed, this.paoLen);
-                this.guiji.getForwardInWorld(this.forward);
-                gd3d.math.vec3ScaleByNum(this.forward, this.guanghuantoPaoJia, this.forward);
-                gd3d.math.vec3Add(this.guiji.getWorldPosition(), this.forward, this.guanghuan.localPosition);
-                this.guanghuan.markDirty();
+                var mat = this.guiji.getWorldMatrix();
+                gd3d.math.matrixTransformVector3(this.startPos, mat, this.worldStart);
+                gd3d.math.matrixTransformVector3(this.hPos, mat, this.worldMiddle);
+                gd3d.math.matrixTransformVector3(this.endpos, mat, this.worldEnd);
+                gd3d.math.vec3Clone(this.worldStart, this.startTrans.localTranslate);
+                gd3d.math.vec3Clone(this.worldMiddle, this.middleTrans.localTranslate);
+                gd3d.math.vec3Clone(this.worldEnd, this.endTrans.localTranslate);
+                this.startTrans.markDirty();
+                this.middleTrans.markDirty();
+                this.endTrans.markDirty();
+                var info = new gd3d.framework.pickinfo();
+                var targets = [];
+                if (this.detectTarget(targets, info)) {
+                    gd3d.math.vec3Clone(info.hitposition, this.guanghuan.localPosition);
+                    this.guanghuan.markDirty();
+                }
+                else {
+                    gd3d.math.vec3Clone(this.worldEnd, this.guanghuan.localPosition);
+                    this.guanghuan.markDirty();
+                }
             }
             if (this.actived) {
                 this.timer += delta * 0.1;
@@ -10670,11 +10712,64 @@ var dome;
                 gd3d.math.vec3ScaleByNum(this.dir, this.speed, move);
                 gd3d.math.vec3ScaleByNum(move, this.timer, move);
                 move.y -= 0.5 * this.gravity * this.timer * this.timer;
+                gd3d.math.vec3Add(this.paoKouPos, this.paojia.getWorldPosition(), this.paoKouPos);
                 gd3d.math.vec3Add(this.paoKouPos, move, this.paodan.localPosition);
-                gd3d.math.vec3Add(this.paodan.localPosition, this.paojia.getWorldPosition(), this.paodan.localPosition);
                 this.paodan.markDirty();
                 if (this.paodan.localPosition.y < 0) {
                     this.actived = false;
+                }
+            }
+        };
+        paowuxian.prototype.detectTarget = function (targets, info) {
+            if (this.linedetectcollider(this.worldStart, this.worldMiddle, targets, info)) {
+                if (this.detectSecond(info.pickedtran, info)) {
+                    return true;
+                }
+            }
+            if (this.linedetectcollider(this.worldMiddle, this.worldEnd, targets, info)) {
+                if (this.detectSecond(info.pickedtran, info)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        paowuxian.prototype.detectSecond = function (target, info) {
+            for (var i = 0; i < this.pointArr.length - 1; i++) {
+                if (this.lineDetectMesh(this.pointArr[i], this.pointArr[i + 1], target, info)) {
+                    return true;
+                }
+            }
+            return false;
+        };
+        paowuxian.prototype.linedetectcollider = function (start, end, targets, info) {
+            var dir = new gd3d.math.vector3();
+            gd3d.math.vec3Subtract(this.worldMiddle, this.worldStart, dir);
+            var len = gd3d.math.vec3Length(dir);
+            gd3d.math.vec3Normalize(dir, dir);
+            var ray = new gd3d.framework.ray(this.worldStart, dir);
+            var transArr = [];
+            for (var key in transArr) {
+                if (ray.intersectCollider(transArr[key], info)) {
+                    if (info.distance < len) {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        };
+        paowuxian.prototype.lineDetectMesh = function (start, end, target, info) {
+            var dir = new gd3d.math.vector3();
+            gd3d.math.vec3Subtract(this.worldMiddle, this.worldStart, dir);
+            var len = gd3d.math.vec3Length(dir);
+            gd3d.math.vec3Normalize(dir, dir);
+            var ray = new gd3d.framework.ray(this.worldStart, dir);
+            var meshf = target.gameObject.getComponent("meshFilter");
+            var mesh = meshf.getMeshOutput();
+            if (mesh != null) {
+                if (mesh.intersects(ray, target.getWorldMatrix(), info)) {
+                    if (info.distance < len) {
+                        return true;
+                    }
                 }
             }
         };
@@ -10726,10 +10821,24 @@ var dome;
             meshr3.materials = [mat];
             var cube4 = new gd3d.framework.transform();
             this.guanghuan = cube4;
+            cube4.localScale = new gd3d.math.vector3(1, 0.1, 1);
             this.scene.addChild(cube4);
             var meshf4 = cube4.gameObject.addComponent("meshFilter");
             cube4.gameObject.addComponent("meshRenderer");
             meshf4.mesh = this.assetmgr.getDefaultMesh("cube");
+            this.startTrans = this.addscaledCube(0.3);
+            this.middleTrans = this.addscaledCube(0.3);
+            this.endTrans = this.addscaledCube(0.3);
+        };
+        paowuxian.prototype.addscaledCube = function (scale) {
+            var cube4 = new gd3d.framework.transform();
+            this.cubes.push(cube4);
+            cube4.localScale = new gd3d.math.vector3(scale, scale, scale);
+            this.scene.addChild(cube4);
+            var meshf4 = cube4.gameObject.addComponent("meshFilter");
+            cube4.gameObject.addComponent("meshRenderer");
+            meshf4.mesh = this.assetmgr.getDefaultMesh("cube");
+            return cube4;
         };
         paowuxian.prototype.getDirByRotAngle = function (euler, dir) {
             var rot = new gd3d.math.quaternion();
@@ -10763,9 +10872,16 @@ var dome;
                     }
                 }
                 this.mesh.data.pos = posarr;
+                this.pointArr = posarr;
                 var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.UV0;
                 var v32 = this.mesh.data.genVertexDataArray(vf);
                 this.mesh.glMesh.uploadVertexData(this.app.webgl, v32);
+                this.startPos.y = paokouy;
+                this.startPos.z = paokouz;
+                var time = speedy / gravity;
+                this.hPos.y = speedy * time - 0.5 * gravity * Math.pow(time, 2) + paokouy;
+                this.hPos.z = speedz * time + paokouz;
+                this.endpos.z = speedz * totalTime + paokouz;
             }
             return this.mesh;
         };

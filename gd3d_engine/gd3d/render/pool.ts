@@ -670,12 +670,15 @@ namespace gd3d.math
         * 获取一个quat
         * @version gd3d 1.0
         */
-        static new_quaternion(): quaternion
+        static new_quaternion(x = 0, y = 0, z = 0, w = 1): quaternion
         {
-            if (pool.unused_quaternion.length > 0)
-                return pool.unused_quaternion.pop();
+            if (pool.unused_quaternion.length > 0){
+                let q = pool.unused_quaternion.pop();
+                q.x=x; q.y=y; q.z=z; q.w=w;
+                return q;
+            }
             else
-                return new quaternion();
+                return new quaternion(x,y,z,w);
         }
         /**
         * @public
@@ -746,6 +749,9 @@ namespace gd3d.math
             if (pool.unused_pickInfo.length > 0)
             {
                 let pk = pool.unused_pickInfo.pop();
+                pk.bu = bu;
+                pk.bv = bv;
+                pk.distance = distance;
                 return pk;
             }
             else
@@ -782,5 +788,76 @@ namespace gd3d.math
         {
             pool.unused_pickInfo.length = 0;
         }
+
+        //for rect
+        private static unused_rect: rect[] = [];
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 获取一个rect
+        * @version gd3d 1.0
+        */
+        static new_rect(x:number =0 ,y:number =0 ,w:number = 0 ,h:number = 0): rect
+        {
+            if (pool.unused_rect.length > 0){
+                let r = pool.unused_rect.pop();
+                r.x = x; r.y = y; r.w = w; r.h = h;
+                return r;
+            }
+            else
+                return new rect(x,y,w,h);
+        }
+
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 带返回值的rect克隆
+        * @version gd3d 1.0
+        */
+       static clone_rect(src: rect): rect
+       {
+           if (pool.unused_rect.length > 0)
+           {
+               var v = pool.unused_rect.pop();
+               v.x = src.x; v.y = src.y; v.w = src.w; v.h = src.h;
+               return v;
+           }
+           else
+               return new rect(src.x, src.y, src.w, src.h);
+       }
+
+       /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 回收一个rect
+        * @version gd3d 1.0
+        */
+       static delete_rect(v: rect): void
+       {
+           if (v == null) return;
+           if (v instanceof rect)
+           {
+               v.x = v.y = v.w = v.h =0;
+               pool.unused_rect.push(v);
+           }
+           else
+               console.error("kindding me?确定你要回收的是rect吗？");
+       }
+
+       /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 清除rect池
+         * @version gd3d 1.0
+         */
+        static collect_rect()
+        {
+            pool.unused_rect.length = 0;
+        }
+
     }
 }

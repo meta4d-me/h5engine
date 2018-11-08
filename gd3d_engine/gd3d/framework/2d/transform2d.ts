@@ -58,6 +58,10 @@ namespace gd3d.framework {
         render(canvas: canvas);
         //刷新顶点信息
         updateTran();
+        //获取渲染材质
+        getMaterial():gd3d.framework.material;
+        //获取渲染边界(合并渲染深度排序会使用到)
+        getDrawBounds():gd3d.math.rect;
     }
 
     /**
@@ -1270,6 +1274,37 @@ namespace gd3d.framework {
             }
 
             return value;
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置兄弟姐妹序列索引
+         * @version egret-gd3d 1.0
+         */
+        setSiblingIndex(siblingIndex:number){
+            let p = this.transform.parent;
+            if(!p || !p.children || siblingIndex >= p.children.length || isNaN(siblingIndex) || siblingIndex < 0 ) return;
+            let currIdx = p.children.indexOf(this);
+            if(currIdx == -1 || currIdx == siblingIndex)   return;
+            p.children.splice(currIdx,1);
+            let useidx = siblingIndex > currIdx ? siblingIndex - 1 : siblingIndex;
+            p.children.splice(useidx,0,this); //insert to target pos
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取兄弟姐妹序列索引
+         * @version egret-gd3d 1.0
+         */
+        getSiblingIndex():number{
+            let p = this.transform.parent;
+            if(!p || !p.children)  return -1;
+            if(p.children.length < 1)   return 0;
+            return p.children.indexOf(this);
         }
 
         /**
