@@ -1571,6 +1571,7 @@ var gd3d;
                 outP.x = scalx * this.pixelWidth;
                 outP.y = scaly * this.pixelHeight;
             };
+            var canvas_1;
             canvas.ClassName = "canvas";
             canvas.depthTag = "__depthTag__";
             canvas.flowIndexTag = "__flowIndexTag__";
@@ -1591,7 +1592,6 @@ var gd3d;
                 __metadata("design:paramtypes", [])
             ], canvas);
             return canvas;
-            var canvas_1;
         }());
         framework.canvas = canvas;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -6180,6 +6180,13 @@ var gd3d;
                 },
                 set: function (value) {
                     this.body.type = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(bassBody.prototype, "collisionFilter", {
+                get: function () {
+                    return this.body.collisionFilter;
                 },
                 enumerable: true,
                 configurable: true

@@ -147,8 +147,9 @@ namespace gd3d.framework {
         position: matterVector;
         speed: number;
         type: string;
-        tag:string;
-        name:string;
+        tag: string;
+        name: string;
+        collisionFilter: collisionFilter;
         applyForce(body: Ibody, positon: matterVector, force: matterVector): void;
     }
 
@@ -156,5 +157,11 @@ namespace gd3d.framework {
         x: number;
         y: number;
         create(x: number, y: number): matterVector
+    }
+
+    export interface collisionFilter {
+        group?: number;
+        category?: number;
+        mask?: number;
     }
 }
