@@ -6167,9 +6167,20 @@ var gd3d;
             bassBody.prototype.setAngularVelocity = function (velocity) {
                 framework.physic2D.setAngularVelocity(this.body, velocity);
             };
-            Object.defineProperty(bassBody.prototype, "velocity", {
+            Object.defineProperty(bassBody.prototype, "speed", {
                 get: function () {
                     return this.body.speed;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(bassBody.prototype, "velocity", {
+                get: function () {
+                    if (this.m_velocity == null)
+                        this.m_velocity = new gd3d.math.vector2();
+                    this.m_velocity.x = this.body.velocity.x;
+                    this.m_velocity.y = this.body.velocity.y;
+                    return this.m_velocity;
                 },
                 enumerable: true,
                 configurable: true

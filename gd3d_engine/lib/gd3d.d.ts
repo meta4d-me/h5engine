@@ -996,10 +996,12 @@ declare namespace gd3d.framework {
     class bassBody implements I2DBody {
         transform: transform2D;
         body: Ibody;
+        m_velocity: math.vector2;
         addForce(Force: math.vector2): void;
         setVelocity(velocity: math.vector2): void;
         setAngularVelocity(velocity: number): void;
-        readonly velocity: number;
+        readonly speed: number;
+        readonly velocity: math.vector2;
         type: string;
         readonly collisionFilter: collisionFilter;
         tag: string;
@@ -1071,6 +1073,7 @@ declare namespace gd3d.framework {
         type: string;
         tag: string;
         name: string;
+        velocity: matterVector;
         collisionFilter: collisionFilter;
         applyForce(body: Ibody, positon: matterVector, force: matterVector): void;
     }

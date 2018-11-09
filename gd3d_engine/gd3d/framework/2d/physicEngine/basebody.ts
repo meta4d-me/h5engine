@@ -33,6 +33,7 @@ namespace gd3d.framework {
         // beStatic:boolean=false;
         transform: transform2D;
         body: Ibody;
+        m_velocity:math.vector2;
         /**
          * 施加作用力
          * @param Force 
@@ -53,12 +54,18 @@ namespace gd3d.framework {
         }
 
         /**
-         * 获取当前刚体的速度
+         * 获取当前刚体的速度值
          */
-        get velocity(): number {
+        get speed(): number {
 
             return this.body.speed;
+        }
 
+        get velocity():math.vector2{
+            if(this.m_velocity==null)this.m_velocity=new gd3d.math.vector2()
+            this.m_velocity.x=this.body.velocity.x;
+            this.m_velocity.y = this.body.velocity.y;
+            return this.m_velocity;
         }
 
         /**
