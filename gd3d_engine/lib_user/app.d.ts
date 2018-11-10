@@ -1398,14 +1398,18 @@ declare namespace dome {
         private timer;
         private forward;
         update(delta: number): void;
+        private beNeedRecompute;
+        private worldPoints;
+        private targets;
         private worldStart;
         private startTrans;
         private worldEnd;
         private endTrans;
         private worldMiddle;
         private middleTrans;
-        private detectTarget(targets, info);
-        private detectSecond(target, info);
+        private detectTarget_2(targets1, targets2, info);
+        private detectSecond_Collider(target, info);
+        private detectSecond_Mesh(target, info);
         private linedetectcollider(start, end, targets, info);
         private lineDetectMesh(start, end, target, info);
         private addcam();
@@ -1425,6 +1429,9 @@ declare namespace dome {
         private actived;
         private addUI();
         private addBtn(text, x, y, func);
+        private loadmesh(laststate, state);
+        private intersects(LinePoints, mesh, matrix, outInfo);
+        private intersectCollider(LinePoints, target, outInfo);
     }
 }
 declare class physic2d_dome implements IState {

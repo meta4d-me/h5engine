@@ -54,7 +54,7 @@ namespace gd3d.framework
         * @version egret-gd3d 1.0
         */
         @gd3d.reflect.Field("vector3")
-        center: math.vector3;
+        center: math.vector3 = new math.vector3(0,0,0);
         /**
         * @public
         * @language zh_CN
@@ -63,7 +63,7 @@ namespace gd3d.framework
         * @version egret-gd3d 1.0
         */
         @gd3d.reflect.Field("vector3")
-        size: math.vector3;
+        size: math.vector3 =  new math.vector3(1,1,1);
          /**
          * @private
          */

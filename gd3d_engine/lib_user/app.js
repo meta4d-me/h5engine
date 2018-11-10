@@ -10637,16 +10637,19 @@ var dome;
             this.orgPos = new gd3d.math.vector3(0, 0, -10);
             this.rotEuler = new gd3d.math.vector3(-30, 30, 0);
             this.gravity = 10;
-            this.speed = 10;
+            this.speed = 30;
             this.dir = new gd3d.math.vector3();
             this.paoKouPos = new gd3d.math.vector3();
             this.timer = 0;
             this.forward = new gd3d.math.vector3();
+            this.beNeedRecompute = true;
+            this.worldPoints = [];
+            this.targets = [];
             this.worldStart = new gd3d.math.vector3();
             this.worldEnd = new gd3d.math.vector3();
             this.worldMiddle = new gd3d.math.vector3();
             this.cubes = [];
-            this.lerpCount = 50;
+            this.lerpCount = 30;
             this.endpos = new gd3d.math.vector3();
             this.hPos = new gd3d.math.vector3();
             this.startPos = new gd3d.math.vector3();
@@ -10657,6 +10660,7 @@ var dome;
             this.scene = app.getScene();
             this.assetmgr = app.getAssetMgr();
             this.taskmgr.addTaskCall(this.loadShader.bind(this));
+            this.taskmgr.addTaskCall(this.loadmesh.bind(this));
             this.taskmgr.addTaskCall(this.gamerun.bind(this));
         };
         paowuxian.prototype.loadShader = function (laststate, state) {
@@ -10694,12 +10698,22 @@ var dome;
                 this.middleTrans.markDirty();
                 this.endTrans.markDirty();
                 var info = new gd3d.framework.pickinfo();
-                var targets = [];
-                if (this.detectTarget(targets, info)) {
+                var targets1 = [];
+                var targets2 = this.targets;
+                targets1 = targets2;
+                this.beNeedRecompute = true;
+                if (this.detectTarget_2(targets1, targets2, info)) {
                     gd3d.math.vec3Clone(info.hitposition, this.guanghuan.localPosition);
+                    var axis = new gd3d.math.vector3();
+                    gd3d.math.vec3Cross(gd3d.math.pool.vector3_up, info.normal, axis);
+                    gd3d.math.vec3Normalize(axis, axis);
+                    var dot = gd3d.math.vec3Dot(info.normal, gd3d.math.pool.vector3_up);
+                    var angle = Math.acos(dot) * 180 / Math.PI;
+                    gd3d.math.quatFromAxisAngle(axis, angle, this.guanghuan.localRotate);
                     this.guanghuan.markDirty();
                 }
                 else {
+                    gd3d.math.quatIdentity(this.guanghuan.localRotate);
                     gd3d.math.vec3Clone(this.worldEnd, this.guanghuan.localPosition);
                     this.guanghuan.markDirty();
                 }
@@ -10720,22 +10734,56 @@ var dome;
                 }
             }
         };
-        paowuxian.prototype.detectTarget = function (targets, info) {
-            if (this.linedetectcollider(this.worldStart, this.worldMiddle, targets, info)) {
-                if (this.detectSecond(info.pickedtran, info)) {
+        paowuxian.prototype.detectTarget_2 = function (targets1, targets2, info) {
+            if (this.linedetectcollider(this.worldStart, this.worldMiddle, targets1, info)) {
+                if (this.detectSecond_Collider(info.pickedtran, info)) {
                     return true;
                 }
             }
-            if (this.linedetectcollider(this.worldMiddle, this.worldEnd, targets, info)) {
-                if (this.detectSecond(info.pickedtran, info)) {
+            if (this.linedetectcollider(this.worldMiddle, this.worldEnd, targets1, info)) {
+                if (this.detectSecond_Collider(info.pickedtran, info)) {
+                    return true;
+                }
+            }
+            if (this.linedetectcollider(this.worldStart, this.worldMiddle, targets2, info)) {
+                if (this.detectSecond_Mesh(info.pickedtran, info)) {
+                    return true;
+                }
+            }
+            if (this.linedetectcollider(this.worldMiddle, this.worldEnd, targets2, info)) {
+                if (this.detectSecond_Mesh(info.pickedtran, info)) {
                     return true;
                 }
             }
             return false;
         };
-        paowuxian.prototype.detectSecond = function (target, info) {
-            for (var i = 0; i < this.pointArr.length - 1; i++) {
-                if (this.lineDetectMesh(this.pointArr[i], this.pointArr[i + 1], target, info)) {
+        paowuxian.prototype.detectSecond_Collider = function (target, info) {
+            if (this.beNeedRecompute) {
+                this.beNeedRecompute = false;
+                var mat = this.guiji.getWorldMatrix();
+                for (var i = 0; i < this.pointArr.length; i++) {
+                    gd3d.math.matrixTransformVector3(this.pointArr[i], mat, this.pointArr[i]);
+                }
+            }
+            if (this.intersectCollider(this.pointArr, target, info)) {
+                info.pickedtran = target;
+                return true;
+            }
+            return false;
+        };
+        paowuxian.prototype.detectSecond_Mesh = function (target, info) {
+            if (this.beNeedRecompute) {
+                this.beNeedRecompute = false;
+                var mat = this.guiji.getWorldMatrix();
+                for (var i = 0; i < this.pointArr.length; i++) {
+                    gd3d.math.matrixTransformVector3(this.pointArr[i], mat, this.pointArr[i]);
+                }
+            }
+            var meshf = target.gameObject.getComponent("meshFilter");
+            var mesh = meshf.getMeshOutput();
+            if (meshf != null && meshf.mesh != null) {
+                if (this.intersects(this.pointArr, meshf.mesh, target.getWorldMatrix(), info)) {
+                    info.pickedtran = target;
                     return true;
                 }
             }
@@ -10743,13 +10791,12 @@ var dome;
         };
         paowuxian.prototype.linedetectcollider = function (start, end, targets, info) {
             var dir = new gd3d.math.vector3();
-            gd3d.math.vec3Subtract(this.worldMiddle, this.worldStart, dir);
+            gd3d.math.vec3Subtract(end, start, dir);
             var len = gd3d.math.vec3Length(dir);
             gd3d.math.vec3Normalize(dir, dir);
-            var ray = new gd3d.framework.ray(this.worldStart, dir);
-            var transArr = [];
-            for (var key in transArr) {
-                if (ray.intersectCollider(transArr[key], info)) {
+            var ray = new gd3d.framework.ray(start, dir);
+            for (var key in targets) {
+                if (ray.intersectCollider(targets[key], info)) {
                     if (info.distance < len) {
                         return true;
                     }
@@ -10759,10 +10806,10 @@ var dome;
         };
         paowuxian.prototype.lineDetectMesh = function (start, end, target, info) {
             var dir = new gd3d.math.vector3();
-            gd3d.math.vec3Subtract(this.worldMiddle, this.worldStart, dir);
+            gd3d.math.vec3Subtract(end, start, dir);
             var len = gd3d.math.vec3Length(dir);
             gd3d.math.vec3Normalize(dir, dir);
-            var ray = new gd3d.framework.ray(this.worldStart, dir);
+            var ray = new gd3d.framework.ray(start, dir);
             var meshf = target.gameObject.getComponent("meshFilter");
             var mesh = meshf.getMeshOutput();
             if (mesh != null) {
@@ -10788,12 +10835,6 @@ var dome;
             CameraController.instance().init(this.app, this.camera);
         };
         paowuxian.prototype.addcube = function () {
-            var cube0 = new gd3d.framework.transform();
-            cube0.localScale = new gd3d.math.vector3(1000, 0.01, 1000);
-            this.scene.addChild(cube0);
-            var meshf0 = cube0.gameObject.addComponent("meshFilter");
-            var meshr0 = cube0.gameObject.addComponent("meshRenderer");
-            meshf0.mesh = this.assetmgr.getDefaultMesh("cube");
             var cube1 = new gd3d.framework.transform();
             this.paojia = cube1;
             cube1.localPosition = this.orgPos;
@@ -10821,7 +10862,7 @@ var dome;
             meshr3.materials = [mat];
             var cube4 = new gd3d.framework.transform();
             this.guanghuan = cube4;
-            cube4.localScale = new gd3d.math.vector3(1, 0.1, 1);
+            cube4.localScale = new gd3d.math.vector3(3, 0.1, 3);
             this.scene.addChild(cube4);
             var meshf4 = cube4.gameObject.addComponent("meshFilter");
             cube4.gameObject.addComponent("meshRenderer");
@@ -10852,8 +10893,9 @@ var dome;
             }
             else {
                 anglex = anglex * Math.PI / 180;
-                var halfwidth = 0.1;
+                var halfwidth = 1;
                 var posarr = [];
+                var Middleposarr = [];
                 var paokouy = paoLen * Math.sin(anglex);
                 var paokouz = paoLen * Math.cos(anglex);
                 var speedy = Math.sin(anglex) * speed;
@@ -10867,12 +10909,14 @@ var dome;
                     var newpos2 = new gd3d.math.vector3(-halfwidth, speedy * counttime - 0.5 * gravity * Math.pow(counttime, 2) + paokouy, speedz * counttime + paokouz);
                     posarr.push(newpos1);
                     posarr.push(newpos2);
+                    var middlepos = new gd3d.math.vector3(0, speedy * counttime - 0.5 * gravity * Math.pow(counttime, 2) + paokouy, speedz * counttime + paokouz);
+                    Middleposarr.push(middlepos);
                     if (i == count) {
                         this.guanghuantoPaoJia = speedz * counttime + paokouz;
                     }
                 }
                 this.mesh.data.pos = posarr;
-                this.pointArr = posarr;
+                this.pointArr = Middleposarr;
                 var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.UV0;
                 var v32 = this.mesh.data.genVertexDataArray(vf);
                 this.mesh.glMesh.uploadVertexData(this.app.webgl, v32);
@@ -10888,7 +10932,7 @@ var dome;
         paowuxian.prototype.initmesh = function (anglex, gravity, speed, paoLen, paojiaPosY) {
             if (paojiaPosY === void 0) { paojiaPosY = 0; }
             anglex = anglex * Math.PI / 180;
-            var halfwidth = 0.1;
+            var halfwidth = 1;
             var posarr = [];
             var uvArr = [];
             var trisindex = [];
@@ -10970,6 +11014,104 @@ var dome;
             btn.style.left = x + "px";
             btn.style.position = "absolute";
             this.app.container.appendChild(btn);
+        };
+        paowuxian.prototype.loadmesh = function (laststate, state) {
+            var _this = this;
+            var name = "box";
+            this.app.getAssetMgr().load("res/prefabs/" + name + "/" + name + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                if (s.isfinish) {
+                    var _prefab = _this.app.getAssetMgr().getAssetByName(name + ".prefab.json");
+                    var item = _prefab.getCloneTrans();
+                    _this.scene.addChild(item);
+                    var showColider_1 = function (trans) {
+                        var collider = trans.gameObject.getComponent("boxcollider");
+                        if (collider != null) {
+                            collider.colliderVisible = true;
+                        }
+                        if (trans.children != null) {
+                            for (var key in trans.children) {
+                                showColider_1(trans.children[key]);
+                                _this.targets.push(trans.children[key]);
+                            }
+                        }
+                    };
+                    showColider_1(item);
+                    state.finish = true;
+                }
+            });
+        };
+        paowuxian.prototype.intersects = function (LinePoints, mesh, matrix, outInfo) {
+            var ishided = false;
+            if (!mesh.submesh)
+                return ishided;
+            var lastDistance = Number.MAX_VALUE;
+            var worldPosArr = [];
+            for (var i = 0, len = mesh.data.pos.length; i < len; i++) {
+                var p0 = mesh.data.pos[i];
+                var t0 = gd3d.math.pool.new_vector3();
+                gd3d.math.matrixTransformVector3(p0, matrix, t0);
+                worldPosArr.push(t0);
+            }
+            for (var i = 0; i < LinePoints.length - 1; i++) {
+                var dir = new gd3d.math.vector3();
+                gd3d.math.vec3Subtract(this.pointArr[i], this.pointArr[i + 1], dir);
+                var len = gd3d.math.vec3Length(dir);
+                gd3d.math.vec3Normalize(dir, dir);
+                var ray = new gd3d.framework.ray(this.pointArr[i], dir);
+                for (var j = 0; j < mesh.submesh.length; j++) {
+                    var submesh = mesh.submesh[j];
+                    for (var index = submesh.start; index < submesh.size; index += 3) {
+                        var t0 = worldPosArr[mesh.data.trisindex[index]];
+                        var t1 = worldPosArr[mesh.data.trisindex[index + 1]];
+                        var t2 = worldPosArr[mesh.data.trisindex[index + 2]];
+                        var tempinfo = gd3d.math.pool.new_pickInfo();
+                        var bool = ray.intersectsTriangle(t0, t1, t2, tempinfo);
+                        if (bool && tempinfo.distance > 0 && tempinfo.distance <= len) {
+                            var hitpos = gd3d.math.pool.new_vector3();
+                            gd3d.math.vec3ScaleByNum(ray.direction, tempinfo.distance, hitpos);
+                            gd3d.math.vec3Add(ray.origin, hitpos, hitpos);
+                            var dist = gd3d.math.vec3Distance(hitpos, LinePoints[0]);
+                            if (dist < lastDistance) {
+                                ishided = true;
+                                outInfo.cloneFrom(tempinfo);
+                                outInfo.faceId = index / 3;
+                                outInfo.subMeshId = j;
+                                gd3d.math.vec3Clone(hitpos, outInfo.hitposition);
+                                lastDistance = dist;
+                            }
+                            gd3d.math.pool.delete_vector3(hitpos);
+                        }
+                        gd3d.math.pool.delete_pickInfo(tempinfo);
+                    }
+                }
+            }
+            gd3d.math.pool.delete_vector3Array(worldPosArr);
+            return ishided;
+        };
+        paowuxian.prototype.intersectCollider = function (LinePoints, target, outInfo) {
+            var ishided = false;
+            var lastDistance = Number.MAX_VALUE;
+            for (var i = 0; i < LinePoints.length - 1; i++) {
+                var dir = new gd3d.math.vector3();
+                gd3d.math.vec3Subtract(this.pointArr[i], this.pointArr[i + 1], dir);
+                var len = gd3d.math.vec3Length(dir);
+                gd3d.math.vec3Normalize(dir, dir);
+                var ray = new gd3d.framework.ray(this.pointArr[i], dir);
+                var tempinfo = gd3d.math.pool.new_pickInfo();
+                var bool = ray.intersectCollider(target, tempinfo);
+                if (bool) {
+                    if (tempinfo.distance <= len) {
+                        var dist = gd3d.math.vec3Distance(tempinfo.hitposition, LinePoints[0]);
+                        if (dist < lastDistance) {
+                            ishided = true;
+                            outInfo.cloneFrom(tempinfo);
+                            lastDistance = dist;
+                        }
+                    }
+                }
+                gd3d.math.pool.delete_pickInfo(tempinfo);
+            }
+            return ishided;
         };
         return paowuxian;
     }());

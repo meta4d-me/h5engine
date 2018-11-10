@@ -10420,6 +10420,8 @@ var gd3d;
     (function (framework) {
         var boxcollider = (function () {
             function boxcollider() {
+                this.center = new gd3d.math.vector3(0, 0, 0);
+                this.size = new gd3d.math.vector3(1, 1, 1);
                 this._colliderVisible = false;
             }
             boxcollider.prototype.getBound = function () {
@@ -30769,6 +30771,7 @@ var gd3d;
                 if (_bu === void 0) { _bu = 0; }
                 if (_bv === void 0) { _bv = 0; }
                 if (_distance === void 0) { _distance = 0; }
+                this.normal = new gd3d.math.vector3();
                 this.distance = 0;
                 this.hitposition = new gd3d.math.vector3();
                 this.bu = 0;
@@ -30785,6 +30788,7 @@ var gd3d;
                 this.faceId = -1;
             };
             pickinfo.prototype.cloneFrom = function (from) {
+                gd3d.math.vec3Clone(from.normal, this.normal);
                 this.pickedtran = from.pickedtran;
                 gd3d.math.vec3Clone(from.hitposition, this.hitposition);
                 this.distance = from.distance;
@@ -31078,6 +31082,7 @@ var gd3d;
                             if (lastDistance > tempinfo.distance) {
                                 ishided = true;
                                 outInfo.cloneFrom(tempinfo);
+                                outInfo.pickedtran = tran;
                                 lastDistance = outInfo.distance;
                                 var tdir = gd3d.math.pool.new_vector3();
                                 gd3d.math.vec3ScaleByNum(this.direction, outInfo.distance, tdir);
@@ -31218,15 +31223,17 @@ var gd3d;
                     return false;
                 }
                 var distance = gd3d.math.vec3Dot(_edge2, _qvec) * invdet;
+                outInfo.init();
+                outInfo.bu = bu;
+                outInfo.bv = bv;
+                outInfo.distance = distance;
+                gd3d.math.vec3Cross(_edge1, _edge2, outInfo.normal);
+                gd3d.math.vec3Normalize(outInfo.normal, outInfo.normal);
                 gd3d.math.pool.delete_vector3(_edge1);
                 gd3d.math.pool.delete_vector3(_edge2);
                 gd3d.math.pool.delete_vector3(_pvec);
                 gd3d.math.pool.delete_vector3(_tvec);
                 gd3d.math.pool.delete_vector3(_qvec);
-                outInfo.init();
-                outInfo.bu = bu;
-                outInfo.bv = bv;
-                outInfo.distance = distance;
                 return true;
             };
             return ray;

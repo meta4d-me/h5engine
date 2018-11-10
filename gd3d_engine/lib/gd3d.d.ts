@@ -5706,6 +5706,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class pickinfo {
+        normal: math.vector3;
         pickedtran: transform;
         distance: number;
         hitposition: math.vector3;
