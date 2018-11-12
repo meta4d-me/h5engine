@@ -24121,7 +24121,8 @@ var gd3d;
                 }
                 this.navTrans = new gd3d.framework.transform();
                 this.navTrans.name = "navMesh";
-                this.navTrans.gameObject.hideFlags = gd3d.framework.HideFlags.HideInHierarchy;
+                var HF = gd3d.framework.HideFlags;
+                this.navTrans.gameObject.hideFlags = HF.HideInHierarchy | HF.DontSave | HF.NotEditable;
                 var meshD = new gd3d.render.meshData();
                 meshD.pos = [];
                 meshD.trisindex = [];

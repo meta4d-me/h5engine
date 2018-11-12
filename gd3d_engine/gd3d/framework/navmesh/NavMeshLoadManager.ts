@@ -75,7 +75,8 @@
         }
         this.navTrans = new gd3d.framework.transform();
         this.navTrans.name = "navMesh";
-        this.navTrans.gameObject.hideFlags = gd3d.framework.HideFlags.HideInHierarchy; //不保存不展示
+        let HF = gd3d.framework.HideFlags;
+        this.navTrans.gameObject.hideFlags = HF.HideInHierarchy | HF.DontSave | HF.NotEditable; //不保存不展示不编辑
         var meshD = new gd3d.render.meshData();
         meshD.pos = [];
         meshD.trisindex = [];
