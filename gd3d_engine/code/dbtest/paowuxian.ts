@@ -14,7 +14,7 @@ namespace dome
         private guiji:gd3d.framework.transform;
         private guanghuan:gd3d.framework.transform;
 
-        private orgPos:gd3d.math.vector3=new gd3d.math.vector3(0,0,-10);
+        private orgPos:gd3d.math.vector3=new gd3d.math.vector3(0,10,-10);
         rotEuler:gd3d.math.vector3=new gd3d.math.vector3(-30,30,0);
         gravity:number=10;
         speed:number=30;
@@ -76,7 +76,7 @@ namespace dome
                 //------------炮口位置
                 //gd3d.math.vec3ScaleByNum(this.dir,this.paoLen,this.paoKouPos);
 
-                meshf.mesh=this.getMeshData(-this.rotEuler.x,this.gravity,this.speed,this.paoLen);
+                meshf.mesh=this.getMeshData(-this.rotEuler.x,this.gravity,this.speed,this.paoLen,this.orgPos.y);
 
                 //------------------------
                 let mat=this.guiji.getWorldMatrix();
@@ -182,10 +182,23 @@ namespace dome
             }
             if(this.linedetectcollider(this.worldStart,this.worldMiddle,targets2,info))
             {
-                if(this.detectSecond_Mesh(info.pickedtran,info))
+                if(info.pickedtran.gameObject.getComponent("meshFilter")!=null)
                 {
-                    return true;
+                    if(this.detectSecond_Mesh(info.pickedtran,info))
+                    {
+                        return true;
+                    }
+                }else
+                {
+                    for(let i=0;i<info.pickedtran.children.length;i++)
+                    {
+                        if(this.detectSecond_Mesh(info.pickedtran,info))
+                        {
+                            return true;
+                        }
+                    }
                 }
+
             }
             if(this.linedetectcollider(this.worldMiddle,this.worldEnd,targets2,info))
             {
@@ -451,6 +464,7 @@ namespace dome
                 let time=speedy/gravity;
                 this.hPos.y=speedy*time-0.5*gravity*Math.pow(time,2)+paokouy;
                 this.hPos.z=speedz*time+paokouz;
+                this.endpos.y=-paojiaPosY;
                 this.endpos.z=speedz*totalTime+paokouz;
             }
             
