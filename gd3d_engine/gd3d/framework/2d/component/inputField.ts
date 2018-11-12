@@ -10,8 +10,7 @@ namespace gd3d.framework
      * @version egret-gd3d 1.0
      */
     @reflect.node2DComponent
-    @reflect.nodeRender
-    export class inputField implements IRectRenderer
+    export class inputField implements I2DComponent
     {
         static readonly ClassName:string="inputField";
 
@@ -138,28 +137,10 @@ namespace gd3d.framework
             this._placeholderLabel = placeholderLabel;
         }
 
-
-
         /**
-         * @private
+         * 刷新布局
          */
-        updateData(_font: gd3d.framework.font)
-        {
-
-        }
-
-        /**
-         * @private
-         */
-        render(canvas: canvas)
-        {
-          
-        }
-
-        /**
-         * @private
-         */
-        updateTran()
+        private layoutRefresh()
         {
             this.inputElmLayout();
             
@@ -214,7 +195,6 @@ namespace gd3d.framework
         private inputElmLayout(){
             if(this.inputElement == null )   return;
             let pos = this.transform.getWorldTranslate();
-            this.transform.localTranslate;
             let cssStyle:CSSStyleDeclaration = this.inputElement.style;
             if(pos.x +"px" == cssStyle.left && pos.y + "px" == cssStyle.top && this.transform.width + "px" == cssStyle.width && this.transform.height + "px" == cssStyle.height)
                 return;
@@ -361,8 +341,8 @@ namespace gd3d.framework
          */
         update(delta: number)
         {
+            this.layoutRefresh();
             this.textRefresh();
-
         }
 
         /**

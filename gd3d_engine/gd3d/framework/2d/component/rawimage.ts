@@ -84,6 +84,33 @@ namespace gd3d.framework
         }
 
         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取rander 的材质
+         * @version egret-gd3d 1.0
+         */
+        getMaterial(){
+            if(!this._uimat){
+                return this.uimat;
+            }
+            return this._uimat;
+        }
+
+        private _darwRect : gd3d.math.rect = new gd3d.math.rect();
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取渲染绘制矩形边界
+         * @version egret-gd3d 1.0
+         */
+        getDrawBounds(){
+            return this._darwRect;
+        }
+
+        /**
          * @private
          * ui默认材质
          */
@@ -151,9 +178,9 @@ namespace gd3d.framework
          */
         render(canvas: canvas)
         {
-            let img = this.image;
             let mat = this.uimat;
             if(!mat) return;
+            let img = this.image;
             // if (img == null)
             // {
             //     var scene = this.transform.canvas.scene;
@@ -222,6 +249,41 @@ namespace gd3d.framework
                 this.datar[i * 13 + 6] = this.color.a;
             }
 
+            //drawRect 
+            this.min_x = Math.min(x0,x1,x2,x3,this.min_x);
+            this.min_y = Math.min(y0,y1,y2,y3,this.min_y);
+            this.max_x = Math.max(x0,x1,x2,x3,this.max_x);
+            this.max_y = Math.max(y0,y1,y2,y3,this.max_y);
+            this.calcDrawRect();
+        }
+
+
+        private min_x : number = Number.MAX_VALUE;
+        private max_x : number = Number.MAX_VALUE * -1;
+        private min_y : number = Number.MAX_VALUE;
+        private max_y : number = Number.MAX_VALUE * -1;
+        /** 计算drawRect */
+        private calcDrawRect(){
+            //drawBounds (y 轴反向)
+            let canvas = this.transform.canvas;
+            if(!canvas)return;
+            let minPos = helpv2;
+            minPos.x = this.min_x;
+            minPos.y = this.max_y;
+            canvas.ModelPosToCanvasPos(minPos,minPos);
+
+            let maxPos = helpv2_1;
+            maxPos.x = this.max_x;
+            maxPos.y = this.min_y;
+            canvas.ModelPosToCanvasPos(maxPos,maxPos);
+
+            this._darwRect.x = minPos.x;
+            this._darwRect.y = minPos.y;
+            this._darwRect.w = maxPos.x - minPos.x;
+            this._darwRect.h = maxPos.y - minPos.y;
+
+            this.min_x = this.min_y = Number.MAX_VALUE;
+            this.max_x = this.max_y = Number.MAX_VALUE * -1;
         }
         
         /**

@@ -1317,6 +1317,7 @@ declare class test_UI_Component implements IState {
     private createUI(astState, state);
     private loadTexture(lastState, state);
     update(delta: number): void;
+    testFun(): void;
 }
 declare class CameraController {
     private static g_this;
@@ -1397,17 +1398,40 @@ declare namespace dome {
         private timer;
         private forward;
         update(delta: number): void;
+        private beNeedRecompute;
+        private worldPoints;
+        private targets;
+        private worldStart;
+        private startTrans;
+        private worldEnd;
+        private endTrans;
+        private worldMiddle;
+        private middleTrans;
+        private detectTarget_2(targets1, targets2, info);
+        private detectSecond_Collider(target, info);
+        private detectSecond_Mesh(target, info);
+        private linedetectcollider(start, end, targets, info);
+        private lineDetectMesh(start, end, target, info);
         private addcam();
         private addcube();
+        private cubes;
+        private addscaledCube(scale);
         getDirByRotAngle(euler: gd3d.math.vector3, dir: gd3d.math.vector3): void;
         private mesh;
         private lerpCount;
         private guanghuantoPaoJia;
+        private pointArr;
+        private endpos;
+        private hPos;
+        private startPos;
         getMeshData(anglex: number, gravity: number, speed: number, paoLen: number, paojiaPosY?: number): gd3d.framework.mesh;
         private initmesh(anglex, gravity, speed, paoLen, paojiaPosY?);
         private actived;
         private addUI();
         private addBtn(text, x, y, func);
+        private loadmesh(laststate, state);
+        private intersects(LinePoints, mesh, matrix, outInfo);
+        private intersectCollider(LinePoints, target, outInfo);
     }
 }
 declare class physic2d_dome implements IState {

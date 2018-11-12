@@ -33,4 +33,13 @@
         }
         return true;
     }
+
+    /**
+     * 检测两个矩形是否相碰
+     * @param r1 
+     * @param r2 
+     */
+    export function rectCollided(r1 : rect, r2 : rect) : boolean{
+        return r1.x < r2.x + r2.w && r1.x + r1.w > r2.x && r1.y < r2.y + r2.h && r1.h + r1.y > r2.y;
+    }
 }

@@ -49,7 +49,7 @@ namespace gd3d.framework
         }
 
         //buffer 最大限制
-        private static limitCount = 2048; 
+        private static limitCount = 2048 * 2048; 
         /**
          * @private
          */
@@ -174,6 +174,16 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         is2dUI: boolean = true;
+        
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * UI绘制使用深度排序规则 
+         * (可以降低drawcall , 但是会一定程度增加CPU计算量,视情况使用)
+         * @version egret-gd3d 1.0
+         */
+        isDrawByDepth = false;
         
         /**
          * @public
@@ -363,6 +373,7 @@ namespace gd3d.framework
             }
         }
 
+
         private objupdate(node: transform2D, delta){
 
             node.init(this.scene.app.bePlay);//组件还未初始化的初始化
@@ -439,7 +450,13 @@ namespace gd3d.framework
                 this.beforeRender();
 
             //begin
-            this.drawScene(this.rootNode, context, assetmgr);
+            if(!this.isDrawByDepth){
+                this.drawScene(this.rootNode, context, assetmgr);
+            }
+            else{
+                this.drawSceneByDepth(this.rootNode, context, assetmgr);
+            }
+
             this.batcher.end(context.webgl);
 
             
@@ -537,6 +554,172 @@ namespace gd3d.framework
                 }
             }
         }
+
+        //深度渲染层列表
+        static readonly depthTag = "__depthTag__";
+        static readonly flowIndexTag = "__flowIndexTag__";
+        private rendererDic : {[fIdx:number]: IRectRenderer} = {}; //渲染对象字典容器
+        private depthList : IRectRenderer[][] = [];
+        private sortedList : IRectRenderer[] = [];
+        private canvasBounds : math.rect = new math.rect(); //canvas 全局边框矩形
+        private readonly qt_maxObjNum =  5; //四叉树节点最大的对象数量
+        private readonly qt_maxlevel=  6; //四叉树最大的深度
+        private depthQTree : quadTree ; //深度的四叉树
+        /** 按深度层 合批渲染 */
+        private drawSceneByDepth(node: transform2D, context: renderContext, assetmgr: assetMgr){
+            //更新 canvasBounds
+            this.canvasBounds.w = this.pixelWidth;
+            this.canvasBounds.h = this.pixelHeight;
+            if(!this.depthQTree) this.depthQTree = new quadTree(this.canvasBounds , this.qt_maxObjNum, this.qt_maxlevel);
+            this.depthQTree.clear();
+
+            //所有Renderer 计算 深度
+                
+            this.flowCount = 0;
+            //test 
+            this.collectToDepthL(node);
+
+            //按队列顺序 逐各渲染
+            this.sortDepthList();
+
+            this.sortedList.forEach(rnode=>{
+                if(rnode) rnode.render(this);
+            });
+
+            this.depthList.length = this.sortedList.length = 0;
+        }
+
+
+        private helpMap : {[id:number]:IRectRenderer[]} = {};
+        /** 排序Depth列表 */
+        private sortDepthList(){
+            let len = this.depthList.length;
+            let lastGuid : number = -1;
+            let idList : number[] = [];
+            for(let i = 0 ;i < len ;i++){
+                idList.length = 0;
+                //逐层按相同材质连续排序 
+                //不同层首尾连接规则 1.队列头部 放置 和上一层同材质类型 2.尾部放置 数量最多的类型 
+
+                let arr = this.depthList[i];
+                let tempM = {};
+                arr.forEach((rn,idx)=>{
+                    if(rn && rn.getMaterial()){
+                        let guid = rn.getMaterial().getGUID();
+                        if(!this.helpMap[guid]) this.helpMap[guid] = [];
+                        this.helpMap[guid].push(rn);
+                        if(!tempM[guid]){
+                            idList.push(guid);
+                            tempM[guid] = true;
+                        }
+                    }
+                });       
+                
+                //排序  1.队列头部 放置 和上一层同材质类型 2.尾部放置 数量最多的类型 
+                //1.队列头部 放置 和上一层同材质类型
+                if(lastGuid != -1 && this.helpMap[lastGuid] && this.helpMap[lastGuid].length > 0 ){
+                    let sidx = idList.indexOf(lastGuid);
+                    if(sidx != -1)  idList.splice(sidx,1);
+                    idList.unshift(lastGuid);
+                }
+
+                //2.尾部放置 数量最多的类型
+                let tempLastLen = 0;
+                let endGuid = -1;
+                for(const key in this.helpMap){
+                    let temparr = this.helpMap[key];
+                    if(temparr && temparr.length > tempLastLen){
+                        endGuid = Number(key);
+                        tempLastLen = temparr.length;
+                    }
+                }
+                //尾部 ,优先 头部规则
+                if(lastGuid != endGuid  && endGuid != -1 && !isNaN(endGuid) ){
+                    let sidx = idList.indexOf(endGuid);
+                    if(sidx != -1)  idList.splice(sidx,1);
+                    idList.push(endGuid);
+                }
+
+                idList.forEach(id=>{
+                    let rArr = this.helpMap[id];
+                    if(rArr && rArr.length > 0){
+                        rArr.forEach(rn=>{
+                            if(rn) this.sortedList.push(rn);
+                        });
+                    }
+                });
+
+                if(idList.length > 0){
+                    lastGuid = idList[idList.length -1];
+                }
+
+                //清理map
+                for(const key in this.helpMap){
+                    let temparr = this.helpMap[key];
+                    if(temparr) temparr.length = 0;
+                }
+            }
+
+            this.helpMap = {};
+        }
+
+        private flowCount : number;
+        /**收集到深度列表 */
+        private collectToDepthL (node: transform2D){
+            if(!node.visible)return;
+            if (node.renderer)
+            {
+                let bounds = node.renderer.getDrawBounds();
+                bounds[canvas.flowIndexTag] = this.flowCount;
+                this.rendererDic[this.flowCount] = node.renderer; //引用 存入字典
+                this.checkBottomUI(node.renderer);
+                this.flowCount ++;
+            }
+
+            if (node.children)
+            {
+                for (let i = 0; i < node.children.length; i++)
+                {
+                    this.collectToDepthL(node.children[i]);
+                }
+            }
+        }
+
+        /**
+         * 检查BottomUI 
+         */
+        private checkBottomUI (rd: IRectRenderer){
+            //检测 bottomUI  (逐当前 depthList 层检测 rect 碰撞 ，优化工具 四叉树 )
+            //无 ，depth = 0
+            //有 ，depth = bottomUI.depth + 1 
+            let tempCup : math.rect []  = [];
+            let myr = rd.getDrawBounds();
+            this.depthQTree.retrieve(myr,tempCup);
+            let lastIdx = -1;
+            //确定 深度
+            while(tempCup.length > 0){
+                let temp = tempCup.pop();
+                if(math.rectCollided(temp,myr)){
+                    if(temp[canvas.flowIndexTag] > lastIdx){
+                        lastIdx = temp[canvas.flowIndexTag];
+                        if(temp[canvas.flowIndexTag] == (myr[canvas.flowIndexTag] - 1)) break; //相邻的bottomUI ，其他不用找了
+                    }
+                }
+            }
+
+            let depth = 0
+            if(lastIdx != -1){
+                let wrd = this.rendererDic[lastIdx];
+                depth = wrd[canvas.depthTag] + 1;
+            }
+
+            rd[canvas.depthTag] = depth;
+            //填入 到四叉树 
+            this.depthQTree.insert(myr);
+            if(!this.depthList[depth] ) this.depthList[depth] = [];
+            this.depthList[depth].push(rd);
+        }
+
         /**
          * @public
          * @language zh_CN

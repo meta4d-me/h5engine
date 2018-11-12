@@ -37,6 +37,7 @@ class test_UI_Component implements IState {
 
         //9宫格拉伸底图
         let bg_t = new gd3d.framework.transform2D;
+        bg_t.name = "框底图"
         bg_t.width = 400;
         bg_t.height = 260;
         bg_t.pivot.x = 0;
@@ -59,19 +60,23 @@ class test_UI_Component implements IState {
 
         //文本
         let lab_t = new gd3d.framework.transform2D;
+        lab_t.name = "我是段文本_lable";
         lab_t.width = 120;
         lab_t.height = 24;
-        lab_t.localTranslate.x = 10;
-        lab_t.localTranslate.y = 30;
+        lab_t.localTranslate.x = -10;
+        lab_t.localTranslate.y = -10;
         bg_t.addChild(lab_t);
         let lab_l = lab_t.addComponent("label") as gd3d.framework.label;
+        test_UI_Component["lab"] = lab_l;
         lab_l.font = this.assetMgr.getAssetByName("STXINGKA.font.json") as gd3d.framework.font;
         lab_l.fontsize = 24;
         lab_l.text = "我是段文本";
         lab_l.color =new gd3d.math.color(0.2,0.2,0.2,1);
+        test_UI_Component["obj"] = this;
 
         //按鈕
         let btn_t = new gd3d.framework.transform2D;
+        btn_t.name = "btn_按鈕"
         btn_t.width = 100;
         btn_t.height = 36;
         btn_t.pivot.x = 0;
@@ -201,6 +206,7 @@ class test_UI_Component implements IState {
         
         //raw png
         let raw_t2 = new gd3d.framework.transform2D;
+        raw_t2.name = "滑动卷轴框png";
         raw_t2.width = 120;
         raw_t2.height = 120;
         let raw_i2 = raw_t2.addComponent("rawImage2D") as gd3d.framework.rawImage2D;
@@ -257,4 +263,22 @@ class test_UI_Component implements IState {
 
     }
 
+
+    testFun(){
+        let lab = test_UI_Component["lab"] as gd3d.framework.label;
+        let datater = lab["datar"] as number[];
+        let frist = new gd3d.math.vector2(datater[0],datater[1]);
+        let endIdx_0 = datater.length - 13;
+        let endIdx_1 = datater.length - 12;
+        let end = new gd3d.math.vector2(datater[endIdx_0],datater[endIdx_1]);
+
+        let canvas  =  lab.transform.canvas;
+        let temp = new gd3d.math.vector2();
+        
+        canvas.ModelPosToCanvasPos(frist,temp);      
+        console.error(`frist:${temp.toString()}`);
+        canvas.ModelPosToCanvasPos(end,temp);   
+        console.error(`end:${temp.toString()}`);
+
+    }
 }
