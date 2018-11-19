@@ -1481,6 +1481,56 @@ declare class CameraController {
     remove(): void;
 }
 declare namespace dome {
+    class GMesh {
+        vf: number;
+        vertexByteSize: number;
+        mat: gd3d.framework.material;
+        mesh: gd3d.framework.mesh;
+        maxVerteCount: number;
+        currentVerteCount: number;
+        maxVboLen: number;
+        realVboLen: number;
+        vbodata: Float32Array;
+        maxEboLen: number;
+        realEboLen: number;
+        ebodata: Uint16Array;
+        constructor(mat: gd3d.framework.material, vCount: number, vf: number, webgl: WebGLRenderingContext);
+        private temptPos;
+        uploadMeshData(mat: gd3d.math.matrix, mesh: gd3d.framework.mesh, webgl: WebGLRenderingContext): void;
+        mixToGLmesh(webgl: WebGLRenderingContext): void;
+        private checkMeshCapacity;
+    }
+    class mixMesh implements IState {
+        app: gd3d.framework.application;
+        prefab: gd3d.framework.transform;
+        scene: gd3d.framework.scene;
+        camera: gd3d.framework.camera;
+        root: gd3d.framework.transform;
+        picker: any[];
+        obs: any;
+        start(app: gd3d.framework.application): void;
+        generateSignelObs(target: any): void;
+        load(path: string, cb: any): void;
+        loadPrefab(name: string, cb: any): void;
+        update(delta: number): void;
+        targets: gd3d.framework.transform[];
+        matDic: {
+            [matID: number]: gd3d.framework.transform[];
+        };
+        matinstance: {
+            [matID: number]: gd3d.framework.material;
+        };
+        mixmeshDic: {
+            [matID: number]: GMesh;
+        };
+        mixMesh(targets: gd3d.framework.transform[], vf?: number): {
+            nobatch: gd3d.framework.transform[];
+            batch: gd3d.framework.transform[];
+            mixMeshId: number[];
+        };
+    }
+}
+declare namespace dome {
     class paowuxian implements IState {
         camera: gd3d.framework.camera;
         scene: gd3d.framework.scene;
