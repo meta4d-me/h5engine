@@ -8,7 +8,7 @@ namespace dome
         assetmgr:gd3d.framework.assetMgr;
         taskmgr: gd3d.framework.taskMgr = new gd3d.framework.taskMgr();
 
-        private paoLen:number=2;
+        private paoLen:number=0;
         private paojia:gd3d.framework.transform;
         private paodan:gd3d.framework.transform;
         private guiji:gd3d.framework.transform;
@@ -87,11 +87,14 @@ namespace dome
 
                 gd3d.math.vec3Clone(this.worldStart,this.startTrans.localTranslate);
                 gd3d.math.vec3Clone(this.worldMiddle,this.middleTrans.localTranslate);
-                gd3d.math.vec3Clone(this.worldEnd,this.endTrans.localTranslate);
                 this.startTrans.markDirty();
                 this.middleTrans.markDirty();
-                this.endTrans.markDirty();
 
+                if(!this.enableWASD)
+                {
+                    gd3d.math.vec3Clone(this.worldEnd,this.endTrans.localTranslate);
+                    this.endTrans.markDirty();
+                }
                 //------------
                 let info:gd3d.framework.pickinfo=new gd3d.framework.pickinfo();
                 //------------------障碍物集合
@@ -426,7 +429,7 @@ namespace dome
                 anglex=anglex*Math.PI/180;
                 let halfwidth:number=1;
                 let posarr:gd3d.math.vector3[]=[];
-                let Middleposarr:gd3d.math.vector3[]=[];
+                let Middleposarr:gd3d.math.vector3[]=[]; 
 
                 let paokouy=paoLen*Math.sin(anglex);
                 let paokouz=paoLen*Math.cos(anglex);
@@ -539,6 +542,8 @@ namespace dome
             return _mesh;
         }
         private actived:boolean=false;
+        private enableWASD:boolean=false;
+
         private addUI()
         {
             let deltaangle:number=3;
@@ -556,10 +561,61 @@ namespace dome
                 this.rotEuler.x+=deltaangle;
             });
 
-            this.addBtn("发射",60,500,()=>{
+            this.addBtn("发射",60,450,()=>{
                 this.actived=true;
             });
+
+
+            this.addBtn("wasd 控制 关闭/打开",60,500,()=>{
+                this.enableWASD=!this.enableWASD;
+            });
+
+            this.addBtn("w",30,600,()=>{
+                if(this.enableWASD)
+                {
+                    this.endTrans.localPosition.z+=1;
+                    this.endTrans.markDirty();
+                    this.apply();
+                }
+            });
+            this.addBtn("s",100,600,()=>{
+                if(this.enableWASD)
+                {
+                    this.endTrans.localPosition.z-=1;
+                    this.endTrans.markDirty();
+                    this.apply();  
+                }
+            });
+
+            this.addBtn("a",30,700,()=>{
+                if(this.enableWASD)
+                {
+                    this.endTrans.localPosition.x-=1;
+                    this.endTrans.markDirty();
+                    this.apply();
+                }
+            });
+            this.addBtn("d",100,700,()=>{
+                if(this.enableWASD)
+                {
+                    this.endTrans.localPosition.x+=1;
+                    this.endTrans.markDirty();
+                    this.apply();
+                }
+            });
+
         }
+
+        private apply()
+        {
+            let target=new gd3d.math.vector3();
+            gd3d.math.vec3Subtract(this.endTrans.localPosition,this.guiji.localPosition,target);
+            target.y=0;
+            let rotinfo=this.getRotAnlge(this.speed,this.orgPos.y,this.gravity,target,gd3d.math.pool.vector3_forward);
+            this.rotEuler.x=-1*rotinfo.rotx;
+            this.rotEuler.y=rotinfo.roty;
+        }
+
 
         private addBtn(text: string,x:number,y:number,func:()=>void)
         {
@@ -698,6 +754,43 @@ namespace dome
                 gd3d.math.pool.delete_pickInfo(tempinfo);
             }
             return ishided;
+        }
+
+        private getRotAnlge(speed:number,h:number,g:number,target:gd3d.math.vector3,forward:gd3d.math.vector3):{rotx:number,roty:number,canReach:boolean}
+        {
+            let L=Math.sqrt(target.x*target.x+target.z*target.z);
+            let a=0.5*g*L*L/(speed*speed);
+
+            let sqrt=(h-a)/a+Math.pow(L/(2*a),2);
+            if(sqrt>0)
+            {
+                let tana=Math.sqrt(sqrt)+L/(2*a);
+
+                // let cosa=Math.sqrt(0.5*g*L*L/h+0.25*L*L/(h*h))-L*0.5/h;
+                let _rotx=Math.atan(tana)*180/Math.PI;
+                let _roty=this.fromToRotation(forward,target);
+                return {rotx:_rotx,roty:_roty,canReach:true}
+            }else
+            {
+                let tana=L/(2*a);
+                let _rotx=Math.atan(tana)*180/Math.PI;
+                let _roty=this.fromToRotation(forward,target);
+                return {rotx:_rotx,roty:_roty,canReach:true}
+            }
+
+        }
+
+        private fromToRotation(from:gd3d.math.vector3,to:gd3d.math.vector3):number
+        {
+            let dir1=gd3d.math.pool.new_vector3();
+            let dir2=gd3d.math.pool.new_vector3();
+
+            gd3d.math.vec3Normalize(from,dir1);  
+            gd3d.math.vec3Normalize(to,dir2);
+
+            let dot=gd3d.math.vec3Dot(dir1,dir2);
+            dot=Math.acos(dot)*180/Math.PI;
+            return dot;
         }
 
     }
