@@ -51,7 +51,11 @@ namespace dome
             this.mesh=gmesh;
             this.vertexByteSize=gmesh.glMesh.vertexByteSize;
         }
-
+        reset() {
+            this.currentVerteCount = 0;
+            this.realVboLen = 0;
+            this.realEboLen = 0;
+        }
 
         private temptPos:gd3d.math.vector3=new gd3d.math.vector3();
         uploadMeshData(mat:gd3d.math.matrix,mesh:gd3d.framework.mesh,webgl:WebGLRenderingContext)
@@ -170,7 +174,7 @@ namespace dome
                     let newebo=new Uint16Array(this.maxEboLen);
                     newebo.set(this.ebodata);
                     this.mesh.glMesh.resetEboSize(webgl,0,this.maxEboLen);
-    
+
                     this.ebodata=newebo;
                 }
             }
@@ -187,7 +191,7 @@ namespace dome
         root: gd3d.framework.transform;
         picker = [];
         obs: any;
-
+        flag: boolean = false;
         start(app: gd3d.framework.application) {
             this.app = app;
             this.app.showDrawCall();
@@ -203,38 +207,19 @@ namespace dome
                         this.obs = json.obs;
 
                         this.root = new gd3d.framework.transform();
-                        // this.root.gameObject.visible = false;
-                        this.scene.addChild(this.root);
 
                         for(let t of this.obs) {
                              this.generateSignelObs(t);
                         }
 
-                        let mr =this.scene.getRoot().gameObject.getComponentsInChildren("meshRenderer");
+                        let mr =this.root.gameObject.getComponentsInChildren("meshRenderer");
                         for(let m of mr) {
                             this.picker.push(m.gameObject.transform);
                         }
                         console.log(this.picker);
-
-                        setTimeout(()=>{
-                            let {nobatch, batch, mixMeshId} = this.mixMesh(this.picker);
-
-                            // Generate result
-                            console.table(nobatch);
-                            console.table(batch);
-                            console.log(mixMeshId);
-
-                            for (let id of mixMeshId) {
-                                let m = this.mixmeshDic[id];
-                                let trans = new gd3d.framework.transform();
-                                trans.localPosition.y=15;
-                                let mf = trans.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-                                mf.mesh = m.mesh;
-                                let meshRender = trans.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-                                meshRender.materials = [m.mat];
-                                this.scene.addChild(trans);
-                            }
-                        },300);
+                        this.scene.update(0);
+                        this.flag = true;
+                        this.refresh();
                     }
                 });
             });
@@ -254,6 +239,35 @@ namespace dome
             // objCam.localTranslate = new gd3d.math.vector3(0, 0, -30);
             CameraController.instance().init(this.app, this.camera);
             objCam.markDirty();//标记为需要刷新
+        }
+
+        refresh() {
+            if(!this.flag)
+                return;
+
+
+            for(let k in this.mixmeshDic) {
+                this.mixmeshDic[k].reset();
+            }
+
+            let { nobatch, batch, mixMeshId } = this.mixMesh(this.picker);
+
+            // Generate result
+            // console.table(nobatch);
+            // console.table(batch);
+            // console.log(mixMeshId);
+
+            for (let id of mixMeshId) {
+                let m = this.mixmeshDic[id];
+                let trans = new gd3d.framework.transform();
+                trans.localPosition.y = 15;
+                let mf = trans.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+                mf.mesh = m.mesh;
+                let meshRender = trans.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+                meshRender.materials = [m.mat];
+                this.scene.addChild(trans);
+                // this.root.gameObject.visible = false;
+            }
         }
 
         generateSignelObs(target) {
@@ -286,6 +300,7 @@ namespace dome
         update(delta: number) {
             CameraController.instance().update(delta);
 
+            // this.refresh();
 
         }
         targets:gd3d.framework.transform[];
