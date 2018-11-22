@@ -16,7 +16,8 @@ class main implements gd3d.framework.IUserCode
 
         console.log("i am here.");
         this.app = app;
-        this.addBtn("paowuxian",()=>new dome.paowuxian());
+        this.addBtn("paowuxian", () => new dome.paowuxian());
+        this.addBtn("mixmesh",()=>new dome.mixMesh());
 
         // this.addBtn("rayTest",()=>new dome.rayTest());
         //this.addBtn("linPai",()=>new dome.font());
@@ -25,12 +26,12 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("physic2d_dome",()=>new physic2d_dome());
 
         // this.addBtn("loadPrefab",()=>new dome.loadPrefab());
-        
+
         //this.addBtn("test_loadScene",()=>new dome.test_loadScene());
         //this.addBtn("starcam",()=>new dome.db_test_starcam());
         //this.addBtn("trailComponent",()=>new dome.db_test_trail());
-        
-        
+
+
         //this.addBtn("loadPrefab",()=>new dome.loadPrefab());
 
 
@@ -98,7 +99,7 @@ class main implements gd3d.framework.IUserCode
 
         //this.addBtn("test_liloadscene", () => new test_LiLoadScene());
         //this.addBtn("test_RangeScreen" ,()=>new test_RangeScreen());
-        
+
         this.addBtn("test_UI组件", () => new test_UI_Component());
         this.addBtn("test_UI预设体加载", () => new test_uiPerfabLoad());
         this.addBtn("test_PBR 展示", () => new test_pbr());
