@@ -10129,7 +10129,7 @@ var test_UI_Component = (function () {
         var lab_t = new gd3d.framework.transform2D;
         lab_t.name = "我是段文本_lable";
         lab_t.width = 120;
-        lab_t.height = 24;
+        lab_t.height = 100;
         lab_t.localTranslate.x = -10;
         lab_t.localTranslate.y = -10;
         bg_t.addChild(lab_t);
@@ -10137,7 +10137,7 @@ var test_UI_Component = (function () {
         test_UI_Component["lab"] = lab_l;
         lab_l.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
         lab_l.fontsize = 24;
-        lab_l.text = "我是段文本";
+        lab_l.text = "我是段文本\n换行测试";
         lab_l.color = new gd3d.math.color(0.2, 0.2, 0.2, 1);
         test_UI_Component["obj"] = this;
         var btn_t = new gd3d.framework.transform2D;
@@ -10634,7 +10634,7 @@ var dome;
         function paowuxian() {
             this.taskmgr = new gd3d.framework.taskMgr();
             this.paoLen = 2;
-            this.orgPos = new gd3d.math.vector3(0, 0, -10);
+            this.orgPos = new gd3d.math.vector3(0, 10, -10);
             this.rotEuler = new gd3d.math.vector3(-30, 30, 0);
             this.gravity = 10;
             this.speed = 30;
@@ -10686,7 +10686,7 @@ var dome;
                 this.guiji.localEulerAngles = new gd3d.math.vector3(0, this.rotEuler.y, 0);
                 this.guiji.markDirty();
                 var meshf = this.guiji.gameObject.getComponent("meshFilter");
-                meshf.mesh = this.getMeshData(-this.rotEuler.x, this.gravity, this.speed, this.paoLen);
+                meshf.mesh = this.getMeshData(-this.rotEuler.x, this.gravity, this.speed, this.paoLen, this.orgPos.y);
                 var mat = this.guiji.getWorldMatrix();
                 gd3d.math.matrixTransformVector3(this.startPos, mat, this.worldStart);
                 gd3d.math.matrixTransformVector3(this.hPos, mat, this.worldMiddle);
@@ -10746,8 +10746,17 @@ var dome;
                 }
             }
             if (this.linedetectcollider(this.worldStart, this.worldMiddle, targets2, info)) {
-                if (this.detectSecond_Mesh(info.pickedtran, info)) {
-                    return true;
+                if (info.pickedtran.gameObject.getComponent("meshFilter") != null) {
+                    if (this.detectSecond_Mesh(info.pickedtran, info)) {
+                        return true;
+                    }
+                }
+                else {
+                    for (var i = 0; i < info.pickedtran.children.length; i++) {
+                        if (this.detectSecond_Mesh(info.pickedtran, info)) {
+                            return true;
+                        }
+                    }
                 }
             }
             if (this.linedetectcollider(this.worldMiddle, this.worldEnd, targets2, info)) {
@@ -10925,6 +10934,7 @@ var dome;
                 var time = speedy / gravity;
                 this.hPos.y = speedy * time - 0.5 * gravity * Math.pow(time, 2) + paokouy;
                 this.hPos.z = speedz * time + paokouz;
+                this.endpos.y = -paojiaPosY;
                 this.endpos.z = speedz * totalTime + paokouz;
             }
             return this.mesh;

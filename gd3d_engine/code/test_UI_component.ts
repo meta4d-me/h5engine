@@ -62,7 +62,7 @@ class test_UI_Component implements IState {
         let lab_t = new gd3d.framework.transform2D;
         lab_t.name = "我是段文本_lable";
         lab_t.width = 120;
-        lab_t.height = 24;
+        lab_t.height = 100;
         lab_t.localTranslate.x = -10;
         lab_t.localTranslate.y = -10;
         bg_t.addChild(lab_t);
@@ -70,7 +70,7 @@ class test_UI_Component implements IState {
         test_UI_Component["lab"] = lab_l;
         lab_l.font = this.assetMgr.getAssetByName("STXINGKA.font.json") as gd3d.framework.font;
         lab_l.fontsize = 24;
-        lab_l.text = "我是段文本";
+        lab_l.text = "我是段文本\n换行测试";
         lab_l.color =new gd3d.math.color(0.2,0.2,0.2,1);
         test_UI_Component["obj"] = this;
 
@@ -207,7 +207,7 @@ class test_UI_Component implements IState {
         //raw png
         let raw_t2 = new gd3d.framework.transform2D;
         raw_t2.name = "滑动卷轴框png";
-        raw_t2.width = 120;
+        raw_t2.width = 120 ;
         raw_t2.height = 120;
         let raw_i2 = raw_t2.addComponent("rawImage2D") as gd3d.framework.rawImage2D;
         raw_i2.image = tex_0;

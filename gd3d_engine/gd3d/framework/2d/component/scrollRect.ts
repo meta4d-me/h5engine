@@ -121,13 +121,13 @@ namespace gd3d.framework
 
             if(this.horizontal){
                 cpos.x += addtransX;
-                if(cpos.x>0)  cpos.x = 0;
-                if(ctrans.width >= trans.width && cpos.x + ctrans.width <  trans.width) cpos.x = -1*(ctrans.width-trans.width);
+                if(cpos.x>0 || ctrans.width <= trans.width)  cpos.x = 0;
+                if(ctrans.width > trans.width && cpos.x + ctrans.width <  trans.width) cpos.x = -1*(ctrans.width-trans.width);
             }
             if(this.vertical){
                 cpos.y += addtransY;
-                if(cpos.y>0)  cpos.y = 0;
-                if(ctrans.height >= trans.height && cpos.y + ctrans.height < trans.height)  cpos.y = -1*(ctrans.height - trans.height);
+                if(cpos.y>0 || ctrans.height <= trans.height)  cpos.y = 0;
+                if(ctrans.height > trans.height && cpos.y + ctrans.height < trans.height)  cpos.y = -1*(ctrans.height - trans.height);
             }
             
             ctrans.markDirty();

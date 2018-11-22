@@ -5350,11 +5350,12 @@ var gd3d;
                 var contrast_h = this.verticalOverflow ? Number.MAX_VALUE : this.transform.height;
                 for (var i = 0; i < this._text.length; i++) {
                     var c = this._text.charAt(i);
+                    var isNewline = c == "\n";
                     var cinfo = _font.cmap[c];
-                    if (cinfo == undefined) {
+                    if (!isNewline && cinfo == undefined) {
                         continue;
                     }
-                    if (txadd + cinfo.xAddvance * rate > contrast_w) {
+                    if (isNewline || txadd + cinfo.xAddvance * rate > contrast_w) {
                         if (tyadd + this._fontsize * this.linespace > contrast_h) {
                             break;
                         }
@@ -5365,7 +5366,8 @@ var gd3d;
                             tyadd += this._fontsize * this.linespace;
                         }
                     }
-                    txadd += cinfo.xAddvance * rate;
+                    if (cinfo)
+                        txadd += cinfo.xAddvance * rate;
                 }
                 this.indexarr.push(i);
                 this.remainarrx.push(this.transform.width - txadd);
@@ -6083,16 +6085,16 @@ var gd3d;
                 gd3d.math.vec2Clone(this.strPos, cpos);
                 if (this.horizontal) {
                     cpos.x += addtransX;
-                    if (cpos.x > 0)
+                    if (cpos.x > 0 || ctrans.width <= trans.width)
                         cpos.x = 0;
-                    if (ctrans.width >= trans.width && cpos.x + ctrans.width < trans.width)
+                    if (ctrans.width > trans.width && cpos.x + ctrans.width < trans.width)
                         cpos.x = -1 * (ctrans.width - trans.width);
                 }
                 if (this.vertical) {
                     cpos.y += addtransY;
-                    if (cpos.y > 0)
+                    if (cpos.y > 0 || ctrans.height <= trans.height)
                         cpos.y = 0;
-                    if (ctrans.height >= trans.height && cpos.y + ctrans.height < trans.height)
+                    if (ctrans.height > trans.height && cpos.y + ctrans.height < trans.height)
                         cpos.y = -1 * (ctrans.height - trans.height);
                 }
                 ctrans.markDirty();
