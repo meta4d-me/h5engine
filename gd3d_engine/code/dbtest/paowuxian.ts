@@ -49,6 +49,11 @@ namespace dome
             this.addcube();
             this.addUI();
             state.finish=true;
+
+
+            this.camctr.setTarget(this.paodan);
+            this.camctr.setDistanceToTarget(2);
+            this.camctr.setRotAngle(180,30);
         }
 
 
@@ -318,7 +323,8 @@ namespace dome
                }
             }
         }
-
+        private cam2:gd3d.framework.gameObject;
+        private camctr:camCtr;
         private addcam()
         {
             //添加一个摄像机
@@ -333,8 +339,23 @@ namespace dome
             objCam.localTranslate = new gd3d.math.vector3(0,0,-15);
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();//标记为需要刷新
-            // let controller=new CameraController();
+            let controller=new CameraController();
             CameraController.instance().init(this.app,this.camera);
+
+
+            var objCam = new gd3d.framework.transform();
+            this.cam2=objCam.gameObject;
+            this.cam2.visible=false;
+            objCam.name = "sth.";
+            this.scene.addChild(objCam);
+            let camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
+            camera.near = 0.01;
+            camera.far = 2000;
+            camera.fov = Math.PI * 0.3;
+            camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
+            objCam.localTranslate = new gd3d.math.vector3(0,0,-15);
+            objCam.markDirty();//标记为需要刷新
+            this.camctr=objCam.gameObject.addComponent("camCtr") as camCtr;
         }
 
 
@@ -566,8 +587,9 @@ namespace dome
             });
 
 
-            this.addBtn("wasd 控制 关闭/打开",60,500,()=>{
-                this.enableWASD=!this.enableWASD;
+            this.addBtn("切换相机",60,500,()=>{
+                this.cam2.visible=!this.cam2.visible;
+                this.camera.gameObject.visible=!this.camera.gameObject.visible;
             });
 
             this.addBtn("w",30,600,()=>{
@@ -793,5 +815,56 @@ namespace dome
             return dot;
         }
 
+    }
+
+    @gd3d.reflect.nodeComponent
+    export class camCtr implements gd3d.framework.INodeComponent
+    {
+        gameObject: gd3d.framework.gameObject;
+        type:string="camCtr";
+        private _target:gd3d.framework.transform;
+        private _distance:number=0;
+        private _offset:gd3d.math.vector3=new gd3d.math.vector3();
+        private camrotAgnle:gd3d.math.vector3=new gd3d.math.vector3();
+        setTarget(target:gd3d.framework.transform)
+        {
+            this._target=target;
+        }
+        setRotAngle(yanle:number,xangle:number)
+        {
+            this.camrotAgnle.x=xangle;
+            this.camrotAgnle.y=yanle;
+        }
+        setDistanceToTarget(distance:number)
+        {
+            this._distance=distance;
+        }
+
+        onPlay() {
+            
+        }
+        start() {
+            
+        }
+        update(delta: number) {
+            if(this._target==null)
+            {
+                gd3d.math.quatFromEulerAngles(this.camrotAgnle.x,this.camrotAgnle.y,0,this.gameObject.transform.localRotate);
+                this.gameObject.transform.markDirty();
+            }else
+            {
+                gd3d.math.quatFromEulerAngles(this.camrotAgnle.x,this.camrotAgnle.y,0,this.gameObject.transform.localRotate);
+                gd3d.math.quatTransformVector(this.gameObject.transform.localRotate,gd3d.math.pool.vector3_forward,this._offset);
+                gd3d.math.vec3ScaleByNum(this._offset,this._distance,this._offset);
+                gd3d.math.vec3Subtract(this._target.localPosition,this._offset,this.gameObject.transform.localPosition);
+                this.gameObject.transform.markDirty();
+            }
+        }
+        remove() {
+            
+        }
+        clone() {
+            
+        }
     }
 }
