@@ -42,4 +42,12 @@
     export function rectCollided(r1 : rect, r2 : rect) : boolean{
         return r1.x < r2.x + r2.w && r1.x + r1.w > r2.x && r1.y < r2.y + r2.h && r1.h + r1.y > r2.y;
     }
+
+    export function rectClone(src: rect, out: rect)
+    {
+        out.rawData[0] = src.rawData[0];
+        out.rawData[1] = src.rawData[1];
+        out.rawData[2] = src.rawData[2];
+        out.rawData[3] = src.rawData[3];
+    }
 }

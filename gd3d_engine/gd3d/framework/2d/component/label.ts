@@ -191,12 +191,13 @@ namespace gd3d.framework
             for (var i = 0; i < this._text.length; i++)
             {
                 let c = this._text.charAt(i);
+                let isNewline = c == `\n`; //换行符
                 let cinfo = _font.cmap[c];
-                if (cinfo == undefined)
+                if (!isNewline && cinfo == undefined)
                 {
                     continue;
                 }
-                if (txadd + cinfo.xAddvance * rate > contrast_w)
+                if ( isNewline || txadd + cinfo.xAddvance * rate > contrast_w )
                 {
                     if (tyadd + this._fontsize * this.linespace > contrast_h)
                     {
@@ -210,7 +211,7 @@ namespace gd3d.framework
                         tyadd += this._fontsize * this.linespace;
                     }
                 }
-                txadd += cinfo.xAddvance * rate;
+                if(cinfo)  txadd += cinfo.xAddvance * rate;
             }
             this.indexarr.push(i);
             this.remainarrx.push(this.transform.width - txadd);
