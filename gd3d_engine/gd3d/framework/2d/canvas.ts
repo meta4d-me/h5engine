@@ -375,6 +375,7 @@ namespace gd3d.framework
 
 
         private objupdate(node: transform2D, delta){
+            if(!node.visible) return;
 
             node.init(this.scene.app.bePlay);//组件还未初始化的初始化
             if (node.components.length > 0)
