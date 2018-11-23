@@ -343,11 +343,11 @@ namespace gd3d.framework
                 else if (this.pointDown == true && touch == true)//pointhold
                 {
                     this.pointEvent.type = event.PointEventEnum.PointHold;
-                    if (this.pointX == this.pointEvent.x && this.pointY == this.pointEvent.y)
-                    {
-                        // console.log("skip event");
-                        skip = true;
-                    }
+                    // if (this.pointX == this.pointEvent.x && this.pointY == this.pointEvent.y)
+                    // {
+                    //     // console.log("skip event");
+                    //     skip = true;
+                    // }
                 }
                 else if (this.pointDown == true && touch == false)//pointup
                 {
