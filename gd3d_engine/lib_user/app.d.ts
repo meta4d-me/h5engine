@@ -1465,6 +1465,8 @@ declare namespace dome {
         private detectSecond_Mesh(target, info);
         private linedetectcollider(start, end, targets, info);
         private lineDetectMesh(start, end, target, info);
+        private cam2;
+        private camctr;
         private addcam();
         private addcube();
         private cubes;
@@ -1489,6 +1491,22 @@ declare namespace dome {
         private intersectCollider(LinePoints, target, outInfo);
         private getRotAnlge(speed, h, g, target, forward);
         private fromToRotation(from, to);
+    }
+    class camCtr implements gd3d.framework.INodeComponent {
+        gameObject: gd3d.framework.gameObject;
+        type: string;
+        private _target;
+        private _distance;
+        private _offset;
+        private camrotAgnle;
+        setTarget(target: gd3d.framework.transform): void;
+        setRotAngle(yanle: number, xangle: number): void;
+        setDistanceToTarget(distance: number): void;
+        onPlay(): void;
+        start(): void;
+        update(delta: number): void;
+        remove(): void;
+        clone(): void;
     }
 }
 declare class physic2d_dome implements IState {

@@ -1,7 +1,10 @@
 /// <reference path="../../io/reflect.ts" />
+/// <reference path="../../render/struct.ts" />
 
 namespace gd3d.framework
 {
+    let helpv2 = new math.vector2();
+
     /**
      * @public
      * @language zh_CN
@@ -328,9 +331,12 @@ namespace gd3d.framework
             {//updateinput
                 //重置event
                 this.pointEvent.eated = false;
-                this.pointEvent.x = XOnModelSpace;
-                this.pointEvent.y = YOnModelSpace;
+                helpv2.x = this.pointEvent.x = XOnModelSpace;
+                helpv2.y = this.pointEvent.y = YOnModelSpace;
                 this.pointEvent.selected = null;
+                this.ModelPosToCanvasPos(helpv2,helpv2);
+                this.pointEvent.c_x = helpv2.x;
+                this.pointEvent.c_y = helpv2.y;
                 var skip = false;
                 if (this.pointDown == false && touch == false)//nothing
                 {

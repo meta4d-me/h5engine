@@ -14,5 +14,7 @@ namespace gd3d.framework
         y: number;
         eated: boolean;//事件是否被吃掉
         selected: transform2D;//是否有谁被选中
+        c_x : number; //canvas 坐标系 x
+        c_y : number;  //canvas 坐标系 y
     }
 }

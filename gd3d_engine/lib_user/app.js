@@ -10953,6 +10953,9 @@ var dome;
             this.addcube();
             this.addUI();
             state.finish = true;
+            this.camctr.setTarget(this.paodan);
+            this.camctr.setDistanceToTarget(2);
+            this.camctr.setRotAngle(180, 30);
         };
         paowuxian.prototype.update = function (delta) {
             this.taskmgr.move(delta);
@@ -11121,7 +11124,21 @@ var dome;
             objCam.localTranslate = new gd3d.math.vector3(0, 0, -15);
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();
+            var controller = new CameraController();
             CameraController.instance().init(this.app, this.camera);
+            var objCam = new gd3d.framework.transform();
+            this.cam2 = objCam.gameObject;
+            this.cam2.visible = false;
+            objCam.name = "sth.";
+            this.scene.addChild(objCam);
+            var camera = objCam.gameObject.addComponent("camera");
+            camera.near = 0.01;
+            camera.far = 2000;
+            camera.fov = Math.PI * 0.3;
+            camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
+            objCam.localTranslate = new gd3d.math.vector3(0, 0, -15);
+            objCam.markDirty();
+            this.camctr = objCam.gameObject.addComponent("camCtr");
         };
         paowuxian.prototype.addcube = function () {
             var cube1 = new gd3d.framework.transform();
@@ -11293,8 +11310,9 @@ var dome;
             this.addBtn("发射", 60, 450, function () {
                 _this.actived = true;
             });
-            this.addBtn("wasd 控制 关闭/打开", 60, 500, function () {
-                _this.enableWASD = !_this.enableWASD;
+            this.addBtn("切换相机", 60, 500, function () {
+                _this.cam2.visible = !_this.cam2.visible;
+                _this.camera.gameObject.visible = !_this.camera.gameObject.visible;
             });
             this.addBtn("w", 30, 600, function () {
                 if (_this.enableWASD) {
@@ -11471,6 +11489,50 @@ var dome;
         return paowuxian;
     }());
     dome.paowuxian = paowuxian;
+    var camCtr = (function () {
+        function camCtr() {
+            this.type = "camCtr";
+            this._distance = 0;
+            this._offset = new gd3d.math.vector3();
+            this.camrotAgnle = new gd3d.math.vector3();
+        }
+        camCtr.prototype.setTarget = function (target) {
+            this._target = target;
+        };
+        camCtr.prototype.setRotAngle = function (yanle, xangle) {
+            this.camrotAgnle.x = xangle;
+            this.camrotAgnle.y = yanle;
+        };
+        camCtr.prototype.setDistanceToTarget = function (distance) {
+            this._distance = distance;
+        };
+        camCtr.prototype.onPlay = function () {
+        };
+        camCtr.prototype.start = function () {
+        };
+        camCtr.prototype.update = function (delta) {
+            if (this._target == null) {
+                gd3d.math.quatFromEulerAngles(this.camrotAgnle.x, this.camrotAgnle.y, 0, this.gameObject.transform.localRotate);
+                this.gameObject.transform.markDirty();
+            }
+            else {
+                gd3d.math.quatFromEulerAngles(this.camrotAgnle.x, this.camrotAgnle.y, 0, this.gameObject.transform.localRotate);
+                gd3d.math.quatTransformVector(this.gameObject.transform.localRotate, gd3d.math.pool.vector3_forward, this._offset);
+                gd3d.math.vec3ScaleByNum(this._offset, this._distance, this._offset);
+                gd3d.math.vec3Subtract(this._target.localPosition, this._offset, this.gameObject.transform.localPosition);
+                this.gameObject.transform.markDirty();
+            }
+        };
+        camCtr.prototype.remove = function () {
+        };
+        camCtr.prototype.clone = function () {
+        };
+        camCtr = __decorate([
+            gd3d.reflect.nodeComponent
+        ], camCtr);
+        return camCtr;
+    }());
+    dome.camCtr = camCtr;
 })(dome || (dome = {}));
 var physic2d_dome = (function () {
     function physic2d_dome() {

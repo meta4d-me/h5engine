@@ -246,6 +246,106 @@ declare namespace gd3d {
         function UIStyle(style: string, min?: number, max?: number, defvalue?: any): (target: Object, propertyKey: string) => void;
     }
 }
+declare namespace gd3d.math {
+    type byte = number;
+    type ubyte = number;
+    type short = number;
+    type int = number;
+    type ushort = number;
+    type uint = number;
+    type float = number;
+    type double = number;
+    function UByte(v?: number | string): ubyte;
+    function Byte(v?: number | string): byte;
+    function Int16(v?: number | string): short;
+    function Int32(v?: number | string): int;
+    function UInt16(v?: number | string): ushort;
+    function UInt32(v?: number | string): uint;
+    function Float(v?: number | string): float;
+    function Double(v?: number | string): double;
+    class vector2 {
+        static readonly ClassName: string;
+        rawData: Float32Array;
+        constructor(x?: float, y?: float);
+        x: float;
+        y: float;
+        toString(): string;
+    }
+    class rect {
+        static readonly ClassName: string;
+        rawData: Float32Array;
+        constructor(x?: float, y?: float, w?: float, h?: float);
+        x: float;
+        y: float;
+        w: float;
+        h: float;
+        toString(): string;
+    }
+    class border {
+        static readonly ClassName: string;
+        rawData: Float32Array;
+        constructor(l?: float, t?: float, r?: float, b?: float);
+        l: float;
+        t: float;
+        r: float;
+        b: float;
+        toString(): string;
+    }
+    class color {
+        static readonly ClassName: string;
+        rawData: Float32Array;
+        constructor(r?: float, g?: float, b?: float, a?: float);
+        r: float;
+        g: float;
+        b: float;
+        a: float;
+        toString(): string;
+    }
+    class vector3 {
+        static readonly ClassName: string;
+        rawData: Float32Array;
+        constructor(x?: float, y?: float, z?: float);
+        x: float;
+        y: float;
+        z: float;
+        toString(): string;
+    }
+    class vector4 {
+        static readonly ClassName: string;
+        rawData: Float32Array;
+        constructor(x?: float, y?: float, z?: float, w?: float);
+        x: float;
+        y: float;
+        z: float;
+        w: float;
+        toString(): string;
+    }
+    class quaternion {
+        static readonly ClassName: string;
+        rawData: Float32Array;
+        constructor(x?: float, y?: float, z?: float, w?: float);
+        x: float;
+        y: float;
+        z: float;
+        w: float;
+        toString(): string;
+    }
+    class matrix {
+        static readonly ClassName: string;
+        rawData: Float32Array;
+        constructor(datas?: Float32Array);
+        toString(): string;
+    }
+    class matrix3x2 {
+        rawData: Float32Array;
+        constructor(datas?: Float32Array);
+        toString(): string;
+    }
+    function vec4FormJson(json: string, vec4: vector4): void;
+    function vec3FormJson(json: string, vec3: vector3): void;
+    function vec2FormJson(json: string, vec2: vector2): void;
+    function colorFormJson(json: string, _color: color): void;
+}
 declare namespace gd3d.framework {
     class batcher2D {
         private mesh;
@@ -350,15 +450,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class PointEvent {
-        type: event.PointEventEnum;
-        x: number;
-        y: number;
-        eated: boolean;
-        selected: transform2D;
-    }
-}
-declare namespace gd3d.framework {
     enum UIScaleMode {
         CONSTANT_PIXEL_SIZE = 0,
         SCALE_WITH_SCREEN_SIZE = 1,
@@ -393,106 +484,6 @@ declare namespace gd3d.framework {
         calScreenPosToCanvasPos(screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2): void;
         calScreenPosToModelPos(screenPos: gd3d.math.vector2, outModelPos: gd3d.math.vector2): void;
     }
-}
-declare namespace gd3d.math {
-    type byte = number;
-    type ubyte = number;
-    type short = number;
-    type int = number;
-    type ushort = number;
-    type uint = number;
-    type float = number;
-    type double = number;
-    function UByte(v?: number | string): ubyte;
-    function Byte(v?: number | string): byte;
-    function Int16(v?: number | string): short;
-    function Int32(v?: number | string): int;
-    function UInt16(v?: number | string): ushort;
-    function UInt32(v?: number | string): uint;
-    function Float(v?: number | string): float;
-    function Double(v?: number | string): double;
-    class vector2 {
-        static readonly ClassName: string;
-        rawData: Float32Array;
-        constructor(x?: float, y?: float);
-        x: float;
-        y: float;
-        toString(): string;
-    }
-    class rect {
-        static readonly ClassName: string;
-        rawData: Float32Array;
-        constructor(x?: float, y?: float, w?: float, h?: float);
-        x: float;
-        y: float;
-        w: float;
-        h: float;
-        toString(): string;
-    }
-    class border {
-        static readonly ClassName: string;
-        rawData: Float32Array;
-        constructor(l?: float, t?: float, r?: float, b?: float);
-        l: float;
-        t: float;
-        r: float;
-        b: float;
-        toString(): string;
-    }
-    class color {
-        static readonly ClassName: string;
-        rawData: Float32Array;
-        constructor(r?: float, g?: float, b?: float, a?: float);
-        r: float;
-        g: float;
-        b: float;
-        a: float;
-        toString(): string;
-    }
-    class vector3 {
-        static readonly ClassName: string;
-        rawData: Float32Array;
-        constructor(x?: float, y?: float, z?: float);
-        x: float;
-        y: float;
-        z: float;
-        toString(): string;
-    }
-    class vector4 {
-        static readonly ClassName: string;
-        rawData: Float32Array;
-        constructor(x?: float, y?: float, z?: float, w?: float);
-        x: float;
-        y: float;
-        z: float;
-        w: float;
-        toString(): string;
-    }
-    class quaternion {
-        static readonly ClassName: string;
-        rawData: Float32Array;
-        constructor(x?: float, y?: float, z?: float, w?: float);
-        x: float;
-        y: float;
-        z: float;
-        w: float;
-        toString(): string;
-    }
-    class matrix {
-        static readonly ClassName: string;
-        rawData: Float32Array;
-        constructor(datas?: Float32Array);
-        toString(): string;
-    }
-    class matrix3x2 {
-        rawData: Float32Array;
-        constructor(datas?: Float32Array);
-        toString(): string;
-    }
-    function vec4FormJson(json: string, vec4: vector4): void;
-    function vec3FormJson(json: string, vec3: vector3): void;
-    function vec2FormJson(json: string, vec2: vector2): void;
-    function colorFormJson(json: string, _color: color): void;
 }
 declare namespace gd3d.framework {
     enum layoutOption {
@@ -3504,6 +3495,17 @@ declare namespace gd3d {
         RemoveListener(event: string, func: Function, thisArg: any): void;
         RemoveListenerAll(): void;
         listenerCount(event: string): number;
+    }
+}
+declare namespace gd3d.framework {
+    class PointEvent {
+        type: event.PointEventEnum;
+        x: number;
+        y: number;
+        eated: boolean;
+        selected: transform2D;
+        c_x: number;
+        c_y: number;
     }
 }
 declare namespace gd3d.event {
