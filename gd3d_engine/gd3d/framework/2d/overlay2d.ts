@@ -330,12 +330,14 @@ namespace gd3d.framework
             let mPos = this.helpv2;
             this.calScreenPosToModelPos(screenPos,mPos);
             
-            var mat: gd3d.math.matrix3x2 = gd3d.math.pool.new_matrix3x2();
-            gd3d.math.matrix3x2Clone(this.canvas.getRoot().getWorldMatrix(), mat);
-            gd3d.math.matrix3x2Inverse(mat, mat);
-            gd3d.math.matrix3x2TransformVector2(mat, mPos, outCanvasPos);
+            // var mat: gd3d.math.matrix3x2 = gd3d.math.pool.new_matrix3x2();
+            // gd3d.math.matrix3x2Clone(this.canvas.getRoot().getWorldMatrix(), mat);
+            // gd3d.math.matrix3x2Inverse(mat, mat);
+            // gd3d.math.matrix3x2TransformVector2(mat, mPos, outCanvasPos);
 
-            gd3d.math.pool.delete_matrix3x2(mat);
+            // gd3d.math.pool.delete_matrix3x2(mat);
+
+            this.canvas.ModelPosToCanvasPos(mPos,outCanvasPos);
         }
 
         /**
