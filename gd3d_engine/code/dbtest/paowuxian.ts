@@ -563,7 +563,7 @@ namespace dome
             return _mesh;
         }
         private actived:boolean=false;
-        private enableWASD:boolean=false;
+        private enableWASD:boolean=true;
 
         private addUI()
         {
@@ -790,19 +790,19 @@ namespace dome
 
                 // let cosa=Math.sqrt(0.5*g*L*L/h+0.25*L*L/(h*h))-L*0.5/h;
                 let _rotx=Math.atan(tana)*180/Math.PI;
-                let _roty=this.fromToRotation(forward,target);
+                let _roty=this.fromToRotation(forward,target,gd3d.math.pool.vector3_right);
                 return {rotx:_rotx,roty:_roty,canReach:true}
             }else
             {
                 let tana=L/(2*a);
                 let _rotx=Math.atan(tana)*180/Math.PI;
-                let _roty=this.fromToRotation(forward,target);
+                let _roty=this.fromToRotation(forward,target,gd3d.math.pool.vector3_right);
                 return {rotx:_rotx,roty:_roty,canReach:true}
             }
 
         }
 
-        private fromToRotation(from:gd3d.math.vector3,to:gd3d.math.vector3):number
+        private fromToRotation(from:gd3d.math.vector3,to:gd3d.math.vector3,right:gd3d.math.vector3):number
         {
             let dir1=gd3d.math.pool.new_vector3();
             let dir2=gd3d.math.pool.new_vector3();
@@ -811,7 +811,17 @@ namespace dome
             gd3d.math.vec3Normalize(to,dir2);
 
             let dot=gd3d.math.vec3Dot(dir1,dir2);
-            dot=Math.acos(dot)*180/Math.PI;
+
+            let dot2=gd3d.math.vec3Dot(dir2,right);
+            dot2=Math.acos(dot2)*180/Math.PI;
+            if(dot2>90)
+            {
+                dot=-1*Math.acos(dot)*180/Math.PI;
+            }else
+            {
+                dot=Math.acos(dot)*180/Math.PI;
+            }
+
             return dot;
         }
 
