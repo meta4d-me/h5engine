@@ -62,7 +62,7 @@ class test_UI_Component implements IState {
         let lab_t = new gd3d.framework.transform2D;
         lab_t.name = "我是段文本_lable";
         lab_t.width = 120;
-        lab_t.height = 24;
+        lab_t.height = 100;
         lab_t.localTranslate.x = -10;
         lab_t.localTranslate.y = -10;
         bg_t.addChild(lab_t);
@@ -70,7 +70,7 @@ class test_UI_Component implements IState {
         test_UI_Component["lab"] = lab_l;
         lab_l.font = this.assetMgr.getAssetByName("STXINGKA.font.json") as gd3d.framework.font;
         lab_l.fontsize = 24;
-        lab_l.text = "我是段文本";
+        lab_l.text = "我是段文本\n换行测试";
         lab_l.color =new gd3d.math.color(0.2,0.2,0.2,1);
         test_UI_Component["obj"] = this;
 
@@ -189,16 +189,18 @@ class test_UI_Component implements IState {
 
         //滑动卷轴框
         let scroll_t = new gd3d.framework.transform2D;
-        scroll_t.width =  70;
-        scroll_t.height = 100;
+        scroll_t.width =  160;
+        scroll_t.height = 200;
         bg_t.addChild(scroll_t);
         scroll_t.localTranslate.x = 160;
         scroll_t.localTranslate.y = 30;
         let scroll_ = scroll_t.addComponent("scrollRect") as gd3d.framework.scrollRect;
         let ct = new gd3d.framework.transform2D;
         scroll_t.addChild(ct);
-        ct.width = 120;
-        ct.height = 120;
+        scroll_.inertia = true;
+        ct.width = 300;
+        ct.height = 300;
+        scroll_.decelerationRate = 0.135;
         scroll_.content = ct;
         scroll_t.isMask = true;
         scroll_.horizontal = true;
@@ -207,8 +209,8 @@ class test_UI_Component implements IState {
         //raw png
         let raw_t2 = new gd3d.framework.transform2D;
         raw_t2.name = "滑动卷轴框png";
-        raw_t2.width = 120;
-        raw_t2.height = 120;
+        raw_t2.width = 300 ;
+        raw_t2.height = 300;
         let raw_i2 = raw_t2.addComponent("rawImage2D") as gd3d.framework.rawImage2D;
         raw_i2.image = tex_0;
         ct.addChild(raw_t2);

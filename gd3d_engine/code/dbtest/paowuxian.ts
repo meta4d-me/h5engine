@@ -8,7 +8,7 @@ namespace dome
         assetmgr:gd3d.framework.assetMgr;
         taskmgr: gd3d.framework.taskMgr = new gd3d.framework.taskMgr();
 
-        private paoLen:number=2;
+        private paoLen:number=0;
         private paojia:gd3d.framework.transform;
         private paodan:gd3d.framework.transform;
         private guiji:gd3d.framework.transform;
@@ -49,6 +49,11 @@ namespace dome
             this.addcube();
             this.addUI();
             state.finish=true;
+
+
+            this.camctr.setTarget(this.paodan);
+            this.camctr.setDistanceToTarget(2);
+            this.camctr.setRotAngle(180,30);
         }
 
 
@@ -87,11 +92,14 @@ namespace dome
 
                 gd3d.math.vec3Clone(this.worldStart,this.startTrans.localTranslate);
                 gd3d.math.vec3Clone(this.worldMiddle,this.middleTrans.localTranslate);
-                gd3d.math.vec3Clone(this.worldEnd,this.endTrans.localTranslate);
                 this.startTrans.markDirty();
                 this.middleTrans.markDirty();
-                this.endTrans.markDirty();
 
+                if(!this.enableWASD)
+                {
+                    gd3d.math.vec3Clone(this.worldEnd,this.endTrans.localTranslate);
+                    this.endTrans.markDirty();
+                }
                 //------------
                 let info:gd3d.framework.pickinfo=new gd3d.framework.pickinfo();
                 //------------------障碍物集合
@@ -315,7 +323,8 @@ namespace dome
                }
             }
         }
-
+        private cam2:gd3d.framework.gameObject;
+        private camctr:camCtr;
         private addcam()
         {
             //添加一个摄像机
@@ -330,8 +339,23 @@ namespace dome
             objCam.localTranslate = new gd3d.math.vector3(0,0,-15);
             objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
             objCam.markDirty();//标记为需要刷新
-            // let controller=new CameraController();
+            let controller=new CameraController();
             CameraController.instance().init(this.app,this.camera);
+
+
+            var objCam = new gd3d.framework.transform();
+            this.cam2=objCam.gameObject;
+            this.cam2.visible=false;
+            objCam.name = "sth.";
+            this.scene.addChild(objCam);
+            let camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
+            camera.near = 0.01;
+            camera.far = 2000;
+            camera.fov = Math.PI * 0.3;
+            camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
+            objCam.localTranslate = new gd3d.math.vector3(0,0,-15);
+            objCam.markDirty();//标记为需要刷新
+            this.camctr=objCam.gameObject.addComponent("camCtr") as camCtr;
         }
 
 
@@ -426,7 +450,7 @@ namespace dome
                 anglex=anglex*Math.PI/180;
                 let halfwidth:number=1;
                 let posarr:gd3d.math.vector3[]=[];
-                let Middleposarr:gd3d.math.vector3[]=[];
+                let Middleposarr:gd3d.math.vector3[]=[]; 
 
                 let paokouy=paoLen*Math.sin(anglex);
                 let paokouz=paoLen*Math.cos(anglex);
@@ -539,6 +563,8 @@ namespace dome
             return _mesh;
         }
         private actived:boolean=false;
+        private enableWASD:boolean=true;
+
         private addUI()
         {
             let deltaangle:number=3;
@@ -556,10 +582,62 @@ namespace dome
                 this.rotEuler.x+=deltaangle;
             });
 
-            this.addBtn("发射",60,500,()=>{
+            this.addBtn("发射",60,450,()=>{
                 this.actived=true;
             });
+
+
+            this.addBtn("切换相机",60,500,()=>{
+                this.cam2.visible=!this.cam2.visible;
+                this.camera.gameObject.visible=!this.camera.gameObject.visible;
+            });
+
+            this.addBtn("w",30,600,()=>{
+                if(this.enableWASD)
+                {
+                    this.endTrans.localPosition.z+=1;
+                    this.endTrans.markDirty();
+                    this.apply();
+                }
+            });
+            this.addBtn("s",100,600,()=>{
+                if(this.enableWASD)
+                {
+                    this.endTrans.localPosition.z-=1;
+                    this.endTrans.markDirty();
+                    this.apply();  
+                }
+            });
+
+            this.addBtn("a",30,700,()=>{
+                if(this.enableWASD)
+                {
+                    this.endTrans.localPosition.x-=1;
+                    this.endTrans.markDirty();
+                    this.apply();
+                }
+            });
+            this.addBtn("d",100,700,()=>{
+                if(this.enableWASD)
+                {
+                    this.endTrans.localPosition.x+=1;
+                    this.endTrans.markDirty();
+                    this.apply();
+                }
+            });
+
         }
+
+        private apply()
+        {
+            let target=new gd3d.math.vector3();
+            gd3d.math.vec3Subtract(this.endTrans.localPosition,this.guiji.localPosition,target);
+            target.y=0;
+            let rotinfo=this.getRotAnlge(this.speed,this.orgPos.y,this.gravity,target,gd3d.math.pool.vector3_forward);
+            this.rotEuler.x=-1*rotinfo.rotx;
+            this.rotEuler.y=rotinfo.roty;
+        }
+
 
         private addBtn(text: string,x:number,y:number,func:()=>void)
         {
@@ -700,5 +778,103 @@ namespace dome
             return ishided;
         }
 
+        private getRotAnlge(speed:number,h:number,g:number,target:gd3d.math.vector3,forward:gd3d.math.vector3):{rotx:number,roty:number,canReach:boolean}
+        {
+            let L=Math.sqrt(target.x*target.x+target.z*target.z);
+            let a=0.5*g*L*L/(speed*speed);
+
+            let sqrt=(h-a)/a+Math.pow(L/(2*a),2);
+            if(sqrt>0)
+            {
+                let tana=Math.sqrt(sqrt)+L/(2*a);
+
+                // let cosa=Math.sqrt(0.5*g*L*L/h+0.25*L*L/(h*h))-L*0.5/h;
+                let _rotx=Math.atan(tana)*180/Math.PI;
+                let _roty=this.fromToRotation(forward,target,gd3d.math.pool.vector3_right);
+                return {rotx:_rotx,roty:_roty,canReach:true}
+            }else
+            {
+                let tana=L/(2*a);
+                let _rotx=Math.atan(tana)*180/Math.PI;
+                let _roty=this.fromToRotation(forward,target,gd3d.math.pool.vector3_right);
+                return {rotx:_rotx,roty:_roty,canReach:true}
+            }
+
+        }
+
+        private fromToRotation(from:gd3d.math.vector3,to:gd3d.math.vector3,right:gd3d.math.vector3):number
+        {
+            let dir1=gd3d.math.pool.new_vector3();
+            let dir2=gd3d.math.pool.new_vector3();
+
+            gd3d.math.vec3Normalize(from,dir1);  
+            gd3d.math.vec3Normalize(to,dir2);
+
+            let dot=gd3d.math.vec3Dot(dir1,dir2);
+
+            let dot2=gd3d.math.vec3Dot(dir2,right);
+            dot2=Math.acos(dot2)*180/Math.PI;
+            if(dot2>90)
+            {
+                dot=-1*Math.acos(dot)*180/Math.PI;
+            }else
+            {
+                dot=Math.acos(dot)*180/Math.PI;
+            }
+
+            return dot;
+        }
+
+    }
+
+    @gd3d.reflect.nodeComponent
+    export class camCtr implements gd3d.framework.INodeComponent
+    {
+        gameObject: gd3d.framework.gameObject;
+        type:string="camCtr";
+        private _target:gd3d.framework.transform;
+        private _distance:number=0;
+        private _offset:gd3d.math.vector3=new gd3d.math.vector3();
+        private camrotAgnle:gd3d.math.vector3=new gd3d.math.vector3();
+        setTarget(target:gd3d.framework.transform)
+        {
+            this._target=target;
+        }
+        setRotAngle(yanle:number,xangle:number)
+        {
+            this.camrotAgnle.x=xangle;
+            this.camrotAgnle.y=yanle;
+        }
+        setDistanceToTarget(distance:number)
+        {
+            this._distance=distance;
+        }
+
+        onPlay() {
+            
+        }
+        start() {
+            
+        }
+        update(delta: number) {
+            if(this._target==null)
+            {
+                gd3d.math.quatFromEulerAngles(this.camrotAgnle.x,this.camrotAgnle.y,0,this.gameObject.transform.localRotate);
+                this.gameObject.transform.markDirty();
+            }else
+            {
+                gd3d.math.quatFromEulerAngles(this.camrotAgnle.x,this.camrotAgnle.y,0,this.gameObject.transform.localRotate);
+                gd3d.math.quatTransformVector(this.gameObject.transform.localRotate,gd3d.math.pool.vector3_forward,this._offset);
+                gd3d.math.vec3ScaleByNum(this._offset,this._distance,this._offset);
+                gd3d.math.vec3Subtract(this._target.localPosition,this._offset,this.gameObject.transform.localPosition);
+                this.gameObject.transform.markDirty();
+            }
+        }
+        remove() {
+            
+        }
+        clone() {
+            
+        }
     }
 }

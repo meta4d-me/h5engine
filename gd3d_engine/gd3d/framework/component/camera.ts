@@ -4,6 +4,14 @@ let helpv3_1 = new gd3d.math.vector3();
 
 let helpv2 = new gd3d.math.vector2();
 let helpv2_1 = new gd3d.math.vector2();
+
+let helpmtx = new gd3d.math.matrix();
+let helpmtx_1 = new gd3d.math.matrix();
+let helpmtx_2 = new gd3d.math.matrix();
+let helpmtx_3 = new gd3d.math.matrix();
+
+let helprect = new gd3d.math.rect();
+
 namespace gd3d.framework
 {
     /**
@@ -62,7 +70,7 @@ namespace gd3d.framework
             context.webgl.clearColor(0, 0.3, 0, 0);
             context.webgl.clearDepth(1.0);
             context.webgl.clear(context.webgl.COLOR_BUFFER_BIT | context.webgl.DEPTH_BUFFER_BIT);
-            var mesh = scene.app.getAssetMgr().getDefaultMesh("quad");
+            let mesh = scene.app.getAssetMgr().getDefaultMesh("quad");
             //画四边形
             context.drawtype = "";
             mesh.glMesh.bindVboBuffer(context.webgl);
@@ -344,7 +352,7 @@ namespace gd3d.framework
          */
         calcViewMatrix(matrix: gd3d.math.matrix)
         {
-            var camworld = this.gameObject.transform.getWorldMatrix();
+            let camworld = this.gameObject.transform.getWorldMatrix();
             //视矩阵刚好是摄像机世界矩阵的逆
             gd3d.math.matrixInverse(camworld, this.matView);
 
@@ -365,8 +373,8 @@ namespace gd3d.framework
         calcViewPortPixel(app: application, viewPortPixel: math.rect)
         {
 
-            var w: number;
-            var h: number;
+            let w: number;
+            let h: number;
             if (this.renderTarget == null)
             {
                 w = app.width;
@@ -420,23 +428,23 @@ namespace gd3d.framework
          */
         public creatRayByScreen(screenpos: gd3d.math.vector2, app: application): ray
         {
-            var src1 = gd3d.math.pool.new_vector3();
+            let src1 = gd3d.math.pool.new_vector3();
             src1.x = screenpos.x;
             src1.y = screenpos.y;
             src1.z = 0;
-            var src2 = gd3d.math.pool.new_vector3();
+            let src2 = gd3d.math.pool.new_vector3();
             src2.x = screenpos.x;
             src2.y = screenpos.y;
             src2.z = 1;
-            var dest1 = gd3d.math.pool.new_vector3();
-            var dest2 = gd3d.math.pool.new_vector3();
+            let dest1 = gd3d.math.pool.new_vector3();
+            let dest2 = gd3d.math.pool.new_vector3();
             this.calcWorldPosFromScreenPos(app, src1, dest1);
             this.calcWorldPosFromScreenPos(app, src2, dest2);
 
-            var dir = gd3d.math.pool.new_vector3();
+            let dir = gd3d.math.pool.new_vector3();
             gd3d.math.vec3Subtract(dest2, dest1, dir);
             gd3d.math.vec3Normalize(dir, dir);
-            var ray = new gd3d.framework.ray(dest1, dir);
+            let ray = new gd3d.framework.ray(dest1, dir);
 
             gd3d.math.pool.delete_vector3(src1);
             gd3d.math.pool.delete_vector3(src2);
@@ -457,19 +465,27 @@ namespace gd3d.framework
          */
         calcWorldPosFromScreenPos(app: application, screenPos: math.vector3, outWorldPos: math.vector3)
         {
-            var vpp = new math.rect();
+            
+            let vpp = helprect;
             this.calcViewPortPixel(app, vpp);
-            var vppos = new math.vector2(screenPos.x / vpp.w * 2 - 1, 1 - screenPos.y / vpp.h * 2);
-            var matrixView = new gd3d.math.matrix();
-            var matrixProject = new gd3d.math.matrix();
-            var asp = vpp.w / vpp.h;
+            let vppos = helpv2;
+            vppos.x = screenPos.x / vpp.w * 2 - 1;
+            vppos.y =  1 - screenPos.y / vpp.h * 2;
+            // new math.vector2(screenPos.x / vpp.w * 2 - 1, 1 - screenPos.y / vpp.h * 2);
+            let matrixView = helpmtx;
+            let matrixProject = helpmtx_1;
+            let asp = vpp.w / vpp.h;
             this.calcViewMatrix(matrixView);
             this.calcProjectMatrix(asp, matrixProject);
-            var matrixViewProject = new gd3d.math.matrix();
-            var matinv = new gd3d.math.matrix();
+            let matrixViewProject = helpmtx_2;
+            let matinv = helpmtx_3;
             gd3d.math.matrixMultiply(matrixProject, matrixView, matrixViewProject);
             gd3d.math.matrixInverse(matrixViewProject, matinv);
-            var src1 = new math.vector3(vppos.x, vppos.y, screenPos.z);
+            let src1 = helpv3; 
+            src1.x = vppos.x;
+            src1.y = vppos.y;
+            src1.z = screenPos.z;
+            // new math.vector3(vppos.x, vppos.y, screenPos.z);
             gd3d.math.matrixTransformVector3(src1, matinv, outWorldPos);
 
         }
@@ -485,48 +501,57 @@ namespace gd3d.framework
          */
         calcScreenPosFromWorldPos(app: application, worldPos: math.vector3, outScreenPos: math.vector2)
         {
-            var vpp = new math.rect();
+            let vpp = helprect;
             this.calcViewPortPixel(app, vpp);
-            var matrixView = new gd3d.math.matrix();
-            var matrixProject = new gd3d.math.matrix();
-            var asp = vpp.w / vpp.h;
+            let matrixView = helpmtx;
+            let matrixProject = helpmtx_1;
+            let asp = vpp.w / vpp.h;
             this.calcViewMatrix(matrixView);
             this.calcProjectMatrix(asp, matrixProject);
-            var matrixViewProject = new gd3d.math.matrix();
+            let matrixViewProject = helpmtx_2;
             gd3d.math.matrixMultiply(matrixProject, matrixView, matrixViewProject);
 
-            var ndcPos = gd3d.math.pool.new_vector3();
+            let ndcPos = helpv3;
             gd3d.math.matrixTransformVector3(worldPos, matrixViewProject, ndcPos);
             outScreenPos.x = (ndcPos.x + 1) * vpp.w / 2;
             outScreenPos.y = (1 - ndcPos.y) * vpp.h / 2;
         }
+        
+        private lastCamMtx = new math.matrix();
+        private lastCamRect = new math.rect();
+        private paraArr = [0,0,0];
         /**
-         * @private
+         * @private 计算相机框
          * @param app
          */
-        calcCameraFrame(app: application)
+        private calcCameraFrame(app: application)
         {
-            var _vpp = new math.rect();
-            this.calcViewPortPixel(app, _vpp);
-
-            var near_h = this.near * Math.tan(this.fov * 0.5);
-            var asp = _vpp.w / _vpp.h;
-            var near_w = near_h * asp;
-
-            var nearLT = new gd3d.math.vector3(-near_w, near_h, this.near);
-            var nearLD = new gd3d.math.vector3(-near_w, -near_h, this.near);
-            var nearRT = new gd3d.math.vector3(near_w, near_h, this.near);
-            var nearRD = new gd3d.math.vector3(near_w, -near_h, this.near);
-
-            var far_h = this.far * Math.tan(this.fov * 0.5);
-            var far_w = far_h * asp;
-
-            var farLT = new gd3d.math.vector3(-far_w, far_h, this.far);
-            var farLD = new gd3d.math.vector3(-far_w, -far_h, this.far);
-            var farRT = new gd3d.math.vector3(far_w, far_h, this.far);
-            var farRD = new gd3d.math.vector3(far_w, -far_h, this.far);
-
             let matrix = this.gameObject.transform.getWorldMatrix();
+            let _vpp = math.pool.new_rect();
+            this.calcViewPortPixel(app, _vpp);
+            //检查是否需要更新
+            if(math.matrixEqual(this.lastCamMtx,matrix) && math.rectEqul(this.lastCamRect,_vpp) && 
+                this.paraArr[0] == this.fov && this.paraArr[1] == this.near && this.paraArr[2] == this.far){
+                return;   
+            }
+
+            let near_h = this.near * Math.tan(this.fov * 0.5);
+            let asp = _vpp.w / _vpp.h;
+            let near_w = near_h * asp;
+
+            let nearLT = math.pool.new_vector3(-near_w, near_h, this.near);
+            let nearLD = math.pool.new_vector3(-near_w, -near_h, this.near);
+            let nearRT = math.pool.new_vector3(near_w, near_h, this.near);
+            let nearRD = math.pool.new_vector3(near_w, -near_h, this.near);
+
+            let far_h = this.far * Math.tan(this.fov * 0.5);
+            let far_w = far_h * asp;
+
+            let farLT = math.pool.new_vector3(-far_w, far_h, this.far);
+            let farLD = math.pool.new_vector3(-far_w, -far_h, this.far);
+            let farRT = math.pool.new_vector3(far_w, far_h, this.far);
+            let farRD = math.pool.new_vector3(far_w, -far_h, this.far);
+
             gd3d.math.matrixTransformVector3(farLD, matrix, farLD);
             gd3d.math.matrixTransformVector3(nearLD, matrix, nearLD);
             gd3d.math.matrixTransformVector3(farRD, matrix, farRD);
@@ -535,15 +560,24 @@ namespace gd3d.framework
             gd3d.math.matrixTransformVector3(nearLT, matrix, nearLT);
             gd3d.math.matrixTransformVector3(farRT, matrix, farRT);
             gd3d.math.matrixTransformVector3(nearRT, matrix, nearRT);
-            this.frameVecs.length = 0;
-            this.frameVecs.push(farLD);
-            this.frameVecs.push(nearLD);
-            this.frameVecs.push(farRD);
-            this.frameVecs.push(nearRD);
-            this.frameVecs.push(farLT);
-            this.frameVecs.push(nearLT);
-            this.frameVecs.push(farRT);
-            this.frameVecs.push(nearRT);
+            this.frameVecs[0] = farLD;
+            this.frameVecs[1] = nearLD;
+            this.frameVecs[2] = farRD;
+            this.frameVecs[3] = nearRD;
+            this.frameVecs[4] = farLT;
+            this.frameVecs[5] = nearLT;
+            this.frameVecs[6] = farRT;
+            this.frameVecs[7] = nearRT;
+
+            //回收
+            math.pool.delete_vector3Array([nearLT,nearLD,nearRT,nearRD,farLT,farLD,farRT,farRD]);
+
+            //同步
+            math.matrixClone(matrix,this.lastCamMtx);
+            math.rectClone(_vpp,this.lastCamRect);
+            this.paraArr[0] = this.fov;
+            this.paraArr[1] = this.near;
+            this.paraArr[2] = this.far;
         }
         private matView: math.matrix = new math.matrix;
         private matProjP: math.matrix = new math.matrix;
@@ -599,20 +633,20 @@ namespace gd3d.framework
          */
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2)
         {
-            var vpp = new math.rect();
+            let vpp = helprect;
             this.calcViewPortPixel(app, vpp);
 
-            var nearpos: gd3d.math.vector3 = new gd3d.math.vector3;
+            let nearpos = helpv3;
             nearpos.z = -this.near;
             nearpos.x = screenPos.x - vpp.w * 0.5;
             nearpos.y = vpp.h * 0.5 - screenPos.y;
 
-            var farpos: gd3d.math.vector3 = new gd3d.math.vector3;
+            let farpos = helpv3_1;
             farpos.z = -this.far;
             farpos.x = this.far * nearpos.x / this.near;
             farpos.y = this.far * nearpos.y / this.near;;
 
-            var rate = (nearpos.z - z) / (nearpos.z - farpos.z);
+            let rate = (nearpos.z - z) / (nearpos.z - farpos.z);
             out.x = nearpos.x - (nearpos.x - farpos.x) * rate;
             out.y = nearpos.y - (nearpos.y - farpos.y) * rate;
         }
@@ -628,14 +662,14 @@ namespace gd3d.framework
         }
         private _fillRenderer(scene: scene, node: transform)
         {
-            if (node.hasRendererComp == false && node.hasRendererCompChild == false) return;  //自己没有渲染组件 且 子物体也没有 return
+            if (!node.gameObject.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false)) return;  //自己没有渲染组件 且 子物体也没有 return
 
             if (scene.app.isFrustumCulling && !this.testFrustumCulling(scene, node)) return;//视锥测试不通过 直接return
-            if (node.gameObject != null && node.gameObject.renderer != null && node.gameObject.visible)
+            if (node.gameObject != null && node.gameObject.renderer != null )
             {
                 scene.renderList.addRenderer(node.gameObject.renderer);
             }
-            if (node.children != null && node.gameObject.visible)
+            if (node.children != null )
             {
                 for (var i = 0; i < node.children.length; i++)
                 {
@@ -666,8 +700,8 @@ namespace gd3d.framework
         _targetAndViewport(target: render.glRenderTarget, scene: scene, context: renderContext, withoutClear: boolean)
         {
             {
-                var w: number;
-                var h: number;
+                let w: number;
+                let h: number;
                 if (target == null)
                 {
                     w = scene.app.width;
@@ -740,7 +774,7 @@ namespace gd3d.framework
         {
             context.drawtype = drawtype;
 
-            var assetmgr = scene.app.getAssetMgr();
+            let assetmgr = scene.app.getAssetMgr();
             for (let layer of scene.renderList.renderLayers)
             {
                 for (let item of layer.list)
