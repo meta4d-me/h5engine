@@ -149,6 +149,7 @@ namespace gd3d.framework {
         type: string;
         tag: string;
         name: string;
+        angularVelocity:number;
         velocity:matterVector;
         collisionFilter: collisionFilter;
         applyForce(body: Ibody, positon: matterVector, force: matterVector): void;
