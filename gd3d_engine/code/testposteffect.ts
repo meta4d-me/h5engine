@@ -197,7 +197,8 @@
                 "桶模糊",
                 "bloom",
                 "景深",
-                "Vignetting"
+                "Vignetting",
+                "校色"
             ];
 
             var select = document.createElement("select");
@@ -394,6 +395,10 @@
                 {
                     let actr = this.scene.mainCamera.gameObject.addComponent("vignettingCtr") as gd3d.framework.vignettingCtr;
                     console.log("Vignetting");
+                }else if(select.value=="10")
+                {
+                    let actr = this.scene.mainCamera.gameObject.addComponent("colorCorrect") as gd3d.framework.colorCorrect;
+                    console.log("colorCorrect"); 
                 }
 
             }

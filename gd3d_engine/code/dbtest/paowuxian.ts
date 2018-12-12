@@ -15,7 +15,7 @@ namespace dome
         private guanghuan:gd3d.framework.transform;
 
         private orgPos:gd3d.math.vector3=new gd3d.math.vector3(0,10,-10);
-        rotEuler:gd3d.math.vector3=new gd3d.math.vector3(-30,30,0);
+        rotEuler:gd3d.math.vector3=new gd3d.math.vector3(-30,180,0);
         gravity:number=10;
         speed:number=30;
 
@@ -178,6 +178,7 @@ namespace dome
             {
                 if(this.detectSecond_Collider(info.pickedtran,info))
                 {
+                    // console.error("collider:"+info.pickedtran.name);
                     return true;
                 }
             }
@@ -185,6 +186,7 @@ namespace dome
             {
                 if(this.detectSecond_Collider(info.pickedtran,info))
                 {
+                    // console.error("collider:"+info.pickedtran.name);
                     return true;
                 }
             }
@@ -289,18 +291,33 @@ namespace dome
             let len=gd3d.math.vec3Length(dir);
             gd3d.math.vec3Normalize(dir,dir);
             let ray=new gd3d.framework.ray(start,dir);
+
+            let distance=Number.MAX_VALUE;
+            let picked=false;
             //--------------
             for(let key in targets)
             {
-                if(ray.intersectCollider(targets[key],info))
+                let _info=new gd3d.framework.pickinfo();
+                if(ray.intersectCollider(targets[key],_info))
                 {
-                    if(info.distance<len)
+                    if(_info.distance<len)
                     {
-                        return true;
+                        picked=true;
+                        
+                        if(_info.distance<distance)
+                        {
+                            distance=_info.distance;
+                            info.cloneFrom(_info);
+                            // console.warn("picktrans:"+_info.pickedtran.gameObject.getName()+"   distance:"+distance);
+                        }
                     }
                 }
             }
-            return false;
+            // if(picked)
+            // {
+            //     console.warn("result:"+info.pickedtran.name);
+            // }
+            return picked;
         }
         private lineDetectMesh(start:gd3d.math.vector3,end:gd3d.math.vector3,target:gd3d.framework.transform,info:gd3d.framework.pickinfo):boolean
         {
@@ -656,6 +673,7 @@ namespace dome
         private loadmesh(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
             var name="box";
+            name="CJ";
             this.app.getAssetMgr().load("res/prefabs/"+name+"/"+name+".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s) =>
             {
                 if (s.isfinish)

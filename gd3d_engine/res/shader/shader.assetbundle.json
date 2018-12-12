@@ -175,6 +175,14 @@
       {
           "name":"resources/posteffect/bloom.shader.json",
           "length":0
+          },
+      {
+          "name":"resources/posteffect/colorcorrect.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/colorcorrect.shader.json",
+          "length":0
           }
       ]
   }
