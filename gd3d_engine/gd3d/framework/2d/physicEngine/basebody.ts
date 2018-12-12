@@ -21,7 +21,7 @@ namespace gd3d.framework {
         frictionStatic?: number;
         frictionAir?: number;
         friction?: number;
-        collisionFilter?:collisionFilter;
+        collisionFilter?: collisionFilter;
         slop?: number;
         isStatic?: boolean;
         type?: string;
@@ -33,7 +33,7 @@ namespace gd3d.framework {
         // beStatic:boolean=false;
         transform: transform2D;
         body: Ibody;
-        m_velocity:math.vector2;
+        m_velocity: math.vector2;
         /**
          * 施加作用力
          * @param Force 
@@ -53,6 +53,12 @@ namespace gd3d.framework {
             physic2D.setAngularVelocity(this.body, velocity);
         }
 
+        /**获取角速度 */
+        get angularVelocity(): number {
+
+            return this.body.angularVelocity;
+        }
+
         /**
          * 获取当前刚体的速度值
          */
@@ -61,9 +67,9 @@ namespace gd3d.framework {
             return this.body.speed;
         }
 
-        get velocity():math.vector2{
-            if(this.m_velocity==null)this.m_velocity=new gd3d.math.vector2()
-            this.m_velocity.x=this.body.velocity.x;
+        get velocity(): math.vector2 {
+            if (this.m_velocity == null) this.m_velocity = new gd3d.math.vector2()
+            this.m_velocity.x = this.body.velocity.x;
             this.m_velocity.y = this.body.velocity.y;
             return this.m_velocity;
         }
