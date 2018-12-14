@@ -213,29 +213,6 @@ namespace gd3d.framework
             //     }
             // }
 
-            this.camera.calcViewPortPixel(assetmgr.app, this.viewPixelrect);
-            switch (this.scaleMode){
-                case UIScaleMode.CONSTANT_PIXEL_SIZE:
-                    if(this.canvas.pixelWidth == this.viewPixelrect.w && this.canvas.pixelHeight == this.viewPixelrect.h) break;
-                    this.canvas.pixelWidth = this.viewPixelrect.w;
-                    this.canvas.pixelHeight = this.viewPixelrect.h;
-                    this.canvas.getRoot().markDirty();
-                break;
-                case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
-                    let match = this.screenMatchRate < 0 ? 0: this.screenMatchRate;
-                    match = match>1? 1:match;
-                    let asp = this.viewPixelrect.w / this.viewPixelrect.h;
-                    let w = math.numberLerp(this.matchReference_width,this.matchReference_height * asp,match);
-                    let h = math.numberLerp(this.matchReference_height,this.matchReference_width / asp, 1 - match );
-                    if (this.canvas.pixelWidth != w || this.canvas.pixelHeight != h)
-                    {
-                        this.canvas.pixelWidth = w;
-                        this.canvas.pixelHeight = h;
-                        this.canvas.getRoot().markDirty();
-                    }
-                break;
-            }
-
             context.updateOverlay();
             this.canvas.render(context, assetmgr);
         }
@@ -248,6 +225,32 @@ namespace gd3d.framework
          */
         update(delta: number)
         {
+            //layout update
+            if (this.canvas.getRoot().visible && this.camera){
+                this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+                switch (this.scaleMode){
+                    case UIScaleMode.CONSTANT_PIXEL_SIZE:
+                        if(this.canvas.pixelWidth == this.viewPixelrect.w && this.canvas.pixelHeight == this.viewPixelrect.h) break;
+                        this.canvas.pixelWidth = this.viewPixelrect.w;
+                        this.canvas.pixelHeight = this.viewPixelrect.h;
+                        this.canvas.getRoot().markDirty();
+                    break;
+                    case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
+                        let match = this.screenMatchRate < 0 ? 0: this.screenMatchRate;
+                        match = match>1? 1:match;
+                        let asp = this.viewPixelrect.w / this.viewPixelrect.h;
+                        let w = math.numberLerp(this.matchReference_width,this.matchReference_height * asp,match);
+                        let h = math.numberLerp(this.matchReference_height,this.matchReference_width / asp, 1 - match );
+                        if (this.canvas.pixelWidth != w || this.canvas.pixelHeight != h)
+                        {
+                            this.canvas.pixelWidth = w;
+                            this.canvas.pixelHeight = h;
+                            this.canvas.getRoot().markDirty();
+                        }
+                    break;
+                }
+            }
+
             // this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
             // let rect = this.camera.viewport;
             // let real_x = this.inputmgr.point.x - rect.x * this.app.width ;
