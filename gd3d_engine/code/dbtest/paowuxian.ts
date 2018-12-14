@@ -106,10 +106,10 @@ namespace dome
                 //炮车集合
                 let targets1:gd3d.framework.transform[]=[];
                 //障碍物集合
-                let targets2:gd3d.framework.transform[]=this.targets;
-                targets1=targets2;
+                let targets2:gd3d.framework.transform[]=[];
+                // targets1=targets2;
                 this.beNeedRecompute=true;
-                if(this.detectTarget_2(targets1,targets2,info))
+                if(this.detectTarget_2(this.targets,targets2,info))
                 {
                     gd3d.math.vec3Clone(info.hitposition,this.guanghuan.localPosition);
                     let axis=new gd3d.math.vector3();
@@ -174,45 +174,36 @@ namespace dome
          */
         private detectTarget_2(targets1:gd3d.framework.transform[],targets2:gd3d.framework.transform[],info:gd3d.framework.pickinfo):boolean
         {
-            if(this.linedetectcollider(this.worldStart,this.worldMiddle,targets1,info))
+            let newtargets=[];
+            if(this.linedetectcollider(this.worldStart,this.worldMiddle,targets1,newtargets))
             {
-                if(this.detectSecond_Collider(info.pickedtran,info))
+                if(this.detectSecond_Colliders(newtargets,info))
                 {
                     // console.error("collider:"+info.pickedtran.name);
                     return true;
                 }
             }
-            if(this.linedetectcollider(this.worldMiddle,this.worldEnd,targets1,info))
+            newtargets=[];
+            if(this.linedetectcollider(this.worldMiddle,this.worldEnd,targets1,newtargets))
             {
-                if(this.detectSecond_Collider(info.pickedtran,info))
+                if(this.detectSecond_Colliders(newtargets,info))
                 {
                     // console.error("collider:"+info.pickedtran.name);
                     return true;
                 }
             }
-            if(this.linedetectcollider(this.worldStart,this.worldMiddle,targets2,info))
+            newtargets=[];
+            if(this.linedetectcollider(this.worldStart,this.worldMiddle,targets2,newtargets))
             {
-                if(info.pickedtran.gameObject.getComponent("meshFilter")!=null)
+                if(this.detectSecond_Meshs(newtargets,info))
                 {
-                    if(this.detectSecond_Mesh(info.pickedtran,info))
-                    {
-                        return true;
-                    }
-                }else
-                {
-                    for(let i=0;i<info.pickedtran.children.length;i++)
-                    {
-                        if(this.detectSecond_Mesh(info.pickedtran,info))
-                        {
-                            return true;
-                        }
-                    }
+                    return true;
                 }
-
             }
-            if(this.linedetectcollider(this.worldMiddle,this.worldEnd,targets2,info))
+            newtargets=[];
+            if(this.linedetectcollider(this.worldMiddle,this.worldEnd,targets2,newtargets))
             {
-                if(this.detectSecond_Mesh(info.pickedtran,info))
+                if(this.detectSecond_Meshs(newtargets,info))
                 {
                     return true;
                 }
@@ -241,6 +232,27 @@ namespace dome
         //     }
         //     return false;
         // }
+
+        private detectSecond_Colliders(target:gd3d.framework.transform[],info:gd3d.framework.pickinfo):boolean
+        {
+            let distancc:number=Number.MAX_VALUE;
+            let picked=false;
+            for(let i=0;i<target.length;i++)
+            {
+                let _info=new gd3d.framework.pickinfo();
+                if(this.detectSecond_Collider(target[i],_info))
+                {
+                    if(_info.distance<distancc)
+                    {
+                        picked=true;
+                        distancc=_info.distance;
+                        info.cloneFrom(_info);
+                    }
+                }
+            }
+            return picked;
+        }
+
         private detectSecond_Collider(target:gd3d.framework.transform,info:gd3d.framework.pickinfo):boolean
         {
             if(this.beNeedRecompute)
@@ -259,6 +271,27 @@ namespace dome
             }
             return false;
         }
+
+        private detectSecond_Meshs(target:gd3d.framework.transform[],info:gd3d.framework.pickinfo):boolean
+        {
+            let distancc:number=Number.MAX_VALUE;
+            let picked=false;
+            for(let i=0;i<target.length;i++)
+            {
+                let _info=new gd3d.framework.pickinfo();
+                if(this.detectSecond_Mesh(target[i],_info))
+                {
+                    if(_info.distance<distancc)
+                    {
+                        picked=true;
+                        distancc=_info.distance;
+                        info.cloneFrom(_info);
+                    }
+                }
+            }
+            return picked;
+        }
+
         private detectSecond_Mesh(target:gd3d.framework.transform,info:gd3d.framework.pickinfo):boolean
         {
             if(this.beNeedRecompute)
@@ -284,7 +317,7 @@ namespace dome
             return false;
         }
 
-        private linedetectcollider(start:gd3d.math.vector3,end:gd3d.math.vector3,targets:gd3d.framework.transform[],info:gd3d.framework.pickinfo):boolean
+        private linedetectcollider(start:gd3d.math.vector3,end:gd3d.math.vector3,targets:gd3d.framework.transform[],newtargets:gd3d.framework.transform[]):boolean
         {
             let dir=new gd3d.math.vector3();
             gd3d.math.vec3Subtract(end,start,dir);
@@ -303,20 +336,10 @@ namespace dome
                     if(_info.distance<len)
                     {
                         picked=true;
-                        
-                        if(_info.distance<distance)
-                        {
-                            distance=_info.distance;
-                            info.cloneFrom(_info);
-                            // console.warn("picktrans:"+_info.pickedtran.gameObject.getName()+"   distance:"+distance);
-                        }
+                        newtargets.push(_info.pickedtran);
                     }
                 }
             }
-            // if(picked)
-            // {
-            //     console.warn("result:"+info.pickedtran.name);
-            // }
             return picked;
         }
         private lineDetectMesh(start:gd3d.math.vector3,end:gd3d.math.vector3,target:gd3d.framework.transform,info:gd3d.framework.pickinfo):boolean
@@ -688,13 +711,14 @@ namespace dome
                         if(collider!=null)
                         {
                             collider.colliderVisible=true;
+                            this.targets.push(trans);
                         }
                         if(trans.children!=null)
                         {
                             for(let key in trans.children)
                             {
                                 showColider(trans.children[key]);
-                                this.targets.push(trans.children[key]);
+                                // this.targets.push(trans.children[key]);
                             }
                         }
                     }
@@ -722,10 +746,10 @@ namespace dome
             for(let i=0;i<LinePoints.length-1;i++)
             {
                 let dir=new gd3d.math.vector3();
-                gd3d.math.vec3Subtract(this.pointArr[i],this.pointArr[i+1],dir);
+                gd3d.math.vec3Subtract(LinePoints[i+1],LinePoints[i],dir);
                 let len=gd3d.math.vec3Length(dir);
                 gd3d.math.vec3Normalize(dir,dir);
-                let ray=new gd3d.framework.ray(this.pointArr[i],dir);
+                let ray=new gd3d.framework.ray(LinePoints[i],dir);
                
                 for (let j = 0; j < mesh.submesh.length; j++)
                 {
@@ -772,10 +796,10 @@ namespace dome
             for(let i=0;i<LinePoints.length-1;i++)
             {
                 let dir=new gd3d.math.vector3();
-                gd3d.math.vec3Subtract(this.pointArr[i],this.pointArr[i+1],dir);
+                gd3d.math.vec3Subtract(LinePoints[i+1],LinePoints[i],dir);
                 let len=gd3d.math.vec3Length(dir);
                 gd3d.math.vec3Normalize(dir,dir);
-                let ray=new gd3d.framework.ray(this.pointArr[i],dir);
+                let ray=new gd3d.framework.ray(LinePoints[i],dir);
                 let tempinfo=gd3d.math.pool.new_pickInfo();
                 let bool=ray.intersectCollider(target,tempinfo);
                 if (bool)
@@ -787,6 +811,7 @@ namespace dome
                         {
                             ishided = true;
                             outInfo.cloneFrom(tempinfo);
+                            outInfo.distance=dist;
                             lastDistance = dist;
                         }
                     }
