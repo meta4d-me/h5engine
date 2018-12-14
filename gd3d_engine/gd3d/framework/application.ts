@@ -235,6 +235,8 @@ namespace gd3d.framework
 
             // this.webgl = <WebGLRenderingContext>canvas.getContext('webgl') ||
             //     <WebGLRenderingContext>canvas.getContext("experimental-webgl");
+
+
             this.ccWidth = canvas.clientWidth;
             this.ccHeight = canvas.clientHeight;
 
@@ -256,6 +258,7 @@ namespace gd3d.framework
                 alert("Failed to get webgl at the application.start()");
                 throw Error("Failed to get webgl at the application.start()");
             }
+            let devicePixelRatio = window.devicePixelRatio || 1;
             this.canvasFixedType = type;
             // if (this.outcontainer)
             {
@@ -263,22 +266,22 @@ namespace gd3d.framework
                 {
                     case CanvasFixedType.Free:
                         this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
-                        canvas.width = this.ccWidth;
-                        canvas.height = this.ccHeight;
+                        canvas.width = this.ccWidth*devicePixelRatio;
+                        canvas.height = this.ccHeight*devicePixelRatio;
                         this._scaleFromPandding = 1;
                         break;
                     case CanvasFixedType.FixedWidthType:
                         this.canvasFixWidth = val;
                         this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
-                        canvas.width = this._fixWidth;
-                        canvas.height = this._fixWidth * this.ccHeight / this.ccWidth;
+                        canvas.width = this._fixWidth*devicePixelRatio;
+                        canvas.height = canvas.width * this.ccHeight / this.ccWidth;
                         this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
                         break;
                     case CanvasFixedType.FixedHeightType:
                         this.canvasFixHeight = val;
                         this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
-                        canvas.height = this._fixHeight;
-                        canvas.width = this.ccWidth * this._fixHeight / this.ccHeight;
+                        canvas.height = this._fixHeight*devicePixelRatio;
+                        canvas.width = canvas.height * this._fixHeight / this.ccHeight;
                         this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
                         break;
                 }

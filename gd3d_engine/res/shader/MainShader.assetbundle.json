@@ -37,6 +37,18 @@
           "length":0
           },
       {
+          "name":"resources/base/alphaTest.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/base/alphaTest.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/base/alphaTest.vs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/base/diffuse.fs.glsl",
           "length":0
           },
@@ -162,6 +174,14 @@
           },
       {
           "name":"resources/posteffect/blur.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/colorcorrect.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/posteffect/colorcorrect.shader.json",
           "length":0
           },
       {
