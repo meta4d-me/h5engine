@@ -326,8 +326,7 @@ namespace gd3d.framework
 
             this.rootNode.pivot.x = 0;
             this.rootNode.pivot.y = 0;
-            this.rootNode.updateTran(false);
-
+            
             {//updateinput
                 //重置event
                 this.pointEvent.eated = false;
@@ -372,6 +371,7 @@ namespace gd3d.framework
                 }
             }
 
+            this.rootNode.updateTran(false);
             //this.rootNode.update(delta);
             if (this.scene.app.bePlay)
             {
