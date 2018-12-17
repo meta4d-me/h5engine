@@ -275,14 +275,14 @@ namespace gd3d.framework
                         this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
                         canvas.width = this._fixWidth*devicePixelRatio;
                         canvas.height = canvas.width * this.ccHeight / this.ccWidth;
-                        this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
+                        this._scaleFromPandding = canvas.height / this.webgl.canvas.height;
                         break;
                     case CanvasFixedType.FixedHeightType:
                         this.canvasFixHeight = val;
                         this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
                         canvas.height = this._fixHeight*devicePixelRatio;
                         canvas.width = canvas.height * this._fixHeight / this.ccHeight;
-                        this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
+                        this._scaleFromPandding = canvas.height / this.webgl.canvas.height;
                         break;
                 }
             }
@@ -318,7 +318,7 @@ namespace gd3d.framework
 
         markNotify(trans: any, type: NotifyType)
         {
-            this.doNotify(trans, type);
+            // this.doNotify(trans, type);
         }
 
         private doNotify(trans: transform, type: NotifyType)

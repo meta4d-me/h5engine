@@ -226,30 +226,7 @@ namespace gd3d.framework
         update(delta: number)
         {
             //layout update
-            if (this.canvas.getRoot().visible && this.camera){
-                this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
-                switch (this.scaleMode){
-                    case UIScaleMode.CONSTANT_PIXEL_SIZE:
-                        if(this.canvas.pixelWidth == this.viewPixelrect.w && this.canvas.pixelHeight == this.viewPixelrect.h) break;
-                        this.canvas.pixelWidth = this.viewPixelrect.w;
-                        this.canvas.pixelHeight = this.viewPixelrect.h;
-                        this.canvas.getRoot().markDirty();
-                    break;
-                    case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
-                        let match = this.screenMatchRate < 0 ? 0: this.screenMatchRate;
-                        match = match>1? 1:match;
-                        let asp = this.viewPixelrect.w / this.viewPixelrect.h;
-                        let w = math.numberLerp(this.matchReference_width,this.matchReference_height * asp,match);
-                        let h = math.numberLerp(this.matchReference_height,this.matchReference_width / asp, 1 - match );
-                        if (this.canvas.pixelWidth != w || this.canvas.pixelHeight != h)
-                        {
-                            this.canvas.pixelWidth = w;
-                            this.canvas.pixelHeight = h;
-                            this.canvas.getRoot().markDirty();
-                        }
-                    break;
-                }
-            }
+            this.ckScaleMode();
 
             // this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
             // let rect = this.camera.viewport;
@@ -266,6 +243,44 @@ namespace gd3d.framework
 
             //canvas de update 直接集成pointevent处理
             this.canvas.update(delta, this.inputmgr.point.touch, mPos.x, mPos.y);
+        }
+
+        private lastVPRect = new math.rect();
+        //检查缩放模式 改变
+        private ckScaleMode(){
+            if(!this.canvas.getRoot().visible || !this.camera) return;
+            this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+            let dirty = false;
+            let _w = this.viewPixelrect.w;
+            let _h = this.viewPixelrect.h;
+            if(math.rectEqul(this.lastVPRect,this.viewPixelrect)){
+                switch(this.scaleMode){
+                    case UIScaleMode.CONSTANT_PIXEL_SIZE:
+
+                    break;
+                    case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
+                        let match = this.screenMatchRate < 0 ? 0: this.screenMatchRate;
+                        match = match>1? 1:match;
+                        let asp = this.viewPixelrect.w / this.viewPixelrect.h;
+                        _w = math.numberLerp(this.matchReference_width,this.matchReference_height * asp,match);
+                        _h = math.numberLerp(this.matchReference_height,this.matchReference_width / asp, 1 - match );
+                        if(this.canvas.pixelWidth != _w || this.canvas.pixelHeight != _h){
+                            dirty = true;
+                        }
+                    break;
+                }
+            }else{
+                //rect 不等 需要重刷
+                dirty = true;
+            }
+
+            math.rectClone(this.viewPixelrect,this.lastVPRect);
+
+            if(dirty){
+                this.canvas.pixelWidth = _w;
+                this.canvas.pixelHeight = _h;
+                this.canvas.getRoot().markDirty();
+            }
         }
 
         /**
