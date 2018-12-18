@@ -3996,8 +3996,6 @@ var t;
                     console.log("Vignetting");
                 }
                 else if (select.value == "10") {
-                    var actr = _this.scene.mainCamera.gameObject.addComponent("colorCorrect");
-                    console.log("colorCorrect");
                 }
             };
             this.addbtn("60px", "深度图", function () {

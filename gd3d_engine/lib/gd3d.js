@@ -182,34 +182,18 @@ var gd3d;
                     alert("Failed to get webgl at the application.start()");
                     throw Error("Failed to get webgl at the application.start()");
                 }
-                var devicePixelRatio = window.devicePixelRatio || 1;
-                this.canvasFixedType = type;
-                {
-                    switch (type) {
-                        case CanvasFixedType.Free:
-                            this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
-                            canvas.width = this.ccWidth * devicePixelRatio;
-                            canvas.height = this.ccHeight * devicePixelRatio;
-                            this._scaleFromPandding = 1;
-                            break;
-                        case CanvasFixedType.FixedWidthType:
-                            this.canvasFixWidth = val;
-                            this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
-                            canvas.width = this._fixWidth * devicePixelRatio;
-                            canvas.height = canvas.width * this.ccHeight / this.ccWidth;
-                            this._scaleFromPandding = canvas.height / this.webgl.canvas.height;
-                            break;
-                        case CanvasFixedType.FixedHeightType:
-                            this.canvasFixHeight = val;
-                            this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
-                            canvas.height = this._fixHeight * devicePixelRatio;
-                            canvas.width = canvas.height * this._fixHeight / this.ccHeight;
-                            this._scaleFromPandding = canvas.height / this.webgl.canvas.height;
-                            break;
-                    }
+                switch (type) {
+                    case CanvasFixedType.FixedWidthType:
+                        this.canvasFixWidth = val;
+                        break;
+                    case CanvasFixedType.FixedHeightType:
+                        this.canvasFixHeight = val;
+                        break;
                 }
-                this._canvasClientWidth = canvas.width;
-                this._canvasClientHeight = canvas.height;
+                this.canvasFixedType = type;
+                this.setScreenAsp();
+                this._canvasClientWidth = this.ccWidth;
+                this._canvasClientHeight = this.ccHeight;
                 gd3d.render.webglkit.initConst(this.webgl);
                 this.initRender();
                 this.initAssetMgr();
@@ -314,21 +298,34 @@ var gd3d;
                 if (this.ccWidth != this._canvasClientWidth || this.ccHeight != this._canvasClientHeight) {
                     this._canvasClientWidth = this.ccWidth;
                     this._canvasClientHeight = this.ccHeight;
-                    if (this.canvasFixedType == CanvasFixedType.Free) {
-                        this.webgl.canvas.width = this.ccWidth;
-                        this.webgl.canvas.height = this.ccHeight;
+                    this.setScreenAsp();
+                }
+            };
+            application.prototype.setScreenAsp = function () {
+                if (!this.webgl || !this.webgl.canvas)
+                    return;
+                var canvas = this.webgl.canvas;
+                var devicePixelRatio = window.devicePixelRatio || 1;
+                var type = this.canvasFixedType;
+                switch (type) {
+                    case CanvasFixedType.Free:
+                        this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
+                        canvas.width = this.ccWidth * devicePixelRatio;
+                        canvas.height = this.ccHeight * devicePixelRatio;
                         this._scaleFromPandding = 1;
-                    }
-                    else if (this.canvasFixedType == CanvasFixedType.FixedWidthType) {
-                        this.webgl.canvas.width = this._fixWidth;
-                        this.webgl.canvas.height = this._fixWidth * this.ccHeight / this.ccWidth;
-                        this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
-                    }
-                    else if (this.canvasFixedType == CanvasFixedType.FixedHeightType) {
-                        this.webgl.canvas.height = this._fixHeight;
-                        this.webgl.canvas.width = this.ccWidth * this._fixHeight / this.ccHeight;
-                        this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
-                    }
+                        break;
+                    case CanvasFixedType.FixedWidthType:
+                        this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
+                        canvas.width = this._fixWidth * devicePixelRatio;
+                        canvas.height = canvas.width * this.ccHeight / this.ccWidth;
+                        this._scaleFromPandding = this.ccHeight * devicePixelRatio / this.webgl.canvas.height;
+                        break;
+                    case CanvasFixedType.FixedHeightType:
+                        this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
+                        canvas.height = this._fixHeight * devicePixelRatio;
+                        canvas.width = this.ccWidth * canvas.height / this.ccHeight;
+                        this._scaleFromPandding = this.ccHeight * devicePixelRatio / this.webgl.canvas.height;
+                        break;
                 }
             };
             application.prototype.getUserUpdateTimer = function () {
@@ -19586,8 +19583,8 @@ var gd3d;
                 if (ev.detail) {
                     this.lastWheel = -1 * ev.detail;
                 }
-                else if (ev.wheelDelta) {
-                    this.lastWheel = ev.wheelDelta / 120;
+                else if (ev.DOM_DELTA_PIXEL) {
+                    this.lastWheel = ev.DOM_DELTA_PIXEL / 120;
                 }
                 else {
                     this.lastWheel = 0;

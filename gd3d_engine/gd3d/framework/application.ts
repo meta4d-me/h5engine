@@ -258,37 +258,47 @@ namespace gd3d.framework
                 alert("Failed to get webgl at the application.start()");
                 throw Error("Failed to get webgl at the application.start()");
             }
-            let devicePixelRatio = window.devicePixelRatio || 1;
-            this.canvasFixedType = type;
-            // if (this.outcontainer)
-            {
-                switch (type)
-                {
-                    case CanvasFixedType.Free:
-                        this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
-                        canvas.width = this.ccWidth*devicePixelRatio;
-                        canvas.height = this.ccHeight*devicePixelRatio;
-                        this._scaleFromPandding = 1;
-                        break;
-                    case CanvasFixedType.FixedWidthType:
-                        this.canvasFixWidth = val;
-                        this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
-                        canvas.width = this._fixWidth*devicePixelRatio;
-                        canvas.height = canvas.width * this.ccHeight / this.ccWidth;
-                        this._scaleFromPandding = canvas.height / this.webgl.canvas.height;
-                        break;
-                    case CanvasFixedType.FixedHeightType:
-                        this.canvasFixHeight = val;
-                        this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
-                        canvas.height = this._fixHeight*devicePixelRatio;
-                        canvas.width = canvas.height * this._fixHeight / this.ccHeight;
-                        this._scaleFromPandding = canvas.height / this.webgl.canvas.height;
-                        break;
-                }
+
+            switch (type){
+                case CanvasFixedType.FixedWidthType: this.canvasFixWidth = val; break;
+                case CanvasFixedType.FixedHeightType: this.canvasFixHeight = val; break;
             }
 
-            this._canvasClientWidth = canvas.width; //this.webgl.canvas.clientWidth;
-            this._canvasClientHeight = canvas.height;//this.webgl.canvas.clientHeight;
+            // let devicePixelRatio = window.devicePixelRatio || 1;
+            this.canvasFixedType = type;
+            // // if (this.outcontainer)
+            // {
+            //     switch (type)
+            //     {
+            //         case CanvasFixedType.Free:
+            //             this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
+            //             canvas.width = this.ccWidth*devicePixelRatio;
+            //             canvas.height = this.ccHeight*devicePixelRatio;
+            //             this._scaleFromPandding = 1;
+            //             break;
+            //         case CanvasFixedType.FixedWidthType:
+            //             this.canvasFixWidth = val;
+            //             this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
+            //             canvas.width = this._fixWidth*devicePixelRatio;
+            //             canvas.height = canvas.width * this.ccHeight / this.ccWidth;
+            //             //this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
+            //             this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
+            //             break;
+            //         case CanvasFixedType.FixedHeightType:
+            //             this.canvasFixHeight = val;
+            //             this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
+            //             canvas.height = this._fixHeight*devicePixelRatio;
+            //             canvas.width = canvas.height * this._fixHeight / this.ccHeight;
+            //             this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
+            //             break;
+            //     }
+            // }
+            this.setScreenAsp();
+
+            // this._canvasClientWidth = canvas.width; //this.webgl.canvas.clientWidth;
+            // this._canvasClientHeight = canvas.height;//this.webgl.canvas.clientHeight;
+            this._canvasClientWidth = this.ccWidth; //this.webgl.canvas.clientWidth;
+            this._canvasClientHeight = this.ccHeight;//this.webgl.canvas.clientHeight;
             gd3d.render.webglkit.initConst(this.webgl);
             this.initRender();
             this.initAssetMgr();
@@ -459,27 +469,59 @@ namespace gd3d.framework
             {
                 this._canvasClientWidth = this.ccWidth;
                 this._canvasClientHeight = this.ccHeight;
-                if (this.canvasFixedType == CanvasFixedType.Free)
-                {
-                    this.webgl.canvas.width = this.ccWidth;
-                    this.webgl.canvas.height = this.ccHeight;
-                    this._scaleFromPandding = 1;
-                }
-                else if (this.canvasFixedType == CanvasFixedType.FixedWidthType)
-                {
-                    this.webgl.canvas.width = this._fixWidth;
-                    this.webgl.canvas.height = this._fixWidth * this.ccHeight / this.ccWidth;
-                    this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
-                } else if (this.canvasFixedType == CanvasFixedType.FixedHeightType)
-                {
-                    this.webgl.canvas.height = this._fixHeight;
-                    this.webgl.canvas.width = this.ccWidth * this._fixHeight / this.ccHeight;
-                    this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
-                }
+                this.setScreenAsp();
+
+                // if (this.canvasFixedType == CanvasFixedType.Free)
+                // {
+                //     this.webgl.canvas.width = this.ccWidth;
+                //     this.webgl.canvas.height = this.ccHeight;
+                //     this._scaleFromPandding = 1;
+                // }
+                // else if (this.canvasFixedType == CanvasFixedType.FixedWidthType)
+                // {
+                //     this.webgl.canvas.width = this._fixWidth;
+                //     this.webgl.canvas.height = this._fixWidth * this.ccHeight / this.ccWidth;
+                //     this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
+                // } else if (this.canvasFixedType == CanvasFixedType.FixedHeightType)
+                // {
+                //     this.webgl.canvas.height = this._fixHeight;
+                //     this.webgl.canvas.width = this.ccWidth * this._fixHeight / this.ccHeight;
+                //     this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
+                // }
                 // console.log("_fixWidth:" + this._fixWidth + "   _fixHeight:" + this._fixHeight);
                 // console.log("canvas resize.   width:" + this.webgl.canvas.width + "   height:" + this.webgl.canvas.height);
                 // console.log("canvas resize.   clientWidth:" + this.webgl.canvas.clientWidth + "   clientHeight:" + this.webgl.canvas.clientHeight);
 
+            }
+        }
+
+        //设置屏幕的 ASP
+        private setScreenAsp(){
+            if(!this.webgl || !this.webgl.canvas) return;
+            let canvas = this.webgl.canvas;
+            let devicePixelRatio = window.devicePixelRatio || 1;
+            let type = this.canvasFixedType;
+            switch (type)
+            {
+                case CanvasFixedType.Free:
+                    this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
+                    canvas.width = this.ccWidth*devicePixelRatio;
+                    canvas.height = this.ccHeight*devicePixelRatio;
+                    this._scaleFromPandding = 1;
+                    break;
+                case CanvasFixedType.FixedWidthType:
+                    this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
+                    canvas.width = this._fixWidth*devicePixelRatio;
+                    canvas.height = canvas.width * this.ccHeight / this.ccWidth;
+                    //this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
+                    this._scaleFromPandding = this.ccHeight * devicePixelRatio / this.webgl.canvas.height;
+                    break;
+                case CanvasFixedType.FixedHeightType:
+                    this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
+                    canvas.height = this._fixHeight*devicePixelRatio;
+                    canvas.width = this.ccWidth * canvas.height / this.ccHeight;
+                    this._scaleFromPandding = this.ccHeight * devicePixelRatio / this.webgl.canvas.height;
+                    break;
             }
         }
 

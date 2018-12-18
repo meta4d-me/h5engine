@@ -58,6 +58,7 @@ declare namespace gd3d.framework {
         private beStepNumber;
         private update(delta);
         private updateScreenAsp();
+        private setScreenAsp();
         preusercodetimer: number;
         usercodetime: number;
         getUserUpdateTimer(): number;
