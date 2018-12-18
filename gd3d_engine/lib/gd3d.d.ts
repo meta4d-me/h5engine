@@ -464,7 +464,6 @@ declare namespace gd3d.framework {
         private inputmgr;
         start(camera: camera): void;
         canvas: canvas;
-        autoAsp: boolean;
         screenMatchRate: number;
         matchReference_width: number;
         matchReference_height: number;
@@ -481,6 +480,9 @@ declare namespace gd3d.framework {
         private helpv2_1;
         update(delta: number): void;
         private lastVPRect;
+        private lastScreenMR;
+        private lastMR_width;
+        private lastMR_height;
         private ckScaleMode();
         pick2d(mx: number, my: number, tolerance?: number): transform2D;
         private dopick2d(ModelPos, tran, tolerance?);

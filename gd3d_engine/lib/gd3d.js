@@ -2487,7 +2487,6 @@ var gd3d;
         var overlay2D = (function () {
             function overlay2D() {
                 this.init = false;
-                this.autoAsp = true;
                 this.screenMatchRate = 0;
                 this.matchReference_width = 800;
                 this.matchReference_height = 600;
@@ -2497,6 +2496,9 @@ var gd3d;
                 this.helpv2 = new gd3d.math.vector2();
                 this.helpv2_1 = new gd3d.math.vector2();
                 this.lastVPRect = new gd3d.math.rect();
+                this.lastScreenMR = 0;
+                this.lastMR_width = 0;
+                this.lastMR_height = 0;
                 this.canvas = new framework.canvas();
                 framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
             }
@@ -2543,19 +2545,12 @@ var gd3d;
                     return;
                 this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
                 var dirty = false;
-                var _w = this.viewPixelrect.w;
-                var _h = this.viewPixelrect.h;
                 if (gd3d.math.rectEqul(this.lastVPRect, this.viewPixelrect)) {
                     switch (this.scaleMode) {
                         case UIScaleMode.CONSTANT_PIXEL_SIZE:
                             break;
                         case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
-                            var match = this.screenMatchRate < 0 ? 0 : this.screenMatchRate;
-                            match = match > 1 ? 1 : match;
-                            var asp = this.viewPixelrect.w / this.viewPixelrect.h;
-                            _w = gd3d.math.numberLerp(this.matchReference_width, this.matchReference_height * asp, match);
-                            _h = gd3d.math.numberLerp(this.matchReference_height, this.matchReference_width / asp, 1 - match);
-                            if (this.canvas.pixelWidth != _w || this.canvas.pixelHeight != _h) {
+                            if (this.lastScreenMR != this.screenMatchRate || this.lastMR_width != this.matchReference_width || this.lastMR_height != this.matchReference_height) {
                                 dirty = true;
                             }
                             break;
@@ -2564,12 +2559,30 @@ var gd3d;
                 else {
                     dirty = true;
                 }
+                if (!dirty)
+                    return;
+                var _w = 0;
+                var _h = 0;
                 gd3d.math.rectClone(this.viewPixelrect, this.lastVPRect);
-                if (dirty) {
-                    this.canvas.pixelWidth = _w;
-                    this.canvas.pixelHeight = _h;
-                    this.canvas.getRoot().markDirty();
+                this.lastScreenMR = this.screenMatchRate;
+                this.lastMR_width = this.matchReference_width;
+                this.lastMR_height = this.matchReference_height;
+                switch (this.scaleMode) {
+                    case UIScaleMode.CONSTANT_PIXEL_SIZE:
+                        _w = this.viewPixelrect.w;
+                        _h = this.viewPixelrect.h;
+                        break;
+                    case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
+                        var match = this.screenMatchRate < 0 ? 0 : this.screenMatchRate;
+                        match = match > 1 ? 1 : match;
+                        var asp = this.viewPixelrect.w / this.viewPixelrect.h;
+                        _w = gd3d.math.numberLerp(this.matchReference_width, this.matchReference_height * asp, match);
+                        _h = gd3d.math.numberLerp(this.matchReference_height, this.matchReference_width / asp, 1 - match);
+                        break;
                 }
+                this.canvas.pixelWidth = _w;
+                this.canvas.pixelHeight = _h;
+                this.canvas.getRoot().markDirty();
             };
             overlay2D.prototype.pick2d = function (mx, my, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
@@ -2626,10 +2639,6 @@ var gd3d;
                 gd3d.reflect.Field("canvas"),
                 __metadata("design:type", framework.canvas)
             ], overlay2D.prototype, "canvas", void 0);
-            __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
-            ], overlay2D.prototype, "autoAsp", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
