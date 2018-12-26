@@ -397,8 +397,8 @@
                     console.log("Vignetting");
                 }else if(select.value=="10")
                 {
-                    let actr = this.scene.mainCamera.gameObject.addComponent("colorCorrect") as gd3d.framework.colorCorrect;
-                    console.log("colorCorrect"); 
+                    // let actr = this.scene.mainCamera.gameObject.addComponent("colorCorrect") as gd3d.framework.colorCorrect;
+                    // console.log("colorCorrect"); 
                 }
 
             }

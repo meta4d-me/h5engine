@@ -182,33 +182,18 @@ var gd3d;
                     alert("Failed to get webgl at the application.start()");
                     throw Error("Failed to get webgl at the application.start()");
                 }
-                this.canvasFixedType = type;
-                {
-                    switch (type) {
-                        case CanvasFixedType.Free:
-                            this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
-                            canvas.width = this.ccWidth;
-                            canvas.height = this.ccHeight;
-                            this._scaleFromPandding = 1;
-                            break;
-                        case CanvasFixedType.FixedWidthType:
-                            this.canvasFixWidth = val;
-                            this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
-                            canvas.width = this._fixWidth;
-                            canvas.height = this._fixWidth * this.ccHeight / this.ccWidth;
-                            this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
-                            break;
-                        case CanvasFixedType.FixedHeightType:
-                            this.canvasFixHeight = val;
-                            this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
-                            canvas.height = this._fixHeight;
-                            canvas.width = this.ccWidth * this._fixHeight / this.ccHeight;
-                            this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
-                            break;
-                    }
+                switch (type) {
+                    case CanvasFixedType.FixedWidthType:
+                        this.canvasFixWidth = val;
+                        break;
+                    case CanvasFixedType.FixedHeightType:
+                        this.canvasFixHeight = val;
+                        break;
                 }
-                this._canvasClientWidth = canvas.width;
-                this._canvasClientHeight = canvas.height;
+                this.canvasFixedType = type;
+                this.setScreenAsp();
+                this._canvasClientWidth = this.ccWidth;
+                this._canvasClientHeight = this.ccHeight;
                 gd3d.render.webglkit.initConst(this.webgl);
                 this.initRender();
                 this.initAssetMgr();
@@ -228,7 +213,6 @@ var gd3d;
                 }
             };
             application.prototype.markNotify = function (trans, type) {
-                this.doNotify(trans, type);
             };
             application.prototype.doNotify = function (trans, type) {
                 if (trans == null)
@@ -314,21 +298,34 @@ var gd3d;
                 if (this.ccWidth != this._canvasClientWidth || this.ccHeight != this._canvasClientHeight) {
                     this._canvasClientWidth = this.ccWidth;
                     this._canvasClientHeight = this.ccHeight;
-                    if (this.canvasFixedType == CanvasFixedType.Free) {
-                        this.webgl.canvas.width = this.ccWidth;
-                        this.webgl.canvas.height = this.ccHeight;
+                    this.setScreenAsp();
+                }
+            };
+            application.prototype.setScreenAsp = function () {
+                if (!this.webgl || !this.webgl.canvas)
+                    return;
+                var canvas = this.webgl.canvas;
+                var devicePixelRatio = window.devicePixelRatio || 1;
+                var type = this.canvasFixedType;
+                switch (type) {
+                    case CanvasFixedType.Free:
+                        this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
+                        canvas.width = this.ccWidth * devicePixelRatio;
+                        canvas.height = this.ccHeight * devicePixelRatio;
                         this._scaleFromPandding = 1;
-                    }
-                    else if (this.canvasFixedType == CanvasFixedType.FixedWidthType) {
-                        this.webgl.canvas.width = this._fixWidth;
-                        this.webgl.canvas.height = this._fixWidth * this.ccHeight / this.ccWidth;
-                        this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
-                    }
-                    else if (this.canvasFixedType == CanvasFixedType.FixedHeightType) {
-                        this.webgl.canvas.height = this._fixHeight;
-                        this.webgl.canvas.width = this.ccWidth * this._fixHeight / this.ccHeight;
-                        this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
-                    }
+                        break;
+                    case CanvasFixedType.FixedWidthType:
+                        this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
+                        canvas.width = this._fixWidth * devicePixelRatio;
+                        canvas.height = canvas.width * this.ccHeight / this.ccWidth;
+                        this._scaleFromPandding = this.ccHeight * devicePixelRatio / this.webgl.canvas.height;
+                        break;
+                    case CanvasFixedType.FixedHeightType:
+                        this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
+                        canvas.height = this._fixHeight * devicePixelRatio;
+                        canvas.width = this.ccWidth * canvas.height / this.ccHeight;
+                        this._scaleFromPandding = this.ccHeight * devicePixelRatio / this.webgl.canvas.height;
+                        break;
                 }
             };
             application.prototype.getUserUpdateTimer = function () {
@@ -2028,7 +2025,6 @@ var gd3d;
                 }
                 this.rootNode.pivot.x = 0;
                 this.rootNode.pivot.y = 0;
-                this.rootNode.updateTran(false);
                 {
                     this.pointEvent.eated = false;
                     helpv2.x = this.pointEvent.x = XOnModelSpace;
@@ -2060,6 +2056,7 @@ var gd3d;
                         this.pointY = this.pointEvent.y;
                     }
                 }
+                this.rootNode.updateTran(false);
                 if (this.scene.app.bePlay) {
                     this.objupdate(this.rootNode, delta);
                 }
@@ -2279,7 +2276,6 @@ var gd3d;
                 outP.x = scalx * this.pixelWidth;
                 outP.y = scaly * this.pixelHeight;
             };
-            var canvas_1;
             canvas.ClassName = "canvas";
             canvas.depthTag = "__depthTag__";
             canvas.flowIndexTag = "__flowIndexTag__";
@@ -2300,6 +2296,7 @@ var gd3d;
                 __metadata("design:paramtypes", [])
             ], canvas);
             return canvas;
+            var canvas_1;
         }());
         framework.canvas = canvas;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -2490,7 +2487,6 @@ var gd3d;
         var overlay2D = (function () {
             function overlay2D() {
                 this.init = false;
-                this.autoAsp = true;
                 this.screenMatchRate = 0;
                 this.matchReference_width = 800;
                 this.matchReference_height = 600;
@@ -2499,6 +2495,10 @@ var gd3d;
                 this.viewPixelrect = new gd3d.math.rect();
                 this.helpv2 = new gd3d.math.vector2();
                 this.helpv2_1 = new gd3d.math.vector2();
+                this.lastVPRect = new gd3d.math.rect();
+                this.lastScreenMR = 0;
+                this.lastMR_width = 0;
+                this.lastMR_height = 0;
                 this.canvas = new framework.canvas();
                 framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
             }
@@ -2528,38 +2528,61 @@ var gd3d;
             overlay2D.prototype.render = function (context, assetmgr, camera) {
                 if (!this.canvas.getRoot().visible || !this.camera)
                     return;
-                this.camera.calcViewPortPixel(assetmgr.app, this.viewPixelrect);
-                switch (this.scaleMode) {
-                    case UIScaleMode.CONSTANT_PIXEL_SIZE:
-                        if (this.canvas.pixelWidth == this.viewPixelrect.w && this.canvas.pixelHeight == this.viewPixelrect.h)
-                            break;
-                        this.canvas.pixelWidth = this.viewPixelrect.w;
-                        this.canvas.pixelHeight = this.viewPixelrect.h;
-                        this.canvas.getRoot().markDirty();
-                        break;
-                    case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
-                        var match = this.screenMatchRate < 0 ? 0 : this.screenMatchRate;
-                        match = match > 1 ? 1 : match;
-                        var asp = this.viewPixelrect.w / this.viewPixelrect.h;
-                        var w = gd3d.math.numberLerp(this.matchReference_width, this.matchReference_height * asp, match);
-                        var h = gd3d.math.numberLerp(this.matchReference_height, this.matchReference_width / asp, 1 - match);
-                        if (this.canvas.pixelWidth != w || this.canvas.pixelHeight != h) {
-                            this.canvas.pixelWidth = w;
-                            this.canvas.pixelHeight = h;
-                            this.canvas.getRoot().markDirty();
-                        }
-                        break;
-                }
                 context.updateOverlay();
                 this.canvas.render(context, assetmgr);
             };
             overlay2D.prototype.update = function (delta) {
+                this.ckScaleMode();
                 this.helpv2.x = this.inputmgr.point.x;
                 this.helpv2.y = this.inputmgr.point.y;
                 var sPos = this.helpv2;
                 var mPos = this.helpv2_1;
                 this.calScreenPosToModelPos(sPos, mPos);
                 this.canvas.update(delta, this.inputmgr.point.touch, mPos.x, mPos.y);
+            };
+            overlay2D.prototype.ckScaleMode = function () {
+                if (!this.canvas.getRoot().visible || !this.camera)
+                    return;
+                this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+                var dirty = false;
+                if (gd3d.math.rectEqul(this.lastVPRect, this.viewPixelrect)) {
+                    switch (this.scaleMode) {
+                        case UIScaleMode.CONSTANT_PIXEL_SIZE:
+                            break;
+                        case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
+                            if (this.lastScreenMR != this.screenMatchRate || this.lastMR_width != this.matchReference_width || this.lastMR_height != this.matchReference_height) {
+                                dirty = true;
+                            }
+                            break;
+                    }
+                }
+                else {
+                    dirty = true;
+                }
+                if (!dirty)
+                    return;
+                var _w = 0;
+                var _h = 0;
+                gd3d.math.rectClone(this.viewPixelrect, this.lastVPRect);
+                this.lastScreenMR = this.screenMatchRate;
+                this.lastMR_width = this.matchReference_width;
+                this.lastMR_height = this.matchReference_height;
+                switch (this.scaleMode) {
+                    case UIScaleMode.CONSTANT_PIXEL_SIZE:
+                        _w = this.viewPixelrect.w;
+                        _h = this.viewPixelrect.h;
+                        break;
+                    case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
+                        var match = this.screenMatchRate < 0 ? 0 : this.screenMatchRate;
+                        match = match > 1 ? 1 : match;
+                        var asp = this.viewPixelrect.w / this.viewPixelrect.h;
+                        _w = gd3d.math.numberLerp(this.matchReference_width, this.matchReference_height * asp, match);
+                        _h = gd3d.math.numberLerp(this.matchReference_height, this.matchReference_width / asp, 1 - match);
+                        break;
+                }
+                this.canvas.pixelWidth = _w;
+                this.canvas.pixelHeight = _h;
+                this.canvas.getRoot().markDirty();
             };
             overlay2D.prototype.pick2d = function (mx, my, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
@@ -2616,10 +2639,6 @@ var gd3d;
                 gd3d.reflect.Field("canvas"),
                 __metadata("design:type", framework.canvas)
             ], overlay2D.prototype, "canvas", void 0);
-            __decorate([
-                gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Boolean)
-            ], overlay2D.prototype, "autoAsp", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
@@ -4850,7 +4869,6 @@ var gd3d;
                     dindex++;
                 }
             };
-            var image2D_1;
             image2D.ClassName = "image2D";
             image2D.defUIShader = "shader/defui";
             image2D.defMaskUIShader = "shader/defmaskui";
@@ -4890,6 +4908,7 @@ var gd3d;
                 __metadata("design:paramtypes", [])
             ], image2D);
             return image2D;
+            var image2D_1;
         }());
         framework.image2D = image2D;
         var ImageType;
@@ -5594,7 +5613,6 @@ var gd3d;
             };
             label.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
-            var label_1;
             label.ClassName = "label";
             label.defUIShader = "shader/defuifont";
             label.defMaskUIShader = "shader/defmaskfont";
@@ -5647,6 +5665,7 @@ var gd3d;
                 gd3d.reflect.nodeRender
             ], label);
             return label;
+            var label_1;
         }());
         framework.label = label;
         var HorizontalType;
@@ -5969,7 +5988,6 @@ var gd3d;
             };
             rawImage2D.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
-            var rawImage2D_1;
             rawImage2D.ClassName = "rawImage2D";
             rawImage2D.defUIShader = "shader/defui";
             rawImage2D.defMaskUIShader = "shader/defmaskui";
@@ -5988,6 +6006,7 @@ var gd3d;
                 gd3d.reflect.nodeRender
             ], rawImage2D);
             return rawImage2D;
+            var rawImage2D_1;
         }());
         framework.rawImage2D = rawImage2D;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -9608,7 +9627,6 @@ var gd3d;
                     return item;
                 }
             };
-            var PoseBoneMatrix_1;
             PoseBoneMatrix.ClassName = "PoseBoneMatrix";
             PoseBoneMatrix.poolmats = [];
             __decorate([
@@ -9623,6 +9641,7 @@ var gd3d;
                 gd3d.reflect.SerializeType
             ], PoseBoneMatrix);
             return PoseBoneMatrix;
+            var PoseBoneMatrix_1;
         }());
         framework.PoseBoneMatrix = PoseBoneMatrix;
         var subClip = (function () {
@@ -11827,7 +11846,6 @@ var gd3d;
                 }
                 return JSON.stringify(obj);
             };
-            var material_2;
             material.ClassName = "material";
             __decorate([
                 gd3d.reflect.Field("constText"),
@@ -11842,6 +11860,7 @@ var gd3d;
                 __metadata("design:paramtypes", [String])
             ], material);
             return material;
+            var material_2;
         }());
         framework.material = material;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -12157,13 +12176,13 @@ var gd3d;
                 _result.glMesh.uploadIndexData(framework.sceneMgr.app.getAssetMgr().webgl, 0, indices);
                 return _result;
             };
-            var mesh_1;
             mesh.ClassName = "mesh";
             mesh = mesh_1 = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
             ], mesh);
             return mesh;
+            var mesh_1;
         }());
         framework.mesh = mesh;
         var subMeshInfo = (function () {
@@ -15144,7 +15163,6 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            var effectSystem_1;
             effectSystem.ClassName = "effectSystem";
             effectSystem.fps = 30;
             __decorate([
@@ -15165,6 +15183,7 @@ var gd3d;
                 gd3d.reflect.nodeComponent
             ], effectSystem);
             return effectSystem;
+            var effectSystem_1;
         }());
         framework.effectSystem = effectSystem;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -19039,6 +19058,18 @@ var gd3d;
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
+    var framework;
+    (function (framework) {
+        var PointEvent = (function () {
+            function PointEvent() {
+            }
+            return PointEvent;
+        }());
+        framework.PointEvent = PointEvent;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
     var event;
     (function (event) {
         var UIEventEnum;
@@ -19451,18 +19482,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var PointEvent = (function () {
-            function PointEvent() {
-            }
-            return PointEvent;
-        }());
-        framework.PointEvent = PointEvent;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var pointinfo = (function () {
             function pointinfo() {
                 this.touch = false;
@@ -19498,6 +19517,7 @@ var gd3d;
                 this._contextMenu = function (ev) { ev.preventDefault(); };
                 this.tempV2_0 = new gd3d.math.vector2();
                 this.tempV2_1 = new gd3d.math.vector2();
+                this.devicePixelRatio = window.devicePixelRatio || 1;
                 this.app = app;
                 gd3d.math.matrix3x2MakeRotate(Math.PI * 90 / 180, this.rMtr_90);
                 gd3d.math.matrix3x2MakeRotate(Math.PI * -90 / 180, this.rMtr_n90);
@@ -19572,8 +19592,8 @@ var gd3d;
                 if (ev.detail) {
                     this.lastWheel = -1 * ev.detail;
                 }
-                else if (ev.wheelDelta) {
-                    this.lastWheel = ev.wheelDelta / 120;
+                else if (ev.DOM_DELTA_PIXEL) {
+                    this.lastWheel = ev.DOM_DELTA_PIXEL / 120;
                 }
                 else {
                     this.lastWheel = 0;
@@ -19779,8 +19799,8 @@ var gd3d;
             inputMgr.prototype.CalcuPoint = function (clientX, clientY, out) {
                 if (!out || !this.app || isNaN(clientX) || isNaN(clientY))
                     return;
-                this.tempV2_0.x = clientX / this.app.scaleFromPandding;
-                this.tempV2_0.y = clientY / this.app.scaleFromPandding;
+                this.tempV2_0.x = clientX * this.devicePixelRatio / this.app.scaleFromPandding;
+                this.tempV2_0.y = clientY * this.devicePixelRatio / this.app.scaleFromPandding;
                 gd3d.math.vec2Clone(this.tempV2_0, this.tempV2_1);
                 if (this.app.shouldRotate) {
                     switch (this.app.orientation) {
@@ -22727,6 +22747,17 @@ var gd3d;
             result.rawData[2] = z / w;
         }
         math.matrixTransformVector3 = matrixTransformVector3;
+        function matrixTransformVector4(src, mtx, out) {
+            var x = (src.rawData[0] * mtx.rawData[0]) + (src.rawData[1] * mtx.rawData[4]) + (src.rawData[2] * mtx.rawData[8]) + (src.rawData[3] * mtx.rawData[12]);
+            var y = (src.rawData[0] * mtx.rawData[1]) + (src.rawData[1] * mtx.rawData[5]) + (src.rawData[2] * mtx.rawData[9]) + (src.rawData[3] * mtx.rawData[13]);
+            var z = (src.rawData[0] * mtx.rawData[2]) + (src.rawData[1] * mtx.rawData[6]) + (src.rawData[2] * mtx.rawData[10]) + (src.rawData[3] * mtx.rawData[14]);
+            var w = (src.rawData[0] * mtx.rawData[3]) + (src.rawData[1] * mtx.rawData[7]) + (src.rawData[2] * mtx.rawData[11]) + (src.rawData[3] * mtx.rawData[15]);
+            out.rawData[0] = x;
+            out.rawData[1] = y;
+            out.rawData[2] = z;
+            out.rawData[3] = w;
+        }
+        math.matrixTransformVector4 = matrixTransformVector4;
         function matrixTransformNormal(vector, transformation, result) {
             var x = (vector.x * transformation.rawData[0]) + (vector.y * transformation.rawData[4]) + (vector.z * transformation.rawData[8]);
             var y = (vector.x * transformation.rawData[1]) + (vector.y * transformation.rawData[5]) + (vector.z * transformation.rawData[9]);
@@ -23445,13 +23476,6 @@ var gd3d;
             out.y = from.y * scale.y;
         }
         math.vec2ScaleByVec2 = vec2ScaleByVec2;
-        function vec4Clone(from, to) {
-            to.rawData[0] = from.rawData[0];
-            to.rawData[1] = from.rawData[1];
-            to.rawData[2] = from.rawData[2];
-            to.rawData[3] = from.rawData[3];
-        }
-        math.vec4Clone = vec4Clone;
         function vec2Length(a) {
             return Math.sqrt(a.x * a.x + a.y * a.y);
         }
@@ -23461,13 +23485,6 @@ var gd3d;
             out.y = vector.y * (1 - v) + vector2.y * v;
         }
         math.vec2SLerp = vec2SLerp;
-        function vec4SLerp(vector, vector2, v, out) {
-            out.x = vector.x * (1 - v) + vector2.x * v;
-            out.y = vector.y * (1 - v) + vector2.y * v;
-            out.z = vector.z * (1 - v) + vector2.z * v;
-            out.w = vector.w * (1 - v) + vector2.w * v;
-        }
-        math.vec4SLerp = vec4SLerp;
         function vec2Normalize(from, out) {
             var num = vec2Length(from);
             if (num > Number.MIN_VALUE) {
@@ -23744,6 +23761,40 @@ var gd3d;
             return true;
         }
         math.vec3Equal = vec3Equal;
+    })(math = gd3d.math || (gd3d.math = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var math;
+    (function (math) {
+        function vec4Clone(from, to) {
+            to.rawData[0] = from.rawData[0];
+            to.rawData[1] = from.rawData[1];
+            to.rawData[2] = from.rawData[2];
+            to.rawData[3] = from.rawData[3];
+        }
+        math.vec4Clone = vec4Clone;
+        function vec4SLerp(vector, vector2, v, out) {
+            out.x = vector.x * (1 - v) + vector2.x * v;
+            out.y = vector.y * (1 - v) + vector2.y * v;
+            out.z = vector.z * (1 - v) + vector2.z * v;
+            out.w = vector.w * (1 - v) + vector2.w * v;
+        }
+        math.vec4SLerp = vec4SLerp;
+        function vec4Add(a, b, out) {
+            out.rawData[0] = a.rawData[0] + b.rawData[0];
+            out.rawData[1] = a.rawData[1] + b.rawData[1];
+            out.rawData[2] = a.rawData[2] + b.rawData[2];
+            out.rawData[3] = a.rawData[3] + b.rawData[3];
+        }
+        math.vec4Add = vec4Add;
+        function vec4ScaleByNum(from, scale, out) {
+            out.rawData[0] = from.rawData[0] * scale;
+            out.rawData[1] = from.rawData[1] * scale;
+            out.rawData[2] = from.rawData[2] * scale;
+            out.rawData[3] = from.rawData[3] * scale;
+        }
+        math.vec4ScaleByNum = vec4ScaleByNum;
     })(math = gd3d.math || (gd3d.math = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -24132,6 +24183,50 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var Navigate = (function () {
+            function Navigate(navinfo, navindexmap) {
+                this.navinfo = navinfo;
+                this.navindexmap = navindexmap;
+            }
+            Navigate.prototype.pathPoints = function (start, end, startIndex, endIndex) {
+                var startVec = new framework.navVec3();
+                startVec.x = start.x;
+                startVec.y = start.y;
+                startVec.z = start.z;
+                var endVec = new framework.navVec3();
+                endVec.x = end.x;
+                endVec.y = end.y;
+                endVec.z = end.z;
+                var startPoly = this.navindexmap[startIndex];
+                var endPoly = this.navindexmap[endIndex];
+                if (startPoly >= 0 && endPoly >= 0) {
+                    var polyPath = gd3d.framework.pathFinding.calcAStarPolyPath(this.navinfo, startPoly, endPoly, endVec, 0.3);
+                }
+                if (polyPath) {
+                    var wayPoints = gd3d.framework.pathFinding.calcWayPoints(this.navinfo, startVec, endVec, polyPath);
+                    var navmeshWayPoints = [];
+                    for (var i = 0; i < wayPoints.length; i++) {
+                        navmeshWayPoints[i] = new gd3d.math.vector3(wayPoints[i].x, wayPoints[i].realy, wayPoints[i].z);
+                    }
+                    return navmeshWayPoints;
+                }
+                else {
+                    return null;
+                }
+            };
+            Navigate.prototype.dispose = function () {
+                this.navinfo = null;
+                this.navindexmap = null;
+            };
+            return Navigate;
+        }());
+        framework.Navigate = Navigate;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var NavMeshLoadManager = (function () {
             function NavMeshLoadManager() {
                 this.navMeshVertexOffset = new gd3d.math.vector3(0, 0, 0);
@@ -24325,50 +24420,6 @@ var gd3d;
             return NavMeshLoadManager;
         }());
         framework.NavMeshLoadManager = NavMeshLoadManager;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var Navigate = (function () {
-            function Navigate(navinfo, navindexmap) {
-                this.navinfo = navinfo;
-                this.navindexmap = navindexmap;
-            }
-            Navigate.prototype.pathPoints = function (start, end, startIndex, endIndex) {
-                var startVec = new framework.navVec3();
-                startVec.x = start.x;
-                startVec.y = start.y;
-                startVec.z = start.z;
-                var endVec = new framework.navVec3();
-                endVec.x = end.x;
-                endVec.y = end.y;
-                endVec.z = end.z;
-                var startPoly = this.navindexmap[startIndex];
-                var endPoly = this.navindexmap[endIndex];
-                if (startPoly >= 0 && endPoly >= 0) {
-                    var polyPath = gd3d.framework.pathFinding.calcAStarPolyPath(this.navinfo, startPoly, endPoly, endVec, 0.3);
-                }
-                if (polyPath) {
-                    var wayPoints = gd3d.framework.pathFinding.calcWayPoints(this.navinfo, startVec, endVec, polyPath);
-                    var navmeshWayPoints = [];
-                    for (var i = 0; i < wayPoints.length; i++) {
-                        navmeshWayPoints[i] = new gd3d.math.vector3(wayPoints[i].x, wayPoints[i].realy, wayPoints[i].z);
-                    }
-                    return navmeshWayPoints;
-                }
-                else {
-                    return null;
-                }
-            };
-            Navigate.prototype.dispose = function () {
-                this.navinfo = null;
-                this.navindexmap = null;
-            };
-            return Navigate;
-        }());
-        framework.Navigate = Navigate;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -26150,298 +26201,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var Particle_new = (function () {
-            function Particle_new(batcher) {
-                this.startScale = new gd3d.math.vector3();
-                this.startRotation = new gd3d.math.quaternion();
-                this.rotationByShape = new gd3d.math.quaternion();
-                this.rotAngle = 0;
-                this.rotationByEuler = new gd3d.math.quaternion();
-                this.localMatrix = new gd3d.math.matrix();
-                this.localTranslate = new gd3d.math.vector3();
-                this.localRotation = new gd3d.math.quaternion();
-                this.localScale = new gd3d.math.vector3(1, 1, 1);
-                this.color = new gd3d.math.vector3(1, 1, 1);
-                this.tex_ST = new gd3d.math.vector4(1, 1, 0, 0);
-                this.curLife = 0;
-                this.life = 0;
-                this.speedDir = new gd3d.math.vector3(0, 0, 0);
-                this.actived = true;
-                this.transformVertex = new gd3d.math.matrix();
-                this.matToworld = new gd3d.math.matrix();
-                this.batcher = batcher;
-                this.emisson = batcher.emission;
-                this.gameObject = this.emisson.gameObject;
-                this.vertexStartIndex = batcher.curVerCount;
-                this.dataForVbo = this.emisson.cloneMeshVBO();
-                this.dataForEbo = this.emisson.cloneMeshEBO();
-                this.sourceVbo = this.emisson.vbo;
-                this.initByData();
-            }
-            Particle_new.prototype.uploadData = function (array) {
-                array.set(this.dataForVbo, this.vertexStartIndex * this.emisson.vertexSize);
-            };
-            Particle_new.prototype.initByData = function () {
-                this.totalLife = this.emisson.lifeTime.getValue();
-                framework.effTools.getRandomDirAndPosByZEmission(this.emisson, this.speedDir, this.localTranslate);
-                this.simulationSpeed = this.emisson.simulationSpeed.getValue();
-                this.Starteuler = this.emisson.startEuler.getValue();
-                gd3d.math.quatFromEulerAngles(this.Starteuler.x, this.Starteuler.y, this.Starteuler.z, this.rotationByEuler);
-                this.localScale = this.emisson.startScale.getValue();
-                this.startColor = this.emisson.startColor;
-                this.sizeNodes = this.emisson.sizeNodes;
-                this.colorNodes = this.emisson.colorNodes;
-                this.alphaNodes = this.emisson.alphaNodes;
-                if (this.emisson.enableVelocityOverLifetime) {
-                    this.movespeed = this.emisson.moveSpeed.getValue();
-                }
-                if (this.emisson.enableRotOverLifeTime) {
-                    this.eulerSpeed = this.emisson.angleSpeed.getValue();
-                }
-                if (this.emisson.rendermodel == framework.RenderModel.StretchedBillBoard) {
-                    var localOrgin = gd3d.math.pool.vector3_zero;
-                    gd3d.math.quatLookat(localOrgin, this.speedDir, this.rotationByShape);
-                    var initRot = gd3d.math.pool.new_quaternion();
-                    gd3d.math.quatFromEulerAngles(90, 0, 90, initRot);
-                    gd3d.math.quatMultiply(this.rotationByShape, initRot, this.rotationByShape);
-                    gd3d.math.quatClone(this.rotationByShape, this.localRotation);
-                    gd3d.math.pool.delete_quaternion(initRot);
-                }
-                if (!this.emisson.simulateInLocalSpace) {
-                    this.emissionMatToWorld = new gd3d.math.matrix();
-                    var mat = this.emisson.getmatrixToWorld();
-                    gd3d.math.matrixClone(mat, this.emissionMatToWorld);
-                    this.emissionWorldRotation = new gd3d.math.quaternion();
-                    var quat = this.emisson.getWorldRotation();
-                    gd3d.math.quatClone(quat, this.emissionWorldRotation);
-                }
-            };
-            Particle_new.prototype.update = function (delta) {
-                if (!this.actived)
-                    return;
-                this.curLife += delta;
-                this.life = this.curLife / this.totalLife;
-                gd3d.math.floatClamp(this.life, 0, 1);
-                if (this.curLife >= this.totalLife) {
-                    gd3d.math.matrixZero(this.transformVertex);
-                    this._updateVBO();
-                    this.emisson.deadParticles.push(this);
-                    this.curLife = 0;
-                    this.actived = false;
-                    return;
-                }
-                this._updatePos(delta);
-                this._updateScale(delta);
-                this._updateEuler(delta);
-                this._updateRotation(delta);
-                this._updateLocalMatrix(delta);
-                this._updateColor(delta);
-                this._updateUV(delta);
-                this._updateVBO();
-            };
-            Particle_new.prototype._updateLocalMatrix = function (delta) {
-                gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
-                if (this.emisson.simulateInLocalSpace) {
-                    gd3d.math.matrixMultiply(this.emisson.matToObj, this.localMatrix, this.transformVertex);
-                }
-                else {
-                    gd3d.math.matrixMultiply(this.emissionMatToWorld, this.localMatrix, this.transformVertex);
-                }
-            };
-            Particle_new.prototype.refreshEmissionData = function () {
-                if (this.emisson.simulateInLocalSpace) {
-                    this.emissionMatToWorld = this.emisson.getmatrixToWorld();
-                    this.emissionWorldRotation = this.emisson.getWorldRotation();
-                }
-            };
-            Particle_new.prototype._updateRotation = function (delta) {
-                if (this.emisson.rendermodel == framework.RenderModel.Mesh) {
-                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, this.rotAngle, this.rotationByEuler);
-                    gd3d.math.quatClone(this.rotationByEuler, this.localRotation);
-                }
-                else {
-                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_forward, this.rotAngle, this.rotationByEuler);
-                    this.refreshEmissionData();
-                    var translation = gd3d.math.pool.new_vector3();
-                    var worldTranslation = gd3d.math.pool.new_vector3();
-                    var worldRotation = gd3d.math.pool.new_quaternion();
-                    var invTransformRotation = gd3d.math.pool.new_quaternion();
-                    gd3d.math.vec3Clone(this.localTranslate, translation);
-                    var cam = this.emisson.renderCamera;
-                    var camPosInWorld = cam.gameObject.transform.getWorldTranslate();
-                    gd3d.math.matrixTransformVector3(translation, this.emissionMatToWorld, worldTranslation);
-                    if (this.emisson.rendermodel == framework.RenderModel.BillBoard) {
-                        gd3d.math.quatLookat(worldTranslation, camPosInWorld, worldRotation);
-                    }
-                    else if (this.emisson.rendermodel == framework.RenderModel.HorizontalBillBoard) {
-                        worldRotation.x = -0.5;
-                        worldRotation.y = 0.5;
-                        worldRotation.z = 0.5;
-                        worldRotation.w = 0.5;
-                    }
-                    else if (this.emisson.rendermodel == framework.RenderModel.VerticalBillBoard) {
-                        var forwardTarget = gd3d.math.pool.new_vector3();
-                        gd3d.math.vec3Clone(camPosInWorld, forwardTarget);
-                        forwardTarget.y = worldTranslation.y;
-                        gd3d.math.quatLookat(worldTranslation, forwardTarget, worldRotation);
-                        gd3d.math.pool.delete_vector3(forwardTarget);
-                    }
-                    else if (this.emisson.rendermodel == framework.RenderModel.StretchedBillBoard) {
-                        gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
-                        gd3d.math.matrixMultiply(this.emissionMatToWorld, this.localMatrix, this.matToworld);
-                        var xaxis = gd3d.math.pool.new_vector3();
-                        var yaxis = gd3d.math.pool.new_vector3();
-                        var zaxis = gd3d.math.pool.new_vector3();
-                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_right, this.matToworld, xaxis);
-                        gd3d.math.vec3Normalize(xaxis, xaxis);
-                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_up, this.matToworld, yaxis);
-                        gd3d.math.vec3Normalize(yaxis, yaxis);
-                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_forward, this.matToworld, zaxis);
-                        gd3d.math.vec3Normalize(zaxis, zaxis);
-                        framework.EffectUtil.lookatbyXAxis(worldTranslation, xaxis, yaxis, zaxis, camPosInWorld, worldRotation);
-                        gd3d.math.quatMultiply(this.localRotation, worldRotation, this.localRotation);
-                        gd3d.math.pool.delete_quaternion(worldRotation);
-                        gd3d.math.pool.delete_vector3(translation);
-                        gd3d.math.pool.delete_quaternion(invTransformRotation);
-                        gd3d.math.pool.delete_vector3(xaxis);
-                        gd3d.math.pool.delete_vector3(yaxis);
-                        gd3d.math.pool.delete_vector3(zaxis);
-                        return;
-                    }
-                    gd3d.math.quatClone(this.emissionWorldRotation, invTransformRotation);
-                    gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
-                    gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.localRotation);
-                    gd3d.math.quatMultiply(this.localRotation, this.rotationByEuler, this.localRotation);
-                    gd3d.math.pool.delete_vector3(translation);
-                    gd3d.math.pool.delete_vector3(worldTranslation);
-                    gd3d.math.pool.delete_quaternion(worldRotation);
-                    gd3d.math.pool.delete_quaternion(invTransformRotation);
-                }
-            };
-            Particle_new.prototype._updatePos = function (delta) {
-                var currentTranslate = framework.EffectUtil.vecMuliNum(this.speedDir, this.simulationSpeed);
-                gd3d.math.vec3Add(this.localTranslate, currentTranslate, this.localTranslate);
-                if (this.emisson.enableVelocityOverLifetime) {
-                    this.localTranslate.x += this.movespeed.x * delta;
-                    this.localTranslate.y += this.movespeed.y * delta;
-                    this.localTranslate.z += this.movespeed.z * delta;
-                }
-            };
-            Particle_new.prototype._updateEuler = function (delta) {
-                if (this.emisson.enableRotOverLifeTime) {
-                    this.rotAngle = this.eulerSpeed * this.curLife;
-                }
-            };
-            Particle_new.prototype._updateScale = function (delta) {
-                if (this.emisson.enableSizeOverLifetime) {
-                    for (var i = 0; i < this.sizeNodes.length - 1; i++) {
-                        if (this.sizeNodes[i].key <= this.life && this.sizeNodes[i + 1].key >= this.life) {
-                            var target = gd3d.math.numberLerp(this.sizeNodes[i].value, this.sizeNodes[i + 1].value, (this.life - this.sizeNodes[i].key) / (this.sizeNodes[i + 1].key - this.sizeNodes[i].key));
-                            gd3d.math.vec3ScaleByNum(this.startScale, target, this.localScale);
-                            break;
-                        }
-                    }
-                }
-            };
-            Particle_new.prototype._updateColor = function (delta) {
-                if (this.emisson.enableColorOverLifetime) {
-                    if (this.colorNodes != null) {
-                        for (var i = 0; i < this.colorNodes.length - 1; i++) {
-                            if (this.colorNodes[i].key <= this.life && this.colorNodes[i + 1].key >= this.life) {
-                                gd3d.math.vec3SLerp(this.colorNodes[i].value, this.colorNodes[i + 1].value, (this.life - this.colorNodes[i].key) / (this.colorNodes[i + 1].key - this.colorNodes[i].key), this.color);
-                                break;
-                            }
-                        }
-                    }
-                    if (this.alphaNodes != null) {
-                        for (var i = 0; i < this.alphaNodes.length - 1; i++) {
-                            if (this.alphaNodes[i].key <= this.life && this.alphaNodes[i + 1].key >= this.life) {
-                                this.alpha = gd3d.math.numberLerp(this.alphaNodes[i].value, this.alphaNodes[i + 1].value, (this.life - this.colorNodes[i].key) / (this.colorNodes[i + 1].key - this.colorNodes[i].key));
-                                break;
-                            }
-                        }
-                    }
-                }
-            };
-            Particle_new.prototype._updateUV = function (delta) {
-                if (this.emisson.uvType == framework.UVTypeEnum.UVRoll) {
-                    this.tex_ST.z = this.emisson.uSpeed * this.curLife;
-                    this.tex_ST.w = this.emisson.vSpeed * this.curLife;
-                }
-                else if (this.emisson.uvType == framework.UVTypeEnum.UVSprite) {
-                    var spriteindex = Math.floor(this.life * this.emisson.count);
-                    gd3d.math.spriteAnimation(this.emisson.row, this.emisson.column, spriteindex, this.tex_ST);
-                }
-            };
-            Particle_new.prototype._updateVBO = function () {
-                var vertexSize = this.emisson.vertexSize;
-                for (var i = 0; i < this.emisson.perVertexCount; i++) {
-                    {
-                        var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = this.sourceVbo[i * vertexSize + 0];
-                        vertex.y = this.sourceVbo[i * vertexSize + 1];
-                        vertex.z = this.sourceVbo[i * vertexSize + 2];
-                        gd3d.math.matrixTransformVector3(vertex, this.transformVertex, vertex);
-                        this.dataForVbo[i * vertexSize + 0] = vertex.x;
-                        this.dataForVbo[i * vertexSize + 1] = vertex.y;
-                        this.dataForVbo[i * vertexSize + 2] = vertex.z;
-                        gd3d.math.pool.delete_vector3(vertex);
-                    }
-                    {
-                        var r = this.sourceVbo[i * vertexSize + 3] * this.startColor.r;
-                        var g = this.sourceVbo[i * vertexSize + 4] * this.startColor.g;
-                        var b = this.sourceVbo[i * vertexSize + 5] * this.startColor.b;
-                        var a = this.sourceVbo[i * vertexSize + 6] * this.startColor.a;
-                        if (this.colorNodes != null) {
-                            r = this.color.x;
-                            g = this.color.y;
-                            b = this.color.z;
-                        }
-                        if (this.alphaNodes != null) {
-                            a = this.alpha;
-                        }
-                        r *= this.emisson.colorRate;
-                        g *= this.emisson.colorRate;
-                        b *= this.emisson.colorRate;
-                        a *= this.emisson.colorRate;
-                        r = gd3d.math.floatClamp(r, 0, 3);
-                        g = gd3d.math.floatClamp(g, 0, 3);
-                        b = gd3d.math.floatClamp(b, 0, 3);
-                        a = gd3d.math.floatClamp(a, 0, 3);
-                        this.dataForVbo[i * this.emisson.vertexSize + 3] = r;
-                        this.dataForVbo[i * this.emisson.vertexSize + 4] = g;
-                        this.dataForVbo[i * this.emisson.vertexSize + 5] = b;
-                        this.dataForVbo[i * this.emisson.vertexSize + 6] = a;
-                    }
-                    {
-                        this.dataForVbo[i * vertexSize + 7] = this.sourceVbo[i * vertexSize + 7] * this.tex_ST.x + this.tex_ST.z;
-                        this.dataForVbo[i * vertexSize + 8] = this.sourceVbo[i * vertexSize + 8] * this.tex_ST.y + this.tex_ST.w;
-                    }
-                }
-            };
-            Particle_new.prototype.dispose = function () {
-                this.dataForVbo = null;
-                this.dataForEbo = null;
-                this.startRotation = null;
-                this.localRotation = null;
-                this.rotationByEuler = null;
-                this.rotationByShape = null;
-                this.tex_ST = null;
-                this.localMatrix = null;
-                this.localTranslate = null;
-                this.Starteuler = null;
-                this.localScale = null;
-                this.color = null;
-            };
-            return Particle_new;
-        }());
-        framework.Particle_new = Particle_new;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var Vector3AttributeData = (function () {
             function Vector3AttributeData() {
                 this.init();
@@ -27176,6 +26935,298 @@ var gd3d;
             return effTools;
         }());
         framework.effTools = effTools;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var Particle_new = (function () {
+            function Particle_new(batcher) {
+                this.startScale = new gd3d.math.vector3();
+                this.startRotation = new gd3d.math.quaternion();
+                this.rotationByShape = new gd3d.math.quaternion();
+                this.rotAngle = 0;
+                this.rotationByEuler = new gd3d.math.quaternion();
+                this.localMatrix = new gd3d.math.matrix();
+                this.localTranslate = new gd3d.math.vector3();
+                this.localRotation = new gd3d.math.quaternion();
+                this.localScale = new gd3d.math.vector3(1, 1, 1);
+                this.color = new gd3d.math.vector3(1, 1, 1);
+                this.tex_ST = new gd3d.math.vector4(1, 1, 0, 0);
+                this.curLife = 0;
+                this.life = 0;
+                this.speedDir = new gd3d.math.vector3(0, 0, 0);
+                this.actived = true;
+                this.transformVertex = new gd3d.math.matrix();
+                this.matToworld = new gd3d.math.matrix();
+                this.batcher = batcher;
+                this.emisson = batcher.emission;
+                this.gameObject = this.emisson.gameObject;
+                this.vertexStartIndex = batcher.curVerCount;
+                this.dataForVbo = this.emisson.cloneMeshVBO();
+                this.dataForEbo = this.emisson.cloneMeshEBO();
+                this.sourceVbo = this.emisson.vbo;
+                this.initByData();
+            }
+            Particle_new.prototype.uploadData = function (array) {
+                array.set(this.dataForVbo, this.vertexStartIndex * this.emisson.vertexSize);
+            };
+            Particle_new.prototype.initByData = function () {
+                this.totalLife = this.emisson.lifeTime.getValue();
+                framework.effTools.getRandomDirAndPosByZEmission(this.emisson, this.speedDir, this.localTranslate);
+                this.simulationSpeed = this.emisson.simulationSpeed.getValue();
+                this.Starteuler = this.emisson.startEuler.getValue();
+                gd3d.math.quatFromEulerAngles(this.Starteuler.x, this.Starteuler.y, this.Starteuler.z, this.rotationByEuler);
+                this.localScale = this.emisson.startScale.getValue();
+                this.startColor = this.emisson.startColor;
+                this.sizeNodes = this.emisson.sizeNodes;
+                this.colorNodes = this.emisson.colorNodes;
+                this.alphaNodes = this.emisson.alphaNodes;
+                if (this.emisson.enableVelocityOverLifetime) {
+                    this.movespeed = this.emisson.moveSpeed.getValue();
+                }
+                if (this.emisson.enableRotOverLifeTime) {
+                    this.eulerSpeed = this.emisson.angleSpeed.getValue();
+                }
+                if (this.emisson.rendermodel == framework.RenderModel.StretchedBillBoard) {
+                    var localOrgin = gd3d.math.pool.vector3_zero;
+                    gd3d.math.quatLookat(localOrgin, this.speedDir, this.rotationByShape);
+                    var initRot = gd3d.math.pool.new_quaternion();
+                    gd3d.math.quatFromEulerAngles(90, 0, 90, initRot);
+                    gd3d.math.quatMultiply(this.rotationByShape, initRot, this.rotationByShape);
+                    gd3d.math.quatClone(this.rotationByShape, this.localRotation);
+                    gd3d.math.pool.delete_quaternion(initRot);
+                }
+                if (!this.emisson.simulateInLocalSpace) {
+                    this.emissionMatToWorld = new gd3d.math.matrix();
+                    var mat = this.emisson.getmatrixToWorld();
+                    gd3d.math.matrixClone(mat, this.emissionMatToWorld);
+                    this.emissionWorldRotation = new gd3d.math.quaternion();
+                    var quat = this.emisson.getWorldRotation();
+                    gd3d.math.quatClone(quat, this.emissionWorldRotation);
+                }
+            };
+            Particle_new.prototype.update = function (delta) {
+                if (!this.actived)
+                    return;
+                this.curLife += delta;
+                this.life = this.curLife / this.totalLife;
+                gd3d.math.floatClamp(this.life, 0, 1);
+                if (this.curLife >= this.totalLife) {
+                    gd3d.math.matrixZero(this.transformVertex);
+                    this._updateVBO();
+                    this.emisson.deadParticles.push(this);
+                    this.curLife = 0;
+                    this.actived = false;
+                    return;
+                }
+                this._updatePos(delta);
+                this._updateScale(delta);
+                this._updateEuler(delta);
+                this._updateRotation(delta);
+                this._updateLocalMatrix(delta);
+                this._updateColor(delta);
+                this._updateUV(delta);
+                this._updateVBO();
+            };
+            Particle_new.prototype._updateLocalMatrix = function (delta) {
+                gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
+                if (this.emisson.simulateInLocalSpace) {
+                    gd3d.math.matrixMultiply(this.emisson.matToObj, this.localMatrix, this.transformVertex);
+                }
+                else {
+                    gd3d.math.matrixMultiply(this.emissionMatToWorld, this.localMatrix, this.transformVertex);
+                }
+            };
+            Particle_new.prototype.refreshEmissionData = function () {
+                if (this.emisson.simulateInLocalSpace) {
+                    this.emissionMatToWorld = this.emisson.getmatrixToWorld();
+                    this.emissionWorldRotation = this.emisson.getWorldRotation();
+                }
+            };
+            Particle_new.prototype._updateRotation = function (delta) {
+                if (this.emisson.rendermodel == framework.RenderModel.Mesh) {
+                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, this.rotAngle, this.rotationByEuler);
+                    gd3d.math.quatClone(this.rotationByEuler, this.localRotation);
+                }
+                else {
+                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_forward, this.rotAngle, this.rotationByEuler);
+                    this.refreshEmissionData();
+                    var translation = gd3d.math.pool.new_vector3();
+                    var worldTranslation = gd3d.math.pool.new_vector3();
+                    var worldRotation = gd3d.math.pool.new_quaternion();
+                    var invTransformRotation = gd3d.math.pool.new_quaternion();
+                    gd3d.math.vec3Clone(this.localTranslate, translation);
+                    var cam = this.emisson.renderCamera;
+                    var camPosInWorld = cam.gameObject.transform.getWorldTranslate();
+                    gd3d.math.matrixTransformVector3(translation, this.emissionMatToWorld, worldTranslation);
+                    if (this.emisson.rendermodel == framework.RenderModel.BillBoard) {
+                        gd3d.math.quatLookat(worldTranslation, camPosInWorld, worldRotation);
+                    }
+                    else if (this.emisson.rendermodel == framework.RenderModel.HorizontalBillBoard) {
+                        worldRotation.x = -0.5;
+                        worldRotation.y = 0.5;
+                        worldRotation.z = 0.5;
+                        worldRotation.w = 0.5;
+                    }
+                    else if (this.emisson.rendermodel == framework.RenderModel.VerticalBillBoard) {
+                        var forwardTarget = gd3d.math.pool.new_vector3();
+                        gd3d.math.vec3Clone(camPosInWorld, forwardTarget);
+                        forwardTarget.y = worldTranslation.y;
+                        gd3d.math.quatLookat(worldTranslation, forwardTarget, worldRotation);
+                        gd3d.math.pool.delete_vector3(forwardTarget);
+                    }
+                    else if (this.emisson.rendermodel == framework.RenderModel.StretchedBillBoard) {
+                        gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
+                        gd3d.math.matrixMultiply(this.emissionMatToWorld, this.localMatrix, this.matToworld);
+                        var xaxis = gd3d.math.pool.new_vector3();
+                        var yaxis = gd3d.math.pool.new_vector3();
+                        var zaxis = gd3d.math.pool.new_vector3();
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_right, this.matToworld, xaxis);
+                        gd3d.math.vec3Normalize(xaxis, xaxis);
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_up, this.matToworld, yaxis);
+                        gd3d.math.vec3Normalize(yaxis, yaxis);
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_forward, this.matToworld, zaxis);
+                        gd3d.math.vec3Normalize(zaxis, zaxis);
+                        framework.EffectUtil.lookatbyXAxis(worldTranslation, xaxis, yaxis, zaxis, camPosInWorld, worldRotation);
+                        gd3d.math.quatMultiply(this.localRotation, worldRotation, this.localRotation);
+                        gd3d.math.pool.delete_quaternion(worldRotation);
+                        gd3d.math.pool.delete_vector3(translation);
+                        gd3d.math.pool.delete_quaternion(invTransformRotation);
+                        gd3d.math.pool.delete_vector3(xaxis);
+                        gd3d.math.pool.delete_vector3(yaxis);
+                        gd3d.math.pool.delete_vector3(zaxis);
+                        return;
+                    }
+                    gd3d.math.quatClone(this.emissionWorldRotation, invTransformRotation);
+                    gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
+                    gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.localRotation);
+                    gd3d.math.quatMultiply(this.localRotation, this.rotationByEuler, this.localRotation);
+                    gd3d.math.pool.delete_vector3(translation);
+                    gd3d.math.pool.delete_vector3(worldTranslation);
+                    gd3d.math.pool.delete_quaternion(worldRotation);
+                    gd3d.math.pool.delete_quaternion(invTransformRotation);
+                }
+            };
+            Particle_new.prototype._updatePos = function (delta) {
+                var currentTranslate = framework.EffectUtil.vecMuliNum(this.speedDir, this.simulationSpeed);
+                gd3d.math.vec3Add(this.localTranslate, currentTranslate, this.localTranslate);
+                if (this.emisson.enableVelocityOverLifetime) {
+                    this.localTranslate.x += this.movespeed.x * delta;
+                    this.localTranslate.y += this.movespeed.y * delta;
+                    this.localTranslate.z += this.movespeed.z * delta;
+                }
+            };
+            Particle_new.prototype._updateEuler = function (delta) {
+                if (this.emisson.enableRotOverLifeTime) {
+                    this.rotAngle = this.eulerSpeed * this.curLife;
+                }
+            };
+            Particle_new.prototype._updateScale = function (delta) {
+                if (this.emisson.enableSizeOverLifetime) {
+                    for (var i = 0; i < this.sizeNodes.length - 1; i++) {
+                        if (this.sizeNodes[i].key <= this.life && this.sizeNodes[i + 1].key >= this.life) {
+                            var target = gd3d.math.numberLerp(this.sizeNodes[i].value, this.sizeNodes[i + 1].value, (this.life - this.sizeNodes[i].key) / (this.sizeNodes[i + 1].key - this.sizeNodes[i].key));
+                            gd3d.math.vec3ScaleByNum(this.startScale, target, this.localScale);
+                            break;
+                        }
+                    }
+                }
+            };
+            Particle_new.prototype._updateColor = function (delta) {
+                if (this.emisson.enableColorOverLifetime) {
+                    if (this.colorNodes != null) {
+                        for (var i = 0; i < this.colorNodes.length - 1; i++) {
+                            if (this.colorNodes[i].key <= this.life && this.colorNodes[i + 1].key >= this.life) {
+                                gd3d.math.vec3SLerp(this.colorNodes[i].value, this.colorNodes[i + 1].value, (this.life - this.colorNodes[i].key) / (this.colorNodes[i + 1].key - this.colorNodes[i].key), this.color);
+                                break;
+                            }
+                        }
+                    }
+                    if (this.alphaNodes != null) {
+                        for (var i = 0; i < this.alphaNodes.length - 1; i++) {
+                            if (this.alphaNodes[i].key <= this.life && this.alphaNodes[i + 1].key >= this.life) {
+                                this.alpha = gd3d.math.numberLerp(this.alphaNodes[i].value, this.alphaNodes[i + 1].value, (this.life - this.colorNodes[i].key) / (this.colorNodes[i + 1].key - this.colorNodes[i].key));
+                                break;
+                            }
+                        }
+                    }
+                }
+            };
+            Particle_new.prototype._updateUV = function (delta) {
+                if (this.emisson.uvType == framework.UVTypeEnum.UVRoll) {
+                    this.tex_ST.z = this.emisson.uSpeed * this.curLife;
+                    this.tex_ST.w = this.emisson.vSpeed * this.curLife;
+                }
+                else if (this.emisson.uvType == framework.UVTypeEnum.UVSprite) {
+                    var spriteindex = Math.floor(this.life * this.emisson.count);
+                    gd3d.math.spriteAnimation(this.emisson.row, this.emisson.column, spriteindex, this.tex_ST);
+                }
+            };
+            Particle_new.prototype._updateVBO = function () {
+                var vertexSize = this.emisson.vertexSize;
+                for (var i = 0; i < this.emisson.perVertexCount; i++) {
+                    {
+                        var vertex = gd3d.math.pool.new_vector3();
+                        vertex.x = this.sourceVbo[i * vertexSize + 0];
+                        vertex.y = this.sourceVbo[i * vertexSize + 1];
+                        vertex.z = this.sourceVbo[i * vertexSize + 2];
+                        gd3d.math.matrixTransformVector3(vertex, this.transformVertex, vertex);
+                        this.dataForVbo[i * vertexSize + 0] = vertex.x;
+                        this.dataForVbo[i * vertexSize + 1] = vertex.y;
+                        this.dataForVbo[i * vertexSize + 2] = vertex.z;
+                        gd3d.math.pool.delete_vector3(vertex);
+                    }
+                    {
+                        var r = this.sourceVbo[i * vertexSize + 3] * this.startColor.r;
+                        var g = this.sourceVbo[i * vertexSize + 4] * this.startColor.g;
+                        var b = this.sourceVbo[i * vertexSize + 5] * this.startColor.b;
+                        var a = this.sourceVbo[i * vertexSize + 6] * this.startColor.a;
+                        if (this.colorNodes != null) {
+                            r = this.color.x;
+                            g = this.color.y;
+                            b = this.color.z;
+                        }
+                        if (this.alphaNodes != null) {
+                            a = this.alpha;
+                        }
+                        r *= this.emisson.colorRate;
+                        g *= this.emisson.colorRate;
+                        b *= this.emisson.colorRate;
+                        a *= this.emisson.colorRate;
+                        r = gd3d.math.floatClamp(r, 0, 3);
+                        g = gd3d.math.floatClamp(g, 0, 3);
+                        b = gd3d.math.floatClamp(b, 0, 3);
+                        a = gd3d.math.floatClamp(a, 0, 3);
+                        this.dataForVbo[i * this.emisson.vertexSize + 3] = r;
+                        this.dataForVbo[i * this.emisson.vertexSize + 4] = g;
+                        this.dataForVbo[i * this.emisson.vertexSize + 5] = b;
+                        this.dataForVbo[i * this.emisson.vertexSize + 6] = a;
+                    }
+                    {
+                        this.dataForVbo[i * vertexSize + 7] = this.sourceVbo[i * vertexSize + 7] * this.tex_ST.x + this.tex_ST.z;
+                        this.dataForVbo[i * vertexSize + 8] = this.sourceVbo[i * vertexSize + 8] * this.tex_ST.y + this.tex_ST.w;
+                    }
+                }
+            };
+            Particle_new.prototype.dispose = function () {
+                this.dataForVbo = null;
+                this.dataForEbo = null;
+                this.startRotation = null;
+                this.localRotation = null;
+                this.rotationByEuler = null;
+                this.rotationByShape = null;
+                this.tex_ST = null;
+                this.localMatrix = null;
+                this.localTranslate = null;
+                this.Starteuler = null;
+                this.localScale = null;
+                this.color = null;
+            };
+            return Particle_new;
+        }());
+        framework.Particle_new = Particle_new;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -31370,338 +31421,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var tweenUtil = (function () {
-            function tweenUtil() {
-            }
-            tweenUtil.GetEaseProgress = function (ease_type, linear_progress) {
-                switch (ease_type) {
-                    case tweenMethod.Linear:
-                        return linear_progress;
-                    case tweenMethod.ExpoEaseOut:
-                        return tweenUtil.ExpoEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.ExpoEaseIn:
-                        return tweenUtil.ExpoEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.ExpoEaseOutIn:
-                        return tweenUtil.ExpoEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.ExpoEaseInOut:
-                        return tweenUtil.ExpoEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.CircEaseOut:
-                        return tweenUtil.CircEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.CircEaseIn:
-                        return tweenUtil.CircEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.CircEaseOutIn:
-                        return tweenUtil.CircEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.CircEaseInOut:
-                        return tweenUtil.CircEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuadEaseOut:
-                        return tweenUtil.QuadEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuadEaseIn:
-                        return tweenUtil.QuadEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuadEaseOutIn:
-                        return tweenUtil.QuadEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuadEaseInOut:
-                        return tweenUtil.QuadEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.SineEaseOut:
-                        return tweenUtil.SineEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.SineEaseIn:
-                        return tweenUtil.SineEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.SineEaseOutIn:
-                        return tweenUtil.SineEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.SineEaseInOut:
-                        return tweenUtil.SineEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.CubicEaseOut:
-                        return tweenUtil.CubicEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.CubicEaseIn:
-                        return tweenUtil.CubicEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.CubicEaseOutIn:
-                        return tweenUtil.CubicEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.CubicEaseInOut:
-                        return tweenUtil.CubicEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuartEaseOut:
-                        return tweenUtil.QuartEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuartEaseIn:
-                        return tweenUtil.QuartEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuartEaseOutIn:
-                        return tweenUtil.QuartEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuartEaseInOut:
-                        return tweenUtil.QuartEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuintEaseOut:
-                        return tweenUtil.QuintEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuintEaseIn:
-                        return tweenUtil.QuintEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuintEaseOutIn:
-                        return tweenUtil.QuintEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuintEaseInOut:
-                        return tweenUtil.QuintEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.ElasticEaseOut:
-                        return tweenUtil.ElasticEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.ElasticEaseIn:
-                        return tweenUtil.ElasticEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.ElasticEaseOutIn:
-                        return tweenUtil.ElasticEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.ElasticEaseInOut:
-                        return tweenUtil.ElasticEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.BounceEaseOut:
-                        return tweenUtil.BounceEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.BounceEaseIn:
-                        return tweenUtil.BounceEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.BounceEaseOutIn:
-                        return tweenUtil.BounceEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.BounceEaseInOut:
-                        return tweenUtil.BounceEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.BackEaseOut:
-                        return tweenUtil.BackEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.BackEaseIn:
-                        return tweenUtil.BackEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.BackEaseOutIn:
-                        return tweenUtil.BackEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.BackEaseInOut:
-                        return tweenUtil.BackEaseInOut(linear_progress, 0, 1, 1);
-                    default:
-                        return linear_progress;
-                }
-            };
-            tweenUtil.Linear = function (t, b, c, d) {
-                return c * t / d + b;
-            };
-            tweenUtil.ExpoEaseOut = function (t, b, c, d) {
-                return (t == d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
-            };
-            tweenUtil.ExpoEaseIn = function (t, b, c, d) {
-                return (t == 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
-            };
-            tweenUtil.ExpoEaseInOut = function (t, b, c, d) {
-                if (t == 0)
-                    return b;
-                if (t == d)
-                    return b + c;
-                if ((t /= d / 2) < 1)
-                    return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
-                return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
-            };
-            tweenUtil.ExpoEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.ExpoEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.ExpoEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.CircEaseOut = function (t, b, c, d) {
-                return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
-            };
-            tweenUtil.CircEaseIn = function (t, b, c, d) {
-                return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
-            };
-            tweenUtil.CircEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
-                return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
-            };
-            tweenUtil.CircEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.CircEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.CircEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.QuadEaseOut = function (t, b, c, d) {
-                return -c * (t /= d) * (t - 2) + b;
-            };
-            tweenUtil.QuadEaseIn = function (t, b, c, d) {
-                return c * (t /= d) * t + b;
-            };
-            tweenUtil.QuadEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return c / 2 * t * t + b;
-                return -c / 2 * ((--t) * (t - 2) - 1) + b;
-            };
-            tweenUtil.QuadEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.QuadEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.QuadEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.SineEaseOut = function (t, b, c, d) {
-                return c * Math.sin(t / d * (Math.PI / 2)) + b;
-            };
-            tweenUtil.SineEaseIn = function (t, b, c, d) {
-                return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
-            };
-            tweenUtil.SineEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return c / 2 * (Math.sin(Math.PI * t / 2)) + b;
-                return -c / 2 * (Math.cos(Math.PI * --t / 2) - 2) + b;
-            };
-            tweenUtil.SineEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.SineEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.SineEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.CubicEaseOut = function (t, b, c, d) {
-                return c * ((t = t / d - 1) * t * t + 1) + b;
-            };
-            tweenUtil.CubicEaseIn = function (t, b, c, d) {
-                return c * (t /= d) * t * t + b;
-            };
-            tweenUtil.CubicEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return c / 2 * t * t * t + b;
-                return c / 2 * ((t -= 2) * t * t + 2) + b;
-            };
-            tweenUtil.CubicEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.CubicEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.CubicEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.QuartEaseOut = function (t, b, c, d) {
-                return -c * ((t = t / d - 1) * t * t * t - 1) + b;
-            };
-            tweenUtil.QuartEaseIn = function (t, b, c, d) {
-                return c * (t /= d) * t * t * t + b;
-            };
-            tweenUtil.QuartEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return c / 2 * t * t * t * t + b;
-                return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
-            };
-            tweenUtil.QuartEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.QuartEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.QuartEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.QuintEaseOut = function (t, b, c, d) {
-                return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
-            };
-            tweenUtil.QuintEaseIn = function (t, b, c, d) {
-                return c * (t /= d) * t * t * t * t + b;
-            };
-            tweenUtil.QuintEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return c / 2 * t * t * t * t * t + b;
-                return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
-            };
-            tweenUtil.QuintEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.QuintEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.QuintEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.ElasticEaseOut = function (t, b, c, d) {
-                if ((t /= d) == 1)
-                    return b + c;
-                var p = d * 0.3;
-                var s = p / 4;
-                return (c * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b);
-            };
-            tweenUtil.ElasticEaseIn = function (t, b, c, d) {
-                if ((t /= d) == 1)
-                    return b + c;
-                var p = d * 0.3;
-                var s = p / 4;
-                return -(c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
-            };
-            tweenUtil.ElasticEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) == 2)
-                    return b + c;
-                var p = d * (0.3 * 1.5);
-                var s = p / 4;
-                if (t < 1)
-                    return -0.5 * (c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
-                return c * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * 0.5 + c + b;
-            };
-            tweenUtil.ElasticEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.ElasticEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.ElasticEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.BounceEaseOut = function (t, b, c, d) {
-                if ((t /= d) < (1 / 2.75))
-                    return c * (7.5625 * t * t) + b;
-                else if (t < (2 / 2.75))
-                    return c * (7.5625 * (t -= (1.5 / 2.75)) * t + 0.75) + b;
-                else if (t < (2.5 / 2.75))
-                    return c * (7.5625 * (t -= (2.25 / 2.75)) * t + 0.9375) + b;
-                else
-                    return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
-            };
-            tweenUtil.BounceEaseIn = function (t, b, c, d) {
-                return c - tweenUtil.BounceEaseOut(d - t, 0, c, d) + b;
-            };
-            tweenUtil.BounceEaseInOut = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.BounceEaseIn(t * 2, 0, c, d) * 0.5 + b;
-                else
-                    return tweenUtil.BounceEaseOut(t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
-            };
-            tweenUtil.BounceEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.BounceEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.BounceEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.BackEaseOut = function (t, b, c, d) {
-                return c * ((t = t / d - 1) * t * ((1.70158 + 1) * t + 1.70158) + 1) + b;
-            };
-            tweenUtil.BackEaseIn = function (t, b, c, d) {
-                return c * (t /= d) * t * ((1.70158 + 1) * t - 1.70158) + b;
-            };
-            tweenUtil.BackEaseInOut = function (t, b, c, d) {
-                var s = 1.70158;
-                if ((t /= d / 2) < 1)
-                    return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
-                return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + b;
-            };
-            tweenUtil.BackEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.BackEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.BackEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            return tweenUtil;
-        }());
-        framework.tweenUtil = tweenUtil;
-        var tweenMethod;
-        (function (tweenMethod) {
-            tweenMethod[tweenMethod["Linear"] = 0] = "Linear";
-            tweenMethod[tweenMethod["ExpoEaseOut"] = 1] = "ExpoEaseOut";
-            tweenMethod[tweenMethod["ExpoEaseIn"] = 2] = "ExpoEaseIn";
-            tweenMethod[tweenMethod["ExpoEaseInOut"] = 3] = "ExpoEaseInOut";
-            tweenMethod[tweenMethod["ExpoEaseOutIn"] = 4] = "ExpoEaseOutIn";
-            tweenMethod[tweenMethod["CircEaseOut"] = 5] = "CircEaseOut";
-            tweenMethod[tweenMethod["CircEaseIn"] = 6] = "CircEaseIn";
-            tweenMethod[tweenMethod["CircEaseInOut"] = 7] = "CircEaseInOut";
-            tweenMethod[tweenMethod["CircEaseOutIn"] = 8] = "CircEaseOutIn";
-            tweenMethod[tweenMethod["QuadEaseOut"] = 9] = "QuadEaseOut";
-            tweenMethod[tweenMethod["QuadEaseIn"] = 10] = "QuadEaseIn";
-            tweenMethod[tweenMethod["QuadEaseInOut"] = 11] = "QuadEaseInOut";
-            tweenMethod[tweenMethod["QuadEaseOutIn"] = 12] = "QuadEaseOutIn";
-            tweenMethod[tweenMethod["SineEaseOut"] = 13] = "SineEaseOut";
-            tweenMethod[tweenMethod["SineEaseIn"] = 14] = "SineEaseIn";
-            tweenMethod[tweenMethod["SineEaseInOut"] = 15] = "SineEaseInOut";
-            tweenMethod[tweenMethod["SineEaseOutIn"] = 16] = "SineEaseOutIn";
-            tweenMethod[tweenMethod["CubicEaseOut"] = 17] = "CubicEaseOut";
-            tweenMethod[tweenMethod["CubicEaseIn"] = 18] = "CubicEaseIn";
-            tweenMethod[tweenMethod["CubicEaseInOut"] = 19] = "CubicEaseInOut";
-            tweenMethod[tweenMethod["CubicEaseOutIn"] = 20] = "CubicEaseOutIn";
-            tweenMethod[tweenMethod["QuartEaseOut"] = 21] = "QuartEaseOut";
-            tweenMethod[tweenMethod["QuartEaseIn"] = 22] = "QuartEaseIn";
-            tweenMethod[tweenMethod["QuartEaseInOut"] = 23] = "QuartEaseInOut";
-            tweenMethod[tweenMethod["QuartEaseOutIn"] = 24] = "QuartEaseOutIn";
-            tweenMethod[tweenMethod["QuintEaseOut"] = 25] = "QuintEaseOut";
-            tweenMethod[tweenMethod["QuintEaseIn"] = 26] = "QuintEaseIn";
-            tweenMethod[tweenMethod["QuintEaseInOut"] = 27] = "QuintEaseInOut";
-            tweenMethod[tweenMethod["QuintEaseOutIn"] = 28] = "QuintEaseOutIn";
-            tweenMethod[tweenMethod["ElasticEaseOut"] = 29] = "ElasticEaseOut";
-            tweenMethod[tweenMethod["ElasticEaseIn"] = 30] = "ElasticEaseIn";
-            tweenMethod[tweenMethod["ElasticEaseInOut"] = 31] = "ElasticEaseInOut";
-            tweenMethod[tweenMethod["ElasticEaseOutIn"] = 32] = "ElasticEaseOutIn";
-            tweenMethod[tweenMethod["BounceEaseOut"] = 33] = "BounceEaseOut";
-            tweenMethod[tweenMethod["BounceEaseIn"] = 34] = "BounceEaseIn";
-            tweenMethod[tweenMethod["BounceEaseInOut"] = 35] = "BounceEaseInOut";
-            tweenMethod[tweenMethod["BounceEaseOutIn"] = 36] = "BounceEaseOutIn";
-            tweenMethod[tweenMethod["BackEaseOut"] = 37] = "BackEaseOut";
-            tweenMethod[tweenMethod["BackEaseIn"] = 38] = "BackEaseIn";
-            tweenMethod[tweenMethod["BackEaseInOut"] = 39] = "BackEaseInOut";
-            tweenMethod[tweenMethod["BackEaseOutIn"] = 40] = "BackEaseOutIn";
-        })(tweenMethod = framework.tweenMethod || (framework.tweenMethod = {}));
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var CullingMask;
         (function (CullingMask) {
             CullingMask[CullingMask["nothing"] = 0] = "nothing";
@@ -32033,6 +31752,338 @@ var gd3d;
             return TransformUtil;
         }());
         framework.TransformUtil = TransformUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var tweenUtil = (function () {
+            function tweenUtil() {
+            }
+            tweenUtil.GetEaseProgress = function (ease_type, linear_progress) {
+                switch (ease_type) {
+                    case tweenMethod.Linear:
+                        return linear_progress;
+                    case tweenMethod.ExpoEaseOut:
+                        return tweenUtil.ExpoEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.ExpoEaseIn:
+                        return tweenUtil.ExpoEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ExpoEaseOutIn:
+                        return tweenUtil.ExpoEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ExpoEaseInOut:
+                        return tweenUtil.ExpoEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseOut:
+                        return tweenUtil.CircEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseIn:
+                        return tweenUtil.CircEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseOutIn:
+                        return tweenUtil.CircEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseInOut:
+                        return tweenUtil.CircEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseOut:
+                        return tweenUtil.QuadEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseIn:
+                        return tweenUtil.QuadEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseOutIn:
+                        return tweenUtil.QuadEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseInOut:
+                        return tweenUtil.QuadEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseOut:
+                        return tweenUtil.SineEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseIn:
+                        return tweenUtil.SineEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseOutIn:
+                        return tweenUtil.SineEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseInOut:
+                        return tweenUtil.SineEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseOut:
+                        return tweenUtil.CubicEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseIn:
+                        return tweenUtil.CubicEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseOutIn:
+                        return tweenUtil.CubicEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseInOut:
+                        return tweenUtil.CubicEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseOut:
+                        return tweenUtil.QuartEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseIn:
+                        return tweenUtil.QuartEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseOutIn:
+                        return tweenUtil.QuartEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseInOut:
+                        return tweenUtil.QuartEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseOut:
+                        return tweenUtil.QuintEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseIn:
+                        return tweenUtil.QuintEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseOutIn:
+                        return tweenUtil.QuintEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseInOut:
+                        return tweenUtil.QuintEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseOut:
+                        return tweenUtil.ElasticEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseIn:
+                        return tweenUtil.ElasticEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseOutIn:
+                        return tweenUtil.ElasticEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseInOut:
+                        return tweenUtil.ElasticEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseOut:
+                        return tweenUtil.BounceEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseIn:
+                        return tweenUtil.BounceEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseOutIn:
+                        return tweenUtil.BounceEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseInOut:
+                        return tweenUtil.BounceEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseOut:
+                        return tweenUtil.BackEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseIn:
+                        return tweenUtil.BackEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseOutIn:
+                        return tweenUtil.BackEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseInOut:
+                        return tweenUtil.BackEaseInOut(linear_progress, 0, 1, 1);
+                    default:
+                        return linear_progress;
+                }
+            };
+            tweenUtil.Linear = function (t, b, c, d) {
+                return c * t / d + b;
+            };
+            tweenUtil.ExpoEaseOut = function (t, b, c, d) {
+                return (t == d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
+            };
+            tweenUtil.ExpoEaseIn = function (t, b, c, d) {
+                return (t == 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
+            };
+            tweenUtil.ExpoEaseInOut = function (t, b, c, d) {
+                if (t == 0)
+                    return b;
+                if (t == d)
+                    return b + c;
+                if ((t /= d / 2) < 1)
+                    return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+                return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
+            };
+            tweenUtil.ExpoEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.ExpoEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.ExpoEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.CircEaseOut = function (t, b, c, d) {
+                return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
+            };
+            tweenUtil.CircEaseIn = function (t, b, c, d) {
+                return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
+            };
+            tweenUtil.CircEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
+                return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
+            };
+            tweenUtil.CircEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.CircEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.CircEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.QuadEaseOut = function (t, b, c, d) {
+                return -c * (t /= d) * (t - 2) + b;
+            };
+            tweenUtil.QuadEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t + b;
+            };
+            tweenUtil.QuadEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t + b;
+                return -c / 2 * ((--t) * (t - 2) - 1) + b;
+            };
+            tweenUtil.QuadEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.QuadEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.QuadEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.SineEaseOut = function (t, b, c, d) {
+                return c * Math.sin(t / d * (Math.PI / 2)) + b;
+            };
+            tweenUtil.SineEaseIn = function (t, b, c, d) {
+                return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+            };
+            tweenUtil.SineEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * (Math.sin(Math.PI * t / 2)) + b;
+                return -c / 2 * (Math.cos(Math.PI * --t / 2) - 2) + b;
+            };
+            tweenUtil.SineEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.SineEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.SineEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.CubicEaseOut = function (t, b, c, d) {
+                return c * ((t = t / d - 1) * t * t + 1) + b;
+            };
+            tweenUtil.CubicEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * t + b;
+            };
+            tweenUtil.CubicEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t * t + b;
+                return c / 2 * ((t -= 2) * t * t + 2) + b;
+            };
+            tweenUtil.CubicEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.CubicEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.CubicEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.QuartEaseOut = function (t, b, c, d) {
+                return -c * ((t = t / d - 1) * t * t * t - 1) + b;
+            };
+            tweenUtil.QuartEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * t * t + b;
+            };
+            tweenUtil.QuartEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t * t * t + b;
+                return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
+            };
+            tweenUtil.QuartEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.QuartEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.QuartEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.QuintEaseOut = function (t, b, c, d) {
+                return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
+            };
+            tweenUtil.QuintEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * t * t * t + b;
+            };
+            tweenUtil.QuintEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t * t * t * t + b;
+                return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
+            };
+            tweenUtil.QuintEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.QuintEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.QuintEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.ElasticEaseOut = function (t, b, c, d) {
+                if ((t /= d) == 1)
+                    return b + c;
+                var p = d * 0.3;
+                var s = p / 4;
+                return (c * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b);
+            };
+            tweenUtil.ElasticEaseIn = function (t, b, c, d) {
+                if ((t /= d) == 1)
+                    return b + c;
+                var p = d * 0.3;
+                var s = p / 4;
+                return -(c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+            };
+            tweenUtil.ElasticEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) == 2)
+                    return b + c;
+                var p = d * (0.3 * 1.5);
+                var s = p / 4;
+                if (t < 1)
+                    return -0.5 * (c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+                return c * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * 0.5 + c + b;
+            };
+            tweenUtil.ElasticEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.ElasticEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.ElasticEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.BounceEaseOut = function (t, b, c, d) {
+                if ((t /= d) < (1 / 2.75))
+                    return c * (7.5625 * t * t) + b;
+                else if (t < (2 / 2.75))
+                    return c * (7.5625 * (t -= (1.5 / 2.75)) * t + 0.75) + b;
+                else if (t < (2.5 / 2.75))
+                    return c * (7.5625 * (t -= (2.25 / 2.75)) * t + 0.9375) + b;
+                else
+                    return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
+            };
+            tweenUtil.BounceEaseIn = function (t, b, c, d) {
+                return c - tweenUtil.BounceEaseOut(d - t, 0, c, d) + b;
+            };
+            tweenUtil.BounceEaseInOut = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.BounceEaseIn(t * 2, 0, c, d) * 0.5 + b;
+                else
+                    return tweenUtil.BounceEaseOut(t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
+            };
+            tweenUtil.BounceEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.BounceEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.BounceEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.BackEaseOut = function (t, b, c, d) {
+                return c * ((t = t / d - 1) * t * ((1.70158 + 1) * t + 1.70158) + 1) + b;
+            };
+            tweenUtil.BackEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * ((1.70158 + 1) * t - 1.70158) + b;
+            };
+            tweenUtil.BackEaseInOut = function (t, b, c, d) {
+                var s = 1.70158;
+                if ((t /= d / 2) < 1)
+                    return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
+                return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + b;
+            };
+            tweenUtil.BackEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.BackEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.BackEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            return tweenUtil;
+        }());
+        framework.tweenUtil = tweenUtil;
+        var tweenMethod;
+        (function (tweenMethod) {
+            tweenMethod[tweenMethod["Linear"] = 0] = "Linear";
+            tweenMethod[tweenMethod["ExpoEaseOut"] = 1] = "ExpoEaseOut";
+            tweenMethod[tweenMethod["ExpoEaseIn"] = 2] = "ExpoEaseIn";
+            tweenMethod[tweenMethod["ExpoEaseInOut"] = 3] = "ExpoEaseInOut";
+            tweenMethod[tweenMethod["ExpoEaseOutIn"] = 4] = "ExpoEaseOutIn";
+            tweenMethod[tweenMethod["CircEaseOut"] = 5] = "CircEaseOut";
+            tweenMethod[tweenMethod["CircEaseIn"] = 6] = "CircEaseIn";
+            tweenMethod[tweenMethod["CircEaseInOut"] = 7] = "CircEaseInOut";
+            tweenMethod[tweenMethod["CircEaseOutIn"] = 8] = "CircEaseOutIn";
+            tweenMethod[tweenMethod["QuadEaseOut"] = 9] = "QuadEaseOut";
+            tweenMethod[tweenMethod["QuadEaseIn"] = 10] = "QuadEaseIn";
+            tweenMethod[tweenMethod["QuadEaseInOut"] = 11] = "QuadEaseInOut";
+            tweenMethod[tweenMethod["QuadEaseOutIn"] = 12] = "QuadEaseOutIn";
+            tweenMethod[tweenMethod["SineEaseOut"] = 13] = "SineEaseOut";
+            tweenMethod[tweenMethod["SineEaseIn"] = 14] = "SineEaseIn";
+            tweenMethod[tweenMethod["SineEaseInOut"] = 15] = "SineEaseInOut";
+            tweenMethod[tweenMethod["SineEaseOutIn"] = 16] = "SineEaseOutIn";
+            tweenMethod[tweenMethod["CubicEaseOut"] = 17] = "CubicEaseOut";
+            tweenMethod[tweenMethod["CubicEaseIn"] = 18] = "CubicEaseIn";
+            tweenMethod[tweenMethod["CubicEaseInOut"] = 19] = "CubicEaseInOut";
+            tweenMethod[tweenMethod["CubicEaseOutIn"] = 20] = "CubicEaseOutIn";
+            tweenMethod[tweenMethod["QuartEaseOut"] = 21] = "QuartEaseOut";
+            tweenMethod[tweenMethod["QuartEaseIn"] = 22] = "QuartEaseIn";
+            tweenMethod[tweenMethod["QuartEaseInOut"] = 23] = "QuartEaseInOut";
+            tweenMethod[tweenMethod["QuartEaseOutIn"] = 24] = "QuartEaseOutIn";
+            tweenMethod[tweenMethod["QuintEaseOut"] = 25] = "QuintEaseOut";
+            tweenMethod[tweenMethod["QuintEaseIn"] = 26] = "QuintEaseIn";
+            tweenMethod[tweenMethod["QuintEaseInOut"] = 27] = "QuintEaseInOut";
+            tweenMethod[tweenMethod["QuintEaseOutIn"] = 28] = "QuintEaseOutIn";
+            tweenMethod[tweenMethod["ElasticEaseOut"] = 29] = "ElasticEaseOut";
+            tweenMethod[tweenMethod["ElasticEaseIn"] = 30] = "ElasticEaseIn";
+            tweenMethod[tweenMethod["ElasticEaseInOut"] = 31] = "ElasticEaseInOut";
+            tweenMethod[tweenMethod["ElasticEaseOutIn"] = 32] = "ElasticEaseOutIn";
+            tweenMethod[tweenMethod["BounceEaseOut"] = 33] = "BounceEaseOut";
+            tweenMethod[tweenMethod["BounceEaseIn"] = 34] = "BounceEaseIn";
+            tweenMethod[tweenMethod["BounceEaseInOut"] = 35] = "BounceEaseInOut";
+            tweenMethod[tweenMethod["BounceEaseOutIn"] = 36] = "BounceEaseOutIn";
+            tweenMethod[tweenMethod["BackEaseOut"] = 37] = "BackEaseOut";
+            tweenMethod[tweenMethod["BackEaseIn"] = 38] = "BackEaseIn";
+            tweenMethod[tweenMethod["BackEaseInOut"] = 39] = "BackEaseInOut";
+            tweenMethod[tweenMethod["BackEaseOutIn"] = 40] = "BackEaseOutIn";
+        })(tweenMethod = framework.tweenMethod || (framework.tweenMethod = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

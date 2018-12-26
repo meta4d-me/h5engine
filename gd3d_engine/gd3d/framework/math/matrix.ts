@@ -852,6 +852,14 @@
         result.rawData[2] = z / w;
     }
 
+    export function matrixTransformVector4(src:gd3d.math.vector4,mtx:gd3d.math.matrix,out:gd3d.math.vector4){
+        let x = (src.rawData[0] * mtx.rawData[0]) + (src.rawData[1] * mtx.rawData[4]) + (src.rawData[2] * mtx.rawData[8]) +  (src.rawData[3] * mtx.rawData[12]);
+        let y = (src.rawData[0] * mtx.rawData[1]) + (src.rawData[1] * mtx.rawData[5]) + (src.rawData[2] * mtx.rawData[9]) +  (src.rawData[3] * mtx.rawData[13]);
+        let z = (src.rawData[0] * mtx.rawData[2]) + (src.rawData[1] * mtx.rawData[6]) + (src.rawData[2] * mtx.rawData[10]) + (src.rawData[3] * mtx.rawData[14]);
+        let w = (src.rawData[0] * mtx.rawData[3]) + (src.rawData[1] * mtx.rawData[7]) + (src.rawData[2] * mtx.rawData[11]) + (src.rawData[3] * mtx.rawData[15]);
+        out.rawData[0] = x; out.rawData[1] = y; out.rawData[2] = z; out.rawData[3] = w;
+    }
+
     //变换向量
     export function matrixTransformNormal(vector: vector3, transformation: matrix, result: vector3): void
     {

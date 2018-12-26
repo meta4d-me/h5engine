@@ -69,15 +69,15 @@ namespace gd3d.framework
         @gd3d.reflect.Field("canvas")
         canvas: canvas;
 
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 是否自适应
-         * @version egret-gd3d 1.0
-         */
-        @gd3d.reflect.Field("boolean")
-        autoAsp: boolean = true;
+        // /**
+        //  * @public
+        //  * @language zh_CN
+        //  * @classdesc
+        //  * 是否自适应
+        //  * @version egret-gd3d 1.0
+        //  */
+        // @gd3d.reflect.Field("boolean")
+        // autoAsp: boolean = true;
 
         /**
          * @public
@@ -113,7 +113,12 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
-         * 缩放模式
+         * 缩放模式 
+         * 
+         * 配合参数 ：
+         * matchReference_height
+         * matchReference_width
+         * screenMatchRate
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("number")
@@ -213,29 +218,6 @@ namespace gd3d.framework
             //     }
             // }
 
-            this.camera.calcViewPortPixel(assetmgr.app, this.viewPixelrect);
-            switch (this.scaleMode){
-                case UIScaleMode.CONSTANT_PIXEL_SIZE:
-                    if(this.canvas.pixelWidth == this.viewPixelrect.w && this.canvas.pixelHeight == this.viewPixelrect.h) break;
-                    this.canvas.pixelWidth = this.viewPixelrect.w;
-                    this.canvas.pixelHeight = this.viewPixelrect.h;
-                    this.canvas.getRoot().markDirty();
-                break;
-                case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
-                    let match = this.screenMatchRate < 0 ? 0: this.screenMatchRate;
-                    match = match>1? 1:match;
-                    let asp = this.viewPixelrect.w / this.viewPixelrect.h;
-                    let w = math.numberLerp(this.matchReference_width,this.matchReference_height * asp,match);
-                    let h = math.numberLerp(this.matchReference_height,this.matchReference_width / asp, 1 - match );
-                    if (this.canvas.pixelWidth != w || this.canvas.pixelHeight != h)
-                    {
-                        this.canvas.pixelWidth = w;
-                        this.canvas.pixelHeight = h;
-                        this.canvas.getRoot().markDirty();
-                    }
-                break;
-            }
-
             context.updateOverlay();
             this.canvas.render(context, assetmgr);
         }
@@ -248,6 +230,9 @@ namespace gd3d.framework
          */
         update(delta: number)
         {
+            //layout update
+            this.ckScaleMode();
+
             // this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
             // let rect = this.camera.viewport;
             // let real_x = this.inputmgr.point.x - rect.x * this.app.width ;
@@ -263,6 +248,59 @@ namespace gd3d.framework
 
             //canvas de update 直接集成pointevent处理
             this.canvas.update(delta, this.inputmgr.point.touch, mPos.x, mPos.y);
+        }
+
+        private lastVPRect = new math.rect();
+        private lastScreenMR = 0;
+        private lastMR_width = 0;
+        private lastMR_height = 0;
+        //检查缩放模式 改变
+        private ckScaleMode(){
+            if(!this.canvas.getRoot().visible || !this.camera) return;
+            this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+            let dirty = false;
+            if(math.rectEqul(this.lastVPRect,this.viewPixelrect)){
+                switch(this.scaleMode){
+                    case UIScaleMode.CONSTANT_PIXEL_SIZE:
+                    break;
+                    case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
+                    if(this.lastScreenMR != this.screenMatchRate || this.lastMR_width != this.matchReference_width || this.lastMR_height != this.matchReference_height){
+                        dirty = true;
+                    }
+                    break;
+                }
+            }else{
+                //rect 不等 需要重刷
+                dirty = true;
+            }
+
+            if(!dirty) return;
+            
+            let _w = 0; let _h = 0;
+            math.rectClone(this.viewPixelrect,this.lastVPRect);
+            this.lastScreenMR = this.screenMatchRate;
+            this.lastMR_width = this.matchReference_width;
+            this.lastMR_height = this.matchReference_height;
+
+            //计算w h
+            switch(this.scaleMode){
+                case UIScaleMode.CONSTANT_PIXEL_SIZE:
+                    _w = this.viewPixelrect.w;
+                    _h = this.viewPixelrect.h;
+                break;
+                case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
+                    let match = this.screenMatchRate < 0 ? 0: this.screenMatchRate;
+                    match = match>1? 1:match;
+                    let asp = this.viewPixelrect.w / this.viewPixelrect.h;
+                    _w = math.numberLerp(this.matchReference_width,this.matchReference_height * asp,match);
+                    _h = math.numberLerp(this.matchReference_height,this.matchReference_width / asp, 1 - match );
+                break;
+            }
+
+            //赋值
+            this.canvas.pixelWidth = _w;
+            this.canvas.pixelHeight = _h;
+            this.canvas.getRoot().markDirty();
         }
 
         /**

@@ -103,8 +103,8 @@ namespace gd3d.framework
             this.hasWheel = true;
             if (ev.detail) {
                 this.lastWheel = -1 * ev.detail;
-            } else if (ev.wheelDelta) {
-                this.lastWheel = ev.wheelDelta / 120;
+            } else if (ev.DOM_DELTA_PIXEL) {
+                this.lastWheel = ev.DOM_DELTA_PIXEL / 120;
             } else {
                 this.lastWheel = 0;
             }
@@ -429,11 +429,11 @@ namespace gd3d.framework
 
         private tempV2_0:gd3d.math.vector2 = new gd3d.math.vector2();
         private tempV2_1:gd3d.math.vector2 = new gd3d.math.vector2();
+        private devicePixelRatio =  window.devicePixelRatio || 1;
         private CalcuPoint(clientX:number,clientY:number , out:pointinfo){
             if(!out || !this.app || isNaN(clientX) || isNaN(clientY)) return;
-
-            this.tempV2_0.x = clientX / this.app.scaleFromPandding;
-            this.tempV2_0.y = clientY / this.app.scaleFromPandding;
+            this.tempV2_0.x = clientX * this.devicePixelRatio/ this.app.scaleFromPandding;
+            this.tempV2_0.y = clientY * this.devicePixelRatio/ this.app.scaleFromPandding;
             gd3d.math.vec2Clone(this.tempV2_0,this.tempV2_1);
 
             if(this.app.shouldRotate){

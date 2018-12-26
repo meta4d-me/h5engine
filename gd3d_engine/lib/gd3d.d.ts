@@ -8,12 +8,12 @@ declare namespace gd3d.framework {
         RemoveChild = 1,
         ChangeVisible = 2,
         AddCamera = 3,
-        AddCanvasRender = 4
+        AddCanvasRender = 4,
     }
     enum CanvasFixedType {
         Free = 0,
         FixedWidthType = 1,
-        FixedHeightType = 2
+        FixedHeightType = 2,
     }
     class application {
         webgl: WebGLRenderingContext;
@@ -49,15 +49,16 @@ declare namespace gd3d.framework {
         start(div: HTMLDivElement, type?: CanvasFixedType, val?: number, webglDebug?: boolean): void;
         startForCanvas(canvas: HTMLCanvasElement, type?: CanvasFixedType, val?: number, webglDebug?: boolean): void;
         markNotify(trans: any, type: NotifyType): void;
-        private doNotify;
+        private doNotify(trans, type);
         checkFilter(trans: any): boolean;
         showFps(): void;
         closeFps(): void;
         showDrawCall(): void;
         closeDrawCall(): void;
         private beStepNumber;
-        private update;
-        private updateScreenAsp;
+        private update(delta);
+        private updateScreenAsp();
+        private setScreenAsp();
         preusercodetimer: number;
         usercodetime: number;
         getUserUpdateTimer(): number;
@@ -71,16 +72,16 @@ declare namespace gd3d.framework {
         private updateTimer;
         getUpdateTimer(): any;
         isFrustumCulling: boolean;
-        private loop;
+        private loop();
         private _scene;
-        private initScene;
-        private initRender;
+        private initScene();
+        private initRender();
         getScene(): scene;
         private _assetmgr;
-        private initAssetMgr;
+        private initAssetMgr();
         getAssetMgr(): assetMgr;
         private _inputmgr;
-        private initInputMgr;
+        private initInputMgr();
         getInputMgr(): inputMgr;
         private _userCode;
         private _userCodeNew;
@@ -94,8 +95,8 @@ declare namespace gd3d.framework {
         bePause: boolean;
         private _beStepForward;
         beStepForward: boolean;
-        private updateUserCode;
-        private updateEditorCode;
+        private updateUserCode(delta);
+        private updateEditorCode(delta);
         addUserCodeDirect(program: IUserCode): void;
         addUserCode(classname: string): void;
         addEditorCode(classname: string): void;
@@ -105,7 +106,7 @@ declare namespace gd3d.framework {
         private lastWidth;
         private lastHeight;
         OffOrientationUpdate: boolean;
-        private updateOrientationMode;
+        private updateOrientationMode();
     }
     interface IUserCode {
         onStart(app: gd3d.framework.application): any;
@@ -129,7 +130,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class DeviceInfo {
         private static debuginfo;
-        private static getExtension;
+        private static getExtension();
         static readonly GraphDevice: string;
         static readonly CanvasWidth: number;
         static readonly CanvasHeight: number;
@@ -141,7 +142,7 @@ declare namespace gd3d.framework {
         UI = 0,
         SKinrender = 1,
         Meshrender = 2,
-        EffectSystem = 3
+        EffectSystem = 3,
     }
     class DrawCallInfo {
         private static _inc;
@@ -156,7 +157,7 @@ declare namespace gd3d.framework {
         private EffectrenderDraw;
         private UIrenderDraw;
         private rootdiv;
-        private initShowPlane;
+        private initShowPlane();
         showPerFrame(): void;
         showDrawcallInfo(): void;
         closeDrawCallInfo(): void;
@@ -186,10 +187,10 @@ declare namespace Stats {
         private memPanel;
         private ratePanel;
         private userratePanel;
-        private showPanel;
-        private addPanel;
-        private begin;
-        private end;
+        private showPanel(id);
+        private addPanel(panel);
+        private begin();
+        private end();
     }
 }
 declare namespace gd3d {
@@ -241,7 +242,7 @@ declare namespace gd3d {
             None = 0,
             RangeFloat = 1,
             MultiLineString = 2,
-            Enum = 3
+            Enum = 3,
         }
         function UIStyle(style: string, min?: number, max?: number, defvalue?: any): (target: Object, propertyKey: string) => void;
     }
@@ -382,7 +383,7 @@ declare namespace gd3d.framework {
         private lastWidth;
         private lastHeight;
         update(delta: number, touch: Boolean, XOnModelSpace: number, YOnModelSpace: number): void;
-        private objupdate;
+        private objupdate(node, delta);
         private lastMat;
         afterRender: Function;
         beforeRender: Function;
@@ -402,12 +403,12 @@ declare namespace gd3d.framework {
         private readonly qt_maxObjNum;
         private readonly qt_maxlevel;
         private depthQTree;
-        private drawSceneByDepth;
+        private drawSceneByDepth(node, context, assetmgr);
         private helpMap;
-        private sortDepthList;
+        private sortDepthList();
         private flowCount;
-        private collectToDepthL;
-        private checkBottomUI;
+        private collectToDepthL(node);
+        private checkBottomUI(rd);
         pixelWidth: number;
         pixelHeight: number;
         private rootNode;
@@ -441,7 +442,7 @@ declare namespace gd3d.framework {
         pickAll2d(ray: gd3d.framework.ray): transform2D[];
         pick2d(ray: gd3d.framework.ray): transform2D;
         private cupTans2ds;
-        private dopick2d;
+        private dopick2d(ModelPos, tran, outPicks, isAll?);
         calScreenPosToCanvasPos(camera: framework.camera, screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2): void;
         calCanvasPosToWorldPos(from: math.vector2, out: math.vector3): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
@@ -452,7 +453,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     enum UIScaleMode {
         CONSTANT_PIXEL_SIZE = 0,
-        SCALE_WITH_SCREEN_SIZE = 1
+        SCALE_WITH_SCREEN_SIZE = 1,
     }
     class overlay2D implements IOverLay {
         static readonly ClassName: string;
@@ -463,7 +464,6 @@ declare namespace gd3d.framework {
         private inputmgr;
         start(camera: camera): void;
         canvas: canvas;
-        autoAsp: boolean;
         screenMatchRate: number;
         matchReference_width: number;
         matchReference_height: number;
@@ -479,8 +479,13 @@ declare namespace gd3d.framework {
         private helpv2;
         private helpv2_1;
         update(delta: number): void;
+        private lastVPRect;
+        private lastScreenMR;
+        private lastMR_width;
+        private lastMR_height;
+        private ckScaleMode();
         pick2d(mx: number, my: number, tolerance?: number): transform2D;
-        private dopick2d;
+        private dopick2d(ModelPos, tran, tolerance?);
         calScreenPosToCanvasPos(screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2): void;
         calScreenPosToModelPos(screenPos: gd3d.math.vector2, outModelPos: gd3d.math.vector2): void;
     }
@@ -492,7 +497,7 @@ declare namespace gd3d.framework {
         RIGHT = 4,
         BOTTOM = 8,
         H_CENTER = 16,
-        V_CENTER = 32
+        V_CENTER = 32,
     }
     interface I2DComponent {
         onPlay(): any;
@@ -550,7 +555,7 @@ declare namespace gd3d.framework {
         readonly maskRect: math.rect;
         private _isMask;
         isMask: boolean;
-        private updateMaskRect;
+        private updateMaskRect();
         private _parentIsMask;
         readonly parentIsMask: boolean;
         private localMatrix;
@@ -566,8 +571,8 @@ declare namespace gd3d.framework {
         markDirty(): void;
         updateTran(parentChange: boolean): void;
         updateWorldTran(): void;
-        private CalcReCanvasMtx;
-        private decomposeWorldMatrix;
+        private CalcReCanvasMtx(out);
+        private decomposeWorldMatrix();
         getWorldTranslate(): math.vector2;
         getWorldScale(): math.vector2;
         getWorldRotate(): math.angelref;
@@ -592,7 +597,7 @@ declare namespace gd3d.framework {
         getComponent(type: string): I2DComponent;
         getComponents(): I2DComponent[];
         getComponentsInChildren(type: string): I2DComponent[];
-        private getNodeCompoents;
+        private getNodeCompoents(node, _type, comps);
         onCapturePointEvent(canvas: canvas, ev: PointEvent): void;
         ContainsCanvasPoint(ModelPos: math.vector2, tolerance?: number): boolean;
         onPointEvent(canvas: canvas, ev: PointEvent): void;
@@ -611,8 +616,8 @@ declare namespace gd3d.framework {
         private lastParentHeight;
         private lastParentPivot;
         private lastPivot;
-        private refreshLayout;
-        private getLayValue;
+        private refreshLayout();
+        private getLayValue(option);
         setSiblingIndex(siblingIndex: number): void;
         getSiblingIndex(): number;
         clone(): transform2D;
@@ -643,7 +648,7 @@ declare namespace gd3d.framework {
         private _obb;
         getBound(): obb2d;
         intersectsTransform(tran: transform2D): boolean;
-        private build;
+        private build();
         refreshTofullOver(): void;
         start(): void;
         onPlay(): void;
@@ -656,7 +661,7 @@ declare namespace gd3d.framework {
     enum TransitionType {
         None = 0,
         ColorTint = 1,
-        SpriteSwap = 2
+        SpriteSwap = 2,
     }
     class button implements I2DComponent, event.IUIEventer {
         static readonly ClassName: string;
@@ -690,11 +695,11 @@ declare namespace gd3d.framework {
         removeListener(eventEnum: event.UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         private _downInThis;
         private _dragOut;
-        private showNormal;
-        private showPress;
-        private tryGetSprite;
-        private changeColor;
-        private changeSprite;
+        private showNormal();
+        private showPress();
+        private tryGetSprite(spriteName);
+        private changeColor(targetColor);
+        private changeSprite(sprite);
     }
 }
 declare namespace gd3d.framework {
@@ -727,38 +732,38 @@ declare namespace gd3d.framework {
         private _imageBorder;
         readonly imageBorder: math.border;
         render(canvas: canvas): void;
-        private searchTexture;
+        private searchTexture();
         private _cacheMaskV4;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
         remove(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
-        private prepareData;
+        private prepareData();
         updateTran(): void;
         private min_x;
         private max_x;
         private min_y;
         private max_y;
-        private calcDrawRect;
-        private updateQuadData;
-        private updateSimpleData;
-        private updateSlicedData;
-        private updateFilledData;
-        private updateTiledData;
+        private calcDrawRect();
+        private updateQuadData(x0, y0, x1, y1, x2, y2, x3, y3, quadIndex?, mirror?);
+        private updateSimpleData(x0, y0, x1, y1, x2, y2, x3, y3);
+        private updateSlicedData(x0, y0, x1, y1, x2, y2, x3, y3);
+        private updateFilledData(x0, y0, x1, y1, x2, y2, x3, y3);
+        private updateTiledData(x0, y0, x1, y1, x2, y2, x3, y3);
     }
     enum ImageType {
         Simple = 0,
         Sliced = 1,
         Tiled = 2,
-        Filled = 3
+        Filled = 3,
     }
     enum FillMethod {
         Horizontal = 0,
         Vertical = 1,
         Radial_90 = 2,
         Radial_180 = 3,
-        Radial_360 = 4
+        Radial_360 = 4,
     }
 }
 declare namespace gd3d.framework {
@@ -782,19 +787,19 @@ declare namespace gd3d.framework {
         TextLabel: label;
         private _placeholderLabel;
         PlaceholderLabel: label;
-        private layoutRefresh;
+        private layoutRefresh();
         start(): void;
         onPlay(): void;
-        private inputElmLayout;
-        private textRefresh;
-        private filterContentText;
+        private inputElmLayout();
+        private textRefresh();
+        private filterContentText();
         update(delta: number): void;
         remove(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
     }
     enum lineType {
         SingleLine = 0,
-        MultiLine = 1
+        MultiLine = 1,
     }
     enum contentType {
         None = 0,
@@ -805,7 +810,7 @@ declare namespace gd3d.framework {
         NoneChineseCharacter = 16,
         Email = 32,
         PassWord = 64,
-        Custom = 128
+        Custom = 128,
     }
 }
 declare namespace gd3d.framework {
@@ -813,7 +818,7 @@ declare namespace gd3d.framework {
         static readonly ClassName: string;
         private _text;
         text: string;
-        private initdater;
+        private initdater();
         private _font;
         font: font;
         private needRefreshFont;
@@ -843,14 +848,14 @@ declare namespace gd3d.framework {
         private readonly uimat;
         private dirtyData;
         render(canvas: canvas): void;
-        private searchTexture;
+        private searchTexture();
         private _cacheMaskV4;
         updateTran(): void;
         private min_x;
         private max_x;
         private min_y;
         private max_y;
-        private calcDrawRect;
+        private calcDrawRect();
         start(): void;
         onPlay(): void;
         update(delta: number): void;
@@ -861,12 +866,12 @@ declare namespace gd3d.framework {
     enum HorizontalType {
         Center = 0,
         Left = 1,
-        Right = 2
+        Right = 2,
     }
     enum VerticalType {
         Center = 0,
         Top = 1,
-        Boom = 2
+        Boom = 2,
     }
 }
 declare namespace gd3d.framework {
@@ -883,8 +888,8 @@ declare namespace gd3d.framework {
         start(): void;
         onPlay(): void;
         update(delta: number): void;
-        private refreshBar;
-        private adjustOverImg;
+        private refreshBar();
+        private adjustOverImg();
         transform: transform2D;
         remove(): void;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
@@ -914,7 +919,7 @@ declare namespace gd3d.framework {
         private max_x;
         private min_y;
         private max_y;
-        private calcDrawRect;
+        private calcDrawRect();
         start(): void;
         onPlay(): void;
         update(delta: number): void;
@@ -941,18 +946,18 @@ declare namespace gd3d.framework {
         private lastPoint;
         private strPoint;
         private strPos;
-        private SlideTo;
+        private SlideTo(addtransX, addtransY);
         private readonly collectNum;
         private points;
-        private collectPointing;
+        private collectPointing();
         private flyVelocity;
-        private onInertiaSliderUp;
+        private onInertiaSliderUp();
         private canfly;
         private readonly threshold;
         private readonly cgTime;
         private cgCount;
         private lastfv;
-        private flyingSlidr;
+        private flyingSlidr(delta);
         remove(): void;
     }
 }
@@ -1066,7 +1071,7 @@ declare namespace gd3d.framework {
         setFrictionStatic(body: Ibody, frictionStatic: number): void;
         setRestitution(body: Ibody, restitution: number): void;
         setAngularVelocity(body: Ibody, angularVelocity: number): void;
-        private set;
+        private set(body, settings, value);
         addEvent(eventname: string, callback: Function): void;
         removeEvent(eventname: string, callback: Function): void;
         removeBody(body: Ibody): void;
@@ -1107,7 +1112,7 @@ declare namespace gd3d.framework {
     class resID {
         constructor();
         private static idAll;
-        private static next;
+        private static next();
         private id;
         getID(): number;
     }
@@ -1147,7 +1152,7 @@ declare namespace gd3d.framework {
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
         downloadFinsih(state: any, list: any, haveBin: boolean, onstate: any, packlist: any, mapPackes: any, assetmgr: assetMgr, handles: any): void;
         NextHandle(list: any, state: any, onstate: any): void;
-        private mapIsNull;
+        private mapIsNull(map);
         mapNamed: {
             [id: string]: number;
         };
@@ -1178,7 +1183,7 @@ declare namespace gd3d.framework {
         PathAsset = 20,
         PVR = 21,
         F14Effect = 22,
-        DDS = 23
+        DDS = 23,
     }
     enum AssetBundleLoadState {
         None = 0,
@@ -1192,7 +1197,7 @@ declare namespace gd3d.framework {
         Textasset = 128,
         Pvr = 256,
         f14eff = 512,
-        Dds = 1024
+        Dds = 1024,
     }
     class ResourceState {
         res: IAsset;
@@ -1286,22 +1291,22 @@ declare namespace gd3d.framework {
         loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad, asset: IAsset, call: (handle: any) => void): void;
         loadResByPack(respack: any, url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad, asset: IAsset, call: (handle: any) => void): void;
         private assetFactorys;
-        private regAssetFactory;
-        private getAssetFactory;
-        private initAssetFactorys;
+        private regAssetFactory(type, factory);
+        private getAssetFactory(type);
+        private initAssetFactorys();
         private waitStateDic;
         doWaitState(name: string, state: stateLoad): void;
         private waitQueueState;
         private loadingQueueState;
         private loadingCountLimit;
-        private checkFreeChannel;
-        private unPkg;
+        private checkFreeChannel();
+        private unPkg(type, url, state, onstate);
         loadCompressBundle(url: string, onstate?: (state: stateLoad) => void): void;
         maploaded: {
             [url: string]: IAsset;
         };
         load(url: string, type?: AssetTypeEnum, onstate?: (state: stateLoad) => void): void;
-        private loadForNoCache;
+        private loadForNoCache(url, type?, onstate?);
         unload(url: string, onstate?: () => void): void;
         waitlightmapScene: {
             [sceneurl: string]: string[];
@@ -1344,7 +1349,7 @@ declare class PvrParse {
     private gl;
     constructor(gl: WebGLRenderingContext);
     parse(_buffer: ArrayBuffer): gd3d.render.glTexture2D;
-    private parseV3;
+    private parseV3(tool);
 }
 declare enum ChannelTypes {
     UnsignedByteNorm = 0,
@@ -1361,7 +1366,7 @@ declare enum ChannelTypes {
     SignedInteger = 11,
     SignedFloat = 12,
     Float = 12,
-    UnsignedFloat = 13
+    UnsignedFloat = 13,
 }
 declare namespace gd3d.framework {
     class defmaterial {
@@ -1371,7 +1376,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class defMesh {
         static initDefaultMesh(assetmgr: assetMgr): void;
-        private static createDefaultMesh;
+        private static createDefaultMesh(name, meshData, webgl);
     }
 }
 declare namespace gd3d.framework {
@@ -1408,7 +1413,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class defTexture {
         static initDefaultTexture(assetmgr: assetMgr): void;
-        private static initDefaultCubeTexture;
+        private static initDefaultCubeTexture(assetmgr);
     }
 }
 declare namespace gd3d.framework {
@@ -1655,7 +1660,7 @@ declare namespace gd3d.framework {
         delayTime: number;
         Parse(jsonStr: string, assetmgr: assetMgr): void;
         getDependents(): IAsset[];
-        private doSearch;
+        private doSearch(obj, arr);
     }
 }
 declare namespace gd3d.framework {
@@ -1704,8 +1709,8 @@ declare namespace gd3d.framework {
         private helpLRotate;
         private helpLPos;
         private helpLScale;
-        private checkLRTSChange;
-        private fastEqual;
+        private checkLRTSChange();
+        private fastEqual(d_0, d_1);
         private _scene;
         scene: scene;
         name: string;
@@ -1716,7 +1721,7 @@ declare namespace gd3d.framework {
         private _dirtyAABB;
         private _aabb;
         readonly aabb: aabb;
-        private _buildAABB;
+        private _buildAABB();
         private _children;
         children: transform[];
         private _parent;
@@ -1728,11 +1733,11 @@ declare namespace gd3d.framework {
         find(name: string): transform;
         checkImpactTran(tran: transform): boolean;
         checkImpact(): Array<transform>;
-        private doImpact;
+        private doImpact(tran, impacted);
         private dirtyLocal;
         private dirtyWorld;
-        private dirtify;
-        private sync;
+        private dirtify(local?);
+        private sync();
         markDirty(): void;
         markHaveComponent(): void;
         markHaveRendererComp(): void;
@@ -1763,14 +1768,14 @@ declare namespace gd3d.framework {
         setWorldScale(scale: math.vector3): void;
         getLocalMatrix(): math.matrix;
         getWorldMatrix(): math.matrix;
-        private checkToTop;
+        private checkToTop();
         getForwardInWorld(out: math.vector3): void;
         getRightInWorld(out: math.vector3): void;
         getUpInWorld(out: math.vector3): void;
         setWorldMatrix(mat: math.matrix): void;
         lookat(trans: transform): void;
         lookatPoint(point: math.vector3): void;
-        private calcLookAt;
+        private calcLookAt(point);
         private _gameObject;
         readonly gameObject: gameObject;
         clone(): transform;
@@ -1782,7 +1787,7 @@ declare namespace gd3d.framework {
     class insID {
         constructor();
         private static idAll;
-        private static next;
+        private static next();
         private id;
         getInsID(): number;
     }
@@ -1810,9 +1815,9 @@ declare namespace gd3d.framework {
         _colliderVisible: boolean;
         colliderVisible: boolean;
         intersectsTransform(tran: transform): boolean;
-        private build;
-        private buildMesh;
-        private getColliderMesh;
+        private build();
+        private buildMesh();
+        private getColliderMesh();
         remove(): void;
         clone(): void;
     }
@@ -1830,8 +1835,8 @@ declare namespace gd3d.framework {
         _colliderVisible: boolean;
         colliderVisible: boolean;
         intersectsTransform(tran: transform): boolean;
-        private buildMesh;
-        private getColliderMesh;
+        private buildMesh();
+        private getColliderMesh();
         remove(): void;
         clone(): void;
     }
@@ -1867,7 +1872,7 @@ declare namespace gd3d.framework {
         filter: meshFilter;
         start(): void;
         onPlay(): void;
-        private refreshLayerAndQue;
+        private refreshLayerAndQue();
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         remove(): void;
@@ -1913,7 +1918,7 @@ declare namespace gd3d.framework {
         Clamp = 1,
         Loop = 2,
         PingPong = 4,
-        ClampForever = 8
+        ClampForever = 8,
     }
     class keyFrameAniClip implements IAsset {
         static readonly ClassName: string;
@@ -2024,8 +2029,8 @@ declare namespace gd3d.framework {
         submesh: subMeshInfo[];
         onReadFinish: () => void;
         private reading;
-        private readProcess;
-        private readFinish;
+        private readProcess(read, data, objVF, vcount, vec10tpose, callback);
+        private readFinish(read, data, buf, objVF, webgl);
         Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): threading.gdPromise<{}>;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
@@ -2057,18 +2062,18 @@ declare namespace gd3d.framework {
         private items;
         Parse(json: JSON): void;
         private lines;
-        private getpaths;
-        private getBeisaierPointAlongCurve;
-        private vec3Lerp;
+        private getpaths();
+        private getBeisaierPointAlongCurve(points, rate, clearflag?);
+        private vec3Lerp(start, end, lerp, out);
     }
     enum pathtype {
         once = 0,
         loop = 1,
-        pingpong = 2
+        pingpong = 2,
     }
     enum epointtype {
         VertexPoint = 0,
-        ControlPoint = 1
+        ControlPoint = 1,
     }
     class pointitem {
         point: gd3d.math.vector3;
@@ -2158,7 +2163,7 @@ declare namespace gd3d.framework {
         layer: RenderLayerEnum;
         parse(assetmgr: assetMgr, json: any): void;
         _parseProperties(assetmgr: assetMgr, properties: any): void;
-        private _parsePass;
+        private _parsePass(assetmgr, json, type);
         fillUnDefUniform(pass: render.glDrawPass): void;
     }
 }
@@ -2231,7 +2236,7 @@ declare namespace gd3d.framework {
         loadAudioBuffer(url: string, fun: (buf: AudioBuffer, _err: Error) => void): void;
         isAvailable(): boolean;
         createAudioChannel(be3DSound: boolean): AudioChannel;
-        private static loadArrayBuffer;
+        private static loadArrayBuffer(url, fun);
     }
     class AudioChannel {
         source: AudioBufferSourceNode;
@@ -2272,7 +2277,7 @@ declare namespace gd3d.framework {
         readonly currentAniclipName: string;
         readonly currentAniclip: animationClip;
         readonly playCount: number;
-        private init;
+        private init();
         addToCareList(bone: transform): void;
         addClip(clip: animationClip): void;
         haveClip(name: string): boolean;
@@ -2286,19 +2291,19 @@ declare namespace gd3d.framework {
         private beActivedEndFrame;
         private endFrame;
         playToXFrame(animName: string, endframe: number, crosstimer?: number, onPlayEnd?: () => void, speed?: number): void;
-        private recordeLastFrameData;
-        private playAniclip;
+        private recordeLastFrameData();
+        private playAniclip(aniclip, onPlayEnd?, speed?, beRevert?);
         stop(): void;
         pause(): void;
         isPlay(): boolean;
         isStop(): boolean;
         remove(): void;
         clone(): void;
-        private checkFrameId;
-        private OnClipPlayEnd;
+        private checkFrameId(delay);
+        private OnClipPlayEnd();
         private beActived;
         private boneCache;
-        private recyclecache;
+        private recyclecache();
         fillPoseData(data: Float32Array, bones: transform[]): void;
     }
 }
@@ -2312,7 +2317,7 @@ declare namespace gd3d.framework {
     enum PlayStyle {
         NormalPlay = 0,
         FramePlay = 1,
-        PingPang = 2
+        PingPang = 2,
     }
 }
 declare namespace gd3d.framework {
@@ -2410,7 +2415,7 @@ declare namespace gd3d.framework {
         private readonly tag;
         gameObject: gameObject;
         private _init;
-        private init;
+        private init();
         start(): void;
         onPlay(): void;
         update(delta: number): void;
@@ -2479,7 +2484,7 @@ declare namespace gd3d.framework {
         addOverLay(overLay: IOverLay): void;
         getOverLays(): IOverLay[];
         removeOverLay(overLay: IOverLay): void;
-        private sortOverLays;
+        private sortOverLays(lays);
         calcViewMatrix(matrix: gd3d.math.matrix): void;
         calcViewPortPixel(app: application, viewPortPixel: math.rect): void;
         calcProjectMatrix(asp: number, matrix: gd3d.math.matrix): void;
@@ -2489,7 +2494,7 @@ declare namespace gd3d.framework {
         private lastCamMtx;
         private lastCamRect;
         private paraArr;
-        private calcCameraFrame;
+        private calcCameraFrame(app);
         private matView;
         private matProjP;
         private matProjO;
@@ -2501,7 +2506,7 @@ declare namespace gd3d.framework {
         opvalue: number;
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2): void;
         fillRenderer(scene: scene): void;
-        private _fillRenderer;
+        private _fillRenderer(scene, node);
         testFrustumCulling(scene: scene, node: transform): boolean;
         _targetAndViewport(target: render.glRenderTarget, scene: scene, context: renderContext, withoutClear: boolean): void;
         _renderOnce(scene: scene, context: renderContext, drawtype: string): void;
@@ -2522,11 +2527,11 @@ declare namespace gd3d.framework {
         getOverLay(): overlay2D;
         sortOrder: number;
         private isCanvasinit;
-        private canvasInit;
+        private canvasInit();
         private _lastMode;
         private _renderMode;
         renderMode: canvasRenderMode;
-        private styleToMode;
+        private styleToMode();
         start(): void;
         onPlay(): void;
         update(delta: number): void;
@@ -2536,7 +2541,7 @@ declare namespace gd3d.framework {
     enum canvasRenderMode {
         ScreenSpaceOverlay = 0,
         ScreenSpaceCamera = 1,
-        WorldSpace = 2
+        WorldSpace = 2,
     }
 }
 declare namespace gd3d.framework {
@@ -2573,26 +2578,26 @@ declare namespace gd3d.framework {
         start(): void;
         onPlay(): void;
         update(delta: number): void;
-        private _update;
-        private mergeLerpAttribData;
-        private updateEffectBatcher;
+        private _update(delta);
+        private mergeLerpAttribData(realUseCurFrameData, curFrameData);
+        private updateEffectBatcher(effectBatcher, curAttrsData, initFrameData, vertexStartIndex);
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         clone(): effectSystem;
         play(speed?: number): void;
         pause(): void;
         stop(): void;
         reset(restSinglemesh?: boolean, resetParticle?: boolean): void;
-        private resetSingleMesh;
-        private resetparticle;
+        private resetSingleMesh();
+        private resetparticle();
         private delayElements;
         private refElements;
-        private addElements;
-        private addElement;
-        private addInitFrame;
+        private addElements();
+        private addElement(data);
+        private addInitFrame(elementData);
         setFrameId(id: number): void;
         getDelayFrameCount(delayTime: number): number;
         private beExecuteNextFrame;
-        private checkFrameId;
+        private checkFrameId();
         remove(): void;
         readonly leftLifeTime: number;
     }
@@ -2628,23 +2633,23 @@ declare namespace gd3d.framework {
         start(): void;
         onPlay(): void;
         update(delta: number): void;
-        private _update;
+        private _update(delta);
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         clone(): effectSystem;
         play(speed?: number): void;
         pause(): void;
         stop(): void;
         reset(restSinglemesh?: boolean, resetParticle?: boolean): void;
-        private resetSingleMesh;
+        private resetSingleMesh();
         private delayElements;
         private refElements;
-        private addElements;
-        private addElement;
+        private addElements();
+        private addElement(data);
         addEmissionElement(data?: EffectElementData): void;
         setFrameId(id: number): void;
         getDelayFrameCount(delayTime: number): number;
         private beExecuteNextFrame;
-        private checkFrameId;
+        private checkFrameId();
         remove(): void;
         readonly leftLifeTime: number;
     }
@@ -2685,7 +2690,7 @@ declare namespace gd3d.framework {
         onPlay(): void;
         update(delta: number): void;
         private adjustDir;
-        private followmove;
+        private followmove(delta);
         gameObject: gameObject;
         remove(): void;
         clone(): void;
@@ -2703,20 +2708,20 @@ declare namespace gd3d.framework {
         start(): void;
         onPlay(): void;
         update(delta: number): void;
-        private displayByTime;
-        private calcValueByTime;
-        private refrasCurveProperty;
-        private timeFilterCurves;
-        private checkPlayEnd;
-        private init;
+        private displayByTime(clip, playTime);
+        private calcValueByTime(curve, playTime);
+        private refrasCurveProperty(curve, playTime);
+        private timeFilterCurves(clip, nowTime);
+        private checkPlayEnd(clip);
+        private init();
         isPlaying(ClipName: string): boolean;
         playByName(ClipName: string): void;
         play(): void;
         stop(): void;
         rewind(): void;
-        private collectPropertyObj;
-        private collectPathPropertyObj;
-        private serchChild;
+        private collectPropertyObj(clip);
+        private collectPathPropertyObj(clip, pathMap);
+        private serchChild(name, trans);
         clone(): void;
         remove(): void;
     }
@@ -2725,7 +2730,7 @@ declare namespace gd3d.framework {
     enum LightTypeEnum {
         Direction = 0,
         Point = 1,
-        Spot = 2
+        Spot = 2,
     }
     class light implements INodeComponent {
         static readonly ClassName: string;
@@ -2775,10 +2780,10 @@ declare namespace gd3d.framework {
         colliderVisible: boolean;
         caclPlaneInDir(v0: math.vector3, v1: math.vector3, v2: math.vector3): boolean;
         intersectsTransform(tran: transform): boolean;
-        private build;
-        private buildMesh;
-        private setMeshRenderer;
-        private getColliderMesh;
+        private build();
+        private buildMesh();
+        private setMeshRenderer();
+        private getColliderMesh();
         remove(): void;
         clone(): void;
     }
@@ -2814,13 +2819,13 @@ declare namespace gd3d.framework {
         play(): void;
         stop(): void;
         lookAtCamera: boolean;
-        private initmesh;
-        private reInitdata;
+        private initmesh();
+        private reInitdata();
         isAlphaGradual: boolean;
         private inited;
-        private intidata;
+        private intidata();
         private speed;
-        private updateTrailData;
+        private updateTrailData();
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         clone(): void;
         remove(): void;
@@ -2866,10 +2871,10 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         gameObject: gameObject;
         remove(): void;
-        private refreshTrailNode;
+        private refreshTrailNode(curTime);
         private notRender;
-        private updateTrailData;
-        private checkBufferSize;
+        private updateTrailData(curTime);
+        private checkBufferSize();
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         clone(): void;
     }
@@ -2895,7 +2900,7 @@ declare namespace gd3d.framework {
         private readonly tag;
         gameObject: gameObject;
         private _init;
-        private init;
+        private init();
         start(): void;
         onPlay(): void;
         update(delta: number): void;
@@ -2931,7 +2936,7 @@ declare namespace gd3d.framework {
         private renderActive;
         beref: boolean;
         update(deltaTime: number): void;
-        private OnEndOnceLoop;
+        private OnEndOnceLoop();
         private _renderCamera;
         readonly renderCamera: camera;
         mvpMat: math.matrix;
@@ -2939,7 +2944,7 @@ declare namespace gd3d.framework {
         private totalTime;
         restartFrame: number;
         totalFrame: number;
-        private addF14layer;
+        private addF14layer(type, layerdata);
         getElementCount(): number;
         private playRate;
         enabletimeFlow: boolean;
@@ -2956,14 +2961,14 @@ declare namespace gd3d.framework {
     enum PlayStateEnum {
         play = 0,
         beReady = 1,
-        pause = 2
+        pause = 2,
     }
 }
 declare namespace gd3d.framework {
     enum F14TypeEnum {
         SingleMeshType = 0,
         particlesType = 1,
-        RefType = 2
+        RefType = 2,
     }
     interface F14Element {
         type: F14TypeEnum;
@@ -3009,9 +3014,9 @@ declare namespace gd3d.framework {
     }
     class F14AttTimeLine {
         name: string;
-        lerpFunc: (from: any, to: any, lerp: any, out: any) => void;
-        cloneFunc: (from: any, to: any) => void;
-        constructor(name: string, lerpfunc: (from: any, to: any, lerp: any, out: any) => void, clonefunc: (from: any, to: any) => void);
+        lerpFunc: (from, to, lerp, out) => void;
+        cloneFunc: (from, to) => void;
+        constructor(name: string, lerpfunc: (from, to, lerp, out) => void, clonefunc: (from, to) => void);
         frameList: number[];
         line: {
             [index: number]: any;
@@ -3122,16 +3127,16 @@ declare namespace gd3d.framework {
         constructor(effect: f14EffectSystem, layer: F14Layer);
         private lastFrame;
         update(deltaTime: number, frame: number, fps: number): void;
-        private refreshByFrameData;
+        private refreshByFrameData(fps);
         changeCurrentBaseData(data: F14EmissionBaseData): void;
-        private initBycurrentdata;
+        private initBycurrentdata();
         getWorldMatrix(): math.matrix;
         getWorldRotation(): math.quaternion;
-        private updateLife;
-        private reInit;
+        private updateLife();
+        private reInit();
         private bursts;
-        private updateEmission;
-        private addParticle;
+        private updateEmission();
+        private addParticle(count?);
         reset(): void;
         changeColor(value: math.color): void;
         OnEndOnceLoop(): void;
@@ -3145,7 +3150,7 @@ declare namespace gd3d.framework {
         StretchedBillBoard = 2,
         HorizontalBillBoard = 3,
         VerticalBillBoard = 4,
-        Mesh = 5
+        Mesh = 5,
     }
     class F14EmissionBaseData implements F14ElementData {
         loopenum: LoopEnum;
@@ -3219,7 +3224,7 @@ declare namespace gd3d.framework {
         curIndexCount: number;
         vertexLength: number;
         constructor(effect: f14EffectSystem, element: F14Emission);
-        private getMaxParticleCount;
+        private getMaxParticleCount();
         render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue: number): void;
         unRender(): void;
         getElementCount(): number;
@@ -3270,8 +3275,8 @@ declare namespace gd3d.framework {
         actived: boolean;
         private emissionMatToWorld;
         private emissionWorldRotation;
-        private getEmissionMatToWorld;
-        private getemissionWorldRotation;
+        private getEmissionMatToWorld();
+        private getemissionWorldRotation();
         constructor(element: F14Emission, data: F14EmissionBaseData);
         initByEmissionData(data: F14EmissionBaseData): void;
         update(deltaTime: number): void;
@@ -3280,10 +3285,10 @@ declare namespace gd3d.framework {
         private temUv;
         uploadMeshdata(): void;
         private transformVertex;
-        private updateLocalMatrix;
-        private updatePos;
-        private updateSize;
-        private updateEuler;
+        private updateLocalMatrix();
+        private updatePos();
+        private updateSize();
+        private updateEuler();
         private angleRot;
         private worldpos;
         private tarWorldpos;
@@ -3293,9 +3298,9 @@ declare namespace gd3d.framework {
         private worldRotation;
         private invParWorldRot;
         private worldStartPos;
-        private updateRot;
-        private updateColor;
-        private updateUV;
+        private updateRot();
+        private updateColor();
+        private updateUV();
         getCurTex_ST(data: F14EmissionBaseData): void;
         dispose(): void;
     }
@@ -3335,7 +3340,7 @@ declare namespace gd3d.framework {
         constructor(effect: f14EffectSystem, layer: F14Layer);
         RefEffect: f14EffectSystem;
         reset(): void;
-        private refreshStartEndFrame;
+        private refreshStartEndFrame();
         update(deltaTime: number, frame: number, fps: number): void;
         OnEndOnceLoop(): void;
         changeColor(value: math.color): void;
@@ -3433,12 +3438,12 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     enum LoopEnum {
         Restart = 0,
-        TimeContinue = 1
+        TimeContinue = 1,
     }
     enum BindAxis {
         X = 0,
         Y = 1,
-        NONE = 2
+        NONE = 2,
     }
     class F14SingleMeshBaseData implements F14ElementData {
         loopenum: LoopEnum;
@@ -3499,13 +3504,24 @@ declare namespace gd3d {
         listenerCount(event: string): number;
     }
 }
+declare namespace gd3d.framework {
+    class PointEvent {
+        type: event.PointEventEnum;
+        x: number;
+        y: number;
+        eated: boolean;
+        selected: transform2D;
+        c_x: number;
+        c_y: number;
+    }
+}
 declare namespace gd3d.event {
     enum UIEventEnum {
         PointerDown = 0,
         PointerUp = 1,
         PointerClick = 2,
         PointerEnter = 3,
-        PointerExit = 4
+        PointerExit = 4,
     }
     enum PointEventEnum {
         PointDown = 0,
@@ -3513,11 +3529,11 @@ declare namespace gd3d.event {
         PointUp = 2,
         PointMove = 3,
         PointClick = 4,
-        MouseWheel = 5
+        MouseWheel = 5,
     }
     enum KeyEventEnum {
         KeyDown = 0,
-        KeyUp = 1
+        KeyUp = 1,
     }
     enum KeyCode {
         None = 0,
@@ -3840,7 +3856,7 @@ declare namespace gd3d.event {
         Joystick8Button16 = 506,
         Joystick8Button17 = 507,
         Joystick8Button18 = 508,
-        Joystick8Button19 = 509
+        Joystick8Button19 = 509,
     }
 }
 declare namespace gd3d.event {
@@ -3859,17 +3875,6 @@ declare namespace gd3d.event {
     class UIEvent extends AEvent {
         OnEnum(event: UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         EmitEnum(event: UIEventEnum, ...args: Array<any>): void;
-    }
-}
-declare namespace gd3d.framework {
-    class PointEvent {
-        type: event.PointEventEnum;
-        x: number;
-        y: number;
-        eated: boolean;
-        selected: transform2D;
-        c_x: number;
-        c_y: number;
     }
 }
 declare namespace gd3d.framework {
@@ -3899,21 +3904,21 @@ declare namespace gd3d.framework {
         private rMtr_90;
         private rMtr_n90;
         constructor(app: application);
-        private attach;
-        private detach;
-        private _mousedown;
-        private _mouseup;
-        private _mousemove;
-        private _mousewheel;
-        private tryAddTouchP;
-        private syncPointByTouches;
-        private _touchstart;
-        private _touchmove;
-        private _touchend;
-        private _touchcancel;
-        private _keydown;
-        private _keyup;
-        private _blur;
+        private attach(element);
+        private detach();
+        private _mousedown(ev);
+        private _mouseup(ev);
+        private _mousemove(ev);
+        private _mousewheel(ev);
+        private tryAddTouchP(id);
+        private syncPointByTouches();
+        private _touchstart(ev);
+        private _touchmove(ev);
+        private _touchend(ev);
+        private _touchcancel(ev);
+        private _keydown(ev);
+        private _keyup(ev);
+        private _blur(ev);
         private readonly moveTolerance;
         private lastTouch;
         private hasPointDown;
@@ -3922,13 +3927,13 @@ declare namespace gd3d.framework {
         private downPoint;
         private lastPoint;
         update(delta: any): void;
-        private pointCk;
+        private pointCk();
         private hasKeyDown;
         private hasKeyUp;
-        private keyCodeCk;
+        private keyCodeCk();
         private hasWheel;
         private lastWheel;
-        private mouseWheelCk;
+        private mouseWheelCk();
         isPressed(button: number): boolean;
         wasPressed(button: number): boolean;
         private _contextMenu;
@@ -3946,7 +3951,8 @@ declare namespace gd3d.framework {
         KeyDownCount(): number;
         private tempV2_0;
         private tempV2_1;
-        private CalcuPoint;
+        private devicePixelRatio;
+        private CalcuPoint(clientX, clientY, out);
     }
 }
 declare namespace gd3d.io {
@@ -3979,7 +3985,7 @@ declare namespace gd3d.io {
         r_offset: number;
         w_offset: number;
         constructor(size?: number);
-        private ckl;
+        private ckl();
         readSingle(): number;
         readLong(): number;
         readULong(): number;
@@ -4053,7 +4059,7 @@ declare namespace gd3d.io {
     enum SaveAssetType {
         FullUrl = 0,
         NameAndContent = 1,
-        DefaultAssets = 2
+        DefaultAssets = 2,
     }
     class SerializeDependent {
         static resourseDatas: any[];
@@ -4139,7 +4145,7 @@ declare namespace gd3d.io {
         private _length;
         private _seek;
         constructor();
-        private sureData;
+        private sureData(addlen);
         getLength(): number;
         getBuffer(): ArrayBuffer;
         seek(seek: number): void;
@@ -4220,6 +4226,7 @@ declare namespace gd3d.math {
     function matrixViewLookatLH(eye: vector3, forward: vector3, up: vector3, out: matrix): void;
     function matrixLerp(left: matrix, right: matrix, v: number, out: matrix): void;
     function matrixTransformVector3(vector: vector3, transformation: matrix, result: vector3): void;
+    function matrixTransformVector4(src: gd3d.math.vector4, mtx: gd3d.math.matrix, out: gd3d.math.vector4): void;
     function matrixTransformNormal(vector: vector3, transformation: matrix, result: vector3): void;
     function matrixGetVector3ByOffset(src: matrix, offset: number, result: vector3): void;
     function matrixReset(mat: matrix): void;
@@ -4292,10 +4299,8 @@ declare namespace gd3d.math {
     function vec2Distance(a: vector2, b: vector2): number;
     function vec2ScaleByNum(from: vector2, scale: number, out: vector2): void;
     function vec2ScaleByVec2(from: vector2, scale: vector2, out: vector2): void;
-    function vec4Clone(from: vector4, to: vector4): void;
     function vec2Length(a: vector2): number;
     function vec2SLerp(vector: vector2, vector2: vector2, v: number, out: vector2): void;
-    function vec4SLerp(vector: vector4, vector2: vector4, v: number, out: vector4): void;
     function vec2Normalize(from: vector2, out: vector2): void;
     function vec2Multiply(a: vector2, b: vector2): number;
     function vec2Dot(lhs: vector2, rhs: vector2): number;
@@ -4339,6 +4344,12 @@ declare namespace gd3d.math {
     function quaternionFormat(vector: quaternion, maxDot: number, out: quaternion): void;
     function floatFormat(num: number, maxDot: number): number;
     function vec3Equal(vector: vector3, vector2: vector3, threshold?: number): boolean;
+}
+declare namespace gd3d.math {
+    function vec4Clone(from: vector4, to: vector4): void;
+    function vec4SLerp(vector: vector4, vector2: vector4, v: number, out: vector4): void;
+    function vec4Add(a: gd3d.math.vector4, b: gd3d.math.vector4, out: gd3d.math.vector4): void;
+    function vec4ScaleByNum(from: gd3d.math.vector4, scale: number, out: gd3d.math.vector4): void;
 }
 declare namespace gd3d.framework {
     class navVec3 {
@@ -4384,31 +4395,10 @@ declare namespace gd3d.framework {
         min: navVec3;
         max: navVec3;
         calcBound(): void;
-        private static cross;
+        private static cross(p0, p1, p2);
         inPoly(p: navVec3, poly: number[]): boolean;
         genBorder(): void;
         static LoadMeshInfo(s: string): navMeshInfo;
-    }
-}
-declare namespace gd3d.framework {
-    class NavMeshLoadManager {
-        private static _instance;
-        private navMeshVertexOffset;
-        navMesh: gd3d.framework.mesh;
-        private app;
-        navigate: gd3d.framework.Navigate;
-        navTrans: gd3d.framework.transform;
-        readonly navmeshJson: string;
-        private _navmeshJson;
-        loadNavMesh(navMeshUrl: string, app: gd3d.framework.application, onstate?: (state: stateLoad) => void): void;
-        loadNavMeshByDate(dataStr: string, app: gd3d.framework.application, callback: () => any): void;
-        private navmeshLoaded;
-        private createMesh;
-        showNavmesh(isshow: boolean, material?: gd3d.framework.material): void;
-        dispose(): void;
-        static readonly Instance: NavMeshLoadManager;
-        moveToPoints(startPos: gd3d.math.vector3, endPos: gd3d.math.vector3): Array<gd3d.math.vector3>;
-        static findtriIndex(point: gd3d.math.vector3, trans: gd3d.framework.transform): number;
     }
 }
 declare namespace gd3d.framework {
@@ -4423,9 +4413,30 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class NavMeshLoadManager {
+        private static _instance;
+        private navMeshVertexOffset;
+        navMesh: gd3d.framework.mesh;
+        private app;
+        navigate: gd3d.framework.Navigate;
+        navTrans: gd3d.framework.transform;
+        readonly navmeshJson: string;
+        private _navmeshJson;
+        loadNavMesh(navMeshUrl: string, app: gd3d.framework.application, onstate?: (state: stateLoad) => void): void;
+        loadNavMeshByDate(dataStr: string, app: gd3d.framework.application, callback: () => any): void;
+        private navmeshLoaded(dataStr, callback);
+        private createMesh(meshData, webgl);
+        showNavmesh(isshow: boolean, material?: gd3d.framework.material): void;
+        dispose(): void;
+        static readonly Instance: NavMeshLoadManager;
+        moveToPoints(startPos: gd3d.math.vector3, endPos: gd3d.math.vector3): Array<gd3d.math.vector3>;
+        static findtriIndex(point: gd3d.math.vector3, trans: gd3d.framework.transform): number;
+    }
+}
+declare namespace gd3d.framework {
     class pathFinding {
         static calcAStarPolyPath(info: navMeshInfo, startPoly: number, endPoly: number, endPos?: navVec3, offset?: number): number[];
-        private static NearAngle;
+        private static NearAngle(a, b);
         static FindPath(info: navMeshInfo, startPos: navVec3, endPos: navVec3, offset?: number): navVec3[];
         static calcWayPoints(info: navMeshInfo, startPos: navVec3, endPos: navVec3, polyPath: number[], offset?: number): navVec3[];
         static intersectBorder(a: navVec3, b: navVec3, c: navVec3, d: navVec3): navVec3;
@@ -4449,7 +4460,7 @@ declare namespace gd3d.framework {
         setRoadPoints(goalQueue: gd3d.math.vector3[]): void;
         addAgent(key: number, transform: gd3d.framework.transform, radius: number, attackRanges: number, speed: number): void;
         removeAgent(key: number): void;
-        private reBuildHashMap;
+        private reBuildHashMap();
         getTransformByKey(key: number): gd3d.framework.transform;
         setRadius(id: number, value: number): void;
         setSpeed(id: number, value: number): void;
@@ -4457,11 +4468,11 @@ declare namespace gd3d.framework {
         disable(): void;
         enable(): void;
         update(): void;
-        private isAlmostStatic;
-        private RVO_walking;
-        private updateTransform;
-        private RVO_check;
-        private cal2dDir;
+        private isAlmostStatic();
+        private RVO_walking(sim, goals);
+        private updateTransform(sim);
+        private RVO_check(sim, goals);
+        private cal2dDir(oPos, tPos, out);
     }
 }
 declare namespace gd3d.framework {
@@ -4493,12 +4504,12 @@ declare namespace gd3d.framework {
         loopFrame: number;
         active: boolean;
         constructor(_data: EffectElementData);
-        private recordElementLerpAttributes;
-        private recordLerpValues;
-        private recordLerp;
+        private recordElementLerpAttributes();
+        private recordLerpValues(effectFrameData);
+        private recordLerp(effectFrameData, lerpData, key);
         initActions(): void;
         update(): void;
-        private updateElementRotation;
+        private updateElementRotation();
         isCurFrameNeedRefresh(frameIndex: number): boolean;
         setActive(_active: boolean): void;
         dispose(): void;
@@ -4575,7 +4586,7 @@ declare namespace gd3d.framework {
     enum EffectBatcherState {
         NotInitedStateType = 0,
         InitedStateType = 1,
-        ResizeCapacityStateType = 2
+        ResizeCapacityStateType = 2,
     }
     class EffectBatcher {
         mesh: mesh;
@@ -4600,15 +4611,15 @@ declare namespace gd3d.framework {
         Play = 2,
         Pause = 3,
         Stop = 4,
-        Dispose = 5
+        Dispose = 5,
     }
     enum EffectElementTypeEnum {
         SingleMeshType = 0,
         EmissionType = 1,
-        MultiMeshType = 2
+        MultiMeshType = 2,
     }
     enum EffectLerpTypeEnum {
-        Linear = 0
+        Linear = 0,
     }
     enum RenderModel {
         None = 0,
@@ -4616,13 +4627,13 @@ declare namespace gd3d.framework {
         StretchedBillBoard = 2,
         HorizontalBillBoard = 3,
         VerticalBillBoard = 4,
-        Mesh = 5
+        Mesh = 5,
     }
 }
 declare namespace gd3d.framework {
     enum ParticleEmissionType {
         burst = 0,
-        continue = 1
+        continue = 1,
     }
     class EmissionData {
         type: ParticleEmissionType;
@@ -4689,7 +4700,7 @@ declare namespace gd3d.framework {
     enum UVTypeEnum {
         NONE = 0,
         UVRoll = 1,
-        UVSprite = 2
+        UVSprite = 2,
     }
 }
 declare namespace gd3d.framework {
@@ -4740,7 +4751,7 @@ declare namespace gd3d.framework {
         HEMISPHERE = 3,
         CONE = 4,
         EDGE = 5,
-        CIRCLE = 6
+        CIRCLE = 6,
     }
     class ParticleStartData {
         shapeType: ParticleSystemShape;
@@ -4765,12 +4776,12 @@ declare namespace gd3d.framework {
         readonly coneDirection: gd3d.math.vector3;
         readonly circleDirection: gd3d.math.vector3;
         readonly edgeDirection: math.vector3;
-        private getposition;
+        private getposition(dir, length);
         clone(): ParticleStartData;
     }
     enum emitfromenum {
         base = 0,
-        volume = 1
+        volume = 1,
     }
 }
 declare namespace gd3d.framework {
@@ -4788,61 +4799,6 @@ declare namespace gd3d.framework {
         getValueRandom(): number;
         constructor();
         static RandomRange(min: number, max: number, isInteger?: boolean): number;
-    }
-}
-declare namespace gd3d.framework {
-    class Particle_new {
-        gameObject: gameObject;
-        private emisson;
-        private batcher;
-        private startScale;
-        startRotation: gd3d.math.quaternion;
-        rotationByShape: math.quaternion;
-        Starteuler: math.vector3;
-        rotAngle: number;
-        eulerSpeed: number;
-        rotationByEuler: math.quaternion;
-        localMatrix: math.matrix;
-        localTranslate: math.vector3;
-        localRotation: math.quaternion;
-        localScale: math.vector3;
-        startColor: math.color;
-        color: math.vector3;
-        alpha: number;
-        tex_ST: math.vector4;
-        private totalLife;
-        private curLife;
-        private life;
-        private speedDir;
-        private movespeed;
-        private simulationSpeed;
-        sourceVbo: Float32Array;
-        vertexStartIndex: number;
-        dataForVbo: Float32Array;
-        dataForEbo: Uint16Array;
-        private emissionMatToWorld;
-        private emissionWorldRotation;
-        private sizeNodes;
-        private colorNodes;
-        private alphaNodes;
-        constructor(batcher: EmissionBatcher_new);
-        uploadData(array: Float32Array): void;
-        initByData(): void;
-        actived: boolean;
-        update(delta: number): void;
-        private transformVertex;
-        private _updateLocalMatrix;
-        private matToworld;
-        private refreshEmissionData;
-        private _updateRotation;
-        private _updatePos;
-        private _updateEuler;
-        private _updateScale;
-        private _updateColor;
-        private spriteIndex;
-        private _updateUV;
-        private _updateVBO;
-        dispose(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -4921,17 +4877,17 @@ declare namespace gd3d.framework {
     enum AttributeUIState {
         None = 0,
         Show = 1,
-        Hide = 2
+        Hide = 2,
     }
     enum AttributeUIType {
         Number = 0,
         Vector2 = 1,
         Vector3 = 2,
-        Vector4 = 3
+        Vector4 = 3,
     }
     enum AttributeValType {
         FixedValType = 0,
-        LerpType = 1
+        LerpType = 1,
     }
     class FrameKeyPointData {
         frameIndex: number;
@@ -4961,7 +4917,7 @@ declare namespace gd3d.framework {
         ColorType = 4,
         ColorRateType = 5,
         AlphaType = 6,
-        TillingType = 7
+        TillingType = 7,
     }
     class EffectElementSingleMesh implements IEffectElement {
         name: string;
@@ -4989,11 +4945,11 @@ declare namespace gd3d.framework {
         rotationByEuler: math.quaternion;
         localRotation: math.quaternion;
         constructor(sys: TestEffectSystem, data?: EffectElementData);
-        private initByElementdata;
-        private initByDefData;
+        private initByElementdata(data);
+        private initByDefData();
         writeToJson(obj: any): any;
         update(): void;
-        private updateElementRotation;
+        private updateElementRotation();
         dispose(): void;
     }
 }
@@ -5061,8 +5017,8 @@ declare namespace gd3d.framework {
         private numcount;
         private beover;
         constructor(sys: TestEffectSystem, data?: EffectElementData);
-        private initDefparticleData;
-        private initByEmissonData;
+        private initDefparticleData();
+        private initByEmissonData(data);
         private worldRotation;
         getWorldRotation(): gd3d.math.quaternion;
         matToObj: gd3d.math.matrix;
@@ -5070,19 +5026,19 @@ declare namespace gd3d.framework {
         getmatrixToObj(): void;
         getmatrixToWorld(): gd3d.math.matrix;
         update(delta: number): void;
-        private updateBatcher;
-        private updateLife;
-        private reInit;
-        private updateEmission;
-        private addParticle;
-        private addBatcher;
+        private updateBatcher(delta);
+        private updateLife(delta);
+        private reInit();
+        private updateEmission();
+        private addParticle(count?);
+        private addBatcher();
         private _renderCamera;
         readonly renderCamera: camera;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         dispose(): void;
         vbo: Float32Array;
         private ebo;
-        private getMesh;
+        private getMesh();
         cloneMeshVBO(): Float32Array;
         cloneMeshEBO(): Uint16Array;
         writeToJson(obj: any): void;
@@ -5098,11 +5054,11 @@ declare namespace gd3d.framework {
         dataForEbo: Uint16Array;
         particles: Particle_new[];
         constructor(emissionElement: EffectElementEmission);
-        private initMesh;
+        private initMesh();
         curVerCount: number;
         curIndexCount: number;
         addParticle(): void;
-        private refreshBuffer;
+        private refreshBuffer();
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         dispose(): void;
@@ -5112,6 +5068,61 @@ declare namespace gd3d.framework {
     class effTools {
         static getRandomDirAndPosByZEmission(emission: EffectElementEmission, outDir: gd3d.math.vector3, outPos: gd3d.math.vector3): void;
         static getTex_ST(emission: EffectElementEmission, out_St: math.vector4): void;
+    }
+}
+declare namespace gd3d.framework {
+    class Particle_new {
+        gameObject: gameObject;
+        private emisson;
+        private batcher;
+        private startScale;
+        startRotation: gd3d.math.quaternion;
+        rotationByShape: math.quaternion;
+        Starteuler: math.vector3;
+        rotAngle: number;
+        eulerSpeed: number;
+        rotationByEuler: math.quaternion;
+        localMatrix: math.matrix;
+        localTranslate: math.vector3;
+        localRotation: math.quaternion;
+        localScale: math.vector3;
+        startColor: math.color;
+        color: math.vector3;
+        alpha: number;
+        tex_ST: math.vector4;
+        private totalLife;
+        private curLife;
+        private life;
+        private speedDir;
+        private movespeed;
+        private simulationSpeed;
+        sourceVbo: Float32Array;
+        vertexStartIndex: number;
+        dataForVbo: Float32Array;
+        dataForEbo: Uint16Array;
+        private emissionMatToWorld;
+        private emissionWorldRotation;
+        private sizeNodes;
+        private colorNodes;
+        private alphaNodes;
+        constructor(batcher: EmissionBatcher_new);
+        uploadData(array: Float32Array): void;
+        initByData(): void;
+        actived: boolean;
+        update(delta: number): void;
+        private transformVertex;
+        private _updateLocalMatrix(delta);
+        private matToworld;
+        private refreshEmissionData();
+        private _updateRotation(delta);
+        private _updatePos(delta);
+        private _updateEuler(delta);
+        private _updateScale(delta);
+        private _updateColor(delta);
+        private spriteIndex;
+        private _updateUV(delta);
+        private _updateVBO();
+        dispose(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -5263,8 +5274,8 @@ declare namespace gd3d.framework {
     class EffectParser {
         asMgr: assetMgr;
         Parse(str: string, assetmgr: assetMgr): EffectSystemData;
-        private _parse;
-        private copyAndOverWrite;
+        private _parse(elementData);
+        private copyAndOverWrite(srcData, desData);
         _parseSingleMeshTypeData(elementData: any, element: EffectElementData): void;
         _parseEmissionTypeData(elementData: any, element: EffectElementData): void;
         _parseEmissionShape(_startdata: any, element: EffectElementData): void;
@@ -5313,7 +5324,7 @@ declare namespace gd3d.framework {
         curVerCount: number;
         curIndexCount: number;
         addParticle(): void;
-        private refreshBuffer;
+        private refreshBuffer();
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         dispose(): void;
@@ -5360,35 +5371,35 @@ declare namespace gd3d.framework {
         actived: boolean;
         update(delta: number): void;
         private transformVertex;
-        private _updateLocalMatrix;
+        private _updateLocalMatrix(delta);
         private matToworld;
-        private refreshEmissionData;
-        private _updateRotation;
-        private _updateElementRotation;
-        private _updatePos;
-        private _updateEuler;
+        private refreshEmissionData();
+        private _updateRotation(delta);
+        private _updateElementRotation();
+        private _updatePos(delta);
+        private _updateEuler(delta);
         private _startNode;
         private endNode;
-        private _updateScale;
-        private _updateColor;
+        private _updateScale(delta);
+        private _updateColor(delta);
         private tempStartNode;
         private tempEndNode;
-        private _updateNode;
+        private _updateNode(nodes, life, out, nodetype?);
         private _startNodeNum;
         private _curNodeNum;
-        private _updateAlpha;
+        private _updateAlpha(delta);
         private _startUVSpeedNode;
         private _curUVSpeedNode;
         private spriteIndex;
-        private _updateUV;
+        private _updateUV(delta);
         private tex_ST;
-        private _updateVBO;
+        private _updateVBO();
         dispose(): void;
     }
     enum nodeType {
         none = 0,
         alpha = 1,
-        scale = 2
+        scale = 2,
     }
 }
 declare namespace gd3d.framework {
@@ -5439,7 +5450,7 @@ declare namespace gd3d.framework {
         updateBatcher(delta: number): void;
         updateEmission(delta: number): void;
         addParticle(count?: number): void;
-        private addBatcher;
+        private addBatcher();
         renderCamera: camera;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         dispose(): void;
@@ -5456,7 +5467,7 @@ declare namespace gd3d.framework {
         DontSaveInBuild = 16,
         DontUnloadUnusedAsset = 32,
         DontSave = 52,
-        HideAndDontSave = 61
+        HideAndDontSave = 61,
     }
     interface INodeComponent {
         onPlay(): any;
@@ -5497,11 +5508,11 @@ declare namespace gd3d.framework {
         getComponent(type: string): INodeComponent;
         getComponents(): INodeComponent[];
         getComponentsInChildren(type: string): INodeComponent[];
-        private _getComponentsInChildren;
+        private _getComponentsInChildren(type, obj, array);
         getComponentInParent(type: string): INodeComponent;
         addComponent(type: string): INodeComponent;
         removeComponent(comp: INodeComponent): void;
-        private remove;
+        private remove(comp);
         removeComponentByTypeName(type: string): void;
         removeAllComponents(): void;
         dispose(): void;
@@ -5554,7 +5565,7 @@ declare namespace gd3d.framework {
     enum RenderLayerEnum {
         Common = 0,
         Transparent = 1,
-        Overlay = 2
+        Overlay = 2,
     }
     interface IRenderer extends INodeComponent {
         layer: RenderLayerEnum;
@@ -5595,14 +5606,14 @@ declare namespace gd3d.framework {
         fog: Fog;
         onLateUpdate: (delta: number) => any;
         update(delta: number): void;
-        private updateSceneOverLay;
+        private updateSceneOverLay(delta);
         private RealCameraNumber;
-        private _renderCamera;
-        private sortOverLays;
-        private updateScene;
-        private objupdateInEditor;
-        private objupdate;
-        private collectCameraAndLight;
+        private _renderCamera(camindex);
+        private sortOverLays(lays);
+        private updateScene(node, delta);
+        private objupdateInEditor(node, delta);
+        private objupdate(node, delta);
+        private collectCameraAndLight(node);
         addChild(node: transform): void;
         removeChild(node: transform): void;
         getChildren(): transform[];
@@ -5612,9 +5623,9 @@ declare namespace gd3d.framework {
         getRoot(): transform;
         pickAll(ray: ray, outInfos: pickinfo[], isPickMesh?: boolean, root?: transform, layermask?: number): boolean;
         pick(ray: ray, outInfo: pickinfo, isPickMesh?: boolean, root?: transform, layermask?: number): boolean;
-        private doPick;
-        private pickMesh;
-        private pickCollider;
+        private doPick(ray, pickall, isPickMesh, root, out, layermask?);
+        private pickMesh(ray, tran, pickedList, layermask?);
+        private pickCollider(ray, tran, pickedList, layermask?);
         enable2DPhysics(op?: IEngine2DOP): void;
     }
 }
@@ -5632,7 +5643,7 @@ declare namespace gd3d.framework {
         error: boolean;
         message: string;
         cancel: boolean;
-        taskCall: (taskstate: any, state: taskstate) => void;
+        taskCall: (taskstate, state: taskstate) => void;
         taskInterface: ITask;
     }
     interface ITask {
@@ -5668,7 +5679,7 @@ declare namespace gd3d.threading {
         private callMap;
         constructor();
         OnMessage(e: MessageEvent): void;
-        Call(name: string, data: any, callback: (result: any) => void): void;
+        Call(name: string, data: any, callback: (result) => void): void;
     }
 }
 declare namespace gd3d.framework {
@@ -5698,9 +5709,9 @@ declare namespace gd3d.framework {
         static obbVsObb(a: obb, b: obb): boolean;
         static sphereVsSphere(a: spherestruct, b: spherestruct): boolean;
         static obbVsSphere(a: obb, b: spherestruct): boolean;
-        private static obb_SphereOverLap;
-        private static obbOverLap;
-        private static extentsOverlap;
+        private static obb_SphereOverLap(axis, box0, sphere);
+        private static obbOverLap(axis, box0, box1);
+        private static extentsOverlap(a, b);
     }
 }
 declare namespace gd3d.framework {
@@ -5734,9 +5745,9 @@ declare namespace gd3d.framework {
         buildByCenterSize(center: gd3d.math.vector2, width: number, height: number): void;
         update(canvasWorldMtx: gd3d.math.matrix3x2): void;
         intersects(_obb: obb2d): boolean;
-        private computeBoxExtents;
-        private axisOverlap;
-        private extentsOverlap;
+        private computeBoxExtents(axis, box);
+        private axisOverlap(axis, box0, box1);
+        private extentsOverlap(min0, max0, min1, max1);
         clone(): obb2d;
         dispose(): void;
     }
@@ -5780,6 +5791,149 @@ declare namespace gd3d.framework {
         intersectBoxMinMax(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): boolean;
         intersectsSphere(center: gd3d.math.vector3, radius: number): boolean;
         intersectsTriangle(vertex0: gd3d.math.vector3, vertex1: gd3d.math.vector3, vertex2: gd3d.math.vector3, outInfo: pickinfo): boolean;
+    }
+}
+declare namespace gd3d.framework {
+    enum CullingMask {
+        nothing = 0,
+        default = 1,
+        transparentFx = 2,
+        IgnoreRaycast = 4,
+        editor = 8,
+        water = 16,
+        ui = 32,
+        preview = 64,
+        builtin_0 = 1,
+        builtin_1 = 2,
+        builtin_2 = 4,
+        builtin_3 = 8,
+        builtin_4 = 16,
+        builtin_5 = 32,
+        builtin_6 = 64,
+        builtin_7 = 128,
+        modelbeforeui = 256,
+        user_8 = 256,
+        user_9 = 512,
+        user_10 = 1024,
+        user_11 = 2048,
+        user_12 = 4096,
+        user_13 = 8192,
+        user_14 = 16384,
+        user_15 = 32768,
+        user_16 = 65536,
+        user_17 = 131072,
+        user_18 = 262144,
+        user_19 = 524288,
+        user_20 = 1048576,
+        user_21 = 2097152,
+        user_22 = 4194304,
+        user_23 = 8388608,
+        user_24 = 16777216,
+        user_25 = 33554432,
+        user_26 = 67108864,
+        user_27 = 134217728,
+        user_28 = 268435456,
+        user_29 = 536870912,
+        user_30 = 1073741824,
+        user_31 = 2147483648,
+        everything = 4294967295,
+    }
+    class cullingmaskutil {
+        static maskTolayer(mask: number): number;
+        static layerToMask(layer: number): number;
+    }
+}
+declare namespace gd3d.framework {
+    class EnumUtil {
+        static getEnumObjByType(enumType: string): any;
+    }
+}
+declare namespace gd3d.framework {
+    class NumberUtil {
+        static KEY_A: number;
+        static KEY_D: number;
+        static KEY_E: number;
+        static KEY_Q: number;
+        static KEY_R: number;
+        static KEY_S: number;
+        static KEY_W: number;
+        static KEY_a: number;
+        static KEY_d: number;
+        static KEY_e: number;
+        static KEY_q: number;
+        static KEY_r: number;
+        static KEY_s: number;
+        static KEY_w: number;
+    }
+}
+declare namespace gd3d.framework {
+    class RegexpUtil {
+        static textureRegexp: RegExp;
+        static vectorRegexp: RegExp;
+        static floatRegexp: RegExp;
+        static rangeRegexp: RegExp;
+        static vector4Regexp: RegExp;
+        static vector3FloatOrRangeRegexp: RegExp;
+    }
+}
+declare namespace gd3d.framework {
+    class StringUtil {
+        static builtinTag_Untagged: string;
+        static builtinTag_Player: string;
+        static builtinTag_EditorOnly: string;
+        static builtinTag_MainCamera: string;
+        static COMPONENT_CAMERA: string;
+        static COMPONENT_BOXCOLLIDER: string;
+        static COMPONENT_LIGHT: string;
+        static COMPONENT_MESHFILTER: string;
+        static COMPONENT_MESHRENDER: string;
+        static COMPONENT_EFFECTSYSTEM: string;
+        static COMPONENT_LABEL: string;
+        static COMPONENT_uirect: string;
+        static COMPONENT_IMAGE: string;
+        static COMPONENT_RAWIMAGE: string;
+        static COMPONENT_BUTTON: string;
+        static COMPONENT_SKINMESHRENDER: string;
+        static COMPONENT_AUDIOPLAYER: string;
+        static COMPONENT_CAMERACONTROLLER: string;
+        static COMPONENT_CANVASRENDER: string;
+        static UIStyle_RangeFloat: string;
+        static UIStyle_Enum: string;
+        static RESOURCES_MESH_CUBE: string;
+        static replaceAll(srcStr: string, fromStr: string, toStr: string): string;
+        static trimAll(str: string): string;
+        static firstCharToLowerCase(str: string): string;
+        static isNullOrEmptyObject(obj: any): boolean;
+    }
+}
+declare namespace gd3d.framework {
+    class textureutil {
+        static loadUtil(path: string): void;
+    }
+}
+declare namespace gd3d.framework {
+    enum PrimitiveType {
+        Sphere = 0,
+        Capsule = 1,
+        Cylinder = 2,
+        Cube = 3,
+        Plane = 4,
+        Quad = 5,
+        Pyramid = 6,
+    }
+    enum Primitive2DType {
+        RawImage2D = 0,
+        Image2D = 1,
+        Label = 2,
+        Button = 3,
+    }
+    class TransformUtil {
+        static CreatePrimitive(type: PrimitiveType, app: application): transform;
+        static Create2DPrimitive(type: Primitive2DType, app: application): transform2D;
+        private static create2D_rawImage(img, app);
+        private static create2D_image2D(img, app);
+        private static create2D_label(label, app);
+        private static create2D_button(btn, app);
     }
 }
 declare namespace gd3d.framework {
@@ -5868,155 +6022,12 @@ declare namespace gd3d.framework {
         BackEaseOut = 37,
         BackEaseIn = 38,
         BackEaseInOut = 39,
-        BackEaseOutIn = 40
-    }
-}
-declare namespace gd3d.framework {
-    enum CullingMask {
-        nothing = 0,
-        default = 1,
-        transparentFx = 2,
-        IgnoreRaycast = 4,
-        editor = 8,
-        water = 16,
-        ui = 32,
-        preview = 64,
-        builtin_0 = 1,
-        builtin_1 = 2,
-        builtin_2 = 4,
-        builtin_3 = 8,
-        builtin_4 = 16,
-        builtin_5 = 32,
-        builtin_6 = 64,
-        builtin_7 = 128,
-        modelbeforeui = 256,
-        user_8 = 256,
-        user_9 = 512,
-        user_10 = 1024,
-        user_11 = 2048,
-        user_12 = 4096,
-        user_13 = 8192,
-        user_14 = 16384,
-        user_15 = 32768,
-        user_16 = 65536,
-        user_17 = 131072,
-        user_18 = 262144,
-        user_19 = 524288,
-        user_20 = 1048576,
-        user_21 = 2097152,
-        user_22 = 4194304,
-        user_23 = 8388608,
-        user_24 = 16777216,
-        user_25 = 33554432,
-        user_26 = 67108864,
-        user_27 = 134217728,
-        user_28 = 268435456,
-        user_29 = 536870912,
-        user_30 = 1073741824,
-        user_31 = 2147483648,
-        everything = 4294967295
-    }
-    class cullingmaskutil {
-        static maskTolayer(mask: number): number;
-        static layerToMask(layer: number): number;
-    }
-}
-declare namespace gd3d.framework {
-    class EnumUtil {
-        static getEnumObjByType(enumType: string): any;
-    }
-}
-declare namespace gd3d.framework {
-    class NumberUtil {
-        static KEY_A: number;
-        static KEY_D: number;
-        static KEY_E: number;
-        static KEY_Q: number;
-        static KEY_R: number;
-        static KEY_S: number;
-        static KEY_W: number;
-        static KEY_a: number;
-        static KEY_d: number;
-        static KEY_e: number;
-        static KEY_q: number;
-        static KEY_r: number;
-        static KEY_s: number;
-        static KEY_w: number;
-    }
-}
-declare namespace gd3d.framework {
-    class RegexpUtil {
-        static textureRegexp: RegExp;
-        static vectorRegexp: RegExp;
-        static floatRegexp: RegExp;
-        static rangeRegexp: RegExp;
-        static vector4Regexp: RegExp;
-        static vector3FloatOrRangeRegexp: RegExp;
-    }
-}
-declare namespace gd3d.framework {
-    class StringUtil {
-        static builtinTag_Untagged: string;
-        static builtinTag_Player: string;
-        static builtinTag_EditorOnly: string;
-        static builtinTag_MainCamera: string;
-        static COMPONENT_CAMERA: string;
-        static COMPONENT_BOXCOLLIDER: string;
-        static COMPONENT_LIGHT: string;
-        static COMPONENT_MESHFILTER: string;
-        static COMPONENT_MESHRENDER: string;
-        static COMPONENT_EFFECTSYSTEM: string;
-        static COMPONENT_LABEL: string;
-        static COMPONENT_uirect: string;
-        static COMPONENT_IMAGE: string;
-        static COMPONENT_RAWIMAGE: string;
-        static COMPONENT_BUTTON: string;
-        static COMPONENT_SKINMESHRENDER: string;
-        static COMPONENT_AUDIOPLAYER: string;
-        static COMPONENT_CAMERACONTROLLER: string;
-        static COMPONENT_CANVASRENDER: string;
-        static UIStyle_RangeFloat: string;
-        static UIStyle_Enum: string;
-        static RESOURCES_MESH_CUBE: string;
-        static replaceAll(srcStr: string, fromStr: string, toStr: string): string;
-        static trimAll(str: string): string;
-        static firstCharToLowerCase(str: string): string;
-        static isNullOrEmptyObject(obj: any): boolean;
-    }
-}
-declare namespace gd3d.framework {
-    class textureutil {
-        static loadUtil(path: string): void;
-    }
-}
-declare namespace gd3d.framework {
-    enum PrimitiveType {
-        Sphere = 0,
-        Capsule = 1,
-        Cylinder = 2,
-        Cube = 3,
-        Plane = 4,
-        Quad = 5,
-        Pyramid = 6
-    }
-    enum Primitive2DType {
-        RawImage2D = 0,
-        Image2D = 1,
-        Label = 2,
-        Button = 3
-    }
-    class TransformUtil {
-        static CreatePrimitive(type: PrimitiveType, app: application): transform;
-        static Create2DPrimitive(type: Primitive2DType, app: application): transform2D;
-        private static create2D_rawImage;
-        private static create2D_image2D;
-        private static create2D_label;
-        private static create2D_button;
+        BackEaseOutIn = 40,
     }
 }
 declare namespace gd3d.framework {
     class WebGLDebugUtils {
-        private log;
+        private log(msg);
         static readonly glValidEnumContexts: {
             'enable': {
                 0: boolean;
@@ -6195,19 +6206,19 @@ declare namespace gd3d.framework {
             };
         };
         private glEnums;
-        private init;
-        private checkInit;
-        private mightBeEnum;
-        private glEnumToString;
-        private glFunctionArgToString;
-        makeDebugContext(ctx: WebGLRenderingContext, opt_onErrorFunc?: (err: any, funcName: any, args: any) => void): WebGLRenderingContext;
-        private resetToInitialState;
-        private makeLostContextSimulatingContext;
+        private init(ctx);
+        private checkInit();
+        private mightBeEnum(value);
+        private glEnumToString(value);
+        private glFunctionArgToString(functionName, argumentIndex, value);
+        makeDebugContext(ctx: WebGLRenderingContext, opt_onErrorFunc?: (err, funcName, args) => void): WebGLRenderingContext;
+        private resetToInitialState(ctx);
+        private makeLostContextSimulatingContext(ctx);
     }
 }
 declare namespace gd3d.framework {
     class WebGLUtils {
-        private makeFailHTML;
+        private makeFailHTML(msg);
         private GET_A_WEBGL_BROWSER;
         private OTHER_PROBLEM;
         setupWebGL(canvas: Element, opt_attribs?: WebGLContextAttributes, opt_onError?: (msg: string) => void): any;
@@ -6346,20 +6357,20 @@ declare namespace gd3d.render {
     enum ShowFaceStateEnum {
         ALL = 0,
         CCW = 1,
-        CW = 2
+        CW = 2,
     }
     enum DrawModeEnum {
         VboTri = 0,
         VboLine = 1,
         EboTri = 2,
-        EboLine = 3
+        EboLine = 3,
     }
     enum BlendModeEnum {
         Close = 0,
         Blend = 1,
         Blend_PreMultiply = 2,
         Add = 3,
-        Add_PreMultiply = 4
+        Add_PreMultiply = 4,
     }
     class glDrawPass {
         static lastShowFace: number;
@@ -6388,9 +6399,9 @@ declare namespace gd3d.render {
         static resetLastState(): void;
         use(webgl: WebGLRenderingContext, applyUniForm?: boolean): void;
         draw(webgl: WebGLRenderingContext, mesh: glMesh, drawmode?: DrawModeEnum, drawindexindex?: number, drawbegin?: number, drawcount?: number): void;
-        private getCurDrawState;
-        private getCurBlendVal;
-        private formate;
+        private getCurDrawState();
+        private getCurBlendVal();
+        private formate(str, out);
     }
 }
 declare namespace gd3d.render {
@@ -6403,7 +6414,7 @@ declare namespace gd3d.render {
         UV1 = 32,
         BlendIndex4 = 64,
         BlendWeight4 = 128,
-        ColorEX = 256
+        ColorEX = 256,
     }
     class number4 {
         v0: number;
@@ -6414,7 +6425,7 @@ declare namespace gd3d.render {
     enum MeshTypeEnum {
         Static = 0,
         Dynamic = 1,
-        Stream = 2
+        Stream = 2,
     }
     class drawInfo {
         private static _ins;
@@ -6516,7 +6527,7 @@ declare namespace gd3d.render {
     class shaderUniform {
         static texindex: number;
         static applyuniformFunc: {
-            [type: number]: (location: any, value: any) => void;
+            [type: number]: (location, value) => void;
         };
         static webgl: WebGLRenderingContext;
         static initApplyUnifmFunc(): void;
@@ -6531,7 +6542,7 @@ declare namespace gd3d.render {
         Float4v = 4,
         Float4x4 = 5,
         Float4x4v = 6,
-        CubeTexture = 7
+        CubeTexture = 7,
     }
     class uniform {
         name: string;
@@ -6540,7 +6551,7 @@ declare namespace gd3d.render {
     }
     enum ShaderTypeEnum {
         VS = 0,
-        FS = 1
+        FS = 1,
     }
     class glShader {
         constructor(name: string, type: ShaderTypeEnum, shader: WebGLShader, code: string);
@@ -6603,7 +6614,7 @@ declare namespace gd3d.render {
         PVRTC4_RGB = 4,
         PVRTC4_RGBA = 4,
         PVRTC2_RGB = 4,
-        PVRTC2_RGBA = 4
+        PVRTC2_RGBA = 4,
     }
     class textureReader {
         constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);
@@ -6649,7 +6660,7 @@ declare namespace gd3d.render {
         private mirroredU;
         private mirroredV;
         constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
-        private getExt;
+        private getExt(name);
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
         uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
         webgl: WebGLRenderingContext;
@@ -6671,7 +6682,7 @@ declare namespace gd3d.render {
     class glTextureCube implements ITexture {
         constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
         uploadImages(Texture_NEGATIVE_X: framework.texture, Texture_NEGATIVE_Y: framework.texture, Texture_NEGATIVE_Z: framework.texture, Texture_POSITIVE_X: framework.texture, Texture_POSITIVE_Y: framework.texture, Texture_POSITIVE_Z: framework.texture): void;
-        private upload;
+        private upload(data, width, height, TEXTURE_CUBE_MAP_);
         webgl: WebGLRenderingContext;
         loaded: boolean;
         texture: WebGLTexture;
