@@ -145,6 +145,7 @@ namespace dome{
             name="s_b";
             name="fx_zgg_Skill01_S";
             name="fx_wp_bj";
+            // name="fx_wd";
             this.app.getAssetMgr().load("res/f14effprefab/"+name+"/"+name+".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s) =>
             {
                 if (s.isfinish)
@@ -204,6 +205,7 @@ namespace dome{
         }
 
         private beActive=false;
+        private currentalpha=0.9;
         private addButton()
         {
             var btn = document.createElement("button");
@@ -225,6 +227,10 @@ namespace dome{
                 // this.enableMove=true;
                 // this.beActive=true;
                 //this.aniPlayer.stop();
+
+                this.currentalpha*=0.8;
+                this.f14eff.changeAlpha(this.currentalpha);
+
                 this.aniPlayer.play(this.SkillName);
 
                 //console.log("delay",this.f14eff.delay);
@@ -325,17 +331,6 @@ namespace dome{
                     }  
 
                     state.finish = true;
-
-
-                    // let cube = new gd3d.framework.transform();
-                    // let meshf = cube.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER) as gd3d.framework.meshFilter;
-                    // let meshr = cube.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER) as gd3d.framework.meshRenderer;
-                    // meshf.mesh = gd3d.framework.sceneMgr.app.getAssetMgr().getDefaultMesh("cube");
-                    // cube.localScale = new gd3d.math.vector3(5,5,5);
-
-                    // let bone=this.role.find("Bip01 Head");
-                    // bone.addChild(cube);
-                    
                 }
             });
         }
@@ -358,20 +353,9 @@ namespace dome{
                 this.effPrefab.localPosition.z+=0.2;
                 this.effPrefab.markDirty();
             }
-            // if(this.effbaseprefab&&!this.beplay)
-            // {
-            //     this.beplay=true;
-            //     this.count++;
-            //     let eff=this.effbaseprefab.getCloneTrans();
-            //     eff.name="cloneEff"+this.count;
-            //     this.scene.addChild(eff);
-            //     let f14Effect0=eff.gameObject.getComponent("f14EffectSystem")as gd3d.framework.f14EffectSystem;
-            //     f14Effect0.play();
-            //     setTimeout(()=>{
-            //         eff.dispose();
-            //         this.beplay=false;
-            //     },1000);
-            // }
         }
+
+        
+
     }
 }

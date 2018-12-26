@@ -109,6 +109,10 @@ namespace gd3d.framework
         {
             this.RefEffect.changeColor(value);
         }
+        changeAlpha(value:number)
+        {
+            this.RefEffect.changeAlpha(value);
+        }
         dispose()
         {
             this.baseddata = null;
