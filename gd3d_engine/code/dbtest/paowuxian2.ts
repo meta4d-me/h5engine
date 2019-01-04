@@ -105,10 +105,11 @@ namespace dome {
 
         hitPosition:gd3d.math.vector3=new gd3d.math.vector3();
         behit:boolean=false;
-        temtOut:{ pos: gd3d.math.vector3, rot: gd3d.math.quaternion }={pos:new gd3d.math.vector3(),rot:new gd3d.math.quaternion()};
+        middlePos:gd3d.math.vector3=new gd3d.math.vector3();
         gameInit(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
-            this.paojia = this.addcube(new gd3d.math.vector3());
-            this.paodan = this.addcube(new gd3d.math.vector3(), 0.2);
+            this.paojia = this.addcube(new gd3d.math.vector3(),new gd3d.math.vector3(1,1.0,2.0));
+            this.paodan = this.addcube(new gd3d.math.vector3(), new gd3d.math.vector3(0.2,0.2,1));
+
 
             this.addPaoDancam();
 
@@ -171,11 +172,10 @@ namespace dome {
             this.pickScene((info)=>{
                 console.warn("pick point:" + info.hitposition.toString(), info);
 
-                this.adjustMiddlePoint(this.paojia.getWorldPosition(),info.hitposition,this.temtOut);
-                gd3d.math.quatClone(this.temtOut.rot,this.paojia.localRotate);
-                this.paojia.markDirty();
+                this.adjustMiddlePoint(this.paojia.getWorldPosition(),info.hitposition,this.middlePos);
 
                 let target = this.addcube(info.hitposition);
+                this.updatePaojia(this.middlePos);
                 this.fireBullet();
             });
 
@@ -199,13 +199,18 @@ namespace dome {
             let inputMgr = this.app.getInputMgr();
             let ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
             let temp=this.temp_pickInfo;
-            let picked = this.scene.pick(ray, temp, false);
-            if (!picked&&this.floor)
+            let bePickCollider = this.scene.pick(ray, temp, false);
+            let bePickMesh=false;
+            if(bePickCollider)
             {
-                picked=this.intersetMesh(ray,temp,this.floor);
+                bePickMesh=this.intersetMesh(ray,temp,temp.pickedtran);
             }
-            this.behit=picked;
-            if(picked)
+            if(!bePickMesh&&this.floor)
+            {
+                bePickMesh=this.intersetMesh(ray,temp,this.floor);
+            }
+            this.behit=bePickMesh;
+            if(bePickMesh)
             {
                 gd3d.math.vec3Clone(temp.hitposition,this.hitPosition);
                 fuc(temp);
@@ -224,6 +229,8 @@ namespace dome {
         }
 
         private temptPos: gd3d.math.vector3 = new gd3d.math.vector3();
+        private temptdir: gd3d.math.vector3 = new gd3d.math.vector3();
+
 
         private updateBullet(delta: number) {
             if (this.beLaunched&&this.behit) {
@@ -232,10 +239,18 @@ namespace dome {
                 let lerp = this.time / this.totaltime;
                 lerp = Math.min(lerp, 1.0);
 
-                this.bessel(this.paojia.getWorldPosition(),this.temtOut.pos,this.hitPosition, lerp, this.temptPos);
+                let paojiaWorldpos=this.paojia.getWorldPosition();
+                this.bessel(paojiaWorldpos,this.middlePos,this.hitPosition, lerp, this.temptPos);
 
                 gd3d.math.vec3Clone(this.temptPos, this.paodan.localPosition);
+                
                 this.paodan.markDirty();
+
+                this.getBeselDir(paojiaWorldpos,this.middlePos,this.hitPosition,lerp,this.temptdir);
+                // gd3d.math.vec3Normalize(this.temptdir,this.temptdir);
+                gd3d.math.vec3Add(this.paodan.getWorldPosition(),this.temptdir,this.temptdir);
+                this.paodan.lookatPoint(this.temptdir);
+
             }
 
         }
@@ -249,6 +264,16 @@ namespace dome {
                 gd3d.math.vec2Clone(this.screenpos, this.testUI.localTranslate);
                 this.testUI.markDirty();
             }
+        }
+
+        private updatePaojia(middlePos:gd3d.math.vector3)
+        {
+            let dir=gd3d.math.pool.new_vector3();
+            gd3d.math.vec3Subtract(middlePos,this.paojia.getWorldPosition(),dir);
+            gd3d.math.vec3Normalize(dir,dir);
+            let info=this.getRotAnlge(dir,gd3d.math.pool.vector3_forward);
+            gd3d.math.quatFromEulerAngles(-1*info.rotx,info.roty,0,this.paojia.localRotate);
+            this.paojia.markDirty();
         }
 
         updateInfo()
@@ -277,9 +302,12 @@ namespace dome {
             return false;
         }
 
-        addcube(pos: gd3d.math.vector3, scale: number = 1): gd3d.framework.transform {
+        addcube(pos: gd3d.math.vector3, scale:gd3d.math.vector3=null): gd3d.framework.transform {
             let cube4 = new gd3d.framework.transform();
-            cube4.localScale = new gd3d.math.vector3(scale, scale, scale);
+            if(scale!=null)
+            {
+                gd3d.math.vec3Clone(scale,cube4.localScale);
+            }
             gd3d.math.vec3Clone(pos, cube4.localPosition);
             this.scene.addChild(cube4);
 
@@ -301,21 +329,15 @@ namespace dome {
             this.app.container.appendChild(btn);
         }
 
-        private adjustMiddlePoint(from: gd3d.math.vector3, to: gd3d.math.vector3,out: { pos: gd3d.math.vector3, rot: gd3d.math.quaternion })
+        private adjustMiddlePoint(from: gd3d.math.vector3, to: gd3d.math.vector3,pos: gd3d.math.vector3)
         {
             let dis = gd3d.math.vec3Distance(from, to);
             //----lerp
             let lerp = 0.7;
-            gd3d.math.vec3SLerp(from, to, lerp,out.pos);
+            gd3d.math.vec3SLerp(from, to, lerp,pos);
             //---------------up延伸
             // let upy=10;
-            out.pos.y += dis * 0.5;
-
-            let dir=gd3d.math.pool.new_vector3();
-            gd3d.math.vec3Subtract(out.pos,from,dir);
-            gd3d.math.vec3Normalize(dir,dir);
-            gd3d.math.quat2Lookat(out.pos,from,out.rot);
-            gd3d.math.pool.delete_vector3(dir);
+            pos.y += dis * 0.5;
         }
 
         private bessel(from: gd3d.math.vector3, middle: gd3d.math.vector3, to: gd3d.math.vector3, t: number,out:gd3d.math.vector3)
@@ -329,6 +351,54 @@ namespace dome {
             out.x = from.x * p1 + middle.x * p2 + to.x * p3;
             out.y = from.y * p1 + middle.y * p2 + to.y * p3;
             out.z = from.z * p1 + middle.z * p2 + to.z * p3;
+        }
+
+        private getBeselDir(from: gd3d.math.vector3, middle: gd3d.math.vector3, to: gd3d.math.vector3, t: number,out:gd3d.math.vector3)
+        {
+            //out=from*2*(1-t)*(-1)+middle*2(1-2t)+to*2t
+            let p1 = -1*2*(1-t);
+            let p2 = 2 *(1-2*t);
+            let p3 = 2*t;
+
+            out.x = from.x * p1 + middle.x * p2 + to.x * p3;
+            out.y = from.y * p1 + middle.y * p2 + to.y * p3;
+            out.z = from.z * p1 + middle.z * p2 + to.z * p3;
+        }
+
+        private getRotAnlge(dir:gd3d.math.vector3,forward:gd3d.math.vector3):{rotx:number,roty:number}
+        {
+            let tana=dir.y/Math.sqrt(dir.x*dir.x+dir.z*dir.z);
+            let _rotx=Math.atan(tana)*180/Math.PI;
+
+            dir.y=0;
+            gd3d.math.vec3Normalize(dir,dir);
+            let _roty=this.fromToRotation(forward,dir,gd3d.math.pool.vector3_right);
+            return {rotx:_rotx,roty:_roty};
+        }
+
+        private fromToRotation(from:gd3d.math.vector3,to:gd3d.math.vector3,right:gd3d.math.vector3):number
+        {
+            let dir1=gd3d.math.pool.new_vector3();
+            let dir2=gd3d.math.pool.new_vector3();
+
+            gd3d.math.vec3Normalize(from,dir1);  
+            gd3d.math.vec3Normalize(to,dir2);
+
+            let dot=gd3d.math.vec3Dot(dir1,dir2);
+
+            let dot2=gd3d.math.vec3Dot(dir2,right);
+            dot2=Math.acos(dot2)*180/Math.PI;
+            if(dot2>90)
+            {
+                dot=-1*Math.acos(dot)*180/Math.PI;
+            }else
+            {
+                dot=Math.acos(dot)*180/Math.PI;
+            }
+
+            gd3d.math.pool.delete_vector3(dir1);
+            gd3d.math.pool.delete_vector3(dir2);
+            return dot;
         }
     }
 }
