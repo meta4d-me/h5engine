@@ -199,11 +199,16 @@ namespace dome {
             let inputMgr = this.app.getInputMgr();
             let ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
             let temp=this.temp_pickInfo;
-            let bePickCollider = this.scene.pick(ray, temp, false);
+
+
             let bePickMesh=false;
-            if(bePickCollider)
+            let infos=this.intersetColliders(ray,this.targets);
+
+            for(let i=0;i<infos.length;i++)
             {
-                bePickMesh=this.intersetMesh(ray,temp,temp.pickedtran);
+                bePickMesh= this.intersetMesh(ray,temp,infos[i].pickedtran);
+                if(bePickMesh)
+                    break;
             }
             if(!bePickMesh&&this.floor)
             {
@@ -218,6 +223,12 @@ namespace dome {
             {
                 // console.error("鸡毛没碰到！");
             }
+
+            for(let key in infos)
+            {
+                gd3d.math.pool.delete_pickInfo(infos[key]);
+            }
+
             // gd3d.math.pool.delete_pickInfo(temp);
         }
 
@@ -300,6 +311,27 @@ namespace dome {
                 }
             }
             return false;
+        }
+
+        intersetColliders(ray:gd3d.framework.ray,trans:gd3d.framework.transform[]):gd3d.framework.pickinfo[]
+        {
+            let infos:gd3d.framework.pickinfo[]=[];
+
+            let info=gd3d.math.pool.new_pickInfo();
+            for(let i=0;i<trans.length;i++)
+            {
+                let bepicked=ray.intersectCollider(trans[i],info);
+                if(bepicked)
+                {
+                    let newinfo=gd3d.math.pool.new_pickInfo();
+                    newinfo.cloneFrom(info);
+                    infos.push(newinfo);
+                }
+            }
+            infos.sort((a,b)=>{
+                return a.distance-b.distance;
+            });
+            return infos;
         }
 
         addcube(pos: gd3d.math.vector3, scale:gd3d.math.vector3=null): gd3d.framework.transform {
