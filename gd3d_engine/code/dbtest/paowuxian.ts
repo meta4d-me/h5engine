@@ -50,7 +50,6 @@ namespace dome
             this.addUI();
             state.finish=true;
 
-
             this.camctr.setTarget(this.paodan);
             this.camctr.setDistanceToTarget(2);
             this.camctr.setRotAngle(180,30);
@@ -876,12 +875,15 @@ namespace dome
         gameObject: gd3d.framework.gameObject;
         type:string="camCtr";
         private _target:gd3d.framework.transform;
+        private _worldOffset:gd3d.math.vector3;
+
         private _distance:number=0;
         private _offset:gd3d.math.vector3=new gd3d.math.vector3();
         private camrotAgnle:gd3d.math.vector3=new gd3d.math.vector3();
-        setTarget(target:gd3d.framework.transform)
+        setTarget(target:gd3d.framework.transform,worldOffset:gd3d.math.vector3=null)
         {
             this._target=target;
+            this._worldOffset=worldOffset;
         }
         setRotAngle(yanle:number,xangle:number)
         {
@@ -899,6 +901,7 @@ namespace dome
         start() {
             
         }
+        private targetpos:gd3d.math.vector3=new gd3d.math.vector3();
         update(delta: number) {
             if(this._target==null)
             {
@@ -909,7 +912,15 @@ namespace dome
                 gd3d.math.quatFromEulerAngles(this.camrotAgnle.x,this.camrotAgnle.y,0,this.gameObject.transform.localRotate);
                 gd3d.math.quatTransformVector(this.gameObject.transform.localRotate,gd3d.math.pool.vector3_forward,this._offset);
                 gd3d.math.vec3ScaleByNum(this._offset,this._distance,this._offset);
-                gd3d.math.vec3Subtract(this._target.localPosition,this._offset,this.gameObject.transform.localPosition);
+
+                if(this._worldOffset!=null)
+                {
+                    gd3d.math.vec3Add(this._target.getWorldPosition(),this._worldOffset,this.targetpos);
+                }else
+                {
+                    gd3d.math.vec3Clone(this._target.getWorldPosition(),this.targetpos);
+                }
+                gd3d.math.vec3Subtract(this.targetpos,this._offset,this.gameObject.transform.localPosition);
                 this.gameObject.transform.markDirty();
             }
         }

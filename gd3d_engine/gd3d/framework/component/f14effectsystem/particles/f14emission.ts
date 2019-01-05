@@ -165,6 +165,11 @@ namespace gd3d.framework
             this.numcount = 0;
 
             this.currentData.rateOverTime.getValue(true);//重新随机
+
+            if(this.settedAlpha!=null)
+            {
+                this.currentData.startAlpha = new NumberData(this.baseddata.startAlpha._value*this.settedAlpha);
+            }
             // for (let i = 0; i < this.baseddata.bursts.length; i++)
             // {
             //     this.baseddata.bursts[i].burst(false);
@@ -235,15 +240,25 @@ namespace gd3d.framework
                 }
             }
         }
+
         changeColor(value: math.color)
         {
             this.currentData.startColor = new Vector3Data(value.r, value.g, value.b);
             this.currentData.startAlpha = new NumberData(value.a);
         }
+
+        private settedAlpha:number;
+        changeAlpha(value:number)
+        {
+            this.currentData.startAlpha = new NumberData(this.baseddata.startAlpha._value*value);
+            this.settedAlpha=value;
+        }
+
         OnEndOnceLoop()
         {
 
         }
+
         dispose()
         {
             this.effect = null;

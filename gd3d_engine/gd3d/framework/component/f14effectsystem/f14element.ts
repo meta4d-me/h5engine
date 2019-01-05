@@ -14,6 +14,7 @@ namespace gd3d.framework
         reset();
         OnEndOnceLoop();
         changeColor(value:math.color);
+        changeAlpha(value:number);
         layer:F14Layer;
         drawActive:boolean;
     }

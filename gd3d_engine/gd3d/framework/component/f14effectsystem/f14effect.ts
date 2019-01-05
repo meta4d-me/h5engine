@@ -389,6 +389,14 @@ namespace gd3d.framework
                 this.elements[i].changeColor(newcolor);
             }
         }
+
+        public changeAlpha(newAlpha:number)
+        {
+            for (let i = 0; i < this.elements.length; i++)
+            {
+                this.elements[i].changeAlpha(newAlpha);
+            }
+        }
         reset()
         {
             this.allTime=0;

@@ -16,7 +16,11 @@ class main implements gd3d.framework.IUserCode
 
         console.log("i am here.");
         this.app = app;
+        this.addBtn("paowuxian2", () => new dome.paowuxian2());
         this.addBtn("paowuxian", () => new dome.paowuxian());
+
+        // this.addBtn("LoadBase64Tex", () => new dome.LoadTex());
+
         this.addBtn("mixmesh",()=>new dome.mixMesh());
 
         // this.addBtn("rayTest",()=>new dome.rayTest());
