@@ -2957,6 +2957,7 @@ declare namespace gd3d.framework {
         stop(): void;
         pause(): void;
         changeColor(newcolor: math.color): void;
+        changeAlpha(newAlpha: number): void;
         reset(): void;
         clone(): void;
         remove(): void;
@@ -2980,6 +2981,7 @@ declare namespace gd3d.framework {
         reset(): any;
         OnEndOnceLoop(): any;
         changeColor(value: math.color): any;
+        changeAlpha(value: number): any;
         layer: F14Layer;
         drawActive: boolean;
     }
@@ -3142,6 +3144,8 @@ declare namespace gd3d.framework {
         private addParticle(count?);
         reset(): void;
         changeColor(value: math.color): void;
+        private settedAlpha;
+        changeAlpha(value: number): void;
         OnEndOnceLoop(): void;
         dispose(): void;
     }
@@ -3347,6 +3351,7 @@ declare namespace gd3d.framework {
         update(deltaTime: number, frame: number, fps: number): void;
         OnEndOnceLoop(): void;
         changeColor(value: math.color): void;
+        changeAlpha(value: number): void;
         dispose(): void;
     }
 }
@@ -3393,6 +3398,8 @@ declare namespace gd3d.framework {
         updateRotByBillboard(): void;
         reset(): void;
         changeColor(value: math.color): void;
+        private settedAlpha;
+        changeAlpha(value: number): void;
         dispose(): void;
     }
 }

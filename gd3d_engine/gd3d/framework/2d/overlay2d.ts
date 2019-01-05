@@ -427,7 +427,7 @@ namespace gd3d.framework
             let rect = this.camera.viewport;
 
             let real_x = this.viewPixelrect.w * (modelPos.x + 1)/2; 
-            let real_y = this.viewPixelrect.w * (modelPos.x - 1)/-2; 
+            let real_y = this.viewPixelrect.h * (modelPos.y - 1)/-2; 
 
             outScreenPos.x = real_x + rect.x * this.app.width;
             outScreenPos.y = real_y + rect.y * this.app.height;

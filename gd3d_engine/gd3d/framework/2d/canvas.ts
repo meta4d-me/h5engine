@@ -795,10 +795,10 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         CanvasPosToModelPos(canvasPos : math.vector2 , outModelPos : math.vector2){
-            if(!canvasPos|| !canvasPos) return;
+            if(!canvasPos|| !outModelPos) return;
             let scalx = canvasPos.x/ this.pixelWidth;
             let scaly = canvasPos.y/ this.pixelHeight;
-            outModelPos.x = scalx - 1;
+            outModelPos.x = scalx * 2  - 1;
             outModelPos.y = 1 - scaly * 2;
         }
 

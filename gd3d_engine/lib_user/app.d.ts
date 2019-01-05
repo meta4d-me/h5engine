@@ -1498,17 +1498,73 @@ declare namespace dome {
         gameObject: gd3d.framework.gameObject;
         type: string;
         private _target;
+        private _worldOffset;
         private _distance;
         private _offset;
         private camrotAgnle;
-        setTarget(target: gd3d.framework.transform): void;
+        setTarget(target: gd3d.framework.transform, worldOffset?: gd3d.math.vector3): void;
         setRotAngle(yanle: number, xangle: number): void;
         setDistanceToTarget(distance: number): void;
         onPlay(): void;
         start(): void;
+        private targetpos;
         update(delta: number): void;
         remove(): void;
         clone(): void;
+    }
+}
+declare namespace dome {
+    class paowuxian2 implements IState {
+        app: gd3d.framework.application;
+        scene: gd3d.framework.scene;
+        assetmgr: gd3d.framework.assetMgr;
+        taskmgr: gd3d.framework.taskMgr;
+        camera: gd3d.framework.camera;
+        inputMgr: gd3d.framework.inputMgr;
+        rooto2d: gd3d.framework.overlay2D;
+        start(app: gd3d.framework.application): void;
+        private pointDown;
+        update(delta: number): void;
+        private loadShader(laststate, state);
+        private targets;
+        private loadmesh(laststate, state);
+        private addcam(laststate, state);
+        paojia: gd3d.framework.transform;
+        paodan: gd3d.framework.transform;
+        cam2: gd3d.framework.gameObject;
+        camctr: camCtr;
+        testUI: gd3d.framework.transform2D;
+        beUIFollow: boolean;
+        hitPosition: gd3d.math.vector3;
+        behit: boolean;
+        middlePos: gd3d.math.vector3;
+        gameInit(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate): void;
+        addPaoDancam(): void;
+        private floor;
+        fire(): void;
+        private beLaunched;
+        private time;
+        private totaltime;
+        private fireBullet();
+        private temp_pickInfo;
+        private pickScene(fuc);
+        gameupdate(delta: number): void;
+        private temptPos;
+        private temptdir;
+        private updateBullet(delta);
+        private screenpos;
+        private updateUI();
+        private updatePaojia(middlePos);
+        updateInfo(): void;
+        intersetMesh(ray: gd3d.framework.ray, info: gd3d.framework.pickinfo, tran: gd3d.framework.transform): boolean;
+        intersetColliders(ray: gd3d.framework.ray, trans: gd3d.framework.transform[]): gd3d.framework.pickinfo[];
+        addcube(pos: gd3d.math.vector3, scale?: gd3d.math.vector3): gd3d.framework.transform;
+        private addBtn(text, x, y, func);
+        private adjustMiddlePoint(from, to, pos);
+        private bessel(from, middle, to, t, out);
+        private getBeselDir(from, middle, to, t, out);
+        private getRotAnlge(dir, forward);
+        private fromToRotation(from, to, right);
     }
 }
 declare class physic2d_dome implements IState {
@@ -1552,6 +1608,7 @@ declare namespace dome {
         private loadSkill(laststate, state);
         private addcontroll(laststate, state);
         private beActive;
+        private currentalpha;
         private addButton();
         private boneIndex;
         private testtrans;
