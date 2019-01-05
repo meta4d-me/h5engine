@@ -382,6 +382,22 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
+         * canvas坐标 转到 屏幕空间坐标
+         * @param canvasPos canvas坐标
+         * @param outScreenPos 输出的屏幕空间坐标
+         * @version egret-gd3d 1.0
+         */
+        calCanvasPosToScreenPos(canvasPos: gd3d.math.vector2, outScreenPos: gd3d.math.vector2){
+            if(!this.camera || !this.canvas)    return;
+            let mPos = this.helpv2;
+            this.canvas.CanvasPosToModelPos(canvasPos,mPos);
+            this.calModelPosToScreenPos(mPos,outScreenPos);
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * 屏幕空间坐标 转到 Model坐标
          * @version egret-gd3d 1.0
          */
@@ -394,6 +410,27 @@ namespace gd3d.framework
             let real_y = screenPos.y - rect.y * this.app.height;
             outModelPos.x = (real_x / this.viewPixelrect.w) * 2 - 1;
             outModelPos.y = (real_y / this.viewPixelrect.h) * -2 + 1;
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * Model坐标 转到 屏幕空间坐标
+         * @param modelPos Model坐标
+         * @param outScreenPos 输出的屏幕空间坐标
+         * @version egret-gd3d 1.0
+         */
+        calModelPosToScreenPos(modelPos: gd3d.math.vector2 , outScreenPos : gd3d.math.vector2){
+            if(!modelPos || !outScreenPos || !this.camera)    return;
+            this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+            let rect = this.camera.viewport;
+
+            let real_x = this.viewPixelrect.w * (modelPos.x + 1)/2; 
+            let real_y = this.viewPixelrect.w * (modelPos.x - 1)/-2; 
+
+            outScreenPos.x = real_x + rect.x * this.app.width;
+            outScreenPos.y = real_y + rect.y * this.app.height;
         }
     }
 

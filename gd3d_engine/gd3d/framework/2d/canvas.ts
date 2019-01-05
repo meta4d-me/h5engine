@@ -768,7 +768,15 @@ namespace gd3d.framework
             return this.rootNode;
         }
 
-        //屏幕空间坐标 转到 canvas 坐标
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * model空间坐标 转到 canvas 坐标
+         * @param fromP 屏幕空间坐标
+         * @param outP canvas 坐标
+         * @version egret-gd3d 1.0
+         */
         ModelPosToCanvasPos(fromP:math.vector2,outP:math.vector2){
             if(fromP == null || outP == null) return;
             let scalx = 1 - (fromP.x - 1)/-2;  
@@ -776,5 +784,23 @@ namespace gd3d.framework
             outP.x = scalx * this.pixelWidth;
             outP.y = scaly * this.pixelHeight;
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * canvas坐标 转到 model空间坐标 
+         * @param canvasPos canvas坐标
+         * @param outModelPos model空间坐标
+         * @version egret-gd3d 1.0
+         */
+        CanvasPosToModelPos(canvasPos : math.vector2 , outModelPos : math.vector2){
+            if(!canvasPos|| !canvasPos) return;
+            let scalx = canvasPos.x/ this.pixelWidth;
+            let scaly = canvasPos.y/ this.pixelHeight;
+            outModelPos.x = scalx - 1;
+            outModelPos.y = 1 - scaly * 2;
+        }
+
     }
 }

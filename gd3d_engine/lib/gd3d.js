@@ -2276,6 +2276,14 @@ var gd3d;
                 outP.x = scalx * this.pixelWidth;
                 outP.y = scaly * this.pixelHeight;
             };
+            canvas.prototype.CanvasPosToModelPos = function (canvasPos, outModelPos) {
+                if (!canvasPos || !canvasPos)
+                    return;
+                var scalx = canvasPos.x / this.pixelWidth;
+                var scaly = canvasPos.y / this.pixelHeight;
+                outModelPos.x = scalx - 1;
+                outModelPos.y = 1 - scaly * 2;
+            };
             canvas.ClassName = "canvas";
             canvas.depthTag = "__depthTag__";
             canvas.flowIndexTag = "__flowIndexTag__";
@@ -2624,6 +2632,13 @@ var gd3d;
                 this.calScreenPosToModelPos(screenPos, mPos);
                 this.canvas.ModelPosToCanvasPos(mPos, outCanvasPos);
             };
+            overlay2D.prototype.calCanvasPosToScreenPos = function (canvasPos, outScreenPos) {
+                if (!this.camera || !this.canvas)
+                    return;
+                var mPos = this.helpv2;
+                this.canvas.CanvasPosToModelPos(canvasPos, mPos);
+                this.calModelPosToScreenPos(mPos, outScreenPos);
+            };
             overlay2D.prototype.calScreenPosToModelPos = function (screenPos, outModelPos) {
                 if (!screenPos || !outModelPos || !this.camera)
                     return;
@@ -2633,6 +2648,16 @@ var gd3d;
                 var real_y = screenPos.y - rect.y * this.app.height;
                 outModelPos.x = (real_x / this.viewPixelrect.w) * 2 - 1;
                 outModelPos.y = (real_y / this.viewPixelrect.h) * -2 + 1;
+            };
+            overlay2D.prototype.calModelPosToScreenPos = function (modelPos, outScreenPos) {
+                if (!modelPos || !outScreenPos || !this.camera)
+                    return;
+                this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+                var rect = this.camera.viewport;
+                var real_x = this.viewPixelrect.w * (modelPos.x + 1) / 2;
+                var real_y = this.viewPixelrect.w * (modelPos.x - 1) / -2;
+                outScreenPos.x = real_x + rect.x * this.app.width;
+                outScreenPos.y = real_y + rect.y * this.app.height;
             };
             overlay2D.ClassName = "overlay2D";
             __decorate([

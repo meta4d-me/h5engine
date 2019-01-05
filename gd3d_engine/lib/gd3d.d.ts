@@ -414,6 +414,7 @@ declare namespace gd3d.framework {
         private rootNode;
         getRoot(): transform2D;
         ModelPosToCanvasPos(fromP: math.vector2, outP: math.vector2): void;
+        CanvasPosToModelPos(canvasPos: math.vector2, outModelPos: math.vector2): void;
     }
 }
 declare namespace gd3d.framework {
@@ -487,7 +488,9 @@ declare namespace gd3d.framework {
         pick2d(mx: number, my: number, tolerance?: number): transform2D;
         private dopick2d(ModelPos, tran, tolerance?);
         calScreenPosToCanvasPos(screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2): void;
+        calCanvasPosToScreenPos(canvasPos: gd3d.math.vector2, outScreenPos: gd3d.math.vector2): void;
         calScreenPosToModelPos(screenPos: gd3d.math.vector2, outModelPos: gd3d.math.vector2): void;
+        calModelPosToScreenPos(modelPos: gd3d.math.vector2, outScreenPos: gd3d.math.vector2): void;
     }
 }
 declare namespace gd3d.framework {
