@@ -192,7 +192,7 @@ namespace dome {
         /**
          * 设置泡弹跑的总时间
          */
-        private totaltime: number = 10;
+        private totaltime: number = 5;
         private fireBullet() {
             this.beLaunched = true;
             this.time = 0;
@@ -257,10 +257,10 @@ namespace dome {
 
         private winddisturb:number=0.1;
         private gravitydisturb:number=1;
-
+        private onEndCollision:(pos:gd3d.math.vector3)=>{};
         private updateBullet(delta: number) {
             if (this.beLaunched) {
-                this.time += delta;
+                this.time += delta*5;
 
                 let lerp = this.time / this.totaltime;
                 // if(lerp>=1.0)
@@ -289,13 +289,26 @@ namespace dome {
                 gd3d.math.vec3Subtract(this.temptPos,this.lastPos,this.realDIr);
                 if(this.realDIr.y<0)
                 {
+                    
                     gd3d.math.vec3Normalize(this.realDIr,this.realDIr);
                     let ray=new gd3d.framework.ray(this.temptPos,this.realDIr);
                     this.rayInstersetScene(ray,(info)=>{
+                        let dis= gd3d.math.vec3Distance(this.lastPos,this.temptPos);
+
                         console.warn(info.distance);
-                        if(info.distance<0.2)
+                        if(info.distance<dis||info.distance<0.3)
                         {
                             this.addcube(info.hitposition);
+                            {
+                                console.warn("---------------碰到了");
+                                this.beLaunched=false;
+                                this.time=0;
+                                if(this.onEndCollision)
+                                {
+                                    this.onEndCollision(info.hitposition);
+                                }
+                            }
+                            
                         }
                     });
                 }
@@ -335,12 +348,24 @@ namespace dome {
             // gd3d.math.quatMultiply(this.targetRotation.roty,this.targetRotation.rotx,this.paojia.localRotate);
             // gd3d.math.quatClone(this.targetRotation,this.paojia.localRotate);
             // this.paojia.markDirty();
+
+
             this.beActiveRot=true;
             this.rottime=0;
+            {
+                gd3d.math.vec3Clone(this.paojia.localPosition,this.paodan.localPosition);
+                this.paodan.markDirty();
+                if(this.onberforeFire)
+                {
+                    this.onberforeFire();
+                }
+            }
         }
 
+        private onberforeFire:()=>void;
+
         private beActiveRot:boolean=false;
-        private rotTotalTime:number=5;
+        private rotTotalTime:number=1;
         private rottime:number=0;
         private onRotEnd:()=>void;
         private updateRotPaojia(delta: number)
