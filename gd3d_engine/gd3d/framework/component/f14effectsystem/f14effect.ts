@@ -155,6 +155,7 @@ namespace gd3d.framework
                 }
                 this.loopCount=newLoopCount;
 
+                if(this.renderCamera==null) return;
                 for (let i = 0; i < this.elements.length; i++)
                 {
                     this.elements[i].update(deltaTime, this.totalFrame, this.fps);
