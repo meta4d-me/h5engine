@@ -108,6 +108,8 @@ namespace dome {
         middlePos:gd3d.math.vector3=new gd3d.math.vector3();
         gameInit(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
             this.paojia = this.addcube(new gd3d.math.vector3(),new gd3d.math.vector3(1,1.0,2.0));
+            // gd3d.math.quatMultiply(this.lastRotaion.roty,this.lastRotaion.rotx,this.paojia.localRotate);
+            this.paojia.markDirty();
             this.paodan = this.addcube(new gd3d.math.vector3(), new gd3d.math.vector3(0.2,0.2,1));
 
 
@@ -128,6 +130,9 @@ namespace dome {
             });
 
             this.floor=this.scene.getRoot().find("Map_Castle_floor");
+
+
+            this.onRotEnd=this.fireBullet;
             state.finish = true;
         }
         //----------------------------------game scene asset------------------------------------------------
@@ -175,8 +180,8 @@ namespace dome {
                 this.adjustMiddlePoint(this.paojia.getWorldPosition(),info.hitposition,this.middlePos);
 
                 let target = this.addcube(info.hitposition);
-                this.updatePaojia(this.middlePos);
-                this.fireBullet();
+                this.rotatePaojia(this.middlePos);
+                // this.fireBullet();
             });
 
             // this.fireBullet();
@@ -198,38 +203,42 @@ namespace dome {
         {
             let inputMgr = this.app.getInputMgr();
             let ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
-            let temp=this.temp_pickInfo;
+            // let temp=this.temp_pickInfo;
 
 
-            let bePickMesh=false;
-            let infos=this.intersetColliders(ray,this.targets);
+            // let bePickMesh=false;
+            // let infos=this.intersetColliders(ray,this.targets);
 
-            for(let i=0;i<infos.length;i++)
-            {
-                bePickMesh= this.intersetMesh(ray,temp,infos[i].pickedtran);
-                if(bePickMesh)
-                    break;
-            }
-            if(!bePickMesh&&this.floor)
-            {
-                bePickMesh=this.intersetMesh(ray,temp,this.floor);
-            }
-            this.behit=bePickMesh;
-            if(bePickMesh)
-            {
-                gd3d.math.vec3Clone(temp.hitposition,this.hitPosition);
-                fuc(temp);
-            }else
-            {
-                // console.error("鸡毛没碰到！");
-            }
+            // for(let i=0;i<infos.length;i++)
+            // {
+            //     bePickMesh= this.intersetMesh(ray,temp,infos[i].pickedtran);
+            //     if(bePickMesh)
+            //         break;
+            // }
+            // if(!bePickMesh&&this.floor)
+            // {
+            //     bePickMesh=this.intersetMesh(ray,temp,this.floor);
+            // }
+            // this.behit=bePickMesh;
+            // if(bePickMesh)
+            // {
+            //     gd3d.math.vec3Clone(temp.hitposition,this.hitPosition);
+            //     fuc(temp);
+            // }else
+            // {
+            //     // console.error("鸡毛没碰到！");
+            // }
 
-            for(let key in infos)
-            {
-                gd3d.math.pool.delete_pickInfo(infos[key]);
-            }
+            // for(let key in infos)
+            // {
+            //     gd3d.math.pool.delete_pickInfo(infos[key]);
+            // }
 
             // gd3d.math.pool.delete_pickInfo(temp);
+            this.rayInstersetScene(ray,(info)=>{
+                gd3d.math.vec3Clone(info.hitposition,this.hitPosition);
+                fuc(info);
+            });
         }
 
         gameupdate(delta:number)
@@ -237,33 +246,60 @@ namespace dome {
             this.updateInfo();
             this.updateBullet(delta);
             this.updateUI();
+            this.updateRotPaojia(delta);
         }
 
         private temptPos: gd3d.math.vector3 = new gd3d.math.vector3();
         private temptdir: gd3d.math.vector3 = new gd3d.math.vector3();
+        private lookpos: gd3d.math.vector3 = new gd3d.math.vector3();
+        private lastPos:gd3d.math.vector3 = new gd3d.math.vector3();
+        private realDIr:gd3d.math.vector3 = new gd3d.math.vector3();
 
+        private winddisturb:number=0.1;
+        private gravitydisturb:number=1;
 
         private updateBullet(delta: number) {
-            if (this.beLaunched&&this.behit) {
+            if (this.beLaunched) {
                 this.time += delta;
 
                 let lerp = this.time / this.totaltime;
-                lerp = Math.min(lerp, 1.0);
+                // if(lerp>=1.0)
+                // {
+                //     this.beLaunched=false;
+                // }
+                // lerp = Math.min(lerp, 1.0);
+
+                gd3d.math.vec3Clone(this.paodan.localPosition,this.lastPos);
 
                 let paojiaWorldpos=this.paojia.getWorldPosition();
                 this.bessel(paojiaWorldpos,this.middlePos,this.hitPosition, lerp, this.temptPos);
 
+                this.temptPos.x+=this.winddisturb*this.time;
+                this.temptPos.y-=this.gravitydisturb*this.time;
+                this.paodan.lookatPoint(this.temptPos);
+
+               
                 gd3d.math.vec3Clone(this.temptPos, this.paodan.localPosition);
-                
+
                 this.paodan.markDirty();
-
-                this.getBeselDir(paojiaWorldpos,this.middlePos,this.hitPosition,lerp,this.temptdir);
-                // gd3d.math.vec3Normalize(this.temptdir,this.temptdir);
-                gd3d.math.vec3Add(this.paodan.getWorldPosition(),this.temptdir,this.temptdir);
-                this.paodan.lookatPoint(this.temptdir);
-
+                // this.getBeselDir(paojiaWorldpos,this.middlePos,this.hitPosition,lerp,this.temptdir);
+                // // gd3d.math.vec3Normalize(this.temptdir,this.temptdir);
+                // gd3d.math.vec3Add(this.paodan.getWorldPosition(),this.temptdir,this.lookpos);
+                
+                gd3d.math.vec3Subtract(this.temptPos,this.lastPos,this.realDIr);
+                if(this.realDIr.y<0)
+                {
+                    gd3d.math.vec3Normalize(this.realDIr,this.realDIr);
+                    let ray=new gd3d.framework.ray(this.temptPos,this.realDIr);
+                    this.rayInstersetScene(ray,(info)=>{
+                        console.warn(info.distance);
+                        if(info.distance<0.2)
+                        {
+                            this.addcube(info.hitposition);
+                        }
+                    });
+                }
             }
-
         }
 
         private screenpos: gd3d.math.vector2 = new gd3d.math.vector2();
@@ -277,15 +313,57 @@ namespace dome {
             }
         }
 
-        private updatePaojia(middlePos:gd3d.math.vector3)
+        // private targetRotation:{rotx:gd3d.math.quaternion,roty:gd3d.math.quaternion}={rotx:new gd3d.math.quaternion(),roty:new gd3d.math.quaternion};
+        // private lastRotaion:{rotx:gd3d.math.quaternion,roty:gd3d.math.quaternion}={rotx:new gd3d.math.quaternion(),roty:new gd3d.math.quaternion};
+        private targetRotation:gd3d.math.quaternion=new gd3d.math.quaternion();
+        private lastRotaion:gd3d.math.quaternion=new gd3d.math.quaternion();
+
+        private rotatePaojia(middlePos:gd3d.math.vector3)
         {
+            
+
             let dir=gd3d.math.pool.new_vector3();
             gd3d.math.vec3Subtract(middlePos,this.paojia.getWorldPosition(),dir);
             gd3d.math.vec3Normalize(dir,dir);
-            let info=this.getRotAnlge(dir,gd3d.math.pool.vector3_forward);
-            gd3d.math.quatFromEulerAngles(-1*info.rotx,info.roty,0,this.paojia.localRotate);
-            this.paojia.markDirty();
+            // let info=this.getRotAnlge(dir,gd3d.math.pool.vector3_forward);
+            // gd3d.math.quatFromEulerAngles(-1*info.rotx,info.roty,0,this.paojia.localRotate);
+
+            gd3d.math.quatClone(this.paojia.localRotate,this.lastRotaion);
+            this.getRotationByDir(dir,gd3d.math.pool.vector3_forward,this.targetRotation);
+
+
+            // gd3d.math.quatMultiply(this.targetRotation.roty,this.targetRotation.rotx,this.paojia.localRotate);
+            // gd3d.math.quatClone(this.targetRotation,this.paojia.localRotate);
+            // this.paojia.markDirty();
+            this.beActiveRot=true;
+            this.rottime=0;
         }
+
+        private beActiveRot:boolean=false;
+        private rotTotalTime:number=5;
+        private rottime:number=0;
+        private onRotEnd:()=>void;
+        private updateRotPaojia(delta: number)
+        {
+            if(this.beActiveRot&&this.rottime<this.rotTotalTime)
+            {
+                this.rottime+=delta;
+                let lerp=this.rottime/this.rotTotalTime;
+                lerp=Math.min(lerp,1.0);
+                if(lerp==1.0)
+                {
+                    this.beActiveRot=false;
+                    if(this.onRotEnd!=null)
+                    {
+                        this.onRotEnd();
+                    }
+                }
+                gd3d.math.quatLerp(this.lastRotaion,this.targetRotation,this.paojia.localRotate,lerp);
+                this.paojia.markDirty();
+            }
+        }
+
+
 
         updateInfo()
         {
@@ -297,6 +375,39 @@ namespace dome {
 
         }
         //-----------------------------game util---------------------------------------------------------------------------------
+
+        rayInstersetScene(ray:gd3d.framework.ray,fuc:(info:gd3d.framework.pickinfo)=>void)
+        {
+            let bePickMesh=false;
+            let infos=this.intersetColliders(ray,this.targets);
+            let info=gd3d.math.pool.new_pickInfo();
+            for(let i=0;i<infos.length;i++)
+            {
+                bePickMesh= this.intersetMesh(ray,info,infos[i].pickedtran);
+                break;
+            }
+            if(bePickMesh)
+            {
+                fuc(info);
+            }else
+            {
+                if(this.floor)
+                {
+                    bePickMesh=this.intersetMesh(ray,info,this.floor);
+                    if(bePickMesh)
+                    {
+                        fuc(info);
+                    }
+                }
+
+            }
+            // this.behit=bePickMesh;
+
+            for(let key in infos)
+            {
+                gd3d.math.pool.delete_pickInfo(infos[key]);
+            }
+        }
         intersetMesh(ray:gd3d.framework.ray,info:gd3d.framework.pickinfo,tran:gd3d.framework.transform):boolean
         {
             var meshFilter = tran.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
@@ -395,6 +506,21 @@ namespace dome {
             out.x = from.x * p1 + middle.x * p2 + to.x * p3;
             out.y = from.y * p1 + middle.y * p2 + to.y * p3;
             out.z = from.z * p1 + middle.z * p2 + to.z * p3;
+        }
+
+        private getRotationByDir(dir:gd3d.math.vector3,forward:gd3d.math.vector3,out:gd3d.math.quaternion)
+        {
+            let tana=dir.y/Math.sqrt(dir.x*dir.x+dir.z*dir.z);
+            let _rotx=Math.atan(tana)*180/Math.PI;
+
+            dir.y=0;
+            gd3d.math.vec3Normalize(dir,dir);
+            let _roty=this.fromToRotation(forward,dir,gd3d.math.pool.vector3_right);
+
+            // gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_right,-1*_rotx,out.rotx);
+            // gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up,_roty,out.roty);
+
+            gd3d.math.quatFromEulerAngles(-1*_rotx,_roty,0,out);
         }
 
         private getRotAnlge(dir:gd3d.math.vector3,forward:gd3d.math.vector3):{rotx:number,roty:number}
