@@ -228,7 +228,7 @@ namespace dome{
                 // this.beActive=true;
                 //this.aniPlayer.stop();
 
-                this.currentalpha*=0.8;
+                this.currentalpha*=0.5;
                 this.f14eff.changeAlpha(this.currentalpha);
 
                 this.aniPlayer.play(this.SkillName);

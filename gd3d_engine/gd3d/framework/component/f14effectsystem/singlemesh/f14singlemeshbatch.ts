@@ -191,7 +191,7 @@ namespace gd3d.framework
                 this.temptColorv4.x=this.activemeshlist[0].color.r;
                 this.temptColorv4.y=this.activemeshlist[0].color.g;
                 this.temptColorv4.z=this.activemeshlist[0].color.b;
-                this.temptColorv4.w=this.activemeshlist[0].color.a;
+                this.temptColorv4.w=this.activemeshlist[0].color.a*(this.activemeshlist[0].settedAlpha||1.0);
                 
                 // let basemesh=this.activemeshlist[0].baseddata.mesh;
                 this.ElementMat.setVector4("_Main_Color",this.temptColorv4);

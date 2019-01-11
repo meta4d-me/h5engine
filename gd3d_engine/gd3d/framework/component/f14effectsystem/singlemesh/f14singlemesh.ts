@@ -262,19 +262,19 @@ namespace gd3d.framework
             math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z,this.localRotate);
             math.colorClone(this.baseddata.color,this.color);
             math.vec4Clone(this.baseddata.tex_ST,this.tex_ST);
-            if(this.settedAlpha!=null)
-            {
-                this.color.a=this.baseddata.color.a*this.settedAlpha;
-            }
+            // if(this.settedAlpha!=null)
+            // {
+            //     this.color.a=this.baseddata.color.a*this.settedAlpha;
+            // }
         }
         changeColor(value:math.color)
         {
             this.color=value;
         }
-        private settedAlpha:number;
+        public settedAlpha:number;
         changeAlpha(value:number)
         {
-            this.color.a=this.baseddata.color.a*this.settedAlpha;
+            // this.color.a=this.baseddata.color.a*this.settedAlpha;
             this.settedAlpha=value;
         }
         dispose()
