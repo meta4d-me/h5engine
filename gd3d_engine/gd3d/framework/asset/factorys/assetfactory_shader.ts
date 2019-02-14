@@ -22,15 +22,16 @@ namespace gd3d.framework
                             return;
 
                         var _shader = new shader(filename);
-                        try
-                        {
-                            _shader.parse(assetMgr, JSON.parse(txt));
-                        }
-                        catch (e)
-                        {
-                            console.error("error  filename :" + filename);
-                            throw new Error("shader on parse");
-                        }
+                        // try
+                        // {
+                        //     _shader.parse(assetMgr, JSON.parse(txt));
+                        // }
+                        // catch (e)
+                        // {
+                        //     console.error("error  filename :" + filename);
+                        //     throw new Error("shader on parse");
+                        // }
+                        this.parseShader(_shader,assetMgr,txt,filename);
 
                         assetMgr.setAssetUrl(_shader, url);
                         assetMgr.mapShader[filename] = _shader;
@@ -55,20 +56,41 @@ namespace gd3d.framework
                 let txt = respack[filename];
                 state.resstate[filename].state = 1;//完成
                 var _shader = new shader(filename);
-                try
-                {
-                    _shader.parse(assetMgr, JSON.parse(txt));
-                }
-                catch (e)
-                {
-                    console.error("error  filename :" + filename);
-                    throw new Error("shader on parse");
-                }
+                // try
+                // {
+                //     _shader.parse(assetMgr, JSON.parse(txt));
+                // }
+                // catch (e)
+                // {
+                //     console.error("error  filename :" + filename);
+                //     throw new Error("shader on parse");
+                // }
+                this.parseShader(_shader,assetMgr,txt,filename);
 
                 assetMgr.setAssetUrl(_shader, url);
                 assetMgr.mapShader[filename] = _shader;
                 onstate(state);
             });
+        }
+
+        private TryParseMap = {};
+        private parseShader(sd : shader , assetMgr: assetMgr , txt : string , filename : string){
+            try
+            {
+                sd.parse(assetMgr, JSON.parse(txt));
+            }
+            catch (e)
+            {
+                if(!this.TryParseMap[filename] ) 
+                    this.TryParseMap[filename]  = 0;
+
+                if( this.TryParseMap[filename]  < 3){  //可以尝试三次
+                    this.TryParseMap[filename] ++;
+                    this.parseShader(sd,assetMgr,txt,filename);
+                }else{
+                    throw new Error(`shader on parse , filename :${filename}   :\n${txt}` );
+                }
+            }
         }
     }
 }

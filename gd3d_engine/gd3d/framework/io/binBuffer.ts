@@ -498,45 +498,32 @@ namespace gd3d.io
 
         write(array: Uint8Array | number[] | number | any, offset: number = 0, length: number = -1)
         {
-            if (array["byteLength"] != undefined)//(array instanceof Uint8Array)
-            {
-                if (this.buffer.byteLength < array.length)
-                    this.buffer = array;
-                else
-                {
-                    if (this.buffer.length > (array.length + this.w_offset))
-                        this.buffer.set(array, this.w_offset);
-                    else
-                    {
-                        let buf = new Uint8Array((array.length + this.w_offset));
-                        buf.set(this.buffer);
-                        buf.set(array, this.w_offset);
-                        this.buffer = buf;
+
+            let arrLenName = "";
+            if(array["byteLength"] != undefined){
+                arrLenName = "byteLength";
+            }else if(array["length"] != undefined){
+                arrLenName = "length";
+            }
+
+            //数组
+            if(arrLenName!= ""){
+                let needSize = array[arrLenName] + this.w_offset;
+                if (this.buffer.byteLength > needSize)
+                    this.buffer.set(array, this.w_offset);
+                else {
+                    let tnum = this.buffer.byteLength;
+                    while(tnum < needSize){
+                        tnum *= 2;
                     }
+
+                    var buf = new Uint8Array(tnum);
+                    buf.set(this.buffer);
+                    buf.set(array, this.w_offset);
+                    this.buffer = buf;
                 }
                 this.w_offset += array.byteLength;
-            } else if (array["length"] != undefined)//(array instanceof Array)
-            {
-                if (this.buffer.byteLength < array.length)
-                    this.buffer = new Uint8Array(array);
-                else
-                {
-
-                    // this.buffer.set(array, this.w_offset);
-                    if (this.buffer.length > (array.length + this.w_offset))
-                        this.buffer.set(array, this.w_offset);
-                    else
-                    {
-                        let buf = new Uint8Array((array.length + this.w_offset));
-                        buf.set(this.buffer);
-                        buf.set(array, this.w_offset);
-                        this.buffer = buf;
-                    }
-                }
-                this.w_offset += array.length;
-            }
-            else
-            {
+            }else{
                 this.buffer[this.w_offset] = array;
                 this.w_offset += 1;
             }
