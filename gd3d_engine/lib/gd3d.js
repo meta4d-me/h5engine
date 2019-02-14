@@ -2276,6 +2276,14 @@ var gd3d;
                 outP.x = scalx * this.pixelWidth;
                 outP.y = scaly * this.pixelHeight;
             };
+            canvas.prototype.CanvasPosToModelPos = function (canvasPos, outModelPos) {
+                if (!canvasPos || !outModelPos)
+                    return;
+                var scalx = canvasPos.x / this.pixelWidth;
+                var scaly = canvasPos.y / this.pixelHeight;
+                outModelPos.x = scalx * 2 - 1;
+                outModelPos.y = 1 - scaly * 2;
+            };
             canvas.ClassName = "canvas";
             canvas.depthTag = "__depthTag__";
             canvas.flowIndexTag = "__flowIndexTag__";
@@ -2624,6 +2632,13 @@ var gd3d;
                 this.calScreenPosToModelPos(screenPos, mPos);
                 this.canvas.ModelPosToCanvasPos(mPos, outCanvasPos);
             };
+            overlay2D.prototype.calCanvasPosToScreenPos = function (canvasPos, outScreenPos) {
+                if (!this.camera || !this.canvas)
+                    return;
+                var mPos = this.helpv2;
+                this.canvas.CanvasPosToModelPos(canvasPos, mPos);
+                this.calModelPosToScreenPos(mPos, outScreenPos);
+            };
             overlay2D.prototype.calScreenPosToModelPos = function (screenPos, outModelPos) {
                 if (!screenPos || !outModelPos || !this.camera)
                     return;
@@ -2633,6 +2648,16 @@ var gd3d;
                 var real_y = screenPos.y - rect.y * this.app.height;
                 outModelPos.x = (real_x / this.viewPixelrect.w) * 2 - 1;
                 outModelPos.y = (real_y / this.viewPixelrect.h) * -2 + 1;
+            };
+            overlay2D.prototype.calModelPosToScreenPos = function (modelPos, outScreenPos) {
+                if (!modelPos || !outScreenPos || !this.camera)
+                    return;
+                this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+                var rect = this.camera.viewport;
+                var real_x = this.viewPixelrect.w * (modelPos.x + 1) / 2;
+                var real_y = this.viewPixelrect.h * (modelPos.y - 1) / -2;
+                outScreenPos.x = real_x + rect.x * this.app.width;
+                outScreenPos.y = real_y + rect.y * this.app.height;
             };
             overlay2D.ClassName = "overlay2D";
             __decorate([
@@ -17018,6 +17043,11 @@ var gd3d;
                     this.elements[i].changeColor(newcolor);
                 }
             };
+            f14EffectSystem.prototype.changeAlpha = function (newAlpha) {
+                for (var i = 0; i < this.elements.length; i++) {
+                    this.elements[i].changeAlpha(newAlpha);
+                }
+            };
             f14EffectSystem.prototype.reset = function () {
                 this.allTime = 0;
                 for (var key in this.elements) {
@@ -17561,6 +17591,9 @@ var gd3d;
                 this.TotalTime = 0;
                 this.numcount = 0;
                 this.currentData.rateOverTime.getValue(true);
+                if (this.settedAlpha != null) {
+                    this.currentData.startAlpha = new framework.NumberData(this.baseddata.startAlpha._value * this.settedAlpha);
+                }
                 this.bursts = [];
             };
             F14Emission.prototype.updateEmission = function () {
@@ -17607,6 +17640,10 @@ var gd3d;
             F14Emission.prototype.changeColor = function (value) {
                 this.currentData.startColor = new framework.Vector3Data(value.r, value.g, value.b);
                 this.currentData.startAlpha = new framework.NumberData(value.a);
+            };
+            F14Emission.prototype.changeAlpha = function (value) {
+                this.currentData.startAlpha = new framework.NumberData(this.baseddata.startAlpha._value * value);
+                this.settedAlpha = value;
             };
             F14Emission.prototype.OnEndOnceLoop = function () {
             };
@@ -18444,6 +18481,9 @@ var gd3d;
             F14RefElement.prototype.changeColor = function (value) {
                 this.RefEffect.changeColor(value);
             };
+            F14RefElement.prototype.changeAlpha = function (value) {
+                this.RefEffect.changeAlpha(value);
+            };
             F14RefElement.prototype.dispose = function () {
                 this.baseddata = null;
                 this.RefEffect.remove();
@@ -18645,9 +18685,16 @@ var gd3d;
                 gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.localRotate);
                 gd3d.math.colorClone(this.baseddata.color, this.color);
                 gd3d.math.vec4Clone(this.baseddata.tex_ST, this.tex_ST);
+                if (this.settedAlpha != null) {
+                    this.color.a = this.baseddata.color.a * this.settedAlpha;
+                }
             };
             F14SingleMesh.prototype.changeColor = function (value) {
                 this.color = value;
+            };
+            F14SingleMesh.prototype.changeAlpha = function (value) {
+                this.color.a = this.baseddata.color.a * this.settedAlpha;
+                this.settedAlpha = value;
             };
             F14SingleMesh.prototype.dispose = function () {
                 this.layer = null;

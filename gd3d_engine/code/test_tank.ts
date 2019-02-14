@@ -827,7 +827,7 @@ namespace demo
         private addJoystick(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate)
         {
             this.overlay2d = new gd3d.framework.overlay2D();
-            this.overlay2d.autoAsp = false;
+            // this.overlay2d.autoAsp = false;
             this.overlay2d.canvas.pixelWidth = window.innerWidth;
             this.overlay2d.canvas.pixelHeight = window.innerHeight;
             this.camera.addOverLay(this.overlay2d);

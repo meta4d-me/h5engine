@@ -145,7 +145,7 @@ namespace dome{
             name="s_b";
             name="fx_zgg_Skill01_S";
             name="fx_wp_bj";
-            // name="fx_wd";
+            name="fx_wd";
             this.app.getAssetMgr().load("res/f14effprefab/"+name+"/"+name+".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (s) =>
             {
                 if (s.isfinish)
@@ -228,7 +228,7 @@ namespace dome{
                 // this.beActive=true;
                 //this.aniPlayer.stop();
 
-                this.currentalpha*=0.8;
+                this.currentalpha*=0.5;
                 this.f14eff.changeAlpha(this.currentalpha);
 
                 this.aniPlayer.play(this.SkillName);
@@ -296,6 +296,7 @@ namespace dome{
             objCam.markDirty();//标记为需要刷新
             // let controller=new CameraController();
             CameraController.instance().init(this.app,this.camera);
+            this.app.getScene().mainCamera=this.camera;
             state.finish = true;
         }
         role:gd3d.framework.transform;

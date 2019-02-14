@@ -101,14 +101,17 @@ namespace dome {
         camctr: camCtr;
         testUI: gd3d.framework.transform2D;
         
-        beUIFollow: boolean = true;
+        beUIFollow: boolean = false;
 
         hitPosition:gd3d.math.vector3=new gd3d.math.vector3();
         behit:boolean=false;
         middlePos:gd3d.math.vector3=new gd3d.math.vector3();
         gameInit(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate) {
             this.paojia = this.addcube(new gd3d.math.vector3(),new gd3d.math.vector3(1,1.0,2.0));
-            this.paodan = this.addcube(new gd3d.math.vector3(), new gd3d.math.vector3(0.2,0.2,1));
+            this.paojia.localPosition.y+=this.paoheight;
+            // gd3d.math.quatMultiply(this.lastRotaion.roty,this.lastRotaion.rotx,this.paojia.localRotate);
+            this.paojia.markDirty();
+            this.paodan = this.addcube(new gd3d.math.vector3(), new gd3d.math.vector3(0.2,0.2,0.2));
 
 
             this.addPaoDancam();
@@ -128,6 +131,9 @@ namespace dome {
             });
 
             this.floor=this.scene.getRoot().find("Map_Castle_floor");
+
+
+            // this.onRotEnd=
             state.finish = true;
         }
         //----------------------------------game scene asset------------------------------------------------
@@ -167,19 +173,16 @@ namespace dome {
         }
 
         //-------------------------------game logic--------------------------------------------------------------------
+        private targetPos:gd3d.math.vector3=new gd3d.math.vector3();
         private floor:gd3d.framework.transform;
         fire(): void {
             this.pickScene((info)=>{
                 console.warn("pick point:" + info.hitposition.toString(), info);
+                gd3d.math.vec3Clone(info.hitposition,this.targetPos);
 
-                this.adjustMiddlePoint(this.paojia.getWorldPosition(),info.hitposition,this.middlePos);
-
-                let target = this.addcube(info.hitposition);
-                this.updatePaojia(this.middlePos);
-                this.fireBullet();
+                let target = this.addcube(this.targetPos);
+                this.beforeRotatePaojia();
             });
-
-            // this.fireBullet();
         }
 
         private beLaunched: boolean = false;
@@ -187,7 +190,7 @@ namespace dome {
         /**
          * 设置泡弹跑的总时间
          */
-        private totaltime: number = 10;
+        private totaltime: number = 5;
         private fireBullet() {
             this.beLaunched = true;
             this.time = 0;
@@ -198,61 +201,69 @@ namespace dome {
         {
             let inputMgr = this.app.getInputMgr();
             let ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
-            let temp=this.temp_pickInfo;
-            let bePickCollider = this.scene.pick(ray, temp, false);
-            let bePickMesh=false;
-            if(bePickCollider)
-            {
-                bePickMesh=this.intersetMesh(ray,temp,temp.pickedtran);
-            }
-            if(!bePickMesh&&this.floor)
-            {
-                bePickMesh=this.intersetMesh(ray,temp,this.floor);
-            }
-            this.behit=bePickMesh;
-            if(bePickMesh)
-            {
-                gd3d.math.vec3Clone(temp.hitposition,this.hitPosition);
-                fuc(temp);
-            }else
-            {
-                // console.error("鸡毛没碰到！");
-            }
-            // gd3d.math.pool.delete_pickInfo(temp);
+            this.rayInstersetScene(ray,(info)=>{
+                gd3d.math.vec3Clone(info.hitposition,this.hitPosition);
+                fuc(info);
+            });
         }
 
         gameupdate(delta:number)
         {
-            this.updateInfo();
             this.updateBullet(delta);
             this.updateUI();
+            this.updateRotPaojia(delta);
         }
 
         private temptPos: gd3d.math.vector3 = new gd3d.math.vector3();
         private temptdir: gd3d.math.vector3 = new gd3d.math.vector3();
+        private lookpos: gd3d.math.vector3 = new gd3d.math.vector3();
+        private lastPos:gd3d.math.vector3 = new gd3d.math.vector3();
+        private realDIr:gd3d.math.vector3 = new gd3d.math.vector3();
 
-
+        private winddisturb:number=0;
+        private gravitydisturb:number=0;
+        private onEndCollision:(pos:gd3d.math.vector3)=>{};
         private updateBullet(delta: number) {
-            if (this.beLaunched&&this.behit) {
-                this.time += delta;
+            if (this.beLaunched) {
+                this.time += delta*4;
+
+                // console.warn("Time:"+this.time.toString());
 
                 let lerp = this.time / this.totaltime;
-                lerp = Math.min(lerp, 1.0);
-
+                gd3d.math.vec3Clone(this.paodan.localPosition,this.lastPos);
                 let paojiaWorldpos=this.paojia.getWorldPosition();
                 this.bessel(paojiaWorldpos,this.middlePos,this.hitPosition, lerp, this.temptPos);
 
+                this.temptPos.x+=this.winddisturb*this.time;
+                this.temptPos.y-=this.gravitydisturb*this.time;
+                this.paodan.lookatPoint(this.temptPos);
+
                 gd3d.math.vec3Clone(this.temptPos, this.paodan.localPosition);
-                
                 this.paodan.markDirty();
-
-                this.getBeselDir(paojiaWorldpos,this.middlePos,this.hitPosition,lerp,this.temptdir);
-                // gd3d.math.vec3Normalize(this.temptdir,this.temptdir);
-                gd3d.math.vec3Add(this.paodan.getWorldPosition(),this.temptdir,this.temptdir);
-                this.paodan.lookatPoint(this.temptdir);
-
+                
+                gd3d.math.vec3Subtract(this.temptPos,this.lastPos,this.realDIr);
+                if(this.realDIr.y<0)//调数值无效，把这个判断去掉
+                {
+                    gd3d.math.vec3Normalize(this.realDIr,this.realDIr);
+                    let ray=new gd3d.framework.ray(this.lastPos,this.realDIr);
+                    this.rayInstersetScene(ray,(info)=>{
+                        let dis= gd3d.math.vec3Distance(this.lastPos,this.temptPos);
+                        if(info.distance<dis+0.2)//碰撞出问题，增加0.2数值
+                        {
+                            this.addcube(info.hitposition);
+                            {//炮弹碰撞
+                                console.warn("---------------碰到了");
+                                this.beLaunched=false;
+                                this.time=0;
+                                if(this.onEndCollision)
+                                {
+                                    this.onEndCollision(info.hitposition);
+                                }
+                            }
+                        }
+                    });
+                }
             }
-
         }
 
         private screenpos: gd3d.math.vector2 = new gd3d.math.vector2();
@@ -265,27 +276,119 @@ namespace dome {
                 this.testUI.markDirty();
             }
         }
+        private targetRotation:gd3d.math.quaternion=new gd3d.math.quaternion();
+        private lastRotaion:gd3d.math.quaternion=new gd3d.math.quaternion();
 
-        private updatePaojia(middlePos:gd3d.math.vector3)
+        private paoheight:number=2;
+        private paoLen:number=1;
+        private paokouPos:gd3d.math.vector3=new gd3d.math.vector3();
+        private beforeRotatePaojia()
         {
+            this.adjustMiddlePoint(this.paojia.getWorldPosition(),this.targetPos,this.middlePos);
+        
             let dir=gd3d.math.pool.new_vector3();
-            gd3d.math.vec3Subtract(middlePos,this.paojia.getWorldPosition(),dir);
+            gd3d.math.vec3Subtract(this.middlePos,this.paojia.getWorldPosition(),dir);
             gd3d.math.vec3Normalize(dir,dir);
-            let info=this.getRotAnlge(dir,gd3d.math.pool.vector3_forward);
-            gd3d.math.quatFromEulerAngles(-1*info.rotx,info.roty,0,this.paojia.localRotate);
-            this.paojia.markDirty();
+            gd3d.math.quatClone(this.paojia.localRotate,this.lastRotaion);
+            this.getRotationByDir(dir,gd3d.math.pool.vector3_forward,this.targetRotation);
+
+            gd3d.math.vec3Clone(this.paojia.getWorldPosition(),this.paokouPos);
+            this.paokouPos.y+=this.paoheight;
+            this.scaleAndAdd(dir,this.paoLen,this.paokouPos,this.paokouPos);
+            this.adjustMiddlePoint(this.paokouPos,this.targetPos,this.middlePos);
+
+            {//---------激活旋转
+                this.beActiveRot=true;
+                this.rottime=0;
+            }
+
+            gd3d.math.pool.delete_vector3(dir);
         }
 
-        updateInfo()
+        private onberforeFire:()=>void;
+
+        private beActiveRot:boolean=false;
+        private rotTotalTime:number=1;
+        private rottime:number=0;
+        private onRotEnd:()=>void;
+        private updateRotPaojia(delta: number)
         {
-            // this.pickScene((info)=>{
-            //     this.adjustMiddlePoint(this.paojia.getWorldPosition(),info.hitposition,this.temtOut);
-            //     gd3d.math.quatClone(this.temtOut.rot,this.paojia.localRotate);
-            //     this.paojia.markDirty();
-            // });
-
+            if(this.beActiveRot&&this.rottime<this.rotTotalTime)
+            {
+                this.rottime+=delta;
+                let lerp=this.rottime/this.rotTotalTime;
+                lerp=Math.min(lerp,1.0);
+                if(lerp==1.0)
+                {
+                    this.beActiveRot=false;
+                    if(this.onRotEnd!=null)
+                    {
+                        this.onRotEnd();
+                    }
+                    {//-----------发射前重置炮弹位置
+                        gd3d.math.vec3Clone(this.paojia.localPosition,this.paodan.localPosition);
+                        this.paodan.markDirty();
+                        if(this.onberforeFire)
+                        {
+                            this.onberforeFire();
+                        }
+                        this.fireBullet();
+                    }
+                }
+                gd3d.math.quatLerp(this.lastRotaion,this.targetRotation,this.paojia.localRotate,lerp);
+                this.paojia.markDirty();
+            }
         }
+
         //-----------------------------game util---------------------------------------------------------------------------------
+
+        private scaleAndAdd(from:gd3d.math.vector3,scale:number,add:gd3d.math.vector3,out:gd3d.math.vector3)
+        {
+            out.x=from.x*scale+add.x;
+            out.y=from.y*scale+add.y;
+            out.z=from.z*scale+add.z;
+        }
+
+        rayInstersetScene(ray:gd3d.framework.ray,fuc:(info:gd3d.framework.pickinfo)=>void)
+        {
+            let bePickMesh=false;
+            let infos=this.intersetColliders(ray,this.targets);
+            let info=gd3d.math.pool.new_pickInfo();
+            let distance=Number.MAX_VALUE;
+            let temptinfo=gd3d.math.pool.new_pickInfo();
+            for(let i=0;i<infos.length;i++)
+            {
+                let picked= this.intersetMesh(ray,temptinfo,infos[i].pickedtran);
+                if(picked&&temptinfo.distance<distance)
+                {
+                    bePickMesh=true;
+                    distance=temptinfo.distance;
+                    info.cloneFrom(temptinfo);
+                }
+            }
+            if(bePickMesh)
+            {
+                fuc(info);
+            }else
+            {
+                if(this.floor)
+                {
+                    bePickMesh=this.intersetMesh(ray,info,this.floor);
+                    if(bePickMesh)
+                    {
+                        fuc(info);
+                    }
+                }
+
+            }
+            // this.behit=bePickMesh;
+
+            for(let key in infos)
+            {
+                gd3d.math.pool.delete_pickInfo(infos[key]);
+            }
+        }
+
         intersetMesh(ray:gd3d.framework.ray,info:gd3d.framework.pickinfo,tran:gd3d.framework.transform):boolean
         {
             var meshFilter = tran.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
@@ -300,6 +403,27 @@ namespace dome {
                 }
             }
             return false;
+        }
+
+        intersetColliders(ray:gd3d.framework.ray,trans:gd3d.framework.transform[]):gd3d.framework.pickinfo[]
+        {
+            let infos:gd3d.framework.pickinfo[]=[];
+
+            let info=gd3d.math.pool.new_pickInfo();
+            for(let i=0;i<trans.length;i++)
+            {
+                let bepicked=ray.intersectCollider(trans[i],info);
+                if(bepicked)
+                {
+                    let newinfo=gd3d.math.pool.new_pickInfo();
+                    newinfo.cloneFrom(info);
+                    infos.push(newinfo);
+                }
+            }
+            infos.sort((a,b)=>{
+                return a.distance-b.distance;
+            });
+            return infos;
         }
 
         addcube(pos: gd3d.math.vector3, scale:gd3d.math.vector3=null): gd3d.framework.transform {
@@ -365,6 +489,17 @@ namespace dome {
             out.z = from.z * p1 + middle.z * p2 + to.z * p3;
         }
 
+        private getRotationByDir(dir:gd3d.math.vector3,forward:gd3d.math.vector3,out:gd3d.math.quaternion)
+        {
+            let tana=dir.y/Math.sqrt(dir.x*dir.x+dir.z*dir.z);
+            let _rotx=Math.atan(tana)*180/Math.PI;
+
+            dir.y=0;
+            gd3d.math.vec3Normalize(dir,dir);
+            let _roty=this.fromToRotation(forward,dir,gd3d.math.pool.vector3_right);
+            gd3d.math.quatFromEulerAngles(-1*_rotx,_roty,0,out);
+        }
+
         private getRotAnlge(dir:gd3d.math.vector3,forward:gd3d.math.vector3):{rotx:number,roty:number}
         {
             let tana=dir.y/Math.sqrt(dir.x*dir.x+dir.z*dir.z);
@@ -400,5 +535,6 @@ namespace dome {
             gd3d.math.pool.delete_vector3(dir2);
             return dot;
         }
+    
     }
 }
