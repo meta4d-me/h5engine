@@ -1540,6 +1540,7 @@ declare namespace dome {
         middlePos: gd3d.math.vector3;
         gameInit(laststate: gd3d.framework.taskstate, state: gd3d.framework.taskstate): void;
         addPaoDancam(): void;
+        private targetPos;
         private floor;
         fire(): void;
         private beLaunched;
@@ -1551,11 +1552,29 @@ declare namespace dome {
         gameupdate(delta: number): void;
         private temptPos;
         private temptdir;
+        private lookpos;
+        private lastPos;
+        private realDIr;
+        private winddisturb;
+        private gravitydisturb;
+        private onEndCollision;
         private updateBullet(delta);
         private screenpos;
         private updateUI();
-        private updatePaojia(middlePos);
-        updateInfo(): void;
+        private targetRotation;
+        private lastRotaion;
+        private paoheight;
+        private paoLen;
+        private paokouPos;
+        private beforeRotatePaojia();
+        private onberforeFire;
+        private beActiveRot;
+        private rotTotalTime;
+        private rottime;
+        private onRotEnd;
+        private updateRotPaojia(delta);
+        private scaleAndAdd(from, scale, add, out);
+        rayInstersetScene(ray: gd3d.framework.ray, fuc: (info: gd3d.framework.pickinfo) => void): void;
         intersetMesh(ray: gd3d.framework.ray, info: gd3d.framework.pickinfo, tran: gd3d.framework.transform): boolean;
         intersetColliders(ray: gd3d.framework.ray, trans: gd3d.framework.transform[]): gd3d.framework.pickinfo[];
         addcube(pos: gd3d.math.vector3, scale?: gd3d.math.vector3): gd3d.framework.transform;
@@ -1563,6 +1582,7 @@ declare namespace dome {
         private adjustMiddlePoint(from, to, pos);
         private bessel(from, middle, to, t, out);
         private getBeselDir(from, middle, to, t, out);
+        private getRotationByDir(dir, forward, out);
         private getRotAnlge(dir, forward);
         private fromToRotation(from, to, right);
     }

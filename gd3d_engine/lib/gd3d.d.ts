@@ -1537,6 +1537,8 @@ declare namespace gd3d.framework {
         newAsset(): shader;
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: shader, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: shader, call: (handle: () => void) => void): void;
+        private TryParseMap;
+        private parseShader(sd, assetMgr, txt, filename);
     }
 }
 declare namespace gd3d.framework {
@@ -3398,7 +3400,7 @@ declare namespace gd3d.framework {
         updateRotByBillboard(): void;
         reset(): void;
         changeColor(value: math.color): void;
-        private settedAlpha;
+        settedAlpha: number;
         changeAlpha(value: number): void;
         dispose(): void;
     }

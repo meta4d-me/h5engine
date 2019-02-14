@@ -9080,11 +9080,13 @@ var gd3d;
     (function (framework) {
         var AssetFactory_Shader = (function () {
             function AssetFactory_Shader() {
+                this.TryParseMap = {};
             }
             AssetFactory_Shader.prototype.newAsset = function () {
                 return null;
             };
             AssetFactory_Shader.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
+                var _this = this;
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
                 gd3d.io.loadText(url, function (txt, err, isloadFail) {
@@ -9093,13 +9095,7 @@ var gd3d;
                         if (framework.AssetFactoryTools.catchError(err, onstate, state))
                             return;
                         var _shader = new framework.shader(filename);
-                        try {
-                            _shader.parse(assetMgr, JSON.parse(txt));
-                        }
-                        catch (e) {
-                            console.error("error  filename :" + filename);
-                            throw new Error("shader on parse");
-                        }
+                        _this.parseShader(_shader, assetMgr, txt, filename);
                         assetMgr.setAssetUrl(_shader, url);
                         assetMgr.mapShader[filename] = _shader;
                         state.resstate[filename].state = 1;
@@ -9110,6 +9106,7 @@ var gd3d;
                 });
             };
             AssetFactory_Shader.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                var _this = this;
                 call(function () {
                     var filename = framework.getFileName(url);
                     var name = filename.substring(0, filename.indexOf("."));
@@ -9117,17 +9114,27 @@ var gd3d;
                     var txt = respack[filename];
                     state.resstate[filename].state = 1;
                     var _shader = new framework.shader(filename);
-                    try {
-                        _shader.parse(assetMgr, JSON.parse(txt));
-                    }
-                    catch (e) {
-                        console.error("error  filename :" + filename);
-                        throw new Error("shader on parse");
-                    }
+                    _this.parseShader(_shader, assetMgr, txt, filename);
                     assetMgr.setAssetUrl(_shader, url);
                     assetMgr.mapShader[filename] = _shader;
                     onstate(state);
                 });
+            };
+            AssetFactory_Shader.prototype.parseShader = function (sd, assetMgr, txt, filename) {
+                try {
+                    sd.parse(assetMgr, JSON.parse(txt));
+                }
+                catch (e) {
+                    if (!this.TryParseMap[filename])
+                        this.TryParseMap[filename] = 0;
+                    if (this.TryParseMap[filename] < 3) {
+                        this.TryParseMap[filename]++;
+                        this.parseShader(sd, assetMgr, txt, filename);
+                    }
+                    else {
+                        throw new Error("shader on parse , filename :" + filename + "   :\n" + txt);
+                    }
+                }
             };
             return AssetFactory_Shader;
         }());
@@ -16905,6 +16912,8 @@ var gd3d;
                         this.OnEndOnceLoop();
                     }
                     this.loopCount = newLoopCount;
+                    if (this.renderCamera == null)
+                        return;
                     for (var i = 0; i < this.elements.length; i++) {
                         this.elements[i].update(deltaTime, this.totalFrame, this.fps);
                     }
@@ -18685,15 +18694,11 @@ var gd3d;
                 gd3d.math.quatFromEulerAngles(this.euler.x, this.euler.y, this.euler.z, this.localRotate);
                 gd3d.math.colorClone(this.baseddata.color, this.color);
                 gd3d.math.vec4Clone(this.baseddata.tex_ST, this.tex_ST);
-                if (this.settedAlpha != null) {
-                    this.color.a = this.baseddata.color.a * this.settedAlpha;
-                }
             };
             F14SingleMesh.prototype.changeColor = function (value) {
                 this.color = value;
             };
             F14SingleMesh.prototype.changeAlpha = function (value) {
-                this.color.a = this.baseddata.color.a * this.settedAlpha;
                 this.settedAlpha = value;
             };
             F14SingleMesh.prototype.dispose = function () {
@@ -18833,7 +18838,7 @@ var gd3d;
                     this.temptColorv4.x = this.activemeshlist[0].color.r;
                     this.temptColorv4.y = this.activemeshlist[0].color.g;
                     this.temptColorv4.z = this.activemeshlist[0].color.b;
-                    this.temptColorv4.w = this.activemeshlist[0].color.a;
+                    this.temptColorv4.w = this.activemeshlist[0].color.a * (this.activemeshlist[0].settedAlpha || 1.0);
                     this.ElementMat.setVector4("_Main_Color", this.temptColorv4);
                     this.ElementMat.setVector4("_Main_Tex_ST", this.activemeshlist[0].tex_ST);
                     singlemesh.glMesh.bindVboBuffer(context.webgl);
@@ -20294,35 +20299,28 @@ var gd3d;
             binTool.prototype.write = function (array, offset, length) {
                 if (offset === void 0) { offset = 0; }
                 if (length === void 0) { length = -1; }
+                var arrLenName = "";
                 if (array["byteLength"] != undefined) {
-                    if (this.buffer.byteLength < array.length)
-                        this.buffer = array;
-                    else {
-                        if (this.buffer.length > (array.length + this.w_offset))
-                            this.buffer.set(array, this.w_offset);
-                        else {
-                            var buf = new Uint8Array((array.length + this.w_offset));
-                            buf.set(this.buffer);
-                            buf.set(array, this.w_offset);
-                            this.buffer = buf;
-                        }
-                    }
-                    this.w_offset += array.byteLength;
+                    arrLenName = "byteLength";
                 }
                 else if (array["length"] != undefined) {
-                    if (this.buffer.byteLength < array.length)
-                        this.buffer = new Uint8Array(array);
+                    arrLenName = "length";
+                }
+                if (arrLenName != "") {
+                    var needSize = array[arrLenName] + this.w_offset;
+                    if (this.buffer.byteLength > needSize)
+                        this.buffer.set(array, this.w_offset);
                     else {
-                        if (this.buffer.length > (array.length + this.w_offset))
-                            this.buffer.set(array, this.w_offset);
-                        else {
-                            var buf = new Uint8Array((array.length + this.w_offset));
-                            buf.set(this.buffer);
-                            buf.set(array, this.w_offset);
-                            this.buffer = buf;
+                        var tnum = this.buffer.byteLength;
+                        while (tnum < needSize) {
+                            tnum *= 2;
                         }
+                        var buf = new Uint8Array(tnum);
+                        buf.set(this.buffer);
+                        buf.set(array, this.w_offset);
+                        this.buffer = buf;
                     }
-                    this.w_offset += array.length;
+                    this.w_offset += array.byteLength;
                 }
                 else {
                     this.buffer[this.w_offset] = array;
