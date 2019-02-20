@@ -39,8 +39,10 @@ namespace gd3d.threading
         }
         public OnMessage(e: MessageEvent)
         {
-            if (e.data && this.callMap[e.data.id])
+            if (e.data && this.callMap[e.data.id]){
                 this.callMap[e.data.id].callback(e.data.result);
+                delete this.callMap[e.data.id];
+            }
         }
 
         public Call(name: string, data: any, callback: (result) => void)

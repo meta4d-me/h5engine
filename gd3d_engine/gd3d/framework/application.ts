@@ -236,10 +236,6 @@ namespace gd3d.framework
             // this.webgl = <WebGLRenderingContext>canvas.getContext('webgl') ||
             //     <WebGLRenderingContext>canvas.getContext("experimental-webgl");
 
-
-            this.ccWidth = canvas.clientWidth;
-            this.ccHeight = canvas.clientHeight;
-
             this.startForCanvas(canvas, type, val, webglDebug);
 
             //this.showDrawCall();
@@ -247,6 +243,8 @@ namespace gd3d.framework
 
         startForCanvas(canvas: HTMLCanvasElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false)
         {
+            this.ccWidth = this.ccWidth == undefined ?  canvas.clientWidth : this.ccWidth;
+            this.ccHeight =this.ccHeight == undefined ?  canvas.clientHeight : this.ccHeight ;
 
             this._timeScale = 1;
             sceneMgr.app = this;

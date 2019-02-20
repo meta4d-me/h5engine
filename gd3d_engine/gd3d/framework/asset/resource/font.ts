@@ -119,7 +119,8 @@
                 this._texture.unuse();
             }
             this._texture = value;
-            this._texture.use();
+            if(this._texture)
+                this._texture.use();
         }
         //mat: spriteMat;
 
