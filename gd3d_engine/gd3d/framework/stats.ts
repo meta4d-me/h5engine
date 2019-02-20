@@ -31,7 +31,8 @@ namespace Stats
             this.msPanel = this.addPanel(new Panel('MS', '#0f0', '#020'));
             this.ratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
             this.userratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
-            if (self.performance && self.performance["memory"])
+
+            if (window && window.performance && window.performance["memory"])
             {
 
                 this.memPanel = this.addPanel(new Panel('MB', '#f08', '#201'));
