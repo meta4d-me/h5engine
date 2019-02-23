@@ -811,6 +811,21 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare class test_3DPhysics_cannon implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    background: gd3d.framework.transform;
+    parts: gd3d.framework.transform;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    count: number;
+    counttimer: number;
+    private loadShader(laststate, state);
+    private addcam(laststate, state);
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
 declare namespace t {
     class test_blend implements IState {
         app: gd3d.framework.application;

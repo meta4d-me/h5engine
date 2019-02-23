@@ -122,6 +122,7 @@ class main implements gd3d.framework.IUserCode
         // this.addBtn("test_eff",()=>new dome.db_test_eff());
         this.addBtn("tesrtss",()=>new dome.testCJ());
         this.addBtn("trans性能测试",()=>new demo.test_performance());
+        this.addBtn("3D物理测试",()=>new test_3DPhysics_cannon());
 
         //this.addBtn("test_f14",()=>new dome.db_test_f14eff());
     }

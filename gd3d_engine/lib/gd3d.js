@@ -166,14 +166,14 @@ var gd3d;
                 canvas.style.backgroundColor = "#1e1e1e";
                 canvas.setAttribute("tabindex", "1");
                 rotateDiv.appendChild(canvas);
-                this.ccWidth = canvas.clientWidth;
-                this.ccHeight = canvas.clientHeight;
                 this.startForCanvas(canvas, type, val, webglDebug);
             };
             application.prototype.startForCanvas = function (canvas, type, val, webglDebug) {
                 if (type === void 0) { type = CanvasFixedType.Free; }
                 if (val === void 0) { val = 1200; }
                 if (webglDebug === void 0) { webglDebug = false; }
+                this.ccWidth = this.ccWidth == undefined ? canvas.clientWidth : this.ccWidth;
+                this.ccHeight = this.ccHeight == undefined ? canvas.clientHeight : this.ccHeight;
                 this._timeScale = 1;
                 framework.sceneMgr.app = this;
                 var tempWebGlUtil = new framework.WebGLUtils();
@@ -810,7 +810,7 @@ var Stats;
             this.msPanel = this.addPanel(new Panel('MS', '#0f0', '#020'));
             this.ratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
             this.userratePanel = this.addPanel(new Panel('%', '#0f0', '#020'));
-            if (self.performance && self.performance["memory"]) {
+            if (window && window.performance && window.performance["memory"]) {
                 this.memPanel = this.addPanel(new Panel('MB', '#f08', '#201'));
             }
             this.showPanel(0);
@@ -9918,7 +9918,8 @@ var gd3d;
                         this._texture.unuse();
                     }
                     this._texture = value;
-                    this._texture.use();
+                    if (this._texture)
+                        this._texture.use();
                 },
                 enumerable: true,
                 configurable: true
@@ -30472,8 +30473,10 @@ var gd3d;
                 configurable: true
             });
             thread.prototype.OnMessage = function (e) {
-                if (e.data && this.callMap[e.data.id])
+                if (e.data && this.callMap[e.data.id]) {
                     this.callMap[e.data.id].callback(e.data.result);
+                    delete this.callMap[e.data.id];
+                }
             };
             thread.prototype.Call = function (name, data, callback) {
                 this.worker.postMessage({

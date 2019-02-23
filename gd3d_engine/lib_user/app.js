@@ -1144,6 +1144,7 @@ var main = (function () {
         this.addBtn("使用加载资源的Demo列表", function () { return new UseAssetByLoadDemoList(); });
         this.addBtn("tesrtss", function () { return new dome.testCJ(); });
         this.addBtn("trans性能测试", function () { return new demo.test_performance(); });
+        this.addBtn("3D物理测试", function () { return new test_3DPhysics_cannon(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -6108,6 +6109,51 @@ var t;
     }());
     t.test_uvroll = test_uvroll;
 })(t || (t = {}));
+var test_3DPhysics_cannon = (function () {
+    function test_3DPhysics_cannon() {
+        this.timer = 0;
+        this.taskmgr = new gd3d.framework.taskMgr();
+        this.count = 0;
+        this.counttimer = 0;
+    }
+    test_3DPhysics_cannon.prototype.loadShader = function (laststate, state) {
+        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            if (_state.isfinish) {
+                state.finish = true;
+            }
+        });
+    };
+    test_3DPhysics_cannon.prototype.addcam = function (laststate, state) {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 120;
+        objCam.localTranslate = new gd3d.math.vector3(0, 10, 10);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        objCam.markDirty();
+        state.finish = true;
+    };
+    test_3DPhysics_cannon.prototype.start = function (app) {
+        var cannonUrl = "./lib/cannon.js";
+        gd3d.io.loadText(cannonUrl, function (txt) {
+            var isok = eval(txt);
+            eval("alert('Hello world')");
+            debugger;
+            var CANNON = CANNON ? CANNON : {};
+            debugger;
+        });
+        console.log("i am here.");
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.taskmgr.addTaskCall(this.loadShader.bind(this));
+        this.taskmgr.addTaskCall(this.addcam.bind(this));
+    };
+    test_3DPhysics_cannon.prototype.update = function (delta) {
+    };
+    return test_3DPhysics_cannon;
+}());
 var t;
 (function (t_2) {
     var test_blend = (function () {
