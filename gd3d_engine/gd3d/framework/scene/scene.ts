@@ -1,5 +1,7 @@
 namespace gd3d.framework
 {
+    export declare let physic: PhysicsEngine;
+    export declare let physic2D:physicEngine2D;
     /**
      * @public
      * @language zh_CN
@@ -179,6 +181,10 @@ namespace gd3d.framework
             if(this.onLateUpdate)
                 this.onLateUpdate(delta);
 
+            if(physic)
+            {
+                physic._step(delta);
+            }
             //排序
             //排序camera 并绘制
             if (this.renderCameras.length > 1)
@@ -383,7 +389,7 @@ namespace gd3d.framework
         }
         private objupdate(node: transform, delta)//play状态下
         {
-            if (!node.gameObject.visible || (node.hasComponent == false && node.hasComponentChild == false))
+            if (node.hasComponent == false && node.hasComponentChild == false)
                 return;
             node.gameObject.init(this.app.bePlay);//组件还未初始化的初始化
             if (node.gameObject.components.length > 0)
@@ -687,10 +693,39 @@ namespace gd3d.framework
             }
             return ishited;
         }
+        
 
-        enable2DPhysics(op:IEngine2DOP=null)
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 启用物理到当前场景
+         * @param gravity 定义场景物理世界的重力向量
+         * @param plugin 定义场景物理世界引擎插件
+         * @version egret-gd3d 1.0
+         */
+        enablePhysics(gravity: math.vector3, plugin?: IPhysicsEnginePlugin)
         {
-            physic2D=new physicEngine2D(op);
+            if (physic) {
+                return true;
+            }
+
+            if(!plugin) plugin = new OimoJSPlugin();
+        
+            try {
+                physic = new PhysicsEngine(gravity, plugin);
+                return true;
+            } catch (e) {
+                console.error(e.message);
+                return false;
+            }
+
+            //physic=new PhysicsEngine(new math.vector3(0,-9.8,0),new OimoJSPlugin());
+        }
+
+        enable2DPhysics()
+        {
+            physic2D=new physicEngine2D();
         }
     }
 }

@@ -2,6 +2,9 @@
 
 namespace gd3d.framework
 {
+    let help_v3 = new gd3d.math.vector3();
+    let help_v3_1 = new gd3d.math.vector3();
+
     export interface ICollider
     {
         gameObject: gameObject;
@@ -71,6 +74,8 @@ namespace gd3d.framework
         {
             return this.obb;
         }
+
+        private static _tempMatrix = new gd3d.math.matrix();
         /**
         * @public
         * @language zh_CN
@@ -82,7 +87,9 @@ namespace gd3d.framework
         {
             if (this.gameObject)
                 return this.gameObject.transform.getWorldMatrix();
-            return new gd3d.math.matrix();
+
+            gd3d.math.matrixMakeIdentity(boxcollider._tempMatrix);
+            return boxcollider._tempMatrix;
         }
         start()
         {
@@ -164,30 +171,27 @@ namespace gd3d.framework
             }
             else
             {
-                var minimum = new gd3d.math.vector3();
-                var maximum = new gd3d.math.vector3();
+                let minimum = help_v3;
+                let maximum = help_v3_1;
                 if (this.filter)
                 {
-                    var meshdata: gd3d.render.meshData = this.filter.getMeshOutput().data;
-                    gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
-                    gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+                    // let meshdata: gd3d.render.meshData = this.filter.getMeshOutput().data;
+                    // gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                    // gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
 
-                    for (var i = 0; i < meshdata.pos.length; i++)
-                    {
-                        gd3d.math.vec3Max(meshdata.pos[i], maximum, maximum);
-                        gd3d.math.vec3Min(meshdata.pos[i], minimum, minimum);
-                    }
-                    console.log("add obb filter " + minimum + "  " + maximum);
+                    // for (var i = 0; i < meshdata.pos.length; i++)
+                    // {
+                    //     gd3d.math.vec3Max(meshdata.pos[i], maximum, maximum);
+                    //     gd3d.math.vec3Min(meshdata.pos[i], minimum, minimum);
+                    // }
+                    // console.log("add obb filter " + minimum + "  " + maximum);
+
+                    this.filter.getMeshOutput().calcVectexMinMax(minimum,maximum);
                 }
                 else
                 {
-                    minimum.x = -1;
-                    minimum.y = -1;
-                    minimum.z = -1;
-
-                    maximum.x = 1;
-                    maximum.y = 1;
-                    maximum.z = 1;
+                    minimum.x = minimum.y = minimum.z = -1;
+                    maximum.x = maximum.y = maximum.z = 1;
                 }
                 this.obb.buildByMaxMin(minimum, maximum);
             }

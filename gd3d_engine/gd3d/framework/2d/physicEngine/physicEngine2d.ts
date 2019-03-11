@@ -1,6 +1,6 @@
 namespace gd3d.framework {
     // export declare let physic: PhysicsEngine;
-    export declare let physic2D: physicEngine2D;
+    //export declare let physic2D: physicEngine2D;
 
     export interface Itiming {
         timeScale?: number;

@@ -365,8 +365,6 @@ namespace gd3d.framework
             // this.onReadFinish();
         }
 
-
-
         /**
          * @public
          * @language zh_CN
@@ -652,6 +650,35 @@ namespace gd3d.framework
             _result.glMesh.addIndex(sceneMgr.app.getAssetMgr().webgl, indices.length);
             _result.glMesh.uploadIndexData(sceneMgr.app.getAssetMgr().webgl, 0, indices);
             return _result;
+        }
+
+        private _cacheMinP : math.vector3;
+        private _cacheMaxP : math.vector3;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 计算模型顶点的 最大最小值
+         * @param outMin 输出最小
+         * @param outMax 输出最大
+         * @version egret-gd3d 1.0
+         */
+        calcVectexMinMax(outMin:math.vector3,outMax:math.vector3){
+            if(!outMin || !outMax) return;
+            if(!this._cacheMinP || !this._cacheMaxP){
+                this._cacheMinP = new math.vector3();
+                this._cacheMaxP = new math.vector3();
+                let meshdata = this.data;
+                gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, this._cacheMinP);
+                gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, this._cacheMaxP);
+                for (var i = 0; i < meshdata.pos.length; i++)
+                {
+                    gd3d.math.vec3Max(meshdata.pos[i], this._cacheMaxP , this._cacheMaxP );
+                    gd3d.math.vec3Min(meshdata.pos[i], this._cacheMinP, this._cacheMinP);
+                }
+            }
+            math.vec3Clone(this._cacheMinP,outMin);
+            math.vec3Clone(this._cacheMaxP,outMax);
         }
     }
     /**

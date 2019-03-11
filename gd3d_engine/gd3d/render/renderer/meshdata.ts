@@ -503,74 +503,75 @@
 
             return data;
         }
-        static genBoxByArray(array: gd3d.math.vector3[]): meshData
+        static genBoxByArray(array: gd3d.math.vector3[] , outData: meshData )
         {
-            var data = new meshData();
-            data.pos = [];
-            data.trisindex = [];
-            data.normal = [];
-            data.tangent = [];
-            data.uv = [];
+            if(!outData) return;
+            // var data = new meshData();
+            outData.pos = [];
+            outData.trisindex = [];
+            outData.normal = [];
+            outData.tangent = [];
+            outData.uv = [];
             //bottom
-            meshData.addQuadVec3ByValue(data.normal, new gd3d.math.vector3(0, -1, 0));
-            meshData.addQuadPos(data, [
+            meshData.addQuadVec3ByValue(outData.normal, new gd3d.math.vector3(0, -1, 0));
+            meshData.addQuadPos(outData, [
                 array[0],
                 array[1],
                 array[2],
                 array[3]
             ]);
-            meshData.addQuadVec3ByValue(data.tangent, new math.vector3(-1, 0, 0));
+            meshData.addQuadVec3ByValue(outData.tangent, new math.vector3(-1, 0, 0));
             //top
-            meshData.addQuadVec3ByValue(data.normal, new gd3d.math.vector3(0, 1, 0));
-            meshData.addQuadPos(data, [
+            meshData.addQuadVec3ByValue(outData.normal, new gd3d.math.vector3(0, 1, 0));
+            meshData.addQuadPos(outData, [
                 array[4],
                 array[5],
                 array[6],
                 array[7]
             ]);
-            meshData.addQuadVec3ByValue(data.tangent, new math.vector3(1, 0, 0));
+            meshData.addQuadVec3ByValue(outData.tangent, new math.vector3(1, 0, 0));
 
             //back
-            meshData.addQuadVec3ByValue(data.normal, new math.vector3(0, 0, 1));
-            meshData.addQuadPos(data, [
+            meshData.addQuadVec3ByValue(outData.normal, new math.vector3(0, 0, 1));
+            meshData.addQuadPos(outData, [
                 array[1],
                 array[3],
                 array[5],
                 array[7]
             ]);
-            meshData.addQuadVec3ByValue(data.tangent, new math.vector3(1, 0, 0));
+            meshData.addQuadVec3ByValue(outData.tangent, new math.vector3(1, 0, 0));
 
             //front
-            meshData.addQuadVec3ByValue(data.normal, new math.vector3(0, 0, -1));
-            meshData.addQuadPos(data, [
+            meshData.addQuadVec3ByValue(outData.normal, new math.vector3(0, 0, -1));
+            meshData.addQuadPos(outData, [
                 array[0],
                 array[2],
                 array[4],
                 array[6]
             ]);
-            meshData.addQuadVec3ByValue(data.tangent, new math.vector3(-1, 0, 0));
+            meshData.addQuadVec3ByValue(outData.tangent, new math.vector3(-1, 0, 0));
 
             //right
-            meshData.addQuadVec3ByValue(data.normal, new math.vector3(1, 0, 0));
-            meshData.addQuadPos(data, [
+            meshData.addQuadVec3ByValue(outData.normal, new math.vector3(1, 0, 0));
+            meshData.addQuadPos(outData, [
                 array[6],
                 array[2],
                 array[7],
                 array[3]
             ]);
-            meshData.addQuadVec3ByValue(data.tangent, new math.vector3(0, 0, -1));
+            meshData.addQuadVec3ByValue(outData.tangent, new math.vector3(0, 0, -1));
 
             //left
-            meshData.addQuadVec3ByValue(data.normal, new math.vector3(-1, 0, 0));
-            meshData.addQuadPos(data, [
+            meshData.addQuadVec3ByValue(outData.normal, new math.vector3(-1, 0, 0));
+            meshData.addQuadPos(outData, [
                 array[0],
                 array[4],
                 array[1],
                 array[5]
             ]);
-            meshData.addQuadVec3ByValue(data.tangent, new math.vector3(0, 0, 1));
+            meshData.addQuadVec3ByValue(outData.tangent, new math.vector3(0, 0, 1));
 
-            return data;
+            // return data;
         }
         static genBoxByArray_Quad(array: gd3d.math.vector3[]): meshData
         {
