@@ -103,6 +103,8 @@ namespace gd3d.framework
             this.hasWheel = true;
             if (ev.detail) {
                 this.lastWheel = -1 * ev.detail;
+            }  else if (ev.wheelDelta) {
+                this.lastWheel = ev.wheelDelta / 120;
             } else if (ev.DOM_DELTA_PIXEL) {
                 this.lastWheel = ev.DOM_DELTA_PIXEL / 120;
             } else {
@@ -194,11 +196,12 @@ namespace gd3d.framework
 
         //key
         private _keydown(ev:KeyboardEvent){
-            this.hasKeyDown = this.keyboardMap[ev.keyCode] = true;
+            this.keyboardMap[ev.keyCode] = true;
+            this.keyDownCode = ev.keyCode;
         }
         private _keyup(ev:KeyboardEvent){
             delete this.keyboardMap[ev.keyCode];
-            this.hasKeyUp = true;
+            this.keyUpCode = ev.keyCode;
         }
         //
         private _blur(ev){
@@ -264,15 +267,15 @@ namespace gd3d.framework
             this.lastPoint.y = pt.y;
         }
 
-        private hasKeyDown = false;
-        private hasKeyUp = false;
+        private keyDownCode : number = -1;
+        private keyUpCode : number = -1;
         private keyCodeCk(){
-            if(this.hasKeyDown)
-                this.eventer.EmitEnum_key(event.KeyEventEnum.KeyDown,null);
-            if(this.hasKeyUp)
-                this.eventer.EmitEnum_key(event.KeyEventEnum.KeyUp,null);
+            if(this.keyDownCode != -1)
+                this.eventer.EmitEnum_key(event.KeyEventEnum.KeyDown, this.keyDownCode);
+            if(this.keyUpCode != -1)
+                this.eventer.EmitEnum_key(event.KeyEventEnum.KeyUp, this.keyUpCode);
 
-            this.hasKeyDown = this.hasKeyUp = false;
+            this.keyDownCode = this.keyUpCode = -1;
         }
 
         private hasWheel = false;
