@@ -24,33 +24,36 @@ namespace gd3d.framework
         */
         static obbVsObb(a:obb,b:obb):boolean{
             if (!a || !b) return false;
-            var box0 = a;
-            var box1 = b;
+            let box0 = a;
+            let box1 = b;
 
-            if (!this.obbOverLap(box0.directions[0], box0, box1)) return false;
-            if (!this.obbOverLap(box0.directions[1], box0, box1)) return false;
-            if (!this.obbOverLap(box0.directions[2], box0, box1)) return false;
-            if (!this.obbOverLap(box1.directions[0], box0, box1)) return false;
-            if (!this.obbOverLap(box1.directions[1], box0, box1)) return false;
-            if (!this.obbOverLap(box1.directions[2], box0, box1)) return false;
+            let box0_dirs = box0.directions;
+            let box1_dirs = box1.directions;
 
-            gd3d.math.vec3Cross(box0.directions[0], box1.directions[0], helpV3_0);
+            if (!this.obbOverLap(box0_dirs[0], box0, box1)) return false;
+            if (!this.obbOverLap(box0_dirs[1], box0, box1)) return false;
+            if (!this.obbOverLap(box0_dirs[2], box0, box1)) return false;
+            if (!this.obbOverLap(box1_dirs[0], box0, box1)) return false;
+            if (!this.obbOverLap(box1_dirs[1], box0, box1)) return false;
+            if (!this.obbOverLap(box1_dirs[2], box0, box1)) return false;
+
+            gd3d.math.vec3Cross(box0_dirs[0], box1_dirs[0], helpV3_0);
             if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[0], box1.directions[1], helpV3_0);
+            gd3d.math.vec3Cross(box0_dirs[0], box1_dirs[1], helpV3_0);
             if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[0], box1.directions[2], helpV3_0);
+            gd3d.math.vec3Cross(box0_dirs[0], box1_dirs[2], helpV3_0);
             if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[1], box1.directions[0], helpV3_0);
+            gd3d.math.vec3Cross(box0_dirs[1], box1_dirs[0], helpV3_0);
             if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[1], box1.directions[1], helpV3_0);
+            gd3d.math.vec3Cross(box0_dirs[1], box1_dirs[1], helpV3_0);
             if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[1], box1.directions[2], helpV3_0);
+            gd3d.math.vec3Cross(box0_dirs[1], box1_dirs[2], helpV3_0);
             if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[2], box1.directions[0], helpV3_0);
+            gd3d.math.vec3Cross(box0_dirs[2], box1_dirs[0], helpV3_0);
             if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[2], box1.directions[1], helpV3_0);
+            gd3d.math.vec3Cross(box0_dirs[2], box1_dirs[1], helpV3_0);
             if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
-            gd3d.math.vec3Cross(box0.directions[2], box1.directions[2], helpV3_0);
+            gd3d.math.vec3Cross(box0_dirs[2], box1_dirs[2], helpV3_0);
             if (!this.obbOverLap(helpV3_0, box0, box1)) return false;
 
             return true;
@@ -78,20 +81,22 @@ namespace gd3d.framework
         */
         static obbVsSphere(a:obb,b:spherestruct):boolean{
             if(!a || !b)    return false;
-            if (!this.obb_SphereOverLap(a.directions[0], a, b)) return false;
-            if (!this.obb_SphereOverLap(a.directions[1], a, b)) return false;
-            if (!this.obb_SphereOverLap(a.directions[2], a, b)) return false;
+            let a_dirs = a.directions;
+
+            if (!this.obb_SphereOverLap(a_dirs[0], a, b)) return false;
+            if (!this.obb_SphereOverLap(a_dirs[1], a, b)) return false;
+            if (!this.obb_SphereOverLap(a_dirs[2], a, b)) return false;
 
             let axis = helpV3_0;
             gd3d.math.vec3Subtract(a.worldCenter,b.center,axis); //obb 上 到圆心最近点 的轴
             gd3d.math.vec3Normalize(axis,axis);
             if (!this.obb_SphereOverLap(axis, a, b)) return false;
 
-            gd3d.math.vec3Cross(a.directions[0], axis, helpV3_1);
+            gd3d.math.vec3Cross(a_dirs[0], axis, helpV3_1);
             if (!this.obb_SphereOverLap(helpV3_1, a, b)) return false;
-            gd3d.math.vec3Cross(a.directions[1], axis, helpV3_1);
+            gd3d.math.vec3Cross(a_dirs[1], axis, helpV3_1);
             if (!this.obb_SphereOverLap(helpV3_1, a, b)) return false;
-            gd3d.math.vec3Cross(a.directions[2], axis, helpV3_1);
+            gd3d.math.vec3Cross(a_dirs[2], axis, helpV3_1);
             if (!this.obb_SphereOverLap(helpV3_1, a, b)) return false;
 
             return true;

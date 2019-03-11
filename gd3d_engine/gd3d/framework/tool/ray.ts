@@ -99,6 +99,9 @@
                 return true;
             }
         }
+        
+        private static tempMData : render.meshData;
+        private static tempVecs : gd3d.math.vector3[];
 
         /**
         * @private
@@ -118,10 +121,21 @@
             {
                 let obb = _collider.getBound() as obb;
                 if(!obb)    return ishided;
-                let vecs: gd3d.math.vector3[] = [];
-                obb.caclWorldVecs(vecs, _collider.gameObject.transform.getWorldMatrix());
-                let data = gd3d.render.meshData.genBoxByArray(vecs);
-
+                if(!ray.tempVecs){
+                    ray.tempVecs = [];
+                    for(let i=0;i < 8 ;i++){
+                        ray.tempVecs.push(new gd3d.math.vector3());
+                    }
+                }
+                let wVects = obb.vectorsWorld;
+                for(let i=0; i < 8 ;i++){
+                    math.vec3Clone(wVects[i],ray.tempVecs[i]);
+                }
+                
+                // obb.caclWorldVecs(ray.tempVecs, _collider.gameObject.transform.getWorldMatrix());   
+                if(!ray.tempMData) ray.tempMData = new render.meshData();
+                gd3d.render.meshData.genBoxByArray(ray.tempVecs,ray.tempMData);    
+                let data = ray.tempMData;
                 for (var index = 0; index < data.trisindex.length; index += 3)
                 {
                     var p0 = data.pos[data.trisindex[index]];
