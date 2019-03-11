@@ -33,5 +33,17 @@ namespace gd3d.math{
         out.rawData[3] = from.rawData[3] * scale;
     }
 
-    
+    export function vec4SetAll(vector : vector3 , value : number){
+        vector.rawData[0] = value;
+        vector.rawData[1] = value;
+        vector.rawData[2] = value;
+        vector.rawData[3] = value;
+    }
+
+    export function vec4Set(vector : vector2 , x : number ,  y : number , z : number , w : number){
+        vector.rawData[0] = x;
+        vector.rawData[1] = y;
+        vector.rawData[2] = z;
+        vector.rawData[3] = w;
+    }
 }

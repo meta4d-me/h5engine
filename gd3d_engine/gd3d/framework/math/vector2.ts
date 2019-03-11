@@ -73,4 +73,14 @@
 
        return true;
     }
+
+    export function vec2SetAll(vector : vector2 , value : number){
+        vector.rawData[0] = value;
+        vector.rawData[1] = value;
+    }
+
+    export function vec2Set (vector : vector2 , x : number ,  y : number){
+        vector.rawData[0] = x;
+        vector.rawData[1] = y;
+    }
 }

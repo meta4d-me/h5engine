@@ -302,6 +302,18 @@
        return true;
     }
 
+    export function vec3SetAll(vector : vector3 , value : number){
+        vector.rawData[0] = value;
+        vector.rawData[1] = value;
+        vector.rawData[2] = value;
+    }
+
+    export function vec3Set(vector : vector2 , x : number ,  y : number , z : number){
+        vector.rawData[0] = x;
+        vector.rawData[1] = y;
+        vector.rawData[2] = z;
+    }
+
     //static sDirection(vector: vector3, vector2: vector3, dest: vector3 = null): vector3 {
     //    if (!dest) dest = new vector3();
 
