@@ -13,6 +13,18 @@
           "length":0
           },
       {
+          "name":"resources/advanced/pbrMR.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/advanced/pbrMR.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/advanced/pbrMR.vs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/advanced/pbr_sss.fs.glsl",
           "length":0
           },
@@ -34,18 +46,6 @@
           },
       {
           "name":"resources/advanced/skybox.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/base/alphaTest.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/base/alphaTest.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/base/alphaTest.vs.glsl",
           "length":0
           },
       {
@@ -174,14 +174,6 @@
           },
       {
           "name":"resources/posteffect/blur.shader.json",
-          "length":0
-          },
-      {
-          "name":"resources/posteffect/colorcorrect.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/posteffect/colorcorrect.shader.json",
           "length":0
           },
       {

@@ -312,6 +312,20 @@ namespace gd3d.framework
             this._children = children;
         }
 
+        private _physicsImpostor: PhysicsImpostor ;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 物理代理对象
+         * @version egret-gd3d 1.0
+         */
+        get physicsImpostor(){
+            return this._physicsImpostor;
+        }
+        set physicsImpostor(physicsImp : PhysicsImpostor){
+            this._physicsImpostor = physicsImp;
+        }
 
         /**
          * @public
@@ -708,7 +722,11 @@ namespace gd3d.framework
          */
         getWorldRotate()
         {
-            math.matrixGetRotation(this.getWorldMatrix(),this.worldRotate);  
+            if(!this._parent || !this._parent._parent){
+                math.quatClone(this._localRotate,this.worldRotate);
+            }else{
+                math.matrixGetRotation(this.getWorldMatrix(),this.worldRotate);  
+            }
             return this.worldRotate;
         }
 
@@ -720,7 +738,7 @@ namespace gd3d.framework
          * 
          */
         setWorldRotate(rotate:math.quaternion){
-            if (!this._parent) {
+            if (!this._parent || !this._parent._parent) {
                 math.quatClone(rotate,this._localRotate);
             } else{
                 math.quatClone(this._parent.getWorldRotate(), helpQuat);
@@ -742,7 +760,11 @@ namespace gd3d.framework
          */
         getWorldTranslate()
         {
-            math.matrixGetTranslation(this.getWorldMatrix(),this.worldTranslate);
+            if(!this._parent || !this._parent._parent){
+                math.vec3Clone(this._localTranslate,this.worldTranslate);
+            }else{
+                math.matrixGetTranslation(this.getWorldMatrix(),this.worldTranslate);
+            }
             return this.worldTranslate;
         }
         /**
@@ -754,7 +776,11 @@ namespace gd3d.framework
          */
         getWorldPosition()
         {
-            math.matrixGetTranslation(this.getWorldMatrix(),this.worldTranslate);
+            if(!this._parent || !this._parent._parent){
+                math.vec3Clone(this._localTranslate,this.worldTranslate);
+            }else{
+                math.matrixGetTranslation(this.getWorldMatrix(),this.worldTranslate);
+            }
             return this.worldTranslate;
         }
 
@@ -767,7 +793,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         setWorldPosition(pos: math.vector3){
-            if (!this._parent) {
+            if (!this._parent || !this._parent._parent) {
                 math.vec3Clone(pos,this._localTranslate);
             } else{
                 math.matrixInverse(this._parent.getWorldMatrix(),helpMtx4);
@@ -788,7 +814,11 @@ namespace gd3d.framework
          */
         getWorldScale()
         {
-            math.matrixGetScale(this.getWorldMatrix(),this.worldScale);  
+            if(!this._parent || !this._parent._parent){
+                math.vec3Clone(this._localScale,this.worldScale);
+            }else{
+                math.matrixGetScale(this.getWorldMatrix(),this.worldScale);  
+            }
             return this.worldScale;
         }
 
@@ -800,7 +830,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         setWorldScale(scale:math.vector3){
-            if (!this._parent) {
+            if (!this._parent || !this._parent._parent) {
                 math.vec3Clone(scale,this._localScale);
             } else{
                 math.vec3Clone(this._parent.getWorldScale(),helpVec3);
