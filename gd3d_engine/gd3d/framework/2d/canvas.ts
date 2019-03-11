@@ -49,10 +49,12 @@ namespace gd3d.framework
             if (this.vboCount > 0)
                 this.end(webgl);
             this.curPass = pass;
+
+            this.vboCount = 0; //不清理会缓存
         }
 
         //buffer 最大限制
-        private static limitCount = 2048 * 2048; 
+        private static limitCount = 2048 * 64; 
         /**
          * @private
          */
@@ -63,6 +65,7 @@ namespace gd3d.framework
                 (ebodata != null && this.eboCount + ebodata.length > batcher2D.limitCount))
             {
                 this.end(webgl);
+                this.dataForVbo
             }
 
             if (this.vboCount + vbodata.length > this.dataForVbo.length)

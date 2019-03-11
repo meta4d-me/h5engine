@@ -447,16 +447,17 @@ namespace gd3d.framework
 
         private OnClipPlayEnd()
         {
-            let Clipame = this._playClip.getName();
+            let Clipame = this._playClip ? this._playClip.getName() : "";
             this._playClip = null;
             // this.lastFrame=null;
+            this.bePlay = false;
+            this.beCross = false;
+            
             let endFunc = this.playEndDic[Clipame];
             if (endFunc)
             {
                 endFunc();
             }
-            this.bePlay = false;
-            this.beCross = false;
         }
         private beActived: boolean = false;//是否play过动画
         private boneCache: { [id: string]: PoseBoneMatrix } = {};
