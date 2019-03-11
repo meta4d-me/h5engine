@@ -1905,12 +1905,14 @@ var gd3d;
                 if (this.vboCount > 0)
                     this.end(webgl);
                 this.curPass = pass;
+                this.vboCount = 0;
             };
             batcher2D.prototype.push = function (webgl, vbodata, ebodata) {
                 if (this.vboCount + vbodata.length > batcher2D.limitCount
                     ||
                         (ebodata != null && this.eboCount + ebodata.length > batcher2D.limitCount)) {
                     this.end(webgl);
+                    this.dataForVbo;
                 }
                 if (this.vboCount + vbodata.length > this.dataForVbo.length) {
                     var narr = new Float32Array(this.dataForVbo.length * 2);
@@ -1967,7 +1969,7 @@ var gd3d;
                 this.vboCount = 0;
                 this.eboCount = 0;
             };
-            batcher2D.limitCount = 2048 * 2048;
+            batcher2D.limitCount = 2048 * 64;
             return batcher2D;
         }());
         framework.batcher2D = batcher2D;
@@ -10116,6 +10118,16 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(transform.prototype, "physicsImpostor", {
+                get: function () {
+                    return this._physicsImpostor;
+                },
+                set: function (physicsImp) {
+                    this._physicsImpostor = physicsImp;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(transform.prototype, "parent", {
                 get: function () {
                     return this._parent;
@@ -10326,11 +10338,16 @@ var gd3d;
                 configurable: true
             });
             transform.prototype.getWorldRotate = function () {
-                gd3d.math.matrixGetRotation(this.getWorldMatrix(), this.worldRotate);
+                if (!this._parent || !this._parent._parent) {
+                    gd3d.math.quatClone(this._localRotate, this.worldRotate);
+                }
+                else {
+                    gd3d.math.matrixGetRotation(this.getWorldMatrix(), this.worldRotate);
+                }
                 return this.worldRotate;
             };
             transform.prototype.setWorldRotate = function (rotate) {
-                if (!this._parent) {
+                if (!this._parent || !this._parent._parent) {
                     gd3d.math.quatClone(rotate, this._localRotate);
                 }
                 else {
@@ -10343,15 +10360,25 @@ var gd3d;
                 }
             };
             transform.prototype.getWorldTranslate = function () {
-                gd3d.math.matrixGetTranslation(this.getWorldMatrix(), this.worldTranslate);
+                if (!this._parent || !this._parent._parent) {
+                    gd3d.math.vec3Clone(this._localTranslate, this.worldTranslate);
+                }
+                else {
+                    gd3d.math.matrixGetTranslation(this.getWorldMatrix(), this.worldTranslate);
+                }
                 return this.worldTranslate;
             };
             transform.prototype.getWorldPosition = function () {
-                gd3d.math.matrixGetTranslation(this.getWorldMatrix(), this.worldTranslate);
+                if (!this._parent || !this._parent._parent) {
+                    gd3d.math.vec3Clone(this._localTranslate, this.worldTranslate);
+                }
+                else {
+                    gd3d.math.matrixGetTranslation(this.getWorldMatrix(), this.worldTranslate);
+                }
                 return this.worldTranslate;
             };
             transform.prototype.setWorldPosition = function (pos) {
-                if (!this._parent) {
+                if (!this._parent || !this._parent._parent) {
                     gd3d.math.vec3Clone(pos, this._localTranslate);
                 }
                 else {
@@ -10363,11 +10390,16 @@ var gd3d;
                 }
             };
             transform.prototype.getWorldScale = function () {
-                gd3d.math.matrixGetScale(this.getWorldMatrix(), this.worldScale);
+                if (!this._parent || !this._parent._parent) {
+                    gd3d.math.vec3Clone(this._localScale, this.worldScale);
+                }
+                else {
+                    gd3d.math.matrixGetScale(this.getWorldMatrix(), this.worldScale);
+                }
                 return this.worldScale;
             };
             transform.prototype.setWorldScale = function (scale) {
-                if (!this._parent) {
+                if (!this._parent || !this._parent._parent) {
                     gd3d.math.vec3Clone(scale, this._localScale);
                 }
                 else {
@@ -10553,12 +10585,15 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var help_v3 = new gd3d.math.vector3();
+        var help_v3_1 = new gd3d.math.vector3();
         var boxcollider = (function () {
             function boxcollider() {
                 this.center = new gd3d.math.vector3(0, 0, 0);
                 this.size = new gd3d.math.vector3(1, 1, 1);
                 this._colliderVisible = false;
             }
+            boxcollider_1 = boxcollider;
             boxcollider.prototype.getBound = function () {
                 return this.obb;
             };
@@ -10566,7 +10601,8 @@ var gd3d;
                 get: function () {
                     if (this.gameObject)
                         return this.gameObject.transform.getWorldMatrix();
-                    return new gd3d.math.matrix();
+                    gd3d.math.matrixMakeIdentity(boxcollider_1._tempMatrix);
+                    return boxcollider_1._tempMatrix;
                 },
                 enumerable: true,
                 configurable: true
@@ -10609,25 +10645,14 @@ var gd3d;
                     this.obb.buildByCenterSize(this.center, this.size);
                 }
                 else {
-                    var minimum = new gd3d.math.vector3();
-                    var maximum = new gd3d.math.vector3();
+                    var minimum = help_v3;
+                    var maximum = help_v3_1;
                     if (this.filter) {
-                        var meshdata = this.filter.getMeshOutput().data;
-                        gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
-                        gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-                        for (var i = 0; i < meshdata.pos.length; i++) {
-                            gd3d.math.vec3Max(meshdata.pos[i], maximum, maximum);
-                            gd3d.math.vec3Min(meshdata.pos[i], minimum, minimum);
-                        }
-                        console.log("add obb filter " + minimum + "  " + maximum);
+                        this.filter.getMeshOutput().calcVectexMinMax(minimum, maximum);
                     }
                     else {
-                        minimum.x = -1;
-                        minimum.y = -1;
-                        minimum.z = -1;
-                        maximum.x = 1;
-                        maximum.y = 1;
-                        maximum.z = 1;
+                        minimum.x = minimum.y = minimum.z = -1;
+                        maximum.x = maximum.y = maximum.z = 1;
                     }
                     this.obb.buildByMaxMin(minimum, maximum);
                 }
@@ -10680,6 +10705,7 @@ var gd3d;
             boxcollider.prototype.clone = function () {
             };
             boxcollider.ClassName = "boxcollider";
+            boxcollider._tempMatrix = new gd3d.math.matrix();
             __decorate([
                 gd3d.reflect.Field("vector3"),
                 __metadata("design:type", gd3d.math.vector3)
@@ -10688,11 +10714,12 @@ var gd3d;
                 gd3d.reflect.Field("vector3"),
                 __metadata("design:type", gd3d.math.vector3)
             ], boxcollider.prototype, "size", void 0);
-            boxcollider = __decorate([
+            boxcollider = boxcollider_1 = __decorate([
                 gd3d.reflect.nodeComponent,
                 gd3d.reflect.nodeBoxCollider
             ], boxcollider);
             return boxcollider;
+            var boxcollider_1;
         }());
         framework.boxcollider = boxcollider;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -12209,6 +12236,23 @@ var gd3d;
                 _result.glMesh.uploadIndexData(framework.sceneMgr.app.getAssetMgr().webgl, 0, indices);
                 return _result;
             };
+            mesh.prototype.calcVectexMinMax = function (outMin, outMax) {
+                if (!outMin || !outMax)
+                    return;
+                if (!this._cacheMinP || !this._cacheMaxP) {
+                    this._cacheMinP = new gd3d.math.vector3();
+                    this._cacheMaxP = new gd3d.math.vector3();
+                    var meshdata = this.data;
+                    gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, this._cacheMinP);
+                    gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, this._cacheMaxP);
+                    for (var i = 0; i < meshdata.pos.length; i++) {
+                        gd3d.math.vec3Max(meshdata.pos[i], this._cacheMaxP, this._cacheMaxP);
+                        gd3d.math.vec3Min(meshdata.pos[i], this._cacheMinP, this._cacheMinP);
+                    }
+                }
+                gd3d.math.vec3Clone(this._cacheMinP, outMin);
+                gd3d.math.vec3Clone(this._cacheMaxP, outMax);
+            };
             mesh.ClassName = "mesh";
             mesh = mesh_1 = __decorate([
                 gd3d.reflect.SerializeType,
@@ -13505,14 +13549,14 @@ var gd3d;
                 }
             };
             aniplayer.prototype.OnClipPlayEnd = function () {
-                var Clipame = this._playClip.getName();
+                var Clipame = this._playClip ? this._playClip.getName() : "";
                 this._playClip = null;
+                this.bePlay = false;
+                this.beCross = false;
                 var endFunc = this.playEndDic[Clipame];
                 if (endFunc) {
                     endFunc();
                 }
-                this.bePlay = false;
-                this.beCross = false;
             };
             aniplayer.prototype.recyclecache = function () {
                 for (var key in this.boneCache) {
@@ -19149,327 +19193,94 @@ var gd3d;
         })(KeyEventEnum = event.KeyEventEnum || (event.KeyEventEnum = {}));
         var KeyCode;
         (function (KeyCode) {
-            KeyCode[KeyCode["None"] = 0] = "None";
-            KeyCode[KeyCode["Backspace"] = 8] = "Backspace";
-            KeyCode[KeyCode["Tab"] = 9] = "Tab";
-            KeyCode[KeyCode["Clear"] = 12] = "Clear";
-            KeyCode[KeyCode["Return"] = 13] = "Return";
+            KeyCode[KeyCode["Numpad4"] = 100] = "Numpad4";
+            KeyCode[KeyCode["Numpad5"] = 101] = "Numpad5";
+            KeyCode[KeyCode["Numpad6"] = 102] = "Numpad6";
+            KeyCode[KeyCode["Numpad7"] = 103] = "Numpad7";
+            KeyCode[KeyCode["Numpad8"] = 104] = "Numpad8";
+            KeyCode[KeyCode["Numpad9"] = 105] = "Numpad9";
+            KeyCode[KeyCode["NumpadMultiply"] = 106] = "NumpadMultiply";
+            KeyCode[KeyCode["NumpadAdd"] = 107] = "NumpadAdd";
+            KeyCode[KeyCode["NumpadSubtract"] = 109] = "NumpadSubtract";
+            KeyCode[KeyCode["NumpadDecimal"] = 110] = "NumpadDecimal";
+            KeyCode[KeyCode["NumpadDivide"] = 111] = "NumpadDivide";
+            KeyCode[KeyCode["F1"] = 112] = "F1";
+            KeyCode[KeyCode["F2"] = 113] = "F2";
+            KeyCode[KeyCode["F3"] = 114] = "F3";
+            KeyCode[KeyCode["F4"] = 115] = "F4";
+            KeyCode[KeyCode["F5"] = 116] = "F5";
+            KeyCode[KeyCode["F6"] = 117] = "F6";
+            KeyCode[KeyCode["F7"] = 118] = "F7";
+            KeyCode[KeyCode["F8"] = 119] = "F8";
+            KeyCode[KeyCode["F9"] = 120] = "F9";
+            KeyCode[KeyCode["F10"] = 121] = "F10";
+            KeyCode[KeyCode["F11"] = 122] = "F11";
+            KeyCode[KeyCode["F12"] = 123] = "F12";
+            KeyCode[KeyCode["Enter"] = 13] = "Enter";
+            KeyCode[KeyCode["NumLock"] = 144] = "NumLock";
+            KeyCode[KeyCode["ScrollLock"] = 145] = "ScrollLock";
+            KeyCode[KeyCode["ShiftLeft"] = 16] = "ShiftLeft";
+            KeyCode[KeyCode["ControlRight"] = 17] = "ControlRight";
+            KeyCode[KeyCode["AltRight"] = 18] = "AltRight";
+            KeyCode[KeyCode["Semicolon"] = 186] = "Semicolon";
+            KeyCode[KeyCode["Comma"] = 188] = "Comma";
             KeyCode[KeyCode["Pause"] = 19] = "Pause";
+            KeyCode[KeyCode["Period"] = 190] = "Period";
+            KeyCode[KeyCode["Slash"] = 191] = "Slash";
+            KeyCode[KeyCode["CapsLock"] = 20] = "CapsLock";
+            KeyCode[KeyCode["BracketLeft"] = 219] = "BracketLeft";
+            KeyCode[KeyCode["Backslash"] = 220] = "Backslash";
+            KeyCode[KeyCode["BracketRight"] = 221] = "BracketRight";
+            KeyCode[KeyCode["Quote"] = 222] = "Quote";
             KeyCode[KeyCode["Escape"] = 27] = "Escape";
             KeyCode[KeyCode["Space"] = 32] = "Space";
-            KeyCode[KeyCode["Exclaim"] = 33] = "Exclaim";
-            KeyCode[KeyCode["DoubleQuote"] = 34] = "DoubleQuote";
-            KeyCode[KeyCode["Hash"] = 35] = "Hash";
-            KeyCode[KeyCode["Dollar"] = 36] = "Dollar";
-            KeyCode[KeyCode["Ampersand"] = 38] = "Ampersand";
-            KeyCode[KeyCode["Quote"] = 39] = "Quote";
-            KeyCode[KeyCode["LeftParen"] = 40] = "LeftParen";
-            KeyCode[KeyCode["RightParen"] = 41] = "RightParen";
-            KeyCode[KeyCode["Asterisk"] = 42] = "Asterisk";
-            KeyCode[KeyCode["Plus"] = 43] = "Plus";
-            KeyCode[KeyCode["Comma"] = 44] = "Comma";
-            KeyCode[KeyCode["Minus"] = 45] = "Minus";
-            KeyCode[KeyCode["Period"] = 46] = "Period";
-            KeyCode[KeyCode["Slash"] = 47] = "Slash";
-            KeyCode[KeyCode["Alpha0"] = 48] = "Alpha0";
-            KeyCode[KeyCode["Alpha1"] = 49] = "Alpha1";
-            KeyCode[KeyCode["Alpha2"] = 50] = "Alpha2";
-            KeyCode[KeyCode["Alpha3"] = 51] = "Alpha3";
-            KeyCode[KeyCode["Alpha4"] = 52] = "Alpha4";
-            KeyCode[KeyCode["Alpha5"] = 53] = "Alpha5";
-            KeyCode[KeyCode["Alpha6"] = 54] = "Alpha6";
-            KeyCode[KeyCode["Alpha7"] = 55] = "Alpha7";
-            KeyCode[KeyCode["Alpha8"] = 56] = "Alpha8";
-            KeyCode[KeyCode["Alpha9"] = 57] = "Alpha9";
-            KeyCode[KeyCode["Colon"] = 58] = "Colon";
-            KeyCode[KeyCode["Semicolon"] = 59] = "Semicolon";
-            KeyCode[KeyCode["Less"] = 60] = "Less";
-            KeyCode[KeyCode["Equals"] = 61] = "Equals";
-            KeyCode[KeyCode["Greater"] = 62] = "Greater";
-            KeyCode[KeyCode["Question"] = 63] = "Question";
-            KeyCode[KeyCode["At"] = 64] = "At";
-            KeyCode[KeyCode["LeftBracket"] = 91] = "LeftBracket";
-            KeyCode[KeyCode["Backslash"] = 92] = "Backslash";
-            KeyCode[KeyCode["RightBracket"] = 93] = "RightBracket";
-            KeyCode[KeyCode["Caret"] = 94] = "Caret";
-            KeyCode[KeyCode["Underscore"] = 95] = "Underscore";
-            KeyCode[KeyCode["BackQuote"] = 96] = "BackQuote";
-            KeyCode[KeyCode["A"] = 97] = "A";
-            KeyCode[KeyCode["B"] = 98] = "B";
-            KeyCode[KeyCode["C"] = 99] = "C";
-            KeyCode[KeyCode["D"] = 100] = "D";
-            KeyCode[KeyCode["E"] = 101] = "E";
-            KeyCode[KeyCode["F"] = 102] = "F";
-            KeyCode[KeyCode["G"] = 103] = "G";
-            KeyCode[KeyCode["H"] = 104] = "H";
-            KeyCode[KeyCode["I"] = 105] = "I";
-            KeyCode[KeyCode["J"] = 106] = "J";
-            KeyCode[KeyCode["K"] = 107] = "K";
-            KeyCode[KeyCode["L"] = 108] = "L";
-            KeyCode[KeyCode["M"] = 109] = "M";
-            KeyCode[KeyCode["N"] = 110] = "N";
-            KeyCode[KeyCode["O"] = 111] = "O";
-            KeyCode[KeyCode["P"] = 112] = "P";
-            KeyCode[KeyCode["Q"] = 113] = "Q";
-            KeyCode[KeyCode["R"] = 114] = "R";
-            KeyCode[KeyCode["S"] = 115] = "S";
-            KeyCode[KeyCode["T"] = 116] = "T";
-            KeyCode[KeyCode["U"] = 117] = "U";
-            KeyCode[KeyCode["V"] = 118] = "V";
-            KeyCode[KeyCode["W"] = 119] = "W";
-            KeyCode[KeyCode["X"] = 120] = "X";
-            KeyCode[KeyCode["Y"] = 121] = "Y";
-            KeyCode[KeyCode["Z"] = 122] = "Z";
-            KeyCode[KeyCode["Delete"] = 127] = "Delete";
-            KeyCode[KeyCode["Keypad0"] = 256] = "Keypad0";
-            KeyCode[KeyCode["Keypad1"] = 257] = "Keypad1";
-            KeyCode[KeyCode["Keypad2"] = 258] = "Keypad2";
-            KeyCode[KeyCode["Keypad3"] = 259] = "Keypad3";
-            KeyCode[KeyCode["Keypad4"] = 260] = "Keypad4";
-            KeyCode[KeyCode["Keypad5"] = 261] = "Keypad5";
-            KeyCode[KeyCode["Keypad6"] = 262] = "Keypad6";
-            KeyCode[KeyCode["Keypad7"] = 263] = "Keypad7";
-            KeyCode[KeyCode["Keypad8"] = 264] = "Keypad8";
-            KeyCode[KeyCode["Keypad9"] = 265] = "Keypad9";
-            KeyCode[KeyCode["KeypadPeriod"] = 266] = "KeypadPeriod";
-            KeyCode[KeyCode["KeypadDivide"] = 267] = "KeypadDivide";
-            KeyCode[KeyCode["KeypadMultiply"] = 268] = "KeypadMultiply";
-            KeyCode[KeyCode["KeypadMinus"] = 269] = "KeypadMinus";
-            KeyCode[KeyCode["KeypadPlus"] = 270] = "KeypadPlus";
-            KeyCode[KeyCode["KeypadEnter"] = 271] = "KeypadEnter";
-            KeyCode[KeyCode["KeypadEquals"] = 272] = "KeypadEquals";
-            KeyCode[KeyCode["UpArrow"] = 273] = "UpArrow";
-            KeyCode[KeyCode["DownArrow"] = 274] = "DownArrow";
-            KeyCode[KeyCode["RightArrow"] = 275] = "RightArrow";
-            KeyCode[KeyCode["LeftArrow"] = 276] = "LeftArrow";
-            KeyCode[KeyCode["Insert"] = 277] = "Insert";
-            KeyCode[KeyCode["Home"] = 278] = "Home";
-            KeyCode[KeyCode["End"] = 279] = "End";
-            KeyCode[KeyCode["PageUp"] = 280] = "PageUp";
-            KeyCode[KeyCode["PageDown"] = 281] = "PageDown";
-            KeyCode[KeyCode["F1"] = 282] = "F1";
-            KeyCode[KeyCode["F2"] = 283] = "F2";
-            KeyCode[KeyCode["F3"] = 284] = "F3";
-            KeyCode[KeyCode["F4"] = 285] = "F4";
-            KeyCode[KeyCode["F5"] = 286] = "F5";
-            KeyCode[KeyCode["F6"] = 287] = "F6";
-            KeyCode[KeyCode["F7"] = 288] = "F7";
-            KeyCode[KeyCode["F8"] = 289] = "F8";
-            KeyCode[KeyCode["F9"] = 290] = "F9";
-            KeyCode[KeyCode["F10"] = 291] = "F10";
-            KeyCode[KeyCode["F11"] = 292] = "F11";
-            KeyCode[KeyCode["F12"] = 293] = "F12";
-            KeyCode[KeyCode["F13"] = 294] = "F13";
-            KeyCode[KeyCode["F14"] = 295] = "F14";
-            KeyCode[KeyCode["F15"] = 296] = "F15";
-            KeyCode[KeyCode["Numlock"] = 300] = "Numlock";
-            KeyCode[KeyCode["CapsLock"] = 301] = "CapsLock";
-            KeyCode[KeyCode["ScrollLock"] = 302] = "ScrollLock";
-            KeyCode[KeyCode["RightShift"] = 303] = "RightShift";
-            KeyCode[KeyCode["LeftShift"] = 304] = "LeftShift";
-            KeyCode[KeyCode["RightControl"] = 305] = "RightControl";
-            KeyCode[KeyCode["LeftControl"] = 306] = "LeftControl";
-            KeyCode[KeyCode["RightAlt"] = 307] = "RightAlt";
-            KeyCode[KeyCode["LeftAlt"] = 308] = "LeftAlt";
-            KeyCode[KeyCode["RightCommand"] = 309] = "RightCommand";
-            KeyCode[KeyCode["RightApple"] = 309] = "RightApple";
-            KeyCode[KeyCode["LeftCommand"] = 310] = "LeftCommand";
-            KeyCode[KeyCode["LeftApple"] = 310] = "LeftApple";
-            KeyCode[KeyCode["LeftWindows"] = 311] = "LeftWindows";
-            KeyCode[KeyCode["RightWindows"] = 312] = "RightWindows";
-            KeyCode[KeyCode["AltGr"] = 313] = "AltGr";
-            KeyCode[KeyCode["Help"] = 315] = "Help";
-            KeyCode[KeyCode["Print"] = 316] = "Print";
-            KeyCode[KeyCode["SysReq"] = 317] = "SysReq";
-            KeyCode[KeyCode["Break"] = 318] = "Break";
-            KeyCode[KeyCode["Menu"] = 319] = "Menu";
-            KeyCode[KeyCode["Mouse0"] = 323] = "Mouse0";
-            KeyCode[KeyCode["Mouse1"] = 324] = "Mouse1";
-            KeyCode[KeyCode["Mouse2"] = 325] = "Mouse2";
-            KeyCode[KeyCode["Mouse3"] = 326] = "Mouse3";
-            KeyCode[KeyCode["Mouse4"] = 327] = "Mouse4";
-            KeyCode[KeyCode["Mouse5"] = 328] = "Mouse5";
-            KeyCode[KeyCode["Mouse6"] = 329] = "Mouse6";
-            KeyCode[KeyCode["JoystickButton0"] = 330] = "JoystickButton0";
-            KeyCode[KeyCode["JoystickButton1"] = 331] = "JoystickButton1";
-            KeyCode[KeyCode["JoystickButton2"] = 332] = "JoystickButton2";
-            KeyCode[KeyCode["JoystickButton3"] = 333] = "JoystickButton3";
-            KeyCode[KeyCode["JoystickButton4"] = 334] = "JoystickButton4";
-            KeyCode[KeyCode["JoystickButton5"] = 335] = "JoystickButton5";
-            KeyCode[KeyCode["JoystickButton6"] = 336] = "JoystickButton6";
-            KeyCode[KeyCode["JoystickButton7"] = 337] = "JoystickButton7";
-            KeyCode[KeyCode["JoystickButton8"] = 338] = "JoystickButton8";
-            KeyCode[KeyCode["JoystickButton9"] = 339] = "JoystickButton9";
-            KeyCode[KeyCode["JoystickButton10"] = 340] = "JoystickButton10";
-            KeyCode[KeyCode["JoystickButton11"] = 341] = "JoystickButton11";
-            KeyCode[KeyCode["JoystickButton12"] = 342] = "JoystickButton12";
-            KeyCode[KeyCode["JoystickButton13"] = 343] = "JoystickButton13";
-            KeyCode[KeyCode["JoystickButton14"] = 344] = "JoystickButton14";
-            KeyCode[KeyCode["JoystickButton15"] = 345] = "JoystickButton15";
-            KeyCode[KeyCode["JoystickButton16"] = 346] = "JoystickButton16";
-            KeyCode[KeyCode["JoystickButton17"] = 347] = "JoystickButton17";
-            KeyCode[KeyCode["JoystickButton18"] = 348] = "JoystickButton18";
-            KeyCode[KeyCode["JoystickButton19"] = 349] = "JoystickButton19";
-            KeyCode[KeyCode["Joystick1Button0"] = 350] = "Joystick1Button0";
-            KeyCode[KeyCode["Joystick1Button1"] = 351] = "Joystick1Button1";
-            KeyCode[KeyCode["Joystick1Button2"] = 352] = "Joystick1Button2";
-            KeyCode[KeyCode["Joystick1Button3"] = 353] = "Joystick1Button3";
-            KeyCode[KeyCode["Joystick1Button4"] = 354] = "Joystick1Button4";
-            KeyCode[KeyCode["Joystick1Button5"] = 355] = "Joystick1Button5";
-            KeyCode[KeyCode["Joystick1Button6"] = 356] = "Joystick1Button6";
-            KeyCode[KeyCode["Joystick1Button7"] = 357] = "Joystick1Button7";
-            KeyCode[KeyCode["Joystick1Button8"] = 358] = "Joystick1Button8";
-            KeyCode[KeyCode["Joystick1Button9"] = 359] = "Joystick1Button9";
-            KeyCode[KeyCode["Joystick1Button10"] = 360] = "Joystick1Button10";
-            KeyCode[KeyCode["Joystick1Button11"] = 361] = "Joystick1Button11";
-            KeyCode[KeyCode["Joystick1Button12"] = 362] = "Joystick1Button12";
-            KeyCode[KeyCode["Joystick1Button13"] = 363] = "Joystick1Button13";
-            KeyCode[KeyCode["Joystick1Button14"] = 364] = "Joystick1Button14";
-            KeyCode[KeyCode["Joystick1Button15"] = 365] = "Joystick1Button15";
-            KeyCode[KeyCode["Joystick1Button16"] = 366] = "Joystick1Button16";
-            KeyCode[KeyCode["Joystick1Button17"] = 367] = "Joystick1Button17";
-            KeyCode[KeyCode["Joystick1Button18"] = 368] = "Joystick1Button18";
-            KeyCode[KeyCode["Joystick1Button19"] = 369] = "Joystick1Button19";
-            KeyCode[KeyCode["Joystick2Button0"] = 370] = "Joystick2Button0";
-            KeyCode[KeyCode["Joystick2Button1"] = 371] = "Joystick2Button1";
-            KeyCode[KeyCode["Joystick2Button2"] = 372] = "Joystick2Button2";
-            KeyCode[KeyCode["Joystick2Button3"] = 373] = "Joystick2Button3";
-            KeyCode[KeyCode["Joystick2Button4"] = 374] = "Joystick2Button4";
-            KeyCode[KeyCode["Joystick2Button5"] = 375] = "Joystick2Button5";
-            KeyCode[KeyCode["Joystick2Button6"] = 376] = "Joystick2Button6";
-            KeyCode[KeyCode["Joystick2Button7"] = 377] = "Joystick2Button7";
-            KeyCode[KeyCode["Joystick2Button8"] = 378] = "Joystick2Button8";
-            KeyCode[KeyCode["Joystick2Button9"] = 379] = "Joystick2Button9";
-            KeyCode[KeyCode["Joystick2Button10"] = 380] = "Joystick2Button10";
-            KeyCode[KeyCode["Joystick2Button11"] = 381] = "Joystick2Button11";
-            KeyCode[KeyCode["Joystick2Button12"] = 382] = "Joystick2Button12";
-            KeyCode[KeyCode["Joystick2Button13"] = 383] = "Joystick2Button13";
-            KeyCode[KeyCode["Joystick2Button14"] = 384] = "Joystick2Button14";
-            KeyCode[KeyCode["Joystick2Button15"] = 385] = "Joystick2Button15";
-            KeyCode[KeyCode["Joystick2Button16"] = 386] = "Joystick2Button16";
-            KeyCode[KeyCode["Joystick2Button17"] = 387] = "Joystick2Button17";
-            KeyCode[KeyCode["Joystick2Button18"] = 388] = "Joystick2Button18";
-            KeyCode[KeyCode["Joystick2Button19"] = 389] = "Joystick2Button19";
-            KeyCode[KeyCode["Joystick3Button0"] = 390] = "Joystick3Button0";
-            KeyCode[KeyCode["Joystick3Button1"] = 391] = "Joystick3Button1";
-            KeyCode[KeyCode["Joystick3Button2"] = 392] = "Joystick3Button2";
-            KeyCode[KeyCode["Joystick3Button3"] = 393] = "Joystick3Button3";
-            KeyCode[KeyCode["Joystick3Button4"] = 394] = "Joystick3Button4";
-            KeyCode[KeyCode["Joystick3Button5"] = 395] = "Joystick3Button5";
-            KeyCode[KeyCode["Joystick3Button6"] = 396] = "Joystick3Button6";
-            KeyCode[KeyCode["Joystick3Button7"] = 397] = "Joystick3Button7";
-            KeyCode[KeyCode["Joystick3Button8"] = 398] = "Joystick3Button8";
-            KeyCode[KeyCode["Joystick3Button9"] = 399] = "Joystick3Button9";
-            KeyCode[KeyCode["Joystick3Button10"] = 400] = "Joystick3Button10";
-            KeyCode[KeyCode["Joystick3Button11"] = 401] = "Joystick3Button11";
-            KeyCode[KeyCode["Joystick3Button12"] = 402] = "Joystick3Button12";
-            KeyCode[KeyCode["Joystick3Button13"] = 403] = "Joystick3Button13";
-            KeyCode[KeyCode["Joystick3Button14"] = 404] = "Joystick3Button14";
-            KeyCode[KeyCode["Joystick3Button15"] = 405] = "Joystick3Button15";
-            KeyCode[KeyCode["Joystick3Button16"] = 406] = "Joystick3Button16";
-            KeyCode[KeyCode["Joystick3Button17"] = 407] = "Joystick3Button17";
-            KeyCode[KeyCode["Joystick3Button18"] = 408] = "Joystick3Button18";
-            KeyCode[KeyCode["Joystick3Button19"] = 409] = "Joystick3Button19";
-            KeyCode[KeyCode["Joystick4Button0"] = 410] = "Joystick4Button0";
-            KeyCode[KeyCode["Joystick4Button1"] = 411] = "Joystick4Button1";
-            KeyCode[KeyCode["Joystick4Button2"] = 412] = "Joystick4Button2";
-            KeyCode[KeyCode["Joystick4Button3"] = 413] = "Joystick4Button3";
-            KeyCode[KeyCode["Joystick4Button4"] = 414] = "Joystick4Button4";
-            KeyCode[KeyCode["Joystick4Button5"] = 415] = "Joystick4Button5";
-            KeyCode[KeyCode["Joystick4Button6"] = 416] = "Joystick4Button6";
-            KeyCode[KeyCode["Joystick4Button7"] = 417] = "Joystick4Button7";
-            KeyCode[KeyCode["Joystick4Button8"] = 418] = "Joystick4Button8";
-            KeyCode[KeyCode["Joystick4Button9"] = 419] = "Joystick4Button9";
-            KeyCode[KeyCode["Joystick4Button10"] = 420] = "Joystick4Button10";
-            KeyCode[KeyCode["Joystick4Button11"] = 421] = "Joystick4Button11";
-            KeyCode[KeyCode["Joystick4Button12"] = 422] = "Joystick4Button12";
-            KeyCode[KeyCode["Joystick4Button13"] = 423] = "Joystick4Button13";
-            KeyCode[KeyCode["Joystick4Button14"] = 424] = "Joystick4Button14";
-            KeyCode[KeyCode["Joystick4Button15"] = 425] = "Joystick4Button15";
-            KeyCode[KeyCode["Joystick4Button16"] = 426] = "Joystick4Button16";
-            KeyCode[KeyCode["Joystick4Button17"] = 427] = "Joystick4Button17";
-            KeyCode[KeyCode["Joystick4Button18"] = 428] = "Joystick4Button18";
-            KeyCode[KeyCode["Joystick4Button19"] = 429] = "Joystick4Button19";
-            KeyCode[KeyCode["Joystick5Button0"] = 430] = "Joystick5Button0";
-            KeyCode[KeyCode["Joystick5Button1"] = 431] = "Joystick5Button1";
-            KeyCode[KeyCode["Joystick5Button2"] = 432] = "Joystick5Button2";
-            KeyCode[KeyCode["Joystick5Button3"] = 433] = "Joystick5Button3";
-            KeyCode[KeyCode["Joystick5Button4"] = 434] = "Joystick5Button4";
-            KeyCode[KeyCode["Joystick5Button5"] = 435] = "Joystick5Button5";
-            KeyCode[KeyCode["Joystick5Button6"] = 436] = "Joystick5Button6";
-            KeyCode[KeyCode["Joystick5Button7"] = 437] = "Joystick5Button7";
-            KeyCode[KeyCode["Joystick5Button8"] = 438] = "Joystick5Button8";
-            KeyCode[KeyCode["Joystick5Button9"] = 439] = "Joystick5Button9";
-            KeyCode[KeyCode["Joystick5Button10"] = 440] = "Joystick5Button10";
-            KeyCode[KeyCode["Joystick5Button11"] = 441] = "Joystick5Button11";
-            KeyCode[KeyCode["Joystick5Button12"] = 442] = "Joystick5Button12";
-            KeyCode[KeyCode["Joystick5Button13"] = 443] = "Joystick5Button13";
-            KeyCode[KeyCode["Joystick5Button14"] = 444] = "Joystick5Button14";
-            KeyCode[KeyCode["Joystick5Button15"] = 445] = "Joystick5Button15";
-            KeyCode[KeyCode["Joystick5Button16"] = 446] = "Joystick5Button16";
-            KeyCode[KeyCode["Joystick5Button17"] = 447] = "Joystick5Button17";
-            KeyCode[KeyCode["Joystick5Button18"] = 448] = "Joystick5Button18";
-            KeyCode[KeyCode["Joystick5Button19"] = 449] = "Joystick5Button19";
-            KeyCode[KeyCode["Joystick6Button0"] = 450] = "Joystick6Button0";
-            KeyCode[KeyCode["Joystick6Button1"] = 451] = "Joystick6Button1";
-            KeyCode[KeyCode["Joystick6Button2"] = 452] = "Joystick6Button2";
-            KeyCode[KeyCode["Joystick6Button3"] = 453] = "Joystick6Button3";
-            KeyCode[KeyCode["Joystick6Button4"] = 454] = "Joystick6Button4";
-            KeyCode[KeyCode["Joystick6Button5"] = 455] = "Joystick6Button5";
-            KeyCode[KeyCode["Joystick6Button6"] = 456] = "Joystick6Button6";
-            KeyCode[KeyCode["Joystick6Button7"] = 457] = "Joystick6Button7";
-            KeyCode[KeyCode["Joystick6Button8"] = 458] = "Joystick6Button8";
-            KeyCode[KeyCode["Joystick6Button9"] = 459] = "Joystick6Button9";
-            KeyCode[KeyCode["Joystick6Button10"] = 460] = "Joystick6Button10";
-            KeyCode[KeyCode["Joystick6Button11"] = 461] = "Joystick6Button11";
-            KeyCode[KeyCode["Joystick6Button12"] = 462] = "Joystick6Button12";
-            KeyCode[KeyCode["Joystick6Button13"] = 463] = "Joystick6Button13";
-            KeyCode[KeyCode["Joystick6Button14"] = 464] = "Joystick6Button14";
-            KeyCode[KeyCode["Joystick6Button15"] = 465] = "Joystick6Button15";
-            KeyCode[KeyCode["Joystick6Button16"] = 466] = "Joystick6Button16";
-            KeyCode[KeyCode["Joystick6Button17"] = 467] = "Joystick6Button17";
-            KeyCode[KeyCode["Joystick6Button18"] = 468] = "Joystick6Button18";
-            KeyCode[KeyCode["Joystick6Button19"] = 469] = "Joystick6Button19";
-            KeyCode[KeyCode["Joystick7Button0"] = 470] = "Joystick7Button0";
-            KeyCode[KeyCode["Joystick7Button1"] = 471] = "Joystick7Button1";
-            KeyCode[KeyCode["Joystick7Button2"] = 472] = "Joystick7Button2";
-            KeyCode[KeyCode["Joystick7Button3"] = 473] = "Joystick7Button3";
-            KeyCode[KeyCode["Joystick7Button4"] = 474] = "Joystick7Button4";
-            KeyCode[KeyCode["Joystick7Button5"] = 475] = "Joystick7Button5";
-            KeyCode[KeyCode["Joystick7Button6"] = 476] = "Joystick7Button6";
-            KeyCode[KeyCode["Joystick7Button7"] = 477] = "Joystick7Button7";
-            KeyCode[KeyCode["Joystick7Button8"] = 478] = "Joystick7Button8";
-            KeyCode[KeyCode["Joystick7Button9"] = 479] = "Joystick7Button9";
-            KeyCode[KeyCode["Joystick7Button10"] = 480] = "Joystick7Button10";
-            KeyCode[KeyCode["Joystick7Button11"] = 481] = "Joystick7Button11";
-            KeyCode[KeyCode["Joystick7Button12"] = 482] = "Joystick7Button12";
-            KeyCode[KeyCode["Joystick7Button13"] = 483] = "Joystick7Button13";
-            KeyCode[KeyCode["Joystick7Button14"] = 484] = "Joystick7Button14";
-            KeyCode[KeyCode["Joystick7Button15"] = 485] = "Joystick7Button15";
-            KeyCode[KeyCode["Joystick7Button16"] = 486] = "Joystick7Button16";
-            KeyCode[KeyCode["Joystick7Button17"] = 487] = "Joystick7Button17";
-            KeyCode[KeyCode["Joystick7Button18"] = 488] = "Joystick7Button18";
-            KeyCode[KeyCode["Joystick7Button19"] = 489] = "Joystick7Button19";
-            KeyCode[KeyCode["Joystick8Button0"] = 490] = "Joystick8Button0";
-            KeyCode[KeyCode["Joystick8Button1"] = 491] = "Joystick8Button1";
-            KeyCode[KeyCode["Joystick8Button2"] = 492] = "Joystick8Button2";
-            KeyCode[KeyCode["Joystick8Button3"] = 493] = "Joystick8Button3";
-            KeyCode[KeyCode["Joystick8Button4"] = 494] = "Joystick8Button4";
-            KeyCode[KeyCode["Joystick8Button5"] = 495] = "Joystick8Button5";
-            KeyCode[KeyCode["Joystick8Button6"] = 496] = "Joystick8Button6";
-            KeyCode[KeyCode["Joystick8Button7"] = 497] = "Joystick8Button7";
-            KeyCode[KeyCode["Joystick8Button8"] = 498] = "Joystick8Button8";
-            KeyCode[KeyCode["Joystick8Button9"] = 499] = "Joystick8Button9";
-            KeyCode[KeyCode["Joystick8Button10"] = 500] = "Joystick8Button10";
-            KeyCode[KeyCode["Joystick8Button11"] = 501] = "Joystick8Button11";
-            KeyCode[KeyCode["Joystick8Button12"] = 502] = "Joystick8Button12";
-            KeyCode[KeyCode["Joystick8Button13"] = 503] = "Joystick8Button13";
-            KeyCode[KeyCode["Joystick8Button14"] = 504] = "Joystick8Button14";
-            KeyCode[KeyCode["Joystick8Button15"] = 505] = "Joystick8Button15";
-            KeyCode[KeyCode["Joystick8Button16"] = 506] = "Joystick8Button16";
-            KeyCode[KeyCode["Joystick8Button17"] = 507] = "Joystick8Button17";
-            KeyCode[KeyCode["Joystick8Button18"] = 508] = "Joystick8Button18";
-            KeyCode[KeyCode["Joystick8Button19"] = 509] = "Joystick8Button19";
+            KeyCode[KeyCode["PageUp"] = 33] = "PageUp";
+            KeyCode[KeyCode["PageDown"] = 34] = "PageDown";
+            KeyCode[KeyCode["End"] = 35] = "End";
+            KeyCode[KeyCode["Home"] = 36] = "Home";
+            KeyCode[KeyCode["ArrowLeft"] = 37] = "ArrowLeft";
+            KeyCode[KeyCode["ArrowUp"] = 38] = "ArrowUp";
+            KeyCode[KeyCode["ArrowRight"] = 39] = "ArrowRight";
+            KeyCode[KeyCode["ArrowDown"] = 40] = "ArrowDown";
+            KeyCode[KeyCode["Insert"] = 45] = "Insert";
+            KeyCode[KeyCode["Delete"] = 46] = "Delete";
+            KeyCode[KeyCode["Digit1"] = 49] = "Digit1";
+            KeyCode[KeyCode["Digit2"] = 50] = "Digit2";
+            KeyCode[KeyCode["Digit3"] = 51] = "Digit3";
+            KeyCode[KeyCode["Digit4"] = 52] = "Digit4";
+            KeyCode[KeyCode["KeyA"] = 65] = "KeyA";
+            KeyCode[KeyCode["KeyB"] = 66] = "KeyB";
+            KeyCode[KeyCode["KeyC"] = 67] = "KeyC";
+            KeyCode[KeyCode["KeyD"] = 68] = "KeyD";
+            KeyCode[KeyCode["KeyE"] = 69] = "KeyE";
+            KeyCode[KeyCode["KeyF"] = 70] = "KeyF";
+            KeyCode[KeyCode["KeyG"] = 71] = "KeyG";
+            KeyCode[KeyCode["KeyH"] = 72] = "KeyH";
+            KeyCode[KeyCode["KeyI"] = 73] = "KeyI";
+            KeyCode[KeyCode["KeyJ"] = 74] = "KeyJ";
+            KeyCode[KeyCode["KeyK"] = 75] = "KeyK";
+            KeyCode[KeyCode["KeyL"] = 76] = "KeyL";
+            KeyCode[KeyCode["KeyM"] = 77] = "KeyM";
+            KeyCode[KeyCode["KeyN"] = 78] = "KeyN";
+            KeyCode[KeyCode["KeyO"] = 79] = "KeyO";
+            KeyCode[KeyCode["KeyP"] = 80] = "KeyP";
+            KeyCode[KeyCode["KeyQ"] = 81] = "KeyQ";
+            KeyCode[KeyCode["KeyR"] = 82] = "KeyR";
+            KeyCode[KeyCode["KeyS"] = 83] = "KeyS";
+            KeyCode[KeyCode["KeyT"] = 84] = "KeyT";
+            KeyCode[KeyCode["KeyU"] = 85] = "KeyU";
+            KeyCode[KeyCode["KeyV"] = 86] = "KeyV";
+            KeyCode[KeyCode["KeyW"] = 87] = "KeyW";
+            KeyCode[KeyCode["KeyX"] = 88] = "KeyX";
+            KeyCode[KeyCode["KeyY"] = 89] = "KeyY";
+            KeyCode[KeyCode["Tab"] = 9] = "Tab";
+            KeyCode[KeyCode["KeyZ"] = 90] = "KeyZ";
+            KeyCode[KeyCode["MetaLeft"] = 91] = "MetaLeft";
+            KeyCode[KeyCode["ContextMenu"] = 93] = "ContextMenu";
+            KeyCode[KeyCode["Numpad0"] = 96] = "Numpad0";
+            KeyCode[KeyCode["Numpad1"] = 97] = "Numpad1";
+            KeyCode[KeyCode["Numpad2"] = 98] = "Numpad2";
+            KeyCode[KeyCode["Numpad3"] = 99] = "Numpad3";
         })(KeyCode = event.KeyCode || (event.KeyCode = {}));
     })(event = gd3d.event || (gd3d.event = {}));
 })(gd3d || (gd3d = {}));
@@ -19563,8 +19374,8 @@ var gd3d;
                 this.hasPointMove = false;
                 this.downPoint = new gd3d.math.vector2();
                 this.lastPoint = new gd3d.math.vector2();
-                this.hasKeyDown = false;
-                this.hasKeyUp = false;
+                this.keyDownCode = -1;
+                this.keyUpCode = -1;
                 this.hasWheel = false;
                 this.lastWheel = 0;
                 this._contextMenu = function (ev) { ev.preventDefault(); };
@@ -19645,6 +19456,9 @@ var gd3d;
                 if (ev.detail) {
                     this.lastWheel = -1 * ev.detail;
                 }
+                else if (ev.wheelDelta) {
+                    this.lastWheel = ev.wheelDelta / 120;
+                }
                 else if (ev.DOM_DELTA_PIXEL) {
                     this.lastWheel = ev.DOM_DELTA_PIXEL / 120;
                 }
@@ -19711,11 +19525,12 @@ var gd3d;
                 this._touchend(ev);
             };
             inputMgr.prototype._keydown = function (ev) {
-                this.hasKeyDown = this.keyboardMap[ev.keyCode] = true;
+                this.keyboardMap[ev.keyCode] = true;
+                this.keyDownCode = ev.keyCode;
             };
             inputMgr.prototype._keyup = function (ev) {
                 delete this.keyboardMap[ev.keyCode];
-                this.hasKeyUp = true;
+                this.keyUpCode = ev.keyCode;
             };
             inputMgr.prototype._blur = function (ev) {
                 this._point.touch = false;
@@ -19762,11 +19577,11 @@ var gd3d;
                 this.lastPoint.y = pt.y;
             };
             inputMgr.prototype.keyCodeCk = function () {
-                if (this.hasKeyDown)
-                    this.eventer.EmitEnum_key(gd3d.event.KeyEventEnum.KeyDown, null);
-                if (this.hasKeyUp)
-                    this.eventer.EmitEnum_key(gd3d.event.KeyEventEnum.KeyUp, null);
-                this.hasKeyDown = this.hasKeyUp = false;
+                if (this.keyDownCode != -1)
+                    this.eventer.EmitEnum_key(gd3d.event.KeyEventEnum.KeyDown, this.keyDownCode);
+                if (this.keyUpCode != -1)
+                    this.eventer.EmitEnum_key(gd3d.event.KeyEventEnum.KeyUp, this.keyUpCode);
+                this.keyDownCode = this.keyUpCode = -1;
             };
             inputMgr.prototype.mouseWheelCk = function () {
                 if (this.hasWheel) {
@@ -22905,6 +22720,15 @@ var gd3d;
             return true;
         }
         math.matrixEqual = matrixEqual;
+        function matrixIsIdentity(mtx) {
+            var m = mtx.rawData;
+            var _isIdentity = (m[0] === 1.0 && m[1] === 0.0 && m[2] === 0.0 && m[3] === 0.0 &&
+                m[4] === 0.0 && m[5] === 1.0 && m[6] === 0.0 && m[7] === 0.0 &&
+                m[8] === 0.0 && m[9] === 0.0 && m[10] === 1.0 && m[11] === 0.0 &&
+                m[12] === 0.0 && m[13] === 0.0 && m[14] === 0.0 && m[15] === 1.0);
+            return _isIdentity;
+        }
+        math.matrixIsIdentity = matrixIsIdentity;
     })(math = gd3d.math || (gd3d.math = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -23560,6 +23384,16 @@ var gd3d;
             return true;
         }
         math.vec2Equal = vec2Equal;
+        function vec2SetAll(vector, value) {
+            vector.rawData[0] = value;
+            vector.rawData[1] = value;
+        }
+        math.vec2SetAll = vec2SetAll;
+        function vec2Set(vector, x, y) {
+            vector.rawData[0] = x;
+            vector.rawData[1] = y;
+        }
+        math.vec2Set = vec2Set;
     })(math = gd3d.math || (gd3d.math = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -23807,6 +23641,18 @@ var gd3d;
             return true;
         }
         math.vec3Equal = vec3Equal;
+        function vec3SetAll(vector, value) {
+            vector.rawData[0] = value;
+            vector.rawData[1] = value;
+            vector.rawData[2] = value;
+        }
+        math.vec3SetAll = vec3SetAll;
+        function vec3Set(vector, x, y, z) {
+            vector.rawData[0] = x;
+            vector.rawData[1] = y;
+            vector.rawData[2] = z;
+        }
+        math.vec3Set = vec3Set;
     })(math = gd3d.math || (gd3d.math = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -23841,6 +23687,20 @@ var gd3d;
             out.rawData[3] = from.rawData[3] * scale;
         }
         math.vec4ScaleByNum = vec4ScaleByNum;
+        function vec4SetAll(vector, value) {
+            vector.rawData[0] = value;
+            vector.rawData[1] = value;
+            vector.rawData[2] = value;
+            vector.rawData[3] = value;
+        }
+        math.vec4SetAll = vec4SetAll;
+        function vec4Set(vector, x, y, z, w) {
+            vector.rawData[0] = x;
+            vector.rawData[1] = y;
+            vector.rawData[2] = z;
+            vector.rawData[3] = w;
+        }
+        math.vec4Set = vec4Set;
     })(math = gd3d.math || (gd3d.math = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -29408,6 +29268,1324 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var BJSCANNON = CANNON;
+        var helpv3 = new gd3d.math.vector3();
+        var CannonJSPlugin = (function () {
+            function CannonJSPlugin(_useDeltaForWorldStep, iterations) {
+                if (_useDeltaForWorldStep === void 0) { _useDeltaForWorldStep = true; }
+                if (iterations === void 0) { iterations = 10; }
+                this._useDeltaForWorldStep = _useDeltaForWorldStep;
+                this.name = "CannonJSPlugin";
+                this._physicsMaterials = new Array();
+                this._fixedTimeStep = 1 / 60;
+                if (!this.isSupported()) {
+                    console.error("CannonJS is not available. Please make sure you included the js file.");
+                    return;
+                }
+                this.world = new BJSCANNON.World();
+                this.world.broadphase = new BJSCANNON.NaiveBroadphase();
+                this.world.solver.iterations = iterations;
+            }
+            CannonJSPlugin.prototype.setGravity = function (gravity) {
+                this.world.gravity.copy(gravity);
+            };
+            CannonJSPlugin.prototype.setTimeStep = function (timeStep) {
+                this._fixedTimeStep = timeStep;
+            };
+            CannonJSPlugin.prototype.getTimeStep = function () {
+                return this._fixedTimeStep;
+            };
+            CannonJSPlugin.prototype.executeStep = function (delta, impostors) {
+                this.world.step(this._fixedTimeStep, this._useDeltaForWorldStep ? delta : 0, 3);
+            };
+            CannonJSPlugin.prototype.applyImpulse = function (impostor, force, contactPoint) {
+                var worldPoint = new BJSCANNON.Vec3(contactPoint.x, contactPoint.y, contactPoint.z);
+                var impulse = new BJSCANNON.Vec3(force.x, force.y, force.z);
+                impostor.physicsBody.applyImpulse(impulse, worldPoint);
+            };
+            CannonJSPlugin.prototype.applyForce = function (impostor, force, contactPoint) {
+                var worldPoint = new BJSCANNON.Vec3(contactPoint.x, contactPoint.y, contactPoint.z);
+                var impulse = new BJSCANNON.Vec3(force.x, force.y, force.z);
+                impostor.physicsBody.applyForce(impulse, worldPoint);
+            };
+            CannonJSPlugin.prototype.generatePhysicsBody = function (impostor) {
+                if (impostor.isBodyInitRequired()) {
+                    var shape = this._createShape(impostor);
+                    var oldBody = impostor.physicsBody;
+                    if (oldBody) {
+                        this.removePhysicsBody(impostor);
+                    }
+                    var material = this._addMaterial("mat-" + impostor.uniqueId, impostor.getParam("friction"), impostor.getParam("restitution"));
+                    var bodyCreationObject = {
+                        mass: impostor.getParam("mass"),
+                        material: material
+                    };
+                    var nativeOptions = impostor.getParam("nativeOptions");
+                    for (var key in nativeOptions) {
+                        if (nativeOptions.hasOwnProperty(key)) {
+                            bodyCreationObject[key] = nativeOptions[key];
+                        }
+                    }
+                    impostor.physicsBody = new BJSCANNON.Body(bodyCreationObject);
+                    impostor.physicsBody.addEventListener("collide", impostor.onCollide);
+                    impostor.physicsBody.addShape(shape);
+                    this.world.add(impostor.physicsBody);
+                    if (oldBody) {
+                        ['force', 'torque', 'velocity', 'angularVelocity'].forEach(function (param) {
+                            impostor.physicsBody[param].copy(oldBody[param]);
+                        });
+                    }
+                }
+                impostor.physicsBody.position.copy(impostor.object.localPosition);
+                impostor.physicsBody.quaternion.copy(impostor.object.localRotate);
+            };
+            CannonJSPlugin.prototype.removePhysicsBody = function (impostor) {
+                impostor.physicsBody.removeEventListener("collide", impostor.onCollide);
+                this.world.remove(impostor.physicsBody);
+            };
+            CannonJSPlugin.prototype.generateJoint = function (impostorJoint) {
+                var mainBody = impostorJoint.mainImpostor.physicsBody;
+                var connectedBody = impostorJoint.connectedImpostor.physicsBody;
+                if (!mainBody || !connectedBody) {
+                    return;
+                }
+                var constraint;
+                var jointData = impostorJoint.joint.jointData;
+                var constraintData = {
+                    pivotA: jointData.mainPivot ? new BJSCANNON.Vec3().copy(jointData.mainPivot) : null,
+                    pivotB: jointData.connectedPivot ? new BJSCANNON.Vec3().copy(jointData.connectedPivot) : null,
+                    axisA: jointData.mainAxis ? new BJSCANNON.Vec3().copy(jointData.mainAxis) : null,
+                    axisB: jointData.connectedAxis ? new BJSCANNON.Vec3().copy(jointData.connectedAxis) : null,
+                    maxForce: jointData.nativeParams.maxForce,
+                    collideConnected: !!jointData.collision
+                };
+                switch (impostorJoint.joint.type) {
+                    case framework.PhysicsJoint.HingeJoint:
+                    case framework.PhysicsJoint.Hinge2Joint:
+                        constraint = new BJSCANNON.HingeConstraint(mainBody, connectedBody, constraintData);
+                        break;
+                    case framework.PhysicsJoint.DistanceJoint:
+                        constraint = new BJSCANNON.DistanceConstraint(mainBody, connectedBody, jointData.maxDistance || 2);
+                        break;
+                    case framework.PhysicsJoint.SpringJoint:
+                        var springData = jointData;
+                        constraint = new BJSCANNON.Spring(mainBody, connectedBody, {
+                            restLength: springData.length,
+                            stiffness: springData.stiffness,
+                            damping: springData.damping,
+                            localAnchorA: constraintData.pivotA,
+                            localAnchorB: constraintData.pivotB
+                        });
+                        break;
+                    case framework.PhysicsJoint.LockJoint:
+                        constraint = new BJSCANNON.LockConstraint(mainBody, connectedBody, constraintData);
+                        break;
+                    case framework.PhysicsJoint.PointToPointJoint:
+                    case framework.PhysicsJoint.BallAndSocketJoint:
+                    default:
+                        constraint = new BJSCANNON.PointToPointConstraint(mainBody, constraintData.pivotA, connectedBody, constraintData.pivotA, constraintData.maxForce);
+                        break;
+                }
+                constraint.collideConnected = !!jointData.collision;
+                impostorJoint.joint.physicsJoint = constraint;
+                if (impostorJoint.joint.type !== framework.PhysicsJoint.SpringJoint) {
+                    this.world.addConstraint(constraint);
+                }
+                else {
+                    impostorJoint.mainImpostor.registerAfterPhysicsStep(function () {
+                        constraint.applyForce();
+                    });
+                }
+            };
+            CannonJSPlugin.prototype.removeJoint = function (impostorJoint) {
+                this.world.removeConstraint(impostorJoint.joint.physicsJoint);
+            };
+            CannonJSPlugin.prototype._addMaterial = function (name, friction, restitution) {
+                var index;
+                var mat;
+                for (index = 0; index < this._physicsMaterials.length; index++) {
+                    mat = this._physicsMaterials[index];
+                    if (mat.friction === friction && mat.restitution === restitution) {
+                        return mat;
+                    }
+                }
+                var currentMat = new BJSCANNON.Material(name);
+                currentMat.friction = friction;
+                currentMat.restitution = restitution;
+                this._physicsMaterials.push(currentMat);
+                return currentMat;
+            };
+            CannonJSPlugin.prototype._checkWithEpsilon = function (value) {
+                return value < framework.PhysicsEngine.Epsilon ? framework.PhysicsEngine.Epsilon : value;
+            };
+            CannonJSPlugin.prototype._createShape = function (impostor) {
+                var object = impostor.object;
+                var returnValue;
+                gd3d.math.vec3Clone(impostor.getObjectExtendSize(), helpv3);
+                var extendSize = helpv3;
+                switch (impostor.type) {
+                    case framework.ImpostorType.SphereImpostor:
+                        var radiusX = extendSize.x;
+                        var radiusY = extendSize.y;
+                        var radiusZ = extendSize.z;
+                        returnValue = new BJSCANNON.Sphere(Math.max(this._checkWithEpsilon(radiusX), this._checkWithEpsilon(radiusY), this._checkWithEpsilon(radiusZ)) / 2);
+                        break;
+                    case framework.ImpostorType.CylinderImpostor:
+                        console.warn("CylinderImpostor not handle yet");
+                        var nativeParams = impostor.getParam("nativeOptions");
+                        if (!nativeParams) {
+                            nativeParams = {};
+                        }
+                        var radiusTop = nativeParams.radiusTop !== undefined ? nativeParams.radiusTop : this._checkWithEpsilon(extendSize.x) / 2;
+                        var radiusBottom = nativeParams.radiusBottom !== undefined ? nativeParams.radiusBottom : this._checkWithEpsilon(extendSize.x) / 2;
+                        var height = nativeParams.height !== undefined ? nativeParams.height : this._checkWithEpsilon(extendSize.y);
+                        var numSegments = nativeParams.numSegments !== undefined ? nativeParams.numSegments : 16;
+                        returnValue = new BJSCANNON.Cylinder(radiusTop, radiusBottom, height, numSegments);
+                        var quat = new BJSCANNON.Quaternion();
+                        quat.setFromAxisAngle(new BJSCANNON.Vec3(1, 0, 0), -Math.PI / 2);
+                        var translation = new BJSCANNON.Vec3(0, 0, 0);
+                        returnValue.transformAllPoints(translation, quat);
+                        break;
+                    case framework.ImpostorType.BoxImpostor:
+                        gd3d.math.vec3ScaleByNum(extendSize, 0.5, extendSize);
+                        var box = extendSize;
+                        returnValue = new BJSCANNON.Box(new BJSCANNON.Vec3(this._checkWithEpsilon(box.x), this._checkWithEpsilon(box.y), this._checkWithEpsilon(box.z)));
+                        break;
+                    case framework.ImpostorType.PlaneImpostor:
+                        console.warn("Attention, PlaneImposter might not behave as you expect. Consider using BoxImposter instead");
+                        returnValue = new BJSCANNON.Plane();
+                        break;
+                    case framework.ImpostorType.ConvexHullImpostor:
+                        if (object && object.gameObject.components.length > 0) {
+                            var mr = object.gameObject.getComponent("meshFilter");
+                            if (mr) {
+                                var verts_1 = [];
+                                mr.mesh.data.pos.forEach(function (p) {
+                                    verts_1.push(new CANNON.Vec3(p.x, p.y, p.z));
+                                });
+                                var tris = [];
+                                var dataTris = mr.mesh.data.trisindex;
+                                var tLen = dataTris.length;
+                                for (var i = 0; i < tLen; i += 3) {
+                                    tris.push([dataTris[i + 2], dataTris[i + 1], dataTris[i]]);
+                                }
+                                returnValue = new BJSCANNON.ConvexPolyhedron(verts_1, tris);
+                            }
+                        }
+                        break;
+                    case framework.ImpostorType.MeshImpostor:
+                        console.warn("MeshImpostor not handle yet");
+                        break;
+                    case framework.ImpostorType.HeightmapImpostor:
+                        console.warn("HeightmapImpostor not handle yet");
+                        break;
+                    case framework.ImpostorType.ParticleImpostor:
+                        returnValue = new BJSCANNON.Particle();
+                        break;
+                    case framework.ImpostorType.NoImpostor:
+                        returnValue = new BJSCANNON.Box(new BJSCANNON.Vec3(0, 0, 0));
+                        break;
+                }
+                return returnValue;
+            };
+            CannonJSPlugin.prototype.vec3Copy = function (from, to) {
+                to.rawData[0] = from.x;
+                to.rawData[1] = from.y;
+                to.rawData[2] = from.z;
+            };
+            CannonJSPlugin.prototype.QuatCopy = function (from, to) {
+                to.rawData[0] = from.x;
+                to.rawData[1] = from.y;
+                to.rawData[2] = from.z;
+                to.rawData[3] = from.w;
+            };
+            CannonJSPlugin.prototype.setTransformationFromPhysicsBody = function (impostor) {
+                this.vec3Copy(impostor.physicsBody.position, impostor.object.localPosition);
+                this.QuatCopy(impostor.physicsBody.quaternion, impostor.object.localRotate);
+            };
+            CannonJSPlugin.prototype.setPhysicsBodyTransformation = function (impostor, newPosition, newRotation) {
+                impostor.physicsBody.position.copy(newPosition);
+                impostor.physicsBody.quaternion.copy(newRotation);
+            };
+            CannonJSPlugin.prototype.isSupported = function () {
+                return BJSCANNON !== undefined;
+            };
+            CannonJSPlugin.prototype.setLinearVelocity = function (impostor, velocity) {
+                impostor.physicsBody.velocity.copy(velocity);
+            };
+            CannonJSPlugin.prototype.setAngularVelocity = function (impostor, velocity) {
+                impostor.physicsBody.angularVelocity.copy(velocity);
+            };
+            CannonJSPlugin.prototype.getLinearVelocity = function (impostor) {
+                var v = impostor.physicsBody.velocity;
+                if (!v) {
+                    return null;
+                }
+                return new gd3d.math.vector3(v.x, v.y, v.z);
+            };
+            CannonJSPlugin.prototype.getAngularVelocity = function (impostor) {
+                var v = impostor.physicsBody.angularVelocity;
+                if (!v) {
+                    return null;
+                }
+                return new gd3d.math.vector3(v.x, v.y, v.z);
+            };
+            CannonJSPlugin.prototype.setBodyMass = function (impostor, mass) {
+                impostor.physicsBody.mass = mass;
+                impostor.physicsBody.updateMassProperties();
+            };
+            CannonJSPlugin.prototype.getBodyMass = function (impostor) {
+                return impostor.physicsBody.mass;
+            };
+            CannonJSPlugin.prototype.getBodyFriction = function (impostor) {
+                return impostor.physicsBody.material.friction;
+            };
+            CannonJSPlugin.prototype.setBodyFriction = function (impostor, friction) {
+                impostor.physicsBody.material.friction = friction;
+            };
+            CannonJSPlugin.prototype.getBodyRestitution = function (impostor) {
+                return impostor.physicsBody.material.restitution;
+            };
+            CannonJSPlugin.prototype.setBodyRestitution = function (impostor, restitution) {
+                impostor.physicsBody.material.restitution = restitution;
+            };
+            CannonJSPlugin.prototype.sleepBody = function (impostor) {
+                impostor.physicsBody.sleep();
+            };
+            CannonJSPlugin.prototype.wakeUpBody = function (impostor) {
+                impostor.physicsBody.wakeUp();
+            };
+            CannonJSPlugin.prototype.updateDistanceJoint = function (joint, maxDistance, minDistance) {
+                joint.physicsJoint.distance = maxDistance;
+            };
+            CannonJSPlugin.prototype.setMotor = function (joint, speed, maxForce, motorIndex) {
+                if (!motorIndex) {
+                    joint.physicsJoint.enableMotor();
+                    joint.physicsJoint.setMotorSpeed(speed);
+                    if (maxForce) {
+                        this.setLimit(joint, maxForce);
+                    }
+                }
+            };
+            CannonJSPlugin.prototype.setLimit = function (joint, upperLimit, lowerLimit) {
+                joint.physicsJoint.motorEquation.maxForce = upperLimit;
+                joint.physicsJoint.motorEquation.minForce = lowerLimit === void 0 ? -upperLimit : lowerLimit;
+            };
+            CannonJSPlugin.prototype.getRadius = function (impostor) {
+                var shape = impostor.physicsBody.shapes[0];
+                return shape.boundingSphereRadius;
+            };
+            CannonJSPlugin.prototype.getBoxSizeToRef = function (impostor, result) {
+                var shape = impostor.physicsBody.shapes[0];
+                result.x = shape.halfExtents.x * 2;
+                result.y = shape.halfExtents.y * 2;
+                result.z = shape.halfExtents.z * 2;
+            };
+            CannonJSPlugin.prototype.dispose = function () {
+            };
+            CannonJSPlugin.prototype._extendNamespace = function () {
+                var step_tmp1 = new BJSCANNON.Vec3();
+                var Engine = BJSCANNON;
+                BJSCANNON.World.prototype.step = function (dt, timeSinceLastCalled, maxSubSteps) {
+                    maxSubSteps = maxSubSteps || 10;
+                    timeSinceLastCalled = timeSinceLastCalled || 0;
+                    if (timeSinceLastCalled === 0) {
+                        this.internalStep(dt);
+                        this.time += dt;
+                    }
+                    else {
+                        var internalSteps = Math.floor((this.time + timeSinceLastCalled) / dt) - Math.floor(this.time / dt);
+                        internalSteps = Math.min(internalSteps, maxSubSteps) || 1;
+                        var t0 = performance.now();
+                        for (var i = 0; i !== internalSteps; i++) {
+                            this.internalStep(dt);
+                            if (performance.now() - t0 > dt * 1000) {
+                                break;
+                            }
+                        }
+                        this.time += timeSinceLastCalled;
+                        var h = this.time % dt;
+                        var h_div_dt = h / dt;
+                        var interpvelo = step_tmp1;
+                        var bodies = this.bodies;
+                        for (var j = 0; j !== bodies.length; j++) {
+                            var b = bodies[j];
+                            if (b.type !== Engine.Body.STATIC && b.sleepState !== Engine.Body.SLEEPING) {
+                                b.position.vsub(b.previousPosition, interpvelo);
+                                interpvelo.scale(h_div_dt, interpvelo);
+                                b.position.vadd(interpvelo, b.interpolatedPosition);
+                            }
+                            else {
+                                b.interpolatedPosition.copy(b.position);
+                                b.interpolatedQuaternion.copy(b.quaternion);
+                            }
+                        }
+                    }
+                };
+            };
+            return CannonJSPlugin;
+        }());
+        framework.CannonJSPlugin = CannonJSPlugin;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var help_v3 = new gd3d.math.vector3();
+        var help_v3_1 = new gd3d.math.vector3();
+        var help_v3_2 = new gd3d.math.vector3();
+        var help_quat = new gd3d.math.quaternion();
+        var OimoJSPlugin = (function () {
+            function OimoJSPlugin(iterations, oimoInjection) {
+                if (oimoInjection === void 0) { oimoInjection = OIMO; }
+                this.name = "OIMOJSPlugin";
+                this._physicsMaterials = new Array();
+                this._fixedTimeStep = 1 / 60;
+                this._tmpImpostorsArray = [];
+                this._tmpPositionVector = new gd3d.math.vector3();
+                this.BJSOIMO = oimoInjection;
+                if (!this.isSupported()) {
+                    console.error("OIMO is not available. Please make sure you included the js file.");
+                    return;
+                }
+                var opt = {
+                    iterations: iterations
+                };
+                var opt_1 = {
+                    timestep: 1 / 60,
+                    iterations: 8,
+                    broadphase: 2,
+                    worldscale: 1,
+                    random: true,
+                    info: false,
+                    gravity: [0, -9.8, 0]
+                };
+                this.world = new this.BJSOIMO.World(opt_1);
+                this.world.clear();
+            }
+            OimoJSPlugin.prototype.setGravity = function (gravity) {
+                this.world.gravity.copy(gravity);
+            };
+            OimoJSPlugin.prototype.setTimeStep = function (timeStep) {
+                this.world.timeStep = timeStep;
+            };
+            OimoJSPlugin.prototype.getTimeStep = function () {
+                return this.world.timeStep;
+            };
+            OimoJSPlugin.prototype.executeStep = function (delta, impostors) {
+                var _this = this;
+                impostors.forEach(function (impostor) {
+                    impostor.beforeStep();
+                });
+                this.world.step();
+                impostors.forEach(function (impostor) {
+                    impostor.afterStep();
+                    _this._tmpImpostorsArray[impostor.uniqueId] = impostor;
+                });
+                var contact = this.world.contacts;
+                while (contact !== null) {
+                    if (contact.touching && !contact.body1.sleeping && !contact.body2.sleeping) {
+                        contact = contact.next;
+                        continue;
+                    }
+                    var mainImpostor = this._tmpImpostorsArray[+contact.body1.name];
+                    var collidingImpostor = this._tmpImpostorsArray[+contact.body2.name];
+                    if (!mainImpostor || !collidingImpostor) {
+                        contact = contact.next;
+                        continue;
+                    }
+                    mainImpostor.onCollide({ body: collidingImpostor.physicsBody });
+                    collidingImpostor.onCollide({ body: mainImpostor.physicsBody });
+                    contact = contact.next;
+                }
+            };
+            OimoJSPlugin.prototype.applyImpulse = function (impostor, force, contactPoint) {
+                var mass = impostor.physicsBody.mass;
+                var _point = help_v3;
+                gd3d.math.vec3ScaleByNum(contactPoint, this.world.invScale, _point);
+                var _force = help_v3_1;
+                gd3d.math.vec3ScaleByNum(force, this.world.invScale * mass, _force);
+                impostor.physicsBody.applyImpulse(_point, _force);
+            };
+            OimoJSPlugin.prototype.applyForce = function (impostor, force, contactPoint) {
+                console.warn("Oimo doesn't support applying force. Using impule instead.");
+                this.applyImpulse(impostor, force, contactPoint);
+            };
+            OimoJSPlugin.prototype.checkWithEpsilon = function (value) {
+                return Math.max(value, framework.PhysicsEngine.Epsilon);
+            };
+            OimoJSPlugin.prototype.generatePhysicsBody = function (impostor) {
+                var _this = this;
+                if (impostor.parent) {
+                    if (impostor.physicsBody) {
+                        this.removePhysicsBody(impostor);
+                        impostor.forceUpdate();
+                    }
+                    return;
+                }
+                if (impostor.isBodyInitRequired()) {
+                    var bodyConfig_1 = {
+                        name: impostor.uniqueId,
+                        config: [impostor.getParam("mass") || 1, impostor.getParam("friction"), impostor.getParam("restitution")],
+                        size: [],
+                        type: [],
+                        pos: [],
+                        posShape: [],
+                        rot: [],
+                        rotShape: [],
+                        move: impostor.getParam("mass") !== 0,
+                        density: impostor.getParam("mass"),
+                        friction: impostor.getParam("friction"),
+                        restitution: impostor.getParam("restitution"),
+                        world: this.world
+                    };
+                    var impostors = [impostor];
+                    if (impostor.object.children) {
+                        impostor.object.children.forEach(function (m) {
+                            if (m.physicsImpostor) {
+                                impostors.push(m.physicsImpostor);
+                            }
+                        });
+                    }
+                    var globalQuat_1 = help_quat;
+                    globalQuat_1.x = globalQuat_1.y = globalQuat_1.z = 0;
+                    globalQuat_1.w = 1;
+                    impostors.forEach(function (i) {
+                        var oldQuaternion = i.object.localRotate;
+                        gd3d.math.quatClone(i.object.localRotate, globalQuat_1);
+                        var rot = help_v3;
+                        gd3d.math.quatToEulerAngles(oldQuaternion, rot);
+                        console.log(_this._tmpPositionVector);
+                        var extendSize = i.getObjectExtendSize();
+                        var radToDeg = 57.295779513082320876;
+                        if (i === impostor) {
+                            var center = impostor.getObjectCenter();
+                            bodyConfig_1.pos.push(center.x);
+                            bodyConfig_1.pos.push(center.y);
+                            bodyConfig_1.pos.push(center.z);
+                            bodyConfig_1.posShape.push(0, 0, 0);
+                            bodyConfig_1.rotShape.push(0, 0, 0);
+                        }
+                        else {
+                            var localPosition = help_v3_2;
+                            gd3d.math.vec3Clone(i.object.localPosition, localPosition);
+                            bodyConfig_1.pos.push(0, 0, 0);
+                            bodyConfig_1.posShape.push(localPosition.x);
+                            bodyConfig_1.posShape.push(localPosition.y);
+                            bodyConfig_1.posShape.push(localPosition.z);
+                            bodyConfig_1.rotShape.push(rot.x * radToDeg);
+                            bodyConfig_1.rotShape.push(rot.y * radToDeg);
+                            bodyConfig_1.rotShape.push(rot.z * radToDeg);
+                        }
+                        var sizeX, sizeY, sizeZ;
+                        switch (i.type) {
+                            case framework.ImpostorType.ParticleImpostor:
+                                console.warn("No Particle support in OIMO.js. using SphereImpostor instead");
+                            case framework.ImpostorType.SphereImpostor:
+                                var radiusX = extendSize.x;
+                                var radiusY = extendSize.y;
+                                var radiusZ = extendSize.z;
+                                var size = Math.max(_this.checkWithEpsilon(radiusX), _this.checkWithEpsilon(radiusY), _this.checkWithEpsilon(radiusZ)) / 2;
+                                bodyConfig_1.type.push('sphere');
+                                bodyConfig_1.size.push(size);
+                                bodyConfig_1.size.push(size);
+                                bodyConfig_1.size.push(size);
+                                break;
+                            case framework.ImpostorType.CylinderImpostor:
+                                sizeX = _this.checkWithEpsilon(extendSize.x) / 2;
+                                sizeY = _this.checkWithEpsilon(extendSize.y);
+                                bodyConfig_1.type.push('cylinder');
+                                bodyConfig_1.size.push(sizeX);
+                                bodyConfig_1.size.push(sizeY);
+                                bodyConfig_1.size.push(sizeY);
+                                break;
+                            case framework.ImpostorType.NoImpostor:
+                            case framework.ImpostorType.PlaneImpostor:
+                            case framework.ImpostorType.BoxImpostor:
+                            default:
+                                sizeX = _this.checkWithEpsilon(extendSize.x);
+                                sizeY = _this.checkWithEpsilon(extendSize.y);
+                                sizeZ = _this.checkWithEpsilon(extendSize.z);
+                                bodyConfig_1.type.push('box');
+                                bodyConfig_1.size.push(sizeX);
+                                bodyConfig_1.size.push(sizeY);
+                                bodyConfig_1.size.push(sizeZ);
+                                break;
+                        }
+                        i.object.localRotate = oldQuaternion;
+                    });
+                    impostor.physicsBody = this.world.add(bodyConfig_1);
+                    impostor.physicsBody.resetQuaternion(globalQuat_1);
+                    impostor.physicsBody.updatePosition(0);
+                    var massCenter = help_v3;
+                    var p = impostor.physicsBody.position;
+                    gd3d.math.vec3Set(massCenter, p.x, p.y, p.z);
+                    impostor.physicsBody.position;
+                    var wpos = impostor.object.getWorldPosition();
+                    if (!gd3d.math.vec3Equal(massCenter, wpos)) {
+                        var scale = help_v3_1;
+                        gd3d.math.vec3Clone(impostor.object.getWorldScale(), scale);
+                        scale.x = 1 / scale.x;
+                        scale.y = 1 / scale.y;
+                        scale.z = 1 / scale.z;
+                        gd3d.math.vec3Subtract(wpos, massCenter, this._tmpPositionVector);
+                        gd3d.math.vec3ScaleByVec3(this._tmpPositionVector, scale, this._tmpPositionVector);
+                    }
+                }
+                else {
+                    this._tmpPositionVector.x = this._tmpPositionVector.y = this._tmpPositionVector.z = 0;
+                }
+                impostor.setDeltaPosition(this._tmpPositionVector);
+            };
+            OimoJSPlugin.prototype.removePhysicsBody = function (impostor) {
+                this.world.removeRigidBody(impostor.physicsBody);
+            };
+            OimoJSPlugin.prototype.generateJoint = function (impostorJoint) {
+            };
+            OimoJSPlugin.prototype.removeJoint = function (impostorJoint) {
+                this.world.removeConstraint(impostorJoint.joint.physicsJoint);
+            };
+            OimoJSPlugin.prototype.vec3Copy = function (from, to) {
+                to.rawData[0] = from.x;
+                to.rawData[1] = from.y;
+                to.rawData[2] = from.z;
+            };
+            OimoJSPlugin.prototype.QuatCopy = function (from, to) {
+                to.rawData[0] = from.x;
+                to.rawData[1] = from.y;
+                to.rawData[2] = from.z;
+                to.rawData[3] = from.w;
+            };
+            OimoJSPlugin.prototype.setTransformationFromPhysicsBody = function (impostor) {
+                this.vec3Copy(impostor.physicsBody.position, impostor.object.localPosition);
+                this.QuatCopy(impostor.physicsBody.quaternion, impostor.object.localRotate);
+            };
+            OimoJSPlugin.prototype.setPhysicsBodyTransformation = function (impostor, newPosition, newRotation) {
+                impostor.physicsBody.position.copy(newPosition);
+                impostor.physicsBody.quaternion.copy(newRotation);
+                impostor.physicsBody.syncShapes();
+                impostor.physicsBody.awake();
+            };
+            OimoJSPlugin.prototype.isSupported = function () {
+                return this.BJSOIMO !== undefined;
+            };
+            OimoJSPlugin.prototype.setLinearVelocity = function (impostor, velocity) {
+                impostor.physicsBody.velocity.copy(velocity);
+            };
+            OimoJSPlugin.prototype.setAngularVelocity = function (impostor, velocity) {
+                impostor.physicsBody.angularVelocity.copy(velocity);
+            };
+            OimoJSPlugin.prototype.getLinearVelocity = function (impostor) {
+                var v = impostor.physicsBody.velocity;
+                if (!v) {
+                    return null;
+                }
+                return new gd3d.math.vector3(v.x, v.y, v.z);
+            };
+            OimoJSPlugin.prototype.getAngularVelocity = function (impostor) {
+                var v = impostor.physicsBody.angularVelocity;
+                if (!v) {
+                    return null;
+                }
+                return new gd3d.math.vector3(v.x, v.y, v.z);
+            };
+            OimoJSPlugin.prototype.setBodyMass = function (impostor, mass) {
+                var staticBody = mass === 0;
+                impostor.physicsBody.shapes.density = staticBody ? 1 : mass;
+                impostor.physicsBody.setupMass(staticBody ? 0x2 : 0x1);
+            };
+            OimoJSPlugin.prototype.getBodyMass = function (impostor) {
+                return impostor.physicsBody.shapes.density;
+            };
+            OimoJSPlugin.prototype.getBodyFriction = function (impostor) {
+                return impostor.physicsBody.shapes.friction;
+            };
+            OimoJSPlugin.prototype.setBodyFriction = function (impostor, friction) {
+                impostor.physicsBody.shapes.friction = friction;
+            };
+            OimoJSPlugin.prototype.getBodyRestitution = function (impostor) {
+                return impostor.physicsBody.shapes.restitution;
+            };
+            OimoJSPlugin.prototype.setBodyRestitution = function (impostor, restitution) {
+                impostor.physicsBody.shapes.restitution = restitution;
+            };
+            OimoJSPlugin.prototype.sleepBody = function (impostor) {
+                impostor.physicsBody.sleep();
+            };
+            OimoJSPlugin.prototype.wakeUpBody = function (impostor) {
+                impostor.physicsBody.awake();
+            };
+            OimoJSPlugin.prototype.updateDistanceJoint = function (joint, maxDistance, minDistance) {
+                joint.physicsJoint.limitMotor.upperLimit = maxDistance;
+                if (minDistance !== void 0) {
+                    joint.physicsJoint.limitMotor.lowerLimit = minDistance;
+                }
+            };
+            OimoJSPlugin.prototype.setMotor = function (joint, speed, force, motorIndex) {
+                if (force !== undefined) {
+                    console.warn("OimoJS plugin currently has unexpected behavior when using setMotor with force parameter");
+                }
+                else {
+                    force = 1e6;
+                }
+                speed *= -1;
+                var motor = motorIndex ? joint.physicsJoint.rotationalLimitMotor2 : joint.physicsJoint.rotationalLimitMotor1 || joint.physicsJoint.rotationalLimitMotor || joint.physicsJoint.limitMotor;
+                if (motor) {
+                    motor.setMotor(speed, force);
+                }
+            };
+            OimoJSPlugin.prototype.setLimit = function (joint, upperLimit, lowerLimit, motorIndex) {
+                var motor = motorIndex ? joint.physicsJoint.rotationalLimitMotor2 : joint.physicsJoint.rotationalLimitMotor1 || joint.physicsJoint.rotationalLimitMotor || joint.physicsJoint.limitMotor;
+                if (motor) {
+                    motor.setLimit(upperLimit, lowerLimit === void 0 ? -upperLimit : lowerLimit);
+                }
+            };
+            OimoJSPlugin.prototype.getRadius = function (impostor) {
+                return impostor.physicsBody.shapes.radius;
+            };
+            OimoJSPlugin.prototype.getBoxSizeToRef = function (impostor, result) {
+                var shape = impostor.physicsBody.shapes;
+                result.x = shape.halfWidth * 2;
+                result.y = shape.halfHeight * 2;
+                result.z = shape.halfDepth * 2;
+            };
+            OimoJSPlugin.prototype.dispose = function () {
+                this.world.clear();
+            };
+            return OimoJSPlugin;
+        }());
+        framework.OimoJSPlugin = OimoJSPlugin;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var PhysicsEngine = (function () {
+            function PhysicsEngine(gravity, _physicsPlugin) {
+                if (gravity === void 0) { gravity = null; }
+                if (_physicsPlugin === void 0) { _physicsPlugin = new framework.CannonJSPlugin(); }
+                this._physicsPlugin = _physicsPlugin;
+                this._impostors = [];
+                this._joints = [];
+                if (!this._physicsPlugin.isSupported()) {
+                    throw new Error("Physics Engine " + this._physicsPlugin.name + " cannot be found. "
+                        + "Please make sure it is included.");
+                }
+                gravity = gravity || new gd3d.math.vector3(0, -9.807, 0);
+                this.setGravity(gravity);
+                this.setTimeStep();
+            }
+            PhysicsEngine.prototype.setGravity = function (gravity) {
+                this.gravity = gravity;
+                this._physicsPlugin.setGravity(this.gravity);
+            };
+            PhysicsEngine.prototype.setTimeStep = function (newTimeStep) {
+                if (newTimeStep === void 0) { newTimeStep = 1 / 60; }
+                this._physicsPlugin.setTimeStep(newTimeStep);
+            };
+            PhysicsEngine.prototype.getTimeStep = function () {
+                return this._physicsPlugin.getTimeStep();
+            };
+            PhysicsEngine.prototype.dispose = function () {
+                this._impostors.forEach(function (impostor) {
+                    impostor.dispose();
+                });
+                this._physicsPlugin.dispose();
+            };
+            PhysicsEngine.prototype.getPhysicsPluginName = function () {
+                return this._physicsPlugin.name;
+            };
+            PhysicsEngine.prototype.addImpostor = function (impostor) {
+                impostor.uniqueId = this._impostors.push(impostor);
+                this._physicsPlugin.generatePhysicsBody(impostor);
+            };
+            PhysicsEngine.prototype.removeImpostor = function (impostor) {
+                var index = this._impostors.indexOf(impostor);
+                if (index > -1) {
+                    var removed = this._impostors.splice(index, 1);
+                    if (removed.length) {
+                        removed[0].physicsBody = null;
+                    }
+                }
+            };
+            PhysicsEngine.prototype.addJoint = function (mainImpostor, connectedImpostor, joint) {
+                var impostorJoint = {
+                    mainImpostor: mainImpostor,
+                    connectedImpostor: connectedImpostor,
+                    joint: joint
+                };
+                joint.physicsPlugin = this._physicsPlugin;
+                this._joints.push(impostorJoint);
+                this._physicsPlugin.generateJoint(impostorJoint);
+            };
+            PhysicsEngine.prototype.removeJoint = function (mainImpostor, connectedImpostor, joint) {
+                var matchingJoints = this._joints.filter(function (impostorJoint) {
+                    return (impostorJoint.connectedImpostor === connectedImpostor
+                        && impostorJoint.joint === joint
+                        && impostorJoint.mainImpostor === mainImpostor);
+                });
+                if (matchingJoints.length) {
+                    this._physicsPlugin.removeJoint(matchingJoints[0]);
+                }
+            };
+            PhysicsEngine.prototype._step = function (delta) {
+                var _this = this;
+                this._impostors.forEach(function (impostor) {
+                    if (impostor.isBodyInitRequired()) {
+                        _this._physicsPlugin.generatePhysicsBody(impostor);
+                    }
+                });
+                if (delta > 0.1) {
+                    delta = 0.1;
+                }
+                else if (delta <= 0) {
+                    delta = 1.0 / 60.0;
+                }
+                this._physicsPlugin.executeStep(delta, this._impostors);
+            };
+            PhysicsEngine.prototype.getPhysicsPlugin = function () {
+                return this._physicsPlugin;
+            };
+            PhysicsEngine.prototype.getImpostors = function () {
+                return this._impostors;
+            };
+            PhysicsEngine.prototype.getImpostorForPhysicsObject = function (object) {
+                for (var i = 0; i < this._impostors.length; ++i) {
+                    if (this._impostors[i].object === object) {
+                        return this._impostors[i];
+                    }
+                }
+                return null;
+            };
+            PhysicsEngine.prototype.getImpostorWithPhysicsBody = function (body) {
+                for (var i = 0; i < this._impostors.length; ++i) {
+                    if (this._impostors[i].physicsBody === body) {
+                        return this._impostors[i];
+                    }
+                }
+                return null;
+            };
+            PhysicsEngine.Epsilon = 0.001;
+            return PhysicsEngine;
+        }());
+        framework.PhysicsEngine = PhysicsEngine;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var help_v3 = new gd3d.math.vector3();
+        var help_v3_1 = new gd3d.math.vector3();
+        var PhysicsImpostor = (function () {
+            function PhysicsImpostor(object, type, _options) {
+                if (_options === void 0) { _options = { mass: 0 }; }
+                var _this = this;
+                this.object = object;
+                this.type = type;
+                this._options = _options;
+                this._bodyUpdateRequired = false;
+                this._onBeforePhysicsStepCallbacks = new Array();
+                this._onAfterPhysicsStepCallbacks = new Array();
+                this._onPhysicsCollideCallbacks = [];
+                this._deltaPosition = new gd3d.math.vector3();
+                this._isDisposed = false;
+                this._cacheSizeWorld = new gd3d.math.vector3();
+                this.beforeStep = function () {
+                    if (!_this._physicsEngine) {
+                        return;
+                    }
+                    var tempv3 = help_v3;
+                    gd3d.math.vec3Clone(_this._deltaPosition, tempv3);
+                    gd3d.math.vec3ScaleByNum(tempv3, -1, tempv3);
+                    gd3d.math.vec3Add(_this.object.getWorldPosition(), tempv3, tempv3);
+                    _this.object.setWorldPosition(tempv3);
+                    if (!_this._options.disableBidirectionalTransformation) {
+                        _this._physicsEngine.getPhysicsPlugin().setPhysicsBodyTransformation(_this, _this.object.getWorldPosition(), _this.object.getWorldRotate());
+                    }
+                    _this._onBeforePhysicsStepCallbacks.forEach(function (func) {
+                        func(_this);
+                    });
+                };
+                this.afterStep = function () {
+                    if (!_this._physicsEngine) {
+                        return;
+                    }
+                    _this._onAfterPhysicsStepCallbacks.forEach(function (func) {
+                        func(_this);
+                    });
+                    _this._physicsEngine.getPhysicsPlugin().setTransformationFromPhysicsBody(_this);
+                    if (_this._parent && _this._parent._parent) {
+                        _this.object.setWorldRotate(_this.object.localRotate);
+                        _this.object.setWorldPosition(_this.object.localPosition);
+                    }
+                    var tempv3 = help_v3;
+                    gd3d.math.vec3Clone(_this._deltaPosition, tempv3);
+                    gd3d.math.vec3Add(_this.object.getWorldPosition(), tempv3, tempv3);
+                    _this.object.setWorldPosition(tempv3);
+                };
+                this.onCollideEvent = null;
+                this.onCollide = function (e) {
+                    if (!_this._onPhysicsCollideCallbacks.length && !_this.onCollideEvent) {
+                        return;
+                    }
+                    if (!_this._physicsEngine) {
+                        return;
+                    }
+                    var otherImpostor = _this._physicsEngine.getImpostorWithPhysicsBody(e.body);
+                    if (otherImpostor) {
+                        if (_this.onCollideEvent) {
+                            _this.onCollideEvent(_this, otherImpostor);
+                        }
+                        _this._onPhysicsCollideCallbacks.filter(function (obj) {
+                            return obj.otherImpostors.indexOf(otherImpostor) !== -1;
+                        }).forEach(function (obj) {
+                            obj.callback(_this, otherImpostor);
+                        });
+                    }
+                };
+                this._physicsEngine = framework.physic;
+                if (!this.object) {
+                    console.error("No object was provided. A physics object is obligatory");
+                    return;
+                }
+                if (!this._physicsEngine) {
+                    console.error("Physics not enabled. Please use scene.enablePhysics(...) before creating impostors.");
+                    return;
+                }
+                {
+                    this._options.mass = (_options.mass === void 0) ? 0 : _options.mass;
+                    this._options.friction = (_options.friction === void 0) ? 0.2 : _options.friction;
+                    this._options.restitution = (_options.restitution === void 0) ? 0.2 : _options.restitution;
+                    this._joints = [];
+                    if (!this.object.parent || this.object.parent == this.object.scene.getRoot() || this._options.ignoreParent) {
+                        this._init();
+                    }
+                    else if (this.object.parent && this.object.parent.physicsImpostor) {
+                        console.warn("You must affect impostors to children before affecting impostor to parent.");
+                    }
+                    if (this.object)
+                        this.object.physicsImpostor = this;
+                }
+            }
+            Object.defineProperty(PhysicsImpostor.prototype, "isDisposed", {
+                get: function () {
+                    return this._isDisposed;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(PhysicsImpostor.prototype, "mass", {
+                get: function () {
+                    return this._physicsEngine.getPhysicsPlugin().getBodyMass(this);
+                },
+                set: function (value) {
+                    this.setMass(value);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(PhysicsImpostor.prototype, "friction", {
+                get: function () {
+                    return this._physicsEngine.getPhysicsPlugin().getBodyFriction(this);
+                },
+                set: function (value) {
+                    this._physicsEngine.getPhysicsPlugin().setBodyFriction(this, value);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(PhysicsImpostor.prototype, "restitution", {
+                get: function () {
+                    return this._physicsEngine.getPhysicsPlugin().getBodyRestitution(this);
+                },
+                set: function (value) {
+                    this._physicsEngine.getPhysicsPlugin().setBodyRestitution(this, value);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            PhysicsImpostor.prototype._init = function () {
+                if (!this._physicsEngine) {
+                    return;
+                }
+                this._physicsEngine.removeImpostor(this);
+                this.physicsBody = null;
+                this._parent = this._parent || this._getPhysicsParent();
+                if (!this._isDisposed && !this.parent) {
+                    this._physicsEngine.addImpostor(this);
+                }
+            };
+            PhysicsImpostor.prototype._getPhysicsParent = function () {
+                if (this.object && this.object.parent) {
+                    return this.object.parent.physicsImpostor;
+                }
+                return null;
+            };
+            PhysicsImpostor.prototype.isBodyInitRequired = function () {
+                return this._bodyUpdateRequired || !this._physicsBody;
+            };
+            PhysicsImpostor.prototype.setScalingUpdated = function (updated) {
+                this.forceUpdate();
+            };
+            PhysicsImpostor.prototype.forceUpdate = function () {
+                this._init();
+                if (this.parent && !this._options.ignoreParent) {
+                    this.parent.forceUpdate();
+                }
+            };
+            Object.defineProperty(PhysicsImpostor.prototype, "physicsBody", {
+                get: function () {
+                    return this._physicsBody;
+                },
+                set: function (physicsBody) {
+                    if (this._physicsBody && this._physicsEngine) {
+                        this._physicsEngine.getPhysicsPlugin().removePhysicsBody(this);
+                    }
+                    this._physicsBody = physicsBody;
+                    this.resetUpdateFlags();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(PhysicsImpostor.prototype, "parent", {
+                get: function () {
+                    return !this._options.ignoreParent && this._parent ? this._parent : null;
+                },
+                set: function (value) {
+                    this._parent = value;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            PhysicsImpostor.prototype.resetUpdateFlags = function () {
+                this._bodyUpdateRequired = false;
+            };
+            PhysicsImpostor.prototype.getObb = function () {
+                if (!this.object || !(this.object instanceof framework.transform)) {
+                    return null;
+                }
+                if (!this._obb) {
+                    var go = this.object.gameObject;
+                    var mf = go.getComponent("meshFilter");
+                    if (!mf)
+                        return null;
+                    var min = help_v3;
+                    var max = help_v3_1;
+                    mf.getMeshOutput().calcVectexMinMax(min, max);
+                    this._obb = new framework.obb();
+                    this._obb.buildByMaxMin(min, max);
+                }
+                this._obb.update(this.object.getWorldMatrix());
+                return this._obb;
+            };
+            PhysicsImpostor.prototype.getObjectExtendSize = function () {
+                var tempObb = this.getObb();
+                if (!tempObb)
+                    return PhysicsImpostor.DEFAULT_OBJECT_SIZE;
+                gd3d.math.vec3Clone(tempObb.halfSizeWorld, this._cacheSizeWorld);
+                gd3d.math.vec3ScaleByNum(this._cacheSizeWorld, 2, this._cacheSizeWorld);
+                return this._cacheSizeWorld;
+            };
+            PhysicsImpostor.prototype.getObjectCenter = function () {
+                var tempObb = this.getObb();
+                if (!tempObb)
+                    return this.object.getWorldPosition();
+                return tempObb.worldCenter;
+            };
+            PhysicsImpostor.prototype.getParam = function (paramName) {
+                return this._options[paramName];
+            };
+            PhysicsImpostor.prototype.setParam = function (paramName, value) {
+                this._options[paramName] = value;
+                this._bodyUpdateRequired = true;
+            };
+            PhysicsImpostor.prototype.setMass = function (mass) {
+                if (this.getParam("mass") !== mass) {
+                    this.setParam("mass", mass);
+                }
+                if (this._physicsEngine) {
+                    this._physicsEngine.getPhysicsPlugin().setBodyMass(this, mass);
+                }
+            };
+            PhysicsImpostor.prototype.getLinearVelocity = function () {
+                return this._physicsEngine.getPhysicsPlugin().getLinearVelocity(this);
+            };
+            PhysicsImpostor.prototype.setLinearVelocity = function (velocity) {
+                this._physicsEngine.getPhysicsPlugin().setLinearVelocity(this, velocity);
+            };
+            PhysicsImpostor.prototype.getAngularVelocity = function () {
+                return this._physicsEngine.getPhysicsPlugin().getAngularVelocity(this);
+            };
+            PhysicsImpostor.prototype.setAngularVelocity = function (velocity) {
+                this._physicsEngine.getPhysicsPlugin().setAngularVelocity(this, velocity);
+            };
+            PhysicsImpostor.prototype.executeNativeFunction = function (func) {
+                if (this._physicsEngine) {
+                    func(this._physicsEngine.getPhysicsPlugin().world, this.physicsBody);
+                }
+            };
+            PhysicsImpostor.prototype.registerBeforePhysicsStep = function (func) {
+                this._onBeforePhysicsStepCallbacks.push(func);
+            };
+            PhysicsImpostor.prototype.unregisterBeforePhysicsStep = function (func) {
+                var index = this._onBeforePhysicsStepCallbacks.indexOf(func);
+                if (index > -1) {
+                    this._onBeforePhysicsStepCallbacks.splice(index, 1);
+                }
+                else {
+                    console.warn("Function to remove was not found");
+                }
+            };
+            PhysicsImpostor.prototype.registerAfterPhysicsStep = function (func) {
+                this._onAfterPhysicsStepCallbacks.push(func);
+            };
+            PhysicsImpostor.prototype.unregisterAfterPhysicsStep = function (func) {
+                var index = this._onAfterPhysicsStepCallbacks.indexOf(func);
+                if (index > -1) {
+                    this._onAfterPhysicsStepCallbacks.splice(index, 1);
+                }
+                else {
+                    console.warn("Function to remove was not found");
+                }
+            };
+            PhysicsImpostor.prototype.registerOnPhysicsCollide = function (collideAgainst, func) {
+                var collidedAgainstList = collideAgainst instanceof Array ? collideAgainst : [collideAgainst];
+                this._onPhysicsCollideCallbacks.push({ callback: func, otherImpostors: collidedAgainstList });
+            };
+            PhysicsImpostor.prototype.unregisterOnPhysicsCollide = function (collideAgainst, func) {
+                var collidedAgainstList = collideAgainst instanceof Array ? collideAgainst : [collideAgainst];
+                var index = -1;
+                var found = this._onPhysicsCollideCallbacks.some(function (cbDef, idx) {
+                    if (cbDef.callback === func && cbDef.otherImpostors.length === collidedAgainstList.length) {
+                        var sameList = cbDef.otherImpostors.every(function (impostor) {
+                            return collidedAgainstList.indexOf(impostor) > -1;
+                        });
+                        if (sameList) {
+                            index = idx;
+                        }
+                        return sameList;
+                    }
+                    return false;
+                });
+                if (found) {
+                    this._onPhysicsCollideCallbacks.splice(index, 1);
+                }
+                else {
+                    console.warn("Function to remove was not found");
+                }
+            };
+            PhysicsImpostor.prototype.applyForce = function (force, contactPoint) {
+                if (this._physicsEngine) {
+                    this._physicsEngine.getPhysicsPlugin().applyForce(this, force, contactPoint);
+                }
+                return this;
+            };
+            PhysicsImpostor.prototype.applyImpulse = function (force, contactPoint) {
+                if (this._physicsEngine) {
+                    this._physicsEngine.getPhysicsPlugin().applyImpulse(this, force, contactPoint);
+                }
+                return this;
+            };
+            PhysicsImpostor.prototype.createJoint = function (otherImpostor, jointType, jointData) {
+                var joint = new framework.PhysicsJoint(jointType, jointData);
+                this.addJoint(otherImpostor, joint);
+                return this;
+            };
+            PhysicsImpostor.prototype.addJoint = function (otherImpostor, joint) {
+                this._joints.push({
+                    otherImpostor: otherImpostor,
+                    joint: joint
+                });
+                if (this._physicsEngine) {
+                    this._physicsEngine.addJoint(this, otherImpostor, joint);
+                }
+                return this;
+            };
+            PhysicsImpostor.prototype.sleep = function () {
+                if (this._physicsEngine) {
+                    this._physicsEngine.getPhysicsPlugin().sleepBody(this);
+                }
+                return this;
+            };
+            PhysicsImpostor.prototype.wakeUp = function () {
+                if (this._physicsEngine) {
+                    this._physicsEngine.getPhysicsPlugin().wakeUpBody(this);
+                }
+                return this;
+            };
+            PhysicsImpostor.prototype.clone = function (newObject) {
+                if (!newObject)
+                    return null;
+                return new PhysicsImpostor(newObject, this.type, this._options);
+            };
+            PhysicsImpostor.prototype.dispose = function () {
+                var _this = this;
+                if (!this._physicsEngine) {
+                    return;
+                }
+                this._joints.forEach(function (j) {
+                    if (_this._physicsEngine) {
+                        _this._physicsEngine.removeJoint(_this, j.otherImpostor, j.joint);
+                    }
+                });
+                this._physicsEngine.removeImpostor(this);
+                if (this.parent) {
+                    this.parent.forceUpdate();
+                }
+                else {
+                }
+                this._isDisposed = true;
+            };
+            PhysicsImpostor.prototype.setDeltaPosition = function (position) {
+                gd3d.math.vec3Clone(position, this._deltaPosition);
+            };
+            PhysicsImpostor.prototype.setDeltaRotation = function (rotation) {
+                if (!this._deltaRotation) {
+                    this._deltaRotation = new gd3d.math.quaternion();
+                }
+                gd3d.math.quatClone(rotation, this._deltaRotation);
+            };
+            PhysicsImpostor.prototype.getBoxSizeToRef = function (result) {
+                this._physicsEngine.getPhysicsPlugin().getBoxSizeToRef(this, result);
+                return this;
+            };
+            PhysicsImpostor.prototype.getRadius = function () {
+                return this._physicsEngine.getPhysicsPlugin().getRadius(this);
+            };
+            PhysicsImpostor.DEFAULT_OBJECT_SIZE = new gd3d.math.vector3(0, 0, 0);
+            PhysicsImpostor.IDENTITY_QUATERNION = new gd3d.math.quaternion();
+            PhysicsImpostor._tmpVecs = [new gd3d.math.vector3(), new gd3d.math.vector3(), new gd3d.math.vector3()];
+            PhysicsImpostor._tmpQuat = new gd3d.math.quaternion();
+            return PhysicsImpostor;
+        }());
+        framework.PhysicsImpostor = PhysicsImpostor;
+        var ImpostorType;
+        (function (ImpostorType) {
+            ImpostorType[ImpostorType["NoImpostor"] = 0] = "NoImpostor";
+            ImpostorType[ImpostorType["SphereImpostor"] = 1] = "SphereImpostor";
+            ImpostorType[ImpostorType["BoxImpostor"] = 2] = "BoxImpostor";
+            ImpostorType[ImpostorType["PlaneImpostor"] = 3] = "PlaneImpostor";
+            ImpostorType[ImpostorType["MeshImpostor"] = 4] = "MeshImpostor";
+            ImpostorType[ImpostorType["CylinderImpostor"] = 7] = "CylinderImpostor";
+            ImpostorType[ImpostorType["ParticleImpostor"] = 8] = "ParticleImpostor";
+            ImpostorType[ImpostorType["HeightmapImpostor"] = 9] = "HeightmapImpostor";
+            ImpostorType[ImpostorType["ConvexHullImpostor"] = 10] = "ConvexHullImpostor";
+            ImpostorType[ImpostorType["RopeImpostor"] = 101] = "RopeImpostor";
+            ImpostorType[ImpostorType["ClothImpostor"] = 102] = "ClothImpostor";
+            ImpostorType[ImpostorType["SoftbodyImpostor"] = 103] = "SoftbodyImpostor";
+        })(ImpostorType = framework.ImpostorType || (framework.ImpostorType = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var PhysicsJoint = (function () {
+            function PhysicsJoint(type, jointData) {
+                this.type = type;
+                this.jointData = jointData;
+                jointData.nativeParams = jointData.nativeParams || {};
+            }
+            Object.defineProperty(PhysicsJoint.prototype, "physicsJoint", {
+                get: function () {
+                    return this._physicsJoint;
+                },
+                set: function (newJoint) {
+                    if (this._physicsJoint) {
+                    }
+                    this._physicsJoint = newJoint;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(PhysicsJoint.prototype, "physicsPlugin", {
+                set: function (physicsPlugin) {
+                    this._physicsPlugin = physicsPlugin;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            PhysicsJoint.prototype.executeNativeFunction = function (func) {
+                func(this._physicsPlugin.world, this._physicsJoint);
+            };
+            PhysicsJoint.DistanceJoint = 0;
+            PhysicsJoint.HingeJoint = 1;
+            PhysicsJoint.BallAndSocketJoint = 2;
+            PhysicsJoint.WheelJoint = 3;
+            PhysicsJoint.SliderJoint = 4;
+            PhysicsJoint.PrismaticJoint = 5;
+            PhysicsJoint.UniversalJoint = 6;
+            PhysicsJoint.Hinge2Joint = PhysicsJoint.WheelJoint;
+            PhysicsJoint.PointToPointJoint = 8;
+            PhysicsJoint.SpringJoint = 9;
+            PhysicsJoint.LockJoint = 10;
+            return PhysicsJoint;
+        }());
+        framework.PhysicsJoint = PhysicsJoint;
+        var DistanceJoint = (function (_super) {
+            __extends(DistanceJoint, _super);
+            function DistanceJoint(jointData) {
+                return _super.call(this, PhysicsJoint.DistanceJoint, jointData) || this;
+            }
+            DistanceJoint.prototype.updateDistance = function (maxDistance, minDistance) {
+                this._physicsPlugin.updateDistanceJoint(this, maxDistance, minDistance);
+            };
+            return DistanceJoint;
+        }(PhysicsJoint));
+        framework.DistanceJoint = DistanceJoint;
+        var MotorEnabledJoint = (function (_super) {
+            __extends(MotorEnabledJoint, _super);
+            function MotorEnabledJoint(type, jointData) {
+                return _super.call(this, type, jointData) || this;
+            }
+            MotorEnabledJoint.prototype.setMotor = function (force, maxForce) {
+                this._physicsPlugin.setMotor(this, force || 0, maxForce);
+            };
+            MotorEnabledJoint.prototype.setLimit = function (upperLimit, lowerLimit) {
+                this._physicsPlugin.setLimit(this, upperLimit, lowerLimit);
+            };
+            return MotorEnabledJoint;
+        }(PhysicsJoint));
+        framework.MotorEnabledJoint = MotorEnabledJoint;
+        var HingeJoint = (function (_super) {
+            __extends(HingeJoint, _super);
+            function HingeJoint(jointData) {
+                return _super.call(this, PhysicsJoint.HingeJoint, jointData) || this;
+            }
+            HingeJoint.prototype.setMotor = function (force, maxForce) {
+                this._physicsPlugin.setMotor(this, force || 0, maxForce);
+            };
+            HingeJoint.prototype.setLimit = function (upperLimit, lowerLimit) {
+                this._physicsPlugin.setLimit(this, upperLimit, lowerLimit);
+            };
+            return HingeJoint;
+        }(MotorEnabledJoint));
+        framework.HingeJoint = HingeJoint;
+        var Hinge2Joint = (function (_super) {
+            __extends(Hinge2Joint, _super);
+            function Hinge2Joint(jointData) {
+                return _super.call(this, PhysicsJoint.Hinge2Joint, jointData) || this;
+            }
+            Hinge2Joint.prototype.setMotor = function (force, maxForce, motorIndex) {
+                if (motorIndex === void 0) { motorIndex = 0; }
+                this._physicsPlugin.setMotor(this, force || 0, maxForce, motorIndex);
+            };
+            Hinge2Joint.prototype.setLimit = function (upperLimit, lowerLimit, motorIndex) {
+                if (motorIndex === void 0) { motorIndex = 0; }
+                this._physicsPlugin.setLimit(this, upperLimit, lowerLimit, motorIndex);
+            };
+            return Hinge2Joint;
+        }(MotorEnabledJoint));
+        framework.Hinge2Joint = Hinge2Joint;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var HideFlags;
         (function (HideFlags) {
             HideFlags[HideFlags["None"] = 0] = "None";
@@ -29936,6 +31114,9 @@ var gd3d;
                 this.updateScene(this.rootNode, delta);
                 if (this.onLateUpdate)
                     this.onLateUpdate(delta);
+                if (framework.physic) {
+                    framework.physic._step(delta);
+                }
                 if (this.renderCameras.length > 1) {
                     this.renderCameras.sort(function (a, b) {
                         return a.order - b.order;
@@ -30069,7 +31250,7 @@ var gd3d;
                 }
             };
             scene.prototype.objupdate = function (node, delta) {
-                if (!node.gameObject.visible || (node.hasComponent == false && node.hasComponentChild == false))
+                if (node.hasComponent == false && node.hasComponentChild == false)
                     return;
                 node.gameObject.init(this.app.bePlay);
                 if (node.gameObject.components.length > 0) {
@@ -30247,9 +31428,23 @@ var gd3d;
                 }
                 return ishited;
             };
-            scene.prototype.enable2DPhysics = function (op) {
-                if (op === void 0) { op = null; }
-                framework.physic2D = new framework.physicEngine2D(op);
+            scene.prototype.enablePhysics = function (gravity, plugin) {
+                if (framework.physic) {
+                    return true;
+                }
+                if (!plugin)
+                    plugin = new framework.OimoJSPlugin();
+                try {
+                    framework.physic = new framework.PhysicsEngine(gravity, plugin);
+                    return true;
+                }
+                catch (e) {
+                    console.error(e.message);
+                    return false;
+                }
+            };
+            scene.prototype.enable2DPhysics = function () {
+                framework.physic2D = new framework.physicEngine2D();
             };
             return scene;
         }());
@@ -30675,43 +31870,45 @@ var gd3d;
                     return false;
                 var box0 = a;
                 var box1 = b;
-                if (!this.obbOverLap(box0.directions[0], box0, box1))
+                var box0_dirs = box0.directions;
+                var box1_dirs = box1.directions;
+                if (!this.obbOverLap(box0_dirs[0], box0, box1))
                     return false;
-                if (!this.obbOverLap(box0.directions[1], box0, box1))
+                if (!this.obbOverLap(box0_dirs[1], box0, box1))
                     return false;
-                if (!this.obbOverLap(box0.directions[2], box0, box1))
+                if (!this.obbOverLap(box0_dirs[2], box0, box1))
                     return false;
-                if (!this.obbOverLap(box1.directions[0], box0, box1))
+                if (!this.obbOverLap(box1_dirs[0], box0, box1))
                     return false;
-                if (!this.obbOverLap(box1.directions[1], box0, box1))
+                if (!this.obbOverLap(box1_dirs[1], box0, box1))
                     return false;
-                if (!this.obbOverLap(box1.directions[2], box0, box1))
+                if (!this.obbOverLap(box1_dirs[2], box0, box1))
                     return false;
-                gd3d.math.vec3Cross(box0.directions[0], box1.directions[0], helpV3_0);
+                gd3d.math.vec3Cross(box0_dirs[0], box1_dirs[0], helpV3_0);
                 if (!this.obbOverLap(helpV3_0, box0, box1))
                     return false;
-                gd3d.math.vec3Cross(box0.directions[0], box1.directions[1], helpV3_0);
+                gd3d.math.vec3Cross(box0_dirs[0], box1_dirs[1], helpV3_0);
                 if (!this.obbOverLap(helpV3_0, box0, box1))
                     return false;
-                gd3d.math.vec3Cross(box0.directions[0], box1.directions[2], helpV3_0);
+                gd3d.math.vec3Cross(box0_dirs[0], box1_dirs[2], helpV3_0);
                 if (!this.obbOverLap(helpV3_0, box0, box1))
                     return false;
-                gd3d.math.vec3Cross(box0.directions[1], box1.directions[0], helpV3_0);
+                gd3d.math.vec3Cross(box0_dirs[1], box1_dirs[0], helpV3_0);
                 if (!this.obbOverLap(helpV3_0, box0, box1))
                     return false;
-                gd3d.math.vec3Cross(box0.directions[1], box1.directions[1], helpV3_0);
+                gd3d.math.vec3Cross(box0_dirs[1], box1_dirs[1], helpV3_0);
                 if (!this.obbOverLap(helpV3_0, box0, box1))
                     return false;
-                gd3d.math.vec3Cross(box0.directions[1], box1.directions[2], helpV3_0);
+                gd3d.math.vec3Cross(box0_dirs[1], box1_dirs[2], helpV3_0);
                 if (!this.obbOverLap(helpV3_0, box0, box1))
                     return false;
-                gd3d.math.vec3Cross(box0.directions[2], box1.directions[0], helpV3_0);
+                gd3d.math.vec3Cross(box0_dirs[2], box1_dirs[0], helpV3_0);
                 if (!this.obbOverLap(helpV3_0, box0, box1))
                     return false;
-                gd3d.math.vec3Cross(box0.directions[2], box1.directions[1], helpV3_0);
+                gd3d.math.vec3Cross(box0_dirs[2], box1_dirs[1], helpV3_0);
                 if (!this.obbOverLap(helpV3_0, box0, box1))
                     return false;
-                gd3d.math.vec3Cross(box0.directions[2], box1.directions[2], helpV3_0);
+                gd3d.math.vec3Cross(box0_dirs[2], box1_dirs[2], helpV3_0);
                 if (!this.obbOverLap(helpV3_0, box0, box1))
                     return false;
                 return true;
@@ -30725,24 +31922,25 @@ var gd3d;
             collision.obbVsSphere = function (a, b) {
                 if (!a || !b)
                     return false;
-                if (!this.obb_SphereOverLap(a.directions[0], a, b))
+                var a_dirs = a.directions;
+                if (!this.obb_SphereOverLap(a_dirs[0], a, b))
                     return false;
-                if (!this.obb_SphereOverLap(a.directions[1], a, b))
+                if (!this.obb_SphereOverLap(a_dirs[1], a, b))
                     return false;
-                if (!this.obb_SphereOverLap(a.directions[2], a, b))
+                if (!this.obb_SphereOverLap(a_dirs[2], a, b))
                     return false;
                 var axis = helpV3_0;
                 gd3d.math.vec3Subtract(a.worldCenter, b.center, axis);
                 gd3d.math.vec3Normalize(axis, axis);
                 if (!this.obb_SphereOverLap(axis, a, b))
                     return false;
-                gd3d.math.vec3Cross(a.directions[0], axis, helpV3_1);
+                gd3d.math.vec3Cross(a_dirs[0], axis, helpV3_1);
                 if (!this.obb_SphereOverLap(helpV3_1, a, b))
                     return false;
-                gd3d.math.vec3Cross(a.directions[1], axis, helpV3_1);
+                gd3d.math.vec3Cross(a_dirs[1], axis, helpV3_1);
                 if (!this.obb_SphereOverLap(helpV3_1, a, b))
                     return false;
-                gd3d.math.vec3Cross(a.directions[2], axis, helpV3_1);
+                gd3d.math.vec3Cross(a_dirs[2], axis, helpV3_1);
                 if (!this.obb_SphereOverLap(helpV3_1, a, b))
                     return false;
                 return true;
@@ -30769,11 +31967,91 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var helpv3 = new gd3d.math.vector3();
+        var helpv3_1 = new gd3d.math.vector3();
         var obb = (function () {
             function obb() {
+                this._directions = [];
+                this._halfSizeWorld = new gd3d.math.vector3();
+                this._vectorsWorld = new Array();
+                this._worldCenter = new gd3d.math.vector3();
+                this._worldMatrix = new gd3d.math.matrix();
                 this.vectors = new Array();
-                this.worldCenter = new gd3d.math.vector3();
+                this.dirtyMap = {};
             }
+            Object.defineProperty(obb.prototype, "vectorsWorld", {
+                get: function () {
+                    var needInit = this._vectorsWorld.length < 1;
+                    if (needInit) {
+                        for (var i = 0; i < 8; i++) {
+                            this._vectorsWorld.push(new gd3d.math.vector3());
+                        }
+                    }
+                    if (this.dirtyMap[obb.tag_wVectors] || needInit) {
+                        var wMtx = this.getWorldMatrix();
+                        for (var i = 0; i < 8; i++) {
+                            gd3d.math.matrixTransformVector3(this.vectors[i], wMtx, this._vectorsWorld[i]);
+                        }
+                        this.dirtyMap[obb.tag_wVectors] = false;
+                    }
+                    return this._vectorsWorld;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(obb.prototype, "worldCenter", {
+                get: function () {
+                    if (this.dirtyMap[obb.tag_wCenter]) {
+                        gd3d.math.matrixTransformVector3(this.center, this._worldMatrix, this._worldCenter);
+                        this.dirtyMap[obb.tag_wCenter] = false;
+                    }
+                    return this._worldCenter;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(obb.prototype, "halfSizeWorld", {
+                get: function () {
+                    if (this.dirtyMap[obb.tag_wHalfSize]) {
+                        var wVects = this.vectorsWorld;
+                        var wMin = helpv3;
+                        var wMax = helpv3_1;
+                        gd3d.math.vec3SetAll(wMin, Number.MAX_VALUE);
+                        gd3d.math.vec3SetAll(wMax, -Number.MAX_VALUE);
+                        for (var i = 0; i < 8; i++) {
+                            var p = wVects[i];
+                            wMin.x = p.x < wMin.x ? p.x : wMin.x;
+                            wMin.y = p.y < wMin.y ? p.y : wMin.y;
+                            wMin.z = p.z < wMin.z ? p.z : wMin.z;
+                            wMax.x = p.x > wMax.x ? p.x : wMax.x;
+                            wMax.y = p.y > wMax.y ? p.y : wMax.y;
+                            wMax.z = p.z > wMax.z ? p.z : wMax.z;
+                        }
+                        gd3d.math.vec3Subtract(wMax, wMin, this._halfSizeWorld);
+                        gd3d.math.vec3ScaleByNum(this._halfSizeWorld, 0.5, this._halfSizeWorld);
+                        this.dirtyMap[obb.tag_wHalfSize] = false;
+                    }
+                    return this._halfSizeWorld;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(obb.prototype, "directions", {
+                get: function () {
+                    if (this.dirtyMap[obb.tag_directions]) {
+                        gd3d.math.matrixGetVector3ByOffset(this._worldMatrix, 0, this._directions[0]);
+                        gd3d.math.matrixGetVector3ByOffset(this._worldMatrix, 4, this._directions[1]);
+                        gd3d.math.matrixGetVector3ByOffset(this._worldMatrix, 8, this._directions[2]);
+                        this.dirtyMap[obb.tag_directions] = false;
+                    }
+                    return this._directions;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            obb.prototype.getWorldMatrix = function () {
+                return this._worldMatrix;
+            };
             obb.prototype.buildByMaxMin = function (minimum, maximum) {
                 this.vectors[0] = gd3d.math.pool.clone_vector3(minimum);
                 this.vectors[1] = gd3d.math.pool.clone_vector3(minimum);
@@ -30795,7 +32073,7 @@ var gd3d;
                 this.halfsize = new gd3d.math.vector3();
                 gd3d.math.vec3Subtract(maximum, minimum, this.halfsize);
                 gd3d.math.vec3ScaleByNum(this.halfsize, 0.5, this.halfsize);
-                this.directions = [new gd3d.math.vector3(), new gd3d.math.vector3(), new gd3d.math.vector3()];
+                this._directions = [new gd3d.math.vector3(), new gd3d.math.vector3(), new gd3d.math.vector3()];
             };
             obb.prototype.buildByCenterSize = function (center, size) {
                 this.center = gd3d.math.pool.clone_vector3(center);
@@ -30815,18 +32093,21 @@ var gd3d;
                 this.vectors[5] = new gd3d.math.vector3(cenx - hsx, ceny + hsy, cenz + hsz);
                 this.vectors[6] = new gd3d.math.vector3(cenx + hsx, ceny + hsy, cenz - hsz);
                 this.vectors[7] = new gd3d.math.vector3(cenx + hsx, ceny + hsy, cenz + hsz);
-                this.directions = [new gd3d.math.vector3(), new gd3d.math.vector3(), new gd3d.math.vector3()];
+                this._directions = [new gd3d.math.vector3(), new gd3d.math.vector3(), new gd3d.math.vector3()];
             };
             obb.prototype.update = function (worldmatrix) {
-                gd3d.math.matrixTransformVector3(this.center, worldmatrix, this.worldCenter);
-                gd3d.math.matrixGetVector3ByOffset(worldmatrix, 0, this.directions[0]);
-                gd3d.math.matrixGetVector3ByOffset(worldmatrix, 4, this.directions[1]);
-                gd3d.math.matrixGetVector3ByOffset(worldmatrix, 8, this.directions[2]);
-            };
-            obb.prototype.caclWorldVecs = function (vecs, worldmatrix) {
-                for (var index = 0; index < this.vectors.length; index++) {
-                    vecs[index] = new gd3d.math.vector3();
-                    gd3d.math.matrixTransformVector3(this.vectors[index], worldmatrix, vecs[index]);
+                var _this = this;
+                if (!worldmatrix)
+                    return;
+                var isDirty = !gd3d.math.matrixEqual(this._worldMatrix, worldmatrix);
+                if (!isDirty) {
+                    return;
+                }
+                else {
+                    gd3d.math.matrixClone(worldmatrix, this._worldMatrix);
+                    obb.tags.forEach(function (tag) {
+                        _this.dirtyMap[tag] = true;
+                    });
                 }
             };
             obb.prototype.intersects = function (bound) {
@@ -30841,9 +32122,11 @@ var gd3d;
             };
             obb.prototype.computeExtentsByAxis = function (axis, out) {
                 var p = gd3d.math.vec3Dot(this.worldCenter, axis);
-                var r0 = Math.abs(gd3d.math.vec3Dot(this.directions[0], axis)) * this.halfsize.x;
-                var r1 = Math.abs(gd3d.math.vec3Dot(this.directions[1], axis)) * this.halfsize.y;
-                var r2 = Math.abs(gd3d.math.vec3Dot(this.directions[2], axis)) * this.halfsize.z;
+                var dirs = this.directions;
+                var size = this.halfSizeWorld;
+                var r0 = Math.abs(gd3d.math.vec3Dot(dirs[0], axis)) * size.x;
+                var r1 = Math.abs(gd3d.math.vec3Dot(dirs[1], axis)) * size.y;
+                var r2 = Math.abs(gd3d.math.vec3Dot(dirs[2], axis)) * size.z;
                 var r = r0 + r1 + r2;
                 out.x = p - r;
                 out.y = p + r;
@@ -30852,15 +32135,38 @@ var gd3d;
                 var _obb = new obb();
                 _obb.center = gd3d.math.pool.clone_vector3(this.center);
                 _obb.halfsize = this.halfsize;
-                for (var key in this.directions) {
-                    _obb.directions[key] = gd3d.math.pool.clone_vector3(this.directions[key]);
+                for (var key in this._directions) {
+                    _obb._directions[key] = gd3d.math.pool.clone_vector3(this._directions[key]);
+                }
+                _obb._worldMatrix = gd3d.math.pool.clone_matrix(this._worldMatrix);
+                _obb._halfSizeWorld = gd3d.math.pool.clone_vector3(this._halfSizeWorld);
+                _obb._worldCenter = gd3d.math.pool.clone_vector3(this._worldCenter);
+                _obb.vectors = [];
+                _obb._vectorsWorld = [];
+                for (var i = 0; i < 8; i++) {
+                    _obb.vectors[i] = this.vectors[i];
+                    _obb._vectorsWorld[i] = this._vectorsWorld[i];
+                }
+                _obb.dirtyMap = {};
+                for (var key in this.dirtyMap) {
+                    _obb.dirtyMap[key] = this.dirtyMap[key];
                 }
                 return _obb;
             };
             obb.prototype.dispose = function () {
                 this.vectors.length = 0;
-                this.directions.length = 0;
+                this._directions.length = 0;
+                this.dirtyMap = null;
+                this._halfSizeWorld = null;
+                this._vectorsWorld.length = 0;
+                this._worldCenter = null;
+                this._worldMatrix = null;
             };
+            obb.tag_wCenter = "tag_wCenter";
+            obb.tag_wVectors = "tag_wVectors";
+            obb.tag_wHalfSize = "tag_wHalfSize";
+            obb.tag_directions = "tag_directions";
+            obb.tags = [obb.tag_wCenter, obb.tag_wVectors, obb.tag_wHalfSize, obb.tag_directions];
             return obb;
         }());
         framework.obb = obb;
@@ -31291,9 +32597,20 @@ var gd3d;
                     var obb_1 = _collider.getBound();
                     if (!obb_1)
                         return ishided;
-                    var vecs = [];
-                    obb_1.caclWorldVecs(vecs, _collider.gameObject.transform.getWorldMatrix());
-                    var data = gd3d.render.meshData.genBoxByArray(vecs);
+                    if (!ray.tempVecs) {
+                        ray.tempVecs = [];
+                        for (var i = 0; i < 8; i++) {
+                            ray.tempVecs.push(new gd3d.math.vector3());
+                        }
+                    }
+                    var wVects = obb_1.vectorsWorld;
+                    for (var i = 0; i < 8; i++) {
+                        gd3d.math.vec3Clone(wVects[i], ray.tempVecs[i]);
+                    }
+                    if (!ray.tempMData)
+                        ray.tempMData = new gd3d.render.meshData();
+                    gd3d.render.meshData.genBoxByArray(ray.tempVecs, ray.tempMData);
+                    var data = ray.tempMData;
                     for (var index = 0; index < data.trisindex.length; index += 3) {
                         var p0 = data.pos[data.trisindex[index]];
                         var p1 = data.pos[data.trisindex[index + 1]];
@@ -34248,62 +35565,62 @@ var gd3d;
                 meshData.addQuadVec3ByValue(data.tangent, new gd3d.math.vector3(0, 0, -1));
                 return data;
             };
-            meshData.genBoxByArray = function (array) {
-                var data = new meshData();
-                data.pos = [];
-                data.trisindex = [];
-                data.normal = [];
-                data.tangent = [];
-                data.uv = [];
-                meshData.addQuadVec3ByValue(data.normal, new gd3d.math.vector3(0, -1, 0));
-                meshData.addQuadPos(data, [
+            meshData.genBoxByArray = function (array, outData) {
+                if (!outData)
+                    return;
+                outData.pos = [];
+                outData.trisindex = [];
+                outData.normal = [];
+                outData.tangent = [];
+                outData.uv = [];
+                meshData.addQuadVec3ByValue(outData.normal, new gd3d.math.vector3(0, -1, 0));
+                meshData.addQuadPos(outData, [
                     array[0],
                     array[1],
                     array[2],
                     array[3]
                 ]);
-                meshData.addQuadVec3ByValue(data.tangent, new gd3d.math.vector3(-1, 0, 0));
-                meshData.addQuadVec3ByValue(data.normal, new gd3d.math.vector3(0, 1, 0));
-                meshData.addQuadPos(data, [
+                meshData.addQuadVec3ByValue(outData.tangent, new gd3d.math.vector3(-1, 0, 0));
+                meshData.addQuadVec3ByValue(outData.normal, new gd3d.math.vector3(0, 1, 0));
+                meshData.addQuadPos(outData, [
                     array[4],
                     array[5],
                     array[6],
                     array[7]
                 ]);
-                meshData.addQuadVec3ByValue(data.tangent, new gd3d.math.vector3(1, 0, 0));
-                meshData.addQuadVec3ByValue(data.normal, new gd3d.math.vector3(0, 0, 1));
-                meshData.addQuadPos(data, [
+                meshData.addQuadVec3ByValue(outData.tangent, new gd3d.math.vector3(1, 0, 0));
+                meshData.addQuadVec3ByValue(outData.normal, new gd3d.math.vector3(0, 0, 1));
+                meshData.addQuadPos(outData, [
                     array[1],
                     array[3],
                     array[5],
                     array[7]
                 ]);
-                meshData.addQuadVec3ByValue(data.tangent, new gd3d.math.vector3(1, 0, 0));
-                meshData.addQuadVec3ByValue(data.normal, new gd3d.math.vector3(0, 0, -1));
-                meshData.addQuadPos(data, [
+                meshData.addQuadVec3ByValue(outData.tangent, new gd3d.math.vector3(1, 0, 0));
+                meshData.addQuadVec3ByValue(outData.normal, new gd3d.math.vector3(0, 0, -1));
+                meshData.addQuadPos(outData, [
                     array[0],
                     array[2],
                     array[4],
                     array[6]
                 ]);
-                meshData.addQuadVec3ByValue(data.tangent, new gd3d.math.vector3(-1, 0, 0));
-                meshData.addQuadVec3ByValue(data.normal, new gd3d.math.vector3(1, 0, 0));
-                meshData.addQuadPos(data, [
+                meshData.addQuadVec3ByValue(outData.tangent, new gd3d.math.vector3(-1, 0, 0));
+                meshData.addQuadVec3ByValue(outData.normal, new gd3d.math.vector3(1, 0, 0));
+                meshData.addQuadPos(outData, [
                     array[6],
                     array[2],
                     array[7],
                     array[3]
                 ]);
-                meshData.addQuadVec3ByValue(data.tangent, new gd3d.math.vector3(0, 0, -1));
-                meshData.addQuadVec3ByValue(data.normal, new gd3d.math.vector3(-1, 0, 0));
-                meshData.addQuadPos(data, [
+                meshData.addQuadVec3ByValue(outData.tangent, new gd3d.math.vector3(0, 0, -1));
+                meshData.addQuadVec3ByValue(outData.normal, new gd3d.math.vector3(-1, 0, 0));
+                meshData.addQuadPos(outData, [
                     array[0],
                     array[4],
                     array[1],
                     array[5]
                 ]);
-                meshData.addQuadVec3ByValue(data.tangent, new gd3d.math.vector3(0, 0, 1));
-                return data;
+                meshData.addQuadVec3ByValue(outData.tangent, new gd3d.math.vector3(0, 0, 1));
             };
             meshData.genBoxByArray_Quad = function (array) {
                 var data = new meshData();

@@ -811,6 +811,24 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare class test_3DPhysics_baseShape implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    background: gd3d.framework.transform;
+    parts: gd3d.framework.transform;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    count: number;
+    counttimer: number;
+    astMgr: gd3d.framework.assetMgr;
+    start(app: gd3d.framework.application): Promise<any>;
+    loadbySync(url: string): gd3d.threading.gdPromise<any>;
+    init(): void;
+    initCamera(): void;
+    update(delta: number): void;
+}
+declare let CANNON: any;
 declare class test_3DPhysics_cannon implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -821,9 +839,13 @@ declare class test_3DPhysics_cannon implements IState {
     taskmgr: gd3d.framework.taskMgr;
     count: number;
     counttimer: number;
-    private loadShader(laststate, state);
-    private addcam(laststate, state);
-    start(app: gd3d.framework.application): void;
+    astMgr: gd3d.framework.assetMgr;
+    iptMgr: gd3d.framework.inputMgr;
+    start(app: gd3d.framework.application): Promise<any>;
+    loadbySync(url: string): gd3d.threading.gdPromise<any>;
+    init(): void;
+    onPonitMove(x: any, y: any): void;
+    doRay(): void;
     update(delta: number): void;
 }
 declare namespace t {
@@ -1616,6 +1638,14 @@ declare class physic2d_dome implements IState {
     private creatbox(posx, posy, width, height, texture, root);
     private loadTexture(lastState, state);
     update(delta: number): void;
+}
+declare namespace PhysicDemo {
+    class physic_01 implements IState {
+        scene: gd3d.framework.scene;
+        camera: gd3d.framework.camera;
+        start(app: gd3d.framework.application): void;
+        update(delta: number): void;
+    }
 }
 declare namespace dome {
     class db_test_f14eff implements IState {

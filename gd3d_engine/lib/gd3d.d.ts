@@ -1043,7 +1043,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    let physic2D: physicEngine2D;
     interface Itiming {
         timeScale?: number;
         timestamp?: number;
@@ -1729,6 +1728,8 @@ declare namespace gd3d.framework {
         private _buildAABB();
         private _children;
         children: transform[];
+        private _physicsImpostor;
+        physicsImpostor: PhysicsImpostor;
         private _parent;
         readonly parent: transform;
         addChild(node: transform): void;
@@ -1813,6 +1814,7 @@ declare namespace gd3d.framework {
         center: math.vector3;
         size: math.vector3;
         getBound(): obb;
+        private static _tempMatrix;
         readonly matrix: gd3d.math.matrix;
         start(): void;
         onPlay(): void;
@@ -2039,6 +2041,9 @@ declare namespace gd3d.framework {
         Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): threading.gdPromise<{}>;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
+        private _cacheMinP;
+        private _cacheMaxP;
+        calcVectexMinMax(outMin: math.vector3, outMax: math.vector3): void;
     }
     class subMeshInfo {
         matIndex: number;
@@ -3548,327 +3553,94 @@ declare namespace gd3d.event {
         KeyUp = 1,
     }
     enum KeyCode {
-        None = 0,
-        Backspace = 8,
-        Tab = 9,
-        Clear = 12,
-        Return = 13,
+        Numpad4 = 100,
+        Numpad5 = 101,
+        Numpad6 = 102,
+        Numpad7 = 103,
+        Numpad8 = 104,
+        Numpad9 = 105,
+        NumpadMultiply = 106,
+        NumpadAdd = 107,
+        NumpadSubtract = 109,
+        NumpadDecimal = 110,
+        NumpadDivide = 111,
+        F1 = 112,
+        F2 = 113,
+        F3 = 114,
+        F4 = 115,
+        F5 = 116,
+        F6 = 117,
+        F7 = 118,
+        F8 = 119,
+        F9 = 120,
+        F10 = 121,
+        F11 = 122,
+        F12 = 123,
+        Enter = 13,
+        NumLock = 144,
+        ScrollLock = 145,
+        ShiftLeft = 16,
+        ControlRight = 17,
+        AltRight = 18,
+        Semicolon = 186,
+        Comma = 188,
         Pause = 19,
+        Period = 190,
+        Slash = 191,
+        CapsLock = 20,
+        BracketLeft = 219,
+        Backslash = 220,
+        BracketRight = 221,
+        Quote = 222,
         Escape = 27,
         Space = 32,
-        Exclaim = 33,
-        DoubleQuote = 34,
-        Hash = 35,
-        Dollar = 36,
-        Ampersand = 38,
-        Quote = 39,
-        LeftParen = 40,
-        RightParen = 41,
-        Asterisk = 42,
-        Plus = 43,
-        Comma = 44,
-        Minus = 45,
-        Period = 46,
-        Slash = 47,
-        Alpha0 = 48,
-        Alpha1 = 49,
-        Alpha2 = 50,
-        Alpha3 = 51,
-        Alpha4 = 52,
-        Alpha5 = 53,
-        Alpha6 = 54,
-        Alpha7 = 55,
-        Alpha8 = 56,
-        Alpha9 = 57,
-        Colon = 58,
-        Semicolon = 59,
-        Less = 60,
-        Equals = 61,
-        Greater = 62,
-        Question = 63,
-        At = 64,
-        LeftBracket = 91,
-        Backslash = 92,
-        RightBracket = 93,
-        Caret = 94,
-        Underscore = 95,
-        BackQuote = 96,
-        A = 97,
-        B = 98,
-        C = 99,
-        D = 100,
-        E = 101,
-        F = 102,
-        G = 103,
-        H = 104,
-        I = 105,
-        J = 106,
-        K = 107,
-        L = 108,
-        M = 109,
-        N = 110,
-        O = 111,
-        P = 112,
-        Q = 113,
-        R = 114,
-        S = 115,
-        T = 116,
-        U = 117,
-        V = 118,
-        W = 119,
-        X = 120,
-        Y = 121,
-        Z = 122,
-        Delete = 127,
-        Keypad0 = 256,
-        Keypad1 = 257,
-        Keypad2 = 258,
-        Keypad3 = 259,
-        Keypad4 = 260,
-        Keypad5 = 261,
-        Keypad6 = 262,
-        Keypad7 = 263,
-        Keypad8 = 264,
-        Keypad9 = 265,
-        KeypadPeriod = 266,
-        KeypadDivide = 267,
-        KeypadMultiply = 268,
-        KeypadMinus = 269,
-        KeypadPlus = 270,
-        KeypadEnter = 271,
-        KeypadEquals = 272,
-        UpArrow = 273,
-        DownArrow = 274,
-        RightArrow = 275,
-        LeftArrow = 276,
-        Insert = 277,
-        Home = 278,
-        End = 279,
-        PageUp = 280,
-        PageDown = 281,
-        F1 = 282,
-        F2 = 283,
-        F3 = 284,
-        F4 = 285,
-        F5 = 286,
-        F6 = 287,
-        F7 = 288,
-        F8 = 289,
-        F9 = 290,
-        F10 = 291,
-        F11 = 292,
-        F12 = 293,
-        F13 = 294,
-        F14 = 295,
-        F15 = 296,
-        Numlock = 300,
-        CapsLock = 301,
-        ScrollLock = 302,
-        RightShift = 303,
-        LeftShift = 304,
-        RightControl = 305,
-        LeftControl = 306,
-        RightAlt = 307,
-        LeftAlt = 308,
-        RightCommand = 309,
-        RightApple = 309,
-        LeftCommand = 310,
-        LeftApple = 310,
-        LeftWindows = 311,
-        RightWindows = 312,
-        AltGr = 313,
-        Help = 315,
-        Print = 316,
-        SysReq = 317,
-        Break = 318,
-        Menu = 319,
-        Mouse0 = 323,
-        Mouse1 = 324,
-        Mouse2 = 325,
-        Mouse3 = 326,
-        Mouse4 = 327,
-        Mouse5 = 328,
-        Mouse6 = 329,
-        JoystickButton0 = 330,
-        JoystickButton1 = 331,
-        JoystickButton2 = 332,
-        JoystickButton3 = 333,
-        JoystickButton4 = 334,
-        JoystickButton5 = 335,
-        JoystickButton6 = 336,
-        JoystickButton7 = 337,
-        JoystickButton8 = 338,
-        JoystickButton9 = 339,
-        JoystickButton10 = 340,
-        JoystickButton11 = 341,
-        JoystickButton12 = 342,
-        JoystickButton13 = 343,
-        JoystickButton14 = 344,
-        JoystickButton15 = 345,
-        JoystickButton16 = 346,
-        JoystickButton17 = 347,
-        JoystickButton18 = 348,
-        JoystickButton19 = 349,
-        Joystick1Button0 = 350,
-        Joystick1Button1 = 351,
-        Joystick1Button2 = 352,
-        Joystick1Button3 = 353,
-        Joystick1Button4 = 354,
-        Joystick1Button5 = 355,
-        Joystick1Button6 = 356,
-        Joystick1Button7 = 357,
-        Joystick1Button8 = 358,
-        Joystick1Button9 = 359,
-        Joystick1Button10 = 360,
-        Joystick1Button11 = 361,
-        Joystick1Button12 = 362,
-        Joystick1Button13 = 363,
-        Joystick1Button14 = 364,
-        Joystick1Button15 = 365,
-        Joystick1Button16 = 366,
-        Joystick1Button17 = 367,
-        Joystick1Button18 = 368,
-        Joystick1Button19 = 369,
-        Joystick2Button0 = 370,
-        Joystick2Button1 = 371,
-        Joystick2Button2 = 372,
-        Joystick2Button3 = 373,
-        Joystick2Button4 = 374,
-        Joystick2Button5 = 375,
-        Joystick2Button6 = 376,
-        Joystick2Button7 = 377,
-        Joystick2Button8 = 378,
-        Joystick2Button9 = 379,
-        Joystick2Button10 = 380,
-        Joystick2Button11 = 381,
-        Joystick2Button12 = 382,
-        Joystick2Button13 = 383,
-        Joystick2Button14 = 384,
-        Joystick2Button15 = 385,
-        Joystick2Button16 = 386,
-        Joystick2Button17 = 387,
-        Joystick2Button18 = 388,
-        Joystick2Button19 = 389,
-        Joystick3Button0 = 390,
-        Joystick3Button1 = 391,
-        Joystick3Button2 = 392,
-        Joystick3Button3 = 393,
-        Joystick3Button4 = 394,
-        Joystick3Button5 = 395,
-        Joystick3Button6 = 396,
-        Joystick3Button7 = 397,
-        Joystick3Button8 = 398,
-        Joystick3Button9 = 399,
-        Joystick3Button10 = 400,
-        Joystick3Button11 = 401,
-        Joystick3Button12 = 402,
-        Joystick3Button13 = 403,
-        Joystick3Button14 = 404,
-        Joystick3Button15 = 405,
-        Joystick3Button16 = 406,
-        Joystick3Button17 = 407,
-        Joystick3Button18 = 408,
-        Joystick3Button19 = 409,
-        Joystick4Button0 = 410,
-        Joystick4Button1 = 411,
-        Joystick4Button2 = 412,
-        Joystick4Button3 = 413,
-        Joystick4Button4 = 414,
-        Joystick4Button5 = 415,
-        Joystick4Button6 = 416,
-        Joystick4Button7 = 417,
-        Joystick4Button8 = 418,
-        Joystick4Button9 = 419,
-        Joystick4Button10 = 420,
-        Joystick4Button11 = 421,
-        Joystick4Button12 = 422,
-        Joystick4Button13 = 423,
-        Joystick4Button14 = 424,
-        Joystick4Button15 = 425,
-        Joystick4Button16 = 426,
-        Joystick4Button17 = 427,
-        Joystick4Button18 = 428,
-        Joystick4Button19 = 429,
-        Joystick5Button0 = 430,
-        Joystick5Button1 = 431,
-        Joystick5Button2 = 432,
-        Joystick5Button3 = 433,
-        Joystick5Button4 = 434,
-        Joystick5Button5 = 435,
-        Joystick5Button6 = 436,
-        Joystick5Button7 = 437,
-        Joystick5Button8 = 438,
-        Joystick5Button9 = 439,
-        Joystick5Button10 = 440,
-        Joystick5Button11 = 441,
-        Joystick5Button12 = 442,
-        Joystick5Button13 = 443,
-        Joystick5Button14 = 444,
-        Joystick5Button15 = 445,
-        Joystick5Button16 = 446,
-        Joystick5Button17 = 447,
-        Joystick5Button18 = 448,
-        Joystick5Button19 = 449,
-        Joystick6Button0 = 450,
-        Joystick6Button1 = 451,
-        Joystick6Button2 = 452,
-        Joystick6Button3 = 453,
-        Joystick6Button4 = 454,
-        Joystick6Button5 = 455,
-        Joystick6Button6 = 456,
-        Joystick6Button7 = 457,
-        Joystick6Button8 = 458,
-        Joystick6Button9 = 459,
-        Joystick6Button10 = 460,
-        Joystick6Button11 = 461,
-        Joystick6Button12 = 462,
-        Joystick6Button13 = 463,
-        Joystick6Button14 = 464,
-        Joystick6Button15 = 465,
-        Joystick6Button16 = 466,
-        Joystick6Button17 = 467,
-        Joystick6Button18 = 468,
-        Joystick6Button19 = 469,
-        Joystick7Button0 = 470,
-        Joystick7Button1 = 471,
-        Joystick7Button2 = 472,
-        Joystick7Button3 = 473,
-        Joystick7Button4 = 474,
-        Joystick7Button5 = 475,
-        Joystick7Button6 = 476,
-        Joystick7Button7 = 477,
-        Joystick7Button8 = 478,
-        Joystick7Button9 = 479,
-        Joystick7Button10 = 480,
-        Joystick7Button11 = 481,
-        Joystick7Button12 = 482,
-        Joystick7Button13 = 483,
-        Joystick7Button14 = 484,
-        Joystick7Button15 = 485,
-        Joystick7Button16 = 486,
-        Joystick7Button17 = 487,
-        Joystick7Button18 = 488,
-        Joystick7Button19 = 489,
-        Joystick8Button0 = 490,
-        Joystick8Button1 = 491,
-        Joystick8Button2 = 492,
-        Joystick8Button3 = 493,
-        Joystick8Button4 = 494,
-        Joystick8Button5 = 495,
-        Joystick8Button6 = 496,
-        Joystick8Button7 = 497,
-        Joystick8Button8 = 498,
-        Joystick8Button9 = 499,
-        Joystick8Button10 = 500,
-        Joystick8Button11 = 501,
-        Joystick8Button12 = 502,
-        Joystick8Button13 = 503,
-        Joystick8Button14 = 504,
-        Joystick8Button15 = 505,
-        Joystick8Button16 = 506,
-        Joystick8Button17 = 507,
-        Joystick8Button18 = 508,
-        Joystick8Button19 = 509,
+        PageUp = 33,
+        PageDown = 34,
+        End = 35,
+        Home = 36,
+        ArrowLeft = 37,
+        ArrowUp = 38,
+        ArrowRight = 39,
+        ArrowDown = 40,
+        Insert = 45,
+        Delete = 46,
+        Digit1 = 49,
+        Digit2 = 50,
+        Digit3 = 51,
+        Digit4 = 52,
+        KeyA = 65,
+        KeyB = 66,
+        KeyC = 67,
+        KeyD = 68,
+        KeyE = 69,
+        KeyF = 70,
+        KeyG = 71,
+        KeyH = 72,
+        KeyI = 73,
+        KeyJ = 74,
+        KeyK = 75,
+        KeyL = 76,
+        KeyM = 77,
+        KeyN = 78,
+        KeyO = 79,
+        KeyP = 80,
+        KeyQ = 81,
+        KeyR = 82,
+        KeyS = 83,
+        KeyT = 84,
+        KeyU = 85,
+        KeyV = 86,
+        KeyW = 87,
+        KeyX = 88,
+        KeyY = 89,
+        Tab = 9,
+        KeyZ = 90,
+        MetaLeft = 91,
+        ContextMenu = 93,
+        Numpad0 = 96,
+        Numpad1 = 97,
+        Numpad2 = 98,
+        Numpad3 = 99,
     }
 }
 declare namespace gd3d.event {
@@ -3940,8 +3712,8 @@ declare namespace gd3d.framework {
         private lastPoint;
         update(delta: any): void;
         private pointCk();
-        private hasKeyDown;
-        private hasKeyUp;
+        private keyDownCode;
+        private keyUpCode;
         private keyCodeCk();
         private hasWheel;
         private lastWheel;
@@ -4246,6 +4018,7 @@ declare namespace gd3d.math {
     function matrixScaleByNum(value: number, mat: matrix): void;
     function matrixAdd(left: matrix, right: matrix, out: matrix): void;
     function matrixEqual(mtx1: matrix, mtx2: matrix, threshold?: number): boolean;
+    function matrixIsIdentity(mtx: matrix): boolean;
 }
 declare namespace gd3d.math {
     function floatClamp(v: number, min?: number, max?: number): number;
@@ -4317,6 +4090,8 @@ declare namespace gd3d.math {
     function vec2Multiply(a: vector2, b: vector2): number;
     function vec2Dot(lhs: vector2, rhs: vector2): number;
     function vec2Equal(vector: vector2, vector2: vector2, threshold?: number): boolean;
+    function vec2SetAll(vector: vector2, value: number): void;
+    function vec2Set(vector: vector2, x: number, y: number): void;
 }
 declare namespace gd3d.math {
     function vec3Clone(from: vector3, to: vector3): void;
@@ -4356,12 +4131,16 @@ declare namespace gd3d.math {
     function quaternionFormat(vector: quaternion, maxDot: number, out: quaternion): void;
     function floatFormat(num: number, maxDot: number): number;
     function vec3Equal(vector: vector3, vector2: vector3, threshold?: number): boolean;
+    function vec3SetAll(vector: vector3, value: number): void;
+    function vec3Set(vector: vector2, x: number, y: number, z: number): void;
 }
 declare namespace gd3d.math {
     function vec4Clone(from: vector4, to: vector4): void;
     function vec4SLerp(vector: vector4, vector2: vector4, v: number, out: vector4): void;
     function vec4Add(a: gd3d.math.vector4, b: gd3d.math.vector4, out: gd3d.math.vector4): void;
     function vec4ScaleByNum(from: gd3d.math.vector4, scale: number, out: gd3d.math.vector4): void;
+    function vec4SetAll(vector: vector3, value: number): void;
+    function vec4Set(vector: vector2, x: number, y: number, z: number, w: number): void;
 }
 declare namespace gd3d.framework {
     class navVec3 {
@@ -5470,6 +5249,338 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class CannonJSPlugin implements IPhysicsEnginePlugin {
+        private _useDeltaForWorldStep;
+        world: any;
+        name: string;
+        private _physicsMaterials;
+        private _fixedTimeStep;
+        constructor(_useDeltaForWorldStep?: boolean, iterations?: number);
+        setGravity(gravity: math.vector3): void;
+        setTimeStep(timeStep: number): void;
+        getTimeStep(): number;
+        executeStep(delta: number, impostors: Array<PhysicsImpostor>): void;
+        applyImpulse(impostor: PhysicsImpostor, force: math.vector3, contactPoint: math.vector3): void;
+        applyForce(impostor: PhysicsImpostor, force: math.vector3, contactPoint: math.vector3): void;
+        generatePhysicsBody(impostor: PhysicsImpostor): void;
+        removePhysicsBody(impostor: PhysicsImpostor): void;
+        generateJoint(impostorJoint: PhysicsImpostorJoint): void;
+        removeJoint(impostorJoint: PhysicsImpostorJoint): void;
+        private _addMaterial(name, friction, restitution);
+        private _checkWithEpsilon(value);
+        private _createShape(impostor);
+        private vec3Copy(from, to);
+        private QuatCopy(from, to);
+        setTransformationFromPhysicsBody(impostor: PhysicsImpostor): void;
+        setPhysicsBodyTransformation(impostor: PhysicsImpostor, newPosition: math.vector3, newRotation: math.vector3): void;
+        isSupported(): boolean;
+        setLinearVelocity(impostor: PhysicsImpostor, velocity: math.vector3): void;
+        setAngularVelocity(impostor: PhysicsImpostor, velocity: math.vector3): void;
+        getLinearVelocity(impostor: PhysicsImpostor): math.vector3;
+        getAngularVelocity(impostor: PhysicsImpostor): math.vector3;
+        setBodyMass(impostor: PhysicsImpostor, mass: number): void;
+        getBodyMass(impostor: PhysicsImpostor): number;
+        getBodyFriction(impostor: PhysicsImpostor): number;
+        setBodyFriction(impostor: PhysicsImpostor, friction: number): void;
+        getBodyRestitution(impostor: PhysicsImpostor): number;
+        setBodyRestitution(impostor: PhysicsImpostor, restitution: number): void;
+        sleepBody(impostor: PhysicsImpostor): void;
+        wakeUpBody(impostor: PhysicsImpostor): void;
+        updateDistanceJoint(joint: PhysicsJoint, maxDistance: number, minDistance?: number): void;
+        setMotor(joint: IMotorEnabledJoint, speed?: number, maxForce?: number, motorIndex?: number): void;
+        setLimit(joint: IMotorEnabledJoint, upperLimit: number, lowerLimit?: number): void;
+        getRadius(impostor: PhysicsImpostor): number;
+        getBoxSizeToRef(impostor: PhysicsImpostor, result: math.vector3): void;
+        dispose(): void;
+        private _extendNamespace();
+    }
+}
+declare namespace gd3d.framework {
+    class OimoJSPlugin implements IPhysicsEnginePlugin {
+        world: any;
+        name: string;
+        private _physicsMaterials;
+        private _fixedTimeStep;
+        BJSOIMO: any;
+        constructor(iterations?: number, oimoInjection?: any);
+        setGravity(gravity: math.vector3): void;
+        setTimeStep(timeStep: number): void;
+        getTimeStep(): number;
+        private _tmpImpostorsArray;
+        executeStep(delta: number, impostors: Array<PhysicsImpostor>): void;
+        applyImpulse(impostor: PhysicsImpostor, force: math.vector3, contactPoint: math.vector3): void;
+        applyForce(impostor: PhysicsImpostor, force: math.vector3, contactPoint: math.vector3): void;
+        private checkWithEpsilon(value);
+        generatePhysicsBody(impostor: PhysicsImpostor): void;
+        private _tmpPositionVector;
+        removePhysicsBody(impostor: PhysicsImpostor): void;
+        generateJoint(impostorJoint: PhysicsImpostorJoint): void;
+        removeJoint(impostorJoint: PhysicsImpostorJoint): void;
+        private vec3Copy(from, to);
+        private QuatCopy(from, to);
+        setTransformationFromPhysicsBody(impostor: PhysicsImpostor): void;
+        setPhysicsBodyTransformation(impostor: PhysicsImpostor, newPosition: math.vector3, newRotation: math.vector3): void;
+        isSupported(): boolean;
+        setLinearVelocity(impostor: PhysicsImpostor, velocity: math.vector3): void;
+        setAngularVelocity(impostor: PhysicsImpostor, velocity: math.vector3): void;
+        getLinearVelocity(impostor: PhysicsImpostor): math.vector3;
+        getAngularVelocity(impostor: PhysicsImpostor): math.vector3;
+        setBodyMass(impostor: PhysicsImpostor, mass: number): void;
+        getBodyMass(impostor: PhysicsImpostor): number;
+        getBodyFriction(impostor: PhysicsImpostor): number;
+        setBodyFriction(impostor: PhysicsImpostor, friction: number): void;
+        getBodyRestitution(impostor: PhysicsImpostor): number;
+        setBodyRestitution(impostor: PhysicsImpostor, restitution: number): void;
+        sleepBody(impostor: PhysicsImpostor): void;
+        wakeUpBody(impostor: PhysicsImpostor): void;
+        updateDistanceJoint(joint: PhysicsJoint, maxDistance: number, minDistance?: number): void;
+        setMotor(joint: IMotorEnabledJoint, speed?: number, force?: number, motorIndex?: number): void;
+        setLimit(joint: IMotorEnabledJoint, upperLimit: number, lowerLimit?: number, motorIndex?: number): void;
+        getRadius(impostor: PhysicsImpostor): number;
+        getBoxSizeToRef(impostor: PhysicsImpostor, result: math.vector3): void;
+        dispose(): void;
+    }
+}
+declare namespace gd3d.framework {
+    interface PhysicsImpostorJoint {
+        mainImpostor: PhysicsImpostor;
+        connectedImpostor: PhysicsImpostor;
+        joint: PhysicsJoint;
+    }
+    class PhysicsEngine {
+        private _physicsPlugin;
+        gravity: math.vector3;
+        constructor(gravity?: math.vector3, _physicsPlugin?: IPhysicsEnginePlugin);
+        setGravity(gravity: math.vector3): void;
+        setTimeStep(newTimeStep?: number): void;
+        getTimeStep(): number;
+        dispose(): void;
+        getPhysicsPluginName(): string;
+        static Epsilon: number;
+        private _impostors;
+        private _joints;
+        addImpostor(impostor: PhysicsImpostor): void;
+        removeImpostor(impostor: PhysicsImpostor): void;
+        addJoint(mainImpostor: PhysicsImpostor, connectedImpostor: PhysicsImpostor, joint: PhysicsJoint): void;
+        removeJoint(mainImpostor: PhysicsImpostor, connectedImpostor: PhysicsImpostor, joint: PhysicsJoint): void;
+        _step(delta: number): void;
+        getPhysicsPlugin(): IPhysicsEnginePlugin;
+        getImpostors(): Array<PhysicsImpostor>;
+        getImpostorForPhysicsObject(object: transform): PhysicsImpostor;
+        getImpostorWithPhysicsBody(body: any): PhysicsImpostor;
+    }
+    interface IPhysicsEnginePlugin {
+        world: any;
+        name: string;
+        setGravity(gravity: math.vector3): void;
+        setTimeStep(timeStep: number): void;
+        getTimeStep(): number;
+        executeStep(delta: number, impostors: Array<PhysicsImpostor>): void;
+        applyImpulse(impostor: PhysicsImpostor, force: math.vector3, contactPoint: math.vector3): void;
+        applyForce(impostor: PhysicsImpostor, force: math.vector3, contactPoint: math.vector3): void;
+        generatePhysicsBody(impostor: PhysicsImpostor): void;
+        removePhysicsBody(impostor: PhysicsImpostor): void;
+        generateJoint(joint: PhysicsImpostorJoint): void;
+        removeJoint(joint: PhysicsImpostorJoint): void;
+        isSupported(): boolean;
+        setTransformationFromPhysicsBody(impostor: PhysicsImpostor): void;
+        setPhysicsBodyTransformation(impostor: PhysicsImpostor, newPosition: math.vector3, newRotation: math.quaternion): void;
+        setLinearVelocity(impostor: PhysicsImpostor, velocity: math.vector3): void;
+        setAngularVelocity(impostor: PhysicsImpostor, velocity: math.vector3): void;
+        getLinearVelocity(impostor: PhysicsImpostor): math.vector3;
+        getAngularVelocity(impostor: PhysicsImpostor): math.vector3;
+        setBodyMass(impostor: PhysicsImpostor, mass: number): void;
+        getBodyMass(impostor: PhysicsImpostor): number;
+        getBodyFriction(impostor: PhysicsImpostor): number;
+        setBodyFriction(impostor: PhysicsImpostor, friction: number): void;
+        getBodyRestitution(impostor: PhysicsImpostor): number;
+        setBodyRestitution(impostor: PhysicsImpostor, restitution: number): void;
+        sleepBody(impostor: PhysicsImpostor): void;
+        wakeUpBody(impostor: PhysicsImpostor): void;
+        updateDistanceJoint(joint: PhysicsJoint, maxDistance: number, minDistance?: number): void;
+        setMotor(joint: IMotorEnabledJoint, speed: number, maxForce?: number, motorIndex?: number): void;
+        setLimit(joint: IMotorEnabledJoint, upperLimit: number, lowerLimit?: number, motorIndex?: number): void;
+        getRadius(impostor: PhysicsImpostor): number;
+        getBoxSizeToRef(impostor: PhysicsImpostor, result: math.vector3): void;
+        dispose(): void;
+    }
+}
+declare namespace gd3d.framework {
+    interface PhysicsImpostorParameters {
+        mass: number;
+        friction?: number;
+        restitution?: number;
+        nativeOptions?: any;
+        ignoreParent?: boolean;
+        disableBidirectionalTransformation?: boolean;
+        heightFieldMatrix?: number[][];
+        heightFieldOptions?: {
+            minValue?: number;
+            maxValue?: number;
+            elementSize?: number;
+        };
+    }
+    interface IPhysicsEnabledObject {
+        position: math.vector3;
+        rotationQuaternion: math.quaternion;
+        scaling: math.vector3;
+        rotation?: math.vector3;
+        parent?: any;
+        getWorldMatrix?(): math.matrix;
+        getAbsolutePosition(): math.vector3;
+        getAbsolutePivotPoint(): math.vector3;
+    }
+    class PhysicsImpostor {
+        object: transform;
+        type: ImpostorType;
+        _options: PhysicsImpostorParameters;
+        static DEFAULT_OBJECT_SIZE: math.vector3;
+        static IDENTITY_QUATERNION: math.quaternion;
+        private _physicsEngine;
+        private _physicsBody;
+        private _bodyUpdateRequired;
+        private _onBeforePhysicsStepCallbacks;
+        private _onAfterPhysicsStepCallbacks;
+        private _onPhysicsCollideCallbacks;
+        private _deltaPosition;
+        private _deltaRotation;
+        private _deltaRotationConjugated;
+        private _parent;
+        private _isDisposed;
+        private static _tmpVecs;
+        private static _tmpQuat;
+        readonly isDisposed: boolean;
+        mass: number;
+        friction: number;
+        restitution: number;
+        uniqueId: number;
+        private _joints;
+        constructor(object: transform, type: ImpostorType, _options?: PhysicsImpostorParameters);
+        _init(): void;
+        private _getPhysicsParent();
+        isBodyInitRequired(): boolean;
+        setScalingUpdated(updated: boolean): void;
+        forceUpdate(): void;
+        physicsBody: any;
+        parent: PhysicsImpostor;
+        resetUpdateFlags(): void;
+        private _obb;
+        private getObb();
+        private _cacheSizeWorld;
+        getObjectExtendSize(): math.vector3;
+        getObjectCenter(): math.vector3;
+        getParam(paramName: string): any;
+        setParam(paramName: string, value: number): void;
+        setMass(mass: number): void;
+        getLinearVelocity(): math.vector3;
+        setLinearVelocity(velocity: math.vector3): void;
+        getAngularVelocity(): math.vector3;
+        setAngularVelocity(velocity: math.vector3): void;
+        executeNativeFunction(func: (world: any, physicsBody: any) => void): void;
+        registerBeforePhysicsStep(func: (impostor: PhysicsImpostor) => void): void;
+        unregisterBeforePhysicsStep(func: (impostor: PhysicsImpostor) => void): void;
+        registerAfterPhysicsStep(func: (impostor: PhysicsImpostor) => void): void;
+        unregisterAfterPhysicsStep(func: (impostor: PhysicsImpostor) => void): void;
+        registerOnPhysicsCollide(collideAgainst: PhysicsImpostor | Array<PhysicsImpostor>, func: (collider: PhysicsImpostor, collidedAgainst: PhysicsImpostor) => void): void;
+        unregisterOnPhysicsCollide(collideAgainst: PhysicsImpostor | Array<PhysicsImpostor>, func: (collider: PhysicsImpostor, collidedAgainst: PhysicsImpostor | Array<PhysicsImpostor>) => void): void;
+        beforeStep: () => void;
+        afterStep: () => void;
+        onCollideEvent: (collider: PhysicsImpostor, collidedWith: PhysicsImpostor) => void;
+        onCollide: (e: {
+            body: any;
+        }) => void;
+        applyForce(force: math.vector3, contactPoint: math.vector3): PhysicsImpostor;
+        applyImpulse(force: math.vector3, contactPoint: math.vector3): PhysicsImpostor;
+        createJoint(otherImpostor: PhysicsImpostor, jointType: number, jointData: PhysicsJointData): PhysicsImpostor;
+        addJoint(otherImpostor: PhysicsImpostor, joint: PhysicsJoint): PhysicsImpostor;
+        sleep(): PhysicsImpostor;
+        wakeUp(): PhysicsImpostor;
+        clone(newObject: transform): PhysicsImpostor;
+        dispose(): void;
+        setDeltaPosition(position: math.vector3): void;
+        setDeltaRotation(rotation: math.quaternion): void;
+        getBoxSizeToRef(result: math.vector3): PhysicsImpostor;
+        getRadius(): number;
+    }
+    enum ImpostorType {
+        NoImpostor = 0,
+        SphereImpostor = 1,
+        BoxImpostor = 2,
+        PlaneImpostor = 3,
+        MeshImpostor = 4,
+        CylinderImpostor = 7,
+        ParticleImpostor = 8,
+        HeightmapImpostor = 9,
+        ConvexHullImpostor = 10,
+        RopeImpostor = 101,
+        ClothImpostor = 102,
+        SoftbodyImpostor = 103,
+    }
+}
+declare namespace gd3d.framework {
+    interface PhysicsJointData {
+        mainPivot?: math.vector3;
+        connectedPivot?: math.vector3;
+        mainAxis?: math.vector3;
+        connectedAxis?: math.vector3;
+        collision?: boolean;
+        nativeParams?: any;
+    }
+    class PhysicsJoint {
+        type: number;
+        jointData: PhysicsJointData;
+        private _physicsJoint;
+        protected _physicsPlugin: IPhysicsEnginePlugin;
+        constructor(type: number, jointData: PhysicsJointData);
+        physicsJoint: any;
+        physicsPlugin: IPhysicsEnginePlugin;
+        executeNativeFunction(func: (world: any, physicsJoint: any) => void): void;
+        static DistanceJoint: number;
+        static HingeJoint: number;
+        static BallAndSocketJoint: number;
+        static WheelJoint: number;
+        static SliderJoint: number;
+        static PrismaticJoint: number;
+        static UniversalJoint: number;
+        static Hinge2Joint: number;
+        static PointToPointJoint: number;
+        static SpringJoint: number;
+        static LockJoint: number;
+    }
+    class DistanceJoint extends PhysicsJoint {
+        constructor(jointData: DistanceJointData);
+        updateDistance(maxDistance: number, minDistance?: number): void;
+    }
+    class MotorEnabledJoint extends PhysicsJoint implements IMotorEnabledJoint {
+        constructor(type: number, jointData: PhysicsJointData);
+        setMotor(force?: number, maxForce?: number): void;
+        setLimit(upperLimit: number, lowerLimit?: number): void;
+    }
+    class HingeJoint extends MotorEnabledJoint {
+        constructor(jointData: PhysicsJointData);
+        setMotor(force?: number, maxForce?: number): void;
+        setLimit(upperLimit: number, lowerLimit?: number): void;
+    }
+    class Hinge2Joint extends MotorEnabledJoint {
+        constructor(jointData: PhysicsJointData);
+        setMotor(force?: number, maxForce?: number, motorIndex?: number): void;
+        setLimit(upperLimit: number, lowerLimit?: number, motorIndex?: number): void;
+    }
+    interface IMotorEnabledJoint {
+        physicsJoint: any;
+        setMotor(force?: number, maxForce?: number, motorIndex?: number): void;
+        setLimit(upperLimit: number, lowerLimit?: number, motorIndex?: number): void;
+    }
+    interface DistanceJointData extends PhysicsJointData {
+        maxDistance: number;
+    }
+    interface SpringJointData extends PhysicsJointData {
+        length: number;
+        stiffness: number;
+        damping: number;
+    }
+}
+declare namespace gd3d.framework {
     enum HideFlags {
         None = 0,
         HideInHierarchy = 1,
@@ -5598,6 +5709,8 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    let physic: PhysicsEngine;
+    let physic2D: physicEngine2D;
     class scene {
         app: application;
         webgl: WebGLRenderingContext;
@@ -5638,7 +5751,8 @@ declare namespace gd3d.framework {
         private doPick(ray, pickall, isPickMesh, root, out, layermask?);
         private pickMesh(ray, tran, pickedList, layermask?);
         private pickCollider(ray, tran, pickedList, layermask?);
-        enable2DPhysics(op?: IEngine2DOP): void;
+        enablePhysics(gravity: math.vector3, plugin?: IPhysicsEnginePlugin): boolean;
+        enable2DPhysics(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -5728,15 +5842,28 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class obb {
-        center: gd3d.math.vector3;
-        halfsize: gd3d.math.vector3;
-        directions: gd3d.math.vector3[];
-        vectors: gd3d.math.vector3[];
-        buildByMaxMin(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): void;
-        buildByCenterSize(center: gd3d.math.vector3, size: gd3d.math.vector3): void;
-        worldCenter: math.vector3;
-        update(worldmatrix: gd3d.math.matrix): void;
-        caclWorldVecs(vecs: gd3d.math.vector3[], worldmatrix: gd3d.math.matrix): void;
+        private _directions;
+        private _halfSizeWorld;
+        private _vectorsWorld;
+        private _worldCenter;
+        private _worldMatrix;
+        center: math.vector3;
+        halfsize: math.vector3;
+        vectors: math.vector3[];
+        private static tag_wCenter;
+        private static tag_wVectors;
+        private static tag_wHalfSize;
+        private static tag_directions;
+        private static tags;
+        private dirtyMap;
+        readonly vectorsWorld: math.vector3[];
+        readonly worldCenter: math.vector3;
+        readonly halfSizeWorld: math.vector3;
+        readonly directions: math.vector3[];
+        getWorldMatrix(): math.matrix;
+        buildByMaxMin(minimum: math.vector3, maximum: math.vector3): void;
+        buildByCenterSize(center: math.vector3, size: math.vector3): void;
+        update(worldmatrix: math.matrix): void;
         intersects(bound: any): boolean;
         computeExtentsByAxis(axis: math.vector3, out: math.vector2): void;
         clone(): obb;
@@ -5799,6 +5926,8 @@ declare namespace gd3d.framework {
         intersectAABB(_aabb: aabb): boolean;
         intersectPlaneTransform(tran: transform, outInfo: pickinfo): boolean;
         intersectPlane(planePoint: gd3d.math.vector3, planeNormal: gd3d.math.vector3, outHitPoint: gd3d.math.vector3): boolean;
+        private static tempMData;
+        private static tempVecs;
         intersectCollider(tran: transform, outInfo: pickinfo): boolean;
         intersectBoxMinMax(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): boolean;
         intersectsSphere(center: gd3d.math.vector3, radius: number): boolean;
@@ -6499,7 +6628,7 @@ declare namespace gd3d.render {
         static genPyramid(height: number, halfsize: number): meshData;
         static genSphereCCW(radius?: number, widthSegments?: number, heightSegments?: number): meshData;
         static genBoxCCW(size: number): meshData;
-        static genBoxByArray(array: gd3d.math.vector3[]): meshData;
+        static genBoxByArray(array: gd3d.math.vector3[], outData: meshData): void;
         static genBoxByArray_Quad(array: gd3d.math.vector3[]): meshData;
         static genCircleLineCCW(radius: number, segment?: number, wide?: number): meshData;
         caclByteLength(): number;

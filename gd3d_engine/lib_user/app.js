@@ -4,6 +4,41 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
+var __generator = (this && this.__generator) || function (thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = y[op[0] & 2 ? "return" : op[0] ? "throw" : "next"]) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [0, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+};
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = Object.setPrototypeOf ||
         ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
@@ -1145,6 +1180,8 @@ var main = (function () {
         this.addBtn("tesrtss", function () { return new dome.testCJ(); });
         this.addBtn("trans性能测试", function () { return new demo.test_performance(); });
         this.addBtn("3D物理测试", function () { return new test_3DPhysics_cannon(); });
+        this.addBtn("3D物理_基础形状", function () { return new test_3DPhysics_baseShape(); });
+        this.addBtn("cannonPhysics3D", function () { return new PhysicDemo.physic_01(); });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -6109,6 +6146,104 @@ var t;
     }());
     t.test_uvroll = test_uvroll;
 })(t || (t = {}));
+var test_3DPhysics_baseShape = (function () {
+    function test_3DPhysics_baseShape() {
+        this.timer = 0;
+        this.taskmgr = new gd3d.framework.taskMgr();
+        this.count = 0;
+        this.counttimer = 0;
+    }
+    test_3DPhysics_baseShape.prototype.start = function (app) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.app = app;
+                        this.scene = this.app.getScene();
+                        this.astMgr = this.app.getAssetMgr();
+                        return [4, this.loadbySync("./res/shader/shader.assetbundle.json")];
+                    case 1:
+                        _a.sent();
+                        return [4, this.loadbySync("./res/prefabs/Capsule/Capsule.assetbundle.json")];
+                    case 2:
+                        _a.sent();
+                        this.initCamera();
+                        this.init();
+                        return [2, null];
+                }
+            });
+        });
+    };
+    test_3DPhysics_baseShape.prototype.loadbySync = function (url) {
+        var _this = this;
+        return new gd3d.threading.gdPromise(function (resolve, reject) {
+            _this.astMgr.load(url, gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                if (state && state.isfinish) {
+                    resolve();
+                }
+            });
+        });
+    };
+    test_3DPhysics_baseShape.prototype.init = function () {
+        var trans = new gd3d.framework.transform();
+        trans.localScale.x = 20;
+        trans.localScale.y = 0.01;
+        trans.localScale.z = 20;
+        this.scene.addChild(trans);
+        var mf = trans.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+        var mr = trans.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+        mf.mesh = this.astMgr.getDefaultMesh("cube");
+        var trans2 = new gd3d.framework.transform();
+        trans2.localPosition.y = 5;
+        trans2.localPosition.x = -0.3;
+        trans2.localPosition.z = 0.3;
+        this.scene.addChild(trans2);
+        var mf2 = trans2.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+        var mr2 = trans2.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+        mf2.mesh = this.astMgr.getDefaultMesh("cube");
+        var trans3 = new gd3d.framework.transform();
+        trans3.localPosition.y = 15;
+        trans3.localPosition.x = -0.2;
+        trans3.localPosition.z = 0.2;
+        this.scene.addChild(trans3);
+        var mf3 = trans3.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+        var mr3 = trans3.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+        mf3.mesh = this.astMgr.getDefaultMesh("sphere");
+        var cylinder_mid = new gd3d.framework.transform();
+        cylinder_mid.name = "cylinder";
+        cylinder_mid.localPosition.y = 8;
+        this.scene.addChild(cylinder_mid);
+        var mf_cl = cylinder_mid.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+        var mr_cl = cylinder_mid.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+        mf_cl.mesh = this.astMgr.getDefaultMesh("cylinder");
+        this.scene.enablePhysics(new gd3d.math.vector3(0, -9.8, 0), new gd3d.framework.OimoJSPlugin());
+        var groundImpostor = new gd3d.framework.PhysicsImpostor(trans, gd3d.framework.ImpostorType.PlaneImpostor, { mass: 0, restitution: 0.3 });
+        var boxImpostor = new gd3d.framework.PhysicsImpostor(trans2, gd3d.framework.ImpostorType.BoxImpostor, { mass: 1, restitution: 0.6 });
+        var sphereImpostor = new gd3d.framework.PhysicsImpostor(trans3, gd3d.framework.ImpostorType.SphereImpostor, { mass: 1, restitution: 0.6 });
+        var cylinderImpostor = new gd3d.framework.PhysicsImpostor(cylinder_mid, gd3d.framework.ImpostorType.CylinderImpostor, { mass: 1, restitution: 0.6 });
+    };
+    test_3DPhysics_baseShape.prototype.initCamera = function () {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 120;
+        this.camera.fov = Math.PI * 0.3;
+        this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
+        objCam.localTranslate = new gd3d.math.vector3(0, 15, -15);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        var hoverc = this.camera.gameObject.addComponent("HoverCameraScript");
+        hoverc.panAngle = 180;
+        hoverc.tiltAngle = 45;
+        hoverc.distance = 30;
+        hoverc.scaleSpeed = 0.1;
+        hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0);
+    };
+    test_3DPhysics_baseShape.prototype.update = function (delta) {
+    };
+    return test_3DPhysics_baseShape;
+}());
 var test_3DPhysics_cannon = (function () {
     function test_3DPhysics_cannon() {
         this.timer = 0;
@@ -6116,39 +6251,151 @@ var test_3DPhysics_cannon = (function () {
         this.count = 0;
         this.counttimer = 0;
     }
-    test_3DPhysics_cannon.prototype.loadShader = function (laststate, state) {
-        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
-            if (_state.isfinish) {
-                state.finish = true;
-            }
+    test_3DPhysics_cannon.prototype.start = function (app) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.app = app;
+                        this.scene = this.app.getScene();
+                        this.astMgr = this.app.getAssetMgr();
+                        this.iptMgr = this.app.getInputMgr();
+                        return [4, this.loadbySync("./res/shader/shader.assetbundle.json")];
+                    case 1:
+                        _a.sent();
+                        return [4, this.loadbySync("./res/prefabs/Capsule/Capsule.assetbundle.json")];
+                    case 2:
+                        _a.sent();
+                        this.init();
+                        return [2, null];
+                }
+            });
         });
     };
-    test_3DPhysics_cannon.prototype.addcam = function (laststate, state) {
+    test_3DPhysics_cannon.prototype.loadbySync = function (url) {
+        var _this = this;
+        return new gd3d.threading.gdPromise(function (resolve, reject) {
+            _this.astMgr.load(url, gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                if (state && state.isfinish) {
+                    resolve();
+                }
+            });
+        });
+    };
+    test_3DPhysics_cannon.prototype.init = function () {
+        var trans = new gd3d.framework.transform();
+        trans.localScale.x = 20;
+        trans.localScale.y = 0.01;
+        trans.localScale.z = 20;
+        this.scene.addChild(trans);
+        var mf = trans.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+        var mr = trans.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+        mf.mesh = this.astMgr.getDefaultMesh("cube");
+        var trans2 = new gd3d.framework.transform();
+        trans2.localPosition.y = 5;
+        trans2.localPosition.x = -0.3;
+        trans2.localPosition.z = 0.3;
+        this.scene.addChild(trans2);
+        var mf2 = trans2.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+        var mr2 = trans2.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+        mf2.mesh = this.astMgr.getDefaultMesh("cube");
+        var trans3 = new gd3d.framework.transform();
+        trans3.localPosition.y = 15;
+        trans3.localPosition.x = -0.2;
+        trans3.localPosition.z = 0.2;
+        this.scene.addChild(trans3);
+        var mf3 = trans3.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+        var mr3 = trans3.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+        mf3.mesh = this.astMgr.getDefaultMesh("sphere");
+        var combination = new gd3d.framework.transform();
+        combination.name = "combination";
+        combination.localPosition.y = 10;
+        this.scene.addChild(combination);
+        var p1 = this.astMgr.getAssetByName("Capsule.prefab.json");
+        var capsule = p1.getCloneTrans();
+        capsule.name = "capsule";
+        var mf4 = capsule.gameObject.getComponent("meshFilter");
+        combination.addChild(capsule);
+        var sphere_top = new gd3d.framework.transform();
+        sphere_top.name = "sphere_top";
+        sphere_top.localPosition.y = 0.5;
+        gd3d.math.vec3SetAll(sphere_top.localScale, 0.5);
+        combination.addChild(sphere_top);
+        var mf_st = sphere_top.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+        var mr_st = sphere_top.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+        mf_st.mesh = this.astMgr.getDefaultMesh("sphere");
+        var cylinder_mid = new gd3d.framework.transform();
+        cylinder_mid.name = "cylinder_mid";
+        gd3d.math.vec3Set(cylinder_mid.localScale, 1, 0.5, 1);
+        combination.addChild(cylinder_mid);
+        var mf_cl = cylinder_mid.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+        var mr_cl = cylinder_mid.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+        mf_cl.mesh = this.astMgr.getDefaultMesh("cylinder");
+        var sphere_bottom = new gd3d.framework.transform();
+        sphere_bottom.name = "sphere_bottom";
+        sphere_bottom.localPosition.y = -0.5;
+        gd3d.math.vec3SetAll(sphere_bottom.localScale, 0.5);
+        combination.addChild(sphere_bottom);
+        var mf_sb = sphere_bottom.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+        var mr_sb = sphere_bottom.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+        mf_sb.mesh = this.astMgr.getDefaultMesh("sphere");
+        var trans5 = new gd3d.framework.transform();
+        trans5.localPosition.x = -30;
+        trans5.localPosition.z = 30;
+        trans5.name = "heightFiled";
+        gd3d.math.quatFromEulerAngles(-90, 0, 0, trans5.localRotate);
+        var hf_matrix = [];
+        var sizeX = 10, sizeY = 10;
+        var testv = -2;
+        for (var i = 0; i < sizeX; i++) {
+            hf_matrix.push([]);
+            for (var j = 0; j < sizeY; j++) {
+                var height = Math.cos(j / sizeY * Math.PI * 2) * testv + 2;
+                if (i === 0 || i === sizeX - 1 || j === 0 || j === sizeY - 1)
+                    height = 3;
+                hf_matrix[i].push(height);
+            }
+        }
+        var opts = { elementSize: 10 };
+        this.scene.enablePhysics(new gd3d.math.vector3(0, -9.8, 0), new gd3d.framework.OimoJSPlugin());
+        var groundImpostor = new gd3d.framework.PhysicsImpostor(trans, gd3d.framework.ImpostorType.PlaneImpostor, { mass: 0, restitution: 0.3 });
+        var boxImpostor = new gd3d.framework.PhysicsImpostor(trans2, gd3d.framework.ImpostorType.BoxImpostor, { mass: 1, restitution: 0.9 });
+        var sphereImpostor = new gd3d.framework.PhysicsImpostor(trans3, gd3d.framework.ImpostorType.SphereImpostor, { mass: 0.3, restitution: 0.9 });
+        var s_top_Impostor = new gd3d.framework.PhysicsImpostor(sphere_top, gd3d.framework.ImpostorType.SphereImpostor, { mass: 1, restitution: 0.5 });
+        var c_mid_Impostor = new gd3d.framework.PhysicsImpostor(cylinder_mid, gd3d.framework.ImpostorType.CylinderImpostor, { mass: 1, restitution: 0.5 });
+        var s_bottom_Impostor = new gd3d.framework.PhysicsImpostor(sphere_bottom, gd3d.framework.ImpostorType.SphereImpostor, { mass: 1, restitution: 0.5 });
+        var combImpostor = new gd3d.framework.PhysicsImpostor(combination, gd3d.framework.ImpostorType.NoImpostor, { mass: 1, restitution: 0.5 });
+        var pWorld = gd3d.framework.physic.getPhysicsPlugin().world;
+        pWorld.broadphase = new CANNON.NaiveBroadphase();
+        var ipt = this.app.getInputMgr();
+        ipt.addKeyListener(gd3d.event.KeyEventEnum.KeyDown, function (code) {
+            if (code == gd3d.event.KeyCode.KeyA) {
+                console.log("AAAAAAAAAAAAA");
+            }
+        }, this);
+        console.log("i am here.");
+        this.scene = this.app.getScene();
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
         this.camera.far = 120;
-        objCam.localTranslate = new gd3d.math.vector3(0, 10, 10);
+        this.camera.fov = Math.PI * 0.3;
+        this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
+        objCam.localTranslate = new gd3d.math.vector3(0, 15, -15);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();
-        state.finish = true;
+        var hoverc = this.camera.gameObject.addComponent("HoverCameraScript");
+        hoverc.panAngle = 180;
+        hoverc.tiltAngle = 45;
+        hoverc.distance = 30;
+        hoverc.scaleSpeed = 0.1;
+        hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0);
     };
-    test_3DPhysics_cannon.prototype.start = function (app) {
-        var cannonUrl = "./lib/cannon.js";
-        gd3d.io.loadText(cannonUrl, function (txt) {
-            var isok = eval(txt);
-            eval("alert('Hello world')");
-            debugger;
-            var CANNON = CANNON ? CANNON : {};
-            debugger;
-        });
-        console.log("i am here.");
-        this.app = app;
-        this.scene = this.app.getScene();
-        this.taskmgr.addTaskCall(this.loadShader.bind(this));
-        this.taskmgr.addTaskCall(this.addcam.bind(this));
+    test_3DPhysics_cannon.prototype.onPonitMove = function (x, y) {
+    };
+    test_3DPhysics_cannon.prototype.doRay = function () {
     };
     test_3DPhysics_cannon.prototype.update = function (delta) {
     };
@@ -12127,6 +12374,49 @@ var physic2d_dome = (function () {
     };
     return physic2d_dome;
 }());
+var PhysicDemo;
+(function (PhysicDemo) {
+    var physic_01 = (function () {
+        function physic_01() {
+        }
+        physic_01.prototype.start = function (app) {
+            this.scene = app.getScene();
+            var trans = new gd3d.framework.transform();
+            trans.localScale.x = 10;
+            trans.localScale.z = 10;
+            this.scene.addChild(trans);
+            var mf = trans.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+            var mr = trans.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+            mf.mesh = app.getAssetMgr().getDefaultMesh("cube");
+            var trans2 = new gd3d.framework.transform();
+            trans2.localPosition.y = 5;
+            this.scene.addChild(trans2);
+            var mf2 = trans2.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
+            var mr2 = trans2.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+            mf2.mesh = app.getAssetMgr().getDefaultMesh("cube");
+            this.scene.enablePhysics(new gd3d.math.vector3(0, -9.8, 0));
+            var groundImpostor = new gd3d.framework.PhysicsImpostor(trans, gd3d.framework.ImpostorType.BoxImpostor, { mass: 0, restitution: 0.9 });
+            var boxImpostor = new gd3d.framework.PhysicsImpostor(trans2, gd3d.framework.ImpostorType.BoxImpostor, { mass: 1, restitution: 0.9 });
+            var objCam = new gd3d.framework.transform();
+            objCam.name = "sth.";
+            this.scene.addChild(objCam);
+            this.camera = objCam.gameObject.addComponent("camera");
+            this.camera.near = 0.01;
+            this.camera.far = 2000;
+            this.camera.fov = Math.PI * 0.3;
+            this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
+            objCam.localTranslate = new gd3d.math.vector3(0, 15, -15);
+            objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+            objCam.markDirty();
+            CameraController.instance().init(app, this.camera);
+        };
+        physic_01.prototype.update = function (delta) {
+            CameraController.instance().update(delta);
+        };
+        return physic_01;
+    }());
+    PhysicDemo.physic_01 = physic_01;
+})(PhysicDemo || (PhysicDemo = {}));
 var dome;
 (function (dome) {
     var db_test_f14eff = (function () {
