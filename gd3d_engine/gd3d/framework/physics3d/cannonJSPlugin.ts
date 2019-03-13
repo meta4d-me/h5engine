@@ -3,10 +3,10 @@ namespace gd3d.framework
     //declare var require: any;
     declare var CANNON: any;
 
-    let BJSCANNON = CANNON;
+    let BJSCANNON ;
     let helpv3 = new math.vector3();
     export class CannonJSPlugin implements IPhysicsEnginePlugin {
-
+        BJSCANNON = CANNON || {};
         public world: any;
         public name: string = "CannonJSPlugin";
         private _physicsMaterials = new Array();
