@@ -22,6 +22,10 @@ namespace gd3d.framework {
          */
         disableBidirectionalTransformation?: boolean;
 
+        /**
+         * kinematic
+         */
+        kinematic?:boolean;
         // radius?:number;
         // width?:number;
         // height?:number;
@@ -430,6 +434,8 @@ namespace gd3d.framework {
             }
         }
 
+        private lastObjwPos = new gd3d.math.vector3();
+        private lastObjwRot = new gd3d.math.quaternion();
         /**
          * this function is executed by the physics engine.
          */
@@ -440,11 +446,18 @@ namespace gd3d.framework {
 
             //处理 质心点 与 模型中心点 的偏移
             // this.object.translate(this._deltaPosition, -1);
-            let tempv3 = help_v3;
-            math.vec3Clone(this._deltaPosition,tempv3);
-            math.vec3ScaleByNum(tempv3,-1,tempv3);
-            math.vec3Add(this.object.getWorldPosition(),tempv3,tempv3);
-            this.object.setWorldPosition(tempv3)
+            let offset_wpos = help_v3;
+            math.vec3Clone(this._deltaPosition,offset_wpos);
+            math.vec3ScaleByNum(offset_wpos,-1,offset_wpos);
+            let wpos = this.object.getWorldPosition();
+            math.vec3Add(wpos ,offset_wpos,offset_wpos);
+            // this.object.setWorldPosition(offset_pos);
+            let wrot = this.object.getWorldRotate();
+
+            let hasDirty = !math.vec3Equal(wpos , this.lastObjwPos) || !math.quatEqual(wrot,this.lastObjwRot);
+            math.vec3Clone(wpos , this.lastObjwPos);
+            math.quatClone(wrot , this.lastObjwRot);
+          
 
             // this._deltaRotationConjugated && this.object.rotationQuaternion && this.object.rotationQuaternion.multiplyToRef(this._deltaRotationConjugated, this.object.rotationQuaternion);
             // this.object.computeWorldMatrix(false);
@@ -454,8 +467,8 @@ namespace gd3d.framework {
             // } else {
             //     this._tmpQuat.copyFrom(this.object.rotationQuaternion || new Quaternion());
             // }
-            if (!this._options.disableBidirectionalTransformation) {
-                this._physicsEngine.getPhysicsPlugin().setPhysicsBodyTransformation(this, /*bInfo.boundingBox.centerWorld*/ this.object.getWorldPosition() , this.object.getWorldRotate());
+            if (hasDirty && !this._options.disableBidirectionalTransformation) {
+                this._physicsEngine.getPhysicsPlugin().setPhysicsBodyTransformation(this, /*bInfo.boundingBox.centerWorld*/offset_wpos , wrot);
             }
 
             this._onBeforePhysicsStepCallbacks.forEach((func) => {
@@ -463,6 +476,31 @@ namespace gd3d.framework {
             });
         }
 
+        static Ivec3Equal(a , b){
+            return a.x == b.x && a.y == b.y && a.z == b.z ;
+        }
+
+        static IQuatEqual(a , b){
+            return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w ;
+        }
+
+        static Ivec3Copy(from:{x,y,z},to:{x,y,z})
+        {
+            to.x=from.x;
+            to.y=from.y;
+            to.z=from.z;
+        }
+
+        static IQuatCopy(from:{x,y,z,w},to:{x,y,z,w})
+        {
+            to.x=from.x;
+            to.y=from.y;
+            to.z=from.z;
+            to.w=from.w;
+        }
+
+        private lastbodywPos = new gd3d.math.vector3();
+        private lastbodywRot = new gd3d.math.quaternion();
         /**
          * this function is executed by the physics engine
          */
@@ -475,7 +513,14 @@ namespace gd3d.framework {
                 func(this);
             });
 
-            this._physicsEngine.getPhysicsPlugin().setTransformationFromPhysicsBody(this);
+            this.physicsBody.position
+            this.physicsBody.quaternion
+            PhysicsImpostor
+
+            let hasDirty = !PhysicsImpostor.Ivec3Equal( this.physicsBody.position , this.lastbodywPos) || !PhysicsImpostor.IQuatEqual(this.physicsBody.quaternion,this.lastbodywRot);
+            PhysicsImpostor.Ivec3Copy(this.physicsBody.position , this.lastObjwPos);
+            PhysicsImpostor.IQuatCopy(this.physicsBody.quaternion , this.lastObjwRot);
+
             // object has now its world rotation. needs to be converted to local.
             
             // if (this.object.parent && this.object.rotationQuaternion) {
@@ -485,18 +530,18 @@ namespace gd3d.framework {
             // }
             // // take the position set and make it the absolute position of this object.
             // this.object.setAbsolutePosition(this.object.position);
-            if(this._parent && this._parent._parent){  //world 不等同 local 坐标空间时 设置到 世界空间
-                this.object.setWorldRotate(this.object.localRotate);
-                this.object.setWorldPosition(this.object.localPosition);
+            if(hasDirty){
+                this._physicsEngine.getPhysicsPlugin().setTransformationFromPhysicsBody(this);
             }
+           
             // this._deltaRotation && this.object.rotationQuaternion && this.object.rotationQuaternion.multiplyToRef(this._deltaRotation, this.object.rotationQuaternion);
             
-            //处理 质心点 与 模型中心点 的偏移
-            //this.object.translate(this._deltaPosition, 1);
-            let tempv3 = help_v3;
-            math.vec3Clone(this._deltaPosition,tempv3);
-            math.vec3Add(this.object.getWorldPosition(),tempv3,tempv3);
-            this.object.setWorldPosition(tempv3)
+            // //处理 质心点 与 模型中心点 的偏移
+            // //this.object.translate(this._deltaPosition, 1);
+            // let tempv3 = help_v3;
+            // math.vec3Clone(this._deltaPosition,tempv3);
+            // math.vec3Add(this.object.getWorldPosition(),tempv3,tempv3);
+            // this.object.setWorldPosition(tempv3)
         }
 
         /**
@@ -587,6 +632,16 @@ namespace gd3d.framework {
         }
 
         /**
+         * result body is sleeping
+         */
+        get isSleeping(){
+            if (this._physicsEngine) {
+                return this._physicsEngine.getPhysicsPlugin().isSleeping(this);
+            }
+            return false;
+        }
+
+        /**
          * Wake the body up.
          */
         public wakeUp(): PhysicsImpostor {
@@ -654,6 +709,22 @@ namespace gd3d.framework {
 
         public getRadius(): number {
             return this._physicsEngine.getPhysicsPlugin().getRadius(this);
+        }
+
+        /**
+         * 设置动力学的 位置
+         */
+        public kinematicSetPosition(position: math.vector3){
+            if(!this._physicsBody || !position) return;
+            this._physicsBody.setPosition(position);
+        }
+
+        /**
+         * 设置动力学的 旋转 
+         */
+        public kinematicSetRotation(rotation: math.quaternion){
+            if(!this._physicsBody || !rotation) return;
+            this._physicsBody.setQuaternion(rotation);
         }
 
         // /**

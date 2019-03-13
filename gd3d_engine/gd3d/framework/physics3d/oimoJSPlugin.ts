@@ -14,24 +14,32 @@ namespace gd3d.framework
         public BJSOIMO: any;
         // private _raycastResult: PhysicsRaycastResult;
 
-        public constructor(iterations?: number, oimoInjection = OIMO) {
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * OimoJS 物理引擎插件
+        * @param option Oimo world 构造选项
+        * @param oimoInjection Omio对象
+        * @version egret-gd3d 1.0
+        */
+        public constructor(option ?: number, oimoInjection = OIMO) {
             this.BJSOIMO = oimoInjection;
             if (!this.isSupported()) {
                 console.error("OIMO is not available. Please make sure you included the js file.");
                 return;
             }
-            let opt = {
-                iterations: iterations
-            };
+            let _o : any = {};
+            if(option) _o = option;
 
-            let opt_1 = { 
-                timestep: 1/60,
-                iterations: 8,
-                broadphase: 2,
-                worldscale: 1,
-                random: true,
-                info:false,
-                gravity: [0,-9.8,0]
+            let opt_1 = {
+                timestep: _o.timestep != undefined ? _o.timestep :  1/60,
+                iterations: _o.iterations != undefined ? _o.iterations : 8,
+                broadphase: _o.broadphase != undefined ? _o.broadphase : 2,
+                worldscale: _o.worldscale != undefined ? _o.worldscale : 1,
+                random: _o.random != undefined ? _o.random : true,
+                info: _o.info != undefined ? _o.info : false,
+                gravity: _o.gravity != undefined ? _o.gravity : [0,-9.8,0]
             };
 
             this.world = new this.BJSOIMO.World( opt_1 );
@@ -140,6 +148,7 @@ namespace gd3d.framework
                     density: impostor.getParam("mass"),
                     friction: impostor.getParam("friction"),
                     restitution: impostor.getParam("restitution"),
+                    kinematic: impostor.getParam("kinematic"),
                     //Supporting older versions of Oimo
                     world: this.world
                 };
@@ -237,8 +246,8 @@ namespace gd3d.framework
                             //due to the way oimo works with compounds, add one more value.
                             bodyConfig.size.push(sizeY);
                             break;
-                        case ImpostorType.NoImpostor:
                         case ImpostorType.PlaneImpostor:
+                        case ImpostorType.NoImpostor:
                         case ImpostorType.BoxImpostor:
                         default:
                             sizeX = this.checkWithEpsilon(extendSize.x);
@@ -359,23 +368,15 @@ namespace gd3d.framework
         public removeJoint(impostorJoint: PhysicsImpostorJoint) {
             this.world.removeConstraint(impostorJoint.joint.physicsJoint);
         }
-
-        private vec3Copy(from:any,to:any)
-        {
-            to.rawData[0]=from.x;
-            to.rawData[1]=from.y;
-            to.rawData[2]=from.z;
-        }
-        private QuatCopy(from:any,to:any)
-        {
-            to.rawData[0]=from.x;
-            to.rawData[1]=from.y;
-            to.rawData[2]=from.z;
-            to.rawData[3]=from.w;
-        }
+       
         public setTransformationFromPhysicsBody(impostor: PhysicsImpostor) {
-            this.vec3Copy(impostor.physicsBody.position,impostor.object.localPosition);
-            this.QuatCopy(impostor.physicsBody.quaternion,impostor.object.localRotate);
+            PhysicsImpostor.Ivec3Copy(impostor.physicsBody.position,impostor.object.localPosition);
+            PhysicsImpostor.IQuatCopy(impostor.physicsBody.quaternion,impostor.object.localRotate);
+            let obj = impostor.object;
+            if(obj.parent && obj.parent.parent){  //world 不等同 local 坐标空间时 设置到 世界空间
+                obj.setWorldRotate(obj.localRotate);
+                obj.setWorldPosition(obj.localPosition);
+            }
 
             // impostor.object.position.copyFrom(impostor.physicsBody.position);
             // if (impostor.object.rotationQuaternion) {
@@ -447,6 +448,10 @@ namespace gd3d.framework
 
         public sleepBody(impostor: PhysicsImpostor) {
             impostor.physicsBody.sleep();
+        }
+
+        public isSleeping(impostor: PhysicsImpostor){
+            return impostor.physicsBody.sleeping;
         }
 
         public wakeUpBody(impostor: PhysicsImpostor) {

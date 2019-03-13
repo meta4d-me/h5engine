@@ -1,6 +1,12 @@
 /// <reference path="../../io/reflect.ts" />
 let helpv3 = new gd3d.math.vector3();
 let helpv3_1 = new gd3d.math.vector3();
+let helpv3_2 = new gd3d.math.vector3();
+let helpv3_3 = new gd3d.math.vector3();
+let helpv3_4 = new gd3d.math.vector3();
+let helpv3_5 = new gd3d.math.vector3();
+let helpv3_6 = new gd3d.math.vector3();
+let helpv3_7 = new gd3d.math.vector3();
 
 let helpv2 = new gd3d.math.vector2();
 let helpv2_1 = new gd3d.math.vector2();
@@ -121,6 +127,12 @@ namespace gd3d.framework
     export class camera implements INodeComponent
     {
         static readonly ClassName:string="camera";
+
+        constructor(){
+            for(let i=0; i < 8 ;i++){
+                this.frameVecs.push(new math.vector3());
+            }
+        }
 
         /**
          * @public
@@ -417,40 +429,45 @@ namespace gd3d.framework
             //投影矩阵函数缺一个
             gd3d.math.matrixClone(this.matProj, matrix);
         }
+
+        private static _shareRay : ray ;
         /**
          * @public
          * @language zh_CN
          * @param screenpos 屏幕坐标
          * @param app 主程序
+         * @param shareRayCache 返回ray 实例 共用一个缓存射线对象 ，默认开启
          * @classdesc
          * 由屏幕坐标发射射线
          * @version egret-gd3d 1.0
          */
-        public creatRayByScreen(screenpos: gd3d.math.vector2, app: application): ray
+        public creatRayByScreen(screenpos: gd3d.math.vector2, app: application , shareRayCache :boolean = true ): ray
         {
-            let src1 = gd3d.math.pool.new_vector3();
-            src1.x = screenpos.x;
-            src1.y = screenpos.y;
-            src1.z = 0;
-            let src2 = gd3d.math.pool.new_vector3();
-            src2.x = screenpos.x;
-            src2.y = screenpos.y;
-            src2.z = 1;
-            let dest1 = gd3d.math.pool.new_vector3();
-            let dest2 = gd3d.math.pool.new_vector3();
+            let src1 = helpv3;
+            math.vec3Set(src1,screenpos.x,screenpos.y,0);
+            
+            let src2 = helpv3_1;
+            math.vec3Set(src2,screenpos.x,screenpos.y,1);
+
+            let dest1 = helpv3_2;
+            let dest2 = helpv3_3;
             this.calcWorldPosFromScreenPos(app, src1, dest1);
             this.calcWorldPosFromScreenPos(app, src2, dest2);
 
-            let dir = gd3d.math.pool.new_vector3();
+            let dir = helpv3_4;
             gd3d.math.vec3Subtract(dest2, dest1, dir);
             gd3d.math.vec3Normalize(dir, dir);
-            let ray = new gd3d.framework.ray(dest1, dir);
+            let ray : ray;
+            if(shareRayCache) {
+                if(!camera._shareRay) {
+                    camera._shareRay = new gd3d.framework.ray(dest1, dir);
+                }
+                ray = camera._shareRay;
+                ray.set(dest1,dir);
+            }else{
+                ray = new gd3d.framework.ray(dest1, dir);
+            }
 
-            gd3d.math.pool.delete_vector3(src1);
-            gd3d.math.pool.delete_vector3(src2);
-            gd3d.math.pool.delete_vector3(dest1);
-            gd3d.math.pool.delete_vector3(dest2);
-            gd3d.math.pool.delete_vector3(dir);
             return ray;
         }
         /**
@@ -539,18 +556,26 @@ namespace gd3d.framework
             let asp = _vpp.w / _vpp.h;
             let near_w = near_h * asp;
 
-            let nearLT = math.pool.new_vector3(-near_w, near_h, this.near);
-            let nearLD = math.pool.new_vector3(-near_w, -near_h, this.near);
-            let nearRT = math.pool.new_vector3(near_w, near_h, this.near);
-            let nearRD = math.pool.new_vector3(near_w, -near_h, this.near);
+            let nearLT = helpv3; 
+            let nearLD = helpv3_1;
+            let nearRT = helpv3_2;
+            let nearRD = helpv3_3;
+            math.vec3Set(nearLT,-near_w, near_h, this.near);
+            math.vec3Set(nearLD,-near_w, -near_h, this.near);
+            math.vec3Set(nearRT,near_w, near_h, this.near);
+            math.vec3Set(nearRD,near_w, -near_h, this.near);
 
             let far_h = this.far * Math.tan(this.fov * 0.5);
             let far_w = far_h * asp;
 
-            let farLT = math.pool.new_vector3(-far_w, far_h, this.far);
-            let farLD = math.pool.new_vector3(-far_w, -far_h, this.far);
-            let farRT = math.pool.new_vector3(far_w, far_h, this.far);
-            let farRD = math.pool.new_vector3(far_w, -far_h, this.far);
+            let farLT = helpv3_4;
+            let farLD = helpv3_5;
+            let farRT = helpv3_6;
+            let farRD = helpv3_7;
+            math.vec3Set(farLT,-far_w, far_h, this.far);
+            math.vec3Set(farLD,-far_w, -far_h, this.far);
+            math.vec3Set(farRT,far_w, far_h, this.far);
+            math.vec3Set(farRD,far_w, -far_h, this.far);
 
             gd3d.math.matrixTransformVector3(farLD, matrix, farLD);
             gd3d.math.matrixTransformVector3(nearLD, matrix, nearLD);
@@ -560,17 +585,14 @@ namespace gd3d.framework
             gd3d.math.matrixTransformVector3(nearLT, matrix, nearLT);
             gd3d.math.matrixTransformVector3(farRT, matrix, farRT);
             gd3d.math.matrixTransformVector3(nearRT, matrix, nearRT);
-            this.frameVecs[0] = farLD;
-            this.frameVecs[1] = nearLD;
-            this.frameVecs[2] = farRD;
-            this.frameVecs[3] = nearRD;
-            this.frameVecs[4] = farLT;
-            this.frameVecs[5] = nearLT;
-            this.frameVecs[6] = farRT;
-            this.frameVecs[7] = nearRT;
-
-            //回收
-            math.pool.delete_vector3Array([nearLT,nearLD,nearRT,nearRD,farLT,farLD,farRT,farRD]);
+            math.vec3Clone(farLD,this. frameVecs[0]);
+            math.vec3Clone(nearLD,this.frameVecs[1]);
+            math.vec3Clone(farRD,this. frameVecs[2]);
+            math.vec3Clone(nearRD,this.frameVecs[3]);
+            math.vec3Clone(farLT,this. frameVecs[4]);
+            math.vec3Clone(nearLT,this.frameVecs[5]);
+            math.vec3Clone(farRT,this. frameVecs[6]);
+            math.vec3Clone(nearRT,this.frameVecs[7]);
 
             //同步
             math.matrixClone(matrix,this.lastCamMtx);

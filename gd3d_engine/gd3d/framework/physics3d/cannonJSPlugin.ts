@@ -571,6 +571,11 @@ namespace gd3d.framework
             impostor.physicsBody.sleep();
         }
 
+        public isSleeping(impostor: PhysicsImpostor){
+            //return impostor.physicsBody.sleeping;
+            return false;
+        }
+
         public wakeUpBody(impostor: PhysicsImpostor) {
             impostor.physicsBody.wakeUp();
         }

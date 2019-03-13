@@ -2,12 +2,29 @@ namespace gd3d.framework {
 
     export interface PhysicsJointData {
         //Important for some engines, optional!
+        /**
+         * The main pivot of the joint
+         */
         mainPivot?: math.vector3;
+        /**
+         * The connected pivot of the joint
+         */
         connectedPivot?: math.vector3;
+        /**
+         * The main axis of the joint
+         */
         mainAxis?: math.vector3,
+        /**
+         * The connected axis of the joint
+         */
         connectedAxis?: math.vector3,
+        /**
+         * The collision of the joint
+         */
         collision?: boolean
-        //Native Oimo/Cannon/Energy data
+        /**
+         * Native Oimo/Cannon/Energy data
+         */
         nativeParams?: any;
     }
 

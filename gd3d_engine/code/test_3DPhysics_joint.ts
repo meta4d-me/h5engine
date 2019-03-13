@@ -1,4 +1,4 @@
-class test_3DPhysics_baseShape implements IState {
+class test_3DPhysics_joint implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
@@ -63,16 +63,16 @@ class test_3DPhysics_baseShape implements IState {
         let mat_sleeping = this.mats["sleeping"];
         let mat_floor = this.mats["floor"];
         //构建物体-------------------
-        //底面
-        let trans=new gd3d.framework.transform();
-        trans.localScale.x= 20;
-        trans.localScale.y= 0.01;
-        trans.localScale.z= 20;
-        this.scene.addChild(trans);
-        let mf=trans.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER) as gd3d.framework.meshFilter;
-        let mr=trans.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER) as gd3d.framework.meshRenderer;
-        mr.materials[0] = mat_floor;
-        mf.mesh=this.astMgr.getDefaultMesh("cube");
+        // //底面
+        // let trans=new gd3d.framework.transform();
+        // trans.localScale.x= 20;
+        // trans.localScale.y= 0.01;
+        // trans.localScale.z= 20;
+        // this.scene.addChild(trans);
+        // let mf=trans.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER) as gd3d.framework.meshFilter;
+        // let mr=trans.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER) as gd3d.framework.meshRenderer;
+        // mr.materials[0] = mat_floor;
+        // mf.mesh=this.astMgr.getDefaultMesh("cube");
 
         //box
         let trans2=new gd3d.framework.transform();
@@ -86,17 +86,17 @@ class test_3DPhysics_baseShape implements IState {
         mr2.materials[0] = mat_activated;
         mf2.mesh=this.astMgr.getDefaultMesh("cube");
 
-        //sphere
-        let trans3=new gd3d.framework.transform();
-        trans3.name = "sphere";
-        trans3.localPosition.y = 15;
-        trans3.localPosition.x = -0.2;
-        trans3.localPosition.z = 0.2;
-        this.scene.addChild(trans3);
-        let mf3=trans3.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER) as gd3d.framework.meshFilter;
-        let mr3=trans3.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER) as gd3d.framework.meshRenderer;
-        mr3.materials[0] = mat_activated;
-        mf3.mesh=this.astMgr.getDefaultMesh("sphere");
+        // //sphere
+        // let trans3=new gd3d.framework.transform();
+        // trans3.name = "sphere";
+        // trans3.localPosition.y = 15;
+        // trans3.localPosition.x = -0.2;
+        // trans3.localPosition.z = 0.2;
+        // this.scene.addChild(trans3);
+        // let mf3=trans3.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER) as gd3d.framework.meshFilter;
+        // let mr3=trans3.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER) as gd3d.framework.meshRenderer;
+        // mr3.materials[0] = mat_activated;
+        // mf3.mesh=this.astMgr.getDefaultMesh("sphere");
 
         //cylinder
         let cylinder_mid =new gd3d.framework.transform();
@@ -110,12 +110,25 @@ class test_3DPhysics_baseShape implements IState {
 
         //初始化 物理世界-----------------------
         this.scene.enablePhysics(new gd3d.math.vector3(0,-9.8,0),new gd3d.framework.OimoJSPlugin());
-        let groundImpostor= new gd3d.framework.PhysicsImpostor(trans, gd3d.framework.ImpostorType.PlaneImpostor, { mass: 0, restitution: 0.1 , friction: 0.9});
-        let boxImpostor = new gd3d.framework.PhysicsImpostor(trans2, gd3d.framework.ImpostorType.BoxImpostor, { mass: 1, restitution: 0.6 ,friction: 0.5 , disableBidirectionalTransformation:true});
-        let sphereImpostor = new gd3d.framework.PhysicsImpostor(trans3, gd3d.framework.ImpostorType.SphereImpostor, { mass: 1, restitution: 0.6 ,friction: 0.5});
-        let cylinderImpostor = new gd3d.framework.PhysicsImpostor(cylinder_mid, gd3d.framework.ImpostorType.CylinderImpostor, { mass: 1, restitution: 0.6 ,friction: 0.5});
+        // let boxImpostor = new gd3d.framework.PhysicsImpostor(trans2, gd3d.framework.ImpostorType.BoxImpostor, { mass: 1, restitution: 0.6 ,friction: 0.5});
+        let boxImpostor = new gd3d.framework.PhysicsImpostor(trans2, gd3d.framework.ImpostorType.BoxImpostor, { mass: 2 });
+        //let sphereImpostor = new gd3d.framework.PhysicsImpostor(trans3, gd3d.framework.ImpostorType.SphereImpostor, { mass: 1, restitution: 0.6 ,friction: 0.5});
+        let cylinderImpostor = new gd3d.framework.PhysicsImpostor(cylinder_mid, gd3d.framework.ImpostorType.CylinderImpostor, { mass: 0 });
 
         this.mrs.push(mr2,mr2,mr_cl);
+
+
+        //Add Joint
+        let joint1 = new gd3d.framework.HingeJoint({
+            mainPivot: new gd3d.math.vector3(0, 0, 0),
+            connectedPivot: new gd3d.math.vector3(0, -4.5, 0),
+            mainAxis: new gd3d.math.vector3(0, 0, 1),
+            connectedAxis: new gd3d.math.vector3(0, 0, 0),
+            nativeParams: {
+            }
+        });
+
+        cylinderImpostor.addJoint(boxImpostor , joint1); 
         
     }
 

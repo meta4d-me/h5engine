@@ -822,13 +822,23 @@ declare class test_3DPhysics_baseShape implements IState {
     count: number;
     counttimer: number;
     astMgr: gd3d.framework.assetMgr;
+    mrs: gd3d.framework.meshRenderer[];
     start(app: gd3d.framework.application): Promise<any>;
+    mats: {
+        [name: string]: gd3d.framework.material;
+    };
+    initMats(): void;
     loadbySync(url: string): gd3d.threading.gdPromise<any>;
     init(): void;
     initCamera(): void;
+    ckBodySleeped(): void;
+    private tcount;
+    private time;
     update(delta: number): void;
 }
 declare let CANNON: any;
+declare let help_v3: gd3d.math.vector3;
+declare let help_v2: gd3d.math.vector2;
 declare class test_3DPhysics_cannon implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -843,8 +853,60 @@ declare class test_3DPhysics_cannon implements IState {
     iptMgr: gd3d.framework.inputMgr;
     start(app: gd3d.framework.application): Promise<any>;
     loadbySync(url: string): gd3d.threading.gdPromise<any>;
+    floor: gd3d.framework.transform;
+    ctrBox: gd3d.framework.transform;
     init(): void;
-    onPonitMove(x: any, y: any): void;
+    cachePickInfo: gd3d.framework.pickinfo;
+    cacheRota: gd3d.math.quaternion;
+    cache_y: number;
+    onPonitMove([x, y]: [any, any]): void;
+    updateRoate(): void;
+    doRay(): void;
+    update(delta: number): void;
+}
+declare class test_3DPhysics_joint implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    background: gd3d.framework.transform;
+    parts: gd3d.framework.transform;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    count: number;
+    counttimer: number;
+    astMgr: gd3d.framework.assetMgr;
+    mrs: gd3d.framework.meshRenderer[];
+    start(app: gd3d.framework.application): Promise<any>;
+    mats: {
+        [name: string]: gd3d.framework.material;
+    };
+    initMats(): void;
+    loadbySync(url: string): gd3d.threading.gdPromise<any>;
+    init(): void;
+    initCamera(): void;
+    ckBodySleeped(): void;
+    private tcount;
+    private time;
+    update(delta: number): void;
+}
+declare class test_3DPhysics_kinematic implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    background: gd3d.framework.transform;
+    taskmgr: gd3d.framework.taskMgr;
+    astMgr: gd3d.framework.assetMgr;
+    iptMgr: gd3d.framework.inputMgr;
+    start(app: gd3d.framework.application): Promise<any>;
+    loadbySync(url: string): gd3d.threading.gdPromise<any>;
+    floor: gd3d.framework.transform;
+    ctrBox: gd3d.framework.transform;
+    init(): void;
+    cachePickInfo: gd3d.framework.pickinfo;
+    cacheRota: gd3d.math.quaternion;
+    cache_y: number;
+    onPonitMove([x, y]: [any, any]): void;
+    updateRoate(): void;
     doRay(): void;
     update(delta: number): void;
 }

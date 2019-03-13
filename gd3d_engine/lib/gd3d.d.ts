@@ -2435,6 +2435,12 @@ declare namespace gd3d.framework {
 }
 declare let helpv3: gd3d.math.vector3;
 declare let helpv3_1: gd3d.math.vector3;
+declare let helpv3_2: gd3d.math.vector3;
+declare let helpv3_3: gd3d.math.vector3;
+declare let helpv3_4: gd3d.math.vector3;
+declare let helpv3_5: gd3d.math.vector3;
+declare let helpv3_6: gd3d.math.vector3;
+declare let helpv3_7: gd3d.math.vector3;
 declare let helpv2: gd3d.math.vector2;
 declare let helpv2_1: gd3d.math.vector2;
 declare let helpmtx: gd3d.math.matrix;
@@ -2472,6 +2478,7 @@ declare namespace gd3d.framework {
     }
     class camera implements INodeComponent {
         static readonly ClassName: string;
+        constructor();
         gameObject: gameObject;
         private _near;
         near: number;
@@ -2498,7 +2505,8 @@ declare namespace gd3d.framework {
         calcViewMatrix(matrix: gd3d.math.matrix): void;
         calcViewPortPixel(app: application, viewPortPixel: math.rect): void;
         calcProjectMatrix(asp: number, matrix: gd3d.math.matrix): void;
-        creatRayByScreen(screenpos: gd3d.math.vector2, app: application): ray;
+        private static _shareRay;
+        creatRayByScreen(screenpos: gd3d.math.vector2, app: application, shareRayCache?: boolean): ray;
         calcWorldPosFromScreenPos(app: application, screenPos: math.vector3, outWorldPos: math.vector3): void;
         calcScreenPosFromWorldPos(app: application, worldPos: math.vector3, outScreenPos: math.vector2): void;
         private lastCamMtx;
@@ -5285,6 +5293,7 @@ declare namespace gd3d.framework {
         getBodyRestitution(impostor: PhysicsImpostor): number;
         setBodyRestitution(impostor: PhysicsImpostor, restitution: number): void;
         sleepBody(impostor: PhysicsImpostor): void;
+        isSleeping(impostor: PhysicsImpostor): boolean;
         wakeUpBody(impostor: PhysicsImpostor): void;
         updateDistanceJoint(joint: PhysicsJoint, maxDistance: number, minDistance?: number): void;
         setMotor(joint: IMotorEnabledJoint, speed?: number, maxForce?: number, motorIndex?: number): void;
@@ -5302,7 +5311,7 @@ declare namespace gd3d.framework {
         private _physicsMaterials;
         private _fixedTimeStep;
         BJSOIMO: any;
-        constructor(iterations?: number, oimoInjection?: any);
+        constructor(option?: number, oimoInjection?: any);
         setGravity(gravity: math.vector3): void;
         setTimeStep(timeStep: number): void;
         getTimeStep(): number;
@@ -5316,8 +5325,6 @@ declare namespace gd3d.framework {
         removePhysicsBody(impostor: PhysicsImpostor): void;
         generateJoint(impostorJoint: PhysicsImpostorJoint): void;
         removeJoint(impostorJoint: PhysicsImpostorJoint): void;
-        private vec3Copy(from, to);
-        private QuatCopy(from, to);
         setTransformationFromPhysicsBody(impostor: PhysicsImpostor): void;
         setPhysicsBodyTransformation(impostor: PhysicsImpostor, newPosition: math.vector3, newRotation: math.vector3): void;
         isSupported(): boolean;
@@ -5332,6 +5339,7 @@ declare namespace gd3d.framework {
         getBodyRestitution(impostor: PhysicsImpostor): number;
         setBodyRestitution(impostor: PhysicsImpostor, restitution: number): void;
         sleepBody(impostor: PhysicsImpostor): void;
+        isSleeping(impostor: PhysicsImpostor): any;
         wakeUpBody(impostor: PhysicsImpostor): void;
         updateDistanceJoint(joint: PhysicsJoint, maxDistance: number, minDistance?: number): void;
         setMotor(joint: IMotorEnabledJoint, speed?: number, force?: number, motorIndex?: number): void;
@@ -5396,6 +5404,7 @@ declare namespace gd3d.framework {
         getBodyRestitution(impostor: PhysicsImpostor): number;
         setBodyRestitution(impostor: PhysicsImpostor, restitution: number): void;
         sleepBody(impostor: PhysicsImpostor): void;
+        isSleeping(impostor: PhysicsImpostor): boolean;
         wakeUpBody(impostor: PhysicsImpostor): void;
         updateDistanceJoint(joint: PhysicsJoint, maxDistance: number, minDistance?: number): void;
         setMotor(joint: IMotorEnabledJoint, speed: number, maxForce?: number, motorIndex?: number): void;
@@ -5413,6 +5422,7 @@ declare namespace gd3d.framework {
         nativeOptions?: any;
         ignoreParent?: boolean;
         disableBidirectionalTransformation?: boolean;
+        kinematic?: boolean;
         heightFieldMatrix?: number[][];
         heightFieldOptions?: {
             minValue?: number;
@@ -5483,7 +5493,33 @@ declare namespace gd3d.framework {
         unregisterAfterPhysicsStep(func: (impostor: PhysicsImpostor) => void): void;
         registerOnPhysicsCollide(collideAgainst: PhysicsImpostor | Array<PhysicsImpostor>, func: (collider: PhysicsImpostor, collidedAgainst: PhysicsImpostor) => void): void;
         unregisterOnPhysicsCollide(collideAgainst: PhysicsImpostor | Array<PhysicsImpostor>, func: (collider: PhysicsImpostor, collidedAgainst: PhysicsImpostor | Array<PhysicsImpostor>) => void): void;
+        private lastObjwPos;
+        private lastObjwRot;
         beforeStep: () => void;
+        static Ivec3Equal(a: any, b: any): boolean;
+        static IQuatEqual(a: any, b: any): boolean;
+        static Ivec3Copy(from: {
+            x;
+            y;
+            z;
+        }, to: {
+            x;
+            y;
+            z;
+        }): void;
+        static IQuatCopy(from: {
+            x;
+            y;
+            z;
+            w;
+        }, to: {
+            x;
+            y;
+            z;
+            w;
+        }): void;
+        private lastbodywPos;
+        private lastbodywRot;
         afterStep: () => void;
         onCollideEvent: (collider: PhysicsImpostor, collidedWith: PhysicsImpostor) => void;
         onCollide: (e: {
@@ -5494,6 +5530,7 @@ declare namespace gd3d.framework {
         createJoint(otherImpostor: PhysicsImpostor, jointType: number, jointData: PhysicsJointData): PhysicsImpostor;
         addJoint(otherImpostor: PhysicsImpostor, joint: PhysicsJoint): PhysicsImpostor;
         sleep(): PhysicsImpostor;
+        readonly isSleeping: boolean;
         wakeUp(): PhysicsImpostor;
         clone(newObject: transform): PhysicsImpostor;
         dispose(): void;
@@ -5501,6 +5538,8 @@ declare namespace gd3d.framework {
         setDeltaRotation(rotation: math.quaternion): void;
         getBoxSizeToRef(result: math.vector3): PhysicsImpostor;
         getRadius(): number;
+        kinematicSetPosition(position: math.vector3): void;
+        kinematicSetRotation(rotation: math.quaternion): void;
     }
     enum ImpostorType {
         NoImpostor = 0,
@@ -5920,9 +5959,10 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class ray {
-        origin: gd3d.math.vector3;
-        direction: gd3d.math.vector3;
+        origin: math.vector3;
+        direction: math.vector3;
         constructor(_origin: gd3d.math.vector3, _dir: gd3d.math.vector3);
+        set(_origin: gd3d.math.vector3, _dir: gd3d.math.vector3): void;
         intersectAABB(_aabb: aabb): boolean;
         intersectPlaneTransform(tran: transform, outInfo: pickinfo): boolean;
         intersectPlane(planePoint: gd3d.math.vector3, planeNormal: gd3d.math.vector3, outHitPoint: gd3d.math.vector3): boolean;

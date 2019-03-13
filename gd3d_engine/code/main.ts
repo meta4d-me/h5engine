@@ -124,6 +124,8 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("trans性能测试",()=>new demo.test_performance());
         this.addBtn("3D物理测试",()=>new test_3DPhysics_cannon());
         this.addBtn("3D物理_基础形状",()=>new test_3DPhysics_baseShape());
+        this.addBtn("3D物理_动力学",()=>new test_3DPhysics_kinematic());
+        this.addBtn("3D物理_关节",()=>new test_3DPhysics_joint());
         this.addBtn("cannonPhysics3D",()=>new PhysicDemo.physic_01());
 
         //this.addBtn("test_f14",()=>new dome.db_test_f14eff());

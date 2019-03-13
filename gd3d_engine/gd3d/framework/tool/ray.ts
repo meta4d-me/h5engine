@@ -9,8 +9,8 @@
      */
     export class ray
     {
-        public origin: gd3d.math.vector3;
-        public direction: gd3d.math.vector3;
+        public origin: math.vector3 = new math.vector3();
+        public direction: math.vector3 = new math.vector3();
         /**
         * @private
         * @language zh_CN
@@ -23,8 +23,22 @@
         */
         constructor(_origin: gd3d.math.vector3, _dir: gd3d.math.vector3)
         {
-            this.origin = gd3d.math.pool.clone_vector3(_origin);
-            this.direction = gd3d.math.pool.clone_vector3(_dir);
+            this.set(_origin , _dir);
+        }
+
+        /**
+        * @private
+        * @language zh_CN
+        * @classdesc
+        * 设置射线的属性
+        * @param _origin 射线起点
+        * @param _dir 射线方向
+        * @version egret-gd3d 1.0
+        * @platform Web,Native
+        */
+        set(_origin: gd3d.math.vector3, _dir: gd3d.math.vector3 ){
+            math.vec3Clone(_origin,this.origin);
+            math.vec3Clone(_dir,this.direction);
         }
 
         /**

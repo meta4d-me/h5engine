@@ -212,6 +212,7 @@ namespace gd3d.framework
         getBodyRestitution(impostor: PhysicsImpostor): number;
         setBodyRestitution(impostor: PhysicsImpostor, restitution: number): void;
         sleepBody(impostor: PhysicsImpostor): void;
+        isSleeping(impostor: PhysicsImpostor) : boolean;
         wakeUpBody(impostor: PhysicsImpostor): void;
         //Joint Update
         updateDistanceJoint(joint: PhysicsJoint, maxDistance:number, minDistance?: number): void;

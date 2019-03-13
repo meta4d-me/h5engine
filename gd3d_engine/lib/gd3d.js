@@ -14093,6 +14093,12 @@ var gd3d;
 })(gd3d || (gd3d = {}));
 var helpv3 = new gd3d.math.vector3();
 var helpv3_1 = new gd3d.math.vector3();
+var helpv3_2 = new gd3d.math.vector3();
+var helpv3_3 = new gd3d.math.vector3();
+var helpv3_4 = new gd3d.math.vector3();
+var helpv3_5 = new gd3d.math.vector3();
+var helpv3_6 = new gd3d.math.vector3();
+var helpv3_7 = new gd3d.math.vector3();
 var helpv2 = new gd3d.math.vector2();
 var helpv2_1 = new gd3d.math.vector2();
 var helpmtx = new gd3d.math.matrix();
@@ -14179,7 +14185,11 @@ var gd3d;
                 this.size = 2;
                 this._opvalue = 1;
                 this.postQueues = [];
+                for (var i = 0; i < 8; i++) {
+                    this.frameVecs.push(new gd3d.math.vector3());
+                }
             }
+            camera_1 = camera;
             Object.defineProperty(camera.prototype, "near", {
                 get: function () {
                     return this._near;
@@ -14285,28 +14295,30 @@ var gd3d;
                     gd3d.math.matrixLerp(this.matProjO, this.matProjP, this.opvalue, this.matProj);
                 gd3d.math.matrixClone(this.matProj, matrix);
             };
-            camera.prototype.creatRayByScreen = function (screenpos, app) {
-                var src1 = gd3d.math.pool.new_vector3();
-                src1.x = screenpos.x;
-                src1.y = screenpos.y;
-                src1.z = 0;
-                var src2 = gd3d.math.pool.new_vector3();
-                src2.x = screenpos.x;
-                src2.y = screenpos.y;
-                src2.z = 1;
-                var dest1 = gd3d.math.pool.new_vector3();
-                var dest2 = gd3d.math.pool.new_vector3();
+            camera.prototype.creatRayByScreen = function (screenpos, app, shareRayCache) {
+                if (shareRayCache === void 0) { shareRayCache = true; }
+                var src1 = helpv3;
+                gd3d.math.vec3Set(src1, screenpos.x, screenpos.y, 0);
+                var src2 = helpv3_1;
+                gd3d.math.vec3Set(src2, screenpos.x, screenpos.y, 1);
+                var dest1 = helpv3_2;
+                var dest2 = helpv3_3;
                 this.calcWorldPosFromScreenPos(app, src1, dest1);
                 this.calcWorldPosFromScreenPos(app, src2, dest2);
-                var dir = gd3d.math.pool.new_vector3();
+                var dir = helpv3_4;
                 gd3d.math.vec3Subtract(dest2, dest1, dir);
                 gd3d.math.vec3Normalize(dir, dir);
-                var ray = new gd3d.framework.ray(dest1, dir);
-                gd3d.math.pool.delete_vector3(src1);
-                gd3d.math.pool.delete_vector3(src2);
-                gd3d.math.pool.delete_vector3(dest1);
-                gd3d.math.pool.delete_vector3(dest2);
-                gd3d.math.pool.delete_vector3(dir);
+                var ray;
+                if (shareRayCache) {
+                    if (!camera_1._shareRay) {
+                        camera_1._shareRay = new gd3d.framework.ray(dest1, dir);
+                    }
+                    ray = camera_1._shareRay;
+                    ray.set(dest1, dir);
+                }
+                else {
+                    ray = new gd3d.framework.ray(dest1, dir);
+                }
                 return ray;
             };
             camera.prototype.calcWorldPosFromScreenPos = function (app, screenPos, outWorldPos) {
@@ -14356,16 +14368,24 @@ var gd3d;
                 var near_h = this.near * Math.tan(this.fov * 0.5);
                 var asp = _vpp.w / _vpp.h;
                 var near_w = near_h * asp;
-                var nearLT = gd3d.math.pool.new_vector3(-near_w, near_h, this.near);
-                var nearLD = gd3d.math.pool.new_vector3(-near_w, -near_h, this.near);
-                var nearRT = gd3d.math.pool.new_vector3(near_w, near_h, this.near);
-                var nearRD = gd3d.math.pool.new_vector3(near_w, -near_h, this.near);
+                var nearLT = helpv3;
+                var nearLD = helpv3_1;
+                var nearRT = helpv3_2;
+                var nearRD = helpv3_3;
+                gd3d.math.vec3Set(nearLT, -near_w, near_h, this.near);
+                gd3d.math.vec3Set(nearLD, -near_w, -near_h, this.near);
+                gd3d.math.vec3Set(nearRT, near_w, near_h, this.near);
+                gd3d.math.vec3Set(nearRD, near_w, -near_h, this.near);
                 var far_h = this.far * Math.tan(this.fov * 0.5);
                 var far_w = far_h * asp;
-                var farLT = gd3d.math.pool.new_vector3(-far_w, far_h, this.far);
-                var farLD = gd3d.math.pool.new_vector3(-far_w, -far_h, this.far);
-                var farRT = gd3d.math.pool.new_vector3(far_w, far_h, this.far);
-                var farRD = gd3d.math.pool.new_vector3(far_w, -far_h, this.far);
+                var farLT = helpv3_4;
+                var farLD = helpv3_5;
+                var farRT = helpv3_6;
+                var farRD = helpv3_7;
+                gd3d.math.vec3Set(farLT, -far_w, far_h, this.far);
+                gd3d.math.vec3Set(farLD, -far_w, -far_h, this.far);
+                gd3d.math.vec3Set(farRT, far_w, far_h, this.far);
+                gd3d.math.vec3Set(farRD, far_w, -far_h, this.far);
                 gd3d.math.matrixTransformVector3(farLD, matrix, farLD);
                 gd3d.math.matrixTransformVector3(nearLD, matrix, nearLD);
                 gd3d.math.matrixTransformVector3(farRD, matrix, farRD);
@@ -14374,15 +14394,14 @@ var gd3d;
                 gd3d.math.matrixTransformVector3(nearLT, matrix, nearLT);
                 gd3d.math.matrixTransformVector3(farRT, matrix, farRT);
                 gd3d.math.matrixTransformVector3(nearRT, matrix, nearRT);
-                this.frameVecs[0] = farLD;
-                this.frameVecs[1] = nearLD;
-                this.frameVecs[2] = farRD;
-                this.frameVecs[3] = nearRD;
-                this.frameVecs[4] = farLT;
-                this.frameVecs[5] = nearLT;
-                this.frameVecs[6] = farRT;
-                this.frameVecs[7] = nearRT;
-                gd3d.math.pool.delete_vector3Array([nearLT, nearLD, nearRT, nearRD, farLT, farLD, farRT, farRD]);
+                gd3d.math.vec3Clone(farLD, this.frameVecs[0]);
+                gd3d.math.vec3Clone(nearLD, this.frameVecs[1]);
+                gd3d.math.vec3Clone(farRD, this.frameVecs[2]);
+                gd3d.math.vec3Clone(nearRD, this.frameVecs[3]);
+                gd3d.math.vec3Clone(farLT, this.frameVecs[4]);
+                gd3d.math.vec3Clone(nearLT, this.frameVecs[5]);
+                gd3d.math.vec3Clone(farRT, this.frameVecs[6]);
+                gd3d.math.vec3Clone(nearRT, this.frameVecs[7]);
                 gd3d.math.matrixClone(matrix, this.lastCamMtx);
                 gd3d.math.rectClone(_vpp, this.lastCamRect);
                 this.paraArr[0] = this.fov;
@@ -14600,11 +14619,13 @@ var gd3d;
                 __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], camera.prototype, "opvalue", null);
-            camera = __decorate([
+            camera = camera_1 = __decorate([
                 gd3d.reflect.nodeComponent,
-                gd3d.reflect.nodeCamera
+                gd3d.reflect.nodeCamera,
+                __metadata("design:paramtypes", [])
             ], camera);
             return camera;
+            var camera_1;
         }());
         framework.camera = camera;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -29552,6 +29573,9 @@ var gd3d;
             CannonJSPlugin.prototype.sleepBody = function (impostor) {
                 impostor.physicsBody.sleep();
             };
+            CannonJSPlugin.prototype.isSleeping = function (impostor) {
+                return false;
+            };
             CannonJSPlugin.prototype.wakeUpBody = function (impostor) {
                 impostor.physicsBody.wakeUp();
             };
@@ -29637,7 +29661,7 @@ var gd3d;
         var help_v3_2 = new gd3d.math.vector3();
         var help_quat = new gd3d.math.quaternion();
         var OimoJSPlugin = (function () {
-            function OimoJSPlugin(iterations, oimoInjection) {
+            function OimoJSPlugin(option, oimoInjection) {
                 if (oimoInjection === void 0) { oimoInjection = OIMO; }
                 this.name = "OIMOJSPlugin";
                 this._physicsMaterials = new Array();
@@ -29649,17 +29673,17 @@ var gd3d;
                     console.error("OIMO is not available. Please make sure you included the js file.");
                     return;
                 }
-                var opt = {
-                    iterations: iterations
-                };
+                var _o = {};
+                if (option)
+                    _o = option;
                 var opt_1 = {
-                    timestep: 1 / 60,
-                    iterations: 8,
-                    broadphase: 2,
-                    worldscale: 1,
-                    random: true,
-                    info: false,
-                    gravity: [0, -9.8, 0]
+                    timestep: _o.timestep != undefined ? _o.timestep : 1 / 60,
+                    iterations: _o.iterations != undefined ? _o.iterations : 8,
+                    broadphase: _o.broadphase != undefined ? _o.broadphase : 2,
+                    worldscale: _o.worldscale != undefined ? _o.worldscale : 1,
+                    random: _o.random != undefined ? _o.random : true,
+                    info: _o.info != undefined ? _o.info : false,
+                    gravity: _o.gravity != undefined ? _o.gravity : [0, -9.8, 0]
                 };
                 this.world = new this.BJSOIMO.World(opt_1);
                 this.world.clear();
@@ -29738,6 +29762,7 @@ var gd3d;
                         density: impostor.getParam("mass"),
                         friction: impostor.getParam("friction"),
                         restitution: impostor.getParam("restitution"),
+                        kinematic: impostor.getParam("kinematic"),
                         world: this.world
                     };
                     var impostors = [impostor];
@@ -29800,8 +29825,8 @@ var gd3d;
                                 bodyConfig_1.size.push(sizeY);
                                 bodyConfig_1.size.push(sizeY);
                                 break;
-                            case framework.ImpostorType.NoImpostor:
                             case framework.ImpostorType.PlaneImpostor:
+                            case framework.ImpostorType.NoImpostor:
                             case framework.ImpostorType.BoxImpostor:
                             default:
                                 sizeX = _this.checkWithEpsilon(extendSize.x);
@@ -29846,20 +29871,14 @@ var gd3d;
             OimoJSPlugin.prototype.removeJoint = function (impostorJoint) {
                 this.world.removeConstraint(impostorJoint.joint.physicsJoint);
             };
-            OimoJSPlugin.prototype.vec3Copy = function (from, to) {
-                to.rawData[0] = from.x;
-                to.rawData[1] = from.y;
-                to.rawData[2] = from.z;
-            };
-            OimoJSPlugin.prototype.QuatCopy = function (from, to) {
-                to.rawData[0] = from.x;
-                to.rawData[1] = from.y;
-                to.rawData[2] = from.z;
-                to.rawData[3] = from.w;
-            };
             OimoJSPlugin.prototype.setTransformationFromPhysicsBody = function (impostor) {
-                this.vec3Copy(impostor.physicsBody.position, impostor.object.localPosition);
-                this.QuatCopy(impostor.physicsBody.quaternion, impostor.object.localRotate);
+                framework.PhysicsImpostor.Ivec3Copy(impostor.physicsBody.position, impostor.object.localPosition);
+                framework.PhysicsImpostor.IQuatCopy(impostor.physicsBody.quaternion, impostor.object.localRotate);
+                var obj = impostor.object;
+                if (obj.parent && obj.parent.parent) {
+                    obj.setWorldRotate(obj.localRotate);
+                    obj.setWorldPosition(obj.localPosition);
+                }
             };
             OimoJSPlugin.prototype.setPhysicsBodyTransformation = function (impostor, newPosition, newRotation) {
                 impostor.physicsBody.position.copy(newPosition);
@@ -29912,6 +29931,9 @@ var gd3d;
             };
             OimoJSPlugin.prototype.sleepBody = function (impostor) {
                 impostor.physicsBody.sleep();
+            };
+            OimoJSPlugin.prototype.isSleeping = function (impostor) {
+                return impostor.physicsBody.sleeping;
             };
             OimoJSPlugin.prototype.wakeUpBody = function (impostor) {
                 impostor.physicsBody.awake();
@@ -30093,22 +30115,30 @@ var gd3d;
                 this._deltaPosition = new gd3d.math.vector3();
                 this._isDisposed = false;
                 this._cacheSizeWorld = new gd3d.math.vector3();
+                this.lastObjwPos = new gd3d.math.vector3();
+                this.lastObjwRot = new gd3d.math.quaternion();
                 this.beforeStep = function () {
                     if (!_this._physicsEngine) {
                         return;
                     }
-                    var tempv3 = help_v3;
-                    gd3d.math.vec3Clone(_this._deltaPosition, tempv3);
-                    gd3d.math.vec3ScaleByNum(tempv3, -1, tempv3);
-                    gd3d.math.vec3Add(_this.object.getWorldPosition(), tempv3, tempv3);
-                    _this.object.setWorldPosition(tempv3);
-                    if (!_this._options.disableBidirectionalTransformation) {
-                        _this._physicsEngine.getPhysicsPlugin().setPhysicsBodyTransformation(_this, _this.object.getWorldPosition(), _this.object.getWorldRotate());
+                    var offset_wpos = help_v3;
+                    gd3d.math.vec3Clone(_this._deltaPosition, offset_wpos);
+                    gd3d.math.vec3ScaleByNum(offset_wpos, -1, offset_wpos);
+                    var wpos = _this.object.getWorldPosition();
+                    gd3d.math.vec3Add(wpos, offset_wpos, offset_wpos);
+                    var wrot = _this.object.getWorldRotate();
+                    var hasDirty = !gd3d.math.vec3Equal(wpos, _this.lastObjwPos) || !gd3d.math.quatEqual(wrot, _this.lastObjwRot);
+                    gd3d.math.vec3Clone(wpos, _this.lastObjwPos);
+                    gd3d.math.quatClone(wrot, _this.lastObjwRot);
+                    if (hasDirty && !_this._options.disableBidirectionalTransformation) {
+                        _this._physicsEngine.getPhysicsPlugin().setPhysicsBodyTransformation(_this, offset_wpos, wrot);
                     }
                     _this._onBeforePhysicsStepCallbacks.forEach(function (func) {
                         func(_this);
                     });
                 };
+                this.lastbodywPos = new gd3d.math.vector3();
+                this.lastbodywRot = new gd3d.math.quaternion();
                 this.afterStep = function () {
                     if (!_this._physicsEngine) {
                         return;
@@ -30116,15 +30146,15 @@ var gd3d;
                     _this._onAfterPhysicsStepCallbacks.forEach(function (func) {
                         func(_this);
                     });
-                    _this._physicsEngine.getPhysicsPlugin().setTransformationFromPhysicsBody(_this);
-                    if (_this._parent && _this._parent._parent) {
-                        _this.object.setWorldRotate(_this.object.localRotate);
-                        _this.object.setWorldPosition(_this.object.localPosition);
+                    _this.physicsBody.position;
+                    _this.physicsBody.quaternion;
+                    PhysicsImpostor;
+                    var hasDirty = !PhysicsImpostor.Ivec3Equal(_this.physicsBody.position, _this.lastbodywPos) || !PhysicsImpostor.IQuatEqual(_this.physicsBody.quaternion, _this.lastbodywRot);
+                    PhysicsImpostor.Ivec3Copy(_this.physicsBody.position, _this.lastObjwPos);
+                    PhysicsImpostor.IQuatCopy(_this.physicsBody.quaternion, _this.lastObjwRot);
+                    if (hasDirty) {
+                        _this._physicsEngine.getPhysicsPlugin().setTransformationFromPhysicsBody(_this);
                     }
-                    var tempv3 = help_v3;
-                    gd3d.math.vec3Clone(_this._deltaPosition, tempv3);
-                    gd3d.math.vec3Add(_this.object.getWorldPosition(), tempv3, tempv3);
-                    _this.object.setWorldPosition(tempv3);
                 };
                 this.onCollideEvent = null;
                 this.onCollide = function (e) {
@@ -30377,6 +30407,23 @@ var gd3d;
                     console.warn("Function to remove was not found");
                 }
             };
+            PhysicsImpostor.Ivec3Equal = function (a, b) {
+                return a.x == b.x && a.y == b.y && a.z == b.z;
+            };
+            PhysicsImpostor.IQuatEqual = function (a, b) {
+                return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
+            };
+            PhysicsImpostor.Ivec3Copy = function (from, to) {
+                to.x = from.x;
+                to.y = from.y;
+                to.z = from.z;
+            };
+            PhysicsImpostor.IQuatCopy = function (from, to) {
+                to.x = from.x;
+                to.y = from.y;
+                to.z = from.z;
+                to.w = from.w;
+            };
             PhysicsImpostor.prototype.applyForce = function (force, contactPoint) {
                 if (this._physicsEngine) {
                     this._physicsEngine.getPhysicsPlugin().applyForce(this, force, contactPoint);
@@ -30410,6 +30457,16 @@ var gd3d;
                 }
                 return this;
             };
+            Object.defineProperty(PhysicsImpostor.prototype, "isSleeping", {
+                get: function () {
+                    if (this._physicsEngine) {
+                        return this._physicsEngine.getPhysicsPlugin().isSleeping(this);
+                    }
+                    return false;
+                },
+                enumerable: true,
+                configurable: true
+            });
             PhysicsImpostor.prototype.wakeUp = function () {
                 if (this._physicsEngine) {
                     this._physicsEngine.getPhysicsPlugin().wakeUpBody(this);
@@ -30454,6 +30511,16 @@ var gd3d;
             };
             PhysicsImpostor.prototype.getRadius = function () {
                 return this._physicsEngine.getPhysicsPlugin().getRadius(this);
+            };
+            PhysicsImpostor.prototype.kinematicSetPosition = function (position) {
+                if (!this._physicsBody || !position)
+                    return;
+                this._physicsBody.setPosition(position);
+            };
+            PhysicsImpostor.prototype.kinematicSetRotation = function (rotation) {
+                if (!this._physicsBody || !rotation)
+                    return;
+                this._physicsBody.setQuaternion(rotation);
             };
             PhysicsImpostor.DEFAULT_OBJECT_SIZE = new gd3d.math.vector3(0, 0, 0);
             PhysicsImpostor.IDENTITY_QUATERNION = new gd3d.math.quaternion();
@@ -32542,9 +32609,14 @@ var gd3d;
     (function (framework) {
         var ray = (function () {
             function ray(_origin, _dir) {
-                this.origin = gd3d.math.pool.clone_vector3(_origin);
-                this.direction = gd3d.math.pool.clone_vector3(_dir);
+                this.origin = new gd3d.math.vector3();
+                this.direction = new gd3d.math.vector3();
+                this.set(_origin, _dir);
             }
+            ray.prototype.set = function (_origin, _dir) {
+                gd3d.math.vec3Clone(_origin, this.origin);
+                gd3d.math.vec3Clone(_dir, this.direction);
+            };
             ray.prototype.intersectAABB = function (_aabb) {
                 return this.intersectBoxMinMax(_aabb.minimum, _aabb.maximum);
             };
