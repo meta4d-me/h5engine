@@ -1,6 +1,8 @@
 namespace gd3d.framework {
     let help_v3 = new math.vector3();
     let help_v3_1 = new math.vector3();
+    let help_quat = new math.quaternion();
+
     export interface PhysicsImpostorParameters {
         mass: number;
         /** The friction of the physics imposter*/
@@ -473,34 +475,39 @@ namespace gd3d.framework {
 
             this._onBeforePhysicsStepCallbacks.forEach((func) => {
                 func(this);
+         
             });
         }
 
-        static Ivec3Equal(a , b){
-            return a.x == b.x && a.y == b.y && a.z == b.z ;
-        }
 
-        static IQuatEqual(a , b){
-            return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w ;
+        private _freezeMask : number = 0; //位移和旋转冻结 mask
+        /**
+         * 设置 位移、旋转 冻结选项
+         * @param option 冻结类型
+         * @param beSelect 是否选上
+         */
+        setFreeze(option: FreezeType, beSelect : boolean ){
+            if(beSelect){
+                this._freezeMask |= option;
+            }else{
+                if(this._freezeMask & option ){
+                    this._freezeMask ^= option;
+                }
+            }
         }
-
-        static Ivec3Copy(from:{x,y,z},to:{x,y,z})
-        {
-            to.x=from.x;
-            to.y=from.y;
-            to.z=from.z;
-        }
-
-        static IQuatCopy(from:{x,y,z,w},to:{x,y,z,w})
-        {
-            to.x=from.x;
-            to.y=from.y;
-            to.z=from.z;
-            to.w=from.w;
+        
+        /**
+         * 获取 位移、旋转 冻结选项
+         * @param option 冻结类型
+         */
+        getFreeze(option: FreezeType){
+            return this._freezeMask & option;
         }
 
         private lastbodywPos = new gd3d.math.vector3();
         private lastbodywRot = new gd3d.math.quaternion();
+        private lastEuler = new gd3d.math.vector3();
+        private lastRotMask : number = 0;
         /**
          * this function is executed by the physics engine
          */
@@ -513,13 +520,83 @@ namespace gd3d.framework {
                 func(this);
             });
 
-            this.physicsBody.position
-            this.physicsBody.quaternion
-            PhysicsImpostor
+            let lwpos = this.lastbodywPos;
+            let lwrot = this.lastbodywRot;
+            let posDirty = !physicTool.Ivec3Equal( this.physicsBody.position , lwpos);
+            let rotDirty = !physicTool.IQuatEqual(this.physicsBody.quaternion, lwrot);
+            //冻结处理逻辑
+            if( this._freezeMask > 0){
+                if(posDirty){
+                    //过滤掉 物理的 位移 影响
+                    let pPos : {x,y,z} = this._physicsBody.position;
+                    //清理 速度
+                    let linearVelocity : {x,y,z} = this._physicsBody.linearVelocity;
+                    if(this.getFreeze(FreezeType.Position_x)) {
+                        pPos.x = lwpos.x;
+                        linearVelocity.x = 0;
+                    } 
+                    if(this.getFreeze(FreezeType.Position_y)) {
+                        pPos.y = lwpos.y;
+                        linearVelocity.y = 0;
+                    }
+                    if(this.getFreeze(FreezeType.Position_z)) {
+                        pPos.z = lwpos.z;
+                        linearVelocity.z = 0;
+                    }
+                }
 
-            let hasDirty = !PhysicsImpostor.Ivec3Equal( this.physicsBody.position , this.lastbodywPos) || !PhysicsImpostor.IQuatEqual(this.physicsBody.quaternion,this.lastbodywRot);
-            PhysicsImpostor.Ivec3Copy(this.physicsBody.position , this.lastObjwPos);
-            PhysicsImpostor.IQuatCopy(this.physicsBody.quaternion , this.lastObjwRot);
+                if(rotDirty){
+                    let l_x = this.getFreeze(FreezeType.Rotation_x);
+                    let l_y = this.getFreeze(FreezeType.Rotation_y);
+                    let l_z = this.getFreeze(FreezeType.Rotation_z);
+
+                    let pRot : {x,y,z,w} = this._physicsBody.quaternion;
+                    let angularVelocity : {x,y,z} = this._physicsBody.angularVelocity;
+                    if(!l_x || !l_y || !l_z ){
+                        //过滤掉 物理的 旋转 影响
+                        //清理 速度
+                        let Euler : math.vector3 = help_v3;
+                        physicTool.IQuatCopy(pRot,help_quat);
+                        math.quatToEulerAngles(help_quat,Euler);  //物理结算当前 欧拉角
+                        let lEuler = this.lastEuler;
+                        let mask_ = l_x?1:0 | l_y?2:0 | l_z?4:0; //优化计算 量
+                        if(mask_ != this.lastRotMask){
+                            math.quatToEulerAngles(lwrot,lEuler);  //上一次的 欧拉角
+                        }
+                        this.lastRotMask = mask_;
+                        //逐轴冻结判定                        
+                        let t_x = lEuler.x;
+                        let t_y = lEuler.y;
+                        let t_z = lEuler.z;
+                        if(this.getFreeze(FreezeType.Rotation_x)) {
+                            angularVelocity.x = 0;
+                        }else{
+                            t_x = Euler.x;
+                        }
+                        if(this.getFreeze(FreezeType.Rotation_y)) {
+                            angularVelocity.y = 0;
+                        }else{
+                            t_y = Euler.y;
+                        }
+                        if(this.getFreeze(FreezeType.Rotation_z)) {
+                            angularVelocity.z = 0;
+                        }else{
+                            t_z = Euler.z;
+                        }
+
+                        math.quatFromEulerAngles(t_x,t_y,t_z,help_quat);
+                        physicTool.IQuatCopy(help_quat,pRot);
+                    }else{
+                        //全部锁定 , 不用计算旋转
+                        angularVelocity.x = angularVelocity.y = angularVelocity.z = 0;
+                        physicTool.IQuatCopy(lwrot,pRot);
+                    }
+                }
+            }
+            
+            physicTool.Ivec3Copy(this.physicsBody.position , lwpos);
+            physicTool.IQuatCopy(this.physicsBody.quaternion , lwrot);
+            if(!posDirty && !rotDirty) return;
 
             // object has now its world rotation. needs to be converted to local.
             
@@ -530,9 +607,8 @@ namespace gd3d.framework {
             // }
             // // take the position set and make it the absolute position of this object.
             // this.object.setAbsolutePosition(this.object.position);
-            if(hasDirty){
-                this._physicsEngine.getPhysicsPlugin().setTransformationFromPhysicsBody(this);
-            }
+           
+            this._physicsEngine.getPhysicsPlugin().setTransformationFromPhysicsBody(this);
            
             // this._deltaRotation && this.object.rotationQuaternion && this.object.rotationQuaternion.multiplyToRef(this._deltaRotation, this.object.rotationQuaternion);
             
@@ -860,5 +936,17 @@ namespace gd3d.framework {
         ClothImpostor,
         /** Softbody-Imposter type */
         SoftbodyImpostor
-    } 
+    }
+    
+    /**
+     * physicImpostor 冻结类型
+     */
+    export enum FreezeType {
+        Position_x = 1,
+        Position_y = 2,
+        Position_z = 4,
+        Rotation_x = 8,
+        Rotation_y = 16,
+        Rotation_z = 32
+    }
 }

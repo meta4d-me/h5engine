@@ -864,7 +864,7 @@ declare class test_3DPhysics_cannon implements IState {
     doRay(): void;
     update(delta: number): void;
 }
-declare class test_3DPhysics_joint implements IState {
+declare class test_3DPhysics_freeze implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
@@ -876,13 +876,258 @@ declare class test_3DPhysics_joint implements IState {
     counttimer: number;
     astMgr: gd3d.framework.assetMgr;
     mrs: gd3d.framework.meshRenderer[];
+    iptMgr: gd3d.framework.inputMgr;
     start(app: gd3d.framework.application): Promise<any>;
     mats: {
         [name: string]: gd3d.framework.material;
     };
     initMats(): void;
+    private addMat(name, color);
     loadbySync(url: string): gd3d.threading.gdPromise<any>;
+    private targetTran;
+    private boxTran;
+    private cylinderTran;
+    private floor;
     init(): void;
+    private guiMsg;
+    setGUI(): void;
+    private reStartDemo();
+    private enumArr;
+    private optStrs;
+    private freezeDic;
+    private applyFreezeOpt();
+    private impulseTarget();
+    private force;
+    private contactlocalPoint;
+    private tempV3;
+    private doImpulse(phyImpostor);
+    cachePickInfo: gd3d.framework.pickinfo;
+    cacheRota: gd3d.math.quaternion;
+    cache_y: number;
+    onPonitMove([x, y]: [any, any]): void;
+    initCamera(): void;
+    ckBodySleeped(): void;
+    attachMesh(tran: gd3d.framework.transform, mat: gd3d.framework.material, meshName: string): gd3d.framework.meshRenderer;
+    private tcount;
+    private time;
+    update(delta: number): void;
+}
+declare class test_3DPhysics_joint_ballandSocket implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    background: gd3d.framework.transform;
+    parts: gd3d.framework.transform;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    count: number;
+    counttimer: number;
+    astMgr: gd3d.framework.assetMgr;
+    mrs: gd3d.framework.meshRenderer[];
+    iptMgr: gd3d.framework.inputMgr;
+    start(app: gd3d.framework.application): Promise<any>;
+    mats: {
+        [name: string]: gd3d.framework.material;
+    };
+    initMats(): void;
+    private addMat(name, color);
+    loadbySync(url: string): gd3d.threading.gdPromise<any>;
+    private boxTran;
+    init(): void;
+    private guiMsg;
+    setGUI(): void;
+    private impulseBox();
+    private force;
+    private contactlocalPoint;
+    private tempV3;
+    private doImpulse(phyImpostor);
+    initCamera(): void;
+    ckBodySleeped(): void;
+    attachMesh(tran: gd3d.framework.transform, mat: gd3d.framework.material, meshName: string): gd3d.framework.meshRenderer;
+    private tcount;
+    private time;
+    update(delta: number): void;
+}
+declare class test_3DPhysics_joint_distance implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    background: gd3d.framework.transform;
+    parts: gd3d.framework.transform;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    count: number;
+    counttimer: number;
+    astMgr: gd3d.framework.assetMgr;
+    mrs: gd3d.framework.meshRenderer[];
+    iptMgr: gd3d.framework.inputMgr;
+    start(app: gd3d.framework.application): Promise<any>;
+    mats: {
+        [name: string]: gd3d.framework.material;
+    };
+    initMats(): void;
+    private addMat(name, color);
+    loadbySync(url: string): gd3d.threading.gdPromise<any>;
+    private boxTran;
+    init(): void;
+    private guiMsg;
+    setGUI(): void;
+    private impulseBox();
+    private force;
+    private contactlocalPoint;
+    private tempV3;
+    private doImpulse(phyImpostor);
+    initCamera(): void;
+    ckBodySleeped(): void;
+    attachMesh(tran: gd3d.framework.transform, mat: gd3d.framework.material, meshName: string): gd3d.framework.meshRenderer;
+    private tcount;
+    private time;
+    update(delta: number): void;
+}
+declare class test_3DPhysics_joint_hinge implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    background: gd3d.framework.transform;
+    parts: gd3d.framework.transform;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    count: number;
+    counttimer: number;
+    astMgr: gd3d.framework.assetMgr;
+    mrs: gd3d.framework.meshRenderer[];
+    iptMgr: gd3d.framework.inputMgr;
+    start(app: gd3d.framework.application): Promise<any>;
+    mats: {
+        [name: string]: gd3d.framework.material;
+    };
+    initMats(): void;
+    private addMat(name, color);
+    loadbySync(url: string): gd3d.threading.gdPromise<any>;
+    private boxTran;
+    init(): void;
+    private guiMsg;
+    setGUI(): void;
+    private impulseBox();
+    private force;
+    private contactlocalPoint;
+    private tempV3;
+    private doImpulse(phyImpostor);
+    initCamera(): void;
+    ckBodySleeped(): void;
+    attachMesh(tran: gd3d.framework.transform, mat: gd3d.framework.material, meshName: string): gd3d.framework.meshRenderer;
+    private tcount;
+    private time;
+    update(delta: number): void;
+}
+declare class test_3DPhysics_joint_prismatic implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    background: gd3d.framework.transform;
+    parts: gd3d.framework.transform;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    count: number;
+    counttimer: number;
+    astMgr: gd3d.framework.assetMgr;
+    mrs: gd3d.framework.meshRenderer[];
+    iptMgr: gd3d.framework.inputMgr;
+    start(app: gd3d.framework.application): Promise<any>;
+    mats: {
+        [name: string]: gd3d.framework.material;
+    };
+    initMats(): void;
+    private addMat(name, color);
+    loadbySync(url: string): gd3d.threading.gdPromise<any>;
+    private boxTran;
+    init(): void;
+    private guiMsg;
+    setGUI(): void;
+    private impulseBox();
+    private force;
+    private contactlocalPoint;
+    private tempV3;
+    private doImpulse(phyImpostor);
+    initCamera(): void;
+    ckBodySleeped(): void;
+    attachMesh(tran: gd3d.framework.transform, mat: gd3d.framework.material, meshName: string): gd3d.framework.meshRenderer;
+    private tcount;
+    private time;
+    update(delta: number): void;
+}
+declare class test_3DPhysics_joint_slider implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    background: gd3d.framework.transform;
+    parts: gd3d.framework.transform;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    count: number;
+    counttimer: number;
+    astMgr: gd3d.framework.assetMgr;
+    mrs: gd3d.framework.meshRenderer[];
+    iptMgr: gd3d.framework.inputMgr;
+    start(app: gd3d.framework.application): Promise<any>;
+    mats: {
+        [name: string]: gd3d.framework.material;
+    };
+    initMats(): void;
+    private addMat(name, color);
+    loadbySync(url: string): gd3d.threading.gdPromise<any>;
+    private boxTran;
+    init(): void;
+    private guiMsg;
+    setGUI(): void;
+    private impulseBox();
+    private force;
+    private contactlocalPoint;
+    private tempV3;
+    private doImpulse(phyImpostor);
+    initCamera(): void;
+    ckBodySleeped(): void;
+    attachMesh(tran: gd3d.framework.transform, mat: gd3d.framework.material, meshName: string): gd3d.framework.meshRenderer;
+    private tcount;
+    private time;
+    update(delta: number): void;
+}
+declare class test_3DPhysics_joint_wheel implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    background: gd3d.framework.transform;
+    parts: gd3d.framework.transform;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    count: number;
+    counttimer: number;
+    astMgr: gd3d.framework.assetMgr;
+    mrs: gd3d.framework.meshRenderer[];
+    iptMgr: gd3d.framework.inputMgr;
+    start(app: gd3d.framework.application): Promise<any>;
+    mats: {
+        [name: string]: gd3d.framework.material;
+    };
+    initMats(): void;
+    private addMat(name, color);
+    loadbySync(url: string): gd3d.threading.gdPromise<any>;
+    private boxTran;
+    init(): void;
+    private connectedPivot;
+    private mainPivot;
+    private pole;
+    private pole_1;
+    addDisplayObj(): void;
+    private tempV3;
+    syncDisplayRT(): void;
+    attachMesh(tran: gd3d.framework.transform, mat: gd3d.framework.material, meshName: string): gd3d.framework.meshRenderer;
+    private guiMsg;
+    setGUI(): void;
+    private impulseBox();
+    private force;
+    private contactlocalPoint;
+    private doImpulse(phyImpostor);
     initCamera(): void;
     ckBodySleeped(): void;
     private tcount;
@@ -908,6 +1153,129 @@ declare class test_3DPhysics_kinematic implements IState {
     onPonitMove([x, y]: [any, any]): void;
     updateRoate(): void;
     doRay(): void;
+    update(delta: number): void;
+}
+declare class test_3DPhysics_motor_hinge implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    background: gd3d.framework.transform;
+    parts: gd3d.framework.transform;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    count: number;
+    counttimer: number;
+    astMgr: gd3d.framework.assetMgr;
+    mrs: gd3d.framework.meshRenderer[];
+    iptMgr: gd3d.framework.inputMgr;
+    start(app: gd3d.framework.application): Promise<any>;
+    mats: {
+        [name: string]: gd3d.framework.material;
+    };
+    initMats(): void;
+    private addMat(name, color);
+    loadbySync(url: string): gd3d.threading.gdPromise<any>;
+    private boxTran;
+    init(): void;
+    private guiMsg;
+    setGUI(): void;
+    private motorSpeed;
+    private targetMotor;
+    private changeMotorSpeed();
+    private impulseBox();
+    private force;
+    private contactlocalPoint;
+    private tempV3;
+    private doImpulse(phyImpostor);
+    initCamera(): void;
+    ckBodySleeped(): void;
+    attachMesh(tran: gd3d.framework.transform, mat: gd3d.framework.material, meshName: string): gd3d.framework.meshRenderer;
+    private tcount;
+    private time;
+    update(delta: number): void;
+}
+declare class test_3DPhysics_motor_slider implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    background: gd3d.framework.transform;
+    parts: gd3d.framework.transform;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    count: number;
+    counttimer: number;
+    astMgr: gd3d.framework.assetMgr;
+    mrs: gd3d.framework.meshRenderer[];
+    iptMgr: gd3d.framework.inputMgr;
+    start(app: gd3d.framework.application): Promise<any>;
+    mats: {
+        [name: string]: gd3d.framework.material;
+    };
+    initMats(): void;
+    private addMat(name, color);
+    loadbySync(url: string): gd3d.threading.gdPromise<any>;
+    private boxTran;
+    init(): void;
+    private guiMsg;
+    setGUI(): void;
+    private impulseBox();
+    private force;
+    private contactlocalPoint;
+    private tempV3;
+    private doImpulse(phyImpostor);
+    initCamera(): void;
+    ckBodySleeped(): void;
+    attachMesh(tran: gd3d.framework.transform, mat: gd3d.framework.material, meshName: string): gd3d.framework.meshRenderer;
+    private motorSpeed;
+    private targetMotor;
+    private changeMotorSpeed();
+    private tcount;
+    private time;
+    update(delta: number): void;
+}
+declare class test_3DPhysics_motor_wheel implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    background: gd3d.framework.transform;
+    parts: gd3d.framework.transform;
+    timer: number;
+    taskmgr: gd3d.framework.taskMgr;
+    count: number;
+    counttimer: number;
+    astMgr: gd3d.framework.assetMgr;
+    mrs: gd3d.framework.meshRenderer[];
+    iptMgr: gd3d.framework.inputMgr;
+    start(app: gd3d.framework.application): Promise<any>;
+    mats: {
+        [name: string]: gd3d.framework.material;
+    };
+    initMats(): void;
+    private addMat(name, color);
+    loadbySync(url: string): gd3d.threading.gdPromise<any>;
+    private boxTran;
+    init(): void;
+    private connectedPivot;
+    private mainPivot;
+    private pole;
+    private pole_1;
+    addDisplayObj(): void;
+    private tempV3;
+    syncDisplayRT(): void;
+    private motorSpeed;
+    private targetMotor;
+    private changeMotorSpeed();
+    attachMesh(tran: gd3d.framework.transform, mat: gd3d.framework.material, meshName: string): gd3d.framework.meshRenderer;
+    private guiMsg;
+    setGUI(): void;
+    private impulseBox();
+    private force;
+    private contactlocalPoint;
+    private doImpulse(phyImpostor);
+    initCamera(): void;
+    ckBodySleeped(): void;
+    private tcount;
+    private time;
     update(delta: number): void;
 }
 declare namespace t {
@@ -1891,6 +2259,13 @@ declare namespace gd3d.framework {
         private onTouch();
         remove(): void;
     }
+}
+declare let dat: any;
+declare let Promise: any;
+declare class datGui {
+    private static _inited;
+    static init(): Promise<void>;
+    private static loadJs();
 }
 declare class UseAniplayClipDemo implements IState {
     app: gd3d.framework.application;

@@ -23,26 +23,17 @@ namespace gd3d.framework
         * @param oimoInjection Omio对象
         * @version egret-gd3d 1.0
         */
-        public constructor(option ?: number, oimoInjection = OIMO) {
+        public constructor(iterations ?: number, oimoInjection = OIMO) {
             this.BJSOIMO = oimoInjection;
             if (!this.isSupported()) {
                 console.error("OIMO is not available. Please make sure you included the js file.");
                 return;
             }
-            let _o : any = {};
-            if(option) _o = option;
-
-            let opt_1 = {
-                timestep: _o.timestep != undefined ? _o.timestep :  1/60,
-                iterations: _o.iterations != undefined ? _o.iterations : 8,
-                broadphase: _o.broadphase != undefined ? _o.broadphase : 2,
-                worldscale: _o.worldscale != undefined ? _o.worldscale : 1,
-                random: _o.random != undefined ? _o.random : true,
-                info: _o.info != undefined ? _o.info : false,
-                gravity: _o.gravity != undefined ? _o.gravity : [0,-9.8,0]
+            let opt = {
+                iterations: iterations,
             };
 
-            this.world = new this.BJSOIMO.World( opt_1 );
+            this.world = new this.BJSOIMO.World( opt );
 
             this.world.clear();
 
@@ -309,69 +300,77 @@ namespace gd3d.framework
         }
 
         public generateJoint(impostorJoint: PhysicsImpostorJoint) {
-            // var mainBody = impostorJoint.mainImpostor.physicsBody;
-            // var connectedBody = impostorJoint.connectedImpostor.physicsBody;
-            // if (!mainBody || !connectedBody) {
-            //     return;
-            // }
-            // var constraint: any;
-            // var jointData = impostorJoint.joint.jointData;
-            // //TODO - https://github.com/schteppe/this.BJSCANNON.js/blob/gh-pages/demos/collisionFilter.html
-            // var constraintData = {
-            //     pivotA: jointData.mainPivot ? new BJSCANNON.Vec3().copy(jointData.mainPivot) : null,
-            //     pivotB: jointData.connectedPivot ? new BJSCANNON.Vec3().copy(jointData.connectedPivot) : null,
-            //     axisA: jointData.mainAxis ? new BJSCANNON.Vec3().copy(jointData.mainAxis) : null,
-            //     axisB: jointData.connectedAxis ? new BJSCANNON.Vec3().copy(jointData.connectedAxis) : null,
-            //     maxForce: jointData.nativeParams.maxForce,
-            //     collideConnected: !!jointData.collision
-            // };
-            // switch (impostorJoint.joint.type) {
-            //     case PhysicsJoint.HingeJoint:
-            //     case PhysicsJoint.Hinge2Joint:
-            //         constraint = new BJSCANNON.HingeConstraint(mainBody, connectedBody, constraintData);
-            //         break;
-            //     case PhysicsJoint.DistanceJoint:
-            //         constraint = new BJSCANNON.DistanceConstraint(mainBody, connectedBody, (<DistanceJointData>jointData).maxDistance || 2)
-            //         break;
-            //     case PhysicsJoint.SpringJoint:
-            //         var springData = <SpringJointData>jointData;
-            //         constraint = new BJSCANNON.Spring(mainBody, connectedBody, {
-            //             restLength: springData.length,
-            //             stiffness: springData.stiffness,
-            //             damping: springData.damping,
-            //             localAnchorA: constraintData.pivotA,
-            //             localAnchorB: constraintData.pivotB
-            //         });
-            //         break;
-            //     case PhysicsJoint.LockJoint:
-            //         constraint = new BJSCANNON.LockConstraint(mainBody, connectedBody, constraintData);
-            //         break;
-            //     case PhysicsJoint.PointToPointJoint:
-            //     case PhysicsJoint.BallAndSocketJoint:
-            //     default:
-            //         constraint = new BJSCANNON.PointToPointConstraint(mainBody, constraintData.pivotA, connectedBody, constraintData.pivotA, constraintData.maxForce);
-            //         break;
-            // }
-            // //set the collideConnected flag after the creation, since DistanceJoint ignores it.
-            // constraint.collideConnected = !!jointData.collision
-            // impostorJoint.joint.physicsJoint = constraint;
-            // //don't add spring as constraint, as it is not one.
-            // if (impostorJoint.joint.type !== PhysicsJoint.SpringJoint) {
-            //     this.world.addConstraint(constraint);
-            // } else {
-            //     impostorJoint.mainImpostor.registerAfterPhysicsStep(function () {
-            //         constraint.applyForce();
-            //     });
-            // }
+            let mainBody = impostorJoint.mainImpostor.physicsBody;
+            let connectedBody = impostorJoint.connectedImpostor.physicsBody;
+
+            if (!mainBody || !connectedBody) {
+                return;
+            }
+            let jointData = impostorJoint.joint.jointData;
+            let options = jointData.nativeParams || {};
+            let type;
+            
+            let nativeJointData: any = {
+                body1: mainBody,
+                body2: connectedBody,
+
+                axe1: options.axe1 || (jointData.mainAxis ? physicTool.vec3AsArray(jointData.mainAxis): null),
+                axe2: options.axe2 || (jointData.connectedAxis ? physicTool.vec3AsArray(jointData.connectedAxis) : null),
+                pos1: options.pos1 || (jointData.mainPivot ? physicTool.vec3AsArray(jointData.mainPivot) : null),
+                pos2: options.pos2 || (jointData.connectedPivot ? physicTool.vec3AsArray(jointData.connectedPivot) : null),
+
+                min: options.min,
+                max: options.max,
+                collision: options.collision || jointData.collision,
+                spring: options.spring,
+
+                //supporting older version of Oimo
+                world: this.world
+
+            };
+            switch (impostorJoint.joint.type) {
+                case PhysicsJoint.BallAndSocketJoint:
+                    type = "jointBall";
+                    break;
+                case PhysicsJoint.SpringJoint:
+                    console.warn("OIMO.js doesn't support Spring Constraint. Simulating using DistanceJoint instead");
+                    let springData = <SpringJointData>jointData;
+                    nativeJointData.min = springData.length || nativeJointData.min;
+                    //Max should also be set, just make sure it is at least min
+                    nativeJointData.max = Math.max(nativeJointData.min, nativeJointData.max);
+                case PhysicsJoint.DistanceJoint:
+                    type = "jointDistance";
+                    nativeJointData.max = (<DistanceJointData>jointData).maxDistance;
+                    break;
+                case PhysicsJoint.PrismaticJoint:
+                    type = "jointPrisme";
+                    break;
+                case PhysicsJoint.SliderJoint:
+                    type = "jointSlide";
+                    break;
+                case PhysicsJoint.WheelJoint:
+                    type = "jointWheel";
+                    break;
+                case PhysicsJoint.HingeJoint:
+                default:
+                    type = "jointHinge";
+                    break;
+            }
+            nativeJointData.type = type;
+            impostorJoint.joint.physicsJoint = this.world.add(nativeJointData);
         }
 
         public removeJoint(impostorJoint: PhysicsImpostorJoint) {
-            this.world.removeConstraint(impostorJoint.joint.physicsJoint);
+            try{
+                this.world.removeConstraint(impostorJoint.joint.physicsJoint);
+            }catch(e){
+                console.warn(e);
+            }
         }
        
         public setTransformationFromPhysicsBody(impostor: PhysicsImpostor) {
-            PhysicsImpostor.Ivec3Copy(impostor.physicsBody.position,impostor.object.localPosition);
-            PhysicsImpostor.IQuatCopy(impostor.physicsBody.quaternion,impostor.object.localRotate);
+            physicTool.Ivec3Copy(impostor.physicsBody.position,impostor.object.localPosition);
+            physicTool.IQuatCopy(impostor.physicsBody.quaternion,impostor.object.localRotate);
             let obj = impostor.object;
             if(obj.parent && obj.parent.parent){  //world 不等同 local 坐标空间时 设置到 世界空间
                 obj.setWorldRotate(obj.localRotate);
@@ -404,14 +403,14 @@ namespace gd3d.framework
         }
 
         public getLinearVelocity(impostor: PhysicsImpostor): math.vector3 {
-            var v = impostor.physicsBody.velocity;
+            let v = impostor.physicsBody.velocity;
             if (!v) {
                 return null;
             }
             return new math.vector3(v.x, v.y, v.z)
         }
         public getAngularVelocity(impostor: PhysicsImpostor):math.vector3 {
-            var v = impostor.physicsBody.angularVelocity;
+            let v = impostor.physicsBody.angularVelocity;
             if (!v) {
                 return null;
             }
@@ -474,7 +473,7 @@ namespace gd3d.framework
             speed *= -1;
     
             //TODO separate rotational and transational motors.
-            var motor = motorIndex ? joint.physicsJoint.rotationalLimitMotor2 : joint.physicsJoint.rotationalLimitMotor1 || joint.physicsJoint.rotationalLimitMotor || joint.physicsJoint.limitMotor;
+            let motor = motorIndex ? joint.physicsJoint.rotationalLimitMotor2 : joint.physicsJoint.rotationalLimitMotor1 || joint.physicsJoint.rotationalLimitMotor || joint.physicsJoint.limitMotor;
             if (motor) {
                 motor.setMotor(speed, force);
             }
@@ -482,7 +481,7 @@ namespace gd3d.framework
 
         public setLimit(joint: IMotorEnabledJoint, upperLimit: number, lowerLimit?: number , motorIndex?: number) {
             //TODO separate rotational and transational motors.
-            var motor = motorIndex ? joint.physicsJoint.rotationalLimitMotor2 : joint.physicsJoint.rotationalLimitMotor1 || joint.physicsJoint.rotationalLimitMotor || joint.physicsJoint.limitMotor;
+            let motor = motorIndex ? joint.physicsJoint.rotationalLimitMotor2 : joint.physicsJoint.rotationalLimitMotor1 || joint.physicsJoint.rotationalLimitMotor || joint.physicsJoint.limitMotor;
             if (motor) {
                 motor.setLimit(upperLimit, lowerLimit === void 0 ? -upperLimit : lowerLimit);
             }

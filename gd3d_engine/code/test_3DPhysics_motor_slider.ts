@@ -1,4 +1,7 @@
-class test_3DPhysics_joint implements IState {
+/** 
+ * 3d物理 滑竿马达 motor slider
+ */
+class test_3DPhysics_motor_slider implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
@@ -10,13 +13,15 @@ class test_3DPhysics_joint implements IState {
     counttimer: number = 0;
     astMgr : gd3d.framework.assetMgr;
     mrs : gd3d.framework.meshRenderer[] = [];
-
+    iptMgr : gd3d.framework.inputMgr;
     async start  (app: gd3d.framework.application) {
         this.app = app;
         this.scene = this.app.getScene();
         this.astMgr = this.app.getAssetMgr();
+        this.iptMgr = this.app.getInputMgr();
         await this.loadbySync(`./res/shader/shader.assetbundle.json`);
         await this.loadbySync(`./res/prefabs/Capsule/Capsule.assetbundle.json`);
+        await datGui.init();
         this.initMats();
         this.initCamera();
         this.init();
@@ -26,25 +31,20 @@ class test_3DPhysics_joint implements IState {
 
     mats : {[name:string] : gd3d.framework.material} = {};
     initMats(){
-        let mat =  new gd3d.framework.material();
-        this.mats["activated"] = mat;
-        let sh = this.astMgr.getShader("diffuse.shader.json");
-        mat.setShader(sh);
-        mat.setVector4("_MainColor",new gd3d.math.vector4(0.51,0.39,0.96,1));
-        
-        //
-        mat =  new gd3d.framework.material();
-        this.mats["floor"] = mat;
-        sh = this.astMgr.getShader("diffuse.shader.json");
-        mat.setShader(sh);
-        mat.setVector4("_MainColor",new gd3d.math.vector4(0.8,0.8,0.8,1));
+        //激活状态
+        this.addMat("activated",new gd3d.math.vector4(0.51,0.39,0.96,1));
+        //yellow
+        this.addMat("yellow",new gd3d.math.vector4(0.8,0.8,0,1));
+        //休眠状态
+        this.addMat("sleeping",new gd3d.math.vector4(0.4,0.4,0.4,1));
+        //purple
+        this.addMat("purple",new gd3d.math.vector4(0.8,0,0.8,1));
+    }
 
-        //
-        mat =  new gd3d.framework.material();
-        this.mats["sleeping"] = mat;
-        sh = this.astMgr.getShader("diffuse.shader.json");
-        mat.setShader(sh);
-        mat.setVector4("_MainColor",new gd3d.math.vector4(0.4,0.4,0.4,1));
+    private addMat(name: string, color:gd3d.math.vector4){
+        let mat = this.mats[name] = new gd3d.framework.material();
+        mat.setShader(this.astMgr.getShader("diffuse.shader.json"));
+        mat.setVector4("_MainColor", color );
     }
 
     loadbySync(url:string){
@@ -57,11 +57,11 @@ class test_3DPhysics_joint implements IState {
         });
     }
 
+    private boxTran : gd3d.framework.transform;
     init(){
-
         let mat_activated = this.mats["activated"];
         let mat_sleeping = this.mats["sleeping"];
-        let mat_floor = this.mats["floor"];
+        let mat_stick = this.mats["yellow"];
         //构建物体-------------------
         // //底面
         // let trans=new gd3d.framework.transform();
@@ -76,60 +76,89 @@ class test_3DPhysics_joint implements IState {
 
         //box
         let trans2=new gd3d.framework.transform();
+        this.boxTran = trans2;
         trans2.name = "box"
-        trans2.localPosition.y=5;
-        trans2.localPosition.x= -0.3;
-        trans2.localPosition.z=0.3;
+        // trans2.localPosition.y=5;
+        trans2.localPosition.x= -4;
+        // trans2.localPosition.z=0.3;
+        trans2.localScale.z = 2;
+        trans2.localScale.y = 3;
         this.scene.addChild(trans2);
-        let mf2=trans2.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER) as gd3d.framework.meshFilter;
-        let mr2=trans2.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER) as gd3d.framework.meshRenderer;
-        mr2.materials[0] = mat_activated;
-        mf2.mesh=this.astMgr.getDefaultMesh("cube");
+        let mr = this.attachMesh(trans2 , mat_activated ,"cube");
 
-        // //sphere
-        // let trans3=new gd3d.framework.transform();
-        // trans3.name = "sphere";
-        // trans3.localPosition.y = 15;
-        // trans3.localPosition.x = -0.2;
-        // trans3.localPosition.z = 0.2;
-        // this.scene.addChild(trans3);
-        // let mf3=trans3.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER) as gd3d.framework.meshFilter;
-        // let mr3=trans3.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER) as gd3d.framework.meshRenderer;
-        // mr3.materials[0] = mat_activated;
-        // mf3.mesh=this.astMgr.getDefaultMesh("sphere");
+        //sphere
+        let trans3=new gd3d.framework.transform();
+        trans3.name = "sphere";
+        trans3.localPosition.y = 8;
+        trans3.localPosition.x = -3;
+        this.scene.addChild(trans3);
+        let mr1 = this.attachMesh(trans3 , mat_activated ,"sphere");
 
         //cylinder
         let cylinder_mid =new gd3d.framework.transform();
         cylinder_mid.name = "cylinder"
         cylinder_mid.localPosition.y = 8;
         this.scene.addChild(cylinder_mid);
-        let mf_cl=cylinder_mid.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER) as gd3d.framework.meshFilter;
-        let mr_cl=cylinder_mid.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER) as gd3d.framework.meshRenderer;
-        mr_cl.materials[0] = mat_activated;
-        mf_cl.mesh=this.astMgr.getDefaultMesh("cylinder");
+        this.attachMesh(cylinder_mid , mat_stick ,"sphere");
 
         //初始化 物理世界-----------------------
-        this.scene.enablePhysics(new gd3d.math.vector3(0,-9.8,0),new gd3d.framework.OimoJSPlugin());
+        this.scene.enablePhysics(new gd3d.math.vector3(0,0,0),new gd3d.framework.OimoJSPlugin());
         // let boxImpostor = new gd3d.framework.PhysicsImpostor(trans2, gd3d.framework.ImpostorType.BoxImpostor, { mass: 1, restitution: 0.6 ,friction: 0.5});
         let boxImpostor = new gd3d.framework.PhysicsImpostor(trans2, gd3d.framework.ImpostorType.BoxImpostor, { mass: 2 });
-        //let sphereImpostor = new gd3d.framework.PhysicsImpostor(trans3, gd3d.framework.ImpostorType.SphereImpostor, { mass: 1, restitution: 0.6 ,friction: 0.5});
-        let cylinderImpostor = new gd3d.framework.PhysicsImpostor(cylinder_mid, gd3d.framework.ImpostorType.CylinderImpostor, { mass: 0 });
+        let sphereImpostor = new gd3d.framework.PhysicsImpostor(trans3, gd3d.framework.ImpostorType.SphereImpostor, { mass: 0.5, restitution: 0.6 ,friction: 0.5});
+        let cylinderImpostor = new gd3d.framework.PhysicsImpostor(cylinder_mid, gd3d.framework.ImpostorType.SphereImpostor, { mass: 0 ,friction:0.5});
 
-        this.mrs.push(mr2,mr2,mr_cl);
-
+        this.mrs.push(mr,mr1);
 
         //Add Joint
-        let joint1 = new gd3d.framework.HingeJoint({
-            mainPivot: new gd3d.math.vector3(0, 0, 0),
-            connectedPivot: new gd3d.math.vector3(0, -4.5, 0),
-            mainAxis: new gd3d.math.vector3(0, 0, 1),
-            connectedAxis: new gd3d.math.vector3(0, 0, 0),
-            nativeParams: {
-            }
+        let phyJ = gd3d.framework.MotorEnabledJoint;
+        let joint1 = new phyJ(phyJ.SliderJoint,{
+            mainAxis : new gd3d.math.vector3(1,0,0),
+            collision : true
         });
+        this.targetMotor = joint1;
+        cylinderImpostor.addJoint(boxImpostor , joint1);
+        joint1.setMotor(this.motorSpeed);
 
-        cylinderImpostor.addJoint(boxImpostor , joint1); 
-        
+        //GUI
+        this.setGUI();
+    }
+
+    private guiMsg = "铰链关节测试demo slider";
+    setGUI(){
+        if(!dat) return;
+        let gui = new dat.GUI();
+        gui.add(this, 'guiMsg');
+        //force
+        let folderF = gui.addFolder("force (冲量)");
+        let limitf = 100;
+        folderF.add(this.force, 'x', -limitf, limitf);
+        folderF.add(this.force, 'y', -limitf, limitf);
+        folderF.add(this.force, 'z', -limitf, limitf);
+        let folderC = gui.addFolder("contactPoint (施加点)");
+        let limitc = 3;
+        folderC.add(this.contactlocalPoint, 'x', -limitc, limitc);
+        folderC.add(this.contactlocalPoint, 'y', -limitc, limitc);
+        folderC.add(this.contactlocalPoint, 'z', -limitc, limitc);
+        gui.add(this , "motorSpeed",1,100);
+        let folderFun = gui.addFolder("触发方法");
+        folderFun.open();
+
+        folderFun.add(this, 'impulseBox' );
+        folderFun.add(this, 'changeMotorSpeed' );
+    }
+
+    private impulseBox(){
+        this.doImpulse(this.boxTran.physicsImpostor);
+    }
+
+    private force = new gd3d.math.vector3(10,0,0);
+    private contactlocalPoint = new gd3d.math.vector3(0,0,0);
+    private tempV3 = new gd3d.math.vector3();
+    private doImpulse(phyImpostor : gd3d.framework.PhysicsImpostor){
+        let pos = this.tempV3;
+        gd3d.math.vec3Add(phyImpostor.object.getWorldPosition(),this.contactlocalPoint,pos);
+        phyImpostor.applyImpulse(this.force, pos);
     }
 
     initCamera(){
@@ -177,6 +206,20 @@ class test_3DPhysics_joint implements IState {
         });
     }
 
+    attachMesh(tran:gd3d.framework.transform, mat: gd3d.framework.material, meshName : string) : gd3d.framework.meshRenderer{
+        let mf=tran.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER) as gd3d.framework.meshFilter;
+        let mr=tran.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER) as gd3d.framework.meshRenderer;
+        mr.materials[0] = mat;
+        mf.mesh=this.astMgr.getDefaultMesh(meshName);
+        return mr;
+    }
+
+    private motorSpeed = 10;
+    private targetMotor :  gd3d.framework.MotorEnabledJoint;
+    private changeMotorSpeed (){
+        if(!this.targetMotor) return;
+        this.targetMotor.setMotor(this.motorSpeed);
+    }
 
     private tcount = 0;
     private time = 0.5;

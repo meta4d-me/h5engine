@@ -125,7 +125,16 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("3D物理测试",()=>new test_3DPhysics_cannon());
         this.addBtn("3D物理_基础形状",()=>new test_3DPhysics_baseShape());
         this.addBtn("3D物理_动力学",()=>new test_3DPhysics_kinematic());
-        this.addBtn("3D物理_关节",()=>new test_3DPhysics_joint());
+        this.addBtn("3D物理_铰链关节",()=>new test_3DPhysics_joint_hinge());
+        this.addBtn("3D物理_球嵌套关节",()=>new test_3DPhysics_joint_ballandSocket());
+        this.addBtn("3D物理_滑竿关节",()=>new test_3DPhysics_joint_slider());
+        this.addBtn("3D物理_棱柱滑竿关节",()=>new test_3DPhysics_joint_prismatic());
+        this.addBtn("3D物理_距离关节",()=>new test_3DPhysics_joint_distance());
+        this.addBtn("3D物理_车轮关节",()=>new test_3DPhysics_joint_wheel());
+        this.addBtn("3D物理_铰链马达",()=>new test_3DPhysics_motor_hinge());
+        this.addBtn("3D物理_车轮马达",()=>new test_3DPhysics_motor_wheel());
+        this.addBtn("3D物理_滑竿马达",()=>new test_3DPhysics_motor_slider());
+        this.addBtn("3D物理_冻结_位移旋转",()=>new test_3DPhysics_freeze());
         this.addBtn("cannonPhysics3D",()=>new PhysicDemo.physic_01());
 
         //this.addBtn("test_f14",()=>new dome.db_test_f14eff());

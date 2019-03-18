@@ -181,8 +181,8 @@ class test_3DPhysics_kinematic implements IState {
         console.log(`x: ${x} ,y :${y}`);
         let ray = this.camera.creatRayByScreen(viewPos,this.app);
         let mf = this.floor.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
-        mf.mesh.intersects(ray,this.floor.getWorldMatrix(),this.cachePickInfo);
-        if(!this.cachePickInfo || !this.cachePickInfo.hitposition)return;
+        let isinsrt = mf.mesh.intersects(ray,this.floor.getWorldMatrix(),this.cachePickInfo);
+        if(!isinsrt || !this.cachePickInfo || !this.cachePickInfo.hitposition)return;
         let pos = this.cachePickInfo.hitposition;
         console.log(`pos  x: ${pos.x} ,y :${pos.y} , z: ${pos.z}`);
 
@@ -196,6 +196,7 @@ class test_3DPhysics_kinematic implements IState {
         this.cache_y += 3;
         gd3d.math.quatFromEulerAngles(0,this.cache_y,0,this.cacheRota);
         this.ctrBox.physicsImpostor.kinematicSetRotation(this.cacheRota); //更新动力学 旋转
+        
     }
 
     doRay(){

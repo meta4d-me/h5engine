@@ -23026,15 +23026,35 @@ var gd3d;
             math.quatNormalize(out, out);
         }
         math.quatFromEulerAngles = quatFromEulerAngles;
-        function quatToEulerAngles(src, out) {
-            var temp = 2.0 * (src.w * src.x - src.y * src.z);
-            temp = math.floatClamp(temp, -1.0, 1.0);
-            out.x = Math.asin(temp);
-            out.y = Math.atan2(2.0 * (src.w * src.y + src.z * src.x), 1.0 - 2.0 * (src.y * src.y + src.x * src.x));
-            out.z = Math.atan2(2.0 * (src.w * src.z + src.y * src.x), 1.0 - 2.0 * (src.x * src.x + src.z * src.z));
-            out.x /= Math.PI / 180;
-            out.y /= Math.PI / 180;
-            out.z /= Math.PI / 180;
+        function quatToEulerAngles(src, result) {
+            var qz = src.z;
+            var qx = src.x;
+            var qy = src.y;
+            var qw = src.w;
+            var sqw = qw * qw;
+            var sqz = qz * qz;
+            var sqx = qx * qx;
+            var sqy = qy * qy;
+            var zAxisY = qy * qz - qx * qw;
+            var limit = .4999999;
+            if (zAxisY < -limit) {
+                result.y = 2 * Math.atan2(qy, qw);
+                result.x = Math.PI / 2;
+                result.z = 0;
+            }
+            else if (zAxisY > limit) {
+                result.y = 2 * Math.atan2(qy, qw);
+                result.x = -Math.PI / 2;
+                result.z = 0;
+            }
+            else {
+                result.z = Math.atan2(2.0 * (qx * qy + qz * qw), (-sqz - sqx + sqy + sqw));
+                result.x = Math.asin(-2.0 * (qz * qy - qx * qw));
+                result.y = Math.atan2(2.0 * (qz * qx + qy * qw), (sqz - sqx - sqy + sqw));
+            }
+            result.x /= Math.PI / 180;
+            result.y /= Math.PI / 180;
+            result.z /= Math.PI / 180;
         }
         math.quatToEulerAngles = quatToEulerAngles;
         function quatReset(src) {
@@ -29661,7 +29681,7 @@ var gd3d;
         var help_v3_2 = new gd3d.math.vector3();
         var help_quat = new gd3d.math.quaternion();
         var OimoJSPlugin = (function () {
-            function OimoJSPlugin(option, oimoInjection) {
+            function OimoJSPlugin(iterations, oimoInjection) {
                 if (oimoInjection === void 0) { oimoInjection = OIMO; }
                 this.name = "OIMOJSPlugin";
                 this._physicsMaterials = new Array();
@@ -29673,19 +29693,10 @@ var gd3d;
                     console.error("OIMO is not available. Please make sure you included the js file.");
                     return;
                 }
-                var _o = {};
-                if (option)
-                    _o = option;
-                var opt_1 = {
-                    timestep: _o.timestep != undefined ? _o.timestep : 1 / 60,
-                    iterations: _o.iterations != undefined ? _o.iterations : 8,
-                    broadphase: _o.broadphase != undefined ? _o.broadphase : 2,
-                    worldscale: _o.worldscale != undefined ? _o.worldscale : 1,
-                    random: _o.random != undefined ? _o.random : true,
-                    info: _o.info != undefined ? _o.info : false,
-                    gravity: _o.gravity != undefined ? _o.gravity : [0, -9.8, 0]
+                var opt = {
+                    iterations: iterations,
                 };
-                this.world = new this.BJSOIMO.World(opt_1);
+                this.world = new this.BJSOIMO.World(opt);
                 this.world.clear();
             }
             OimoJSPlugin.prototype.setGravity = function (gravity) {
@@ -29867,13 +29878,68 @@ var gd3d;
                 this.world.removeRigidBody(impostor.physicsBody);
             };
             OimoJSPlugin.prototype.generateJoint = function (impostorJoint) {
+                var mainBody = impostorJoint.mainImpostor.physicsBody;
+                var connectedBody = impostorJoint.connectedImpostor.physicsBody;
+                if (!mainBody || !connectedBody) {
+                    return;
+                }
+                var jointData = impostorJoint.joint.jointData;
+                var options = jointData.nativeParams || {};
+                var type;
+                var nativeJointData = {
+                    body1: mainBody,
+                    body2: connectedBody,
+                    axe1: options.axe1 || (jointData.mainAxis ? framework.physicTool.vec3AsArray(jointData.mainAxis) : null),
+                    axe2: options.axe2 || (jointData.connectedAxis ? framework.physicTool.vec3AsArray(jointData.connectedAxis) : null),
+                    pos1: options.pos1 || (jointData.mainPivot ? framework.physicTool.vec3AsArray(jointData.mainPivot) : null),
+                    pos2: options.pos2 || (jointData.connectedPivot ? framework.physicTool.vec3AsArray(jointData.connectedPivot) : null),
+                    min: options.min,
+                    max: options.max,
+                    collision: options.collision || jointData.collision,
+                    spring: options.spring,
+                    world: this.world
+                };
+                switch (impostorJoint.joint.type) {
+                    case framework.PhysicsJoint.BallAndSocketJoint:
+                        type = "jointBall";
+                        break;
+                    case framework.PhysicsJoint.SpringJoint:
+                        console.warn("OIMO.js doesn't support Spring Constraint. Simulating using DistanceJoint instead");
+                        var springData = jointData;
+                        nativeJointData.min = springData.length || nativeJointData.min;
+                        nativeJointData.max = Math.max(nativeJointData.min, nativeJointData.max);
+                    case framework.PhysicsJoint.DistanceJoint:
+                        type = "jointDistance";
+                        nativeJointData.max = jointData.maxDistance;
+                        break;
+                    case framework.PhysicsJoint.PrismaticJoint:
+                        type = "jointPrisme";
+                        break;
+                    case framework.PhysicsJoint.SliderJoint:
+                        type = "jointSlide";
+                        break;
+                    case framework.PhysicsJoint.WheelJoint:
+                        type = "jointWheel";
+                        break;
+                    case framework.PhysicsJoint.HingeJoint:
+                    default:
+                        type = "jointHinge";
+                        break;
+                }
+                nativeJointData.type = type;
+                impostorJoint.joint.physicsJoint = this.world.add(nativeJointData);
             };
             OimoJSPlugin.prototype.removeJoint = function (impostorJoint) {
-                this.world.removeConstraint(impostorJoint.joint.physicsJoint);
+                try {
+                    this.world.removeConstraint(impostorJoint.joint.physicsJoint);
+                }
+                catch (e) {
+                    console.warn(e);
+                }
             };
             OimoJSPlugin.prototype.setTransformationFromPhysicsBody = function (impostor) {
-                framework.PhysicsImpostor.Ivec3Copy(impostor.physicsBody.position, impostor.object.localPosition);
-                framework.PhysicsImpostor.IQuatCopy(impostor.physicsBody.quaternion, impostor.object.localRotate);
+                framework.physicTool.Ivec3Copy(impostor.physicsBody.position, impostor.object.localPosition);
+                framework.physicTool.IQuatCopy(impostor.physicsBody.quaternion, impostor.object.localRotate);
                 var obj = impostor.object;
                 if (obj.parent && obj.parent.parent) {
                     obj.setWorldRotate(obj.localRotate);
@@ -30101,6 +30167,7 @@ var gd3d;
     (function (framework) {
         var help_v3 = new gd3d.math.vector3();
         var help_v3_1 = new gd3d.math.vector3();
+        var help_quat = new gd3d.math.quaternion();
         var PhysicsImpostor = (function () {
             function PhysicsImpostor(object, type, _options) {
                 if (_options === void 0) { _options = { mass: 0 }; }
@@ -30137,8 +30204,11 @@ var gd3d;
                         func(_this);
                     });
                 };
+                this._freezeMask = 0;
                 this.lastbodywPos = new gd3d.math.vector3();
                 this.lastbodywRot = new gd3d.math.quaternion();
+                this.lastEuler = new gd3d.math.vector3();
+                this.lastRotMask = 0;
                 this.afterStep = function () {
                     if (!_this._physicsEngine) {
                         return;
@@ -30146,15 +30216,78 @@ var gd3d;
                     _this._onAfterPhysicsStepCallbacks.forEach(function (func) {
                         func(_this);
                     });
-                    _this.physicsBody.position;
-                    _this.physicsBody.quaternion;
-                    PhysicsImpostor;
-                    var hasDirty = !PhysicsImpostor.Ivec3Equal(_this.physicsBody.position, _this.lastbodywPos) || !PhysicsImpostor.IQuatEqual(_this.physicsBody.quaternion, _this.lastbodywRot);
-                    PhysicsImpostor.Ivec3Copy(_this.physicsBody.position, _this.lastObjwPos);
-                    PhysicsImpostor.IQuatCopy(_this.physicsBody.quaternion, _this.lastObjwRot);
-                    if (hasDirty) {
-                        _this._physicsEngine.getPhysicsPlugin().setTransformationFromPhysicsBody(_this);
+                    var lwpos = _this.lastbodywPos;
+                    var lwrot = _this.lastbodywRot;
+                    var posDirty = !framework.physicTool.Ivec3Equal(_this.physicsBody.position, lwpos);
+                    var rotDirty = !framework.physicTool.IQuatEqual(_this.physicsBody.quaternion, lwrot);
+                    if (_this._freezeMask > 0) {
+                        if (posDirty) {
+                            var pPos = _this._physicsBody.position;
+                            var linearVelocity = _this._physicsBody.linearVelocity;
+                            if (_this.getFreeze(FreezeType.Position_x)) {
+                                pPos.x = lwpos.x;
+                                linearVelocity.x = 0;
+                            }
+                            if (_this.getFreeze(FreezeType.Position_y)) {
+                                pPos.y = lwpos.y;
+                                linearVelocity.y = 0;
+                            }
+                            if (_this.getFreeze(FreezeType.Position_z)) {
+                                pPos.z = lwpos.z;
+                                linearVelocity.z = 0;
+                            }
+                        }
+                        if (rotDirty) {
+                            var l_x = _this.getFreeze(FreezeType.Rotation_x);
+                            var l_y = _this.getFreeze(FreezeType.Rotation_y);
+                            var l_z = _this.getFreeze(FreezeType.Rotation_z);
+                            var pRot = _this._physicsBody.quaternion;
+                            var angularVelocity = _this._physicsBody.angularVelocity;
+                            if (!l_x || !l_y || !l_z) {
+                                var Euler = help_v3;
+                                framework.physicTool.IQuatCopy(pRot, help_quat);
+                                gd3d.math.quatToEulerAngles(help_quat, Euler);
+                                var lEuler = _this.lastEuler;
+                                var mask_ = l_x ? 1 : 0 | l_y ? 2 : 0 | l_z ? 4 : 0;
+                                if (mask_ != _this.lastRotMask) {
+                                    gd3d.math.quatToEulerAngles(lwrot, lEuler);
+                                }
+                                _this.lastRotMask = mask_;
+                                var t_x = lEuler.x;
+                                var t_y = lEuler.y;
+                                var t_z = lEuler.z;
+                                if (_this.getFreeze(FreezeType.Rotation_x)) {
+                                    angularVelocity.x = 0;
+                                }
+                                else {
+                                    t_x = Euler.x;
+                                }
+                                if (_this.getFreeze(FreezeType.Rotation_y)) {
+                                    angularVelocity.y = 0;
+                                }
+                                else {
+                                    t_y = Euler.y;
+                                }
+                                if (_this.getFreeze(FreezeType.Rotation_z)) {
+                                    angularVelocity.z = 0;
+                                }
+                                else {
+                                    t_z = Euler.z;
+                                }
+                                gd3d.math.quatFromEulerAngles(t_x, t_y, t_z, help_quat);
+                                framework.physicTool.IQuatCopy(help_quat, pRot);
+                            }
+                            else {
+                                angularVelocity.x = angularVelocity.y = angularVelocity.z = 0;
+                                framework.physicTool.IQuatCopy(lwrot, pRot);
+                            }
+                        }
                     }
+                    framework.physicTool.Ivec3Copy(_this.physicsBody.position, lwpos);
+                    framework.physicTool.IQuatCopy(_this.physicsBody.quaternion, lwrot);
+                    if (!posDirty && !rotDirty)
+                        return;
+                    _this._physicsEngine.getPhysicsPlugin().setTransformationFromPhysicsBody(_this);
                 };
                 this.onCollideEvent = null;
                 this.onCollide = function (e) {
@@ -30407,22 +30540,18 @@ var gd3d;
                     console.warn("Function to remove was not found");
                 }
             };
-            PhysicsImpostor.Ivec3Equal = function (a, b) {
-                return a.x == b.x && a.y == b.y && a.z == b.z;
+            PhysicsImpostor.prototype.setFreeze = function (option, beSelect) {
+                if (beSelect) {
+                    this._freezeMask |= option;
+                }
+                else {
+                    if (this._freezeMask & option) {
+                        this._freezeMask ^= option;
+                    }
+                }
             };
-            PhysicsImpostor.IQuatEqual = function (a, b) {
-                return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
-            };
-            PhysicsImpostor.Ivec3Copy = function (from, to) {
-                to.x = from.x;
-                to.y = from.y;
-                to.z = from.z;
-            };
-            PhysicsImpostor.IQuatCopy = function (from, to) {
-                to.x = from.x;
-                to.y = from.y;
-                to.z = from.z;
-                to.w = from.w;
+            PhysicsImpostor.prototype.getFreeze = function (option) {
+                return this._freezeMask & option;
             };
             PhysicsImpostor.prototype.applyForce = function (force, contactPoint) {
                 if (this._physicsEngine) {
@@ -30544,6 +30673,15 @@ var gd3d;
             ImpostorType[ImpostorType["ClothImpostor"] = 102] = "ClothImpostor";
             ImpostorType[ImpostorType["SoftbodyImpostor"] = 103] = "SoftbodyImpostor";
         })(ImpostorType = framework.ImpostorType || (framework.ImpostorType = {}));
+        var FreezeType;
+        (function (FreezeType) {
+            FreezeType[FreezeType["Position_x"] = 1] = "Position_x";
+            FreezeType[FreezeType["Position_y"] = 2] = "Position_y";
+            FreezeType[FreezeType["Position_z"] = 4] = "Position_z";
+            FreezeType[FreezeType["Rotation_x"] = 8] = "Rotation_x";
+            FreezeType[FreezeType["Rotation_y"] = 16] = "Rotation_y";
+            FreezeType[FreezeType["Rotation_z"] = 32] = "Rotation_z";
+        })(FreezeType = framework.FreezeType || (framework.FreezeType = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -30647,6 +30785,42 @@ var gd3d;
             return Hinge2Joint;
         }(MotorEnabledJoint));
         framework.Hinge2Joint = Hinge2Joint;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var physicTool = (function () {
+            function physicTool() {
+            }
+            physicTool.Ivec3Equal = function (a, b) {
+                return a.x == b.x && a.y == b.y && a.z == b.z;
+            };
+            physicTool.IQuatEqual = function (a, b) {
+                return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
+            };
+            physicTool.Ivec3Copy = function (from, to) {
+                to.x = from.x;
+                to.y = from.y;
+                to.z = from.z;
+            };
+            physicTool.IQuatCopy = function (from, to) {
+                to.x = from.x;
+                to.y = from.y;
+                to.z = from.z;
+                to.w = from.w;
+            };
+            physicTool.vec3AsArray = function (vec3) {
+                var result = [];
+                result[0] = vec3.rawData[0];
+                result[1] = vec3.rawData[1];
+                result[2] = vec3.rawData[2];
+                return result;
+            };
+            return physicTool;
+        }());
+        framework.physicTool = physicTool;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

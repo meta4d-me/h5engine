@@ -242,19 +242,39 @@
 
         math.quatNormalize(out, out);
     }
-    export function quatToEulerAngles(src: quaternion, out: vector3) {
-        var temp: number = 2.0 * (src.w * src.x - src.y * src.z);
-        temp = math.floatClamp(temp, -1.0, 1.0);
-        out.x = Math.asin(temp);
+    export function quatToEulerAngles(src: quaternion, result: vector3) {
+        let qz = src.z;
+        let qx = src.x;
+        let qy = src.y;
+        let qw = src.w;
 
-        out.y = Math.atan2(2.0 * (src.w * src.y + src.z * src.x), 1.0 - 2.0 * (src.y * src.y + src.x * src.x));
+        let sqw = qw * qw;
+        let sqz = qz * qz;
+        let sqx = qx * qx;
+        let sqy = qy * qy;
 
-        out.z = Math.atan2(2.0 * (src.w * src.z + src.y * src.x), 1.0 - 2.0 * (src.x * src.x + src.z * src.z));
+        let zAxisY = qy * qz - qx * qw;
+        let limit = .4999999;
 
-        out.x /= Math.PI / 180;
-        out.y /= Math.PI / 180;
-        out.z /= Math.PI / 180;
+        if (zAxisY < -limit) {
+            result.y = 2 * Math.atan2(qy, qw);
+            result.x = Math.PI / 2;
+            result.z = 0;
+        } else if (zAxisY > limit) {
+            result.y = 2 * Math.atan2(qy, qw);
+            result.x = -Math.PI / 2;
+            result.z = 0;
+        } else {
+            result.z = Math.atan2(2.0 * (qx * qy + qz * qw), (-sqz - sqx + sqy + sqw));
+            result.x = Math.asin(-2.0 * (qz * qy - qx * qw));
+            result.y = Math.atan2(2.0 * (qz * qx + qy * qw), (sqz - sqx - sqy + sqw));
+        }
+
+        result.x /= Math.PI / 180;
+        result.y /= Math.PI / 180;
+        result.z /= Math.PI / 180;
     }
+    
     export function quatReset(src: quaternion) {
         src.x = 0;
         src.y = 0;

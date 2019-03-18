@@ -71,21 +71,53 @@ namespace gd3d.framework {
         //TODO check if the native joints are the same
 
         //Joint Types
+        /**
+         * Distance-Joint type
+         */
         public static DistanceJoint = 0;
+        /**
+         * Hinge-Joint type
+         */
         public static HingeJoint = 1;
+        /**
+         * Ball-and-Socket joint type
+         */
         public static BallAndSocketJoint = 2;
+        /**
+         * Wheel-Joint type
+         */
         public static WheelJoint = 3;
+        /**
+         * Slider-Joint type
+         */
         public static SliderJoint = 4;
         //OIMO
+        /**
+         * Prismatic-Joint type
+         */
         public static PrismaticJoint = 5;
-        //ENERGY FTW! (compare with this - http://ode-wiki.org/wiki/index.php?title=Manual:_Joint_Types_and_Functions)
+        //
+        /**
+         * Universal-Joint type
+         */
         public static UniversalJoint = 6;
+        /**
+         * Hinge-Joint 2 type
+         */
         public static Hinge2Joint = PhysicsJoint.WheelJoint;
         //Cannon
-        //Similar to a Ball-Joint. Different in params
+        /**
+         * Point to Point Joint type.  Similar to a Ball-Joint.  Different in parameters
+         */
         public static PointToPointJoint = 8;
         //Cannon only at the moment
+        /**
+         * Spring-Joint type
+         */
         public static SpringJoint = 9;
+        /**
+         * Lock-Joint type
+         */
         public static LockJoint = 10;
     }
 
@@ -105,6 +137,9 @@ namespace gd3d.framework {
         }
     }
     
+    /**
+     * Represents a Motor-Enabled Joint
+     */
     export class MotorEnabledJoint extends PhysicsJoint implements IMotorEnabledJoint {
         
         constructor(type: number, jointData:PhysicsJointData) {
@@ -190,18 +225,26 @@ namespace gd3d.framework {
         }
     }
 
+    /**
+     * Interface for a motor enabled joint
+     */
     export interface IMotorEnabledJoint {
         physicsJoint: any;
         setMotor(force?: number, maxForce?: number, motorIndex?: number): void;
         setLimit(upperLimit: number, lowerLimit?: number, motorIndex?: number): void;
     }
 
+    /**
+     * Joint data for a Distance-Joint
+     */
     export interface DistanceJointData extends PhysicsJointData {
         maxDistance: number;
         //Oimo - minDistance
         //Cannon - maxForce
     }
-
+    /**
+     * Joint data from a spring joint
+     */
     export interface SpringJointData extends PhysicsJointData {
         length: number;
         stiffness: number;

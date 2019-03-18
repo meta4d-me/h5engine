@@ -4060,7 +4060,7 @@ declare namespace gd3d.math {
     function quatFromAxisAngle(axis: vector3, angle: number, out: quaternion): void;
     function quatToAxisAngle(src: quaternion, axis: vector3): number;
     function quatFromEulerAngles(ax: number, ay: number, az: number, out: quaternion): void;
-    function quatToEulerAngles(src: quaternion, out: vector3): void;
+    function quatToEulerAngles(src: quaternion, result: vector3): void;
     function quatReset(src: quaternion): void;
     function quatLookat(pos: vector3, targetpos: vector3, out: quaternion): void;
     function quat2Lookat(pos: vector3, targetpos: vector3, out: quaternion, updir?: gd3d.math.vector3): void;
@@ -5311,7 +5311,7 @@ declare namespace gd3d.framework {
         private _physicsMaterials;
         private _fixedTimeStep;
         BJSOIMO: any;
-        constructor(option?: number, oimoInjection?: any);
+        constructor(iterations?: number, oimoInjection?: any);
         setGravity(gravity: math.vector3): void;
         setTimeStep(timeStep: number): void;
         getTimeStep(): number;
@@ -5496,30 +5496,13 @@ declare namespace gd3d.framework {
         private lastObjwPos;
         private lastObjwRot;
         beforeStep: () => void;
-        static Ivec3Equal(a: any, b: any): boolean;
-        static IQuatEqual(a: any, b: any): boolean;
-        static Ivec3Copy(from: {
-            x;
-            y;
-            z;
-        }, to: {
-            x;
-            y;
-            z;
-        }): void;
-        static IQuatCopy(from: {
-            x;
-            y;
-            z;
-            w;
-        }, to: {
-            x;
-            y;
-            z;
-            w;
-        }): void;
+        private _freezeMask;
+        setFreeze(option: FreezeType, beSelect: boolean): void;
+        getFreeze(option: FreezeType): number;
         private lastbodywPos;
         private lastbodywRot;
+        private lastEuler;
+        private lastRotMask;
         afterStep: () => void;
         onCollideEvent: (collider: PhysicsImpostor, collidedWith: PhysicsImpostor) => void;
         onCollide: (e: {
@@ -5554,6 +5537,14 @@ declare namespace gd3d.framework {
         RopeImpostor = 101,
         ClothImpostor = 102,
         SoftbodyImpostor = 103,
+    }
+    enum FreezeType {
+        Position_x = 1,
+        Position_y = 2,
+        Position_z = 4,
+        Rotation_x = 8,
+        Rotation_y = 16,
+        Rotation_z = 32,
     }
 }
 declare namespace gd3d.framework {
@@ -5617,6 +5608,33 @@ declare namespace gd3d.framework {
         length: number;
         stiffness: number;
         damping: number;
+    }
+}
+declare namespace gd3d.framework {
+    class physicTool {
+        static Ivec3Equal(a: any, b: any): boolean;
+        static IQuatEqual(a: any, b: any): boolean;
+        static Ivec3Copy(from: {
+            x;
+            y;
+            z;
+        }, to: {
+            x;
+            y;
+            z;
+        }): void;
+        static IQuatCopy(from: {
+            x;
+            y;
+            z;
+            w;
+        }, to: {
+            x;
+            y;
+            z;
+            w;
+        }): void;
+        static vec3AsArray(vec3: math.vector3): any[];
     }
 }
 declare namespace gd3d.framework {
