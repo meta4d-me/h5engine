@@ -308,7 +308,7 @@
         vector.rawData[2] = value;
     }
 
-    export function vec3Set(vector : vector2 , x : number ,  y : number , z : number){
+    export function vec3Set(vector : vector3 , x : number ,  y : number , z : number){
         vector.rawData[0] = x;
         vector.rawData[1] = y;
         vector.rawData[2] = z;

@@ -157,7 +157,7 @@ namespace gd3d.framework
                 let globalQuat = help_quat; //是否能用 缓存？
                 globalQuat.x = globalQuat.y = globalQuat.z = 0;
                 globalQuat.w = 1;
-                
+                let wPos_impostor = impostor.object.getWorldPosition();
                 impostors.forEach( i => {
                     
                     //get the correct bounding box
@@ -192,11 +192,13 @@ namespace gd3d.framework
                         bodyConfig.rotShape.push(0, 0, 0);
 
                     } else {
-                        let localPosition = help_v3_2;
                         // math.vec3Subtract(i.object.getWorldPosition(),impostor.object.getWorldPosition() ,localPosition );
-                        math.vec3Clone(i.object.localPosition ,localPosition);
+                        // math.vec3Clone(i.object.getWorldPosition() ,localPosition);
                         // let localPosition = i.object.getAbsolutePosition().subtract(impostor.object.getAbsolutePosition());
-                        bodyConfig.pos.push(0, 0, 0);
+                        
+                        let localPosition = help_v3_2;
+                        gd3d.math.vec3Subtract(i.object.getWorldPosition() , wPos_impostor ,localPosition);  //子物体世界坐标 与 主物体世界坐标 的差值
+                        // bodyConfig.pos.push(0, 0, 0);
                         bodyConfig.posShape.push(localPosition.x);
                         bodyConfig.posShape.push(localPosition.y);
                         bodyConfig.posShape.push(localPosition.z);
@@ -267,7 +269,6 @@ namespace gd3d.framework
                 impostor.physicsBody.updatePosition(0);
 
                 //计算重心对显示模型原点的偏差
-                
                 let massCenter = help_v3;
                 let p = impostor.physicsBody.position;
                 math.vec3Set(massCenter,p.x,p.y,p.z);

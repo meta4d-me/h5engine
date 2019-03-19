@@ -161,7 +161,7 @@ namespace gd3d.framework {
                 this._joints = [];
                 
                 //If the mesh has a parent and parent is not the scene rootNode , don't initialize the physicsBody. Instead wait for the parent to do that.
-                if (!this.object.parent || this.object.parent == this.object.scene.getRoot() || this._options.ignoreParent) {
+                if (!this.object.parent ||( this.object.scene && this.object.parent == this.object.scene.getRoot()) || this._options.ignoreParent) {
                     this._init();
                 } else if (this.object.parent && this.object.parent.physicsImpostor) {
                     console.warn("You must affect impostors to children before affecting impostor to parent.");
@@ -446,20 +446,18 @@ namespace gd3d.framework {
                 return;
             }
 
-            //处理 质心点 与 模型中心点 的偏移
-            // this.object.translate(this._deltaPosition, -1);
-            let offset_wpos = help_v3;
-            math.vec3Clone(this._deltaPosition,offset_wpos);
-            math.vec3ScaleByNum(offset_wpos,-1,offset_wpos);
             let wpos = this.object.getWorldPosition();
-            math.vec3Add(wpos ,offset_wpos,offset_wpos);
-            // this.object.setWorldPosition(offset_pos);
             let wrot = this.object.getWorldRotate();
-
+            
             let hasDirty = !math.vec3Equal(wpos , this.lastObjwPos) || !math.quatEqual(wrot,this.lastObjwRot);
             math.vec3Clone(wpos , this.lastObjwPos);
             math.quatClone(wrot , this.lastObjwRot);
-          
+            
+            //处理 质心点 与 模型中心点 的偏移
+            let offset_wpos = help_v3;
+            math.vec3Clone(this._deltaPosition,offset_wpos);
+            math.vec3ScaleByNum(offset_wpos,-1,offset_wpos);
+            math.vec3Add(wpos ,offset_wpos,offset_wpos);
 
             // this._deltaRotationConjugated && this.object.rotationQuaternion && this.object.rotationQuaternion.multiplyToRef(this._deltaRotationConjugated, this.object.rotationQuaternion);
             // this.object.computeWorldMatrix(false);
@@ -608,16 +606,15 @@ namespace gd3d.framework {
             // // take the position set and make it the absolute position of this object.
             // this.object.setAbsolutePosition(this.object.position);
            
-            this._physicsEngine.getPhysicsPlugin().setTransformationFromPhysicsBody(this);
-           
+            
             // this._deltaRotation && this.object.rotationQuaternion && this.object.rotationQuaternion.multiplyToRef(this._deltaRotation, this.object.rotationQuaternion);
             
-            // //处理 质心点 与 模型中心点 的偏移
-            // //this.object.translate(this._deltaPosition, 1);
-            // let tempv3 = help_v3;
-            // math.vec3Clone(this._deltaPosition,tempv3);
-            // math.vec3Add(this.object.getWorldPosition(),tempv3,tempv3);
-            // this.object.setWorldPosition(tempv3)
+            //同步到transform
+            this._physicsEngine.getPhysicsPlugin().setTransformationFromPhysicsBody(this);
+            //处理 质心点 与 模型中心点 的偏移
+            let tempv3 = help_v3;
+            math.vec3Add(this.object.getWorldPosition(),this._deltaPosition,tempv3);
+            this.object.setWorldPosition(tempv3)
         }
 
         /**

@@ -1,3 +1,4 @@
+let help_v2 = new gd3d. math.vector2();
 class test_3DPhysics_kinematic implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -78,6 +79,7 @@ class test_3DPhysics_kinematic implements IState {
         //父层级
         let combination = new gd3d.framework.transform();
         combination.name = "combination"
+        // gd3d.math.vec3SetAll(combination.localScale,3);
         combination.localPosition.y = 10;
         this.scene.addChild(combination);
 
@@ -92,7 +94,7 @@ class test_3DPhysics_kinematic implements IState {
         //top sphere
         let sphere_top =new gd3d.framework.transform();
         sphere_top.name = "sphere_top";
-        sphere_top.gameObject.visible = false;
+        // sphere_top.gameObject.visible = false;
         sphere_top.localPosition.y = 0.5;
         gd3d.math.vec3SetAll(sphere_top.localScale,0.5);
         combination.addChild(sphere_top);
@@ -103,7 +105,7 @@ class test_3DPhysics_kinematic implements IState {
         //mid 
         let cylinder_mid =new gd3d.framework.transform();
         cylinder_mid.name = "cylinder_mid";
-        cylinder_mid.gameObject.visible = false;
+        // cylinder_mid.gameObject.visible = false;
         gd3d.math.vec3Set(cylinder_mid.localScale,1,0.5,1);
         combination.addChild(cylinder_mid);
         let mf_cl=cylinder_mid.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER) as gd3d.framework.meshFilter;
@@ -112,7 +114,7 @@ class test_3DPhysics_kinematic implements IState {
 
         //bottom sphere
         let sphere_bottom =new gd3d.framework.transform();
-        sphere_bottom.gameObject.visible = false;
+        // sphere_bottom.gameObject.visible = false;
         sphere_bottom.name = "sphere_bottom"
         sphere_bottom.localPosition.y = -0.5;
         gd3d.math.vec3SetAll(sphere_bottom.localScale,0.5);
@@ -129,7 +131,7 @@ class test_3DPhysics_kinematic implements IState {
         let boxImpostor = new gd3d.framework.PhysicsImpostor(trans2, gd3d.framework.ImpostorType.BoxImpostor, { mass: 1, restitution: 0.3 });
         let sphereImpostor = new gd3d.framework.PhysicsImpostor(trans3, gd3d.framework.ImpostorType.SphereImpostor, { mass: 1, restitution: 0.3 });
         //组合 碰撞体
-        let s_top_Impostor = new gd3d.framework.PhysicsImpostor(sphere_top, gd3d.framework.ImpostorType.SphereImpostor, { mass: 1, restitution: 0.3});
+        let s_top_Impostor = new gd3d.framework.PhysicsImpostor(sphere_top, gd3d.framework.ImpostorType.SphereImpostor, { mass: 1, restitution: 0.3 , disableBidirectionalTransformation:true});
         let c_mid_Impostor = new gd3d.framework.PhysicsImpostor(cylinder_mid, gd3d.framework.ImpostorType.CylinderImpostor, { mass: 1, restitution: 0.3});
         let s_bottom_Impostor = new gd3d.framework.PhysicsImpostor(sphere_bottom, gd3d.framework.ImpostorType.SphereImpostor, { mass: 1, restitution: 0.3});
         let combImpostor = new gd3d.framework.PhysicsImpostor(combination, gd3d.framework.ImpostorType.NoImpostor, { mass: 1, restitution: 0.3});

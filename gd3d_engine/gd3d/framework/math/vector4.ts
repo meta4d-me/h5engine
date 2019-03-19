@@ -40,7 +40,7 @@ namespace gd3d.math{
         vector.rawData[3] = value;
     }
 
-    export function vec4Set(vector : vector2 , x : number ,  y : number , z : number , w : number){
+    export function vec4Set(vector : vector4 , x : number ,  y : number , z : number , w : number){
         vector.rawData[0] = x;
         vector.rawData[1] = y;
         vector.rawData[2] = z;
