@@ -746,14 +746,14 @@ namespace gd3d.framework {
             if (this.parent) {
                 this.parent.forceUpdate();
             } else {
-                /*this._object.getChildMeshes().forEach(function(mesh) {
-                    if (mesh.physicsImpostor) {
-                        if (disposeChildren) {
-                            mesh.physicsImpostor.dispose();
-                            mesh.physicsImpostor = null;
+                if(this.object.children){
+                    this.object.children.forEach(sub=>{
+                        if(sub && sub.physicsImpostor){
+                            sub.physicsImpostor.dispose();
+                            sub.physicsImpostor = null;
                         }
-                    }
-                })*/
+                    });
+                }
             }
 
             this._isDisposed = true;

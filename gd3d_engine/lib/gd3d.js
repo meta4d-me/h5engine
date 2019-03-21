@@ -30626,6 +30626,14 @@ var gd3d;
                     this.parent.forceUpdate();
                 }
                 else {
+                    if (this.object.children) {
+                        this.object.children.forEach(function (sub) {
+                            if (sub && sub.physicsImpostor) {
+                                sub.physicsImpostor.dispose();
+                                sub.physicsImpostor = null;
+                            }
+                        });
+                    }
                 }
                 this._isDisposed = true;
             };

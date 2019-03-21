@@ -278,8 +278,10 @@ class test_3DPhysics_freeze implements IState {
     }
 
     attachMesh(tran:gd3d.framework.transform, mat: gd3d.framework.material, meshName : string) : gd3d.framework.meshRenderer{
-        let mf=tran.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER) as gd3d.framework.meshFilter;
-        let mr=tran.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER) as gd3d.framework.meshRenderer;
+        let mf = tran.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
+        if(!mf) mf = tran.gameObject.addComponent("meshFilter") as any;
+        let mr=tran.gameObject.getComponent("meshRenderer") as gd3d.framework.meshRenderer;
+        if(!mr) mr = tran.gameObject.addComponent("meshRenderer") as any ;
         mr.materials[0] = mat;
         mf.mesh=this.astMgr.getDefaultMesh(meshName);
 

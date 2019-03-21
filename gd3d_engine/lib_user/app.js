@@ -6800,8 +6800,12 @@ var test_3DPhysics_freeze = (function () {
         });
     };
     test_3DPhysics_freeze.prototype.attachMesh = function (tran, mat, meshName) {
-        var mf = tran.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHFILTER);
-        var mr = tran.gameObject.addComponent(gd3d.framework.StringUtil.COMPONENT_MESHRENDER);
+        var mf = tran.gameObject.getComponent("meshFilter");
+        if (!mf)
+            mf = tran.gameObject.addComponent("meshFilter");
+        var mr = tran.gameObject.getComponent("meshRenderer");
+        if (!mr)
+            mr = tran.gameObject.addComponent("meshRenderer");
         mr.materials[0] = mat;
         mf.mesh = this.astMgr.getDefaultMesh(meshName);
         var tag_pos = "__reCachePos";
