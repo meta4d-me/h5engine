@@ -1367,6 +1367,8 @@ var test_anim = (function () {
                         objCam.lookat(prefabObj);
                         objCam.markDirty();
                         var ap = prefabObj.gameObject.getComponent("aniplayer");
+                        ap;
+                        debugger;
                         document.onkeydown = function (ev) {
                         };
                         var wingroot = prefabObj.find("Bip001 R Toe0");

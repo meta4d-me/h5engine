@@ -55,6 +55,9 @@ class test_anim implements IState
                         var ap = prefabObj.gameObject.getComponent("aniplayer") as gd3d.framework.aniplayer;
                         // ap.autoplay = false;
 
+                        ap;
+                        debugger;
+
                         document.onkeydown = (ev) =>
                         {
                             // if (ev.code == "KeyM")

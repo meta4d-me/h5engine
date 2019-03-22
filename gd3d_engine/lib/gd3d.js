@@ -7013,6 +7013,7 @@ var gd3d;
                 this.iserror = false;
                 this.isfinish = false;
                 this.resstate = {};
+                this.resstateFirst = null;
                 this.curtask = 0;
                 this.bundleLoadState = 0;
                 this.totaltask = 0;
@@ -8446,6 +8447,9 @@ var gd3d;
             AssetFactory_Aniclip.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadArrayBuffer(url, function (_buffer, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -8463,6 +8467,9 @@ var gd3d;
             AssetFactory_Aniclip.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 var _buffer = respack[filename];
                 var _clip = asset ? asset : new framework.animationClip(filename);
                 call(function () {
@@ -8489,6 +8496,9 @@ var gd3d;
             AssetFactory_Atlas.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadText(url, function (txt, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -8506,6 +8516,9 @@ var gd3d;
                 call(function () {
                     var filename = framework.getFileName(url);
                     state.resstate[filename] = new framework.ResourceState();
+                    if (state.resstateFirst == null) {
+                        state.resstateFirst = state.resstate[filename];
+                    }
                     var txt = respack[filename];
                     var _atlas = asset ? asset : new framework.atlas(filename);
                     _atlas.Parse(txt, assetMgr);
@@ -8533,6 +8546,9 @@ var gd3d;
             AssetFactory_DDS.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadArrayBuffer(url, function (_buffer, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -8572,6 +8588,9 @@ var gd3d;
                 var bundlename = framework.getFileName(state.url);
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadText(url, function (txt, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -8591,6 +8610,9 @@ var gd3d;
                     var bundlename = framework.getFileName(state.url);
                     var filename = framework.getFileName(url);
                     state.resstate[filename] = new framework.ResourceState();
+                    if (state.resstateFirst == null) {
+                        state.resstateFirst = state.resstate[filename];
+                    }
                     var txt = respack[filename];
                     var _f14eff = asset ? asset : new framework.f14eff(filename);
                     _f14eff.assetbundle = bundlename;
@@ -8616,6 +8638,9 @@ var gd3d;
             AssetFactory_Font.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadText(url, function (txt, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -8633,6 +8658,9 @@ var gd3d;
                 call(function () {
                     var filename = framework.getFileName(url);
                     state.resstate[filename] = new framework.ResourceState();
+                    if (state.resstateFirst == null) {
+                        state.resstateFirst = state.resstate[filename];
+                    }
                     var txt = respack[filename];
                     var _font = asset ? asset : new framework.font(filename);
                     _font.Parse(txt, assetMgr);
@@ -8658,6 +8686,9 @@ var gd3d;
                 var filename = framework.getFileName(url);
                 var name = filename.substring(0, filename.indexOf("."));
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadText(url, function (txt, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -8677,6 +8708,9 @@ var gd3d;
                     var filename = framework.getFileName(url);
                     var name = filename.substring(0, filename.indexOf("."));
                     state.resstate[filename] = new framework.ResourceState();
+                    if (state.resstateFirst == null) {
+                        state.resstateFirst = state.resstate[filename];
+                    }
                     var txt = respack[filename];
                     txt = decodeURI(txt);
                     state.resstate[filename].state = 1;
@@ -8704,6 +8738,9 @@ var gd3d;
                 var filename = framework.getFileName(url);
                 var name = filename.substring(0, filename.indexOf("."));
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadText(url, function (txt, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -8723,6 +8760,9 @@ var gd3d;
                     var filename = framework.getFileName(url);
                     var name = filename.substring(0, filename.indexOf("."));
                     state.resstate[filename] = new framework.ResourceState();
+                    if (state.resstateFirst == null) {
+                        state.resstateFirst = state.resstate[filename];
+                    }
                     var txt = respack[filename];
                     txt = decodeURI(txt);
                     state.resstate[filename].state = 1;
@@ -8796,6 +8836,9 @@ var gd3d;
             assetfactory_keyFrameAniClip.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadText(url, function (text, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -8813,6 +8856,9 @@ var gd3d;
                 call(function () {
                     var filename = framework.getFileName(url);
                     state.resstate[filename] = new framework.ResourceState();
+                    if (state.resstateFirst == null) {
+                        state.resstateFirst = state.resstate[filename];
+                    }
                     var _buffer = respack[filename];
                     var _clip = asset ? asset : new framework.keyFrameAniClip(filename);
                     _clip.Parse(_buffer);
@@ -8838,6 +8884,9 @@ var gd3d;
                 var filename = framework.getFileName(url);
                 var assetbundleName = framework.getFileName(state.url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadText(url, function (txt, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -8856,6 +8905,9 @@ var gd3d;
                     var filename = framework.getFileName(url);
                     var assetbundleName = framework.getFileName(state.url);
                     state.resstate[filename] = new framework.ResourceState();
+                    if (state.resstateFirst == null) {
+                        state.resstateFirst = state.resstate[filename];
+                    }
                     var txt = respack[filename];
                     var _material = asset ? asset : new framework.material(filename);
                     _material.Parse(assetMgr, JSON.parse(txt), assetbundleName);
@@ -8880,6 +8932,9 @@ var gd3d;
             AssetFactory_Mesh.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadArrayBuffer(url, function (_buffer, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -8897,6 +8952,9 @@ var gd3d;
             AssetFactory_Mesh.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 var _buffer = respack[filename];
                 var _mesh = asset ? asset : new framework.mesh(filename);
                 call(function () {
@@ -8923,6 +8981,9 @@ var gd3d;
             AssetFactory_PathAsset.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadText(url, function (txt, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -8940,6 +9001,9 @@ var gd3d;
                 call(function () {
                     var filename = framework.getFileName(url);
                     state.resstate[filename] = new framework.ResourceState();
+                    if (state.resstateFirst == null) {
+                        state.resstateFirst = state.resstate[filename];
+                    }
                     var txt = respack[filename];
                     var _path = asset ? asset : new framework.pathasset(filename);
                     _path.Parse(JSON.parse(txt));
@@ -8965,6 +9029,9 @@ var gd3d;
                 var bundlename = framework.getFileName(state.url);
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadText(url, function (txt, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -8984,6 +9051,9 @@ var gd3d;
                     var bundlename = framework.getFileName(state.url);
                     var filename = framework.getFileName(url);
                     state.resstate[filename] = new framework.ResourceState();
+                    if (state.resstateFirst == null) {
+                        state.resstateFirst = state.resstate[filename];
+                    }
                     var txt = respack[filename];
                     var _prefab = asset ? asset : new framework.prefab(filename);
                     _prefab.assetbundle = bundlename;
@@ -9009,6 +9079,9 @@ var gd3d;
             AssetFactory_PVR.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadArrayBuffer(url, function (_buffer, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -9045,6 +9118,9 @@ var gd3d;
                 var bundlename = framework.getFileName(state.url);
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadText(url, function (txt, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -9064,6 +9140,9 @@ var gd3d;
                     var bundlename = framework.getFileName(state.url);
                     var filename = framework.getFileName(url);
                     state.resstate[filename] = new framework.ResourceState();
+                    if (state.resstateFirst == null) {
+                        state.resstateFirst = state.resstate[filename];
+                    }
                     var txt = respack[filename];
                     var _scene = asset ? asset : new framework.rawscene(filename);
                     _scene.assetbundle = bundlename;
@@ -9091,6 +9170,9 @@ var gd3d;
                 var _this = this;
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadText(url, function (txt, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -9113,6 +9195,9 @@ var gd3d;
                     var filename = framework.getFileName(url);
                     var name = filename.substring(0, filename.indexOf("."));
                     state.resstate[filename] = new framework.ResourceState();
+                    if (state.resstateFirst == null) {
+                        state.resstateFirst = state.resstate[filename];
+                    }
                     var txt = respack[filename];
                     state.resstate[filename].state = 1;
                     var _shader = new framework.shader(filename);
@@ -9156,6 +9241,9 @@ var gd3d;
             AssetFactory_TextAsset.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadText(url, function (txt, err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -9173,6 +9261,9 @@ var gd3d;
                 call(function () {
                     var filename = framework.getFileName(url);
                     state.resstate[filename] = new framework.ResourceState();
+                    if (state.resstateFirst == null) {
+                        state.resstateFirst = state.resstate[filename];
+                    }
                     var txt = respack[filename];
                     var _textasset = asset ? asset : new framework.textasset(filename);
                     _textasset.content = txt;
@@ -9197,6 +9288,9 @@ var gd3d;
             AssetFactory_Texture.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadImg(url, function (_tex, _err, isloadFail) {
                     call(function () {
                         state.isloadFail = isloadFail ? true : false;
@@ -9235,6 +9329,9 @@ var gd3d;
             AssetFactory_TextureDesc.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
                 state.resstate[filename] = new framework.RefResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 gd3d.io.loadText(url, function (txt, err, isloadFail) {
                     state.isloadFail = isloadFail ? true : false;
                     if (framework.AssetFactoryTools.catchError(err, onstate, state))
@@ -9346,6 +9443,9 @@ var gd3d;
                 }
                 var _textureSrc = url.replace(filename, _name);
                 state.resstate[filename] = new framework.ResourceState();
+                if (state.resstateFirst == null) {
+                    state.resstateFirst = state.resstate[filename];
+                }
                 if (_textureSrc.indexOf(".pvr.bin") >= 0) {
                     gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
                         call(function () {

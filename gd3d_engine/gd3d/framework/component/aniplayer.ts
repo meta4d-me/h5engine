@@ -118,6 +118,28 @@ namespace gd3d.framework
             this.careBoneMat[bone.name].t = math.pool.new_vector3();
         }
 
+        private _awaitClips : string [] ;
+        /** 获取待加载的 动画片段名 列表 */
+        awaitLoadClipNames(){
+            if(!this._awaitClips ){
+                this._awaitClips = [];
+                if(this.clips){
+                    this.clips.forEach(clip=>{
+                        if(clip){
+                            this._awaitClips.push(clip.getName());
+                        }
+                    });
+                }
+            }
+            return this._awaitClips;
+        }
+
+        /** 添加动画片段 通过名字加载 */
+        addClipByNameLoad(clipName : string,loadPath:string){
+            
+        }
+
+        /** 添加动画片段 */
         addClip(clip: animationClip)
         {
             if (clip != null)
@@ -125,6 +147,7 @@ namespace gd3d.framework
                 this.clipnames[clip.getName()] = clip;
             }
         }
+        /** 是否有装载指定动画判断 */
         haveClip(name: string): boolean
         {
             return this.clipnames[name] != null;
