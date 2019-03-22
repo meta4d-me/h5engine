@@ -10518,6 +10518,9 @@ var gd3d;
                         this._children[k].dispose();
                     }
                 }
+                if (this._physicsImpostor) {
+                    this._physicsImpostor.dispose();
+                }
                 this._gameObject.dispose();
                 this._beDispose = true;
                 if (this.onDispose)
@@ -30381,7 +30384,7 @@ var gd3d;
                 this._physicsEngine.removeImpostor(this);
                 this.physicsBody = null;
                 this._parent = this._parent || this._getPhysicsParent();
-                if (!this._isDisposed && !this.parent) {
+                if (!this._isDisposed && (!this.parent || this._options.ignoreParent)) {
                     this._physicsEngine.addImpostor(this);
                 }
             };
@@ -30626,14 +30629,6 @@ var gd3d;
                     this.parent.forceUpdate();
                 }
                 else {
-                    if (this.object.children) {
-                        this.object.children.forEach(function (sub) {
-                            if (sub && sub.physicsImpostor) {
-                                sub.physicsImpostor.dispose();
-                                sub.physicsImpostor = null;
-                            }
-                        });
-                    }
                 }
                 this._isDisposed = true;
             };

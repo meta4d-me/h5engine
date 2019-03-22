@@ -5327,7 +5327,7 @@ declare namespace gd3d.framework {
         generateJoint(impostorJoint: PhysicsImpostorJoint): void;
         removeJoint(impostorJoint: PhysicsImpostorJoint): void;
         setTransformationFromPhysicsBody(impostor: PhysicsImpostor): void;
-        setPhysicsBodyTransformation(impostor: PhysicsImpostor, newPosition: math.vector3, newRotation: math.vector3): void;
+        setPhysicsBodyTransformation(impostor: PhysicsImpostor, newPosition: math.vector3, newRotation: math.quaternion): void;
         isSupported(): boolean;
         setLinearVelocity(impostor: PhysicsImpostor, velocity: math.vector3): void;
         setAngularVelocity(impostor: PhysicsImpostor, velocity: math.vector3): void;

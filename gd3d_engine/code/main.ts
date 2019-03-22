@@ -135,6 +135,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("3D物理_车轮马达",()=>new test_3DPhysics_motor_wheel());
         this.addBtn("3D物理_滑竿马达",()=>new test_3DPhysics_motor_slider());
         this.addBtn("3D物理_冻结_位移旋转",()=>new test_3DPhysics_freeze());
+        this.addBtn("3D物理_样例_中心点爆炸",()=>new test_3DPhysics_explode());
         this.addBtn("cannonPhysics3D",()=>new PhysicDemo.physic_01());
 
         //this.addBtn("test_f14",()=>new dome.db_test_f14eff());
