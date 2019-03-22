@@ -14,13 +14,12 @@ class physics3dDemoTool{
         this.astMgr = this.app.getAssetMgr();
         this.iptMgr = this.app.getInputMgr();
         await this.loadbySync(`./res/shader/shader.assetbundle.json`);
-        await this.loadbySync(`./res/prefabs/Capsule/Capsule.assetbundle.json`);
         await datGui.init();
         this.initMats();
         this.initCamera();
     }
 
-    private static loadbySync(url:string){
+    static loadbySync(url:string){
         return new gd3d.threading.gdPromise<any>((resolve,reject)=>{
             this.astMgr.load(url,gd3d.framework.AssetTypeEnum.Auto,(state)=>{
                 if(state && state.isfinish){
@@ -155,15 +154,15 @@ class physics3dDemoTool{
         });
     }
 
-    private static defMatTag = "_defMatName_";
+    private static defMatTag = "_defMat_";
     private static cgDefMat(mr: gd3d.framework.meshRenderer, isSleeping :boolean){
         if(!mr) return;
         let tran = mr.gameObject.transform;
         if(!tran[this.defMatTag]){
-            tran[this.defMatTag] = mr.materials[0].getName();
+            tran[this.defMatTag] = mr.materials[0];
         }
-        let matName = isSleeping ? "sleeping": tran[this.defMatTag];
-        mr.materials[0] = physics3dDemoTool.mats[matName];
+        let mat = isSleeping ? physics3dDemoTool.mats["sleeping"] : tran[this.defMatTag];
+        mr.materials[0] = mat;
     }
 
 }

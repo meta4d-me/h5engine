@@ -42,9 +42,9 @@ class test_3DPhysics_joint_prismatic implements IState {
         let trans2=new gd3d.framework.transform();
         this.boxTran = trans2;
         trans2.name = "box"
-        trans2.localPosition.y=5;
-        trans2.localPosition.x= -0.3;
-        trans2.localPosition.z=0.3;
+        // trans2.localPosition.y = 5;
+        trans2.localPosition.x = -1.5;
+        // trans2.localPosition.z =0.3;
         trans2.localScale.z = 2;
         trans2.localScale.y = 3;
         this.scene.addChild(trans2);
@@ -99,7 +99,7 @@ class test_3DPhysics_joint_prismatic implements IState {
         this.setGUI();
     }
 
-    private guiMsg = "铰链关节测试demo prismatic";
+    private guiMsg = "棱柱形滑竿关节测试demo prismatic";
     setGUI(){
         if(!dat) return;
         let gui = new dat.GUI();
@@ -126,7 +126,7 @@ class test_3DPhysics_joint_prismatic implements IState {
     }
 
     private force = new gd3d.math.vector3(-10,0,5);
-    private contactlocalPoint = new gd3d.math.vector3(0,0,0);
+    private contactlocalPoint = new gd3d.math.vector3(0,-1,1);
     private tempV3 = new gd3d.math.vector3();
     private doImpulse(phyImpostor : gd3d.framework.PhysicsImpostor){
         let pos = this.tempV3;

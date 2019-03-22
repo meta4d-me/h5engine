@@ -10,6 +10,7 @@ class test_3DPhysics_compound implements IState {
     iptMgr : gd3d.framework.inputMgr;
     async start  (app: gd3d.framework.application) {
         await physics3dDemoTool.init(app);
+        await physics3dDemoTool.loadbySync(`./res/prefabs/Capsule/Capsule.assetbundle.json`);
         this.app = app;
         this.scene = physics3dDemoTool.scene;
         this.astMgr = physics3dDemoTool.astMgr;
@@ -65,6 +66,57 @@ class test_3DPhysics_compound implements IState {
         return chairTran;
     }
 
+    /** 创建胶囊体 */
+    private crateCapsule(showCollisionMesh = false){
+        let mat_activated = physics3dDemoTool.mats["activated"];
+        
+        //组合 碰撞体--------------------
+        //父层级
+        let combination = new gd3d.framework.transform();
+        combination.name = "Capsule"
+        combination.localPosition.y = 10;
+        this.scene.addChild(combination);
+        //显示模型
+        //外部加载mesh (capsule)
+        let p1= this.astMgr.getAssetByName("Capsule.prefab.json") as gd3d.framework.prefab;
+        let capsule = p1.getCloneTrans();
+        capsule.name = "capsule"
+        combination.addChild(capsule);
+        //top sphere
+        let sphere_top =new gd3d.framework.transform();
+        sphere_top.name = "sphere_top";
+        sphere_top.gameObject.visible = showCollisionMesh;
+        sphere_top.localPosition.y = 0.5;
+        gd3d.math.vec3SetAll(sphere_top.localScale,0.5);
+        combination.addChild(sphere_top);
+        physics3dDemoTool.attachMesh(sphere_top,mat_activated,"sphere",true);
+        //mid 
+        let cylinder_mid =new gd3d.framework.transform();
+        cylinder_mid.name = "cylinder_mid";
+        cylinder_mid.gameObject.visible = showCollisionMesh;
+        gd3d.math.vec3Set(cylinder_mid.localScale,1,0.5,1);
+        combination.addChild(cylinder_mid);
+        physics3dDemoTool.attachMesh(cylinder_mid,mat_activated,"cylinder",true);
+        //bottom sphere
+        let sphere_bottom =new gd3d.framework.transform();
+        sphere_bottom.gameObject.visible = showCollisionMesh;
+        sphere_bottom.name = "sphere_bottom"
+        sphere_bottom.localPosition.y = -0.5;
+        gd3d.math.vec3SetAll(sphere_bottom.localScale,0.5);
+        combination.addChild(sphere_bottom);
+        physics3dDemoTool.attachMesh(sphere_bottom,mat_activated,"sphere",true);
+
+        //组合 碰撞体
+        let s_top_Impostor = new gd3d.framework.PhysicsImpostor(sphere_top, gd3d.framework.ImpostorType.SphereImpostor, { mass: 1, restitution: 0.3 , disableBidirectionalTransformation:true});
+        let c_mid_Impostor = new gd3d.framework.PhysicsImpostor(cylinder_mid, gd3d.framework.ImpostorType.CylinderImpostor, { mass: 1, restitution: 0.3});
+        let s_bottom_Impostor = new gd3d.framework.PhysicsImpostor(sphere_bottom, gd3d.framework.ImpostorType.SphereImpostor, { mass: 1, restitution: 0.3});
+        let combImpostor = new gd3d.framework.PhysicsImpostor(combination, gd3d.framework.ImpostorType.NoImpostor, { mass: 1, restitution: 0.3});
+
+        let mr = combination.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer; 
+        this.mrs.push(mr);
+        return combination;
+    }
+
     private targetTran : gd3d.framework.transform;
     private boxTran : gd3d.framework.transform;
     private cylinderTran : gd3d.framework.transform;
@@ -73,7 +125,7 @@ class test_3DPhysics_compound implements IState {
         //初始化 物理世界-----------------------
         this.scene.enablePhysics(new gd3d.math.vector3(0,-9.8,0),new gd3d.framework.OimoJSPlugin());
         let mat_activated = physics3dDemoTool.mats["activated"];
-        let mat_stick = physics3dDemoTool.mats["yellow"];
+        let mat_yellow = physics3dDemoTool.mats["yellow"];
         let mat_white = physics3dDemoTool.mats["white"];
         //构建物体-------------------
         //底面
@@ -83,7 +135,7 @@ class test_3DPhysics_compound implements IState {
         trans.localScale.y= 0.01;
         trans.localScale.z= 20;
         this.scene.addChild(trans);
-        physics3dDemoTool.attachMesh(trans , mat_white ,"cube");
+        physics3dDemoTool.attachMesh(trans , mat_yellow ,"cube");
 
         //box
         let trans2=new gd3d.framework.transform();
@@ -103,27 +155,15 @@ class test_3DPhysics_compound implements IState {
         trans3.localPosition.z = 0.2;
         this.scene.addChild(trans3);
         let mr1 = physics3dDemoTool.attachMesh(trans3 , mat_activated ,"sphere");
-
-        //cylinder
-        let cylinder_mid =new gd3d.framework.transform();
-        this.cylinderTran = cylinder_mid;
-        cylinder_mid.name = "cylinder"
-        cylinder_mid.localPosition.y = 8;
-        this.scene.addChild(cylinder_mid);
-        let mr2 =physics3dDemoTool.attachMesh(cylinder_mid , mat_stick ,"cylinder");
-
         
         let groundImpostor = new gd3d.framework.PhysicsImpostor(trans, gd3d.framework.ImpostorType.PlaneImpostor, { mass: 0, restitution: 0.1 , friction: 0.9});
         //chair 复合物体 需要放置在 静态地板之后 不然会有异常（omio 的BUG）
         let _c = this.crateChair();
-        // let boxImpostor = new gd3d.framework.PhysicsImpostor(trans2, gd3d.framework.ImpostorType.BoxImpostor, { mass: 1, restitution: 0.6 ,friction: 0.5});
+        this.crateCapsule();
         let boxImpostor = new gd3d.framework.PhysicsImpostor(trans2, gd3d.framework.ImpostorType.BoxImpostor, { mass: 2 ,restitution: 0.5 , kinematic : true });
         let sphereImpostor = new gd3d.framework.PhysicsImpostor(trans3, gd3d.framework.ImpostorType.SphereImpostor, { mass: 0.5, restitution: 0.6 ,friction: 0.5});
-        let cylinderImpostor = new gd3d.framework.PhysicsImpostor(cylinder_mid, gd3d.framework.ImpostorType.CylinderImpostor, { mass: 2,friction:0.5});
 
-
-
-        this.mrs.push(mr,mr1,mr2);
+        this.mrs.push(mr,mr1);
         //apply Target set
         this.targetTran = _c;
 
