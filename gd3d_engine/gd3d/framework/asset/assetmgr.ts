@@ -261,6 +261,13 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
+         * 记录加载的第一个的状态和资源引用
+         * @version egret-gd3d 1.0
+         */
+        resstateFirst: ResourceState = null;
+        /**
+         * @public
+         * @language zh_CN
          * 当前的文件数进度
          * @version egret-gd3d 1.0
          */
