@@ -152,6 +152,7 @@ declare class test_anim implements IState {
     cubes: {
         [id: string]: gd3d.framework.transform;
     };
+    _assetMgr: gd3d.framework.assetMgr;
     start(app: gd3d.framework.application): void;
     camera: gd3d.framework.camera;
     cube: gd3d.framework.transform;

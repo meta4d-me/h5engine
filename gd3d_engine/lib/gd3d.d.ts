@@ -2290,8 +2290,16 @@ declare namespace gd3d.framework {
         readonly playCount: number;
         private init();
         addToCareList(bone: transform): void;
+        private _awaitClips;
+        awaitLoadClipNames(): string[];
+        private _allClipNames;
+        allClipNames(): string[];
+        private collected;
+        private collectClipNames();
+        addClipByNameLoad(_assetMgr: assetMgr, resPath: string, clipName: string, callback?: (state: stateLoad, clipName: string) => any): void;
         addClip(clip: animationClip): void;
         haveClip(name: string): boolean;
+        getClip(name: string): animationClip;
         start(): void;
         onPlay(): void;
         private temptMat;

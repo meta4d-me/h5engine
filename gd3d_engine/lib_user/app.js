@@ -1340,6 +1340,7 @@ var test_anim = (function () {
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
+        this._assetMgr = this.app.getAssetMgr();
         var prefabObj = new gd3d.framework.transform();
         prefabObj.name = "baihu";
         prefabObj.localScale.x = prefabObj.localScale.y = prefabObj.localScale.z = 1;
@@ -1367,8 +1368,17 @@ var test_anim = (function () {
                         objCam.lookat(prefabObj);
                         objCam.markDirty();
                         var ap = prefabObj.gameObject.getComponent("aniplayer");
-                        ap;
-                        debugger;
+                        var list = ap.awaitLoadClipNames();
+                        var resPath = "res/prefabs/" + resName + "/resources/";
+                        if (list.length > 0) {
+                            var cname_1 = list[1];
+                            ap.addClipByNameLoad(_this._assetMgr, resPath, cname_1, function (sta, clipName) {
+                                if (sta.isfinish) {
+                                    var clip = ap.getClip(cname_1);
+                                    ap.play(cname_1);
+                                }
+                            });
+                        }
                         document.onkeydown = function (ev) {
                         };
                         var wingroot = prefabObj.find("Bip001 R Toe0");

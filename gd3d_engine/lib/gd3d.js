@@ -13362,6 +13362,9 @@ var gd3d;
                 this.careBoneMat = {};
                 this.inversTpos = {};
                 this.startepose = {};
+                this._awaitClips = [];
+                this._allClipNames = [];
+                this.collected = false;
                 this.temptMat = gd3d.math.pool.new_matrix();
                 this.playEndDic = {};
                 this.beActivedEndFrame = false;
@@ -13428,6 +13431,44 @@ var gd3d;
                 this.careBoneMat[bone.name].r = gd3d.math.pool.new_quaternion();
                 this.careBoneMat[bone.name].t = gd3d.math.pool.new_vector3();
             };
+            aniplayer.prototype.awaitLoadClipNames = function () {
+                this.collectClipNames();
+                return this._awaitClips;
+            };
+            aniplayer.prototype.allClipNames = function () {
+                this.collectClipNames();
+                return this._allClipNames;
+            };
+            aniplayer.prototype.collectClipNames = function () {
+                var _this = this;
+                if (this.collected)
+                    return;
+                if (this.clips) {
+                    this.clips.forEach(function (clip) {
+                        if (clip) {
+                            var cname = clip.getName();
+                            _this._allClipNames.push(cname);
+                            if (!_this.haveClip(cname)) {
+                                _this._awaitClips.push(cname);
+                            }
+                        }
+                    });
+                }
+                this.collected = true;
+            };
+            aniplayer.prototype.addClipByNameLoad = function (_assetMgr, resPath, clipName, callback) {
+                var _this = this;
+                var url = resPath + "/" + clipName;
+                _assetMgr.load(url, gd3d.framework.AssetTypeEnum.Aniclip, function (sta) {
+                    if (sta.isfinish) {
+                        var clip = sta.resstateFirst.res;
+                        _this.addClip(clip);
+                    }
+                    if (callback) {
+                        callback(sta, clipName);
+                    }
+                });
+            };
             aniplayer.prototype.addClip = function (clip) {
                 if (clip != null) {
                     this.clipnames[clip.getName()] = clip;
@@ -13435,6 +13476,9 @@ var gd3d;
             };
             aniplayer.prototype.haveClip = function (name) {
                 return this.clipnames[name] != null;
+            };
+            aniplayer.prototype.getClip = function (name) {
+                return this.clipnames[name];
             };
             aniplayer.prototype.start = function () {
                 if (this.bones != null) {

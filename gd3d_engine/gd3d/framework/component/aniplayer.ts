@@ -118,25 +118,49 @@ namespace gd3d.framework
             this.careBoneMat[bone.name].t = math.pool.new_vector3();
         }
 
-        private _awaitClips : string [] ;
+        private _awaitClips : string [] = [];
         /** 获取待加载的 动画片段名 列表 */
         awaitLoadClipNames(){
-            if(!this._awaitClips ){
-                this._awaitClips = [];
-                if(this.clips){
-                    this.clips.forEach(clip=>{
-                        if(clip){
-                            this._awaitClips.push(clip.getName());
-                        }
-                    });
-                }
-            }
+            this.collectClipNames();
             return this._awaitClips;
         }
 
+        private _allClipNames : string[] = [];
+        /** 所有的动画片段名列表，包含待加载的列表 */
+        allClipNames(){
+            this.collectClipNames();
+            return this._allClipNames;
+        }
+
+        private collected = false;
+        private collectClipNames(){
+            if(this.collected) return;
+            if(this.clips){
+                this.clips.forEach(clip=>{
+                    if(clip){
+                        let cname = clip.getName();
+                        this._allClipNames.push(cname);
+                        if(!this.haveClip(cname)){
+                            this._awaitClips.push(cname);
+                        }
+                    }
+                });
+            }
+            this.collected = true;
+        }
+
         /** 添加动画片段 通过名字加载 */
-        addClipByNameLoad(clipName : string,loadPath:string){
-            
+        addClipByNameLoad(_assetMgr: assetMgr, resPath:string , clipName : string, callback? : (state:stateLoad , clipName: string)=>any){
+            let url = `${resPath}/${clipName}`;
+            _assetMgr.load(url,gd3d.framework.AssetTypeEnum.Aniclip,(sta)=>{
+                if(sta.isfinish){
+                    let clip = sta.resstateFirst.res as gd3d.framework.animationClip;
+                    this.addClip(clip);
+                }
+                if(callback){
+                    callback(sta,clipName);
+                }
+            });
         }
 
         /** 添加动画片段 */
@@ -151,6 +175,10 @@ namespace gd3d.framework
         haveClip(name: string): boolean
         {
             return this.clipnames[name] != null;
+        }
+        /** 获取动画片段 */
+        getClip(name: string){
+            return this.clipnames[name];
         }
         start()
         {
@@ -466,7 +494,6 @@ namespace gd3d.framework
                 this._playFrameid = this._playClip.frameCount - this._playFrameid - 1;
             }
         }
-
 
         private OnClipPlayEnd()
         {
