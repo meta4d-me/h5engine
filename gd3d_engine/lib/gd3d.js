@@ -6892,7 +6892,7 @@ var gd3d;
                     var hitem = list_2[_i];
                     if (!hitem.handle)
                         continue;
-                    if (hitem.type == framework.AssetTypeEnum.Prefab || hitem.type == framework.AssetTypeEnum.F14Effect) {
+                    if (hitem.type == framework.AssetTypeEnum.Scene || hitem.type == framework.AssetTypeEnum.Prefab || hitem.type == framework.AssetTypeEnum.F14Effect) {
                         lastHandle.push(hitem);
                         continue;
                     }
@@ -9095,7 +9095,6 @@ var gd3d;
                 }
                 gd3d.io.loadText(url, function (txt, err, isloadFail) {
                     call(function () {
-                        debugger;
                         state.isloadFail = isloadFail ? true : false;
                         if (framework.AssetFactoryTools.catchError(err, onstate, state))
                             return;
@@ -10810,7 +10809,6 @@ var gd3d;
                 this._builded = false;
             }
             meshcollider.prototype.getBound = function () {
-                this.ckbuildMesh();
                 return this._mesh;
             };
             meshcollider.prototype.start = function () {
@@ -10827,7 +10825,6 @@ var gd3d;
                 },
                 set: function (value) {
                     this._colliderVisible = value;
-                    this.ckbuildMesh();
                     if (this.subTran) {
                         this.subTran.gameObject.visible = this._colliderVisible;
                     }
@@ -21453,9 +21450,6 @@ var gd3d;
                     }
                 }
                 else {
-                    if (assetName == "Library_unity_default_resources_Capsule.mesh.bin") {
-                        debugger;
-                    }
                     _asset = assetMgr.getAssetByName(assetName, bundlename);
                 }
                 if (_asset == null && type == "animationClip") {

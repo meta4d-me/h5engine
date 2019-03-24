@@ -1067,9 +1067,6 @@ namespace gd3d.io
             }
             else
             {
-                if(assetName == "Library_unity_default_resources_Capsule.mesh.bin"){
-                    debugger;
-                }
                 _asset = assetMgr.getAssetByName(assetName, bundlename);
             }
 

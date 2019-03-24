@@ -318,10 +318,6 @@ namespace gd3d.framework
                 for (let j = 0, clen = asslist[i].length; j < clen; ++j)
                 {
                     let item = asslist[i][j];
-                    // let state = null;
-                    // if (j == item.length - 1){
-                    //     state = assstatelist[i];
-                    // }
                     handles[item.url] = list.length;
                     list.push({ url: item.url, type: item.type, asset: item.asset, handle: undefined });
                 }
@@ -487,7 +483,7 @@ namespace gd3d.framework
                 if (!hitem.handle)
                     continue;
 
-                if (hitem.type == AssetTypeEnum.Prefab || hitem.type == AssetTypeEnum.F14Effect)
+                if (hitem.type == AssetTypeEnum.Scene || hitem.type == AssetTypeEnum.Prefab || hitem.type == AssetTypeEnum.F14Effect)
                 {
                     lastHandle.push(hitem)
                     continue;

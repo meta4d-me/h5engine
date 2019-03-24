@@ -58,7 +58,6 @@ class test_pick_boxcollider implements IState
             let meshC = trans.gameObject.getComponent("meshcollider") as gd3d.framework.meshcollider;
             if(meshC){
                 meshC.colliderVisible = true;
-                debugger;
             } 
 
             console.error(` layer : ${trans.gameObject.layer} `);

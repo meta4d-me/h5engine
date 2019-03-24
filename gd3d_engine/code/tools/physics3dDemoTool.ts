@@ -99,9 +99,6 @@ class physics3dDemoTool{
         let mr=tran.gameObject.getComponent("meshRenderer") as gd3d.framework.meshRenderer;
         if(!mr) mr = tran.gameObject.addComponent("meshRenderer") as any ;
         mr.materials[0] = mat;
-        if(mat == null){
-            debugger;
-        }
         mf.mesh=this.astMgr.getDefaultMesh(meshName);
 
         if(isCompound && tran.parent){

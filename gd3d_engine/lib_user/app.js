@@ -1356,7 +1356,7 @@ var test_loadScene = (function () {
         this.app = app;
         this.scene = this.app.getScene();
         var names = ["test_01", "MainCity_", "city", "lvyexianzong_02_1024", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
-        var name = names[0];
+        var name = names[1];
         this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
                 _this.loadScene(name);
@@ -1376,7 +1376,6 @@ var test_loadScene = (function () {
         if (isCompress === void 0) { isCompress = false; }
         var addScene = function () {
             var _scene = _this.app.getAssetMgr().getAssetByName(assetName + ".scene.json");
-            debugger;
             var _root = _scene.getSceneRoot();
             _this.scene.addChild(_root);
             _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
@@ -5875,7 +5874,6 @@ var test_pick_boxcollider = (function () {
             var meshC = trans.gameObject.getComponent("meshcollider");
             if (meshC) {
                 meshC.colliderVisible = true;
-                debugger;
             }
             console.error(" layer : " + trans.gameObject.layer + " ");
             if (!trans.children)
@@ -9201,7 +9199,6 @@ var test_load = (function () {
             if (state.isfinish) {
                 _this.app.getAssetMgr().load("res/prefabs/baihu/" + (isSplitPcakge ? mpath : "") + "resources/res_baihu_baihu.FBX_baihu.mesh.bin", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
-                        debugger;
                         var smesh1 = _this.app.getAssetMgr().getAssetByName("res_baihu_baihu.FBX_baihu.mesh.bin");
                         var mesh1 = baihu.gameObject.addComponent("meshFilter");
                         mesh1.mesh = smesh1;
@@ -15548,9 +15545,6 @@ var physics3dDemoTool = (function () {
         if (!mr)
             mr = tran.gameObject.addComponent("meshRenderer");
         mr.materials[0] = mat;
-        if (mat == null) {
-            debugger;
-        }
         mf.mesh = this.astMgr.getDefaultMesh(meshName);
         if (isCompound && tran.parent) {
             tran = tran.parent;

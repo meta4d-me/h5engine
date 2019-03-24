@@ -32,7 +32,6 @@ class test_load implements IState
                 {
                     if (s.isfinish)
                     {
-                        debugger;
                         var smesh1 = this.app.getAssetMgr().getAssetByName("res_baihu_baihu.FBX_baihu.mesh.bin") as gd3d.framework.mesh;
                         var mesh1 = baihu.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
                         // mesh1.mesh = smesh1.clone();  //clone 失效

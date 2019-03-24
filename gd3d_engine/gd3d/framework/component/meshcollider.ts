@@ -36,7 +36,6 @@
          */
         getBound()
         {
-            this.ckbuildMesh();
             return this._mesh;
         }
         start()
@@ -81,7 +80,6 @@
         set colliderVisible(value: boolean)
         {
             this._colliderVisible = value;
-            this.ckbuildMesh();
             if (this.subTran)
             {
                 this.subTran.gameObject.visible = this._colliderVisible;

@@ -22,7 +22,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("physic2d_dome",()=>new physic2d_dome());
         this.addBtn("test_ui", () => new t.test_ui());
         this.addBtn("test_load", () => new test_load());
-        this.addBtn("test_loadScene", () => new test_loadScene()); //有问题
+        this.addBtn("test_loadScene", () => new test_loadScene()); 
         this.addBtn("test_pick", () => new test_pick());
         this.addBtn("test_anim", () => new test_anim());
         this.addBtn("test_multipleplayer_anim", () => new test_multipleplayer_anim());
@@ -43,11 +43,10 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_skillsystem", () => new t.test_skillsystem());
         this.addBtn("test_blend", () => new t.test_blend());
         this.addBtn("TestRotate", () => new t.TestRotate());
-        this.addBtn("testtrailrenderRecorde", () => new t.test_trailrenderrecorde()); //有问题
         this.addBtn("pathasset", () => new t.test_pathAsset());
         this.addBtn("test_Asi_prefab", () => new test_loadAsiprefab());
         this.addBtn("test_tex_uv", () => new test_texuv());
-        this.addBtn("test_shadowmap", () => new test_ShadowMap()); //有问题
+        this.addBtn("test_shadowmap", () => new test_ShadowMap()); 
         this.addBtn("test_liChange", () => new testLiChangeMesh());
         //----------------------------------------------文档案例
         this.addBtn("example_newObject",()=>new test_NewGameObject);
@@ -60,13 +59,13 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("test_PBR 展示", () => new test_pbr());
         this.addBtn("test_PBR 场景", () => new test_pbr_scene());
         this.addBtn("关键帧动画",()=>new test_keyFrameAni());
-        this.addBtn("导航网格", () => new test_navMesh());//有问题
+        this.addBtn("导航网格", () => new test_navMesh());
         this.addBtn("rvo2_驾驶行为", () => new test_Rvo2());
         this.addBtn("导航RVO_防挤Demo", () => new demo_navigaionRVO());
-        this.addBtn("Collider碰撞", () => new test_pick_boxcollider());//有问题
+        this.addBtn("Collider碰撞", () => new test_pick_boxcollider());
         this.addBtn("SSSSS", () => new test_sssss());
         this.addBtn("dome_加载播放动画",()=>new dome_loadaniplayer());
-        this.addBtn("使用加载资源的Demo列表",()=>new UseAssetByLoadDemoList());//有问题
+        this.addBtn("使用加载资源的Demo列表",()=>new UseAssetByLoadDemoList());
         this.addBtn("tesrtss",()=>new dome.testCJ());
         this.addBtn("trans性能测试",()=>new demo.test_performance());
         this.addBtn("3D物理_基础形状",()=>new test_3DPhysics_baseShape());
@@ -86,6 +85,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("cannonPhysics3D",()=>new PhysicDemo.physic_01());
         
         //others
+        // this.addBtn("testtrailrenderRecorde", () => new t.test_trailrenderrecorde()); //有问题
         // this.addBtn("LoadBase64Tex", () => new dome.LoadTex());
         // this.addBtn("rayTest",()=>new dome.rayTest());
         //this.addBtn("linPai",()=>new dome.font());
