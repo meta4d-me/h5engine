@@ -41,6 +41,10 @@
             let filter = this.gameObject.getComponent("meshFilter") as meshFilter;
             if (filter != null)
             {
+                if(this.gameObject.getName() == "MainCity_collider")
+                {
+                    debugger;
+                }
                 this.mesh = filter.getMeshOutput();
                 this.buildMesh();
             }
