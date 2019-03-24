@@ -22,7 +22,7 @@ class test_3DPhysics_motor_wheel implements IState {
     init(){
         let mat_activated = physics3dDemoTool.mats["activated"];
         let mat_sleeping = physics3dDemoTool.mats["sleeping"];
-        let mat_joint = physics3dDemoTool.mats["yellow"];
+        let mat_joint = physics3dDemoTool.mats["uvTest"];
         //构建物体-------------------
         //box
         let trans2=new gd3d.framework.transform();

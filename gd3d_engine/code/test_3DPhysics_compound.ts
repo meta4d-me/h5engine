@@ -135,7 +135,7 @@ class test_3DPhysics_compound implements IState {
         trans.localScale.y= 0.01;
         trans.localScale.z= 20;
         this.scene.addChild(trans);
-        physics3dDemoTool.attachMesh(trans , mat_yellow ,"cube");
+        physics3dDemoTool.attachMesh(trans , mat_white ,"cube");
 
         //box
         let trans2=new gd3d.framework.transform();

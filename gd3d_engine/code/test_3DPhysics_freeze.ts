@@ -27,7 +27,7 @@ class test_3DPhysics_freeze implements IState {
         
         let mat_activated = physics3dDemoTool.mats["activated"];
         let mat_sleeping = physics3dDemoTool.mats["sleeping"];
-        let mat_stick = physics3dDemoTool.mats["yellow"];
+        let mat_stick = physics3dDemoTool.mats["uvTest"];
         let mat_white = physics3dDemoTool.mats["white"];
         //构建物体-------------------
         //底面

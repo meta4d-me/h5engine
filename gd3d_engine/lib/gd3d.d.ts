@@ -1150,7 +1150,6 @@ declare namespace gd3d.framework {
         loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr): void;
         parse(json: any, totalLength?: number): void;
         unload(): void;
-        private curLoadState;
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
         downloadFinsih(state: any, list: any, haveBin: boolean, onstate: any, packlist: any, mapPackes: any, assetmgr: assetMgr, handles: any): void;
         NextHandle(list: any, state: any, onstate: any): void;
@@ -1187,20 +1186,6 @@ declare namespace gd3d.framework {
         F14Effect = 22,
         DDS = 23,
     }
-    enum AssetBundleLoadState {
-        None = 0,
-        Shader = 1,
-        Mesh = 2,
-        Texture = 4,
-        Material = 8,
-        Anclip = 16,
-        Prefab = 32,
-        Scene = 64,
-        Textasset = 128,
-        Pvr = 256,
-        f14eff = 512,
-        Dds = 1024,
-    }
     class ResourceState {
         res: IAsset;
         state: number;
@@ -1218,7 +1203,6 @@ declare namespace gd3d.framework {
         };
         resstateFirst: ResourceState;
         curtask: number;
-        bundleLoadState: number;
         totaltask: number;
         readonly fileProgress: number;
         readonly curByteLength: number;
@@ -1835,15 +1819,17 @@ declare namespace gd3d.framework {
         static readonly ClassName: string;
         gameObject: gameObject;
         subTran: transform;
-        mesh: mesh;
+        private _mesh;
+        private _filter;
         getBound(): mesh;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
-        _colliderVisible: boolean;
+        private _colliderVisible;
         colliderVisible: boolean;
         intersectsTransform(tran: transform): boolean;
-        private buildMesh();
+        private _builded;
+        private ckbuildMesh();
         private getColliderMesh();
         remove(): void;
         clone(): void;

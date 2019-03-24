@@ -22,6 +22,7 @@ namespace gd3d.framework
                 {
                     call(() =>
                     {
+                        debugger;
                         state.isloadFail = isloadFail ? true : false;
                         if (AssetFactoryTools.catchError(err, onstate, state))
                             return;

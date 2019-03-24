@@ -24,7 +24,7 @@ class test_3DPhysics_joint_hinge implements IState {
     init(){
         let mat_activated = physics3dDemoTool.mats["activated"];
         let mat_sleeping = physics3dDemoTool.mats["sleeping"];
-        let mat_stick = physics3dDemoTool.mats["yellow"];
+        let mat_stick = physics3dDemoTool.mats["uvTest"];
         //构建物体-------------------
         // //底面
         // let trans=new gd3d.framework.transform();

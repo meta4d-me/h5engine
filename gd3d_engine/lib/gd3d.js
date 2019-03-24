@@ -6642,7 +6642,6 @@ var gd3d;
                 state.totalByteLength = this.totalLength;
                 var total = this.files.length;
                 this.assetmgr = assetmgr;
-                this.curLoadState = framework.AssetBundleLoadState.None;
                 var glvshaders = [];
                 var glfshaders = [];
                 var shaders = [];
@@ -6662,9 +6661,7 @@ var gd3d;
                 var ddss = [];
                 var kfaniclips = [];
                 var asslist = [];
-                var assstatelist = [];
                 asslist.push(packs, glvshaders, glfshaders, shaders, textassets, meshs, textures, pvrs, ddss, texturedescs, fonts, atlass, materials, anclips, kfaniclips, f14effs, prefabs, scenes);
-                assstatelist.push(framework.AssetBundleLoadState.None, framework.AssetBundleLoadState.None, framework.AssetBundleLoadState.None, framework.AssetBundleLoadState.Shader, framework.AssetBundleLoadState.Prefab, framework.AssetBundleLoadState.Mesh, framework.AssetBundleLoadState.Material, framework.AssetBundleLoadState.Scene, framework.AssetBundleLoadState.None, framework.AssetBundleLoadState.Texture, framework.AssetBundleLoadState.Anclip, framework.AssetBundleLoadState.Textasset, framework.AssetBundleLoadState.Pvr, framework.AssetBundleLoadState.f14eff, framework.AssetBundleLoadState.Dds);
                 var mapPackes = {};
                 for (var _i = 0, _a = this.packages; _i < _a.length; _i++) {
                     var pack = _a[_i];
@@ -6764,14 +6761,10 @@ var gd3d;
                 for (var i = 0, len = asslist.length; i < len; ++i) {
                     for (var j = 0, clen = asslist[i].length; j < clen; ++j) {
                         var item = asslist[i][j];
-                        var state_1 = null;
-                        if (j == item.length - 1)
-                            state_1 = assstatelist[i];
                         handles[item.url] = list.length;
-                        list.push({ url: item.url, type: item.type, asset: item.asset, state: state_1, handle: undefined });
+                        list.push({ url: item.url, type: item.type, asset: item.asset, handle: undefined });
                     }
                 }
-                state.bundleLoadState = framework.AssetBundleLoadState.None;
                 var packlist = [];
                 var haveBin = false;
                 var tempMap = {};
@@ -6780,9 +6773,8 @@ var gd3d;
                     var type = item.type;
                     var asset = item.asset;
                     tempMap[surl] = 1;
-                    var loadstate = item.state;
                     if (mapPackes[surl] != undefined) {
-                        packlist.push({ surl: surl, type: type, asset: asset, loadstate: loadstate });
+                        packlist.push({ surl: surl, type: type, asset: asset });
                         delete tempMap[surl];
                         if (this_2.mapIsNull(tempMap))
                             this_2.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
@@ -6812,8 +6804,6 @@ var gd3d;
                                     var bufs = _buffer.slice(start, start + len);
                                     _this.bundlePackBin[strs[0]] = bufs;
                                 }
-                                if (state != undefined)
-                                    state.bundleLoadState |= loadstate;
                                 delete tempMap[surl];
                                 if (_this.mapIsNull(tempMap))
                                     _this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
@@ -6834,8 +6824,6 @@ var gd3d;
                                     onstate(state);
                                     return;
                                 }
-                                if (state != undefined)
-                                    state.bundleLoadState |= loadstate;
                             }, state, asset, function (data) {
                                 list[handles[data.url]].handle = data.handle;
                                 delete tempMap[data.url];
@@ -6973,21 +6961,6 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["F14Effect"] = 22] = "F14Effect";
             AssetTypeEnum[AssetTypeEnum["DDS"] = 23] = "DDS";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
-        var AssetBundleLoadState;
-        (function (AssetBundleLoadState) {
-            AssetBundleLoadState[AssetBundleLoadState["None"] = 0] = "None";
-            AssetBundleLoadState[AssetBundleLoadState["Shader"] = 1] = "Shader";
-            AssetBundleLoadState[AssetBundleLoadState["Mesh"] = 2] = "Mesh";
-            AssetBundleLoadState[AssetBundleLoadState["Texture"] = 4] = "Texture";
-            AssetBundleLoadState[AssetBundleLoadState["Material"] = 8] = "Material";
-            AssetBundleLoadState[AssetBundleLoadState["Anclip"] = 16] = "Anclip";
-            AssetBundleLoadState[AssetBundleLoadState["Prefab"] = 32] = "Prefab";
-            AssetBundleLoadState[AssetBundleLoadState["Scene"] = 64] = "Scene";
-            AssetBundleLoadState[AssetBundleLoadState["Textasset"] = 128] = "Textasset";
-            AssetBundleLoadState[AssetBundleLoadState["Pvr"] = 256] = "Pvr";
-            AssetBundleLoadState[AssetBundleLoadState["f14eff"] = 512] = "f14eff";
-            AssetBundleLoadState[AssetBundleLoadState["Dds"] = 1024] = "Dds";
-        })(AssetBundleLoadState = framework.AssetBundleLoadState || (framework.AssetBundleLoadState = {}));
         var ResourceState = (function () {
             function ResourceState() {
                 this.res = null;
@@ -7015,7 +6988,6 @@ var gd3d;
                 this.resstate = {};
                 this.resstateFirst = null;
                 this.curtask = 0;
-                this.bundleLoadState = 0;
                 this.totaltask = 0;
                 this.totalByteLength = 0;
                 this.progressCall = false;
@@ -7432,9 +7404,9 @@ var gd3d;
                 if (onstate === void 0) { onstate = null; }
                 if (this.maploaded[url]) {
                     if (onstate) {
-                        var state_2 = new stateLoad();
-                        state_2.isfinish = true;
-                        onstate(state_2);
+                        var state_1 = new stateLoad();
+                        state_1.isfinish = true;
+                        onstate(state_1);
                     }
                     return;
                 }
@@ -9123,6 +9095,7 @@ var gd3d;
                 }
                 gd3d.io.loadText(url, function (txt, err, isloadFail) {
                     call(function () {
+                        debugger;
                         state.isloadFail = isloadFail ? true : false;
                         if (framework.AssetFactoryTools.catchError(err, onstate, state))
                             return;
@@ -10834,19 +10807,15 @@ var gd3d;
         var meshcollider = (function () {
             function meshcollider() {
                 this._colliderVisible = false;
+                this._builded = false;
             }
             meshcollider.prototype.getBound = function () {
-                return this.mesh;
+                this.ckbuildMesh();
+                return this._mesh;
             };
             meshcollider.prototype.start = function () {
-                var filter = this.gameObject.getComponent("meshFilter");
-                if (filter != null) {
-                    if (this.gameObject.getName() == "MainCity_collider") {
-                        debugger;
-                    }
-                    this.mesh = filter.getMeshOutput();
-                    this.buildMesh();
-                }
+                this._filter = this.gameObject.getComponent("meshFilter");
+                this.ckbuildMesh();
             };
             meshcollider.prototype.onPlay = function () {
             };
@@ -10858,6 +10827,7 @@ var gd3d;
                 },
                 set: function (value) {
                     this._colliderVisible = value;
+                    this.ckbuildMesh();
                     if (this.subTran) {
                         this.subTran.gameObject.visible = this._colliderVisible;
                     }
@@ -10868,22 +10838,27 @@ var gd3d;
             meshcollider.prototype.intersectsTransform = function (tran) {
                 return false;
             };
-            meshcollider.prototype.buildMesh = function () {
+            meshcollider.prototype.ckbuildMesh = function () {
+                if (this._builded || !this._filter)
+                    return;
+                this._mesh = this._filter.getMeshOutput();
+                if (!this._mesh)
+                    return;
                 this.subTran = new gd3d.framework.transform();
                 this.subTran.gameObject.hideFlags = framework.HideFlags.DontSave | framework.HideFlags.HideInHierarchy;
-                this.subTran.name = "meshcollider";
+                this.subTran.name = this.gameObject.getName() + "_meshcollider";
                 var mesh = this.subTran.gameObject.addComponent("meshFilter");
                 mesh.mesh = this.getColliderMesh();
-                var renderer = this.subTran.gameObject.addComponent("meshRenderer");
                 this.subTran.gameObject.visible = this._colliderVisible;
                 this.gameObject.transform.addChild(this.subTran);
                 this.gameObject.transform.markDirty();
                 this.subTran.markDirty();
                 this.gameObject.transform.updateWorldTran();
+                this._builded = true;
             };
             meshcollider.prototype.getColliderMesh = function () {
                 var _mesh = new framework.mesh();
-                _mesh.data = this.mesh.data;
+                _mesh.data = this._mesh.data;
                 var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal;
                 var v32 = _mesh.data.genVertexDataArray(vf);
                 var i16 = _mesh.data.genIndexDataArrayTri2Line();
@@ -10909,6 +10884,8 @@ var gd3d;
                 if (this.subTran) {
                     this.subTran.dispose();
                 }
+                this._mesh = null;
+                this._filter = null;
             };
             meshcollider.prototype.clone = function () {
             };
@@ -21476,6 +21453,9 @@ var gd3d;
                     }
                 }
                 else {
+                    if (assetName == "Library_unity_default_resources_Capsule.mesh.bin") {
+                        debugger;
+                    }
                     _asset = assetMgr.getAssetByName(assetName, bundlename);
                 }
                 if (_asset == null && type == "animationClip") {

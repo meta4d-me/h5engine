@@ -32,6 +32,8 @@ class physics3dDemoTool{
     private static initMats(){
         //地板
         this.addMat("white",new gd3d.math.vector4(1,1,1,1));
+
+        this.addMat("uvTest",new gd3d.math.vector4(1,1,1,1));
         //激活状态
         this.addMat("activated",new gd3d.math.vector4(0.51,0.39,0.96,1));
         //yellow
@@ -75,12 +77,12 @@ class physics3dDemoTool{
         let mat = this.mats[name] = new gd3d.framework.material(name);
         mat.setShader(this.astMgr.getShader("diffuse.shader.json"));
         mat.setVector4("_MainColor", color );
-        if(name == "yellow"){
+        if(name == "uvTest"){
             //
-            let url = `./res/uvSprite.png`;
+            let url = `./res/uvTest.jpg`;
             this.astMgr.load(url,gd3d.framework.AssetTypeEnum.Texture,(sta)=>{
                 if(sta.isfinish){
-                    let t = this.astMgr.getAssetByName("uvSprite.png") as gd3d.framework.texture;
+                    let t = this.astMgr.getAssetByName("uvTest.jpg") as gd3d.framework.texture;
                     mat.setTexture("_MainTex",t);
                 }
             });
@@ -97,6 +99,9 @@ class physics3dDemoTool{
         let mr=tran.gameObject.getComponent("meshRenderer") as gd3d.framework.meshRenderer;
         if(!mr) mr = tran.gameObject.addComponent("meshRenderer") as any ;
         mr.materials[0] = mat;
+        if(mat == null){
+            debugger;
+        }
         mf.mesh=this.astMgr.getDefaultMesh(meshName);
 
         if(isCompound && tran.parent){

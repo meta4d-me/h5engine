@@ -8,7 +8,7 @@ class test_loadScene implements IState
         this.app = app;
         this.scene = this.app.getScene();
 
-        let names: string[] = ["MainCity_","city", "lvyexianzong_02_1024", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
+        let names: string[] = ["test_01","MainCity_","city", "lvyexianzong_02_1024", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
         let name = names[0];
         this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {
@@ -33,6 +33,7 @@ class test_loadScene implements IState
 
         let addScene = ()=>{
             var _scene: gd3d.framework.rawscene = this.app.getAssetMgr().getAssetByName(assetName + ".scene.json") as gd3d.framework.rawscene;
+            debugger;
             var _root = _scene.getSceneRoot();
             this.scene.addChild(_root);
             // _root.localTranslate = new gd3d.math.vector3(-60, -30, 26.23);

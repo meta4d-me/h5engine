@@ -1355,7 +1355,7 @@ var test_loadScene = (function () {
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
-        var names = ["MainCity_", "city", "lvyexianzong_02_1024", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
+        var names = ["test_01", "MainCity_", "city", "lvyexianzong_02_1024", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
         var name = names[0];
         this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
             if (state.isfinish) {
@@ -1376,6 +1376,7 @@ var test_loadScene = (function () {
         if (isCompress === void 0) { isCompress = false; }
         var addScene = function () {
             var _scene = _this.app.getAssetMgr().getAssetByName(assetName + ".scene.json");
+            debugger;
             var _root = _scene.getSceneRoot();
             _this.scene.addChild(_root);
             _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
@@ -2179,7 +2180,7 @@ var test_3DPhysics_compound = (function () {
         trans.localScale.y = 0.01;
         trans.localScale.z = 20;
         this.scene.addChild(trans);
-        physics3dDemoTool.attachMesh(trans, mat_yellow, "cube");
+        physics3dDemoTool.attachMesh(trans, mat_white, "cube");
         var trans2 = new gd3d.framework.transform();
         this.boxTran = trans2;
         trans2.name = "box";
@@ -2468,7 +2469,7 @@ var test_3DPhysics_freeze = (function () {
         var _this = this;
         var mat_activated = physics3dDemoTool.mats["activated"];
         var mat_sleeping = physics3dDemoTool.mats["sleeping"];
-        var mat_stick = physics3dDemoTool.mats["yellow"];
+        var mat_stick = physics3dDemoTool.mats["uvTest"];
         var mat_white = physics3dDemoTool.mats["white"];
         var trans = new gd3d.framework.transform();
         this.floor = trans;
@@ -2623,7 +2624,7 @@ var test_3DPhysics_joint_ballandSocket = (function () {
     test_3DPhysics_joint_ballandSocket.prototype.init = function () {
         var mat_activated = physics3dDemoTool.mats["activated"];
         var mat_sleeping = physics3dDemoTool.mats["sleeping"];
-        var mat_stick = physics3dDemoTool.mats["yellow"];
+        var mat_stick = physics3dDemoTool.mats["uvTest"];
         var trans2 = new gd3d.framework.transform();
         this.boxTran = trans2;
         trans2.name = "box";
@@ -2730,7 +2731,7 @@ var test_3DPhysics_joint_distance = (function () {
     test_3DPhysics_joint_distance.prototype.init = function () {
         var mat_activated = physics3dDemoTool.mats["activated"];
         var mat_sleeping = physics3dDemoTool.mats["sleeping"];
-        var mat_stick = physics3dDemoTool.mats["yellow"];
+        var mat_stick = physics3dDemoTool.mats["uvTest"];
         var trans2 = new gd3d.framework.transform();
         this.boxTran = trans2;
         trans2.name = "box";
@@ -2837,7 +2838,7 @@ var test_3DPhysics_joint_hinge = (function () {
     test_3DPhysics_joint_hinge.prototype.init = function () {
         var mat_activated = physics3dDemoTool.mats["activated"];
         var mat_sleeping = physics3dDemoTool.mats["sleeping"];
-        var mat_stick = physics3dDemoTool.mats["yellow"];
+        var mat_stick = physics3dDemoTool.mats["uvTest"];
         var trans2 = new gd3d.framework.transform();
         this.boxTran = trans2;
         trans2.name = "box";
@@ -2949,7 +2950,7 @@ var test_3DPhysics_joint_prismatic = (function () {
     test_3DPhysics_joint_prismatic.prototype.init = function () {
         var mat_activated = physics3dDemoTool.mats["activated"];
         var mat_sleeping = physics3dDemoTool.mats["sleeping"];
-        var mat_stick = physics3dDemoTool.mats["yellow"];
+        var mat_stick = physics3dDemoTool.mats["uvTest"];
         var trans2 = new gd3d.framework.transform();
         this.boxTran = trans2;
         trans2.name = "box";
@@ -3049,7 +3050,7 @@ var test_3DPhysics_joint_slider = (function () {
     test_3DPhysics_joint_slider.prototype.init = function () {
         var mat_activated = physics3dDemoTool.mats["activated"];
         var mat_sleeping = physics3dDemoTool.mats["sleeping"];
-        var mat_stick = physics3dDemoTool.mats["yellow"];
+        var mat_stick = physics3dDemoTool.mats["uvTest"];
         var trans2 = new gd3d.framework.transform();
         this.boxTran = trans2;
         trans2.name = "box";
@@ -3151,7 +3152,7 @@ var test_3DPhysics_joint_wheel = (function () {
     test_3DPhysics_joint_wheel.prototype.init = function () {
         var mat_activated = physics3dDemoTool.mats["activated"];
         var mat_sleeping = physics3dDemoTool.mats["sleeping"];
-        var mat_joint = physics3dDemoTool.mats["yellow"];
+        var mat_joint = physics3dDemoTool.mats["uvTest"];
         var trans2 = new gd3d.framework.transform();
         this.boxTran = trans2;
         trans2.name = "box";
@@ -3381,7 +3382,7 @@ var test_3DPhysics_motor_hinge = (function () {
     test_3DPhysics_motor_hinge.prototype.init = function () {
         var mat_activated = physics3dDemoTool.mats["activated"];
         var mat_sleeping = physics3dDemoTool.mats["sleeping"];
-        var mat_stick = physics3dDemoTool.mats["yellow"];
+        var mat_stick = physics3dDemoTool.mats["uvTest"];
         var trans2 = new gd3d.framework.transform();
         this.boxTran = trans2;
         trans2.name = "box";
@@ -3497,7 +3498,7 @@ var test_3DPhysics_motor_slider = (function () {
     test_3DPhysics_motor_slider.prototype.init = function () {
         var mat_activated = physics3dDemoTool.mats["activated"];
         var mat_sleeping = physics3dDemoTool.mats["sleeping"];
-        var mat_stick = physics3dDemoTool.mats["yellow"];
+        var mat_stick = physics3dDemoTool.mats["uvTest"];
         var trans2 = new gd3d.framework.transform();
         this.boxTran = trans2;
         trans2.name = "box";
@@ -3608,7 +3609,7 @@ var test_3DPhysics_motor_wheel = (function () {
     test_3DPhysics_motor_wheel.prototype.init = function () {
         var mat_activated = physics3dDemoTool.mats["activated"];
         var mat_sleeping = physics3dDemoTool.mats["sleeping"];
-        var mat_joint = physics3dDemoTool.mats["yellow"];
+        var mat_joint = physics3dDemoTool.mats["uvTest"];
         var trans2 = new gd3d.framework.transform();
         this.boxTran = trans2;
         trans2.name = "box";
@@ -5871,6 +5872,11 @@ var test_pick_boxcollider = (function () {
             var boxc = trans.gameObject.getComponent("boxcollider");
             if (boxc)
                 boxc.colliderVisible = true;
+            var meshC = trans.gameObject.getComponent("meshcollider");
+            if (meshC) {
+                meshC.colliderVisible = true;
+                debugger;
+            }
             console.error(" layer : " + trans.gameObject.layer + " ");
             if (!trans.children)
                 return;
@@ -15486,6 +15492,7 @@ var physics3dDemoTool = (function () {
     };
     physics3dDemoTool.initMats = function () {
         this.addMat("white", new gd3d.math.vector4(1, 1, 1, 1));
+        this.addMat("uvTest", new gd3d.math.vector4(1, 1, 1, 1));
         this.addMat("activated", new gd3d.math.vector4(0.51, 0.39, 0.96, 1));
         this.addMat("yellow", new gd3d.math.vector4(0.8, 0.8, 0, 1));
         this.addMat("sleeping", new gd3d.math.vector4(0.4, 0.4, 0.4, 1));
@@ -15521,11 +15528,11 @@ var physics3dDemoTool = (function () {
         var mat = this.mats[name] = new gd3d.framework.material(name);
         mat.setShader(this.astMgr.getShader("diffuse.shader.json"));
         mat.setVector4("_MainColor", color);
-        if (name == "yellow") {
-            var url = "./res/uvSprite.png";
+        if (name == "uvTest") {
+            var url = "./res/uvTest.jpg";
             this.astMgr.load(url, gd3d.framework.AssetTypeEnum.Texture, function (sta) {
                 if (sta.isfinish) {
-                    var t_4 = _this.astMgr.getAssetByName("uvSprite.png");
+                    var t_4 = _this.astMgr.getAssetByName("uvTest.jpg");
                     mat.setTexture("_MainTex", t_4);
                 }
             });
@@ -15541,6 +15548,9 @@ var physics3dDemoTool = (function () {
         if (!mr)
             mr = tran.gameObject.addComponent("meshRenderer");
         mr.materials[0] = mat;
+        if (mat == null) {
+            debugger;
+        }
         mf.mesh = this.astMgr.getDefaultMesh(meshName);
         if (isCompound && tran.parent) {
             tran = tran.parent;
