@@ -1170,7 +1170,6 @@ var main = (function () {
         this.addBtn("test_skillsystem", function () { return new t.test_skillsystem(); });
         this.addBtn("test_blend", function () { return new t.test_blend(); });
         this.addBtn("TestRotate", function () { return new t.TestRotate(); });
-        this.addBtn("testtrailrenderRecorde", function () { return new t.test_trailrenderrecorde(); });
         this.addBtn("pathasset", function () { return new t.test_pathAsset(); });
         this.addBtn("test_Asi_prefab", function () { return new test_loadAsiprefab(); });
         this.addBtn("test_tex_uv", function () { return new test_texuv(); });

@@ -121,7 +121,6 @@ class physics3dDemoTool{
             tran.setWorldPosition(tran[this.tag_pos]);
             tran.setWorldRotate(tran[this.tag_Rot]);
         }
-
         return mr;
     }
 
