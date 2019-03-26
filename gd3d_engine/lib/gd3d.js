@@ -10066,7 +10066,6 @@ var gd3d;
                 this.prefab = "";
                 this._dirtyAABB = true;
                 this._children = [];
-                this._FrustumCull = true;
                 this.dirtiedOfFrustumCulling = false;
                 this.dirtyLocal = false;
                 this.dirtyWorld = false;
@@ -10198,16 +10197,6 @@ var gd3d;
             Object.defineProperty(transform.prototype, "parent", {
                 get: function () {
                     return this._parent;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(transform.prototype, "FrustumCulling", {
-                get: function () {
-                    return this._FrustumCull;
-                },
-                set: function (val) {
-                    this._FrustumCull = val;
                 },
                 enumerable: true,
                 configurable: true

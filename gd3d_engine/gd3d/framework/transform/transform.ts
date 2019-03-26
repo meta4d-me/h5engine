@@ -334,23 +334,6 @@ namespace gd3d.framework
             return this._parent;
         }
 
-        private _FrustumCull : boolean = true;
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 被视锥剔除,不在视锥范围显示将被隐藏
-         * @version egret-gd3d 1.0
-         */
-        @gd3d.reflect.Field("boolean")
-        get FrustumCulling(){
-            return this._FrustumCull;
-        }
-
-        set FrustumCulling(val:boolean){
-            this._FrustumCull = val;
-        }
-
         /**
          * @public
          * @language zh_CN
