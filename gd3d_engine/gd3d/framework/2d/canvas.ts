@@ -3,8 +3,6 @@
 
 namespace gd3d.framework
 {
-    let helpv2 = new math.vector2();
-
     /**
      * @public
      * @language zh_CN
@@ -333,12 +331,13 @@ namespace gd3d.framework
             {//updateinput
                 //重置event
                 this.pointEvent.eated = false;
-                helpv2.x = this.pointEvent.x = XOnModelSpace;
-                helpv2.y = this.pointEvent.y = YOnModelSpace;
+                let tv2 = helpv2();
+                tv2.x = this.pointEvent.x = XOnModelSpace;
+                tv2.y = this.pointEvent.y = YOnModelSpace;
                 this.pointEvent.selected = null;
-                this.ModelPosToCanvasPos(helpv2,helpv2);
-                this.pointEvent.c_x = helpv2.x;
-                this.pointEvent.c_y = helpv2.y;
+                this.ModelPosToCanvasPos(tv2,tv2);
+                this.pointEvent.c_x = tv2.x;
+                this.pointEvent.c_y = tv2.y;
                 var skip = false;
                 if (this.pointDown == false && touch == false)//nothing
                 {

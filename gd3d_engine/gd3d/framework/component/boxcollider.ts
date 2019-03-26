@@ -2,9 +2,6 @@
 
 namespace gd3d.framework
 {
-    let help_v3 = new gd3d.math.vector3();
-    let help_v3_1 = new gd3d.math.vector3();
-
     export interface ICollider
     {
         gameObject: gameObject;
@@ -171,8 +168,8 @@ namespace gd3d.framework
             }
             else
             {
-                let minimum = help_v3;
-                let maximum = help_v3_1;
+                let minimum = helpv3();
+                let maximum = helpv3_1();
                 if (this.filter)
                 {
                     // let meshdata: gd3d.render.meshData = this.filter.getMeshOutput().data;

@@ -1,8 +1,6 @@
 /// <reference path="../../../io/reflect.ts" />
 namespace gd3d.framework
 {
-    let helpV2 = new gd3d.math.vector2();
-    let helpV2_1 = new gd3d.math.vector2();
      /**
      * @public
      * @language zh_CN
@@ -86,9 +84,10 @@ namespace gd3d.framework
             //oncap==true 是捕获阶段，一般的行为，只在pop阶段处理
             if (oncap == false)
             {
-                helpV2.x = ev.x;
-                helpV2.y = ev.y;
-                var b = this.transform.ContainsCanvasPoint(helpV2);
+                let tv2 = helpv2(); 
+                tv2.x = ev.x;
+                tv2.y = ev.y;
+                var b = this.transform.ContainsCanvasPoint(tv2);
                 
                 if (b)
                 {
@@ -96,8 +95,8 @@ namespace gd3d.framework
                     if(this._content == null)return;
                     if(!this.horizontal && !this.vertical) return;
 
-                    let temps = helpV2;
-                    let tempc = helpV2_1;
+                    let temps = helpv2();
+                    let tempc = helpv2_1();
                     this.transform.canvas.ModelPosToCanvasPos(temps,tempc);
 
                     let sp = this.strPoint;
@@ -188,8 +187,8 @@ namespace gd3d.framework
             for(let i = 1 ; i< len ; i++){
                 let p_0 = this.points[i -1];
                 let p_1 = this.points[i];
-                math.vec2Subtract(p_1,p_0,helpv2);
-                math.vec2Add(helpv2,fv,fv);
+                math.vec2Subtract(p_1,p_0,helpv2());
+                math.vec2Add(helpv2(),fv,fv);
             }
 
             math.vec2Clone(this.flyVelocity,this.lastfv);
@@ -217,9 +216,9 @@ namespace gd3d.framework
                 this.canfly = false;
                 this.cgCount = this.cgTime;
             }
-
-            math.vec2SLerp(this.lastfv , fv , this.cgCount/this.cgTime , helpv2);
-            this.SlideTo(helpv2.x,helpv2.y);
+            let tv2 = helpv2();
+            math.vec2SLerp(this.lastfv , fv , this.cgCount/this.cgTime , tv2);
+            this.SlideTo(tv2.x,tv2.y);
         }
         
         remove() {

@@ -2,7 +2,6 @@
 
 namespace gd3d.framework
 {
-    let helpV2 = new gd3d.math.vector2();
     /**
      * @public
      * @language zh_CN
@@ -226,9 +225,10 @@ namespace gd3d.framework
             //oncap==true 是捕获阶段，一般的行为，只在pop阶段处理
             if (oncap == false)
             {
-                helpV2.x = ev.x;
-                helpV2.y = ev.y;
-                var b = this.transform.ContainsCanvasPoint(helpV2);
+                let tv2 = helpv2();
+                tv2.x = ev.x;
+                tv2.y = ev.y;
+                var b = this.transform.ContainsCanvasPoint(tv2);
 
                 if (b)
                 {
@@ -253,7 +253,7 @@ namespace gd3d.framework
                             this.showPress();
                         }
                         if(!this.isMovedLimit){
-                            this.isMovedLimit = gd3d.math.vec2Distance(helpV2,this.downPointV2) > this.movedLimit;
+                            this.isMovedLimit = gd3d.math.vec2Distance(tv2,this.downPointV2) > this.movedLimit;
                         }
                     }
                     else if (ev.type == event.PointEventEnum.PointUp && this._downInThis)

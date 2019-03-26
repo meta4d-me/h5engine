@@ -624,12 +624,12 @@ namespace gd3d.framework
             //drawBounds (y 轴反向)
             let canvas = this.transform.canvas;
             if(!canvas)return;
-            let minPos = helpv2;
+            let minPos = helpv2();
             minPos.x = this.min_x;
             minPos.y = this.max_y;
             canvas.ModelPosToCanvasPos(minPos,minPos);
 
-            let maxPos = helpv2_1;
+            let maxPos = helpv2_1();
             maxPos.x = this.max_x;
             maxPos.y = this.min_y;
             canvas.ModelPosToCanvasPos(maxPos,maxPos);

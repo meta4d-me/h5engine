@@ -220,7 +220,7 @@ class test_3DPhysics_compound implements IState {
     cache_y = 0;
     //移动 到射线点
     onPonitMove([x,y]){
-        let viewPos = help_v2;
+        let viewPos = gd3d.helpv2();
         viewPos.x = x;
         viewPos.y = y;
         console.log(`x: ${x} ,y :${y}`);

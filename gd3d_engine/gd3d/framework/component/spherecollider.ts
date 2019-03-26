@@ -1,4 +1,3 @@
-let helpMat  : gd3d.framework.material = null;
 namespace gd3d.framework
 {
     /**
@@ -102,6 +101,7 @@ namespace gd3d.framework
     export class spherecollider implements INodeComponent, ICollider
     {
         static readonly ClassName:string="spherecollider";
+        private static helpMat : gd3d.framework.material = null;
 
         /**
          * @public
@@ -334,16 +334,16 @@ namespace gd3d.framework
             let renderer = this.subTran.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
             //
             renderer.materials = [];
-            if(!helpMat){
+            if(!spherecollider.helpMat){
                 let ass = this.gameObject.getScene().app.getAssetMgr();
-                helpMat = new material("sphereCMat");
-                helpMat.defaultAsset = true;
-                helpMat.setShader(ass.getShader("shader/materialcolor"));
+                spherecollider.helpMat = new material("sphereCMat");
+                spherecollider.helpMat.defaultAsset = true;
+                spherecollider.helpMat.setShader(ass.getShader("shader/materialcolor"));
                 let color = new gd3d.math.vector4(0,1,0,1);
-                helpMat.setVector4("_Color",color);
-                helpMat.setFloat("_Alpha",0.3);
+                spherecollider.helpMat.setVector4("_Color",color);
+                spherecollider.helpMat.setFloat("_Alpha",0.3);
             }
-            renderer.materials[0] = helpMat;
+            renderer.materials[0] = spherecollider.helpMat;
 
             this.subTran.gameObject.visible = this._colliderVisible;
 

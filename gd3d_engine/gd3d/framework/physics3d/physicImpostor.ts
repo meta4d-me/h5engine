@@ -1,8 +1,4 @@
 namespace gd3d.framework {
-    let help_v3 = new math.vector3();
-    let help_v3_1 = new math.vector3();
-    let help_quat = new math.quaternion();
-
     export interface PhysicsImpostorParameters {
         mass: number;
         /** The friction of the physics imposter*/
@@ -273,8 +269,8 @@ namespace gd3d.framework {
                 let go = this.object.gameObject;
                 let mf = go.getComponent("meshFilter") as  meshFilter;
                 if(!mf) return null;
-                let min = help_v3;
-                let max = help_v3_1;
+                let min = helpv3();
+                let max = helpv3_1();
                 mf.getMeshOutput().calcVectexMinMax(min,max);
                 //构建一个 obb
                 this._obb = new obb();
@@ -454,7 +450,7 @@ namespace gd3d.framework {
             math.quatClone(wrot , this.lastObjwRot);
             
             //处理 质心点 与 模型中心点 的偏移
-            let offset_wpos = help_v3;
+            let offset_wpos = helpv3();
             math.vec3Clone(this._deltaPosition,offset_wpos);
             math.vec3ScaleByNum(offset_wpos,-1,offset_wpos);
             math.vec3Add(wpos ,offset_wpos,offset_wpos);
@@ -553,9 +549,10 @@ namespace gd3d.framework {
                     if(!l_x || !l_y || !l_z ){
                         //过滤掉 物理的 旋转 影响
                         //清理 速度
-                        let Euler : math.vector3 = help_v3;
-                        physicTool.IQuatCopy(pRot,help_quat);
-                        math.quatToEulerAngles(help_quat,Euler);  //物理结算当前 欧拉角
+                        let Euler : math.vector3 = helpv3();
+                        let tquat = helpquat();
+                        physicTool.IQuatCopy(pRot,tquat);
+                        math.quatToEulerAngles(tquat,Euler);  //物理结算当前 欧拉角
                         let lEuler = this.lastEuler;
                         let mask_ = l_x?1:0 | l_y?2:0 | l_z?4:0; //优化计算 量
                         if(mask_ != this.lastRotMask){
@@ -582,8 +579,8 @@ namespace gd3d.framework {
                             t_z = Euler.z;
                         }
 
-                        math.quatFromEulerAngles(t_x,t_y,t_z,help_quat);
-                        physicTool.IQuatCopy(help_quat,pRot);
+                        math.quatFromEulerAngles(t_x,t_y,t_z,tquat);
+                        physicTool.IQuatCopy(tquat,pRot);
                     }else{
                         //全部锁定 , 不用计算旋转
                         angularVelocity.x = angularVelocity.y = angularVelocity.z = 0;
@@ -612,7 +609,7 @@ namespace gd3d.framework {
             //同步到transform
             this._physicsEngine.getPhysicsPlugin().setTransformationFromPhysicsBody(this);
             //处理 质心点 与 模型中心点 的偏移
-            let tempv3 = help_v3;
+            let tempv3 = helpv3();
             math.vec3Add(this.object.getWorldPosition(),this._deltaPosition,tempv3);
             this.object.setWorldPosition(tempv3)
         }

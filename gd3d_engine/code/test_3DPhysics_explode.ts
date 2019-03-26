@@ -170,15 +170,16 @@ class test_3DPhysics_explode implements IState {
         if(!point) return;
         this.boxList.forEach(box=>{
             if(box){
-                gd3d.math.vec3Subtract(box.gameObject.transform.localPosition,point,helpv3);
-                let len = gd3d.math.vec3Length(helpv3);
-                gd3d.math.vec3Normalize(helpv3,helpv3);
+                let tv3 = gd3d.helpv3();
+                gd3d.math.vec3Subtract(box.gameObject.transform.localPosition,point,tv3);
+                let len = gd3d.math.vec3Length(tv3);
+                gd3d.math.vec3Normalize(tv3,tv3);
                 len = Math.min(len,this.explodeRadius);
                 let rate = 1 - (len/ this.explodeRadius);
                 if(rate > 0.00001){
                     let froce = rate * this.explodeFroce;  //承受的力
-                    gd3d.math.vec3ScaleByNum(helpv3,froce,helpv3);
-                    box.gameObject.transform.physicsImpostor.applyImpulse(helpv3,box.gameObject.transform.localPosition);
+                    gd3d.math.vec3ScaleByNum(tv3,froce,tv3);
+                    box.gameObject.transform.physicsImpostor.applyImpulse(tv3,box.gameObject.transform.localPosition);
                 }
             }
         });

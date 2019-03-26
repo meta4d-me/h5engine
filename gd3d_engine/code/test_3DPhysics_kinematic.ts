@@ -1,4 +1,3 @@
-let help_v2 = new gd3d. math.vector2();
 class test_3DPhysics_kinematic implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -77,7 +76,7 @@ class test_3DPhysics_kinematic implements IState {
     cacheRota = new gd3d.math.quaternion();
     cache_y = 0;
     onPonitMove([x,y]){
-        let viewPos = help_v2;
+        let viewPos = gd3d.helpv2();
         viewPos.x = x;
         viewPos.y = y;
         console.log(`x: ${x} ,y :${y}`);

@@ -1,23 +1,4 @@
 /// <reference path="../../io/reflect.ts" />
-let helpv3 = new gd3d.math.vector3();
-let helpv3_1 = new gd3d.math.vector3();
-let helpv3_2 = new gd3d.math.vector3();
-let helpv3_3 = new gd3d.math.vector3();
-let helpv3_4 = new gd3d.math.vector3();
-let helpv3_5 = new gd3d.math.vector3();
-let helpv3_6 = new gd3d.math.vector3();
-let helpv3_7 = new gd3d.math.vector3();
-
-let helpv2 = new gd3d.math.vector2();
-let helpv2_1 = new gd3d.math.vector2();
-
-let helpmtx = new gd3d.math.matrix();
-let helpmtx_1 = new gd3d.math.matrix();
-let helpmtx_2 = new gd3d.math.matrix();
-let helpmtx_3 = new gd3d.math.matrix();
-
-let helprect = new gd3d.math.rect();
-
 namespace gd3d.framework
 {
     /**
@@ -443,18 +424,18 @@ namespace gd3d.framework
          */
         public creatRayByScreen(screenpos: gd3d.math.vector2, app: application , shareRayCache :boolean = true ): ray
         {
-            let src1 = helpv3;
+            let src1 = helpv3();
             math.vec3Set(src1,screenpos.x,screenpos.y,0);
             
-            let src2 = helpv3_1;
+            let src2 = helpv3_1();
             math.vec3Set(src2,screenpos.x,screenpos.y,1);
 
-            let dest1 = helpv3_2;
-            let dest2 = helpv3_3;
+            let dest1 = helpv3_2();
+            let dest2 = helpv3_3();
             this.calcWorldPosFromScreenPos(app, src1, dest1);
             this.calcWorldPosFromScreenPos(app, src2, dest2);
 
-            let dir = helpv3_4;
+            let dir = helpv3_4();
             gd3d.math.vec3Subtract(dest2, dest1, dir);
             gd3d.math.vec3Normalize(dir, dir);
             let ray : ray;
@@ -483,22 +464,22 @@ namespace gd3d.framework
         calcWorldPosFromScreenPos(app: application, screenPos: math.vector3, outWorldPos: math.vector3)
         {
             
-            let vpp = helprect;
+            let vpp = helprect();
             this.calcViewPortPixel(app, vpp);
-            let vppos = helpv2;
+            let vppos = helpv2();
             vppos.x = screenPos.x / vpp.w * 2 - 1;
             vppos.y =  1 - screenPos.y / vpp.h * 2;
             // new math.vector2(screenPos.x / vpp.w * 2 - 1, 1 - screenPos.y / vpp.h * 2);
-            let matrixView = helpmtx;
-            let matrixProject = helpmtx_1;
+            let matrixView = helpmtx();
+            let matrixProject = helpmtx_1();
             let asp = vpp.w / vpp.h;
             this.calcViewMatrix(matrixView);
             this.calcProjectMatrix(asp, matrixProject);
-            let matrixViewProject = helpmtx_2;
-            let matinv = helpmtx_3;
+            let matrixViewProject = helpmtx_2();
+            let matinv = helpmtx_3();
             gd3d.math.matrixMultiply(matrixProject, matrixView, matrixViewProject);
             gd3d.math.matrixInverse(matrixViewProject, matinv);
-            let src1 = helpv3; 
+            let src1 = helpv3(); 
             src1.x = vppos.x;
             src1.y = vppos.y;
             src1.z = screenPos.z;
@@ -518,17 +499,17 @@ namespace gd3d.framework
          */
         calcScreenPosFromWorldPos(app: application, worldPos: math.vector3, outScreenPos: math.vector2)
         {
-            let vpp = helprect;
+            let vpp = helprect();
             this.calcViewPortPixel(app, vpp);
-            let matrixView = helpmtx;
-            let matrixProject = helpmtx_1;
+            let matrixView = helpmtx();
+            let matrixProject = helpmtx_1();
             let asp = vpp.w / vpp.h;
             this.calcViewMatrix(matrixView);
             this.calcProjectMatrix(asp, matrixProject);
-            let matrixViewProject = helpmtx_2;
+            let matrixViewProject = helpmtx_2();
             gd3d.math.matrixMultiply(matrixProject, matrixView, matrixViewProject);
 
-            let ndcPos = helpv3;
+            let ndcPos = helpv3();
             gd3d.math.matrixTransformVector3(worldPos, matrixViewProject, ndcPos);
             outScreenPos.x = (ndcPos.x + 1) * vpp.w / 2;
             outScreenPos.y = (1 - ndcPos.y) * vpp.h / 2;
@@ -556,10 +537,10 @@ namespace gd3d.framework
             let asp = _vpp.w / _vpp.h;
             let near_w = near_h * asp;
 
-            let nearLT = helpv3; 
-            let nearLD = helpv3_1;
-            let nearRT = helpv3_2;
-            let nearRD = helpv3_3;
+            let nearLT = helpv3(); 
+            let nearLD = helpv3_1();
+            let nearRT = helpv3_2();
+            let nearRD = helpv3_3();
             math.vec3Set(nearLT,-near_w, near_h, this.near);
             math.vec3Set(nearLD,-near_w, -near_h, this.near);
             math.vec3Set(nearRT,near_w, near_h, this.near);
@@ -568,10 +549,10 @@ namespace gd3d.framework
             let far_h = this.far * Math.tan(this.fov * 0.5);
             let far_w = far_h * asp;
 
-            let farLT = helpv3_4;
-            let farLD = helpv3_5;
-            let farRT = helpv3_6;
-            let farRD = helpv3_7;
+            let farLT = helpv3_4();
+            let farLD = helpv3_5();
+            let farRT = helpv3_6();
+            let farRD = helpv3_7();
             math.vec3Set(farLT,-far_w, far_h, this.far);
             math.vec3Set(farLD,-far_w, -far_h, this.far);
             math.vec3Set(farRT,far_w, far_h, this.far);
@@ -655,15 +636,15 @@ namespace gd3d.framework
          */
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2)
         {
-            let vpp = helprect;
+            let vpp = helprect();
             this.calcViewPortPixel(app, vpp);
 
-            let nearpos = helpv3;
+            let nearpos = helpv3();
             nearpos.z = -this.near;
             nearpos.x = screenPos.x - vpp.w * 0.5;
             nearpos.y = vpp.h * 0.5 - screenPos.y;
 
-            let farpos = helpv3_1;
+            let farpos = helpv3_1();
             farpos.z = -this.far;
             farpos.x = this.far * nearpos.x / this.near;
             farpos.y = this.far * nearpos.y / this.near;;
@@ -853,8 +834,8 @@ namespace gd3d.framework
                                 // this.calcViewMatrix(matrixView);
                                 let matrixView = context.matrixView;
 
-                                let az = helpv3;
-                                let bz = helpv3_1;
+                                let az = helpv3();
+                                let bz = helpv3_1();
 
                                 gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                 gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);

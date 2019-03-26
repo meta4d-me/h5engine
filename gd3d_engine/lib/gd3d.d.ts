@@ -1698,6 +1698,9 @@ declare namespace gd3d.framework {
         private helpLRotate;
         private helpLPos;
         private helpLScale;
+        private static helpUp;
+        private static helpRight;
+        private static helpFoward;
         private checkLRTSChange();
         private fastEqual(d_0, d_1);
         private _scene;
@@ -2428,21 +2431,6 @@ declare namespace gd3d.framework {
         clone(): void;
     }
 }
-declare let helpv3: gd3d.math.vector3;
-declare let helpv3_1: gd3d.math.vector3;
-declare let helpv3_2: gd3d.math.vector3;
-declare let helpv3_3: gd3d.math.vector3;
-declare let helpv3_4: gd3d.math.vector3;
-declare let helpv3_5: gd3d.math.vector3;
-declare let helpv3_6: gd3d.math.vector3;
-declare let helpv3_7: gd3d.math.vector3;
-declare let helpv2: gd3d.math.vector2;
-declare let helpv2_1: gd3d.math.vector2;
-declare let helpmtx: gd3d.math.matrix;
-declare let helpmtx_1: gd3d.math.matrix;
-declare let helpmtx_2: gd3d.math.matrix;
-declare let helpmtx_3: gd3d.math.matrix;
-declare let helprect: gd3d.math.rect;
 declare namespace gd3d.framework {
     interface ICameraPostQueue {
         render(scene: scene, context: renderContext, camera: camera): any;
@@ -2761,7 +2749,6 @@ declare namespace gd3d.framework {
         clone(): void;
     }
 }
-declare let helpMat: gd3d.framework.material;
 declare namespace gd3d.framework {
     class spherestruct {
         center: gd3d.math.vector3;
@@ -2776,6 +2763,7 @@ declare namespace gd3d.framework {
     }
     class spherecollider implements INodeComponent, ICollider {
         static readonly ClassName: string;
+        private static helpMat;
         gameObject: gameObject;
         subTran: transform;
         filter: meshFilter;
@@ -3524,6 +3512,17 @@ declare namespace gd3d {
         listenerCount(event: string): number;
     }
 }
+declare namespace gd3d.framework {
+    class PointEvent {
+        type: event.PointEventEnum;
+        x: number;
+        y: number;
+        eated: boolean;
+        selected: transform2D;
+        c_x: number;
+        c_y: number;
+    }
+}
 declare namespace gd3d.event {
     enum UIEventEnum {
         PointerDown = 0,
@@ -3651,17 +3650,6 @@ declare namespace gd3d.event {
     class UIEvent extends AEvent {
         OnEnum(event: UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         EmitEnum(event: UIEventEnum, ...args: Array<any>): void;
-    }
-}
-declare namespace gd3d.framework {
-    class PointEvent {
-        type: event.PointEventEnum;
-        x: number;
-        y: number;
-        eated: boolean;
-        selected: transform2D;
-        c_x: number;
-        c_y: number;
     }
 }
 declare namespace gd3d.framework {
@@ -4196,6 +4184,17 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class Navigate {
+        navindexmap: {
+            [id: number]: number;
+        };
+        navinfo: navMeshInfo;
+        constructor(navinfo: gd3d.framework.navMeshInfo, navindexmap: any);
+        pathPoints(start: gd3d.math.vector3, end: gd3d.math.vector3, startIndex: number, endIndex: number): Array<gd3d.math.vector3>;
+        dispose(): void;
+    }
+}
+declare namespace gd3d.framework {
     class NavMeshLoadManager {
         private static _instance;
         private navMeshVertexOffset;
@@ -4214,17 +4213,6 @@ declare namespace gd3d.framework {
         static readonly Instance: NavMeshLoadManager;
         moveToPoints(startPos: gd3d.math.vector3, endPos: gd3d.math.vector3): Array<gd3d.math.vector3>;
         static findtriIndex(point: gd3d.math.vector3, trans: gd3d.framework.transform): number;
-    }
-}
-declare namespace gd3d.framework {
-    class Navigate {
-        navindexmap: {
-            [id: number]: number;
-        };
-        navinfo: navMeshInfo;
-        constructor(navinfo: gd3d.framework.navMeshInfo, navindexmap: any);
-        pathPoints(start: gd3d.math.vector3, end: gd3d.math.vector3, startIndex: number, endIndex: number): Array<gd3d.math.vector3>;
-        dispose(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -4596,61 +4584,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class Particle_new {
-        gameObject: gameObject;
-        private emisson;
-        private batcher;
-        private startScale;
-        startRotation: gd3d.math.quaternion;
-        rotationByShape: math.quaternion;
-        Starteuler: math.vector3;
-        rotAngle: number;
-        eulerSpeed: number;
-        rotationByEuler: math.quaternion;
-        localMatrix: math.matrix;
-        localTranslate: math.vector3;
-        localRotation: math.quaternion;
-        localScale: math.vector3;
-        startColor: math.color;
-        color: math.vector3;
-        alpha: number;
-        tex_ST: math.vector4;
-        private totalLife;
-        private curLife;
-        private life;
-        private speedDir;
-        private movespeed;
-        private simulationSpeed;
-        sourceVbo: Float32Array;
-        vertexStartIndex: number;
-        dataForVbo: Float32Array;
-        dataForEbo: Uint16Array;
-        private emissionMatToWorld;
-        private emissionWorldRotation;
-        private sizeNodes;
-        private colorNodes;
-        private alphaNodes;
-        constructor(batcher: EmissionBatcher_new);
-        uploadData(array: Float32Array): void;
-        initByData(): void;
-        actived: boolean;
-        update(delta: number): void;
-        private transformVertex;
-        private _updateLocalMatrix(delta);
-        private matToworld;
-        private refreshEmissionData();
-        private _updateRotation(delta);
-        private _updatePos(delta);
-        private _updateEuler(delta);
-        private _updateScale(delta);
-        private _updateColor(delta);
-        private spriteIndex;
-        private _updateUV(delta);
-        private _updateVBO();
-        dispose(): void;
-    }
-}
-declare namespace gd3d.framework {
     interface IAttributeData {
         uiState: AttributeUIState;
         data: {
@@ -4917,6 +4850,61 @@ declare namespace gd3d.framework {
     class effTools {
         static getRandomDirAndPosByZEmission(emission: EffectElementEmission, outDir: gd3d.math.vector3, outPos: gd3d.math.vector3): void;
         static getTex_ST(emission: EffectElementEmission, out_St: math.vector4): void;
+    }
+}
+declare namespace gd3d.framework {
+    class Particle_new {
+        gameObject: gameObject;
+        private emisson;
+        private batcher;
+        private startScale;
+        startRotation: gd3d.math.quaternion;
+        rotationByShape: math.quaternion;
+        Starteuler: math.vector3;
+        rotAngle: number;
+        eulerSpeed: number;
+        rotationByEuler: math.quaternion;
+        localMatrix: math.matrix;
+        localTranslate: math.vector3;
+        localRotation: math.quaternion;
+        localScale: math.vector3;
+        startColor: math.color;
+        color: math.vector3;
+        alpha: number;
+        tex_ST: math.vector4;
+        private totalLife;
+        private curLife;
+        private life;
+        private speedDir;
+        private movespeed;
+        private simulationSpeed;
+        sourceVbo: Float32Array;
+        vertexStartIndex: number;
+        dataForVbo: Float32Array;
+        dataForEbo: Uint16Array;
+        private emissionMatToWorld;
+        private emissionWorldRotation;
+        private sizeNodes;
+        private colorNodes;
+        private alphaNodes;
+        constructor(batcher: EmissionBatcher_new);
+        uploadData(array: Float32Array): void;
+        initByData(): void;
+        actived: boolean;
+        update(delta: number): void;
+        private transformVertex;
+        private _updateLocalMatrix(delta);
+        private matToworld;
+        private refreshEmissionData();
+        private _updateRotation(delta);
+        private _updatePos(delta);
+        private _updateEuler(delta);
+        private _updateScale(delta);
+        private _updateColor(delta);
+        private spriteIndex;
+        private _updateUV(delta);
+        private _updateVBO();
+        dispose(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -5989,95 +5977,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class tweenUtil {
-        static GetEaseProgress(ease_type: tweenMethod, linear_progress: number): number;
-        static Linear(t: number, b: number, c: number, d: number): number;
-        static ExpoEaseOut(t: number, b: number, c: number, d: number): number;
-        static ExpoEaseIn(t: number, b: number, c: number, d: number): number;
-        static ExpoEaseInOut(t: number, b: number, c: number, d: number): number;
-        static ExpoEaseOutIn(t: number, b: number, c: number, d: number): number;
-        static CircEaseOut(t: number, b: number, c: number, d: number): number;
-        static CircEaseIn(t: number, b: number, c: number, d: number): number;
-        static CircEaseInOut(t: number, b: number, c: number, d: number): number;
-        static CircEaseOutIn(t: number, b: number, c: number, d: number): number;
-        static QuadEaseOut(t: number, b: number, c: number, d: number): number;
-        static QuadEaseIn(t: number, b: number, c: number, d: number): number;
-        static QuadEaseInOut(t: number, b: number, c: number, d: number): number;
-        static QuadEaseOutIn(t: number, b: number, c: number, d: number): number;
-        static SineEaseOut(t: number, b: number, c: number, d: number): number;
-        static SineEaseIn(t: number, b: number, c: number, d: number): number;
-        static SineEaseInOut(t: number, b: number, c: number, d: number): number;
-        static SineEaseOutIn(t: number, b: number, c: number, d: number): number;
-        static CubicEaseOut(t: number, b: number, c: number, d: number): number;
-        static CubicEaseIn(t: number, b: number, c: number, d: number): number;
-        static CubicEaseInOut(t: number, b: number, c: number, d: number): number;
-        static CubicEaseOutIn(t: number, b: number, c: number, d: number): number;
-        static QuartEaseOut(t: number, b: number, c: number, d: number): number;
-        static QuartEaseIn(t: number, b: number, c: number, d: number): number;
-        static QuartEaseInOut(t: number, b: number, c: number, d: number): number;
-        static QuartEaseOutIn(t: number, b: number, c: number, d: number): number;
-        static QuintEaseOut(t: number, b: number, c: number, d: number): number;
-        static QuintEaseIn(t: number, b: number, c: number, d: number): number;
-        static QuintEaseInOut(t: number, b: number, c: number, d: number): number;
-        static QuintEaseOutIn(t: number, b: number, c: number, d: number): number;
-        static ElasticEaseOut(t: number, b: number, c: number, d: number): number;
-        static ElasticEaseIn(t: number, b: number, c: number, d: number): number;
-        static ElasticEaseInOut(t: number, b: number, c: number, d: number): number;
-        static ElasticEaseOutIn(t: number, b: number, c: number, d: number): number;
-        static BounceEaseOut(t: number, b: number, c: number, d: number): number;
-        static BounceEaseIn(t: number, b: number, c: number, d: number): number;
-        static BounceEaseInOut(t: number, b: number, c: number, d: number): number;
-        static BounceEaseOutIn(t: number, b: number, c: number, d: number): number;
-        static BackEaseOut(t: number, b: number, c: number, d: number): number;
-        static BackEaseIn(t: number, b: number, c: number, d: number): number;
-        static BackEaseInOut(t: number, b: number, c: number, d: number): number;
-        static BackEaseOutIn(t: number, b: number, c: number, d: number): number;
-    }
-    enum tweenMethod {
-        Linear = 0,
-        ExpoEaseOut = 1,
-        ExpoEaseIn = 2,
-        ExpoEaseInOut = 3,
-        ExpoEaseOutIn = 4,
-        CircEaseOut = 5,
-        CircEaseIn = 6,
-        CircEaseInOut = 7,
-        CircEaseOutIn = 8,
-        QuadEaseOut = 9,
-        QuadEaseIn = 10,
-        QuadEaseInOut = 11,
-        QuadEaseOutIn = 12,
-        SineEaseOut = 13,
-        SineEaseIn = 14,
-        SineEaseInOut = 15,
-        SineEaseOutIn = 16,
-        CubicEaseOut = 17,
-        CubicEaseIn = 18,
-        CubicEaseInOut = 19,
-        CubicEaseOutIn = 20,
-        QuartEaseOut = 21,
-        QuartEaseIn = 22,
-        QuartEaseInOut = 23,
-        QuartEaseOutIn = 24,
-        QuintEaseOut = 25,
-        QuintEaseIn = 26,
-        QuintEaseInOut = 27,
-        QuintEaseOutIn = 28,
-        ElasticEaseOut = 29,
-        ElasticEaseIn = 30,
-        ElasticEaseInOut = 31,
-        ElasticEaseOutIn = 32,
-        BounceEaseOut = 33,
-        BounceEaseIn = 34,
-        BounceEaseInOut = 35,
-        BounceEaseOutIn = 36,
-        BackEaseOut = 37,
-        BackEaseIn = 38,
-        BackEaseInOut = 39,
-        BackEaseOutIn = 40,
-    }
-}
-declare namespace gd3d.framework {
     enum CullingMask {
         nothing = 0,
         default = 1,
@@ -6218,6 +6117,95 @@ declare namespace gd3d.framework {
         private static create2D_image2D(img, app);
         private static create2D_label(label, app);
         private static create2D_button(btn, app);
+    }
+}
+declare namespace gd3d.framework {
+    class tweenUtil {
+        static GetEaseProgress(ease_type: tweenMethod, linear_progress: number): number;
+        static Linear(t: number, b: number, c: number, d: number): number;
+        static ExpoEaseOut(t: number, b: number, c: number, d: number): number;
+        static ExpoEaseIn(t: number, b: number, c: number, d: number): number;
+        static ExpoEaseInOut(t: number, b: number, c: number, d: number): number;
+        static ExpoEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static CircEaseOut(t: number, b: number, c: number, d: number): number;
+        static CircEaseIn(t: number, b: number, c: number, d: number): number;
+        static CircEaseInOut(t: number, b: number, c: number, d: number): number;
+        static CircEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static QuadEaseOut(t: number, b: number, c: number, d: number): number;
+        static QuadEaseIn(t: number, b: number, c: number, d: number): number;
+        static QuadEaseInOut(t: number, b: number, c: number, d: number): number;
+        static QuadEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static SineEaseOut(t: number, b: number, c: number, d: number): number;
+        static SineEaseIn(t: number, b: number, c: number, d: number): number;
+        static SineEaseInOut(t: number, b: number, c: number, d: number): number;
+        static SineEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static CubicEaseOut(t: number, b: number, c: number, d: number): number;
+        static CubicEaseIn(t: number, b: number, c: number, d: number): number;
+        static CubicEaseInOut(t: number, b: number, c: number, d: number): number;
+        static CubicEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static QuartEaseOut(t: number, b: number, c: number, d: number): number;
+        static QuartEaseIn(t: number, b: number, c: number, d: number): number;
+        static QuartEaseInOut(t: number, b: number, c: number, d: number): number;
+        static QuartEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static QuintEaseOut(t: number, b: number, c: number, d: number): number;
+        static QuintEaseIn(t: number, b: number, c: number, d: number): number;
+        static QuintEaseInOut(t: number, b: number, c: number, d: number): number;
+        static QuintEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static ElasticEaseOut(t: number, b: number, c: number, d: number): number;
+        static ElasticEaseIn(t: number, b: number, c: number, d: number): number;
+        static ElasticEaseInOut(t: number, b: number, c: number, d: number): number;
+        static ElasticEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static BounceEaseOut(t: number, b: number, c: number, d: number): number;
+        static BounceEaseIn(t: number, b: number, c: number, d: number): number;
+        static BounceEaseInOut(t: number, b: number, c: number, d: number): number;
+        static BounceEaseOutIn(t: number, b: number, c: number, d: number): number;
+        static BackEaseOut(t: number, b: number, c: number, d: number): number;
+        static BackEaseIn(t: number, b: number, c: number, d: number): number;
+        static BackEaseInOut(t: number, b: number, c: number, d: number): number;
+        static BackEaseOutIn(t: number, b: number, c: number, d: number): number;
+    }
+    enum tweenMethod {
+        Linear = 0,
+        ExpoEaseOut = 1,
+        ExpoEaseIn = 2,
+        ExpoEaseInOut = 3,
+        ExpoEaseOutIn = 4,
+        CircEaseOut = 5,
+        CircEaseIn = 6,
+        CircEaseInOut = 7,
+        CircEaseOutIn = 8,
+        QuadEaseOut = 9,
+        QuadEaseIn = 10,
+        QuadEaseInOut = 11,
+        QuadEaseOutIn = 12,
+        SineEaseOut = 13,
+        SineEaseIn = 14,
+        SineEaseInOut = 15,
+        SineEaseOutIn = 16,
+        CubicEaseOut = 17,
+        CubicEaseIn = 18,
+        CubicEaseInOut = 19,
+        CubicEaseOutIn = 20,
+        QuartEaseOut = 21,
+        QuartEaseIn = 22,
+        QuartEaseInOut = 23,
+        QuartEaseOutIn = 24,
+        QuintEaseOut = 25,
+        QuintEaseIn = 26,
+        QuintEaseInOut = 27,
+        QuintEaseOutIn = 28,
+        ElasticEaseOut = 29,
+        ElasticEaseIn = 30,
+        ElasticEaseInOut = 31,
+        ElasticEaseOutIn = 32,
+        BounceEaseOut = 33,
+        BounceEaseIn = 34,
+        BounceEaseInOut = 35,
+        BounceEaseOutIn = 36,
+        BackEaseOut = 37,
+        BackEaseIn = 38,
+        BackEaseInOut = 39,
+        BackEaseOutIn = 40,
     }
 }
 declare namespace gd3d.framework {
@@ -6428,8 +6416,56 @@ declare namespace gd3d.io {
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error, loadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
 }
+declare namespace gd3d {
+    function helpv2(): math.vector2;
+    function helpv2_1(): math.vector2;
+    function helpv2_2(): math.vector2;
+    function helpv2_3(): math.vector2;
+    function helpv2_4(): math.vector2;
+    function helpv2_5(): math.vector2;
+    function helpv3(): math.vector3;
+    function helpv3_1(): math.vector3;
+    function helpv3_2(): math.vector3;
+    function helpv3_3(): math.vector3;
+    function helpv3_4(): math.vector3;
+    function helpv3_5(): math.vector3;
+    function helpv3_6(): math.vector3;
+    function helpv3_7(): math.vector3;
+    function helpv4(): math.vector4;
+    function helpv4_1(): math.vector4;
+    function helpv4_2(): math.vector4;
+    function helpv4_3(): math.vector4;
+    function helpv4_4(): math.vector4;
+    function helpv4_5(): math.vector4;
+    function helpquat(): math.quaternion;
+    function helpquat_1(): math.quaternion;
+    function helpquat_2(): math.quaternion;
+    function helpquat_3(): math.quaternion;
+    function helpquat_4(): math.quaternion;
+    function helpquat_5(): math.quaternion;
+    function helpmtx(): math.matrix;
+    function helpmtx_1(): math.matrix;
+    function helpmtx_2(): math.matrix;
+    function helpmtx_3(): math.matrix;
+    function helpmtx_4(): math.matrix;
+    function helpmtx_5(): math.matrix;
+    function helpmtx3x2(): math.matrix3x2;
+    function helpmtx3x2_1(): math.matrix3x2;
+    function helpmtx3x2_2(): math.matrix3x2;
+    function helpmtx3x2_3(): math.matrix3x2;
+    function helpmtx3x2_4(): math.matrix3x2;
+    function helpmtx3x2_5(): math.matrix3x2;
+    function helprect(): math.rect;
+    function helprect_1(): math.rect;
+    function helprect_2(): math.rect;
+    function helpcolor(): math.color;
+    function helpcolor_1(): math.color;
+    function helpcolor_2(): math.color;
+}
 declare namespace gd3d.math {
     class pool {
+        private static helpDataMap;
+        static genHelpData(type: string, id: number): any;
         static collect_all(): void;
         private static _vector4_one;
         static readonly vector4_one: vector4;

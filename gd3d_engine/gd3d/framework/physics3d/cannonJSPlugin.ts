@@ -4,7 +4,6 @@ namespace gd3d.framework
     declare var CANNON: any;
 
     let BJSCANNON ;
-    let helpv3 = new math.vector3();
     export class CannonJSPlugin implements IPhysicsEnginePlugin {
         BJSCANNON = CANNON || {};
         public world: any;
@@ -249,8 +248,8 @@ namespace gd3d.framework
             let object = impostor.object;
 
             let returnValue;
-            math.vec3Clone(impostor.getObjectExtendSize(),helpv3);
-            let extendSize = helpv3;
+            let extendSize = helpv3();
+            math.vec3Clone(impostor.getObjectExtendSize(),extendSize);
             switch (impostor.type) {
                 case ImpostorType.SphereImpostor:
                     let radiusX = extendSize.x;

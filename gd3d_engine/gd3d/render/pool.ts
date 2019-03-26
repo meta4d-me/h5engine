@@ -1,3 +1,67 @@
+namespace gd3d{
+    //定义 临时计算 用数据结构对象 
+    //v2
+    export function helpv2   ():math.vector2{  return math.pool.genHelpData("v2",0); }
+    export function helpv2_1 ():math.vector2{  return math.pool.genHelpData("v2",1); }
+    export function helpv2_2 ():math.vector2{  return math.pool.genHelpData("v2",2); }
+    export function helpv2_3 ():math.vector2{  return math.pool.genHelpData("v2",3); }
+    export function helpv2_4 ():math.vector2{  return math.pool.genHelpData("v2",4); }
+    export function helpv2_5 ():math.vector2{  return math.pool.genHelpData("v2",5); }
+
+    //v3
+    export function helpv3   ():math.vector3{  return math.pool.genHelpData("v3",0); }
+    export function helpv3_1 ():math.vector3{  return math.pool.genHelpData("v3",1); }
+    export function helpv3_2 ():math.vector3{  return math.pool.genHelpData("v3",2); }
+    export function helpv3_3 ():math.vector3{  return math.pool.genHelpData("v3",3); }
+    export function helpv3_4 ():math.vector3{  return math.pool.genHelpData("v3",4); }
+    export function helpv3_5 ():math.vector3{  return math.pool.genHelpData("v3",5); }
+    export function helpv3_6 ():math.vector3{  return math.pool.genHelpData("v3",6); }
+    export function helpv3_7 ():math.vector3{  return math.pool.genHelpData("v3",7); }
+    
+    //v4
+    export function helpv4   ():math.vector4{  return math.pool.genHelpData("v4",0); }
+    export function helpv4_1 ():math.vector4{  return math.pool.genHelpData("v4",1); }
+    export function helpv4_2 ():math.vector4{  return math.pool.genHelpData("v4",2); }
+    export function helpv4_3 ():math.vector4{  return math.pool.genHelpData("v4",3); }
+    export function helpv4_4 ():math.vector4{  return math.pool.genHelpData("v4",4); }
+    export function helpv4_5 ():math.vector4{  return math.pool.genHelpData("v4",5); }
+
+    //quat
+    export function helpquat   ():math.quaternion{  return math.pool.genHelpData("quat",0); }
+    export function helpquat_1 ():math.quaternion{  return math.pool.genHelpData("quat",1); }
+    export function helpquat_2 ():math.quaternion{  return math.pool.genHelpData("quat",2); }
+    export function helpquat_3 ():math.quaternion{  return math.pool.genHelpData("quat",3); }
+    export function helpquat_4 ():math.quaternion{  return math.pool.genHelpData("quat",4); }
+    export function helpquat_5 ():math.quaternion{  return math.pool.genHelpData("quat",5); }
+
+    //mtx
+    export function helpmtx   ():math.matrix{  return math.pool.genHelpData("mtx",0); }
+    export function helpmtx_1 ():math.matrix{  return math.pool.genHelpData("mtx",1); }
+    export function helpmtx_2 ():math.matrix{  return math.pool.genHelpData("mtx",2); }
+    export function helpmtx_3 ():math.matrix{  return math.pool.genHelpData("mtx",3); }
+    export function helpmtx_4 ():math.matrix{  return math.pool.genHelpData("mtx",4); }
+    export function helpmtx_5 ():math.matrix{  return math.pool.genHelpData("mtx",5); }
+
+    //mtx3x2
+    export function helpmtx3x2   ():math.matrix3x2{  return math.pool.genHelpData("mtx3x2",0); }
+    export function helpmtx3x2_1 ():math.matrix3x2{  return math.pool.genHelpData("mtx3x2",1); }
+    export function helpmtx3x2_2 ():math.matrix3x2{  return math.pool.genHelpData("mtx3x2",2); }
+    export function helpmtx3x2_3 ():math.matrix3x2{  return math.pool.genHelpData("mtx3x2",3); }
+    export function helpmtx3x2_4 ():math.matrix3x2{  return math.pool.genHelpData("mtx3x2",4); }
+    export function helpmtx3x2_5 ():math.matrix3x2{  return math.pool.genHelpData("mtx3x2",5); }
+
+    //rect
+    export function helprect   ():math.rect{  return math.pool.genHelpData("rect",0); }
+    export function helprect_1 ():math.rect{  return math.pool.genHelpData("rect",1); }
+    export function helprect_2 ():math.rect{  return math.pool.genHelpData("rect",2); }
+
+    //color
+    export function helpcolor   ():math.color{  return math.pool.genHelpData("color",0); }
+    export function helpcolor_1 ():math.color{  return math.pool.genHelpData("color",1); }
+    export function helpcolor_2 ():math.color{  return math.pool.genHelpData("color",2); }
+
+}
+
 namespace gd3d.math
 {
     /**
@@ -10,6 +74,33 @@ namespace gd3d.math
     */
     export class pool
     {
+        private static helpDataMap: {[type:string]:{[id:number]:any}} = {};
+        static genHelpData(type:string,id:number){
+            let result ;
+            if(!type || id == null) return result;
+            if(this.helpDataMap[type] && this.helpDataMap[type][id]) {
+                result = this.helpDataMap[type][id];
+            }else{
+                if(!this.helpDataMap[type]) this.helpDataMap[type] = {};
+                let obj;
+                switch(type){
+                    case "v2": obj = this.new_vector2();  break;
+                    case "v3": obj = this.new_vector3();  break;
+                    case "v4": obj = this.new_vector4();  break;
+                    case "quat": obj = this.new_quaternion();  break;
+                    case "mtx": obj = this.new_matrix();  break;
+                    case "mtx3x2": obj = this.new_matrix3x2();  break;
+                    case "pinfo": obj = this.new_pickInfo();  break;
+                    case "color": obj = this.new_color();  break;
+                    case "rect": obj = this.new_rect();  break;
+                    default: obj = {};  break;
+                }
+                this.helpDataMap[type][id] = obj;
+                result = obj;
+            }
+            return result;
+        }
+
         /**
         * @public
         * @language zh_CN

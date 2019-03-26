@@ -2,15 +2,6 @@
 
 namespace gd3d.framework
 {
-    let helpVec3 = new math.vector3();
-    let helpVec3_1 = new math.vector3();
-    let helpMtx4 = new math.matrix();
-    let helpQuat = new math.quaternion();
-    let helpQuat_1 = new math.quaternion();
-    let helpUp = new math.vector3(0, 1, 0);
-    let helpRight = new math.vector3(1, 0, 0);
-    let helpFoward = new math.vector3(0, 0, 1);
-
     /**
      * @public
      * @language zh_CN
@@ -25,6 +16,10 @@ namespace gd3d.framework
         private helpLRotate:math.quaternion = new math.quaternion();
         private helpLPos:math.vector3 = new math.vector3();
         private helpLScale:math.vector3 = new math.vector3(1,1,1);
+
+        private static helpUp = new math.vector3(0, 1, 0);
+        private static helpRight = new math.vector3(1, 0, 0);
+        private static helpFoward = new math.vector3(0, 0, 1);
 
         private checkLRTSChange():boolean{
             // if(!math.vec3Equal(this.helpLPos,this._localTranslate,Number.MIN_VALUE))
@@ -741,9 +736,11 @@ namespace gd3d.framework
             if (!this._parent || !this._parent._parent) {
                 math.quatClone(rotate,this._localRotate);
             } else{
-                math.quatClone(this._parent.getWorldRotate(), helpQuat);
-                math.quatInverse(helpQuat,helpQuat_1);
-                math.quatMultiply(helpQuat_1,rotate,this._localRotate);
+                let tquat = helpquat();
+                let tquat_1 = helpquat_1();
+                math.quatClone(this._parent.getWorldRotate(), tquat);
+                math.quatInverse(tquat,tquat_1);
+                math.quatMultiply(tquat_1,rotate,this._localRotate);
             }
 
             if (!this.dirtyLocal) {
@@ -796,8 +793,9 @@ namespace gd3d.framework
             if (!this._parent || !this._parent._parent) {
                 math.vec3Clone(pos,this._localTranslate);
             } else{
-                math.matrixInverse(this._parent.getWorldMatrix(),helpMtx4);
-                math.matrixTransformVector3(pos,helpMtx4,this._localTranslate);
+                let tmtx = helpmtx();
+                math.matrixInverse(this._parent.getWorldMatrix(),tmtx);
+                math.matrixTransformVector3(pos,tmtx,this._localTranslate);
             }
 
             if (!this.dirtyLocal) {
@@ -833,10 +831,11 @@ namespace gd3d.framework
             if (!this._parent || !this._parent._parent) {
                 math.vec3Clone(scale,this._localScale);
             } else{
-                math.vec3Clone(this._parent.getWorldScale(),helpVec3);
-                this._localScale.x = scale.x / helpVec3.x;
-                this._localScale.y = scale.y / helpVec3.y;
-                this._localScale.z = scale.z / helpVec3.z;
+                let tv3 = helpv3();
+                math.vec3Clone(this._parent.getWorldScale(),tv3);
+                this._localScale.x = scale.x / tv3.x;
+                this._localScale.y = scale.y / tv3.y;
+                this._localScale.z = scale.z / tv3.z;
             }
 
             if (!this.dirtyLocal) {
@@ -922,7 +921,7 @@ namespace gd3d.framework
          */
         getForwardInWorld(out: math.vector3)
         {
-            math.matrixTransformNormal(helpFoward, this.getWorldMatrix(), out);
+            math.matrixTransformNormal(transform.helpFoward, this.getWorldMatrix(), out);
             math.vec3Normalize(out, out);
         }
 
@@ -935,7 +934,7 @@ namespace gd3d.framework
          */
         getRightInWorld(out: math.vector3)
         {
-            math.matrixTransformNormal(helpRight, this.getWorldMatrix(), out);
+            math.matrixTransformNormal(transform.helpRight, this.getWorldMatrix(), out);
             math.vec3Normalize(out, out);
         }
 
@@ -948,7 +947,7 @@ namespace gd3d.framework
          */
         getUpInWorld(out: math.vector3)
         {
-            math.matrixTransformNormal(helpUp, this.getWorldMatrix(), out);
+            math.matrixTransformNormal(transform.helpUp, this.getWorldMatrix(), out);
             math.vec3Normalize(out, out);
         }
 
@@ -965,8 +964,9 @@ namespace gd3d.framework
             if (!this._parent) {
                 math.matrixDecompose(mat, this._localScale, this._localRotate, this._localTranslate);
             } else {
-                math.matrixInverse(this._parent.getWorldMatrix(), helpMtx4);
-                math.matrixMultiply(helpMtx4, mat, this.localMatrix);
+                let tmtx = helpmtx();
+                math.matrixInverse(this._parent.getWorldMatrix(), tmtx);
+                math.matrixMultiply(tmtx, mat, this.localMatrix);
                 math.matrixDecompose(this.localMatrix, this._localScale, this._localRotate, this._localTranslate);
             }
 

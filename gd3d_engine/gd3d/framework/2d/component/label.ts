@@ -615,12 +615,12 @@ namespace gd3d.framework
             let canvas = this.transform.canvas;
             if(!canvas)return;
 
-            let minPos = helpv2;
+            let minPos = helpv2();
             minPos.x = this.min_x;
             minPos.y = this.max_y;
             canvas.ModelPosToCanvasPos(minPos,minPos);
 
-            let maxPos = helpv2_1;
+            let maxPos = helpv2_1();
             maxPos.x = this.max_x;
             maxPos.y = this.min_y;
             canvas.ModelPosToCanvasPos(maxPos,maxPos);
