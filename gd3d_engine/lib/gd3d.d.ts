@@ -1720,6 +1720,9 @@ declare namespace gd3d.framework {
         physicsImpostor: PhysicsImpostor;
         private _parent;
         readonly parent: transform;
+        private _FrustumCull;
+        FrustumCulling: boolean;
+        dirtiedOfFrustumCulling: boolean;
         addChild(node: transform): void;
         addChildAt(node: transform, index: number): void;
         removeAllChild(): void;

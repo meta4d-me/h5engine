@@ -10066,6 +10066,8 @@ var gd3d;
                 this.prefab = "";
                 this._dirtyAABB = true;
                 this._children = [];
+                this._FrustumCull = true;
+                this.dirtiedOfFrustumCulling = false;
                 this.dirtyLocal = false;
                 this.dirtyWorld = false;
                 this.hasComponent = false;
@@ -10200,6 +10202,16 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(transform.prototype, "FrustumCulling", {
+                get: function () {
+                    return this._FrustumCull;
+                },
+                set: function (val) {
+                    this._FrustumCull = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
             transform.prototype.addChild = function (node) {
                 this.addChildAt(node, this._children.length);
             };
@@ -10282,6 +10294,7 @@ var gd3d;
             };
             transform.prototype.dirtify = function (local) {
                 if (local === void 0) { local = false; }
+                this.dirtiedOfFrustumCulling = true;
                 if ((!local || (local && this.dirtyLocal)) && this.dirtyWorld) {
                     return;
                 }
@@ -10498,6 +10511,7 @@ var gd3d;
                 if (!this.dirtyLocal && !this.dirtyWorld) {
                     return this.worldMatrix;
                 }
+                this.dirtiedOfFrustumCulling = true;
                 if (this._parent) {
                     this._parent.getWorldMatrix();
                 }

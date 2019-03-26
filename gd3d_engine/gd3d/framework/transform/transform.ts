@@ -334,6 +334,32 @@ namespace gd3d.framework
             return this._parent;
         }
 
+        private _FrustumCull : boolean = true;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 被视锥剔除,不在视锥范围显示将被隐藏
+         * @version egret-gd3d 1.0
+         */
+        @gd3d.reflect.Field("boolean")
+        get FrustumCulling(){
+            return this._FrustumCull;
+        }
+
+        set FrustumCulling(val:boolean){
+            this._FrustumCull = val;
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 对象RTS有变化了,视锥剔除使用
+         * @version egret-gd3d 1.0
+         */
+        dirtiedOfFrustumCulling = false;
+
         /**
          * @public
          * @language zh_CN
@@ -497,6 +523,7 @@ namespace gd3d.framework
         private dirtyWorld : boolean = false;
 
         private dirtify(local = false){
+            this.dirtiedOfFrustumCulling = true;
             if ((!local || (local && this.dirtyLocal)) && this.dirtyWorld) {
                 return;
             }
@@ -883,6 +910,8 @@ namespace gd3d.framework
             if (!this.dirtyLocal && !this.dirtyWorld) {
                 return this.worldMatrix;
             }
+
+            this.dirtiedOfFrustumCulling = true;
 
             //找dirty标记的 顶 ， 再刷新
             if (this._parent) {
