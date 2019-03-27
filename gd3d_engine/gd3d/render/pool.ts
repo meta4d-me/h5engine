@@ -1,65 +1,44 @@
 namespace gd3d{
-    //定义 临时计算 用数据结构对象 
-    //v2
-    export function helpv2   ():math.vector2{  return math.pool.genHelpData("v2",0); }
-    export function helpv2_1 ():math.vector2{  return math.pool.genHelpData("v2",1); }
-    export function helpv2_2 ():math.vector2{  return math.pool.genHelpData("v2",2); }
-    export function helpv2_3 ():math.vector2{  return math.pool.genHelpData("v2",3); }
-    export function helpv2_4 ():math.vector2{  return math.pool.genHelpData("v2",4); }
-    export function helpv2_5 ():math.vector2{  return math.pool.genHelpData("v2",5); }
+    //定义 快捷使用池 数据结构对象 
+    /** 从池中取一个 vector2 */
+    export function poolv2 (clone?:math.vector2):math.vector2{  return !clone? math.pool.new_vector2(): math.pool.clone_vector2(clone); }
+    /** 删除释放一个 vector2 */
+    export function poolv2_del(data:math.vector2){math.pool.delete_vector2(data)};
 
-    //v3
-    export function helpv3   ():math.vector3{  return math.pool.genHelpData("v3",0); }
-    export function helpv3_1 ():math.vector3{  return math.pool.genHelpData("v3",1); }
-    export function helpv3_2 ():math.vector3{  return math.pool.genHelpData("v3",2); }
-    export function helpv3_3 ():math.vector3{  return math.pool.genHelpData("v3",3); }
-    export function helpv3_4 ():math.vector3{  return math.pool.genHelpData("v3",4); }
-    export function helpv3_5 ():math.vector3{  return math.pool.genHelpData("v3",5); }
-    export function helpv3_6 ():math.vector3{  return math.pool.genHelpData("v3",6); }
-    export function helpv3_7 ():math.vector3{  return math.pool.genHelpData("v3",7); }
-    
-    //v4
-    export function helpv4   ():math.vector4{  return math.pool.genHelpData("v4",0); }
-    export function helpv4_1 ():math.vector4{  return math.pool.genHelpData("v4",1); }
-    export function helpv4_2 ():math.vector4{  return math.pool.genHelpData("v4",2); }
-    export function helpv4_3 ():math.vector4{  return math.pool.genHelpData("v4",3); }
-    export function helpv4_4 ():math.vector4{  return math.pool.genHelpData("v4",4); }
-    export function helpv4_5 ():math.vector4{  return math.pool.genHelpData("v4",5); }
+     /** 从池中取一个 vector3 */
+     export function poolv3 (clone?:math.vector3):math.vector3{  return !clone? math.pool.new_vector3(): math.pool.clone_vector3(clone); }
+     /** 删除释放一个 vector3 */
+     export function poolv3_del(data:math.vector3){math.pool.delete_vector3(data)};
 
-    //quat
-    export function helpquat   ():math.quaternion{  return math.pool.genHelpData("quat",0); }
-    export function helpquat_1 ():math.quaternion{  return math.pool.genHelpData("quat",1); }
-    export function helpquat_2 ():math.quaternion{  return math.pool.genHelpData("quat",2); }
-    export function helpquat_3 ():math.quaternion{  return math.pool.genHelpData("quat",3); }
-    export function helpquat_4 ():math.quaternion{  return math.pool.genHelpData("quat",4); }
-    export function helpquat_5 ():math.quaternion{  return math.pool.genHelpData("quat",5); }
+    /** 从池中取一个 vector4 */
+    export function poolv4 (clone?:math.vector4):math.vector4{  return !clone? math.pool.new_vector4(): math.pool.clone_vector4(clone); }
+    /** 删除释放一个 vector4 */
+    export function poolv4_del(data:math.vector4){math.pool.delete_vector4(data)};
 
-    //mtx
-    export function helpmtx   ():math.matrix{  return math.pool.genHelpData("mtx",0); }
-    export function helpmtx_1 ():math.matrix{  return math.pool.genHelpData("mtx",1); }
-    export function helpmtx_2 ():math.matrix{  return math.pool.genHelpData("mtx",2); }
-    export function helpmtx_3 ():math.matrix{  return math.pool.genHelpData("mtx",3); }
-    export function helpmtx_4 ():math.matrix{  return math.pool.genHelpData("mtx",4); }
-    export function helpmtx_5 ():math.matrix{  return math.pool.genHelpData("mtx",5); }
+    /** 从池中取一个 quaternion */
+    export function poolquat (clone?:math.quaternion):math.quaternion{  return !clone? math.pool.new_quaternion(): math.pool.clone_quaternion(clone); }
+    /** 删除释放一个 quaternion */
+    export function poolquat_del(data:math.quaternion){math.pool.delete_quaternion(data)};
 
-    //mtx3x2
-    export function helpmtx3x2   ():math.matrix3x2{  return math.pool.genHelpData("mtx3x2",0); }
-    export function helpmtx3x2_1 ():math.matrix3x2{  return math.pool.genHelpData("mtx3x2",1); }
-    export function helpmtx3x2_2 ():math.matrix3x2{  return math.pool.genHelpData("mtx3x2",2); }
-    export function helpmtx3x2_3 ():math.matrix3x2{  return math.pool.genHelpData("mtx3x2",3); }
-    export function helpmtx3x2_4 ():math.matrix3x2{  return math.pool.genHelpData("mtx3x2",4); }
-    export function helpmtx3x2_5 ():math.matrix3x2{  return math.pool.genHelpData("mtx3x2",5); }
+    /** 从池中取一个 matrix */
+    export function poolmtx (clone?:math.matrix):math.matrix{  return !clone? math.pool.new_matrix(): math.pool.clone_matrix(clone); }
+    /** 删除释放一个 matrix */
+    export function poolmtx_del(data:math.matrix){math.pool.delete_matrix(data)};
 
-    //rect
-    export function helprect   ():math.rect{  return math.pool.genHelpData("rect",0); }
-    export function helprect_1 ():math.rect{  return math.pool.genHelpData("rect",1); }
-    export function helprect_2 ():math.rect{  return math.pool.genHelpData("rect",2); }
+    /** 从池中取一个 matrix3x2 */
+    export function poolmtx3x2 (clone?:math.matrix3x2):math.matrix3x2{  return !clone? math.pool.new_matrix3x2(): math.pool.clone_matrix3x2(clone); }
+    /** 删除释放一个 matrix3x2 */
+    export function poolmtx3x2_del(data:math.matrix3x2){math.pool.delete_matrix3x2(data)};
 
-    //color
-    export function helpcolor   ():math.color{  return math.pool.genHelpData("color",0); }
-    export function helpcolor_1 ():math.color{  return math.pool.genHelpData("color",1); }
-    export function helpcolor_2 ():math.color{  return math.pool.genHelpData("color",2); }
+    /** 从池中取一个 rect */
+    export function poolrect (clone?:math.rect):math.rect{  return !clone? math.pool.new_rect(): math.pool.clone_rect(clone); }
+    /** 删除释放一个 rect */
+    export function poolrect_del(data:math.rect){math.pool.delete_rect(data)};
 
+    /** 从池中取一个 color */
+    export function poolcolor (clone?:math.color):math.color{  return !clone? math.pool.new_color(): math.pool.clone_color(clone); }
+    /** 删除释放一个 color */
+    export function poolcolor_del(data:math.color){math.pool.delete_color(data)};
 }
 
 namespace gd3d.math
@@ -247,6 +226,24 @@ namespace gd3d.math
             else
                 return new color(r, g, b, a);
         }
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * clone一个color
+        * @version gd3d 1.0
+        */
+       static clone_color(col: color): color
+       {
+           if (pool.unused_color.length > 0)
+           {
+               let c = pool.unused_color.pop();
+               c.rawData.set(col.rawData);
+               return c;
+           }
+           else
+               return new color(col.r, col.g, col.b, col.a);
+       }
         /**
         * @public
         * @language zh_CN

@@ -8,6 +8,9 @@ namespace gd3d.framework
      * @version egret-gd3d 1.0
      */
     export class collision{ 
+        private static helpv3 = new math.vector3();
+        private static helpv3_1 = new math.vector3();
+
         //obb-mesh  obb-obb  mesh-mesh
         
         /**
@@ -32,7 +35,7 @@ namespace gd3d.framework
             if (!this.obbOverLap(box1_dirs[1], box0, box1)) return false;
             if (!this.obbOverLap(box1_dirs[2], box0, box1)) return false;
 
-            let tv3 = helpv3();
+            let tv3 = collision.helpv3;
             gd3d.math.vec3Cross(box0_dirs[0], box1_dirs[0], tv3);
             if (!this.obbOverLap(tv3, box0, box1)) return false;
             gd3d.math.vec3Cross(box0_dirs[0], box1_dirs[1], tv3);
@@ -83,11 +86,11 @@ namespace gd3d.framework
             if (!this.obb_SphereOverLap(a_dirs[1], a, b)) return false;
             if (!this.obb_SphereOverLap(a_dirs[2], a, b)) return false;
 
-            let axis = helpv3();
+            let axis = collision.helpv3;
             gd3d.math.vec3Subtract(a.worldCenter,b.center,axis); //obb 上 到圆心最近点 的轴
             gd3d.math.vec3Normalize(axis,axis);
             if (!this.obb_SphereOverLap(axis, a, b)) return false;
-            let tv3_1 = helpv3_1();
+            let tv3_1 = collision.helpv3_1;
             gd3d.math.vec3Cross(a_dirs[0], axis, tv3_1);
             if (!this.obb_SphereOverLap(tv3_1, a, b)) return false;
             gd3d.math.vec3Cross(a_dirs[1], axis, tv3_1);
@@ -105,18 +108,19 @@ namespace gd3d.framework
         //SphereVsMesh
 
         //tool fun
-
+        private static helpv2 = new gd3d.math.vector2();
+        private static helpv2_1 = new gd3d.math.vector2();
         private static obb_SphereOverLap(axis: gd3d.math.vector3, box0: obb, sphere: spherestruct){
-            let tv2 = helpv2();
-            let tv2_1 = helpv2_1();
+            let tv2 = this.helpv2;
+            let tv2_1 = this.helpv2_1;
             box0.computeExtentsByAxis(axis,tv2);
             sphere.computeExtentsByAxis(axis,tv2_1);
             return this.extentsOverlap(tv2,tv2_1);
         }
 
         private static obbOverLap(axis: gd3d.math.vector3, box0: obb, box1: obb){
-            let tv2 = helpv2();
-            let tv2_1 = helpv2_1();
+            let tv2 = this.helpv2;
+            let tv2_1 = this.helpv2_1;
             box0.computeExtentsByAxis(axis,tv2);
             box1.computeExtentsByAxis(axis,tv2_1);
             return this.extentsOverlap(tv2,tv2_1);

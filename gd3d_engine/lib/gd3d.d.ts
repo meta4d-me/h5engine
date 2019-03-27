@@ -935,6 +935,8 @@ declare namespace gd3d.framework {
     class scrollRect implements I2DComponent {
         static readonly ClassName: string;
         private _content;
+        private static helpv2;
+        private static helpv2_1;
         content: transform2D;
         horizontal: boolean;
         vertical: boolean;
@@ -1698,9 +1700,13 @@ declare namespace gd3d.framework {
         private helpLRotate;
         private helpLPos;
         private helpLScale;
+        private static helpv3;
         private static helpUp;
         private static helpRight;
         private static helpFoward;
+        private static helpquat;
+        private static helpquat_1;
+        private static helpmtx;
         private checkLRTSChange();
         private fastEqual(d_0, d_1);
         private _scene;
@@ -2463,6 +2469,19 @@ declare namespace gd3d.framework {
     class camera implements INodeComponent {
         static readonly ClassName: string;
         constructor();
+        private static helpv3;
+        private static helpv3_1;
+        private static helpv3_2;
+        private static helpv3_3;
+        private static helpv3_4;
+        private static helpv3_5;
+        private static helpv3_6;
+        private static helpv3_7;
+        private static helpmtx;
+        private static helpmtx_1;
+        private static helpmtx_2;
+        private static helpmtx_3;
+        private static helprect;
         gameObject: gameObject;
         private _near;
         near: number;
@@ -5248,6 +5267,7 @@ declare namespace gd3d.framework {
         name: string;
         private _physicsMaterials;
         private _fixedTimeStep;
+        private static helpv3;
         constructor(_useDeltaForWorldStep?: boolean, iterations?: number);
         setGravity(gravity: math.vector3): void;
         setTimeStep(timeStep: number): void;
@@ -5296,6 +5316,10 @@ declare namespace gd3d.framework {
         private _physicsMaterials;
         private _fixedTimeStep;
         BJSOIMO: any;
+        private static helpquat;
+        private static helpv3;
+        private static helpv3_1;
+        private static helpv3_2;
         constructor(iterations?: number, oimoInjection?: any);
         setGravity(gravity: math.vector3): void;
         setTimeStep(timeStep: number): void;
@@ -5444,6 +5468,9 @@ declare namespace gd3d.framework {
         private _isDisposed;
         private static _tmpVecs;
         private static _tmpQuat;
+        private static helpquat;
+        private static helpv3;
+        private static helpv3_1;
         readonly isDisposed: boolean;
         mass: number;
         friction: number;
@@ -5874,9 +5901,13 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class collision {
+        private static helpv3;
+        private static helpv3_1;
         static obbVsObb(a: obb, b: obb): boolean;
         static sphereVsSphere(a: spherestruct, b: spherestruct): boolean;
         static obbVsSphere(a: obb, b: spherestruct): boolean;
+        private static helpv2;
+        private static helpv2_1;
         private static obb_SphereOverLap(axis, box0, sphere);
         private static obbOverLap(axis, box0, box1);
         private static extentsOverlap(a, b);
@@ -5884,6 +5915,8 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class obb {
+        private static helpv3;
+        private static helpv3_1;
         private _directions;
         private _halfSizeWorld;
         private _vectorsWorld;
@@ -6418,50 +6451,22 @@ declare namespace gd3d.io {
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error, loadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
 }
 declare namespace gd3d {
-    function helpv2(): math.vector2;
-    function helpv2_1(): math.vector2;
-    function helpv2_2(): math.vector2;
-    function helpv2_3(): math.vector2;
-    function helpv2_4(): math.vector2;
-    function helpv2_5(): math.vector2;
-    function helpv3(): math.vector3;
-    function helpv3_1(): math.vector3;
-    function helpv3_2(): math.vector3;
-    function helpv3_3(): math.vector3;
-    function helpv3_4(): math.vector3;
-    function helpv3_5(): math.vector3;
-    function helpv3_6(): math.vector3;
-    function helpv3_7(): math.vector3;
-    function helpv4(): math.vector4;
-    function helpv4_1(): math.vector4;
-    function helpv4_2(): math.vector4;
-    function helpv4_3(): math.vector4;
-    function helpv4_4(): math.vector4;
-    function helpv4_5(): math.vector4;
-    function helpquat(): math.quaternion;
-    function helpquat_1(): math.quaternion;
-    function helpquat_2(): math.quaternion;
-    function helpquat_3(): math.quaternion;
-    function helpquat_4(): math.quaternion;
-    function helpquat_5(): math.quaternion;
-    function helpmtx(): math.matrix;
-    function helpmtx_1(): math.matrix;
-    function helpmtx_2(): math.matrix;
-    function helpmtx_3(): math.matrix;
-    function helpmtx_4(): math.matrix;
-    function helpmtx_5(): math.matrix;
-    function helpmtx3x2(): math.matrix3x2;
-    function helpmtx3x2_1(): math.matrix3x2;
-    function helpmtx3x2_2(): math.matrix3x2;
-    function helpmtx3x2_3(): math.matrix3x2;
-    function helpmtx3x2_4(): math.matrix3x2;
-    function helpmtx3x2_5(): math.matrix3x2;
-    function helprect(): math.rect;
-    function helprect_1(): math.rect;
-    function helprect_2(): math.rect;
-    function helpcolor(): math.color;
-    function helpcolor_1(): math.color;
-    function helpcolor_2(): math.color;
+    function poolv2(clone?: math.vector2): math.vector2;
+    function poolv2_del(data: math.vector2): void;
+    function poolv3(clone?: math.vector3): math.vector3;
+    function poolv3_del(data: math.vector3): void;
+    function poolv4(clone?: math.vector4): math.vector4;
+    function poolv4_del(data: math.vector4): void;
+    function poolquat(clone?: math.quaternion): math.quaternion;
+    function poolquat_del(data: math.quaternion): void;
+    function poolmtx(clone?: math.matrix): math.matrix;
+    function poolmtx_del(data: math.matrix): void;
+    function poolmtx3x2(clone?: math.matrix3x2): math.matrix3x2;
+    function poolmtx3x2_del(data: math.matrix3x2): void;
+    function poolrect(clone?: math.rect): math.rect;
+    function poolrect_del(data: math.rect): void;
+    function poolcolor(clone?: math.color): math.color;
+    function poolcolor_del(data: math.color): void;
 }
 declare namespace gd3d.math {
     class pool {
@@ -6479,6 +6484,7 @@ declare namespace gd3d.math {
         static readonly color_one: color;
         private static unused_color;
         static new_color(r?: number, g?: number, b?: number, a?: number): color;
+        static clone_color(col: color): color;
         static delete_color(v: color): void;
         static collect_color(): void;
         private static _vector3_up;

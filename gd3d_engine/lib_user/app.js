@@ -6463,7 +6463,7 @@ var test_3DPhysics_compound = (function () {
     };
     test_3DPhysics_compound.prototype.onPonitMove = function (_a) {
         var x = _a[0], y = _a[1];
-        var viewPos = gd3d.helpv2();
+        var viewPos = gd3d.poolv2();
         viewPos.x = x;
         viewPos.y = y;
         console.log("x: " + x + " ,y :" + y);
@@ -6476,6 +6476,7 @@ var test_3DPhysics_compound = (function () {
         console.log("pos  x: " + pos.x + " ,y :" + pos.y + " , z: " + pos.z);
         pos.y += 0.55;
         this.boxTran.physicsImpostor.kinematicSetPosition(pos);
+        gd3d.poolv2_del(viewPos);
     };
     test_3DPhysics_compound.prototype.update = function (delta) {
         this.tcount += delta;
@@ -6632,7 +6633,7 @@ var test_3DPhysics_explode = (function () {
             return;
         this.boxList.forEach(function (box) {
             if (box) {
-                var tv3 = gd3d.helpv3();
+                var tv3 = gd3d.poolv3();
                 gd3d.math.vec3Subtract(box.gameObject.transform.localPosition, point, tv3);
                 var len = gd3d.math.vec3Length(tv3);
                 gd3d.math.vec3Normalize(tv3, tv3);
@@ -6643,6 +6644,7 @@ var test_3DPhysics_explode = (function () {
                     gd3d.math.vec3ScaleByNum(tv3, froce, tv3);
                     box.gameObject.transform.physicsImpostor.applyImpulse(tv3, box.gameObject.transform.localPosition);
                 }
+                gd3d.poolv3_del(tv3);
             }
         });
     };
@@ -6794,7 +6796,7 @@ var test_3DPhysics_freeze = (function () {
     };
     test_3DPhysics_freeze.prototype.onPonitMove = function (_a) {
         var x = _a[0], y = _a[1];
-        var viewPos = gd3d.helpv2();
+        var viewPos = gd3d.poolv2();
         viewPos.x = x;
         viewPos.y = y;
         console.log("x: " + x + " ,y :" + y);
@@ -6807,6 +6809,7 @@ var test_3DPhysics_freeze = (function () {
         console.log("pos  x: " + pos.x + " ,y :" + pos.y + " , z: " + pos.z);
         pos.y += 0.55;
         this.boxTran.physicsImpostor.kinematicSetPosition(pos);
+        gd3d.poolv2_del(viewPos);
     };
     test_3DPhysics_freeze.prototype.update = function (delta) {
         this.tcount += delta;
@@ -7544,7 +7547,7 @@ var test_3DPhysics_kinematic = (function () {
     };
     test_3DPhysics_kinematic.prototype.onPonitMove = function (_a) {
         var x = _a[0], y = _a[1];
-        var viewPos = gd3d.helpv2();
+        var viewPos = gd3d.poolv2();
         viewPos.x = x;
         viewPos.y = y;
         console.log("x: " + x + " ,y :" + y);
@@ -7557,6 +7560,7 @@ var test_3DPhysics_kinematic = (function () {
         console.log("pos  x: " + pos.x + " ,y :" + pos.y + " , z: " + pos.z);
         pos.y += 0.55;
         this.ctrBox.physicsImpostor.kinematicSetPosition(pos);
+        gd3d.poolv2_del(viewPos);
     };
     test_3DPhysics_kinematic.prototype.updateRoate = function () {
         if (!this.ctrBox)

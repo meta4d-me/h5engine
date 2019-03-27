@@ -2028,7 +2028,7 @@ var gd3d;
                 this.rootNode.pivot.y = 0;
                 {
                     this.pointEvent.eated = false;
-                    var tv2 = gd3d.helpv2();
+                    var tv2 = gd3d.poolv2();
                     tv2.x = this.pointEvent.x = XOnModelSpace;
                     tv2.y = this.pointEvent.y = YOnModelSpace;
                     this.pointEvent.selected = null;
@@ -2057,6 +2057,7 @@ var gd3d;
                         this.pointX = this.pointEvent.x;
                         this.pointY = this.pointEvent.y;
                     }
+                    gd3d.poolv2_del(tv2);
                 }
                 this.rootNode.updateTran(false);
                 if (this.scene.app.bePlay) {
@@ -3733,7 +3734,7 @@ var gd3d;
             };
             button.prototype.onPointEvent = function (canvas, ev, oncap) {
                 if (oncap == false) {
-                    var tv2 = gd3d.helpv2();
+                    var tv2 = gd3d.poolv2();
                     tv2.x = ev.x;
                     tv2.y = ev.y;
                     var b = this.transform.ContainsCanvasPoint(tv2);
@@ -3785,6 +3786,7 @@ var gd3d;
                             }
                         }
                     }
+                    gd3d.poolv2_del(tv2);
                 }
             };
             button.prototype.addListener = function (eventEnum, func, thisArg) {
@@ -4298,11 +4300,11 @@ var gd3d;
                 var canvas = this.transform.canvas;
                 if (!canvas)
                     return;
-                var minPos = gd3d.helpv2();
+                var minPos = gd3d.poolv2();
                 minPos.x = this.min_x;
                 minPos.y = this.max_y;
                 canvas.ModelPosToCanvasPos(minPos, minPos);
-                var maxPos = gd3d.helpv2_1();
+                var maxPos = gd3d.poolv2();
                 maxPos.x = this.max_x;
                 maxPos.y = this.min_y;
                 canvas.ModelPosToCanvasPos(maxPos, maxPos);
@@ -4312,6 +4314,8 @@ var gd3d;
                 this._darwRect.h = maxPos.y - minPos.y;
                 this.min_x = this.min_y = Number.MAX_VALUE;
                 this.max_x = this.max_y = Number.MAX_VALUE * -1;
+                gd3d.poolv2_del(minPos);
+                gd3d.poolv2_del(maxPos);
             };
             image2D.prototype.updateQuadData = function (x0, y0, x1, y1, x2, y2, x3, y3, quadIndex, mirror) {
                 if (quadIndex === void 0) { quadIndex = 0; }
@@ -5606,11 +5610,11 @@ var gd3d;
                 var canvas = this.transform.canvas;
                 if (!canvas)
                     return;
-                var minPos = gd3d.helpv2();
+                var minPos = gd3d.poolv2();
                 minPos.x = this.min_x;
                 minPos.y = this.max_y;
                 canvas.ModelPosToCanvasPos(minPos, minPos);
-                var maxPos = gd3d.helpv2_1();
+                var maxPos = gd3d.poolv2();
                 maxPos.x = this.max_x;
                 maxPos.y = this.min_y;
                 canvas.ModelPosToCanvasPos(maxPos, maxPos);
@@ -5620,6 +5624,8 @@ var gd3d;
                 this._darwRect.h = maxPos.y - minPos.y;
                 this.min_x = this.min_y = Number.MAX_VALUE;
                 this.max_x = this.max_y = Number.MAX_VALUE * -1;
+                gd3d.poolv2_del(minPos);
+                gd3d.poolv2_del(maxPos);
             };
             label.prototype.start = function () {
             };
@@ -5982,11 +5988,11 @@ var gd3d;
                 var canvas = this.transform.canvas;
                 if (!canvas)
                     return;
-                var minPos = gd3d.helpv2();
+                var minPos = gd3d.poolv2();
                 minPos.x = this.min_x;
                 minPos.y = this.max_y;
                 canvas.ModelPosToCanvasPos(minPos, minPos);
-                var maxPos = gd3d.helpv2_1();
+                var maxPos = gd3d.poolv2();
                 maxPos.x = this.max_x;
                 maxPos.y = this.min_y;
                 canvas.ModelPosToCanvasPos(maxPos, maxPos);
@@ -5996,6 +6002,8 @@ var gd3d;
                 this._darwRect.h = maxPos.y - minPos.y;
                 this.min_x = this.min_y = Number.MAX_VALUE;
                 this.max_x = this.max_y = Number.MAX_VALUE * -1;
+                gd3d.poolv2_del(minPos);
+                gd3d.poolv2_del(maxPos);
             };
             rawImage2D.prototype.start = function () {
             };
@@ -6061,6 +6069,7 @@ var gd3d;
                 this.cgCount = this.cgTime;
                 this.lastfv = new gd3d.math.vector2();
             }
+            scrollRect_1 = scrollRect;
             Object.defineProperty(scrollRect.prototype, "content", {
                 get: function () {
                     return this._content;
@@ -6080,7 +6089,7 @@ var gd3d;
             };
             scrollRect.prototype.onPointEvent = function (canvas, ev, oncap) {
                 if (oncap == false) {
-                    var tv2 = gd3d.helpv2();
+                    var tv2 = scrollRect_1.helpv2;
                     tv2.x = ev.x;
                     tv2.y = ev.y;
                     var b = this.transform.ContainsCanvasPoint(tv2);
@@ -6090,8 +6099,9 @@ var gd3d;
                             return;
                         if (!this.horizontal && !this.vertical)
                             return;
-                        var temps = gd3d.helpv2();
-                        var tempc = gd3d.helpv2_1();
+                        var temps = scrollRect_1.helpv2;
+                        gd3d.math.vec2Set(temps, ev.x, ev.y);
+                        var tempc = scrollRect_1.helpv2_1;
                         this.transform.canvas.ModelPosToCanvasPos(temps, tempc);
                         var sp = this.strPoint;
                         if (ev.type == gd3d.event.PointEventEnum.PointDown) {
@@ -6165,11 +6175,12 @@ var gd3d;
                 var fv = this.flyVelocity;
                 fv.x = fv.y = 0;
                 var len = this.points.length;
+                var tv2 = scrollRect_1.helpv2;
                 for (var i = 1; i < len; i++) {
                     var p_0 = this.points[i - 1];
                     var p_1 = this.points[i];
-                    gd3d.math.vec2Subtract(p_1, p_0, gd3d.helpv2());
-                    gd3d.math.vec2Add(gd3d.helpv2(), fv, fv);
+                    gd3d.math.vec2Subtract(p_1, p_0, tv2);
+                    gd3d.math.vec2Add(tv2, fv, fv);
                 }
                 gd3d.math.vec2Clone(this.flyVelocity, this.lastfv);
                 gd3d.math.pool.delete_vector2Array(this.points);
@@ -6189,7 +6200,7 @@ var gd3d;
                     this.canfly = false;
                     this.cgCount = this.cgTime;
                 }
-                var tv2 = gd3d.helpv2();
+                var tv2 = scrollRect_1.helpv2;
                 gd3d.math.vec2SLerp(this.lastfv, fv, this.cgCount / this.cgTime, tv2);
                 this.SlideTo(tv2.x, tv2.y);
             };
@@ -6198,6 +6209,8 @@ var gd3d;
                 this.transform = null;
             };
             scrollRect.ClassName = "scrollRect";
+            scrollRect.helpv2 = new gd3d.math.vector2();
+            scrollRect.helpv2_1 = new gd3d.math.vector2();
             __decorate([
                 gd3d.reflect.Field("reference", null, "transform2D"),
                 __metadata("design:type", framework.transform2D),
@@ -6219,10 +6232,11 @@ var gd3d;
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
             ], scrollRect.prototype, "decelerationRate", void 0);
-            scrollRect = __decorate([
+            scrollRect = scrollRect_1 = __decorate([
                 gd3d.reflect.node2DComponent
             ], scrollRect);
             return scrollRect;
+            var scrollRect_1;
         }());
         framework.scrollRect = scrollRect;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -10418,8 +10432,8 @@ var gd3d;
                     gd3d.math.quatClone(rotate, this._localRotate);
                 }
                 else {
-                    var tquat = gd3d.helpquat();
-                    var tquat_1 = gd3d.helpquat_1();
+                    var tquat = transform_2.helpquat;
+                    var tquat_1 = transform_2.helpquat_1;
                     gd3d.math.quatClone(this._parent.getWorldRotate(), tquat);
                     gd3d.math.quatInverse(tquat, tquat_1);
                     gd3d.math.quatMultiply(tquat_1, rotate, this._localRotate);
@@ -10451,7 +10465,7 @@ var gd3d;
                     gd3d.math.vec3Clone(pos, this._localTranslate);
                 }
                 else {
-                    var tmtx = gd3d.helpmtx();
+                    var tmtx = transform_2.helpmtx;
                     gd3d.math.matrixInverse(this._parent.getWorldMatrix(), tmtx);
                     gd3d.math.matrixTransformVector3(pos, tmtx, this._localTranslate);
                 }
@@ -10473,7 +10487,7 @@ var gd3d;
                     gd3d.math.vec3Clone(scale, this._localScale);
                 }
                 else {
-                    var tv3 = gd3d.helpv3();
+                    var tv3 = transform_2.helpv3;
                     gd3d.math.vec3Clone(this._parent.getWorldScale(), tv3);
                     this._localScale.x = scale.x / tv3.x;
                     this._localScale.y = scale.y / tv3.y;
@@ -10540,7 +10554,7 @@ var gd3d;
                     gd3d.math.matrixDecompose(mat, this._localScale, this._localRotate, this._localTranslate);
                 }
                 else {
-                    var tmtx = gd3d.helpmtx();
+                    var tmtx = transform_2.helpmtx;
                     gd3d.math.matrixInverse(this._parent.getWorldMatrix(), tmtx);
                     gd3d.math.matrixMultiply(tmtx, mat, this.localMatrix);
                     gd3d.math.matrixDecompose(this.localMatrix, this._localScale, this._localRotate, this._localTranslate);
@@ -10600,9 +10614,13 @@ var gd3d;
                     this.onDispose();
             };
             transform.ClassName = "transform";
+            transform.helpv3 = new gd3d.math.vector3();
             transform.helpUp = new gd3d.math.vector3(0, 1, 0);
             transform.helpRight = new gd3d.math.vector3(1, 0, 0);
             transform.helpFoward = new gd3d.math.vector3(0, 0, 1);
+            transform.helpquat = new gd3d.math.quaternion();
+            transform.helpquat_1 = new gd3d.math.quaternion();
+            transform.helpmtx = new gd3d.math.matrix();
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
@@ -10723,8 +10741,8 @@ var gd3d;
                     this.obb.buildByCenterSize(this.center, this.size);
                 }
                 else {
-                    var minimum = gd3d.helpv3();
-                    var maximum = gd3d.helpv3_1();
+                    var minimum = gd3d.poolv3();
+                    var maximum = gd3d.poolv3();
                     if (this.filter) {
                         this.filter.getMeshOutput().calcVectexMinMax(minimum, maximum);
                     }
@@ -10733,6 +10751,8 @@ var gd3d;
                         maximum.x = maximum.y = maximum.z = 1;
                     }
                     this.obb.buildByMaxMin(minimum, maximum);
+                    gd3d.poolv3_del(minimum);
+                    gd3d.poolv3_del(maximum);
                 }
                 this.buildMesh();
             };
@@ -14409,15 +14429,15 @@ var gd3d;
             };
             camera.prototype.creatRayByScreen = function (screenpos, app, shareRayCache) {
                 if (shareRayCache === void 0) { shareRayCache = true; }
-                var src1 = gd3d.helpv3();
+                var src1 = camera_1.helpv3;
                 gd3d.math.vec3Set(src1, screenpos.x, screenpos.y, 0);
-                var src2 = gd3d.helpv3_1();
+                var src2 = camera_1.helpv3_1;
                 gd3d.math.vec3Set(src2, screenpos.x, screenpos.y, 1);
-                var dest1 = gd3d.helpv3_2();
-                var dest2 = gd3d.helpv3_3();
+                var dest1 = camera_1.helpv3_2;
+                var dest2 = camera_1.helpv3_3;
                 this.calcWorldPosFromScreenPos(app, src1, dest1);
                 this.calcWorldPosFromScreenPos(app, src2, dest2);
-                var dir = gd3d.helpv3_4();
+                var dir = camera_1.helpv3_4;
                 gd3d.math.vec3Subtract(dest2, dest1, dir);
                 gd3d.math.vec3Normalize(dir, dir);
                 var ray;
@@ -14434,37 +14454,38 @@ var gd3d;
                 return ray;
             };
             camera.prototype.calcWorldPosFromScreenPos = function (app, screenPos, outWorldPos) {
-                var vpp = gd3d.helprect();
+                var vpp = camera_1.helprect;
                 this.calcViewPortPixel(app, vpp);
-                var vppos = gd3d.helpv2();
+                var vppos = gd3d.poolv2();
                 vppos.x = screenPos.x / vpp.w * 2 - 1;
                 vppos.y = 1 - screenPos.y / vpp.h * 2;
-                var matrixView = gd3d.helpmtx();
-                var matrixProject = gd3d.helpmtx_1();
+                var matrixView = camera_1.helpmtx;
+                var matrixProject = camera_1.helpmtx_1;
                 var asp = vpp.w / vpp.h;
                 this.calcViewMatrix(matrixView);
                 this.calcProjectMatrix(asp, matrixProject);
-                var matrixViewProject = gd3d.helpmtx_2();
-                var matinv = gd3d.helpmtx_3();
+                var matrixViewProject = camera_1.helpmtx_2;
+                var matinv = camera_1.helpmtx_3;
                 gd3d.math.matrixMultiply(matrixProject, matrixView, matrixViewProject);
                 gd3d.math.matrixInverse(matrixViewProject, matinv);
-                var src1 = gd3d.helpv3();
+                var src1 = camera_1.helpv3;
                 src1.x = vppos.x;
                 src1.y = vppos.y;
                 src1.z = screenPos.z;
                 gd3d.math.matrixTransformVector3(src1, matinv, outWorldPos);
+                gd3d.poolv2_del(vppos);
             };
             camera.prototype.calcScreenPosFromWorldPos = function (app, worldPos, outScreenPos) {
-                var vpp = gd3d.helprect();
+                var vpp = camera_1.helprect;
                 this.calcViewPortPixel(app, vpp);
-                var matrixView = gd3d.helpmtx();
-                var matrixProject = gd3d.helpmtx_1();
+                var matrixView = camera_1.helpmtx;
+                var matrixProject = camera_1.helpmtx_1;
                 var asp = vpp.w / vpp.h;
                 this.calcViewMatrix(matrixView);
                 this.calcProjectMatrix(asp, matrixProject);
-                var matrixViewProject = gd3d.helpmtx_2();
+                var matrixViewProject = camera_1.helpmtx_2;
                 gd3d.math.matrixMultiply(matrixProject, matrixView, matrixViewProject);
-                var ndcPos = gd3d.helpv3();
+                var ndcPos = camera_1.helpv3;
                 gd3d.math.matrixTransformVector3(worldPos, matrixViewProject, ndcPos);
                 outScreenPos.x = (ndcPos.x + 1) * vpp.w / 2;
                 outScreenPos.y = (1 - ndcPos.y) * vpp.h / 2;
@@ -14480,20 +14501,20 @@ var gd3d;
                 var near_h = this.near * Math.tan(this.fov * 0.5);
                 var asp = _vpp.w / _vpp.h;
                 var near_w = near_h * asp;
-                var nearLT = gd3d.helpv3();
-                var nearLD = gd3d.helpv3_1();
-                var nearRT = gd3d.helpv3_2();
-                var nearRD = gd3d.helpv3_3();
+                var nearLT = camera_1.helpv3;
+                var nearLD = camera_1.helpv3_1;
+                var nearRT = camera_1.helpv3_2;
+                var nearRD = camera_1.helpv3_3;
                 gd3d.math.vec3Set(nearLT, -near_w, near_h, this.near);
                 gd3d.math.vec3Set(nearLD, -near_w, -near_h, this.near);
                 gd3d.math.vec3Set(nearRT, near_w, near_h, this.near);
                 gd3d.math.vec3Set(nearRD, near_w, -near_h, this.near);
                 var far_h = this.far * Math.tan(this.fov * 0.5);
                 var far_w = far_h * asp;
-                var farLT = gd3d.helpv3_4();
-                var farLD = gd3d.helpv3_5();
-                var farRT = gd3d.helpv3_6();
-                var farRD = gd3d.helpv3_7();
+                var farLT = camera_1.helpv3_4;
+                var farLD = camera_1.helpv3_5;
+                var farRT = camera_1.helpv3_6;
+                var farRD = camera_1.helpv3_7;
                 gd3d.math.vec3Set(farLT, -far_w, far_h, this.far);
                 gd3d.math.vec3Set(farLD, -far_w, -far_h, this.far);
                 gd3d.math.vec3Set(farRT, far_w, far_h, this.far);
@@ -14536,13 +14557,13 @@ var gd3d;
                 configurable: true
             });
             camera.prototype.getPosAtXPanelInViewCoordinateByScreenPos = function (screenPos, app, z, out) {
-                var vpp = gd3d.helprect();
+                var vpp = camera_1.helprect;
                 this.calcViewPortPixel(app, vpp);
-                var nearpos = gd3d.helpv3();
+                var nearpos = camera_1.helpv3;
                 nearpos.z = -this.near;
                 nearpos.x = screenPos.x - vpp.w * 0.5;
                 nearpos.y = vpp.h * 0.5 - screenPos.y;
-                var farpos = gd3d.helpv3_1();
+                var farpos = camera_1.helpv3_1;
                 farpos.z = -this.far;
                 farpos.x = this.far * nearpos.x / this.near;
                 farpos.y = this.far * nearpos.y / this.near;
@@ -14665,8 +14686,8 @@ var gd3d;
                                 }
                                 else {
                                     var matrixView = context.matrixView;
-                                    var az = gd3d.helpv3();
-                                    var bz = gd3d.helpv3_1();
+                                    var az = camera_1.helpv3;
+                                    var bz = camera_1.helpv3_1;
                                     gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                     gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
                                     return bz.z - az.z;
@@ -14692,6 +14713,19 @@ var gd3d;
             camera.prototype.clone = function () {
             };
             camera.ClassName = "camera";
+            camera.helpv3 = new gd3d.math.vector3();
+            camera.helpv3_1 = new gd3d.math.vector3();
+            camera.helpv3_2 = new gd3d.math.vector3();
+            camera.helpv3_3 = new gd3d.math.vector3();
+            camera.helpv3_4 = new gd3d.math.vector3();
+            camera.helpv3_5 = new gd3d.math.vector3();
+            camera.helpv3_6 = new gd3d.math.vector3();
+            camera.helpv3_7 = new gd3d.math.vector3();
+            camera.helpmtx = new gd3d.math.matrix();
+            camera.helpmtx_1 = new gd3d.math.matrix();
+            camera.helpmtx_2 = new gd3d.math.matrix();
+            camera.helpmtx_3 = new gd3d.math.matrix();
+            camera.helprect = new gd3d.math.rect();
             __decorate([
                 gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 2),
                 gd3d.reflect.Field("number"),
@@ -29576,7 +29610,7 @@ var gd3d;
             CannonJSPlugin.prototype._createShape = function (impostor) {
                 var object = impostor.object;
                 var returnValue;
-                var extendSize = gd3d.helpv3();
+                var extendSize = CannonJSPlugin.helpv3;
                 gd3d.math.vec3Clone(impostor.getObjectExtendSize(), extendSize);
                 switch (impostor.type) {
                     case framework.ImpostorType.SphereImpostor:
@@ -29781,6 +29815,7 @@ var gd3d;
                     }
                 };
             };
+            CannonJSPlugin.helpv3 = new gd3d.math.vector3();
             return CannonJSPlugin;
         }());
         framework.CannonJSPlugin = CannonJSPlugin;
@@ -29847,9 +29882,9 @@ var gd3d;
             };
             OimoJSPlugin.prototype.applyImpulse = function (impostor, force, contactPoint) {
                 var mass = impostor.physicsBody.mass;
-                var _point = gd3d.helpv3();
+                var _point = OimoJSPlugin.helpv3;
                 gd3d.math.vec3ScaleByNum(contactPoint, this.world.invScale, _point);
-                var _force = gd3d.helpv3_1();
+                var _force = OimoJSPlugin.helpv3_1;
                 gd3d.math.vec3ScaleByNum(force, this.world.invScale * mass, _force);
                 impostor.physicsBody.applyImpulse(_point, _force);
             };
@@ -29894,14 +29929,14 @@ var gd3d;
                             }
                         });
                     }
-                    var globalQuat_1 = gd3d.helpquat();
+                    var globalQuat_1 = OimoJSPlugin.helpquat;
                     globalQuat_1.x = globalQuat_1.y = globalQuat_1.z = 0;
                     globalQuat_1.w = 1;
                     var wPos_impostor_1 = impostor.object.getWorldPosition();
                     impostors.forEach(function (i) {
                         var oldQuaternion = i.object.localRotate;
                         gd3d.math.quatClone(i.object.localRotate, globalQuat_1);
-                        var rot = gd3d.helpv3();
+                        var rot = OimoJSPlugin.helpv3;
                         gd3d.math.quatToEulerAngles(oldQuaternion, rot);
                         console.log(_this._tmpPositionVector);
                         var extendSize = i.getObjectExtendSize();
@@ -29915,7 +29950,7 @@ var gd3d;
                             bodyConfig_1.rotShape.push(0, 0, 0);
                         }
                         else {
-                            var localPosition = gd3d.helpv3_2();
+                            var localPosition = OimoJSPlugin.helpv3_2;
                             gd3d.math.vec3Subtract(i.object.getWorldPosition(), wPos_impostor_1, localPosition);
                             bodyConfig_1.posShape.push(localPosition.x);
                             bodyConfig_1.posShape.push(localPosition.y);
@@ -29964,13 +29999,13 @@ var gd3d;
                     impostor.physicsBody = this.world.add(bodyConfig_1);
                     impostor.physicsBody.resetQuaternion(globalQuat_1);
                     impostor.physicsBody.updatePosition(0);
-                    var massCenter = gd3d.helpv3();
+                    var massCenter = OimoJSPlugin.helpv3;
                     var p = impostor.physicsBody.position;
                     gd3d.math.vec3Set(massCenter, p.x, p.y, p.z);
                     impostor.physicsBody.position;
                     var wpos = impostor.object.getWorldPosition();
                     if (!gd3d.math.vec3Equal(massCenter, wpos)) {
-                        var scale = gd3d.helpv3_1();
+                        var scale = OimoJSPlugin.helpv3_1;
                         gd3d.math.vec3Clone(impostor.object.getWorldScale(), scale);
                         scale.x = 1 / scale.x;
                         scale.y = 1 / scale.y;
@@ -30151,6 +30186,10 @@ var gd3d;
             OimoJSPlugin.prototype.dispose = function () {
                 this.world.clear();
             };
+            OimoJSPlugin.helpquat = new gd3d.math.quaternion();
+            OimoJSPlugin.helpv3 = new gd3d.math.vector3();
+            OimoJSPlugin.helpv3_1 = new gd3d.math.vector3();
+            OimoJSPlugin.helpv3_2 = new gd3d.math.vector3();
             return OimoJSPlugin;
         }());
         framework.OimoJSPlugin = OimoJSPlugin;
@@ -30300,7 +30339,7 @@ var gd3d;
                     var hasDirty = !gd3d.math.vec3Equal(wpos, _this.lastObjwPos) || !gd3d.math.quatEqual(wrot, _this.lastObjwRot);
                     gd3d.math.vec3Clone(wpos, _this.lastObjwPos);
                     gd3d.math.quatClone(wrot, _this.lastObjwRot);
-                    var offset_wpos = gd3d.helpv3();
+                    var offset_wpos = PhysicsImpostor.helpv3;
                     gd3d.math.vec3Clone(_this._deltaPosition, offset_wpos);
                     gd3d.math.vec3ScaleByNum(offset_wpos, -1, offset_wpos);
                     gd3d.math.vec3Add(wpos, offset_wpos, offset_wpos);
@@ -30351,8 +30390,8 @@ var gd3d;
                             var pRot = _this._physicsBody.quaternion;
                             var angularVelocity = _this._physicsBody.angularVelocity;
                             if (!l_x || !l_y || !l_z) {
-                                var Euler = gd3d.helpv3();
-                                var tquat = gd3d.helpquat();
+                                var Euler = PhysicsImpostor.helpv3;
+                                var tquat = PhysicsImpostor.helpquat;
                                 framework.physicTool.IQuatCopy(pRot, tquat);
                                 gd3d.math.quatToEulerAngles(tquat, Euler);
                                 var lEuler = _this.lastEuler;
@@ -30396,7 +30435,7 @@ var gd3d;
                     if (!posDirty && !rotDirty)
                         return;
                     _this._physicsEngine.getPhysicsPlugin().setTransformationFromPhysicsBody(_this);
-                    var tempv3 = gd3d.helpv3();
+                    var tempv3 = PhysicsImpostor.helpv3;
                     gd3d.math.vec3Add(_this.object.getWorldPosition(), _this._deltaPosition, tempv3);
                     _this.object.setWorldPosition(tempv3);
                 };
@@ -30546,8 +30585,8 @@ var gd3d;
                     var mf = go.getComponent("meshFilter");
                     if (!mf)
                         return null;
-                    var min = gd3d.helpv3();
-                    var max = gd3d.helpv3_1();
+                    var min = PhysicsImpostor.helpv3;
+                    var max = PhysicsImpostor.helpv3_1;
                     mf.getMeshOutput().calcVectexMinMax(min, max);
                     this._obb = new framework.obb();
                     this._obb.buildByMaxMin(min, max);
@@ -30766,6 +30805,9 @@ var gd3d;
             PhysicsImpostor.IDENTITY_QUATERNION = new gd3d.math.quaternion();
             PhysicsImpostor._tmpVecs = [new gd3d.math.vector3(), new gd3d.math.vector3(), new gd3d.math.vector3()];
             PhysicsImpostor._tmpQuat = new gd3d.math.quaternion();
+            PhysicsImpostor.helpquat = new gd3d.math.quaternion();
+            PhysicsImpostor.helpv3 = new gd3d.math.vector3();
+            PhysicsImpostor.helpv3_1 = new gd3d.math.vector3();
             return PhysicsImpostor;
         }());
         framework.PhysicsImpostor = PhysicsImpostor;
@@ -32232,7 +32274,7 @@ var gd3d;
                     return false;
                 if (!this.obbOverLap(box1_dirs[2], box0, box1))
                     return false;
-                var tv3 = gd3d.helpv3();
+                var tv3 = collision.helpv3;
                 gd3d.math.vec3Cross(box0_dirs[0], box1_dirs[0], tv3);
                 if (!this.obbOverLap(tv3, box0, box1))
                     return false;
@@ -32278,12 +32320,12 @@ var gd3d;
                     return false;
                 if (!this.obb_SphereOverLap(a_dirs[2], a, b))
                     return false;
-                var axis = gd3d.helpv3();
+                var axis = collision.helpv3;
                 gd3d.math.vec3Subtract(a.worldCenter, b.center, axis);
                 gd3d.math.vec3Normalize(axis, axis);
                 if (!this.obb_SphereOverLap(axis, a, b))
                     return false;
-                var tv3_1 = gd3d.helpv3_1();
+                var tv3_1 = collision.helpv3_1;
                 gd3d.math.vec3Cross(a_dirs[0], axis, tv3_1);
                 if (!this.obb_SphereOverLap(tv3_1, a, b))
                     return false;
@@ -32296,15 +32338,15 @@ var gd3d;
                 return true;
             };
             collision.obb_SphereOverLap = function (axis, box0, sphere) {
-                var tv2 = gd3d.helpv2();
-                var tv2_1 = gd3d.helpv2_1();
+                var tv2 = this.helpv2;
+                var tv2_1 = this.helpv2_1;
                 box0.computeExtentsByAxis(axis, tv2);
                 sphere.computeExtentsByAxis(axis, tv2_1);
                 return this.extentsOverlap(tv2, tv2_1);
             };
             collision.obbOverLap = function (axis, box0, box1) {
-                var tv2 = gd3d.helpv2();
-                var tv2_1 = gd3d.helpv2_1();
+                var tv2 = this.helpv2;
+                var tv2_1 = this.helpv2_1;
                 box0.computeExtentsByAxis(axis, tv2);
                 box1.computeExtentsByAxis(axis, tv2_1);
                 return this.extentsOverlap(tv2, tv2_1);
@@ -32312,6 +32354,10 @@ var gd3d;
             collision.extentsOverlap = function (a, b) {
                 return !(a.x > b.y || b.x > a.y);
             };
+            collision.helpv3 = new gd3d.math.vector3();
+            collision.helpv3_1 = new gd3d.math.vector3();
+            collision.helpv2 = new gd3d.math.vector2();
+            collision.helpv2_1 = new gd3d.math.vector2();
             return collision;
         }());
         framework.collision = collision;
@@ -32321,8 +32367,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var helpv3 = new gd3d.math.vector3();
-        var helpv3_1 = new gd3d.math.vector3();
         var obb = (function () {
             function obb() {
                 this._directions = [];
@@ -32368,8 +32412,8 @@ var gd3d;
                 get: function () {
                     if (this.dirtyMap[obb.tag_wHalfSize]) {
                         var wVects = this.vectorsWorld;
-                        var wMin = helpv3;
-                        var wMax = helpv3_1;
+                        var wMin = obb.helpv3;
+                        var wMax = obb.helpv3_1;
                         gd3d.math.vec3SetAll(wMin, Number.MAX_VALUE);
                         gd3d.math.vec3SetAll(wMax, -Number.MAX_VALUE);
                         for (var i = 0; i < 8; i++) {
@@ -32516,6 +32560,8 @@ var gd3d;
                 this._worldCenter = null;
                 this._worldMatrix = null;
             };
+            obb.helpv3 = new gd3d.math.vector3();
+            obb.helpv3_1 = new gd3d.math.vector3();
             obb.tag_wCenter = "tag_wCenter";
             obb.tag_wVectors = "tag_wVectors";
             obb.tag_wHalfSize = "tag_wHalfSize";
@@ -34458,94 +34504,46 @@ var gd3d;
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
-    function helpv2() { return gd3d.math.pool.genHelpData("v2", 0); }
-    gd3d.helpv2 = helpv2;
-    function helpv2_1() { return gd3d.math.pool.genHelpData("v2", 1); }
-    gd3d.helpv2_1 = helpv2_1;
-    function helpv2_2() { return gd3d.math.pool.genHelpData("v2", 2); }
-    gd3d.helpv2_2 = helpv2_2;
-    function helpv2_3() { return gd3d.math.pool.genHelpData("v2", 3); }
-    gd3d.helpv2_3 = helpv2_3;
-    function helpv2_4() { return gd3d.math.pool.genHelpData("v2", 4); }
-    gd3d.helpv2_4 = helpv2_4;
-    function helpv2_5() { return gd3d.math.pool.genHelpData("v2", 5); }
-    gd3d.helpv2_5 = helpv2_5;
-    function helpv3() { return gd3d.math.pool.genHelpData("v3", 0); }
-    gd3d.helpv3 = helpv3;
-    function helpv3_1() { return gd3d.math.pool.genHelpData("v3", 1); }
-    gd3d.helpv3_1 = helpv3_1;
-    function helpv3_2() { return gd3d.math.pool.genHelpData("v3", 2); }
-    gd3d.helpv3_2 = helpv3_2;
-    function helpv3_3() { return gd3d.math.pool.genHelpData("v3", 3); }
-    gd3d.helpv3_3 = helpv3_3;
-    function helpv3_4() { return gd3d.math.pool.genHelpData("v3", 4); }
-    gd3d.helpv3_4 = helpv3_4;
-    function helpv3_5() { return gd3d.math.pool.genHelpData("v3", 5); }
-    gd3d.helpv3_5 = helpv3_5;
-    function helpv3_6() { return gd3d.math.pool.genHelpData("v3", 6); }
-    gd3d.helpv3_6 = helpv3_6;
-    function helpv3_7() { return gd3d.math.pool.genHelpData("v3", 7); }
-    gd3d.helpv3_7 = helpv3_7;
-    function helpv4() { return gd3d.math.pool.genHelpData("v4", 0); }
-    gd3d.helpv4 = helpv4;
-    function helpv4_1() { return gd3d.math.pool.genHelpData("v4", 1); }
-    gd3d.helpv4_1 = helpv4_1;
-    function helpv4_2() { return gd3d.math.pool.genHelpData("v4", 2); }
-    gd3d.helpv4_2 = helpv4_2;
-    function helpv4_3() { return gd3d.math.pool.genHelpData("v4", 3); }
-    gd3d.helpv4_3 = helpv4_3;
-    function helpv4_4() { return gd3d.math.pool.genHelpData("v4", 4); }
-    gd3d.helpv4_4 = helpv4_4;
-    function helpv4_5() { return gd3d.math.pool.genHelpData("v4", 5); }
-    gd3d.helpv4_5 = helpv4_5;
-    function helpquat() { return gd3d.math.pool.genHelpData("quat", 0); }
-    gd3d.helpquat = helpquat;
-    function helpquat_1() { return gd3d.math.pool.genHelpData("quat", 1); }
-    gd3d.helpquat_1 = helpquat_1;
-    function helpquat_2() { return gd3d.math.pool.genHelpData("quat", 2); }
-    gd3d.helpquat_2 = helpquat_2;
-    function helpquat_3() { return gd3d.math.pool.genHelpData("quat", 3); }
-    gd3d.helpquat_3 = helpquat_3;
-    function helpquat_4() { return gd3d.math.pool.genHelpData("quat", 4); }
-    gd3d.helpquat_4 = helpquat_4;
-    function helpquat_5() { return gd3d.math.pool.genHelpData("quat", 5); }
-    gd3d.helpquat_5 = helpquat_5;
-    function helpmtx() { return gd3d.math.pool.genHelpData("mtx", 0); }
-    gd3d.helpmtx = helpmtx;
-    function helpmtx_1() { return gd3d.math.pool.genHelpData("mtx", 1); }
-    gd3d.helpmtx_1 = helpmtx_1;
-    function helpmtx_2() { return gd3d.math.pool.genHelpData("mtx", 2); }
-    gd3d.helpmtx_2 = helpmtx_2;
-    function helpmtx_3() { return gd3d.math.pool.genHelpData("mtx", 3); }
-    gd3d.helpmtx_3 = helpmtx_3;
-    function helpmtx_4() { return gd3d.math.pool.genHelpData("mtx", 4); }
-    gd3d.helpmtx_4 = helpmtx_4;
-    function helpmtx_5() { return gd3d.math.pool.genHelpData("mtx", 5); }
-    gd3d.helpmtx_5 = helpmtx_5;
-    function helpmtx3x2() { return gd3d.math.pool.genHelpData("mtx3x2", 0); }
-    gd3d.helpmtx3x2 = helpmtx3x2;
-    function helpmtx3x2_1() { return gd3d.math.pool.genHelpData("mtx3x2", 1); }
-    gd3d.helpmtx3x2_1 = helpmtx3x2_1;
-    function helpmtx3x2_2() { return gd3d.math.pool.genHelpData("mtx3x2", 2); }
-    gd3d.helpmtx3x2_2 = helpmtx3x2_2;
-    function helpmtx3x2_3() { return gd3d.math.pool.genHelpData("mtx3x2", 3); }
-    gd3d.helpmtx3x2_3 = helpmtx3x2_3;
-    function helpmtx3x2_4() { return gd3d.math.pool.genHelpData("mtx3x2", 4); }
-    gd3d.helpmtx3x2_4 = helpmtx3x2_4;
-    function helpmtx3x2_5() { return gd3d.math.pool.genHelpData("mtx3x2", 5); }
-    gd3d.helpmtx3x2_5 = helpmtx3x2_5;
-    function helprect() { return gd3d.math.pool.genHelpData("rect", 0); }
-    gd3d.helprect = helprect;
-    function helprect_1() { return gd3d.math.pool.genHelpData("rect", 1); }
-    gd3d.helprect_1 = helprect_1;
-    function helprect_2() { return gd3d.math.pool.genHelpData("rect", 2); }
-    gd3d.helprect_2 = helprect_2;
-    function helpcolor() { return gd3d.math.pool.genHelpData("color", 0); }
-    gd3d.helpcolor = helpcolor;
-    function helpcolor_1() { return gd3d.math.pool.genHelpData("color", 1); }
-    gd3d.helpcolor_1 = helpcolor_1;
-    function helpcolor_2() { return gd3d.math.pool.genHelpData("color", 2); }
-    gd3d.helpcolor_2 = helpcolor_2;
+    function poolv2(clone) { return !clone ? gd3d.math.pool.new_vector2() : gd3d.math.pool.clone_vector2(clone); }
+    gd3d.poolv2 = poolv2;
+    function poolv2_del(data) { gd3d.math.pool.delete_vector2(data); }
+    gd3d.poolv2_del = poolv2_del;
+    ;
+    function poolv3(clone) { return !clone ? gd3d.math.pool.new_vector3() : gd3d.math.pool.clone_vector3(clone); }
+    gd3d.poolv3 = poolv3;
+    function poolv3_del(data) { gd3d.math.pool.delete_vector3(data); }
+    gd3d.poolv3_del = poolv3_del;
+    ;
+    function poolv4(clone) { return !clone ? gd3d.math.pool.new_vector4() : gd3d.math.pool.clone_vector4(clone); }
+    gd3d.poolv4 = poolv4;
+    function poolv4_del(data) { gd3d.math.pool.delete_vector4(data); }
+    gd3d.poolv4_del = poolv4_del;
+    ;
+    function poolquat(clone) { return !clone ? gd3d.math.pool.new_quaternion() : gd3d.math.pool.clone_quaternion(clone); }
+    gd3d.poolquat = poolquat;
+    function poolquat_del(data) { gd3d.math.pool.delete_quaternion(data); }
+    gd3d.poolquat_del = poolquat_del;
+    ;
+    function poolmtx(clone) { return !clone ? gd3d.math.pool.new_matrix() : gd3d.math.pool.clone_matrix(clone); }
+    gd3d.poolmtx = poolmtx;
+    function poolmtx_del(data) { gd3d.math.pool.delete_matrix(data); }
+    gd3d.poolmtx_del = poolmtx_del;
+    ;
+    function poolmtx3x2(clone) { return !clone ? gd3d.math.pool.new_matrix3x2() : gd3d.math.pool.clone_matrix3x2(clone); }
+    gd3d.poolmtx3x2 = poolmtx3x2;
+    function poolmtx3x2_del(data) { gd3d.math.pool.delete_matrix3x2(data); }
+    gd3d.poolmtx3x2_del = poolmtx3x2_del;
+    ;
+    function poolrect(clone) { return !clone ? gd3d.math.pool.new_rect() : gd3d.math.pool.clone_rect(clone); }
+    gd3d.poolrect = poolrect;
+    function poolrect_del(data) { gd3d.math.pool.delete_rect(data); }
+    gd3d.poolrect_del = poolrect_del;
+    ;
+    function poolcolor(clone) { return !clone ? gd3d.math.pool.new_color() : gd3d.math.pool.clone_color(clone); }
+    gd3d.poolcolor = poolcolor;
+    function poolcolor_del(data) { gd3d.math.pool.delete_color(data); }
+    gd3d.poolcolor_del = poolcolor_del;
+    ;
 })(gd3d || (gd3d = {}));
 (function (gd3d) {
     var math;
@@ -34684,6 +34682,15 @@ var gd3d;
                 }
                 else
                     return new math.color(r, g, b, a);
+            };
+            pool.clone_color = function (col) {
+                if (pool.unused_color.length > 0) {
+                    var c = pool.unused_color.pop();
+                    c.rawData.set(col.rawData);
+                    return c;
+                }
+                else
+                    return new math.color(col.r, col.g, col.b, col.a);
             };
             pool.delete_color = function (v) {
                 if (v == null)

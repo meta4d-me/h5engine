@@ -14,6 +14,9 @@ namespace gd3d.framework
         static readonly ClassName:string="scrollRect";
         
         private _content : transform2D;
+
+        private static helpv2 = new math.vector2();
+        private static helpv2_1 = new math.vector2();
         /**
          * @public
          * @language zh_CN
@@ -84,7 +87,7 @@ namespace gd3d.framework
             //oncap==true 是捕获阶段，一般的行为，只在pop阶段处理
             if (oncap == false)
             {
-                let tv2 = helpv2(); 
+                let tv2 = scrollRect.helpv2; 
                 tv2.x = ev.x;
                 tv2.y = ev.y;
                 var b = this.transform.ContainsCanvasPoint(tv2);
@@ -95,8 +98,9 @@ namespace gd3d.framework
                     if(this._content == null)return;
                     if(!this.horizontal && !this.vertical) return;
 
-                    let temps = helpv2();
-                    let tempc = helpv2_1();
+                    let temps = scrollRect.helpv2;
+                    gd3d.math.vec2Set(temps,ev.x,ev.y);
+                    let tempc = scrollRect.helpv2_1;
                     this.transform.canvas.ModelPosToCanvasPos(temps,tempc);
 
                     let sp = this.strPoint;
@@ -184,11 +188,12 @@ namespace gd3d.framework
             let fv = this.flyVelocity;
             fv.x = fv.y = 0;
             let len = this.points.length;
+            let tv2 = scrollRect.helpv2;
             for(let i = 1 ; i< len ; i++){
                 let p_0 = this.points[i -1];
                 let p_1 = this.points[i];
-                math.vec2Subtract(p_1,p_0,helpv2());
-                math.vec2Add(helpv2(),fv,fv);
+                math.vec2Subtract(p_1,p_0,tv2);
+                math.vec2Add(tv2,fv,fv);
             }
 
             math.vec2Clone(this.flyVelocity,this.lastfv);
@@ -216,7 +221,7 @@ namespace gd3d.framework
                 this.canfly = false;
                 this.cgCount = this.cgTime;
             }
-            let tv2 = helpv2();
+            let tv2 = scrollRect.helpv2;
             math.vec2SLerp(this.lastfv , fv , this.cgCount/this.cgTime , tv2);
             this.SlideTo(tv2.x,tv2.y);
         }

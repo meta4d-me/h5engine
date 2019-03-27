@@ -83,6 +83,9 @@ namespace gd3d.framework {
         private static _tmpVecs: math.vector3[] = [new math.vector3(), new math.vector3(), new math.vector3()];
         private static _tmpQuat: math.quaternion = new math.quaternion();
 
+        private static helpquat = new math.quaternion();
+        private static helpv3 = new math.vector3();
+        private static helpv3_1 = new math.vector3();
         get isDisposed(): boolean {
             return this._isDisposed;
         }
@@ -269,8 +272,8 @@ namespace gd3d.framework {
                 let go = this.object.gameObject;
                 let mf = go.getComponent("meshFilter") as  meshFilter;
                 if(!mf) return null;
-                let min = helpv3();
-                let max = helpv3_1();
+                let min = PhysicsImpostor.helpv3;
+                let max = PhysicsImpostor.helpv3_1;
                 mf.getMeshOutput().calcVectexMinMax(min,max);
                 //构建一个 obb
                 this._obb = new obb();
@@ -450,7 +453,7 @@ namespace gd3d.framework {
             math.quatClone(wrot , this.lastObjwRot);
             
             //处理 质心点 与 模型中心点 的偏移
-            let offset_wpos = helpv3();
+            let offset_wpos = PhysicsImpostor.helpv3;
             math.vec3Clone(this._deltaPosition,offset_wpos);
             math.vec3ScaleByNum(offset_wpos,-1,offset_wpos);
             math.vec3Add(wpos ,offset_wpos,offset_wpos);
@@ -549,8 +552,8 @@ namespace gd3d.framework {
                     if(!l_x || !l_y || !l_z ){
                         //过滤掉 物理的 旋转 影响
                         //清理 速度
-                        let Euler : math.vector3 = helpv3();
-                        let tquat = helpquat();
+                        let Euler : math.vector3 = PhysicsImpostor.helpv3;
+                        let tquat = PhysicsImpostor.helpquat;
                         physicTool.IQuatCopy(pRot,tquat);
                         math.quatToEulerAngles(tquat,Euler);  //物理结算当前 欧拉角
                         let lEuler = this.lastEuler;
@@ -609,7 +612,7 @@ namespace gd3d.framework {
             //同步到transform
             this._physicsEngine.getPhysicsPlugin().setTransformationFromPhysicsBody(this);
             //处理 质心点 与 模型中心点 的偏移
-            let tempv3 = helpv3();
+            let tempv3 = PhysicsImpostor.helpv3;
             math.vec3Add(this.object.getWorldPosition(),this._deltaPosition,tempv3);
             this.object.setWorldPosition(tempv3)
         }

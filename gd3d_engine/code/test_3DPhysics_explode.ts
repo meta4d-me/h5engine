@@ -170,7 +170,7 @@ class test_3DPhysics_explode implements IState {
         if(!point) return;
         this.boxList.forEach(box=>{
             if(box){
-                let tv3 = gd3d.helpv3();
+                let tv3 = gd3d.poolv3();
                 gd3d.math.vec3Subtract(box.gameObject.transform.localPosition,point,tv3);
                 let len = gd3d.math.vec3Length(tv3);
                 gd3d.math.vec3Normalize(tv3,tv3);
@@ -181,6 +181,7 @@ class test_3DPhysics_explode implements IState {
                     gd3d.math.vec3ScaleByNum(tv3,froce,tv3);
                     box.gameObject.transform.physicsImpostor.applyImpulse(tv3,box.gameObject.transform.localPosition);
                 }
+                gd3d.poolv3_del(tv3);
             }
         });
     }

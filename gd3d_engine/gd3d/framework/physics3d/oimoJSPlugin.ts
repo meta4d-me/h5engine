@@ -8,6 +8,10 @@ namespace gd3d.framework
         private _physicsMaterials = new Array();
         private _fixedTimeStep: number = 1 / 60;
         public BJSOIMO: any;
+        private static helpquat = new math.quaternion();
+        private static helpv3 = new math.vector3();
+        private static helpv3_1 = new math.vector3();
+        private static helpv3_2 = new math.vector3();
         // private _raycastResult: PhysicsRaycastResult;
 
         /**
@@ -93,9 +97,9 @@ namespace gd3d.framework
         /** 申请 冲量 */
         public applyImpulse(impostor: PhysicsImpostor, force: math.vector3, contactPoint: math.vector3) {
             let mass = impostor.physicsBody.mass;
-            let _point = helpv3();
+            let _point = OimoJSPlugin.helpv3;
             math.vec3ScaleByNum(contactPoint,this.world.invScale, _point);
-            let _force = helpv3_1();
+            let _force = OimoJSPlugin.helpv3_1;
             math.vec3ScaleByNum(force, this.world.invScale * mass , _force);
             impostor.physicsBody.applyImpulse(_point, _force);
         }
@@ -150,7 +154,7 @@ namespace gd3d.framework
                     })
                 }
 
-                let globalQuat = helpquat(); //是否能用 缓存？
+                let globalQuat = OimoJSPlugin.helpquat; //是否能用 缓存？
                 globalQuat.x = globalQuat.y = globalQuat.z = 0;
                 globalQuat.w = 1;
                 let wPos_impostor = impostor.object.getWorldPosition();
@@ -160,7 +164,7 @@ namespace gd3d.framework
                     let oldQuaternion = i.object.localRotate;
                     math.quatClone(i.object.localRotate , globalQuat);
                     
-                    let rot = helpv3();
+                    let rot = OimoJSPlugin.helpv3;
                     gd3d.math.quatToEulerAngles(oldQuaternion,rot);
                     // rot = oldQuaternion.toEulerAngles();
 
@@ -192,7 +196,7 @@ namespace gd3d.framework
                         // math.vec3Clone(i.object.getWorldPosition() ,localPosition);
                         // let localPosition = i.object.getAbsolutePosition().subtract(impostor.object.getAbsolutePosition());
                         
-                        let localPosition = helpv3_2();
+                        let localPosition = OimoJSPlugin.helpv3_2;
                         gd3d.math.vec3Subtract(i.object.getWorldPosition() , wPos_impostor ,localPosition);  //子物体世界坐标 与 主物体世界坐标 的差值
                         // bodyConfig.pos.push(0, 0, 0);
                         bodyConfig.posShape.push(localPosition.x);
@@ -265,14 +269,14 @@ namespace gd3d.framework
                 impostor.physicsBody.updatePosition(0);
 
                 //计算重心对显示模型原点的偏差
-                let massCenter = helpv3();
+                let massCenter = OimoJSPlugin.helpv3;
                 let p = impostor.physicsBody.position;
                 math.vec3Set(massCenter,p.x,p.y,p.z);
                 
                 impostor.physicsBody.position;
                 let wpos = impostor.object.getWorldPosition();
                 if(!math.vec3Equal(massCenter,wpos)){
-                    let scale = helpv3_1();
+                    let scale = OimoJSPlugin.helpv3_1;
                     math.vec3Clone(impostor.object.getWorldScale(),scale);
                     scale.x = 1/scale.x ; scale.y = 1/scale.y ; scale.z = 1/scale.z ;
                     math.vec3Subtract(wpos,massCenter,this._tmpPositionVector);

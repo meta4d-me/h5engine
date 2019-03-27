@@ -331,7 +331,7 @@ namespace gd3d.framework
             {//updateinput
                 //重置event
                 this.pointEvent.eated = false;
-                let tv2 = helpv2();
+                let tv2 = poolv2();
                 tv2.x = this.pointEvent.x = XOnModelSpace;
                 tv2.y = this.pointEvent.y = YOnModelSpace;
                 this.pointEvent.selected = null;
@@ -371,6 +371,8 @@ namespace gd3d.framework
                     this.pointX = this.pointEvent.x;
                     this.pointY = this.pointEvent.y;
                 }
+
+                gd3d.poolv2_del(tv2);
             }
 
             this.rootNode.updateTran(false);
