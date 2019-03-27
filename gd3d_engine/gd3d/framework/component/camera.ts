@@ -426,7 +426,7 @@ namespace gd3d.framework
         {
             let src1 = helpv3();
             math.vec3Set(src1,screenpos.x,screenpos.y,0);
-            
+
             let src2 = helpv3_1();
             math.vec3Set(src2,screenpos.x,screenpos.y,1);
 
@@ -463,7 +463,7 @@ namespace gd3d.framework
          */
         calcWorldPosFromScreenPos(app: application, screenPos: math.vector3, outWorldPos: math.vector3)
         {
-            
+
             let vpp = helprect();
             this.calcViewPortPixel(app, vpp);
             let vppos = helpv2();
@@ -479,7 +479,7 @@ namespace gd3d.framework
             let matinv = helpmtx_3();
             gd3d.math.matrixMultiply(matrixProject, matrixView, matrixViewProject);
             gd3d.math.matrixInverse(matrixViewProject, matinv);
-            let src1 = helpv3(); 
+            let src1 = helpv3();
             src1.x = vppos.x;
             src1.y = vppos.y;
             src1.z = screenPos.z;
@@ -514,7 +514,7 @@ namespace gd3d.framework
             outScreenPos.x = (ndcPos.x + 1) * vpp.w / 2;
             outScreenPos.y = (1 - ndcPos.y) * vpp.h / 2;
         }
-        
+
         private lastCamMtx = new math.matrix();
         private lastCamRect = new math.rect();
         private paraArr = [0,0,0];
@@ -528,16 +528,16 @@ namespace gd3d.framework
             let _vpp = math.pool.new_rect();
             this.calcViewPortPixel(app, _vpp);
             //检查是否需要更新
-            if(math.matrixEqual(this.lastCamMtx,matrix) && math.rectEqul(this.lastCamRect,_vpp) && 
+            if(math.matrixEqual(this.lastCamMtx,matrix) && math.rectEqul(this.lastCamRect,_vpp) &&
                 this.paraArr[0] == this.fov && this.paraArr[1] == this.near && this.paraArr[2] == this.far){
-                return;   
+                return;
             }
 
             let near_h = this.near * Math.tan(this.fov * 0.5);
             let asp = _vpp.w / _vpp.h;
             let near_w = near_h * asp;
 
-            let nearLT = helpv3(); 
+            let nearLT = helpv3();
             let nearLD = helpv3_1();
             let nearRT = helpv3_2();
             let nearRD = helpv3_3();
@@ -668,6 +668,16 @@ namespace gd3d.framework
             if (!node.gameObject.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false)) return;  //自己没有渲染组件 且 子物体也没有 return
 
             if (scene.app.isFrustumCulling && !this.testFrustumCulling(scene, node)) return;//视锥测试不通过 直接return
+
+            // if(node.dirtiedOfFrustumCulling) {
+            //     node.gameObject.tag = this.isCulling(node)
+            //         ? 'culling'
+            //         : 'd';
+            //     node.dirtiedOfFrustumCulling = false;
+            // }
+
+            // if(scene.app.isFrustumCulling && node.gameObject.tag == 'culling') return;
+
             if (node.gameObject != null && node.gameObject.renderer != null )
             {
                 scene.renderList.addRenderer(node.gameObject.renderer);
@@ -680,6 +690,95 @@ namespace gd3d.framework
                 }
             }
         }
+        // private fruMap = {
+        //     farLD:  0,
+        //     nearLD: 1,
+        //     farRD:  2,
+        //     nearRD: 3,
+        //     farLT:  4,
+        //     nearLT: 5,
+        //     farRT:  6,
+        //     nearRT: 7,
+        // }
+        // isCulling(node: transform) {
+        //     const vec3cache = gd3d.helpv3();
+        //     const {aabb} = node;
+        //     gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, vec3cache);
+        //     const radius = gd3d.math.vec3Length(vec3cache)/2;
+        //     const center = node.aabb.center;
+        //     // Left
+        //     if (this.isRight(
+        //         this.frameVecs[this.fruMap.nearLD],
+        //         this.frameVecs[this.fruMap.farLD],
+        //         this.frameVecs[this.fruMap.farLT],
+        //         center,
+        //         radius
+        //     )) return true;
+
+        //     // Right
+        //     if (this.isRight(
+        //         this.frameVecs[this.fruMap.nearRT],
+        //         this.frameVecs[this.fruMap.farRT],
+        //         this.frameVecs[this.fruMap.farRD],
+        //         center,
+        //         radius
+        //     )) return true;
+
+        //     // Top
+        //     if (this.isRight(
+        //         this.frameVecs[this.fruMap.nearLT],
+        //         this.frameVecs[this.fruMap.farLT],
+        //         this.frameVecs[this.fruMap.farRT],
+        //         center,
+        //         radius
+        //     )) return true;
+
+        //     // Bottom
+        //     if (this.isRight(
+        //         this.frameVecs[this.fruMap.nearRD],
+        //         this.frameVecs[this.fruMap.farRD],
+        //         this.frameVecs[this.fruMap.farLD],
+        //         center,
+        //         radius
+        //     )) return true;
+
+        //     // Front
+        //     if (this.isRight(
+        //         this.frameVecs[this.fruMap.nearLT],
+        //         this.frameVecs[this.fruMap.nearRT],
+        //         this.frameVecs[this.fruMap.nearRD],
+        //         center,
+        //         radius
+        //     )) return true;
+
+        //     // Back
+        //     if (this.isRight(
+        //         this.frameVecs[this.fruMap.farRT],
+        //         this.frameVecs[this.fruMap.farLT],
+        //         this.frameVecs[this.fruMap.farLD],
+        //         center,
+        //         radius
+        //     )) return true;
+
+        //     return false;
+        // }
+        // private isRight(v0: gd3d.math.vector3, v1: gd3d.math.vector3, v2: gd3d.math.vector3, pos: gd3d.math.vector3, radius: number) {
+        //     const edge1 = gd3d.helpv3_1();
+        //     const edge2 = gd3d.helpv3_2();
+        //     const vec3cache = gd3d.helpv3_3();
+        //     gd3d.math.vec3Subtract(v1, v0, edge1);
+        //     gd3d.math.vec3Subtract(v2, v0, edge2);
+        //     // direction
+        //     gd3d.math.vec3Cross(edge1, edge2, vec3cache);
+        //     gd3d.math.vec3Normalize(vec3cache, vec3cache);
+        //     // gd3d.math.vec3ScaleByNum(this.vec3cache, Math.abs(Math.sin(Date.now()/100)) * 8, this.m_trans.localTranslate);
+        //     // this.m_trans.markDirty();
+
+        //     // distance
+        //     gd3d.math.vec3Subtract(pos, v0, edge1);
+        //     let dis = gd3d.math.vec3Dot(edge1, vec3cache) - radius;
+        //     return dis > 0;
+        // }
         /**
         * @private
         */
