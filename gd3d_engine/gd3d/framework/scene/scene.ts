@@ -29,7 +29,7 @@ namespace gd3d.framework
         webgl: WebGLRenderingContext;
         /**
          * @private
-         * @param app 
+         * @param app
          */
         constructor(app: application)
         {
@@ -97,7 +97,7 @@ namespace gd3d.framework
          * 参与渲染的相机
          * @version egret-gd3d 1.0
          */
-        public renderCameras: camera[] = [];//需要camera class 
+        public renderCameras: camera[] = [];//需要camera class
 
         private _mainCamera: camera = null;
         /**
@@ -163,7 +163,7 @@ namespace gd3d.framework
          */
         update(delta: number)
         {
-            
+
 
             //更新矩阵
             //this.rootNode.updateTran(false);
@@ -200,7 +200,11 @@ namespace gd3d.framework
             for (var i = 0; i < this.renderCameras.length; i++)
             {
                 render.glDrawPass.resetLastState();
+                if(i == this.renderCameras.length-1) {
+                    this.renderCameras[i].isLastCamera = true;
+                }
                 this._renderCamera(i);
+                this.renderCameras[i].isLastCamera = false;
             }
 
             this.updateSceneOverLay(delta);
@@ -693,7 +697,7 @@ namespace gd3d.framework
             }
             return ishited;
         }
-        
+
 
         /**
          * @public
@@ -711,7 +715,7 @@ namespace gd3d.framework
             }
 
             if(!plugin) plugin = new OimoJSPlugin();
-        
+
             try {
                 physic = new PhysicsEngine(gravity, plugin);
                 return true;
