@@ -52,6 +52,25 @@ var __extends = (this && this.__extends) || (function () {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var demoList = (function () {
+    function demoList() {
+    }
+    demoList.addBtn = function (title, demo) {
+        if (!title || !demo)
+            return;
+        var p = [title, demo];
+        this.funArr.push(p);
+    };
+    demoList.prototype.start = function (app) {
+        demoList.funArr.forEach(function (element) {
+            main.instance.addBtn(element[0], element[1]);
+        });
+    };
+    demoList.prototype.update = function () {
+    };
+    demoList.funArr = [];
+    return demoList;
+}());
 var demo_navigaionRVO = (function () {
     function demo_navigaionRVO() {
         this.cubesize = 0.5;
@@ -1135,81 +1154,103 @@ var localSave = (function () {
 }());
 var main = (function () {
     function main() {
-        this.x = 0;
-        this.y = 100;
+        this.def_x = 0;
+        this.def_y = 100;
+        this.x = this.def_x;
+        this.y = this.def_y;
         this.btns = [];
     }
+    main_1 = main;
     main.prototype.onStart = function (app) {
+        if (!main_1.instance)
+            main_1.instance = this;
         console.log("i am here.");
         this.app = app;
-        this.addBtn("paowuxian2", function () { return new dome.paowuxian2(); });
-        this.addBtn("paowuxian", function () { return new dome.paowuxian(); });
-        this.addBtn("mixmesh", function () { return new dome.mixMesh(); });
-        this.addBtn("f14effect", function () { return new dome.db_test_f14eff(); });
-        this.addBtn("physic2d_dome", function () { return new physic2d_dome(); });
-        this.addBtn("test_ui", function () { return new t.test_ui(); });
-        this.addBtn("test_load", function () { return new test_load(); });
-        this.addBtn("test_loadScene", function () { return new test_loadScene(); });
-        this.addBtn("test_pick", function () { return new test_pick(); });
-        this.addBtn("test_anim", function () { return new test_anim(); });
-        this.addBtn("test_multipleplayer_anim", function () { return new test_multipleplayer_anim(); });
-        this.addBtn("test_reload(换装)", function () { return new testReload(); });
-        this.addBtn("test_light1", function () { return new t.test_light1(); });
-        this.addBtn("test_light_d1", function () { return new t.light_d1(); });
-        this.addBtn("test_normalmap", function () { return new t.Test_NormalMap(); });
-        this.addBtn("test_assestmgr", function () { return new test_assestmgr(); });
-        this.addBtn("test_posteffect(后期效果)", function () { return new t.test_posteffect(); });
-        this.addBtn("test_streamlight", function () { return new test_streamlight(); });
-        this.addBtn("test_trailRender", function () { return new t.test_trailrender(); });
-        this.addBtn("test_rendertexture", function () { return new t.test_rendertexture(); });
-        this.addBtn("test_sound", function () { return new t.test_sound(); });
-        this.addBtn("test_cleardepth", function () { return new t.test_clearDepth0(); });
-        this.addBtn("test_fakepbr", function () { return new test_fakepbr(); });
-        this.addBtn("test_tank", function () { return new demo.TankGame(); });
-        this.addBtn("test_long", function () { return new demo.DragonTest(); });
-        this.addBtn("test_skillsystem", function () { return new t.test_skillsystem(); });
-        this.addBtn("test_blend", function () { return new t.test_blend(); });
-        this.addBtn("TestRotate", function () { return new t.TestRotate(); });
-        this.addBtn("pathasset", function () { return new t.test_pathAsset(); });
-        this.addBtn("test_Asi_prefab", function () { return new test_loadAsiprefab(); });
-        this.addBtn("test_tex_uv", function () { return new test_texuv(); });
-        this.addBtn("test_shadowmap", function () { return new test_ShadowMap(); });
-        this.addBtn("test_liChange", function () { return new testLiChangeMesh(); });
-        this.addBtn("example_newObject", function () { return new test_NewGameObject; });
-        this.addBtn("example_changeMesh", function () { return new test_ChangeMesh(); });
-        this.addBtn("example_changeMaterial", function () { return new test_ChangeMaterial(); });
-        this.addBtn("demo_ScreenSplit", function () { return new demo_ScreenSplit(); });
-        this.addBtn("test_UI组件", function () { return new test_UI_Component(); });
-        this.addBtn("test_UI预设体加载", function () { return new test_uiPerfabLoad(); });
-        this.addBtn("UI 新手引导mask", function () { return new test_UIGuideMask(); });
-        this.addBtn("test_PBR 展示", function () { return new test_pbr(); });
-        this.addBtn("test_PBR 场景", function () { return new test_pbr_scene(); });
-        this.addBtn("关键帧动画", function () { return new test_keyFrameAni(); });
-        this.addBtn("导航网格", function () { return new test_navMesh(); });
-        this.addBtn("rvo2_驾驶行为", function () { return new test_Rvo2(); });
-        this.addBtn("导航RVO_防挤Demo", function () { return new demo_navigaionRVO(); });
-        this.addBtn("Collider碰撞", function () { return new test_pick_boxcollider(); });
-        this.addBtn("SSSSS", function () { return new test_sssss(); });
-        this.addBtn("dome_加载播放动画", function () { return new dome_loadaniplayer(); });
-        this.addBtn("使用加载资源的Demo列表", function () { return new UseAssetByLoadDemoList(); });
-        this.addBtn("tesrtss", function () { return new dome.testCJ(); });
-        this.addBtn("表面贴花(弹痕)", function () { return new test_Decal(); });
-        this.addBtn("3D物理_基础形状", function () { return new test_3DPhysics_baseShape(); });
-        this.addBtn("3D物理_复合组合", function () { return new test_3DPhysics_compound(); });
-        this.addBtn("3D物理_动力学", function () { return new test_3DPhysics_kinematic(); });
-        this.addBtn("3D物理_铰链关节", function () { return new test_3DPhysics_joint_hinge(); });
-        this.addBtn("3D物理_球嵌套关节", function () { return new test_3DPhysics_joint_ballandSocket(); });
-        this.addBtn("3D物理_滑竿关节", function () { return new test_3DPhysics_joint_slider(); });
-        this.addBtn("3D物理_棱柱滑竿关节", function () { return new test_3DPhysics_joint_prismatic(); });
-        this.addBtn("3D物理_距离关节", function () { return new test_3DPhysics_joint_distance(); });
-        this.addBtn("3D物理_车轮关节", function () { return new test_3DPhysics_joint_wheel(); });
-        this.addBtn("3D物理_铰链马达", function () { return new test_3DPhysics_motor_hinge(); });
-        this.addBtn("3D物理_车轮马达", function () { return new test_3DPhysics_motor_wheel(); });
-        this.addBtn("3D物理_滑竿马达", function () { return new test_3DPhysics_motor_slider(); });
-        this.addBtn("3D物理_冻结_位移旋转", function () { return new test_3DPhysics_freeze(); });
-        this.addBtn("3D物理_样例_中心点爆炸", function () { return new test_3DPhysics_explode(); });
-        this.addBtn("cannonPhysics3D", function () { return new PhysicDemo.physic_01(); });
-        this.addBtn("test_xinshouMask", function () { return new t.test_xinshouMask(); });
+        this.addBtn("基础==>", function () {
+            demoList.addBtn("f14effect", function () { return new dome.db_test_f14eff(); });
+            demoList.addBtn("物理2d_dome", function () { return new physic2d_dome(); });
+            demoList.addBtn("test_load", function () { return new test_load(); });
+            demoList.addBtn("test_loadScene", function () { return new test_loadScene(); });
+            demoList.addBtn("test_pick", function () { return new test_pick(); });
+            demoList.addBtn("test_anim", function () { return new test_anim(); });
+            demoList.addBtn("test_sound", function () { return new t.test_sound(); });
+            demoList.addBtn("射线检测", function () { return new test_pick_boxcollider(); });
+            demoList.addBtn("关键帧动画", function () { return new test_keyFrameAni(); });
+            return new demoList();
+        });
+        this.addBtn("渲染==>", function () {
+            demoList.addBtn("test_posteffect(后期效果)", function () { return new t.test_posteffect(); });
+            demoList.addBtn("test_blend", function () { return new t.test_blend(); });
+            demoList.addBtn("test_shadowmap", function () { return new test_ShadowMap(); });
+            demoList.addBtn("test_tex_uv", function () { return new test_texuv(); });
+            demoList.addBtn("test_PBR 展示", function () { return new test_pbr(); });
+            demoList.addBtn("test_PBR 场景", function () { return new test_pbr_scene(); });
+            demoList.addBtn("SSSSS", function () { return new test_sssss(); });
+            demoList.addBtn("test_trailRender", function () { return new t.test_trailrender(); });
+            demoList.addBtn("test_light1", function () { return new t.test_light1(); });
+            demoList.addBtn("test_light_d1", function () { return new t.light_d1(); });
+            demoList.addBtn("test_normalmap", function () { return new t.Test_NormalMap(); });
+            return new demoList();
+        });
+        this.addBtn("UI样例==>", function () {
+            demoList.addBtn("test_ui", function () { return new t.test_ui(); });
+            demoList.addBtn("test_UI组件", function () { return new test_UI_Component(); });
+            demoList.addBtn("test_UI预设体加载", function () { return new test_uiPerfabLoad(); });
+            demoList.addBtn("UI 新手引导mask", function () { return new test_UIGuideMask(); });
+            return new demoList();
+        });
+        this.addBtn("3D物理样例==>", function () {
+            demoList.addBtn("3D物理_基础形状", function () { return new test_3DPhysics_baseShape(); });
+            demoList.addBtn("3D物理_复合组合", function () { return new test_3DPhysics_compound(); });
+            demoList.addBtn("3D物理_动力学", function () { return new test_3DPhysics_kinematic(); });
+            demoList.addBtn("3D物理_铰链关节", function () { return new test_3DPhysics_joint_hinge(); });
+            demoList.addBtn("3D物理_球嵌套关节", function () { return new test_3DPhysics_joint_ballandSocket(); });
+            demoList.addBtn("3D物理_滑竿关节", function () { return new test_3DPhysics_joint_slider(); });
+            demoList.addBtn("3D物理_棱柱滑竿关节", function () { return new test_3DPhysics_joint_prismatic(); });
+            demoList.addBtn("3D物理_距离关节", function () { return new test_3DPhysics_joint_distance(); });
+            demoList.addBtn("3D物理_车轮关节", function () { return new test_3DPhysics_joint_wheel(); });
+            demoList.addBtn("3D物理_铰链马达", function () { return new test_3DPhysics_motor_hinge(); });
+            demoList.addBtn("3D物理_车轮马达", function () { return new test_3DPhysics_motor_wheel(); });
+            demoList.addBtn("3D物理_滑竿马达", function () { return new test_3DPhysics_motor_slider(); });
+            demoList.addBtn("3D物理_冻结_位移旋转", function () { return new test_3DPhysics_freeze(); });
+            demoList.addBtn("3D物理_样例_中心点爆炸", function () { return new test_3DPhysics_explode(); });
+            demoList.addBtn("cannonPhysics3D", function () { return new PhysicDemo.physic_01(); });
+            return new demoList();
+        });
+        this.addBtn("其他==>", function () {
+            demoList.addBtn("test_multipleplayer_anim", function () { return new test_multipleplayer_anim(); });
+            demoList.addBtn("test_reload(换装)", function () { return new testReload(); });
+            demoList.addBtn("mixmesh", function () { return new dome.mixMesh(); });
+            demoList.addBtn("test_assestmgr", function () { return new test_assestmgr(); });
+            demoList.addBtn("test_streamlight", function () { return new test_streamlight(); });
+            demoList.addBtn("test_rendertexture", function () { return new t.test_rendertexture(); });
+            demoList.addBtn("test_cleardepth", function () { return new t.test_clearDepth0(); });
+            demoList.addBtn("test_fakepbr", function () { return new test_fakepbr(); });
+            demoList.addBtn("test_skillsystem", function () { return new t.test_skillsystem(); });
+            demoList.addBtn("TestRotate", function () { return new t.TestRotate(); });
+            demoList.addBtn("pathasset", function () { return new t.test_pathAsset(); });
+            demoList.addBtn("test_Asi_prefab", function () { return new test_loadAsiprefab(); });
+            demoList.addBtn("test_liChange", function () { return new testLiChangeMesh(); });
+            demoList.addBtn("example_newObject", function () { return new test_NewGameObject; });
+            demoList.addBtn("example_changeMesh", function () { return new test_ChangeMesh(); });
+            demoList.addBtn("example_changeMaterial", function () { return new test_ChangeMaterial(); });
+            demoList.addBtn("demo_ScreenSplit", function () { return new demo_ScreenSplit(); });
+            demoList.addBtn("导航网格", function () { return new test_navMesh(); });
+            demoList.addBtn("rvo2_驾驶行为", function () { return new test_Rvo2(); });
+            demoList.addBtn("导航RVO_防挤Demo", function () { return new demo_navigaionRVO(); });
+            demoList.addBtn("dome_加载播放动画", function () { return new dome_loadaniplayer(); });
+            demoList.addBtn("使用加载资源的Demo列表", function () { return new UseAssetByLoadDemoList(); });
+            demoList.addBtn("tesrtss", function () { return new dome.testCJ(); });
+            demoList.addBtn("表面贴花(弹痕)", function () { return new test_Decal(); });
+            return new demoList();
+        });
+        this.addBtn("项目Demo==>", function () {
+            demoList.addBtn("paowuxian2", function () { return new dome.paowuxian2(); });
+            demoList.addBtn("paowuxian", function () { return new dome.paowuxian(); });
+            demoList.addBtn("test_tank", function () { return new demo.TankGame(); });
+            demoList.addBtn("test_long", function () { return new demo.DragonTest(); });
+            return new demoList();
+        });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -1237,6 +1278,8 @@ var main = (function () {
         for (var i = 0; i < this.btns.length; i++) {
             this.app.container.removeChild(this.btns[i]);
         }
+        this.x = this.def_x;
+        this.y = this.def_y;
         this.btns.length = 0;
     };
     main.prototype.onUpdate = function (delta) {
@@ -1246,10 +1289,11 @@ var main = (function () {
     main.prototype.isClosed = function () {
         return false;
     };
-    main = __decorate([
+    main = main_1 = __decorate([
         gd3d.reflect.userCode
     ], main);
     return main;
+    var main_1;
 }());
 var test_01 = (function () {
     function test_01() {
@@ -8084,7 +8128,7 @@ var test_Decal = (function () {
         this.buildingPname = "Map_Castle_dajiwuA";
         this.texName = "EF_decal_yp.png";
         this.inited = false;
-        this.dec = "点击屏幕 , 移动孔的位置";
+        this.dec = "点击模型发射贴上弹痕";
         this.Y_ag = 0;
     }
     test_Decal.prototype.start = function (app) {

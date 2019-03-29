@@ -1,5 +1,11 @@
 /// <reference path="../lib/gd3d.d.ts" />
 /// <reference path="../lib/htmlui.d.ts" />
+declare class demoList implements IState {
+    private static funArr;
+    static addBtn(title: string, demo: Function): void;
+    start(app: any): void;
+    update(): void;
+}
 declare var RVO: any;
 declare class demo_navigaionRVO implements IState {
     app: gd3d.framework.application;
@@ -123,14 +129,17 @@ interface IState {
     update(delta: number): any;
 }
 declare class main implements gd3d.framework.IUserCode {
+    static instance: main;
     app: gd3d.framework.application;
     state: IState;
     onStart(app: gd3d.framework.application): void;
+    private def_x;
+    private def_y;
     private x;
     private y;
     private btns;
-    private addBtn(text, act);
-    private clearBtn();
+    addBtn(text: string, act: () => IState): void;
+    clearBtn(): void;
     onUpdate(delta: number): void;
     isClosed(): boolean;
 }

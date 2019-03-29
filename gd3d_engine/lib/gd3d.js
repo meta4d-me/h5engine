@@ -14332,6 +14332,21 @@ var gd3d;
                 this.fov = 60 * Math.PI / 180;
                 this.size = 2;
                 this._opvalue = 1;
+                this.cullingMap = {};
+                this.isLastCamera = false;
+                this.fruMap = {
+                    farLD: 0,
+                    nearLD: 1,
+                    farRD: 2,
+                    nearRD: 3,
+                    farLT: 4,
+                    nearLT: 5,
+                    farRT: 6,
+                    nearRT: 7,
+                };
+                this._vec3cache = new gd3d.math.vector3();
+                this._edge1 = new gd3d.math.vector3();
+                this._edge2 = new gd3d.math.vector3();
                 this.postQueues = [];
                 for (var i = 0; i < 8; i++) {
                     this.frameVecs.push(new gd3d.math.vector3());
@@ -14593,20 +14608,65 @@ var gd3d;
                 if (scene.app.isFrustumCulling)
                     this.calcCameraFrame(scene.app);
                 this._fillRenderer(scene, scene.getRoot());
+                if (this.gameObject.transform.dirtiedOfFrustumCulling)
+                    this.gameObject.transform.dirtiedOfFrustumCulling = false;
             };
             camera.prototype._fillRenderer = function (scene, node) {
                 if (!node.gameObject.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false))
                     return;
-                if (scene.app.isFrustumCulling && !this.testFrustumCulling(scene, node))
-                    return;
+                var id = node.insId.getInsID();
+                if (node.dirtiedOfFrustumCulling || this.gameObject.transform.dirtiedOfFrustumCulling) {
+                    this.cullingMap[id] = this.isCulling(node);
+                    if (this.isLastCamera)
+                        node.dirtiedOfFrustumCulling = false;
+                }
                 if (node.gameObject != null && node.gameObject.renderer != null) {
-                    scene.renderList.addRenderer(node.gameObject.renderer);
+                    if (scene.app.isFrustumCulling) {
+                        if (!this.cullingMap[id]) {
+                            scene.renderList.addRenderer(node.gameObject.renderer);
+                        }
+                    }
+                    else {
+                        scene.renderList.addRenderer(node.gameObject.renderer);
+                    }
                 }
                 if (node.children != null) {
                     for (var i = 0; i < node.children.length; i++) {
                         this._fillRenderer(scene, node.children[i]);
                     }
                 }
+            };
+            camera.prototype.isCulling = function (node) {
+                var vec3cache = this._vec3cache;
+                var aabb = node.aabb;
+                gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, vec3cache);
+                var radius = gd3d.math.vec3Length(vec3cache) / 2;
+                var center = node.aabb.center;
+                if (this.isRight(this.frameVecs[this.fruMap.nearLD], this.frameVecs[this.fruMap.farLD], this.frameVecs[this.fruMap.farLT], center, radius))
+                    return true;
+                if (this.isRight(this.frameVecs[this.fruMap.nearRT], this.frameVecs[this.fruMap.farRT], this.frameVecs[this.fruMap.farRD], center, radius))
+                    return true;
+                if (this.isRight(this.frameVecs[this.fruMap.nearLT], this.frameVecs[this.fruMap.farLT], this.frameVecs[this.fruMap.farRT], center, radius))
+                    return true;
+                if (this.isRight(this.frameVecs[this.fruMap.nearRD], this.frameVecs[this.fruMap.farRD], this.frameVecs[this.fruMap.farLD], center, radius))
+                    return true;
+                if (this.isRight(this.frameVecs[this.fruMap.nearLT], this.frameVecs[this.fruMap.nearRT], this.frameVecs[this.fruMap.nearRD], center, radius))
+                    return true;
+                if (this.isRight(this.frameVecs[this.fruMap.farRT], this.frameVecs[this.fruMap.farLT], this.frameVecs[this.fruMap.farLD], center, radius))
+                    return true;
+                return false;
+            };
+            camera.prototype.isRight = function (v0, v1, v2, pos, radius) {
+                var edge1 = this._edge1;
+                var edge2 = this._edge2;
+                var vec3cache = this._vec3cache;
+                gd3d.math.vec3Subtract(v1, v0, edge1);
+                gd3d.math.vec3Subtract(v2, v0, edge2);
+                gd3d.math.vec3Cross(edge1, edge2, vec3cache);
+                gd3d.math.vec3Normalize(vec3cache, vec3cache);
+                gd3d.math.vec3Subtract(pos, v0, edge1);
+                var dis = gd3d.math.vec3Dot(edge1, vec3cache) - radius;
+                return dis > 0;
             };
             camera.prototype.testFrustumCulling = function (scene, node) {
                 if (!node.gameObject.getComponent("frustumculling"))
@@ -31538,7 +31598,11 @@ var gd3d;
                 this.RealCameraNumber = 0;
                 for (var i = 0; i < this.renderCameras.length; i++) {
                     gd3d.render.glDrawPass.resetLastState();
+                    if (i == this.renderCameras.length - 1) {
+                        this.renderCameras[i].isLastCamera = true;
+                    }
                     this._renderCamera(i);
+                    this.renderCameras[i].isLastCamera = false;
                 }
                 this.updateSceneOverLay(delta);
                 if (this.RealCameraNumber == 0) {

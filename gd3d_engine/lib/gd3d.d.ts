@@ -2542,8 +2542,16 @@ declare namespace gd3d.framework {
         private _opvalue;
         opvalue: number;
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2): void;
+        private cullingMap;
+        isLastCamera: boolean;
         fillRenderer(scene: scene): void;
         private _fillRenderer(scene, node);
+        private fruMap;
+        private _vec3cache;
+        isCulling(node: transform): boolean;
+        private _edge1;
+        private _edge2;
+        private isRight(v0, v1, v2, pos, radius);
         testFrustumCulling(scene: scene, node: transform): boolean;
         _targetAndViewport(target: render.glRenderTarget, scene: scene, context: renderContext, withoutClear: boolean): void;
         _renderOnce(scene: scene, context: renderContext, drawtype: string): void;
