@@ -10,12 +10,12 @@ class test_3DPhysics_compound implements IState {
     iptMgr : gd3d.framework.inputMgr;
     async start  (app: gd3d.framework.application) {
         await physics3dDemoTool.init(app);
-        await physics3dDemoTool.loadbySync(`./res/prefabs/Capsule/Capsule.assetbundle.json`);
         this.app = app;
         this.scene = physics3dDemoTool.scene;
         this.astMgr = physics3dDemoTool.astMgr;
         this.iptMgr = physics3dDemoTool.iptMgr;
         this.camera = physics3dDemoTool.camera;
+        await demoTool.loadbySync(`./res/prefabs/Capsule/Capsule.assetbundle.json`,this.astMgr);
         this.init();
         return null;
     }

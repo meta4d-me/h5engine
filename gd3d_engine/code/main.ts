@@ -56,6 +56,8 @@ class main implements gd3d.framework.IUserCode
         //----------------------------------------------文档案例
         this.addBtn("test_UI组件", () => new test_UI_Component());
         this.addBtn("test_UI预设体加载", () => new test_uiPerfabLoad());
+        this.addBtn("UI 新手引导mask",()=>new test_UIGuideMask());
+
         this.addBtn("test_PBR 展示", () => new test_pbr());
         this.addBtn("test_PBR 场景", () => new test_pbr_scene());
         this.addBtn("关键帧动画",()=>new test_keyFrameAni());
@@ -67,7 +69,8 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("dome_加载播放动画",()=>new dome_loadaniplayer());
         this.addBtn("使用加载资源的Demo列表",()=>new UseAssetByLoadDemoList());
         this.addBtn("tesrtss",()=>new dome.testCJ());
-        this.addBtn("trans性能测试",()=>new demo.test_performance());
+        this.addBtn("表面贴花(弹痕)",()=>new test_Decal());
+        //-------------------------------------------物理
         this.addBtn("3D物理_基础形状",()=>new test_3DPhysics_baseShape());
         this.addBtn("3D物理_复合组合",()=>new test_3DPhysics_compound());
         this.addBtn("3D物理_动力学",()=>new test_3DPhysics_kinematic());
@@ -85,6 +88,7 @@ class main implements gd3d.framework.IUserCode
         this.addBtn("cannonPhysics3D",()=>new PhysicDemo.physic_01());
         
         //others
+        //this.addBtn("trans性能测试",()=>new demo.test_performance());
         // this.addBtn("testtrailrenderRecorde", () => new t.test_trailrenderrecorde()); //有问题
         // this.addBtn("LoadBase64Tex", () => new dome.LoadTex());
         // this.addBtn("rayTest",()=>new dome.rayTest());
@@ -106,7 +110,7 @@ class main implements gd3d.framework.IUserCode
         //this.addBtn("effect", () => new test_effect());
         //this.addBtn("test_uimove", () => new test_uimove());
         //this.addBtn("test_effecteditor", () => new test_effecteditor());
-        //this.addBtn("test_xinshouMask", () => new t.test_xinshouMask());
+        this.addBtn("test_xinshouMask", () => new t.test_xinshouMask());
         //this.addBtn("example_newScene",() =>new test_NewScene());
         // this.addBtn("example_Sound",()=>new test_Sound());
         //this.addBtn("test_四分屏", () => new test_pick_4p());

@@ -1183,6 +1183,23 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare class test_Decal implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    taskmgr: gd3d.framework.taskMgr;
+    assetMgr: gd3d.framework.assetMgr;
+    private buildingPname;
+    private texName;
+    private inited;
+    start(app: gd3d.framework.application): Promise<any>;
+    private dec;
+    private building;
+    init(): void;
+    private initCamera();
+    private Y_ag;
+    update(delta: number): void;
+}
 declare class test_fakepbr implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -1603,6 +1620,19 @@ declare class test_UIEffect implements IState {
     timer: number;
     bere: boolean;
     bere1: boolean;
+    update(delta: number): void;
+}
+declare class test_UIGuideMask implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    assetMgr: gd3d.framework.assetMgr;
+    iptMgr: gd3d.framework.inputMgr;
+    rooto2d: gd3d.framework.overlay2D;
+    private inited;
+    start(app: gd3d.framework.application): Promise<void>;
+    private dec;
+    init(): void;
     update(delta: number): void;
 }
 declare class test_uimove implements IState {
@@ -2144,12 +2174,89 @@ declare namespace gd3d.framework {
         remove(): void;
     }
 }
+declare class decalCreater extends gd3d.framework.behaviour {
+    private static helpv2;
+    private static helpv3;
+    private static helpv3_1;
+    private static helpv3_2;
+    private static helpv3_3;
+    private static helpqaut;
+    sizeN: number;
+    tempTex: gd3d.framework.meshRenderer;
+    camera: gd3d.framework.camera;
+    targetMF: gd3d.framework.meshFilter;
+    private app;
+    private scene;
+    private _assetMgr;
+    private _offset;
+    private tag_decalRoot;
+    onPlay(): void;
+    update(delta: number): void;
+    remove(): void;
+    limitDecalMaxCount: number;
+    private size;
+    private wdir;
+    private rotate;
+    private woffsetPos;
+    sprayDecal(pinfo: gd3d.framework.pickinfo): void;
+    private print(meshF, position, orientation, size);
+    private calecWorldNormal(pinfo, mf, result);
+    private calecRoation(dir, pinfo, result);
+    private static multipleViewFix(_camera, app, screenPos, result);
+}
+declare class decalGeometry {
+    tragetMeshf: gd3d.framework.meshFilter;
+    position: gd3d.math.vector3;
+    orientation: gd3d.math.quaternion;
+    size: gd3d.math.vector3;
+    private static onlyPostion;
+    mesh: gd3d.framework.mesh;
+    meshF: gd3d.framework.meshFilter;
+    private static id;
+    private static planes;
+    private projectorMatrix;
+    private projectorMatrixInverse;
+    private plane;
+    private vertices;
+    private normals;
+    private uvs;
+    constructor(tragetMeshf: gd3d.framework.meshFilter, position: gd3d.math.vector3, orientation: gd3d.math.quaternion, size: gd3d.math.vector3, webgl: WebGLRenderingContext);
+    private generate();
+    private pushDecalVertex(decalVertices, vertex, normal);
+    private clipGeometry(inVertices, plane);
+    private clip(v0, v1, p, s);
+}
+declare class DecalVertex {
+    position: gd3d.math.vector3;
+    normal: gd3d.math.vector3;
+    constructor(position: gd3d.math.vector3, normal?: gd3d.math.vector3);
+    clone(): DecalVertex;
+}
+declare class guideMask extends gd3d.framework.behaviour2d {
+    private _holeRect;
+    holeRect: gd3d.math.rect;
+    template: gd3d.framework.transform2D;
+    private inited;
+    onPlay(): void;
+    update(delta: number): void;
+    remove(): void;
+    private cells;
+    private top;
+    private bottom;
+    private left;
+    private right;
+    private refreshMask();
+}
 declare let dat: any;
 declare let Promise: any;
 declare class datGui {
     private static _inited;
     static init(): Promise<void>;
     private static loadJs();
+    static example(): void;
+}
+declare class demoTool {
+    static loadbySync(url: string, astMgr: gd3d.framework.assetMgr): gd3d.threading.gdPromise<any>;
 }
 declare class physics3dDemoTool {
     static app: gd3d.framework.application;
@@ -2161,7 +2268,6 @@ declare class physics3dDemoTool {
         [name: string]: gd3d.framework.material;
     };
     static init(app: gd3d.framework.application): Promise<void>;
-    static loadbySync(url: string): gd3d.threading.gdPromise<any>;
     private static initMats();
     private static initCamera();
     private static addMat(name, color);

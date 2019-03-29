@@ -8001,15 +8001,15 @@ var gd3d;
             function defMesh() {
             }
             defMesh.initDefaultMesh = function (assetmgr) {
-                assetmgr.mapDefaultMesh["cube"] = gd3d.framework.defMesh.createDefaultMesh("cube", gd3d.render.meshData.genBoxCCW(1.0), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["quad"] = gd3d.framework.defMesh.createDefaultMesh("quad", gd3d.render.meshData.genQuad(1.0), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["quad_particle"] = gd3d.framework.defMesh.createDefaultMesh("quad_particle", gd3d.render.meshData.genQuad_forparticle(1.0), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["plane"] = gd3d.framework.defMesh.createDefaultMesh("plane", gd3d.render.meshData.genPlaneCCW(10), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["sphere"] = gd3d.framework.defMesh.createDefaultMesh("sphere", gd3d.render.meshData.genSphereCCW(), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["sphere_quality"] = gd3d.framework.defMesh.createDefaultMesh("sphere_quality", gd3d.render.meshData.genSphereCCW(2.58, 40, 40), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["pyramid"] = gd3d.framework.defMesh.createDefaultMesh("pyramid", gd3d.render.meshData.genPyramid(2, 0.5), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["cylinder"] = gd3d.framework.defMesh.createDefaultMesh("cylinder", gd3d.render.meshData.genCylinderCCW(2, 0.5), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["circleline"] = gd3d.framework.defMesh.createDefaultMesh("circleline", gd3d.render.meshData.genCircleLineCCW(1), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.cube] = this.createDefaultMesh(this.cube, gd3d.render.meshData.genBoxCCW(1.0), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.quad] = this.createDefaultMesh(this.quad, gd3d.render.meshData.genQuad(1.0), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.quad_particle] = this.createDefaultMesh(this.quad_particle, gd3d.render.meshData.genQuad_forparticle(1.0), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.plane] = this.createDefaultMesh(this.plane, gd3d.render.meshData.genPlaneCCW(10), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.sphere] = this.createDefaultMesh(this.sphere, gd3d.render.meshData.genSphereCCW(), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.sphere_quality] = this.createDefaultMesh(this.sphere_quality, gd3d.render.meshData.genSphereCCW(2.58, 40, 40), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.pyramid] = this.createDefaultMesh(this.pyramid, gd3d.render.meshData.genPyramid(2, 0.5), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.cylinder] = this.createDefaultMesh(this.cylinder, gd3d.render.meshData.genCylinderCCW(2, 0.5), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.circleline] = this.createDefaultMesh(this.circleline, gd3d.render.meshData.genCircleLineCCW(1), assetmgr.webgl);
             };
             defMesh.createDefaultMesh = function (name, meshData, webgl) {
                 var _mesh = new gd3d.framework.mesh(name + ".mesh.bin");
@@ -8036,6 +8036,15 @@ var gd3d;
                 }
                 return _mesh;
             };
+            defMesh.cube = "cube";
+            defMesh.quad = "quad";
+            defMesh.quad_particle = "quad_particle";
+            defMesh.plane = "plane";
+            defMesh.sphere = "sphere";
+            defMesh.sphere_quality = "sphere_quality";
+            defMesh.pyramid = "pyramid";
+            defMesh.cylinder = "cylinder";
+            defMesh.circleline = "circleline";
             return defMesh;
         }());
         framework.defMesh = defMesh;
@@ -8360,22 +8369,25 @@ var gd3d;
             function defsprite() {
             }
             defsprite.initDefaultSprite = function (assetmgr) {
-                var spt_white = new framework.sprite("white_sprite");
+                var spt_white = new framework.sprite(this.white_sprite);
                 spt_white.texture = assetmgr.getDefaultTexture("white");
                 spt_white.defaultAsset = true;
                 spt_white.rect = new gd3d.math.rect(0, 0, spt_white.texture.glTexture.width, spt_white.texture.glTexture.height);
-                assetmgr.mapDefaultSprite["white_sprite"] = spt_white;
-                var spt_gray = new framework.sprite("gray_sprite");
+                assetmgr.mapDefaultSprite[this.white_sprite] = spt_white;
+                var spt_gray = new framework.sprite(this.gray_sprite);
                 spt_gray.texture = assetmgr.getDefaultTexture("gray");
                 spt_gray.defaultAsset = true;
                 spt_gray.rect = new gd3d.math.rect(0, 0, spt_gray.texture.glTexture.width, spt_gray.texture.glTexture.height);
-                assetmgr.mapDefaultSprite["gray_sprite"] = spt_gray;
-                var spt_grid = new framework.sprite("grid_sprite");
+                assetmgr.mapDefaultSprite[this.gray_sprite] = spt_gray;
+                var spt_grid = new framework.sprite(this.grid_sprite);
                 spt_grid.texture = assetmgr.getDefaultTexture("grid");
                 spt_grid.defaultAsset = true;
                 spt_grid.rect = new gd3d.math.rect(0, 0, spt_grid.texture.glTexture.width, spt_grid.texture.glTexture.height);
-                assetmgr.mapDefaultSprite["grid_sprite"] = spt_grid;
+                assetmgr.mapDefaultSprite[this.grid_sprite] = spt_grid;
             };
+            defsprite.white_sprite = "white_sprite";
+            defsprite.gray_sprite = "gray_sprite";
+            defsprite.grid_sprite = "grid_sprite";
             return defsprite;
         }());
         framework.defsprite = defsprite;
@@ -8389,32 +8401,36 @@ var gd3d;
             function defTexture() {
             }
             defTexture.initDefaultTexture = function (assetmgr) {
-                var t = new framework.texture("white");
-                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, "white");
+                var t = new framework.texture(this.white);
+                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, this.white);
                 t.defaultAsset = true;
-                assetmgr.mapDefaultTexture["white"] = t;
-                var t = new framework.texture("gray");
-                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, "gray");
+                assetmgr.mapDefaultTexture[this.white] = t;
+                var t = new framework.texture(this.gray);
+                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, this.gray);
                 t.defaultAsset = true;
-                assetmgr.mapDefaultTexture["gray"] = t;
-                var t = new framework.texture("normal");
-                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, "normal");
+                assetmgr.mapDefaultTexture[this.gray] = t;
+                var t = new framework.texture(this.normal);
+                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, this.normal);
                 t.defaultAsset = true;
-                assetmgr.mapDefaultTexture["normal"] = t;
-                var t = new framework.texture("grid");
-                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, "grid");
+                assetmgr.mapDefaultTexture[this.normal] = t;
+                var t = new framework.texture(this.grid);
+                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, this.grid);
                 t.defaultAsset = true;
-                assetmgr.mapDefaultTexture["grid"] = t;
+                assetmgr.mapDefaultTexture[this.grid] = t;
                 defTexture.initDefaultCubeTexture(assetmgr);
             };
             defTexture.initDefaultCubeTexture = function (assetmgr) {
-                var whiteTex = assetmgr.mapDefaultTexture["white"];
-                var t = new framework.texture("white");
+                var whiteTex = assetmgr.mapDefaultTexture[this.white];
+                var t = new framework.texture(this.white);
                 t.glTexture = new gd3d.render.glTextureCube(assetmgr.app.webgl);
                 t.glTexture.uploadImages(whiteTex, whiteTex, whiteTex, whiteTex, whiteTex, whiteTex);
                 t.defaultAsset = true;
-                assetmgr.mapDefaultCubeTexture["white"] = t;
+                assetmgr.mapDefaultCubeTexture[this.white] = t;
             };
+            defTexture.white = "white";
+            defTexture.gray = "gray";
+            defTexture.normal = "normal";
+            defTexture.grid = "grid";
             return defTexture;
         }());
         framework.defTexture = defTexture;
@@ -23692,9 +23708,12 @@ var gd3d;
         }
         math.vec3Product = vec3Product;
         function vec3Cross(lhs, rhs, out) {
-            out.rawData[0] = lhs.y * rhs.z - lhs.z * rhs.y;
-            out.rawData[1] = lhs.z * rhs.x - lhs.x * rhs.z;
-            out.rawData[2] = lhs.x * rhs.y - lhs.y * rhs.x;
+            var x = lhs.y * rhs.z - lhs.z * rhs.y;
+            var y = lhs.z * rhs.x - lhs.x * rhs.z;
+            var z = lhs.x * rhs.y - lhs.y * rhs.x;
+            out.rawData[0] = x;
+            out.rawData[1] = y;
+            out.rawData[2] = z;
         }
         math.vec3Cross = vec3Cross;
         function vec3Reflect(inDirection, inNormal, out) {

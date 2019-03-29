@@ -1364,6 +1364,15 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class defMesh {
+        static readonly cube: string;
+        static readonly quad: string;
+        static readonly quad_particle: string;
+        static readonly plane: string;
+        static readonly sphere: string;
+        static readonly sphere_quality: string;
+        static readonly pyramid: string;
+        static readonly cylinder: string;
+        static readonly circleline: string;
         static initDefaultMesh(assetmgr: assetMgr): void;
         private static createDefaultMesh(name, meshData, webgl);
     }
@@ -1396,11 +1405,18 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class defsprite {
+        static readonly white_sprite: string;
+        static readonly gray_sprite: string;
+        static readonly grid_sprite: string;
         static initDefaultSprite(assetmgr: assetMgr): void;
     }
 }
 declare namespace gd3d.framework {
     class defTexture {
+        static readonly white: string;
+        static readonly gray: string;
+        static readonly normal: string;
+        static readonly grid: string;
         static initDefaultTexture(assetmgr: assetMgr): void;
         private static initDefaultCubeTexture(assetmgr);
     }

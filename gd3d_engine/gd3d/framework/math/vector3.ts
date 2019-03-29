@@ -123,9 +123,12 @@
     }
     export function vec3Cross(lhs: vector3, rhs: vector3, out: vector3)
     {
-        out.rawData[0] = lhs.y * rhs.z - lhs.z * rhs.y;
-        out.rawData[1] = lhs.z * rhs.x - lhs.x * rhs.z;
-        out.rawData[2] = lhs.x * rhs.y - lhs.y * rhs.x;
+        let x = lhs.y * rhs.z - lhs.z * rhs.y;
+        let y = lhs.z * rhs.x - lhs.x * rhs.z;
+        let z = lhs.x * rhs.y - lhs.y * rhs.x;
+        out.rawData[0] = x;
+        out.rawData[1] = y;
+        out.rawData[2] = z;
     }
     export function vec3Reflect(inDirection: vector3, inNormal: vector3, out: vector3)
     {
