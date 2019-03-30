@@ -131,6 +131,11 @@ namespace gd3d.framework
         set colliderVisible(value: boolean)
         {
             this._colliderVisible = value;
+            if(this._colliderVisible){
+                if(!this.subTran){
+                    this.buildMesh();
+                }
+            }
             if (this.subTran)
             {
                 this.subTran.gameObject.visible = this._colliderVisible;
@@ -195,7 +200,7 @@ namespace gd3d.framework
                 poolv3_del(minimum);
                 poolv3_del(maximum);
             }
-            this.buildMesh();
+            //this.buildMesh();
         }
         /**
         * @private

@@ -242,9 +242,12 @@ namespace gd3d.framework
         {
             this._colliderVisible = value;
             if(this._colliderVisible){
-                if(this.subTran && this.subTran.gameObject.components.length<1){
-                    this.setMeshRenderer();
+                if(!this.subTran){
+                    this.buildMesh();
                 }
+                // if(this.subTran && this.subTran.gameObject.components.length<1){
+                //     this.setMeshRenderer();
+                // }
             }
             if(this.subTran){
                 this.subTran.gameObject.visible = this._colliderVisible;
@@ -309,7 +312,7 @@ namespace gd3d.framework
                 this.spherestruct = new spherestruct(this.center, this.radius);
             }
 
-            this.buildMesh();
+            //this.buildMesh();
         }
         /**
         * @private
