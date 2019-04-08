@@ -331,12 +331,5 @@ namespace gd3d.framework
             this.datar.length = 0;
         }
 
-        /**
-         * @private
-         */
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean)
-        {
-
-        }
     }
 }

@@ -28,9 +28,5 @@ namespace gd3d.framework
         onPlay(){
 
         }
-
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean) {
-
-        }
     }
 }

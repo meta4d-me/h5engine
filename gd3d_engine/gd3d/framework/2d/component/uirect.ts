@@ -21,9 +21,6 @@ namespace gd3d.framework
 
         }
         transform: transform2D;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean) {
-
-        }
         remove() {
             this.transform = null;
         }

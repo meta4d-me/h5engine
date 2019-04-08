@@ -126,12 +126,5 @@ namespace gd3d.framework
 
         }
 
-        /**
-         * @private
-         */
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean)
-        {
-
-        }
     }
 }

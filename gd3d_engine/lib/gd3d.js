@@ -2050,8 +2050,7 @@ var gd3d;
                     }
                     if (!skip) {
                         if (this.scene.app.bePlay) {
-                            this.rootNode.onCapturePointEvent(this, this.pointEvent);
-                            this.rootNode.onPointEvent(this, this.pointEvent);
+                            this.popPointFlow();
                         }
                         this.pointDown = touch;
                         this.pointX = this.pointEvent.x;
@@ -2061,18 +2060,88 @@ var gd3d;
                 }
                 this.rootNode.updateTran(false);
                 if (this.scene.app.bePlay) {
+                    canvas_1._peCareListBuoy = -1;
                     this.objupdate(this.rootNode, delta);
+                }
+            };
+            canvas.prototype.capturePointFlow = function () {
+                var list = canvas_1._pointEventCareList;
+                var buoy = canvas_1._peCareListBuoy;
+                var ev = this.pointEvent;
+                var Eated = false;
+                while (buoy >= 0) {
+                    var idx = canvas_1._peCareListBuoy - buoy;
+                    var node = framework.transform2D.getTransform2DById(list[idx]);
+                    if (node.components) {
+                        for (var i = 0; i <= node.components.length; i++) {
+                            if (ev.eated == false) {
+                                var comp = node.components[i];
+                                if (comp && comp.init && framework.instanceOfI2DPointListener(comp.comp)) {
+                                    comp.comp.onPointEvent(canvas_1, ev, true);
+                                    Eated = ev.eated;
+                                    if (ev.eated)
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    buoy--;
+                    if (Eated)
+                        break;
+                }
+            };
+            canvas.prototype.popPointFlow = function () {
+                var list = canvas_1._pointEventCareList;
+                var buoy = canvas_1._peCareListBuoy;
+                var ev = this.pointEvent;
+                var Eated = false;
+                while (buoy >= 0) {
+                    var node = framework.transform2D.getTransform2DById(list[buoy]);
+                    if (node.components) {
+                        for (var i = 0; i <= node.components.length; i++) {
+                            if (ev.eated == false) {
+                                var comp = node.components[i];
+                                if (comp && comp.init && framework.instanceOfI2DPointListener(comp.comp)) {
+                                    comp.comp.onPointEvent(canvas_1, ev, false);
+                                    Eated = ev.eated;
+                                    if (ev.eated)
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    buoy--;
+                    if (Eated)
+                        break;
                 }
             };
             canvas.prototype.objupdate = function (node, delta) {
                 if (!node.visible)
                     return;
                 node.init(this.scene.app.bePlay);
-                if (node.components.length > 0) {
-                    node.update(delta);
+                var compLen = node.components.length;
+                if (compLen > 0) {
+                    for (var i = 0; i < compLen; i++) {
+                        var comp = node.components[i].comp;
+                        comp.update(delta);
+                        if (framework.instanceOfI2DPointListener(comp)) {
+                            canvas_1._peCareListBuoy++;
+                            var insId = node.insId.getInsID();
+                            var plist = canvas_1._pointEventCareList;
+                            var pBuoy = canvas_1._peCareListBuoy;
+                            if (plist.length <= pBuoy) {
+                                plist.push(insId);
+                            }
+                            else {
+                                plist[pBuoy] = insId;
+                            }
+                            plist[pBuoy];
+                        }
+                    }
                 }
                 if (node.children != null) {
-                    for (var i = 0; i < node.children.length; i++) {
+                    var chiLen = node.children.length;
+                    for (var i = 0; i < chiLen; i++) {
                         this.objupdate(node.children[i], delta);
                     }
                 }
@@ -2288,6 +2357,8 @@ var gd3d;
                 outModelPos.y = 1 - scaly * 2;
             };
             canvas.ClassName = "canvas";
+            canvas._peCareListBuoy = -1;
+            canvas._pointEventCareList = [];
             canvas.depthTag = "__depthTag__";
             canvas.flowIndexTag = "__flowIndexTag__";
             __decorate([
@@ -2709,6 +2780,10 @@ var gd3d;
             layoutOption[layoutOption["H_CENTER"] = 16] = "H_CENTER";
             layoutOption[layoutOption["V_CENTER"] = 32] = "V_CENTER";
         })(layoutOption = framework.layoutOption || (framework.layoutOption = {}));
+        function instanceOfI2DPointListener(object) {
+            return "onPointEvent" in object;
+        }
+        framework.instanceOfI2DPointListener = instanceOfI2DPointListener;
         var C2DComponent = (function () {
             function C2DComponent(comp, init) {
                 if (init === void 0) { init = false; }
@@ -2734,6 +2809,7 @@ var gd3d;
                 this.tag = framework.StringUtil.builtinTag_Untagged;
                 this.name = "noname";
                 this.isStatic = false;
+                this.children = [];
                 this.width = 0;
                 this.height = 0;
                 this.pivot = new gd3d.math.vector2(0, 0);
@@ -2769,6 +2845,10 @@ var gd3d;
                 this.lastParentPivot = new gd3d.math.vector2(0, 0);
                 this.lastPivot = new gd3d.math.vector2(0, 0);
             }
+            transform2D_1 = transform2D;
+            transform2D.getTransform2DById = function (insID) {
+                return this._transform2DMap[insID];
+            };
             Object.defineProperty(transform2D.prototype, "canvas", {
                 get: function () {
                     if (this._canvas == null) {
@@ -2902,20 +2982,12 @@ var gd3d;
                 configurable: true
             });
             transform2D.prototype.addChild = function (node) {
-                if (node.parent != null) {
-                    node.parent.removeChild(node);
-                }
-                if (this.children == null)
-                    this.children = [];
-                this.children.push(node);
-                node.parent = this;
-                node.canvas = this.canvas;
-                framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
-                this.markDirty();
+                this.addChildAt(node, this.children.length);
             };
             transform2D.prototype.addChildAt = function (node, index) {
-                if (index < 0)
+                if (index < 0 || !node) {
                     return;
+                }
                 if (node.parent != null) {
                     node.parent.removeChild(node);
                 }
@@ -2924,19 +2996,25 @@ var gd3d;
                 this.children.splice(index, 0, node);
                 node.canvas = this.canvas;
                 node.parent = this;
+                transform2D_1._transform2DMap[node.insId.getInsID()] = node;
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
                 this.markDirty();
             };
             transform2D.prototype.removeChild = function (node) {
+                if (!node) {
+                    console.warn("target is null");
+                    return;
+                }
                 if (node.parent != this || this.children == null) {
                     throw new Error("not my child.");
                 }
                 var i = this.children.indexOf(node);
-                if (i >= 0) {
-                    this.children.splice(i, 1);
-                    node.parent = null;
-                    framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
-                }
+                if (i < 0)
+                    return;
+                this.children.splice(i, 1);
+                node.parent = null;
+                delete transform2D_1._transform2DMap[node.insId.getInsID()];
+                framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
             };
             transform2D.prototype.removeAllChild = function () {
                 while (this.children.length > 0) {
@@ -3088,13 +3166,6 @@ var gd3d;
                 }
                 this.removeAllComponents();
             };
-            transform2D.prototype.update = function (delta) {
-                if (this.components.length == 0)
-                    return;
-                for (var i = 0; i < this.components.length; i++) {
-                    this.components[i].comp.update(delta);
-                }
-            };
             transform2D.prototype.init = function (bePlayed) {
                 if (bePlayed === void 0) { bePlayed = false; }
                 if (this.componentsInit.length > 0) {
@@ -3165,6 +3236,7 @@ var gd3d;
                         }
                         var p = this.components.splice(i, 1);
                         comp.remove();
+                        comp.transform = null;
                         break;
                     }
                 }
@@ -3226,28 +3298,6 @@ var gd3d;
                     }
                 }
             };
-            transform2D.prototype.onCapturePointEvent = function (canvas, ev) {
-                if (this.components != null) {
-                    for (var i = 0; i <= this.components.length; i++) {
-                        if (ev.eated == false) {
-                            var comp = this.components[i];
-                            if (comp != null)
-                                if (comp.init) {
-                                    comp.comp.onPointEvent(canvas, ev, true);
-                                }
-                        }
-                    }
-                }
-                if (ev.eated == false) {
-                    if (this.children != null) {
-                        for (var i = 0; i <= this.children.length; i++) {
-                            var c = this.children[i];
-                            if (c != null && c.visible)
-                                c.onCapturePointEvent(canvas, ev);
-                        }
-                    }
-                }
-            };
             transform2D.prototype.ContainsCanvasPoint = function (ModelPos, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
                 var result = false;
@@ -3262,26 +3312,6 @@ var gd3d;
                 gd3d.math.pool.delete_matrix3x2(mout);
                 gd3d.math.pool.delete_vector2(p2);
                 return result;
-            };
-            transform2D.prototype.onPointEvent = function (canvas, ev) {
-                if (this.children != null) {
-                    for (var i = this.children.length - 1; i >= 0; i--) {
-                        if (ev.eated == false) {
-                            var c = this.children[i];
-                            if (c != null && c.visible)
-                                c.onPointEvent(canvas, ev);
-                        }
-                    }
-                }
-                if (ev.eated == false && this.components != null) {
-                    for (var i = this.components.length - 1; i >= 0; i--) {
-                        var comp = this.components[i];
-                        if (comp != null)
-                            if (comp.init) {
-                                comp.comp.onPointEvent(canvas, ev, false);
-                            }
-                    }
-                }
             };
             Object.defineProperty(transform2D.prototype, "layoutState", {
                 get: function () {
@@ -3424,6 +3454,7 @@ var gd3d;
                 return gd3d.io.cloneObj(this);
             };
             transform2D.ClassName = "transform2D";
+            transform2D._transform2DMap = {};
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
@@ -3500,10 +3531,11 @@ var gd3d;
                 __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], transform2D.prototype, "layoutPercentState", null);
-            transform2D = __decorate([
+            transform2D = transform2D_1 = __decorate([
                 gd3d.reflect.SerializeType
             ], transform2D);
             return transform2D;
+            var transform2D_1;
         }());
         framework.transform2D = transform2D;
         var t2dInfo = (function () {
@@ -3532,8 +3564,6 @@ var gd3d;
             behaviour2d.prototype.onPlay = function () {
             };
             behaviour2d.prototype.update = function (delta) {
-            };
-            behaviour2d.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             behaviour2d.prototype.remove = function () {
             };
@@ -3584,8 +3614,6 @@ var gd3d;
                 if (this._obb) {
                     this._obb.update(this.transform.getCanvasWorldMatrix());
                 }
-            };
-            boxcollider2d.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             boxcollider2d.prototype.remove = function () {
                 if (this._obb)
@@ -4107,8 +4135,6 @@ var gd3d;
                 this.datar.length = 0;
                 this.transform = null;
                 this._imageBorder = null;
-            };
-            image2D.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             image2D.prototype.prepareData = function () {
                 if (this._sprite == null)
@@ -5644,8 +5670,6 @@ var gd3d;
                 this.transform = null;
                 this._cacheMaskV4 = null;
             };
-            label.prototype.onPointEvent = function (canvas, ev, oncap) {
-            };
             label.ClassName = "label";
             label.defUIShader = "shader/defuifont";
             label.defMaskUIShader = "shader/defmaskfont";
@@ -5797,8 +5821,6 @@ var gd3d;
                 this._barBg = null;
                 this._barOverImg = null;
                 this._cutPanel = null;
-            };
-            progressbar.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             progressbar.ClassName = "progressbar";
             __decorate([
@@ -6020,8 +6042,6 @@ var gd3d;
                 this._cacheMaskV4 = null;
                 this.transform = null;
                 this.datar.length = 0;
-            };
-            rawImage2D.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             rawImage2D.ClassName = "rawImage2D";
             rawImage2D.defUIShader = "shader/defui";
@@ -6255,8 +6275,6 @@ var gd3d;
             };
             uirect.prototype.update = function (delta) {
             };
-            uirect.prototype.onPointEvent = function (canvas, ev, oncap) {
-            };
             uirect.prototype.remove = function () {
                 this.transform = null;
             };
@@ -6406,8 +6424,6 @@ var gd3d;
             };
             circleBody.prototype.onPlay = function () {
             };
-            circleBody.prototype.onPointEvent = function (canvas, ev, oncap) {
-            };
             circleBody.ClassName = "circleBody";
             circleBody = __decorate([
                 gd3d.reflect.node2DComponent
@@ -6525,8 +6541,6 @@ var gd3d;
                 }
             };
             rectBody.prototype.onPlay = function () {
-            };
-            rectBody.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             rectBody.ClassName = "rectBody";
             rectBody = __decorate([

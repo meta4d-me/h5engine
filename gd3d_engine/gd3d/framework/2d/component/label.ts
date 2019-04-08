@@ -680,13 +680,6 @@ namespace gd3d.framework
             this._cacheMaskV4 = null;
         }
         
-        /**
-         * @private
-         */
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean)
-        {
-
-        }
     }
 
     /**

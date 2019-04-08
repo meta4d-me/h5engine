@@ -365,6 +365,8 @@ declare namespace gd3d.framework {
     class canvas {
         static readonly ClassName: string;
         constructor();
+        private static _peCareListBuoy;
+        private static _pointEventCareList;
         is2dUI: boolean;
         isDrawByDepth: boolean;
         parentTrans: transform;
@@ -383,6 +385,8 @@ declare namespace gd3d.framework {
         private lastWidth;
         private lastHeight;
         update(delta: number, touch: Boolean, XOnModelSpace: number, YOnModelSpace: number): void;
+        private capturePointFlow();
+        private popPointFlow();
         private objupdate(node, delta);
         private lastMat;
         afterRender: Function;
@@ -502,12 +506,15 @@ declare namespace gd3d.framework {
         H_CENTER = 16,
         V_CENTER = 32,
     }
+    interface I2DPointListener {
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): any;
+    }
+    function instanceOfI2DPointListener(object: any): boolean;
     interface I2DComponent {
         onPlay(): any;
         start(): any;
         update(delta: number): any;
         transform: transform2D;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): any;
         remove(): any;
     }
     interface ICollider2d {
@@ -530,6 +537,8 @@ declare namespace gd3d.framework {
     class transform2D {
         static readonly ClassName: string;
         private _canvas;
+        private static _transform2DMap;
+        static getTransform2DById(insID: number): transform2D;
         prefab: string;
         canvas: canvas;
         layer: number;
@@ -590,7 +599,6 @@ declare namespace gd3d.framework {
         components: C2DComponent[];
         private componentsInit;
         private componentplayed;
-        update(delta: number): void;
         init(bePlayed?: boolean): void;
         addComponent(type: string): I2DComponent;
         addComponentDirect(comp: I2DComponent): I2DComponent;
@@ -601,9 +609,7 @@ declare namespace gd3d.framework {
         getComponents(): I2DComponent[];
         getComponentsInChildren(type: string): I2DComponent[];
         private getNodeCompoents(node, _type, comps);
-        onCapturePointEvent(canvas: canvas, ev: PointEvent): void;
         ContainsCanvasPoint(ModelPos: math.vector2, tolerance?: number): boolean;
-        onPointEvent(canvas: canvas, ev: PointEvent): void;
         private readonly optionArr;
         private _layoutState;
         layoutState: number;
@@ -640,7 +646,6 @@ declare namespace gd3d.framework {
         start(): void;
         onPlay(): void;
         update(delta: number): void;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         remove(): void;
     }
 }
@@ -656,7 +661,6 @@ declare namespace gd3d.framework {
         start(): void;
         onPlay(): void;
         update(delta: number): void;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         remove(): void;
     }
 }
@@ -666,7 +670,7 @@ declare namespace gd3d.framework {
         ColorTint = 1,
         SpriteSwap = 2,
     }
-    class button implements I2DComponent, event.IUIEventer {
+    class button implements I2DComponent, event.IUIEventer, I2DPointListener {
         static readonly ClassName: string;
         private _transition;
         transition: TransitionType;
@@ -741,7 +745,6 @@ declare namespace gd3d.framework {
         onPlay(): void;
         update(delta: number): void;
         remove(): void;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         private prepareData();
         updateTran(): void;
         private min_x;
@@ -770,7 +773,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class inputField implements I2DComponent {
+    class inputField implements I2DComponent, I2DPointListener {
         static readonly ClassName: string;
         transform: transform2D;
         private _frameImage;
@@ -864,7 +867,6 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         transform: transform2D;
         remove(): void;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
     }
     enum HorizontalType {
         Center = 0,
@@ -895,7 +897,6 @@ declare namespace gd3d.framework {
         private adjustOverImg();
         transform: transform2D;
         remove(): void;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
     }
 }
 declare namespace gd3d.framework {
@@ -928,11 +929,10 @@ declare namespace gd3d.framework {
         update(delta: number): void;
         transform: transform2D;
         remove(): void;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
     }
 }
 declare namespace gd3d.framework {
-    class scrollRect implements I2DComponent {
+    class scrollRect implements I2DComponent, I2DPointListener {
         static readonly ClassName: string;
         private _content;
         private static helpv2;
@@ -974,7 +974,6 @@ declare namespace gd3d.framework {
         onPlay(): void;
         update(delta: number): void;
         transform: transform2D;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         remove(): void;
     }
 }
@@ -1041,7 +1040,6 @@ declare namespace gd3d.framework {
         radius: number;
         start(): void;
         onPlay(): void;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1109,7 +1107,6 @@ declare namespace gd3d.framework {
         transform: transform2D;
         start(): void;
         onPlay(): void;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
     }
 }
 declare namespace gd3d.framework {

@@ -380,14 +380,6 @@ namespace gd3d.framework
 
         /**
          * @private
-         */
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean)
-        {
-
-        }
-
-        /**
-         * @private
          * 根据显示方式来准备数据
          */
         private prepareData()

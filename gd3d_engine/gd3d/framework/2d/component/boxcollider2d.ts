@@ -89,9 +89,6 @@ namespace gd3d.framework
                 this._obb.update(this.transform.getCanvasWorldMatrix());
             }
         }
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean) {
-
-        }
         remove() {
             if(this._obb)   this._obb.dispose();
             this._obb = null;

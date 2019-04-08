@@ -24,7 +24,7 @@ namespace gd3d.framework
      * @version egret-gd3d 1.0
      */
     @reflect.node2DComponent
-    export class button implements I2DComponent ,event.IUIEventer
+    export class button implements I2DComponent ,event.IUIEventer ,I2DPointListener
     {
         static readonly ClassName:string="button";
 

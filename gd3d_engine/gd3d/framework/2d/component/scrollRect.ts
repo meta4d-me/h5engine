@@ -9,7 +9,7 @@ namespace gd3d.framework
      * @version egret-gd3d 1.0
      */
     @reflect.node2DComponent
-    export class scrollRect implements I2DComponent
+    export class scrollRect implements I2DComponent , I2DPointListener
     {
         static readonly ClassName:string="scrollRect";
         
