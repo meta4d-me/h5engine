@@ -6055,6 +6055,9 @@ var t;
             }
         };
         test_ui.prototype.update = function (delta) {
+            if (gd3d["__he__"]) {
+                debugger;
+            }
             this.timer += delta;
             var x = Math.sin(this.timer);
             var z = Math.cos(this.timer);

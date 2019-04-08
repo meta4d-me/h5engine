@@ -1974,6 +1974,8 @@ var gd3d;
         framework.batcher2D = batcher2D;
         var canvas = (function () {
             function canvas() {
+                this._peCareListBuoy = -1;
+                this._pointEventCareList = [];
                 this.is2dUI = true;
                 this.isDrawByDepth = false;
                 this.pointDown = false;
@@ -2060,17 +2062,17 @@ var gd3d;
                 }
                 this.rootNode.updateTran(false);
                 if (this.scene.app.bePlay) {
-                    canvas_1._peCareListBuoy = -1;
+                    this._peCareListBuoy = -1;
                     this.objupdate(this.rootNode, delta);
                 }
             };
             canvas.prototype.capturePointFlow = function () {
-                var list = canvas_1._pointEventCareList;
-                var buoy = canvas_1._peCareListBuoy;
+                var list = this._pointEventCareList;
+                var buoy = this._peCareListBuoy;
                 var ev = this.pointEvent;
                 var Eated = false;
                 while (buoy >= 0) {
-                    var idx = canvas_1._peCareListBuoy - buoy;
+                    var idx = this._peCareListBuoy - buoy;
                     var node = framework.transform2D.getTransform2DById(list[idx]);
                     if (node.components) {
                         for (var i = 0; i <= node.components.length; i++) {
@@ -2091,8 +2093,8 @@ var gd3d;
                 }
             };
             canvas.prototype.popPointFlow = function () {
-                var list = canvas_1._pointEventCareList;
-                var buoy = canvas_1._peCareListBuoy;
+                var list = this._pointEventCareList;
+                var buoy = this._peCareListBuoy;
                 var ev = this.pointEvent;
                 var Eated = false;
                 while (buoy >= 0) {
@@ -2125,10 +2127,10 @@ var gd3d;
                         var comp = node.components[i].comp;
                         comp.update(delta);
                         if (framework.instanceOfI2DPointListener(comp)) {
-                            canvas_1._peCareListBuoy++;
+                            this._peCareListBuoy++;
                             var insId = node.insId.getInsID();
-                            var plist = canvas_1._pointEventCareList;
-                            var pBuoy = canvas_1._peCareListBuoy;
+                            var plist = this._pointEventCareList;
+                            var pBuoy = this._peCareListBuoy;
                             if (plist.length <= pBuoy) {
                                 plist.push(insId);
                             }
@@ -2357,8 +2359,6 @@ var gd3d;
                 outModelPos.y = 1 - scaly * 2;
             };
             canvas.ClassName = "canvas";
-            canvas._peCareListBuoy = -1;
-            canvas._pointEventCareList = [];
             canvas.depthTag = "__depthTag__";
             canvas.flowIndexTag = "__flowIndexTag__";
             __decorate([

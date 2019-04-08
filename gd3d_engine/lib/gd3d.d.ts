@@ -365,8 +365,8 @@ declare namespace gd3d.framework {
     class canvas {
         static readonly ClassName: string;
         constructor();
-        private static _peCareListBuoy;
-        private static _pointEventCareList;
+        private _peCareListBuoy;
+        private _pointEventCareList;
         is2dUI: boolean;
         isDrawByDepth: boolean;
         parentTrans: transform;

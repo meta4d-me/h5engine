@@ -171,8 +171,8 @@ namespace gd3d.framework
         }
 
 
-        private static _peCareListBuoy : number = -1;
-        private static _pointEventCareList : number[] = [];
+        private _peCareListBuoy : number = -1;
+        private _pointEventCareList : number[] = [];
 
         /**
          * @public
@@ -387,7 +387,7 @@ namespace gd3d.framework
             //this.rootNode.update(delta);
             if (this.scene.app.bePlay)
             {
-                canvas._peCareListBuoy = -1;
+                this._peCareListBuoy = -1;
                 this.objupdate(this.rootNode,delta);
             }
         }
@@ -395,12 +395,12 @@ namespace gd3d.framework
         //捕获阶段流
         private capturePointFlow(){
             //event 捕捉阶段，自上而下
-            var list = canvas._pointEventCareList;
-            var buoy = canvas._peCareListBuoy;
+            var list = this._pointEventCareList;
+            var buoy = this._peCareListBuoy;
             var ev = this.pointEvent;
             var Eated = false;
             while(buoy >= 0 ){
-                let idx = canvas._peCareListBuoy - buoy;
+                let idx = this._peCareListBuoy - buoy;
                 let node = transform2D.getTransform2DById(list[idx]);
                 if (node.components ) {
                     for (var i = 0; i <= node.components.length; i++) {
@@ -421,8 +421,8 @@ namespace gd3d.framework
 
         //冒泡阶段流
         private popPointFlow(){
-            var list = canvas._pointEventCareList;
-            var buoy = canvas._peCareListBuoy;
+            var list = this._pointEventCareList;
+            var buoy = this._peCareListBuoy;
             var ev = this.pointEvent;
             var Eated = false;
             while(buoy >= 0 ){
@@ -457,10 +457,10 @@ namespace gd3d.framework
                     var comp = node.components[i].comp;
                     comp.update(delta);
                     if(instanceOfI2DPointListener(comp)){  //判断是否为
-                        canvas._peCareListBuoy++;
+                        this._peCareListBuoy++;
                         var insId = node.insId.getInsID();
-                        var plist = canvas._pointEventCareList;
-                        var pBuoy = canvas._peCareListBuoy;
+                        var plist = this._pointEventCareList;
+                        var pBuoy = this._peCareListBuoy;
                         if(plist.length <= pBuoy){
                             plist.push(insId);
                         }else{
