@@ -6293,15 +6293,20 @@ var gd3d;
     (function (framework) {
         var bassBody = (function () {
             function bassBody() {
+                this._physicsEngine = framework.physics2D;
+                if (!this._physicsEngine) {
+                    console.error("Physics not enabled. Please use scene.enable2DPhysics(...) before creating 2dPhysicsBody.");
+                    return;
+                }
             }
             bassBody.prototype.addForce = function (Force) {
-                framework.physic2D.applyForceAtCenter(this.body, Force);
+                this._physicsEngine.applyForceAtCenter(this.body, Force);
             };
             bassBody.prototype.setVelocity = function (velocity) {
-                framework.physic2D.setVelocity(this.body, velocity);
+                this._physicsEngine.setVelocity(this.body, velocity);
             };
             bassBody.prototype.setAngularVelocity = function (velocity) {
-                framework.physic2D.setAngularVelocity(this.body, velocity);
+                this._physicsEngine.setAngularVelocity(this.body, velocity);
             };
             Object.defineProperty(bassBody.prototype, "angularVelocity", {
                 get: function () {
@@ -6366,28 +6371,28 @@ var gd3d;
                 configurable: true
             });
             bassBody.prototype.setDesity = function (Desity) {
-                framework.physic2D.setDesity(this.body, Desity);
+                this._physicsEngine.setDesity(this.body, Desity);
             };
             bassBody.prototype.setFrictionAir = function (frictionAir) {
-                framework.physic2D.setFrictionAir(this.body, frictionAir);
+                this._physicsEngine.setFrictionAir(this.body, frictionAir);
             };
             bassBody.prototype.setFriction = function (friction) {
-                framework.physic2D.setFriction(this.body, friction);
+                this._physicsEngine.setFriction(this.body, friction);
             };
             bassBody.prototype.setFrictionStatic = function (frictionStatic) {
-                framework.physic2D.setFrictionStatic(this.body, frictionStatic);
+                this._physicsEngine.setFrictionStatic(this.body, frictionStatic);
             };
             bassBody.prototype.setRestitution = function (restitution) {
-                framework.physic2D.setRestitution(this.body, restitution);
+                this._physicsEngine.setRestitution(this.body, restitution);
             };
             bassBody.prototype.setMass = function (mass) {
-                framework.physic2D.setMass(this.body, mass);
+                this._physicsEngine.setMass(this.body, mass);
             };
             bassBody.prototype.setInitData = function (att) {
                 this.initData = att;
             };
             bassBody.prototype.setPosition = function (pos) {
-                framework.physic2D.setPosition(this.body, pos);
+                this._physicsEngine.setPosition(this.body, pos);
             };
             bassBody.prototype.update = function (delta) {
                 this.transform.localTranslate.x = this.body.position.x;
@@ -6396,7 +6401,7 @@ var gd3d;
                 this.transform.markDirty();
             };
             bassBody.prototype.remove = function () {
-                framework.physic2D.removeBody(this.body);
+                this._physicsEngine.removeBody(this.body);
             };
             return bassBody;
         }());
@@ -6416,10 +6421,10 @@ var gd3d;
             }
             circleBody.prototype.start = function () {
                 if (this.initData != null) {
-                    this.body = framework.physic2D.creatCircleBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.radius, this.initData);
+                    this.body = this._physicsEngine.creatCircleBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.radius, this.initData);
                 }
                 else {
-                    this.body = framework.physic2D.creatCircleBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.radius, {});
+                    this.body = this._physicsEngine.creatCircleBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.radius, {});
                 }
             };
             circleBody.prototype.onPlay = function () {
@@ -6534,10 +6539,10 @@ var gd3d;
             }
             rectBody.prototype.start = function () {
                 if (this.initData != null) {
-                    this.body = framework.physic2D.creatRectBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.transform.width, this.transform.height, this.initData);
+                    this.body = this._physicsEngine.creatRectBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.transform.width, this.transform.height, this.initData);
                 }
                 else {
-                    this.body = framework.physic2D.creatRectBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.transform.width, this.transform.height, {});
+                    this.body = this._physicsEngine.creatRectBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.transform.width, this.transform.height, {});
                 }
             };
             rectBody.prototype.onPlay = function () {
@@ -30555,7 +30560,7 @@ var gd3d;
                         });
                     }
                 };
-                this._physicsEngine = framework.physic;
+                this._physicsEngine = framework.physics;
                 if (!this.object) {
                     console.error("No object was provided. A physics object is obligatory");
                     return;
@@ -31604,8 +31609,8 @@ var gd3d;
                 this.updateScene(this.rootNode, delta);
                 if (this.onLateUpdate)
                     this.onLateUpdate(delta);
-                if (framework.physic) {
-                    framework.physic._step(delta);
+                if (framework.physics) {
+                    framework.physics._step(delta);
                 }
                 if (this.renderCameras.length > 1) {
                     this.renderCameras.sort(function (a, b) {
@@ -31923,13 +31928,13 @@ var gd3d;
                 return ishited;
             };
             scene.prototype.enablePhysics = function (gravity, plugin) {
-                if (framework.physic) {
+                if (framework.physics) {
                     return true;
                 }
                 if (!plugin)
                     plugin = new framework.OimoJSPlugin();
                 try {
-                    framework.physic = new framework.PhysicsEngine(gravity, plugin);
+                    framework.physics = new framework.PhysicsEngine(gravity, plugin);
                     return true;
                 }
                 catch (e) {
@@ -31937,8 +31942,19 @@ var gd3d;
                     return false;
                 }
             };
-            scene.prototype.enable2DPhysics = function () {
-                framework.physic2D = new framework.physicEngine2D();
+            scene.prototype.enable2DPhysics = function (gravity) {
+                if (framework.physics2D) {
+                    return true;
+                }
+                try {
+                    framework.physics2D = new framework.physicEngine2D();
+                    framework.physics2D.setGravity(gravity.x, gravity.y);
+                    return true;
+                }
+                catch (e) {
+                    console.error(e.message);
+                    return false;
+                }
             };
             return scene;
         }());

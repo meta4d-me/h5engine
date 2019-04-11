@@ -25,9 +25,8 @@ class physic2d_dome implements IState {
         this.rooto2d = new gd3d.framework.overlay2D();
         this.camera.addOverLay(this.rooto2d);
 
-        this.scene.enable2DPhysics();
+        this.scene.enable2DPhysics(new gd3d.math.vector2(0,0));
 
-        gd3d.framework.physic2D.setGravity(0,0);
         //任务排队执行系统
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
         this.taskmgr.addTaskCall(this.createUI.bind(this));

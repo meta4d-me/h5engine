@@ -14061,8 +14061,7 @@ var physic2d_dome = (function () {
         this.camera.far = 10;
         this.rooto2d = new gd3d.framework.overlay2D();
         this.camera.addOverLay(this.rooto2d);
-        this.scene.enable2DPhysics();
-        gd3d.framework.physic2D.setGravity(0, 0);
+        this.scene.enable2DPhysics(new gd3d.math.vector2(0, 0));
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
         this.taskmgr.addTaskCall(this.createUI.bind(this));
     };

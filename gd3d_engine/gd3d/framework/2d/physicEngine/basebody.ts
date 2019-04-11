@@ -30,6 +30,15 @@ namespace gd3d.framework {
     }
 
     export class bassBody implements I2DBody {
+        /** 2d物理引擎实例对象 */
+        protected _physicsEngine : physicEngine2D;
+        constructor(){
+            this._physicsEngine = physics2D;
+            if (!this._physicsEngine) {
+                console.error("Physics not enabled. Please use scene.enable2DPhysics(...) before creating 2dPhysicsBody.")
+                return;
+            }
+        }
         // beStatic:boolean=false;
         transform: transform2D;
         body: Ibody;
@@ -39,18 +48,18 @@ namespace gd3d.framework {
          * @param Force 
          */
         addForce(Force: math.vector2) {
-            physic2D.applyForceAtCenter(this.body, Force);
+            this._physicsEngine.applyForceAtCenter(this.body, Force);
         }
         /**
          * 设置速度
          * @param velocity 
          */
         setVelocity(velocity: math.vector2) {
-            physic2D.setVelocity(this.body, velocity);
+            this._physicsEngine.setVelocity(this.body, velocity);
         }
 
         setAngularVelocity(velocity: number) {
-            physic2D.setAngularVelocity(this.body, velocity);
+            this._physicsEngine.setAngularVelocity(this.body, velocity);
         }
 
         /**获取角速度 */
@@ -124,7 +133,7 @@ namespace gd3d.framework {
          * @param Desity 
          */
         setDesity(Desity: number) {
-            physic2D.setDesity(this.body, Desity);
+            this._physicsEngine.setDesity(this.body, Desity);
         }
 
         /**
@@ -132,32 +141,32 @@ namespace gd3d.framework {
          * @param frictionAir 
          */
         setFrictionAir(frictionAir: number) {
-            physic2D.setFrictionAir(this.body, frictionAir);
+            this._physicsEngine.setFrictionAir(this.body, frictionAir);
         }
         /**
          * 设置摩擦力
          * @param friction 
          */
         setFriction(friction: number) {
-            physic2D.setFriction(this.body, friction);
+            this._physicsEngine.setFriction(this.body, friction);
         }
         /**
          * 设置静态摩擦力
          * @param frictionStatic 
          */
         setFrictionStatic(frictionStatic: number) {
-            physic2D.setFrictionStatic(this.body, frictionStatic);
+            this._physicsEngine.setFrictionStatic(this.body, frictionStatic);
         }
         /**
          * 设置还原张力
          * @param restitution 
          */
         setRestitution(restitution: number) {
-            physic2D.setRestitution(this.body, restitution);
+            this._physicsEngine.setRestitution(this.body, restitution);
         }
 
         setMass(mass: number) {
-            physic2D.setMass(this.body, mass);
+            this._physicsEngine.setMass(this.body, mass);
         }
 
         initData: IBodyData;
@@ -166,7 +175,7 @@ namespace gd3d.framework {
         }
 
         setPosition(pos: math.vector2) {
-            physic2D.setPosition(this.body, pos);
+            this._physicsEngine.setPosition(this.body, pos);
         }
 
         update(delta: number) {
@@ -176,7 +185,7 @@ namespace gd3d.framework {
             this.transform.markDirty();
         }
         remove() {
-            physic2D.removeBody(this.body);
+            this._physicsEngine.removeBody(this.body);
         }
     }
 }

@@ -132,7 +132,7 @@ namespace gd3d.framework {
          * @param _options Body Parameters
          */
         constructor(public object: transform, public type: ImpostorType, public _options: PhysicsImpostorParameters = { mass: 0 }) {
-            this._physicsEngine=physic;
+            this._physicsEngine=physics;
             if(!this.object){
                 console.error("No object was provided. A physics object is obligatory");
                 return;

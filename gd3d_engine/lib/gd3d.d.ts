@@ -1007,6 +1007,8 @@ declare namespace gd3d.framework {
         name?: string;
     }
     class bassBody implements I2DBody {
+        protected _physicsEngine: physicEngine2D;
+        constructor();
         transform: transform2D;
         body: Ibody;
         m_velocity: math.vector2;
@@ -1034,7 +1036,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class circleBody extends bassBody implements I2DComponent, I2DBody {
+    class circleBody extends bassBody implements I2DComponent {
         static readonly ClassName: string;
         transform: transform2D;
         radius: number;
@@ -1102,7 +1104,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class rectBody extends bassBody implements I2DComponent, I2DBody {
+    class rectBody extends bassBody implements I2DComponent {
         static readonly ClassName: string;
         transform: transform2D;
         start(): void;
@@ -5799,8 +5801,8 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    let physic: PhysicsEngine;
-    let physic2D: physicEngine2D;
+    let physics: PhysicsEngine;
+    let physics2D: physicEngine2D;
     class scene {
         app: application;
         webgl: WebGLRenderingContext;
@@ -5842,7 +5844,7 @@ declare namespace gd3d.framework {
         private pickMesh(ray, tran, pickedList, layermask?);
         private pickCollider(ray, tran, pickedList, layermask?);
         enablePhysics(gravity: math.vector3, plugin?: IPhysicsEnginePlugin): boolean;
-        enable2DPhysics(): void;
+        enable2DPhysics(gravity: math.vector2): boolean;
     }
 }
 declare namespace gd3d.framework {

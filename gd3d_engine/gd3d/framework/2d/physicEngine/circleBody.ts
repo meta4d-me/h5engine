@@ -10,7 +10,7 @@ namespace gd3d.framework
      * @version gd3d 1.0
      */
     @reflect.node2DComponent
-    export class circleBody extends bassBody implements I2DComponent,I2DBody
+    export class circleBody extends bassBody implements I2DComponent
     {
         static readonly ClassName:string="circleBody";
 
@@ -20,10 +20,10 @@ namespace gd3d.framework
         start() {
             if(this.initData!=null)
             {
-                this.body=physic2D.creatCircleBodyByInitData(this.transform.localTranslate.x,this.transform.localTranslate.y,this.radius,this.initData);
+                this.body=this._physicsEngine.creatCircleBodyByInitData(this.transform.localTranslate.x,this.transform.localTranslate.y,this.radius,this.initData);
             }else
             {
-                this.body=physic2D.creatCircleBodyByInitData(this.transform.localTranslate.x,this.transform.localTranslate.y,this.radius,{});
+                this.body=this._physicsEngine.creatCircleBodyByInitData(this.transform.localTranslate.x,this.transform.localTranslate.y,this.radius,{});
             }
         }
         onPlay(){
