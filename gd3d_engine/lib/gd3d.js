@@ -6420,12 +6420,8 @@ var gd3d;
                 return _this;
             }
             circleBody.prototype.start = function () {
-                if (this.initData != null) {
-                    this.body = this._physicsEngine.creatCircleBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.radius, this.initData);
-                }
-                else {
-                    this.body = this._physicsEngine.creatCircleBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.radius, {});
-                }
+                var data = this.initData || {};
+                this.body = this._physicsEngine.creatCircleBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.radius, data);
             };
             circleBody.prototype.onPlay = function () {
             };
@@ -6538,12 +6534,8 @@ var gd3d;
                 return _super !== null && _super.apply(this, arguments) || this;
             }
             rectBody.prototype.start = function () {
-                if (this.initData != null) {
-                    this.body = this._physicsEngine.creatRectBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.transform.width, this.transform.height, this.initData);
-                }
-                else {
-                    this.body = this._physicsEngine.creatRectBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.transform.width, this.transform.height, {});
-                }
+                var data = this.initData || {};
+                this.body = this._physicsEngine.creatRectBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.transform.width, this.transform.height, data);
             };
             rectBody.prototype.onPlay = function () {
             };

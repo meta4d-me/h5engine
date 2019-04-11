@@ -16,13 +16,8 @@ namespace gd3d.framework
 
         transform: transform2D;
         start() {
-            if(this.initData!=null)
-            {
-                this.body=this._physicsEngine.creatRectBodyByInitData(this.transform.localTranslate.x,this.transform.localTranslate.y,this.transform.width,this.transform.height,this.initData);
-            }else
-            {
-                this.body=this._physicsEngine.creatRectBodyByInitData(this.transform.localTranslate.x,this.transform.localTranslate.y,this.transform.width,this.transform.height,{});
-            }
+            let data = this.initData || {};
+            this.body=this._physicsEngine.creatRectBodyByInitData(this.transform.localTranslate.x,this.transform.localTranslate.y,this.transform.width,this.transform.height,data);
             //this.body=physic2D.creatRectBody(this.transform.localTranslate.x,this.transform.localTranslate.y,this.transform.width,this.transform.height,this.beStatic);
         }
         onPlay(){

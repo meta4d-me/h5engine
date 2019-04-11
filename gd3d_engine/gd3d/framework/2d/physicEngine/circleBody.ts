@@ -18,13 +18,8 @@ namespace gd3d.framework
         radius:number=1;
 
         start() {
-            if(this.initData!=null)
-            {
-                this.body=this._physicsEngine.creatCircleBodyByInitData(this.transform.localTranslate.x,this.transform.localTranslate.y,this.radius,this.initData);
-            }else
-            {
-                this.body=this._physicsEngine.creatCircleBodyByInitData(this.transform.localTranslate.x,this.transform.localTranslate.y,this.radius,{});
-            }
+            let data = this.initData || {};
+            this.body=this._physicsEngine.creatCircleBodyByInitData(this.transform.localTranslate.x,this.transform.localTranslate.y,this.radius,data);
         }
         onPlay(){
 
