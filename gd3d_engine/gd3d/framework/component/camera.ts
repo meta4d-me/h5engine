@@ -230,6 +230,11 @@ namespace gd3d.framework
 
         update(delta: number)
         {
+            this._updateOverLays(delta);
+        }
+
+        /** overLays update */
+        private _updateOverLays(delta: number){
             for (var i = 0; i < this.overlays.length; i++)
             {
                 if (!this.overlays[i].init)
