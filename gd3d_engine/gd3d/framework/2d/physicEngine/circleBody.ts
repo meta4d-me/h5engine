@@ -16,10 +16,11 @@ namespace gd3d.framework
 
         transform: transform2D;
         radius:number=1;
+        maxSides : number = 25;
 
         start() {
-            let data = this.initData || {};
-            this.body=this._physicsEngine.creatCircleBodyByInitData(this.transform.localTranslate.x,this.transform.localTranslate.y,this.radius,data);
+            let data = this.options || {};
+            this.body=this._physicsEngine.creatCircleBodyByInitData(this.transform.localTranslate.x,this.transform.localTranslate.y,this.radius,data,this.maxSides);
         }
         onPlay(){
 

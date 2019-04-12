@@ -1,6 +1,6 @@
 namespace gd3d.framework {
     export interface I2DBody {
-        initData: IBodyData;
+        options: IBodyData;
         // beStatic:boolean;
         transform: transform2D;
         body: Ibody;
@@ -169,9 +169,9 @@ namespace gd3d.framework {
             this._physicsEngine.setMass(this.body, mass);
         }
 
-        initData: IBodyData;
+        options: IBodyData;
         setInitData(att: IBodyData) {
-            this.initData = att;
+            this.options = att;
         }
 
         setPosition(pos: math.vector2) {

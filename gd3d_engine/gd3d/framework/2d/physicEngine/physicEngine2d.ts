@@ -63,14 +63,57 @@ namespace gd3d.framework {
         //     return body;
         // }
 
-        public creatRectBodyByInitData(posx: number, posy: number, width: number, height: number, initData: IBodyData) {
-            let body = Matter.Bodies.rectangle(posx, posy, width, height, initData);
+        /**
+         * Creates a new rigid body model with a circle hull. 
+         * The options parameter is an object that specifies any properties you wish to override the defaults.
+         * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
+         * @param posx 中心点x
+         * @param posy 中心点x
+         * @param width 矩形宽度
+         * @param height 矩形高度
+         * @param options 初始化选项
+         */
+        public creatRectBodyByInitData(posx: number, posy: number, width: number, height: number, options: IBodyData) {
+            let body = Matter.Bodies.rectangle(posx, posy, width, height, options);
             this.addBody(body);
             return body;
         }
 
-        public creatCircleBodyByInitData(posx: number, posy: number, radius: number, initData: IBodyData) {
-            let body = Matter.Bodies.circle(posx, posy, radius, initData);
+        /**
+         * Creates a new rigid body model with a circle hull. 
+         * The options parameter is an object that specifies any properties you wish to override the defaults.
+         * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
+         * @param posx 中心点x
+         * @param posy 中心点x
+         * @param radius 半径
+         * @param options 初始化选项
+         * @param maxSides 最大边
+         */
+        public creatCircleBodyByInitData(posx: number, posy: number, radius: number, options: IBodyData , maxSides: number = 25) {
+            let body = Matter.Bodies.circle(posx, posy, radius, options,maxSides);
+            this.addBody(body);
+            return body;
+        }
+        /**
+         * Creates a body using the supplied vertices (or an array containing multiple sets of vertices).
+         * If the vertices are convex, they will pass through as supplied.
+         * Otherwise if the vertices are concave, they will be decomposed if [poly-decomp.js](https://github.com/schteppe/poly-decomp.js) is available.
+         * Note that this process is not guaranteed to support complex sets of vertices (e.g. those with holes may fail).
+         * By default the decomposition will discard collinear edges (to improve performance).
+         * It can also optionally discard any parts that have an area less than `minimumArea`.
+         * If the vertices can not be decomposed, the result will fall back to using the convex hull.
+         * The options parameter is an object that specifies any `Matter.Body` properties you wish to override the defaults.
+         * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
+         * @param posx 中心点x
+         * @param posy 中心点y
+         * @param vertexSets 顶点集合
+         * @param options 初始化选项
+         * @param flagInternal 内部模式标记
+         * @param removeCollinear 共线移除参考值
+         * @param minimumArea 最小面积
+         */
+        ConvexHullBodyByInitData(posx: number, posy: number,vertexSets:number[],options: IBodyData,flagInternal = false, removeCollinear = 0.01, minimumArea:10){
+            let body = Matter.Bodies.fromVertices(posx, posy, vertexSets, options, flagInternal , removeCollinear , minimumArea);
             this.addBody(body);
             return body;
         }

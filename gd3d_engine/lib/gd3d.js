@@ -6389,7 +6389,7 @@ var gd3d;
                 this._physicsEngine.setMass(this.body, mass);
             };
             bassBody.prototype.setInitData = function (att) {
-                this.initData = att;
+                this.options = att;
             };
             bassBody.prototype.setPosition = function (pos) {
                 this._physicsEngine.setPosition(this.body, pos);
@@ -6417,11 +6417,12 @@ var gd3d;
             function circleBody() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.radius = 1;
+                _this.maxSides = 25;
                 return _this;
             }
             circleBody.prototype.start = function () {
-                var data = this.initData || {};
-                this.body = this._physicsEngine.creatCircleBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.radius, data);
+                var data = this.options || {};
+                this.body = this._physicsEngine.creatCircleBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.radius, data, this.maxSides);
             };
             circleBody.prototype.onPlay = function () {
             };
@@ -6432,6 +6433,35 @@ var gd3d;
             return circleBody;
         }(framework.bassBody));
         framework.circleBody = circleBody;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ConvexHullBody = (function (_super) {
+            __extends(ConvexHullBody, _super);
+            function ConvexHullBody() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.vertexSets = [];
+                _this.flagInternal = false;
+                _this.removeCollinear = 0.01;
+                return _this;
+            }
+            ConvexHullBody.prototype.start = function () {
+                var data = this.options || {};
+                var pos = this.transform.localTranslate;
+                this.body = this._physicsEngine.ConvexHullBodyByInitData(pos.x, pos.y, this.vertexSets, data, this.flagInternal, this.removeCollinear, this.minimumArea);
+            };
+            ConvexHullBody.prototype.onPlay = function () {
+            };
+            ConvexHullBody.ClassName = "ConvexHullBody";
+            ConvexHullBody = __decorate([
+                gd3d.reflect.node2DComponent
+            ], ConvexHullBody);
+            return ConvexHullBody;
+        }(framework.bassBody));
+        framework.ConvexHullBody = ConvexHullBody;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -6457,13 +6487,21 @@ var gd3d;
             physicEngine2D.prototype.update = function (delta) {
                 Matter.Engine.update(this.matterEngine, delta);
             };
-            physicEngine2D.prototype.creatRectBodyByInitData = function (posx, posy, width, height, initData) {
-                var body = Matter.Bodies.rectangle(posx, posy, width, height, initData);
+            physicEngine2D.prototype.creatRectBodyByInitData = function (posx, posy, width, height, options) {
+                var body = Matter.Bodies.rectangle(posx, posy, width, height, options);
                 this.addBody(body);
                 return body;
             };
-            physicEngine2D.prototype.creatCircleBodyByInitData = function (posx, posy, radius, initData) {
-                var body = Matter.Bodies.circle(posx, posy, radius, initData);
+            physicEngine2D.prototype.creatCircleBodyByInitData = function (posx, posy, radius, options, maxSides) {
+                if (maxSides === void 0) { maxSides = 25; }
+                var body = Matter.Bodies.circle(posx, posy, radius, options, maxSides);
+                this.addBody(body);
+                return body;
+            };
+            physicEngine2D.prototype.ConvexHullBodyByInitData = function (posx, posy, vertexSets, options, flagInternal, removeCollinear, minimumArea) {
+                if (flagInternal === void 0) { flagInternal = false; }
+                if (removeCollinear === void 0) { removeCollinear = 0.01; }
+                var body = Matter.Bodies.fromVertices(posx, posy, vertexSets, options, flagInternal, removeCollinear, minimumArea);
                 this.addBody(body);
                 return body;
             };
@@ -6534,7 +6572,7 @@ var gd3d;
                 return _super !== null && _super.apply(this, arguments) || this;
             }
             rectBody.prototype.start = function () {
-                var data = this.initData || {};
+                var data = this.options || {};
                 this.body = this._physicsEngine.creatRectBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.transform.width, this.transform.height, data);
             };
             rectBody.prototype.onPlay = function () {
@@ -14408,6 +14446,9 @@ var gd3d;
             camera.prototype.onPlay = function () {
             };
             camera.prototype.update = function (delta) {
+                this._updateOverLays(delta);
+            };
+            camera.prototype._updateOverLays = function (delta) {
                 for (var i = 0; i < this.overlays.length; i++) {
                     if (!this.overlays[i].init) {
                         this.overlays[i].start(this);
@@ -14931,6 +14972,12 @@ var gd3d;
                             return;
                         var scene_2 = this.gameObject.getScene();
                         scene_2.addScreenSpaceOverlay(this._overlay2d);
+                        break;
+                    case canvasRenderMode.ScreenSpaceOverlay:
+                        console.warn("not support now of " + canvasRenderMode[canvasRenderMode.ScreenSpaceOverlay] + " mode");
+                        break;
+                    case canvasRenderMode.WorldSpace:
+                        console.warn("not support now of " + canvasRenderMode[canvasRenderMode.WorldSpace] + " mode");
                         break;
                 }
             };

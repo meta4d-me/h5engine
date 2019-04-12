@@ -13,12 +13,11 @@ namespace gd3d.framework
     export class rectBody extends bassBody implements I2DComponent
     {
         static readonly ClassName:string="rectBody";
-
         transform: transform2D;
+        
         start() {
-            let data = this.initData || {};
+            let data = this.options || {};
             this.body=this._physicsEngine.creatRectBodyByInitData(this.transform.localTranslate.x,this.transform.localTranslate.y,this.transform.width,this.transform.height,data);
-            //this.body=physic2D.creatRectBody(this.transform.localTranslate.x,this.transform.localTranslate.y,this.transform.width,this.transform.height,this.beStatic);
         }
         onPlay(){
 

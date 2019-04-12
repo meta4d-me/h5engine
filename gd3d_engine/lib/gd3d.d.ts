@@ -979,7 +979,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     interface I2DBody {
-        initData: IBodyData;
+        options: IBodyData;
         transform: transform2D;
         body: Ibody;
         addForce(Force: gd3d.math.vector2): any;
@@ -1028,7 +1028,7 @@ declare namespace gd3d.framework {
         setFrictionStatic(frictionStatic: number): void;
         setRestitution(restitution: number): void;
         setMass(mass: number): void;
-        initData: IBodyData;
+        options: IBodyData;
         setInitData(att: IBodyData): void;
         setPosition(pos: math.vector2): void;
         update(delta: number): void;
@@ -1040,6 +1040,20 @@ declare namespace gd3d.framework {
         static readonly ClassName: string;
         transform: transform2D;
         radius: number;
+        maxSides: number;
+        start(): void;
+        onPlay(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ConvexHullBody extends bassBody implements I2DComponent {
+        static readonly ClassName: string;
+        vertexSets: number[];
+        options: IBodyData;
+        flagInternal: boolean;
+        removeCollinear: number;
+        minimumArea: 10;
+        transform: transform2D;
         start(): void;
         onPlay(): void;
     }
@@ -1060,8 +1074,9 @@ declare namespace gd3d.framework {
         private matterVector;
         constructor(op?: IEngine2DOP);
         update(delta: number): void;
-        creatRectBodyByInitData(posx: number, posy: number, width: number, height: number, initData: IBodyData): any;
-        creatCircleBodyByInitData(posx: number, posy: number, radius: number, initData: IBodyData): any;
+        creatRectBodyByInitData(posx: number, posy: number, width: number, height: number, options: IBodyData): any;
+        creatCircleBodyByInitData(posx: number, posy: number, radius: number, options: IBodyData, maxSides?: number): any;
+        ConvexHullBodyByInitData(posx: number, posy: number, vertexSets: number[], options: IBodyData, flagInternal: boolean, removeCollinear: number, minimumArea: 10): any;
         addBody(body: Ibody): void;
         applyForce(body: Ibody, positon: math.vector2, force: math.vector2): void;
         applyForceAtCenter(body: Ibody, force: math.vector2): void;
@@ -2509,6 +2524,7 @@ declare namespace gd3d.framework {
         start(): void;
         onPlay(): void;
         update(delta: number): void;
+        private _updateOverLays(delta);
         clearOption_Color: boolean;
         clearOption_Depth: boolean;
         backgroundColor: gd3d.math.color;
