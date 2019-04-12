@@ -203,13 +203,15 @@ namespace gd3d.framework
                 if(i == this.renderCameras.length-1) {
                     this.renderCameras[i].isLastCamera = true;
                 }
-                this._renderCamera(i);
+                if(this.app && this.app.beRendering){
+                    this._renderCamera(i);
+                }
                 this.renderCameras[i].isLastCamera = false;
             }
 
             this.updateSceneOverLay(delta);
 
-            if (this.RealCameraNumber == 0)
+            if (this.RealCameraNumber == 0 && this.app && this.app.beRendering)
             {
                 this.webgl.clearColor(0, 0, 0, 1);
                 this.webgl.clearDepth(1.0);
@@ -262,7 +264,9 @@ namespace gd3d.framework
                     {
                         overlay.start(targetcamera);
                         overlay.update(delta);
-                        overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
+                        if(this.app && this.app.beRendering){
+                            overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
+                        }
                     }
                 });
             }
