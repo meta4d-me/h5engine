@@ -10,9 +10,9 @@ namespace gd3d.framework
      * @version gd3d 1.0
      */
     @reflect.node2DComponent
-    export class ConvexHullBody extends bassBody implements I2DComponent
+    export class convexHullBody2d extends bassBody implements I2DComponent
     {
-        static readonly ClassName:string="ConvexHullBody";
+        static readonly ClassName:string="convexHullBody2d";
         vertexSets:number[] = [];
         options: IBodyData;
         flagInternal = false;

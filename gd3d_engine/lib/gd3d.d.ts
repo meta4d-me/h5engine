@@ -1036,7 +1036,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class circleBody extends bassBody implements I2DComponent {
+    class circleBody2d extends bassBody implements I2DComponent {
         static readonly ClassName: string;
         transform: transform2D;
         radius: number;
@@ -1046,7 +1046,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class ConvexHullBody extends bassBody implements I2DComponent {
+    class convexHullBody2d extends bassBody implements I2DComponent {
         static readonly ClassName: string;
         vertexSets: number[];
         options: IBodyData;
@@ -1119,7 +1119,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class rectBody extends bassBody implements I2DComponent {
+    class rectBody2d extends bassBody implements I2DComponent {
         static readonly ClassName: string;
         transform: transform2D;
         start(): void;

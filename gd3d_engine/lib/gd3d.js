@@ -6412,56 +6412,56 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var circleBody = (function (_super) {
-            __extends(circleBody, _super);
-            function circleBody() {
+        var circleBody2d = (function (_super) {
+            __extends(circleBody2d, _super);
+            function circleBody2d() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.radius = 1;
                 _this.maxSides = 25;
                 return _this;
             }
-            circleBody.prototype.start = function () {
+            circleBody2d.prototype.start = function () {
                 var data = this.options || {};
                 this.body = this._physicsEngine.creatCircleBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.radius, data, this.maxSides);
             };
-            circleBody.prototype.onPlay = function () {
+            circleBody2d.prototype.onPlay = function () {
             };
-            circleBody.ClassName = "circleBody";
-            circleBody = __decorate([
+            circleBody2d.ClassName = "circleBody2d";
+            circleBody2d = __decorate([
                 gd3d.reflect.node2DComponent
-            ], circleBody);
-            return circleBody;
+            ], circleBody2d);
+            return circleBody2d;
         }(framework.bassBody));
-        framework.circleBody = circleBody;
+        framework.circleBody2d = circleBody2d;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var ConvexHullBody = (function (_super) {
-            __extends(ConvexHullBody, _super);
-            function ConvexHullBody() {
+        var convexHullBody2d = (function (_super) {
+            __extends(convexHullBody2d, _super);
+            function convexHullBody2d() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.vertexSets = [];
                 _this.flagInternal = false;
                 _this.removeCollinear = 0.01;
                 return _this;
             }
-            ConvexHullBody.prototype.start = function () {
+            convexHullBody2d.prototype.start = function () {
                 var data = this.options || {};
                 var pos = this.transform.localTranslate;
                 this.body = this._physicsEngine.ConvexHullBodyByInitData(pos.x, pos.y, this.vertexSets, data, this.flagInternal, this.removeCollinear, this.minimumArea);
             };
-            ConvexHullBody.prototype.onPlay = function () {
+            convexHullBody2d.prototype.onPlay = function () {
             };
-            ConvexHullBody.ClassName = "ConvexHullBody";
-            ConvexHullBody = __decorate([
+            convexHullBody2d.ClassName = "convexHullBody2d";
+            convexHullBody2d = __decorate([
                 gd3d.reflect.node2DComponent
-            ], ConvexHullBody);
-            return ConvexHullBody;
+            ], convexHullBody2d);
+            return convexHullBody2d;
         }(framework.bassBody));
-        framework.ConvexHullBody = ConvexHullBody;
+        framework.convexHullBody2d = convexHullBody2d;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -6566,24 +6566,24 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var rectBody = (function (_super) {
-            __extends(rectBody, _super);
-            function rectBody() {
+        var rectBody2d = (function (_super) {
+            __extends(rectBody2d, _super);
+            function rectBody2d() {
                 return _super !== null && _super.apply(this, arguments) || this;
             }
-            rectBody.prototype.start = function () {
+            rectBody2d.prototype.start = function () {
                 var data = this.options || {};
                 this.body = this._physicsEngine.creatRectBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.transform.width, this.transform.height, data);
             };
-            rectBody.prototype.onPlay = function () {
+            rectBody2d.prototype.onPlay = function () {
             };
-            rectBody.ClassName = "rectBody";
-            rectBody = __decorate([
+            rectBody2d.ClassName = "rectBody2d";
+            rectBody2d = __decorate([
                 gd3d.reflect.node2DComponent
-            ], rectBody);
-            return rectBody;
+            ], rectBody2d);
+            return rectBody2d;
         }(framework.bassBody));
-        framework.rectBody = rectBody;
+        framework.rectBody2d = rectBody2d;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
