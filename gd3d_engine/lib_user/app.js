@@ -14088,7 +14088,7 @@ var physic2d_dome = (function () {
         bound3.pivot.y = 0.5;
         var boundimag3 = bound3.addComponent("rawImage2D");
         boundimag3.image = texture;
-        var body3 = bound3.addComponent("rectBody");
+        var body3 = bound3.addComponent("rectBody2d");
         body3.setInitData({ isStatic: true });
         root.addChild(bound3);
         return bound3;
@@ -14103,7 +14103,7 @@ var physic2d_dome = (function () {
         bound3.pivot.y = 0.5;
         var boundimag3 = bound3.addComponent("rawImage2D");
         boundimag3.image = texture;
-        var body3 = bound3.addComponent("rectBody");
+        var body3 = bound3.addComponent("rectBody2d");
         setTimeout(function () {
             body3.addForce(new gd3d.math.vector2(1, 0));
         }, 3000);
