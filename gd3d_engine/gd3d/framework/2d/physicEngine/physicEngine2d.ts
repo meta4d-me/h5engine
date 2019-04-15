@@ -112,7 +112,7 @@ namespace gd3d.framework {
          * @param removeCollinear 共线移除参考值
          * @param minimumArea 最小面积
          */
-        ConvexHullBodyByInitData(posx: number, posy: number,vertexSets:number[],options: IBodyData,flagInternal = false, removeCollinear = 0.01, minimumArea:10){
+        ConvexHullBodyByInitData(posx: number, posy: number,vertexSets:math.vector2[],options: IBodyData,flagInternal = false, removeCollinear = 0.01, minimumArea = 10){
             let body = Matter.Bodies.fromVertices(posx, posy, vertexSets, options, flagInternal , removeCollinear , minimumArea);
             this.addBody(body);
             return body;
@@ -181,6 +181,11 @@ namespace gd3d.framework {
         public removeBody(body: Ibody) {
 
             Matter.World.remove(this.engineWorld, body);
+        }
+
+        /** 清理世界 */
+        clearWorld(keepStatic:boolean = false){
+            Matter.World.clear(this.engineWorld,keepStatic);
         }
     }
 

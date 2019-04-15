@@ -13,11 +13,11 @@ namespace gd3d.framework
     export class convexHullBody2d extends bassBody implements I2DComponent
     {
         static readonly ClassName:string="convexHullBody2d";
-        vertexSets:number[] = [];
+        vertexSets: math.vector2[] = [];
         options: IBodyData;
-        flagInternal = false;
-        removeCollinear = 0.01;
-        minimumArea:10;
+        flagInternal : boolean = false;
+        removeCollinear : number = 0.01;
+        minimumArea : number = 10;
 
         transform: transform2D;
         start() {
