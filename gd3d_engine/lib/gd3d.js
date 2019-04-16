@@ -6472,10 +6472,13 @@ var gd3d;
                 var offset = center;
                 gd3d.math.vec2ScaleByNum(center, -1, offset);
                 var newPos = offset;
-                gd3d.math.vec2Add(this.transform.localTranslate, offset, newPos);
+                var add = gd3d.poolv2(this.transform.localTranslate);
+                gd3d.math.vec2ScaleByNum(add, 2, add);
+                gd3d.math.vec2Add(add, offset, newPos);
                 this.setPosition(newPos);
                 this.transform.markDirty();
                 gd3d.poolv2_del(center);
+                gd3d.poolv2_del(add);
             };
             convexHullBody2d.prototype.calceBoundingCenter = function (max, min, center) {
                 center.x = (max.x + min.x) / 2;

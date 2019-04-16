@@ -34,10 +34,13 @@ namespace gd3d.framework
             let offset  = center;
             math.vec2ScaleByNum(center,-1,offset);
             let newPos = offset;
-            math.vec2Add(this.transform.localTranslate,offset,newPos);
+            let add = poolv2(this.transform.localTranslate);
+            math.vec2ScaleByNum(add,2,add);
+            math.vec2Add(add ,offset ,newPos);
             this.setPosition(newPos);
             this.transform.markDirty();
             poolv2_del(center);
+            poolv2_del(add);
         }
 
         private calceBoundingCenter(max:{x:number,y:number},min:{x:number,y:number},center:math.vector2){
