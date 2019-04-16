@@ -980,11 +980,11 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    interface I2DBody {
+    interface I2DPhysicsBody {
         options: IBodyData;
         transform: transform2D;
         body: Ibody;
-        addForce(Force: gd3d.math.vector2): any;
+        addForce(Force: math.vector2): any;
         setVelocity(velocity: math.vector2): any;
         setDesity(Desity: number): any;
         setFrictionAir(frictionAir: number): any;
@@ -992,6 +992,7 @@ declare namespace gd3d.framework {
         setFrictionStatic(frictionStatic: number): any;
         setRestitution(restitution: number): any;
         setMass(mass: number): any;
+        setPosition(pos: math.vector2): any;
     }
     interface IBodyData {
         mass?: number;
@@ -1008,7 +1009,7 @@ declare namespace gd3d.framework {
         tag?: string;
         name?: string;
     }
-    class bassBody implements I2DBody {
+    abstract class bassBody implements I2DPhysicsBody {
         protected _physicsEngine: physicEngine2D;
         constructor();
         transform: transform2D;
@@ -1057,6 +1058,7 @@ declare namespace gd3d.framework {
         minimumArea: number;
         transform: transform2D;
         start(): void;
+        private calceBoundingCenter(max, min, center);
         onPlay(): void;
     }
 }
@@ -1075,11 +1077,16 @@ declare namespace gd3d.framework {
         private engineWorld;
         private matterVector;
         constructor(op?: IEngine2DOP);
+        private beforeUpdate(event);
+        private afterRender(event);
         update(delta: number): void;
-        creatRectBodyByInitData(posx: number, posy: number, width: number, height: number, options: IBodyData): any;
-        creatCircleBodyByInitData(posx: number, posy: number, radius: number, options: IBodyData, maxSides?: number): any;
-        ConvexHullBodyByInitData(posx: number, posy: number, vertexSets: math.vector2[], options: IBodyData, flagInternal?: boolean, removeCollinear?: number, minimumArea?: number): any;
-        addBody(body: Ibody): void;
+        creatRectBodyByInitData(pBody: I2DPhysicsBody): any;
+        creatCircleBodyByInitData(pBody: I2DPhysicsBody, radius: number, maxSides?: number): any;
+        ConvexHullBodyByInitData(pBody: I2DPhysicsBody, vertexSets: any, flagInternal?: boolean, removeCollinear?: number, minimumArea?: number): any;
+        private _physicsBodys;
+        private addBody(_Pbody);
+        removeBody(_Pbody: I2DPhysicsBody): void;
+        clearWorld(keepStatic?: boolean): void;
         applyForce(body: Ibody, positon: math.vector2, force: math.vector2): void;
         applyForceAtCenter(body: Ibody, force: math.vector2): void;
         setGravity(x: number, y: number): void;
@@ -1095,10 +1102,18 @@ declare namespace gd3d.framework {
         private set(body, settings, value);
         addEvent(eventname: string, callback: Function): void;
         removeEvent(eventname: string, callback: Function): void;
-        removeBody(body: Ibody): void;
-        clearWorld(keepStatic?: boolean): void;
     }
     interface Ibody {
+        bounds: {
+            max: {
+                x: number;
+                y: number;
+            };
+            min: {
+                x: number;
+                y: number;
+            };
+        };
         angle: number;
         position: matterVector;
         speed: number;

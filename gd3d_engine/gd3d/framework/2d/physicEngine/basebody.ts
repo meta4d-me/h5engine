@@ -1,10 +1,10 @@
 namespace gd3d.framework {
-    export interface I2DBody {
+    export interface I2DPhysicsBody {
         options: IBodyData;
         // beStatic:boolean;
         transform: transform2D;
         body: Ibody;
-        addForce(Force: gd3d.math.vector2);
+        addForce(Force: math.vector2);
         setVelocity(velocity: math.vector2);
         setDesity(Desity: number);
         setFrictionAir(frictionAir: number);
@@ -12,6 +12,7 @@ namespace gd3d.framework {
         setFrictionStatic(frictionStatic: number);
         setRestitution(restitution: number);
         setMass(mass: number);
+        setPosition(pos:math.vector2);
     }
     export interface IBodyData {
         mass?: number;
@@ -28,8 +29,8 @@ namespace gd3d.framework {
         tag?: string;
         name?: string;
     }
-
-    export class bassBody implements I2DBody {
+ 
+    export abstract class bassBody implements I2DPhysicsBody {
         /** 2d物理引擎实例对象 */
         protected _physicsEngine : physicEngine2D;
         constructor(){
@@ -169,7 +170,7 @@ namespace gd3d.framework {
             this._physicsEngine.setMass(this.body, mass);
         }
 
-        options: IBodyData;
+        options: IBodyData = {};
         setInitData(att: IBodyData) {
             this.options = att;
         }
@@ -179,13 +180,15 @@ namespace gd3d.framework {
         }
 
         update(delta: number) {
+            if(!this.body)return;
             this.transform.localTranslate.x = this.body.position.x;
             this.transform.localTranslate.y = this.body.position.y;
             this.transform.localRotate = this.body.angle;
             this.transform.markDirty();
         }
         remove() {
-            this._physicsEngine.removeBody(this.body);
+            this._physicsEngine.removeBody(this);
+            this.body = null;
         }
     }
 }

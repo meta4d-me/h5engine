@@ -23,9 +23,28 @@ namespace gd3d.framework
         start() {
             let data = this.options || {};
             let pos = this.transform.localTranslate;
-            this.body=this._physicsEngine.ConvexHullBodyByInitData(pos.x,pos.y,this.vertexSets,data,this.flagInternal,this.removeCollinear,this.minimumArea);
+            this._physicsEngine.ConvexHullBodyByInitData(this,this.vertexSets,this.flagInternal,this.removeCollinear,this.minimumArea);
             //this.body=physic2D.creatRectBody(this.transform.localTranslate.x,this.transform.localTranslate.y,this.transform.width,this.transform.height,this.beStatic);
+            
+            //校准 重心 初始位置
+            let max = this.body.bounds.max;
+            let min = this.body.bounds.min;
+            let center = poolv2();
+            this.calceBoundingCenter(max,min,center);
+            let offset  = center;
+            math.vec2ScaleByNum(center,-1,offset);
+            let newPos = offset;
+            math.vec2Add(this.transform.localTranslate,offset,newPos);
+            this.setPosition(newPos);
+            this.transform.markDirty();
+            poolv2_del(center);
         }
+
+        private calceBoundingCenter(max:{x:number,y:number},min:{x:number,y:number},center:math.vector2){
+            center.x = (max.x + min.x)/2;
+            center.y = (max.y + min.y)/2;
+        }
+
         onPlay(){
 
         }

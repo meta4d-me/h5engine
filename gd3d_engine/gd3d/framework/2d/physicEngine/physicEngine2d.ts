@@ -30,52 +30,39 @@ namespace gd3d.framework {
 
             //---------run the engine
             Matter.Engine.run(this.matterEngine);
+
+            //Event
+            Matter.Events.on(this.matterEngine,"beforeUpdate",this.beforeUpdate.bind(this));
+            Matter.Events.on(this.matterEngine,"afterRender",this.afterRender.bind(this));
+        }
+
+        /** Matter.Engine update 调用前 */
+        private beforeUpdate(event){
+
+        }
+
+        /** Matter.Engine update 调用之后 */
+        private afterRender(event){
+
         }
 
         update(delta: number) {
             Matter.Engine.update(this.matterEngine, delta);
         }
-        // public creatRectBody(posx:number,posy:number,width:number,height:number,beStatic:boolean=false):Ibody
-        // {
-        //     let body:Ibody;
-        //     if(beStatic)
-        //     {
-        //         body=Matter.Bodies.rectangle(posx,posy,width,height,{isStatic: true});
-        //     }else
-        //     {
-        //         body=Matter.Bodies.rectangle(posx,posy,width,height);
-        //     }
-        //     this.addBody(body);
-        //     return body;
-        // }
-
-        // public creatCircle(posx:number,posy:number,radius:number,beStatic:boolean=false):Ibody
-        // {
-        //     let body:Ibody;
-        //     if(beStatic)
-        //     {
-        //         body=Matter.Bodies.circle(posx, posy, radius,{isStatic: true});
-        //     }else
-        //     {
-        //         body=Matter.Bodies.circle(posx, posy, radius);
-        //     }
-        //     this.addBody(body);
-        //     return body;
-        // }
 
         /**
          * Creates a new rigid body model with a circle hull. 
          * The options parameter is an object that specifies any properties you wish to override the defaults.
          * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
-         * @param posx 中心点x
-         * @param posy 中心点x
-         * @param width 矩形宽度
-         * @param height 矩形高度
-         * @param options 初始化选项
+         * @param pBody I2DPhysicsBody 实例
          */
-        public creatRectBodyByInitData(posx: number, posy: number, width: number, height: number, options: IBodyData) {
-            let body = Matter.Bodies.rectangle(posx, posy, width, height, options);
-            this.addBody(body);
+        public creatRectBodyByInitData(pBody :I2DPhysicsBody ) {
+            if(!pBody || !pBody.transform) return;
+            let tran = pBody.transform;
+            let pos = tran.getWorldTranslate();
+            let body = Matter.Bodies.rectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
+            pBody.body = body;
+            this.addBody(pBody);
             return body;
         }
 
@@ -83,15 +70,17 @@ namespace gd3d.framework {
          * Creates a new rigid body model with a circle hull. 
          * The options parameter is an object that specifies any properties you wish to override the defaults.
          * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
-         * @param posx 中心点x
-         * @param posy 中心点x
+         * @param pBody I2DPhysicsBody 实例
          * @param radius 半径
-         * @param options 初始化选项
          * @param maxSides 最大边
          */
-        public creatCircleBodyByInitData(posx: number, posy: number, radius: number, options: IBodyData , maxSides: number = 25) {
-            let body = Matter.Bodies.circle(posx, posy, radius, options,maxSides);
-            this.addBody(body);
+        public creatCircleBodyByInitData(pBody :I2DPhysicsBody , radius: number, maxSides: number = 25) {
+            if(!pBody || !pBody.transform) return;
+            let tran = pBody.transform;
+            let pos = tran.getWorldTranslate();
+            let body = Matter.Bodies.circle(pos.x, pos.y, radius, pBody.options ,maxSides);
+            pBody.body = body;
+            this.addBody(pBody);
             return body;
         }
         /**
@@ -104,22 +93,43 @@ namespace gd3d.framework {
          * If the vertices can not be decomposed, the result will fall back to using the convex hull.
          * The options parameter is an object that specifies any `Matter.Body` properties you wish to override the defaults.
          * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
-         * @param posx 中心点x
-         * @param posy 中心点y
+         * @param pBody I2DPhysicsBody 实例
          * @param vertexSets 顶点集合
-         * @param options 初始化选项
          * @param flagInternal 内部模式标记
          * @param removeCollinear 共线移除参考值
          * @param minimumArea 最小面积
          */
-        ConvexHullBodyByInitData(posx: number, posy: number,vertexSets:math.vector2[],options: IBodyData,flagInternal = false, removeCollinear = 0.01, minimumArea = 10){
-            let body = Matter.Bodies.fromVertices(posx, posy, vertexSets, options, flagInternal , removeCollinear , minimumArea);
-            this.addBody(body);
+        ConvexHullBodyByInitData(pBody :I2DPhysicsBody ,vertexSets , flagInternal = false, removeCollinear = 0.01, minimumArea = 10){
+            if(!pBody || !pBody.transform) return;
+            let tran = pBody.transform;
+            let pos = tran.getWorldTranslate();
+            let body = Matter.Bodies.fromVertices(pos.x, pos.y, vertexSets, pBody.options, flagInternal , removeCollinear , minimumArea);
+            pBody.body = body;
+            this.addBody(pBody,);
             return body;
         }
 
-        public addBody(body: Ibody) {
-            Matter.World.add(this.engineWorld, body);
+        private _physicsBodys : I2DPhysicsBody[]  = [];
+
+        /** 添加 I2DPhysicsBody 实例到 2d物理世界*/
+        private addBody(_Pbody: I2DPhysicsBody){
+            this._physicsBodys.push(_Pbody);
+            Matter.World.add(this.engineWorld, _Pbody.body);
+        }
+
+        /** 移除 指定 I2DPhysicsBody 实例 */
+        removeBody(_Pbody: I2DPhysicsBody) {
+            if(!_Pbody) return;
+            let idx = this._physicsBodys.indexOf(_Pbody);
+            if(idx != -1){
+                this._physicsBodys.splice(idx,1);
+            }
+            Matter.World.remove(this.engineWorld, _Pbody.body);
+        }
+
+        /** 清理世界 */
+        clearWorld(keepStatic:boolean = false){
+            Matter.World.clear(this.engineWorld,keepStatic);
         }
 
         public applyForce(body: Ibody, positon: math.vector2, force: math.vector2): void {
@@ -178,19 +188,11 @@ namespace gd3d.framework {
             Matter.Events.off(this.matterEngine, eventname, callback);
         }
 
-        public removeBody(body: Ibody) {
-
-            Matter.World.remove(this.engineWorld, body);
-        }
-
-        /** 清理世界 */
-        clearWorld(keepStatic:boolean = false){
-            Matter.World.clear(this.engineWorld,keepStatic);
-        }
+        
     }
 
     export interface Ibody {
-
+        bounds : {max:{x:number,y:number},min:{x:number,y:number}};
         angle: number;
         position: matterVector;
         speed: number;
