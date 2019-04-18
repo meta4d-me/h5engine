@@ -6605,10 +6605,10 @@ var gd3d;
             };
             Object.defineProperty(physicEngine2D.prototype, "enableSleeping", {
                 get: function () {
-                    return this.engineWorld.enableSleeping;
+                    return this.matterEngine.enableSleeping;
                 },
                 set: function (val) {
-                    this.engineWorld.enableSleeping = val;
+                    this.matterEngine.enableSleeping = val;
                 },
                 enumerable: true,
                 configurable: true

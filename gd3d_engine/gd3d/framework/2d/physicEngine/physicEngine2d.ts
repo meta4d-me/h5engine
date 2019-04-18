@@ -148,11 +148,11 @@ namespace gd3d.framework {
         }
 
         set enableSleeping (val:boolean){
-            this.engineWorld.enableSleeping = val;
+            this.matterEngine.enableSleeping = val;
         }
 
         get enableSleeping(){
-            return this.engineWorld.enableSleeping ;
+            return this.matterEngine.enableSleeping ;
         }
 
         public setVelocity(body: Ibody, velocity: math.vector2) {
