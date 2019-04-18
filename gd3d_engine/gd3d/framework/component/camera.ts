@@ -737,7 +737,13 @@ namespace gd3d.framework
         private _vec3cache = new gd3d.math.vector3();
         isCulling(node: transform) {
             const vec3cache = this._vec3cache;
-            const {aabb} = node;
+            let  {aabb} = node;
+            var skinmesh = node.gameObject.getComponent("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer;
+            if(skinmesh != null) {
+                // 如果有骨骼动画, 使用unity导出的aabb
+                // if (skinmesh.aabb != null)
+                aabb = skinmesh.aabb;
+            }
             gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, vec3cache);
             const radius = gd3d.math.vec3Length(vec3cache)/2;
             const center = node.aabb.center;

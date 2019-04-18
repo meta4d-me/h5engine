@@ -110,12 +110,12 @@ namespace gd3d.framework
         /**
          * @private
          */
-        // @gd3d.reflect.Field("vector3")
+        @gd3d.reflect.Field("vector3")
         center: math.vector3;
         /**
          * @private
          */
-        // @gd3d.reflect.Field("vector3")
+        @gd3d.reflect.Field("vector3")
         size: math.vector3;
         /**
          * 最大骨骼数量
@@ -126,6 +126,42 @@ namespace gd3d.framework
         private _efficient: boolean = true;
         //这个数据是扣掉tpose之后的
         private _skeletonMatrixData: Float32Array;
+
+        _aabb: aabb;
+        get aabb() {
+            if(!this._aabb) {
+                // calculate aabb from bounds
+                const {size, center} = this;
+                let max = gd3d.math.pool.new_vector3();
+                let min = gd3d.math.pool.new_vector3();
+                let temp = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3ScaleByNum(size, 0.5, min); // temp
+                // Ensure extent
+                min.x = Math.abs(min.x);
+                min.y = Math.abs(min.y);
+                min.z = Math.abs(min.z);
+
+                gd3d.math.vec3Add(center, min, max);
+                gd3d.math.vec3Subtract(center, min, min);
+
+                // Apply root bone matrix
+                // 骨骼可能有旋转之类的操作, aabb默认只会计算位移
+                const rootboneMat = this.rootBone.getWorldMatrix();
+                gd3d.math.matrixTransformVector3(max, rootboneMat, max);
+                gd3d.math.matrixTransformVector3(min, rootboneMat, min);
+
+                gd3d.math.vec3Max(max, min, temp);
+                gd3d.math.vec3Min(max, min, min);
+                gd3d.math.vec3Clone(temp, max);
+
+                this._aabb = new aabb(max, min);
+                gd3d.math.pool.delete_vector3(max);
+                gd3d.math.pool.delete_vector3(min);
+                gd3d.math.pool.delete_vector3(temp);
+            }
+            return this._aabb;
+        }
+
         start()
         {
 
@@ -139,7 +175,7 @@ namespace gd3d.framework
 
         /**
          * @private
-         * @param index 
+         * @param index
          */
         getMatByIndex(index: number)
         {
@@ -254,6 +290,17 @@ namespace gd3d.framework
             }
             return mat;
         }
+
+        calActualVertexByIndex(index: number, t: gd3d.math.vector3) {
+            let data = this.mesh.data;
+            let verindex = data.trisindex[index];
+            var p = data.pos[verindex];
+            let mat = this.getMatByIndex(verindex);
+            // gd3d.math.matrixMultiply(this.gameObject.transform.getLocalMatrix(), mat, mat);
+            if(mat == null)
+                debugger
+            gd3d.math.matrixTransformVector3(p, mat, t);
+        }
         /**
          * @public
          * @language zh_CN
@@ -266,63 +313,65 @@ namespace gd3d.framework
         {
             let ishided = false;
             let lastDistance = Number.MAX_VALUE;
-            let mvpmat = this.player.gameObject.transform.getWorldMatrix();
-            let data = this.mesh.data;
-            for (var i = 0; i < this.mesh.submesh.length; i++)
-            {
-                var submesh = this.mesh.submesh[i];
-                var t0 = gd3d.math.pool.new_vector3();
-                var t1 = gd3d.math.pool.new_vector3();
-                var t2 = gd3d.math.pool.new_vector3();
-                for (var index = submesh.start; index < submesh.size; index += 3)
+            if (this.player != null && this.player.gameObject) {
+                let mvpmat = this.player.gameObject.transform.getWorldMatrix();
+                let data = this.mesh.data;
+                for (var i = 0; i < this.mesh.submesh.length; i++)
                 {
-                    let verindex0 = data.trisindex[index];
-                    let verindex1 = data.trisindex[index + 1];
-                    let verindex2 = data.trisindex[index + 2];
-
-                    var p0 = data.pos[verindex0];
-                    var p1 = data.pos[verindex1];
-                    var p2 = data.pos[verindex2];
-
-                    let mat0 = this.getMatByIndex(verindex0);
-                    let mat1 = this.getMatByIndex(verindex1);
-                    let mat2 = this.getMatByIndex(verindex2);
-                    if (mat0 == null || mat1 == null || mat2 == null) continue;
-
-                    let mat00 = gd3d.math.pool.new_matrix();
-                    gd3d.math.matrixMultiply(mvpmat, mat0, mat00);
-                    let mat11 = gd3d.math.pool.new_matrix();
-                    gd3d.math.matrixMultiply(mvpmat, mat1, mat11);
-                    let mat22 = gd3d.math.pool.new_matrix();
-                    gd3d.math.matrixMultiply(mvpmat, mat2, mat22);
-
-                    gd3d.math.matrixTransformVector3(p0, mat00, t0);
-                    gd3d.math.matrixTransformVector3(p1, mat11, t1);
-                    gd3d.math.matrixTransformVector3(p2, mat22, t2);
-
-                    let tempinfo = math.pool.new_pickInfo();
-                    var bool = ray.intersectsTriangle(t0, t1, t2, tempinfo);
-                    if (bool)
+                    var submesh = this.mesh.submesh[i];
+                    var t0 = gd3d.math.pool.new_vector3();
+                    var t1 = gd3d.math.pool.new_vector3();
+                    var t2 = gd3d.math.pool.new_vector3();
+                    for (var index = submesh.start; index < submesh.size; index += 3)
                     {
-                        if (tempinfo.distance < 0) continue;
-                        if (lastDistance > tempinfo.distance)
+                        let verindex0 = data.trisindex[index];
+                        let verindex1 = data.trisindex[index + 1];
+                        let verindex2 = data.trisindex[index + 2];
+
+                        var p0 = data.pos[verindex0];
+                        var p1 = data.pos[verindex1];
+                        var p2 = data.pos[verindex2];
+
+                        let mat0 = this.getMatByIndex(verindex0);
+                        let mat1 = this.getMatByIndex(verindex1);
+                        let mat2 = this.getMatByIndex(verindex2);
+                        if (mat0 == null || mat1 == null || mat2 == null) continue;
+
+                        let mat00 = gd3d.math.pool.new_matrix();
+                        gd3d.math.matrixMultiply(mvpmat, mat0, mat00);
+                        let mat11 = gd3d.math.pool.new_matrix();
+                        gd3d.math.matrixMultiply(mvpmat, mat1, mat11);
+                        let mat22 = gd3d.math.pool.new_matrix();
+                        gd3d.math.matrixMultiply(mvpmat, mat2, mat22);
+
+                        gd3d.math.matrixTransformVector3(p0, mat00, t0);
+                        gd3d.math.matrixTransformVector3(p1, mat11, t1);
+                        gd3d.math.matrixTransformVector3(p2, mat22, t2);
+
+                        let tempinfo = math.pool.new_pickInfo();
+                        var bool = ray.intersectsTriangle(t0, t1, t2, tempinfo);
+                        if (bool)
                         {
-                            ishided = true;
-                            outInfo.cloneFrom(tempinfo);
-                            lastDistance = outInfo.distance;
-                            outInfo.faceId = index / 3;
-                            outInfo.subMeshId = i;
-                            var tdir = gd3d.math.pool.new_vector3();
-                            gd3d.math.vec3ScaleByNum(ray.direction, outInfo.distance, tdir);
-                            gd3d.math.vec3Add(ray.origin, tdir, outInfo.hitposition);
-                            gd3d.math.pool.delete_vector3(tdir);
+                            if (tempinfo.distance < 0) continue;
+                            if (lastDistance > tempinfo.distance)
+                            {
+                                ishided = true;
+                                outInfo.cloneFrom(tempinfo);
+                                lastDistance = outInfo.distance;
+                                outInfo.faceId = index / 3;
+                                outInfo.subMeshId = i;
+                                var tdir = gd3d.math.pool.new_vector3();
+                                gd3d.math.vec3ScaleByNum(ray.direction, outInfo.distance, tdir);
+                                gd3d.math.vec3Add(ray.origin, tdir, outInfo.hitposition);
+                                gd3d.math.pool.delete_vector3(tdir);
+                            }
                         }
+                        math.pool.delete_pickInfo(tempinfo);
                     }
-                    math.pool.delete_pickInfo(tempinfo);
+                    gd3d.math.pool.delete_vector3(t0);
+                    gd3d.math.pool.delete_vector3(t1);
+                    gd3d.math.pool.delete_vector3(t2);
                 }
-                gd3d.math.pool.delete_vector3(t0);
-                gd3d.math.pool.delete_vector3(t1);
-                gd3d.math.pool.delete_vector3(t2);
             }
             return ishided;
         }
@@ -347,7 +396,7 @@ namespace gd3d.framework
                 }
             }
 
-            if (this.player != null)
+            if (this.player != null && this.player.gameObject)
             {
                 this.player.fillPoseData(this._skeletonMatrixData, this.bones);
             }
@@ -357,7 +406,7 @@ namespace gd3d.framework
         {
             DrawCallInfo.inc.currentState=DrawCallEnum.SKinrender;
 
-            if (this.player != null)
+            if (this.player != null && this.player.gameObject)
             {
                 context.updateLightMask(this.gameObject.layer);
                 context.updateModel(this.player.gameObject.transform);

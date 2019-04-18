@@ -47,7 +47,7 @@ namespace gd3d.framework
     export class nodeComponent
     {
         static readonly ClassName:string="nodeComponent";
-        
+
         /**
          * @public
          * @language zh_CN
@@ -230,7 +230,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 设置自身的可见状态
-         * @param val 
+         * @param val
          * @version egret-gd3d 1.0
          */
         set visible(val: boolean)
@@ -272,7 +272,7 @@ namespace gd3d.framework
                     this.componentsInit[i].init = true;
                     if (bePlay)
                         this.componentsInit[i].comp.onPlay();
-                    else 
+                    else
                         this.componentsPlayed.push(this.componentsInit[i]);
                 }
                 this.componentsInit.length = 0;
@@ -543,6 +543,7 @@ namespace gd3d.framework
                     if (this.components[i].init)
                     {//已经初始化过
                         this.components[i].comp.remove();
+                        this.components[i].comp.gameObject = null;
                     }
                     this.remove(this.components[i].comp);
                     this.components.splice(i, 1);
@@ -588,6 +589,7 @@ namespace gd3d.framework
                     if (this.components[i].init)
                     {//已经初始化过
                         this.components[i].comp.remove();
+                        this.components[i].comp.gameObject = null;
                     }
                     this.remove(this.components[i].comp);
                     this.components.splice(i, 1);
@@ -609,6 +611,7 @@ namespace gd3d.framework
                 // if (this.components[i].init)
                 {//已经初始化过
                     this.components[i].comp.remove();
+                    this.components[i].comp.gameObject = null;
                 }
                 this.remove(this.components[i].comp);
             }
