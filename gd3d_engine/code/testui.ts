@@ -359,6 +359,9 @@ namespace t
         bere1 = false;
         update(delta: number)
         {
+            if(gd3d["__he__"]){
+                debugger;
+            }
             //this.cube.localTranslate = this.scene.pickCenter;
             //this.cube.markDirty();
             this.timer += delta;

@@ -25,9 +25,8 @@ class physic2d_dome implements IState {
         this.rooto2d = new gd3d.framework.overlay2D();
         this.camera.addOverLay(this.rooto2d);
 
-        this.scene.enable2DPhysics();
+        this.scene.enable2DPhysics(new gd3d.math.vector2(0,0));
 
-        gd3d.framework.physic2D.setGravity(0,0);
         //任务排队执行系统
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
         this.taskmgr.addTaskCall(this.createUI.bind(this));
@@ -68,7 +67,7 @@ class physic2d_dome implements IState {
         bound3.pivot.y=0.5;
         let boundimag3 = bound3.addComponent("rawImage2D") as gd3d.framework.rawImage2D;
         boundimag3.image = texture;
-        let body3=bound3.addComponent("rectBody") as gd3d.framework.rectBody;
+        let body3=bound3.addComponent("rectBody2d") as gd3d.framework.rectBody2d;
         body3.setInitData({isStatic:true});
 
         root.addChild(bound3);
@@ -86,7 +85,7 @@ class physic2d_dome implements IState {
         bound3.pivot.y=0.5;
         let boundimag3 = bound3.addComponent("rawImage2D") as gd3d.framework.rawImage2D;
         boundimag3.image = texture;
-        let body3=bound3.addComponent("rectBody") as gd3d.framework.rectBody;
+        let body3=bound3.addComponent("rectBody2d") as gd3d.framework.rectBody2d;
 
         setTimeout(()=>{
             body3.addForce(new gd3d.math.vector2(1,0));

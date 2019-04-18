@@ -28,4 +28,22 @@ class datGui {
         return p;
     }
 
+    /** 使用样例 */
+    static example(){
+        let FizzyText = function() {
+            this.message = 'dat.gui';
+            this.speed = 0.8;
+            this.displayOutline = false;
+            this.explode = function() { console.log(`do explode`) };
+            // Define render logic ...
+          };
+
+        let text = new FizzyText();
+        let gui = new dat.GUI();
+        gui.add(text, 'message');
+        gui.add(text, 'speed', -5, 5);
+        gui.add(text, 'displayOutline');
+        gui.add(text, 'explode');
+    }
+
 }

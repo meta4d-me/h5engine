@@ -170,6 +170,10 @@ namespace gd3d.framework
             this.rootNode.canvas = this;
         }
 
+
+        private _peCareListBuoy : number = -1;
+        private _pointEventCareList : number[] = [];
+
         /**
          * @public
          * @language zh_CN
@@ -331,7 +335,7 @@ namespace gd3d.framework
             {//updateinput
                 //重置event
                 this.pointEvent.eated = false;
-                let tv2 = helpv2();
+                let tv2 = poolv2();
                 tv2.x = this.pointEvent.x = XOnModelSpace;
                 tv2.y = this.pointEvent.y = YOnModelSpace;
                 this.pointEvent.selected = null;
@@ -364,20 +368,79 @@ namespace gd3d.framework
                 if (!skip)
                 {
                     if(this.scene.app.bePlay){
-                        this.rootNode.onCapturePointEvent(this, this.pointEvent);
-                        this.rootNode.onPointEvent(this, this.pointEvent);
+                        // this.rootNode.onCapturePointEvent(this, this.pointEvent);
+                        // this.rootNode.onPointEvent(this, this.pointEvent);
+                        
+                        //优化
+                        // this.capturePointFlow();  //多余 flow
+                        this.popPointFlow();
                     }
                     this.pointDown = touch;
                     this.pointX = this.pointEvent.x;
                     this.pointY = this.pointEvent.y;
                 }
+
+                gd3d.poolv2_del(tv2);
             }
 
             this.rootNode.updateTran(false);
             //this.rootNode.update(delta);
             if (this.scene.app.bePlay)
             {
+                this._peCareListBuoy = -1;
                 this.objupdate(this.rootNode,delta);
+            }
+        }
+
+        //捕获阶段流
+        private capturePointFlow(){
+            //event 捕捉阶段，自上而下
+            var list = this._pointEventCareList;
+            var buoy = this._peCareListBuoy;
+            var ev = this.pointEvent;
+            var Eated = false;
+            while(buoy >= 0 ){
+                let idx = this._peCareListBuoy - buoy;
+                let node = transform2D.getTransform2DById(list[idx]);
+                if (node.components ) {
+                    for (var i = 0; i <= node.components.length; i++) {
+                        if (ev.eated == false) {
+                            var comp = node.components[i];
+                            if (comp && comp.init && instanceOfI2DPointListener(comp.comp) ) {
+                                (comp.comp as any).onPointEvent(canvas, ev, true);
+                                Eated = ev.eated;
+                                if(ev.eated)   break;
+                            }
+                        }
+                    }
+                }
+                buoy--;
+                if(Eated) break;
+            }
+        }
+
+        //冒泡阶段流
+        private popPointFlow(){
+            var list = this._pointEventCareList;
+            var buoy = this._peCareListBuoy;
+            var ev = this.pointEvent;
+            var Eated = false;
+            while(buoy >= 0 ){
+                let node = transform2D.getTransform2DById(list[buoy]);
+                if (node.components ) {
+                    for (var i = 0; i <= node.components.length; i++) {
+                        if (ev.eated == false) {
+                            var comp = node.components[i];
+                            if (comp && comp.init && instanceOfI2DPointListener(comp.comp) ) {
+                                (comp.comp as any).onPointEvent(canvas, ev, false);
+                                Eated = ev.eated;
+                                if(ev.eated)   break;
+                            }
+                        }
+                    }
+                }
+                buoy--;
+                if(Eated) break;
             }
         }
 
@@ -386,14 +449,32 @@ namespace gd3d.framework
             if(!node.visible) return;
 
             node.init(this.scene.app.bePlay);//组件还未初始化的初始化
-            if (node.components.length > 0)
+            let compLen = node.components.length;
+            if (compLen > 0)
             {
-                node.update(delta);
+                for (let i = 0; i < compLen; i++)
+                {
+                    var comp = node.components[i].comp;
+                    comp.update(delta);
+                    if(instanceOfI2DPointListener(comp)){  //判断是否为
+                        this._peCareListBuoy++;
+                        var insId = node.insId.getInsID();
+                        var plist = this._pointEventCareList;
+                        var pBuoy = this._peCareListBuoy;
+                        if(plist.length <= pBuoy){
+                            plist.push(insId);
+                        }else{
+                            plist[pBuoy] = insId;
+                        }
+                        plist[pBuoy];
+                    }
+                }
             }
 
             if (node.children != null)
             {
-                for (let i = 0; i < node.children.length; i++)
+                let chiLen = node.children.length;
+                for (let i = 0; i < chiLen ; i++)
                 {
                     this.objupdate(node.children[i], delta);
                 }

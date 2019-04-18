@@ -56,6 +56,7 @@ var gd3d;
                 this.curcameraindex = -1;
                 this._bePause = false;
                 this._beStepForward = false;
+                this._beRendering = true;
                 this.orientation = framework.OrientationMode.AUTO;
                 this.shouldRotate = false;
                 this.lastWidth = 0;
@@ -480,6 +481,13 @@ var gd3d;
                     }
                 }
             };
+            Object.defineProperty(application.prototype, "beRendering", {
+                get: function () { return this._beRendering; },
+                set: function (val) { this._beRendering = val; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
             application.prototype.addUserCodeDirect = function (program) {
                 this._userCodeNew.push(program);
             };
@@ -1974,6 +1982,8 @@ var gd3d;
         framework.batcher2D = batcher2D;
         var canvas = (function () {
             function canvas() {
+                this._peCareListBuoy = -1;
+                this._pointEventCareList = [];
                 this.is2dUI = true;
                 this.isDrawByDepth = false;
                 this.pointDown = false;
@@ -2028,7 +2038,7 @@ var gd3d;
                 this.rootNode.pivot.y = 0;
                 {
                     this.pointEvent.eated = false;
-                    var tv2 = gd3d.helpv2();
+                    var tv2 = gd3d.poolv2();
                     tv2.x = this.pointEvent.x = XOnModelSpace;
                     tv2.y = this.pointEvent.y = YOnModelSpace;
                     this.pointEvent.selected = null;
@@ -2050,28 +2060,98 @@ var gd3d;
                     }
                     if (!skip) {
                         if (this.scene.app.bePlay) {
-                            this.rootNode.onCapturePointEvent(this, this.pointEvent);
-                            this.rootNode.onPointEvent(this, this.pointEvent);
+                            this.popPointFlow();
                         }
                         this.pointDown = touch;
                         this.pointX = this.pointEvent.x;
                         this.pointY = this.pointEvent.y;
                     }
+                    gd3d.poolv2_del(tv2);
                 }
                 this.rootNode.updateTran(false);
                 if (this.scene.app.bePlay) {
+                    this._peCareListBuoy = -1;
                     this.objupdate(this.rootNode, delta);
+                }
+            };
+            canvas.prototype.capturePointFlow = function () {
+                var list = this._pointEventCareList;
+                var buoy = this._peCareListBuoy;
+                var ev = this.pointEvent;
+                var Eated = false;
+                while (buoy >= 0) {
+                    var idx = this._peCareListBuoy - buoy;
+                    var node = framework.transform2D.getTransform2DById(list[idx]);
+                    if (node.components) {
+                        for (var i = 0; i <= node.components.length; i++) {
+                            if (ev.eated == false) {
+                                var comp = node.components[i];
+                                if (comp && comp.init && framework.instanceOfI2DPointListener(comp.comp)) {
+                                    comp.comp.onPointEvent(canvas_1, ev, true);
+                                    Eated = ev.eated;
+                                    if (ev.eated)
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    buoy--;
+                    if (Eated)
+                        break;
+                }
+            };
+            canvas.prototype.popPointFlow = function () {
+                var list = this._pointEventCareList;
+                var buoy = this._peCareListBuoy;
+                var ev = this.pointEvent;
+                var Eated = false;
+                while (buoy >= 0) {
+                    var node = framework.transform2D.getTransform2DById(list[buoy]);
+                    if (node.components) {
+                        for (var i = 0; i <= node.components.length; i++) {
+                            if (ev.eated == false) {
+                                var comp = node.components[i];
+                                if (comp && comp.init && framework.instanceOfI2DPointListener(comp.comp)) {
+                                    comp.comp.onPointEvent(canvas_1, ev, false);
+                                    Eated = ev.eated;
+                                    if (ev.eated)
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    buoy--;
+                    if (Eated)
+                        break;
                 }
             };
             canvas.prototype.objupdate = function (node, delta) {
                 if (!node.visible)
                     return;
                 node.init(this.scene.app.bePlay);
-                if (node.components.length > 0) {
-                    node.update(delta);
+                var compLen = node.components.length;
+                if (compLen > 0) {
+                    for (var i = 0; i < compLen; i++) {
+                        var comp = node.components[i].comp;
+                        comp.update(delta);
+                        if (framework.instanceOfI2DPointListener(comp)) {
+                            this._peCareListBuoy++;
+                            var insId = node.insId.getInsID();
+                            var plist = this._pointEventCareList;
+                            var pBuoy = this._peCareListBuoy;
+                            if (plist.length <= pBuoy) {
+                                plist.push(insId);
+                            }
+                            else {
+                                plist[pBuoy] = insId;
+                            }
+                            plist[pBuoy];
+                        }
+                    }
                 }
                 if (node.children != null) {
-                    for (var i = 0; i < node.children.length; i++) {
+                    var chiLen = node.children.length;
+                    for (var i = 0; i < chiLen; i++) {
                         this.objupdate(node.children[i], delta);
                     }
                 }
@@ -2708,6 +2788,10 @@ var gd3d;
             layoutOption[layoutOption["H_CENTER"] = 16] = "H_CENTER";
             layoutOption[layoutOption["V_CENTER"] = 32] = "V_CENTER";
         })(layoutOption = framework.layoutOption || (framework.layoutOption = {}));
+        function instanceOfI2DPointListener(object) {
+            return "onPointEvent" in object;
+        }
+        framework.instanceOfI2DPointListener = instanceOfI2DPointListener;
         var C2DComponent = (function () {
             function C2DComponent(comp, init) {
                 if (init === void 0) { init = false; }
@@ -2733,6 +2817,7 @@ var gd3d;
                 this.tag = framework.StringUtil.builtinTag_Untagged;
                 this.name = "noname";
                 this.isStatic = false;
+                this.children = [];
                 this.width = 0;
                 this.height = 0;
                 this.pivot = new gd3d.math.vector2(0, 0);
@@ -2768,6 +2853,10 @@ var gd3d;
                 this.lastParentPivot = new gd3d.math.vector2(0, 0);
                 this.lastPivot = new gd3d.math.vector2(0, 0);
             }
+            transform2D_1 = transform2D;
+            transform2D.getTransform2DById = function (insID) {
+                return this._transform2DMap[insID];
+            };
             Object.defineProperty(transform2D.prototype, "canvas", {
                 get: function () {
                     if (this._canvas == null) {
@@ -2901,20 +2990,12 @@ var gd3d;
                 configurable: true
             });
             transform2D.prototype.addChild = function (node) {
-                if (node.parent != null) {
-                    node.parent.removeChild(node);
-                }
-                if (this.children == null)
-                    this.children = [];
-                this.children.push(node);
-                node.parent = this;
-                node.canvas = this.canvas;
-                framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
-                this.markDirty();
+                this.addChildAt(node, this.children.length);
             };
             transform2D.prototype.addChildAt = function (node, index) {
-                if (index < 0)
+                if (index < 0 || !node) {
                     return;
+                }
                 if (node.parent != null) {
                     node.parent.removeChild(node);
                 }
@@ -2923,19 +3004,25 @@ var gd3d;
                 this.children.splice(index, 0, node);
                 node.canvas = this.canvas;
                 node.parent = this;
+                transform2D_1._transform2DMap[node.insId.getInsID()] = node;
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
                 this.markDirty();
             };
             transform2D.prototype.removeChild = function (node) {
+                if (!node) {
+                    console.warn("target is null");
+                    return;
+                }
                 if (node.parent != this || this.children == null) {
                     throw new Error("not my child.");
                 }
                 var i = this.children.indexOf(node);
-                if (i >= 0) {
-                    this.children.splice(i, 1);
-                    node.parent = null;
-                    framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
-                }
+                if (i < 0)
+                    return;
+                this.children.splice(i, 1);
+                node.parent = null;
+                delete transform2D_1._transform2DMap[node.insId.getInsID()];
+                framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
             };
             transform2D.prototype.removeAllChild = function () {
                 while (this.children.length > 0) {
@@ -3087,13 +3174,6 @@ var gd3d;
                 }
                 this.removeAllComponents();
             };
-            transform2D.prototype.update = function (delta) {
-                if (this.components.length == 0)
-                    return;
-                for (var i = 0; i < this.components.length; i++) {
-                    this.components[i].comp.update(delta);
-                }
-            };
             transform2D.prototype.init = function (bePlayed) {
                 if (bePlayed === void 0) { bePlayed = false; }
                 if (this.componentsInit.length > 0) {
@@ -3164,6 +3244,7 @@ var gd3d;
                         }
                         var p = this.components.splice(i, 1);
                         comp.remove();
+                        comp.transform = null;
                         break;
                     }
                 }
@@ -3225,28 +3306,6 @@ var gd3d;
                     }
                 }
             };
-            transform2D.prototype.onCapturePointEvent = function (canvas, ev) {
-                if (this.components != null) {
-                    for (var i = 0; i <= this.components.length; i++) {
-                        if (ev.eated == false) {
-                            var comp = this.components[i];
-                            if (comp != null)
-                                if (comp.init) {
-                                    comp.comp.onPointEvent(canvas, ev, true);
-                                }
-                        }
-                    }
-                }
-                if (ev.eated == false) {
-                    if (this.children != null) {
-                        for (var i = 0; i <= this.children.length; i++) {
-                            var c = this.children[i];
-                            if (c != null && c.visible)
-                                c.onCapturePointEvent(canvas, ev);
-                        }
-                    }
-                }
-            };
             transform2D.prototype.ContainsCanvasPoint = function (ModelPos, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
                 var result = false;
@@ -3261,26 +3320,6 @@ var gd3d;
                 gd3d.math.pool.delete_matrix3x2(mout);
                 gd3d.math.pool.delete_vector2(p2);
                 return result;
-            };
-            transform2D.prototype.onPointEvent = function (canvas, ev) {
-                if (this.children != null) {
-                    for (var i = this.children.length - 1; i >= 0; i--) {
-                        if (ev.eated == false) {
-                            var c = this.children[i];
-                            if (c != null && c.visible)
-                                c.onPointEvent(canvas, ev);
-                        }
-                    }
-                }
-                if (ev.eated == false && this.components != null) {
-                    for (var i = this.components.length - 1; i >= 0; i--) {
-                        var comp = this.components[i];
-                        if (comp != null)
-                            if (comp.init) {
-                                comp.comp.onPointEvent(canvas, ev, false);
-                            }
-                    }
-                }
             };
             Object.defineProperty(transform2D.prototype, "layoutState", {
                 get: function () {
@@ -3423,6 +3462,7 @@ var gd3d;
                 return gd3d.io.cloneObj(this);
             };
             transform2D.ClassName = "transform2D";
+            transform2D._transform2DMap = {};
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
@@ -3499,10 +3539,11 @@ var gd3d;
                 __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], transform2D.prototype, "layoutPercentState", null);
-            transform2D = __decorate([
+            transform2D = transform2D_1 = __decorate([
                 gd3d.reflect.SerializeType
             ], transform2D);
             return transform2D;
+            var transform2D_1;
         }());
         framework.transform2D = transform2D;
         var t2dInfo = (function () {
@@ -3531,8 +3572,6 @@ var gd3d;
             behaviour2d.prototype.onPlay = function () {
             };
             behaviour2d.prototype.update = function (delta) {
-            };
-            behaviour2d.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             behaviour2d.prototype.remove = function () {
             };
@@ -3583,8 +3622,6 @@ var gd3d;
                 if (this._obb) {
                     this._obb.update(this.transform.getCanvasWorldMatrix());
                 }
-            };
-            boxcollider2d.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             boxcollider2d.prototype.remove = function () {
                 if (this._obb)
@@ -3733,7 +3770,7 @@ var gd3d;
             };
             button.prototype.onPointEvent = function (canvas, ev, oncap) {
                 if (oncap == false) {
-                    var tv2 = gd3d.helpv2();
+                    var tv2 = gd3d.poolv2();
                     tv2.x = ev.x;
                     tv2.y = ev.y;
                     var b = this.transform.ContainsCanvasPoint(tv2);
@@ -3785,6 +3822,7 @@ var gd3d;
                             }
                         }
                     }
+                    gd3d.poolv2_del(tv2);
                 }
             };
             button.prototype.addListener = function (eventEnum, func, thisArg) {
@@ -4106,8 +4144,6 @@ var gd3d;
                 this.transform = null;
                 this._imageBorder = null;
             };
-            image2D.prototype.onPointEvent = function (canvas, ev, oncap) {
-            };
             image2D.prototype.prepareData = function () {
                 if (this._sprite == null)
                     return;
@@ -4298,11 +4334,11 @@ var gd3d;
                 var canvas = this.transform.canvas;
                 if (!canvas)
                     return;
-                var minPos = gd3d.helpv2();
+                var minPos = gd3d.poolv2();
                 minPos.x = this.min_x;
                 minPos.y = this.max_y;
                 canvas.ModelPosToCanvasPos(minPos, minPos);
-                var maxPos = gd3d.helpv2_1();
+                var maxPos = gd3d.poolv2();
                 maxPos.x = this.max_x;
                 maxPos.y = this.min_y;
                 canvas.ModelPosToCanvasPos(maxPos, maxPos);
@@ -4312,6 +4348,8 @@ var gd3d;
                 this._darwRect.h = maxPos.y - minPos.y;
                 this.min_x = this.min_y = Number.MAX_VALUE;
                 this.max_x = this.max_y = Number.MAX_VALUE * -1;
+                gd3d.poolv2_del(minPos);
+                gd3d.poolv2_del(maxPos);
             };
             image2D.prototype.updateQuadData = function (x0, y0, x1, y1, x2, y2, x3, y3, quadIndex, mirror) {
                 if (quadIndex === void 0) { quadIndex = 0; }
@@ -5606,11 +5644,11 @@ var gd3d;
                 var canvas = this.transform.canvas;
                 if (!canvas)
                     return;
-                var minPos = gd3d.helpv2();
+                var minPos = gd3d.poolv2();
                 minPos.x = this.min_x;
                 minPos.y = this.max_y;
                 canvas.ModelPosToCanvasPos(minPos, minPos);
-                var maxPos = gd3d.helpv2_1();
+                var maxPos = gd3d.poolv2();
                 maxPos.x = this.max_x;
                 maxPos.y = this.min_y;
                 canvas.ModelPosToCanvasPos(maxPos, maxPos);
@@ -5620,6 +5658,8 @@ var gd3d;
                 this._darwRect.h = maxPos.y - minPos.y;
                 this.min_x = this.min_y = Number.MAX_VALUE;
                 this.max_x = this.max_y = Number.MAX_VALUE * -1;
+                gd3d.poolv2_del(minPos);
+                gd3d.poolv2_del(maxPos);
             };
             label.prototype.start = function () {
             };
@@ -5637,8 +5677,6 @@ var gd3d;
                 this.datar.length = 0;
                 this.transform = null;
                 this._cacheMaskV4 = null;
-            };
-            label.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             label.ClassName = "label";
             label.defUIShader = "shader/defuifont";
@@ -5791,8 +5829,6 @@ var gd3d;
                 this._barBg = null;
                 this._barOverImg = null;
                 this._cutPanel = null;
-            };
-            progressbar.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             progressbar.ClassName = "progressbar";
             __decorate([
@@ -5982,11 +6018,11 @@ var gd3d;
                 var canvas = this.transform.canvas;
                 if (!canvas)
                     return;
-                var minPos = gd3d.helpv2();
+                var minPos = gd3d.poolv2();
                 minPos.x = this.min_x;
                 minPos.y = this.max_y;
                 canvas.ModelPosToCanvasPos(minPos, minPos);
-                var maxPos = gd3d.helpv2_1();
+                var maxPos = gd3d.poolv2();
                 maxPos.x = this.max_x;
                 maxPos.y = this.min_y;
                 canvas.ModelPosToCanvasPos(maxPos, maxPos);
@@ -5996,6 +6032,8 @@ var gd3d;
                 this._darwRect.h = maxPos.y - minPos.y;
                 this.min_x = this.min_y = Number.MAX_VALUE;
                 this.max_x = this.max_y = Number.MAX_VALUE * -1;
+                gd3d.poolv2_del(minPos);
+                gd3d.poolv2_del(maxPos);
             };
             rawImage2D.prototype.start = function () {
             };
@@ -6012,8 +6050,6 @@ var gd3d;
                 this._cacheMaskV4 = null;
                 this.transform = null;
                 this.datar.length = 0;
-            };
-            rawImage2D.prototype.onPointEvent = function (canvas, ev, oncap) {
             };
             rawImage2D.ClassName = "rawImage2D";
             rawImage2D.defUIShader = "shader/defui";
@@ -6061,6 +6097,7 @@ var gd3d;
                 this.cgCount = this.cgTime;
                 this.lastfv = new gd3d.math.vector2();
             }
+            scrollRect_1 = scrollRect;
             Object.defineProperty(scrollRect.prototype, "content", {
                 get: function () {
                     return this._content;
@@ -6080,7 +6117,7 @@ var gd3d;
             };
             scrollRect.prototype.onPointEvent = function (canvas, ev, oncap) {
                 if (oncap == false) {
-                    var tv2 = gd3d.helpv2();
+                    var tv2 = scrollRect_1.helpv2;
                     tv2.x = ev.x;
                     tv2.y = ev.y;
                     var b = this.transform.ContainsCanvasPoint(tv2);
@@ -6090,8 +6127,9 @@ var gd3d;
                             return;
                         if (!this.horizontal && !this.vertical)
                             return;
-                        var temps = gd3d.helpv2();
-                        var tempc = gd3d.helpv2_1();
+                        var temps = scrollRect_1.helpv2;
+                        gd3d.math.vec2Set(temps, ev.x, ev.y);
+                        var tempc = scrollRect_1.helpv2_1;
                         this.transform.canvas.ModelPosToCanvasPos(temps, tempc);
                         var sp = this.strPoint;
                         if (ev.type == gd3d.event.PointEventEnum.PointDown) {
@@ -6165,11 +6203,12 @@ var gd3d;
                 var fv = this.flyVelocity;
                 fv.x = fv.y = 0;
                 var len = this.points.length;
+                var tv2 = scrollRect_1.helpv2;
                 for (var i = 1; i < len; i++) {
                     var p_0 = this.points[i - 1];
                     var p_1 = this.points[i];
-                    gd3d.math.vec2Subtract(p_1, p_0, gd3d.helpv2());
-                    gd3d.math.vec2Add(gd3d.helpv2(), fv, fv);
+                    gd3d.math.vec2Subtract(p_1, p_0, tv2);
+                    gd3d.math.vec2Add(tv2, fv, fv);
                 }
                 gd3d.math.vec2Clone(this.flyVelocity, this.lastfv);
                 gd3d.math.pool.delete_vector2Array(this.points);
@@ -6189,7 +6228,7 @@ var gd3d;
                     this.canfly = false;
                     this.cgCount = this.cgTime;
                 }
-                var tv2 = gd3d.helpv2();
+                var tv2 = scrollRect_1.helpv2;
                 gd3d.math.vec2SLerp(this.lastfv, fv, this.cgCount / this.cgTime, tv2);
                 this.SlideTo(tv2.x, tv2.y);
             };
@@ -6198,6 +6237,8 @@ var gd3d;
                 this.transform = null;
             };
             scrollRect.ClassName = "scrollRect";
+            scrollRect.helpv2 = new gd3d.math.vector2();
+            scrollRect.helpv2_1 = new gd3d.math.vector2();
             __decorate([
                 gd3d.reflect.Field("reference", null, "transform2D"),
                 __metadata("design:type", framework.transform2D),
@@ -6219,10 +6260,11 @@ var gd3d;
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
             ], scrollRect.prototype, "decelerationRate", void 0);
-            scrollRect = __decorate([
+            scrollRect = scrollRect_1 = __decorate([
                 gd3d.reflect.node2DComponent
             ], scrollRect);
             return scrollRect;
+            var scrollRect_1;
         }());
         framework.scrollRect = scrollRect;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -6241,8 +6283,6 @@ var gd3d;
             };
             uirect.prototype.update = function (delta) {
             };
-            uirect.prototype.onPointEvent = function (canvas, ev, oncap) {
-            };
             uirect.prototype.remove = function () {
                 this.transform = null;
             };
@@ -6259,33 +6299,39 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var bassBody = (function () {
-            function bassBody() {
+        var physics2DBody = (function () {
+            function physics2DBody() {
+                this.options = {};
+                this._physicsEngine = framework.physics2D;
+                if (!this._physicsEngine) {
+                    console.error("Physics not enabled. Please use scene.enable2DPhysics(...) before creating 2dPhysicsBody.");
+                    return;
+                }
             }
-            bassBody.prototype.addForce = function (Force) {
-                framework.physic2D.applyForceAtCenter(this.body, Force);
+            physics2DBody.prototype.addForce = function (Force) {
+                this._physicsEngine.applyForceAtCenter(this.body, Force);
             };
-            bassBody.prototype.setVelocity = function (velocity) {
-                framework.physic2D.setVelocity(this.body, velocity);
+            physics2DBody.prototype.setVelocity = function (velocity) {
+                this._physicsEngine.setVelocity(this.body, velocity);
             };
-            bassBody.prototype.setAngularVelocity = function (velocity) {
-                framework.physic2D.setAngularVelocity(this.body, velocity);
+            physics2DBody.prototype.setAngularVelocity = function (velocity) {
+                this._physicsEngine.setAngularVelocity(this.body, velocity);
             };
-            Object.defineProperty(bassBody.prototype, "angularVelocity", {
+            Object.defineProperty(physics2DBody.prototype, "angularVelocity", {
                 get: function () {
                     return this.body.angularVelocity;
                 },
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(bassBody.prototype, "speed", {
+            Object.defineProperty(physics2DBody.prototype, "speed", {
                 get: function () {
                     return this.body.speed;
                 },
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(bassBody.prototype, "velocity", {
+            Object.defineProperty(physics2DBody.prototype, "velocity", {
                 get: function () {
                     if (this.m_velocity == null)
                         this.m_velocity = new gd3d.math.vector2();
@@ -6296,7 +6342,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(bassBody.prototype, "type", {
+            Object.defineProperty(physics2DBody.prototype, "type", {
                 get: function () {
                     return this.body.type;
                 },
@@ -6306,14 +6352,14 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(bassBody.prototype, "collisionFilter", {
+            Object.defineProperty(physics2DBody.prototype, "collisionFilter", {
                 get: function () {
                     return this.body.collisionFilter;
                 },
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(bassBody.prototype, "tag", {
+            Object.defineProperty(physics2DBody.prototype, "tag", {
                 get: function () {
                     return this.body.tag;
                 },
@@ -6323,7 +6369,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(bassBody.prototype, "name", {
+            Object.defineProperty(physics2DBody.prototype, "name", {
                 get: function () {
                     return this.body.name;
                 },
@@ -6333,74 +6379,120 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            bassBody.prototype.setDesity = function (Desity) {
-                framework.physic2D.setDesity(this.body, Desity);
+            physics2DBody.prototype.setDesity = function (Desity) {
+                this._physicsEngine.setDesity(this.body, Desity);
             };
-            bassBody.prototype.setFrictionAir = function (frictionAir) {
-                framework.physic2D.setFrictionAir(this.body, frictionAir);
+            physics2DBody.prototype.setFrictionAir = function (frictionAir) {
+                this._physicsEngine.setFrictionAir(this.body, frictionAir);
             };
-            bassBody.prototype.setFriction = function (friction) {
-                framework.physic2D.setFriction(this.body, friction);
+            physics2DBody.prototype.setFriction = function (friction) {
+                this._physicsEngine.setFriction(this.body, friction);
             };
-            bassBody.prototype.setFrictionStatic = function (frictionStatic) {
-                framework.physic2D.setFrictionStatic(this.body, frictionStatic);
+            physics2DBody.prototype.setFrictionStatic = function (frictionStatic) {
+                this._physicsEngine.setFrictionStatic(this.body, frictionStatic);
             };
-            bassBody.prototype.setRestitution = function (restitution) {
-                framework.physic2D.setRestitution(this.body, restitution);
+            physics2DBody.prototype.setRestitution = function (restitution) {
+                this._physicsEngine.setRestitution(this.body, restitution);
             };
-            bassBody.prototype.setMass = function (mass) {
-                framework.physic2D.setMass(this.body, mass);
+            physics2DBody.prototype.setMass = function (mass) {
+                this._physicsEngine.setMass(this.body, mass);
             };
-            bassBody.prototype.setInitData = function (att) {
-                this.initData = att;
+            physics2DBody.prototype.setInitData = function (att) {
+                this.options = att;
             };
-            bassBody.prototype.setPosition = function (pos) {
-                framework.physic2D.setPosition(this.body, pos);
+            physics2DBody.prototype.setPosition = function (pos) {
+                this._physicsEngine.setPosition(this.body, pos);
             };
-            bassBody.prototype.update = function (delta) {
+            physics2DBody.prototype.update = function (delta) {
+                if (!this.body)
+                    return;
                 this.transform.localTranslate.x = this.body.position.x;
                 this.transform.localTranslate.y = this.body.position.y;
                 this.transform.localRotate = this.body.angle;
                 this.transform.markDirty();
             };
-            bassBody.prototype.remove = function () {
-                framework.physic2D.removeBody(this.body);
+            physics2DBody.prototype.remove = function () {
+                this._physicsEngine.removeBody(this);
+                this.body = null;
             };
-            return bassBody;
+            return physics2DBody;
         }());
-        framework.bassBody = bassBody;
+        framework.physics2DBody = physics2DBody;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var circleBody = (function (_super) {
-            __extends(circleBody, _super);
-            function circleBody() {
+        var circleBody2d = (function (_super) {
+            __extends(circleBody2d, _super);
+            function circleBody2d() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.radius = 1;
+                _this.maxSides = 25;
                 return _this;
             }
-            circleBody.prototype.start = function () {
-                if (this.initData != null) {
-                    this.body = framework.physic2D.creatCircleBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.radius, this.initData);
-                }
-                else {
-                    this.body = framework.physic2D.creatCircleBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.radius, {});
-                }
+            circleBody2d.prototype.start = function () {
+                var data = this.options || {};
+                this._physicsEngine.creatCircleBodyByInitData(this, this.radius, this.maxSides);
             };
-            circleBody.prototype.onPlay = function () {
+            circleBody2d.prototype.onPlay = function () {
             };
-            circleBody.prototype.onPointEvent = function (canvas, ev, oncap) {
-            };
-            circleBody.ClassName = "circleBody";
-            circleBody = __decorate([
+            circleBody2d.ClassName = "circleBody2d";
+            circleBody2d = __decorate([
                 gd3d.reflect.node2DComponent
-            ], circleBody);
-            return circleBody;
-        }(framework.bassBody));
-        framework.circleBody = circleBody;
+            ], circleBody2d);
+            return circleBody2d;
+        }(framework.physics2DBody));
+        framework.circleBody2d = circleBody2d;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var convexHullBody2d = (function (_super) {
+            __extends(convexHullBody2d, _super);
+            function convexHullBody2d() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.vertexSets = [];
+                _this.flagInternal = false;
+                _this.removeCollinear = 0.01;
+                _this.minimumArea = 10;
+                return _this;
+            }
+            convexHullBody2d.prototype.start = function () {
+                var data = this.options || {};
+                var pos = this.transform.localTranslate;
+                this._physicsEngine.ConvexHullBodyByInitData(this, this.vertexSets, this.flagInternal, this.removeCollinear, this.minimumArea);
+                var max = this.body.bounds.max;
+                var min = this.body.bounds.min;
+                var center = gd3d.poolv2();
+                this.calceBoundingCenter(max, min, center);
+                var offset = center;
+                gd3d.math.vec2ScaleByNum(center, -1, offset);
+                var newPos = offset;
+                var add = gd3d.poolv2(this.transform.localTranslate);
+                gd3d.math.vec2ScaleByNum(add, 2, add);
+                gd3d.math.vec2Add(add, offset, newPos);
+                this.setPosition(newPos);
+                this.transform.markDirty();
+                gd3d.poolv2_del(center);
+                gd3d.poolv2_del(add);
+            };
+            convexHullBody2d.prototype.calceBoundingCenter = function (max, min, center) {
+                center.x = (max.x + min.x) / 2;
+                center.y = (max.y + min.y) / 2;
+            };
+            convexHullBody2d.prototype.onPlay = function () {
+            };
+            convexHullBody2d.ClassName = "convexHullBody2d";
+            convexHullBody2d = __decorate([
+                gd3d.reflect.node2DComponent
+            ], convexHullBody2d);
+            return convexHullBody2d;
+        }(framework.physics2DBody));
+        framework.convexHullBody2d = convexHullBody2d;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -6410,6 +6502,7 @@ var gd3d;
         var physicEngine2D = (function () {
             function physicEngine2D(op) {
                 if (op === void 0) { op = null; }
+                this._physicsBodys = [];
                 if (Matter == undefined) {
                     console.error("2d physic not supportted");
                 }
@@ -6422,22 +6515,66 @@ var gd3d;
                 this.engineWorld = this.matterEngine.world;
                 this.matterVector = Matter.Vector;
                 Matter.Engine.run(this.matterEngine);
+                Matter.Events.on(this.matterEngine, "beforeUpdate", this.beforeUpdate.bind(this));
+                Matter.Events.on(this.matterEngine, "afterRender", this.afterRender.bind(this));
             }
+            physicEngine2D.prototype.beforeUpdate = function (event) {
+            };
+            physicEngine2D.prototype.afterRender = function (event) {
+            };
             physicEngine2D.prototype.update = function (delta) {
                 Matter.Engine.update(this.matterEngine, delta);
             };
-            physicEngine2D.prototype.creatRectBodyByInitData = function (posx, posy, width, height, initData) {
-                var body = Matter.Bodies.rectangle(posx, posy, width, height, initData);
-                this.addBody(body);
+            physicEngine2D.prototype.creatRectBodyByInitData = function (pBody) {
+                if (!pBody || !pBody.transform)
+                    return;
+                var tran = pBody.transform;
+                var pos = tran.getWorldTranslate();
+                var body = Matter.Bodies.rectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
+                pBody.body = body;
+                this.addBody(pBody);
                 return body;
             };
-            physicEngine2D.prototype.creatCircleBodyByInitData = function (posx, posy, radius, initData) {
-                var body = Matter.Bodies.circle(posx, posy, radius, initData);
-                this.addBody(body);
+            physicEngine2D.prototype.creatCircleBodyByInitData = function (pBody, radius, maxSides) {
+                if (maxSides === void 0) { maxSides = 25; }
+                if (!pBody || !pBody.transform)
+                    return;
+                var tran = pBody.transform;
+                var pos = tran.getWorldTranslate();
+                var body = Matter.Bodies.circle(pos.x, pos.y, radius, pBody.options, maxSides);
+                pBody.body = body;
+                this.addBody(pBody);
                 return body;
             };
-            physicEngine2D.prototype.addBody = function (body) {
-                Matter.World.add(this.engineWorld, body);
+            physicEngine2D.prototype.ConvexHullBodyByInitData = function (pBody, vertexSets, flagInternal, removeCollinear, minimumArea) {
+                if (flagInternal === void 0) { flagInternal = false; }
+                if (removeCollinear === void 0) { removeCollinear = 0.01; }
+                if (minimumArea === void 0) { minimumArea = 10; }
+                if (!pBody || !pBody.transform)
+                    return;
+                var tran = pBody.transform;
+                var pos = tran.getWorldTranslate();
+                var body = Matter.Bodies.fromVertices(pos.x, pos.y, vertexSets, pBody.options, flagInternal, removeCollinear, minimumArea);
+                pBody.body = body;
+                this.addBody(pBody);
+                return body;
+            };
+            physicEngine2D.prototype.addBody = function (_Pbody) {
+                this._physicsBodys.push(_Pbody);
+                Matter.World.add(this.engineWorld, _Pbody.body);
+            };
+            physicEngine2D.prototype.removeBody = function (_Pbody) {
+                if (!_Pbody)
+                    return;
+                var idx = this._physicsBodys.indexOf(_Pbody);
+                if (idx != -1) {
+                    this._physicsBodys.splice(idx, 1);
+                }
+                Matter.World.remove(this.engineWorld, _Pbody.body);
+            };
+            physicEngine2D.prototype.clearWorld = function (keepStatic) {
+                if (keepStatic === void 0) { keepStatic = false; }
+                Matter.World.clear(this.engineWorld, keepStatic);
             };
             physicEngine2D.prototype.applyForce = function (body, positon, force) {
                 Matter.Body.applyForce(body, this.matterVector.create(positon.x, positon.y), this.matterVector.create(force.x, force.y));
@@ -6485,9 +6622,6 @@ var gd3d;
             physicEngine2D.prototype.removeEvent = function (eventname, callback) {
                 Matter.Events.off(this.matterEngine, eventname, callback);
             };
-            physicEngine2D.prototype.removeBody = function (body) {
-                Matter.World.remove(this.engineWorld, body);
-            };
             return physicEngine2D;
         }());
         framework.physicEngine2D = physicEngine2D;
@@ -6497,30 +6631,24 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var rectBody = (function (_super) {
-            __extends(rectBody, _super);
-            function rectBody() {
+        var rectBody2d = (function (_super) {
+            __extends(rectBody2d, _super);
+            function rectBody2d() {
                 return _super !== null && _super.apply(this, arguments) || this;
             }
-            rectBody.prototype.start = function () {
-                if (this.initData != null) {
-                    this.body = framework.physic2D.creatRectBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.transform.width, this.transform.height, this.initData);
-                }
-                else {
-                    this.body = framework.physic2D.creatRectBodyByInitData(this.transform.localTranslate.x, this.transform.localTranslate.y, this.transform.width, this.transform.height, {});
-                }
+            rectBody2d.prototype.start = function () {
+                var data = this.options || {};
+                this._physicsEngine.creatRectBodyByInitData(this);
             };
-            rectBody.prototype.onPlay = function () {
+            rectBody2d.prototype.onPlay = function () {
             };
-            rectBody.prototype.onPointEvent = function (canvas, ev, oncap) {
-            };
-            rectBody.ClassName = "rectBody";
-            rectBody = __decorate([
+            rectBody2d.ClassName = "rectBody2d";
+            rectBody2d = __decorate([
                 gd3d.reflect.node2DComponent
-            ], rectBody);
-            return rectBody;
-        }(framework.bassBody));
-        framework.rectBody = rectBody;
+            ], rectBody2d);
+            return rectBody2d;
+        }(framework.physics2DBody));
+        framework.rectBody2d = rectBody2d;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -7987,15 +8115,15 @@ var gd3d;
             function defMesh() {
             }
             defMesh.initDefaultMesh = function (assetmgr) {
-                assetmgr.mapDefaultMesh["cube"] = gd3d.framework.defMesh.createDefaultMesh("cube", gd3d.render.meshData.genBoxCCW(1.0), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["quad"] = gd3d.framework.defMesh.createDefaultMesh("quad", gd3d.render.meshData.genQuad(1.0), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["quad_particle"] = gd3d.framework.defMesh.createDefaultMesh("quad_particle", gd3d.render.meshData.genQuad_forparticle(1.0), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["plane"] = gd3d.framework.defMesh.createDefaultMesh("plane", gd3d.render.meshData.genPlaneCCW(10), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["sphere"] = gd3d.framework.defMesh.createDefaultMesh("sphere", gd3d.render.meshData.genSphereCCW(), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["sphere_quality"] = gd3d.framework.defMesh.createDefaultMesh("sphere_quality", gd3d.render.meshData.genSphereCCW(2.58, 40, 40), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["pyramid"] = gd3d.framework.defMesh.createDefaultMesh("pyramid", gd3d.render.meshData.genPyramid(2, 0.5), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["cylinder"] = gd3d.framework.defMesh.createDefaultMesh("cylinder", gd3d.render.meshData.genCylinderCCW(2, 0.5), assetmgr.webgl);
-                assetmgr.mapDefaultMesh["circleline"] = gd3d.framework.defMesh.createDefaultMesh("circleline", gd3d.render.meshData.genCircleLineCCW(1), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.cube] = this.createDefaultMesh(this.cube, gd3d.render.meshData.genBoxCCW(1.0), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.quad] = this.createDefaultMesh(this.quad, gd3d.render.meshData.genQuad(1.0), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.quad_particle] = this.createDefaultMesh(this.quad_particle, gd3d.render.meshData.genQuad_forparticle(1.0), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.plane] = this.createDefaultMesh(this.plane, gd3d.render.meshData.genPlaneCCW(10), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.sphere] = this.createDefaultMesh(this.sphere, gd3d.render.meshData.genSphereCCW(), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.sphere_quality] = this.createDefaultMesh(this.sphere_quality, gd3d.render.meshData.genSphereCCW(2.58, 40, 40), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.pyramid] = this.createDefaultMesh(this.pyramid, gd3d.render.meshData.genPyramid(2, 0.5), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.cylinder] = this.createDefaultMesh(this.cylinder, gd3d.render.meshData.genCylinderCCW(2, 0.5), assetmgr.webgl);
+                assetmgr.mapDefaultMesh[this.circleline] = this.createDefaultMesh(this.circleline, gd3d.render.meshData.genCircleLineCCW(1), assetmgr.webgl);
             };
             defMesh.createDefaultMesh = function (name, meshData, webgl) {
                 var _mesh = new gd3d.framework.mesh(name + ".mesh.bin");
@@ -8022,6 +8150,15 @@ var gd3d;
                 }
                 return _mesh;
             };
+            defMesh.cube = "cube";
+            defMesh.quad = "quad";
+            defMesh.quad_particle = "quad_particle";
+            defMesh.plane = "plane";
+            defMesh.sphere = "sphere";
+            defMesh.sphere_quality = "sphere_quality";
+            defMesh.pyramid = "pyramid";
+            defMesh.cylinder = "cylinder";
+            defMesh.circleline = "circleline";
             return defMesh;
         }());
         framework.defMesh = defMesh;
@@ -8346,22 +8483,25 @@ var gd3d;
             function defsprite() {
             }
             defsprite.initDefaultSprite = function (assetmgr) {
-                var spt_white = new framework.sprite("white_sprite");
+                var spt_white = new framework.sprite(this.white_sprite);
                 spt_white.texture = assetmgr.getDefaultTexture("white");
                 spt_white.defaultAsset = true;
                 spt_white.rect = new gd3d.math.rect(0, 0, spt_white.texture.glTexture.width, spt_white.texture.glTexture.height);
-                assetmgr.mapDefaultSprite["white_sprite"] = spt_white;
-                var spt_gray = new framework.sprite("gray_sprite");
+                assetmgr.mapDefaultSprite[this.white_sprite] = spt_white;
+                var spt_gray = new framework.sprite(this.gray_sprite);
                 spt_gray.texture = assetmgr.getDefaultTexture("gray");
                 spt_gray.defaultAsset = true;
                 spt_gray.rect = new gd3d.math.rect(0, 0, spt_gray.texture.glTexture.width, spt_gray.texture.glTexture.height);
-                assetmgr.mapDefaultSprite["gray_sprite"] = spt_gray;
-                var spt_grid = new framework.sprite("grid_sprite");
+                assetmgr.mapDefaultSprite[this.gray_sprite] = spt_gray;
+                var spt_grid = new framework.sprite(this.grid_sprite);
                 spt_grid.texture = assetmgr.getDefaultTexture("grid");
                 spt_grid.defaultAsset = true;
                 spt_grid.rect = new gd3d.math.rect(0, 0, spt_grid.texture.glTexture.width, spt_grid.texture.glTexture.height);
-                assetmgr.mapDefaultSprite["grid_sprite"] = spt_grid;
+                assetmgr.mapDefaultSprite[this.grid_sprite] = spt_grid;
             };
+            defsprite.white_sprite = "white_sprite";
+            defsprite.gray_sprite = "gray_sprite";
+            defsprite.grid_sprite = "grid_sprite";
             return defsprite;
         }());
         framework.defsprite = defsprite;
@@ -8375,32 +8515,36 @@ var gd3d;
             function defTexture() {
             }
             defTexture.initDefaultTexture = function (assetmgr) {
-                var t = new framework.texture("white");
-                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, "white");
+                var t = new framework.texture(this.white);
+                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, this.white);
                 t.defaultAsset = true;
-                assetmgr.mapDefaultTexture["white"] = t;
-                var t = new framework.texture("gray");
-                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, "gray");
+                assetmgr.mapDefaultTexture[this.white] = t;
+                var t = new framework.texture(this.gray);
+                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, this.gray);
                 t.defaultAsset = true;
-                assetmgr.mapDefaultTexture["gray"] = t;
-                var t = new framework.texture("normal");
-                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, "normal");
+                assetmgr.mapDefaultTexture[this.gray] = t;
+                var t = new framework.texture(this.normal);
+                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, this.normal);
                 t.defaultAsset = true;
-                assetmgr.mapDefaultTexture["normal"] = t;
-                var t = new framework.texture("grid");
-                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, "grid");
+                assetmgr.mapDefaultTexture[this.normal] = t;
+                var t = new framework.texture(this.grid);
+                t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, this.grid);
                 t.defaultAsset = true;
-                assetmgr.mapDefaultTexture["grid"] = t;
+                assetmgr.mapDefaultTexture[this.grid] = t;
                 defTexture.initDefaultCubeTexture(assetmgr);
             };
             defTexture.initDefaultCubeTexture = function (assetmgr) {
-                var whiteTex = assetmgr.mapDefaultTexture["white"];
-                var t = new framework.texture("white");
+                var whiteTex = assetmgr.mapDefaultTexture[this.white];
+                var t = new framework.texture(this.white);
                 t.glTexture = new gd3d.render.glTextureCube(assetmgr.app.webgl);
                 t.glTexture.uploadImages(whiteTex, whiteTex, whiteTex, whiteTex, whiteTex, whiteTex);
                 t.defaultAsset = true;
-                assetmgr.mapDefaultCubeTexture["white"] = t;
+                assetmgr.mapDefaultCubeTexture[this.white] = t;
             };
+            defTexture.white = "white";
+            defTexture.gray = "gray";
+            defTexture.normal = "normal";
+            defTexture.grid = "grid";
             return defTexture;
         }());
         framework.defTexture = defTexture;
@@ -10418,8 +10562,8 @@ var gd3d;
                     gd3d.math.quatClone(rotate, this._localRotate);
                 }
                 else {
-                    var tquat = gd3d.helpquat();
-                    var tquat_1 = gd3d.helpquat_1();
+                    var tquat = transform_2.helpquat;
+                    var tquat_1 = transform_2.helpquat_1;
                     gd3d.math.quatClone(this._parent.getWorldRotate(), tquat);
                     gd3d.math.quatInverse(tquat, tquat_1);
                     gd3d.math.quatMultiply(tquat_1, rotate, this._localRotate);
@@ -10451,7 +10595,7 @@ var gd3d;
                     gd3d.math.vec3Clone(pos, this._localTranslate);
                 }
                 else {
-                    var tmtx = gd3d.helpmtx();
+                    var tmtx = transform_2.helpmtx;
                     gd3d.math.matrixInverse(this._parent.getWorldMatrix(), tmtx);
                     gd3d.math.matrixTransformVector3(pos, tmtx, this._localTranslate);
                 }
@@ -10473,7 +10617,7 @@ var gd3d;
                     gd3d.math.vec3Clone(scale, this._localScale);
                 }
                 else {
-                    var tv3 = gd3d.helpv3();
+                    var tv3 = transform_2.helpv3;
                     gd3d.math.vec3Clone(this._parent.getWorldScale(), tv3);
                     this._localScale.x = scale.x / tv3.x;
                     this._localScale.y = scale.y / tv3.y;
@@ -10540,7 +10684,7 @@ var gd3d;
                     gd3d.math.matrixDecompose(mat, this._localScale, this._localRotate, this._localTranslate);
                 }
                 else {
-                    var tmtx = gd3d.helpmtx();
+                    var tmtx = transform_2.helpmtx;
                     gd3d.math.matrixInverse(this._parent.getWorldMatrix(), tmtx);
                     gd3d.math.matrixMultiply(tmtx, mat, this.localMatrix);
                     gd3d.math.matrixDecompose(this.localMatrix, this._localScale, this._localRotate, this._localTranslate);
@@ -10600,9 +10744,13 @@ var gd3d;
                     this.onDispose();
             };
             transform.ClassName = "transform";
+            transform.helpv3 = new gd3d.math.vector3();
             transform.helpUp = new gd3d.math.vector3(0, 1, 0);
             transform.helpRight = new gd3d.math.vector3(1, 0, 0);
             transform.helpFoward = new gd3d.math.vector3(0, 0, 1);
+            transform.helpquat = new gd3d.math.quaternion();
+            transform.helpquat_1 = new gd3d.math.quaternion();
+            transform.helpmtx = new gd3d.math.matrix();
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
@@ -10702,6 +10850,11 @@ var gd3d;
                 },
                 set: function (value) {
                     this._colliderVisible = value;
+                    if (this._colliderVisible) {
+                        if (!this.subTran) {
+                            this.buildMesh();
+                        }
+                    }
                     if (this.subTran) {
                         this.subTran.gameObject.visible = this._colliderVisible;
                     }
@@ -10723,8 +10876,8 @@ var gd3d;
                     this.obb.buildByCenterSize(this.center, this.size);
                 }
                 else {
-                    var minimum = gd3d.helpv3();
-                    var maximum = gd3d.helpv3_1();
+                    var minimum = gd3d.poolv3();
+                    var maximum = gd3d.poolv3();
                     if (this.filter) {
                         this.filter.getMeshOutput().calcVectexMinMax(minimum, maximum);
                     }
@@ -10733,8 +10886,9 @@ var gd3d;
                         maximum.x = maximum.y = maximum.z = 1;
                     }
                     this.obb.buildByMaxMin(minimum, maximum);
+                    gd3d.poolv3_del(minimum);
+                    gd3d.poolv3_del(maximum);
                 }
-                this.buildMesh();
             };
             boxcollider.prototype.buildMesh = function () {
                 this.subTran = new gd3d.framework.transform();
@@ -14296,6 +14450,21 @@ var gd3d;
                 this.fov = 60 * Math.PI / 180;
                 this.size = 2;
                 this._opvalue = 1;
+                this.cullingMap = {};
+                this.isLastCamera = false;
+                this.fruMap = {
+                    farLD: 0,
+                    nearLD: 1,
+                    farRD: 2,
+                    nearRD: 3,
+                    farLT: 4,
+                    nearLT: 5,
+                    farRT: 6,
+                    nearRT: 7,
+                };
+                this._vec3cache = new gd3d.math.vector3();
+                this._edge1 = new gd3d.math.vector3();
+                this._edge2 = new gd3d.math.vector3();
                 this.postQueues = [];
                 for (var i = 0; i < 8; i++) {
                     this.frameVecs.push(new gd3d.math.vector3());
@@ -14342,6 +14511,9 @@ var gd3d;
             camera.prototype.onPlay = function () {
             };
             camera.prototype.update = function (delta) {
+                this._updateOverLays(delta);
+            };
+            camera.prototype._updateOverLays = function (delta) {
                 for (var i = 0; i < this.overlays.length; i++) {
                     if (!this.overlays[i].init) {
                         this.overlays[i].start(this);
@@ -14409,15 +14581,15 @@ var gd3d;
             };
             camera.prototype.creatRayByScreen = function (screenpos, app, shareRayCache) {
                 if (shareRayCache === void 0) { shareRayCache = true; }
-                var src1 = gd3d.helpv3();
+                var src1 = camera_1.helpv3;
                 gd3d.math.vec3Set(src1, screenpos.x, screenpos.y, 0);
-                var src2 = gd3d.helpv3_1();
+                var src2 = camera_1.helpv3_1;
                 gd3d.math.vec3Set(src2, screenpos.x, screenpos.y, 1);
-                var dest1 = gd3d.helpv3_2();
-                var dest2 = gd3d.helpv3_3();
+                var dest1 = camera_1.helpv3_2;
+                var dest2 = camera_1.helpv3_3;
                 this.calcWorldPosFromScreenPos(app, src1, dest1);
                 this.calcWorldPosFromScreenPos(app, src2, dest2);
-                var dir = gd3d.helpv3_4();
+                var dir = camera_1.helpv3_4;
                 gd3d.math.vec3Subtract(dest2, dest1, dir);
                 gd3d.math.vec3Normalize(dir, dir);
                 var ray;
@@ -14434,37 +14606,38 @@ var gd3d;
                 return ray;
             };
             camera.prototype.calcWorldPosFromScreenPos = function (app, screenPos, outWorldPos) {
-                var vpp = gd3d.helprect();
+                var vpp = camera_1.helprect;
                 this.calcViewPortPixel(app, vpp);
-                var vppos = gd3d.helpv2();
+                var vppos = gd3d.poolv2();
                 vppos.x = screenPos.x / vpp.w * 2 - 1;
                 vppos.y = 1 - screenPos.y / vpp.h * 2;
-                var matrixView = gd3d.helpmtx();
-                var matrixProject = gd3d.helpmtx_1();
+                var matrixView = camera_1.helpmtx;
+                var matrixProject = camera_1.helpmtx_1;
                 var asp = vpp.w / vpp.h;
                 this.calcViewMatrix(matrixView);
                 this.calcProjectMatrix(asp, matrixProject);
-                var matrixViewProject = gd3d.helpmtx_2();
-                var matinv = gd3d.helpmtx_3();
+                var matrixViewProject = camera_1.helpmtx_2;
+                var matinv = camera_1.helpmtx_3;
                 gd3d.math.matrixMultiply(matrixProject, matrixView, matrixViewProject);
                 gd3d.math.matrixInverse(matrixViewProject, matinv);
-                var src1 = gd3d.helpv3();
+                var src1 = camera_1.helpv3;
                 src1.x = vppos.x;
                 src1.y = vppos.y;
                 src1.z = screenPos.z;
                 gd3d.math.matrixTransformVector3(src1, matinv, outWorldPos);
+                gd3d.poolv2_del(vppos);
             };
             camera.prototype.calcScreenPosFromWorldPos = function (app, worldPos, outScreenPos) {
-                var vpp = gd3d.helprect();
+                var vpp = camera_1.helprect;
                 this.calcViewPortPixel(app, vpp);
-                var matrixView = gd3d.helpmtx();
-                var matrixProject = gd3d.helpmtx_1();
+                var matrixView = camera_1.helpmtx;
+                var matrixProject = camera_1.helpmtx_1;
                 var asp = vpp.w / vpp.h;
                 this.calcViewMatrix(matrixView);
                 this.calcProjectMatrix(asp, matrixProject);
-                var matrixViewProject = gd3d.helpmtx_2();
+                var matrixViewProject = camera_1.helpmtx_2;
                 gd3d.math.matrixMultiply(matrixProject, matrixView, matrixViewProject);
-                var ndcPos = gd3d.helpv3();
+                var ndcPos = camera_1.helpv3;
                 gd3d.math.matrixTransformVector3(worldPos, matrixViewProject, ndcPos);
                 outScreenPos.x = (ndcPos.x + 1) * vpp.w / 2;
                 outScreenPos.y = (1 - ndcPos.y) * vpp.h / 2;
@@ -14480,20 +14653,20 @@ var gd3d;
                 var near_h = this.near * Math.tan(this.fov * 0.5);
                 var asp = _vpp.w / _vpp.h;
                 var near_w = near_h * asp;
-                var nearLT = gd3d.helpv3();
-                var nearLD = gd3d.helpv3_1();
-                var nearRT = gd3d.helpv3_2();
-                var nearRD = gd3d.helpv3_3();
+                var nearLT = camera_1.helpv3;
+                var nearLD = camera_1.helpv3_1;
+                var nearRT = camera_1.helpv3_2;
+                var nearRD = camera_1.helpv3_3;
                 gd3d.math.vec3Set(nearLT, -near_w, near_h, this.near);
                 gd3d.math.vec3Set(nearLD, -near_w, -near_h, this.near);
                 gd3d.math.vec3Set(nearRT, near_w, near_h, this.near);
                 gd3d.math.vec3Set(nearRD, near_w, -near_h, this.near);
                 var far_h = this.far * Math.tan(this.fov * 0.5);
                 var far_w = far_h * asp;
-                var farLT = gd3d.helpv3_4();
-                var farLD = gd3d.helpv3_5();
-                var farRT = gd3d.helpv3_6();
-                var farRD = gd3d.helpv3_7();
+                var farLT = camera_1.helpv3_4;
+                var farLD = camera_1.helpv3_5;
+                var farRT = camera_1.helpv3_6;
+                var farRD = camera_1.helpv3_7;
                 gd3d.math.vec3Set(farLT, -far_w, far_h, this.far);
                 gd3d.math.vec3Set(farLD, -far_w, -far_h, this.far);
                 gd3d.math.vec3Set(farRT, far_w, far_h, this.far);
@@ -14536,13 +14709,13 @@ var gd3d;
                 configurable: true
             });
             camera.prototype.getPosAtXPanelInViewCoordinateByScreenPos = function (screenPos, app, z, out) {
-                var vpp = gd3d.helprect();
+                var vpp = camera_1.helprect;
                 this.calcViewPortPixel(app, vpp);
-                var nearpos = gd3d.helpv3();
+                var nearpos = camera_1.helpv3;
                 nearpos.z = -this.near;
                 nearpos.x = screenPos.x - vpp.w * 0.5;
                 nearpos.y = vpp.h * 0.5 - screenPos.y;
-                var farpos = gd3d.helpv3_1();
+                var farpos = camera_1.helpv3_1;
                 farpos.z = -this.far;
                 farpos.x = this.far * nearpos.x / this.near;
                 farpos.y = this.far * nearpos.y / this.near;
@@ -14556,20 +14729,65 @@ var gd3d;
                 if (scene.app.isFrustumCulling)
                     this.calcCameraFrame(scene.app);
                 this._fillRenderer(scene, scene.getRoot());
+                if (this.gameObject.transform.dirtiedOfFrustumCulling)
+                    this.gameObject.transform.dirtiedOfFrustumCulling = false;
             };
             camera.prototype._fillRenderer = function (scene, node) {
                 if (!node.gameObject.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false))
                     return;
-                if (scene.app.isFrustumCulling && !this.testFrustumCulling(scene, node))
-                    return;
+                var id = node.insId.getInsID();
+                if (node.dirtiedOfFrustumCulling || this.gameObject.transform.dirtiedOfFrustumCulling) {
+                    this.cullingMap[id] = this.isCulling(node);
+                    if (this.isLastCamera)
+                        node.dirtiedOfFrustumCulling = false;
+                }
                 if (node.gameObject != null && node.gameObject.renderer != null) {
-                    scene.renderList.addRenderer(node.gameObject.renderer);
+                    if (scene.app.isFrustumCulling) {
+                        if (!this.cullingMap[id]) {
+                            scene.renderList.addRenderer(node.gameObject.renderer);
+                        }
+                    }
+                    else {
+                        scene.renderList.addRenderer(node.gameObject.renderer);
+                    }
                 }
                 if (node.children != null) {
                     for (var i = 0; i < node.children.length; i++) {
                         this._fillRenderer(scene, node.children[i]);
                     }
                 }
+            };
+            camera.prototype.isCulling = function (node) {
+                var vec3cache = this._vec3cache;
+                var aabb = node.aabb;
+                gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, vec3cache);
+                var radius = gd3d.math.vec3Length(vec3cache) / 2;
+                var center = node.aabb.center;
+                if (this.isRight(this.frameVecs[this.fruMap.nearLD], this.frameVecs[this.fruMap.farLD], this.frameVecs[this.fruMap.farLT], center, radius))
+                    return true;
+                if (this.isRight(this.frameVecs[this.fruMap.nearRT], this.frameVecs[this.fruMap.farRT], this.frameVecs[this.fruMap.farRD], center, radius))
+                    return true;
+                if (this.isRight(this.frameVecs[this.fruMap.nearLT], this.frameVecs[this.fruMap.farLT], this.frameVecs[this.fruMap.farRT], center, radius))
+                    return true;
+                if (this.isRight(this.frameVecs[this.fruMap.nearRD], this.frameVecs[this.fruMap.farRD], this.frameVecs[this.fruMap.farLD], center, radius))
+                    return true;
+                if (this.isRight(this.frameVecs[this.fruMap.nearLT], this.frameVecs[this.fruMap.nearRT], this.frameVecs[this.fruMap.nearRD], center, radius))
+                    return true;
+                if (this.isRight(this.frameVecs[this.fruMap.farRT], this.frameVecs[this.fruMap.farLT], this.frameVecs[this.fruMap.farLD], center, radius))
+                    return true;
+                return false;
+            };
+            camera.prototype.isRight = function (v0, v1, v2, pos, radius) {
+                var edge1 = this._edge1;
+                var edge2 = this._edge2;
+                var vec3cache = this._vec3cache;
+                gd3d.math.vec3Subtract(v1, v0, edge1);
+                gd3d.math.vec3Subtract(v2, v0, edge2);
+                gd3d.math.vec3Cross(edge1, edge2, vec3cache);
+                gd3d.math.vec3Normalize(vec3cache, vec3cache);
+                gd3d.math.vec3Subtract(pos, v0, edge1);
+                var dis = gd3d.math.vec3Dot(edge1, vec3cache) - radius;
+                return dis > 0;
             };
             camera.prototype.testFrustumCulling = function (scene, node) {
                 if (!node.gameObject.getComponent("frustumculling"))
@@ -14665,8 +14883,8 @@ var gd3d;
                                 }
                                 else {
                                     var matrixView = context.matrixView;
-                                    var az = gd3d.helpv3();
-                                    var bz = gd3d.helpv3_1();
+                                    var az = camera_1.helpv3;
+                                    var bz = camera_1.helpv3_1;
                                     gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
                                     gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
                                     return bz.z - az.z;
@@ -14692,6 +14910,19 @@ var gd3d;
             camera.prototype.clone = function () {
             };
             camera.ClassName = "camera";
+            camera.helpv3 = new gd3d.math.vector3();
+            camera.helpv3_1 = new gd3d.math.vector3();
+            camera.helpv3_2 = new gd3d.math.vector3();
+            camera.helpv3_3 = new gd3d.math.vector3();
+            camera.helpv3_4 = new gd3d.math.vector3();
+            camera.helpv3_5 = new gd3d.math.vector3();
+            camera.helpv3_6 = new gd3d.math.vector3();
+            camera.helpv3_7 = new gd3d.math.vector3();
+            camera.helpmtx = new gd3d.math.matrix();
+            camera.helpmtx_1 = new gd3d.math.matrix();
+            camera.helpmtx_2 = new gd3d.math.matrix();
+            camera.helpmtx_3 = new gd3d.math.matrix();
+            camera.helprect = new gd3d.math.rect();
             __decorate([
                 gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 2),
                 gd3d.reflect.Field("number"),
@@ -14806,6 +15037,12 @@ var gd3d;
                             return;
                         var scene_2 = this.gameObject.getScene();
                         scene_2.addScreenSpaceOverlay(this._overlay2d);
+                        break;
+                    case canvasRenderMode.ScreenSpaceOverlay:
+                        console.warn("not support now of " + canvasRenderMode[canvasRenderMode.ScreenSpaceOverlay] + " mode");
+                        break;
+                    case canvasRenderMode.WorldSpace:
+                        console.warn("not support now of " + canvasRenderMode[canvasRenderMode.WorldSpace] + " mode");
                         break;
                 }
             };
@@ -16199,8 +16436,8 @@ var gd3d;
                 set: function (value) {
                     this._colliderVisible = value;
                     if (this._colliderVisible) {
-                        if (this.subTran && this.subTran.gameObject.components.length < 1) {
-                            this.setMeshRenderer();
+                        if (!this.subTran) {
+                            this.buildMesh();
                         }
                     }
                     if (this.subTran) {
@@ -16245,7 +16482,6 @@ var gd3d;
                 if (this.center && this.radius) {
                     this.spherestruct = new spherestruct(this.center, this.radius);
                 }
-                this.buildMesh();
             };
             spherecollider.prototype.buildMesh = function () {
                 this.subTran = new gd3d.framework.transform();
@@ -23658,9 +23894,12 @@ var gd3d;
         }
         math.vec3Product = vec3Product;
         function vec3Cross(lhs, rhs, out) {
-            out.rawData[0] = lhs.y * rhs.z - lhs.z * rhs.y;
-            out.rawData[1] = lhs.z * rhs.x - lhs.x * rhs.z;
-            out.rawData[2] = lhs.x * rhs.y - lhs.y * rhs.x;
+            var x = lhs.y * rhs.z - lhs.z * rhs.y;
+            var y = lhs.z * rhs.x - lhs.x * rhs.z;
+            var z = lhs.x * rhs.y - lhs.y * rhs.x;
+            out.rawData[0] = x;
+            out.rawData[1] = y;
+            out.rawData[2] = z;
         }
         math.vec3Cross = vec3Cross;
         function vec3Reflect(inDirection, inNormal, out) {
@@ -29576,7 +29815,7 @@ var gd3d;
             CannonJSPlugin.prototype._createShape = function (impostor) {
                 var object = impostor.object;
                 var returnValue;
-                var extendSize = gd3d.helpv3();
+                var extendSize = CannonJSPlugin.helpv3;
                 gd3d.math.vec3Clone(impostor.getObjectExtendSize(), extendSize);
                 switch (impostor.type) {
                     case framework.ImpostorType.SphereImpostor:
@@ -29781,6 +30020,7 @@ var gd3d;
                     }
                 };
             };
+            CannonJSPlugin.helpv3 = new gd3d.math.vector3();
             return CannonJSPlugin;
         }());
         framework.CannonJSPlugin = CannonJSPlugin;
@@ -29847,9 +30087,9 @@ var gd3d;
             };
             OimoJSPlugin.prototype.applyImpulse = function (impostor, force, contactPoint) {
                 var mass = impostor.physicsBody.mass;
-                var _point = gd3d.helpv3();
+                var _point = OimoJSPlugin.helpv3;
                 gd3d.math.vec3ScaleByNum(contactPoint, this.world.invScale, _point);
-                var _force = gd3d.helpv3_1();
+                var _force = OimoJSPlugin.helpv3_1;
                 gd3d.math.vec3ScaleByNum(force, this.world.invScale * mass, _force);
                 impostor.physicsBody.applyImpulse(_point, _force);
             };
@@ -29894,14 +30134,14 @@ var gd3d;
                             }
                         });
                     }
-                    var globalQuat_1 = gd3d.helpquat();
+                    var globalQuat_1 = OimoJSPlugin.helpquat;
                     globalQuat_1.x = globalQuat_1.y = globalQuat_1.z = 0;
                     globalQuat_1.w = 1;
                     var wPos_impostor_1 = impostor.object.getWorldPosition();
                     impostors.forEach(function (i) {
                         var oldQuaternion = i.object.localRotate;
                         gd3d.math.quatClone(i.object.localRotate, globalQuat_1);
-                        var rot = gd3d.helpv3();
+                        var rot = OimoJSPlugin.helpv3;
                         gd3d.math.quatToEulerAngles(oldQuaternion, rot);
                         console.log(_this._tmpPositionVector);
                         var extendSize = i.getObjectExtendSize();
@@ -29915,7 +30155,7 @@ var gd3d;
                             bodyConfig_1.rotShape.push(0, 0, 0);
                         }
                         else {
-                            var localPosition = gd3d.helpv3_2();
+                            var localPosition = OimoJSPlugin.helpv3_2;
                             gd3d.math.vec3Subtract(i.object.getWorldPosition(), wPos_impostor_1, localPosition);
                             bodyConfig_1.posShape.push(localPosition.x);
                             bodyConfig_1.posShape.push(localPosition.y);
@@ -29964,13 +30204,13 @@ var gd3d;
                     impostor.physicsBody = this.world.add(bodyConfig_1);
                     impostor.physicsBody.resetQuaternion(globalQuat_1);
                     impostor.physicsBody.updatePosition(0);
-                    var massCenter = gd3d.helpv3();
+                    var massCenter = OimoJSPlugin.helpv3;
                     var p = impostor.physicsBody.position;
                     gd3d.math.vec3Set(massCenter, p.x, p.y, p.z);
                     impostor.physicsBody.position;
                     var wpos = impostor.object.getWorldPosition();
                     if (!gd3d.math.vec3Equal(massCenter, wpos)) {
-                        var scale = gd3d.helpv3_1();
+                        var scale = OimoJSPlugin.helpv3_1;
                         gd3d.math.vec3Clone(impostor.object.getWorldScale(), scale);
                         scale.x = 1 / scale.x;
                         scale.y = 1 / scale.y;
@@ -30151,6 +30391,10 @@ var gd3d;
             OimoJSPlugin.prototype.dispose = function () {
                 this.world.clear();
             };
+            OimoJSPlugin.helpquat = new gd3d.math.quaternion();
+            OimoJSPlugin.helpv3 = new gd3d.math.vector3();
+            OimoJSPlugin.helpv3_1 = new gd3d.math.vector3();
+            OimoJSPlugin.helpv3_2 = new gd3d.math.vector3();
             return OimoJSPlugin;
         }());
         framework.OimoJSPlugin = OimoJSPlugin;
@@ -30300,7 +30544,7 @@ var gd3d;
                     var hasDirty = !gd3d.math.vec3Equal(wpos, _this.lastObjwPos) || !gd3d.math.quatEqual(wrot, _this.lastObjwRot);
                     gd3d.math.vec3Clone(wpos, _this.lastObjwPos);
                     gd3d.math.quatClone(wrot, _this.lastObjwRot);
-                    var offset_wpos = gd3d.helpv3();
+                    var offset_wpos = PhysicsImpostor.helpv3;
                     gd3d.math.vec3Clone(_this._deltaPosition, offset_wpos);
                     gd3d.math.vec3ScaleByNum(offset_wpos, -1, offset_wpos);
                     gd3d.math.vec3Add(wpos, offset_wpos, offset_wpos);
@@ -30351,8 +30595,8 @@ var gd3d;
                             var pRot = _this._physicsBody.quaternion;
                             var angularVelocity = _this._physicsBody.angularVelocity;
                             if (!l_x || !l_y || !l_z) {
-                                var Euler = gd3d.helpv3();
-                                var tquat = gd3d.helpquat();
+                                var Euler = PhysicsImpostor.helpv3;
+                                var tquat = PhysicsImpostor.helpquat;
                                 framework.physicTool.IQuatCopy(pRot, tquat);
                                 gd3d.math.quatToEulerAngles(tquat, Euler);
                                 var lEuler = _this.lastEuler;
@@ -30396,7 +30640,7 @@ var gd3d;
                     if (!posDirty && !rotDirty)
                         return;
                     _this._physicsEngine.getPhysicsPlugin().setTransformationFromPhysicsBody(_this);
-                    var tempv3 = gd3d.helpv3();
+                    var tempv3 = PhysicsImpostor.helpv3;
                     gd3d.math.vec3Add(_this.object.getWorldPosition(), _this._deltaPosition, tempv3);
                     _this.object.setWorldPosition(tempv3);
                 };
@@ -30420,7 +30664,7 @@ var gd3d;
                         });
                     }
                 };
-                this._physicsEngine = framework.physic;
+                this._physicsEngine = framework.physics;
                 if (!this.object) {
                     console.error("No object was provided. A physics object is obligatory");
                     return;
@@ -30546,8 +30790,8 @@ var gd3d;
                     var mf = go.getComponent("meshFilter");
                     if (!mf)
                         return null;
-                    var min = gd3d.helpv3();
-                    var max = gd3d.helpv3_1();
+                    var min = PhysicsImpostor.helpv3;
+                    var max = PhysicsImpostor.helpv3_1;
                     mf.getMeshOutput().calcVectexMinMax(min, max);
                     this._obb = new framework.obb();
                     this._obb.buildByMaxMin(min, max);
@@ -30766,6 +31010,9 @@ var gd3d;
             PhysicsImpostor.IDENTITY_QUATERNION = new gd3d.math.quaternion();
             PhysicsImpostor._tmpVecs = [new gd3d.math.vector3(), new gd3d.math.vector3(), new gd3d.math.vector3()];
             PhysicsImpostor._tmpQuat = new gd3d.math.quaternion();
+            PhysicsImpostor.helpquat = new gd3d.math.quaternion();
+            PhysicsImpostor.helpv3 = new gd3d.math.vector3();
+            PhysicsImpostor.helpv3_1 = new gd3d.math.vector3();
             return PhysicsImpostor;
         }());
         framework.PhysicsImpostor = PhysicsImpostor;
@@ -31466,8 +31713,8 @@ var gd3d;
                 this.updateScene(this.rootNode, delta);
                 if (this.onLateUpdate)
                     this.onLateUpdate(delta);
-                if (framework.physic) {
-                    framework.physic._step(delta);
+                if (framework.physics) {
+                    framework.physics._step(delta);
                 }
                 if (this.renderCameras.length > 1) {
                     this.renderCameras.sort(function (a, b) {
@@ -31477,10 +31724,16 @@ var gd3d;
                 this.RealCameraNumber = 0;
                 for (var i = 0; i < this.renderCameras.length; i++) {
                     gd3d.render.glDrawPass.resetLastState();
-                    this._renderCamera(i);
+                    if (i == this.renderCameras.length - 1) {
+                        this.renderCameras[i].isLastCamera = true;
+                    }
+                    if (this.app && this.app.beRendering) {
+                        this._renderCamera(i);
+                    }
+                    this.renderCameras[i].isLastCamera = false;
                 }
                 this.updateSceneOverLay(delta);
-                if (this.RealCameraNumber == 0) {
+                if (this.RealCameraNumber == 0 && this.app && this.app.beRendering) {
                     this.webgl.clearColor(0, 0, 0, 1);
                     this.webgl.clearDepth(1.0);
                     this.webgl.clear(this.webgl.COLOR_BUFFER_BIT | this.webgl.DEPTH_BUFFER_BIT);
@@ -31523,7 +31776,9 @@ var gd3d;
                         if (overlay) {
                             overlay.start(targetcamera);
                             overlay.update(delta);
-                            overlay.render(_this.renderContext[mainCamIdx], _this.assetmgr, targetcamera);
+                            if (_this.app && _this.app.beRendering) {
+                                overlay.render(_this.renderContext[mainCamIdx], _this.assetmgr, targetcamera);
+                            }
                         }
                     });
                 }
@@ -31781,13 +32036,13 @@ var gd3d;
                 return ishited;
             };
             scene.prototype.enablePhysics = function (gravity, plugin) {
-                if (framework.physic) {
+                if (framework.physics) {
                     return true;
                 }
                 if (!plugin)
                     plugin = new framework.OimoJSPlugin();
                 try {
-                    framework.physic = new framework.PhysicsEngine(gravity, plugin);
+                    framework.physics = new framework.PhysicsEngine(gravity, plugin);
                     return true;
                 }
                 catch (e) {
@@ -31795,8 +32050,19 @@ var gd3d;
                     return false;
                 }
             };
-            scene.prototype.enable2DPhysics = function () {
-                framework.physic2D = new framework.physicEngine2D();
+            scene.prototype.enable2DPhysics = function (gravity) {
+                if (framework.physics2D) {
+                    return true;
+                }
+                try {
+                    framework.physics2D = new framework.physicEngine2D();
+                    framework.physics2D.setGravity(gravity.x, gravity.y);
+                    return true;
+                }
+                catch (e) {
+                    console.error(e.message);
+                    return false;
+                }
             };
             return scene;
         }());
@@ -32232,7 +32498,7 @@ var gd3d;
                     return false;
                 if (!this.obbOverLap(box1_dirs[2], box0, box1))
                     return false;
-                var tv3 = gd3d.helpv3();
+                var tv3 = collision.helpv3;
                 gd3d.math.vec3Cross(box0_dirs[0], box1_dirs[0], tv3);
                 if (!this.obbOverLap(tv3, box0, box1))
                     return false;
@@ -32278,12 +32544,12 @@ var gd3d;
                     return false;
                 if (!this.obb_SphereOverLap(a_dirs[2], a, b))
                     return false;
-                var axis = gd3d.helpv3();
+                var axis = collision.helpv3;
                 gd3d.math.vec3Subtract(a.worldCenter, b.center, axis);
                 gd3d.math.vec3Normalize(axis, axis);
                 if (!this.obb_SphereOverLap(axis, a, b))
                     return false;
-                var tv3_1 = gd3d.helpv3_1();
+                var tv3_1 = collision.helpv3_1;
                 gd3d.math.vec3Cross(a_dirs[0], axis, tv3_1);
                 if (!this.obb_SphereOverLap(tv3_1, a, b))
                     return false;
@@ -32296,15 +32562,15 @@ var gd3d;
                 return true;
             };
             collision.obb_SphereOverLap = function (axis, box0, sphere) {
-                var tv2 = gd3d.helpv2();
-                var tv2_1 = gd3d.helpv2_1();
+                var tv2 = this.helpv2;
+                var tv2_1 = this.helpv2_1;
                 box0.computeExtentsByAxis(axis, tv2);
                 sphere.computeExtentsByAxis(axis, tv2_1);
                 return this.extentsOverlap(tv2, tv2_1);
             };
             collision.obbOverLap = function (axis, box0, box1) {
-                var tv2 = gd3d.helpv2();
-                var tv2_1 = gd3d.helpv2_1();
+                var tv2 = this.helpv2;
+                var tv2_1 = this.helpv2_1;
                 box0.computeExtentsByAxis(axis, tv2);
                 box1.computeExtentsByAxis(axis, tv2_1);
                 return this.extentsOverlap(tv2, tv2_1);
@@ -32312,6 +32578,10 @@ var gd3d;
             collision.extentsOverlap = function (a, b) {
                 return !(a.x > b.y || b.x > a.y);
             };
+            collision.helpv3 = new gd3d.math.vector3();
+            collision.helpv3_1 = new gd3d.math.vector3();
+            collision.helpv2 = new gd3d.math.vector2();
+            collision.helpv2_1 = new gd3d.math.vector2();
             return collision;
         }());
         framework.collision = collision;
@@ -32321,8 +32591,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var helpv3 = new gd3d.math.vector3();
-        var helpv3_1 = new gd3d.math.vector3();
         var obb = (function () {
             function obb() {
                 this._directions = [];
@@ -32368,8 +32636,8 @@ var gd3d;
                 get: function () {
                     if (this.dirtyMap[obb.tag_wHalfSize]) {
                         var wVects = this.vectorsWorld;
-                        var wMin = helpv3;
-                        var wMax = helpv3_1;
+                        var wMin = obb.helpv3;
+                        var wMax = obb.helpv3_1;
                         gd3d.math.vec3SetAll(wMin, Number.MAX_VALUE);
                         gd3d.math.vec3SetAll(wMax, -Number.MAX_VALUE);
                         for (var i = 0; i < 8; i++) {
@@ -32516,6 +32784,8 @@ var gd3d;
                 this._worldCenter = null;
                 this._worldMatrix = null;
             };
+            obb.helpv3 = new gd3d.math.vector3();
+            obb.helpv3_1 = new gd3d.math.vector3();
             obb.tag_wCenter = "tag_wCenter";
             obb.tag_wVectors = "tag_wVectors";
             obb.tag_wHalfSize = "tag_wHalfSize";
@@ -34458,94 +34728,46 @@ var gd3d;
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
-    function helpv2() { return gd3d.math.pool.genHelpData("v2", 0); }
-    gd3d.helpv2 = helpv2;
-    function helpv2_1() { return gd3d.math.pool.genHelpData("v2", 1); }
-    gd3d.helpv2_1 = helpv2_1;
-    function helpv2_2() { return gd3d.math.pool.genHelpData("v2", 2); }
-    gd3d.helpv2_2 = helpv2_2;
-    function helpv2_3() { return gd3d.math.pool.genHelpData("v2", 3); }
-    gd3d.helpv2_3 = helpv2_3;
-    function helpv2_4() { return gd3d.math.pool.genHelpData("v2", 4); }
-    gd3d.helpv2_4 = helpv2_4;
-    function helpv2_5() { return gd3d.math.pool.genHelpData("v2", 5); }
-    gd3d.helpv2_5 = helpv2_5;
-    function helpv3() { return gd3d.math.pool.genHelpData("v3", 0); }
-    gd3d.helpv3 = helpv3;
-    function helpv3_1() { return gd3d.math.pool.genHelpData("v3", 1); }
-    gd3d.helpv3_1 = helpv3_1;
-    function helpv3_2() { return gd3d.math.pool.genHelpData("v3", 2); }
-    gd3d.helpv3_2 = helpv3_2;
-    function helpv3_3() { return gd3d.math.pool.genHelpData("v3", 3); }
-    gd3d.helpv3_3 = helpv3_3;
-    function helpv3_4() { return gd3d.math.pool.genHelpData("v3", 4); }
-    gd3d.helpv3_4 = helpv3_4;
-    function helpv3_5() { return gd3d.math.pool.genHelpData("v3", 5); }
-    gd3d.helpv3_5 = helpv3_5;
-    function helpv3_6() { return gd3d.math.pool.genHelpData("v3", 6); }
-    gd3d.helpv3_6 = helpv3_6;
-    function helpv3_7() { return gd3d.math.pool.genHelpData("v3", 7); }
-    gd3d.helpv3_7 = helpv3_7;
-    function helpv4() { return gd3d.math.pool.genHelpData("v4", 0); }
-    gd3d.helpv4 = helpv4;
-    function helpv4_1() { return gd3d.math.pool.genHelpData("v4", 1); }
-    gd3d.helpv4_1 = helpv4_1;
-    function helpv4_2() { return gd3d.math.pool.genHelpData("v4", 2); }
-    gd3d.helpv4_2 = helpv4_2;
-    function helpv4_3() { return gd3d.math.pool.genHelpData("v4", 3); }
-    gd3d.helpv4_3 = helpv4_3;
-    function helpv4_4() { return gd3d.math.pool.genHelpData("v4", 4); }
-    gd3d.helpv4_4 = helpv4_4;
-    function helpv4_5() { return gd3d.math.pool.genHelpData("v4", 5); }
-    gd3d.helpv4_5 = helpv4_5;
-    function helpquat() { return gd3d.math.pool.genHelpData("quat", 0); }
-    gd3d.helpquat = helpquat;
-    function helpquat_1() { return gd3d.math.pool.genHelpData("quat", 1); }
-    gd3d.helpquat_1 = helpquat_1;
-    function helpquat_2() { return gd3d.math.pool.genHelpData("quat", 2); }
-    gd3d.helpquat_2 = helpquat_2;
-    function helpquat_3() { return gd3d.math.pool.genHelpData("quat", 3); }
-    gd3d.helpquat_3 = helpquat_3;
-    function helpquat_4() { return gd3d.math.pool.genHelpData("quat", 4); }
-    gd3d.helpquat_4 = helpquat_4;
-    function helpquat_5() { return gd3d.math.pool.genHelpData("quat", 5); }
-    gd3d.helpquat_5 = helpquat_5;
-    function helpmtx() { return gd3d.math.pool.genHelpData("mtx", 0); }
-    gd3d.helpmtx = helpmtx;
-    function helpmtx_1() { return gd3d.math.pool.genHelpData("mtx", 1); }
-    gd3d.helpmtx_1 = helpmtx_1;
-    function helpmtx_2() { return gd3d.math.pool.genHelpData("mtx", 2); }
-    gd3d.helpmtx_2 = helpmtx_2;
-    function helpmtx_3() { return gd3d.math.pool.genHelpData("mtx", 3); }
-    gd3d.helpmtx_3 = helpmtx_3;
-    function helpmtx_4() { return gd3d.math.pool.genHelpData("mtx", 4); }
-    gd3d.helpmtx_4 = helpmtx_4;
-    function helpmtx_5() { return gd3d.math.pool.genHelpData("mtx", 5); }
-    gd3d.helpmtx_5 = helpmtx_5;
-    function helpmtx3x2() { return gd3d.math.pool.genHelpData("mtx3x2", 0); }
-    gd3d.helpmtx3x2 = helpmtx3x2;
-    function helpmtx3x2_1() { return gd3d.math.pool.genHelpData("mtx3x2", 1); }
-    gd3d.helpmtx3x2_1 = helpmtx3x2_1;
-    function helpmtx3x2_2() { return gd3d.math.pool.genHelpData("mtx3x2", 2); }
-    gd3d.helpmtx3x2_2 = helpmtx3x2_2;
-    function helpmtx3x2_3() { return gd3d.math.pool.genHelpData("mtx3x2", 3); }
-    gd3d.helpmtx3x2_3 = helpmtx3x2_3;
-    function helpmtx3x2_4() { return gd3d.math.pool.genHelpData("mtx3x2", 4); }
-    gd3d.helpmtx3x2_4 = helpmtx3x2_4;
-    function helpmtx3x2_5() { return gd3d.math.pool.genHelpData("mtx3x2", 5); }
-    gd3d.helpmtx3x2_5 = helpmtx3x2_5;
-    function helprect() { return gd3d.math.pool.genHelpData("rect", 0); }
-    gd3d.helprect = helprect;
-    function helprect_1() { return gd3d.math.pool.genHelpData("rect", 1); }
-    gd3d.helprect_1 = helprect_1;
-    function helprect_2() { return gd3d.math.pool.genHelpData("rect", 2); }
-    gd3d.helprect_2 = helprect_2;
-    function helpcolor() { return gd3d.math.pool.genHelpData("color", 0); }
-    gd3d.helpcolor = helpcolor;
-    function helpcolor_1() { return gd3d.math.pool.genHelpData("color", 1); }
-    gd3d.helpcolor_1 = helpcolor_1;
-    function helpcolor_2() { return gd3d.math.pool.genHelpData("color", 2); }
-    gd3d.helpcolor_2 = helpcolor_2;
+    function poolv2(clone) { return !clone ? gd3d.math.pool.new_vector2() : gd3d.math.pool.clone_vector2(clone); }
+    gd3d.poolv2 = poolv2;
+    function poolv2_del(data) { gd3d.math.pool.delete_vector2(data); }
+    gd3d.poolv2_del = poolv2_del;
+    ;
+    function poolv3(clone) { return !clone ? gd3d.math.pool.new_vector3() : gd3d.math.pool.clone_vector3(clone); }
+    gd3d.poolv3 = poolv3;
+    function poolv3_del(data) { gd3d.math.pool.delete_vector3(data); }
+    gd3d.poolv3_del = poolv3_del;
+    ;
+    function poolv4(clone) { return !clone ? gd3d.math.pool.new_vector4() : gd3d.math.pool.clone_vector4(clone); }
+    gd3d.poolv4 = poolv4;
+    function poolv4_del(data) { gd3d.math.pool.delete_vector4(data); }
+    gd3d.poolv4_del = poolv4_del;
+    ;
+    function poolquat(clone) { return !clone ? gd3d.math.pool.new_quaternion() : gd3d.math.pool.clone_quaternion(clone); }
+    gd3d.poolquat = poolquat;
+    function poolquat_del(data) { gd3d.math.pool.delete_quaternion(data); }
+    gd3d.poolquat_del = poolquat_del;
+    ;
+    function poolmtx(clone) { return !clone ? gd3d.math.pool.new_matrix() : gd3d.math.pool.clone_matrix(clone); }
+    gd3d.poolmtx = poolmtx;
+    function poolmtx_del(data) { gd3d.math.pool.delete_matrix(data); }
+    gd3d.poolmtx_del = poolmtx_del;
+    ;
+    function poolmtx3x2(clone) { return !clone ? gd3d.math.pool.new_matrix3x2() : gd3d.math.pool.clone_matrix3x2(clone); }
+    gd3d.poolmtx3x2 = poolmtx3x2;
+    function poolmtx3x2_del(data) { gd3d.math.pool.delete_matrix3x2(data); }
+    gd3d.poolmtx3x2_del = poolmtx3x2_del;
+    ;
+    function poolrect(clone) { return !clone ? gd3d.math.pool.new_rect() : gd3d.math.pool.clone_rect(clone); }
+    gd3d.poolrect = poolrect;
+    function poolrect_del(data) { gd3d.math.pool.delete_rect(data); }
+    gd3d.poolrect_del = poolrect_del;
+    ;
+    function poolcolor(clone) { return !clone ? gd3d.math.pool.new_color() : gd3d.math.pool.clone_color(clone); }
+    gd3d.poolcolor = poolcolor;
+    function poolcolor_del(data) { gd3d.math.pool.delete_color(data); }
+    gd3d.poolcolor_del = poolcolor_del;
+    ;
 })(gd3d || (gd3d = {}));
 (function (gd3d) {
     var math;
@@ -34684,6 +34906,15 @@ var gd3d;
                 }
                 else
                     return new math.color(r, g, b, a);
+            };
+            pool.clone_color = function (col) {
+                if (pool.unused_color.length > 0) {
+                    var c = pool.unused_color.pop();
+                    c.rawData.set(col.rawData);
+                    return c;
+                }
+                else
+                    return new math.color(col.r, col.g, col.b, col.a);
             };
             pool.delete_color = function (v) {
                 if (v == null)

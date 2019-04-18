@@ -22,6 +22,25 @@ namespace gd3d.framework {
      * @public
      * @language zh_CN
      * @classdesc
+     * 2d Point事件流接口
+     * @version egret-gd3d 1.0
+     */
+    export interface I2DPointListener{
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean);
+    }
+
+    /**
+     * 实例对象是 I2DPointListener 
+     * @param object 
+     */
+    export function instanceOfI2DPointListener(object){
+        return "onPointEvent" in object;
+    } 
+
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
      * 2d组件的接口
      * @version egret-gd3d 1.0
      */
@@ -30,7 +49,6 @@ namespace gd3d.framework {
         start();
         update(delta: number);
         transform: transform2D;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean);
         remove();
     }
 
@@ -99,6 +117,17 @@ namespace gd3d.framework {
 
         // public notify: INotify;
         private _canvas: canvas;
+
+        //insID : transform2D 收集 map
+        private static _transform2DMap : {[guid:number]: transform2D} = {};
+        /**
+         * 获取transform2D 通过 insID
+         * @param id transform2D
+         */
+        static getTransform2DById(insID:number){
+            return this._transform2DMap[insID];
+        }
+
 
         /**
         * @public
@@ -187,7 +216,7 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("transform2D[]")
-        children: transform2D[];
+        children: transform2D[] = [];
 
         /**
          * @public
@@ -416,16 +445,17 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         addChild(node: transform2D) {
-            if (node.parent != null) {
-                node.parent.removeChild(node);
-            }
-            if (this.children == null)
-                this.children = [];
-            this.children.push(node);
-            node.parent = this;
-            node.canvas = this.canvas;
-            sceneMgr.app.markNotify(node, NotifyType.AddChild);
-            this.markDirty();
+            // if (node.parent != null) {
+            //     node.parent.removeChild(node);
+            // }
+            // if (this.children == null)
+            //     this.children = [];
+            // this.children.push(node);
+            // node.parent = this;
+            // node.canvas = this.canvas;
+            // sceneMgr.app.markNotify(node, NotifyType.AddChild);
+            // this.markDirty();
+            this.addChildAt(node,this.children.length);
         }
 
         /**
@@ -438,8 +468,9 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         addChildAt(node: transform2D, index: number) {
-            if (index < 0)
+            if (index < 0 || !node ){
                 return;
+            }
             if (node.parent != null) {
                 node.parent.removeChild(node);
             }
@@ -450,6 +481,7 @@ namespace gd3d.framework {
 
             node.canvas = this.canvas;
             node.parent = this;
+            transform2D._transform2DMap[node.insId.getInsID()] = node;
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
             this.markDirty();
         }
@@ -463,15 +495,19 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         removeChild(node: transform2D) {
+            if(!node){
+                console.warn(`target is null`);
+                return;
+            }
             if (node.parent != this || this.children == null) {
                 throw new Error("not my child.");
             }
             var i = this.children.indexOf(node);
-            if (i >= 0) {
-                this.children.splice(i, 1);
-                node.parent = null;
-                sceneMgr.app.markNotify(node, NotifyType.RemoveChild);
-            }
+            if(i < 0 ) return;
+            this.children.splice(i, 1);
+            node.parent = null;
+            delete transform2D._transform2DMap[node.insId.getInsID()];
+            sceneMgr.app.markNotify(node, NotifyType.RemoveChild);
         }
 
         /**
@@ -792,22 +828,6 @@ namespace gd3d.framework {
          * @public
          * @language zh_CN
          * @classdesc
-         * 当前节点的update
-         * @param delta 两次update的间隔时间
-         * @version egret-gd3d 1.0
-         */
-        update(delta: number) {
-            if (this.components.length == 0) return;
-            for (let i = 0; i < this.components.length; i++)
-            {
-                this.components[i].comp.update(delta);
-            }
-        }
-
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
          * 组件的初始化
          * @version egret-gd3d 1.0
          */
@@ -911,6 +931,7 @@ namespace gd3d.framework {
                     }
                     let p = this.components.splice(i, 1);
                     comp.remove();
+                    comp.transform = null;
                     break;
                 }
             }
@@ -1022,38 +1043,38 @@ namespace gd3d.framework {
             }
         }
 
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 捕获事件
-         * @param canvas canvas实例
-         * @param ev 事件对象
-         * @version egret-gd3d 1.0
-         */
-        onCapturePointEvent(canvas: canvas, ev: PointEvent) {
-            //event 捕捉阶段，正向
-            if (this.components != null) {
-                for (var i = 0; i <= this.components.length; i++) {
-                    if (ev.eated == false) {
-                        var comp = this.components[i];
-                        if (comp != null)
-                            if (comp.init) {
-                                comp.comp.onPointEvent(canvas, ev, true);
-                            }
-                    }
-                }
-            }
-            if (ev.eated == false) {
-                if (this.children != null) {
-                    for (var i = 0; i <= this.children.length; i++) {
-                        var c = this.children[i];
-                        if (c != null && c.visible)
-                            c.onCapturePointEvent(canvas, ev);
-                    }
-                }
-            }
-        }
+        // /**
+        //  * @public
+        //  * @language zh_CN
+        //  * @classdesc
+        //  * 捕获事件
+        //  * @param canvas canvas实例
+        //  * @param ev 事件对象
+        //  * @version egret-gd3d 1.0
+        //  */
+        // onCapturePointEvent(canvas: canvas, ev: PointEvent) {
+        //     //event 捕捉阶段，正向
+        //     if (this.components != null) {
+        //         for (var i = 0; i <= this.components.length; i++) {
+        //             if (ev.eated == false) {
+        //                 var comp = this.components[i];
+        //                 if (comp != null)
+        //                     if (comp.init && instanceOfI2DPointListener(comp.comp) ) {
+        //                         (comp.comp as any).onPointEvent(canvas, ev, true);
+        //                     }
+        //             }
+        //         }
+        //     }
+        //     if (ev.eated == false) {
+        //         if (this.children != null) {
+        //             for (var i = 0; i <= this.children.length; i++) {
+        //                 var c = this.children[i];
+        //                 if (c != null && c.visible)
+        //                     c.onCapturePointEvent(canvas, ev);
+        //             }
+        //         }
+        //     }
+        // }
 
         // ContainsPoint(p: math.vector2): boolean
         // {
@@ -1088,41 +1109,41 @@ namespace gd3d.framework {
             return result;
         }
 
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 当前节点的渲染组件，一个节点同时只能存在一个渲染组件
-         * @version egret-gd3d 1.0
-         */
-        onPointEvent(canvas: canvas, ev: PointEvent) {
-            //event 上升阶段,上升阶段事件会被吞掉
-            if (this.children != null) {
-                for (var i = this.children.length - 1; i >= 0; i--) {
-                    if (ev.eated == false) {
-                        var c = this.children[i];
-                        if (c != null && c.visible)
-                            c.onPointEvent(canvas, ev);
-                        // if (ev.eated)
-                        // {//事件刚刚被吃掉，
-                        //     //这时是否要做点什么？
-                        // }
-                    }
-                }
-            }
+        // /**
+        //  * @public
+        //  * @language zh_CN
+        //  * @classdesc
+        //  * 当前节点的渲染组件，一个节点同时只能存在一个渲染组件
+        //  * @version egret-gd3d 1.0
+        //  */
+        // onPointEvent(canvas: canvas, ev: PointEvent) {
+        //     //event 上升阶段,上升阶段事件会被吞掉
+        //     if (this.children != null) {
+        //         for (var i = this.children.length - 1; i >= 0; i--) {
+        //             if (ev.eated == false) {
+        //                 var c = this.children[i];
+        //                 if (c != null && c.visible)
+        //                     c.onPointEvent(canvas, ev);
+        //                 // if (ev.eated)
+        //                 // {//事件刚刚被吃掉，
+        //                 //     //这时是否要做点什么？
+        //                 // }
+        //             }
+        //         }
+        //     }
 
-            if (ev.eated == false && this.components != null) {
+        //     if (ev.eated == false && this.components != null) {
 
-                for (var i = this.components.length - 1; i >= 0; i--) {
-                    var comp = this.components[i];
-                    if (comp != null)
-                        if (comp.init) {
-                            comp.comp.onPointEvent(canvas, ev, false);
-                        }
-                }
-            }
+        //         for (var i = this.components.length - 1; i >= 0; i--) {
+        //             var comp = this.components[i];
+        //             if (comp != null)
+        //                 if (comp.init && instanceOfI2DPointListener(comp.comp) ) {
+        //                     (comp.comp as any).onPointEvent(canvas, ev, false);
+        //                 }
+        //         }
+        //     }
 
-        }
+        // }
 
         private readonly optionArr: layoutOption[] = [layoutOption.LEFT, layoutOption.TOP, layoutOption.RIGHT, layoutOption.BOTTOM, layoutOption.H_CENTER, layoutOption.V_CENTER];
         private _layoutState: number = 0;

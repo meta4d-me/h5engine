@@ -14,9 +14,6 @@ namespace gd3d.framework
         update(delta: number) {
 
         }
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean) {
-
-        }
         remove() {
             
         }

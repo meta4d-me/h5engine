@@ -615,12 +615,12 @@ namespace gd3d.framework
             let canvas = this.transform.canvas;
             if(!canvas)return;
 
-            let minPos = helpv2();
+            let minPos = poolv2();
             minPos.x = this.min_x;
             minPos.y = this.max_y;
             canvas.ModelPosToCanvasPos(minPos,minPos);
 
-            let maxPos = helpv2_1();
+            let maxPos = poolv2();
             maxPos.x = this.max_x;
             maxPos.y = this.min_y;
             canvas.ModelPosToCanvasPos(maxPos,maxPos);
@@ -632,6 +632,9 @@ namespace gd3d.framework
 
             this.min_x = this.min_y = Number.MAX_VALUE;
             this.max_x = this.max_y = Number.MAX_VALUE * -1;
+
+            poolv2_del(minPos);
+            poolv2_del(maxPos);
         }
 
         /**
@@ -677,13 +680,6 @@ namespace gd3d.framework
             this._cacheMaskV4 = null;
         }
         
-        /**
-         * @private
-         */
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean)
-        {
-
-        }
     }
 
     /**

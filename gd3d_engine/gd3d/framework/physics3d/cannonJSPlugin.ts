@@ -10,6 +10,7 @@ namespace gd3d.framework
         public name: string = "CannonJSPlugin";
         private _physicsMaterials = new Array();
         private _fixedTimeStep: number = 1 / 60;
+        private static helpv3 = new math.vector3();
         //See https://github.com/schteppe/CANNON.js/blob/gh-pages/demos/collisionFilter.html
         // public BJSCANNON = CANNON;
 
@@ -248,7 +249,7 @@ namespace gd3d.framework
             let object = impostor.object;
 
             let returnValue;
-            let extendSize = helpv3();
+            let extendSize = CannonJSPlugin.helpv3;
             math.vec3Clone(impostor.getObjectExtendSize(),extendSize);
             switch (impostor.type) {
                 case ImpostorType.SphereImpostor:

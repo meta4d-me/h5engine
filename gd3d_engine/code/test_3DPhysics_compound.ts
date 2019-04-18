@@ -10,12 +10,12 @@ class test_3DPhysics_compound implements IState {
     iptMgr : gd3d.framework.inputMgr;
     async start  (app: gd3d.framework.application) {
         await physics3dDemoTool.init(app);
-        await physics3dDemoTool.loadbySync(`./res/prefabs/Capsule/Capsule.assetbundle.json`);
         this.app = app;
         this.scene = physics3dDemoTool.scene;
         this.astMgr = physics3dDemoTool.astMgr;
         this.iptMgr = physics3dDemoTool.iptMgr;
         this.camera = physics3dDemoTool.camera;
+        await demoTool.loadbySync(`./res/prefabs/Capsule/Capsule.assetbundle.json`,this.astMgr);
         this.init();
         return null;
     }
@@ -220,7 +220,7 @@ class test_3DPhysics_compound implements IState {
     cache_y = 0;
     //移动 到射线点
     onPonitMove([x,y]){
-        let viewPos = gd3d.helpv2();
+        let viewPos = gd3d.poolv2();
         viewPos.x = x;
         viewPos.y = y;
         console.log(`x: ${x} ,y :${y}`);
@@ -234,6 +234,7 @@ class test_3DPhysics_compound implements IState {
         //同步ctr box 位置
         pos.y += 0.55;
         this.boxTran.physicsImpostor.kinematicSetPosition(pos);  //更新动力学 位置
+        gd3d.poolv2_del(viewPos);
     }
 
     private tcount = 0;

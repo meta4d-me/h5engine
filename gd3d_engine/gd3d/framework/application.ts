@@ -697,7 +697,7 @@ namespace gd3d.framework
         be2dstate: boolean = false;
         public curcameraindex: number = -1;
         /**
-         * @private
+         * 运行开关
          */
         public get bePlay()
         {
@@ -802,6 +802,13 @@ namespace gd3d.framework
                 }
             }
         }
+
+        private _beRendering = true;
+        /**
+         * 渲染开关
+         */
+        get beRendering(){return this._beRendering;}
+        set beRendering(val: boolean){ this._beRendering = val;};
 
         /**
          * @public

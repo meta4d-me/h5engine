@@ -91,6 +91,12 @@ namespace gd3d.framework
                     let scene =this.gameObject.getScene();
                     scene.addScreenSpaceOverlay(this._overlay2d);
                 break;
+                case canvasRenderMode.ScreenSpaceOverlay:
+                    console.warn(`not support now of ${canvasRenderMode[canvasRenderMode.ScreenSpaceOverlay]} mode`);
+                break;
+                case canvasRenderMode.WorldSpace:
+                    console.warn(`not support now of ${canvasRenderMode[canvasRenderMode.WorldSpace]} mode`);
+                break;
             }
 
         }

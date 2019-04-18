@@ -52,6 +52,25 @@ var __extends = (this && this.__extends) || (function () {
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
+var demoList = (function () {
+    function demoList() {
+    }
+    demoList.addBtn = function (title, demo) {
+        if (!title || !demo)
+            return;
+        var p = [title, demo];
+        this.funArr.push(p);
+    };
+    demoList.prototype.start = function (app) {
+        demoList.funArr.forEach(function (element) {
+            main.instance.addBtn(element[0], element[1]);
+        });
+    };
+    demoList.prototype.update = function () {
+    };
+    demoList.funArr = [];
+    return demoList;
+}());
 var demo_navigaionRVO = (function () {
     function demo_navigaionRVO() {
         this.cubesize = 0.5;
@@ -1135,79 +1154,103 @@ var localSave = (function () {
 }());
 var main = (function () {
     function main() {
-        this.x = 0;
-        this.y = 100;
+        this.def_x = 0;
+        this.def_y = 100;
+        this.x = this.def_x;
+        this.y = this.def_y;
         this.btns = [];
     }
+    main_1 = main;
     main.prototype.onStart = function (app) {
+        if (!main_1.instance)
+            main_1.instance = this;
         console.log("i am here.");
         this.app = app;
-        this.addBtn("paowuxian2", function () { return new dome.paowuxian2(); });
-        this.addBtn("paowuxian", function () { return new dome.paowuxian(); });
-        this.addBtn("mixmesh", function () { return new dome.mixMesh(); });
-        this.addBtn("f14effect", function () { return new dome.db_test_f14eff(); });
-        this.addBtn("physic2d_dome", function () { return new physic2d_dome(); });
-        this.addBtn("test_ui", function () { return new t.test_ui(); });
-        this.addBtn("test_load", function () { return new test_load(); });
-        this.addBtn("test_loadScene", function () { return new test_loadScene(); });
-        this.addBtn("test_pick", function () { return new test_pick(); });
-        this.addBtn("test_anim", function () { return new test_anim(); });
-        this.addBtn("test_multipleplayer_anim", function () { return new test_multipleplayer_anim(); });
-        this.addBtn("test_reload(换装)", function () { return new testReload(); });
-        this.addBtn("test_light1", function () { return new t.test_light1(); });
-        this.addBtn("test_light_d1", function () { return new t.light_d1(); });
-        this.addBtn("test_normalmap", function () { return new t.Test_NormalMap(); });
-        this.addBtn("test_assestmgr", function () { return new test_assestmgr(); });
-        this.addBtn("test_posteffect(后期效果)", function () { return new t.test_posteffect(); });
-        this.addBtn("test_streamlight", function () { return new test_streamlight(); });
-        this.addBtn("test_trailRender", function () { return new t.test_trailrender(); });
-        this.addBtn("test_rendertexture", function () { return new t.test_rendertexture(); });
-        this.addBtn("test_sound", function () { return new t.test_sound(); });
-        this.addBtn("test_cleardepth", function () { return new t.test_clearDepth0(); });
-        this.addBtn("test_fakepbr", function () { return new test_fakepbr(); });
-        this.addBtn("test_tank", function () { return new demo.TankGame(); });
-        this.addBtn("test_long", function () { return new demo.DragonTest(); });
-        this.addBtn("test_skillsystem", function () { return new t.test_skillsystem(); });
-        this.addBtn("test_blend", function () { return new t.test_blend(); });
-        this.addBtn("TestRotate", function () { return new t.TestRotate(); });
-        this.addBtn("pathasset", function () { return new t.test_pathAsset(); });
-        this.addBtn("test_Asi_prefab", function () { return new test_loadAsiprefab(); });
-        this.addBtn("test_tex_uv", function () { return new test_texuv(); });
-        this.addBtn("test_shadowmap", function () { return new test_ShadowMap(); });
-        this.addBtn("test_liChange", function () { return new testLiChangeMesh(); });
-        this.addBtn("example_newObject", function () { return new test_NewGameObject; });
-        this.addBtn("example_changeMesh", function () { return new test_ChangeMesh(); });
-        this.addBtn("example_changeMaterial", function () { return new test_ChangeMaterial(); });
-        this.addBtn("demo_ScreenSplit", function () { return new demo_ScreenSplit(); });
-        this.addBtn("test_UI组件", function () { return new test_UI_Component(); });
-        this.addBtn("test_UI预设体加载", function () { return new test_uiPerfabLoad(); });
-        this.addBtn("test_PBR 展示", function () { return new test_pbr(); });
-        this.addBtn("test_PBR 场景", function () { return new test_pbr_scene(); });
-        this.addBtn("关键帧动画", function () { return new test_keyFrameAni(); });
-        this.addBtn("导航网格", function () { return new test_navMesh(); });
-        this.addBtn("rvo2_驾驶行为", function () { return new test_Rvo2(); });
-        this.addBtn("导航RVO_防挤Demo", function () { return new demo_navigaionRVO(); });
-        this.addBtn("Collider碰撞", function () { return new test_pick_boxcollider(); });
-        this.addBtn("SSSSS", function () { return new test_sssss(); });
-        this.addBtn("dome_加载播放动画", function () { return new dome_loadaniplayer(); });
-        this.addBtn("使用加载资源的Demo列表", function () { return new UseAssetByLoadDemoList(); });
-        this.addBtn("tesrtss", function () { return new dome.testCJ(); });
-        this.addBtn("trans性能测试", function () { return new demo.test_performance(); });
-        this.addBtn("3D物理_基础形状", function () { return new test_3DPhysics_baseShape(); });
-        this.addBtn("3D物理_复合组合", function () { return new test_3DPhysics_compound(); });
-        this.addBtn("3D物理_动力学", function () { return new test_3DPhysics_kinematic(); });
-        this.addBtn("3D物理_铰链关节", function () { return new test_3DPhysics_joint_hinge(); });
-        this.addBtn("3D物理_球嵌套关节", function () { return new test_3DPhysics_joint_ballandSocket(); });
-        this.addBtn("3D物理_滑竿关节", function () { return new test_3DPhysics_joint_slider(); });
-        this.addBtn("3D物理_棱柱滑竿关节", function () { return new test_3DPhysics_joint_prismatic(); });
-        this.addBtn("3D物理_距离关节", function () { return new test_3DPhysics_joint_distance(); });
-        this.addBtn("3D物理_车轮关节", function () { return new test_3DPhysics_joint_wheel(); });
-        this.addBtn("3D物理_铰链马达", function () { return new test_3DPhysics_motor_hinge(); });
-        this.addBtn("3D物理_车轮马达", function () { return new test_3DPhysics_motor_wheel(); });
-        this.addBtn("3D物理_滑竿马达", function () { return new test_3DPhysics_motor_slider(); });
-        this.addBtn("3D物理_冻结_位移旋转", function () { return new test_3DPhysics_freeze(); });
-        this.addBtn("3D物理_样例_中心点爆炸", function () { return new test_3DPhysics_explode(); });
-        this.addBtn("cannonPhysics3D", function () { return new PhysicDemo.physic_01(); });
+        this.addBtn("基础==>", function () {
+            demoList.addBtn("f14effect", function () { return new dome.db_test_f14eff(); });
+            demoList.addBtn("物理2d_dome", function () { return new physic2d_dome(); });
+            demoList.addBtn("test_load", function () { return new test_load(); });
+            demoList.addBtn("test_loadScene", function () { return new test_loadScene(); });
+            demoList.addBtn("test_pick", function () { return new test_pick(); });
+            demoList.addBtn("test_anim", function () { return new test_anim(); });
+            demoList.addBtn("test_sound", function () { return new t.test_sound(); });
+            demoList.addBtn("射线检测", function () { return new test_pick_boxcollider(); });
+            demoList.addBtn("关键帧动画", function () { return new test_keyFrameAni(); });
+            return new demoList();
+        });
+        this.addBtn("渲染==>", function () {
+            demoList.addBtn("test_posteffect(后期效果)", function () { return new t.test_posteffect(); });
+            demoList.addBtn("test_blend", function () { return new t.test_blend(); });
+            demoList.addBtn("test_shadowmap", function () { return new test_ShadowMap(); });
+            demoList.addBtn("test_tex_uv", function () { return new test_texuv(); });
+            demoList.addBtn("test_PBR 展示", function () { return new test_pbr(); });
+            demoList.addBtn("test_PBR 场景", function () { return new test_pbr_scene(); });
+            demoList.addBtn("SSSSS", function () { return new test_sssss(); });
+            demoList.addBtn("test_trailRender", function () { return new t.test_trailrender(); });
+            demoList.addBtn("test_light1", function () { return new t.test_light1(); });
+            demoList.addBtn("test_light_d1", function () { return new t.light_d1(); });
+            demoList.addBtn("test_normalmap", function () { return new t.Test_NormalMap(); });
+            return new demoList();
+        });
+        this.addBtn("UI样例==>", function () {
+            demoList.addBtn("test_ui", function () { return new t.test_ui(); });
+            demoList.addBtn("test_UI组件", function () { return new test_UI_Component(); });
+            demoList.addBtn("test_UI预设体加载", function () { return new test_uiPerfabLoad(); });
+            demoList.addBtn("UI 新手引导mask", function () { return new test_UIGuideMask(); });
+            return new demoList();
+        });
+        this.addBtn("3D物理样例==>", function () {
+            demoList.addBtn("3D物理_基础形状", function () { return new test_3DPhysics_baseShape(); });
+            demoList.addBtn("3D物理_复合组合", function () { return new test_3DPhysics_compound(); });
+            demoList.addBtn("3D物理_动力学", function () { return new test_3DPhysics_kinematic(); });
+            demoList.addBtn("3D物理_铰链关节", function () { return new test_3DPhysics_joint_hinge(); });
+            demoList.addBtn("3D物理_球嵌套关节", function () { return new test_3DPhysics_joint_ballandSocket(); });
+            demoList.addBtn("3D物理_滑竿关节", function () { return new test_3DPhysics_joint_slider(); });
+            demoList.addBtn("3D物理_棱柱滑竿关节", function () { return new test_3DPhysics_joint_prismatic(); });
+            demoList.addBtn("3D物理_距离关节", function () { return new test_3DPhysics_joint_distance(); });
+            demoList.addBtn("3D物理_车轮关节", function () { return new test_3DPhysics_joint_wheel(); });
+            demoList.addBtn("3D物理_铰链马达", function () { return new test_3DPhysics_motor_hinge(); });
+            demoList.addBtn("3D物理_车轮马达", function () { return new test_3DPhysics_motor_wheel(); });
+            demoList.addBtn("3D物理_滑竿马达", function () { return new test_3DPhysics_motor_slider(); });
+            demoList.addBtn("3D物理_冻结_位移旋转", function () { return new test_3DPhysics_freeze(); });
+            demoList.addBtn("3D物理_样例_中心点爆炸", function () { return new test_3DPhysics_explode(); });
+            demoList.addBtn("cannonPhysics3D", function () { return new PhysicDemo.physic_01(); });
+            return new demoList();
+        });
+        this.addBtn("其他==>", function () {
+            demoList.addBtn("test_multipleplayer_anim", function () { return new test_multipleplayer_anim(); });
+            demoList.addBtn("test_reload(换装)", function () { return new testReload(); });
+            demoList.addBtn("mixmesh", function () { return new dome.mixMesh(); });
+            demoList.addBtn("test_assestmgr", function () { return new test_assestmgr(); });
+            demoList.addBtn("test_streamlight", function () { return new test_streamlight(); });
+            demoList.addBtn("test_rendertexture", function () { return new t.test_rendertexture(); });
+            demoList.addBtn("test_cleardepth", function () { return new t.test_clearDepth0(); });
+            demoList.addBtn("test_fakepbr", function () { return new test_fakepbr(); });
+            demoList.addBtn("test_skillsystem", function () { return new t.test_skillsystem(); });
+            demoList.addBtn("TestRotate", function () { return new t.TestRotate(); });
+            demoList.addBtn("pathasset", function () { return new t.test_pathAsset(); });
+            demoList.addBtn("test_Asi_prefab", function () { return new test_loadAsiprefab(); });
+            demoList.addBtn("test_liChange", function () { return new testLiChangeMesh(); });
+            demoList.addBtn("example_newObject", function () { return new test_NewGameObject; });
+            demoList.addBtn("example_changeMesh", function () { return new test_ChangeMesh(); });
+            demoList.addBtn("example_changeMaterial", function () { return new test_ChangeMaterial(); });
+            demoList.addBtn("demo_ScreenSplit", function () { return new demo_ScreenSplit(); });
+            demoList.addBtn("导航网格", function () { return new test_navMesh(); });
+            demoList.addBtn("rvo2_驾驶行为", function () { return new test_Rvo2(); });
+            demoList.addBtn("导航RVO_防挤Demo", function () { return new demo_navigaionRVO(); });
+            demoList.addBtn("dome_加载播放动画", function () { return new dome_loadaniplayer(); });
+            demoList.addBtn("使用加载资源的Demo列表", function () { return new UseAssetByLoadDemoList(); });
+            demoList.addBtn("tesrtss", function () { return new dome.testCJ(); });
+            demoList.addBtn("表面贴花(弹痕)", function () { return new test_Decal(); });
+            return new demoList();
+        });
+        this.addBtn("项目Demo==>", function () {
+            demoList.addBtn("paowuxian2", function () { return new dome.paowuxian2(); });
+            demoList.addBtn("paowuxian", function () { return new dome.paowuxian(); });
+            demoList.addBtn("test_tank", function () { return new demo.TankGame(); });
+            demoList.addBtn("test_long", function () { return new demo.DragonTest(); });
+            return new demoList();
+        });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -1235,6 +1278,8 @@ var main = (function () {
         for (var i = 0; i < this.btns.length; i++) {
             this.app.container.removeChild(this.btns[i]);
         }
+        this.x = this.def_x;
+        this.y = this.def_y;
         this.btns.length = 0;
     };
     main.prototype.onUpdate = function (delta) {
@@ -1244,10 +1289,11 @@ var main = (function () {
     main.prototype.isClosed = function () {
         return false;
     };
-    main = __decorate([
+    main = main_1 = __decorate([
         gd3d.reflect.userCode
     ], main);
     return main;
+    var main_1;
 }());
 var test_01 = (function () {
     function test_01() {
@@ -6009,6 +6055,9 @@ var t;
             }
         };
         test_ui.prototype.update = function (delta) {
+            if (gd3d["__he__"]) {
+                debugger;
+            }
             this.timer += delta;
             var x = Math.sin(this.timer);
             var z = Math.cos(this.timer);
@@ -6304,14 +6353,14 @@ var test_3DPhysics_compound = (function () {
                     case 0: return [4, physics3dDemoTool.init(app)];
                     case 1:
                         _a.sent();
-                        return [4, physics3dDemoTool.loadbySync("./res/prefabs/Capsule/Capsule.assetbundle.json")];
-                    case 2:
-                        _a.sent();
                         this.app = app;
                         this.scene = physics3dDemoTool.scene;
                         this.astMgr = physics3dDemoTool.astMgr;
                         this.iptMgr = physics3dDemoTool.iptMgr;
                         this.camera = physics3dDemoTool.camera;
+                        return [4, demoTool.loadbySync("./res/prefabs/Capsule/Capsule.assetbundle.json", this.astMgr)];
+                    case 2:
+                        _a.sent();
                         this.init();
                         return [2, null];
                 }
@@ -6463,7 +6512,7 @@ var test_3DPhysics_compound = (function () {
     };
     test_3DPhysics_compound.prototype.onPonitMove = function (_a) {
         var x = _a[0], y = _a[1];
-        var viewPos = gd3d.helpv2();
+        var viewPos = gd3d.poolv2();
         viewPos.x = x;
         viewPos.y = y;
         console.log("x: " + x + " ,y :" + y);
@@ -6476,6 +6525,7 @@ var test_3DPhysics_compound = (function () {
         console.log("pos  x: " + pos.x + " ,y :" + pos.y + " , z: " + pos.z);
         pos.y += 0.55;
         this.boxTran.physicsImpostor.kinematicSetPosition(pos);
+        gd3d.poolv2_del(viewPos);
     };
     test_3DPhysics_compound.prototype.update = function (delta) {
         this.tcount += delta;
@@ -6632,7 +6682,7 @@ var test_3DPhysics_explode = (function () {
             return;
         this.boxList.forEach(function (box) {
             if (box) {
-                var tv3 = gd3d.helpv3();
+                var tv3 = gd3d.poolv3();
                 gd3d.math.vec3Subtract(box.gameObject.transform.localPosition, point, tv3);
                 var len = gd3d.math.vec3Length(tv3);
                 gd3d.math.vec3Normalize(tv3, tv3);
@@ -6643,6 +6693,7 @@ var test_3DPhysics_explode = (function () {
                     gd3d.math.vec3ScaleByNum(tv3, froce, tv3);
                     box.gameObject.transform.physicsImpostor.applyImpulse(tv3, box.gameObject.transform.localPosition);
                 }
+                gd3d.poolv3_del(tv3);
             }
         });
     };
@@ -6794,7 +6845,7 @@ var test_3DPhysics_freeze = (function () {
     };
     test_3DPhysics_freeze.prototype.onPonitMove = function (_a) {
         var x = _a[0], y = _a[1];
-        var viewPos = gd3d.helpv2();
+        var viewPos = gd3d.poolv2();
         viewPos.x = x;
         viewPos.y = y;
         console.log("x: " + x + " ,y :" + y);
@@ -6807,6 +6858,7 @@ var test_3DPhysics_freeze = (function () {
         console.log("pos  x: " + pos.x + " ,y :" + pos.y + " , z: " + pos.z);
         pos.y += 0.55;
         this.boxTran.physicsImpostor.kinematicSetPosition(pos);
+        gd3d.poolv2_del(viewPos);
     };
     test_3DPhysics_freeze.prototype.update = function (delta) {
         this.tcount += delta;
@@ -7544,7 +7596,7 @@ var test_3DPhysics_kinematic = (function () {
     };
     test_3DPhysics_kinematic.prototype.onPonitMove = function (_a) {
         var x = _a[0], y = _a[1];
-        var viewPos = gd3d.helpv2();
+        var viewPos = gd3d.poolv2();
         viewPos.x = x;
         viewPos.y = y;
         console.log("x: " + x + " ,y :" + y);
@@ -7557,6 +7609,7 @@ var test_3DPhysics_kinematic = (function () {
         console.log("pos  x: " + pos.x + " ,y :" + pos.y + " , z: " + pos.z);
         pos.y += 0.55;
         this.ctrBox.physicsImpostor.kinematicSetPosition(pos);
+        gd3d.poolv2_del(viewPos);
     };
     test_3DPhysics_kinematic.prototype.updateRoate = function () {
         if (!this.ctrBox)
@@ -8072,6 +8125,93 @@ var t;
     }());
     t_2.test_blend = test_blend;
 })(t || (t = {}));
+var test_Decal = (function () {
+    function test_Decal() {
+        this.taskmgr = new gd3d.framework.taskMgr();
+        this.buildingPname = "Map_Castle_dajiwuA";
+        this.texName = "EF_decal_yp.png";
+        this.inited = false;
+        this.dec = "点击模型发射贴上弹痕";
+        this.Y_ag = 0;
+    }
+    test_Decal.prototype.start = function (app) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.app = app;
+                        this.scene = this.app.getScene();
+                        this.assetMgr = this.app.getAssetMgr();
+                        return [4, demoTool.loadbySync("./res/shader/shader.assetbundle.json", this.assetMgr)];
+                    case 1:
+                        _a.sent();
+                        return [4, demoTool.loadbySync("./res/texture/" + this.texName, this.assetMgr)];
+                    case 2:
+                        _a.sent();
+                        return [4, demoTool.loadbySync("./res/prefabs/" + this.buildingPname + "/" + this.buildingPname + ".assetbundle.json", this.assetMgr)];
+                    case 3:
+                        _a.sent();
+                        return [4, datGui.init()];
+                    case 4:
+                        _a.sent();
+                        this.init();
+                        this.inited = true;
+                        return [2, null];
+                }
+            });
+        });
+    };
+    test_Decal.prototype.init = function () {
+        this.initCamera();
+        var bPrefb = this.assetMgr.getAssetByName(this.buildingPname + ".prefab.json");
+        var bTrans = bPrefb.getCloneTrans();
+        this.building = bTrans;
+        var mf = bTrans.gameObject.getComponent("meshFilter");
+        gd3d.math.vec3SetAll(bTrans.localScale, 5);
+        this.scene.addChild(bTrans);
+        var templateD = new gd3d.framework.transform();
+        var mr = templateD.gameObject.addComponent("meshRenderer");
+        mr.materials = [];
+        mr.materials[0] = new gd3d.framework.material();
+        mr.materials[0].setShader(this.assetMgr.getShader("particles_blend.shader.json"));
+        mr.materials[0].setTexture("_Main_Tex", this.assetMgr.getAssetByName(this.texName));
+        var mgr = new gd3d.framework.transform();
+        this.scene.addChild(mgr);
+        var decal = mgr.gameObject.addComponent("decalCreater");
+        decal.tempTex = mr;
+        decal.targetMF = mf;
+        decal.camera = this.camera;
+        var gui = new dat.GUI();
+        ;
+        gui.add(this, 'dec');
+    };
+    test_Decal.prototype.initCamera = function () {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 1000;
+        this.camera.fov = Math.PI * 0.3;
+        this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
+        objCam.localTranslate = new gd3d.math.vector3(0, 15, -15);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        var hoverc = this.camera.gameObject.addComponent("HoverCameraScript");
+        hoverc.panAngle = 180;
+        hoverc.tiltAngle = 45;
+        hoverc.distance = 30;
+        hoverc.scaleSpeed = 0.1;
+        hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0);
+    };
+    test_Decal.prototype.update = function (delta) {
+        if (!this.inited)
+            return;
+        this.Y_ag += delta * 30;
+        gd3d.math.quatFromEulerAngles(0, this.Y_ag, 0, this.building.localRotate);
+        this.building.localRotate = this.building.localRotate;
+    };
+    return test_Decal;
+}());
 var test_fakepbr = (function () {
     function test_fakepbr() {
         this.timer = 0;
@@ -11692,6 +11832,69 @@ var test_UIEffect = (function () {
     };
     return test_UIEffect;
 }());
+var test_UIGuideMask = (function () {
+    function test_UIGuideMask() {
+        this.inited = false;
+        this.dec = "点击屏幕 , 移动孔的位置";
+    }
+    test_UIGuideMask.prototype.start = function (app) {
+        return __awaiter(this, void 0, void 0, function () {
+            var objCam;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.app = app;
+                        this.scene = this.app.getScene();
+                        this.assetMgr = this.app.getAssetMgr();
+                        this.iptMgr = this.app.getInputMgr();
+                        objCam = new gd3d.framework.transform();
+                        objCam.name = "sth.";
+                        this.scene.addChild(objCam);
+                        this.camera = objCam.gameObject.addComponent("camera");
+                        this.camera.near = 0.01;
+                        this.camera.far = 10;
+                        this.rooto2d = new gd3d.framework.overlay2D();
+                        this.camera.addOverLay(this.rooto2d);
+                        return [4, datGui.init()];
+                    case 1:
+                        _a.sent();
+                        this.init();
+                        return [2];
+                }
+            });
+        });
+    };
+    test_UIGuideMask.prototype.init = function () {
+        var _this = this;
+        var template = new gd3d.framework.transform2D();
+        var rImg = template.addComponent("rawImage2D");
+        rImg.image = this.assetMgr.getDefaultTexture(gd3d.framework.defTexture.white);
+        rImg.color = new gd3d.math.color(0, 0, 0, 0.8);
+        var opt = gd3d.framework.layoutOption;
+        var maskui = new gd3d.framework.transform2D();
+        maskui.layoutState = opt.TOP | opt.BOTTOM | opt.LEFT | opt.RIGHT;
+        var maskComp = maskui.addComponent("guideMask");
+        this.rooto2d.addChild(maskui);
+        maskComp.holeRect = new gd3d.math.rect(200, 200, 100, 100);
+        maskComp.template = template;
+        var tv2 = new gd3d.math.vector2();
+        var tv2_1 = new gd3d.math.vector2();
+        this.iptMgr.addPointListener(gd3d.event.PointEventEnum.PointDown, function (_a) {
+            var x = _a[0], y = _a[1];
+            gd3d.math.vec2Set(tv2, x, y);
+            _this.rooto2d.calScreenPosToCanvasPos(tv2, tv2_1);
+            maskComp.holeRect.x = tv2_1.x;
+            maskComp.holeRect.y = tv2_1.y;
+            maskComp.holeRect = maskComp.holeRect;
+        }, this);
+        var gui = new dat.GUI();
+        ;
+        gui.add(this, 'dec');
+    };
+    test_UIGuideMask.prototype.update = function (delta) {
+    };
+    return test_UIGuideMask;
+}());
 var test_uimove = (function () {
     function test_uimove() {
         this.timer = 0;
@@ -13858,8 +14061,7 @@ var physic2d_dome = (function () {
         this.camera.far = 10;
         this.rooto2d = new gd3d.framework.overlay2D();
         this.camera.addOverLay(this.rooto2d);
-        this.scene.enable2DPhysics();
-        gd3d.framework.physic2D.setGravity(0, 0);
+        this.scene.enable2DPhysics(new gd3d.math.vector2(0, 0));
         this.taskmgr.addTaskCall(this.loadTexture.bind(this));
         this.taskmgr.addTaskCall(this.createUI.bind(this));
     };
@@ -13886,7 +14088,7 @@ var physic2d_dome = (function () {
         bound3.pivot.y = 0.5;
         var boundimag3 = bound3.addComponent("rawImage2D");
         boundimag3.image = texture;
-        var body3 = bound3.addComponent("rectBody");
+        var body3 = bound3.addComponent("rectBody2d");
         body3.setInitData({ isStatic: true });
         root.addChild(bound3);
         return bound3;
@@ -13901,7 +14103,7 @@ var physic2d_dome = (function () {
         bound3.pivot.y = 0.5;
         var boundimag3 = bound3.addComponent("rawImage2D");
         boundimag3.image = texture;
-        var body3 = bound3.addComponent("rectBody");
+        var body3 = bound3.addComponent("rectBody2d");
         setTimeout(function () {
             body3.addForce(new gd3d.math.vector2(1, 0));
         }, 3000);
@@ -14855,6 +15057,522 @@ var gd3d;
         framework.HoverCameraScript = HoverCameraScript;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
+var decalCreater = (function (_super) {
+    __extends(decalCreater, _super);
+    function decalCreater() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this.sizeN = 3;
+        _this._offset = 0.05;
+        _this.tag_decalRoot = "__tag_decalRoot__";
+        _this.limitDecalMaxCount = 5;
+        _this.size = new gd3d.math.vector3();
+        _this.wdir = new gd3d.math.vector3();
+        _this.rotate = new gd3d.math.quaternion();
+        _this.woffsetPos = new gd3d.math.vector3();
+        return _this;
+    }
+    decalCreater_1 = decalCreater;
+    decalCreater.prototype.onPlay = function () {
+        var _this = this;
+        if (!this.camera)
+            return;
+        var meshF = this.targetMF;
+        var mTran = meshF.gameObject.transform;
+        var mMtx = mTran.getWorldMatrix();
+        this.scene = this.gameObject.transform.scene;
+        var app = this.scene.app;
+        this.app = app;
+        this._assetMgr = app.getAssetMgr();
+        var iptMgr = app.getInputMgr();
+        var pinfo = new gd3d.framework.pickinfo();
+        var tv2 = decalCreater_1.helpv2;
+        iptMgr.addPointListener(gd3d.event.PointEventEnum.PointDown, function (_a) {
+            var x = _a[0], y = _a[1];
+            console.warn(" pos : " + x + "_" + y);
+            gd3d.math.vec2Set(tv2, x, y);
+            decalCreater_1.multipleViewFix(_this.camera, app, tv2, tv2);
+            var ray = _this.camera.creatRayByScreen(tv2, app);
+            var b = meshF.mesh.intersects(ray, mMtx, pinfo);
+            if (!b)
+                return;
+            _this.sprayDecal(pinfo);
+        }, this);
+    };
+    decalCreater.prototype.update = function (delta) {
+    };
+    decalCreater.prototype.remove = function () {
+    };
+    decalCreater.prototype.sprayDecal = function (pinfo) {
+        if (!pinfo || !this.targetMF)
+            return;
+        var meshF = this.targetMF;
+        var mfTrans = meshF.gameObject.transform;
+        var droot;
+        var len = mfTrans.children.length;
+        for (var i = 0; i < len; i++) {
+            var c = mfTrans.children[i];
+            if (c && c[this.tag_decalRoot]) {
+                droot = c;
+                break;
+            }
+            if (i == len - 1) {
+                droot = new gd3d.framework.transform();
+                droot.name = "decalRoot";
+                droot[this.tag_decalRoot] = true;
+                mfTrans.addChildAt(droot, 0);
+            }
+        }
+        var wdir = this.wdir;
+        this.calecWorldNormal(pinfo, meshF, wdir);
+        this.calecRoation(wdir, pinfo, this.rotate);
+        gd3d.math.vec3SetAll(this.size, this.sizeN);
+        var cc = this.print(meshF, pinfo.hitposition, this.rotate, this.size);
+        gd3d.math.vec3ScaleByNum(wdir, this._offset, this.woffsetPos);
+        gd3d.math.vec3Add(cc.localPosition, this.woffsetPos, cc.localPosition);
+        droot.addChild(cc);
+        cc.setWorldRotate(cc.localRotate);
+        cc.setWorldScale(cc.localScale);
+        cc.setWorldPosition(cc.localPosition);
+        var clen = droot.children ? droot.children.length : 0;
+        var limiMC = this.limitDecalMaxCount < 0 ? 0 : this.limitDecalMaxCount;
+        if (clen > limiMC) {
+            var fristT = droot.children[0];
+            droot.removeChild(fristT);
+            fristT.dispose();
+        }
+    };
+    decalCreater.prototype.print = function (meshF, position, orientation, size) {
+        if (!this.app)
+            return;
+        var webgl = this.app.webgl;
+        var d = new decalGeometry(meshF, position, orientation, size, webgl);
+        d.meshF;
+        var mr = d.meshF.gameObject.addComponent("meshRenderer");
+        mr.materials = [];
+        var mat;
+        if (this.tempTex) {
+            mat = this.tempTex.materials[0];
+        }
+        else {
+            mr.materials[0] = new gd3d.framework.material();
+            mr.materials[0].setShader(this.app.getAssetMgr().getShader("diffuse.shader.json"));
+            mr.materials[0].setTexture("_MainTex", this._assetMgr.getDefaultTexture("grid"));
+        }
+        mr.materials[0] = mat;
+        return d.meshF.gameObject.transform;
+    };
+    decalCreater.prototype.calecWorldNormal = function (pinfo, mf, result) {
+        var fid = pinfo.faceId;
+        var md = mf.mesh.data;
+        var trisIds = md.trisindex;
+        var maseTran = mf.gameObject.transform;
+        var p1 = md.pos[trisIds[fid * 3]];
+        var p2 = md.pos[trisIds[fid * 3 + 1]];
+        var p3 = md.pos[trisIds[fid * 3 + 2]];
+        var line_a = decalCreater_1.helpv3;
+        gd3d.math.vec3Subtract(p3, p1, line_a);
+        var line_b = decalCreater_1.helpv3_1;
+        gd3d.math.vec3Subtract(p2, p1, line_b);
+        var nor = decalCreater_1.helpv3_2;
+        gd3d.math.vec3Cross(line_a, line_b, nor);
+        var wmtx = maseTran.getWorldMatrix();
+        gd3d.math.matrixTransformNormal(nor, wmtx, nor);
+        gd3d.math.vec3Normalize(nor, result);
+    };
+    decalCreater.prototype.calecRoation = function (dir, pinfo, result) {
+        var lookpoint = decalCreater_1.helpv3;
+        gd3d.math.vec3Clone(dir, lookpoint);
+        gd3d.math.vec3ScaleByNum(lookpoint, 10, lookpoint);
+        gd3d.math.vec3Add(lookpoint, pinfo.hitposition, lookpoint);
+        gd3d.math.quatLookat(pinfo.hitposition, lookpoint, result);
+        var rAg = Math.random() * 360;
+        gd3d.math.quatFromAxisAngle(dir, rAg, decalCreater_1.helpqaut);
+        gd3d.math.quatMultiply(decalCreater_1.helpqaut, result, result);
+    };
+    decalCreater.multipleViewFix = function (_camera, app, screenPos, result) {
+        var vp = _camera.viewport;
+        var offset_x = app.width * vp.x;
+        var offset_y = app.height * vp.y;
+        gd3d.math.vec2Clone(screenPos, result);
+        result.x -= offset_x;
+        result.y -= offset_y;
+    };
+    decalCreater.helpv2 = new gd3d.math.vector2();
+    decalCreater.helpv3 = new gd3d.math.vector3();
+    decalCreater.helpv3_1 = new gd3d.math.vector3();
+    decalCreater.helpv3_2 = new gd3d.math.vector3();
+    decalCreater.helpv3_3 = new gd3d.math.vector3();
+    decalCreater.helpqaut = new gd3d.math.quaternion();
+    __decorate([
+        gd3d.reflect.Field("number"),
+        __metadata("design:type", Object)
+    ], decalCreater.prototype, "sizeN", void 0);
+    __decorate([
+        gd3d.reflect.Field("reference", null, "meshRenderer"),
+        __metadata("design:type", gd3d.framework.meshRenderer)
+    ], decalCreater.prototype, "tempTex", void 0);
+    __decorate([
+        gd3d.reflect.Field("reference", null, "camera"),
+        __metadata("design:type", gd3d.framework.camera)
+    ], decalCreater.prototype, "camera", void 0);
+    __decorate([
+        gd3d.reflect.Field("reference", null, "meshFilter"),
+        __metadata("design:type", gd3d.framework.meshFilter)
+    ], decalCreater.prototype, "targetMF", void 0);
+    decalCreater = decalCreater_1 = __decorate([
+        gd3d.reflect.nodeComponent
+    ], decalCreater);
+    return decalCreater;
+    var decalCreater_1;
+}(gd3d.framework.behaviour));
+var decalGeometry = (function () {
+    function decalGeometry(tragetMeshf, position, orientation, size, webgl) {
+        var _this = this;
+        this.tragetMeshf = tragetMeshf;
+        this.position = position;
+        this.orientation = orientation;
+        this.size = size;
+        this.vertices = [];
+        this.normals = [];
+        this.uvs = [];
+        decalGeometry.id++;
+        this.mesh = new gd3d.framework.mesh("decalGeometry_" + decalGeometry.id);
+        var projectorMatrix = new gd3d.math.matrix();
+        this.projectorMatrix = projectorMatrix;
+        gd3d.math.quatToMatrix(orientation, projectorMatrix);
+        projectorMatrix.rawData[12] = position.x;
+        projectorMatrix.rawData[13] = position.y;
+        projectorMatrix.rawData[14] = position.z;
+        var projectorMatrixInverse = new gd3d.math.matrix();
+        this.projectorMatrixInverse = projectorMatrixInverse;
+        gd3d.math.matrixInverse(projectorMatrix, projectorMatrixInverse);
+        this.generate();
+        this.mesh.data = new gd3d.render.meshData();
+        var vfm = gd3d.render.VertexFormatMask;
+        var vf = vfm.Position | vfm.UV0 | vfm.Color;
+        if (!decalGeometry.onlyPostion) {
+            var vf_1 = vfm.Position | vfm.Normal | vfm.UV0 | vfm.Color;
+            this.mesh.data.normal = this.normals;
+        }
+        this.mesh.data.originVF = vf;
+        this.mesh.data.pos = this.vertices;
+        this.mesh.data.uv = this.uvs;
+        this.mesh.data.trisindex = [];
+        this.mesh.data.pos.forEach(function (p, i) {
+            _this.mesh.data.trisindex.push(i);
+        });
+        var vertexs = this.mesh.data.genVertexDataArray(vf);
+        var indices = this.mesh.data.genIndexDataArray();
+        this.mesh.glMesh = new gd3d.render.glMesh();
+        this.mesh.glMesh.initBuffer(webgl, vf, this.mesh.data.pos.length);
+        this.mesh.glMesh.uploadVertexData(webgl, vertexs);
+        this.mesh.glMesh.addIndex(webgl, indices.length);
+        this.mesh.glMesh.uploadIndexData(webgl, 0, indices);
+        this.mesh.submesh = [];
+        var minfo = new gd3d.framework.subMeshInfo();
+        minfo = new gd3d.framework.subMeshInfo();
+        minfo.line = false;
+        minfo.matIndex = 0;
+        minfo.size = indices.length;
+        minfo.start = 0;
+        minfo.useVertexIndex = 0;
+        this.mesh.submesh.push(minfo);
+        var outTran = new gd3d.framework.transform;
+        this.meshF = outTran.gameObject.addComponent("meshFilter");
+        this.meshF.mesh = this.mesh;
+    }
+    decalGeometry.prototype.generate = function () {
+        var decalVertices = [];
+        var vertex = new gd3d.math.vector3();
+        var normal = new gd3d.math.vector3();
+        var meshData = this.tragetMeshf.mesh.data;
+        var vLen = meshData.trisindex.length;
+        for (var i = 0; i < vLen; i++) {
+            var idx = meshData.trisindex[i];
+            var p = gd3d.math.pool.clone_vector3(meshData.pos[idx]);
+            var n = void 0;
+            if (!decalGeometry.onlyPostion)
+                n = gd3d.math.pool.clone_vector3(meshData.normal[idx]);
+            this.pushDecalVertex(decalVertices, p, n);
+        }
+        var len = decalGeometry.planes.length;
+        for (var i = 0; i < len; i++) {
+            var p = decalGeometry.planes[i];
+            decalVertices = this.clipGeometry(decalVertices, p);
+        }
+        var dlen = decalVertices.length;
+        for (var i = 0; i < dlen; i++) {
+            var decalVertex = decalVertices[i];
+            var dPos = decalVertex.position;
+            var dNor = void 0;
+            if (!decalGeometry.onlyPostion)
+                dNor = decalVertex.normal;
+            var uv = new gd3d.math.vector2(0.5 + (dPos.x / this.size.x), 0.5 + (dPos.y / this.size.y));
+            this.uvs.push(uv);
+            gd3d.math.matrixTransformVector3(decalVertex.position, this.projectorMatrix, decalVertex.position);
+            this.vertices.push(gd3d.math.pool.clone_vector3(dPos));
+            if (!decalGeometry.onlyPostion)
+                this.normals.push(gd3d.math.pool.clone_vector3(dNor));
+        }
+    };
+    decalGeometry.prototype.pushDecalVertex = function (decalVertices, vertex, normal) {
+        var pos = gd3d.math.pool.clone_vector3(vertex);
+        var nor;
+        if (!decalGeometry.onlyPostion)
+            nor = gd3d.math.pool.clone_vector3(normal);
+        var wmat = this.tragetMeshf.gameObject.transform.getWorldMatrix();
+        gd3d.math.matrixTransformVector3(pos, wmat, pos);
+        gd3d.math.matrixTransformVector3(pos, this.projectorMatrixInverse, pos);
+        decalVertices.push(new DecalVertex(pos, nor));
+    };
+    decalGeometry.prototype.clipGeometry = function (inVertices, plane) {
+        var outVertices = [];
+        var s = 0.5 * Math.abs(gd3d.math.vec3Dot(this.size, plane));
+        for (var i = 0; i < inVertices.length; i += 3) {
+            var v1Out = void 0, v2Out = void 0, v3Out = void 0, total = 0;
+            var nV1 = void 0, nV2 = void 0, nV3 = void 0, nV4 = void 0;
+            var d1 = gd3d.math.vec3Dot(inVertices[i + 0].position, plane) - s;
+            var d2 = gd3d.math.vec3Dot(inVertices[i + 1].position, plane) - s;
+            var d3 = gd3d.math.vec3Dot(inVertices[i + 2].position, plane) - s;
+            v1Out = d1 > 0;
+            v2Out = d2 > 0;
+            v3Out = d3 > 0;
+            total = (v1Out ? 1 : 0) + (v2Out ? 1 : 0) + (v3Out ? 1 : 0);
+            switch (total) {
+                case 0: {
+                    outVertices.push(inVertices[i]);
+                    outVertices.push(inVertices[i + 1]);
+                    outVertices.push(inVertices[i + 2]);
+                    break;
+                }
+                case 1: {
+                    if (v1Out) {
+                        nV1 = inVertices[i + 1];
+                        nV2 = inVertices[i + 2];
+                        nV3 = this.clip(inVertices[i], nV1, plane, s);
+                        nV4 = this.clip(inVertices[i], nV2, plane, s);
+                    }
+                    if (v2Out) {
+                        nV1 = inVertices[i];
+                        nV2 = inVertices[i + 2];
+                        nV3 = this.clip(inVertices[i + 1], nV1, plane, s);
+                        nV4 = this.clip(inVertices[i + 1], nV2, plane, s);
+                        outVertices.push(nV3);
+                        outVertices.push(nV2.clone());
+                        outVertices.push(nV1.clone());
+                        outVertices.push(nV2.clone());
+                        outVertices.push(nV3.clone());
+                        outVertices.push(nV4);
+                        break;
+                    }
+                    if (v3Out) {
+                        nV1 = inVertices[i];
+                        nV2 = inVertices[i + 1];
+                        nV3 = this.clip(inVertices[i + 2], nV1, plane, s);
+                        nV4 = this.clip(inVertices[i + 2], nV2, plane, s);
+                    }
+                    outVertices.push(nV1.clone());
+                    outVertices.push(nV2.clone());
+                    outVertices.push(nV3);
+                    outVertices.push(nV4);
+                    outVertices.push(nV3.clone());
+                    outVertices.push(nV2.clone());
+                    break;
+                }
+                case 2: {
+                    if (!v1Out) {
+                        nV1 = inVertices[i].clone();
+                        nV2 = this.clip(nV1, inVertices[i + 1], plane, s);
+                        nV3 = this.clip(nV1, inVertices[i + 2], plane, s);
+                        outVertices.push(nV1);
+                        outVertices.push(nV2);
+                        outVertices.push(nV3);
+                    }
+                    if (!v2Out) {
+                        nV1 = inVertices[i + 1].clone();
+                        nV2 = this.clip(nV1, inVertices[i + 2], plane, s);
+                        nV3 = this.clip(nV1, inVertices[i], plane, s);
+                        outVertices.push(nV1);
+                        outVertices.push(nV2);
+                        outVertices.push(nV3);
+                    }
+                    if (!v3Out) {
+                        nV1 = inVertices[i + 2].clone();
+                        nV2 = this.clip(nV1, inVertices[i], plane, s);
+                        nV3 = this.clip(nV1, inVertices[i + 1], plane, s);
+                        outVertices.push(nV1);
+                        outVertices.push(nV2);
+                        outVertices.push(nV3);
+                    }
+                    break;
+                }
+                case 3: {
+                    break;
+                }
+            }
+        }
+        return outVertices;
+    };
+    decalGeometry.prototype.clip = function (v0, v1, p, s) {
+        var d0 = gd3d.math.vec3Dot(p, v0.position) - s;
+        var d1 = gd3d.math.vec3Dot(p, v1.position) - s;
+        var s0 = d0 / (d0 - d1);
+        var pos = new gd3d.math.vector3(v0.position.x + s0 * (v1.position.x - v0.position.x), v0.position.y + s0 * (v1.position.y - v0.position.y), v0.position.z + s0 * (v1.position.z - v0.position.z));
+        var nor;
+        if (!decalGeometry.onlyPostion) {
+            nor = new gd3d.math.vector3(v0.normal.x + s0 * (v1.normal.x - v0.normal.x), v0.normal.y + s0 * (v1.normal.y - v0.normal.y), v0.normal.z + s0 * (v1.normal.z - v0.normal.z));
+        }
+        var v = new DecalVertex(pos, nor);
+        return v;
+    };
+    decalGeometry.onlyPostion = false;
+    decalGeometry.id = 0;
+    decalGeometry.planes = [new gd3d.math.vector3(1, 0, 0), new gd3d.math.vector3(-1, 0, 0), new gd3d.math.vector3(0, 1, 0),
+        new gd3d.math.vector3(0, -1, 0), new gd3d.math.vector3(0, 0, 1), new gd3d.math.vector3(0, 0, -1),];
+    return decalGeometry;
+}());
+var DecalVertex = (function () {
+    function DecalVertex(position, normal) {
+        this.position = position;
+        this.normal = normal;
+    }
+    DecalVertex.prototype.clone = function () {
+        var pos = gd3d.math.pool.clone_vector3(this.position);
+        var nor;
+        if (this.normal)
+            nor = gd3d.math.pool.clone_vector3(this.normal);
+        return new DecalVertex(pos, nor);
+    };
+    return DecalVertex;
+}());
+var guideMask = (function (_super) {
+    __extends(guideMask, _super);
+    function guideMask() {
+        var _this = _super !== null && _super.apply(this, arguments) || this;
+        _this._holeRect = new gd3d.math.rect(50, 50, 100, 100);
+        _this.inited = false;
+        _this.cells = [];
+        return _this;
+    }
+    Object.defineProperty(guideMask.prototype, "holeRect", {
+        get: function () {
+            return this._holeRect;
+        },
+        set: function (val) {
+            gd3d.math.rectClone(val, this._holeRect);
+            this.refreshMask();
+            console.error("set holeRect");
+        },
+        enumerable: true,
+        configurable: true
+    });
+    guideMask.prototype.onPlay = function () {
+        var _this = this;
+        if (!this.template)
+            return;
+        var opt = gd3d.framework.layoutOption;
+        this.top = this.template.clone();
+        this.top.name = "top";
+        this.bottom = this.template.clone();
+        this.bottom.name = "bottom";
+        this.left = this.template.clone();
+        this.left.name = "left";
+        this.right = this.template.clone();
+        this.right.name = "right";
+        this.cells.push(this.top, this.bottom, this.left, this.right);
+        this.cells.forEach(function (sub) {
+            sub.layoutState = opt.TOP | opt.BOTTOM | opt.LEFT | opt.RIGHT;
+            sub.visible = true;
+            _this.transform.addChild(sub);
+        });
+        this.inited = true;
+        this.refreshMask();
+    };
+    guideMask.prototype.update = function (delta) {
+    };
+    guideMask.prototype.remove = function () {
+        var len = this.cells.length;
+        for (var i = 0; i < len; i++) {
+            var sub = this.cells.pop();
+            sub.dispose();
+        }
+        this.cells.length = 0;
+        this.template.dispose();
+        this.template = null;
+        gd3d.math.pool.delete_rect(this._holeRect);
+        this._holeRect = null;
+    };
+    guideMask.prototype.refreshMask = function () {
+        if (!this.inited)
+            return;
+        this.cells.forEach(function (sub) { sub.visible = false; });
+        console.error(this.cells.length);
+        var opt = gd3d.framework.layoutOption;
+        var r = this._holeRect;
+        var tran = this.transform;
+        var pos = tran.localTranslate;
+        var isFull = false;
+        var topVal = 0;
+        if (r.y > 0) {
+            topVal = this.transform.height - r.y;
+            this.top.setLayoutValue(opt.BOTTOM, topVal);
+            this.top.markDirty();
+            this.top.visible = true;
+        }
+        else {
+            this.top.visible = false;
+            isFull = true;
+        }
+        var bottomVal = 0;
+        if (r.y + r.h < tran.height) {
+            var height = r.h < 0 ? 0 : r.h;
+            bottomVal = r.y + height;
+            this.bottom.setLayoutValue(opt.TOP, bottomVal);
+            this.bottom.markDirty();
+            this.bottom.visible = true;
+        }
+        else {
+            this.bottom.visible = false;
+            isFull = true;
+        }
+        if (r.x > 0 && !isFull) {
+            this.left.setLayoutValue(opt.BOTTOM, topVal);
+            this.left.setLayoutValue(opt.TOP, bottomVal);
+            var val = this.transform.width - r.x;
+            this.left.setLayoutValue(opt.RIGHT, val);
+            this.left.markDirty();
+            this.left.visible = true;
+        }
+        else {
+            this.left.visible = false;
+        }
+        if (r.x + r.w < tran.width && !isFull) {
+            this.right.setLayoutValue(opt.BOTTOM, topVal);
+            this.right.setLayoutValue(opt.TOP, bottomVal);
+            var width = r.w < 0 ? 0 : r.w;
+            var val = r.x + width;
+            this.right.setLayoutValue(opt.LEFT, val);
+            this.right.markDirty();
+            this.right.visible = true;
+        }
+        else {
+            this.right.visible = false;
+        }
+    };
+    __decorate([
+        gd3d.reflect.Field("rect"),
+        __metadata("design:type", Object),
+        __metadata("design:paramtypes", [gd3d.math.rect])
+    ], guideMask.prototype, "holeRect", null);
+    __decorate([
+        gd3d.reflect.Field("reference", null, "transform2D"),
+        __metadata("design:type", gd3d.framework.transform2D)
+    ], guideMask.prototype, "template", void 0);
+    guideMask = __decorate([
+        gd3d.reflect.node2DComponent
+    ], guideMask);
+    return guideMask;
+}(gd3d.framework.behaviour2d));
 var datGui = (function () {
     function datGui() {
     }
@@ -14884,8 +15602,36 @@ var datGui = (function () {
         });
         return p;
     };
+    datGui.example = function () {
+        var FizzyText = function () {
+            this.message = 'dat.gui';
+            this.speed = 0.8;
+            this.displayOutline = false;
+            this.explode = function () { console.log("do explode"); };
+        };
+        var text = new FizzyText();
+        var gui = new dat.GUI();
+        gui.add(text, 'message');
+        gui.add(text, 'speed', -5, 5);
+        gui.add(text, 'displayOutline');
+        gui.add(text, 'explode');
+    };
     datGui._inited = false;
     return datGui;
+}());
+var demoTool = (function () {
+    function demoTool() {
+    }
+    demoTool.loadbySync = function (url, astMgr) {
+        return new gd3d.threading.gdPromise(function (resolve, reject) {
+            astMgr.load(url, gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                if (state && state.isfinish) {
+                    resolve();
+                }
+            });
+        });
+    };
+    return demoTool;
 }());
 var physics3dDemoTool = (function () {
     function physics3dDemoTool() {
@@ -14899,7 +15645,7 @@ var physics3dDemoTool = (function () {
                         this.scene = this.app.getScene();
                         this.astMgr = this.app.getAssetMgr();
                         this.iptMgr = this.app.getInputMgr();
-                        return [4, this.loadbySync("./res/shader/shader.assetbundle.json")];
+                        return [4, demoTool.loadbySync("./res/shader/shader.assetbundle.json", this.astMgr)];
                     case 1:
                         _a.sent();
                         return [4, datGui.init()];
@@ -14908,16 +15654,6 @@ var physics3dDemoTool = (function () {
                         this.initMats();
                         this.initCamera();
                         return [2];
-                }
-            });
-        });
-    };
-    physics3dDemoTool.loadbySync = function (url) {
-        var _this = this;
-        return new gd3d.threading.gdPromise(function (resolve, reject) {
-            _this.astMgr.load(url, gd3d.framework.AssetTypeEnum.Auto, function (state) {
-                if (state && state.isfinish) {
-                    resolve();
                 }
             });
         });

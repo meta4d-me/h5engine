@@ -24,7 +24,7 @@ namespace gd3d.framework
      * @version egret-gd3d 1.0
      */
     @reflect.node2DComponent
-    export class button implements I2DComponent ,event.IUIEventer
+    export class button implements I2DComponent ,event.IUIEventer ,I2DPointListener
     {
         static readonly ClassName:string="button";
 
@@ -225,7 +225,7 @@ namespace gd3d.framework
             //oncap==true 是捕获阶段，一般的行为，只在pop阶段处理
             if (oncap == false)
             {
-                let tv2 = helpv2();
+                let tv2 = poolv2();
                 tv2.x = ev.x;
                 tv2.y = ev.y;
                 var b = this.transform.ContainsCanvasPoint(tv2);
@@ -289,6 +289,8 @@ namespace gd3d.framework
                         }
                     }
                 }
+
+                gd3d.poolv2_del(tv2);
             }
         }
 

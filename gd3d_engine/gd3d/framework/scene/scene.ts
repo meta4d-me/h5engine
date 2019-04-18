@@ -1,7 +1,7 @@
 namespace gd3d.framework
 {
-    export declare let physic: PhysicsEngine;
-    export declare let physic2D:physicEngine2D;
+    export declare let physics: PhysicsEngine;
+    export declare let physics2D:physicEngine2D;
     /**
      * @public
      * @language zh_CN
@@ -181,9 +181,9 @@ namespace gd3d.framework
             if(this.onLateUpdate)
                 this.onLateUpdate(delta);
 
-            if(physic)
+            if(physics)
             {
-                physic._step(delta);
+                physics._step(delta);
             }
             //排序
             //排序camera 并绘制
@@ -203,13 +203,15 @@ namespace gd3d.framework
                 if(i == this.renderCameras.length-1) {
                     this.renderCameras[i].isLastCamera = true;
                 }
-                this._renderCamera(i);
+                if(this.app && this.app.beRendering){
+                    this._renderCamera(i);
+                }
                 this.renderCameras[i].isLastCamera = false;
             }
 
             this.updateSceneOverLay(delta);
 
-            if (this.RealCameraNumber == 0)
+            if (this.RealCameraNumber == 0 && this.app && this.app.beRendering)
             {
                 this.webgl.clearColor(0, 0, 0, 1);
                 this.webgl.clearDepth(1.0);
@@ -262,7 +264,9 @@ namespace gd3d.framework
                     {
                         overlay.start(targetcamera);
                         overlay.update(delta);
-                        overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
+                        if(this.app && this.app.beRendering){
+                            overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
+                        }
                     }
                 });
             }
@@ -710,14 +714,14 @@ namespace gd3d.framework
          */
         enablePhysics(gravity: math.vector3, plugin?: IPhysicsEnginePlugin)
         {
-            if (physic) {
+            if (physics) {
                 return true;
             }
 
             if(!plugin) plugin = new OimoJSPlugin();
 
             try {
-                physic = new PhysicsEngine(gravity, plugin);
+                physics = new PhysicsEngine(gravity, plugin);
                 return true;
             } catch (e) {
                 console.error(e.message);
@@ -727,9 +731,19 @@ namespace gd3d.framework
             //physic=new PhysicsEngine(new math.vector3(0,-9.8,0),new OimoJSPlugin());
         }
 
-        enable2DPhysics()
+        enable2DPhysics(gravity: math.vector2)
         {
-            physic2D=new physicEngine2D();
+            if(physics2D){
+                return true;
+            }
+            try{
+                physics2D = new physicEngine2D();
+                physics2D.setGravity(gravity.x , gravity.y);
+                return true;
+            }catch(e){
+                console.error(e.message);
+                return false;
+            }
         }
     }
 }

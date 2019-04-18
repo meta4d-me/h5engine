@@ -30,53 +30,106 @@ namespace gd3d.framework {
 
             //---------run the engine
             Matter.Engine.run(this.matterEngine);
+
+            //Event
+            Matter.Events.on(this.matterEngine,"beforeUpdate",this.beforeUpdate.bind(this));
+            Matter.Events.on(this.matterEngine,"afterRender",this.afterRender.bind(this));
+        }
+
+        /** Matter.Engine update 调用前 */
+        private beforeUpdate(event){
+
+        }
+
+        /** Matter.Engine update 调用之后 */
+        private afterRender(event){
+
         }
 
         update(delta: number) {
             Matter.Engine.update(this.matterEngine, delta);
         }
-        // public creatRectBody(posx:number,posy:number,width:number,height:number,beStatic:boolean=false):Ibody
-        // {
-        //     let body:Ibody;
-        //     if(beStatic)
-        //     {
-        //         body=Matter.Bodies.rectangle(posx,posy,width,height,{isStatic: true});
-        //     }else
-        //     {
-        //         body=Matter.Bodies.rectangle(posx,posy,width,height);
-        //     }
-        //     this.addBody(body);
-        //     return body;
-        // }
 
-        // public creatCircle(posx:number,posy:number,radius:number,beStatic:boolean=false):Ibody
-        // {
-        //     let body:Ibody;
-        //     if(beStatic)
-        //     {
-        //         body=Matter.Bodies.circle(posx, posy, radius,{isStatic: true});
-        //     }else
-        //     {
-        //         body=Matter.Bodies.circle(posx, posy, radius);
-        //     }
-        //     this.addBody(body);
-        //     return body;
-        // }
-
-        public creatRectBodyByInitData(posx: number, posy: number, width: number, height: number, initData: IBodyData) {
-            let body = Matter.Bodies.rectangle(posx, posy, width, height, initData);
-            this.addBody(body);
+        /**
+         * Creates a new rigid body model with a circle hull. 
+         * The options parameter is an object that specifies any properties you wish to override the defaults.
+         * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
+         * @param pBody I2DPhysicsBody 实例
+         */
+        public creatRectBodyByInitData(pBody :I2DPhysicsBody ) {
+            if(!pBody || !pBody.transform) return;
+            let tran = pBody.transform;
+            let pos = tran.getWorldTranslate();
+            let body = Matter.Bodies.rectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
+            pBody.body = body;
+            this.addBody(pBody);
             return body;
         }
 
-        public creatCircleBodyByInitData(posx: number, posy: number, radius: number, initData: IBodyData) {
-            let body = Matter.Bodies.circle(posx, posy, radius, initData);
-            this.addBody(body);
+        /**
+         * Creates a new rigid body model with a circle hull. 
+         * The options parameter is an object that specifies any properties you wish to override the defaults.
+         * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
+         * @param pBody I2DPhysicsBody 实例
+         * @param radius 半径
+         * @param maxSides 最大边
+         */
+        public creatCircleBodyByInitData(pBody :I2DPhysicsBody , radius: number, maxSides: number = 25) {
+            if(!pBody || !pBody.transform) return;
+            let tran = pBody.transform;
+            let pos = tran.getWorldTranslate();
+            let body = Matter.Bodies.circle(pos.x, pos.y, radius, pBody.options ,maxSides);
+            pBody.body = body;
+            this.addBody(pBody);
+            return body;
+        }
+        /**
+         * Creates a body using the supplied vertices (or an array containing multiple sets of vertices).
+         * If the vertices are convex, they will pass through as supplied.
+         * Otherwise if the vertices are concave, they will be decomposed if [poly-decomp.js](https://github.com/schteppe/poly-decomp.js) is available.
+         * Note that this process is not guaranteed to support complex sets of vertices (e.g. those with holes may fail).
+         * By default the decomposition will discard collinear edges (to improve performance).
+         * It can also optionally discard any parts that have an area less than `minimumArea`.
+         * If the vertices can not be decomposed, the result will fall back to using the convex hull.
+         * The options parameter is an object that specifies any `Matter.Body` properties you wish to override the defaults.
+         * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
+         * @param pBody I2DPhysicsBody 实例
+         * @param vertexSets 顶点集合
+         * @param flagInternal 内部模式标记
+         * @param removeCollinear 共线移除参考值
+         * @param minimumArea 最小面积
+         */
+        ConvexHullBodyByInitData(pBody :I2DPhysicsBody ,vertexSets , flagInternal = false, removeCollinear = 0.01, minimumArea = 10){
+            if(!pBody || !pBody.transform) return;
+            let tran = pBody.transform;
+            let pos = tran.getWorldTranslate();
+            let body = Matter.Bodies.fromVertices(pos.x, pos.y, vertexSets, pBody.options, flagInternal , removeCollinear , minimumArea);
+            pBody.body = body;
+            this.addBody(pBody,);
             return body;
         }
 
-        public addBody(body: Ibody) {
-            Matter.World.add(this.engineWorld, body);
+        private _physicsBodys : I2DPhysicsBody[]  = [];
+
+        /** 添加 I2DPhysicsBody 实例到 2d物理世界*/
+        private addBody(_Pbody: I2DPhysicsBody){
+            this._physicsBodys.push(_Pbody);
+            Matter.World.add(this.engineWorld, _Pbody.body);
+        }
+
+        /** 移除 指定 I2DPhysicsBody 实例 */
+        removeBody(_Pbody: I2DPhysicsBody) {
+            if(!_Pbody) return;
+            let idx = this._physicsBodys.indexOf(_Pbody);
+            if(idx != -1){
+                this._physicsBodys.splice(idx,1);
+            }
+            Matter.World.remove(this.engineWorld, _Pbody.body);
+        }
+
+        /** 清理世界 */
+        clearWorld(keepStatic:boolean = false){
+            Matter.World.clear(this.engineWorld,keepStatic);
         }
 
         public applyForce(body: Ibody, positon: math.vector2, force: math.vector2): void {
@@ -135,14 +188,11 @@ namespace gd3d.framework {
             Matter.Events.off(this.matterEngine, eventname, callback);
         }
 
-        public removeBody(body: Ibody) {
-
-            Matter.World.remove(this.engineWorld, body);
-        }
+        
     }
 
     export interface Ibody {
-
+        bounds : {max:{x:number,y:number},min:{x:number,y:number}};
         angle: number;
         position: matterVector;
         speed: number;

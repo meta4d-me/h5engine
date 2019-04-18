@@ -1,7 +1,5 @@
 ﻿namespace gd3d.framework
 {  
-    let helpv3 = new math.vector3();
-    let helpv3_1 = new math.vector3();
     /**
      * @public
      * @language zh_CN
@@ -11,6 +9,8 @@
      */
     export class obb
     {
+        private static helpv3 = new math.vector3();
+        private static helpv3_1 = new math.vector3();
         /** xyz 轴 方向  */
         private _directions:  math.vector3[] = [];
         /** 世界坐标顶半长 */
@@ -106,8 +106,8 @@
         get halfSizeWorld(){
             if(this.dirtyMap[obb.tag_wHalfSize]){
                 let wVects = this.vectorsWorld;
-                let wMin = helpv3;
-                let wMax = helpv3_1;
+                let wMin = obb.helpv3;
+                let wMax = obb.helpv3_1;
                 math.vec3SetAll(wMin , Number.MAX_VALUE);
                 math.vec3SetAll(wMax , -Number.MAX_VALUE);
 

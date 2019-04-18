@@ -175,6 +175,18 @@
       {
           "name":"resources/posteffect/bloom.shader.json",
           "length":0
+          },
+      {
+          "name":"resources/base/diffuse_nolight.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/base/diffuse_nolight.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/base/diffuse_nolight.shader.json",
+          "length":0
           }
       ]
   }

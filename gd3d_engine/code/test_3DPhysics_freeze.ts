@@ -169,7 +169,7 @@ class test_3DPhysics_freeze implements IState {
     cache_y = 0;
     //移动 到射线点
     onPonitMove([x,y]){
-        let viewPos = gd3d.helpv2();
+        let viewPos = gd3d.poolv2();
         viewPos.x = x;
         viewPos.y = y;
         console.log(`x: ${x} ,y :${y}`);
@@ -183,6 +183,7 @@ class test_3DPhysics_freeze implements IState {
         //同步ctr box 位置
         pos.y += 0.55;
         this.boxTran.physicsImpostor.kinematicSetPosition(pos);  //更新动力学 位置
+        gd3d.poolv2_del(viewPos);
     }
 
     private tcount = 0;

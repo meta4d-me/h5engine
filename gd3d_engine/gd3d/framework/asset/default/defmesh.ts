@@ -2,17 +2,27 @@ namespace gd3d.framework
 {
     export class defMesh
     {
+        static readonly cube = "cube";
+        static readonly quad = "quad";
+        static readonly quad_particle = "quad_particle";
+        static readonly plane = "plane";
+        static readonly sphere = "sphere";
+        static readonly sphere_quality = "sphere_quality";
+        static readonly pyramid = "pyramid";
+        static readonly cylinder = "cylinder";
+        static readonly circleline = "circleline";
+
         static initDefaultMesh(assetmgr: assetMgr)
         {
-            assetmgr.mapDefaultMesh["cube"] = gd3d.framework.defMesh.createDefaultMesh("cube", gd3d.render.meshData.genBoxCCW(1.0), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["quad"] = gd3d.framework.defMesh.createDefaultMesh("quad", gd3d.render.meshData.genQuad(1.0), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["quad_particle"] = gd3d.framework.defMesh.createDefaultMesh("quad_particle", gd3d.render.meshData.genQuad_forparticle(1.0), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["plane"] = gd3d.framework.defMesh.createDefaultMesh("plane", gd3d.render.meshData.genPlaneCCW(10), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["sphere"] = gd3d.framework.defMesh.createDefaultMesh("sphere", gd3d.render.meshData.genSphereCCW(), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["sphere_quality"] = gd3d.framework.defMesh.createDefaultMesh("sphere_quality", gd3d.render.meshData.genSphereCCW(2.58,40,40), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["pyramid"] = gd3d.framework.defMesh.createDefaultMesh("pyramid", gd3d.render.meshData.genPyramid(2,0.5), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["cylinder"] = gd3d.framework.defMesh.createDefaultMesh("cylinder", gd3d.render.meshData.genCylinderCCW(2, 0.5), assetmgr.webgl);
-            assetmgr.mapDefaultMesh["circleline"] = gd3d.framework.defMesh.createDefaultMesh("circleline", gd3d.render.meshData.genCircleLineCCW(1), assetmgr.webgl);
+            assetmgr.mapDefaultMesh[this.cube] = this.createDefaultMesh(this.cube, gd3d.render.meshData.genBoxCCW(1.0), assetmgr.webgl);
+            assetmgr.mapDefaultMesh[this.quad] = this.createDefaultMesh(this.quad, gd3d.render.meshData.genQuad(1.0), assetmgr.webgl);
+            assetmgr.mapDefaultMesh[this.quad_particle] = this.createDefaultMesh(this.quad_particle, gd3d.render.meshData.genQuad_forparticle(1.0), assetmgr.webgl);
+            assetmgr.mapDefaultMesh[this.plane] = this.createDefaultMesh(this.plane, gd3d.render.meshData.genPlaneCCW(10), assetmgr.webgl);
+            assetmgr.mapDefaultMesh[this.sphere] = this.createDefaultMesh(this.sphere, gd3d.render.meshData.genSphereCCW(), assetmgr.webgl);
+            assetmgr.mapDefaultMesh[this.sphere_quality] = this.createDefaultMesh(this.sphere_quality, gd3d.render.meshData.genSphereCCW(2.58,40,40), assetmgr.webgl);
+            assetmgr.mapDefaultMesh[this.pyramid] = this.createDefaultMesh(this.pyramid, gd3d.render.meshData.genPyramid(2,0.5), assetmgr.webgl);
+            assetmgr.mapDefaultMesh[this.cylinder] = this.createDefaultMesh(this.cylinder, gd3d.render.meshData.genCylinderCCW(2, 0.5), assetmgr.webgl);
+            assetmgr.mapDefaultMesh[this.circleline] = this.createDefaultMesh(this.circleline, gd3d.render.meshData.genCircleLineCCW(1), assetmgr.webgl);
         }
 
         private static createDefaultMesh(name: string, meshData: render.meshData, webgl: WebGLRenderingContext): mesh

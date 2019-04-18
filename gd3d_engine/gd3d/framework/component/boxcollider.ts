@@ -131,6 +131,11 @@ namespace gd3d.framework
         set colliderVisible(value: boolean)
         {
             this._colliderVisible = value;
+            if(this._colliderVisible){
+                if(!this.subTran){
+                    this.buildMesh();
+                }
+            }
             if (this.subTran)
             {
                 this.subTran.gameObject.visible = this._colliderVisible;
@@ -168,8 +173,8 @@ namespace gd3d.framework
             }
             else
             {
-                let minimum = helpv3();
-                let maximum = helpv3_1();
+                let minimum = poolv3();
+                let maximum = poolv3();
                 if (this.filter)
                 {
                     // let meshdata: gd3d.render.meshData = this.filter.getMeshOutput().data;
@@ -191,8 +196,11 @@ namespace gd3d.framework
                     maximum.x = maximum.y = maximum.z = 1;
                 }
                 this.obb.buildByMaxMin(minimum, maximum);
+
+                poolv3_del(minimum);
+                poolv3_del(maximum);
             }
-            this.buildMesh();
+            //this.buildMesh();
         }
         /**
         * @private

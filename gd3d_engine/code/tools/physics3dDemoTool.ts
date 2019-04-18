@@ -13,21 +13,21 @@ class physics3dDemoTool{
         this.scene = this.app.getScene();
         this.astMgr = this.app.getAssetMgr();
         this.iptMgr = this.app.getInputMgr();
-        await this.loadbySync(`./res/shader/shader.assetbundle.json`);
+        await demoTool.loadbySync(`./res/shader/shader.assetbundle.json`,this.astMgr);
         await datGui.init();
         this.initMats();
         this.initCamera();
     }
 
-    static loadbySync(url:string){
-        return new gd3d.threading.gdPromise<any>((resolve,reject)=>{
-            this.astMgr.load(url,gd3d.framework.AssetTypeEnum.Auto,(state)=>{
-                if(state && state.isfinish){
-                    resolve();
-                }
-            });
-        });
-    }
+    // static loadbySync(url:string){
+    //     return new gd3d.threading.gdPromise<any>((resolve,reject)=>{
+    //         this.astMgr.load(url,gd3d.framework.AssetTypeEnum.Auto,(state)=>{
+    //             if(state && state.isfinish){
+    //                 resolve();
+    //             }
+    //         });
+    //     });
+    // }
 
     private static initMats(){
         //地板

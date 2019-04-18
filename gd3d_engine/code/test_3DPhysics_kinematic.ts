@@ -76,7 +76,7 @@ class test_3DPhysics_kinematic implements IState {
     cacheRota = new gd3d.math.quaternion();
     cache_y = 0;
     onPonitMove([x,y]){
-        let viewPos = gd3d.helpv2();
+        let viewPos = gd3d.poolv2();
         viewPos.x = x;
         viewPos.y = y;
         console.log(`x: ${x} ,y :${y}`);
@@ -90,6 +90,7 @@ class test_3DPhysics_kinematic implements IState {
         //同步ctr box 位置
         pos.y += 0.55;
         this.ctrBox.physicsImpostor.kinematicSetPosition(pos);  //更新动力学 位置
+        gd3d.poolv2_del(viewPos);
     }
 
     updateRoate(){
