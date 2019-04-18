@@ -1,18 +1,33 @@
 namespace gd3d.framework {
     export interface I2DPhysicsBody {
+        /** body 选项数据*/
         options: I2dPhyBodyData;
         // beStatic:boolean;
+        /** 绑定的UI */
         transform: transform2D;
+        /** 物理世界body */
         body: Ibody;
+        /** 施加力 */
         addForce(Force: math.vector2);
+        /**设置 速度*/
         setVelocity(velocity: math.vector2);
+        /**设置 密度*/
         setDesity(Desity: number);
+        /**设置 空气摩擦系数*/
         setFrictionAir(frictionAir: number);
         setFriction(friction: number);
+        /**设置 静态摩擦系数*/
         setFrictionStatic(frictionStatic: number);
+        /**设置 恢复系数*/
         setRestitution(restitution: number);
+        /** 设置质量 */
         setMass(mass: number);
+        /**设置位置 */
         setPosition(pos:math.vector2);
+        /**是否睡眠 */
+        isSleeping():boolean;
+        /** 物理世界body的ID */
+        getId():number;
     }
     export interface I2dPhyBodyData {
         mass?: number;
@@ -48,7 +63,7 @@ namespace gd3d.framework {
         // beStatic:boolean=false;
         transform: transform2D;
         body: Ibody;
-        m_velocity: math.vector2;
+        private m_velocity: math.vector2;
         /**
          * 施加作用力
          * @param Force 
@@ -117,7 +132,6 @@ namespace gd3d.framework {
         }
 
         public set tag(value: string) {
-
             this.body.tag = value;
         }
 
@@ -129,7 +143,6 @@ namespace gd3d.framework {
         }
 
         public set name(value: string) {
-
             this.body.name = value;
         }
 
@@ -182,6 +195,14 @@ namespace gd3d.framework {
 
         setPosition(pos: math.vector2) {
             this.physicsEngine.setPosition(this.body, pos);
+        }
+
+        isSleeping(){
+            return this.body.isSleeping;
+        }
+
+        getId(){
+            return this.body.id;
         }
 
         update(delta: number) {

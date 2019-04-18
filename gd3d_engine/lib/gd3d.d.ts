@@ -993,6 +993,8 @@ declare namespace gd3d.framework {
         setRestitution(restitution: number): any;
         setMass(mass: number): any;
         setPosition(pos: math.vector2): any;
+        isSleeping(): boolean;
+        getId(): number;
     }
     interface I2dPhyBodyData {
         mass?: number;
@@ -1015,7 +1017,7 @@ declare namespace gd3d.framework {
         constructor();
         transform: transform2D;
         body: Ibody;
-        m_velocity: math.vector2;
+        private m_velocity;
         addForce(Force: math.vector2): void;
         setVelocity(velocity: math.vector2): void;
         setAngularVelocity(velocity: number): void;
@@ -1035,6 +1037,8 @@ declare namespace gd3d.framework {
         options: I2dPhyBodyData;
         setInitData(att: I2dPhyBodyData): void;
         setPosition(pos: math.vector2): void;
+        isSleeping(): boolean;
+        getId(): number;
         update(delta: number): void;
         remove(): void;
     }
@@ -1124,6 +1128,8 @@ declare namespace gd3d.framework {
         angularVelocity: number;
         velocity: matterVector;
         collisionFilter: collisionFilter;
+        id: number;
+        isSleeping: boolean;
         applyForce(body: Ibody, positon: matterVector, force: matterVector): void;
     }
     interface matterVector {
@@ -1954,9 +1960,12 @@ declare namespace gd3d.framework {
         maxBoneCount: number;
         private _efficient;
         private _skeletonMatrixData;
+        _aabb: aabb;
+        readonly aabb: aabb;
         start(): void;
         onPlay(): void;
         getMatByIndex(index: number): math.matrix;
+        calActualVertexByIndex(index: number, t: gd3d.math.vector3): void;
         intersects(ray: ray, outInfo: pickinfo): boolean;
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;

@@ -6413,6 +6413,12 @@ var gd3d;
             physics2DBody.prototype.setPosition = function (pos) {
                 this.physicsEngine.setPosition(this.body, pos);
             };
+            physics2DBody.prototype.isSleeping = function () {
+                return this.body.isSleeping;
+            };
+            physics2DBody.prototype.getId = function () {
+                return this.body.id;
+            };
             physics2DBody.prototype.update = function (delta) {
                 if (!this.body)
                     return;
@@ -10311,10 +10317,13 @@ var gd3d;
                         var skinmeshdata = skinmesh.mesh.data;
                         gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
                         gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+                        var p0 = gd3d.math.pool.new_vector3();
                         for (var i = 0; i < skinmeshdata.pos.length; i++) {
-                            gd3d.math.vec3Max(skinmeshdata.pos[i], maximum, maximum);
-                            gd3d.math.vec3Min(skinmeshdata.pos[i], minimum, minimum);
+                            skinmesh.calActualVertexByIndex(i, p0);
+                            gd3d.math.vec3Max(p0, maximum, maximum);
+                            gd3d.math.vec3Min(p0, minimum, minimum);
                         }
+                        gd3d.math.pool.delete_vector3(p0);
                     }
                     else {
                         minimum.x = -1;
@@ -11320,6 +11329,35 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(skinnedMeshRenderer.prototype, "aabb", {
+                get: function () {
+                    if (!this._aabb) {
+                        var _a = this, size = _a.size, center = _a.center;
+                        var max = gd3d.math.pool.new_vector3();
+                        var min = gd3d.math.pool.new_vector3();
+                        var temp = gd3d.math.pool.new_vector3();
+                        gd3d.math.vec3ScaleByNum(size, 0.5, min);
+                        min.x = Math.abs(min.x);
+                        min.y = Math.abs(min.y);
+                        min.z = Math.abs(min.z);
+                        gd3d.math.vec3Add(center, min, max);
+                        gd3d.math.vec3Subtract(center, min, min);
+                        var rootboneMat = this.rootBone.getWorldMatrix();
+                        gd3d.math.matrixTransformVector3(max, rootboneMat, max);
+                        gd3d.math.matrixTransformVector3(min, rootboneMat, min);
+                        gd3d.math.vec3Max(max, min, temp);
+                        gd3d.math.vec3Min(max, min, min);
+                        gd3d.math.vec3Clone(temp, max);
+                        this._aabb = new framework.aabb(max, min);
+                        gd3d.math.pool.delete_vector3(max);
+                        gd3d.math.pool.delete_vector3(min);
+                        gd3d.math.pool.delete_vector3(temp);
+                    }
+                    return this._aabb;
+                },
+                enumerable: true,
+                configurable: true
+            });
             skinnedMeshRenderer.prototype.start = function () {
             };
             skinnedMeshRenderer.prototype.onPlay = function () {
@@ -11418,59 +11456,70 @@ var gd3d;
                 }
                 return mat;
             };
+            skinnedMeshRenderer.prototype.calActualVertexByIndex = function (index, t) {
+                var data = this.mesh.data;
+                var verindex = data.trisindex[index];
+                var p = data.pos[verindex];
+                var mat = this.getMatByIndex(verindex);
+                if (mat == null)
+                    debugger;
+                gd3d.math.matrixTransformVector3(p, mat, t);
+            };
             skinnedMeshRenderer.prototype.intersects = function (ray, outInfo) {
                 var ishided = false;
                 var lastDistance = Number.MAX_VALUE;
-                var mvpmat = this.player.gameObject.transform.getWorldMatrix();
-                var data = this.mesh.data;
-                for (var i = 0; i < this.mesh.submesh.length; i++) {
-                    var submesh = this.mesh.submesh[i];
-                    var t0 = gd3d.math.pool.new_vector3();
-                    var t1 = gd3d.math.pool.new_vector3();
-                    var t2 = gd3d.math.pool.new_vector3();
-                    for (var index = submesh.start; index < submesh.size; index += 3) {
-                        var verindex0 = data.trisindex[index];
-                        var verindex1 = data.trisindex[index + 1];
-                        var verindex2 = data.trisindex[index + 2];
-                        var p0 = data.pos[verindex0];
-                        var p1 = data.pos[verindex1];
-                        var p2 = data.pos[verindex2];
-                        var mat0 = this.getMatByIndex(verindex0);
-                        var mat1 = this.getMatByIndex(verindex1);
-                        var mat2 = this.getMatByIndex(verindex2);
-                        if (mat0 == null || mat1 == null || mat2 == null)
-                            continue;
-                        var mat00 = gd3d.math.pool.new_matrix();
-                        gd3d.math.matrixMultiply(mvpmat, mat0, mat00);
-                        var mat11 = gd3d.math.pool.new_matrix();
-                        gd3d.math.matrixMultiply(mvpmat, mat1, mat11);
-                        var mat22 = gd3d.math.pool.new_matrix();
-                        gd3d.math.matrixMultiply(mvpmat, mat2, mat22);
-                        gd3d.math.matrixTransformVector3(p0, mat00, t0);
-                        gd3d.math.matrixTransformVector3(p1, mat11, t1);
-                        gd3d.math.matrixTransformVector3(p2, mat22, t2);
-                        var tempinfo = gd3d.math.pool.new_pickInfo();
-                        var bool = ray.intersectsTriangle(t0, t1, t2, tempinfo);
-                        if (bool) {
-                            if (tempinfo.distance < 0)
+                if (this.player != null && this.player.gameObject) {
+                    var mvpmat = this.player.gameObject.transform.getWorldMatrix();
+                    var data = this.mesh.data;
+                    for (var i = 0; i < this.mesh.submesh.length; i++) {
+                        var submesh = this.mesh.submesh[i];
+                        var t0 = gd3d.math.pool.new_vector3();
+                        var t1 = gd3d.math.pool.new_vector3();
+                        var t2 = gd3d.math.pool.new_vector3();
+                        for (var index = submesh.start; index < submesh.size; index += 3) {
+                            var verindex0 = data.trisindex[index];
+                            var verindex1 = data.trisindex[index + 1];
+                            var verindex2 = data.trisindex[index + 2];
+                            var p0 = data.pos[verindex0];
+                            var p1 = data.pos[verindex1];
+                            var p2 = data.pos[verindex2];
+                            var mat0 = this.getMatByIndex(verindex0);
+                            var mat1 = this.getMatByIndex(verindex1);
+                            var mat2 = this.getMatByIndex(verindex2);
+                            if (mat0 == null || mat1 == null || mat2 == null)
                                 continue;
-                            if (lastDistance > tempinfo.distance) {
-                                ishided = true;
-                                outInfo.cloneFrom(tempinfo);
-                                lastDistance = outInfo.distance;
-                                outInfo.faceId = index / 3;
-                                outInfo.subMeshId = i;
-                                var tdir = gd3d.math.pool.new_vector3();
-                                gd3d.math.vec3ScaleByNum(ray.direction, outInfo.distance, tdir);
-                                gd3d.math.vec3Add(ray.origin, tdir, outInfo.hitposition);
-                                gd3d.math.pool.delete_vector3(tdir);
+                            var mat00 = gd3d.math.pool.new_matrix();
+                            gd3d.math.matrixMultiply(mvpmat, mat0, mat00);
+                            var mat11 = gd3d.math.pool.new_matrix();
+                            gd3d.math.matrixMultiply(mvpmat, mat1, mat11);
+                            var mat22 = gd3d.math.pool.new_matrix();
+                            gd3d.math.matrixMultiply(mvpmat, mat2, mat22);
+                            gd3d.math.matrixTransformVector3(p0, mat00, t0);
+                            gd3d.math.matrixTransformVector3(p1, mat11, t1);
+                            gd3d.math.matrixTransformVector3(p2, mat22, t2);
+                            var tempinfo = gd3d.math.pool.new_pickInfo();
+                            var bool = ray.intersectsTriangle(t0, t1, t2, tempinfo);
+                            if (bool) {
+                                if (tempinfo.distance < 0)
+                                    continue;
+                                if (lastDistance > tempinfo.distance) {
+                                    ishided = true;
+                                    outInfo.cloneFrom(tempinfo);
+                                    lastDistance = outInfo.distance;
+                                    outInfo.faceId = index / 3;
+                                    outInfo.subMeshId = i;
+                                    var tdir = gd3d.math.pool.new_vector3();
+                                    gd3d.math.vec3ScaleByNum(ray.direction, outInfo.distance, tdir);
+                                    gd3d.math.vec3Add(ray.origin, tdir, outInfo.hitposition);
+                                    gd3d.math.pool.delete_vector3(tdir);
+                                }
                             }
+                            gd3d.math.pool.delete_pickInfo(tempinfo);
                         }
-                        gd3d.math.pool.delete_pickInfo(tempinfo);
+                        gd3d.math.pool.delete_vector3(t0);
+                        gd3d.math.pool.delete_vector3(t1);
+                        gd3d.math.pool.delete_vector3(t2);
                     }
-                    gd3d.math.pool.delete_vector3(t0);
-                    gd3d.math.pool.delete_vector3(t1);
-                    gd3d.math.pool.delete_vector3(t2);
                 }
                 return ishided;
             };
@@ -11487,13 +11536,13 @@ var gd3d;
                             this._queue = _mat.getQueue();
                     }
                 }
-                if (this.player != null) {
+                if (this.player != null && this.player.gameObject) {
                     this.player.fillPoseData(this._skeletonMatrixData, this.bones);
                 }
             };
             skinnedMeshRenderer.prototype.render = function (context, assetmgr, camera) {
                 framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.SKinrender;
-                if (this.player != null) {
+                if (this.player != null && this.player.gameObject) {
                     context.updateLightMask(this.gameObject.layer);
                     context.updateModel(this.player.gameObject.transform);
                 }
@@ -11548,6 +11597,14 @@ var gd3d;
                 gd3d.reflect.Field("transform"),
                 __metadata("design:type", framework.transform)
             ], skinnedMeshRenderer.prototype, "rootBone", void 0);
+            __decorate([
+                gd3d.reflect.Field("vector3"),
+                __metadata("design:type", gd3d.math.vector3)
+            ], skinnedMeshRenderer.prototype, "center", void 0);
+            __decorate([
+                gd3d.reflect.Field("vector3"),
+                __metadata("design:type", gd3d.math.vector3)
+            ], skinnedMeshRenderer.prototype, "size", void 0);
             skinnedMeshRenderer = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
@@ -14770,6 +14827,10 @@ var gd3d;
             camera.prototype.isCulling = function (node) {
                 var vec3cache = this._vec3cache;
                 var aabb = node.aabb;
+                var skinmesh = node.gameObject.getComponent("skinnedMeshRenderer");
+                if (skinmesh != null) {
+                    aabb = skinmesh.aabb;
+                }
                 gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, vec3cache);
                 var radius = gd3d.math.vec3Length(vec3cache) / 2;
                 var center = node.aabb.center;
@@ -31407,6 +31468,7 @@ var gd3d;
                     if (this.components[i].comp == comp) {
                         if (this.components[i].init) {
                             this.components[i].comp.remove();
+                            this.components[i].comp.gameObject = null;
                         }
                         this.remove(this.components[i].comp);
                         this.components.splice(i, 1);
@@ -31433,6 +31495,7 @@ var gd3d;
                     if (gd3d.reflect.getClassName(this.components[i].comp) == type) {
                         if (this.components[i].init) {
                             this.components[i].comp.remove();
+                            this.components[i].comp.gameObject = null;
                         }
                         this.remove(this.components[i].comp);
                         this.components.splice(i, 1);
@@ -31444,6 +31507,7 @@ var gd3d;
                 for (var i = 0; i < this.components.length; i++) {
                     {
                         this.components[i].comp.remove();
+                        this.components[i].comp.gameObject = null;
                     }
                     this.remove(this.components[i].comp);
                 }

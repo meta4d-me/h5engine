@@ -202,6 +202,8 @@ namespace gd3d.framework {
         angularVelocity:number;
         velocity:matterVector;
         collisionFilter: collisionFilter;
+        id:number;
+        isSleeping:boolean;
         applyForce(body: Ibody, positon: matterVector, force: matterVector): void;
     }
 
