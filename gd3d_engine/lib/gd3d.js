@@ -6520,7 +6520,8 @@ var gd3d;
                 if (op === void 0) { op = null; }
                 this._physicsBodys = [];
                 if (Matter == undefined) {
-                    console.error("2d physic not supportted");
+                    console.error(" Matter not found , create physicEngine2D fail");
+                    return;
                 }
                 if (op != null) {
                     this.matterEngine = Matter.Engine.create(op);
@@ -6602,6 +6603,16 @@ var gd3d;
                 this.engineWorld.gravity.x = x;
                 this.engineWorld.gravity.y = y;
             };
+            Object.defineProperty(physicEngine2D.prototype, "enableSleeping", {
+                get: function () {
+                    return this.engineWorld.enableSleeping;
+                },
+                set: function (val) {
+                    this.engineWorld.enableSleeping = val;
+                },
+                enumerable: true,
+                configurable: true
+            });
             physicEngine2D.prototype.setVelocity = function (body, velocity) {
                 Matter.Body.setVelocity(body, this.matterVector.create(velocity.x, velocity.y));
             };

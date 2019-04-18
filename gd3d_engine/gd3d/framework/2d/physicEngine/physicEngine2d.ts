@@ -10,6 +10,7 @@ namespace gd3d.framework {
         constraintIterations?: number;
         timing?: Itiming;
         velocityIterations?: number;
+        enableSleeping?:boolean;
     }
     declare var Matter: any;
     export class physicEngine2D {
@@ -18,7 +19,8 @@ namespace gd3d.framework {
         private matterVector: matterVector;
         public constructor(op: IEngine2DOP = null) {
             if (Matter == undefined) {
-                console.error("2d physic not supportted");
+                console.error(" Matter not found , create physicEngine2D fail");
+                return;
             }
             if (op != null) {
                 this.matterEngine = Matter.Engine.create(op);
@@ -143,6 +145,14 @@ namespace gd3d.framework {
         public setGravity(x: number, y: number) {
             this.engineWorld.gravity.x = x;
             this.engineWorld.gravity.y = y;
+        }
+
+        set enableSleeping (val:boolean){
+            this.engineWorld.enableSleeping = val;
+        }
+
+        get enableSleeping(){
+            return this.engineWorld.enableSleeping ;
         }
 
         public setVelocity(body: Ibody, velocity: math.vector2) {

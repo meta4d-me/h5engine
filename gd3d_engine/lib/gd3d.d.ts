@@ -1076,6 +1076,7 @@ declare namespace gd3d.framework {
         constraintIterations?: number;
         timing?: Itiming;
         velocityIterations?: number;
+        enableSleeping?: boolean;
     }
     class physicEngine2D {
         matterEngine: any;
@@ -1095,6 +1096,7 @@ declare namespace gd3d.framework {
         applyForce(body: Ibody, positon: math.vector2, force: math.vector2): void;
         applyForceAtCenter(body: Ibody, force: math.vector2): void;
         setGravity(x: number, y: number): void;
+        enableSleeping: boolean;
         setVelocity(body: Ibody, velocity: math.vector2): void;
         setPosition(body: Ibody, pos: math.vector2): void;
         setMass(body: Ibody, mass: number): void;
