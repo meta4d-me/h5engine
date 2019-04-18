@@ -1,6 +1,6 @@
 namespace gd3d.framework {
     export interface I2DPhysicsBody {
-        options: IBodyData;
+        options: I2dPhyBodyData;
         // beStatic:boolean;
         transform: transform2D;
         body: Ibody;
@@ -14,7 +14,7 @@ namespace gd3d.framework {
         setMass(mass: number);
         setPosition(pos:math.vector2);
     }
-    export interface IBodyData {
+    export interface I2dPhyBodyData {
         mass?: number;
         density?: number;
         inertia?: number;
@@ -30,7 +30,7 @@ namespace gd3d.framework {
         name?: string;
     }
  
-    export abstract class bassBody implements I2DPhysicsBody {
+    export abstract class physics2DBody implements I2DPhysicsBody {
         /** 2d物理引擎实例对象 */
         protected _physicsEngine : physicEngine2D;
         constructor(){
@@ -170,8 +170,8 @@ namespace gd3d.framework {
             this._physicsEngine.setMass(this.body, mass);
         }
 
-        options: IBodyData = {};
-        setInitData(att: IBodyData) {
+        options: I2dPhyBodyData = {};
+        setInitData(att: I2dPhyBodyData) {
             this.options = att;
         }
 

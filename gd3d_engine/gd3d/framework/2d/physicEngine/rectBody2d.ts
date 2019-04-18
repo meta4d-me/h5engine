@@ -10,7 +10,7 @@ namespace gd3d.framework
      * @version gd3d 1.0
      */
     @reflect.node2DComponent
-    export class rectBody2d extends bassBody implements I2DComponent
+    export class rectBody2d extends physics2DBody implements I2DComponent
     {
         static readonly ClassName:string="rectBody2d";
         transform: transform2D;

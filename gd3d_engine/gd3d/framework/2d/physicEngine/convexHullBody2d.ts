@@ -10,11 +10,11 @@ namespace gd3d.framework
      * @version gd3d 1.0
      */
     @reflect.node2DComponent
-    export class convexHullBody2d extends bassBody implements I2DComponent
+    export class convexHullBody2d extends physics2DBody implements I2DComponent
     {
         static readonly ClassName:string="convexHullBody2d";
         vertexSets: math.vector2[] = [];
-        options: IBodyData;
+        options: I2dPhyBodyData;
         flagInternal : boolean = false;
         removeCollinear : number = 0.01;
         minimumArea : number = 10;

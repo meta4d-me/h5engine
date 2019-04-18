@@ -981,7 +981,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     interface I2DPhysicsBody {
-        options: IBodyData;
+        options: I2dPhyBodyData;
         transform: transform2D;
         body: Ibody;
         addForce(Force: math.vector2): any;
@@ -994,7 +994,7 @@ declare namespace gd3d.framework {
         setMass(mass: number): any;
         setPosition(pos: math.vector2): any;
     }
-    interface IBodyData {
+    interface I2dPhyBodyData {
         mass?: number;
         density?: number;
         inertia?: number;
@@ -1009,7 +1009,7 @@ declare namespace gd3d.framework {
         tag?: string;
         name?: string;
     }
-    abstract class bassBody implements I2DPhysicsBody {
+    abstract class physics2DBody implements I2DPhysicsBody {
         protected _physicsEngine: physicEngine2D;
         constructor();
         transform: transform2D;
@@ -1031,15 +1031,15 @@ declare namespace gd3d.framework {
         setFrictionStatic(frictionStatic: number): void;
         setRestitution(restitution: number): void;
         setMass(mass: number): void;
-        options: IBodyData;
-        setInitData(att: IBodyData): void;
+        options: I2dPhyBodyData;
+        setInitData(att: I2dPhyBodyData): void;
         setPosition(pos: math.vector2): void;
         update(delta: number): void;
         remove(): void;
     }
 }
 declare namespace gd3d.framework {
-    class circleBody2d extends bassBody implements I2DComponent {
+    class circleBody2d extends physics2DBody implements I2DComponent {
         static readonly ClassName: string;
         transform: transform2D;
         radius: number;
@@ -1049,10 +1049,10 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class convexHullBody2d extends bassBody implements I2DComponent {
+    class convexHullBody2d extends physics2DBody implements I2DComponent {
         static readonly ClassName: string;
         vertexSets: math.vector2[];
-        options: IBodyData;
+        options: I2dPhyBodyData;
         flagInternal: boolean;
         removeCollinear: number;
         minimumArea: number;
@@ -1137,7 +1137,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class rectBody2d extends bassBody implements I2DComponent {
+    class rectBody2d extends physics2DBody implements I2DComponent {
         static readonly ClassName: string;
         transform: transform2D;
         start(): void;

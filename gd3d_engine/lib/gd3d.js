@@ -6299,8 +6299,8 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var bassBody = (function () {
-            function bassBody() {
+        var physics2DBody = (function () {
+            function physics2DBody() {
                 this.options = {};
                 this._physicsEngine = framework.physics2D;
                 if (!this._physicsEngine) {
@@ -6308,30 +6308,30 @@ var gd3d;
                     return;
                 }
             }
-            bassBody.prototype.addForce = function (Force) {
+            physics2DBody.prototype.addForce = function (Force) {
                 this._physicsEngine.applyForceAtCenter(this.body, Force);
             };
-            bassBody.prototype.setVelocity = function (velocity) {
+            physics2DBody.prototype.setVelocity = function (velocity) {
                 this._physicsEngine.setVelocity(this.body, velocity);
             };
-            bassBody.prototype.setAngularVelocity = function (velocity) {
+            physics2DBody.prototype.setAngularVelocity = function (velocity) {
                 this._physicsEngine.setAngularVelocity(this.body, velocity);
             };
-            Object.defineProperty(bassBody.prototype, "angularVelocity", {
+            Object.defineProperty(physics2DBody.prototype, "angularVelocity", {
                 get: function () {
                     return this.body.angularVelocity;
                 },
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(bassBody.prototype, "speed", {
+            Object.defineProperty(physics2DBody.prototype, "speed", {
                 get: function () {
                     return this.body.speed;
                 },
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(bassBody.prototype, "velocity", {
+            Object.defineProperty(physics2DBody.prototype, "velocity", {
                 get: function () {
                     if (this.m_velocity == null)
                         this.m_velocity = new gd3d.math.vector2();
@@ -6342,7 +6342,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(bassBody.prototype, "type", {
+            Object.defineProperty(physics2DBody.prototype, "type", {
                 get: function () {
                     return this.body.type;
                 },
@@ -6352,14 +6352,14 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(bassBody.prototype, "collisionFilter", {
+            Object.defineProperty(physics2DBody.prototype, "collisionFilter", {
                 get: function () {
                     return this.body.collisionFilter;
                 },
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(bassBody.prototype, "tag", {
+            Object.defineProperty(physics2DBody.prototype, "tag", {
                 get: function () {
                     return this.body.tag;
                 },
@@ -6369,7 +6369,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            Object.defineProperty(bassBody.prototype, "name", {
+            Object.defineProperty(physics2DBody.prototype, "name", {
                 get: function () {
                     return this.body.name;
                 },
@@ -6379,31 +6379,31 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            bassBody.prototype.setDesity = function (Desity) {
+            physics2DBody.prototype.setDesity = function (Desity) {
                 this._physicsEngine.setDesity(this.body, Desity);
             };
-            bassBody.prototype.setFrictionAir = function (frictionAir) {
+            physics2DBody.prototype.setFrictionAir = function (frictionAir) {
                 this._physicsEngine.setFrictionAir(this.body, frictionAir);
             };
-            bassBody.prototype.setFriction = function (friction) {
+            physics2DBody.prototype.setFriction = function (friction) {
                 this._physicsEngine.setFriction(this.body, friction);
             };
-            bassBody.prototype.setFrictionStatic = function (frictionStatic) {
+            physics2DBody.prototype.setFrictionStatic = function (frictionStatic) {
                 this._physicsEngine.setFrictionStatic(this.body, frictionStatic);
             };
-            bassBody.prototype.setRestitution = function (restitution) {
+            physics2DBody.prototype.setRestitution = function (restitution) {
                 this._physicsEngine.setRestitution(this.body, restitution);
             };
-            bassBody.prototype.setMass = function (mass) {
+            physics2DBody.prototype.setMass = function (mass) {
                 this._physicsEngine.setMass(this.body, mass);
             };
-            bassBody.prototype.setInitData = function (att) {
+            physics2DBody.prototype.setInitData = function (att) {
                 this.options = att;
             };
-            bassBody.prototype.setPosition = function (pos) {
+            physics2DBody.prototype.setPosition = function (pos) {
                 this._physicsEngine.setPosition(this.body, pos);
             };
-            bassBody.prototype.update = function (delta) {
+            physics2DBody.prototype.update = function (delta) {
                 if (!this.body)
                     return;
                 this.transform.localTranslate.x = this.body.position.x;
@@ -6411,13 +6411,13 @@ var gd3d;
                 this.transform.localRotate = this.body.angle;
                 this.transform.markDirty();
             };
-            bassBody.prototype.remove = function () {
+            physics2DBody.prototype.remove = function () {
                 this._physicsEngine.removeBody(this);
                 this.body = null;
             };
-            return bassBody;
+            return physics2DBody;
         }());
-        framework.bassBody = bassBody;
+        framework.physics2DBody = physics2DBody;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -6443,7 +6443,7 @@ var gd3d;
                 gd3d.reflect.node2DComponent
             ], circleBody2d);
             return circleBody2d;
-        }(framework.bassBody));
+        }(framework.physics2DBody));
         framework.circleBody2d = circleBody2d;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -6491,7 +6491,7 @@ var gd3d;
                 gd3d.reflect.node2DComponent
             ], convexHullBody2d);
             return convexHullBody2d;
-        }(framework.bassBody));
+        }(framework.physics2DBody));
         framework.convexHullBody2d = convexHullBody2d;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -6647,7 +6647,7 @@ var gd3d;
                 gd3d.reflect.node2DComponent
             ], rectBody2d);
             return rectBody2d;
-        }(framework.bassBody));
+        }(framework.physics2DBody));
         framework.rectBody2d = rectBody2d;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
