@@ -9,10 +9,10 @@ namespace gd3d.framework
      * @version egret-gd3d 1.0
      */
     @gd3d.reflect.SerializeType
-    export class transform 
+    export class transform
     {
         static readonly ClassName:string="transform";
-        
+
         private helpLRotate:math.quaternion = new math.quaternion();
         private helpLPos:math.vector3 = new math.vector3();
         private helpLScale:math.vector3 = new math.vector3(1,1,1);
@@ -116,7 +116,7 @@ namespace gd3d.framework
 
         /**
          * [过时接口,完全弃用]
-         * @param bool 
+         * @param bool
          */
         updateTran(bool:boolean){
 
@@ -226,7 +226,7 @@ namespace gd3d.framework
         //     if (this._aabb == null) return;
         //     //this.aabbchild = this.aabb.clone();
         //     this._aabb.cloneTo(this._aabbchild);
-            
+
         //     if (this._children != null)
         //     {
         //         for (var i = 0; i < this._children.length; i++)
@@ -242,7 +242,7 @@ namespace gd3d.framework
         * 构建aabb
         * @version egret-gd3d 1.0
         */
-        private _buildAABB(): aabb  
+        private _buildAABB(): aabb
         {
             var minimum = new math.vector3();
             var maximum = new math.vector3();
@@ -265,15 +265,19 @@ namespace gd3d.framework
                 var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer;
                 if (skinmesh != null && skinmesh.mesh != null && skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null)
                 {
+                    // NOTE: 如果当前物体有骨骼动画, 则不会使用这里的aabb进行剔除
                     var skinmeshdata: gd3d.render.meshData = skinmesh.mesh.data;
                     math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
                     math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
 
+                    var p0 = gd3d.math.pool.new_vector3();
                     for (var i = 0; i < skinmeshdata.pos.length; i++)
                     {
-                        math.vec3Max(skinmeshdata.pos[i], maximum, maximum);
-                        math.vec3Min(skinmeshdata.pos[i], minimum, minimum);
+                        skinmesh.calActualVertexByIndex(i, p0);
+                        math.vec3Max(p0, maximum, maximum);
+                        math.vec3Min(p0, minimum, minimum);
                     }
+                    gd3d.math.pool.delete_vector3(p0);
                 }
                 else
                 {
@@ -501,7 +505,7 @@ namespace gd3d.framework
                 }
             }
         }
-        
+
         private dirtyLocal : boolean = false;
         private dirtyWorld : boolean = false;
 
@@ -690,7 +694,7 @@ namespace gd3d.framework
                 this.dirtify(true);
             }
         }
-        
+
         private localMatrix: math.matrix = new math.matrix();
         private _localEulerAngles: math.vector3 = new math.vector3(0, 0, 0);
         /**
@@ -730,7 +734,7 @@ namespace gd3d.framework
             if(!this._parent || !this._parent._parent){
                 math.quatClone(this._localRotate,this.worldRotate);
             }else{
-                math.matrixGetRotation(this.getWorldMatrix(),this.worldRotate);  
+                math.matrixGetRotation(this.getWorldMatrix(),this.worldRotate);
             }
             return this.worldRotate;
         }
@@ -738,9 +742,9 @@ namespace gd3d.framework
         /**
          * @public
          * @language zh_CN
-         * @classdesc 
+         * @classdesc
          * 设置transform世界空间下的旋转
-         * 
+         *
          */
         setWorldRotate(rotate:math.quaternion){
             if (!this._parent || !this._parent._parent) {
@@ -825,7 +829,7 @@ namespace gd3d.framework
             if(!this._parent || !this._parent._parent){
                 math.vec3Clone(this._localScale,this.worldScale);
             }else{
-                math.matrixGetScale(this.getWorldMatrix(),this.worldScale);  
+                math.matrixGetScale(this.getWorldMatrix(),this.worldScale);
             }
             return this.worldScale;
         }
@@ -915,7 +919,7 @@ namespace gd3d.framework
                     //temp.dirtify(true);
                     top = temp;
                 }
-                
+
                 if(!temp._parent) break;
                 temp = temp._parent;
             }
@@ -986,7 +990,7 @@ namespace gd3d.framework
                 this.dirtify(true);
             }
         }
-        
+
         /**
          * @public
          * @language zh_CN
@@ -1047,7 +1051,7 @@ namespace gd3d.framework
         {
             return io.cloneObj(this) as transform;
         }
-        
+
         /**
          * @public
          * @language zh_CN
@@ -1059,7 +1063,7 @@ namespace gd3d.framework
         {
             return this._beDispose;
         }
-        private _beDispose:boolean = false;//是否被释放了 
+        private _beDispose:boolean = false;//是否被释放了
 
         public onDispose:()=>void;
         /**
@@ -1088,7 +1092,7 @@ namespace gd3d.framework
                 this._physicsImpostor.dispose();
             }
             this._gameObject.dispose();
-            
+
             this._beDispose = true;
             if(this.onDispose)
                 this.onDispose();
