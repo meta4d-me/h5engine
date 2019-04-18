@@ -1010,6 +1010,7 @@ declare namespace gd3d.framework {
         name?: string;
     }
     abstract class physics2DBody implements I2DPhysicsBody {
+        readonly physicsEngine: physicEngine2D;
         protected _physicsEngine: physicEngine2D;
         constructor();
         transform: transform2D;

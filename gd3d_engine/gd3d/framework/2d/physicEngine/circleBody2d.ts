@@ -20,7 +20,7 @@ namespace gd3d.framework
 
         start() {
             let data = this.options || {};
-            this._physicsEngine.creatCircleBodyByInitData(this,this.radius,this.maxSides);
+            this.physicsEngine.creatCircleBodyByInitData(this,this.radius,this.maxSides);
         }
         onPlay(){
 

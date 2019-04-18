@@ -17,7 +17,7 @@ namespace gd3d.framework
 
         start() {
             let data = this.options || {};
-            this._physicsEngine.creatRectBodyByInitData(this);
+            this.physicsEngine.creatRectBodyByInitData(this);
         }
         onPlay(){
 

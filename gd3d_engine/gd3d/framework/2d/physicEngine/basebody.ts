@@ -32,13 +32,18 @@ namespace gd3d.framework {
  
     export abstract class physics2DBody implements I2DPhysicsBody {
         /** 2d物理引擎实例对象 */
+        get physicsEngine (){
+            if(this._physicsEngine){
+                return this._physicsEngine;
+            }else{
+                console.error("Physics not enabled. Please use scene.enable2DPhysics(...) before creating 2dPhysicsBody.");
+            }
+        };
         protected _physicsEngine : physicEngine2D;
+        
         constructor(){
             this._physicsEngine = physics2D;
-            if (!this._physicsEngine) {
-                console.error("Physics not enabled. Please use scene.enable2DPhysics(...) before creating 2dPhysicsBody.")
-                return;
-            }
+            this.physicsEngine;
         }
         // beStatic:boolean=false;
         transform: transform2D;
@@ -49,18 +54,18 @@ namespace gd3d.framework {
          * @param Force 
          */
         addForce(Force: math.vector2) {
-            this._physicsEngine.applyForceAtCenter(this.body, Force);
+            this.physicsEngine.applyForceAtCenter(this.body, Force);
         }
         /**
          * 设置速度
          * @param velocity 
          */
         setVelocity(velocity: math.vector2) {
-            this._physicsEngine.setVelocity(this.body, velocity);
+            this.physicsEngine.setVelocity(this.body, velocity);
         }
 
         setAngularVelocity(velocity: number) {
-            this._physicsEngine.setAngularVelocity(this.body, velocity);
+            this.physicsEngine.setAngularVelocity(this.body, velocity);
         }
 
         /**获取角速度 */
@@ -134,7 +139,7 @@ namespace gd3d.framework {
          * @param Desity 
          */
         setDesity(Desity: number) {
-            this._physicsEngine.setDesity(this.body, Desity);
+            this.physicsEngine.setDesity(this.body, Desity);
         }
 
         /**
@@ -142,32 +147,32 @@ namespace gd3d.framework {
          * @param frictionAir 
          */
         setFrictionAir(frictionAir: number) {
-            this._physicsEngine.setFrictionAir(this.body, frictionAir);
+            this.physicsEngine.setFrictionAir(this.body, frictionAir);
         }
         /**
          * 设置摩擦力
          * @param friction 
          */
         setFriction(friction: number) {
-            this._physicsEngine.setFriction(this.body, friction);
+            this.physicsEngine.setFriction(this.body, friction);
         }
         /**
          * 设置静态摩擦力
          * @param frictionStatic 
          */
         setFrictionStatic(frictionStatic: number) {
-            this._physicsEngine.setFrictionStatic(this.body, frictionStatic);
+            this.physicsEngine.setFrictionStatic(this.body, frictionStatic);
         }
         /**
          * 设置还原张力
          * @param restitution 
          */
         setRestitution(restitution: number) {
-            this._physicsEngine.setRestitution(this.body, restitution);
+            this.physicsEngine.setRestitution(this.body, restitution);
         }
 
         setMass(mass: number) {
-            this._physicsEngine.setMass(this.body, mass);
+            this.physicsEngine.setMass(this.body, mass);
         }
 
         options: I2dPhyBodyData = {};
@@ -176,7 +181,7 @@ namespace gd3d.framework {
         }
 
         setPosition(pos: math.vector2) {
-            this._physicsEngine.setPosition(this.body, pos);
+            this.physicsEngine.setPosition(this.body, pos);
         }
 
         update(delta: number) {
@@ -187,7 +192,7 @@ namespace gd3d.framework {
             this.transform.markDirty();
         }
         remove() {
-            this._physicsEngine.removeBody(this);
+            this.physicsEngine.removeBody(this);
             this.body = null;
         }
     }

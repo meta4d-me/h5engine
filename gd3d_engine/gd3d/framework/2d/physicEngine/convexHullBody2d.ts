@@ -23,7 +23,7 @@ namespace gd3d.framework
         start() {
             let data = this.options || {};
             let pos = this.transform.localTranslate;
-            this._physicsEngine.ConvexHullBodyByInitData(this,this.vertexSets,this.flagInternal,this.removeCollinear,this.minimumArea);
+            this.physicsEngine.ConvexHullBodyByInitData(this,this.vertexSets,this.flagInternal,this.removeCollinear,this.minimumArea);
             //this.body=physic2D.creatRectBody(this.transform.localTranslate.x,this.transform.localTranslate.y,this.transform.width,this.transform.height,this.beStatic);
             
             //校准 重心 初始位置
