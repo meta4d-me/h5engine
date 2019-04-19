@@ -427,7 +427,7 @@ namespace gd3d.framework
             var Eated = false;
             while(buoy >= 0 ){
                 let node = transform2D.getTransform2DById(list[buoy]);
-                if (node.components ) {
+                if (node && node.components ) {
                     for (var i = 0; i <= node.components.length; i++) {
                         if (ev.eated == false) {
                             var comp = node.components[i];
