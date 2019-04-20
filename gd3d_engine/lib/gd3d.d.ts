@@ -1757,7 +1757,9 @@ declare namespace gd3d.framework {
         private helpLRotate;
         private helpLPos;
         private helpLScale;
+        private static helpv2;
         private static helpv3;
+        private static helpv3_1;
         private static helpUp;
         private static helpRight;
         private static helpFoward;
@@ -1776,6 +1778,7 @@ declare namespace gd3d.framework {
         private _dirtyAABB;
         private _aabb;
         readonly aabb: aabb;
+        private static readonly aabbCareTypes;
         private _buildAABB();
         private _children;
         children: transform[];
@@ -1868,11 +1871,13 @@ declare namespace gd3d.framework {
         getBound(): obb;
         private static _tempMatrix;
         readonly matrix: gd3d.math.matrix;
+        private started;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
         _colliderVisible: boolean;
         colliderVisible: boolean;
+        private ckBuildColliderMesh();
         intersectsTransform(tran: transform): boolean;
         private build();
         private buildMesh();
@@ -4201,8 +4206,8 @@ declare namespace gd3d.math {
     function vec3Angle(from: vector3, to: vector3): number;
     function vec3Distance(a: vector3, b: vector3): number;
     function vec3ClampLength(vector: vector3, maxLength: number, out: vector3): void;
-    function vec3Min(lhs: vector3, rhs: vector3, out: vector3): void;
-    function vec3Max(lhs: vector3, rhs: vector3, out: vector3): void;
+    function vec3Min(v0: vector3, v1: vector3, out: vector3): void;
+    function vec3Max(v0: vector3, v1: vector3, out: vector3): void;
     function vec3AngleBetween(from: vector3, to: vector3): number;
     function vec3Reset(out: vector3): void;
     function vec3SLerp(vector: vector3, vector2: vector3, v: number, out: vector3): void;

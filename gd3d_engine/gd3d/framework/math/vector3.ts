@@ -201,17 +201,17 @@
         }
         out.rawData.set(vector.rawData);
     }
-    export function vec3Min(lhs: vector3, rhs: vector3, out: vector3)
+    export function vec3Min(v0: vector3, v1: vector3, out: vector3)
     {
-        out.rawData[0] = Math.min(lhs.x, rhs.x);
-        out.rawData[1] = Math.min(lhs.y, rhs.y);
-        out.rawData[2] = Math.min(lhs.z, rhs.z);
+        out.rawData[0] = Math.min(v0.x, v1.x);
+        out.rawData[1] = Math.min(v0.y, v1.y);
+        out.rawData[2] = Math.min(v0.z, v1.z);
     }
-    export function vec3Max(lhs: vector3, rhs: vector3, out: vector3)
+    export function vec3Max(v0: vector3, v1: vector3, out: vector3)
     {
-        out.rawData[0] = Math.max(lhs.x, rhs.x);
-        out.rawData[1] = Math.max(lhs.y, rhs.y);
-        out.rawData[2] = Math.max(lhs.z, rhs.z);
+        out.rawData[0] = Math.max(v0.x, v1.x);
+        out.rawData[1] = Math.max(v0.y, v1.y);
+        out.rawData[2] = Math.max(v0.z, v1.z);
     }
     export function vec3AngleBetween(from: vector3, to: vector3): number
     {

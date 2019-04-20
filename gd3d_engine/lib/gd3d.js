@@ -2107,7 +2107,7 @@ var gd3d;
                 var Eated = false;
                 while (buoy >= 0) {
                     var node = framework.transform2D.getTransform2DById(list[buoy]);
-                    if (node.components) {
+                    if (node && node.components) {
                         for (var i = 0; i <= node.components.length; i++) {
                             if (ev.eated == false) {
                                 var comp = node.components[i];
@@ -10312,38 +10312,64 @@ var gd3d;
             transform.prototype._buildAABB = function () {
                 var minimum = new gd3d.math.vector3();
                 var maximum = new gd3d.math.vector3();
-                var filter = this.gameObject.getComponent("meshFilter");
-                if (filter != null && filter.mesh != null && filter.mesh.data != null && filter.mesh.data.pos != null) {
-                    var meshdata = filter.mesh.data;
-                    gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
-                    gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-                    for (var i = 0; i < meshdata.pos.length; i++) {
-                        gd3d.math.vec3Max(meshdata.pos[i], maximum, maximum);
-                        gd3d.math.vec3Min(meshdata.pos[i], minimum, minimum);
+                var _types = transform_2.aabbCareTypes;
+                var len = _types.length;
+                var matched = false;
+                for (var i = 0; i < len; i++) {
+                    var t = _types[i];
+                    switch (t) {
+                        case framework.meshFilter.ClassName:
+                            var filter = this.gameObject.getComponent("meshFilter");
+                            if (filter != null && filter.mesh != null && filter.mesh.data != null && filter.mesh.data.pos != null) {
+                                var meshdata = filter.mesh.data;
+                                gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                                gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+                                for (var i = 0; i < meshdata.pos.length; i++) {
+                                    gd3d.math.vec3Max(meshdata.pos[i], maximum, maximum);
+                                    gd3d.math.vec3Min(meshdata.pos[i], minimum, minimum);
+                                }
+                                matched = true;
+                            }
+                            break;
+                        case framework.skinnedMeshRenderer.ClassName:
+                            var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer");
+                            if (skinmesh != null && skinmesh.mesh != null && skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null) {
+                                var skinmeshdata = skinmesh.mesh.data;
+                                gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                                gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+                                var p0 = gd3d.math.pool.new_vector3();
+                                for (var i = 0; i < skinmeshdata.pos.length; i++) {
+                                    skinmesh.calActualVertexByIndex(i, p0);
+                                    gd3d.math.vec3Max(p0, maximum, maximum);
+                                    gd3d.math.vec3Min(p0, minimum, minimum);
+                                }
+                                gd3d.math.pool.delete_vector3(p0);
+                                matched = true;
+                            }
+                            break;
+                        case framework.canvasRenderer.ClassName:
+                            var canvasR = this.gameObject.getComponent("canvasRenderer");
+                            if (canvasR && canvasR.canvas) {
+                                var cvs = canvasR.canvas;
+                                var cPos = transform_2.helpv2;
+                                gd3d.math.vec2Set(cPos, 0, 0);
+                                var wPos_0 = transform_2.helpv3;
+                                canvasR.calCanvasPosToWorldPos(cPos, wPos_0);
+                                var wPos_1 = transform_2.helpv3_1;
+                                gd3d.math.vec2Set(cPos, cvs.pixelWidth, cvs.pixelHeight);
+                                canvasR.calCanvasPosToWorldPos(cPos, wPos_1);
+                                gd3d.math.vec3Min(wPos_0, wPos_1, minimum);
+                                gd3d.math.vec3Max(wPos_0, wPos_1, maximum);
+                                matched = true;
+                            }
+                            break;
                     }
+                    if (matched)
+                        break;
                 }
-                else {
-                    var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer");
-                    if (skinmesh != null && skinmesh.mesh != null && skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null) {
-                        var skinmeshdata = skinmesh.mesh.data;
-                        gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
-                        gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-                        var p0 = gd3d.math.pool.new_vector3();
-                        for (var i = 0; i < skinmeshdata.pos.length; i++) {
-                            skinmesh.calActualVertexByIndex(i, p0);
-                            gd3d.math.vec3Max(p0, maximum, maximum);
-                            gd3d.math.vec3Min(p0, minimum, minimum);
-                        }
-                        gd3d.math.pool.delete_vector3(p0);
-                    }
-                    else {
-                        minimum.x = -1;
-                        minimum.y = -1;
-                        minimum.z = -1;
-                        maximum.x = 1;
-                        maximum.y = 1;
-                        maximum.z = 1;
-                    }
+                if (!matched) {
+                    minimum.x = minimum.y = minimum.z = -1;
+                    maximum.x = maximum.y = maximum.z = 1;
                 }
                 var _aabb = new framework.aabb(minimum, maximum);
                 return _aabb;
@@ -10774,13 +10800,16 @@ var gd3d;
                     this.onDispose();
             };
             transform.ClassName = "transform";
+            transform.helpv2 = new gd3d.math.vector2();
             transform.helpv3 = new gd3d.math.vector3();
+            transform.helpv3_1 = new gd3d.math.vector3();
             transform.helpUp = new gd3d.math.vector3(0, 1, 0);
             transform.helpRight = new gd3d.math.vector3(1, 0, 0);
             transform.helpFoward = new gd3d.math.vector3(0, 0, 1);
             transform.helpquat = new gd3d.math.quaternion();
             transform.helpquat_1 = new gd3d.math.quaternion();
             transform.helpmtx = new gd3d.math.matrix();
+            transform.aabbCareTypes = ["meshFilter", "skinnedMeshRenderer", "canvasRenderer"];
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
@@ -10847,6 +10876,7 @@ var gd3d;
             function boxcollider() {
                 this.center = new gd3d.math.vector3(0, 0, 0);
                 this.size = new gd3d.math.vector3(1, 1, 1);
+                this.started = false;
                 this._colliderVisible = false;
             }
             boxcollider_1 = boxcollider;
@@ -10866,6 +10896,8 @@ var gd3d;
             boxcollider.prototype.start = function () {
                 this.filter = this.gameObject.getComponent("meshFilter");
                 this.build();
+                this.started = true;
+                this.ckBuildColliderMesh();
             };
             boxcollider.prototype.onPlay = function () {
             };
@@ -10880,11 +10912,7 @@ var gd3d;
                 },
                 set: function (value) {
                     this._colliderVisible = value;
-                    if (this._colliderVisible) {
-                        if (!this.subTran) {
-                            this.buildMesh();
-                        }
-                    }
+                    this.ckBuildColliderMesh();
                     if (this.subTran) {
                         this.subTran.gameObject.visible = this._colliderVisible;
                     }
@@ -10892,6 +10920,13 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            boxcollider.prototype.ckBuildColliderMesh = function () {
+                if (this._colliderVisible && this.started) {
+                    if (!this.subTran) {
+                        this.buildMesh();
+                    }
+                }
+            };
             boxcollider.prototype.intersectsTransform = function (tran) {
                 if (tran.gameObject.collider == null)
                     return false;
@@ -24049,16 +24084,16 @@ var gd3d;
             out.rawData.set(vector.rawData);
         }
         math.vec3ClampLength = vec3ClampLength;
-        function vec3Min(lhs, rhs, out) {
-            out.rawData[0] = Math.min(lhs.x, rhs.x);
-            out.rawData[1] = Math.min(lhs.y, rhs.y);
-            out.rawData[2] = Math.min(lhs.z, rhs.z);
+        function vec3Min(v0, v1, out) {
+            out.rawData[0] = Math.min(v0.x, v1.x);
+            out.rawData[1] = Math.min(v0.y, v1.y);
+            out.rawData[2] = Math.min(v0.z, v1.z);
         }
         math.vec3Min = vec3Min;
-        function vec3Max(lhs, rhs, out) {
-            out.rawData[0] = Math.max(lhs.x, rhs.x);
-            out.rawData[1] = Math.max(lhs.y, rhs.y);
-            out.rawData[2] = Math.max(lhs.z, rhs.z);
+        function vec3Max(v0, v1, out) {
+            out.rawData[0] = Math.max(v0.x, v1.x);
+            out.rawData[1] = Math.max(v0.y, v1.y);
+            out.rawData[2] = Math.max(v0.z, v1.z);
         }
         math.vec3Max = vec3Max;
         function vec3AngleBetween(from, to) {
@@ -31800,6 +31835,9 @@ var gd3d;
                     this.onLateUpdate(delta);
                 if (framework.physics) {
                     framework.physics._step(delta);
+                }
+                if (this._mainCamera && !this._mainCamera.gameObject) {
+                    this._mainCamera = null;
                 }
                 if (this.renderCameras.length > 1) {
                     this.renderCameras.sort(function (a, b) {
