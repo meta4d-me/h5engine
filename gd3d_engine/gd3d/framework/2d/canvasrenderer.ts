@@ -35,6 +35,31 @@ namespace gd3d.framework
         }
 
         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 不受视锥剔除
+         * @version egret-gd3d 1.0
+         */
+        @gd3d.reflect.Field("boolean")
+        get dontFrustumCulling(){
+            if(this.gameObject){
+                return (this.gameObject.hideFlags & HideFlags.DontFrustumCulling) != 0;
+            }else{
+                return false;
+            }
+        }
+
+        set dontFrustumCulling(val:boolean){
+            if(this.gameObject){
+                if(val)
+                    this.gameObject.hideFlags |=  HideFlags.DontFrustumCulling;
+                else
+                    this.gameObject.hideFlags ^=  HideFlags.DontFrustumCulling;
+            }
+        }
+
+        /**
          * @private
          */
         subTran: transform;

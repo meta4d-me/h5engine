@@ -428,6 +428,7 @@ declare namespace gd3d.framework {
         static readonly ClassName: string;
         constructor();
         renderLayer: number;
+        dontFrustumCulling: boolean;
         subTran: transform;
         getBound(): any;
         intersectsTransform(tran: transform): boolean;
@@ -5732,6 +5733,7 @@ declare namespace gd3d.framework {
         NotEditable = 8,
         DontSaveInBuild = 16,
         DontUnloadUnusedAsset = 32,
+        DontFrustumCulling = 64,
         DontSave = 52,
         HideAndDontSave = 61,
     }

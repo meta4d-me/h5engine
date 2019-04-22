@@ -2411,6 +2411,26 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(canvasRenderer.prototype, "dontFrustumCulling", {
+                get: function () {
+                    if (this.gameObject) {
+                        return (this.gameObject.hideFlags & framework.HideFlags.DontFrustumCulling) != 0;
+                    }
+                    else {
+                        return false;
+                    }
+                },
+                set: function (val) {
+                    if (this.gameObject) {
+                        if (val)
+                            this.gameObject.hideFlags |= framework.HideFlags.DontFrustumCulling;
+                        else
+                            this.gameObject.hideFlags ^= framework.HideFlags.DontFrustumCulling;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
             canvasRenderer.prototype.getBound = function () {
                 return null;
             };
@@ -2550,6 +2570,11 @@ var gd3d;
             canvasRenderer.prototype.clone = function () {
             };
             canvasRenderer.ClassName = "canvasRenderer";
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Boolean])
+            ], canvasRenderer.prototype, "dontFrustumCulling", null);
             __decorate([
                 gd3d.reflect.Field("canvas"),
                 __metadata("design:type", framework.canvas)
@@ -14871,10 +14896,12 @@ var gd3d;
                 }
             };
             camera.prototype.isCulling = function (node) {
+                if (node.gameObject.hideFlags & framework.HideFlags.DontFrustumCulling)
+                    return false;
                 var vec3cache = this._vec3cache;
                 var aabb = node.aabb;
-                var skinmesh = node.gameObject.getComponent("skinnedMeshRenderer");
-                if (skinmesh != null) {
+                var skinmesh = node.gameObject.renderer;
+                if (skinmesh != null && skinmesh.aabb) {
                     aabb = skinmesh.aabb;
                 }
                 gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, vec3cache);
@@ -31311,6 +31338,7 @@ var gd3d;
             HideFlags[HideFlags["NotEditable"] = 8] = "NotEditable";
             HideFlags[HideFlags["DontSaveInBuild"] = 16] = "DontSaveInBuild";
             HideFlags[HideFlags["DontUnloadUnusedAsset"] = 32] = "DontUnloadUnusedAsset";
+            HideFlags[HideFlags["DontFrustumCulling"] = 64] = "DontFrustumCulling";
             HideFlags[HideFlags["DontSave"] = 52] = "DontSave";
             HideFlags[HideFlags["HideAndDontSave"] = 61] = "HideAndDontSave";
         })(HideFlags = framework.HideFlags || (framework.HideFlags = {}));

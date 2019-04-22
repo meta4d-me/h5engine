@@ -736,10 +736,12 @@ namespace gd3d.framework
         }
         private _vec3cache = new gd3d.math.vector3();
         isCulling(node: transform) {
+            if(node.gameObject.hideFlags & HideFlags.DontFrustumCulling) return false;
             const vec3cache = this._vec3cache;
             let  {aabb} = node;
-            var skinmesh = node.gameObject.getComponent("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer;
-            if(skinmesh != null) {
+            //var skinmesh = node.gameObject.getComponent("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer;
+            var skinmesh = node.gameObject.renderer as any; //skinnedMeshRenderer noly
+            if(skinmesh != null && skinmesh.aabb) {
                 // 如果有骨骼动画, 使用unity导出的aabb
                 // if (skinmesh.aabb != null)
                 aabb = skinmesh.aabb;
