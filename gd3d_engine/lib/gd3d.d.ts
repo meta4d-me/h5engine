@@ -250,6 +250,21 @@ declare namespace gd3d {
     }
 }
 declare namespace gd3d.math {
+    interface Ivec2 {
+        x: number;
+        y: number;
+    }
+    interface Ivec3 {
+        x: number;
+        y: number;
+        z: number;
+    }
+    interface Iquat {
+        x: number;
+        y: number;
+        z: number;
+        w: number;
+    }
     type byte = number;
     type ubyte = number;
     type short = number;
@@ -266,7 +281,7 @@ declare namespace gd3d.math {
     function UInt32(v?: number | string): uint;
     function Float(v?: number | string): float;
     function Double(v?: number | string): double;
-    class vector2 {
+    class vector2 implements Ivec2 {
         static readonly ClassName: string;
         rawData: Float32Array;
         constructor(x?: float, y?: float);
@@ -304,7 +319,7 @@ declare namespace gd3d.math {
         a: float;
         toString(): string;
     }
-    class vector3 {
+    class vector3 implements Ivec3 {
         static readonly ClassName: string;
         rawData: Float32Array;
         constructor(x?: float, y?: float, z?: float);
@@ -323,7 +338,7 @@ declare namespace gd3d.math {
         w: float;
         toString(): string;
     }
-    class quaternion {
+    class quaternion implements Iquat {
         static readonly ClassName: string;
         rawData: Float32Array;
         constructor(x?: float, y?: float, z?: float, w?: float);
@@ -987,7 +1002,7 @@ declare namespace gd3d.framework {
         body: Ibody;
         addForce(Force: math.vector2): any;
         setVelocity(velocity: math.vector2): any;
-        setDesity(Desity: number): any;
+        setDensity(Desity: number): any;
         setFrictionAir(frictionAir: number): any;
         setFriction(friction: number): any;
         setFrictionStatic(frictionStatic: number): any;
@@ -995,7 +1010,6 @@ declare namespace gd3d.framework {
         setMass(mass: number): any;
         setPosition(pos: math.vector2): any;
         isSleeping(): boolean;
-        getId(): number;
     }
     interface I2dPhyBodyData {
         mass?: number;
@@ -1018,18 +1032,10 @@ declare namespace gd3d.framework {
         constructor();
         transform: transform2D;
         body: Ibody;
-        private m_velocity;
         addForce(Force: math.vector2): void;
         setVelocity(velocity: math.vector2): void;
         setAngularVelocity(velocity: number): void;
-        readonly angularVelocity: number;
-        readonly speed: number;
-        readonly velocity: math.vector2;
-        type: string;
-        readonly collisionFilter: collisionFilter;
-        tag: string;
-        name: string;
-        setDesity(Desity: number): void;
+        setDensity(Desity: number): void;
         setFrictionAir(frictionAir: number): void;
         setFriction(friction: number): void;
         setFrictionStatic(frictionStatic: number): void;
@@ -1039,7 +1045,6 @@ declare namespace gd3d.framework {
         setInitData(att: I2dPhyBodyData): void;
         setPosition(pos: math.vector2): void;
         isSleeping(): boolean;
-        getId(): number;
         update(delta: number): void;
         remove(): void;
     }
@@ -1083,10 +1088,16 @@ declare namespace gd3d.framework {
         matterEngine: any;
         private engineWorld;
         private matterVector;
+        private eventer;
         constructor(op?: IEngine2DOP);
-        private beforeUpdate(event);
-        private afterRender(event);
         update(delta: number): void;
+        private beforeUpdate(ev);
+        private afterUpdate(ev);
+        private collisionStart(ev);
+        private collisionActive(ev);
+        private collisionEnd(ev);
+        addEventListener(eventEnum: event.Physic2dEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        removeEventListener(eventEnum: event.UIEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         creatRectBodyByInitData(pBody: I2DPhysicsBody): any;
         creatCircleBodyByInitData(pBody: I2DPhysicsBody, radius: number, maxSides?: number): any;
         ConvexHullBodyByInitData(pBody: I2DPhysicsBody, vertexSets: any, flagInternal?: boolean, removeCollinear?: number, minimumArea?: number): any;
@@ -1101,15 +1112,8 @@ declare namespace gd3d.framework {
         setVelocity(body: Ibody, velocity: math.vector2): void;
         setPosition(body: Ibody, pos: math.vector2): void;
         setMass(body: Ibody, mass: number): void;
-        setDesity(body: Ibody, Desity: number): void;
-        setFrictionAir(body: Ibody, frictionAir: number): void;
-        setFriction(body: Ibody, friction: number): void;
-        setFrictionStatic(body: Ibody, frictionStatic: number): void;
-        setRestitution(body: Ibody, restitution: number): void;
+        setDensity(body: Ibody, Desity: number): void;
         setAngularVelocity(body: Ibody, angularVelocity: number): void;
-        private set(body, settings, value);
-        addEvent(eventname: string, callback: Function): void;
-        removeEvent(eventname: string, callback: Function): void;
     }
     interface Ibody {
         bounds: {
@@ -1122,23 +1126,35 @@ declare namespace gd3d.framework {
                 y: number;
             };
         };
-        angle: number;
-        position: matterVector;
-        speed: number;
+        isSleeping: boolean;
+        isSensor: boolean;
+        isStatic: boolean;
+        position: math.Ivec2;
+        velocity: math.Ivec2;
+        collisionFilter: collisionFilter;
         type: string;
         tag: string;
         name: string;
+        angle: number;
+        speed: number;
+        angularSpeed: number;
+        frictionAir: number;
+        friction: number;
+        frictionStatic: number;
+        restitution: number;
         angularVelocity: number;
-        velocity: matterVector;
-        collisionFilter: collisionFilter;
         id: number;
-        isSleeping: boolean;
-        applyForce(body: Ibody, positon: matterVector, force: matterVector): void;
-    }
-    interface matterVector {
-        x: number;
-        y: number;
-        create(x: number, y: number): matterVector;
+        motion: number;
+        force: number;
+        torque: number;
+        sleepThreshold: number;
+        density: number;
+        mass: number;
+        inverseMass: number;
+        inertia: number;
+        inverseInertia: number;
+        slop: number;
+        timeScale: number;
     }
     interface collisionFilter {
         group?: number;
@@ -3728,6 +3744,13 @@ declare namespace gd3d.event {
         Numpad2 = 98,
         Numpad3 = 99,
     }
+    enum Physic2dEventEnum {
+        BeforeUpdate = 0,
+        afterUpdate = 1,
+        collisionStart = 2,
+        collisionActive = 3,
+        collisionEnd = 4,
+    }
 }
 declare namespace gd3d.event {
     class InputEvent extends AEvent {
@@ -3735,6 +3758,12 @@ declare namespace gd3d.event {
         EmitEnum_key(event: KeyEventEnum, ...args: Array<any>): void;
         OnEnum_point(event: PointEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         EmitEnum_point(event: PointEventEnum, ...args: Array<any>): void;
+    }
+}
+declare namespace gd3d.event {
+    class Physic2dEvent extends AEvent {
+        OnEnum(event: Physic2dEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        EmitEnum(event: Physic2dEventEnum, ...args: Array<any>): void;
     }
 }
 declare namespace gd3d.event {
@@ -5699,28 +5728,12 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class physicTool {
-        static Ivec3Equal(a: any, b: any): boolean;
-        static IQuatEqual(a: any, b: any): boolean;
-        static Ivec3Copy(from: {
-            x;
-            y;
-            z;
-        }, to: {
-            x;
-            y;
-            z;
-        }): void;
-        static IQuatCopy(from: {
-            x;
-            y;
-            z;
-            w;
-        }, to: {
-            x;
-            y;
-            z;
-            w;
-        }): void;
+        static Ivec3Equal(a: math.Ivec3, b: math.Ivec3): boolean;
+        static Ivec2Equal(a: math.Ivec2, b: math.Ivec2): boolean;
+        static IQuatEqual(a: math.Iquat, b: math.Iquat): boolean;
+        static Ivec3Copy(from: math.Ivec3, to: math.Ivec3): void;
+        static Ivec2Copy(from: math.Ivec2, to: math.Ivec2): void;
+        static IQuatCopy(from: math.Iquat, to: math.Iquat): void;
         static vec3AsArray(vec3: math.vector3): any[];
     }
 }

@@ -1188,6 +1188,9 @@ var gd3d;
 (function (gd3d) {
     var math;
     (function (math) {
+        ;
+        ;
+        ;
         var _ubyte = new Uint8Array(1);
         var _byte = new Int8Array(1);
         var _int16 = new Int16Array(1);
@@ -6352,82 +6355,20 @@ var gd3d;
             physics2DBody.prototype.setAngularVelocity = function (velocity) {
                 this.physicsEngine.setAngularVelocity(this.body, velocity);
             };
-            Object.defineProperty(physics2DBody.prototype, "angularVelocity", {
-                get: function () {
-                    return this.body.angularVelocity;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(physics2DBody.prototype, "speed", {
-                get: function () {
-                    return this.body.speed;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(physics2DBody.prototype, "velocity", {
-                get: function () {
-                    if (this.m_velocity == null)
-                        this.m_velocity = new gd3d.math.vector2();
-                    this.m_velocity.x = this.body.velocity.x;
-                    this.m_velocity.y = this.body.velocity.y;
-                    return this.m_velocity;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(physics2DBody.prototype, "type", {
-                get: function () {
-                    return this.body.type;
-                },
-                set: function (value) {
-                    this.body.type = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(physics2DBody.prototype, "collisionFilter", {
-                get: function () {
-                    return this.body.collisionFilter;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(physics2DBody.prototype, "tag", {
-                get: function () {
-                    return this.body.tag;
-                },
-                set: function (value) {
-                    this.body.tag = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(physics2DBody.prototype, "name", {
-                get: function () {
-                    return this.body.name;
-                },
-                set: function (value) {
-                    this.body.name = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            physics2DBody.prototype.setDesity = function (Desity) {
-                this.physicsEngine.setDesity(this.body, Desity);
+            physics2DBody.prototype.setDensity = function (Desity) {
+                this.physicsEngine.setDensity(this.body, Desity);
             };
             physics2DBody.prototype.setFrictionAir = function (frictionAir) {
-                this.physicsEngine.setFrictionAir(this.body, frictionAir);
+                this.body.frictionAir = frictionAir;
             };
             physics2DBody.prototype.setFriction = function (friction) {
-                this.physicsEngine.setFriction(this.body, friction);
+                this.body.friction = friction;
             };
             physics2DBody.prototype.setFrictionStatic = function (frictionStatic) {
-                this.physicsEngine.setFrictionStatic(this.body, frictionStatic);
+                this.body.frictionStatic = frictionStatic;
             };
             physics2DBody.prototype.setRestitution = function (restitution) {
-                this.physicsEngine.setRestitution(this.body, restitution);
+                this.body.restitution = restitution;
             };
             physics2DBody.prototype.setMass = function (mass) {
                 this.physicsEngine.setMass(this.body, mass);
@@ -6441,14 +6382,10 @@ var gd3d;
             physics2DBody.prototype.isSleeping = function () {
                 return this.body.isSleeping;
             };
-            physics2DBody.prototype.getId = function () {
-                return this.body.id;
-            };
             physics2DBody.prototype.update = function (delta) {
                 if (!this.body)
                     return;
-                this.transform.localTranslate.x = this.body.position.x;
-                this.transform.localTranslate.y = this.body.position.y;
+                framework.physicTool.Ivec2Copy(this.body.position, this.transform.localTranslate);
                 this.transform.localRotate = this.body.angle;
                 this.transform.markDirty();
             };
@@ -6543,6 +6480,7 @@ var gd3d;
         var physicEngine2D = (function () {
             function physicEngine2D(op) {
                 if (op === void 0) { op = null; }
+                this.eventer = new gd3d.event.Physic2dEvent();
                 this._physicsBodys = [];
                 if (Matter == undefined) {
                     console.error(" Matter not found , create physicEngine2D fail");
@@ -6558,14 +6496,34 @@ var gd3d;
                 this.matterVector = Matter.Vector;
                 Matter.Engine.run(this.matterEngine);
                 Matter.Events.on(this.matterEngine, "beforeUpdate", this.beforeUpdate.bind(this));
-                Matter.Events.on(this.matterEngine, "afterRender", this.afterRender.bind(this));
+                Matter.Events.on(this.matterEngine, "afterUpdate", this.afterUpdate.bind(this));
+                Matter.Events.on(this.matterEngine, "collisionStart", this.collisionStart.bind(this));
+                Matter.Events.on(this.matterEngine, "collisionActive", this.collisionActive.bind(this));
+                Matter.Events.on(this.matterEngine, "collisionEnd", this.collisionEnd.bind(this));
             }
-            physicEngine2D.prototype.beforeUpdate = function (event) {
-            };
-            physicEngine2D.prototype.afterRender = function (event) {
-            };
             physicEngine2D.prototype.update = function (delta) {
                 Matter.Engine.update(this.matterEngine, delta);
+            };
+            physicEngine2D.prototype.beforeUpdate = function (ev) {
+                this.eventer.EmitEnum(gd3d.event.Physic2dEventEnum.BeforeUpdate, ev);
+            };
+            physicEngine2D.prototype.afterUpdate = function (ev) {
+                this.eventer.EmitEnum(gd3d.event.Physic2dEventEnum.afterUpdate, ev);
+            };
+            physicEngine2D.prototype.collisionStart = function (ev) {
+                this.eventer.EmitEnum(gd3d.event.Physic2dEventEnum.collisionStart, ev);
+            };
+            physicEngine2D.prototype.collisionActive = function (ev) {
+                this.eventer.EmitEnum(gd3d.event.Physic2dEventEnum.collisionActive, ev);
+            };
+            physicEngine2D.prototype.collisionEnd = function (ev) {
+                this.eventer.EmitEnum(gd3d.event.Physic2dEventEnum.collisionEnd, ev);
+            };
+            physicEngine2D.prototype.addEventListener = function (eventEnum, func, thisArg) {
+                this.eventer.OnEnum(eventEnum, func, thisArg);
+            };
+            physicEngine2D.prototype.removeEventListener = function (eventEnum, func, thisArg) {
+                this.eventer.RemoveListener(gd3d.event.UIEventEnum[eventEnum], func, thisArg);
             };
             physicEngine2D.prototype.creatRectBodyByInitData = function (pBody) {
                 if (!pBody || !pBody.transform)
@@ -6619,10 +6577,10 @@ var gd3d;
                 Matter.World.clear(this.engineWorld, keepStatic);
             };
             physicEngine2D.prototype.applyForce = function (body, positon, force) {
-                Matter.Body.applyForce(body, this.matterVector.create(positon.x, positon.y), this.matterVector.create(force.x, force.y));
+                Matter.Body.applyForce(body, positon, force);
             };
             physicEngine2D.prototype.applyForceAtCenter = function (body, force) {
-                Matter.Body.applyForce(body, body.position, this.matterVector.create(force.x, force.y));
+                Matter.Body.applyForce(body, body.position, force);
             };
             physicEngine2D.prototype.setGravity = function (x, y) {
                 this.engineWorld.gravity.x = x;
@@ -6639,40 +6597,19 @@ var gd3d;
                 configurable: true
             });
             physicEngine2D.prototype.setVelocity = function (body, velocity) {
-                Matter.Body.setVelocity(body, this.matterVector.create(velocity.x, velocity.y));
+                Matter.Body.setVelocity(body, velocity);
             };
             physicEngine2D.prototype.setPosition = function (body, pos) {
-                Matter.Body.setPosition(body, this.matterVector.create(pos.x, pos.y));
+                Matter.Body.setPosition(body, pos);
             };
             physicEngine2D.prototype.setMass = function (body, mass) {
                 Matter.Body.setMass(body, mass);
             };
-            physicEngine2D.prototype.setDesity = function (body, Desity) {
-                this.set(body, "desity", Desity);
-            };
-            physicEngine2D.prototype.setFrictionAir = function (body, frictionAir) {
-                this.set(body, "frictionAir", frictionAir);
-            };
-            physicEngine2D.prototype.setFriction = function (body, friction) {
-                this.set(body, "friction", friction);
-            };
-            physicEngine2D.prototype.setFrictionStatic = function (body, frictionStatic) {
-                this.set(body, "frictionStatic", frictionStatic);
-            };
-            physicEngine2D.prototype.setRestitution = function (body, restitution) {
-                this.set(body, "restitution", restitution);
+            physicEngine2D.prototype.setDensity = function (body, Desity) {
+                Matter.Body.setDensity(body, Desity);
             };
             physicEngine2D.prototype.setAngularVelocity = function (body, angularVelocity) {
-                this.set(body, "angularVelocity", angularVelocity);
-            };
-            physicEngine2D.prototype.set = function (body, settings, value) {
-                Matter.Body.set(body, settings, value);
-            };
-            physicEngine2D.prototype.addEvent = function (eventname, callback) {
-                Matter.Events.on(this.matterEngine, eventname, callback);
-            };
-            physicEngine2D.prototype.removeEvent = function (eventname, callback) {
-                Matter.Events.off(this.matterEngine, eventname, callback);
+                Matter.Body.setAngularVelocity(body, angularVelocity);
             };
             return physicEngine2D;
         }());
@@ -19797,6 +19734,14 @@ var gd3d;
             KeyCode[KeyCode["Numpad2"] = 98] = "Numpad2";
             KeyCode[KeyCode["Numpad3"] = 99] = "Numpad3";
         })(KeyCode = event.KeyCode || (event.KeyCode = {}));
+        var Physic2dEventEnum;
+        (function (Physic2dEventEnum) {
+            Physic2dEventEnum[Physic2dEventEnum["BeforeUpdate"] = 0] = "BeforeUpdate";
+            Physic2dEventEnum[Physic2dEventEnum["afterUpdate"] = 1] = "afterUpdate";
+            Physic2dEventEnum[Physic2dEventEnum["collisionStart"] = 2] = "collisionStart";
+            Physic2dEventEnum[Physic2dEventEnum["collisionActive"] = 3] = "collisionActive";
+            Physic2dEventEnum[Physic2dEventEnum["collisionEnd"] = 4] = "collisionEnd";
+        })(Physic2dEventEnum = event.Physic2dEventEnum || (event.Physic2dEventEnum = {}));
     })(event = gd3d.event || (gd3d.event = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -19837,24 +19782,48 @@ var gd3d;
 (function (gd3d) {
     var event;
     (function (event_2) {
+        var Physic2dEvent = (function (_super) {
+            __extends(Physic2dEvent, _super);
+            function Physic2dEvent() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            Physic2dEvent.prototype.OnEnum = function (event, func, thisArg) {
+                this.On(event_2.Physic2dEventEnum[event], func, thisArg);
+            };
+            Physic2dEvent.prototype.EmitEnum = function (event) {
+                var args = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    args[_i - 1] = arguments[_i];
+                }
+                _super.prototype.Emit.call(this, event_2.Physic2dEventEnum[event], args);
+            };
+            return Physic2dEvent;
+        }(gd3d.AEvent));
+        event_2.Physic2dEvent = Physic2dEvent;
+    })(event = gd3d.event || (gd3d.event = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var event;
+    (function (event_3) {
         var UIEvent = (function (_super) {
             __extends(UIEvent, _super);
             function UIEvent() {
                 return _super !== null && _super.apply(this, arguments) || this;
             }
             UIEvent.prototype.OnEnum = function (event, func, thisArg) {
-                this.On(event_2.UIEventEnum[event], func, thisArg);
+                this.On(event_3.UIEventEnum[event], func, thisArg);
             };
             UIEvent.prototype.EmitEnum = function (event) {
                 var args = [];
                 for (var _i = 1; _i < arguments.length; _i++) {
                     args[_i - 1] = arguments[_i];
                 }
-                _super.prototype.Emit.call(this, event_2.UIEventEnum[event], args);
+                _super.prototype.Emit.call(this, event_3.UIEventEnum[event], args);
             };
             return UIEvent;
         }(gd3d.AEvent));
-        event_2.UIEvent = UIEvent;
+        event_3.UIEvent = UIEvent;
     })(event = gd3d.event || (gd3d.event = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -31299,6 +31268,9 @@ var gd3d;
             physicTool.Ivec3Equal = function (a, b) {
                 return a.x == b.x && a.y == b.y && a.z == b.z;
             };
+            physicTool.Ivec2Equal = function (a, b) {
+                return a.x == b.x && a.y == b.y;
+            };
             physicTool.IQuatEqual = function (a, b) {
                 return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
             };
@@ -31306,6 +31278,10 @@ var gd3d;
                 to.x = from.x;
                 to.y = from.y;
                 to.z = from.z;
+            };
+            physicTool.Ivec2Copy = function (from, to) {
+                to.x = from.x;
+                to.y = from.y;
             };
             physicTool.IQuatCopy = function (from, to) {
                 to.x = from.x;

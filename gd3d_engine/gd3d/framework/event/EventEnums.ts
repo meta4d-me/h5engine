@@ -128,4 +128,21 @@ namespace gd3d.event
         Numpad3 = 99 
     }
 
+    /**
+     * 2d Physics 事件枚举
+     */
+    export enum Physic2dEventEnum
+    {
+        /** 物理引擎更新前 */
+        BeforeUpdate,
+        /** 物理引擎更新后 */
+        afterUpdate,
+        /** 开始碰撞 （触发在update 之后）*/
+        collisionStart,
+        /** 碰撞持续中 （触发在update 之后）*/
+        collisionActive,
+        /** 碰撞结束 （触发在update 之后）*/
+        collisionEnd
+    }
+
 }

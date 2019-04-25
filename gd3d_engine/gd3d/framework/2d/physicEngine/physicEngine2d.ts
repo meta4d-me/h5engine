@@ -16,7 +16,8 @@ namespace gd3d.framework {
     export class physicEngine2D {
         matterEngine: any;
         private engineWorld: any;
-        private matterVector: matterVector;
+        private matterVector: math.Ivec2;
+        private eventer : event.Physic2dEvent = new event.Physic2dEvent();
         public constructor(op: IEngine2DOP = null) {
             if (Matter == undefined) {
                 console.error(" Matter not found , create physicEngine2D fail");
@@ -35,21 +36,60 @@ namespace gd3d.framework {
 
             //Event
             Matter.Events.on(this.matterEngine,"beforeUpdate",this.beforeUpdate.bind(this));
-            Matter.Events.on(this.matterEngine,"afterRender",this.afterRender.bind(this));
-        }
-
-        /** Matter.Engine update 调用前 */
-        private beforeUpdate(event){
-
-        }
-
-        /** Matter.Engine update 调用之后 */
-        private afterRender(event){
-
+            Matter.Events.on(this.matterEngine,"afterUpdate",this.afterUpdate.bind(this));
+            Matter.Events.on(this.matterEngine,"collisionStart",this.collisionStart.bind(this));
+            Matter.Events.on(this.matterEngine,"collisionActive",this.collisionActive.bind(this));
+            Matter.Events.on(this.matterEngine,"collisionEnd",this.collisionEnd.bind(this));
         }
 
         update(delta: number) {
             Matter.Engine.update(this.matterEngine, delta);
+        }
+
+
+        /** Matter.Engine update 调用前 */
+        private beforeUpdate(ev){
+            this.eventer.EmitEnum(event.Physic2dEventEnum.BeforeUpdate , ev);
+        }
+
+        /** Matter.Engine update 调用之后 */
+        private afterUpdate(ev){
+            this.eventer.EmitEnum(event.Physic2dEventEnum.afterUpdate , ev);
+        }
+
+        /** 开始碰撞 ， Matter.Engine update 调用之后 */
+        private collisionStart(ev){
+            this.eventer.EmitEnum(event.Physic2dEventEnum.collisionStart , ev);
+        }
+
+        /** 碰撞持续中， Matter.Engine update 调用之后 */
+        private collisionActive(ev){
+            this.eventer.EmitEnum(event.Physic2dEventEnum.collisionActive , ev);
+        }
+
+        /** 碰撞结束 ， Matter.Engine update 调用之后 */
+        private collisionEnd(ev){
+            this.eventer.EmitEnum(event.Physic2dEventEnum.collisionEnd , ev);
+        }
+
+        /**
+         * 添加事件监听
+         * @param eventEnum 事件类型
+         * @param func 事件回调函数
+         * @param thisArg 函数持有对象
+         */
+        addEventListener(eventEnum: event.Physic2dEventEnum ,func: (...args: Array<any>) => void,thisArg:any){
+            this.eventer.OnEnum(eventEnum,func,thisArg);
+        }
+
+        /**
+         * 移除事件监听
+         * @param eventEnum 事件类型
+         * @param func 事件回调函数
+         * @param thisArg 函数持有对象
+         */
+        removeEventListener(eventEnum: event.UIEventEnum, func: (...args: Array<any>) => void , thisArg:any){
+            this.eventer.RemoveListener(event.UIEventEnum[eventEnum],func,thisArg);
         }
 
         /**
@@ -105,7 +145,7 @@ namespace gd3d.framework {
             if(!pBody || !pBody.transform) return;
             let tran = pBody.transform;
             let pos = tran.getWorldTranslate();
-            let body = Matter.Bodies.fromVertices(pos.x, pos.y, vertexSets, pBody.options, flagInternal , removeCollinear , minimumArea);
+            let body = Matter.Bodies.fromVertices(pos.x, pos.y, vertexSets, pBody.options , flagInternal , removeCollinear , minimumArea);
             pBody.body = body;
             this.addBody(pBody,);
             return body;
@@ -135,11 +175,11 @@ namespace gd3d.framework {
         }
 
         public applyForce(body: Ibody, positon: math.vector2, force: math.vector2): void {
-            Matter.Body.applyForce(body, this.matterVector.create(positon.x, positon.y), this.matterVector.create(force.x, force.y));
+            Matter.Body.applyForce(body, positon , force );
         }
 
         public applyForceAtCenter(body: Ibody, force: math.vector2): void {
-            Matter.Body.applyForce(body, body.position, this.matterVector.create(force.x, force.y));
+            Matter.Body.applyForce(body, body.position, force );
         }
 
         public setGravity(x: number, y: number) {
@@ -156,76 +196,77 @@ namespace gd3d.framework {
         }
 
         public setVelocity(body: Ibody, velocity: math.vector2) {
-            Matter.Body.setVelocity(body, this.matterVector.create(velocity.x, velocity.y));
+            Matter.Body.setVelocity(body, velocity);
         }
 
         public setPosition(body: Ibody, pos: math.vector2) {
-            Matter.Body.setPosition(body, this.matterVector.create(pos.x, pos.y));
+            Matter.Body.setPosition(body, pos);
         }
 
         public setMass(body: Ibody, mass: number) {
             Matter.Body.setMass(body, mass);
         }
 
-        public setDesity(body: Ibody, Desity: number) {
-            this.set(body, "desity", Desity);
-        }
-        public setFrictionAir(body: Ibody, frictionAir: number) {
-            this.set(body, "frictionAir", frictionAir);
-        }
-        public setFriction(body: Ibody, friction: number) {
-            this.set(body, "friction", friction);
-        }
-        public setFrictionStatic(body: Ibody, frictionStatic: number) {
-            this.set(body, "frictionStatic", frictionStatic);
-        }
-        public setRestitution(body: Ibody, restitution: number) {
-            this.set(body, "restitution", restitution);
+        public setDensity(body: Ibody, Desity: number) {
+            Matter.Body.setDensity(body, Desity);
         }
 
         public setAngularVelocity(body: Ibody, angularVelocity: number) {
-            this.set(body, "angularVelocity", angularVelocity);
+            Matter.Body.setAngularVelocity(body, angularVelocity);
         }
-        private set(body: Ibody, settings: string, value: any) {
-            Matter.Body.set(body, settings, value)
-        }
-
-        public addEvent(eventname: string, callback: Function) {
-            Matter.Events.on(this.matterEngine, eventname, callback);
-        }
-
-        public removeEvent(eventname: string, callback: Function) {
-            Matter.Events.off(this.matterEngine, eventname, callback);
-        }
-
-        
     }
 
     export interface Ibody {
         bounds : {max:{x:number,y:number},min:{x:number,y:number}};
-        angle: number;
-        position: matterVector;
-        speed: number;
+        /** 睡眠状态 */
+        isSleeping:boolean;
+        /** 传感器的标志 , 开启时触发碰撞事件*/
+        isSensor:boolean;
+        /** 静态 */
+        isStatic:boolean;
+        /** 重心点位置 */
+        position: math.Ivec2;
+        /** 速率向量 , 想要改变它 需要通过给它施加力*/
+        velocity: math.Ivec2;
+        /** 碰撞筛选属性对象 */
+        collisionFilter: collisionFilter;
         type: string;
         tag: string;
         name: string;
+        angle: number;
+        speed: number;
+        angularSpeed:number;
+        frictionAir:number;
+        friction:number;
+        frictionStatic:number;
+        restitution:number;
         angularVelocity:number;
-        velocity:matterVector;
-        collisionFilter: collisionFilter;
         id:number;
-        isSleeping:boolean;
-        applyForce(body: Ibody, positon: matterVector, force: matterVector): void;
+        motion:number;
+        force:number;
+        torque:number;
+        sleepThreshold:number;
+        density:number;
+        mass:number;
+        inverseMass:number;
+        inertia:number;
+        inverseInertia:number;
+        slop:number;
+        timeScale:number;
     }
 
-    export interface matterVector {
-        x: number;
-        y: number;
-        create(x: number, y: number): matterVector
-    }
-
+    /**
+     * 碰撞筛选属性对象
+     * 两个物体之间的碰撞将遵守以下规则：
+     * 1.两个物体的group相同且大于0时会执行碰撞，如果负数将永远不会碰撞。
+     * 2.当两个物体group不相同或等于0时将执行 类别/位掩码 的规则。
+     */
     export interface collisionFilter {
+        /** 组号*/
         group?: number;
+        /** 类别 (32位 , 范围[1,2^31])*/
         category?: number;
+        /** 位掩码（指定此主体可能碰撞的碰撞类别）*/
         mask?: number;
     }
 }
