@@ -185,7 +185,11 @@ namespace gd3d.framework
             {
                 physics._step(delta);
             }
-            //排序
+
+            //清理空引用
+            if(this._mainCamera && !this._mainCamera.gameObject){
+                this._mainCamera = null;
+            }
             //排序camera 并绘制
             if (this.renderCameras.length > 1)
             {

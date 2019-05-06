@@ -88,10 +88,14 @@ namespace gd3d.framework
             gd3d.math.matrixMakeIdentity(boxcollider._tempMatrix);
             return boxcollider._tempMatrix;
         }
+
+        private started = false;
         start()
         {
             this.filter = this.gameObject.getComponent("meshFilter") as meshFilter;
             this.build();
+            this.started = true;
+            this.ckBuildColliderMesh();
         }
 
         onPlay()
@@ -131,16 +135,23 @@ namespace gd3d.framework
         set colliderVisible(value: boolean)
         {
             this._colliderVisible = value;
-            if(this._colliderVisible){
-                if(!this.subTran){
-                    this.buildMesh();
-                }
-            }
+            this.ckBuildColliderMesh();
             if (this.subTran)
             {
                 this.subTran.gameObject.visible = this._colliderVisible;
             }
 
+        }
+
+        /**
+         * 检查创建碰撞区域 显示mesh
+         */
+        private ckBuildColliderMesh(){
+            if(this._colliderVisible && this.started){
+                if(!this.subTran){
+                    this.buildMesh();
+                }
+            }
         }
         /**
         * @public

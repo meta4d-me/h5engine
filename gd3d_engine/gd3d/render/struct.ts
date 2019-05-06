@@ -2,7 +2,9 @@
 
 namespace gd3d.math
 {
-
+    export interface Ivec2{x:number,y:number};
+    export interface Ivec3{x:number,y:number,z:number};
+    export interface Iquat{x:number,y:number,z:number,w:number};
 
     export type byte = number;
     export type ubyte = number;
@@ -91,7 +93,7 @@ namespace gd3d.math
      * @private
      */
     @gd3d.reflect.SerializeType
-    export class vector2
+    export class vector2 implements Ivec2
     {
         static readonly ClassName:string="vector2";
 
@@ -306,7 +308,7 @@ namespace gd3d.math
      * @private
      */
     @gd3d.reflect.SerializeType
-    export class vector3
+    export class vector3 implements Ivec3
     {
         static readonly ClassName:string="vector3";
 
@@ -413,7 +415,7 @@ namespace gd3d.math
      * @private
      */
     @gd3d.reflect.SerializeType
-    export class quaternion
+    export class quaternion implements Iquat
     {
         static readonly ClassName:string="quaternion";
 

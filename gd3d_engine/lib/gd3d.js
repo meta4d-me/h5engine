@@ -1188,6 +1188,9 @@ var gd3d;
 (function (gd3d) {
     var math;
     (function (math) {
+        ;
+        ;
+        ;
         var _ubyte = new Uint8Array(1);
         var _byte = new Int8Array(1);
         var _int16 = new Int16Array(1);
@@ -2107,7 +2110,7 @@ var gd3d;
                 var Eated = false;
                 while (buoy >= 0) {
                     var node = framework.transform2D.getTransform2DById(list[buoy]);
-                    if (node.components) {
+                    if (node && node.components) {
                         for (var i = 0; i <= node.components.length; i++) {
                             if (ev.eated == false) {
                                 var comp = node.components[i];
@@ -2411,6 +2414,26 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(canvasRenderer.prototype, "dontFrustumCulling", {
+                get: function () {
+                    if (this.gameObject) {
+                        return (this.gameObject.hideFlags & framework.HideFlags.DontFrustumCulling) != 0;
+                    }
+                    else {
+                        return false;
+                    }
+                },
+                set: function (val) {
+                    if (this.gameObject) {
+                        if (val)
+                            this.gameObject.hideFlags |= framework.HideFlags.DontFrustumCulling;
+                        else
+                            this.gameObject.hideFlags ^= framework.HideFlags.DontFrustumCulling;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
             canvasRenderer.prototype.getBound = function () {
                 return null;
             };
@@ -2550,6 +2573,11 @@ var gd3d;
             canvasRenderer.prototype.clone = function () {
             };
             canvasRenderer.ClassName = "canvasRenderer";
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Boolean])
+            ], canvasRenderer.prototype, "dontFrustumCulling", null);
             __decorate([
                 gd3d.reflect.Field("canvas"),
                 __metadata("design:type", framework.canvas)
@@ -6327,82 +6355,20 @@ var gd3d;
             physics2DBody.prototype.setAngularVelocity = function (velocity) {
                 this.physicsEngine.setAngularVelocity(this.body, velocity);
             };
-            Object.defineProperty(physics2DBody.prototype, "angularVelocity", {
-                get: function () {
-                    return this.body.angularVelocity;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(physics2DBody.prototype, "speed", {
-                get: function () {
-                    return this.body.speed;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(physics2DBody.prototype, "velocity", {
-                get: function () {
-                    if (this.m_velocity == null)
-                        this.m_velocity = new gd3d.math.vector2();
-                    this.m_velocity.x = this.body.velocity.x;
-                    this.m_velocity.y = this.body.velocity.y;
-                    return this.m_velocity;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(physics2DBody.prototype, "type", {
-                get: function () {
-                    return this.body.type;
-                },
-                set: function (value) {
-                    this.body.type = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(physics2DBody.prototype, "collisionFilter", {
-                get: function () {
-                    return this.body.collisionFilter;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(physics2DBody.prototype, "tag", {
-                get: function () {
-                    return this.body.tag;
-                },
-                set: function (value) {
-                    this.body.tag = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(physics2DBody.prototype, "name", {
-                get: function () {
-                    return this.body.name;
-                },
-                set: function (value) {
-                    this.body.name = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            physics2DBody.prototype.setDesity = function (Desity) {
-                this.physicsEngine.setDesity(this.body, Desity);
+            physics2DBody.prototype.setDensity = function (Desity) {
+                this.physicsEngine.setDensity(this.body, Desity);
             };
             physics2DBody.prototype.setFrictionAir = function (frictionAir) {
-                this.physicsEngine.setFrictionAir(this.body, frictionAir);
+                this.body.frictionAir = frictionAir;
             };
             physics2DBody.prototype.setFriction = function (friction) {
-                this.physicsEngine.setFriction(this.body, friction);
+                this.body.friction = friction;
             };
             physics2DBody.prototype.setFrictionStatic = function (frictionStatic) {
-                this.physicsEngine.setFrictionStatic(this.body, frictionStatic);
+                this.body.frictionStatic = frictionStatic;
             };
             physics2DBody.prototype.setRestitution = function (restitution) {
-                this.physicsEngine.setRestitution(this.body, restitution);
+                this.body.restitution = restitution;
             };
             physics2DBody.prototype.setMass = function (mass) {
                 this.physicsEngine.setMass(this.body, mass);
@@ -6416,14 +6382,10 @@ var gd3d;
             physics2DBody.prototype.isSleeping = function () {
                 return this.body.isSleeping;
             };
-            physics2DBody.prototype.getId = function () {
-                return this.body.id;
-            };
             physics2DBody.prototype.update = function (delta) {
                 if (!this.body)
                     return;
-                this.transform.localTranslate.x = this.body.position.x;
-                this.transform.localTranslate.y = this.body.position.y;
+                framework.physicTool.Ivec2Copy(this.body.position, this.transform.localTranslate);
                 this.transform.localRotate = this.body.angle;
                 this.transform.markDirty();
             };
@@ -6518,6 +6480,7 @@ var gd3d;
         var physicEngine2D = (function () {
             function physicEngine2D(op) {
                 if (op === void 0) { op = null; }
+                this.eventer = new gd3d.event.Physic2dEvent();
                 this._physicsBodys = [];
                 if (Matter == undefined) {
                     console.error(" Matter not found , create physicEngine2D fail");
@@ -6533,14 +6496,34 @@ var gd3d;
                 this.matterVector = Matter.Vector;
                 Matter.Engine.run(this.matterEngine);
                 Matter.Events.on(this.matterEngine, "beforeUpdate", this.beforeUpdate.bind(this));
-                Matter.Events.on(this.matterEngine, "afterRender", this.afterRender.bind(this));
+                Matter.Events.on(this.matterEngine, "afterUpdate", this.afterUpdate.bind(this));
+                Matter.Events.on(this.matterEngine, "collisionStart", this.collisionStart.bind(this));
+                Matter.Events.on(this.matterEngine, "collisionActive", this.collisionActive.bind(this));
+                Matter.Events.on(this.matterEngine, "collisionEnd", this.collisionEnd.bind(this));
             }
-            physicEngine2D.prototype.beforeUpdate = function (event) {
-            };
-            physicEngine2D.prototype.afterRender = function (event) {
-            };
             physicEngine2D.prototype.update = function (delta) {
                 Matter.Engine.update(this.matterEngine, delta);
+            };
+            physicEngine2D.prototype.beforeUpdate = function (ev) {
+                this.eventer.EmitEnum(gd3d.event.Physic2dEventEnum.BeforeUpdate, ev);
+            };
+            physicEngine2D.prototype.afterUpdate = function (ev) {
+                this.eventer.EmitEnum(gd3d.event.Physic2dEventEnum.afterUpdate, ev);
+            };
+            physicEngine2D.prototype.collisionStart = function (ev) {
+                this.eventer.EmitEnum(gd3d.event.Physic2dEventEnum.collisionStart, ev);
+            };
+            physicEngine2D.prototype.collisionActive = function (ev) {
+                this.eventer.EmitEnum(gd3d.event.Physic2dEventEnum.collisionActive, ev);
+            };
+            physicEngine2D.prototype.collisionEnd = function (ev) {
+                this.eventer.EmitEnum(gd3d.event.Physic2dEventEnum.collisionEnd, ev);
+            };
+            physicEngine2D.prototype.addEventListener = function (eventEnum, func, thisArg) {
+                this.eventer.OnEnum(eventEnum, func, thisArg);
+            };
+            physicEngine2D.prototype.removeEventListener = function (eventEnum, func, thisArg) {
+                this.eventer.RemoveListener(gd3d.event.UIEventEnum[eventEnum], func, thisArg);
             };
             physicEngine2D.prototype.creatRectBodyByInitData = function (pBody) {
                 if (!pBody || !pBody.transform)
@@ -6594,10 +6577,10 @@ var gd3d;
                 Matter.World.clear(this.engineWorld, keepStatic);
             };
             physicEngine2D.prototype.applyForce = function (body, positon, force) {
-                Matter.Body.applyForce(body, this.matterVector.create(positon.x, positon.y), this.matterVector.create(force.x, force.y));
+                Matter.Body.applyForce(body, positon, force);
             };
             physicEngine2D.prototype.applyForceAtCenter = function (body, force) {
-                Matter.Body.applyForce(body, body.position, this.matterVector.create(force.x, force.y));
+                Matter.Body.applyForce(body, body.position, force);
             };
             physicEngine2D.prototype.setGravity = function (x, y) {
                 this.engineWorld.gravity.x = x;
@@ -6614,40 +6597,19 @@ var gd3d;
                 configurable: true
             });
             physicEngine2D.prototype.setVelocity = function (body, velocity) {
-                Matter.Body.setVelocity(body, this.matterVector.create(velocity.x, velocity.y));
+                Matter.Body.setVelocity(body, velocity);
             };
             physicEngine2D.prototype.setPosition = function (body, pos) {
-                Matter.Body.setPosition(body, this.matterVector.create(pos.x, pos.y));
+                Matter.Body.setPosition(body, pos);
             };
             physicEngine2D.prototype.setMass = function (body, mass) {
                 Matter.Body.setMass(body, mass);
             };
-            physicEngine2D.prototype.setDesity = function (body, Desity) {
-                this.set(body, "desity", Desity);
-            };
-            physicEngine2D.prototype.setFrictionAir = function (body, frictionAir) {
-                this.set(body, "frictionAir", frictionAir);
-            };
-            physicEngine2D.prototype.setFriction = function (body, friction) {
-                this.set(body, "friction", friction);
-            };
-            physicEngine2D.prototype.setFrictionStatic = function (body, frictionStatic) {
-                this.set(body, "frictionStatic", frictionStatic);
-            };
-            physicEngine2D.prototype.setRestitution = function (body, restitution) {
-                this.set(body, "restitution", restitution);
+            physicEngine2D.prototype.setDensity = function (body, Desity) {
+                Matter.Body.setDensity(body, Desity);
             };
             physicEngine2D.prototype.setAngularVelocity = function (body, angularVelocity) {
-                this.set(body, "angularVelocity", angularVelocity);
-            };
-            physicEngine2D.prototype.set = function (body, settings, value) {
-                Matter.Body.set(body, settings, value);
-            };
-            physicEngine2D.prototype.addEvent = function (eventname, callback) {
-                Matter.Events.on(this.matterEngine, eventname, callback);
-            };
-            physicEngine2D.prototype.removeEvent = function (eventname, callback) {
-                Matter.Events.off(this.matterEngine, eventname, callback);
+                Matter.Body.setAngularVelocity(body, angularVelocity);
             };
             return physicEngine2D;
         }());
@@ -10312,38 +10274,64 @@ var gd3d;
             transform.prototype._buildAABB = function () {
                 var minimum = new gd3d.math.vector3();
                 var maximum = new gd3d.math.vector3();
-                var filter = this.gameObject.getComponent("meshFilter");
-                if (filter != null && filter.mesh != null && filter.mesh.data != null && filter.mesh.data.pos != null) {
-                    var meshdata = filter.mesh.data;
-                    gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
-                    gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-                    for (var i = 0; i < meshdata.pos.length; i++) {
-                        gd3d.math.vec3Max(meshdata.pos[i], maximum, maximum);
-                        gd3d.math.vec3Min(meshdata.pos[i], minimum, minimum);
+                var _types = transform_2.aabbCareTypes;
+                var len = _types.length;
+                var matched = false;
+                for (var i = 0; i < len; i++) {
+                    var t = _types[i];
+                    switch (t) {
+                        case framework.meshFilter.ClassName:
+                            var filter = this.gameObject.getComponent("meshFilter");
+                            if (filter != null && filter.mesh != null && filter.mesh.data != null && filter.mesh.data.pos != null) {
+                                var meshdata = filter.mesh.data;
+                                gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                                gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+                                for (var i = 0; i < meshdata.pos.length; i++) {
+                                    gd3d.math.vec3Max(meshdata.pos[i], maximum, maximum);
+                                    gd3d.math.vec3Min(meshdata.pos[i], minimum, minimum);
+                                }
+                                matched = true;
+                            }
+                            break;
+                        case framework.skinnedMeshRenderer.ClassName:
+                            var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer");
+                            if (skinmesh != null && skinmesh.mesh != null && skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null) {
+                                var skinmeshdata = skinmesh.mesh.data;
+                                gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                                gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+                                var p0 = gd3d.math.pool.new_vector3();
+                                for (var i = 0; i < skinmeshdata.pos.length; i++) {
+                                    skinmesh.calActualVertexByIndex(i, p0);
+                                    gd3d.math.vec3Max(p0, maximum, maximum);
+                                    gd3d.math.vec3Min(p0, minimum, minimum);
+                                }
+                                gd3d.math.pool.delete_vector3(p0);
+                                matched = true;
+                            }
+                            break;
+                        case framework.canvasRenderer.ClassName:
+                            var canvasR = this.gameObject.getComponent("canvasRenderer");
+                            if (canvasR && canvasR.canvas) {
+                                var cvs = canvasR.canvas;
+                                var cPos = transform_2.helpv2;
+                                gd3d.math.vec2Set(cPos, 0, 0);
+                                var wPos_0 = transform_2.helpv3;
+                                canvasR.calCanvasPosToWorldPos(cPos, wPos_0);
+                                var wPos_1 = transform_2.helpv3_1;
+                                gd3d.math.vec2Set(cPos, cvs.pixelWidth, cvs.pixelHeight);
+                                canvasR.calCanvasPosToWorldPos(cPos, wPos_1);
+                                gd3d.math.vec3Min(wPos_0, wPos_1, minimum);
+                                gd3d.math.vec3Max(wPos_0, wPos_1, maximum);
+                                matched = true;
+                            }
+                            break;
                     }
+                    if (matched)
+                        break;
                 }
-                else {
-                    var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer");
-                    if (skinmesh != null && skinmesh.mesh != null && skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null) {
-                        var skinmeshdata = skinmesh.mesh.data;
-                        gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
-                        gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-                        var p0 = gd3d.math.pool.new_vector3();
-                        for (var i = 0; i < skinmeshdata.pos.length; i++) {
-                            skinmesh.calActualVertexByIndex(i, p0);
-                            gd3d.math.vec3Max(p0, maximum, maximum);
-                            gd3d.math.vec3Min(p0, minimum, minimum);
-                        }
-                        gd3d.math.pool.delete_vector3(p0);
-                    }
-                    else {
-                        minimum.x = -1;
-                        minimum.y = -1;
-                        minimum.z = -1;
-                        maximum.x = 1;
-                        maximum.y = 1;
-                        maximum.z = 1;
-                    }
+                if (!matched) {
+                    minimum.x = minimum.y = minimum.z = -1;
+                    maximum.x = maximum.y = maximum.z = 1;
                 }
                 var _aabb = new framework.aabb(minimum, maximum);
                 return _aabb;
@@ -10774,13 +10762,16 @@ var gd3d;
                     this.onDispose();
             };
             transform.ClassName = "transform";
+            transform.helpv2 = new gd3d.math.vector2();
             transform.helpv3 = new gd3d.math.vector3();
+            transform.helpv3_1 = new gd3d.math.vector3();
             transform.helpUp = new gd3d.math.vector3(0, 1, 0);
             transform.helpRight = new gd3d.math.vector3(1, 0, 0);
             transform.helpFoward = new gd3d.math.vector3(0, 0, 1);
             transform.helpquat = new gd3d.math.quaternion();
             transform.helpquat_1 = new gd3d.math.quaternion();
             transform.helpmtx = new gd3d.math.matrix();
+            transform.aabbCareTypes = ["meshFilter", "skinnedMeshRenderer", "canvasRenderer"];
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
@@ -10847,6 +10838,7 @@ var gd3d;
             function boxcollider() {
                 this.center = new gd3d.math.vector3(0, 0, 0);
                 this.size = new gd3d.math.vector3(1, 1, 1);
+                this.started = false;
                 this._colliderVisible = false;
             }
             boxcollider_1 = boxcollider;
@@ -10866,6 +10858,8 @@ var gd3d;
             boxcollider.prototype.start = function () {
                 this.filter = this.gameObject.getComponent("meshFilter");
                 this.build();
+                this.started = true;
+                this.ckBuildColliderMesh();
             };
             boxcollider.prototype.onPlay = function () {
             };
@@ -10880,11 +10874,7 @@ var gd3d;
                 },
                 set: function (value) {
                     this._colliderVisible = value;
-                    if (this._colliderVisible) {
-                        if (!this.subTran) {
-                            this.buildMesh();
-                        }
-                    }
+                    this.ckBuildColliderMesh();
                     if (this.subTran) {
                         this.subTran.gameObject.visible = this._colliderVisible;
                     }
@@ -10892,6 +10882,13 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            boxcollider.prototype.ckBuildColliderMesh = function () {
+                if (this._colliderVisible && this.started) {
+                    if (!this.subTran) {
+                        this.buildMesh();
+                    }
+                }
+            };
             boxcollider.prototype.intersectsTransform = function (tran) {
                 if (tran.gameObject.collider == null)
                     return false;
@@ -14836,10 +14833,12 @@ var gd3d;
                 }
             };
             camera.prototype.isCulling = function (node) {
+                if (node.gameObject.hideFlags & framework.HideFlags.DontFrustumCulling)
+                    return false;
                 var vec3cache = this._vec3cache;
                 var aabb = node.aabb;
-                var skinmesh = node.gameObject.getComponent("skinnedMeshRenderer");
-                if (skinmesh != null) {
+                var skinmesh = node.gameObject.renderer;
+                if (skinmesh != null && skinmesh.aabb) {
                     aabb = skinmesh.aabb;
                 }
                 gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, vec3cache);
@@ -19735,6 +19734,14 @@ var gd3d;
             KeyCode[KeyCode["Numpad2"] = 98] = "Numpad2";
             KeyCode[KeyCode["Numpad3"] = 99] = "Numpad3";
         })(KeyCode = event.KeyCode || (event.KeyCode = {}));
+        var Physic2dEventEnum;
+        (function (Physic2dEventEnum) {
+            Physic2dEventEnum[Physic2dEventEnum["BeforeUpdate"] = 0] = "BeforeUpdate";
+            Physic2dEventEnum[Physic2dEventEnum["afterUpdate"] = 1] = "afterUpdate";
+            Physic2dEventEnum[Physic2dEventEnum["collisionStart"] = 2] = "collisionStart";
+            Physic2dEventEnum[Physic2dEventEnum["collisionActive"] = 3] = "collisionActive";
+            Physic2dEventEnum[Physic2dEventEnum["collisionEnd"] = 4] = "collisionEnd";
+        })(Physic2dEventEnum = event.Physic2dEventEnum || (event.Physic2dEventEnum = {}));
     })(event = gd3d.event || (gd3d.event = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -19775,24 +19782,48 @@ var gd3d;
 (function (gd3d) {
     var event;
     (function (event_2) {
+        var Physic2dEvent = (function (_super) {
+            __extends(Physic2dEvent, _super);
+            function Physic2dEvent() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            Physic2dEvent.prototype.OnEnum = function (event, func, thisArg) {
+                this.On(event_2.Physic2dEventEnum[event], func, thisArg);
+            };
+            Physic2dEvent.prototype.EmitEnum = function (event) {
+                var args = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    args[_i - 1] = arguments[_i];
+                }
+                _super.prototype.Emit.call(this, event_2.Physic2dEventEnum[event], args);
+            };
+            return Physic2dEvent;
+        }(gd3d.AEvent));
+        event_2.Physic2dEvent = Physic2dEvent;
+    })(event = gd3d.event || (gd3d.event = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var event;
+    (function (event_3) {
         var UIEvent = (function (_super) {
             __extends(UIEvent, _super);
             function UIEvent() {
                 return _super !== null && _super.apply(this, arguments) || this;
             }
             UIEvent.prototype.OnEnum = function (event, func, thisArg) {
-                this.On(event_2.UIEventEnum[event], func, thisArg);
+                this.On(event_3.UIEventEnum[event], func, thisArg);
             };
             UIEvent.prototype.EmitEnum = function (event) {
                 var args = [];
                 for (var _i = 1; _i < arguments.length; _i++) {
                     args[_i - 1] = arguments[_i];
                 }
-                _super.prototype.Emit.call(this, event_2.UIEventEnum[event], args);
+                _super.prototype.Emit.call(this, event_3.UIEventEnum[event], args);
             };
             return UIEvent;
         }(gd3d.AEvent));
-        event_2.UIEvent = UIEvent;
+        event_3.UIEvent = UIEvent;
     })(event = gd3d.event || (gd3d.event = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -24049,16 +24080,16 @@ var gd3d;
             out.rawData.set(vector.rawData);
         }
         math.vec3ClampLength = vec3ClampLength;
-        function vec3Min(lhs, rhs, out) {
-            out.rawData[0] = Math.min(lhs.x, rhs.x);
-            out.rawData[1] = Math.min(lhs.y, rhs.y);
-            out.rawData[2] = Math.min(lhs.z, rhs.z);
+        function vec3Min(v0, v1, out) {
+            out.rawData[0] = Math.min(v0.x, v1.x);
+            out.rawData[1] = Math.min(v0.y, v1.y);
+            out.rawData[2] = Math.min(v0.z, v1.z);
         }
         math.vec3Min = vec3Min;
-        function vec3Max(lhs, rhs, out) {
-            out.rawData[0] = Math.max(lhs.x, rhs.x);
-            out.rawData[1] = Math.max(lhs.y, rhs.y);
-            out.rawData[2] = Math.max(lhs.z, rhs.z);
+        function vec3Max(v0, v1, out) {
+            out.rawData[0] = Math.max(v0.x, v1.x);
+            out.rawData[1] = Math.max(v0.y, v1.y);
+            out.rawData[2] = Math.max(v0.z, v1.z);
         }
         math.vec3Max = vec3Max;
         function vec3AngleBetween(from, to) {
@@ -31237,6 +31268,9 @@ var gd3d;
             physicTool.Ivec3Equal = function (a, b) {
                 return a.x == b.x && a.y == b.y && a.z == b.z;
             };
+            physicTool.Ivec2Equal = function (a, b) {
+                return a.x == b.x && a.y == b.y;
+            };
             physicTool.IQuatEqual = function (a, b) {
                 return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w;
             };
@@ -31244,6 +31278,10 @@ var gd3d;
                 to.x = from.x;
                 to.y = from.y;
                 to.z = from.z;
+            };
+            physicTool.Ivec2Copy = function (from, to) {
+                to.x = from.x;
+                to.y = from.y;
             };
             physicTool.IQuatCopy = function (from, to) {
                 to.x = from.x;
@@ -31276,6 +31314,7 @@ var gd3d;
             HideFlags[HideFlags["NotEditable"] = 8] = "NotEditable";
             HideFlags[HideFlags["DontSaveInBuild"] = 16] = "DontSaveInBuild";
             HideFlags[HideFlags["DontUnloadUnusedAsset"] = 32] = "DontUnloadUnusedAsset";
+            HideFlags[HideFlags["DontFrustumCulling"] = 64] = "DontFrustumCulling";
             HideFlags[HideFlags["DontSave"] = 52] = "DontSave";
             HideFlags[HideFlags["HideAndDontSave"] = 61] = "HideAndDontSave";
         })(HideFlags = framework.HideFlags || (framework.HideFlags = {}));
@@ -31800,6 +31839,9 @@ var gd3d;
                     this.onLateUpdate(delta);
                 if (framework.physics) {
                     framework.physics._step(delta);
+                }
+                if (this._mainCamera && !this._mainCamera.gameObject) {
+                    this._mainCamera = null;
                 }
                 if (this.renderCameras.length > 1) {
                     this.renderCameras.sort(function (a, b) {

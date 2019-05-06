@@ -115,21 +115,21 @@ namespace gd3d.framework
             }
         }
 
-        private static helpv3 = new gd3d.math.vector3();
-        private static helpv3_1 = new gd3d.math.vector3();
-        private static helpv3_2 = new gd3d.math.vector3();
-        private static helpv3_3 = new gd3d.math.vector3();
-        private static helpv3_4 = new gd3d.math.vector3();
-        private static helpv3_5 = new gd3d.math.vector3();
-        private static helpv3_6 = new gd3d.math.vector3();
-        private static helpv3_7 = new gd3d.math.vector3();
+        private static helpv3 = new gd3d.math.vector3(); 
+        private static helpv3_1 = new gd3d.math.vector3(); 
+        private static helpv3_2 = new gd3d.math.vector3(); 
+        private static helpv3_3 = new gd3d.math.vector3(); 
+        private static helpv3_4 = new gd3d.math.vector3(); 
+        private static helpv3_5 = new gd3d.math.vector3(); 
+        private static helpv3_6 = new gd3d.math.vector3(); 
+        private static helpv3_7 = new gd3d.math.vector3(); 
 
-        private static helpmtx = new gd3d.math.matrix();
-        private static helpmtx_1 = new gd3d.math.matrix();
-        private static helpmtx_2 = new gd3d.math.matrix();
-        private static helpmtx_3 = new gd3d.math.matrix();
+        private static helpmtx = new gd3d.math.matrix(); 
+        private static helpmtx_1 = new gd3d.math.matrix(); 
+        private static helpmtx_2 = new gd3d.math.matrix(); 
+        private static helpmtx_3 = new gd3d.math.matrix(); 
 
-        private static helprect = new gd3d.math.rect();
+        private static helprect = new gd3d.math.rect(); 
 
         /**
          * @public
@@ -500,7 +500,7 @@ namespace gd3d.framework
             let matinv = camera.helpmtx_3;
             gd3d.math.matrixMultiply(matrixProject, matrixView, matrixViewProject);
             gd3d.math.matrixInverse(matrixViewProject, matinv);
-            let src1 = camera.helpv3;
+            let src1 = camera.helpv3; 
             src1.x = vppos.x;
             src1.y = vppos.y;
             src1.z = screenPos.z;
@@ -559,7 +559,7 @@ namespace gd3d.framework
             let asp = _vpp.w / _vpp.h;
             let near_w = near_h * asp;
 
-            let nearLT = camera.helpv3;
+            let nearLT = camera.helpv3; 
             let nearLD = camera.helpv3_1;
             let nearRT = camera.helpv3_2;
             let nearRD = camera.helpv3_3;
@@ -736,11 +736,12 @@ namespace gd3d.framework
         }
         private _vec3cache = new gd3d.math.vector3();
         isCulling(node: transform) {
+            if(node.gameObject.hideFlags & HideFlags.DontFrustumCulling) return false;
             const vec3cache = this._vec3cache;
             let  {aabb} = node;
-            var skinmesh = node.gameObject.getComponent("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer;
-            if(skinmesh != null && skinmesh.size) {
-                // 有些模型没有size属性
+            //var skinmesh = node.gameObject.getComponent("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer;
+            var skinmesh = node.gameObject.renderer as any; //skinnedMeshRenderer noly
+            if(skinmesh != null && skinmesh.aabb) {
                 // 如果有骨骼动画, 使用unity导出的aabb
                 // if (skinmesh.aabb != null)
                 aabb = skinmesh.aabb;

@@ -7,14 +7,26 @@ namespace gd3d.framework
      */
     export enum HideFlags
     {
+        //---------------单选项-------------------
         None = 0x00000000,
+        /** Hierarchy 中隐藏 */
         HideInHierarchy = 0x00000001,
+        /** Inspector 中隐藏 */
         HideInInspector = 0x00000002,
+        /** 在Editor中不可保存 */
         DontSaveInEditor = 0x00000004,
+        /** 不可编辑的 */
         NotEditable = 0x00000008,
+        /** Build时不保存 */
         DontSaveInBuild = 0x00000010,
+        /** 不卸载 不使用的资源 */
         DontUnloadUnusedAsset = 0x00000020,
+        /** 不受视锥剔除 */
+        DontFrustumCulling = 0x00000040,
+        //--------------组合选项--------------
+        /** 不保存 */
         DontSave = 0x00000034,
+        /** 隐藏并不保存 */
         HideAndDontSave = 0x0000003D
     }
 

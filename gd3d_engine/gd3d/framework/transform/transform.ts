@@ -1,5 +1,4 @@
 /// <reference path="../../io/reflect.ts" />
-
 namespace gd3d.framework
 {
     /**
@@ -17,7 +16,9 @@ namespace gd3d.framework
         private helpLPos:math.vector3 = new math.vector3();
         private helpLScale:math.vector3 = new math.vector3(1,1,1);
 
+        private static helpv2 = new math.vector2();
         private static helpv3 = new math.vector3();
+        private static helpv3_1 = new math.vector3();
         private static helpUp = new math.vector3(0, 1, 0);
         private static helpRight = new math.vector3(1, 0, 0);
         private static helpFoward = new math.vector3(0, 0, 1);
@@ -242,6 +243,8 @@ namespace gd3d.framework
         //     }
         // }
 
+
+        private static readonly aabbCareTypes = ["meshFilter","skinnedMeshRenderer","canvasRenderer"];
         /**
         * @private
         * @language zh_CN
@@ -250,54 +253,127 @@ namespace gd3d.framework
         */
         private _buildAABB(): aabb
         {
-            var minimum = new math.vector3();
-            var maximum = new math.vector3();
+            let minimum = new math.vector3();
+            let maximum = new math.vector3();
+            let _types = transform.aabbCareTypes;
+            let len = _types.length;
+            let matched = false;
+            for(var i=0; i < len ;i++){
+                let t = _types[i];
+                switch (t){
+                    case meshFilter.ClassName: 
+                        var filter = this.gameObject.getComponent("meshFilter") as meshFilter;
+                        if (filter != null && filter.mesh != null && filter.mesh.data != null && filter.mesh.data.pos != null)
+                        {
+                            var meshdata: gd3d.render.meshData = filter.mesh.data;
+                            math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                            math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+            
+                            for (var i = 0; i < meshdata.pos.length; i++)
+                            {
+                                math.vec3Max(meshdata.pos[i], maximum, maximum);
+                                math.vec3Min(meshdata.pos[i], minimum, minimum);
+                            }
+                            matched =  true;
+                        }
+                    break;
+                    case skinnedMeshRenderer.ClassName: 
+                        var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer;
+                        if (skinmesh != null && skinmesh.mesh != null && skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null)
+                        {
+                            // NOTE: 如果当前物体有骨骼动画, 则不会使用这里的aabb进行剔除
+                            var skinmeshdata: gd3d.render.meshData = skinmesh.mesh.data;
+                            math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                            math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+        
+                            var p0 = gd3d.math.pool.new_vector3();
+                            for (var i = 0; i < skinmeshdata.pos.length; i++)
+                            {
+                                skinmesh.calActualVertexByIndex(i, p0);
+                                math.vec3Max(p0, maximum, maximum);
+                                math.vec3Min(p0, minimum, minimum);
+                            }
+                            gd3d.math.pool.delete_vector3(p0);
+                            
+                            matched =  true;
+                        }
+                    break;
+                    case canvasRenderer.ClassName: 
+                        var canvasR = this.gameObject.getComponent("canvasRenderer") as gd3d.framework.canvasRenderer;
+                        if(canvasR && canvasR.canvas){
+                            var cvs = canvasR.canvas;
+                            var cPos = transform.helpv2;
+                            gd3d.math.vec2Set(cPos,0,0);
+                            var wPos_0 = transform.helpv3;
+                            canvasR.calCanvasPosToWorldPos(cPos,wPos_0);
 
-            var filter = this.gameObject.getComponent("meshFilter") as meshFilter;
-            if (filter != null && filter.mesh != null && filter.mesh.data != null && filter.mesh.data.pos != null)
-            {
-                var meshdata: gd3d.render.meshData = filter.mesh.data;
-                math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
-                math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+                            var wPos_1 = transform.helpv3_1;
+                            gd3d.math.vec2Set(cPos,cvs.pixelWidth,cvs.pixelHeight);
+                            canvasR.calCanvasPosToWorldPos(cPos,wPos_1);
+                            
+                            gd3d.math.vec3Min(wPos_0,wPos_1,minimum);
+                            gd3d.math.vec3Max(wPos_0,wPos_1,maximum);
+                            
+                            matched =  true;
+                        }
 
-                for (var i = 0; i < meshdata.pos.length; i++)
-                {
-                    math.vec3Max(meshdata.pos[i], maximum, maximum);
-                    math.vec3Min(meshdata.pos[i], minimum, minimum);
+                    break;
                 }
+                
+                if(matched) break;
             }
-            else
-            {
-                var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer;
-                if (skinmesh != null && skinmesh.mesh != null && skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null)
-                {
-                    // NOTE: 如果当前物体有骨骼动画, 则不会使用这里的aabb进行剔除
-                    var skinmeshdata: gd3d.render.meshData = skinmesh.mesh.data;
-                    math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
-                    math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-
-                    var p0 = gd3d.math.pool.new_vector3();
-                    for (var i = 0; i < skinmeshdata.pos.length; i++)
-                    {
-                        skinmesh.calActualVertexByIndex(i, p0);
-                        math.vec3Max(p0, maximum, maximum);
-                        math.vec3Min(p0, minimum, minimum);
-                    }
-                    gd3d.math.pool.delete_vector3(p0);
-                }
-                else
-                {
-                    minimum.x = -1;
-                    minimum.y = -1;
-                    minimum.z = -1;
-
-                    maximum.x = 1;
-                    maximum.y = 1;
-                    maximum.z = 1;
-
-                }
+            
+            if(!matched){
+                minimum.x =  minimum.y = minimum.z = -1;
+                maximum.x = maximum.y = maximum.z = 1;
             }
-            var _aabb = new aabb(minimum, maximum);
+
+            // var filter = this.gameObject.getComponent("meshFilter") as meshFilter;
+            // if (filter != null && filter.mesh != null && filter.mesh.data != null && filter.mesh.data.pos != null)
+            // {
+            //     var meshdata: gd3d.render.meshData = filter.mesh.data;
+            //     math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+            //     math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+
+            //     for (var i = 0; i < meshdata.pos.length; i++)
+            //     {
+            //         math.vec3Max(meshdata.pos[i], maximum, maximum);
+            //         math.vec3Min(meshdata.pos[i], minimum, minimum);
+            //     }
+            // }
+            // else
+            // {
+            //     var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer;
+            //     if (skinmesh != null && skinmesh.mesh != null && skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null)
+            //     {
+            //         // NOTE: 如果当前物体有骨骼动画, 则不会使用这里的aabb进行剔除
+            //         var skinmeshdata: gd3d.render.meshData = skinmesh.mesh.data;
+            //         math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+            //         math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+
+            //         var p0 = gd3d.math.pool.new_vector3();
+            //         for (var i = 0; i < skinmeshdata.pos.length; i++)
+            //         {
+            //             skinmesh.calActualVertexByIndex(i, p0);
+            //             math.vec3Max(p0, maximum, maximum);
+            //             math.vec3Min(p0, minimum, minimum);
+            //         }
+            //         gd3d.math.pool.delete_vector3(p0);
+            //     }
+            //     else
+            //     {
+            //         minimum.x = -1;
+            //         minimum.y = -1;
+            //         minimum.z = -1;
+
+            //         maximum.x = 1;
+            //         maximum.y = 1;
+            //         maximum.z = 1;
+
+            //     }
+            // }
+
+            let _aabb = new aabb(minimum, maximum);
             return _aabb;
         }
 

@@ -3,22 +3,32 @@ namespace gd3d.framework {
      * tool of physic
      */
     export class physicTool{
-        static Ivec3Equal(a , b){
+        static Ivec3Equal(a : math.Ivec3, b:math.Ivec3){
             return a.x == b.x && a.y == b.y && a.z == b.z ;
         }
 
-        static IQuatEqual(a , b){
+        static Ivec2Equal(a : math.Ivec2, b:math.Ivec2){
+            return a.x == b.x && a.y == b.y;
+        }
+
+        static IQuatEqual(a:math.Iquat , b:math.Iquat){
             return a.x == b.x && a.y == b.y && a.z == b.z && a.w == b.w ;
         }
 
-        static Ivec3Copy(from:{x,y,z},to:{x,y,z})
+        static Ivec3Copy(from:math.Ivec3,to:math.Ivec3)
         {
             to.x=from.x;
             to.y=from.y;
             to.z=from.z;
         }
 
-        static IQuatCopy(from:{x,y,z,w},to:{x,y,z,w})
+        static Ivec2Copy(from:math.Ivec2,to:math.Ivec2)
+        {
+            to.x=from.x;
+            to.y=from.y;
+        }
+
+        static IQuatCopy(from:math.Iquat,to:math.Iquat)
         {
             to.x=from.x;
             to.y=from.y;
