@@ -970,7 +970,7 @@ namespace gd3d.framework {
                 this.components[i].comp.remove();
             }
             if (this.renderer) this.renderer = null;
-            if (this.collider) this.renderer = null;
+            if (this.collider) this.collider = null;
             this.components.length = 0;
         }
 
