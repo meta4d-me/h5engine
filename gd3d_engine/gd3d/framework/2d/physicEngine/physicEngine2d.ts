@@ -14,6 +14,8 @@ namespace gd3d.framework {
     }
     declare var Matter: any;
     export class physicEngine2D {
+        private _Matter : any;
+        get Matter(){return this._Matter};
         matterEngine: any;
         private engineWorld: any;
         private matterVector: math.Ivec2;
@@ -23,6 +25,7 @@ namespace gd3d.framework {
                 console.error(" Matter not found , create physicEngine2D fail");
                 return;
             }
+            this._Matter = Matter;
             if (op != null) {
                 this.matterEngine = Matter.Engine.create(op);
             } else {
@@ -194,30 +197,102 @@ namespace gd3d.framework {
         get enableSleeping(){
             return this.matterEngine.enableSleeping ;
         }
-
+        
+        //-----------------body设置-------------------------
+        /** 设置速度
+         * Sets the linear velocity of the body instantly. Position, angle, force etc. are unchanged. See also `Body.applyForce`.
+         */
         public setVelocity(body: Ibody, velocity: math.Ivec2) {
             Matter.Body.setVelocity(body, velocity);
         }
-
+        /** 设置位置 
+         * Moves a body by a given vector relative to its current position, without imparting any velocity.
+        */
         public setPosition(body: Ibody, pos: math.Ivec2) {
             Matter.Body.setPosition(body, pos);
         }
-
+        /** 设置质量 
+         * Sets the mass of the body. Inverse mass, density and inertia are automatically updated to reflect the change.
+        */
         public setMass(body: Ibody, mass: number) {
             Matter.Body.setMass(body, mass);
         }
 
+        /** 设置密度
+         * Sets the density of the body. Mass and inertia are automatically updated to reflect the change.
+         */
         public setDensity(body: Ibody, Desity: number) {
             Matter.Body.setDensity(body, Desity);
         }
 
+        /**
+         * 设置角速度
+         * Sets the angular velocity of the body instantly. Position, angle, force etc. are unchanged. See also `Body.applyForce`.
+         */
         public setAngularVelocity(body: Ibody, angularVelocity: number) {
             Matter.Body.setAngularVelocity(body, angularVelocity);
         }
+
+        /** 设置静态状态
+         * Sets the body as static, including isStatic flag and setting mass and inertia to Infinity.
+         */
+        public setStatic(body: Ibody, isStatic: boolean) {
+            Matter.Body.setStatic(body, isStatic);
+        }
+
+        /** 设置休眠状态
+         */
+        public setSleeping(body: Ibody, isSleeping: boolean) {
+            Matter.Sleeping.set(body, isSleeping);
+        }
+
+        /** 设置惯性值
+         * Sets the moment of inertia (i.e. second moment of area) of the body. 
+         * Inverse inertia is automatically updated to reflect the change. Mass is not changed.
+         */
+        public setInertia(body: Ibody, Inertia: number) {
+            Matter.Body.setInertia(body, Inertia);
+        }
+
+        /** 设置顶点
+        * Sets the body's vertices and updates body properties accordingly, including inertia, area and mass (with respect to `body.density`).
+        * Vertices will be automatically transformed to be orientated around their centre of mass as the origin.
+        * They are then automatically translated to world space based on `body.position`.
+        *
+        * The `vertices` argument should be passed as an array of `Matter.Vector` points (or a `Matter.Vertices` array).
+        * Vertices must form a convex hull, concave hulls are not supported.
+        */
+        public setVertices(body: Ibody, vertices: math.Ivec2[]) {
+            Matter.Body.setVertices(body, vertices);
+        }
+
+        /** 设置成员 
+        * Sets the parts of the `body` and updates mass, inertia and centroid.
+        * Each part will have its parent set to `body`.
+        * By default the convex hull will be automatically computed and set on `body`, unless `autoHull` is set to `false.`
+        * Note that this method will ensure that the first part in `body.parts` will always be the `body`.
+        */
+        public setParts(body: Ibody, parts: Ibody[] , autoHull  = true) {
+            Matter.Body.setParts(body, parts,autoHull);
+        }
+
+        /** 设置中心点 
+        * Set the centre of mass of the body. 
+        * The `centre` is a vector in world-space unless `relative` is set, in which case it is a translation.
+        * The centre of mass is the point the body rotates about and can be used to simulate non-uniform density.
+        * This is equal to moving `body.position` but not the `body.vertices`.
+        * Invalid if the `centre` falls outside the body's convex hull.
+        */
+        public setCentre(body : Ibody, centre: math.Ivec2, relative = false){
+            Matter.Body.setCentre(body, centre,relative);
+        }
+
     }
 
     export interface Ibody {
         bounds : {max:{x:number,y:number},min:{x:number,y:number}};
+        /** 成员 */
+        parts: Ibody[];
         /** 睡眠状态 */
         isSleeping:boolean;
         /** 传感器的标志 , 开启时触发碰撞事件*/
@@ -228,6 +303,8 @@ namespace gd3d.framework {
         position: math.Ivec2;
         /** 速率向量 , 想要改变它 需要通过给它施加力*/
         velocity: math.Ivec2;
+        /** 力*/
+        force:math.Ivec2;
         /** 碰撞筛选属性对象 */
         collisionFilter: collisionFilter;
         type: string;
@@ -243,7 +320,6 @@ namespace gd3d.framework {
         angularVelocity:number;
         id:number;
         motion:number;
-        force:number;
         torque:number;
         sleepThreshold:number;
         density:number;

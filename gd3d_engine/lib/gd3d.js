@@ -6346,6 +6346,15 @@ var gd3d;
                 configurable: true
             });
             ;
+            physics2DBody.prototype.isSleeping = function () {
+                return this.body.isSleeping;
+            };
+            physics2DBody.prototype.isStatic = function () {
+                return this.body.isStatic;
+            };
+            physics2DBody.prototype.isSensor = function () {
+                return this.body.isSensor;
+            };
             physics2DBody.prototype.addForce = function (Force) {
                 this.physicsEngine.applyForceAtCenter(this.body, Force);
             };
@@ -6373,14 +6382,31 @@ var gd3d;
             physics2DBody.prototype.setMass = function (mass) {
                 this.physicsEngine.setMass(this.body, mass);
             };
-            physics2DBody.prototype.setInitData = function (att) {
-                this.options = att;
+            physics2DBody.prototype.setInitData = function (options) {
+                this.options = options;
             };
             physics2DBody.prototype.setPosition = function (pos) {
                 this.physicsEngine.setPosition(this.body, pos);
             };
-            physics2DBody.prototype.isSleeping = function () {
-                return this.body.isSleeping;
+            physics2DBody.prototype.setStatic = function (isStatic) {
+                this.physicsEngine.setStatic(this.body, isStatic);
+            };
+            physics2DBody.prototype.setSleeping = function (isSleeping) {
+                this.physicsEngine.setSleeping(this.body, isSleeping);
+            };
+            physics2DBody.prototype.setInertia = function (Inertia) {
+                this.physicsEngine.setInertia(this.body, Inertia);
+            };
+            physics2DBody.prototype.setVertices = function (vertices) {
+                this.physicsEngine.setVertices(this.body, vertices);
+            };
+            physics2DBody.prototype.setParts = function (parts, autoHull) {
+                if (autoHull === void 0) { autoHull = true; }
+                this.physicsEngine.setParts(this.body, parts, autoHull);
+            };
+            physics2DBody.prototype.setCentre = function (centre, relative) {
+                if (relative === void 0) { relative = false; }
+                this.physicsEngine.setCentre(this.body, centre, relative);
             };
             physics2DBody.prototype.update = function (delta) {
                 if (!this.body)
@@ -6486,6 +6512,7 @@ var gd3d;
                     console.error(" Matter not found , create physicEngine2D fail");
                     return;
                 }
+                this._Matter = Matter;
                 if (op != null) {
                     this.matterEngine = Matter.Engine.create(op);
                 }
@@ -6501,6 +6528,12 @@ var gd3d;
                 Matter.Events.on(this.matterEngine, "collisionActive", this.collisionActive.bind(this));
                 Matter.Events.on(this.matterEngine, "collisionEnd", this.collisionEnd.bind(this));
             }
+            Object.defineProperty(physicEngine2D.prototype, "Matter", {
+                get: function () { return this._Matter; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
             physicEngine2D.prototype.update = function (delta) {
                 Matter.Engine.update(this.matterEngine, delta);
             };
@@ -6610,6 +6643,26 @@ var gd3d;
             };
             physicEngine2D.prototype.setAngularVelocity = function (body, angularVelocity) {
                 Matter.Body.setAngularVelocity(body, angularVelocity);
+            };
+            physicEngine2D.prototype.setStatic = function (body, isStatic) {
+                Matter.Body.setStatic(body, isStatic);
+            };
+            physicEngine2D.prototype.setSleeping = function (body, isSleeping) {
+                Matter.Sleeping.set(body, isSleeping);
+            };
+            physicEngine2D.prototype.setInertia = function (body, Inertia) {
+                Matter.Body.setInertia(body, Inertia);
+            };
+            physicEngine2D.prototype.setVertices = function (body, vertices) {
+                Matter.Body.setVertices(body, vertices);
+            };
+            physicEngine2D.prototype.setParts = function (body, parts, autoHull) {
+                if (autoHull === void 0) { autoHull = true; }
+                Matter.Body.setParts(body, parts, autoHull);
+            };
+            physicEngine2D.prototype.setCentre = function (body, centre, relative) {
+                if (relative === void 0) { relative = false; }
+                Matter.Body.setCentre(body, centre, relative);
             };
             return physicEngine2D;
         }());

@@ -1022,6 +1022,7 @@ declare namespace gd3d.framework {
         collisionFilter?: collisionFilter;
         slop?: number;
         isStatic?: boolean;
+        isSensor?: boolean;
         type?: string;
         tag?: string;
         name?: string;
@@ -1032,6 +1033,9 @@ declare namespace gd3d.framework {
         constructor();
         transform: transform2D;
         body: Ibody;
+        isSleeping(): boolean;
+        isStatic(): boolean;
+        isSensor(): boolean;
         addForce(Force: math.Ivec2): void;
         setVelocity(velocity: math.Ivec2): void;
         setAngularVelocity(velocity: number): void;
@@ -1042,9 +1046,14 @@ declare namespace gd3d.framework {
         setRestitution(restitution: number): void;
         setMass(mass: number): void;
         options: I2dPhyBodyData;
-        setInitData(att: I2dPhyBodyData): void;
+        setInitData(options: I2dPhyBodyData): void;
         setPosition(pos: math.Ivec2): void;
-        isSleeping(): boolean;
+        setStatic(isStatic: boolean): void;
+        setSleeping(isSleeping: boolean): void;
+        setInertia(Inertia: number): void;
+        setVertices(vertices: math.Ivec2[]): void;
+        setParts(parts: Ibody[], autoHull?: boolean): void;
+        setCentre(centre: math.Ivec2, relative?: boolean): void;
         update(delta: number): void;
         remove(): void;
     }
@@ -1085,6 +1094,8 @@ declare namespace gd3d.framework {
         enableSleeping?: boolean;
     }
     class physicEngine2D {
+        private _Matter;
+        readonly Matter: any;
         matterEngine: any;
         private engineWorld;
         private matterVector;
@@ -1114,6 +1125,12 @@ declare namespace gd3d.framework {
         setMass(body: Ibody, mass: number): void;
         setDensity(body: Ibody, Desity: number): void;
         setAngularVelocity(body: Ibody, angularVelocity: number): void;
+        setStatic(body: Ibody, isStatic: boolean): void;
+        setSleeping(body: Ibody, isSleeping: boolean): void;
+        setInertia(body: Ibody, Inertia: number): void;
+        setVertices(body: Ibody, vertices: math.Ivec2[]): void;
+        setParts(body: Ibody, parts: Ibody[], autoHull?: boolean): void;
+        setCentre(body: Ibody, centre: math.Ivec2, relative?: boolean): void;
     }
     interface Ibody {
         bounds: {
@@ -1126,11 +1143,13 @@ declare namespace gd3d.framework {
                 y: number;
             };
         };
+        parts: Ibody[];
         isSleeping: boolean;
         isSensor: boolean;
         isStatic: boolean;
         position: math.Ivec2;
         velocity: math.Ivec2;
+        force: math.Ivec2;
         collisionFilter: collisionFilter;
         type: string;
         tag: string;
@@ -1145,7 +1164,6 @@ declare namespace gd3d.framework {
         angularVelocity: number;
         id: number;
         motion: number;
-        force: number;
         torque: number;
         sleepThreshold: number;
         density: number;
