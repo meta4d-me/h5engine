@@ -1000,15 +1000,15 @@ declare namespace gd3d.framework {
         options: I2dPhyBodyData;
         transform: transform2D;
         body: Ibody;
-        addForce(Force: math.vector2): any;
-        setVelocity(velocity: math.vector2): any;
+        addForce(Force: math.Ivec2): any;
+        setVelocity(velocity: math.Ivec2): any;
         setDensity(Desity: number): any;
         setFrictionAir(frictionAir: number): any;
         setFriction(friction: number): any;
         setFrictionStatic(frictionStatic: number): any;
         setRestitution(restitution: number): any;
         setMass(mass: number): any;
-        setPosition(pos: math.vector2): any;
+        setPosition(pos: math.Ivec2): any;
         isSleeping(): boolean;
     }
     interface I2dPhyBodyData {
@@ -1032,8 +1032,8 @@ declare namespace gd3d.framework {
         constructor();
         transform: transform2D;
         body: Ibody;
-        addForce(Force: math.vector2): void;
-        setVelocity(velocity: math.vector2): void;
+        addForce(Force: math.Ivec2): void;
+        setVelocity(velocity: math.Ivec2): void;
         setAngularVelocity(velocity: number): void;
         setDensity(Desity: number): void;
         setFrictionAir(frictionAir: number): void;
@@ -1043,7 +1043,7 @@ declare namespace gd3d.framework {
         setMass(mass: number): void;
         options: I2dPhyBodyData;
         setInitData(att: I2dPhyBodyData): void;
-        setPosition(pos: math.vector2): void;
+        setPosition(pos: math.Ivec2): void;
         isSleeping(): boolean;
         update(delta: number): void;
         remove(): void;
@@ -1105,12 +1105,12 @@ declare namespace gd3d.framework {
         private addBody(_Pbody);
         removeBody(_Pbody: I2DPhysicsBody): void;
         clearWorld(keepStatic?: boolean): void;
-        applyForce(body: Ibody, positon: math.vector2, force: math.vector2): void;
-        applyForceAtCenter(body: Ibody, force: math.vector2): void;
+        applyForce(body: Ibody, positon: math.Ivec2, force: math.Ivec2): void;
+        applyForceAtCenter(body: Ibody, force: math.Ivec2): void;
         setGravity(x: number, y: number): void;
         enableSleeping: boolean;
-        setVelocity(body: Ibody, velocity: math.vector2): void;
-        setPosition(body: Ibody, pos: math.vector2): void;
+        setVelocity(body: Ibody, velocity: math.Ivec2): void;
+        setPosition(body: Ibody, pos: math.Ivec2): void;
         setMass(body: Ibody, mass: number): void;
         setDensity(body: Ibody, Desity: number): void;
         setAngularVelocity(body: Ibody, angularVelocity: number): void;

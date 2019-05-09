@@ -3297,7 +3297,7 @@ var gd3d;
                 if (this.renderer)
                     this.renderer = null;
                 if (this.collider)
-                    this.renderer = null;
+                    this.collider = null;
                 this.components.length = 0;
             };
             transform2D.prototype.getComponent = function (type) {
@@ -14838,7 +14838,7 @@ var gd3d;
                 var vec3cache = this._vec3cache;
                 var aabb = node.aabb;
                 var skinmesh = node.gameObject.renderer;
-                if (skinmesh != null && skinmesh.aabb) {
+                if (skinmesh != null && skinmesh.size && skinmesh.aabb) {
                     aabb = skinmesh.aabb;
                 }
                 gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, vec3cache);
@@ -32446,80 +32446,13 @@ var gd3d;
                 this.maximum = gd3d.math.pool.clone_vector3(_maximum);
             }
             aabb.prototype.update = function (worldmatrix) {
-                gd3d.math.matrixGetTranslation(worldmatrix, this.opmin);
-                gd3d.math.matrixGetTranslation(worldmatrix, this.opmax);
-                if (worldmatrix.rawData[0] > 0) {
-                    this.opmin.x += worldmatrix.rawData[0] * this.srcmin.x;
-                    this.opmax.x += worldmatrix.rawData[0] * this.srcmax.x;
-                }
-                else {
-                    this.opmin.x += worldmatrix.rawData[0] * this.srcmax.x;
-                    this.opmax.x += worldmatrix.rawData[0] * this.srcmin.x;
-                }
-                if (worldmatrix.rawData[1] > 0) {
-                    this.opmin.y += worldmatrix.rawData[1] * this.srcmin.y;
-                    this.opmax.y += worldmatrix.rawData[1] * this.srcmax.y;
-                }
-                else {
-                    this.opmin.y += worldmatrix.rawData[1] * this.srcmax.y;
-                    this.opmax.y += worldmatrix.rawData[1] * this.srcmin.y;
-                }
-                if (worldmatrix.rawData[2] > 0) {
-                    this.opmin.z += worldmatrix.rawData[2] * this.srcmin.z;
-                    this.opmax.z += worldmatrix.rawData[2] * this.srcmax.z;
-                }
-                else {
-                    this.opmin.z += worldmatrix.rawData[2] * this.srcmax.z;
-                    this.opmax.z += worldmatrix.rawData[2] * this.srcmin.z;
-                }
-                if (worldmatrix.rawData[4] > 0) {
-                    this.opmin.x += worldmatrix.rawData[4] * this.srcmin.x;
-                    this.opmax.x += worldmatrix.rawData[4] * this.srcmax.x;
-                }
-                else {
-                    this.opmin.x += worldmatrix.rawData[4] * this.srcmax.x;
-                    this.opmax.x += worldmatrix.rawData[4] * this.srcmin.x;
-                }
-                if (worldmatrix.rawData[5] > 0) {
-                    this.opmin.y += worldmatrix.rawData[5] * this.srcmin.y;
-                    this.opmax.y += worldmatrix.rawData[5] * this.srcmax.y;
-                }
-                else {
-                    this.opmin.y += worldmatrix.rawData[5] * this.srcmax.y;
-                    this.opmax.y += worldmatrix.rawData[5] * this.srcmin.y;
-                }
-                if (worldmatrix.rawData[6] > 0) {
-                    this.opmin.z += worldmatrix.rawData[6] * this.srcmin.z;
-                    this.opmax.z += worldmatrix.rawData[6] * this.srcmax.z;
-                }
-                else {
-                    this.opmin.z += worldmatrix.rawData[6] * this.srcmax.z;
-                    this.opmax.z += worldmatrix.rawData[6] * this.srcmin.z;
-                }
-                if (worldmatrix.rawData[8] > 0) {
-                    this.opmin.x += worldmatrix.rawData[8] * this.srcmin.x;
-                    this.opmax.x += worldmatrix.rawData[8] * this.srcmax.x;
-                }
-                else {
-                    this.opmin.x += worldmatrix.rawData[8] * this.srcmax.x;
-                    this.opmax.x += worldmatrix.rawData[8] * this.srcmin.x;
-                }
-                if (worldmatrix.rawData[9] > 0) {
-                    this.opmin.y += worldmatrix.rawData[9] * this.srcmin.y;
-                    this.opmax.y += worldmatrix.rawData[9] * this.srcmax.y;
-                }
-                else {
-                    this.opmin.y += worldmatrix.rawData[9] * this.srcmax.y;
-                    this.opmax.y += worldmatrix.rawData[9] * this.srcmin.y;
-                }
-                if (worldmatrix.rawData[10] > 0) {
-                    this.opmin.z += worldmatrix.rawData[10] * this.srcmin.z;
-                    this.opmax.z += worldmatrix.rawData[10] * this.srcmax.z;
-                }
-                else {
-                    this.opmin.z += worldmatrix.rawData[10] * this.srcmax.z;
-                    this.opmax.z += worldmatrix.rawData[10] * this.srcmin.z;
-                }
+                gd3d.math.matrixTransformVector3(this.srcmax, worldmatrix, this.opmax);
+                gd3d.math.matrixTransformVector3(this.srcmin, worldmatrix, this.opmin);
+                var temp = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Max(this.opmax, this.opmin, temp);
+                gd3d.math.vec3Min(this.opmax, this.opmin, this.opmin);
+                gd3d.math.vec3Clone(temp, this.opmax);
+                gd3d.math.pool.delete_vector3(temp);
                 this.minimum = gd3d.math.pool.clone_vector3(this.opmin);
                 this.maximum = gd3d.math.pool.clone_vector3(this.opmax);
             };

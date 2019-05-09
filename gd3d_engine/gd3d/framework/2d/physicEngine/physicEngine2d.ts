@@ -174,11 +174,11 @@ namespace gd3d.framework {
             Matter.World.clear(this.engineWorld,keepStatic);
         }
 
-        public applyForce(body: Ibody, positon: math.vector2, force: math.vector2): void {
+        public applyForce(body: Ibody, positon:math.Ivec2, force:math.Ivec2): void {
             Matter.Body.applyForce(body, positon , force );
         }
 
-        public applyForceAtCenter(body: Ibody, force: math.vector2): void {
+        public applyForceAtCenter(body: Ibody, force: math.Ivec2): void {
             Matter.Body.applyForce(body, body.position, force );
         }
 
@@ -195,11 +195,11 @@ namespace gd3d.framework {
             return this.matterEngine.enableSleeping ;
         }
 
-        public setVelocity(body: Ibody, velocity: math.vector2) {
+        public setVelocity(body: Ibody, velocity: math.Ivec2) {
             Matter.Body.setVelocity(body, velocity);
         }
 
-        public setPosition(body: Ibody, pos: math.vector2) {
+        public setPosition(body: Ibody, pos: math.Ivec2) {
             Matter.Body.setPosition(body, pos);
         }
 

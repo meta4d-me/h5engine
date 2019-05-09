@@ -7,9 +7,9 @@ namespace gd3d.framework {
         /** 物理世界body */
         body: Ibody;
         /** 施加力 */
-        addForce(Force: math.vector2);
+        addForce(Force: math.Ivec2);
         /**设置 速度*/
-        setVelocity(velocity: math.vector2);
+        setVelocity(velocity:math.Ivec2);
         /**设置 密度*/
         setDensity(Desity: number);
         /**设置 空气摩擦系数*/
@@ -23,7 +23,7 @@ namespace gd3d.framework {
         /** 设置质量 */
         setMass(mass: number);
         /**设置位置 */
-        setPosition(pos:math.vector2);
+        setPosition(pos:math.Ivec2);
         /**是否睡眠 */
         isSleeping():boolean;
     }
@@ -65,14 +65,14 @@ namespace gd3d.framework {
          * 施加作用力
          * @param Force 
          */
-        addForce(Force: math.vector2) {
+        addForce(Force: math.Ivec2) {
             this.physicsEngine.applyForceAtCenter(this.body, Force);
         }
         /**
          * 设置速度
          * @param velocity 
          */
-        setVelocity(velocity: math.vector2) {
+        setVelocity(velocity: math.Ivec2) {
             this.physicsEngine.setVelocity(this.body, velocity);
         }
 
@@ -126,7 +126,7 @@ namespace gd3d.framework {
             this.options = att;
         }
 
-        setPosition(pos: math.vector2) {
+        setPosition(pos: math.Ivec2) {
             this.physicsEngine.setPosition(this.body, pos);
         }
 
