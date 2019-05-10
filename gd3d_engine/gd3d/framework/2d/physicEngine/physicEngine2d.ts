@@ -91,8 +91,8 @@ namespace gd3d.framework {
          * @param func 事件回调函数
          * @param thisArg 函数持有对象
          */
-        removeEventListener(eventEnum: event.UIEventEnum, func: (...args: Array<any>) => void , thisArg:any){
-            this.eventer.RemoveListener(event.UIEventEnum[eventEnum],func,thisArg);
+        removeEventListener(eventEnum: event.Physic2dEventEnum, func: (...args: Array<any>) => void , thisArg:any){
+            this.eventer.RemoveListener(event.Physic2dEventEnum[eventEnum],func,thisArg);
         }
 
         /**
