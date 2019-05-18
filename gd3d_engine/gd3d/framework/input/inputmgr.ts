@@ -99,7 +99,7 @@ namespace gd3d.framework
         private _mousemove(ev:MouseEvent){
             this.CalcuPoint(ev.offsetX,ev.offsetY,this._point);
         }
-        private _mousewheel(ev:MouseWheelEvent){
+        private _mousewheel(ev:any){
             this.hasWheel = true;
             if (ev.detail) {
                 this.lastWheel = -1 * ev.detail;
