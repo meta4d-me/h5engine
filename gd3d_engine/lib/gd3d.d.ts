@@ -985,6 +985,25 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class slideArea implements I2DComponent, I2DPointListener {
+        static readonly ClassName: string;
+        private static helpv2;
+        private static helpv2_1;
+        horizontal: boolean;
+        vertical: boolean;
+        start(): void;
+        onPlay(): void;
+        update(delta: number): void;
+        transform: transform2D;
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        onMoveFun: (x: number, y: number) => {};
+        private isPointDown;
+        private lastPoint;
+        private strPoint;
+        remove(): void;
+    }
+}
+declare namespace gd3d.framework {
     class uirect implements I2DComponent {
         static readonly ClassName: string;
         canbeClick: boolean;
@@ -1026,13 +1045,15 @@ declare namespace gd3d.framework {
         type?: string;
         tag?: string;
         name?: string;
+        chamfer?: number;
     }
-    abstract class physics2DBody implements I2DPhysicsBody {
+    class physics2DBody extends behaviour2d implements I2DPhysicsBody {
         readonly physicsEngine: physicEngine2D;
         protected _physicsEngine: physicEngine2D;
         constructor();
         transform: transform2D;
         body: Ibody;
+        onInit: (phy2dBody: I2DPhysicsBody) => any;
         isSleeping(): boolean;
         isStatic(): boolean;
         isSensor(): boolean;
@@ -1054,12 +1075,13 @@ declare namespace gd3d.framework {
         setVertices(vertices: math.Ivec2[]): void;
         setParts(parts: Ibody[], autoHull?: boolean): void;
         setCentre(centre: math.Ivec2, relative?: boolean): void;
+        start(): void;
         update(delta: number): void;
         remove(): void;
     }
 }
 declare namespace gd3d.framework {
-    class circleBody2d extends physics2DBody implements I2DComponent {
+    class circleBody2d extends physics2DBody {
         static readonly ClassName: string;
         transform: transform2D;
         radius: number;
@@ -1069,15 +1091,15 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class convexHullBody2d extends physics2DBody implements I2DComponent {
+    class convexHullBody2d extends physics2DBody {
         static readonly ClassName: string;
         vertexSets: math.vector2[];
-        options: I2dPhyBodyData;
         flagInternal: boolean;
         removeCollinear: number;
         minimumArea: number;
         transform: transform2D;
         start(): void;
+        private fixCenter;
         private calceBoundingCenter;
         onPlay(): void;
     }
@@ -1113,7 +1135,7 @@ declare namespace gd3d.framework {
         creatCircleBodyByInitData(pBody: I2DPhysicsBody, radius: number, maxSides?: number): any;
         ConvexHullBodyByInitData(pBody: I2DPhysicsBody, vertexSets: any, flagInternal?: boolean, removeCollinear?: number, minimumArea?: number): any;
         private _physicsBodys;
-        private addBody;
+        addBody(_Pbody: I2DPhysicsBody): void;
         removeBody(_Pbody: I2DPhysicsBody): void;
         clearWorld(keepStatic?: boolean): void;
         applyForce(body: Ibody, positon: math.Ivec2, force: math.Ivec2): void;
@@ -1181,7 +1203,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class rectBody2d extends physics2DBody implements I2DComponent {
+    class rectBody2d extends physics2DBody {
         static readonly ClassName: string;
         transform: transform2D;
         start(): void;

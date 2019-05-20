@@ -107,7 +107,7 @@ namespace gd3d.framework {
             let pos = tran.getWorldTranslate();
             let body = Matter.Bodies.rectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
             pBody.body = body;
-            this.addBody(pBody);
+            // this.addBody(pBody);
             return body;
         }
 
@@ -125,7 +125,7 @@ namespace gd3d.framework {
             let pos = tran.getWorldTranslate();
             let body = Matter.Bodies.circle(pos.x, pos.y, radius, pBody.options ,maxSides);
             pBody.body = body;
-            this.addBody(pBody);
+            // this.addBody(pBody);
             return body;
         }
         /**
@@ -150,14 +150,14 @@ namespace gd3d.framework {
             let pos = tran.getWorldTranslate();
             let body = Matter.Bodies.fromVertices(pos.x, pos.y, vertexSets, pBody.options , flagInternal , removeCollinear , minimumArea);
             pBody.body = body;
-            this.addBody(pBody,);
+            // this.addBody(pBody,);
             return body;
         }
 
         private _physicsBodys : I2DPhysicsBody[]  = [];
 
         /** 添加 I2DPhysicsBody 实例到 2d物理世界*/
-        private addBody(_Pbody: I2DPhysicsBody){
+        addBody(_Pbody: I2DPhysicsBody){
             this._physicsBodys.push(_Pbody);
             Matter.World.add(this.engineWorld, _Pbody.body);
         }

@@ -10,14 +10,16 @@ namespace gd3d.framework
      * @version gd3d 1.0
      */
     @reflect.node2DComponent
-    export class rectBody2d extends physics2DBody implements I2DComponent
+    export class rectBody2d extends physics2DBody
     {
         static readonly ClassName:string="rectBody2d";
         transform: transform2D;
 
         start() {
             let data = this.options || {};
-            this.physicsEngine.creatRectBodyByInitData(this);
+            let body = this.physicsEngine.creatRectBodyByInitData(this);
+            this.physicsEngine.addBody(this);
+            if(this.onInit) this.onInit(this);
         }
         onPlay(){
 

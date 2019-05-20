@@ -42,9 +42,14 @@ namespace gd3d.framework {
         type?: string;
         tag?: string;
         name?: string;
+        chamfer?:number;
     }
 
-    export abstract class physics2DBody implements I2DPhysicsBody {
+    /**
+     * 2d 物理引擎Body 组件
+     * （本组件不会创建具体物理对象，需要使用子类对象 或者 自行在onInit回调中创建）
+     */
+    export class physics2DBody extends behaviour2d implements I2DPhysicsBody {
         /** 2d物理引擎实例对象 */
         get physicsEngine() {
             if (this._physicsEngine) {
@@ -56,12 +61,14 @@ namespace gd3d.framework {
         protected _physicsEngine: physicEngine2D;
 
         constructor() {
+            super();
             this._physicsEngine = physics2D;
-            this.physicsEngine;
         }
         // beStatic:boolean=false;
         transform: transform2D;
         body: Ibody;
+        /** 物理对象初始化完成回调 */
+        onInit : (phy2dBody : I2DPhysicsBody)=>any;
 
         /** 是否已休眠
         * A flag that indicates whether the body is considered sleeping. A sleeping body acts similar to a static body, except it is only temporary and can be awoken.
@@ -223,6 +230,10 @@ namespace gd3d.framework {
         */
         public setCentre(centre: math.Ivec2, relative = false) {
             this.physicsEngine.setCentre(this.body, centre, relative);
+        }
+
+        start (){
+            if(this.onInit) this.onInit(this);
         }
 
         update(delta: number) {

@@ -6304,6 +6304,85 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var slideArea = (function () {
+            function slideArea() {
+                this.horizontal = false;
+                this.vertical = false;
+                this.isPointDown = false;
+                this.lastPoint = new gd3d.math.vector2();
+                this.strPoint = new gd3d.math.vector2();
+            }
+            slideArea_1 = slideArea;
+            slideArea.prototype.start = function () {
+            };
+            slideArea.prototype.onPlay = function () {
+            };
+            slideArea.prototype.update = function (delta) {
+            };
+            slideArea.prototype.onPointEvent = function (canvas, ev, oncap) {
+                if (oncap == false) {
+                    var tv2 = slideArea_1.helpv2;
+                    tv2.x = ev.x;
+                    tv2.y = ev.y;
+                    var b = this.transform.ContainsCanvasPoint(tv2);
+                    if (b) {
+                        ev.eated = true;
+                        if (!this.horizontal && !this.vertical)
+                            return;
+                        var temps = slideArea_1.helpv2;
+                        gd3d.math.vec2Set(temps, ev.x, ev.y);
+                        var tempc = slideArea_1.helpv2_1;
+                        this.transform.canvas.ModelPosToCanvasPos(temps, tempc);
+                        var sp = this.strPoint;
+                        if (ev.type == gd3d.event.PointEventEnum.PointDown) {
+                            this.isPointDown = true;
+                            sp.x = tempc.x;
+                            sp.y = tempc.y;
+                        }
+                        if (ev.type == gd3d.event.PointEventEnum.PointHold && this.isPointDown) {
+                            var lp = this.lastPoint;
+                            if (lp.x != tempc.x || lp.y != tempc.y) {
+                                lp.x = tempc.x;
+                                lp.y = tempc.y;
+                                var addtransX = lp.x - sp.x;
+                                var addtransY = lp.y - sp.y;
+                                if (this.onMoveFun)
+                                    this.onMoveFun(addtransX, addtransY);
+                            }
+                        }
+                    }
+                }
+                if (ev.type == gd3d.event.PointEventEnum.PointUp) {
+                    this.isPointDown = false;
+                }
+            };
+            slideArea.prototype.remove = function () {
+                this.transform = null;
+            };
+            var slideArea_1;
+            slideArea.ClassName = "slideArea";
+            slideArea.helpv2 = new gd3d.math.vector2();
+            slideArea.helpv2_1 = new gd3d.math.vector2();
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], slideArea.prototype, "horizontal", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], slideArea.prototype, "vertical", void 0);
+            slideArea = slideArea_1 = __decorate([
+                gd3d.reflect.node2DComponent
+            ], slideArea);
+            return slideArea;
+        }());
+        framework.slideArea = slideArea;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var uirect = (function () {
             function uirect() {
                 this.canbeClick = true;
@@ -6330,11 +6409,13 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var physics2DBody = (function () {
+        var physics2DBody = (function (_super) {
+            __extends(physics2DBody, _super);
             function physics2DBody() {
-                this.options = {};
-                this._physicsEngine = framework.physics2D;
-                this.physicsEngine;
+                var _this = _super.call(this) || this;
+                _this.options = {};
+                _this._physicsEngine = framework.physics2D;
+                return _this;
             }
             Object.defineProperty(physics2DBody.prototype, "physicsEngine", {
                 get: function () {
@@ -6411,6 +6492,10 @@ var gd3d;
                 if (relative === void 0) { relative = false; }
                 this.physicsEngine.setCentre(this.body, centre, relative);
             };
+            physics2DBody.prototype.start = function () {
+                if (this.onInit)
+                    this.onInit(this);
+            };
             physics2DBody.prototype.update = function (delta) {
                 if (!this.body)
                     return;
@@ -6423,7 +6508,7 @@ var gd3d;
                 this.body = null;
             };
             return physics2DBody;
-        }());
+        }(framework.behaviour2d));
         framework.physics2DBody = physics2DBody;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -6441,11 +6526,22 @@ var gd3d;
             }
             circleBody2d.prototype.start = function () {
                 var data = this.options || {};
-                this.physicsEngine.creatCircleBodyByInitData(this, this.radius, this.maxSides);
+                var body = this.physicsEngine.creatCircleBodyByInitData(this, this.radius, this.maxSides);
+                this.physicsEngine.addBody(this);
+                if (this.onInit)
+                    this.onInit(this);
             };
             circleBody2d.prototype.onPlay = function () {
             };
             circleBody2d.ClassName = "circleBody2d";
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], circleBody2d.prototype, "radius", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], circleBody2d.prototype, "maxSides", void 0);
             circleBody2d = __decorate([
                 gd3d.reflect.node2DComponent
             ], circleBody2d);
@@ -6471,7 +6567,13 @@ var gd3d;
             convexHullBody2d.prototype.start = function () {
                 var data = this.options || {};
                 var pos = this.transform.localTranslate;
-                this.physicsEngine.ConvexHullBodyByInitData(this, this.vertexSets, this.flagInternal, this.removeCollinear, this.minimumArea);
+                var body = this.physicsEngine.ConvexHullBodyByInitData(this, this.vertexSets, this.flagInternal, this.removeCollinear, this.minimumArea);
+                this.fixCenter();
+                this.physicsEngine.addBody(this);
+                if (this.onInit)
+                    this.onInit(body);
+            };
+            convexHullBody2d.prototype.fixCenter = function () {
                 var max = this.body.bounds.max;
                 var min = this.body.bounds.min;
                 var center = gd3d.poolv2();
@@ -6494,6 +6596,22 @@ var gd3d;
             convexHullBody2d.prototype.onPlay = function () {
             };
             convexHullBody2d.ClassName = "convexHullBody2d";
+            __decorate([
+                gd3d.reflect.Field("vector2[]"),
+                __metadata("design:type", Array)
+            ], convexHullBody2d.prototype, "vertexSets", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], convexHullBody2d.prototype, "flagInternal", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], convexHullBody2d.prototype, "removeCollinear", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], convexHullBody2d.prototype, "minimumArea", void 0);
             convexHullBody2d = __decorate([
                 gd3d.reflect.node2DComponent
             ], convexHullBody2d);
@@ -6568,7 +6686,6 @@ var gd3d;
                 var pos = tran.getWorldTranslate();
                 var body = Matter.Bodies.rectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
                 pBody.body = body;
-                this.addBody(pBody);
                 return body;
             };
             physicEngine2D.prototype.creatCircleBodyByInitData = function (pBody, radius, maxSides) {
@@ -6579,7 +6696,6 @@ var gd3d;
                 var pos = tran.getWorldTranslate();
                 var body = Matter.Bodies.circle(pos.x, pos.y, radius, pBody.options, maxSides);
                 pBody.body = body;
-                this.addBody(pBody);
                 return body;
             };
             physicEngine2D.prototype.ConvexHullBodyByInitData = function (pBody, vertexSets, flagInternal, removeCollinear, minimumArea) {
@@ -6592,7 +6708,6 @@ var gd3d;
                 var pos = tran.getWorldTranslate();
                 var body = Matter.Bodies.fromVertices(pos.x, pos.y, vertexSets, pBody.options, flagInternal, removeCollinear, minimumArea);
                 pBody.body = body;
-                this.addBody(pBody);
                 return body;
             };
             physicEngine2D.prototype.addBody = function (_Pbody) {
@@ -6683,7 +6798,10 @@ var gd3d;
             }
             rectBody2d.prototype.start = function () {
                 var data = this.options || {};
-                this.physicsEngine.creatRectBodyByInitData(this);
+                var body = this.physicsEngine.creatRectBodyByInitData(this);
+                this.physicsEngine.addBody(this);
+                if (this.onInit)
+                    this.onInit(this);
             };
             rectBody2d.prototype.onPlay = function () {
             };
@@ -31920,8 +32038,8 @@ var gd3d;
                     this.webgl.clearColor(0, 0, 0, 1);
                     this.webgl.clearDepth(1.0);
                     this.webgl.clear(this.webgl.COLOR_BUFFER_BIT | this.webgl.DEPTH_BUFFER_BIT);
+                    this.webgl.flush();
                 }
-                this.webgl.flush();
                 if (framework.DrawCallInfo.BeActived) {
                     framework.DrawCallInfo.inc.showPerFrame();
                     framework.DrawCallInfo.inc.reset();

@@ -10,23 +10,32 @@ namespace gd3d.framework
      * @version gd3d 1.0
      */
     @reflect.node2DComponent
-    export class convexHullBody2d extends physics2DBody implements I2DComponent
+    export class convexHullBody2d extends physics2DBody
     {
         static readonly ClassName:string="convexHullBody2d";
+        @reflect.Field("vector2[]")
         vertexSets: math.vector2[] = [];
-        options: I2dPhyBodyData;
+        @reflect.Field("boolean")
         flagInternal : boolean = false;
+        @reflect.Field("number")
         removeCollinear : number = 0.01;
+        @reflect.Field("number")
         minimumArea : number = 10;
 
         transform: transform2D;
         start() {
             let data = this.options || {};
             let pos = this.transform.localTranslate;
-            this.physicsEngine.ConvexHullBodyByInitData(this,this.vertexSets,this.flagInternal,this.removeCollinear,this.minimumArea);
+            let body = this.physicsEngine.ConvexHullBodyByInitData(this,this.vertexSets,this.flagInternal,this.removeCollinear,this.minimumArea);
             //this.body=physic2D.creatRectBody(this.transform.localTranslate.x,this.transform.localTranslate.y,this.transform.width,this.transform.height,this.beStatic);
             
-            //校准 重心 初始位置
+            this.fixCenter();
+            this.physicsEngine.addBody(this);
+            if(this.onInit) this.onInit(body);
+        }
+
+        //校准 重心 初始位置
+        private fixCenter(){
             let max = this.body.bounds.max;
             let min = this.body.bounds.min;
             let center = poolv2();
