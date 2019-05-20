@@ -1049,6 +1049,34 @@ declare namespace gd3d.framework {
         tag?: string;
         name?: string;
         chamfer?: number;
+        label?: string;
+        parts?: Ibody[];
+        plugin?: {};
+        angle?: number;
+        vertices?: math.Ivec2[];
+        position?: math.Ivec2;
+        force?: math.Ivec2;
+        torque?: number;
+        positionImpulse?: math.Ivec2;
+        previousPositionImpulse?: math.Ivec2;
+        totalContacts?: number;
+        speed?: number;
+        angularSpeed?: number;
+        velocity?: math.Ivec2;
+        angularVelocity?: number;
+        isSleeping?: boolean;
+        motion?: number;
+        sleepThreshold?: number;
+        timeScale?: number;
+        events?: any;
+        bounds?: any;
+        circleRadius?: number;
+        positionPrev?: any;
+        anglePrev?: number;
+        parent?: any;
+        axes?: any;
+        area?: number;
+        _original?: any;
     }
     class physics2DBody extends behaviour2d implements I2DPhysicsBody {
         readonly physicsEngine: physicEngine2D;
