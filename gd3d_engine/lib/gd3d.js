@@ -6511,6 +6511,10 @@ var gd3d;
                 this.physicsEngine.removeBody(this);
                 this.body = null;
             };
+            physics2DBody = __decorate([
+                gd3d.reflect.node2DComponent,
+                __metadata("design:paramtypes", [])
+            ], physics2DBody);
             return physics2DBody;
         }(framework.behaviour2d));
         framework.physics2DBody = physics2DBody;
