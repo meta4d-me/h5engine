@@ -63,6 +63,8 @@ namespace gd3d.framework {
                         this.isPointDown = true;
                         sp.x = tempc.x;
                         sp.y = tempc.y;
+                        if (this.onDownFun)
+                            this.onDownFun(sp.x, sp.y);
                     }
                     if (ev.type == event.PointEventEnum.PointHold && this.isPointDown) {
                         //滑动中
@@ -82,10 +84,14 @@ namespace gd3d.framework {
             if (ev.type == event.PointEventEnum.PointUp) {
                 //滑动结束
                 this.isPointDown = false;
+                if (this.onUpFun)
+                    this.onUpFun();
             }
         }
 
         public onMoveFun: (x: number, y: number) => {};
+        public onDownFun: (x: number, y: number) => {};
+        public onUpFun: () => {};
         private isPointDown = false;
         private lastPoint = new math.vector2();
         private strPoint = new math.vector2();
