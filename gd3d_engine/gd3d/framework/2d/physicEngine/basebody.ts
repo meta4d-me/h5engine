@@ -1,5 +1,7 @@
 namespace gd3d.framework {
     export interface I2DPhysicsBody {
+        /** 物理引擎对象 */
+        physicsEngine: physicEngine2D;
         /** body 选项数据*/
         options: I2dPhyBodyData;
         /** 绑定的UI */

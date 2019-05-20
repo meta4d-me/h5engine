@@ -997,6 +997,8 @@ declare namespace gd3d.framework {
         transform: transform2D;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         onMoveFun: (x: number, y: number) => {};
+        onDownFun: (x: number, y: number) => {};
+        onUpFun: () => {};
         private isPointDown;
         private lastPoint;
         private strPoint;
@@ -1016,6 +1018,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     interface I2DPhysicsBody {
+        physicsEngine: physicEngine2D;
         options: I2dPhyBodyData;
         transform: transform2D;
         body: Ibody;
@@ -1131,9 +1134,10 @@ declare namespace gd3d.framework {
         private collisionEnd;
         addEventListener(eventEnum: event.Physic2dEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         removeEventListener(eventEnum: event.Physic2dEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
-        creatRectBodyByInitData(pBody: I2DPhysicsBody): any;
-        creatCircleBodyByInitData(pBody: I2DPhysicsBody, radius: number, maxSides?: number): any;
-        ConvexHullBodyByInitData(pBody: I2DPhysicsBody, vertexSets: any, flagInternal?: boolean, removeCollinear?: number, minimumArea?: number): any;
+        creatRectBodyByInitData(pBody: I2DPhysicsBody): Ibody;
+        creatCircleBodyByInitData(pBody: I2DPhysicsBody, radius: number, maxSides?: number): Ibody;
+        ConvexHullBodyByInitData(pBody: I2DPhysicsBody, vertexSets: any, flagInternal?: boolean, removeCollinear?: number, minimumArea?: number): Ibody;
+        createBody(options: I2dPhyBodyData): Ibody;
         private _physicsBodys;
         addBody(_Pbody: I2DPhysicsBody): void;
         removeBody(_Pbody: I2DPhysicsBody): void;

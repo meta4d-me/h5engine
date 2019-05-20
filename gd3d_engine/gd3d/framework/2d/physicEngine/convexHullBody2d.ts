@@ -31,7 +31,7 @@ namespace gd3d.framework
             
             this.fixCenter();
             this.physicsEngine.addBody(this);
-            if(this.onInit) this.onInit(body);
+            if(this.onInit) this.onInit(this);
         }
 
         //校准 重心 初始位置

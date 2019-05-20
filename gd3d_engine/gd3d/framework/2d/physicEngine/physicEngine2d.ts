@@ -101,7 +101,7 @@ namespace gd3d.framework {
          * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
          * @param pBody I2DPhysicsBody 实例
          */
-        public creatRectBodyByInitData(pBody :I2DPhysicsBody ) {
+        public creatRectBodyByInitData(pBody :I2DPhysicsBody ) : Ibody{
             if(!pBody || !pBody.transform) return;
             let tran = pBody.transform;
             let pos = tran.getWorldTranslate();
@@ -119,7 +119,7 @@ namespace gd3d.framework {
          * @param radius 半径
          * @param maxSides 最大边
          */
-        public creatCircleBodyByInitData(pBody :I2DPhysicsBody , radius: number, maxSides: number = 25) {
+        public creatCircleBodyByInitData(pBody :I2DPhysicsBody , radius: number, maxSides: number = 25) : Ibody{
             if(!pBody || !pBody.transform) return;
             let tran = pBody.transform;
             let pos = tran.getWorldTranslate();
@@ -144,7 +144,7 @@ namespace gd3d.framework {
          * @param removeCollinear 共线移除参考值
          * @param minimumArea 最小面积
          */
-        ConvexHullBodyByInitData(pBody :I2DPhysicsBody ,vertexSets , flagInternal = false, removeCollinear = 0.01, minimumArea = 10){
+        ConvexHullBodyByInitData(pBody :I2DPhysicsBody ,vertexSets , flagInternal = false, removeCollinear = 0.01, minimumArea = 10) : Ibody{
             if(!pBody || !pBody.transform) return;
             let tran = pBody.transform;
             let pos = tran.getWorldTranslate();
@@ -152,6 +152,17 @@ namespace gd3d.framework {
             pBody.body = body;
             // this.addBody(pBody,);
             return body;
+        }
+
+        /**
+         * Creates a new rigid body model. The options parameter is an object that specifies any properties you wish to override the defaults.
+         * All properties have default values, and many are pre-calculated automatically based on other properties.
+         * Vertices must be specified in clockwise order.
+         * See the properties section below for detailed information on what you can pass via the `options` object.
+         * @param options 
+         */
+        createBody(options:I2dPhyBodyData) : Ibody{
+            return Matter.Body.create(options);
         }
 
         private _physicsBodys : I2DPhysicsBody[]  = [];

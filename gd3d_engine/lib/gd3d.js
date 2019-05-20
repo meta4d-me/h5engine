@@ -6338,6 +6338,8 @@ var gd3d;
                             this.isPointDown = true;
                             sp.x = tempc.x;
                             sp.y = tempc.y;
+                            if (this.onDownFun)
+                                this.onDownFun(sp.x, sp.y);
                         }
                         if (ev.type == gd3d.event.PointEventEnum.PointHold && this.isPointDown) {
                             var lp = this.lastPoint;
@@ -6354,6 +6356,8 @@ var gd3d;
                 }
                 if (ev.type == gd3d.event.PointEventEnum.PointUp) {
                     this.isPointDown = false;
+                    if (this.onUpFun)
+                        this.onUpFun();
                 }
             };
             slideArea.prototype.remove = function () {
@@ -6571,7 +6575,7 @@ var gd3d;
                 this.fixCenter();
                 this.physicsEngine.addBody(this);
                 if (this.onInit)
-                    this.onInit(body);
+                    this.onInit(this);
             };
             convexHullBody2d.prototype.fixCenter = function () {
                 var max = this.body.bounds.max;
@@ -6709,6 +6713,9 @@ var gd3d;
                 var body = Matter.Bodies.fromVertices(pos.x, pos.y, vertexSets, pBody.options, flagInternal, removeCollinear, minimumArea);
                 pBody.body = body;
                 return body;
+            };
+            physicEngine2D.prototype.createBody = function (options) {
+                return Matter.Body.create(options);
             };
             physicEngine2D.prototype.addBody = function (_Pbody) {
                 this._physicsBodys.push(_Pbody);
