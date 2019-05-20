@@ -96,48 +96,39 @@ namespace gd3d.framework {
         }
 
         /**
-         * Creates a new rigid body model with a circle hull. 
-         * The options parameter is an object that specifies any properties you wish to override the defaults.
-         * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
+         * 创建一个新的矩形Body
          * @param pBody I2DPhysicsBody 实例
          */
-        public creatRectBodyByInitData(pBody :I2DPhysicsBody ) : Ibody{
+        public createRectBodyByInitData(pBody :I2DPhysicsBody ) : Ibody{
             if(!pBody || !pBody.transform) return;
             let tran = pBody.transform;
             let pos = tran.getWorldTranslate();
-            let body = Matter.Bodies.rectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
+            // let body = Matter.Bodies.rectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
+            let body = this.createRectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
             pBody.body = body;
             // this.addBody(pBody);
             return body;
         }
 
         /**
-         * Creates a new rigid body model with a circle hull. 
-         * The options parameter is an object that specifies any properties you wish to override the defaults.
-         * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
+         * 创建一个新的圆形Body
          * @param pBody I2DPhysicsBody 实例
          * @param radius 半径
          * @param maxSides 最大边
          */
-        public creatCircleBodyByInitData(pBody :I2DPhysicsBody , radius: number, maxSides: number = 25) : Ibody{
+        public createCircleBodyByInitData(pBody :I2DPhysicsBody , radius: number, maxSides: number = 25) : Ibody{
             if(!pBody || !pBody.transform) return;
             let tran = pBody.transform;
             let pos = tran.getWorldTranslate();
-            let body = Matter.Bodies.circle(pos.x, pos.y, radius, pBody.options ,maxSides);
+            // let body = Matter.Bodies.circle(pos.x, pos.y, radius, pBody.options ,maxSides);
+            let body = this.createCircle(pos.x, pos.y, radius, pBody.options ,maxSides);
             pBody.body = body;
             // this.addBody(pBody);
             return body;
         }
         /**
-         * Creates a body using the supplied vertices (or an array containing multiple sets of vertices).
-         * If the vertices are convex, they will pass through as supplied.
-         * Otherwise if the vertices are concave, they will be decomposed if [poly-decomp.js](https://github.com/schteppe/poly-decomp.js) is available.
-         * Note that this process is not guaranteed to support complex sets of vertices (e.g. those with holes may fail).
-         * By default the decomposition will discard collinear edges (to improve performance).
-         * It can also optionally discard any parts that have an area less than `minimumArea`.
-         * If the vertices can not be decomposed, the result will fall back to using the convex hull.
-         * The options parameter is an object that specifies any `Matter.Body` properties you wish to override the defaults.
-         * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
+         * 使用提供的顶点（或包含多组顶点的数组）创建一个新的物理实体
+         * 详细参考： createFromVertices（）
          * @param pBody I2DPhysicsBody 实例
          * @param vertexSets 顶点集合
          * @param flagInternal 内部模式标记
@@ -148,7 +139,8 @@ namespace gd3d.framework {
             if(!pBody || !pBody.transform) return;
             let tran = pBody.transform;
             let pos = tran.getWorldTranslate();
-            let body = Matter.Bodies.fromVertices(pos.x, pos.y, vertexSets, pBody.options , flagInternal , removeCollinear , minimumArea);
+            // let body = Matter.Bodies.fromVertices(pos.x, pos.y, vertexSets, pBody.options , flagInternal , removeCollinear , minimumArea);
+            let body = this.createFromVertices(pos.x, pos.y, vertexSets, pBody.options , flagInternal , removeCollinear , minimumArea);
             pBody.body = body;
             // this.addBody(pBody,);
             return body;
@@ -163,6 +155,95 @@ namespace gd3d.framework {
          */
         createBody(options:I2dPhyBodyData) : Ibody{
             return Matter.Body.create(options);
+        }
+
+        /**
+         * Creates a new rigid body model with a circle hull. 
+         * The options parameter is an object that specifies any properties you wish to override the defaults.
+         * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
+         * @method circle
+         * @param {number} x
+         * @param {number} y
+         * @param {number} radius
+         * @param {object} [options]
+         * @param {number} [maxSides]
+         * @return {body} A new circle body
+         */
+        createCircle(x :number, y:number, radius:number, options : I2dPhyBodyData, maxSides:number):Ibody{
+            return Matter.Bodies.circle(x,y,radius,options,maxSides);
+        }
+
+        /**
+         * Creates a new rigid body model with a rectangle hull. 
+         * The options parameter is an object that specifies any properties you wish to override the defaults.
+         * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
+         * @method rectangle
+         * @param {number} x
+         * @param {number} y
+         * @param {number} width
+         * @param {number} height
+         * @param {object} [options]
+         * @return {body} A new rectangle body
+         */
+        createRectangle(x:number, y:number, width:number, height:number, options:I2dPhyBodyData):Ibody{
+            return Matter.Bodies.rectangle(x,y,width,height,options);
+        }
+
+        /**
+         * Creates a new rigid body model with a trapezoid hull. 
+         * The options parameter is an object that specifies any properties you wish to override the defaults.
+         * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
+         * @method trapezoid
+         * @param {number} x
+         * @param {number} y
+         * @param {number} width
+         * @param {number} height
+         * @param {number} slope
+         * @param {object} [options]
+         * @return {body} A new trapezoid body
+         */
+        createTrapezoid(x:number, y:number, width:number, height:number, slope:number, options:I2dPhyBodyData):Ibody{
+            return Matter.Bodies.trapezoid(x,y,width,height,slope,options);
+        }
+
+        /**
+         * Creates a new rigid body model with a regular polygon hull with the given number of sides. 
+         * The options parameter is an object that specifies any properties you wish to override the defaults.
+         * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
+         * @method polygon
+         * @param {number} x
+         * @param {number} y
+         * @param {number} sides
+         * @param {number} radius
+         * @param {object} [options]
+         * @return {body} A new regular polygon body
+         */
+        createPolygon(x:number, y:number, sides:number, radius:number, options:I2dPhyBodyData):Ibody{
+            return Matter.Bodies.polygon(x,y,sides,radius,options);
+        }
+
+        /**
+         * Creates a body using the supplied vertices (or an array containing multiple sets of vertices).
+         * If the vertices are convex, they will pass through as supplied.
+         * Otherwise if the vertices are concave, they will be decomposed if [poly-decomp.js](https://github.com/schteppe/poly-decomp.js) is available.
+         * Note that this process is not guaranteed to support complex sets of vertices (e.g. those with holes may fail).
+         * By default the decomposition will discard collinear edges (to improve performance).
+         * It can also optionally discard any parts that have an area less than `minimumArea`.
+         * If the vertices can not be decomposed, the result will fall back to using the convex hull.
+         * The options parameter is an object that specifies any `Matter.Body` properties you wish to override the defaults.
+         * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
+         * @method fromVertices
+         * @param {number} x
+         * @param {number} y
+         * @param [Ivec2] vertexSets
+         * @param {object} [options]
+         * @param {bool} [flagInternal=false]
+         * @param {number} [removeCollinear=0.01]
+         * @param {number} [minimumArea=10]
+         * @return {body}
+         */
+        createFromVertices(x:number, y:number, vertexSets : math.Ivec2[] , options : I2dPhyBodyData, flagInternal = false, removeCollinear = 0.01, minimumArea = 10):Ibody{
+            return Matter.Bodies.polygon(x,y,vertexSets,options,flagInternal,removeCollinear,minimumArea);
         }
 
         private _physicsBodys : I2DPhysicsBody[]  = [];

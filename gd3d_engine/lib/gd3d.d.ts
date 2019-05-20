@@ -1134,10 +1134,15 @@ declare namespace gd3d.framework {
         private collisionEnd;
         addEventListener(eventEnum: event.Physic2dEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         removeEventListener(eventEnum: event.Physic2dEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
-        creatRectBodyByInitData(pBody: I2DPhysicsBody): Ibody;
-        creatCircleBodyByInitData(pBody: I2DPhysicsBody, radius: number, maxSides?: number): Ibody;
+        createRectBodyByInitData(pBody: I2DPhysicsBody): Ibody;
+        createCircleBodyByInitData(pBody: I2DPhysicsBody, radius: number, maxSides?: number): Ibody;
         ConvexHullBodyByInitData(pBody: I2DPhysicsBody, vertexSets: any, flagInternal?: boolean, removeCollinear?: number, minimumArea?: number): Ibody;
         createBody(options: I2dPhyBodyData): Ibody;
+        createCircle(x: number, y: number, radius: number, options: I2dPhyBodyData, maxSides: number): Ibody;
+        createRectangle(x: number, y: number, width: number, height: number, options: I2dPhyBodyData): Ibody;
+        createTrapezoid(x: number, y: number, width: number, height: number, slope: number, options: I2dPhyBodyData): Ibody;
+        createPolygon(x: number, y: number, sides: number, radius: number, options: I2dPhyBodyData): Ibody;
+        createFromVertices(x: number, y: number, vertexSets: math.Ivec2[], options: I2dPhyBodyData, flagInternal?: boolean, removeCollinear?: number, minimumArea?: number): Ibody;
         private _physicsBodys;
         addBody(_Pbody: I2DPhysicsBody): void;
         removeBody(_Pbody: I2DPhysicsBody): void;

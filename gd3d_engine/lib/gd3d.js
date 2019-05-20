@@ -6530,7 +6530,7 @@ var gd3d;
             }
             circleBody2d.prototype.start = function () {
                 var data = this.options || {};
-                var body = this.physicsEngine.creatCircleBodyByInitData(this, this.radius, this.maxSides);
+                var body = this.physicsEngine.createCircleBodyByInitData(this, this.radius, this.maxSides);
                 this.physicsEngine.addBody(this);
                 if (this.onInit)
                     this.onInit(this);
@@ -6683,22 +6683,22 @@ var gd3d;
             physicEngine2D.prototype.removeEventListener = function (eventEnum, func, thisArg) {
                 this.eventer.RemoveListener(gd3d.event.Physic2dEventEnum[eventEnum], func, thisArg);
             };
-            physicEngine2D.prototype.creatRectBodyByInitData = function (pBody) {
+            physicEngine2D.prototype.createRectBodyByInitData = function (pBody) {
                 if (!pBody || !pBody.transform)
                     return;
                 var tran = pBody.transform;
                 var pos = tran.getWorldTranslate();
-                var body = Matter.Bodies.rectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
+                var body = this.createRectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
                 pBody.body = body;
                 return body;
             };
-            physicEngine2D.prototype.creatCircleBodyByInitData = function (pBody, radius, maxSides) {
+            physicEngine2D.prototype.createCircleBodyByInitData = function (pBody, radius, maxSides) {
                 if (maxSides === void 0) { maxSides = 25; }
                 if (!pBody || !pBody.transform)
                     return;
                 var tran = pBody.transform;
                 var pos = tran.getWorldTranslate();
-                var body = Matter.Bodies.circle(pos.x, pos.y, radius, pBody.options, maxSides);
+                var body = this.createCircle(pos.x, pos.y, radius, pBody.options, maxSides);
                 pBody.body = body;
                 return body;
             };
@@ -6710,12 +6710,30 @@ var gd3d;
                     return;
                 var tran = pBody.transform;
                 var pos = tran.getWorldTranslate();
-                var body = Matter.Bodies.fromVertices(pos.x, pos.y, vertexSets, pBody.options, flagInternal, removeCollinear, minimumArea);
+                var body = this.createFromVertices(pos.x, pos.y, vertexSets, pBody.options, flagInternal, removeCollinear, minimumArea);
                 pBody.body = body;
                 return body;
             };
             physicEngine2D.prototype.createBody = function (options) {
                 return Matter.Body.create(options);
+            };
+            physicEngine2D.prototype.createCircle = function (x, y, radius, options, maxSides) {
+                return Matter.Bodies.circle(x, y, radius, options, maxSides);
+            };
+            physicEngine2D.prototype.createRectangle = function (x, y, width, height, options) {
+                return Matter.Bodies.rectangle(x, y, width, height, options);
+            };
+            physicEngine2D.prototype.createTrapezoid = function (x, y, width, height, slope, options) {
+                return Matter.Bodies.trapezoid(x, y, width, height, slope, options);
+            };
+            physicEngine2D.prototype.createPolygon = function (x, y, sides, radius, options) {
+                return Matter.Bodies.polygon(x, y, sides, radius, options);
+            };
+            physicEngine2D.prototype.createFromVertices = function (x, y, vertexSets, options, flagInternal, removeCollinear, minimumArea) {
+                if (flagInternal === void 0) { flagInternal = false; }
+                if (removeCollinear === void 0) { removeCollinear = 0.01; }
+                if (minimumArea === void 0) { minimumArea = 10; }
+                return Matter.Bodies.polygon(x, y, vertexSets, options, flagInternal, removeCollinear, minimumArea);
             };
             physicEngine2D.prototype.addBody = function (_Pbody) {
                 this._physicsBodys.push(_Pbody);
@@ -6805,7 +6823,7 @@ var gd3d;
             }
             rectBody2d.prototype.start = function () {
                 var data = this.options || {};
-                var body = this.physicsEngine.creatRectBodyByInitData(this);
+                var body = this.physicsEngine.createRectBodyByInitData(this);
                 this.physicsEngine.addBody(this);
                 if (this.onInit)
                     this.onInit(this);
