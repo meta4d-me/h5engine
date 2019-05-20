@@ -1078,7 +1078,7 @@ declare namespace gd3d.framework {
         area?: number;
         _original?: any;
     }
-    class physics2DBody extends behaviour2d implements I2DPhysicsBody {
+    abstract class physics2DBody extends behaviour2d implements I2DPhysicsBody {
         readonly physicsEngine: physicEngine2D;
         protected _physicsEngine: physicEngine2D;
         constructor();
@@ -1118,6 +1118,16 @@ declare namespace gd3d.framework {
         radius: number;
         maxSides: number;
         start(): void;
+        onPlay(): void;
+    }
+}
+declare namespace gd3d.framework {
+    class compoundBody2d extends physics2DBody {
+        static readonly ClassName: string;
+        transform: transform2D;
+        private _bodys;
+        start(): void;
+        addPart(body: Ibody): void;
         onPlay(): void;
     }
 }

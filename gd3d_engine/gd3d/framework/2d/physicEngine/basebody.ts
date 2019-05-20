@@ -76,11 +76,10 @@ namespace gd3d.framework {
     }
 
     /**
-     * 2d 物理引擎Body 组件
+     * 2d 物理引擎Body 组件父对象
      * （本组件不会创建具体物理对象，需要使用子类对象 或者 自行在onInit回调中创建）
      */
-    @reflect.node2DComponent
-    export class physics2DBody extends behaviour2d implements I2DPhysicsBody {
+    export abstract class physics2DBody extends behaviour2d implements I2DPhysicsBody {
         /** 2d物理引擎实例对象 */
         get physicsEngine() {
             if (this._physicsEngine) {

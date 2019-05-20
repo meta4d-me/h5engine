@@ -6,7 +6,7 @@ namespace gd3d.framework
      * @public  
      * @language zh_CN
      * @classdesc
-     * 矩形 刚体
+     * 矩形 2d刚体
      * @version gd3d 1.0
      */
     @reflect.node2DComponent

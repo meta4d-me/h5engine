@@ -6511,10 +6511,6 @@ var gd3d;
                 this.physicsEngine.removeBody(this);
                 this.body = null;
             };
-            physics2DBody = __decorate([
-                gd3d.reflect.node2DComponent,
-                __metadata("design:paramtypes", [])
-            ], physics2DBody);
             return physics2DBody;
         }(framework.behaviour2d));
         framework.physics2DBody = physics2DBody;
@@ -6556,6 +6552,52 @@ var gd3d;
             return circleBody2d;
         }(framework.physics2DBody));
         framework.circleBody2d = circleBody2d;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var compoundBody2d = (function (_super) {
+            __extends(compoundBody2d, _super);
+            function compoundBody2d() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this._bodys = [];
+                return _this;
+            }
+            compoundBody2d.prototype.start = function () {
+                var data = this.options || {};
+                var engine = this.physicsEngine;
+                var pos = this.transform.getWorldTranslate();
+                var tempv2 = gd3d.poolv2();
+                var len = this._bodys.length;
+                for (var i = 0; i < len; i++) {
+                    var body = this._bodys[i];
+                    tempv2.x = body.position.x + pos.x;
+                    tempv2.y = body.position.y + pos.y;
+                    engine.setPosition(body, tempv2);
+                }
+                this.options.parts = this._bodys;
+                this.body = engine.createBody(this.options);
+                engine.addBody(this);
+                if (this.onInit)
+                    this.onInit(this);
+                gd3d.poolv2_del(tempv2);
+            };
+            compoundBody2d.prototype.addPart = function (body) {
+                if (!body)
+                    return;
+                this._bodys.push(body);
+            };
+            compoundBody2d.prototype.onPlay = function () {
+            };
+            compoundBody2d.ClassName = "compoundBody2d";
+            compoundBody2d = __decorate([
+                gd3d.reflect.node2DComponent
+            ], compoundBody2d);
+            return compoundBody2d;
+        }(framework.physics2DBody));
+        framework.compoundBody2d = compoundBody2d;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
