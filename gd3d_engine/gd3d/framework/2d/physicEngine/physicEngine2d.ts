@@ -243,7 +243,7 @@ namespace gd3d.framework {
          * @return {body}
          */
         createFromVertices(x:number, y:number, vertexSets : math.Ivec2[] , options : I2dPhyBodyData, flagInternal = false, removeCollinear = 0.01, minimumArea = 10):Ibody{
-            return Matter.Bodies.polygon(x,y,vertexSets,options,flagInternal,removeCollinear,minimumArea);
+            return Matter.Bodies.fromVertices(x,y,vertexSets,options,flagInternal,removeCollinear,minimumArea);
         }
 
         private _physicsBodys : I2DPhysicsBody[]  = [];

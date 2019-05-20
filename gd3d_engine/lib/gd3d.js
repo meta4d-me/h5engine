@@ -6733,7 +6733,7 @@ var gd3d;
                 if (flagInternal === void 0) { flagInternal = false; }
                 if (removeCollinear === void 0) { removeCollinear = 0.01; }
                 if (minimumArea === void 0) { minimumArea = 10; }
-                return Matter.Bodies.polygon(x, y, vertexSets, options, flagInternal, removeCollinear, minimumArea);
+                return Matter.Bodies.fromVertices(x, y, vertexSets, options, flagInternal, removeCollinear, minimumArea);
             };
             physicEngine2D.prototype.addBody = function (_Pbody) {
                 this._physicsBodys.push(_Pbody);
