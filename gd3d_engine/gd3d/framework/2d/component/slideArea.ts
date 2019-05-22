@@ -72,8 +72,14 @@ namespace gd3d.framework {
                         if (lp.x != tempc.x || lp.y != tempc.y) {
                             lp.x = tempc.x;
                             lp.y = tempc.y;
-                            let addtransX = lp.x - sp.x;
-                            let addtransY = lp.y - sp.y;
+                            let addtransX = 0;
+                            if (this.horizontal) {
+                                addtransX = lp.x - sp.x;
+                            }
+                            let addtransY = 0;
+                            if (this.vertical) {
+                                addtransY = lp.y - sp.y;
+                            }
                             // console.error(addtransX+"  ***  "+addtransY);
                             if (this.onMoveFun)
                                 this.onMoveFun(addtransX, addtransY);
