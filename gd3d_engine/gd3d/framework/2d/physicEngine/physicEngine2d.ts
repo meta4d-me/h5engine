@@ -246,22 +246,24 @@ namespace gd3d.framework {
             return Matter.Bodies.fromVertices(x,y,vertexSets,options,flagInternal,removeCollinear,minimumArea);
         }
 
-        private _physicsBodys : I2DPhysicsBody[]  = [];
-
+        private _bodysObjMap : {[id:number]: I2DPhysicsBody} = {};
         /** 添加 I2DPhysicsBody 实例到 2d物理世界*/
         addBody(_Pbody: I2DPhysicsBody){
-            this._physicsBodys.push(_Pbody);
+            if(!_Pbody) return;
+            this._bodysObjMap[_Pbody.body.id] = _Pbody;
             Matter.World.add(this.engineWorld, _Pbody.body);
         }
 
         /** 移除 指定 I2DPhysicsBody 实例 */
         removeBody(_Pbody: I2DPhysicsBody) {
             if(!_Pbody) return;
-            let idx = this._physicsBodys.indexOf(_Pbody);
-            if(idx != -1){
-                this._physicsBodys.splice(idx,1);
-            }
+            delete this._bodysObjMap[_Pbody.body.id];
             Matter.World.remove(this.engineWorld, _Pbody.body);
+        }
+
+        /** 获取 I2DPhysicsBody 对象通过 Ibody.id */
+        getBody(bodyId:number): I2DPhysicsBody{
+            return this._bodysObjMap[bodyId];
         }
 
         /** 清理世界 */
