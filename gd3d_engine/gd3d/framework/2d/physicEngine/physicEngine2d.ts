@@ -10,16 +10,16 @@ namespace gd3d.framework {
         constraintIterations?: number;
         timing?: Itiming;
         velocityIterations?: number;
-        enableSleeping?:boolean;
+        enableSleeping?: boolean;
     }
     declare var Matter: any;
     export class physicEngine2D {
-        private _Matter : any;
-        get Matter(){return this._Matter};
+        private _Matter: any;
+        get Matter() { return this._Matter };
         matterEngine: any;
         private engineWorld: any;
         private matterVector: math.Ivec2;
-        private eventer : event.Physic2dEvent = new event.Physic2dEvent();
+        private eventer: event.Physic2dEvent = new event.Physic2dEvent();
         public constructor(op: IEngine2DOP = null) {
             if (Matter == undefined) {
                 console.error(" Matter not found , create physicEngine2D fail");
@@ -38,11 +38,11 @@ namespace gd3d.framework {
             Matter.Engine.run(this.matterEngine);
 
             //Event
-            Matter.Events.on(this.matterEngine,"beforeUpdate",this.beforeUpdate.bind(this));
-            Matter.Events.on(this.matterEngine,"afterUpdate",this.afterUpdate.bind(this));
-            Matter.Events.on(this.matterEngine,"collisionStart",this.collisionStart.bind(this));
-            Matter.Events.on(this.matterEngine,"collisionActive",this.collisionActive.bind(this));
-            Matter.Events.on(this.matterEngine,"collisionEnd",this.collisionEnd.bind(this));
+            Matter.Events.on(this.matterEngine, "beforeUpdate", this.beforeUpdate.bind(this));
+            Matter.Events.on(this.matterEngine, "afterUpdate", this.afterUpdate.bind(this));
+            Matter.Events.on(this.matterEngine, "collisionStart", this.collisionStart.bind(this));
+            Matter.Events.on(this.matterEngine, "collisionActive", this.collisionActive.bind(this));
+            Matter.Events.on(this.matterEngine, "collisionEnd", this.collisionEnd.bind(this));
         }
 
         update(delta: number) {
@@ -51,28 +51,28 @@ namespace gd3d.framework {
 
 
         /** Matter.Engine update 调用前 */
-        private beforeUpdate(ev){
-            this.eventer.EmitEnum(event.Physic2dEventEnum.BeforeUpdate , ev);
+        private beforeUpdate(ev) {
+            this.eventer.EmitEnum(event.Physic2dEventEnum.BeforeUpdate, ev);
         }
 
         /** Matter.Engine update 调用之后 */
-        private afterUpdate(ev){
-            this.eventer.EmitEnum(event.Physic2dEventEnum.afterUpdate , ev);
+        private afterUpdate(ev) {
+            this.eventer.EmitEnum(event.Physic2dEventEnum.afterUpdate, ev);
         }
 
         /** 开始碰撞 ， Matter.Engine update 调用之后 */
-        private collisionStart(ev){
-            this.eventer.EmitEnum(event.Physic2dEventEnum.collisionStart , ev);
+        private collisionStart(ev) {
+            this.eventer.EmitEnum(event.Physic2dEventEnum.collisionStart, ev);
         }
 
         /** 碰撞持续中， Matter.Engine update 调用之后 */
-        private collisionActive(ev){
-            this.eventer.EmitEnum(event.Physic2dEventEnum.collisionActive , ev);
+        private collisionActive(ev) {
+            this.eventer.EmitEnum(event.Physic2dEventEnum.collisionActive, ev);
         }
 
         /** 碰撞结束 ， Matter.Engine update 调用之后 */
-        private collisionEnd(ev){
-            this.eventer.EmitEnum(event.Physic2dEventEnum.collisionEnd , ev);
+        private collisionEnd(ev) {
+            this.eventer.EmitEnum(event.Physic2dEventEnum.collisionEnd, ev);
         }
 
         /**
@@ -81,8 +81,8 @@ namespace gd3d.framework {
          * @param func 事件回调函数
          * @param thisArg 函数持有对象
          */
-        addEventListener(eventEnum: event.Physic2dEventEnum ,func: (...args: Array<any>) => void,thisArg:any){
-            this.eventer.OnEnum(eventEnum,func,thisArg);
+        addEventListener(eventEnum: event.Physic2dEventEnum, func: (...args: Array<any>) => void, thisArg: any) {
+            this.eventer.OnEnum(eventEnum, func, thisArg);
         }
 
         /**
@@ -91,16 +91,16 @@ namespace gd3d.framework {
          * @param func 事件回调函数
          * @param thisArg 函数持有对象
          */
-        removeEventListener(eventEnum: event.Physic2dEventEnum, func: (...args: Array<any>) => void , thisArg:any){
-            this.eventer.RemoveListener(event.Physic2dEventEnum[eventEnum],func,thisArg);
+        removeEventListener(eventEnum: event.Physic2dEventEnum, func: (...args: Array<any>) => void, thisArg: any) {
+            this.eventer.RemoveListener(event.Physic2dEventEnum[eventEnum], func, thisArg);
         }
 
         /**
          * 创建一个新的矩形Body
          * @param pBody I2DPhysicsBody 实例
          */
-        public createRectBodyByInitData(pBody :I2DPhysicsBody ) : Ibody{
-            if(!pBody || !pBody.transform) return;
+        createRectByPBody(pBody: I2DPhysicsBody): Ibody {
+            if (!pBody || !pBody.transform) return;
             let tran = pBody.transform;
             let pos = tran.getWorldTranslate();
             // let body = Matter.Bodies.rectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
@@ -116,14 +116,14 @@ namespace gd3d.framework {
          * @param radius 半径
          * @param maxSides 最大边
          */
-        public createCircleBodyByInitData(pBody :I2DPhysicsBody , radius: number, maxSides: number = 25) : Ibody{
-            if(!pBody || !pBody.transform) return;
+        createCircleByPBody(pBody: I2DPhysicsBody , maxSides: number = 25): Ibody {
+            if (!pBody || !pBody.transform) return;
             let tran = pBody.transform;
             let pos = tran.getWorldTranslate();
-            // let body = Matter.Bodies.circle(pos.x, pos.y, radius, pBody.options ,maxSides);
-            let body = this.createCircle(pos.x, pos.y, radius, pBody.options ,maxSides);
+            let r = tran.width > tran.height ? tran.width: tran.height;
+            r *= 0.5;
+            let body = this.createCircle(pos.x, pos.y, r, pBody.options, maxSides);
             pBody.body = body;
-            // this.addBody(pBody);
             return body;
         }
         /**
@@ -135,14 +135,32 @@ namespace gd3d.framework {
          * @param removeCollinear 共线移除参考值
          * @param minimumArea 最小面积
          */
-        ConvexHullBodyByInitData(pBody :I2DPhysicsBody ,vertexSets , flagInternal = false, removeCollinear = 0.01, minimumArea = 10) : Ibody{
-            if(!pBody || !pBody.transform) return;
+        ConvexHullByPBody(pBody: I2DPhysicsBody, vertexSets, flagInternal = false, removeCollinear = 0.01, minimumArea = 10): Ibody {
+            if (!pBody || !pBody.transform) return;
             let tran = pBody.transform;
             let pos = tran.getWorldTranslate();
             // let body = Matter.Bodies.fromVertices(pos.x, pos.y, vertexSets, pBody.options , flagInternal , removeCollinear , minimumArea);
-            let body = this.createFromVertices(pos.x, pos.y, vertexSets, pBody.options , flagInternal , removeCollinear , minimumArea);
+            let body = this.createFromVertices(pos.x, pos.y, vertexSets, pBody.options, flagInternal, removeCollinear, minimumArea);
             pBody.body = body;
             // this.addBody(pBody,);
+            return body;
+        }
+
+        /**
+         * 创建一个新的胶囊体Body
+         * @param pBody 
+         * @param maxSides 
+         */
+        createCapsuleByPBody(pBody: I2DPhysicsBody , maxSides:number = 25){
+            if (!pBody || !pBody.transform) return;
+            let tran = pBody.transform;
+            let pos = tran.getWorldTranslate();
+            let y_Axis = tran.height > tran.width ;
+            let r = y_Axis ? tran.width : tran.height;
+            let h = y_Axis ? tran.height : tran.width ;
+            let angle = y_Axis ? 0 : Math.PI * 0.5;
+            let body = this.createCapsule(pos.x, pos.y, r, h, pBody.options,angle, maxSides);
+            pBody.body = body;
             return body;
         }
 
@@ -153,7 +171,7 @@ namespace gd3d.framework {
          * See the properties section below for detailed information on what you can pass via the `options` object.
          * @param options 
          */
-        createBody(options:I2dPhyBodyData) : Ibody{
+        createBody(options: I2dPhyBodyData): Ibody {
             return Matter.Body.create(options);
         }
 
@@ -169,8 +187,8 @@ namespace gd3d.framework {
          * @param {number} [maxSides]
          * @return {body} A new circle body
          */
-        createCircle(x :number, y:number, radius:number, options : I2dPhyBodyData, maxSides:number):Ibody{
-            return Matter.Bodies.circle(x,y,radius,options,maxSides);
+        createCircle(x: number, y: number, radius: number, options: I2dPhyBodyData, maxSides: number): Ibody {
+            return Matter.Bodies.circle(x, y, radius, options, maxSides);
         }
 
         /**
@@ -185,8 +203,8 @@ namespace gd3d.framework {
          * @param {object} [options]
          * @return {body} A new rectangle body
          */
-        createRectangle(x:number, y:number, width:number, height:number, options:I2dPhyBodyData):Ibody{
-            return Matter.Bodies.rectangle(x,y,width,height,options);
+        createRectangle(x: number, y: number, width: number, height: number, options: I2dPhyBodyData): Ibody {
+            return Matter.Bodies.rectangle(x, y, width, height, options);
         }
 
         /**
@@ -202,8 +220,8 @@ namespace gd3d.framework {
          * @param {object} [options]
          * @return {body} A new trapezoid body
          */
-        createTrapezoid(x:number, y:number, width:number, height:number, slope:number, options:I2dPhyBodyData):Ibody{
-            return Matter.Bodies.trapezoid(x,y,width,height,slope,options);
+        createTrapezoid(x: number, y: number, width: number, height: number, slope: number, options: I2dPhyBodyData): Ibody {
+            return Matter.Bodies.trapezoid(x, y, width, height, slope, options);
         }
 
         /**
@@ -218,8 +236,8 @@ namespace gd3d.framework {
          * @param {object} [options]
          * @return {body} A new regular polygon body
          */
-        createPolygon(x:number, y:number, sides:number, radius:number, options:I2dPhyBodyData):Ibody{
-            return Matter.Bodies.polygon(x,y,sides,radius,options);
+        createPolygon(x: number, y: number, sides: number, radius: number, options: I2dPhyBodyData): Ibody {
+            return Matter.Bodies.polygon(x, y, sides, radius, options);
         }
 
         /**
@@ -242,41 +260,102 @@ namespace gd3d.framework {
          * @param {number} [minimumArea=10]
          * @return {body}
          */
-        createFromVertices(x:number, y:number, vertexSets : math.Ivec2[] , options : I2dPhyBodyData, flagInternal = false, removeCollinear = 0.01, minimumArea = 10):Ibody{
-            return Matter.Bodies.fromVertices(x,y,vertexSets,options,flagInternal,removeCollinear,minimumArea);
+        createFromVertices(x: number, y: number, vertexSets: math.Ivec2[], options: I2dPhyBodyData, flagInternal = false, removeCollinear = 0.01, minimumArea = 10): Ibody {
+            return Matter.Bodies.fromVertices(x, y, vertexSets, options, flagInternal, removeCollinear, minimumArea);
         }
 
-        private _bodysObjMap : {[id:number]: I2DPhysicsBody} = {};
+        /**
+         * Creates a new rigid body model with a capsule hull. 
+         * The options parameter is an object that specifies any properties you wish to override the defaults.
+         * See the properties section of the `Matter.Body` module for detailed information on what you can pass via the `options` object.
+         * @method createCapsule
+         * @param {number} x
+         * @param {number} y
+         * @param {number} radius
+         * @param {number} height
+         * @param {object} [options]
+         * @param {number} rotation vertices roate of angle
+         * @param {number} [maxSides]
+         * @return {body} A new capsule body
+         */
+        createCapsule(x: number, y: number, radius: number, height: number, options: I2dPhyBodyData, rotation: number = 0, maxSides: number = 25) {
+            options = options || {};
+
+            maxSides = maxSides || 25;
+            let sides = Math.ceil(Math.max(6, Math.min(maxSides, radius)));
+            // optimisation: always use even number of sides (half the number of unique axes)
+            sides = sides % 2 === 1 ? sides++ : sides;
+
+            let halfSides = sides / 2,
+                halfDiff = (height - radius) / 2,
+                theta = 2 * Math.PI / sides,
+                path = '',
+                angOffset = Math.PI + theta * 0.5,
+                angle,
+                xx,
+                yy,
+                yOffset;
+
+            // Always greater than 0 of halfDiff
+            halfDiff = halfDiff < 0 ? 0 : halfDiff;
+
+            for (var i = 0; i < sides; i++) {
+                yOffset = i > halfSides ? halfDiff : -halfDiff;
+                angle = angOffset + (i * theta);
+                xx = Math.cos(angle) * radius;
+                yy = Math.sin(angle) * radius + yOffset;
+                if (i == 0) {
+                    path += 'L ' + xx.toFixed(3) + ' ' + (yy - yOffset * 2).toFixed(3) + ' ';
+                }
+                path += 'L ' + xx.toFixed(3) + ' ' + yy.toFixed(3) + ' ';
+                if (i == halfSides) {
+                    path += 'L ' + xx.toFixed(3) + ' ' + (yy - yOffset * 2).toFixed(3) + ' ';
+                }
+            }
+            let createCapsule = {
+                label: 'createCapsule Body',
+                position: { x: x, y: y },
+                vertices: Matter.Vertices.fromPath(path)
+            };
+
+            if (rotation != null || rotation % (Math.PI * 2) == 0) {
+                Matter.Vertices.rotate(createCapsule.vertices, rotation, { x: x, y: y });
+            }
+
+            return Matter.Body.create(Matter.Common.extend({}, createCapsule, options));
+        }
+
+        private _bodysObjMap: { [id: number]: I2DPhysicsBody } = {};
         /** 添加 I2DPhysicsBody 实例到 2d物理世界*/
-        addBody(_Pbody: I2DPhysicsBody){
-            if(!_Pbody) return;
+        addBody(_Pbody: I2DPhysicsBody) {
+            if (!_Pbody) return;
             this._bodysObjMap[_Pbody.body.id] = _Pbody;
             Matter.World.add(this.engineWorld, _Pbody.body);
         }
 
         /** 移除 指定 I2DPhysicsBody 实例 */
         removeBody(_Pbody: I2DPhysicsBody) {
-            if(!_Pbody) return;
+            if (!_Pbody) return;
             delete this._bodysObjMap[_Pbody.body.id];
             Matter.World.remove(this.engineWorld, _Pbody.body);
         }
 
         /** 获取 I2DPhysicsBody 对象通过 Ibody.id */
-        getBody(bodyId:number): I2DPhysicsBody{
+        getBody(bodyId: number): I2DPhysicsBody {
             return this._bodysObjMap[bodyId];
         }
 
         /** 清理世界 */
-        clearWorld(keepStatic:boolean = false){
-            Matter.World.clear(this.engineWorld,keepStatic);
+        clearWorld(keepStatic: boolean = false) {
+            Matter.World.clear(this.engineWorld, keepStatic);
         }
 
-        public applyForce(body: Ibody, positon:math.Ivec2, force:math.Ivec2): void {
-            Matter.Body.applyForce(body, positon , force );
+        public applyForce(body: Ibody, positon: math.Ivec2, force: math.Ivec2): void {
+            Matter.Body.applyForce(body, positon, force);
         }
 
         public applyForceAtCenter(body: Ibody, force: math.Ivec2): void {
-            Matter.Body.applyForce(body, body.position, force );
+            Matter.Body.applyForce(body, body.position, force);
         }
 
         public setGravity(x: number, y: number) {
@@ -284,14 +363,14 @@ namespace gd3d.framework {
             this.engineWorld.gravity.y = y;
         }
 
-        set enableSleeping (val:boolean){
+        set enableSleeping(val: boolean) {
             this.matterEngine.enableSleeping = val;
         }
 
-        get enableSleeping(){
-            return this.matterEngine.enableSleeping ;
+        get enableSleeping() {
+            return this.matterEngine.enableSleeping;
         }
-        
+
         //-----------------body设置-------------------------
         /** 设置速度
          * Sets the linear velocity of the body instantly. Position, angle, force etc. are unchanged. See also `Body.applyForce`.
@@ -366,8 +445,8 @@ namespace gd3d.framework {
         * By default the convex hull will be automatically computed and set on `body`, unless `autoHull` is set to `false.`
         * Note that this method will ensure that the first part in `body.parts` will always be the `body`.
         */
-        public setParts(body: Ibody, parts: Ibody[] , autoHull  = true) {
-            Matter.Body.setParts(body, parts,autoHull);
+        public setParts(body: Ibody, parts: Ibody[], autoHull = true) {
+            Matter.Body.setParts(body, parts, autoHull);
         }
 
         /** 设置中心点 
@@ -377,28 +456,28 @@ namespace gd3d.framework {
         * This is equal to moving `body.position` but not the `body.vertices`.
         * Invalid if the `centre` falls outside the body's convex hull.
         */
-        public setCentre(body : Ibody, centre: math.Ivec2, relative = false){
-            Matter.Body.setCentre(body, centre,relative);
+        public setCentre(body: Ibody, centre: math.Ivec2, relative = false) {
+            Matter.Body.setCentre(body, centre, relative);
         }
 
     }
 
     export interface Ibody {
-        bounds : {max:{x:number,y:number},min:{x:number,y:number}};
+        bounds: { max: { x: number, y: number }, min: { x: number, y: number } };
         /** 成员 */
         parts: Ibody[];
         /** 睡眠状态 */
-        isSleeping:boolean;
+        isSleeping: boolean;
         /** 传感器的标志 , 开启时触发碰撞事件*/
-        isSensor:boolean;
+        isSensor: boolean;
         /** 静态 */
-        isStatic:boolean;
+        isStatic: boolean;
         /** 重心点位置 */
         position: math.Ivec2;
         /** 速率向量 , 想要改变它 需要通过给它施加力*/
         velocity: math.Ivec2;
         /** 力*/
-        force:math.Ivec2;
+        force: math.Ivec2;
         /** 碰撞筛选属性对象 */
         collisionFilter: collisionFilter;
         type: string;
@@ -406,23 +485,23 @@ namespace gd3d.framework {
         name: string;
         angle: number;
         speed: number;
-        angularSpeed:number;
-        frictionAir:number;
-        friction:number;
-        frictionStatic:number;
-        restitution:number;
-        angularVelocity:number;
-        id:number;
-        motion:number;
-        torque:number;
-        sleepThreshold:number;
-        density:number;
-        mass:number;
-        inverseMass:number;
-        inertia:number;
-        inverseInertia:number;
-        slop:number;
-        timeScale:number;
+        angularSpeed: number;
+        frictionAir: number;
+        friction: number;
+        frictionStatic: number;
+        restitution: number;
+        angularVelocity: number;
+        id: number;
+        motion: number;
+        torque: number;
+        sleepThreshold: number;
+        density: number;
+        mass: number;
+        inverseMass: number;
+        inertia: number;
+        inverseInertia: number;
+        slop: number;
+        timeScale: number;
     }
 
     /**

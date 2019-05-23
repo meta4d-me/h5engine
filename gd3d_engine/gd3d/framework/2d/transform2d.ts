@@ -815,6 +815,15 @@ namespace gd3d.framework {
          * @public
          * @language zh_CN
          * @classdesc
+         * 碰撞盒组件 可为空
+         * @version egret-gd3d 1.0
+         */
+        physicsBody: I2DPhysicsBody;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * 当前节点的所有组件
          * @version egret-gd3d 1.0
          */
@@ -911,6 +920,14 @@ namespace gd3d.framework {
                     throw new Error("已经有一个碰撞组件了，不能俩");
                 }
             }
+            if (reflect.getClassTag(comp["__proto__"], "node2dphysicsbody") == "1") {//这货是个node2dphysicsbody
+                if (this.physicsBody == null) {
+                    this.physicsBody = comp as any;
+                }
+                else {
+                    throw new Error("已经有一个碰撞组件了，不能俩");
+                }
+            }
             return comp;
         }
 
@@ -951,6 +968,7 @@ namespace gd3d.framework {
                     var p = this.components.splice(i, 1);
                     if (p[0].comp == this.renderer) this.renderer = null;
                     if (p[0].comp == (this.collider as any)) this.collider = null;
+                    if (p[0].comp == (this.physicsBody as any)) this.physicsBody = null;
                     p[0].comp.remove();
                     return p[0];
                 }
@@ -971,6 +989,7 @@ namespace gd3d.framework {
             }
             if (this.renderer) this.renderer = null;
             if (this.collider) this.collider = null;
+            if (this.physicsBody) this.physicsBody = null;
             this.components.length = 0;
         }
 

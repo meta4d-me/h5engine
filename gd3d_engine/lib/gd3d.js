@@ -1076,6 +1076,10 @@ var gd3d;
             regType(constructorObj, { "boxcollider2d": "1" });
         }
         reflect.nodeBoxCollider2d = nodeBoxCollider2d;
+        function node2DPhysicsBody(constructorObj) {
+            regType(constructorObj, { "node2dphysicsbody": "1" });
+        }
+        reflect.node2DPhysicsBody = node2DPhysicsBody;
         function nodeSphereCollider(constructorObj) {
             regType(constructorObj, { "spherecollider": "1" });
         }
@@ -3264,6 +3268,14 @@ var gd3d;
                         throw new Error("已经有一个碰撞组件了，不能俩");
                     }
                 }
+                if (gd3d.reflect.getClassTag(comp["__proto__"], "node2dphysicsbody") == "1") {
+                    if (this.physicsBody == null) {
+                        this.physicsBody = comp;
+                    }
+                    else {
+                        throw new Error("已经有一个碰撞组件了，不能俩");
+                    }
+                }
                 return comp;
             };
             transform2D.prototype.removeComponent = function (comp) {
@@ -3288,6 +3300,8 @@ var gd3d;
                             this.renderer = null;
                         if (p[0].comp == this.collider)
                             this.collider = null;
+                        if (p[0].comp == this.physicsBody)
+                            this.physicsBody = null;
                         p[0].comp.remove();
                         return p[0];
                     }
@@ -3301,6 +3315,8 @@ var gd3d;
                     this.renderer = null;
                 if (this.collider)
                     this.collider = null;
+                if (this.physicsBody)
+                    this.physicsBody = null;
                 this.components.length = 0;
             };
             transform2D.prototype.getComponent = function (type) {
@@ -6346,8 +6362,14 @@ var gd3d;
                             if (lp.x != tempc.x || lp.y != tempc.y) {
                                 lp.x = tempc.x;
                                 lp.y = tempc.y;
-                                var addtransX = lp.x - sp.x;
-                                var addtransY = lp.y - sp.y;
+                                var addtransX = 0;
+                                if (this.horizontal) {
+                                    addtransX = lp.x - sp.x;
+                                }
+                                var addtransY = 0;
+                                if (this.vertical) {
+                                    addtransY = lp.y - sp.y;
+                                }
                                 if (this.onMoveFun)
                                     this.onMoveFun(addtransX, addtransY);
                             }
@@ -6520,17 +6542,64 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var capsuleBody2d = (function (_super) {
+            __extends(capsuleBody2d, _super);
+            function capsuleBody2d() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.maxSides = 25;
+                return _this;
+            }
+            Object.defineProperty(capsuleBody2d.prototype, "y_Axis", {
+                get: function () { return this.transform.height > this.transform.width; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            capsuleBody2d.prototype.start = function () {
+                var data = this.options || {};
+                var body = this.physicsEngine.createCapsuleByPBody(this, this.maxSides);
+                this.physicsEngine.addBody(this);
+                if (this.onInit)
+                    this.onInit(this);
+            };
+            capsuleBody2d.prototype.onPlay = function () {
+            };
+            capsuleBody2d.ClassName = "capsuleBody2d";
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], capsuleBody2d.prototype, "maxSides", void 0);
+            capsuleBody2d = __decorate([
+                gd3d.reflect.node2DComponent,
+                gd3d.reflect.node2DPhysicsBody
+            ], capsuleBody2d);
+            return capsuleBody2d;
+        }(framework.physics2DBody));
+        framework.capsuleBody2d = capsuleBody2d;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var circleBody2d = (function (_super) {
             __extends(circleBody2d, _super);
             function circleBody2d() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.radius = 1;
                 _this.maxSides = 25;
                 return _this;
             }
+            Object.defineProperty(circleBody2d.prototype, "radius", {
+                get: function () {
+                    return (this.transform.width > this.transform.height ? this.transform.width : this.transform.height) * 0.5;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ;
             circleBody2d.prototype.start = function () {
                 var data = this.options || {};
-                var body = this.physicsEngine.createCircleBodyByInitData(this, this.radius, this.maxSides);
+                var body = this.physicsEngine.createCircleByPBody(this, this.maxSides);
                 this.physicsEngine.addBody(this);
                 if (this.onInit)
                     this.onInit(this);
@@ -6541,13 +6610,10 @@ var gd3d;
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
-            ], circleBody2d.prototype, "radius", void 0);
-            __decorate([
-                gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
             ], circleBody2d.prototype, "maxSides", void 0);
             circleBody2d = __decorate([
-                gd3d.reflect.node2DComponent
+                gd3d.reflect.node2DComponent,
+                gd3d.reflect.node2DPhysicsBody
             ], circleBody2d);
             return circleBody2d;
         }(framework.physics2DBody));
@@ -6593,7 +6659,8 @@ var gd3d;
             };
             compoundBody2d.ClassName = "compoundBody2d";
             compoundBody2d = __decorate([
-                gd3d.reflect.node2DComponent
+                gd3d.reflect.node2DComponent,
+                gd3d.reflect.node2DPhysicsBody
             ], compoundBody2d);
             return compoundBody2d;
         }(framework.physics2DBody));
@@ -6617,7 +6684,7 @@ var gd3d;
             convexHullBody2d.prototype.start = function () {
                 var data = this.options || {};
                 var pos = this.transform.localTranslate;
-                var body = this.physicsEngine.ConvexHullBodyByInitData(this, this.vertexSets, this.flagInternal, this.removeCollinear, this.minimumArea);
+                var body = this.physicsEngine.ConvexHullByPBody(this, this.vertexSets, this.flagInternal, this.removeCollinear, this.minimumArea);
                 this.fixCenter();
                 this.physicsEngine.addBody(this);
                 if (this.onInit)
@@ -6663,7 +6730,8 @@ var gd3d;
                 __metadata("design:type", Number)
             ], convexHullBody2d.prototype, "minimumArea", void 0);
             convexHullBody2d = __decorate([
-                gd3d.reflect.node2DComponent
+                gd3d.reflect.node2DComponent,
+                gd3d.reflect.node2DPhysicsBody
             ], convexHullBody2d);
             return convexHullBody2d;
         }(framework.physics2DBody));
@@ -6678,7 +6746,7 @@ var gd3d;
             function physicEngine2D(op) {
                 if (op === void 0) { op = null; }
                 this.eventer = new gd3d.event.Physic2dEvent();
-                this._physicsBodys = [];
+                this._bodysObjMap = {};
                 if (Matter == undefined) {
                     console.error(" Matter not found , create physicEngine2D fail");
                     return;
@@ -6729,7 +6797,7 @@ var gd3d;
             physicEngine2D.prototype.removeEventListener = function (eventEnum, func, thisArg) {
                 this.eventer.RemoveListener(gd3d.event.Physic2dEventEnum[eventEnum], func, thisArg);
             };
-            physicEngine2D.prototype.createRectBodyByInitData = function (pBody) {
+            physicEngine2D.prototype.createRectByPBody = function (pBody) {
                 if (!pBody || !pBody.transform)
                     return;
                 var tran = pBody.transform;
@@ -6738,17 +6806,19 @@ var gd3d;
                 pBody.body = body;
                 return body;
             };
-            physicEngine2D.prototype.createCircleBodyByInitData = function (pBody, radius, maxSides) {
+            physicEngine2D.prototype.createCircleByPBody = function (pBody, maxSides) {
                 if (maxSides === void 0) { maxSides = 25; }
                 if (!pBody || !pBody.transform)
                     return;
                 var tran = pBody.transform;
                 var pos = tran.getWorldTranslate();
-                var body = this.createCircle(pos.x, pos.y, radius, pBody.options, maxSides);
+                var r = tran.width > tran.height ? tran.width : tran.height;
+                r *= 0.5;
+                var body = this.createCircle(pos.x, pos.y, r, pBody.options, maxSides);
                 pBody.body = body;
                 return body;
             };
-            physicEngine2D.prototype.ConvexHullBodyByInitData = function (pBody, vertexSets, flagInternal, removeCollinear, minimumArea) {
+            physicEngine2D.prototype.ConvexHullByPBody = function (pBody, vertexSets, flagInternal, removeCollinear, minimumArea) {
                 if (flagInternal === void 0) { flagInternal = false; }
                 if (removeCollinear === void 0) { removeCollinear = 0.01; }
                 if (minimumArea === void 0) { minimumArea = 10; }
@@ -6757,6 +6827,20 @@ var gd3d;
                 var tran = pBody.transform;
                 var pos = tran.getWorldTranslate();
                 var body = this.createFromVertices(pos.x, pos.y, vertexSets, pBody.options, flagInternal, removeCollinear, minimumArea);
+                pBody.body = body;
+                return body;
+            };
+            physicEngine2D.prototype.createCapsuleByPBody = function (pBody, maxSides) {
+                if (maxSides === void 0) { maxSides = 25; }
+                if (!pBody || !pBody.transform)
+                    return;
+                var tran = pBody.transform;
+                var pos = tran.getWorldTranslate();
+                var y_Axis = tran.height > tran.width;
+                var r = y_Axis ? tran.width : tran.height;
+                var h = y_Axis ? tran.height : tran.width;
+                var angle = y_Axis ? 0 : Math.PI * 0.5;
+                var body = this.createCapsule(pos.x, pos.y, r, h, pBody.options, angle, maxSides);
                 pBody.body = body;
                 return body;
             };
@@ -6781,18 +6865,52 @@ var gd3d;
                 if (minimumArea === void 0) { minimumArea = 10; }
                 return Matter.Bodies.fromVertices(x, y, vertexSets, options, flagInternal, removeCollinear, minimumArea);
             };
+            physicEngine2D.prototype.createCapsule = function (x, y, radius, height, options, rotation, maxSides) {
+                if (rotation === void 0) { rotation = 0; }
+                if (maxSides === void 0) { maxSides = 25; }
+                options = options || {};
+                maxSides = maxSides || 25;
+                var sides = Math.ceil(Math.max(6, Math.min(maxSides, radius)));
+                sides = sides % 2 === 1 ? sides++ : sides;
+                var halfSides = sides / 2, halfDiff = (height - radius) / 2, theta = 2 * Math.PI / sides, path = '', angOffset = Math.PI + theta * 0.5, angle, xx, yy, yOffset;
+                halfDiff = halfDiff < 0 ? 0 : halfDiff;
+                for (var i = 0; i < sides; i++) {
+                    yOffset = i > halfSides ? halfDiff : -halfDiff;
+                    angle = angOffset + (i * theta);
+                    xx = Math.cos(angle) * radius;
+                    yy = Math.sin(angle) * radius + yOffset;
+                    if (i == 0) {
+                        path += 'L ' + xx.toFixed(3) + ' ' + (yy - yOffset * 2).toFixed(3) + ' ';
+                    }
+                    path += 'L ' + xx.toFixed(3) + ' ' + yy.toFixed(3) + ' ';
+                    if (i == halfSides) {
+                        path += 'L ' + xx.toFixed(3) + ' ' + (yy - yOffset * 2).toFixed(3) + ' ';
+                    }
+                }
+                var createCapsule = {
+                    label: 'createCapsule Body',
+                    position: { x: x, y: y },
+                    vertices: Matter.Vertices.fromPath(path)
+                };
+                if (rotation != null || rotation % (Math.PI * 2) == 0) {
+                    Matter.Vertices.rotate(createCapsule.vertices, rotation, { x: x, y: y });
+                }
+                return Matter.Body.create(Matter.Common.extend({}, createCapsule, options));
+            };
             physicEngine2D.prototype.addBody = function (_Pbody) {
-                this._physicsBodys.push(_Pbody);
+                if (!_Pbody)
+                    return;
+                this._bodysObjMap[_Pbody.body.id] = _Pbody;
                 Matter.World.add(this.engineWorld, _Pbody.body);
             };
             physicEngine2D.prototype.removeBody = function (_Pbody) {
                 if (!_Pbody)
                     return;
-                var idx = this._physicsBodys.indexOf(_Pbody);
-                if (idx != -1) {
-                    this._physicsBodys.splice(idx, 1);
-                }
+                delete this._bodysObjMap[_Pbody.body.id];
                 Matter.World.remove(this.engineWorld, _Pbody.body);
+            };
+            physicEngine2D.prototype.getBody = function (bodyId) {
+                return this._bodysObjMap[bodyId];
             };
             physicEngine2D.prototype.clearWorld = function (keepStatic) {
                 if (keepStatic === void 0) { keepStatic = false; }
@@ -6869,7 +6987,7 @@ var gd3d;
             }
             rectBody2d.prototype.start = function () {
                 var data = this.options || {};
-                var body = this.physicsEngine.createRectBodyByInitData(this);
+                var body = this.physicsEngine.createRectByPBody(this);
                 this.physicsEngine.addBody(this);
                 if (this.onInit)
                     this.onInit(this);
@@ -6878,7 +6996,8 @@ var gd3d;
             };
             rectBody2d.ClassName = "rectBody2d";
             rectBody2d = __decorate([
-                gd3d.reflect.node2DComponent
+                gd3d.reflect.node2DComponent,
+                gd3d.reflect.node2DPhysicsBody
             ], rectBody2d);
             return rectBody2d;
         }(framework.physics2DBody));

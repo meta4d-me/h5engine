@@ -10,6 +10,7 @@ namespace gd3d.framework
      * @version gd3d 1.0
      */
     @reflect.node2DComponent
+    @reflect.node2DPhysicsBody
     export class convexHullBody2d extends physics2DBody
     {
         static readonly ClassName:string="convexHullBody2d";
@@ -26,7 +27,7 @@ namespace gd3d.framework
         start() {
             let data = this.options || {};
             let pos = this.transform.localTranslate;
-            let body = this.physicsEngine.ConvexHullBodyByInitData(this,this.vertexSets,this.flagInternal,this.removeCollinear,this.minimumArea);
+            let body = this.physicsEngine.ConvexHullByPBody(this,this.vertexSets,this.flagInternal,this.removeCollinear,this.minimumArea);
             //this.body=physic2D.creatRectBody(this.transform.localTranslate.x,this.transform.localTranslate.y,this.transform.width,this.transform.height,this.beStatic);
             
             this.fixCenter();

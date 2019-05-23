@@ -249,6 +249,12 @@ namespace gd3d {
         /**
          * @private
          */
+        export function node2DPhysicsBody(constructorObj: any) {
+            regType(constructorObj, { "node2dphysicsbody": "1" });
+        }
+        /**
+         * @private
+         */
         export function nodeSphereCollider(constructorObj: any) {
             regType(constructorObj, { "spherecollider": "1" });
         }

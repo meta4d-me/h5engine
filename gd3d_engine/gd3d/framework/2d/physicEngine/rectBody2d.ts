@@ -10,6 +10,7 @@ namespace gd3d.framework
      * @version gd3d 1.0
      */
     @reflect.node2DComponent
+    @reflect.node2DPhysicsBody
     export class rectBody2d extends physics2DBody
     {
         static readonly ClassName:string="rectBody2d";
@@ -17,7 +18,7 @@ namespace gd3d.framework
 
         start() {
             let data = this.options || {};
-            let body = this.physicsEngine.createRectBodyByInitData(this);
+            let body = this.physicsEngine.createRectByPBody(this);
             this.physicsEngine.addBody(this);
             if(this.onInit) this.onInit(this);
         }

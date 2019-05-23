@@ -225,6 +225,7 @@ declare namespace gd3d {
         function nodeLight(constructorObj: any): void;
         function nodeBoxCollider(constructorObj: any): void;
         function nodeBoxCollider2d(constructorObj: any): void;
+        function node2DPhysicsBody(constructorObj: any): void;
         function nodeSphereCollider(constructorObj: any): void;
         function nodeEffectBatcher(constructorObj: any): void;
         function nodeMeshCollider(constructorObj: any): void;
@@ -614,6 +615,7 @@ declare namespace gd3d.framework {
         dispose(): void;
         renderer: IRectRenderer;
         collider: ICollider2d;
+        physicsBody: I2DPhysicsBody;
         components: C2DComponent[];
         private componentsInit;
         private componentplayed;
@@ -1112,10 +1114,20 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class capsuleBody2d extends physics2DBody {
+        static readonly ClassName: string;
+        transform: transform2D;
+        readonly y_Axis: boolean;
+        maxSides: number;
+        start(): void;
+        onPlay(): void;
+    }
+}
+declare namespace gd3d.framework {
     class circleBody2d extends physics2DBody {
         static readonly ClassName: string;
         transform: transform2D;
-        radius: number;
+        readonly radius: number;
         maxSides: number;
         start(): void;
         onPlay(): void;
@@ -1172,18 +1184,21 @@ declare namespace gd3d.framework {
         private collisionEnd;
         addEventListener(eventEnum: event.Physic2dEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         removeEventListener(eventEnum: event.Physic2dEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
-        createRectBodyByInitData(pBody: I2DPhysicsBody): Ibody;
-        createCircleBodyByInitData(pBody: I2DPhysicsBody, radius: number, maxSides?: number): Ibody;
-        ConvexHullBodyByInitData(pBody: I2DPhysicsBody, vertexSets: any, flagInternal?: boolean, removeCollinear?: number, minimumArea?: number): Ibody;
+        createRectByPBody(pBody: I2DPhysicsBody): Ibody;
+        createCircleByPBody(pBody: I2DPhysicsBody, maxSides?: number): Ibody;
+        ConvexHullByPBody(pBody: I2DPhysicsBody, vertexSets: any, flagInternal?: boolean, removeCollinear?: number, minimumArea?: number): Ibody;
+        createCapsuleByPBody(pBody: I2DPhysicsBody, maxSides?: number): any;
         createBody(options: I2dPhyBodyData): Ibody;
         createCircle(x: number, y: number, radius: number, options: I2dPhyBodyData, maxSides: number): Ibody;
         createRectangle(x: number, y: number, width: number, height: number, options: I2dPhyBodyData): Ibody;
         createTrapezoid(x: number, y: number, width: number, height: number, slope: number, options: I2dPhyBodyData): Ibody;
         createPolygon(x: number, y: number, sides: number, radius: number, options: I2dPhyBodyData): Ibody;
         createFromVertices(x: number, y: number, vertexSets: math.Ivec2[], options: I2dPhyBodyData, flagInternal?: boolean, removeCollinear?: number, minimumArea?: number): Ibody;
-        private _physicsBodys;
+        createCapsule(x: number, y: number, radius: number, height: number, options: I2dPhyBodyData, rotation?: number, maxSides?: number): any;
+        private _bodysObjMap;
         addBody(_Pbody: I2DPhysicsBody): void;
         removeBody(_Pbody: I2DPhysicsBody): void;
+        getBody(bodyId: number): I2DPhysicsBody;
         clearWorld(keepStatic?: boolean): void;
         applyForce(body: Ibody, positon: math.Ivec2, force: math.Ivec2): void;
         applyForceAtCenter(body: Ibody, force: math.Ivec2): void;
