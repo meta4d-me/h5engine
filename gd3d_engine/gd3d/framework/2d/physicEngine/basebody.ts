@@ -1,6 +1,8 @@
 namespace gd3d.framework {
     export interface I2DPhysicsBody {
-        /** 物理引擎对象 */
+        /** 初始化完成回调 */
+        onInit : (phy2dBody : I2DPhysicsBody)=>any;
+        /** 引擎对象 */
         physicsEngine: physicEngine2D;
         /** body 选项数据*/
         options: I2dPhyBodyData;
@@ -26,8 +28,20 @@ namespace gd3d.framework {
         setMass(mass: number);
         /**设置位置 */
         setPosition(pos: math.Ivec2);
+        /** 设置成员 */
+        setParts(parts: Ibody[], autoHull:boolean);
+        /** 设置顶点 */
+        setVertices(vertices: math.Ivec2[]);
+        /** 设置惯性值*/
+        setInertia(Inertia: number);
+        /**设置角速度 */
+        setAngularVelocity(velocity: number) ;
         /**是否睡眠 */
         isSleeping(): boolean;
+        /** 是否是传感器*/
+        isSensor():boolean;
+        /**是否是静态 */
+        isStatic():boolean;
     }
     export interface I2dPhyBodyData {
         mass?: number;

@@ -1020,6 +1020,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     interface I2DPhysicsBody {
+        onInit: (phy2dBody: I2DPhysicsBody) => any;
         physicsEngine: physicEngine2D;
         options: I2dPhyBodyData;
         transform: transform2D;
@@ -1033,7 +1034,13 @@ declare namespace gd3d.framework {
         setRestitution(restitution: number): any;
         setMass(mass: number): any;
         setPosition(pos: math.Ivec2): any;
+        setParts(parts: Ibody[], autoHull: boolean): any;
+        setVertices(vertices: math.Ivec2[]): any;
+        setInertia(Inertia: number): any;
+        setAngularVelocity(velocity: number): any;
         isSleeping(): boolean;
+        isSensor(): boolean;
+        isStatic(): boolean;
     }
     interface I2dPhyBodyData {
         mass?: number;
