@@ -473,6 +473,11 @@
 
         pool.delete_vector3(tmpvec3);
     }
+
+    export function quatRotationTo (from: vector3, to: vector3,out: quaternion){
+        rotationTo(from,to,out);
+    }
+
     export function myLookRotation(dir:vector3, out:quaternion,up:vector3=pool.vector3_up)
     {
         if(vec3Equal(dir,pool.vector3_zero))
