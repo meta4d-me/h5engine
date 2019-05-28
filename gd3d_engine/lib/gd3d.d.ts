@@ -4284,6 +4284,7 @@ declare namespace gd3d.math {
     function quatLookRotation(dir: vector3, upwards: vector3, out: quaternion): void;
     function quatYAxis(pos: vector3, targetpos: vector3, out: quaternion): void;
     function rotationTo(from: vector3, to: vector3, out: quaternion): void;
+    function quatRotationTo(from: vector3, to: vector3, out: quaternion): void;
     function myLookRotation(dir: vector3, out: quaternion, up?: vector3): void;
 }
 declare namespace gd3d.math {

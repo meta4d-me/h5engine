@@ -24019,22 +24019,26 @@ var gd3d;
                 quatFromAxisAngle(tmpvec3, 180, out);
             }
             else if (dot > 0.999999) {
-                out[0] = 0;
-                out[1] = 0;
-                out[2] = 0;
-                out[3] = 1;
+                out.rawData[0] = 0;
+                out.rawData[1] = 0;
+                out.rawData[2] = 0;
+                out.rawData[3] = 1;
             }
             else {
                 math.vec3Cross(from, to, tmpvec3);
-                out[0] = tmpvec3[0];
-                out[1] = tmpvec3[1];
-                out[2] = tmpvec3[2];
-                out[3] = 1 + dot;
+                out.rawData[0] = tmpvec3.rawData[0];
+                out.rawData[1] = tmpvec3.rawData[1];
+                out.rawData[2] = tmpvec3.rawData[2];
+                out.rawData[3] = 1 + dot;
                 quatNormalize(out, out);
             }
             math.pool.delete_vector3(tmpvec3);
         }
         math.rotationTo = rotationTo;
+        function quatRotationTo(from, to, out) {
+            rotationTo(from, to, out);
+        }
+        math.quatRotationTo = quatRotationTo;
         function myLookRotation(dir, out, up) {
             if (up === void 0) { up = math.pool.vector3_up; }
             if (math.vec3Equal(dir, math.pool.vector3_zero)) {

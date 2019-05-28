@@ -456,17 +456,17 @@
             vec3Normalize(tmpvec3,tmpvec3);
             quatFromAxisAngle(tmpvec3,180,out);
         } else if (dot > 0.999999) {
-            out[0] = 0;
-            out[1] = 0;
-            out[2] = 0;
-            out[3] = 1;
+            out.rawData[0] = 0;
+            out.rawData[1] = 0;
+            out.rawData[2] = 0;
+            out.rawData[3] = 1;
         } else {
             //vec3.cross(tmpvec3, from, to);
             vec3Cross(from, to,tmpvec3);
-            out[0] = tmpvec3[0];
-            out[1] = tmpvec3[1];
-            out[2] = tmpvec3[2];
-            out[3] = 1 + dot;
+            out.rawData[0] = tmpvec3.rawData[0];
+            out.rawData[1] = tmpvec3.rawData[1];
+            out.rawData[2] = tmpvec3.rawData[2];
+            out.rawData[3] = 1 + dot;
             quatNormalize(out,out);
             //return quat.normalize(out, out);
         }
