@@ -6838,6 +6838,7 @@ var gd3d;
                 var pos = tran.getWorldTranslate();
                 var y_Axis = tran.height > tran.width;
                 var r = y_Axis ? tran.width : tran.height;
+                r *= 0.5;
                 var h = y_Axis ? tran.height : tran.width;
                 var angle = y_Axis ? 0 : Math.PI * 0.5;
                 var body = this.createCapsule(pos.x, pos.y, r, h, pBody.options, angle, maxSides);

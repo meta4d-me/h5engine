@@ -157,6 +157,7 @@ namespace gd3d.framework {
             let pos = tran.getWorldTranslate();
             let y_Axis = tran.height > tran.width ;
             let r = y_Axis ? tran.width : tran.height;
+            r *= 0.5;
             let h = y_Axis ? tran.height : tran.width ;
             let angle = y_Axis ? 0 : Math.PI * 0.5;
             let body = this.createCapsule(pos.x, pos.y, r, h, pBody.options,angle, maxSides);
