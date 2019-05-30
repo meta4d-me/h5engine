@@ -240,6 +240,7 @@ declare namespace gd3d {
         }): (target: any, propertyKey: string, value: any) => void;
         function SerializeType(constructorObj: any): void;
         function Field(valueType: string, defaultValue?: any, referenceType?: string): (target: Object, propertyKey: string) => void;
+        function FieldRef(referenceType: string, defaultValue?: any): (target: Object, propertyKey: string) => void;
         function UIComment(comment: string): (target: Object, propertyKey: string) => void;
         enum FieldUIStyle {
             None = 0,
@@ -2702,7 +2703,7 @@ declare namespace gd3d.framework {
         calcProjectMatrix(asp: number, matrix: gd3d.math.matrix): void;
         private static _shareRay;
         creatRayByScreen(screenpos: gd3d.math.vector2, app: application, shareRayCache?: boolean): ray;
-        calcWorldPosFromScreenPos(app: application, screenPos: math.vector3, outWorldPos: math.vector3): void;
+        calcModelPosFromScreenPos(app: application, screenPos: math.vector3, outModelPos: math.vector3): void;
         calcScreenPosFromWorldPos(app: application, worldPos: math.vector3, outScreenPos: math.vector2): void;
         private lastCamMtx;
         private lastCamRect;
@@ -4284,7 +4285,7 @@ declare namespace gd3d.math {
     function quatLookRotation(dir: vector3, upwards: vector3, out: quaternion): void;
     function quatYAxis(pos: vector3, targetpos: vector3, out: quaternion): void;
     function rotationTo(from: vector3, to: vector3, out: quaternion): void;
-    function quatRotationTo(from: vector3, to: vector3, out: quaternion): void;
+    function quatRotationTo(start: vector3, end: vector3, out: quaternion): void;
     function myLookRotation(dir: vector3, out: quaternion, up?: vector3): void;
 }
 declare namespace gd3d.math {
@@ -4358,6 +4359,7 @@ declare namespace gd3d.math {
     function vec3Equal(vector: vector3, vector2: vector3, threshold?: number): boolean;
     function vec3SetAll(vector: vector3, value: number): void;
     function vec3Set(vector: vector3, x: number, y: number, z: number): void;
+    function vec3Perpendicular(vector: vector3, out: vector3): void;
 }
 declare namespace gd3d.math {
     function vec4Clone(from: vector4, to: vector4): void;

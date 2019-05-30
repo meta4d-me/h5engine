@@ -1163,6 +1163,22 @@ var gd3d;
             };
         }
         reflect.Field = Field;
+        function FieldRef(referenceType, defaultValue) {
+            if (defaultValue === void 0) { defaultValue = undefined; }
+            return function (target, propertyKey) {
+                regField(target, propertyKey, {
+                    "SerializeField": true,
+                    "valueType": "reference",
+                    "referenceType": referenceType
+                });
+                if (defaultValue != null) {
+                    regField(target, propertyKey, {
+                        "defaultValue": defaultValue
+                    });
+                }
+            };
+        }
+        reflect.FieldRef = FieldRef;
         function UIComment(comment) {
             return function (target, propertyKey) {
                 regField(target, propertyKey, {
@@ -15027,8 +15043,8 @@ var gd3d;
                 gd3d.math.vec3Set(src2, screenpos.x, screenpos.y, 1);
                 var dest1 = camera_1.helpv3_2;
                 var dest2 = camera_1.helpv3_3;
-                this.calcWorldPosFromScreenPos(app, src1, dest1);
-                this.calcWorldPosFromScreenPos(app, src2, dest2);
+                this.calcModelPosFromScreenPos(app, src1, dest1);
+                this.calcModelPosFromScreenPos(app, src2, dest2);
                 var dir = camera_1.helpv3_4;
                 gd3d.math.vec3Subtract(dest2, dest1, dir);
                 gd3d.math.vec3Normalize(dir, dir);
@@ -15045,7 +15061,7 @@ var gd3d;
                 }
                 return ray;
             };
-            camera.prototype.calcWorldPosFromScreenPos = function (app, screenPos, outWorldPos) {
+            camera.prototype.calcModelPosFromScreenPos = function (app, screenPos, outModelPos) {
                 var vpp = camera_1.helprect;
                 this.calcViewPortPixel(app, vpp);
                 var vppos = gd3d.poolv2();
@@ -15064,7 +15080,7 @@ var gd3d;
                 src1.x = vppos.x;
                 src1.y = vppos.y;
                 src1.z = screenPos.z;
-                gd3d.math.matrixTransformVector3(src1, matinv, outWorldPos);
+                gd3d.math.matrixTransformVector3(src1, matinv, outModelPos);
                 gd3d.poolv2_del(vppos);
             };
             camera.prototype.calcScreenPosFromWorldPos = function (app, worldPos, outScreenPos) {
@@ -24011,7 +24027,7 @@ var gd3d;
             var xUnitVec3 = math.pool.vector3_right;
             var yUnitVec3 = math.pool.vector3_up;
             var dot = math.vec3Dot(from, to);
-            if (dot < -0.999999) {
+            if (dot < -0.99999847691) {
                 math.vec3Cross(xUnitVec3, from, tmpvec3);
                 if (math.vec3Length(tmpvec3) < 0.000001) {
                     math.vec3Cross(yUnitVec3, from, tmpvec3);
@@ -24019,7 +24035,7 @@ var gd3d;
                 math.vec3Normalize(tmpvec3, tmpvec3);
                 quatFromAxisAngle(tmpvec3, 180, out);
             }
-            else if (dot > 0.999999) {
+            else if (dot > 0.99999847691) {
                 out.rawData[0] = 0;
                 out.rawData[1] = 0;
                 out.rawData[2] = 0;
@@ -24036,8 +24052,32 @@ var gd3d;
             math.pool.delete_vector3(tmpvec3);
         }
         math.rotationTo = rotationTo;
-        function quatRotationTo(from, to, out) {
-            rotationTo(from, to, out);
+        function quatRotationTo(start, end, out) {
+            math.vec3Normalize(start, start);
+            math.vec3Normalize(end, end);
+            var dot = math.vec3Dot(start, end);
+            if (dot >= 0.99999847691) {
+                quatIdentity(out);
+                return;
+            }
+            if (dot <= -0.99999847691) {
+                var pVec = math.pool.new_vector3();
+                math.vec3Perpendicular(start, pVec);
+                out.w = 0;
+                out.x = pVec.x;
+                out.y = pVec.y;
+                out.z = pVec.z;
+                math.pool.delete_vector3(pVec);
+                return;
+            }
+            var cross_product = math.pool.new_vector3();
+            math.vec3Cross(start, end, cross_product);
+            out.w = 1;
+            out.x = cross_product.x;
+            out.y = cross_product.y;
+            out.z = cross_product.z;
+            quatNormalize(out, out);
+            math.pool.delete_vector3(cross_product);
         }
         math.quatRotationTo = quatRotationTo;
         function myLookRotation(dir, out, up) {
@@ -24529,6 +24569,14 @@ var gd3d;
             vector.rawData[2] = z;
         }
         math.vec3Set = vec3Set;
+        function vec3Perpendicular(vector, out) {
+            gd3d.math.vec3Cross(math.pool.vector3_right, vector, out);
+            var dot = gd3d.math.vec3Dot(out, out);
+            if (dot < 0.05) {
+                gd3d.math.vec3Cross(math.pool.vector3_up, vector, out);
+            }
+        }
+        math.vec3Perpendicular = vec3Perpendicular;
     })(math = gd3d.math || (gd3d.math = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

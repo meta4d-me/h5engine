@@ -443,7 +443,7 @@
 
         //var dot = vec3.dot(from, to);
         let dot=vec3Dot(from,to);
-        if (dot < -0.999999) {
+        if (dot < -0.99999847691) {
             //vec3.cross(tmpvec3, xUnitVec3, from);
             vec3Cross(xUnitVec3,from,tmpvec3);
             if (vec3Length(tmpvec3) < 0.000001)
@@ -455,7 +455,7 @@
             // quat.AxisAngle(tmpvec3, Math.PI,out);
             vec3Normalize(tmpvec3,tmpvec3);
             quatFromAxisAngle(tmpvec3,180,out);
-        } else if (dot > 0.999999) {
+        } else if (dot > 0.99999847691) {
             out.rawData[0] = 0;
             out.rawData[1] = 0;
             out.rawData[2] = 0;
@@ -474,8 +474,37 @@
         pool.delete_vector3(tmpvec3);
     }
 
-    export function quatRotationTo (from: vector3, to: vector3,out: quaternion){
-        rotationTo(from,to,out);
+    /** 计算 从 start 到 end 旋转的四元数 */
+    export function quatRotationTo (start: vector3, end: vector3,out: quaternion){
+        vec3Normalize(start,start);
+        vec3Normalize(end,end);
+        let dot=vec3Dot(start,end);
+
+        if (dot >= 0.99999847691) {
+            quatIdentity(out);
+            return;
+          }
+
+        if (dot <= -0.99999847691) {
+            var pVec = pool.new_vector3();
+            vec3Perpendicular(start,pVec);
+            out.w = 0;
+            out.x = pVec.x;
+            out.y = pVec.y;
+            out.z = pVec.z;
+            pool.delete_vector3(pVec);
+            return;
+        }
+
+        var cross_product = pool.new_vector3();
+        vec3Cross(start,end,cross_product);
+        out.w = 1;
+        out.x = cross_product.x;
+        out.y = cross_product.y;
+        out.z = cross_product.z;
+        quatNormalize(out,out);
+
+        pool.delete_vector3(cross_product);
     }
 
     export function myLookRotation(dir:vector3, out:quaternion,up:vector3=pool.vector3_up)

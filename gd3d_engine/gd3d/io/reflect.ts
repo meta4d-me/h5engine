@@ -367,6 +367,27 @@ namespace gd3d {
         }
 
         /**
+         * Field的引用类型(修饰后，改字段将在 Inspector 中暴露 , 该函数是Field() 的封装 )
+         * @param referenceType reference指定类型 支持:"transform"、"transform2D"、@reflect.node2DComponent、@reflect.nodeComponent
+         * @param defaultValue 默认值
+         */
+        export function FieldRef(referenceType: string , defaultValue: any = undefined){
+            return function (target: Object, propertyKey: string) {
+                regField(target, propertyKey, {
+                    "SerializeField": true,
+                    "valueType": "reference",
+                    "referenceType": referenceType
+                });
+                
+                if(defaultValue != null) {
+                    regField(target, propertyKey, {
+                        "defaultValue": defaultValue
+                    });
+                }
+            }
+        }
+
+        /**
          * @public
          * @language zh_CN
          * @classdesc
