@@ -196,13 +196,12 @@
         angle *= Math.PI / 180.0;
         var halfAngle: number = angle * 0.5;
         var sin_a: number = Math.sin(halfAngle);
-
+        vec3Normalize(axis,axis);
         out.w = Math.cos(halfAngle);
         out.x = axis.x * sin_a;
         out.y = axis.y * sin_a;
         out.z = axis.z * sin_a;
-
-        math.quatNormalize(out, out);
+        // math.quatNormalize(out, out);
     }
 
     export function quatToAxisAngle(src: quaternion, axis: vector3): number {
@@ -435,45 +434,6 @@
         pool.delete_vector3(dirxz);
     }
 
-    export function rotationTo(from: vector3, to: vector3,out: quaternion)
-    {
-        var tmpvec3 =pool.new_vector3();
-        var xUnitVec3 = pool.vector3_right;
-        var yUnitVec3 = pool.vector3_up;
-
-        //var dot = vec3.dot(from, to);
-        let dot=vec3Dot(from,to);
-        if (dot < -0.99999847691) {
-            //vec3.cross(tmpvec3, xUnitVec3, from);
-            vec3Cross(xUnitVec3,from,tmpvec3);
-            if (vec3Length(tmpvec3) < 0.000001)
-            {
-                //vec3.cross(tmpvec3, yUnitVec3, from);
-                vec3Cross(yUnitVec3,from,tmpvec3);
-            }
-            // vec3.normalize(tmpvec3, tmpvec3);
-            // quat.AxisAngle(tmpvec3, Math.PI,out);
-            vec3Normalize(tmpvec3,tmpvec3);
-            quatFromAxisAngle(tmpvec3,180,out);
-        } else if (dot > 0.99999847691) {
-            out.rawData[0] = 0;
-            out.rawData[1] = 0;
-            out.rawData[2] = 0;
-            out.rawData[3] = 1;
-        } else {
-            //vec3.cross(tmpvec3, from, to);
-            vec3Cross(from, to,tmpvec3);
-            out.rawData[0] = tmpvec3.rawData[0];
-            out.rawData[1] = tmpvec3.rawData[1];
-            out.rawData[2] = tmpvec3.rawData[2];
-            out.rawData[3] = 1 + dot;
-            quatNormalize(out,out);
-            //return quat.normalize(out, out);
-        }
-
-        pool.delete_vector3(tmpvec3);
-    }
-
     /** 计算 从 start 到 end 旋转的四元数 */
     export function quatRotationTo (start: vector3, end: vector3,out: quaternion){
         vec3Normalize(start,start);
@@ -498,7 +458,7 @@
 
         var cross_product = pool.new_vector3();
         vec3Cross(start,end,cross_product);
-        out.w = 1;
+        out.w = 1 + dot;
         out.x = cross_product.x;
         out.y = cross_product.y;
         out.z = cross_product.z;
@@ -521,9 +481,9 @@
             vec3ScaleByNum(up,vec3Dot(up,dir),tempv);
             vec3Subtract(dir,tempv,tempv);
             let qu=pool.new_quaternion();
-            this.rotationTo(pool.vector3_forward,tempv,qu);
+            this.quatRotationTo(pool.vector3_forward,tempv,qu);
             let qu2=pool.new_quaternion();
-            this.rotationTo(tempv,dir,qu2);
+            this.quatRotationTo(tempv,dir,qu2);
             quatMultiply(qu,qu2,out);
 
             pool.delete_quaternion(qu);
@@ -531,7 +491,7 @@
             pool.delete_vector3(tempv);
         }
         else {
-            this.rotationTo(pool.vector3_forward,dir,out);
+            this.quatRotationTo(pool.vector3_forward,dir,out);
         }
     }
 }

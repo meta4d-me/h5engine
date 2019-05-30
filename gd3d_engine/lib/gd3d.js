@@ -23828,11 +23828,11 @@ var gd3d;
             angle *= Math.PI / 180.0;
             var halfAngle = angle * 0.5;
             var sin_a = Math.sin(halfAngle);
+            math.vec3Normalize(axis, axis);
             out.w = Math.cos(halfAngle);
             out.x = axis.x * sin_a;
             out.y = axis.y * sin_a;
             out.z = axis.z * sin_a;
-            math.quatNormalize(out, out);
         }
         math.quatFromAxisAngle = quatFromAxisAngle;
         function quatToAxisAngle(src, axis) {
@@ -24022,36 +24022,6 @@ var gd3d;
             math.pool.delete_vector3(dirxz);
         }
         math.quatYAxis = quatYAxis;
-        function rotationTo(from, to, out) {
-            var tmpvec3 = math.pool.new_vector3();
-            var xUnitVec3 = math.pool.vector3_right;
-            var yUnitVec3 = math.pool.vector3_up;
-            var dot = math.vec3Dot(from, to);
-            if (dot < -0.99999847691) {
-                math.vec3Cross(xUnitVec3, from, tmpvec3);
-                if (math.vec3Length(tmpvec3) < 0.000001) {
-                    math.vec3Cross(yUnitVec3, from, tmpvec3);
-                }
-                math.vec3Normalize(tmpvec3, tmpvec3);
-                quatFromAxisAngle(tmpvec3, 180, out);
-            }
-            else if (dot > 0.99999847691) {
-                out.rawData[0] = 0;
-                out.rawData[1] = 0;
-                out.rawData[2] = 0;
-                out.rawData[3] = 1;
-            }
-            else {
-                math.vec3Cross(from, to, tmpvec3);
-                out.rawData[0] = tmpvec3.rawData[0];
-                out.rawData[1] = tmpvec3.rawData[1];
-                out.rawData[2] = tmpvec3.rawData[2];
-                out.rawData[3] = 1 + dot;
-                quatNormalize(out, out);
-            }
-            math.pool.delete_vector3(tmpvec3);
-        }
-        math.rotationTo = rotationTo;
         function quatRotationTo(start, end, out) {
             math.vec3Normalize(start, start);
             math.vec3Normalize(end, end);
@@ -24072,7 +24042,7 @@ var gd3d;
             }
             var cross_product = math.pool.new_vector3();
             math.vec3Cross(start, end, cross_product);
-            out.w = 1;
+            out.w = 1 + dot;
             out.x = cross_product.x;
             out.y = cross_product.y;
             out.z = cross_product.z;
@@ -24092,16 +24062,16 @@ var gd3d;
                 math.vec3ScaleByNum(up, math.vec3Dot(up, dir), tempv);
                 math.vec3Subtract(dir, tempv, tempv);
                 var qu = math.pool.new_quaternion();
-                this.rotationTo(math.pool.vector3_forward, tempv, qu);
+                this.quatRotationTo(math.pool.vector3_forward, tempv, qu);
                 var qu2 = math.pool.new_quaternion();
-                this.rotationTo(tempv, dir, qu2);
+                this.quatRotationTo(tempv, dir, qu2);
                 quatMultiply(qu, qu2, out);
                 math.pool.delete_quaternion(qu);
                 math.pool.delete_quaternion(qu2);
                 math.pool.delete_vector3(tempv);
             }
             else {
-                this.rotationTo(math.pool.vector3_forward, dir, out);
+                this.quatRotationTo(math.pool.vector3_forward, dir, out);
             }
         }
         math.myLookRotation = myLookRotation;
