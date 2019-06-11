@@ -735,13 +735,13 @@ namespace gd3d.framework
             //physic=new PhysicsEngine(new math.vector3(0,-9.8,0),new OimoJSPlugin());
         }
 
-        enable2DPhysics(gravity: math.vector2)
+        enable2DPhysics(gravity: math.vector2 , physicOption : IEngine2DOP = null)
         {
             if(physics2D){
                 return true;
             }
             try{
-                physics2D = new physicEngine2D();
+                physics2D = new physicEngine2D(physicOption);
                 physics2D.setGravity(gravity.x , gravity.y);
                 return true;
             }catch(e){

@@ -32564,12 +32564,13 @@ var gd3d;
                     return false;
                 }
             };
-            scene.prototype.enable2DPhysics = function (gravity) {
+            scene.prototype.enable2DPhysics = function (gravity, physicOption) {
+                if (physicOption === void 0) { physicOption = null; }
                 if (framework.physics2D) {
                     return true;
                 }
                 try {
-                    framework.physics2D = new framework.physicEngine2D();
+                    framework.physics2D = new framework.physicEngine2D(physicOption);
                     framework.physics2D.setGravity(gravity.x, gravity.y);
                     return true;
                 }

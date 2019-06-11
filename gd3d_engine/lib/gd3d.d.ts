@@ -1171,10 +1171,15 @@ declare namespace gd3d.framework {
         timestamp?: number;
     }
     interface IEngine2DOP {
-        constraintIterations?: number;
-        timing?: Itiming;
+        positionIterations?: number;
         velocityIterations?: number;
+        constraintIterations?: number;
         enableSleeping?: boolean;
+        timing?: Itiming;
+        broadphase?: {
+            bucketWidth: number;
+            bucketHeight: number;
+        };
     }
     class physicEngine2D {
         private _Matter;
@@ -6021,7 +6026,7 @@ declare namespace gd3d.framework {
         private pickMesh;
         private pickCollider;
         enablePhysics(gravity: math.vector3, plugin?: IPhysicsEnginePlugin): boolean;
-        enable2DPhysics(gravity: math.vector2): boolean;
+        enable2DPhysics(gravity: math.vector2, physicOption?: IEngine2DOP): boolean;
     }
 }
 declare namespace gd3d.framework {

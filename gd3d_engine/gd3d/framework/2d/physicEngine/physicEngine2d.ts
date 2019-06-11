@@ -3,14 +3,23 @@ namespace gd3d.framework {
     //export declare let physic2D: physicEngine2D;
 
     export interface Itiming {
-        timeScale?: number;
+        /** 默认值 ： 0 */
+        timeScale?: number;  
+        /** 默认值 ： 1  */
         timestamp?: number;
     }
     export interface IEngine2DOP {
+        /** 默认值 ： 6 */
+        positionIterations?:number;
+        /** 默认值 ： 4 */
+        velocityIterations?:number;
+        /** 默认值 ： 2  */
         constraintIterations?: number;
-        timing?: Itiming;
-        velocityIterations?: number;
-        enableSleeping?: boolean;
+        /** 默认值 : fales */
+        enableSleeping?:boolean;
+        timing?: Itiming; 
+        /** 默认值 : {bucketWidth: 48, bucketHeight: 48} */
+        broadphase? : {bucketWidth:number,bucketHeight:number};  
     }
     declare var Matter: any;
     export class physicEngine2D {
