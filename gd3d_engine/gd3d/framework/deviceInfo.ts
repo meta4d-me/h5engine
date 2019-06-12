@@ -134,53 +134,39 @@ namespace gd3d.framework
             this.rootdiv=div;
             sceneMgr.app.container.appendChild(div);
             div.style.display="inline-block";
+            div.style.background = "#00000085";
             div.style.position="absolute";
             div.style.left = "100px";
             div.style.top = "0px";
-            div.style.height="200px";
-            div.style.width = "200px";
+            div.style.height="60px";
+            div.style.width = "170px";
     
-            let ul = document.createElement("ul");
-            div.appendChild(ul);
             let li1 = document.createElement("li");
             li1.textContent="SkinMeshDrawcall: ";
-            li1.style.fontSize="12px";
-            li1.style.color="Aqua";
-            li1.style.height="20px";
-            li1.style.width="200px";
-            li1.style.left="0px";
-            ul.appendChild(li1);
             this.SKinrenderDraw=li1;
     
             let li3 = document.createElement("li");
             li3.textContent="MeshrenderDrawcall: ";
-            li3.style.fontSize="12px";
-            li3.style.color="Aqua";
-            li3.style.height="20px";
-            li3.style.width="200px";
-            li3.style.left="0px";
-            ul.appendChild(li3);
             this.MeshrenderDraw=li3;
     
             let li2 = document.createElement("li");
             li2.textContent="EffectrenderDrawcall: ";
-            li2.style.fontSize="12px";
-            li2.style.color="Aqua";
-            li2.style.height="20px";
-            li2.style.width="200px";
-            li2.style.left="0px";
-            ul.appendChild(li2);
             this.EffectrenderDraw=li2;
 
             let li4 = document.createElement("li");
-            li4.textContent="EffectrenderDrawcall: ";
-            li4.style.fontSize="12px";
-            li4.style.color="Aqua";
-            li4.style.height="20px";
-            li4.style.width="200px";
-            li4.style.left="0px";
-            ul.appendChild(li4);
+            li4.textContent="UIrenderDrawcall: ";
             this.UIrenderDraw=li4;
+
+            let list = [li1,li3,li2,li4];
+            for(var i=0;i < list.length ;i++){
+                let li = list[i];
+                li.style.fontSize="10px";
+                li.style.color="Aqua";
+                li.style.height="12px";
+                li.style.width="170px";
+                li.style.left="0px";
+                div.appendChild(li);
+            }
 
         }
 
