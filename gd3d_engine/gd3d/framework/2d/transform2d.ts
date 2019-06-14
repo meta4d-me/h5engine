@@ -152,9 +152,9 @@ namespace gd3d.framework {
         }
         get canvas(): canvas {
             if (this._canvas == null) {
-                if (this.parent == null)
+                if (this._parent == null)
                     return null;
-                return this.parent.canvas;
+                return this._parent.canvas;
             }
             return this._canvas;
         }
@@ -206,7 +206,10 @@ namespace gd3d.framework {
          * 当前2d节点的父亲节点
          * @version egret-gd3d 1.0
          */
-        parent: transform2D;
+        private _parent: transform2D;
+        get parent(){
+            return this._parent;
+        }
 
         /**
          * @public
@@ -216,7 +219,23 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("transform2D[]")
-        children: transform2D[] = [];
+        get children(){
+            return this._children;
+        }
+        set children(children:transform2D[]){
+            this._children = children;
+        }
+        private _children: transform2D[] = [];
+
+        // private _children: transform[] = [];
+        // /**
+        //  * @public
+        //  * @language zh_CN
+        //  * @classdesc
+        //  * 子物体列表
+        //  * @version egret-gd3d 1.0
+        //  */
+        // @gd3d.reflect.Field("transform[]")
 
         /**
          * @public
@@ -271,7 +290,7 @@ namespace gd3d.framework {
         get visibleInScene() {
             let obj: transform2D = this;
             while (obj.visible) {
-                obj = obj.parent;
+                obj = obj._parent;
             }
             return obj.visible;
         }
@@ -373,16 +392,16 @@ namespace gd3d.framework {
         set isMask(b: boolean) {
             this._isMask = b;
             this.markDirty();
-            if (this.parent != null)
+            if (this._parent != null)
                 this.updateTran(true);
         }
 
         private updateMaskRect() {
             let rect_x; let rect_y; let rect_w; let rect_h;
             let ParentRect;
-            if (this.parent != null) {
-                this._parentIsMask = this.parent.isMask || this.parent.parentIsMask;
-                ParentRect = this.parent.maskRect;
+            if (this._parent != null) {
+                this._parentIsMask = this._parent.isMask || this._parent.parentIsMask;
+                ParentRect = this._parent.maskRect;
             } else
                 this._parentIsMask = false;
             if (this.isMask || this.parentIsMask) {
@@ -455,7 +474,7 @@ namespace gd3d.framework {
             // node.canvas = this.canvas;
             // sceneMgr.app.markNotify(node, NotifyType.AddChild);
             // this.markDirty();
-            this.addChildAt(node,this.children.length);
+            this.addChildAt(node,this._children.length);
         }
 
         /**
@@ -471,16 +490,16 @@ namespace gd3d.framework {
             if (index < 0 || !node ){
                 return;
             }
-            if (node.parent != null) {
-                node.parent.removeChild(node);
+            if (node._parent != null) {
+                node._parent.removeChild(node);
             }
-            if (this.children == null)
-                this.children = [];
+            if (this._children == null)
+                this._children = [];
 
-            this.children.splice(index, 0, node);
+            this._children.splice(index, 0, node);
 
             node.canvas = this.canvas;
-            node.parent = this;
+            node._parent = this;
             transform2D._transform2DMap[node.insId.getInsID()] = node;
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
             this.markDirty();
@@ -499,13 +518,13 @@ namespace gd3d.framework {
                 console.warn(`target is null`);
                 return;
             }
-            if (node.parent != this || this.children == null) {
+            if (node._parent != this || this._children == null) {
                 throw new Error("not my child.");
             }
-            var i = this.children.indexOf(node);
+            var i = this._children.indexOf(node);
             if(i < 0 ) return;
-            this.children.splice(i, 1);
-            node.parent = null;
+            this._children.splice(i, 1);
+            node._parent = null;
             delete transform2D._transform2DMap[node.insId.getInsID()];
             sceneMgr.app.markNotify(node, NotifyType.RemoveChild);
         }
@@ -518,8 +537,8 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         removeAllChild() {
-            while (this.children.length > 0) {
-                this.removeChild(this.children[0]);
+            while (this._children.length > 0) {
+                this.removeChild(this._children[0]);
             }
         }
 
@@ -532,10 +551,10 @@ namespace gd3d.framework {
          */
         markDirty() {
             this.dirty = true;
-            var p = this.parent;
+            var p = this._parent;
             while (p != null) {
                 p.dirtyChild = true;
-                p = p.parent;
+                p = p._parent;
             }
         }
 
@@ -571,9 +590,9 @@ namespace gd3d.framework {
                 }
             }
 
-            if (this.children != null) {
-                for (var i = 0; i < this.children.length; i++) {
-                    this.children[i].updateTran(parentChange || this.dirty);
+            if (this._children != null) {
+                for (var i = 0; i < this._children.length; i++) {
+                    this._children[i].updateTran(parentChange || this.dirty);
                 }
             }
             this.dirty = false;
@@ -589,13 +608,13 @@ namespace gd3d.framework {
          */
         updateWorldTran() {
             //parent 找到顶，第一个dirty的
-            var p = this.parent;
+            var p = this._parent;
             var dirtylist: transform2D[] = [];
             dirtylist.push(this);
             while (p != null) {
                 if (p.dirty)
                     dirtylist.push(p);
-                p = p.parent;
+                p = p._parent;
             }
             var top = dirtylist.pop();
             top.updateTran(false);
@@ -756,8 +775,8 @@ namespace gd3d.framework {
             dir.y = pos.y - thispos.y;
 
             var pworld = math.pool.new_matrix3x2();
-            if (this.parent != null) {
-                math.matrix3x2Clone(this.parent.worldMatrix, pworld);
+            if (this._parent != null) {
+                math.matrix3x2Clone(this._parent.worldMatrix, pworld);
             }
             else {
                 math.matrix3x2MakeIdentity(pworld);
@@ -780,17 +799,38 @@ namespace gd3d.framework {
          * @public
          * @language zh_CN
          * @classdesc
+         * 获取当前transform是否被释放掉了
+         * @version egret-gd3d 1.0
+         */
+        get beDispose():boolean
+        {
+            return this._beDispose;
+        }
+        private _beDispose:boolean = false;//是否被释放了
+
+        public onDispose:()=>void;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * 释放当前节点，包括其子节点
          * @version egret-gd3d 1.0
          */
         dispose() {
-            if (this.children) {
-                for (var k in this.children) {
-                    this.children[k].dispose();
+            if(this._beDispose)  return;
+            if(this._parent)    this._parent.removeChild(this);
+            if (this._children) {
+                for (var k in this._children) {
+                    this._children[k].dispose();
                 }
                 this.removeAllChild();
             }
             this.removeAllComponents();
+
+            this._beDispose = true;
+            if(this.onDispose)
+                this.onDispose();
         }
 
         /**
@@ -984,8 +1024,10 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         removeAllComponents() {
-            for (var i = 0; i < this.components.length; i++) {
+            let len = this.components.length;
+            for (var i = 0; i < len; i++) {
                 this.components[i].comp.remove();
+                this.components[i].comp.transform = null;
             }
             if (this.renderer) this.renderer = null;
             if (this.collider) this.collider = null;
@@ -1055,9 +1097,9 @@ namespace gd3d.framework {
                     comps.push(node.components[i].comp);
                 }
             }
-            if (node.children != null) {
-                for (var i in node.children) {
-                    this.getNodeCompoents(node.children[i], _type, comps);
+            if (node._children != null) {
+                for (var i in node._children) {
+                    this.getNodeCompoents(node._children[i], _type, comps);
                 }
             }
         }
@@ -1240,7 +1282,7 @@ namespace gd3d.framework {
         private lastPivot = new math.vector2(0, 0);
 
         private refreshLayout() {
-            let parent = this.parent;
+            let parent = this._parent;
             if (!parent) return;
             if (this.width != this.lastWidth || this.height != this.lastHeight || parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
                 || parent.pivot.y != this.lastParentPivot.y || this.pivot.x != this.lastPivot.x || this.pivot.y != this.lastPivot.y)
@@ -1295,17 +1337,17 @@ namespace gd3d.framework {
 
             let value = 0;
             if (this._layoutPercentState & option) {
-                if (this.parent) {
+                if (this._parent) {
                     switch (option) {
                         case layoutOption.LEFT:
                         case layoutOption.H_CENTER:
                         case layoutOption.RIGHT:
-                            value = this.parent.width * this.layoutValueMap[option] / 100;
+                            value = this._parent.width * this.layoutValueMap[option] / 100;
                             break;
                         case layoutOption.TOP:
                         case layoutOption.V_CENTER:
                         case layoutOption.BOTTOM:
-                            value = this.parent.height * this.layoutValueMap[option] / 100;
+                            value = this._parent.height * this.layoutValueMap[option] / 100;
                             break;
                     }
                 }
@@ -1324,13 +1366,13 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         setSiblingIndex(siblingIndex:number){
-            let p = this.transform.parent;
-            if(!p || !p.children || siblingIndex >= p.children.length || isNaN(siblingIndex) || siblingIndex < 0 ) return;
-            let currIdx = p.children.indexOf(this);
+            let p = this._parent;
+            if(!p || !p._children || siblingIndex >= p._children.length || isNaN(siblingIndex) || siblingIndex < 0 ) return;
+            let currIdx = p._children.indexOf(this);
             if(currIdx == -1 || currIdx == siblingIndex)   return;
-            p.children.splice(currIdx,1);
+            p._children.splice(currIdx,1);
             let useidx = siblingIndex > currIdx ? siblingIndex - 1 : siblingIndex;
-            p.children.splice(useidx,0,this); //insert to target pos
+            p._children.splice(useidx,0,this); //insert to target pos
         }
 
         /**
@@ -1341,10 +1383,10 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         getSiblingIndex():number{
-            let p = this.transform.parent;
-            if(!p || !p.children)  return -1;
-            if(p.children.length < 1)   return 0;
-            return p.children.indexOf(this);
+            let p = this._parent;
+            if(!p || !p._children)  return -1;
+            if(p._children.length < 1)   return 0;
+            return p._children.indexOf(this);
         }
 
         /**

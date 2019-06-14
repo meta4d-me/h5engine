@@ -2137,12 +2137,14 @@ var gd3d;
                 }
             };
             canvas.prototype.objupdate = function (node, delta) {
-                if (!node.visible)
+                if (!node || !node.visible)
                     return;
                 node.init(this.scene.app.bePlay);
                 var compLen = node.components.length;
                 if (compLen > 0) {
                     for (var i = 0; i < compLen; i++) {
+                        if (!node.components[i])
+                            continue;
                         var comp = node.components[i].comp;
                         comp.update(delta);
                         if (framework.instanceOfI2DPointListener(comp)) {
@@ -2853,7 +2855,7 @@ var gd3d;
                 this.tag = framework.StringUtil.builtinTag_Untagged;
                 this.name = "noname";
                 this.isStatic = false;
-                this.children = [];
+                this._children = [];
                 this.width = 0;
                 this.height = 0;
                 this.pivot = new gd3d.math.vector2(0, 0);
@@ -2874,6 +2876,7 @@ var gd3d;
                 this.worldRotate = new gd3d.math.angelref();
                 this.worldTranslate = new gd3d.math.vector2(0, 0);
                 this.worldScale = new gd3d.math.vector2(1, 1);
+                this._beDispose = false;
                 this.components = [];
                 this.componentsInit = [];
                 this.componentplayed = [];
@@ -2896,9 +2899,9 @@ var gd3d;
             Object.defineProperty(transform2D.prototype, "canvas", {
                 get: function () {
                     if (this._canvas == null) {
-                        if (this.parent == null)
+                        if (this._parent == null)
                             return null;
-                        return this.parent.canvas;
+                        return this._parent.canvas;
                     }
                     return this._canvas;
                 },
@@ -2910,11 +2913,28 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(transform2D.prototype, "parent", {
+                get: function () {
+                    return this._parent;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(transform2D.prototype, "children", {
+                get: function () {
+                    return this._children;
+                },
+                set: function (children) {
+                    this._children = children;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(transform2D.prototype, "visibleInScene", {
                 get: function () {
                     var obj = this;
                     while (obj.visible) {
-                        obj = obj.parent;
+                        obj = obj._parent;
                     }
                     return obj.visible;
                 },
@@ -2964,7 +2984,7 @@ var gd3d;
                 set: function (b) {
                     this._isMask = b;
                     this.markDirty();
-                    if (this.parent != null)
+                    if (this._parent != null)
                         this.updateTran(true);
                 },
                 enumerable: true,
@@ -2976,9 +2996,9 @@ var gd3d;
                 var rect_w;
                 var rect_h;
                 var ParentRect;
-                if (this.parent != null) {
-                    this._parentIsMask = this.parent.isMask || this.parent.parentIsMask;
-                    ParentRect = this.parent.maskRect;
+                if (this._parent != null) {
+                    this._parentIsMask = this._parent.isMask || this._parent.parentIsMask;
+                    ParentRect = this._parent.maskRect;
                 }
                 else
                     this._parentIsMask = false;
@@ -3026,20 +3046,20 @@ var gd3d;
                 configurable: true
             });
             transform2D.prototype.addChild = function (node) {
-                this.addChildAt(node, this.children.length);
+                this.addChildAt(node, this._children.length);
             };
             transform2D.prototype.addChildAt = function (node, index) {
                 if (index < 0 || !node) {
                     return;
                 }
-                if (node.parent != null) {
-                    node.parent.removeChild(node);
+                if (node._parent != null) {
+                    node._parent.removeChild(node);
                 }
-                if (this.children == null)
-                    this.children = [];
-                this.children.splice(index, 0, node);
+                if (this._children == null)
+                    this._children = [];
+                this._children.splice(index, 0, node);
                 node.canvas = this.canvas;
-                node.parent = this;
+                node._parent = this;
                 transform2D_1._transform2DMap[node.insId.getInsID()] = node;
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
                 this.markDirty();
@@ -3049,28 +3069,28 @@ var gd3d;
                     console.warn("target is null");
                     return;
                 }
-                if (node.parent != this || this.children == null) {
+                if (node._parent != this || this._children == null) {
                     throw new Error("not my child.");
                 }
-                var i = this.children.indexOf(node);
+                var i = this._children.indexOf(node);
                 if (i < 0)
                     return;
-                this.children.splice(i, 1);
-                node.parent = null;
+                this._children.splice(i, 1);
+                node._parent = null;
                 delete transform2D_1._transform2DMap[node.insId.getInsID()];
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
             };
             transform2D.prototype.removeAllChild = function () {
-                while (this.children.length > 0) {
-                    this.removeChild(this.children[0]);
+                while (this._children.length > 0) {
+                    this.removeChild(this._children[0]);
                 }
             };
             transform2D.prototype.markDirty = function () {
                 this.dirty = true;
-                var p = this.parent;
+                var p = this._parent;
                 while (p != null) {
                     p.dirtyChild = true;
-                    p = p.parent;
+                    p = p._parent;
                 }
             };
             transform2D.prototype.updateTran = function (parentChange) {
@@ -3093,22 +3113,22 @@ var gd3d;
                         this.renderer.updateTran();
                     }
                 }
-                if (this.children != null) {
-                    for (var i = 0; i < this.children.length; i++) {
-                        this.children[i].updateTran(parentChange || this.dirty);
+                if (this._children != null) {
+                    for (var i = 0; i < this._children.length; i++) {
+                        this._children[i].updateTran(parentChange || this.dirty);
                     }
                 }
                 this.dirty = false;
                 this.dirtyChild = false;
             };
             transform2D.prototype.updateWorldTran = function () {
-                var p = this.parent;
+                var p = this._parent;
                 var dirtylist = [];
                 dirtylist.push(this);
                 while (p != null) {
                     if (p.dirty)
                         dirtylist.push(p);
-                    p = p.parent;
+                    p = p._parent;
                 }
                 var top = dirtylist.pop();
                 top.updateTran(false);
@@ -3185,8 +3205,8 @@ var gd3d;
                 dir.x = pos.x - thispos.x;
                 dir.y = pos.y - thispos.y;
                 var pworld = gd3d.math.pool.new_matrix3x2();
-                if (this.parent != null) {
-                    gd3d.math.matrix3x2Clone(this.parent.worldMatrix, pworld);
+                if (this._parent != null) {
+                    gd3d.math.matrix3x2Clone(this._parent.worldMatrix, pworld);
                 }
                 else {
                     gd3d.math.matrix3x2MakeIdentity(pworld);
@@ -3201,14 +3221,28 @@ var gd3d;
                 gd3d.math.pool.delete_vector2(dir);
                 gd3d.math.pool.delete_vector2(dirinv);
             };
+            Object.defineProperty(transform2D.prototype, "beDispose", {
+                get: function () {
+                    return this._beDispose;
+                },
+                enumerable: true,
+                configurable: true
+            });
             transform2D.prototype.dispose = function () {
-                if (this.children) {
-                    for (var k in this.children) {
-                        this.children[k].dispose();
+                if (this._beDispose)
+                    return;
+                if (this._parent)
+                    this._parent.removeChild(this);
+                if (this._children) {
+                    for (var k in this._children) {
+                        this._children[k].dispose();
                     }
                     this.removeAllChild();
                 }
                 this.removeAllComponents();
+                this._beDispose = true;
+                if (this.onDispose)
+                    this.onDispose();
             };
             transform2D.prototype.init = function (bePlayed) {
                 if (bePlayed === void 0) { bePlayed = false; }
@@ -3309,8 +3343,10 @@ var gd3d;
                 }
             };
             transform2D.prototype.removeAllComponents = function () {
-                for (var i = 0; i < this.components.length; i++) {
+                var len = this.components.length;
+                for (var i = 0; i < len; i++) {
                     this.components[i].comp.remove();
+                    this.components[i].comp.transform = null;
                 }
                 if (this.renderer)
                     this.renderer = null;
@@ -3348,9 +3384,9 @@ var gd3d;
                         comps.push(node.components[i].comp);
                     }
                 }
-                if (node.children != null) {
-                    for (var i in node.children) {
-                        this.getNodeCompoents(node.children[i], _type, comps);
+                if (node._children != null) {
+                    for (var i in node._children) {
+                        this.getNodeCompoents(node._children[i], _type, comps);
                     }
                 }
             };
@@ -3416,7 +3452,7 @@ var gd3d;
                 configurable: true
             });
             transform2D.prototype.refreshLayout = function () {
-                var parent = this.parent;
+                var parent = this._parent;
                 if (!parent)
                     return;
                 if (this.width != this.lastWidth || this.height != this.lastHeight || parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
@@ -3467,17 +3503,17 @@ var gd3d;
                     this.layoutValueMap[option] = 0;
                 var value = 0;
                 if (this._layoutPercentState & option) {
-                    if (this.parent) {
+                    if (this._parent) {
                         switch (option) {
                             case layoutOption.LEFT:
                             case layoutOption.H_CENTER:
                             case layoutOption.RIGHT:
-                                value = this.parent.width * this.layoutValueMap[option] / 100;
+                                value = this._parent.width * this.layoutValueMap[option] / 100;
                                 break;
                             case layoutOption.TOP:
                             case layoutOption.V_CENTER:
                             case layoutOption.BOTTOM:
-                                value = this.parent.height * this.layoutValueMap[option] / 100;
+                                value = this._parent.height * this.layoutValueMap[option] / 100;
                                 break;
                         }
                     }
@@ -3488,23 +3524,23 @@ var gd3d;
                 return value;
             };
             transform2D.prototype.setSiblingIndex = function (siblingIndex) {
-                var p = this.transform.parent;
-                if (!p || !p.children || siblingIndex >= p.children.length || isNaN(siblingIndex) || siblingIndex < 0)
+                var p = this._parent;
+                if (!p || !p._children || siblingIndex >= p._children.length || isNaN(siblingIndex) || siblingIndex < 0)
                     return;
-                var currIdx = p.children.indexOf(this);
+                var currIdx = p._children.indexOf(this);
                 if (currIdx == -1 || currIdx == siblingIndex)
                     return;
-                p.children.splice(currIdx, 1);
+                p._children.splice(currIdx, 1);
                 var useidx = siblingIndex > currIdx ? siblingIndex - 1 : siblingIndex;
-                p.children.splice(useidx, 0, this);
+                p._children.splice(useidx, 0, this);
             };
             transform2D.prototype.getSiblingIndex = function () {
-                var p = this.transform.parent;
-                if (!p || !p.children)
+                var p = this._parent;
+                if (!p || !p._children)
                     return -1;
-                if (p.children.length < 1)
+                if (p._children.length < 1)
                     return 0;
-                return p.children.indexOf(this);
+                return p._children.indexOf(this);
             };
             transform2D.prototype.clone = function () {
                 return gd3d.io.cloneObj(this);
@@ -3535,8 +3571,9 @@ var gd3d;
             ], transform2D.prototype, "isStatic", void 0);
             __decorate([
                 gd3d.reflect.Field("transform2D[]"),
-                __metadata("design:type", Array)
-            ], transform2D.prototype, "children", void 0);
+                __metadata("design:type", Array),
+                __metadata("design:paramtypes", [Array])
+            ], transform2D.prototype, "children", null);
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
@@ -31771,9 +31808,11 @@ var gd3d;
                 }
             };
             gameObject.prototype.update = function (delta) {
-                for (var _i = 0, _a = this.components; _i < _a.length; _i++) {
-                    var item = _a[_i];
-                    item.comp.update(delta);
+                var len = this.components.length;
+                for (var i = 0; i < len; i++) {
+                    if (!this.components[i])
+                        continue;
+                    this.components[i].comp.update(delta);
                 }
             };
             gameObject.prototype.addComponentDirect = function (comp) {
@@ -31926,13 +31965,22 @@ var gd3d;
                 }
             };
             gameObject.prototype.removeAllComponents = function () {
-                for (var i = 0; i < this.components.length; i++) {
+                var len = this.components.length;
+                for (var i = 0; i < len; i++) {
                     {
                         this.components[i].comp.remove();
                         this.components[i].comp.gameObject = null;
                     }
                     this.remove(this.components[i].comp);
                 }
+                if (this.camera)
+                    this.camera = null;
+                if (this.renderer)
+                    this.renderer = null;
+                if (this.light)
+                    this.light = null;
+                if (this.collider)
+                    this.collider = null;
                 this.components.length = 0;
             };
             gameObject.prototype.dispose = function () {
@@ -32356,6 +32404,8 @@ var gd3d;
                 }
             };
             scene.prototype.objupdate = function (node, delta) {
+                if (!node)
+                    return;
                 if (node.hasComponent == false && node.hasComponentChild == false)
                     return;
                 node.gameObject.init(this.app.bePlay);

@@ -565,8 +565,10 @@ declare namespace gd3d.framework {
         tag: string;
         name: string;
         isStatic: boolean;
-        parent: transform2D;
+        private _parent;
+        readonly parent: transform2D;
         children: transform2D[];
+        private _children;
         width: number;
         height: number;
         pivot: math.vector2;
@@ -613,6 +615,9 @@ declare namespace gd3d.framework {
         getCanvasWorldMatrix(): gd3d.math.matrix3x2;
         static getTransInfoInCanvas(trans: transform2D, out: t2dInfo): void;
         setWorldPosition(pos: math.vector2): void;
+        readonly beDispose: boolean;
+        private _beDispose;
+        onDispose: () => void;
         dispose(): void;
         renderer: IRectRenderer;
         collider: ICollider2d;
