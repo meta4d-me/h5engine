@@ -601,7 +601,7 @@ declare namespace gd3d.framework {
         addChild(node: transform2D): void;
         addChildAt(node: transform2D, index: number): void;
         removeChild(node: transform2D): void;
-        removeAllChild(): void;
+        removeAllChild(needDispose?: boolean): void;
         markDirty(): void;
         updateTran(parentChange: boolean): void;
         updateWorldTran(): void;
@@ -1926,7 +1926,7 @@ declare namespace gd3d.framework {
         dirtiedOfFrustumCulling: boolean;
         addChild(node: transform): void;
         addChildAt(node: transform, index: number): void;
-        removeAllChild(): void;
+        removeAllChild(needDispose?: boolean): void;
         removeChild(node: transform): void;
         find(name: string): transform;
         checkImpactTran(tran: transform): boolean;

@@ -536,9 +536,12 @@ namespace gd3d.framework {
          * 为当前2d节点移除所有子节点
          * @version egret-gd3d 1.0
          */
-        removeAllChild() {
+        removeAllChild(needDispose:boolean = false) {
             while (this._children.length > 0) {
-                this.removeChild(this._children[0]);
+                if(needDispose)
+                    this._children[0].dispose();
+                else
+                    this.removeChild(this._children[0]);
             }
         }
 
@@ -824,7 +827,7 @@ namespace gd3d.framework {
                 for (var k in this._children) {
                     this._children[k].dispose();
                 }
-                this.removeAllChild();
+                // this.removeAllChild();
             }
             this.removeAllComponents();
 

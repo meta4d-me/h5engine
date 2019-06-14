@@ -480,12 +480,15 @@ namespace gd3d.framework
          * 移除所有子物体
          * @version egret-gd3d 1.0
          */
-        removeAllChild()
+        removeAllChild(needDispose:boolean = false)
         {
             if(this._children==undefined) return;
             while (this._children.length > 0)
             {
-                this.removeChild(this._children[0]);
+                if(needDispose)
+                    this._children[0].dispose();
+                else
+                    this.removeChild(this._children[0]);
             }
         }
         /**

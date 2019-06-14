@@ -3080,9 +3080,13 @@ var gd3d;
                 delete transform2D_1._transform2DMap[node.insId.getInsID()];
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
             };
-            transform2D.prototype.removeAllChild = function () {
+            transform2D.prototype.removeAllChild = function (needDispose) {
+                if (needDispose === void 0) { needDispose = false; }
                 while (this._children.length > 0) {
-                    this.removeChild(this._children[0]);
+                    if (needDispose)
+                        this._children[0].dispose();
+                    else
+                        this.removeChild(this._children[0]);
                 }
             };
             transform2D.prototype.markDirty = function () {
@@ -3237,7 +3241,6 @@ var gd3d;
                     for (var k in this._children) {
                         this._children[k].dispose();
                     }
-                    this.removeAllChild();
                 }
                 this.removeAllComponents();
                 this._beDispose = true;
@@ -10787,11 +10790,15 @@ var gd3d;
                     this.markHaveRendererComp();
                 node.dirtify(true);
             };
-            transform.prototype.removeAllChild = function () {
+            transform.prototype.removeAllChild = function (needDispose) {
+                if (needDispose === void 0) { needDispose = false; }
                 if (this._children == undefined)
                     return;
                 while (this._children.length > 0) {
-                    this.removeChild(this._children[0]);
+                    if (needDispose)
+                        this._children[0].dispose();
+                    else
+                        this.removeChild(this._children[0]);
                 }
             };
             transform.prototype.removeChild = function (node) {
