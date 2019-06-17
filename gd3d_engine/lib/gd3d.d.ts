@@ -619,6 +619,7 @@ declare namespace gd3d.framework {
         private _beDispose;
         onDispose: () => void;
         dispose(): void;
+        private _dispose;
         renderer: IRectRenderer;
         collider: ICollider2d;
         physicsBody: I2DPhysicsBody;
@@ -1981,6 +1982,7 @@ declare namespace gd3d.framework {
         private _beDispose;
         onDispose: () => void;
         dispose(): void;
+        private _dispose;
     }
     class insID {
         constructor();

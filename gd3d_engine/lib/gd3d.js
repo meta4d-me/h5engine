@@ -3233,14 +3233,18 @@ var gd3d;
                 configurable: true
             });
             transform2D.prototype.dispose = function () {
-                if (this._beDispose)
-                    return;
                 if (this._parent)
                     this._parent.removeChild(this);
+                this._dispose();
+            };
+            transform2D.prototype._dispose = function () {
+                if (this._beDispose)
+                    return;
                 if (this._children) {
                     for (var k in this._children) {
-                        this._children[k].dispose();
+                        this._children[k]._dispose();
                     }
+                    this.removeAllChild();
                 }
                 this.removeAllComponents();
                 this._beDispose = true;
@@ -11161,20 +11165,23 @@ var gd3d;
                 configurable: true
             });
             transform.prototype.dispose = function () {
+                if (this._parent)
+                    this._parent.removeChild(this);
+                this._dispose();
+            };
+            transform.prototype._dispose = function () {
                 if (this._beDispose)
                     return;
-                if (this._parent) {
-                    this._parent.removeChild(this);
-                }
                 if (this._children) {
                     for (var k in this._children) {
-                        this._children[k].dispose();
+                        this._children[k]._dispose();
                     }
                 }
                 if (this._physicsImpostor) {
                     this._physicsImpostor.dispose();
                 }
                 this._gameObject.dispose();
+                this._physicsImpostor = null;
                 this._beDispose = true;
                 if (this.onDispose)
                     this.onDispose();

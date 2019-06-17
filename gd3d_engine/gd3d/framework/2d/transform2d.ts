@@ -821,14 +821,19 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         dispose() {
-            if(this._beDispose)  return;
             if(this._parent)    this._parent.removeChild(this);
+            this._dispose();
+        }
+
+        private _dispose(){
+            if(this._beDispose)  return;
             if (this._children) {
                 for (var k in this._children) {
-                    this._children[k].dispose();
+                    this._children[k]._dispose();
                 }
-                // this.removeAllChild();
+                this.removeAllChild();
             }
+
             this.removeAllComponents();
 
             this._beDispose = true;

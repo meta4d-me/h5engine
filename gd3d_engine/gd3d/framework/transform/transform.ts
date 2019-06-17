@@ -1160,16 +1160,17 @@ namespace gd3d.framework
          */
         dispose()
         {
+            if(this._parent)    this._parent.removeChild(this);
+            this._dispose();            
+        }
+
+        private _dispose(){
             if(this._beDispose)  return;
-            if(this._parent)
-            {
-                this._parent.removeChild(this);
-            }
             if (this._children)
             {
                 for (var k in this._children)
                 {
-                    this._children[k].dispose();
+                    this._children[k]._dispose();
                 }
                 //this.removeAllChild();
             }
@@ -1178,9 +1179,11 @@ namespace gd3d.framework
             }
             this._gameObject.dispose();
 
+            this._physicsImpostor = null;
             this._beDispose = true;
             if(this.onDispose)
                 this.onDispose();
+
         }
     }
 
