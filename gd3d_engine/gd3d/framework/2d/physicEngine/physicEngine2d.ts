@@ -113,6 +113,7 @@ namespace gd3d.framework {
             let tran = pBody.transform;
             let pos = tran.getWorldTranslate();
             // let body = Matter.Bodies.rectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
+            if(!pBody.options.label)    pBody.options.label = 'Rect Body';
             let body = this.createRectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
             pBody.body = body;
             // this.addBody(pBody);
@@ -131,6 +132,7 @@ namespace gd3d.framework {
             let pos = tran.getWorldTranslate();
             let r = tran.width > tran.height ? tran.width: tran.height;
             r *= 0.5;
+            if(!pBody.options.label)    pBody.options.label = 'Circle Body';
             let body = this.createCircle(pos.x, pos.y, r, pBody.options, maxSides);
             pBody.body = body;
             return body;
@@ -149,6 +151,7 @@ namespace gd3d.framework {
             let tran = pBody.transform;
             let pos = tran.getWorldTranslate();
             // let body = Matter.Bodies.fromVertices(pos.x, pos.y, vertexSets, pBody.options , flagInternal , removeCollinear , minimumArea);
+            if(!pBody.options.label)    pBody.options.label = 'ConvexHull Body';
             let body = this.createFromVertices(pos.x, pos.y, vertexSets, pBody.options, flagInternal, removeCollinear, minimumArea);
             pBody.body = body;
             // this.addBody(pBody,);
@@ -169,6 +172,7 @@ namespace gd3d.framework {
             r *= 0.5;
             let h = y_Axis ? tran.height : tran.width ;
             let angle = y_Axis ? 0 : Math.PI * 0.5;
+            if(!pBody.options.label)    pBody.options.label = 'Capsule Body';
             let body = this.createCapsule(pos.x, pos.y, r, h, pBody.options,angle, maxSides);
             pBody.body = body;
             return body;
@@ -323,7 +327,7 @@ namespace gd3d.framework {
                 }
             }
             let createCapsule = {
-                label: 'createCapsule Body',
+                label: 'Capsule Body',
                 position: { x: x, y: y },
                 vertices: Matter.Vertices.fromPath(path)
             };

@@ -6843,6 +6843,8 @@ var gd3d;
                     return;
                 var tran = pBody.transform;
                 var pos = tran.getWorldTranslate();
+                if (!pBody.options.label)
+                    pBody.options.label = 'Rect Body';
                 var body = this.createRectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
                 pBody.body = body;
                 return body;
@@ -6855,6 +6857,8 @@ var gd3d;
                 var pos = tran.getWorldTranslate();
                 var r = tran.width > tran.height ? tran.width : tran.height;
                 r *= 0.5;
+                if (!pBody.options.label)
+                    pBody.options.label = 'Circle Body';
                 var body = this.createCircle(pos.x, pos.y, r, pBody.options, maxSides);
                 pBody.body = body;
                 return body;
@@ -6867,6 +6871,8 @@ var gd3d;
                     return;
                 var tran = pBody.transform;
                 var pos = tran.getWorldTranslate();
+                if (!pBody.options.label)
+                    pBody.options.label = 'ConvexHull Body';
                 var body = this.createFromVertices(pos.x, pos.y, vertexSets, pBody.options, flagInternal, removeCollinear, minimumArea);
                 pBody.body = body;
                 return body;
@@ -6882,6 +6888,8 @@ var gd3d;
                 r *= 0.5;
                 var h = y_Axis ? tran.height : tran.width;
                 var angle = y_Axis ? 0 : Math.PI * 0.5;
+                if (!pBody.options.label)
+                    pBody.options.label = 'Capsule Body';
                 var body = this.createCapsule(pos.x, pos.y, r, h, pBody.options, angle, maxSides);
                 pBody.body = body;
                 return body;
@@ -6930,7 +6938,7 @@ var gd3d;
                     }
                 }
                 var createCapsule = {
-                    label: 'createCapsule Body',
+                    label: 'Capsule Body',
                     position: { x: x, y: y },
                     vertices: Matter.Vertices.fromPath(path)
                 };
