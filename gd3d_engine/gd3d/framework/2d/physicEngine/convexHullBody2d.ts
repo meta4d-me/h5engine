@@ -41,16 +41,14 @@ namespace gd3d.framework
             let min = this.body.bounds.min;
             let center = poolv2();
             this.calceBoundingCenter(max,min,center);
-            let offset  = center;
-            math.vec2ScaleByNum(center,-1,offset);
-            let newPos = offset;
-            let add = poolv2(this.transform.localTranslate);
-            math.vec2ScaleByNum(add,2,add);
-            math.vec2Add(add ,offset ,newPos);
-            this.setPosition(newPos);
+            let offset = poolv2();
+            math.vec2Subtract(this.transform.localTranslate,center,offset);
+            let newpos = offset;
+            math.vec2Add(this.transform.localTranslate,offset,newpos);
+            this.setPosition(newpos);
             this.transform.markDirty();
             poolv2_del(center);
-            poolv2_del(add);
+            poolv2_del(offset);
         }
 
         private calceBoundingCenter(max:{x:number,y:number},min:{x:number,y:number},center:math.vector2){
