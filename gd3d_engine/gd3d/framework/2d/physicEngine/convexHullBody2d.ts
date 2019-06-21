@@ -25,8 +25,7 @@ namespace gd3d.framework
 
         transform: transform2D;
         start() {
-            let data = this.options || {};
-            let pos = this.transform.localTranslate;
+            this.options.angle = this.transform.localRotate;
             let body = this.physicsEngine.ConvexHullByPBody(this,this.vertexSets,this.flagInternal,this.removeCollinear,this.minimumArea);
             //this.body=physic2D.creatRectBody(this.transform.localTranslate.x,this.transform.localTranslate.y,this.transform.width,this.transform.height,this.beStatic);
             

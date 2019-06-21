@@ -6543,6 +6543,9 @@ var gd3d;
             physics2DBody.prototype.setPosition = function (pos) {
                 this.physicsEngine.setPosition(this.body, pos);
             };
+            physics2DBody.prototype.setAngle = function (angle) {
+                this._physicsEngine.setAngle(this.body, angle);
+            };
             physics2DBody.prototype.setStatic = function (isStatic) {
                 this.physicsEngine.setStatic(this.body, isStatic);
             };
@@ -6601,7 +6604,7 @@ var gd3d;
             });
             ;
             capsuleBody2d.prototype.start = function () {
-                var data = this.options || {};
+                this.options.angle = this.transform.localRotate;
                 var body = this.physicsEngine.createCapsuleByPBody(this, this.maxSides);
                 this.physicsEngine.addBody(this);
                 if (this.onInit)
@@ -6643,7 +6646,7 @@ var gd3d;
             });
             ;
             circleBody2d.prototype.start = function () {
-                var data = this.options || {};
+                this.options.angle = this.transform.localRotate;
                 var body = this.physicsEngine.createCircleByPBody(this, this.maxSides);
                 this.physicsEngine.addBody(this);
                 if (this.onInit)
@@ -6677,7 +6680,6 @@ var gd3d;
                 return _this;
             }
             compoundBody2d.prototype.start = function () {
-                var data = this.options || {};
                 var engine = this.physicsEngine;
                 var pos = this.transform.getWorldTranslate();
                 var tempv2 = gd3d.poolv2();
@@ -6689,6 +6691,7 @@ var gd3d;
                     engine.setPosition(body, tempv2);
                 }
                 this.options.parts = this._bodys;
+                this.options.angle = this.transform.localRotate;
                 this.body = engine.createBody(this.options);
                 engine.addBody(this);
                 if (this.onInit)
@@ -6727,8 +6730,7 @@ var gd3d;
                 return _this;
             }
             convexHullBody2d.prototype.start = function () {
-                var data = this.options || {};
-                var pos = this.transform.localTranslate;
+                this.options.angle = this.transform.localRotate;
                 var body = this.physicsEngine.ConvexHullByPBody(this, this.vertexSets, this.flagInternal, this.removeCollinear, this.minimumArea);
                 this.fixCenter();
                 this.physicsEngine.addBody(this);
@@ -6994,6 +6996,9 @@ var gd3d;
             physicEngine2D.prototype.setPosition = function (body, pos) {
                 Matter.Body.setPosition(body, pos);
             };
+            physicEngine2D.prototype.setAngle = function (body, angle) {
+                Matter.Body.setAngle(body, angle);
+            };
             physicEngine2D.prototype.setMass = function (body, mass) {
                 Matter.Body.setMass(body, mass);
             };
@@ -7038,7 +7043,7 @@ var gd3d;
                 return _super !== null && _super.apply(this, arguments) || this;
             }
             rectBody2d.prototype.start = function () {
-                var data = this.options || {};
+                this.options.angle = this.transform.localRotate;
                 var body = this.physicsEngine.createRectByPBody(this);
                 this.physicsEngine.addBody(this);
                 if (this.onInit)

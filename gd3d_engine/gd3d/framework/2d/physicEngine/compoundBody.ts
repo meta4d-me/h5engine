@@ -19,7 +19,6 @@ namespace gd3d.framework
         private _bodys : Ibody[] = [];
 
         start() {
-            let data = this.options || {};
             // let body = this.physicsEngine.createCircleBodyByInitData(this,this.radius,this.maxSides);
 
             let engine = this.physicsEngine;
@@ -38,6 +37,7 @@ namespace gd3d.framework
             this.options.parts = this._bodys;
 
             //root body
+            this.options.angle = this.transform.localRotate;
             this.body  = engine.createBody(this.options);
 
             engine.addBody(this);

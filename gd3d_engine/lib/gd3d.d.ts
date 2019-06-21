@@ -1041,6 +1041,7 @@ declare namespace gd3d.framework {
         setRestitution(restitution: number): any;
         setMass(mass: number): any;
         setPosition(pos: math.Ivec2): any;
+        setAngle(angle: number): any;
         setParts(parts: Ibody[], autoHull: boolean): any;
         setVertices(vertices: math.Ivec2[]): any;
         setInertia(Inertia: number): any;
@@ -1116,6 +1117,7 @@ declare namespace gd3d.framework {
         options: I2dPhyBodyData;
         setInitData(options: I2dPhyBodyData): void;
         setPosition(pos: math.Ivec2): void;
+        setAngle(angle: number): void;
         setStatic(isStatic: boolean): void;
         setSleeping(isSleeping: boolean): void;
         setInertia(Inertia: number): void;
@@ -1225,6 +1227,7 @@ declare namespace gd3d.framework {
         enableSleeping: boolean;
         setVelocity(body: Ibody, velocity: math.Ivec2): void;
         setPosition(body: Ibody, pos: math.Ivec2): void;
+        setAngle(body: Ibody, angle: number): void;
         setMass(body: Ibody, mass: number): void;
         setDensity(body: Ibody, Desity: number): void;
         setAngularVelocity(body: Ibody, angularVelocity: number): void;

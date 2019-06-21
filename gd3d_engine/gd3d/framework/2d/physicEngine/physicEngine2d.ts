@@ -398,6 +398,15 @@ namespace gd3d.framework {
         public setPosition(body: Ibody, pos: math.Ivec2) {
             Matter.Body.setPosition(body, pos);
         }
+
+        /**
+         * Sets the angle of the body instantly. Angular velocity, position, force etc. are unchanged.
+         * @param body body
+         * @param angle 旋转角度
+         */
+        public setAngle(body: Ibody, angle : number){
+            Matter.Body.setAngle(body, angle);
+        }
         /** 设置质量 
          * Sets the mass of the body. Inverse mass, density and inertia are automatically updated to reflect the change.
         */

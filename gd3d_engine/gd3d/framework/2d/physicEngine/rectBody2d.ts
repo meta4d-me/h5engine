@@ -17,7 +17,7 @@ namespace gd3d.framework
         transform: transform2D;
 
         start() {
-            let data = this.options || {};
+            this.options.angle = this.transform.localRotate;
             let body = this.physicsEngine.createRectByPBody(this);
             this.physicsEngine.addBody(this);
             if(this.onInit) this.onInit(this);

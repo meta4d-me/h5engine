@@ -24,7 +24,7 @@ namespace gd3d.framework
         @reflect.Field("number")
         maxSides : number = 25;
         start() {
-            let data = this.options || {};
+            this.options.angle = this.transform.localRotate;
             let body = this.physicsEngine.createCircleByPBody(this,this.maxSides);
             this.physicsEngine.addBody(this);
             if(this.onInit) this.onInit(this);

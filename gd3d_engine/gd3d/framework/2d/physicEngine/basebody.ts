@@ -28,6 +28,8 @@ namespace gd3d.framework {
         setMass(mass: number);
         /**设置位置 */
         setPosition(pos: math.Ivec2);
+        /** 设置旋转角度 */
+        setAngle(angle:number);
         /** 设置成员 */
         setParts(parts: Ibody[], autoHull:boolean);
         /** 设置顶点 */
@@ -220,6 +222,14 @@ namespace gd3d.framework {
          */
         setPosition(pos: math.Ivec2) {
             this.physicsEngine.setPosition(this.body, pos);
+        }
+
+        /**
+         * 设置旋转角度
+         * @param angle
+         */
+        setAngle(angle:number){
+            this._physicsEngine.setAngle(this.body,angle);
         }
 
         /** 设置静态状态
