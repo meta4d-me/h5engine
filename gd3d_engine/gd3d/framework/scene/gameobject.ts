@@ -308,29 +308,11 @@ namespace gd3d.framework
          */
         update(delta: number)
         {
-
-            for (let item of this.components)
-                item.comp.update(delta);
-            // if (this.components.length == 0) return;
-
-            // for (var i = 0; i < this.components.length; i++)
-            // {
-            // if (this.components[i].init == false)
-            // {
-            //     this.components[i].comp.start();
-            //     this.components[i].init = true;
-            // }
-            // if (this.getScene().app.bePlay && !this.getScene().app.bePause)
-            // {
-            //     this.components[i].comp.update(delta);
-            // }
-            // else if (this.components[i].comp == this.renderer || this.components[i].comp == this.camera)
-            // {
-            //     //有些组件是需要在场编状态下运行的
-            //     this.components[i].comp.update(delta);
-            // }
-            //     this.components[i].comp.update(delta);
-            // }
+            let len = this.components.length;
+            for(var i=0;i < len ;i++){
+                if(!this.components[i])continue;
+                this.components[i].comp.update(delta);
+            }
         }
         /**
          * @public
@@ -618,7 +600,8 @@ namespace gd3d.framework
          */
         removeAllComponents()
         {
-            for (var i = 0; i < this.components.length; i++)
+            let len = this.components.length;
+            for (var i = 0; i < len; i++)
             {
                 // if (this.components[i].init)
                 {//已经初始化过
@@ -627,6 +610,12 @@ namespace gd3d.framework
                 }
                 this.remove(this.components[i].comp);
             }
+
+            if(this.camera) this.camera = null;
+            if(this.renderer)   this.renderer = null;
+            if(this.light)  this.light = null;
+            if(this.collider) this.collider = null;
+
             this.components.length = 0;
         }
         /**

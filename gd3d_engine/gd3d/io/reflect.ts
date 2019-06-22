@@ -249,6 +249,12 @@ namespace gd3d {
         /**
          * @private
          */
+        export function node2DPhysicsBody(constructorObj: any) {
+            regType(constructorObj, { "node2dphysicsbody": "1" });
+        }
+        /**
+         * @private
+         */
         export function nodeSphereCollider(constructorObj: any) {
             regType(constructorObj, { "spherecollider": "1" });
         }
@@ -355,6 +361,27 @@ namespace gd3d {
                 if (valueType == "reference" && referenceType != undefined) {
                     regField(target, propertyKey, {
                         "referenceType": referenceType
+                    });
+                }
+            }
+        }
+
+        /**
+         * Field的引用类型(修饰后，改字段将在 Inspector 中暴露 , 该函数是Field() 的封装 )
+         * @param referenceType reference指定类型 支持:"transform"、"transform2D"、@reflect.node2DComponent、@reflect.nodeComponent
+         * @param defaultValue 默认值
+         */
+        export function FieldRef(referenceType: string , defaultValue: any = undefined){
+            return function (target: Object, propertyKey: string) {
+                regField(target, propertyKey, {
+                    "SerializeField": true,
+                    "valueType": "reference",
+                    "referenceType": referenceType
+                });
+                
+                if(defaultValue != null) {
+                    regField(target, propertyKey, {
+                        "defaultValue": defaultValue
                     });
                 }
             }

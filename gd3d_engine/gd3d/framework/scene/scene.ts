@@ -220,8 +220,8 @@ namespace gd3d.framework
                 this.webgl.clearColor(0, 0, 0, 1);
                 this.webgl.clearDepth(1.0);
                 this.webgl.clear(this.webgl.COLOR_BUFFER_BIT | this.webgl.DEPTH_BUFFER_BIT);
+                this.webgl.flush();
             }
-            this.webgl.flush();
 
             if(DrawCallInfo.BeActived)
             {
@@ -401,6 +401,7 @@ namespace gd3d.framework
         }
         private objupdate(node: transform, delta)//play状态下
         {
+            if(!node) return;
             if (node.hasComponent == false && node.hasComponentChild == false)
                 return;
             node.gameObject.init(this.app.bePlay);//组件还未初始化的初始化
@@ -735,13 +736,13 @@ namespace gd3d.framework
             //physic=new PhysicsEngine(new math.vector3(0,-9.8,0),new OimoJSPlugin());
         }
 
-        enable2DPhysics(gravity: math.vector2)
+        enable2DPhysics(gravity: math.vector2 , physicOption : IEngine2DOP = null)
         {
             if(physics2D){
                 return true;
             }
             try{
-                physics2D = new physicEngine2D();
+                physics2D = new physicEngine2D(physicOption);
                 physics2D.setGravity(gravity.x , gravity.y);
                 return true;
             }catch(e){

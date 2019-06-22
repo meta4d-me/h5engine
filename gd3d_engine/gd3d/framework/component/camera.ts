@@ -453,8 +453,8 @@ namespace gd3d.framework
 
             let dest1 = camera.helpv3_2;
             let dest2 = camera.helpv3_3;
-            this.calcWorldPosFromScreenPos(app, src1, dest1);
-            this.calcWorldPosFromScreenPos(app, src2, dest2);
+            this.calcModelPosFromScreenPos(app, src1, dest1);
+            this.calcModelPosFromScreenPos(app, src2, dest2);
 
             let dir = camera.helpv3_4;
             gd3d.math.vec3Subtract(dest2, dest1, dir);
@@ -477,12 +477,12 @@ namespace gd3d.framework
          * @language zh_CN
          * @param app 主程序
          * @param screenpos 屏幕坐标
-         * @param outWorldPos 世界坐标
+         * @param outWorldPos model空间坐标
          * @classdesc
-         * 由屏幕坐标得到世界坐标
+         * 由屏幕坐标得到model空间坐标
          * @version egret-gd3d 1.0
          */
-        calcWorldPosFromScreenPos(app: application, screenPos: math.vector3, outWorldPos: math.vector3)
+        calcModelPosFromScreenPos(app: application, screenPos: math.vector3, outModelPos: math.vector3)
         {
 
             let vpp = camera.helprect;
@@ -505,7 +505,7 @@ namespace gd3d.framework
             src1.y = vppos.y;
             src1.z = screenPos.z;
             // new math.vector3(vppos.x, vppos.y, screenPos.z);
-            gd3d.math.matrixTransformVector3(src1, matinv, outWorldPos);
+            gd3d.math.matrixTransformVector3(src1, matinv, outModelPos);
 
             poolv2_del(vppos);
         }

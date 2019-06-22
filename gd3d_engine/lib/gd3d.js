@@ -8,9 +8,12 @@ var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
 var __extends = (this && this.__extends) || (function () {
-    var extendStatics = Object.setPrototypeOf ||
-        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    var extendStatics = function (d, b) {
+        extendStatics = Object.setPrototypeOf ||
+            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+        return extendStatics(d, b);
+    };
     return function (d, b) {
         extendStatics(d, b);
         function __() { this.constructor = d; }
@@ -712,49 +715,34 @@ var gd3d;
                 this.rootdiv = div;
                 framework.sceneMgr.app.container.appendChild(div);
                 div.style.display = "inline-block";
+                div.style.background = "#00000085";
                 div.style.position = "absolute";
                 div.style.left = "100px";
                 div.style.top = "0px";
-                div.style.height = "200px";
-                div.style.width = "200px";
-                var ul = document.createElement("ul");
-                div.appendChild(ul);
+                div.style.height = "60px";
+                div.style.width = "170px";
                 var li1 = document.createElement("li");
                 li1.textContent = "SkinMeshDrawcall: ";
-                li1.style.fontSize = "12px";
-                li1.style.color = "Aqua";
-                li1.style.height = "20px";
-                li1.style.width = "200px";
-                li1.style.left = "0px";
-                ul.appendChild(li1);
                 this.SKinrenderDraw = li1;
                 var li3 = document.createElement("li");
                 li3.textContent = "MeshrenderDrawcall: ";
-                li3.style.fontSize = "12px";
-                li3.style.color = "Aqua";
-                li3.style.height = "20px";
-                li3.style.width = "200px";
-                li3.style.left = "0px";
-                ul.appendChild(li3);
                 this.MeshrenderDraw = li3;
                 var li2 = document.createElement("li");
                 li2.textContent = "EffectrenderDrawcall: ";
-                li2.style.fontSize = "12px";
-                li2.style.color = "Aqua";
-                li2.style.height = "20px";
-                li2.style.width = "200px";
-                li2.style.left = "0px";
-                ul.appendChild(li2);
                 this.EffectrenderDraw = li2;
                 var li4 = document.createElement("li");
-                li4.textContent = "EffectrenderDrawcall: ";
-                li4.style.fontSize = "12px";
-                li4.style.color = "Aqua";
-                li4.style.height = "20px";
-                li4.style.width = "200px";
-                li4.style.left = "0px";
-                ul.appendChild(li4);
+                li4.textContent = "UIrenderDrawcall: ";
                 this.UIrenderDraw = li4;
+                var list = [li1, li3, li2, li4];
+                for (var i = 0; i < list.length; i++) {
+                    var li = list[i];
+                    li.style.fontSize = "10px";
+                    li.style.color = "Aqua";
+                    li.style.height = "12px";
+                    li.style.width = "170px";
+                    li.style.left = "0px";
+                    div.appendChild(li);
+                }
             };
             DrawCallInfo.prototype.showPerFrame = function () {
                 this.MeshrenderDraw.textContent = "MeshrenderDrawcall: " + this.data[DrawCallEnum.Meshrender];
@@ -1073,6 +1061,10 @@ var gd3d;
             regType(constructorObj, { "boxcollider2d": "1" });
         }
         reflect.nodeBoxCollider2d = nodeBoxCollider2d;
+        function node2DPhysicsBody(constructorObj) {
+            regType(constructorObj, { "node2dphysicsbody": "1" });
+        }
+        reflect.node2DPhysicsBody = node2DPhysicsBody;
         function nodeSphereCollider(constructorObj) {
             regType(constructorObj, { "spherecollider": "1" });
         }
@@ -1156,6 +1148,22 @@ var gd3d;
             };
         }
         reflect.Field = Field;
+        function FieldRef(referenceType, defaultValue) {
+            if (defaultValue === void 0) { defaultValue = undefined; }
+            return function (target, propertyKey) {
+                regField(target, propertyKey, {
+                    "SerializeField": true,
+                    "valueType": "reference",
+                    "referenceType": referenceType
+                });
+                if (defaultValue != null) {
+                    regField(target, propertyKey, {
+                        "defaultValue": defaultValue
+                    });
+                }
+            };
+        }
+        reflect.FieldRef = FieldRef;
         function UIComment(comment) {
             return function (target, propertyKey) {
                 regField(target, propertyKey, {
@@ -2129,12 +2137,14 @@ var gd3d;
                 }
             };
             canvas.prototype.objupdate = function (node, delta) {
-                if (!node.visible)
+                if (!node || !node.visible)
                     return;
                 node.init(this.scene.app.bePlay);
                 var compLen = node.components.length;
                 if (compLen > 0) {
                     for (var i = 0; i < compLen; i++) {
+                        if (!node.components[i])
+                            continue;
                         var comp = node.components[i].comp;
                         comp.update(delta);
                         if (framework.instanceOfI2DPointListener(comp)) {
@@ -2369,6 +2379,7 @@ var gd3d;
                 outModelPos.x = scalx * 2 - 1;
                 outModelPos.y = 1 - scaly * 2;
             };
+            var canvas_1;
             canvas.ClassName = "canvas";
             canvas.depthTag = "__depthTag__";
             canvas.flowIndexTag = "__flowIndexTag__";
@@ -2389,7 +2400,6 @@ var gd3d;
                 __metadata("design:paramtypes", [])
             ], canvas);
             return canvas;
-            var canvas_1;
         }());
         framework.canvas = canvas;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -2575,7 +2585,7 @@ var gd3d;
             canvasRenderer.ClassName = "canvasRenderer";
             __decorate([
                 gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Boolean),
                 __metadata("design:paramtypes", [Boolean])
             ], canvasRenderer.prototype, "dontFrustumCulling", null);
             __decorate([
@@ -2845,7 +2855,7 @@ var gd3d;
                 this.tag = framework.StringUtil.builtinTag_Untagged;
                 this.name = "noname";
                 this.isStatic = false;
-                this.children = [];
+                this._children = [];
                 this.width = 0;
                 this.height = 0;
                 this.pivot = new gd3d.math.vector2(0, 0);
@@ -2866,6 +2876,7 @@ var gd3d;
                 this.worldRotate = new gd3d.math.angelref();
                 this.worldTranslate = new gd3d.math.vector2(0, 0);
                 this.worldScale = new gd3d.math.vector2(1, 1);
+                this._beDispose = false;
                 this.components = [];
                 this.componentsInit = [];
                 this.componentplayed = [];
@@ -2888,9 +2899,9 @@ var gd3d;
             Object.defineProperty(transform2D.prototype, "canvas", {
                 get: function () {
                     if (this._canvas == null) {
-                        if (this.parent == null)
+                        if (this._parent == null)
                             return null;
-                        return this.parent.canvas;
+                        return this._parent.canvas;
                     }
                     return this._canvas;
                 },
@@ -2902,11 +2913,28 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(transform2D.prototype, "parent", {
+                get: function () {
+                    return this._parent;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(transform2D.prototype, "children", {
+                get: function () {
+                    return this._children;
+                },
+                set: function (children) {
+                    this._children = children;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(transform2D.prototype, "visibleInScene", {
                 get: function () {
                     var obj = this;
                     while (obj.visible) {
-                        obj = obj.parent;
+                        obj = obj._parent;
                     }
                     return obj.visible;
                 },
@@ -2956,7 +2984,7 @@ var gd3d;
                 set: function (b) {
                     this._isMask = b;
                     this.markDirty();
-                    if (this.parent != null)
+                    if (this._parent != null)
                         this.updateTran(true);
                 },
                 enumerable: true,
@@ -2968,9 +2996,9 @@ var gd3d;
                 var rect_w;
                 var rect_h;
                 var ParentRect;
-                if (this.parent != null) {
-                    this._parentIsMask = this.parent.isMask || this.parent.parentIsMask;
-                    ParentRect = this.parent.maskRect;
+                if (this._parent != null) {
+                    this._parentIsMask = this._parent.isMask || this._parent.parentIsMask;
+                    ParentRect = this._parent.maskRect;
                 }
                 else
                     this._parentIsMask = false;
@@ -3018,20 +3046,20 @@ var gd3d;
                 configurable: true
             });
             transform2D.prototype.addChild = function (node) {
-                this.addChildAt(node, this.children.length);
+                this.addChildAt(node, this._children.length);
             };
             transform2D.prototype.addChildAt = function (node, index) {
                 if (index < 0 || !node) {
                     return;
                 }
-                if (node.parent != null) {
-                    node.parent.removeChild(node);
+                if (node._parent != null) {
+                    node._parent.removeChild(node);
                 }
-                if (this.children == null)
-                    this.children = [];
-                this.children.splice(index, 0, node);
+                if (this._children == null)
+                    this._children = [];
+                this._children.splice(index, 0, node);
                 node.canvas = this.canvas;
-                node.parent = this;
+                node._parent = this;
                 transform2D_1._transform2DMap[node.insId.getInsID()] = node;
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
                 this.markDirty();
@@ -3041,28 +3069,32 @@ var gd3d;
                     console.warn("target is null");
                     return;
                 }
-                if (node.parent != this || this.children == null) {
+                if (node._parent != this || this._children == null) {
                     throw new Error("not my child.");
                 }
-                var i = this.children.indexOf(node);
+                var i = this._children.indexOf(node);
                 if (i < 0)
                     return;
-                this.children.splice(i, 1);
-                node.parent = null;
+                this._children.splice(i, 1);
+                node._parent = null;
                 delete transform2D_1._transform2DMap[node.insId.getInsID()];
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
             };
-            transform2D.prototype.removeAllChild = function () {
-                while (this.children.length > 0) {
-                    this.removeChild(this.children[0]);
+            transform2D.prototype.removeAllChild = function (needDispose) {
+                if (needDispose === void 0) { needDispose = false; }
+                while (this._children.length > 0) {
+                    if (needDispose)
+                        this._children[0].dispose();
+                    else
+                        this.removeChild(this._children[0]);
                 }
             };
             transform2D.prototype.markDirty = function () {
                 this.dirty = true;
-                var p = this.parent;
+                var p = this._parent;
                 while (p != null) {
                     p.dirtyChild = true;
-                    p = p.parent;
+                    p = p._parent;
                 }
             };
             transform2D.prototype.updateTran = function (parentChange) {
@@ -3085,22 +3117,22 @@ var gd3d;
                         this.renderer.updateTran();
                     }
                 }
-                if (this.children != null) {
-                    for (var i = 0; i < this.children.length; i++) {
-                        this.children[i].updateTran(parentChange || this.dirty);
+                if (this._children != null) {
+                    for (var i = 0; i < this._children.length; i++) {
+                        this._children[i].updateTran(parentChange || this.dirty);
                     }
                 }
                 this.dirty = false;
                 this.dirtyChild = false;
             };
             transform2D.prototype.updateWorldTran = function () {
-                var p = this.parent;
+                var p = this._parent;
                 var dirtylist = [];
                 dirtylist.push(this);
                 while (p != null) {
                     if (p.dirty)
                         dirtylist.push(p);
-                    p = p.parent;
+                    p = p._parent;
                 }
                 var top = dirtylist.pop();
                 top.updateTran(false);
@@ -3177,8 +3209,8 @@ var gd3d;
                 dir.x = pos.x - thispos.x;
                 dir.y = pos.y - thispos.y;
                 var pworld = gd3d.math.pool.new_matrix3x2();
-                if (this.parent != null) {
-                    gd3d.math.matrix3x2Clone(this.parent.worldMatrix, pworld);
+                if (this._parent != null) {
+                    gd3d.math.matrix3x2Clone(this._parent.worldMatrix, pworld);
                 }
                 else {
                     gd3d.math.matrix3x2MakeIdentity(pworld);
@@ -3193,14 +3225,31 @@ var gd3d;
                 gd3d.math.pool.delete_vector2(dir);
                 gd3d.math.pool.delete_vector2(dirinv);
             };
+            Object.defineProperty(transform2D.prototype, "beDispose", {
+                get: function () {
+                    return this._beDispose;
+                },
+                enumerable: true,
+                configurable: true
+            });
             transform2D.prototype.dispose = function () {
-                if (this.children) {
-                    for (var k in this.children) {
-                        this.children[k].dispose();
+                if (this._parent)
+                    this._parent.removeChild(this);
+                this._dispose();
+            };
+            transform2D.prototype._dispose = function () {
+                if (this._beDispose)
+                    return;
+                if (this._children) {
+                    for (var k in this._children) {
+                        this._children[k]._dispose();
                     }
                     this.removeAllChild();
                 }
                 this.removeAllComponents();
+                this._beDispose = true;
+                if (this.onDispose)
+                    this.onDispose();
             };
             transform2D.prototype.init = function (bePlayed) {
                 if (bePlayed === void 0) { bePlayed = false; }
@@ -3261,6 +3310,14 @@ var gd3d;
                         throw new Error("已经有一个碰撞组件了，不能俩");
                     }
                 }
+                if (gd3d.reflect.getClassTag(comp["__proto__"], "node2dphysicsbody") == "1") {
+                    if (this.physicsBody == null) {
+                        this.physicsBody = comp;
+                    }
+                    else {
+                        throw new Error("已经有一个碰撞组件了，不能俩");
+                    }
+                }
                 return comp;
             };
             transform2D.prototype.removeComponent = function (comp) {
@@ -3285,19 +3342,25 @@ var gd3d;
                             this.renderer = null;
                         if (p[0].comp == this.collider)
                             this.collider = null;
+                        if (p[0].comp == this.physicsBody)
+                            this.physicsBody = null;
                         p[0].comp.remove();
                         return p[0];
                     }
                 }
             };
             transform2D.prototype.removeAllComponents = function () {
-                for (var i = 0; i < this.components.length; i++) {
+                var len = this.components.length;
+                for (var i = 0; i < len; i++) {
                     this.components[i].comp.remove();
+                    this.components[i].comp.transform = null;
                 }
                 if (this.renderer)
                     this.renderer = null;
                 if (this.collider)
-                    this.renderer = null;
+                    this.collider = null;
+                if (this.physicsBody)
+                    this.physicsBody = null;
                 this.components.length = 0;
             };
             transform2D.prototype.getComponent = function (type) {
@@ -3328,9 +3391,9 @@ var gd3d;
                         comps.push(node.components[i].comp);
                     }
                 }
-                if (node.children != null) {
-                    for (var i in node.children) {
-                        this.getNodeCompoents(node.children[i], _type, comps);
+                if (node._children != null) {
+                    for (var i in node._children) {
+                        this.getNodeCompoents(node._children[i], _type, comps);
                     }
                 }
             };
@@ -3396,7 +3459,7 @@ var gd3d;
                 configurable: true
             });
             transform2D.prototype.refreshLayout = function () {
-                var parent = this.parent;
+                var parent = this._parent;
                 if (!parent)
                     return;
                 if (this.width != this.lastWidth || this.height != this.lastHeight || parent.width != this.lastParentWidth || parent.height != this.lastParentHeight || parent.pivot.x != this.lastParentPivot.x
@@ -3447,17 +3510,17 @@ var gd3d;
                     this.layoutValueMap[option] = 0;
                 var value = 0;
                 if (this._layoutPercentState & option) {
-                    if (this.parent) {
+                    if (this._parent) {
                         switch (option) {
                             case layoutOption.LEFT:
                             case layoutOption.H_CENTER:
                             case layoutOption.RIGHT:
-                                value = this.parent.width * this.layoutValueMap[option] / 100;
+                                value = this._parent.width * this.layoutValueMap[option] / 100;
                                 break;
                             case layoutOption.TOP:
                             case layoutOption.V_CENTER:
                             case layoutOption.BOTTOM:
-                                value = this.parent.height * this.layoutValueMap[option] / 100;
+                                value = this._parent.height * this.layoutValueMap[option] / 100;
                                 break;
                         }
                     }
@@ -3468,27 +3531,28 @@ var gd3d;
                 return value;
             };
             transform2D.prototype.setSiblingIndex = function (siblingIndex) {
-                var p = this.transform.parent;
-                if (!p || !p.children || siblingIndex >= p.children.length || isNaN(siblingIndex) || siblingIndex < 0)
+                var p = this._parent;
+                if (!p || !p._children || siblingIndex >= p._children.length || isNaN(siblingIndex) || siblingIndex < 0)
                     return;
-                var currIdx = p.children.indexOf(this);
+                var currIdx = p._children.indexOf(this);
                 if (currIdx == -1 || currIdx == siblingIndex)
                     return;
-                p.children.splice(currIdx, 1);
+                p._children.splice(currIdx, 1);
                 var useidx = siblingIndex > currIdx ? siblingIndex - 1 : siblingIndex;
-                p.children.splice(useidx, 0, this);
+                p._children.splice(useidx, 0, this);
             };
             transform2D.prototype.getSiblingIndex = function () {
-                var p = this.transform.parent;
-                if (!p || !p.children)
+                var p = this._parent;
+                if (!p || !p._children)
                     return -1;
-                if (p.children.length < 1)
+                if (p._children.length < 1)
                     return 0;
-                return p.children.indexOf(this);
+                return p._children.indexOf(this);
             };
             transform2D.prototype.clone = function () {
                 return gd3d.io.cloneObj(this);
             };
+            var transform2D_1;
             transform2D.ClassName = "transform2D";
             transform2D._transform2DMap = {};
             __decorate([
@@ -3514,8 +3578,9 @@ var gd3d;
             ], transform2D.prototype, "isStatic", void 0);
             __decorate([
                 gd3d.reflect.Field("transform2D[]"),
-                __metadata("design:type", Array)
-            ], transform2D.prototype, "children", void 0);
+                __metadata("design:type", Array),
+                __metadata("design:paramtypes", [Array])
+            ], transform2D.prototype, "children", null);
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
@@ -3546,7 +3611,7 @@ var gd3d;
             ], transform2D.prototype, "localRotate", void 0);
             __decorate([
                 gd3d.reflect.Field("boolean"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Boolean),
                 __metadata("design:paramtypes", [Boolean])
             ], transform2D.prototype, "isMask", null);
             __decorate([
@@ -3571,7 +3636,6 @@ var gd3d;
                 gd3d.reflect.SerializeType
             ], transform2D);
             return transform2D;
-            var transform2D_1;
         }());
         framework.transform2D = transform2D;
         var t2dInfo = (function () {
@@ -3912,7 +3976,7 @@ var gd3d;
             button.ClassName = "button";
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], button.prototype, "transition", null);
             __decorate([
@@ -3925,24 +3989,24 @@ var gd3d;
             ], button.prototype, "_pressedSpriteName", void 0);
             __decorate([
                 gd3d.reflect.Field("reference", null, "image2D"),
-                __metadata("design:type", Object),
+                __metadata("design:type", framework.image2D),
                 __metadata("design:paramtypes", [framework.image2D])
             ], button.prototype, "targetImage", null);
             __decorate([
                 gd3d.reflect.Field("color"),
                 gd3d.reflect.UIStyle("color"),
-                __metadata("design:type", Object),
+                __metadata("design:type", gd3d.math.color),
                 __metadata("design:paramtypes", [gd3d.math.color])
             ], button.prototype, "normalColor", null);
             __decorate([
                 gd3d.reflect.Field("color"),
                 gd3d.reflect.UIStyle("color"),
-                __metadata("design:type", Object),
+                __metadata("design:type", gd3d.math.color),
                 __metadata("design:paramtypes", [gd3d.math.color])
             ], button.prototype, "pressedColor", null);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], button.prototype, "fadeDuration", null);
             button = __decorate([
@@ -4962,6 +5026,7 @@ var gd3d;
                     dindex++;
                 }
             };
+            var image2D_1;
             image2D.ClassName = "image2D";
             image2D.defUIShader = "shader/defui";
             image2D.defMaskUIShader = "shader/defmaskui";
@@ -4973,18 +5038,18 @@ var gd3d;
             __decorate([
                 gd3d.reflect.Field("number"),
                 gd3d.reflect.UIStyle("enum"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], image2D.prototype, "imageType", null);
             __decorate([
                 gd3d.reflect.Field("number"),
                 gd3d.reflect.UIStyle("enum"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], image2D.prototype, "fillMethod", null);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], image2D.prototype, "fillAmmount", null);
             __decorate([
@@ -5001,7 +5066,6 @@ var gd3d;
                 __metadata("design:paramtypes", [])
             ], image2D);
             return image2D;
-            var image2D_1;
         }());
         framework.image2D = image2D;
         var ImageType;
@@ -5291,22 +5355,22 @@ var gd3d;
             inputField.ClassName = "inputField";
             __decorate([
                 gd3d.reflect.Field("reference", null, "image2D"),
-                __metadata("design:type", Object),
+                __metadata("design:type", framework.image2D),
                 __metadata("design:paramtypes", [framework.image2D])
             ], inputField.prototype, "frameImage", null);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], inputField.prototype, "characterLimit", null);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], inputField.prototype, "LineType", null);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], inputField.prototype, "ContentType", null);
             __decorate([
@@ -5706,6 +5770,7 @@ var gd3d;
                 this.transform = null;
                 this._cacheMaskV4 = null;
             };
+            var label_1;
             label.ClassName = "label";
             label.defUIShader = "shader/defuifont";
             label.defMaskUIShader = "shader/defmaskfont";
@@ -5720,7 +5785,7 @@ var gd3d;
             ], label.prototype, "_fontName", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], label.prototype, "fontsize", null);
             __decorate([
@@ -5758,7 +5823,6 @@ var gd3d;
                 gd3d.reflect.nodeRender
             ], label);
             return label;
-            var label_1;
         }());
         framework.label = label;
         var HorizontalType;
@@ -5861,22 +5925,22 @@ var gd3d;
             progressbar.ClassName = "progressbar";
             __decorate([
                 gd3d.reflect.Field("reference", null, "transform2D"),
-                __metadata("design:type", Object),
+                __metadata("design:type", framework.transform2D),
                 __metadata("design:paramtypes", [framework.transform2D])
             ], progressbar.prototype, "cutPanel", null);
             __decorate([
                 gd3d.reflect.Field("reference", null, "image2D"),
-                __metadata("design:type", Object),
+                __metadata("design:type", framework.image2D),
                 __metadata("design:paramtypes", [framework.image2D])
             ], progressbar.prototype, "barBg", null);
             __decorate([
                 gd3d.reflect.Field("reference", null, "image2D"),
-                __metadata("design:type", Object),
+                __metadata("design:type", framework.image2D),
                 __metadata("design:paramtypes", [framework.image2D])
             ], progressbar.prototype, "barOverImg", null);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], progressbar.prototype, "value", null);
             progressbar = __decorate([
@@ -6079,12 +6143,13 @@ var gd3d;
                 this.transform = null;
                 this.datar.length = 0;
             };
+            var rawImage2D_1;
             rawImage2D.ClassName = "rawImage2D";
             rawImage2D.defUIShader = "shader/defui";
             rawImage2D.defMaskUIShader = "shader/defmaskui";
             __decorate([
                 gd3d.reflect.Field("texture"),
-                __metadata("design:type", Object),
+                __metadata("design:type", framework.texture),
                 __metadata("design:paramtypes", [framework.texture])
             ], rawImage2D.prototype, "image", null);
             __decorate([
@@ -6097,7 +6162,6 @@ var gd3d;
                 gd3d.reflect.nodeRender
             ], rawImage2D);
             return rawImage2D;
-            var rawImage2D_1;
         }());
         framework.rawImage2D = rawImage2D;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -6264,6 +6328,7 @@ var gd3d;
                 this._content = null;
                 this.transform = null;
             };
+            var scrollRect_1;
             scrollRect.ClassName = "scrollRect";
             scrollRect.helpv2 = new gd3d.math.vector2();
             scrollRect.helpv2_1 = new gd3d.math.vector2();
@@ -6292,9 +6357,97 @@ var gd3d;
                 gd3d.reflect.node2DComponent
             ], scrollRect);
             return scrollRect;
-            var scrollRect_1;
         }());
         framework.scrollRect = scrollRect;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var slideArea = (function () {
+            function slideArea() {
+                this.horizontal = false;
+                this.vertical = false;
+                this.isPointDown = false;
+                this.lastPoint = new gd3d.math.vector2();
+                this.strPoint = new gd3d.math.vector2();
+            }
+            slideArea_1 = slideArea;
+            slideArea.prototype.start = function () {
+            };
+            slideArea.prototype.onPlay = function () {
+            };
+            slideArea.prototype.update = function (delta) {
+            };
+            slideArea.prototype.onPointEvent = function (canvas, ev, oncap) {
+                if (oncap == false) {
+                    var tv2 = slideArea_1.helpv2;
+                    tv2.x = ev.x;
+                    tv2.y = ev.y;
+                    var b = this.transform.ContainsCanvasPoint(tv2);
+                    if (b) {
+                        ev.eated = true;
+                        if (!this.horizontal && !this.vertical)
+                            return;
+                        var temps = slideArea_1.helpv2;
+                        gd3d.math.vec2Set(temps, ev.x, ev.y);
+                        var tempc = slideArea_1.helpv2_1;
+                        this.transform.canvas.ModelPosToCanvasPos(temps, tempc);
+                        var sp = this.strPoint;
+                        if (ev.type == gd3d.event.PointEventEnum.PointDown) {
+                            this.isPointDown = true;
+                            sp.x = tempc.x;
+                            sp.y = tempc.y;
+                            if (this.onDownFun)
+                                this.onDownFun(sp.x, sp.y);
+                        }
+                        if (ev.type == gd3d.event.PointEventEnum.PointHold && this.isPointDown) {
+                            var lp = this.lastPoint;
+                            if (lp.x != tempc.x || lp.y != tempc.y) {
+                                lp.x = tempc.x;
+                                lp.y = tempc.y;
+                                var addtransX = 0;
+                                if (this.horizontal) {
+                                    addtransX = lp.x - sp.x;
+                                }
+                                var addtransY = 0;
+                                if (this.vertical) {
+                                    addtransY = lp.y - sp.y;
+                                }
+                                if (this.onMoveFun)
+                                    this.onMoveFun(addtransX, addtransY);
+                            }
+                        }
+                    }
+                }
+                if (ev.type == gd3d.event.PointEventEnum.PointUp) {
+                    this.isPointDown = false;
+                    if (this.onUpFun)
+                        this.onUpFun();
+                }
+            };
+            slideArea.prototype.remove = function () {
+                this.transform = null;
+            };
+            var slideArea_1;
+            slideArea.ClassName = "slideArea";
+            slideArea.helpv2 = new gd3d.math.vector2();
+            slideArea.helpv2_1 = new gd3d.math.vector2();
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], slideArea.prototype, "horizontal", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], slideArea.prototype, "vertical", void 0);
+            slideArea = slideArea_1 = __decorate([
+                gd3d.reflect.node2DComponent
+            ], slideArea);
+            return slideArea;
+        }());
+        framework.slideArea = slideArea;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -6327,11 +6480,13 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var physics2DBody = (function () {
+        var physics2DBody = (function (_super) {
+            __extends(physics2DBody, _super);
             function physics2DBody() {
-                this.options = {};
-                this._physicsEngine = framework.physics2D;
-                this.physicsEngine;
+                var _this = _super.call(this) || this;
+                _this.options = {};
+                _this._physicsEngine = framework.physics2D;
+                return _this;
             }
             Object.defineProperty(physics2DBody.prototype, "physicsEngine", {
                 get: function () {
@@ -6346,6 +6501,15 @@ var gd3d;
                 configurable: true
             });
             ;
+            physics2DBody.prototype.isSleeping = function () {
+                return this.body.isSleeping;
+            };
+            physics2DBody.prototype.isStatic = function () {
+                return this.body.isStatic;
+            };
+            physics2DBody.prototype.isSensor = function () {
+                return this.body.isSensor;
+            };
             physics2DBody.prototype.addForce = function (Force) {
                 this.physicsEngine.applyForceAtCenter(this.body, Force);
             };
@@ -6373,14 +6537,38 @@ var gd3d;
             physics2DBody.prototype.setMass = function (mass) {
                 this.physicsEngine.setMass(this.body, mass);
             };
-            physics2DBody.prototype.setInitData = function (att) {
-                this.options = att;
+            physics2DBody.prototype.setInitData = function (options) {
+                this.options = options;
             };
             physics2DBody.prototype.setPosition = function (pos) {
                 this.physicsEngine.setPosition(this.body, pos);
             };
-            physics2DBody.prototype.isSleeping = function () {
-                return this.body.isSleeping;
+            physics2DBody.prototype.setAngle = function (angle) {
+                this._physicsEngine.setAngle(this.body, angle);
+            };
+            physics2DBody.prototype.setStatic = function (isStatic) {
+                this.physicsEngine.setStatic(this.body, isStatic);
+            };
+            physics2DBody.prototype.setSleeping = function (isSleeping) {
+                this.physicsEngine.setSleeping(this.body, isSleeping);
+            };
+            physics2DBody.prototype.setInertia = function (Inertia) {
+                this.physicsEngine.setInertia(this.body, Inertia);
+            };
+            physics2DBody.prototype.setVertices = function (vertices) {
+                this.physicsEngine.setVertices(this.body, vertices);
+            };
+            physics2DBody.prototype.setParts = function (parts, autoHull) {
+                if (autoHull === void 0) { autoHull = true; }
+                this.physicsEngine.setParts(this.body, parts, autoHull);
+            };
+            physics2DBody.prototype.setCentre = function (centre, relative) {
+                if (relative === void 0) { relative = false; }
+                this.physicsEngine.setCentre(this.body, centre, relative);
+            };
+            physics2DBody.prototype.start = function () {
+                if (this.onInit)
+                    this.onInit(this);
             };
             physics2DBody.prototype.update = function (delta) {
                 if (!this.body)
@@ -6394,8 +6582,48 @@ var gd3d;
                 this.body = null;
             };
             return physics2DBody;
-        }());
+        }(framework.behaviour2d));
         framework.physics2DBody = physics2DBody;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var capsuleBody2d = (function (_super) {
+            __extends(capsuleBody2d, _super);
+            function capsuleBody2d() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.maxSides = 25;
+                return _this;
+            }
+            Object.defineProperty(capsuleBody2d.prototype, "y_Axis", {
+                get: function () { return this.transform.height > this.transform.width; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            capsuleBody2d.prototype.start = function () {
+                this.options.angle = this.transform.localRotate;
+                var body = this.physicsEngine.createCapsuleByPBody(this, this.maxSides);
+                this.physicsEngine.addBody(this);
+                if (this.onInit)
+                    this.onInit(this);
+            };
+            capsuleBody2d.prototype.onPlay = function () {
+            };
+            capsuleBody2d.ClassName = "capsuleBody2d";
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], capsuleBody2d.prototype, "maxSides", void 0);
+            capsuleBody2d = __decorate([
+                gd3d.reflect.node2DComponent,
+                gd3d.reflect.node2DPhysicsBody
+            ], capsuleBody2d);
+            return capsuleBody2d;
+        }(framework.physics2DBody));
+        framework.capsuleBody2d = capsuleBody2d;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -6406,23 +6634,85 @@ var gd3d;
             __extends(circleBody2d, _super);
             function circleBody2d() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.radius = 1;
                 _this.maxSides = 25;
                 return _this;
             }
+            Object.defineProperty(circleBody2d.prototype, "radius", {
+                get: function () {
+                    return (this.transform.width > this.transform.height ? this.transform.width : this.transform.height) * 0.5;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ;
             circleBody2d.prototype.start = function () {
-                var data = this.options || {};
-                this.physicsEngine.creatCircleBodyByInitData(this, this.radius, this.maxSides);
+                this.options.angle = this.transform.localRotate;
+                var body = this.physicsEngine.createCircleByPBody(this, this.maxSides);
+                this.physicsEngine.addBody(this);
+                if (this.onInit)
+                    this.onInit(this);
             };
             circleBody2d.prototype.onPlay = function () {
             };
             circleBody2d.ClassName = "circleBody2d";
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], circleBody2d.prototype, "maxSides", void 0);
             circleBody2d = __decorate([
-                gd3d.reflect.node2DComponent
+                gd3d.reflect.node2DComponent,
+                gd3d.reflect.node2DPhysicsBody
             ], circleBody2d);
             return circleBody2d;
         }(framework.physics2DBody));
         framework.circleBody2d = circleBody2d;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var compoundBody2d = (function (_super) {
+            __extends(compoundBody2d, _super);
+            function compoundBody2d() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this._bodys = [];
+                return _this;
+            }
+            compoundBody2d.prototype.start = function () {
+                var engine = this.physicsEngine;
+                var pos = this.transform.getWorldTranslate();
+                var tempv2 = gd3d.poolv2();
+                var len = this._bodys.length;
+                for (var i = 0; i < len; i++) {
+                    var body = this._bodys[i];
+                    tempv2.x = body.position.x + pos.x;
+                    tempv2.y = body.position.y + pos.y;
+                    engine.setPosition(body, tempv2);
+                }
+                this.options.parts = this._bodys;
+                this.options.angle = this.transform.localRotate;
+                this.body = engine.createBody(this.options);
+                engine.addBody(this);
+                if (this.onInit)
+                    this.onInit(this);
+                gd3d.poolv2_del(tempv2);
+            };
+            compoundBody2d.prototype.addPart = function (body) {
+                if (!body)
+                    return;
+                this._bodys.push(body);
+            };
+            compoundBody2d.prototype.onPlay = function () {
+            };
+            compoundBody2d.ClassName = "compoundBody2d";
+            compoundBody2d = __decorate([
+                gd3d.reflect.node2DComponent,
+                gd3d.reflect.node2DPhysicsBody
+            ], compoundBody2d);
+            return compoundBody2d;
+        }(framework.physics2DBody));
+        framework.compoundBody2d = compoundBody2d;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -6440,23 +6730,26 @@ var gd3d;
                 return _this;
             }
             convexHullBody2d.prototype.start = function () {
-                var data = this.options || {};
-                var pos = this.transform.localTranslate;
-                this.physicsEngine.ConvexHullBodyByInitData(this, this.vertexSets, this.flagInternal, this.removeCollinear, this.minimumArea);
+                this.options.angle = this.transform.localRotate;
+                var body = this.physicsEngine.ConvexHullByPBody(this, this.vertexSets, this.flagInternal, this.removeCollinear, this.minimumArea);
+                this.fixCenter();
+                this.physicsEngine.addBody(this);
+                if (this.onInit)
+                    this.onInit(this);
+            };
+            convexHullBody2d.prototype.fixCenter = function () {
                 var max = this.body.bounds.max;
                 var min = this.body.bounds.min;
                 var center = gd3d.poolv2();
                 this.calceBoundingCenter(max, min, center);
-                var offset = center;
-                gd3d.math.vec2ScaleByNum(center, -1, offset);
-                var newPos = offset;
-                var add = gd3d.poolv2(this.transform.localTranslate);
-                gd3d.math.vec2ScaleByNum(add, 2, add);
-                gd3d.math.vec2Add(add, offset, newPos);
-                this.setPosition(newPos);
+                var offset = gd3d.poolv2();
+                gd3d.math.vec2Subtract(this.transform.localTranslate, center, offset);
+                var newpos = offset;
+                gd3d.math.vec2Add(this.transform.localTranslate, offset, newpos);
+                this.setPosition(newpos);
                 this.transform.markDirty();
                 gd3d.poolv2_del(center);
-                gd3d.poolv2_del(add);
+                gd3d.poolv2_del(offset);
             };
             convexHullBody2d.prototype.calceBoundingCenter = function (max, min, center) {
                 center.x = (max.x + min.x) / 2;
@@ -6465,8 +6758,25 @@ var gd3d;
             convexHullBody2d.prototype.onPlay = function () {
             };
             convexHullBody2d.ClassName = "convexHullBody2d";
+            __decorate([
+                gd3d.reflect.Field("vector2[]"),
+                __metadata("design:type", Array)
+            ], convexHullBody2d.prototype, "vertexSets", void 0);
+            __decorate([
+                gd3d.reflect.Field("boolean"),
+                __metadata("design:type", Boolean)
+            ], convexHullBody2d.prototype, "flagInternal", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], convexHullBody2d.prototype, "removeCollinear", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Number)
+            ], convexHullBody2d.prototype, "minimumArea", void 0);
             convexHullBody2d = __decorate([
-                gd3d.reflect.node2DComponent
+                gd3d.reflect.node2DComponent,
+                gd3d.reflect.node2DPhysicsBody
             ], convexHullBody2d);
             return convexHullBody2d;
         }(framework.physics2DBody));
@@ -6481,11 +6791,12 @@ var gd3d;
             function physicEngine2D(op) {
                 if (op === void 0) { op = null; }
                 this.eventer = new gd3d.event.Physic2dEvent();
-                this._physicsBodys = [];
+                this._bodysObjMap = {};
                 if (Matter == undefined) {
                     console.error(" Matter not found , create physicEngine2D fail");
                     return;
                 }
+                this._Matter = Matter;
                 if (op != null) {
                     this.matterEngine = Matter.Engine.create(op);
                 }
@@ -6501,6 +6812,12 @@ var gd3d;
                 Matter.Events.on(this.matterEngine, "collisionActive", this.collisionActive.bind(this));
                 Matter.Events.on(this.matterEngine, "collisionEnd", this.collisionEnd.bind(this));
             }
+            Object.defineProperty(physicEngine2D.prototype, "Matter", {
+                get: function () { return this._Matter; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
             physicEngine2D.prototype.update = function (delta) {
                 Matter.Engine.update(this.matterEngine, delta);
             };
@@ -6523,30 +6840,34 @@ var gd3d;
                 this.eventer.OnEnum(eventEnum, func, thisArg);
             };
             physicEngine2D.prototype.removeEventListener = function (eventEnum, func, thisArg) {
-                this.eventer.RemoveListener(gd3d.event.UIEventEnum[eventEnum], func, thisArg);
+                this.eventer.RemoveListener(gd3d.event.Physic2dEventEnum[eventEnum], func, thisArg);
             };
-            physicEngine2D.prototype.creatRectBodyByInitData = function (pBody) {
+            physicEngine2D.prototype.createRectByPBody = function (pBody) {
                 if (!pBody || !pBody.transform)
                     return;
                 var tran = pBody.transform;
                 var pos = tran.getWorldTranslate();
-                var body = Matter.Bodies.rectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
+                if (!pBody.options.label)
+                    pBody.options.label = 'Rect Body';
+                var body = this.createRectangle(pos.x, pos.y, tran.width, tran.height, pBody.options);
                 pBody.body = body;
-                this.addBody(pBody);
                 return body;
             };
-            physicEngine2D.prototype.creatCircleBodyByInitData = function (pBody, radius, maxSides) {
+            physicEngine2D.prototype.createCircleByPBody = function (pBody, maxSides) {
                 if (maxSides === void 0) { maxSides = 25; }
                 if (!pBody || !pBody.transform)
                     return;
                 var tran = pBody.transform;
                 var pos = tran.getWorldTranslate();
-                var body = Matter.Bodies.circle(pos.x, pos.y, radius, pBody.options, maxSides);
+                var r = tran.width > tran.height ? tran.width : tran.height;
+                r *= 0.5;
+                if (!pBody.options.label)
+                    pBody.options.label = 'Circle Body';
+                var body = this.createCircle(pos.x, pos.y, r, pBody.options, maxSides);
                 pBody.body = body;
-                this.addBody(pBody);
                 return body;
             };
-            physicEngine2D.prototype.ConvexHullBodyByInitData = function (pBody, vertexSets, flagInternal, removeCollinear, minimumArea) {
+            physicEngine2D.prototype.ConvexHullByPBody = function (pBody, vertexSets, flagInternal, removeCollinear, minimumArea) {
                 if (flagInternal === void 0) { flagInternal = false; }
                 if (removeCollinear === void 0) { removeCollinear = 0.01; }
                 if (minimumArea === void 0) { minimumArea = 10; }
@@ -6554,23 +6875,96 @@ var gd3d;
                     return;
                 var tran = pBody.transform;
                 var pos = tran.getWorldTranslate();
-                var body = Matter.Bodies.fromVertices(pos.x, pos.y, vertexSets, pBody.options, flagInternal, removeCollinear, minimumArea);
+                if (!pBody.options.label)
+                    pBody.options.label = 'ConvexHull Body';
+                var body = this.createFromVertices(pos.x, pos.y, vertexSets, pBody.options, flagInternal, removeCollinear, minimumArea);
                 pBody.body = body;
-                this.addBody(pBody);
                 return body;
             };
+            physicEngine2D.prototype.createCapsuleByPBody = function (pBody, maxSides) {
+                if (maxSides === void 0) { maxSides = 25; }
+                if (!pBody || !pBody.transform)
+                    return;
+                var tran = pBody.transform;
+                var pos = tran.getWorldTranslate();
+                var y_Axis = tran.height > tran.width;
+                var r = y_Axis ? tran.width : tran.height;
+                r *= 0.5;
+                var h = y_Axis ? tran.height : tran.width;
+                var angle = y_Axis ? 0 : Math.PI * 0.5;
+                if (!pBody.options.label)
+                    pBody.options.label = 'Capsule Body';
+                var body = this.createCapsule(pos.x, pos.y, r, h, pBody.options, angle, maxSides);
+                pBody.body = body;
+                return body;
+            };
+            physicEngine2D.prototype.createBody = function (options) {
+                return Matter.Body.create(options);
+            };
+            physicEngine2D.prototype.createCircle = function (x, y, radius, options, maxSides) {
+                return Matter.Bodies.circle(x, y, radius, options, maxSides);
+            };
+            physicEngine2D.prototype.createRectangle = function (x, y, width, height, options) {
+                return Matter.Bodies.rectangle(x, y, width, height, options);
+            };
+            physicEngine2D.prototype.createTrapezoid = function (x, y, width, height, slope, options) {
+                return Matter.Bodies.trapezoid(x, y, width, height, slope, options);
+            };
+            physicEngine2D.prototype.createPolygon = function (x, y, sides, radius, options) {
+                return Matter.Bodies.polygon(x, y, sides, radius, options);
+            };
+            physicEngine2D.prototype.createFromVertices = function (x, y, vertexSets, options, flagInternal, removeCollinear, minimumArea) {
+                if (flagInternal === void 0) { flagInternal = false; }
+                if (removeCollinear === void 0) { removeCollinear = 0.01; }
+                if (minimumArea === void 0) { minimumArea = 10; }
+                return Matter.Bodies.fromVertices(x, y, vertexSets, options, flagInternal, removeCollinear, minimumArea);
+            };
+            physicEngine2D.prototype.createCapsule = function (x, y, radius, height, options, rotation, maxSides) {
+                if (rotation === void 0) { rotation = 0; }
+                if (maxSides === void 0) { maxSides = 25; }
+                options = options || {};
+                maxSides = maxSides || 25;
+                var sides = Math.ceil(Math.max(6, Math.min(maxSides, radius)));
+                sides = sides % 2 === 1 ? sides++ : sides;
+                var halfSides = sides / 2, halfDiff = (height - radius) / 2, theta = 2 * Math.PI / sides, path = '', angOffset = Math.PI + theta * 0.5, angle, xx, yy, yOffset;
+                halfDiff = halfDiff < 0 ? 0 : halfDiff;
+                for (var i = 0; i < sides; i++) {
+                    yOffset = i > halfSides ? halfDiff : -halfDiff;
+                    angle = angOffset + (i * theta);
+                    xx = Math.cos(angle) * radius;
+                    yy = Math.sin(angle) * radius + yOffset;
+                    if (i == 0) {
+                        path += 'L ' + xx.toFixed(3) + ' ' + (yy - yOffset * 2).toFixed(3) + ' ';
+                    }
+                    path += 'L ' + xx.toFixed(3) + ' ' + yy.toFixed(3) + ' ';
+                    if (i == halfSides) {
+                        path += 'L ' + xx.toFixed(3) + ' ' + (yy - yOffset * 2).toFixed(3) + ' ';
+                    }
+                }
+                var createCapsule = {
+                    label: 'Capsule Body',
+                    position: { x: x, y: y },
+                    vertices: Matter.Vertices.fromPath(path)
+                };
+                if (rotation != null || rotation % (Math.PI * 2) == 0) {
+                    Matter.Vertices.rotate(createCapsule.vertices, rotation, { x: x, y: y });
+                }
+                return Matter.Body.create(Matter.Common.extend({}, createCapsule, options));
+            };
             physicEngine2D.prototype.addBody = function (_Pbody) {
-                this._physicsBodys.push(_Pbody);
+                if (!_Pbody)
+                    return;
+                this._bodysObjMap[_Pbody.body.id] = _Pbody;
                 Matter.World.add(this.engineWorld, _Pbody.body);
             };
             physicEngine2D.prototype.removeBody = function (_Pbody) {
                 if (!_Pbody)
                     return;
-                var idx = this._physicsBodys.indexOf(_Pbody);
-                if (idx != -1) {
-                    this._physicsBodys.splice(idx, 1);
-                }
+                delete this._bodysObjMap[_Pbody.body.id];
                 Matter.World.remove(this.engineWorld, _Pbody.body);
+            };
+            physicEngine2D.prototype.getBody = function (bodyId) {
+                return this._bodysObjMap[bodyId];
             };
             physicEngine2D.prototype.clearWorld = function (keepStatic) {
                 if (keepStatic === void 0) { keepStatic = false; }
@@ -6602,6 +6996,9 @@ var gd3d;
             physicEngine2D.prototype.setPosition = function (body, pos) {
                 Matter.Body.setPosition(body, pos);
             };
+            physicEngine2D.prototype.setAngle = function (body, angle) {
+                Matter.Body.setAngle(body, angle);
+            };
             physicEngine2D.prototype.setMass = function (body, mass) {
                 Matter.Body.setMass(body, mass);
             };
@@ -6610,6 +7007,26 @@ var gd3d;
             };
             physicEngine2D.prototype.setAngularVelocity = function (body, angularVelocity) {
                 Matter.Body.setAngularVelocity(body, angularVelocity);
+            };
+            physicEngine2D.prototype.setStatic = function (body, isStatic) {
+                Matter.Body.setStatic(body, isStatic);
+            };
+            physicEngine2D.prototype.setSleeping = function (body, isSleeping) {
+                Matter.Sleeping.set(body, isSleeping);
+            };
+            physicEngine2D.prototype.setInertia = function (body, Inertia) {
+                Matter.Body.setInertia(body, Inertia);
+            };
+            physicEngine2D.prototype.setVertices = function (body, vertices) {
+                Matter.Body.setVertices(body, vertices);
+            };
+            physicEngine2D.prototype.setParts = function (body, parts, autoHull) {
+                if (autoHull === void 0) { autoHull = true; }
+                Matter.Body.setParts(body, parts, autoHull);
+            };
+            physicEngine2D.prototype.setCentre = function (body, centre, relative) {
+                if (relative === void 0) { relative = false; }
+                Matter.Body.setCentre(body, centre, relative);
             };
             return physicEngine2D;
         }());
@@ -6626,14 +7043,18 @@ var gd3d;
                 return _super !== null && _super.apply(this, arguments) || this;
             }
             rectBody2d.prototype.start = function () {
-                var data = this.options || {};
-                this.physicsEngine.creatRectBodyByInitData(this);
+                this.options.angle = this.transform.localRotate;
+                var body = this.physicsEngine.createRectByPBody(this);
+                this.physicsEngine.addBody(this);
+                if (this.onInit)
+                    this.onInit(this);
             };
             rectBody2d.prototype.onPlay = function () {
             };
             rectBody2d.ClassName = "rectBody2d";
             rectBody2d = __decorate([
-                gd3d.reflect.node2DComponent
+                gd3d.reflect.node2DComponent,
+                gd3d.reflect.node2DPhysicsBody
             ], rectBody2d);
             return rectBody2d;
         }(framework.physics2DBody));
@@ -9866,6 +10287,7 @@ var gd3d;
                     return item;
                 }
             };
+            var PoseBoneMatrix_1;
             PoseBoneMatrix.ClassName = "PoseBoneMatrix";
             PoseBoneMatrix.poolmats = [];
             __decorate([
@@ -9880,7 +10302,6 @@ var gd3d;
                 gd3d.reflect.SerializeType
             ], PoseBoneMatrix);
             return PoseBoneMatrix;
-            var PoseBoneMatrix_1;
         }());
         framework.PoseBoneMatrix = PoseBoneMatrix;
         var subClip = (function () {
@@ -10384,11 +10805,15 @@ var gd3d;
                     this.markHaveRendererComp();
                 node.dirtify(true);
             };
-            transform.prototype.removeAllChild = function () {
+            transform.prototype.removeAllChild = function (needDispose) {
+                if (needDispose === void 0) { needDispose = false; }
                 if (this._children == undefined)
                     return;
                 while (this._children.length > 0) {
-                    this.removeChild(this._children[0]);
+                    if (needDispose)
+                        this._children[0].dispose();
+                    else
+                        this.removeChild(this._children[0]);
                 }
             };
             transform.prototype.removeChild = function (node) {
@@ -10743,24 +11168,28 @@ var gd3d;
                 configurable: true
             });
             transform.prototype.dispose = function () {
+                if (this._parent)
+                    this._parent.removeChild(this);
+                this._dispose();
+            };
+            transform.prototype._dispose = function () {
                 if (this._beDispose)
                     return;
-                if (this._parent) {
-                    this._parent.removeChild(this);
-                }
                 if (this._children) {
                     for (var k in this._children) {
-                        this._children[k].dispose();
+                        this._children[k]._dispose();
                     }
                 }
                 if (this._physicsImpostor) {
                     this._physicsImpostor.dispose();
                 }
                 this._gameObject.dispose();
+                this._physicsImpostor = null;
                 this._beDispose = true;
                 if (this.onDispose)
                     this.onDispose();
             };
+            var transform_2;
             transform.ClassName = "transform";
             transform.helpv2 = new gd3d.math.vector2();
             transform.helpv3 = new gd3d.math.vector3();
@@ -10782,22 +11211,22 @@ var gd3d;
             ], transform.prototype, "prefab", void 0);
             __decorate([
                 gd3d.reflect.Field("transform[]"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Array),
                 __metadata("design:paramtypes", [Array])
             ], transform.prototype, "children", null);
             __decorate([
                 gd3d.reflect.Field("quaternion"),
-                __metadata("design:type", Object),
+                __metadata("design:type", gd3d.math.quaternion),
                 __metadata("design:paramtypes", [gd3d.math.quaternion])
             ], transform.prototype, "localRotate", null);
             __decorate([
                 gd3d.reflect.Field("vector3"),
-                __metadata("design:type", Object),
+                __metadata("design:type", gd3d.math.vector3),
                 __metadata("design:paramtypes", [gd3d.math.vector3])
             ], transform.prototype, "localTranslate", null);
             __decorate([
                 gd3d.reflect.Field("vector3"),
-                __metadata("design:type", Object),
+                __metadata("design:type", gd3d.math.vector3),
                 __metadata("design:paramtypes", [gd3d.math.vector3])
             ], transform.prototype, "localScale", null);
             __decorate([
@@ -10809,7 +11238,6 @@ var gd3d;
                 gd3d.reflect.SerializeType
             ], transform);
             return transform;
-            var transform_2;
         }());
         framework.transform = transform;
         var insID = (function () {
@@ -10963,6 +11391,7 @@ var gd3d;
             };
             boxcollider.prototype.clone = function () {
             };
+            var boxcollider_1;
             boxcollider.ClassName = "boxcollider";
             boxcollider._tempMatrix = new gd3d.math.matrix();
             __decorate([
@@ -10978,7 +11407,6 @@ var gd3d;
                 gd3d.reflect.nodeBoxCollider
             ], boxcollider);
             return boxcollider;
-            var boxcollider_1;
         }());
         framework.boxcollider = boxcollider;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -11126,7 +11554,7 @@ var gd3d;
             __decorate([
                 gd3d.reflect.Field("mesh"),
                 gd3d.reflect.UIStyle("WidgetDragSelect"),
-                __metadata("design:type", Object),
+                __metadata("design:type", framework.mesh),
                 __metadata("design:paramtypes", [framework.mesh])
             ], meshFilter.prototype, "mesh", null);
             meshFilter = __decorate([
@@ -11594,7 +12022,7 @@ var gd3d;
             ], skinnedMeshRenderer.prototype, "materials", void 0);
             __decorate([
                 gd3d.reflect.Field("mesh"),
-                __metadata("design:type", Object),
+                __metadata("design:type", framework.mesh),
                 __metadata("design:paramtypes", [framework.mesh])
             ], skinnedMeshRenderer.prototype, "mesh", null);
             __decorate([
@@ -12218,6 +12646,7 @@ var gd3d;
                 }
                 return JSON.stringify(obj);
             };
+            var material_2;
             material.ClassName = "material";
             __decorate([
                 gd3d.reflect.Field("constText"),
@@ -12232,7 +12661,6 @@ var gd3d;
                 __metadata("design:paramtypes", [String])
             ], material);
             return material;
-            var material_2;
         }());
         framework.material = material;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -12565,13 +12993,13 @@ var gd3d;
                 gd3d.math.vec3Clone(this._cacheMinP, outMin);
                 gd3d.math.vec3Clone(this._cacheMaxP, outMax);
             };
+            var mesh_1;
             mesh.ClassName = "mesh";
             mesh = mesh_1 = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
             ], mesh);
             return mesh;
-            var mesh_1;
         }());
         framework.mesh = mesh;
         var subMeshInfo = (function () {
@@ -14431,12 +14859,12 @@ var gd3d;
             bloomctr.ClassName = "bloomctr";
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], bloomctr.prototype, "bloomThreshold", null);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], bloomctr.prototype, "bloomIntensity", null);
             bloomctr = __decorate([
@@ -14662,8 +15090,8 @@ var gd3d;
                 gd3d.math.vec3Set(src2, screenpos.x, screenpos.y, 1);
                 var dest1 = camera_1.helpv3_2;
                 var dest2 = camera_1.helpv3_3;
-                this.calcWorldPosFromScreenPos(app, src1, dest1);
-                this.calcWorldPosFromScreenPos(app, src2, dest2);
+                this.calcModelPosFromScreenPos(app, src1, dest1);
+                this.calcModelPosFromScreenPos(app, src2, dest2);
                 var dir = camera_1.helpv3_4;
                 gd3d.math.vec3Subtract(dest2, dest1, dir);
                 gd3d.math.vec3Normalize(dir, dir);
@@ -14680,7 +15108,7 @@ var gd3d;
                 }
                 return ray;
             };
-            camera.prototype.calcWorldPosFromScreenPos = function (app, screenPos, outWorldPos) {
+            camera.prototype.calcModelPosFromScreenPos = function (app, screenPos, outModelPos) {
                 var vpp = camera_1.helprect;
                 this.calcViewPortPixel(app, vpp);
                 var vppos = gd3d.poolv2();
@@ -14699,7 +15127,7 @@ var gd3d;
                 src1.x = vppos.x;
                 src1.y = vppos.y;
                 src1.z = screenPos.z;
-                gd3d.math.matrixTransformVector3(src1, matinv, outWorldPos);
+                gd3d.math.matrixTransformVector3(src1, matinv, outModelPos);
                 gd3d.poolv2_del(vppos);
             };
             camera.prototype.calcScreenPosFromWorldPos = function (app, worldPos, outScreenPos) {
@@ -14838,7 +15266,7 @@ var gd3d;
                 var vec3cache = this._vec3cache;
                 var aabb = node.aabb;
                 var skinmesh = node.gameObject.renderer;
-                if (skinmesh != null && skinmesh.aabb) {
+                if (skinmesh != null && skinmesh.size && skinmesh.aabb) {
                     aabb = skinmesh.aabb;
                 }
                 gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, vec3cache);
@@ -14990,6 +15418,7 @@ var gd3d;
             };
             camera.prototype.clone = function () {
             };
+            var camera_1;
             camera.ClassName = "camera";
             camera.helpv3 = new gd3d.math.vector3();
             camera.helpv3_1 = new gd3d.math.vector3();
@@ -15049,7 +15478,6 @@ var gd3d;
                 __metadata("design:paramtypes", [])
             ], camera);
             return camera;
-            var camera_1;
         }());
         framework.camera = camera;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -15149,7 +15577,7 @@ var gd3d;
             ], canvascontainer.prototype, "_overlay2d", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], canvascontainer.prototype, "renderMode", null);
             canvascontainer = __decorate([
@@ -15691,6 +16119,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            var effectSystem_1;
             effectSystem.ClassName = "effectSystem";
             effectSystem.fps = 30;
             __decorate([
@@ -15711,7 +16140,6 @@ var gd3d;
                 gd3d.reflect.nodeComponent
             ], effectSystem);
             return effectSystem;
-            var effectSystem_1;
         }());
         framework.effectSystem = effectSystem;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -16604,6 +17032,7 @@ var gd3d;
             };
             spherecollider.prototype.clone = function () {
             };
+            var spherecollider_1;
             spherecollider.ClassName = "spherecollider";
             spherecollider.helpMat = null;
             __decorate([
@@ -16619,7 +17048,6 @@ var gd3d;
                 gd3d.reflect.nodeSphereCollider
             ], spherecollider);
             return spherecollider;
-            var spherecollider_1;
         }());
         framework.spherecollider = spherecollider;
     })(framework = gd3d.framework || (gd3d.framework = {}));
@@ -17586,12 +18014,12 @@ var gd3d;
             __decorate([
                 gd3d.reflect.Field("f14eff"),
                 gd3d.reflect.UIStyle("WidgetDragSelect"),
-                __metadata("design:type", Object),
+                __metadata("design:type", framework.f14eff),
                 __metadata("design:paramtypes", [framework.f14eff])
             ], f14EffectSystem.prototype, "f14eff", null);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Object),
+                __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], f14EffectSystem.prototype, "delay", null);
             f14EffectSystem = __decorate([
@@ -19607,18 +20035,6 @@ var gd3d;
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
-    var framework;
-    (function (framework) {
-        var PointEvent = (function () {
-            function PointEvent() {
-            }
-            return PointEvent;
-        }());
-        framework.PointEvent = PointEvent;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
     var event;
     (function (event) {
         var UIEventEnum;
@@ -19825,6 +20241,18 @@ var gd3d;
         }(gd3d.AEvent));
         event_3.UIEvent = UIEvent;
     })(event = gd3d.event || (gd3d.event = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var PointEvent = (function () {
+            function PointEvent() {
+            }
+            return PointEvent;
+        }());
+        framework.PointEvent = PointEvent;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
@@ -23447,11 +23875,11 @@ var gd3d;
             angle *= Math.PI / 180.0;
             var halfAngle = angle * 0.5;
             var sin_a = Math.sin(halfAngle);
+            math.vec3Normalize(axis, axis);
             out.w = Math.cos(halfAngle);
             out.x = axis.x * sin_a;
             out.y = axis.y * sin_a;
             out.z = axis.z * sin_a;
-            math.quatNormalize(out, out);
         }
         math.quatFromAxisAngle = quatFromAxisAngle;
         function quatToAxisAngle(src, axis) {
@@ -23641,36 +24069,34 @@ var gd3d;
             math.pool.delete_vector3(dirxz);
         }
         math.quatYAxis = quatYAxis;
-        function rotationTo(from, to, out) {
-            var tmpvec3 = math.pool.new_vector3();
-            var xUnitVec3 = math.pool.vector3_right;
-            var yUnitVec3 = math.pool.vector3_up;
-            var dot = math.vec3Dot(from, to);
-            if (dot < -0.999999) {
-                math.vec3Cross(xUnitVec3, from, tmpvec3);
-                if (math.vec3Length(tmpvec3) < 0.000001) {
-                    math.vec3Cross(yUnitVec3, from, tmpvec3);
-                }
-                math.vec3Normalize(tmpvec3, tmpvec3);
-                quatFromAxisAngle(tmpvec3, 180, out);
+        function quatRotationTo(start, end, out) {
+            math.vec3Normalize(start, start);
+            math.vec3Normalize(end, end);
+            var dot = math.vec3Dot(start, end);
+            if (dot >= 0.99999847691) {
+                quatIdentity(out);
+                return;
             }
-            else if (dot > 0.999999) {
-                out[0] = 0;
-                out[1] = 0;
-                out[2] = 0;
-                out[3] = 1;
+            if (dot <= -0.99999847691) {
+                var pVec = math.pool.new_vector3();
+                math.vec3Perpendicular(start, pVec);
+                out.w = 0;
+                out.x = pVec.x;
+                out.y = pVec.y;
+                out.z = pVec.z;
+                math.pool.delete_vector3(pVec);
+                return;
             }
-            else {
-                math.vec3Cross(from, to, tmpvec3);
-                out[0] = tmpvec3[0];
-                out[1] = tmpvec3[1];
-                out[2] = tmpvec3[2];
-                out[3] = 1 + dot;
-                quatNormalize(out, out);
-            }
-            math.pool.delete_vector3(tmpvec3);
+            var cross_product = math.pool.new_vector3();
+            math.vec3Cross(start, end, cross_product);
+            out.w = 1 + dot;
+            out.x = cross_product.x;
+            out.y = cross_product.y;
+            out.z = cross_product.z;
+            quatNormalize(out, out);
+            math.pool.delete_vector3(cross_product);
         }
-        math.rotationTo = rotationTo;
+        math.quatRotationTo = quatRotationTo;
         function myLookRotation(dir, out, up) {
             if (up === void 0) { up = math.pool.vector3_up; }
             if (math.vec3Equal(dir, math.pool.vector3_zero)) {
@@ -23683,16 +24109,16 @@ var gd3d;
                 math.vec3ScaleByNum(up, math.vec3Dot(up, dir), tempv);
                 math.vec3Subtract(dir, tempv, tempv);
                 var qu = math.pool.new_quaternion();
-                this.rotationTo(math.pool.vector3_forward, tempv, qu);
+                this.quatRotationTo(math.pool.vector3_forward, tempv, qu);
                 var qu2 = math.pool.new_quaternion();
-                this.rotationTo(tempv, dir, qu2);
+                this.quatRotationTo(tempv, dir, qu2);
                 quatMultiply(qu, qu2, out);
                 math.pool.delete_quaternion(qu);
                 math.pool.delete_quaternion(qu2);
                 math.pool.delete_vector3(tempv);
             }
             else {
-                this.rotationTo(math.pool.vector3_forward, dir, out);
+                this.quatRotationTo(math.pool.vector3_forward, dir, out);
             }
         }
         math.myLookRotation = myLookRotation;
@@ -24160,6 +24586,14 @@ var gd3d;
             vector.rawData[2] = z;
         }
         math.vec3Set = vec3Set;
+        function vec3Perpendicular(vector, out) {
+            gd3d.math.vec3Cross(math.pool.vector3_right, vector, out);
+            var dot = gd3d.math.vec3Dot(out, out);
+            if (dot < 0.05) {
+                gd3d.math.vec3Cross(math.pool.vector3_up, vector, out);
+            }
+        }
+        math.vec3Perpendicular = vec3Perpendicular;
     })(math = gd3d.math || (gd3d.math = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -24596,50 +25030,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var Navigate = (function () {
-            function Navigate(navinfo, navindexmap) {
-                this.navinfo = navinfo;
-                this.navindexmap = navindexmap;
-            }
-            Navigate.prototype.pathPoints = function (start, end, startIndex, endIndex) {
-                var startVec = new framework.navVec3();
-                startVec.x = start.x;
-                startVec.y = start.y;
-                startVec.z = start.z;
-                var endVec = new framework.navVec3();
-                endVec.x = end.x;
-                endVec.y = end.y;
-                endVec.z = end.z;
-                var startPoly = this.navindexmap[startIndex];
-                var endPoly = this.navindexmap[endIndex];
-                if (startPoly >= 0 && endPoly >= 0) {
-                    var polyPath = gd3d.framework.pathFinding.calcAStarPolyPath(this.navinfo, startPoly, endPoly, endVec, 0.3);
-                }
-                if (polyPath) {
-                    var wayPoints = gd3d.framework.pathFinding.calcWayPoints(this.navinfo, startVec, endVec, polyPath);
-                    var navmeshWayPoints = [];
-                    for (var i = 0; i < wayPoints.length; i++) {
-                        navmeshWayPoints[i] = new gd3d.math.vector3(wayPoints[i].x, wayPoints[i].realy, wayPoints[i].z);
-                    }
-                    return navmeshWayPoints;
-                }
-                else {
-                    return null;
-                }
-            };
-            Navigate.prototype.dispose = function () {
-                this.navinfo = null;
-                this.navindexmap = null;
-            };
-            return Navigate;
-        }());
-        framework.Navigate = Navigate;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var NavMeshLoadManager = (function () {
             function NavMeshLoadManager() {
                 this.navMeshVertexOffset = new gd3d.math.vector3(0, 0, 0);
@@ -24833,6 +25223,50 @@ var gd3d;
             return NavMeshLoadManager;
         }());
         framework.NavMeshLoadManager = NavMeshLoadManager;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var Navigate = (function () {
+            function Navigate(navinfo, navindexmap) {
+                this.navinfo = navinfo;
+                this.navindexmap = navindexmap;
+            }
+            Navigate.prototype.pathPoints = function (start, end, startIndex, endIndex) {
+                var startVec = new framework.navVec3();
+                startVec.x = start.x;
+                startVec.y = start.y;
+                startVec.z = start.z;
+                var endVec = new framework.navVec3();
+                endVec.x = end.x;
+                endVec.y = end.y;
+                endVec.z = end.z;
+                var startPoly = this.navindexmap[startIndex];
+                var endPoly = this.navindexmap[endIndex];
+                if (startPoly >= 0 && endPoly >= 0) {
+                    var polyPath = gd3d.framework.pathFinding.calcAStarPolyPath(this.navinfo, startPoly, endPoly, endVec, 0.3);
+                }
+                if (polyPath) {
+                    var wayPoints = gd3d.framework.pathFinding.calcWayPoints(this.navinfo, startVec, endVec, polyPath);
+                    var navmeshWayPoints = [];
+                    for (var i = 0; i < wayPoints.length; i++) {
+                        navmeshWayPoints[i] = new gd3d.math.vector3(wayPoints[i].x, wayPoints[i].realy, wayPoints[i].z);
+                    }
+                    return navmeshWayPoints;
+                }
+                else {
+                    return null;
+                }
+            };
+            Navigate.prototype.dispose = function () {
+                this.navinfo = null;
+                this.navindexmap = null;
+            };
+            return Navigate;
+        }());
+        framework.Navigate = Navigate;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -26614,6 +27048,298 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var Particle_new = (function () {
+            function Particle_new(batcher) {
+                this.startScale = new gd3d.math.vector3();
+                this.startRotation = new gd3d.math.quaternion();
+                this.rotationByShape = new gd3d.math.quaternion();
+                this.rotAngle = 0;
+                this.rotationByEuler = new gd3d.math.quaternion();
+                this.localMatrix = new gd3d.math.matrix();
+                this.localTranslate = new gd3d.math.vector3();
+                this.localRotation = new gd3d.math.quaternion();
+                this.localScale = new gd3d.math.vector3(1, 1, 1);
+                this.color = new gd3d.math.vector3(1, 1, 1);
+                this.tex_ST = new gd3d.math.vector4(1, 1, 0, 0);
+                this.curLife = 0;
+                this.life = 0;
+                this.speedDir = new gd3d.math.vector3(0, 0, 0);
+                this.actived = true;
+                this.transformVertex = new gd3d.math.matrix();
+                this.matToworld = new gd3d.math.matrix();
+                this.batcher = batcher;
+                this.emisson = batcher.emission;
+                this.gameObject = this.emisson.gameObject;
+                this.vertexStartIndex = batcher.curVerCount;
+                this.dataForVbo = this.emisson.cloneMeshVBO();
+                this.dataForEbo = this.emisson.cloneMeshEBO();
+                this.sourceVbo = this.emisson.vbo;
+                this.initByData();
+            }
+            Particle_new.prototype.uploadData = function (array) {
+                array.set(this.dataForVbo, this.vertexStartIndex * this.emisson.vertexSize);
+            };
+            Particle_new.prototype.initByData = function () {
+                this.totalLife = this.emisson.lifeTime.getValue();
+                framework.effTools.getRandomDirAndPosByZEmission(this.emisson, this.speedDir, this.localTranslate);
+                this.simulationSpeed = this.emisson.simulationSpeed.getValue();
+                this.Starteuler = this.emisson.startEuler.getValue();
+                gd3d.math.quatFromEulerAngles(this.Starteuler.x, this.Starteuler.y, this.Starteuler.z, this.rotationByEuler);
+                this.localScale = this.emisson.startScale.getValue();
+                this.startColor = this.emisson.startColor;
+                this.sizeNodes = this.emisson.sizeNodes;
+                this.colorNodes = this.emisson.colorNodes;
+                this.alphaNodes = this.emisson.alphaNodes;
+                if (this.emisson.enableVelocityOverLifetime) {
+                    this.movespeed = this.emisson.moveSpeed.getValue();
+                }
+                if (this.emisson.enableRotOverLifeTime) {
+                    this.eulerSpeed = this.emisson.angleSpeed.getValue();
+                }
+                if (this.emisson.rendermodel == framework.RenderModel.StretchedBillBoard) {
+                    var localOrgin = gd3d.math.pool.vector3_zero;
+                    gd3d.math.quatLookat(localOrgin, this.speedDir, this.rotationByShape);
+                    var initRot = gd3d.math.pool.new_quaternion();
+                    gd3d.math.quatFromEulerAngles(90, 0, 90, initRot);
+                    gd3d.math.quatMultiply(this.rotationByShape, initRot, this.rotationByShape);
+                    gd3d.math.quatClone(this.rotationByShape, this.localRotation);
+                    gd3d.math.pool.delete_quaternion(initRot);
+                }
+                if (!this.emisson.simulateInLocalSpace) {
+                    this.emissionMatToWorld = new gd3d.math.matrix();
+                    var mat = this.emisson.getmatrixToWorld();
+                    gd3d.math.matrixClone(mat, this.emissionMatToWorld);
+                    this.emissionWorldRotation = new gd3d.math.quaternion();
+                    var quat = this.emisson.getWorldRotation();
+                    gd3d.math.quatClone(quat, this.emissionWorldRotation);
+                }
+            };
+            Particle_new.prototype.update = function (delta) {
+                if (!this.actived)
+                    return;
+                this.curLife += delta;
+                this.life = this.curLife / this.totalLife;
+                gd3d.math.floatClamp(this.life, 0, 1);
+                if (this.curLife >= this.totalLife) {
+                    gd3d.math.matrixZero(this.transformVertex);
+                    this._updateVBO();
+                    this.emisson.deadParticles.push(this);
+                    this.curLife = 0;
+                    this.actived = false;
+                    return;
+                }
+                this._updatePos(delta);
+                this._updateScale(delta);
+                this._updateEuler(delta);
+                this._updateRotation(delta);
+                this._updateLocalMatrix(delta);
+                this._updateColor(delta);
+                this._updateUV(delta);
+                this._updateVBO();
+            };
+            Particle_new.prototype._updateLocalMatrix = function (delta) {
+                gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
+                if (this.emisson.simulateInLocalSpace) {
+                    gd3d.math.matrixMultiply(this.emisson.matToObj, this.localMatrix, this.transformVertex);
+                }
+                else {
+                    gd3d.math.matrixMultiply(this.emissionMatToWorld, this.localMatrix, this.transformVertex);
+                }
+            };
+            Particle_new.prototype.refreshEmissionData = function () {
+                if (this.emisson.simulateInLocalSpace) {
+                    this.emissionMatToWorld = this.emisson.getmatrixToWorld();
+                    this.emissionWorldRotation = this.emisson.getWorldRotation();
+                }
+            };
+            Particle_new.prototype._updateRotation = function (delta) {
+                if (this.emisson.rendermodel == framework.RenderModel.Mesh) {
+                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, this.rotAngle, this.rotationByEuler);
+                    gd3d.math.quatClone(this.rotationByEuler, this.localRotation);
+                }
+                else {
+                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_forward, this.rotAngle, this.rotationByEuler);
+                    this.refreshEmissionData();
+                    var translation = gd3d.math.pool.new_vector3();
+                    var worldTranslation = gd3d.math.pool.new_vector3();
+                    var worldRotation = gd3d.math.pool.new_quaternion();
+                    var invTransformRotation = gd3d.math.pool.new_quaternion();
+                    gd3d.math.vec3Clone(this.localTranslate, translation);
+                    var cam = this.emisson.renderCamera;
+                    var camPosInWorld = cam.gameObject.transform.getWorldTranslate();
+                    gd3d.math.matrixTransformVector3(translation, this.emissionMatToWorld, worldTranslation);
+                    if (this.emisson.rendermodel == framework.RenderModel.BillBoard) {
+                        gd3d.math.quatLookat(worldTranslation, camPosInWorld, worldRotation);
+                    }
+                    else if (this.emisson.rendermodel == framework.RenderModel.HorizontalBillBoard) {
+                        worldRotation.x = -0.5;
+                        worldRotation.y = 0.5;
+                        worldRotation.z = 0.5;
+                        worldRotation.w = 0.5;
+                    }
+                    else if (this.emisson.rendermodel == framework.RenderModel.VerticalBillBoard) {
+                        var forwardTarget = gd3d.math.pool.new_vector3();
+                        gd3d.math.vec3Clone(camPosInWorld, forwardTarget);
+                        forwardTarget.y = worldTranslation.y;
+                        gd3d.math.quatLookat(worldTranslation, forwardTarget, worldRotation);
+                        gd3d.math.pool.delete_vector3(forwardTarget);
+                    }
+                    else if (this.emisson.rendermodel == framework.RenderModel.StretchedBillBoard) {
+                        gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
+                        gd3d.math.matrixMultiply(this.emissionMatToWorld, this.localMatrix, this.matToworld);
+                        var xaxis = gd3d.math.pool.new_vector3();
+                        var yaxis = gd3d.math.pool.new_vector3();
+                        var zaxis = gd3d.math.pool.new_vector3();
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_right, this.matToworld, xaxis);
+                        gd3d.math.vec3Normalize(xaxis, xaxis);
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_up, this.matToworld, yaxis);
+                        gd3d.math.vec3Normalize(yaxis, yaxis);
+                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_forward, this.matToworld, zaxis);
+                        gd3d.math.vec3Normalize(zaxis, zaxis);
+                        framework.EffectUtil.lookatbyXAxis(worldTranslation, xaxis, yaxis, zaxis, camPosInWorld, worldRotation);
+                        gd3d.math.quatMultiply(this.localRotation, worldRotation, this.localRotation);
+                        gd3d.math.pool.delete_quaternion(worldRotation);
+                        gd3d.math.pool.delete_vector3(translation);
+                        gd3d.math.pool.delete_quaternion(invTransformRotation);
+                        gd3d.math.pool.delete_vector3(xaxis);
+                        gd3d.math.pool.delete_vector3(yaxis);
+                        gd3d.math.pool.delete_vector3(zaxis);
+                        return;
+                    }
+                    gd3d.math.quatClone(this.emissionWorldRotation, invTransformRotation);
+                    gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
+                    gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.localRotation);
+                    gd3d.math.quatMultiply(this.localRotation, this.rotationByEuler, this.localRotation);
+                    gd3d.math.pool.delete_vector3(translation);
+                    gd3d.math.pool.delete_vector3(worldTranslation);
+                    gd3d.math.pool.delete_quaternion(worldRotation);
+                    gd3d.math.pool.delete_quaternion(invTransformRotation);
+                }
+            };
+            Particle_new.prototype._updatePos = function (delta) {
+                var currentTranslate = framework.EffectUtil.vecMuliNum(this.speedDir, this.simulationSpeed);
+                gd3d.math.vec3Add(this.localTranslate, currentTranslate, this.localTranslate);
+                if (this.emisson.enableVelocityOverLifetime) {
+                    this.localTranslate.x += this.movespeed.x * delta;
+                    this.localTranslate.y += this.movespeed.y * delta;
+                    this.localTranslate.z += this.movespeed.z * delta;
+                }
+            };
+            Particle_new.prototype._updateEuler = function (delta) {
+                if (this.emisson.enableRotOverLifeTime) {
+                    this.rotAngle = this.eulerSpeed * this.curLife;
+                }
+            };
+            Particle_new.prototype._updateScale = function (delta) {
+                if (this.emisson.enableSizeOverLifetime) {
+                    for (var i = 0; i < this.sizeNodes.length - 1; i++) {
+                        if (this.sizeNodes[i].key <= this.life && this.sizeNodes[i + 1].key >= this.life) {
+                            var target = gd3d.math.numberLerp(this.sizeNodes[i].value, this.sizeNodes[i + 1].value, (this.life - this.sizeNodes[i].key) / (this.sizeNodes[i + 1].key - this.sizeNodes[i].key));
+                            gd3d.math.vec3ScaleByNum(this.startScale, target, this.localScale);
+                            break;
+                        }
+                    }
+                }
+            };
+            Particle_new.prototype._updateColor = function (delta) {
+                if (this.emisson.enableColorOverLifetime) {
+                    if (this.colorNodes != null) {
+                        for (var i = 0; i < this.colorNodes.length - 1; i++) {
+                            if (this.colorNodes[i].key <= this.life && this.colorNodes[i + 1].key >= this.life) {
+                                gd3d.math.vec3SLerp(this.colorNodes[i].value, this.colorNodes[i + 1].value, (this.life - this.colorNodes[i].key) / (this.colorNodes[i + 1].key - this.colorNodes[i].key), this.color);
+                                break;
+                            }
+                        }
+                    }
+                    if (this.alphaNodes != null) {
+                        for (var i = 0; i < this.alphaNodes.length - 1; i++) {
+                            if (this.alphaNodes[i].key <= this.life && this.alphaNodes[i + 1].key >= this.life) {
+                                this.alpha = gd3d.math.numberLerp(this.alphaNodes[i].value, this.alphaNodes[i + 1].value, (this.life - this.colorNodes[i].key) / (this.colorNodes[i + 1].key - this.colorNodes[i].key));
+                                break;
+                            }
+                        }
+                    }
+                }
+            };
+            Particle_new.prototype._updateUV = function (delta) {
+                if (this.emisson.uvType == framework.UVTypeEnum.UVRoll) {
+                    this.tex_ST.z = this.emisson.uSpeed * this.curLife;
+                    this.tex_ST.w = this.emisson.vSpeed * this.curLife;
+                }
+                else if (this.emisson.uvType == framework.UVTypeEnum.UVSprite) {
+                    var spriteindex = Math.floor(this.life * this.emisson.count);
+                    gd3d.math.spriteAnimation(this.emisson.row, this.emisson.column, spriteindex, this.tex_ST);
+                }
+            };
+            Particle_new.prototype._updateVBO = function () {
+                var vertexSize = this.emisson.vertexSize;
+                for (var i = 0; i < this.emisson.perVertexCount; i++) {
+                    {
+                        var vertex = gd3d.math.pool.new_vector3();
+                        vertex.x = this.sourceVbo[i * vertexSize + 0];
+                        vertex.y = this.sourceVbo[i * vertexSize + 1];
+                        vertex.z = this.sourceVbo[i * vertexSize + 2];
+                        gd3d.math.matrixTransformVector3(vertex, this.transformVertex, vertex);
+                        this.dataForVbo[i * vertexSize + 0] = vertex.x;
+                        this.dataForVbo[i * vertexSize + 1] = vertex.y;
+                        this.dataForVbo[i * vertexSize + 2] = vertex.z;
+                        gd3d.math.pool.delete_vector3(vertex);
+                    }
+                    {
+                        var r = this.sourceVbo[i * vertexSize + 3] * this.startColor.r;
+                        var g = this.sourceVbo[i * vertexSize + 4] * this.startColor.g;
+                        var b = this.sourceVbo[i * vertexSize + 5] * this.startColor.b;
+                        var a = this.sourceVbo[i * vertexSize + 6] * this.startColor.a;
+                        if (this.colorNodes != null) {
+                            r = this.color.x;
+                            g = this.color.y;
+                            b = this.color.z;
+                        }
+                        if (this.alphaNodes != null) {
+                            a = this.alpha;
+                        }
+                        r *= this.emisson.colorRate;
+                        g *= this.emisson.colorRate;
+                        b *= this.emisson.colorRate;
+                        a *= this.emisson.colorRate;
+                        r = gd3d.math.floatClamp(r, 0, 3);
+                        g = gd3d.math.floatClamp(g, 0, 3);
+                        b = gd3d.math.floatClamp(b, 0, 3);
+                        a = gd3d.math.floatClamp(a, 0, 3);
+                        this.dataForVbo[i * this.emisson.vertexSize + 3] = r;
+                        this.dataForVbo[i * this.emisson.vertexSize + 4] = g;
+                        this.dataForVbo[i * this.emisson.vertexSize + 5] = b;
+                        this.dataForVbo[i * this.emisson.vertexSize + 6] = a;
+                    }
+                    {
+                        this.dataForVbo[i * vertexSize + 7] = this.sourceVbo[i * vertexSize + 7] * this.tex_ST.x + this.tex_ST.z;
+                        this.dataForVbo[i * vertexSize + 8] = this.sourceVbo[i * vertexSize + 8] * this.tex_ST.y + this.tex_ST.w;
+                    }
+                }
+            };
+            Particle_new.prototype.dispose = function () {
+                this.dataForVbo = null;
+                this.dataForEbo = null;
+                this.startRotation = null;
+                this.localRotation = null;
+                this.rotationByEuler = null;
+                this.rotationByShape = null;
+                this.tex_ST = null;
+                this.localMatrix = null;
+                this.localTranslate = null;
+                this.Starteuler = null;
+                this.localScale = null;
+                this.color = null;
+            };
+            return Particle_new;
+        }());
+        framework.Particle_new = Particle_new;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var Vector3AttributeData = (function () {
             function Vector3AttributeData() {
                 this.init();
@@ -27348,298 +28074,6 @@ var gd3d;
             return effTools;
         }());
         framework.effTools = effTools;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var Particle_new = (function () {
-            function Particle_new(batcher) {
-                this.startScale = new gd3d.math.vector3();
-                this.startRotation = new gd3d.math.quaternion();
-                this.rotationByShape = new gd3d.math.quaternion();
-                this.rotAngle = 0;
-                this.rotationByEuler = new gd3d.math.quaternion();
-                this.localMatrix = new gd3d.math.matrix();
-                this.localTranslate = new gd3d.math.vector3();
-                this.localRotation = new gd3d.math.quaternion();
-                this.localScale = new gd3d.math.vector3(1, 1, 1);
-                this.color = new gd3d.math.vector3(1, 1, 1);
-                this.tex_ST = new gd3d.math.vector4(1, 1, 0, 0);
-                this.curLife = 0;
-                this.life = 0;
-                this.speedDir = new gd3d.math.vector3(0, 0, 0);
-                this.actived = true;
-                this.transformVertex = new gd3d.math.matrix();
-                this.matToworld = new gd3d.math.matrix();
-                this.batcher = batcher;
-                this.emisson = batcher.emission;
-                this.gameObject = this.emisson.gameObject;
-                this.vertexStartIndex = batcher.curVerCount;
-                this.dataForVbo = this.emisson.cloneMeshVBO();
-                this.dataForEbo = this.emisson.cloneMeshEBO();
-                this.sourceVbo = this.emisson.vbo;
-                this.initByData();
-            }
-            Particle_new.prototype.uploadData = function (array) {
-                array.set(this.dataForVbo, this.vertexStartIndex * this.emisson.vertexSize);
-            };
-            Particle_new.prototype.initByData = function () {
-                this.totalLife = this.emisson.lifeTime.getValue();
-                framework.effTools.getRandomDirAndPosByZEmission(this.emisson, this.speedDir, this.localTranslate);
-                this.simulationSpeed = this.emisson.simulationSpeed.getValue();
-                this.Starteuler = this.emisson.startEuler.getValue();
-                gd3d.math.quatFromEulerAngles(this.Starteuler.x, this.Starteuler.y, this.Starteuler.z, this.rotationByEuler);
-                this.localScale = this.emisson.startScale.getValue();
-                this.startColor = this.emisson.startColor;
-                this.sizeNodes = this.emisson.sizeNodes;
-                this.colorNodes = this.emisson.colorNodes;
-                this.alphaNodes = this.emisson.alphaNodes;
-                if (this.emisson.enableVelocityOverLifetime) {
-                    this.movespeed = this.emisson.moveSpeed.getValue();
-                }
-                if (this.emisson.enableRotOverLifeTime) {
-                    this.eulerSpeed = this.emisson.angleSpeed.getValue();
-                }
-                if (this.emisson.rendermodel == framework.RenderModel.StretchedBillBoard) {
-                    var localOrgin = gd3d.math.pool.vector3_zero;
-                    gd3d.math.quatLookat(localOrgin, this.speedDir, this.rotationByShape);
-                    var initRot = gd3d.math.pool.new_quaternion();
-                    gd3d.math.quatFromEulerAngles(90, 0, 90, initRot);
-                    gd3d.math.quatMultiply(this.rotationByShape, initRot, this.rotationByShape);
-                    gd3d.math.quatClone(this.rotationByShape, this.localRotation);
-                    gd3d.math.pool.delete_quaternion(initRot);
-                }
-                if (!this.emisson.simulateInLocalSpace) {
-                    this.emissionMatToWorld = new gd3d.math.matrix();
-                    var mat = this.emisson.getmatrixToWorld();
-                    gd3d.math.matrixClone(mat, this.emissionMatToWorld);
-                    this.emissionWorldRotation = new gd3d.math.quaternion();
-                    var quat = this.emisson.getWorldRotation();
-                    gd3d.math.quatClone(quat, this.emissionWorldRotation);
-                }
-            };
-            Particle_new.prototype.update = function (delta) {
-                if (!this.actived)
-                    return;
-                this.curLife += delta;
-                this.life = this.curLife / this.totalLife;
-                gd3d.math.floatClamp(this.life, 0, 1);
-                if (this.curLife >= this.totalLife) {
-                    gd3d.math.matrixZero(this.transformVertex);
-                    this._updateVBO();
-                    this.emisson.deadParticles.push(this);
-                    this.curLife = 0;
-                    this.actived = false;
-                    return;
-                }
-                this._updatePos(delta);
-                this._updateScale(delta);
-                this._updateEuler(delta);
-                this._updateRotation(delta);
-                this._updateLocalMatrix(delta);
-                this._updateColor(delta);
-                this._updateUV(delta);
-                this._updateVBO();
-            };
-            Particle_new.prototype._updateLocalMatrix = function (delta) {
-                gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
-                if (this.emisson.simulateInLocalSpace) {
-                    gd3d.math.matrixMultiply(this.emisson.matToObj, this.localMatrix, this.transformVertex);
-                }
-                else {
-                    gd3d.math.matrixMultiply(this.emissionMatToWorld, this.localMatrix, this.transformVertex);
-                }
-            };
-            Particle_new.prototype.refreshEmissionData = function () {
-                if (this.emisson.simulateInLocalSpace) {
-                    this.emissionMatToWorld = this.emisson.getmatrixToWorld();
-                    this.emissionWorldRotation = this.emisson.getWorldRotation();
-                }
-            };
-            Particle_new.prototype._updateRotation = function (delta) {
-                if (this.emisson.rendermodel == framework.RenderModel.Mesh) {
-                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_up, this.rotAngle, this.rotationByEuler);
-                    gd3d.math.quatClone(this.rotationByEuler, this.localRotation);
-                }
-                else {
-                    gd3d.math.quatFromAxisAngle(gd3d.math.pool.vector3_forward, this.rotAngle, this.rotationByEuler);
-                    this.refreshEmissionData();
-                    var translation = gd3d.math.pool.new_vector3();
-                    var worldTranslation = gd3d.math.pool.new_vector3();
-                    var worldRotation = gd3d.math.pool.new_quaternion();
-                    var invTransformRotation = gd3d.math.pool.new_quaternion();
-                    gd3d.math.vec3Clone(this.localTranslate, translation);
-                    var cam = this.emisson.renderCamera;
-                    var camPosInWorld = cam.gameObject.transform.getWorldTranslate();
-                    gd3d.math.matrixTransformVector3(translation, this.emissionMatToWorld, worldTranslation);
-                    if (this.emisson.rendermodel == framework.RenderModel.BillBoard) {
-                        gd3d.math.quatLookat(worldTranslation, camPosInWorld, worldRotation);
-                    }
-                    else if (this.emisson.rendermodel == framework.RenderModel.HorizontalBillBoard) {
-                        worldRotation.x = -0.5;
-                        worldRotation.y = 0.5;
-                        worldRotation.z = 0.5;
-                        worldRotation.w = 0.5;
-                    }
-                    else if (this.emisson.rendermodel == framework.RenderModel.VerticalBillBoard) {
-                        var forwardTarget = gd3d.math.pool.new_vector3();
-                        gd3d.math.vec3Clone(camPosInWorld, forwardTarget);
-                        forwardTarget.y = worldTranslation.y;
-                        gd3d.math.quatLookat(worldTranslation, forwardTarget, worldRotation);
-                        gd3d.math.pool.delete_vector3(forwardTarget);
-                    }
-                    else if (this.emisson.rendermodel == framework.RenderModel.StretchedBillBoard) {
-                        gd3d.math.matrixMakeTransformRTS(this.localTranslate, this.localScale, this.localRotation, this.localMatrix);
-                        gd3d.math.matrixMultiply(this.emissionMatToWorld, this.localMatrix, this.matToworld);
-                        var xaxis = gd3d.math.pool.new_vector3();
-                        var yaxis = gd3d.math.pool.new_vector3();
-                        var zaxis = gd3d.math.pool.new_vector3();
-                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_right, this.matToworld, xaxis);
-                        gd3d.math.vec3Normalize(xaxis, xaxis);
-                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_up, this.matToworld, yaxis);
-                        gd3d.math.vec3Normalize(yaxis, yaxis);
-                        gd3d.math.matrixTransformNormal(gd3d.math.pool.vector3_forward, this.matToworld, zaxis);
-                        gd3d.math.vec3Normalize(zaxis, zaxis);
-                        framework.EffectUtil.lookatbyXAxis(worldTranslation, xaxis, yaxis, zaxis, camPosInWorld, worldRotation);
-                        gd3d.math.quatMultiply(this.localRotation, worldRotation, this.localRotation);
-                        gd3d.math.pool.delete_quaternion(worldRotation);
-                        gd3d.math.pool.delete_vector3(translation);
-                        gd3d.math.pool.delete_quaternion(invTransformRotation);
-                        gd3d.math.pool.delete_vector3(xaxis);
-                        gd3d.math.pool.delete_vector3(yaxis);
-                        gd3d.math.pool.delete_vector3(zaxis);
-                        return;
-                    }
-                    gd3d.math.quatClone(this.emissionWorldRotation, invTransformRotation);
-                    gd3d.math.quatInverse(invTransformRotation, invTransformRotation);
-                    gd3d.math.quatMultiply(invTransformRotation, worldRotation, this.localRotation);
-                    gd3d.math.quatMultiply(this.localRotation, this.rotationByEuler, this.localRotation);
-                    gd3d.math.pool.delete_vector3(translation);
-                    gd3d.math.pool.delete_vector3(worldTranslation);
-                    gd3d.math.pool.delete_quaternion(worldRotation);
-                    gd3d.math.pool.delete_quaternion(invTransformRotation);
-                }
-            };
-            Particle_new.prototype._updatePos = function (delta) {
-                var currentTranslate = framework.EffectUtil.vecMuliNum(this.speedDir, this.simulationSpeed);
-                gd3d.math.vec3Add(this.localTranslate, currentTranslate, this.localTranslate);
-                if (this.emisson.enableVelocityOverLifetime) {
-                    this.localTranslate.x += this.movespeed.x * delta;
-                    this.localTranslate.y += this.movespeed.y * delta;
-                    this.localTranslate.z += this.movespeed.z * delta;
-                }
-            };
-            Particle_new.prototype._updateEuler = function (delta) {
-                if (this.emisson.enableRotOverLifeTime) {
-                    this.rotAngle = this.eulerSpeed * this.curLife;
-                }
-            };
-            Particle_new.prototype._updateScale = function (delta) {
-                if (this.emisson.enableSizeOverLifetime) {
-                    for (var i = 0; i < this.sizeNodes.length - 1; i++) {
-                        if (this.sizeNodes[i].key <= this.life && this.sizeNodes[i + 1].key >= this.life) {
-                            var target = gd3d.math.numberLerp(this.sizeNodes[i].value, this.sizeNodes[i + 1].value, (this.life - this.sizeNodes[i].key) / (this.sizeNodes[i + 1].key - this.sizeNodes[i].key));
-                            gd3d.math.vec3ScaleByNum(this.startScale, target, this.localScale);
-                            break;
-                        }
-                    }
-                }
-            };
-            Particle_new.prototype._updateColor = function (delta) {
-                if (this.emisson.enableColorOverLifetime) {
-                    if (this.colorNodes != null) {
-                        for (var i = 0; i < this.colorNodes.length - 1; i++) {
-                            if (this.colorNodes[i].key <= this.life && this.colorNodes[i + 1].key >= this.life) {
-                                gd3d.math.vec3SLerp(this.colorNodes[i].value, this.colorNodes[i + 1].value, (this.life - this.colorNodes[i].key) / (this.colorNodes[i + 1].key - this.colorNodes[i].key), this.color);
-                                break;
-                            }
-                        }
-                    }
-                    if (this.alphaNodes != null) {
-                        for (var i = 0; i < this.alphaNodes.length - 1; i++) {
-                            if (this.alphaNodes[i].key <= this.life && this.alphaNodes[i + 1].key >= this.life) {
-                                this.alpha = gd3d.math.numberLerp(this.alphaNodes[i].value, this.alphaNodes[i + 1].value, (this.life - this.colorNodes[i].key) / (this.colorNodes[i + 1].key - this.colorNodes[i].key));
-                                break;
-                            }
-                        }
-                    }
-                }
-            };
-            Particle_new.prototype._updateUV = function (delta) {
-                if (this.emisson.uvType == framework.UVTypeEnum.UVRoll) {
-                    this.tex_ST.z = this.emisson.uSpeed * this.curLife;
-                    this.tex_ST.w = this.emisson.vSpeed * this.curLife;
-                }
-                else if (this.emisson.uvType == framework.UVTypeEnum.UVSprite) {
-                    var spriteindex = Math.floor(this.life * this.emisson.count);
-                    gd3d.math.spriteAnimation(this.emisson.row, this.emisson.column, spriteindex, this.tex_ST);
-                }
-            };
-            Particle_new.prototype._updateVBO = function () {
-                var vertexSize = this.emisson.vertexSize;
-                for (var i = 0; i < this.emisson.perVertexCount; i++) {
-                    {
-                        var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = this.sourceVbo[i * vertexSize + 0];
-                        vertex.y = this.sourceVbo[i * vertexSize + 1];
-                        vertex.z = this.sourceVbo[i * vertexSize + 2];
-                        gd3d.math.matrixTransformVector3(vertex, this.transformVertex, vertex);
-                        this.dataForVbo[i * vertexSize + 0] = vertex.x;
-                        this.dataForVbo[i * vertexSize + 1] = vertex.y;
-                        this.dataForVbo[i * vertexSize + 2] = vertex.z;
-                        gd3d.math.pool.delete_vector3(vertex);
-                    }
-                    {
-                        var r = this.sourceVbo[i * vertexSize + 3] * this.startColor.r;
-                        var g = this.sourceVbo[i * vertexSize + 4] * this.startColor.g;
-                        var b = this.sourceVbo[i * vertexSize + 5] * this.startColor.b;
-                        var a = this.sourceVbo[i * vertexSize + 6] * this.startColor.a;
-                        if (this.colorNodes != null) {
-                            r = this.color.x;
-                            g = this.color.y;
-                            b = this.color.z;
-                        }
-                        if (this.alphaNodes != null) {
-                            a = this.alpha;
-                        }
-                        r *= this.emisson.colorRate;
-                        g *= this.emisson.colorRate;
-                        b *= this.emisson.colorRate;
-                        a *= this.emisson.colorRate;
-                        r = gd3d.math.floatClamp(r, 0, 3);
-                        g = gd3d.math.floatClamp(g, 0, 3);
-                        b = gd3d.math.floatClamp(b, 0, 3);
-                        a = gd3d.math.floatClamp(a, 0, 3);
-                        this.dataForVbo[i * this.emisson.vertexSize + 3] = r;
-                        this.dataForVbo[i * this.emisson.vertexSize + 4] = g;
-                        this.dataForVbo[i * this.emisson.vertexSize + 5] = b;
-                        this.dataForVbo[i * this.emisson.vertexSize + 6] = a;
-                    }
-                    {
-                        this.dataForVbo[i * vertexSize + 7] = this.sourceVbo[i * vertexSize + 7] * this.tex_ST.x + this.tex_ST.z;
-                        this.dataForVbo[i * vertexSize + 8] = this.sourceVbo[i * vertexSize + 8] * this.tex_ST.y + this.tex_ST.w;
-                    }
-                }
-            };
-            Particle_new.prototype.dispose = function () {
-                this.dataForVbo = null;
-                this.dataForEbo = null;
-                this.startRotation = null;
-                this.localRotation = null;
-                this.rotationByEuler = null;
-                this.rotationByShape = null;
-                this.tex_ST = null;
-                this.localMatrix = null;
-                this.localTranslate = null;
-                this.Starteuler = null;
-                this.localScale = null;
-                this.color = null;
-            };
-            return Particle_new;
-        }());
-        framework.Particle_new = Particle_new;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -30634,8 +31068,8 @@ var gd3d;
     (function (framework) {
         var PhysicsImpostor = (function () {
             function PhysicsImpostor(object, type, _options) {
-                if (_options === void 0) { _options = { mass: 0 }; }
                 var _this = this;
+                if (_options === void 0) { _options = { mass: 0 }; }
                 this.object = object;
                 this.type = type;
                 this._options = _options;
@@ -31399,9 +31833,11 @@ var gd3d;
                 }
             };
             gameObject.prototype.update = function (delta) {
-                for (var _i = 0, _a = this.components; _i < _a.length; _i++) {
-                    var item = _a[_i];
-                    item.comp.update(delta);
+                var len = this.components.length;
+                for (var i = 0; i < len; i++) {
+                    if (!this.components[i])
+                        continue;
+                    this.components[i].comp.update(delta);
                 }
             };
             gameObject.prototype.addComponentDirect = function (comp) {
@@ -31554,13 +31990,22 @@ var gd3d;
                 }
             };
             gameObject.prototype.removeAllComponents = function () {
-                for (var i = 0; i < this.components.length; i++) {
+                var len = this.components.length;
+                for (var i = 0; i < len; i++) {
                     {
                         this.components[i].comp.remove();
                         this.components[i].comp.gameObject = null;
                     }
                     this.remove(this.components[i].comp);
                 }
+                if (this.camera)
+                    this.camera = null;
+                if (this.renderer)
+                    this.renderer = null;
+                if (this.light)
+                    this.light = null;
+                if (this.collider)
+                    this.collider = null;
                 this.components.length = 0;
             };
             gameObject.prototype.dispose = function () {
@@ -31864,8 +32309,8 @@ var gd3d;
                     this.webgl.clearColor(0, 0, 0, 1);
                     this.webgl.clearDepth(1.0);
                     this.webgl.clear(this.webgl.COLOR_BUFFER_BIT | this.webgl.DEPTH_BUFFER_BIT);
+                    this.webgl.flush();
                 }
-                this.webgl.flush();
                 if (framework.DrawCallInfo.BeActived) {
                     framework.DrawCallInfo.inc.showPerFrame();
                     framework.DrawCallInfo.inc.reset();
@@ -31984,6 +32429,8 @@ var gd3d;
                 }
             };
             scene.prototype.objupdate = function (node, delta) {
+                if (!node)
+                    return;
                 if (node.hasComponent == false && node.hasComponentChild == false)
                     return;
                 node.gameObject.init(this.app.bePlay);
@@ -32177,12 +32624,13 @@ var gd3d;
                     return false;
                 }
             };
-            scene.prototype.enable2DPhysics = function (gravity) {
+            scene.prototype.enable2DPhysics = function (gravity, physicOption) {
+                if (physicOption === void 0) { physicOption = null; }
                 if (framework.physics2D) {
                     return true;
                 }
                 try {
-                    framework.physics2D = new framework.physicEngine2D();
+                    framework.physics2D = new framework.physicEngine2D(physicOption);
                     framework.physics2D.setGravity(gravity.x, gravity.y);
                     return true;
                 }
@@ -32446,80 +32894,13 @@ var gd3d;
                 this.maximum = gd3d.math.pool.clone_vector3(_maximum);
             }
             aabb.prototype.update = function (worldmatrix) {
-                gd3d.math.matrixGetTranslation(worldmatrix, this.opmin);
-                gd3d.math.matrixGetTranslation(worldmatrix, this.opmax);
-                if (worldmatrix.rawData[0] > 0) {
-                    this.opmin.x += worldmatrix.rawData[0] * this.srcmin.x;
-                    this.opmax.x += worldmatrix.rawData[0] * this.srcmax.x;
-                }
-                else {
-                    this.opmin.x += worldmatrix.rawData[0] * this.srcmax.x;
-                    this.opmax.x += worldmatrix.rawData[0] * this.srcmin.x;
-                }
-                if (worldmatrix.rawData[1] > 0) {
-                    this.opmin.y += worldmatrix.rawData[1] * this.srcmin.y;
-                    this.opmax.y += worldmatrix.rawData[1] * this.srcmax.y;
-                }
-                else {
-                    this.opmin.y += worldmatrix.rawData[1] * this.srcmax.y;
-                    this.opmax.y += worldmatrix.rawData[1] * this.srcmin.y;
-                }
-                if (worldmatrix.rawData[2] > 0) {
-                    this.opmin.z += worldmatrix.rawData[2] * this.srcmin.z;
-                    this.opmax.z += worldmatrix.rawData[2] * this.srcmax.z;
-                }
-                else {
-                    this.opmin.z += worldmatrix.rawData[2] * this.srcmax.z;
-                    this.opmax.z += worldmatrix.rawData[2] * this.srcmin.z;
-                }
-                if (worldmatrix.rawData[4] > 0) {
-                    this.opmin.x += worldmatrix.rawData[4] * this.srcmin.x;
-                    this.opmax.x += worldmatrix.rawData[4] * this.srcmax.x;
-                }
-                else {
-                    this.opmin.x += worldmatrix.rawData[4] * this.srcmax.x;
-                    this.opmax.x += worldmatrix.rawData[4] * this.srcmin.x;
-                }
-                if (worldmatrix.rawData[5] > 0) {
-                    this.opmin.y += worldmatrix.rawData[5] * this.srcmin.y;
-                    this.opmax.y += worldmatrix.rawData[5] * this.srcmax.y;
-                }
-                else {
-                    this.opmin.y += worldmatrix.rawData[5] * this.srcmax.y;
-                    this.opmax.y += worldmatrix.rawData[5] * this.srcmin.y;
-                }
-                if (worldmatrix.rawData[6] > 0) {
-                    this.opmin.z += worldmatrix.rawData[6] * this.srcmin.z;
-                    this.opmax.z += worldmatrix.rawData[6] * this.srcmax.z;
-                }
-                else {
-                    this.opmin.z += worldmatrix.rawData[6] * this.srcmax.z;
-                    this.opmax.z += worldmatrix.rawData[6] * this.srcmin.z;
-                }
-                if (worldmatrix.rawData[8] > 0) {
-                    this.opmin.x += worldmatrix.rawData[8] * this.srcmin.x;
-                    this.opmax.x += worldmatrix.rawData[8] * this.srcmax.x;
-                }
-                else {
-                    this.opmin.x += worldmatrix.rawData[8] * this.srcmax.x;
-                    this.opmax.x += worldmatrix.rawData[8] * this.srcmin.x;
-                }
-                if (worldmatrix.rawData[9] > 0) {
-                    this.opmin.y += worldmatrix.rawData[9] * this.srcmin.y;
-                    this.opmax.y += worldmatrix.rawData[9] * this.srcmax.y;
-                }
-                else {
-                    this.opmin.y += worldmatrix.rawData[9] * this.srcmax.y;
-                    this.opmax.y += worldmatrix.rawData[9] * this.srcmin.y;
-                }
-                if (worldmatrix.rawData[10] > 0) {
-                    this.opmin.z += worldmatrix.rawData[10] * this.srcmin.z;
-                    this.opmax.z += worldmatrix.rawData[10] * this.srcmax.z;
-                }
-                else {
-                    this.opmin.z += worldmatrix.rawData[10] * this.srcmax.z;
-                    this.opmax.z += worldmatrix.rawData[10] * this.srcmin.z;
-                }
+                gd3d.math.matrixTransformVector3(this.srcmax, worldmatrix, this.opmax);
+                gd3d.math.matrixTransformVector3(this.srcmin, worldmatrix, this.opmin);
+                var temp = gd3d.math.pool.new_vector3();
+                gd3d.math.vec3Max(this.opmax, this.opmin, temp);
+                gd3d.math.vec3Min(this.opmax, this.opmin, this.opmin);
+                gd3d.math.vec3Clone(temp, this.opmax);
+                gd3d.math.pool.delete_vector3(temp);
                 this.minimum = gd3d.math.pool.clone_vector3(this.opmin);
                 this.maximum = gd3d.math.pool.clone_vector3(this.opmax);
             };
@@ -33035,7 +33416,7 @@ var gd3d;
             ], obb2d.prototype, "offset", void 0);
             __decorate([
                 gd3d.reflect.Field("vector2"),
-                __metadata("design:type", Object),
+                __metadata("design:type", gd3d.math.vector2),
                 __metadata("design:paramtypes", [gd3d.math.vector2])
             ], obb2d.prototype, "size", null);
             return obb2d;
@@ -33542,6 +33923,338 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var tweenUtil = (function () {
+            function tweenUtil() {
+            }
+            tweenUtil.GetEaseProgress = function (ease_type, linear_progress) {
+                switch (ease_type) {
+                    case tweenMethod.Linear:
+                        return linear_progress;
+                    case tweenMethod.ExpoEaseOut:
+                        return tweenUtil.ExpoEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.ExpoEaseIn:
+                        return tweenUtil.ExpoEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ExpoEaseOutIn:
+                        return tweenUtil.ExpoEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ExpoEaseInOut:
+                        return tweenUtil.ExpoEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseOut:
+                        return tweenUtil.CircEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseIn:
+                        return tweenUtil.CircEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseOutIn:
+                        return tweenUtil.CircEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseInOut:
+                        return tweenUtil.CircEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseOut:
+                        return tweenUtil.QuadEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseIn:
+                        return tweenUtil.QuadEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseOutIn:
+                        return tweenUtil.QuadEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseInOut:
+                        return tweenUtil.QuadEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseOut:
+                        return tweenUtil.SineEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseIn:
+                        return tweenUtil.SineEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseOutIn:
+                        return tweenUtil.SineEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseInOut:
+                        return tweenUtil.SineEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseOut:
+                        return tweenUtil.CubicEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseIn:
+                        return tweenUtil.CubicEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseOutIn:
+                        return tweenUtil.CubicEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseInOut:
+                        return tweenUtil.CubicEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseOut:
+                        return tweenUtil.QuartEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseIn:
+                        return tweenUtil.QuartEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseOutIn:
+                        return tweenUtil.QuartEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseInOut:
+                        return tweenUtil.QuartEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseOut:
+                        return tweenUtil.QuintEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseIn:
+                        return tweenUtil.QuintEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseOutIn:
+                        return tweenUtil.QuintEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseInOut:
+                        return tweenUtil.QuintEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseOut:
+                        return tweenUtil.ElasticEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseIn:
+                        return tweenUtil.ElasticEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseOutIn:
+                        return tweenUtil.ElasticEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseInOut:
+                        return tweenUtil.ElasticEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseOut:
+                        return tweenUtil.BounceEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseIn:
+                        return tweenUtil.BounceEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseOutIn:
+                        return tweenUtil.BounceEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseInOut:
+                        return tweenUtil.BounceEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseOut:
+                        return tweenUtil.BackEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseIn:
+                        return tweenUtil.BackEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseOutIn:
+                        return tweenUtil.BackEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseInOut:
+                        return tweenUtil.BackEaseInOut(linear_progress, 0, 1, 1);
+                    default:
+                        return linear_progress;
+                }
+            };
+            tweenUtil.Linear = function (t, b, c, d) {
+                return c * t / d + b;
+            };
+            tweenUtil.ExpoEaseOut = function (t, b, c, d) {
+                return (t == d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
+            };
+            tweenUtil.ExpoEaseIn = function (t, b, c, d) {
+                return (t == 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
+            };
+            tweenUtil.ExpoEaseInOut = function (t, b, c, d) {
+                if (t == 0)
+                    return b;
+                if (t == d)
+                    return b + c;
+                if ((t /= d / 2) < 1)
+                    return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+                return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
+            };
+            tweenUtil.ExpoEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.ExpoEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.ExpoEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.CircEaseOut = function (t, b, c, d) {
+                return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
+            };
+            tweenUtil.CircEaseIn = function (t, b, c, d) {
+                return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
+            };
+            tweenUtil.CircEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
+                return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
+            };
+            tweenUtil.CircEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.CircEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.CircEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.QuadEaseOut = function (t, b, c, d) {
+                return -c * (t /= d) * (t - 2) + b;
+            };
+            tweenUtil.QuadEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t + b;
+            };
+            tweenUtil.QuadEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t + b;
+                return -c / 2 * ((--t) * (t - 2) - 1) + b;
+            };
+            tweenUtil.QuadEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.QuadEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.QuadEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.SineEaseOut = function (t, b, c, d) {
+                return c * Math.sin(t / d * (Math.PI / 2)) + b;
+            };
+            tweenUtil.SineEaseIn = function (t, b, c, d) {
+                return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+            };
+            tweenUtil.SineEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * (Math.sin(Math.PI * t / 2)) + b;
+                return -c / 2 * (Math.cos(Math.PI * --t / 2) - 2) + b;
+            };
+            tweenUtil.SineEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.SineEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.SineEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.CubicEaseOut = function (t, b, c, d) {
+                return c * ((t = t / d - 1) * t * t + 1) + b;
+            };
+            tweenUtil.CubicEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * t + b;
+            };
+            tweenUtil.CubicEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t * t + b;
+                return c / 2 * ((t -= 2) * t * t + 2) + b;
+            };
+            tweenUtil.CubicEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.CubicEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.CubicEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.QuartEaseOut = function (t, b, c, d) {
+                return -c * ((t = t / d - 1) * t * t * t - 1) + b;
+            };
+            tweenUtil.QuartEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * t * t + b;
+            };
+            tweenUtil.QuartEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t * t * t + b;
+                return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
+            };
+            tweenUtil.QuartEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.QuartEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.QuartEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.QuintEaseOut = function (t, b, c, d) {
+                return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
+            };
+            tweenUtil.QuintEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * t * t * t + b;
+            };
+            tweenUtil.QuintEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t * t * t * t + b;
+                return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
+            };
+            tweenUtil.QuintEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.QuintEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.QuintEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.ElasticEaseOut = function (t, b, c, d) {
+                if ((t /= d) == 1)
+                    return b + c;
+                var p = d * 0.3;
+                var s = p / 4;
+                return (c * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b);
+            };
+            tweenUtil.ElasticEaseIn = function (t, b, c, d) {
+                if ((t /= d) == 1)
+                    return b + c;
+                var p = d * 0.3;
+                var s = p / 4;
+                return -(c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+            };
+            tweenUtil.ElasticEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) == 2)
+                    return b + c;
+                var p = d * (0.3 * 1.5);
+                var s = p / 4;
+                if (t < 1)
+                    return -0.5 * (c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+                return c * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * 0.5 + c + b;
+            };
+            tweenUtil.ElasticEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.ElasticEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.ElasticEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.BounceEaseOut = function (t, b, c, d) {
+                if ((t /= d) < (1 / 2.75))
+                    return c * (7.5625 * t * t) + b;
+                else if (t < (2 / 2.75))
+                    return c * (7.5625 * (t -= (1.5 / 2.75)) * t + 0.75) + b;
+                else if (t < (2.5 / 2.75))
+                    return c * (7.5625 * (t -= (2.25 / 2.75)) * t + 0.9375) + b;
+                else
+                    return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
+            };
+            tweenUtil.BounceEaseIn = function (t, b, c, d) {
+                return c - tweenUtil.BounceEaseOut(d - t, 0, c, d) + b;
+            };
+            tweenUtil.BounceEaseInOut = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.BounceEaseIn(t * 2, 0, c, d) * 0.5 + b;
+                else
+                    return tweenUtil.BounceEaseOut(t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
+            };
+            tweenUtil.BounceEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.BounceEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.BounceEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.BackEaseOut = function (t, b, c, d) {
+                return c * ((t = t / d - 1) * t * ((1.70158 + 1) * t + 1.70158) + 1) + b;
+            };
+            tweenUtil.BackEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * ((1.70158 + 1) * t - 1.70158) + b;
+            };
+            tweenUtil.BackEaseInOut = function (t, b, c, d) {
+                var s = 1.70158;
+                if ((t /= d / 2) < 1)
+                    return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
+                return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + b;
+            };
+            tweenUtil.BackEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.BackEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.BackEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            return tweenUtil;
+        }());
+        framework.tweenUtil = tweenUtil;
+        var tweenMethod;
+        (function (tweenMethod) {
+            tweenMethod[tweenMethod["Linear"] = 0] = "Linear";
+            tweenMethod[tweenMethod["ExpoEaseOut"] = 1] = "ExpoEaseOut";
+            tweenMethod[tweenMethod["ExpoEaseIn"] = 2] = "ExpoEaseIn";
+            tweenMethod[tweenMethod["ExpoEaseInOut"] = 3] = "ExpoEaseInOut";
+            tweenMethod[tweenMethod["ExpoEaseOutIn"] = 4] = "ExpoEaseOutIn";
+            tweenMethod[tweenMethod["CircEaseOut"] = 5] = "CircEaseOut";
+            tweenMethod[tweenMethod["CircEaseIn"] = 6] = "CircEaseIn";
+            tweenMethod[tweenMethod["CircEaseInOut"] = 7] = "CircEaseInOut";
+            tweenMethod[tweenMethod["CircEaseOutIn"] = 8] = "CircEaseOutIn";
+            tweenMethod[tweenMethod["QuadEaseOut"] = 9] = "QuadEaseOut";
+            tweenMethod[tweenMethod["QuadEaseIn"] = 10] = "QuadEaseIn";
+            tweenMethod[tweenMethod["QuadEaseInOut"] = 11] = "QuadEaseInOut";
+            tweenMethod[tweenMethod["QuadEaseOutIn"] = 12] = "QuadEaseOutIn";
+            tweenMethod[tweenMethod["SineEaseOut"] = 13] = "SineEaseOut";
+            tweenMethod[tweenMethod["SineEaseIn"] = 14] = "SineEaseIn";
+            tweenMethod[tweenMethod["SineEaseInOut"] = 15] = "SineEaseInOut";
+            tweenMethod[tweenMethod["SineEaseOutIn"] = 16] = "SineEaseOutIn";
+            tweenMethod[tweenMethod["CubicEaseOut"] = 17] = "CubicEaseOut";
+            tweenMethod[tweenMethod["CubicEaseIn"] = 18] = "CubicEaseIn";
+            tweenMethod[tweenMethod["CubicEaseInOut"] = 19] = "CubicEaseInOut";
+            tweenMethod[tweenMethod["CubicEaseOutIn"] = 20] = "CubicEaseOutIn";
+            tweenMethod[tweenMethod["QuartEaseOut"] = 21] = "QuartEaseOut";
+            tweenMethod[tweenMethod["QuartEaseIn"] = 22] = "QuartEaseIn";
+            tweenMethod[tweenMethod["QuartEaseInOut"] = 23] = "QuartEaseInOut";
+            tweenMethod[tweenMethod["QuartEaseOutIn"] = 24] = "QuartEaseOutIn";
+            tweenMethod[tweenMethod["QuintEaseOut"] = 25] = "QuintEaseOut";
+            tweenMethod[tweenMethod["QuintEaseIn"] = 26] = "QuintEaseIn";
+            tweenMethod[tweenMethod["QuintEaseInOut"] = 27] = "QuintEaseInOut";
+            tweenMethod[tweenMethod["QuintEaseOutIn"] = 28] = "QuintEaseOutIn";
+            tweenMethod[tweenMethod["ElasticEaseOut"] = 29] = "ElasticEaseOut";
+            tweenMethod[tweenMethod["ElasticEaseIn"] = 30] = "ElasticEaseIn";
+            tweenMethod[tweenMethod["ElasticEaseInOut"] = 31] = "ElasticEaseInOut";
+            tweenMethod[tweenMethod["ElasticEaseOutIn"] = 32] = "ElasticEaseOutIn";
+            tweenMethod[tweenMethod["BounceEaseOut"] = 33] = "BounceEaseOut";
+            tweenMethod[tweenMethod["BounceEaseIn"] = 34] = "BounceEaseIn";
+            tweenMethod[tweenMethod["BounceEaseInOut"] = 35] = "BounceEaseInOut";
+            tweenMethod[tweenMethod["BounceEaseOutIn"] = 36] = "BounceEaseOutIn";
+            tweenMethod[tweenMethod["BackEaseOut"] = 37] = "BackEaseOut";
+            tweenMethod[tweenMethod["BackEaseIn"] = 38] = "BackEaseIn";
+            tweenMethod[tweenMethod["BackEaseInOut"] = 39] = "BackEaseInOut";
+            tweenMethod[tweenMethod["BackEaseOutIn"] = 40] = "BackEaseOutIn";
+        })(tweenMethod = framework.tweenMethod || (framework.tweenMethod = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var CullingMask;
         (function (CullingMask) {
             CullingMask[CullingMask["nothing"] = 0] = "nothing";
@@ -33873,338 +34586,6 @@ var gd3d;
             return TransformUtil;
         }());
         framework.TransformUtil = TransformUtil;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var tweenUtil = (function () {
-            function tweenUtil() {
-            }
-            tweenUtil.GetEaseProgress = function (ease_type, linear_progress) {
-                switch (ease_type) {
-                    case tweenMethod.Linear:
-                        return linear_progress;
-                    case tweenMethod.ExpoEaseOut:
-                        return tweenUtil.ExpoEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.ExpoEaseIn:
-                        return tweenUtil.ExpoEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.ExpoEaseOutIn:
-                        return tweenUtil.ExpoEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.ExpoEaseInOut:
-                        return tweenUtil.ExpoEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.CircEaseOut:
-                        return tweenUtil.CircEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.CircEaseIn:
-                        return tweenUtil.CircEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.CircEaseOutIn:
-                        return tweenUtil.CircEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.CircEaseInOut:
-                        return tweenUtil.CircEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuadEaseOut:
-                        return tweenUtil.QuadEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuadEaseIn:
-                        return tweenUtil.QuadEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuadEaseOutIn:
-                        return tweenUtil.QuadEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuadEaseInOut:
-                        return tweenUtil.QuadEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.SineEaseOut:
-                        return tweenUtil.SineEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.SineEaseIn:
-                        return tweenUtil.SineEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.SineEaseOutIn:
-                        return tweenUtil.SineEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.SineEaseInOut:
-                        return tweenUtil.SineEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.CubicEaseOut:
-                        return tweenUtil.CubicEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.CubicEaseIn:
-                        return tweenUtil.CubicEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.CubicEaseOutIn:
-                        return tweenUtil.CubicEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.CubicEaseInOut:
-                        return tweenUtil.CubicEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuartEaseOut:
-                        return tweenUtil.QuartEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuartEaseIn:
-                        return tweenUtil.QuartEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuartEaseOutIn:
-                        return tweenUtil.QuartEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuartEaseInOut:
-                        return tweenUtil.QuartEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuintEaseOut:
-                        return tweenUtil.QuintEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuintEaseIn:
-                        return tweenUtil.QuintEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuintEaseOutIn:
-                        return tweenUtil.QuintEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuintEaseInOut:
-                        return tweenUtil.QuintEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.ElasticEaseOut:
-                        return tweenUtil.ElasticEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.ElasticEaseIn:
-                        return tweenUtil.ElasticEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.ElasticEaseOutIn:
-                        return tweenUtil.ElasticEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.ElasticEaseInOut:
-                        return tweenUtil.ElasticEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.BounceEaseOut:
-                        return tweenUtil.BounceEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.BounceEaseIn:
-                        return tweenUtil.BounceEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.BounceEaseOutIn:
-                        return tweenUtil.BounceEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.BounceEaseInOut:
-                        return tweenUtil.BounceEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.BackEaseOut:
-                        return tweenUtil.BackEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.BackEaseIn:
-                        return tweenUtil.BackEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.BackEaseOutIn:
-                        return tweenUtil.BackEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.BackEaseInOut:
-                        return tweenUtil.BackEaseInOut(linear_progress, 0, 1, 1);
-                    default:
-                        return linear_progress;
-                }
-            };
-            tweenUtil.Linear = function (t, b, c, d) {
-                return c * t / d + b;
-            };
-            tweenUtil.ExpoEaseOut = function (t, b, c, d) {
-                return (t == d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
-            };
-            tweenUtil.ExpoEaseIn = function (t, b, c, d) {
-                return (t == 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
-            };
-            tweenUtil.ExpoEaseInOut = function (t, b, c, d) {
-                if (t == 0)
-                    return b;
-                if (t == d)
-                    return b + c;
-                if ((t /= d / 2) < 1)
-                    return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
-                return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
-            };
-            tweenUtil.ExpoEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.ExpoEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.ExpoEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.CircEaseOut = function (t, b, c, d) {
-                return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
-            };
-            tweenUtil.CircEaseIn = function (t, b, c, d) {
-                return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
-            };
-            tweenUtil.CircEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
-                return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
-            };
-            tweenUtil.CircEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.CircEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.CircEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.QuadEaseOut = function (t, b, c, d) {
-                return -c * (t /= d) * (t - 2) + b;
-            };
-            tweenUtil.QuadEaseIn = function (t, b, c, d) {
-                return c * (t /= d) * t + b;
-            };
-            tweenUtil.QuadEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return c / 2 * t * t + b;
-                return -c / 2 * ((--t) * (t - 2) - 1) + b;
-            };
-            tweenUtil.QuadEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.QuadEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.QuadEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.SineEaseOut = function (t, b, c, d) {
-                return c * Math.sin(t / d * (Math.PI / 2)) + b;
-            };
-            tweenUtil.SineEaseIn = function (t, b, c, d) {
-                return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
-            };
-            tweenUtil.SineEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return c / 2 * (Math.sin(Math.PI * t / 2)) + b;
-                return -c / 2 * (Math.cos(Math.PI * --t / 2) - 2) + b;
-            };
-            tweenUtil.SineEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.SineEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.SineEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.CubicEaseOut = function (t, b, c, d) {
-                return c * ((t = t / d - 1) * t * t + 1) + b;
-            };
-            tweenUtil.CubicEaseIn = function (t, b, c, d) {
-                return c * (t /= d) * t * t + b;
-            };
-            tweenUtil.CubicEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return c / 2 * t * t * t + b;
-                return c / 2 * ((t -= 2) * t * t + 2) + b;
-            };
-            tweenUtil.CubicEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.CubicEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.CubicEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.QuartEaseOut = function (t, b, c, d) {
-                return -c * ((t = t / d - 1) * t * t * t - 1) + b;
-            };
-            tweenUtil.QuartEaseIn = function (t, b, c, d) {
-                return c * (t /= d) * t * t * t + b;
-            };
-            tweenUtil.QuartEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return c / 2 * t * t * t * t + b;
-                return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
-            };
-            tweenUtil.QuartEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.QuartEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.QuartEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.QuintEaseOut = function (t, b, c, d) {
-                return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
-            };
-            tweenUtil.QuintEaseIn = function (t, b, c, d) {
-                return c * (t /= d) * t * t * t * t + b;
-            };
-            tweenUtil.QuintEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return c / 2 * t * t * t * t * t + b;
-                return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
-            };
-            tweenUtil.QuintEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.QuintEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.QuintEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.ElasticEaseOut = function (t, b, c, d) {
-                if ((t /= d) == 1)
-                    return b + c;
-                var p = d * 0.3;
-                var s = p / 4;
-                return (c * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b);
-            };
-            tweenUtil.ElasticEaseIn = function (t, b, c, d) {
-                if ((t /= d) == 1)
-                    return b + c;
-                var p = d * 0.3;
-                var s = p / 4;
-                return -(c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
-            };
-            tweenUtil.ElasticEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) == 2)
-                    return b + c;
-                var p = d * (0.3 * 1.5);
-                var s = p / 4;
-                if (t < 1)
-                    return -0.5 * (c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
-                return c * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * 0.5 + c + b;
-            };
-            tweenUtil.ElasticEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.ElasticEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.ElasticEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.BounceEaseOut = function (t, b, c, d) {
-                if ((t /= d) < (1 / 2.75))
-                    return c * (7.5625 * t * t) + b;
-                else if (t < (2 / 2.75))
-                    return c * (7.5625 * (t -= (1.5 / 2.75)) * t + 0.75) + b;
-                else if (t < (2.5 / 2.75))
-                    return c * (7.5625 * (t -= (2.25 / 2.75)) * t + 0.9375) + b;
-                else
-                    return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
-            };
-            tweenUtil.BounceEaseIn = function (t, b, c, d) {
-                return c - tweenUtil.BounceEaseOut(d - t, 0, c, d) + b;
-            };
-            tweenUtil.BounceEaseInOut = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.BounceEaseIn(t * 2, 0, c, d) * 0.5 + b;
-                else
-                    return tweenUtil.BounceEaseOut(t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
-            };
-            tweenUtil.BounceEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.BounceEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.BounceEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.BackEaseOut = function (t, b, c, d) {
-                return c * ((t = t / d - 1) * t * ((1.70158 + 1) * t + 1.70158) + 1) + b;
-            };
-            tweenUtil.BackEaseIn = function (t, b, c, d) {
-                return c * (t /= d) * t * ((1.70158 + 1) * t - 1.70158) + b;
-            };
-            tweenUtil.BackEaseInOut = function (t, b, c, d) {
-                var s = 1.70158;
-                if ((t /= d / 2) < 1)
-                    return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
-                return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + b;
-            };
-            tweenUtil.BackEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.BackEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.BackEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            return tweenUtil;
-        }());
-        framework.tweenUtil = tweenUtil;
-        var tweenMethod;
-        (function (tweenMethod) {
-            tweenMethod[tweenMethod["Linear"] = 0] = "Linear";
-            tweenMethod[tweenMethod["ExpoEaseOut"] = 1] = "ExpoEaseOut";
-            tweenMethod[tweenMethod["ExpoEaseIn"] = 2] = "ExpoEaseIn";
-            tweenMethod[tweenMethod["ExpoEaseInOut"] = 3] = "ExpoEaseInOut";
-            tweenMethod[tweenMethod["ExpoEaseOutIn"] = 4] = "ExpoEaseOutIn";
-            tweenMethod[tweenMethod["CircEaseOut"] = 5] = "CircEaseOut";
-            tweenMethod[tweenMethod["CircEaseIn"] = 6] = "CircEaseIn";
-            tweenMethod[tweenMethod["CircEaseInOut"] = 7] = "CircEaseInOut";
-            tweenMethod[tweenMethod["CircEaseOutIn"] = 8] = "CircEaseOutIn";
-            tweenMethod[tweenMethod["QuadEaseOut"] = 9] = "QuadEaseOut";
-            tweenMethod[tweenMethod["QuadEaseIn"] = 10] = "QuadEaseIn";
-            tweenMethod[tweenMethod["QuadEaseInOut"] = 11] = "QuadEaseInOut";
-            tweenMethod[tweenMethod["QuadEaseOutIn"] = 12] = "QuadEaseOutIn";
-            tweenMethod[tweenMethod["SineEaseOut"] = 13] = "SineEaseOut";
-            tweenMethod[tweenMethod["SineEaseIn"] = 14] = "SineEaseIn";
-            tweenMethod[tweenMethod["SineEaseInOut"] = 15] = "SineEaseInOut";
-            tweenMethod[tweenMethod["SineEaseOutIn"] = 16] = "SineEaseOutIn";
-            tweenMethod[tweenMethod["CubicEaseOut"] = 17] = "CubicEaseOut";
-            tweenMethod[tweenMethod["CubicEaseIn"] = 18] = "CubicEaseIn";
-            tweenMethod[tweenMethod["CubicEaseInOut"] = 19] = "CubicEaseInOut";
-            tweenMethod[tweenMethod["CubicEaseOutIn"] = 20] = "CubicEaseOutIn";
-            tweenMethod[tweenMethod["QuartEaseOut"] = 21] = "QuartEaseOut";
-            tweenMethod[tweenMethod["QuartEaseIn"] = 22] = "QuartEaseIn";
-            tweenMethod[tweenMethod["QuartEaseInOut"] = 23] = "QuartEaseInOut";
-            tweenMethod[tweenMethod["QuartEaseOutIn"] = 24] = "QuartEaseOutIn";
-            tweenMethod[tweenMethod["QuintEaseOut"] = 25] = "QuintEaseOut";
-            tweenMethod[tweenMethod["QuintEaseIn"] = 26] = "QuintEaseIn";
-            tweenMethod[tweenMethod["QuintEaseInOut"] = 27] = "QuintEaseInOut";
-            tweenMethod[tweenMethod["QuintEaseOutIn"] = 28] = "QuintEaseOutIn";
-            tweenMethod[tweenMethod["ElasticEaseOut"] = 29] = "ElasticEaseOut";
-            tweenMethod[tweenMethod["ElasticEaseIn"] = 30] = "ElasticEaseIn";
-            tweenMethod[tweenMethod["ElasticEaseInOut"] = 31] = "ElasticEaseInOut";
-            tweenMethod[tweenMethod["ElasticEaseOutIn"] = 32] = "ElasticEaseOutIn";
-            tweenMethod[tweenMethod["BounceEaseOut"] = 33] = "BounceEaseOut";
-            tweenMethod[tweenMethod["BounceEaseIn"] = 34] = "BounceEaseIn";
-            tweenMethod[tweenMethod["BounceEaseInOut"] = 35] = "BounceEaseInOut";
-            tweenMethod[tweenMethod["BounceEaseOutIn"] = 36] = "BounceEaseOutIn";
-            tweenMethod[tweenMethod["BackEaseOut"] = 37] = "BackEaseOut";
-            tweenMethod[tweenMethod["BackEaseIn"] = 38] = "BackEaseIn";
-            tweenMethod[tweenMethod["BackEaseInOut"] = 39] = "BackEaseInOut";
-            tweenMethod[tweenMethod["BackEaseOutIn"] = 40] = "BackEaseOutIn";
-        })(tweenMethod = framework.tweenMethod || (framework.tweenMethod = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

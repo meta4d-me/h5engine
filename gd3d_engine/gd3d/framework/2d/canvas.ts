@@ -446,7 +446,7 @@ namespace gd3d.framework
 
 
         private objupdate(node: transform2D, delta){
-            if(!node.visible) return;
+            if(!node || !node.visible) return;
 
             node.init(this.scene.app.bePlay);//组件还未初始化的初始化
             let compLen = node.components.length;
@@ -454,6 +454,7 @@ namespace gd3d.framework
             {
                 for (let i = 0; i < compLen; i++)
                 {
+                    if(!node.components[i]) continue;  //能在有对象在update环节dispose
                     var comp = node.components[i].comp;
                     comp.update(delta);
                     if(instanceOfI2DPointListener(comp)){  //判断是否为

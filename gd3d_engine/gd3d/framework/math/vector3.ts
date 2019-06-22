@@ -317,6 +317,15 @@
         vector.rawData[2] = z;
     }
 
+    /** 获取指定 向量的 垂直向量 */
+    export function vec3Perpendicular(vector : vector3, out : vector3){
+        gd3d.math.vec3Cross(pool.vector3_right, vector , out);
+        var dot = gd3d.math.vec3Dot(out,out);
+        if(dot < 0.05){
+            gd3d.math.vec3Cross(pool.vector3_up, vector , out);
+        }
+    }
+
     //static sDirection(vector: vector3, vector2: vector3, dest: vector3 = null): vector3 {
     //    if (!dest) dest = new vector3();
 

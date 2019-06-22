@@ -196,13 +196,12 @@
         angle *= Math.PI / 180.0;
         var halfAngle: number = angle * 0.5;
         var sin_a: number = Math.sin(halfAngle);
-
+        vec3Normalize(axis,axis);
         out.w = Math.cos(halfAngle);
         out.x = axis.x * sin_a;
         out.y = axis.y * sin_a;
         out.z = axis.z * sin_a;
-
-        math.quatNormalize(out, out);
+        // math.quatNormalize(out, out);
     }
 
     export function quatToAxisAngle(src: quaternion, axis: vector3): number {
@@ -435,44 +434,39 @@
         pool.delete_vector3(dirxz);
     }
 
-    export function rotationTo(from: vector3, to: vector3,out: quaternion)
-    {
-        var tmpvec3 =pool.new_vector3();
-        var xUnitVec3 = pool.vector3_right;
-        var yUnitVec3 = pool.vector3_up;
+    /** 计算 从 start 到 end 旋转的四元数 */
+    export function quatRotationTo (start: vector3, end: vector3,out: quaternion){
+        vec3Normalize(start,start);
+        vec3Normalize(end,end);
+        let dot=vec3Dot(start,end);
 
-        //var dot = vec3.dot(from, to);
-        let dot=vec3Dot(from,to);
-        if (dot < -0.999999) {
-            //vec3.cross(tmpvec3, xUnitVec3, from);
-            vec3Cross(xUnitVec3,from,tmpvec3);
-            if (vec3Length(tmpvec3) < 0.000001)
-            {
-                //vec3.cross(tmpvec3, yUnitVec3, from);
-                vec3Cross(yUnitVec3,from,tmpvec3);
-            }
-            // vec3.normalize(tmpvec3, tmpvec3);
-            // quat.AxisAngle(tmpvec3, Math.PI,out);
-            vec3Normalize(tmpvec3,tmpvec3);
-            quatFromAxisAngle(tmpvec3,180,out);
-        } else if (dot > 0.999999) {
-            out[0] = 0;
-            out[1] = 0;
-            out[2] = 0;
-            out[3] = 1;
-        } else {
-            //vec3.cross(tmpvec3, from, to);
-            vec3Cross(from, to,tmpvec3);
-            out[0] = tmpvec3[0];
-            out[1] = tmpvec3[1];
-            out[2] = tmpvec3[2];
-            out[3] = 1 + dot;
-            quatNormalize(out,out);
-            //return quat.normalize(out, out);
+        if (dot >= 0.99999847691) {
+            quatIdentity(out);
+            return;
+          }
+
+        if (dot <= -0.99999847691) {
+            var pVec = pool.new_vector3();
+            vec3Perpendicular(start,pVec);
+            out.w = 0;
+            out.x = pVec.x;
+            out.y = pVec.y;
+            out.z = pVec.z;
+            pool.delete_vector3(pVec);
+            return;
         }
 
-        pool.delete_vector3(tmpvec3);
+        var cross_product = pool.new_vector3();
+        vec3Cross(start,end,cross_product);
+        out.w = 1 + dot;
+        out.x = cross_product.x;
+        out.y = cross_product.y;
+        out.z = cross_product.z;
+        quatNormalize(out,out);
+
+        pool.delete_vector3(cross_product);
     }
+
     export function myLookRotation(dir:vector3, out:quaternion,up:vector3=pool.vector3_up)
     {
         if(vec3Equal(dir,pool.vector3_zero))
@@ -487,9 +481,9 @@
             vec3ScaleByNum(up,vec3Dot(up,dir),tempv);
             vec3Subtract(dir,tempv,tempv);
             let qu=pool.new_quaternion();
-            this.rotationTo(pool.vector3_forward,tempv,qu);
+            this.quatRotationTo(pool.vector3_forward,tempv,qu);
             let qu2=pool.new_quaternion();
-            this.rotationTo(tempv,dir,qu2);
+            this.quatRotationTo(tempv,dir,qu2);
             quatMultiply(qu,qu2,out);
 
             pool.delete_quaternion(qu);
@@ -497,7 +491,7 @@
             pool.delete_vector3(tempv);
         }
         else {
-            this.rotationTo(pool.vector3_forward,dir,out);
+            this.quatRotationTo(pool.vector3_forward,dir,out);
         }
     }
 }

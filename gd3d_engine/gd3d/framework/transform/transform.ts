@@ -480,12 +480,15 @@ namespace gd3d.framework
          * 移除所有子物体
          * @version egret-gd3d 1.0
          */
-        removeAllChild()
+        removeAllChild(needDispose:boolean = false)
         {
             if(this._children==undefined) return;
             while (this._children.length > 0)
             {
-                this.removeChild(this._children[0]);
+                if(needDispose)
+                    this._children[0].dispose();
+                else
+                    this.removeChild(this._children[0]);
             }
         }
         /**
@@ -1157,16 +1160,17 @@ namespace gd3d.framework
          */
         dispose()
         {
+            if(this._parent)    this._parent.removeChild(this);
+            this._dispose();            
+        }
+
+        private _dispose(){
             if(this._beDispose)  return;
-            if(this._parent)
-            {
-                this._parent.removeChild(this);
-            }
             if (this._children)
             {
                 for (var k in this._children)
                 {
-                    this._children[k].dispose();
+                    this._children[k]._dispose();
                 }
                 //this.removeAllChild();
             }
@@ -1175,9 +1179,11 @@ namespace gd3d.framework
             }
             this._gameObject.dispose();
 
+            this._physicsImpostor = null;
             this._beDispose = true;
             if(this.onDispose)
                 this.onDispose();
+
         }
     }
 
