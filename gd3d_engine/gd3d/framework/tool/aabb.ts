@@ -165,8 +165,10 @@
             gd3d.math.pool.delete_vector3(temp);
 
 
-            this.minimum = gd3d.math.pool.clone_vector3(this.opmin);
-            this.maximum = gd3d.math.pool.clone_vector3(this.opmax);
+            // this.minimum = gd3d.math.pool.clone_vector3(this.opmin);
+            // this.maximum = gd3d.math.pool.clone_vector3(this.opmax);
+            gd3d.math.vec3Clone(this.opmin, this.minimum);
+            gd3d.math.vec3Clone(this.opmax, this.maximum);
         }
 
         /**
