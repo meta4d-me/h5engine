@@ -55,6 +55,8 @@ declare namespace gd3d.framework {
         closeFps(): void;
         showDrawCall(): void;
         closeDrawCall(): void;
+        private _frameID;
+        readonly frameID: number;
         private beStepNumber;
         private update;
         private updateScreenAsp;
@@ -2242,7 +2244,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess;
         private readFinish;
-        Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): threading.gdPromise<{}>;
+        Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): threading.gdPromise<unknown>;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
         private _cacheMinP;
@@ -2737,6 +2739,8 @@ declare namespace gd3d.framework {
         private cullingMap;
         isLastCamera: boolean;
         fillRenderer(scene: scene): void;
+        private static lastFID;
+        private needUpdateWpos;
         private _fillRenderer;
         private fruMap;
         private _vec3cache;

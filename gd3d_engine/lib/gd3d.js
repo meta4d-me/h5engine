@@ -47,6 +47,7 @@ var gd3d;
                 this._standDeltaTime = -1;
                 this.canvasFixedType = CanvasFixedType.Free;
                 this._scaleFromPandding = 1;
+                this._frameID = 0;
                 this.beStepNumber = 0;
                 this.pretimer = 0;
                 this.isFrustumCulling = true;
@@ -269,7 +270,14 @@ var gd3d;
             application.prototype.closeDrawCall = function () {
                 framework.DrawCallInfo.inc.closeDrawCallInfo();
             };
+            Object.defineProperty(application.prototype, "frameID", {
+                get: function () { return this._frameID; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
             application.prototype.update = function (delta) {
+                this._frameID++;
                 {
                     this.updateOrientationMode();
                 }
@@ -14955,6 +14963,7 @@ var gd3d;
                 this._opvalue = 1;
                 this.cullingMap = {};
                 this.isLastCamera = false;
+                this.needUpdateWpos = false;
                 this.fruMap = {
                     farLD: 0,
                     nearLD: 1,
@@ -15231,7 +15240,14 @@ var gd3d;
                 scene.renderList.clear();
                 if (scene.app.isFrustumCulling)
                     this.calcCameraFrame(scene.app);
+                var fID = scene.app.frameID;
+                if (camera_1.lastFID != fID) {
+                    this.needUpdateWpos = true;
+                    camera_1.lastFID = fID;
+                }
                 this._fillRenderer(scene, scene.getRoot());
+                this.needUpdateWpos = false;
+                camera_1.lastFID = fID;
                 if (this.gameObject.transform.dirtiedOfFrustumCulling)
                     this.gameObject.transform.dirtiedOfFrustumCulling = false;
             };
@@ -15240,6 +15256,9 @@ var gd3d;
                     return;
                 var id = node.insId.getInsID();
                 if (node.dirtiedOfFrustumCulling || this.gameObject.transform.dirtiedOfFrustumCulling) {
+                    if (this.needUpdateWpos) {
+                        node.getWorldTranslate();
+                    }
                     this.cullingMap[id] = this.isCulling(node);
                     if (this.isLastCamera)
                         node.dirtiedOfFrustumCulling = false;
@@ -15394,8 +15413,8 @@ var gd3d;
                                     var matrixView = context.matrixView;
                                     var az = camera_1.helpv3;
                                     var bz = camera_1.helpv3_1;
-                                    gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
-                                    gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
+                                    gd3d.math.matrixTransformVector3(a.gameObject.transform['worldTranslate'], matrixView, az);
+                                    gd3d.math.matrixTransformVector3(b.gameObject.transform['worldTranslate'], matrixView, bz);
                                     return bz.z - az.z;
                                 }
                             });
@@ -15433,6 +15452,7 @@ var gd3d;
             camera.helpmtx_2 = new gd3d.math.matrix();
             camera.helpmtx_3 = new gd3d.math.matrix();
             camera.helprect = new gd3d.math.rect();
+            camera.lastFID = -1;
             __decorate([
                 gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 2),
                 gd3d.reflect.Field("number"),
