@@ -689,10 +689,20 @@ namespace gd3d.framework
             scene.renderList.clear();
             if (scene.app.isFrustumCulling)
                 this.calcCameraFrame(scene.app);
+            let fID = scene.app.frameID;
+            if(camera.lastFID != fID) {
+                this.needUpdateWpos = true;
+                camera.lastFID = fID;
+            }
             this._fillRenderer(scene, scene.getRoot());
+            this.needUpdateWpos = false;
+            camera.lastFID = fID;
             if(this.gameObject.transform.dirtiedOfFrustumCulling)
                 this.gameObject.transform.dirtiedOfFrustumCulling = false;
         }
+
+        private static lastFID = -1;
+        private needUpdateWpos = false;
         private _fillRenderer(scene: scene, node: transform)
         {
             if (!node.gameObject.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false)) return;  //自己没有渲染组件 且 子物体也没有 return
@@ -701,6 +711,9 @@ namespace gd3d.framework
 
             const id = node.insId.getInsID();
             if(node.dirtiedOfFrustumCulling || this.gameObject.transform.dirtiedOfFrustumCulling) {
+                if (this.needUpdateWpos) { // 更新世界坐标
+                    node.getWorldTranslate();
+                }
                 this.cullingMap[id] = this.isCulling(node);
                 if(this.isLastCamera)
                     node.dirtiedOfFrustumCulling = false;
@@ -981,8 +994,10 @@ namespace gd3d.framework
                                 let az = camera.helpv3;
                                 let bz = camera.helpv3_1;
 
-                                gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
-                                gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
+                                // gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
+                                // gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
+                                gd3d.math.matrixTransformVector3(a.gameObject.transform['worldTranslate'], matrixView, az);
+                                gd3d.math.matrixTransformVector3(b.gameObject.transform['worldTranslate'], matrixView, bz);
                                 return bz.z - az.z;
                             }
                         })

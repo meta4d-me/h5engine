@@ -417,11 +417,14 @@ namespace gd3d.framework
         {
             DrawCallInfo.inc.closeDrawCallInfo();
         }
-
+        private _frameID = 0;
+        get frameID () {return this._frameID;};
         private beStepNumber = 0;
         //delta 单位秒
         private update(delta: number)
         {
+            this._frameID ++;
+
             //if (this.outcontainer.clientWidth != this._canvasClientWidth || this.outcontainer.clientHeight != this._canvasClientHeight)
             {
                 this.updateOrientationMode();
@@ -459,8 +462,8 @@ namespace gd3d.framework
             if (!this.outcontainer)
                 return;
             if(this.webgl && this.webgl.canvas ){
-                this.ccWidth = this.webgl.canvas.clientWidth != null ?  this.webgl.canvas.clientWidth : this.ccWidth; 
-                this.ccHeight = this.webgl.canvas.clientHeight != null ? this.webgl.canvas.clientHeight :this.ccHeight; 
+                this.ccWidth = this.webgl.canvas.clientWidth != null ?  this.webgl.canvas.clientWidth : this.ccWidth;
+                this.ccHeight = this.webgl.canvas.clientHeight != null ? this.webgl.canvas.clientHeight :this.ccHeight;
             }
 
             if (this.ccWidth != this._canvasClientWidth || this.ccHeight != this._canvasClientHeight)
