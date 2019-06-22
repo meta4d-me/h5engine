@@ -2244,7 +2244,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess;
         private readFinish;
-        Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): threading.gdPromise<unknown>;
+        Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): threading.gdPromise<{}>;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
         private _cacheMinP;
