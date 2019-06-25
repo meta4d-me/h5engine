@@ -14337,19 +14337,17 @@ var gd3d;
             aniplayer.prototype.checkFrameId = function (delay) {
                 this._playTimer += delay * this.speed;
                 this._playFrameid = (this._playClip.fps * this._playTimer) | 0;
-                if (this._playClip.loop) {
+                if (this.beActivedEndFrame && this._playFrameid >= this.endFrame) {
+                    this._playFrameid = this.endFrame;
+                    this.OnClipPlayEnd();
+                }
+                else if (this._playClip.loop) {
                     this._playCount = Math.floor(this._playFrameid / this._playClip.frameCount);
                     this._playFrameid %= this._playClip.frameCount;
                 }
-                else {
-                    if (this.beActivedEndFrame && this._playFrameid >= this.endFrame) {
-                        this._playFrameid = this.endFrame;
-                        this.OnClipPlayEnd();
-                    }
-                    else if (this._playFrameid > this._playClip.frameCount - 1) {
-                        this._playFrameid = this._playClip.frameCount - 1;
-                        this.OnClipPlayEnd();
-                    }
+                else if (this._playFrameid > this._playClip.frameCount - 1) {
+                    this._playFrameid = this._playClip.frameCount - 1;
+                    this.OnClipPlayEnd();
                 }
                 if (this.beRevert) {
                     this._playFrameid = this._playClip.frameCount - this._playFrameid - 1;

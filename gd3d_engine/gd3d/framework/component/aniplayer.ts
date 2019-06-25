@@ -471,24 +471,23 @@ namespace gd3d.framework
         {
             this._playTimer += delay * this.speed;
             this._playFrameid = (this._playClip.fps * this._playTimer) | 0;
-            if (this._playClip.loop)//加上循环与非循环动画的分别控制
+
+            if (this.beActivedEndFrame && this._playFrameid >= this.endFrame)
+            {
+                this._playFrameid = this.endFrame;
+                this.OnClipPlayEnd();
+            }else if (this._playClip.loop)//加上循环与非循环动画的分别控制
             {
                 this._playCount = Math.floor(this._playFrameid / this._playClip.frameCount);
                 this._playFrameid %= this._playClip.frameCount;
             }
-            else
+            else if (this._playFrameid > this._playClip.frameCount - 1)
             {
-                if (this.beActivedEndFrame && this._playFrameid >= this.endFrame)
-                {
-                    this._playFrameid = this.endFrame
-                    this.OnClipPlayEnd();
-                } else if (this._playFrameid > this._playClip.frameCount - 1)
-                {
-                    this._playFrameid = this._playClip.frameCount - 1;
-                    //-------------------OnPlayEnd
-                    this.OnClipPlayEnd();
-                }
+                this._playFrameid = this._playClip.frameCount - 1;
+                //-------------------OnPlayEnd
+                this.OnClipPlayEnd();
             }
+            
             if (this.beRevert)
             {
                 this._playFrameid = this._playClip.frameCount - this._playFrameid - 1;
