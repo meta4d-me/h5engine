@@ -4043,7 +4043,6 @@ var gd3d;
                 this.needRefreshImg = false;
                 this.color = new gd3d.math.color(1.0, 1.0, 1.0, 1.0);
                 this._CustomShaderName = "";
-                this._darwRect = new gd3d.math.rect();
                 this._imageType = ImageType.Simple;
                 this._fillMethod = FillMethod.Horizontal;
                 this._fillAmmount = 1;
@@ -4067,6 +4066,10 @@ var gd3d;
                 return this._uimat;
             };
             image2D.prototype.getDrawBounds = function () {
+                if (!this._darwRect) {
+                    this._darwRect = new gd3d.math.rect();
+                    this.calcDrawRect();
+                }
                 return this._darwRect;
             };
             Object.defineProperty(image2D.prototype, "uimat", {
@@ -4431,6 +4434,8 @@ var gd3d;
                 this.calcDrawRect();
             };
             image2D.prototype.calcDrawRect = function () {
+                if (!this._darwRect)
+                    return;
                 var canvas = this.transform.canvas;
                 if (!canvas)
                     return;
@@ -5437,7 +5442,6 @@ var gd3d;
                 this.color = new gd3d.math.color(1, 1, 1, 1);
                 this.color2 = new gd3d.math.color(0, 0, 0.5, 0.5);
                 this._CustomShaderName = "";
-                this._darwRect = new gd3d.math.rect();
                 this.dirtyData = true;
                 this.min_x = Number.MAX_VALUE;
                 this.max_x = Number.MAX_VALUE * -1;
@@ -5639,6 +5643,10 @@ var gd3d;
                 return this._uimat;
             };
             label.prototype.getDrawBounds = function () {
+                if (!this._darwRect) {
+                    this._darwRect = new gd3d.math.rect();
+                    this.calcDrawRect();
+                }
                 return this._darwRect;
             };
             Object.defineProperty(label.prototype, "uimat", {
@@ -5741,6 +5749,8 @@ var gd3d;
                 this.dirtyData = true;
             };
             label.prototype.calcDrawRect = function () {
+                if (!this._darwRect)
+                    return;
                 var canvas = this.transform.canvas;
                 if (!canvas)
                     return;
@@ -5976,7 +5986,6 @@ var gd3d;
                 this.needRefreshImg = false;
                 this.color = new gd3d.math.color(1.0, 1.0, 1.0, 1.0);
                 this._CustomShaderName = "";
-                this._darwRect = new gd3d.math.rect();
                 this.min_x = Number.MAX_VALUE;
                 this.max_x = Number.MAX_VALUE * -1;
                 this.min_y = Number.MAX_VALUE;
@@ -6012,6 +6021,10 @@ var gd3d;
                 return this._uimat;
             };
             rawImage2D.prototype.getDrawBounds = function () {
+                if (!this._darwRect) {
+                    this._darwRect = new gd3d.math.rect();
+                    this.calcDrawRect();
+                }
                 return this._darwRect;
             };
             Object.defineProperty(rawImage2D.prototype, "uimat", {
@@ -6115,6 +6128,8 @@ var gd3d;
                 this.calcDrawRect();
             };
             rawImage2D.prototype.calcDrawRect = function () {
+                if (!this._darwRect)
+                    return;
                 var canvas = this.transform.canvas;
                 if (!canvas)
                     return;

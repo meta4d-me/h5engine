@@ -110,8 +110,8 @@ namespace gd3d.framework
             math.pool.delete_vector3(dirt);
             //收集灯光参数
         }
-        updateOverlay()
-        {
+        updateOverlay()  
+        {   //可能性优化点 UI 不用乘MVP 矩阵
             //v 特殊
             //gd3d.math.matrixMakeIdentity(this.matrixView);//v
             //gd3d.math.matrixMakeIdentity(this.matrixProject);//p

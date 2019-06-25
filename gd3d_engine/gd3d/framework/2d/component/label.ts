@@ -472,7 +472,7 @@ namespace gd3d.framework
             return this._uimat;
         }
 
-        private _darwRect : gd3d.math.rect = new gd3d.math.rect();
+        private _darwRect : gd3d.math.rect;
 
         /**
          * @public
@@ -482,6 +482,10 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         getDrawBounds(){
+            if(!this._darwRect){
+                this._darwRect = new math.rect();
+                this.calcDrawRect();
+            }
             return this._darwRect;
         }
 
@@ -611,6 +615,7 @@ namespace gd3d.framework
         private max_y : number = Number.MAX_VALUE * -1;
         /** 计算drawRect */
         private calcDrawRect(){
+            if(!this._darwRect)    return;
             //drawBounds (y 轴反向)
             let canvas = this.transform.canvas;
             if(!canvas)return;
