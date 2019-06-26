@@ -11742,6 +11742,7 @@ var gd3d;
                 this._queue = 0;
                 this.maxBoneCount = 55;
                 this._efficient = true;
+                this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
             }
             Object.defineProperty(skinnedMeshRenderer.prototype, "renderLayer", {
                 get: function () { return this.gameObject.layer; },
@@ -11983,10 +11984,6 @@ var gd3d;
                 return ishided;
             };
             skinnedMeshRenderer.prototype.update = function (delta) {
-                if (this._skeletonMatrixData == null) {
-                    this.maxBoneCount = 55;
-                    this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
-                }
                 if (this.materials != null && this.materials.length > 0) {
                     var _mat = this.materials[0];
                     if (_mat) {

@@ -125,7 +125,7 @@ namespace gd3d.framework
         //是否高效
         private _efficient: boolean = true;
         //这个数据是扣掉tpose之后的
-        private _skeletonMatrixData: Float32Array;
+        private _skeletonMatrixData: Float32Array = new Float32Array(8 * this.maxBoneCount);
 
         _aabb: aabb;
         get aabb() {
@@ -164,7 +164,6 @@ namespace gd3d.framework
 
         start()
         {
-
         }
 
         onPlay()
@@ -378,12 +377,12 @@ namespace gd3d.framework
 
         update(delta: number)
         {
-            if (this._skeletonMatrixData == null)
-            {
-                this.maxBoneCount = 55;
-                this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
-                //this._efficient = true;
-            }
+            // if (this._skeletonMatrixData == null)
+            // {
+            //     this.maxBoneCount = 55;
+            //     this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
+            //     //this._efficient = true;
+            // }
 
             if (this.materials != null && this.materials.length > 0)
             {
