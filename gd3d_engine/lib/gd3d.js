@@ -14335,11 +14335,14 @@ var gd3d;
             aniplayer.prototype.clone = function () {
             };
             aniplayer.prototype.checkFrameId = function (delay) {
+                var lastFid = this._playFrameid;
                 this._playTimer += delay * this.speed;
                 this._playFrameid = (this._playClip.fps * this._playTimer) | 0;
-                if (this.beActivedEndFrame && this._playFrameid >= this.endFrame) {
+                if (this.beActivedEndFrame && this._playFrameid > this.endFrame) {
                     this._playFrameid = this.endFrame;
-                    this.OnClipPlayEnd();
+                    if (lastFid == this.endFrame) {
+                        this.OnClipPlayEnd();
+                    }
                 }
                 else if (this._playClip.loop) {
                     this._playCount = Math.floor(this._playFrameid / this._playClip.frameCount);
