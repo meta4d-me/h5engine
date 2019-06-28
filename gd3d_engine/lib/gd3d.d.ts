@@ -1252,6 +1252,7 @@ declare namespace gd3d.framework {
             };
         };
         parts: Ibody[];
+        vertices: math.Ivec2[];
         isSleeping: boolean;
         isSensor: boolean;
         isStatic: boolean;
