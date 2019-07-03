@@ -472,7 +472,7 @@ namespace gd3d.framework
             let lastFid = this._playFrameid;
             this._playTimer += delay * this.speed;
             this._playFrameid = (this._playClip.fps * this._playTimer) | 0;
-
+            let clipFrameCount = this._playClip.frameCount;
             if (this.beActivedEndFrame && this._playFrameid > this.endFrame )
             {
                 this._playFrameid = this.endFrame;
@@ -481,19 +481,19 @@ namespace gd3d.framework
                 }
             }else if (this._playClip.loop)//加上循环与非循环动画的分别控制
             {
-                this._playCount = Math.floor(this._playFrameid / this._playClip.frameCount);
-                this._playFrameid %= this._playClip.frameCount;
+                this._playCount = Math.floor(this._playFrameid / clipFrameCount);
+                this._playFrameid %= clipFrameCount;
             }
-            else if (this._playFrameid > this._playClip.frameCount - 1)
+            else if (this._playFrameid > clipFrameCount - 1)
             {
-                this._playFrameid = this._playClip.frameCount - 1;
+                this._playFrameid = clipFrameCount - 1;
                 //-------------------OnPlayEnd
                 this.OnClipPlayEnd();
             }
 
             if (this.beRevert)
             {
-                this._playFrameid = this._playClip.frameCount - this._playFrameid - 1;
+                this._playFrameid = clipFrameCount - this._playFrameid - 1;
             }
         }
 
