@@ -3405,6 +3405,24 @@ var gd3d;
                     }
                 }
             };
+            transform2D.prototype.getFirstComponentInChildren = function (type) {
+                return this.getNodeFirstComponent(this, type);
+            };
+            transform2D.prototype.getNodeFirstComponent = function (node, _type) {
+                for (var i in node.components) {
+                    var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
+                    if (cname == _type) {
+                        return node.components[i].comp;
+                    }
+                }
+                if (node._children != null) {
+                    for (var i in node._children) {
+                        var result = node.getNodeFirstComponent(node._children[i], _type);
+                        if (result)
+                            return result;
+                    }
+                }
+            };
             transform2D.prototype.ContainsCanvasPoint = function (ModelPos, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
                 var result = false;
@@ -14335,6 +14353,7 @@ var gd3d;
                 var lastFid = this._playFrameid;
                 this._playTimer += delay * this.speed;
                 this._playFrameid = (this._playClip.fps * this._playTimer) | 0;
+                var clipFrameCount = this._playClip.frameCount;
                 if (this.beActivedEndFrame && this._playFrameid > this.endFrame) {
                     this._playFrameid = this.endFrame;
                     if (lastFid == this.endFrame) {
@@ -14342,15 +14361,15 @@ var gd3d;
                     }
                 }
                 else if (this._playClip.loop) {
-                    this._playCount = Math.floor(this._playFrameid / this._playClip.frameCount);
-                    this._playFrameid %= this._playClip.frameCount;
+                    this._playCount = Math.floor(this._playFrameid / clipFrameCount);
+                    this._playFrameid %= clipFrameCount;
                 }
-                else if (this._playFrameid > this._playClip.frameCount - 1) {
-                    this._playFrameid = this._playClip.frameCount - 1;
+                else if (this._playFrameid > clipFrameCount - 1) {
+                    this._playFrameid = clipFrameCount - 1;
                     this.OnClipPlayEnd();
                 }
                 if (this.beRevert) {
-                    this._playFrameid = this._playClip.frameCount - this._playFrameid - 1;
+                    this._playFrameid = clipFrameCount - this._playFrameid - 1;
                 }
             };
             aniplayer.prototype.OnClipPlayEnd = function () {
@@ -31960,6 +31979,25 @@ var gd3d;
                 for (var i_5 = 0; obj.transform.children != undefined && i_5 < obj.transform.children.length; i_5++) {
                     var _obj = obj.transform.children[i_5].gameObject;
                     this._getComponentsInChildren(type, _obj, array);
+                }
+            };
+            gameObject.prototype.getFirstComponentInChildren = function (type) {
+                return this.getNodeFirstComponent(this, type);
+            };
+            gameObject.prototype.getNodeFirstComponent = function (node, _type) {
+                for (var i in node.components) {
+                    var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
+                    if (cname == _type) {
+                        return node.components[i].comp;
+                    }
+                }
+                var children = node.transform.children;
+                if (children != null) {
+                    for (var i in children) {
+                        var result = node.getNodeFirstComponent(children[i].gameObject, _type);
+                        if (result)
+                            return result;
+                    }
                 }
             };
             gameObject.prototype.getComponentInParent = function (type) {
