@@ -148,11 +148,11 @@ namespace gd3d.math
             if (pool.unused_vector4.length > 0)
             {
                 var v = pool.unused_vector4.pop();
-                // v.x = src.x;
-                // v.y = src.y;
-                // v.z = src.z;
-                // v.w = src.w;
-                v.rawData.set(src.rawData);
+                v.x = src.x;
+                v.y = src.y;
+                v.z = src.z;
+                v.w = src.w;
+                // v.rawData.set(src.rawData);
                 return v;
             }
             else
@@ -238,7 +238,11 @@ namespace gd3d.math
            if (pool.unused_color.length > 0)
            {
                let c = pool.unused_color.pop();
-               c.rawData.set(col.rawData);
+               c.r = col.r;
+               c.g = col.g;
+               c.b = col.b;
+               c.a = col.r;
+            //    c.rawData.set(col.rawData);
                return c;
            }
            else
@@ -396,10 +400,10 @@ namespace gd3d.math
             if (pool.unused_vector3.length > 0)
             {
                 var v = pool.unused_vector3.pop();
-                // v.x = src.x;
-                // v.y = src.y;
-                // v.z = src.z;
-                v.rawData.set(src.rawData);
+                v.x = src.x;
+                v.y = src.y;
+                v.z = src.z;
+                // v.rawData.set(src.rawData);
                 return v;
             }
             else
@@ -539,14 +543,14 @@ namespace gd3d.math
             if (pool.unused_vector2.length > 0)
             {
                 var v = pool.unused_vector2.pop();
-                // v.x = src.x;
-                // v.y = src.y;
-                if (src.rawData.length > v.rawData.length)
-                {
-                    src.rawData[0] = v.rawData[0];
-                    src.rawData[1] = v.rawData[1];
-                } else
-                    v.rawData.set(src.rawData);
+                v.x = src.x;
+                v.y = src.y;
+                // if (src.rawData.length > v.rawData.length)
+                // {
+                //     src.rawData[0] = v.rawData[0];
+                //     src.rawData[1] = v.rawData[1];
+                // } else
+                //     v.rawData.set(src.rawData);
 
                 return v;
             }
@@ -628,9 +632,9 @@ namespace gd3d.math
         static clone_matrix3x2(src: matrix3x2): matrix3x2
         {
             var v: matrix3x2 = pool.new_matrix3x2();
-            // for (var i = 0; i < 6; i++)
-            //     v.rawData[i] = src.rawData[i];
-            v.rawData.set(src.rawData);
+            for (var i = 0; i < 6; i++)
+                v.rawData[i] = src.rawData[i];
+            // v.rawData.set(src.rawData);
             return v;
         }
         /**
@@ -695,9 +699,9 @@ namespace gd3d.math
         static clone_matrix(src: matrix): matrix
         {
             var v: matrix = pool.new_matrix();
-            // for (var i = 0; i < 16; i++)
-            //     v.rawData[i] = src.rawData[i];
-            v.rawData.set(src.rawData);
+            for (var i = 0; i < 16; i++)
+                v.rawData[i] = src.rawData[i];
+            // v.rawData.set(src.rawData);
             return v;
         }
         static readonly identityMat: matrix = new matrix();
@@ -780,11 +784,11 @@ namespace gd3d.math
             if (pool.unused_quaternion.length > 0)
             {
                 var v = pool.unused_quaternion.pop();
-                // v.x = src.x;
-                // v.y = src.y;
-                // v.z = src.z;
-                // v.w = src.w;
-                v.rawData.set(src.rawData);
+                v.x = src.x;
+                v.y = src.y;
+                v.z = src.z;
+                v.w = src.w;
+                // v.rawData.set(src.rawData);
                 return v;
             }
             else

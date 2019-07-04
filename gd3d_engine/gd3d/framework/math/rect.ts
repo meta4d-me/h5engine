@@ -45,9 +45,14 @@
 
     export function rectClone(src: rect, out: rect)
     {
-        out.rawData[0] = src.rawData[0];
-        out.rawData[1] = src.rawData[1];
-        out.rawData[2] = src.rawData[2];
-        out.rawData[3] = src.rawData[3];
+        out.x = src.x;
+        out.y = src.y;
+        out.h = src.h;
+        out.w = src.w; 
+        
+        // out.rawData[0] = src.rawData[0];
+        // out.rawData[1] = src.rawData[1];
+        // out.rawData[2] = src.rawData[2];
+        // out.rawData[3] = src.rawData[3];
     }
 }

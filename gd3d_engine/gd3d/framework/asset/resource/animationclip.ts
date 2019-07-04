@@ -12,8 +12,8 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class animationClip implements IAsset
     {
-        static readonly ClassName:string="animationClip";
-        
+        static readonly ClassName: string = "animationClip";
+
         @gd3d.reflect.Field("constText")
         private name: constText;
         private id: resID = new resID();
@@ -250,7 +250,7 @@ namespace gd3d.framework
          */
         bones: string[];
 
-        indexDic: { [boneName: string]: number }={};
+        indexDic: { [boneName: string]: number } = {};
         /**
          * @private
          */
@@ -277,7 +277,7 @@ namespace gd3d.framework
     @reflect.SerializeType
     export class PoseBoneMatrix
     {
-        static readonly ClassName:string="PoseBoneMatrix";
+        static readonly ClassName: string = "PoseBoneMatrix";
 
         @reflect.Field("vector3")
         t: math.vector3;
@@ -322,8 +322,10 @@ namespace gd3d.framework
         }
         copyFrom(src: PoseBoneMatrix)
         {
-            this.r.rawData.set(src.r.rawData);
-            this.t.rawData.set(src.t.rawData);
+            // this.r.rawData.set(src.r.rawData);
+            // this.t.rawData.set(src.t.rawData);
+            math.quatClone(src.r, this.r);
+            math.vec3Clone(src.t, this.t);
         }
         copyFromData(src: Float32Array, seek: number)
         {
@@ -456,20 +458,20 @@ namespace gd3d.framework
             return target;
         }
 
-        private static poolmats:PoseBoneMatrix[]=[];
-        static recycle(mat:PoseBoneMatrix)
+        private static poolmats: PoseBoneMatrix[] = [];
+        static recycle(mat: PoseBoneMatrix)
         {
             this.poolmats.push(mat);
         }
-        static create():PoseBoneMatrix
+        static create(): PoseBoneMatrix
         {
-            let item=this.poolmats.pop();
-            if(item)
+            let item = this.poolmats.pop();
+            if (item)
             {
                 return item;
-            }else
+            } else
             {
-                item=PoseBoneMatrix.createDefault();
+                item = PoseBoneMatrix.createDefault();
                 return item;
             }
         }

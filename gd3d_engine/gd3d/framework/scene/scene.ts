@@ -1,7 +1,7 @@
 namespace gd3d.framework
 {
     export declare let physics: PhysicsEngine;
-    export declare let physics2D:physicEngine2D;
+    export declare let physics2D: physicEngine2D;
     /**
      * @public
      * @language zh_CN
@@ -152,7 +152,7 @@ namespace gd3d.framework
          */
         fog: Fog;
 
-        onLateUpdate:(delta:number)=>any;
+        onLateUpdate: (delta: number) => any;
         /**
          * @public
          * @language zh_CN
@@ -178,16 +178,17 @@ namespace gd3d.framework
 
             //递归的更新与填充渲染列表
             this.updateScene(this.rootNode, delta);
-            if(this.onLateUpdate)
+            if (this.onLateUpdate)
                 this.onLateUpdate(delta);
 
-            if(physics)
+            if (physics)
             {
                 physics._step(delta);
             }
 
             //清理空引用
-            if(this._mainCamera && !this._mainCamera.gameObject){
+            if (this._mainCamera && !this._mainCamera.gameObject)
+            {
                 this._mainCamera = null;
             }
             //排序camera 并绘制
@@ -204,10 +205,12 @@ namespace gd3d.framework
             for (var i = 0; i < this.renderCameras.length; i++)
             {
                 render.glDrawPass.resetLastState();
-                if(i == this.renderCameras.length-1) {
+                if (i == this.renderCameras.length - 1)
+                {
                     this.renderCameras[i].isLastCamera = true;
                 }
-                if(this.app && this.app.beRendering){
+                if (this.app && this.app.beRendering)
+                {
                     this._renderCamera(i);
                 }
                 this.renderCameras[i].isLastCamera = false;
@@ -223,7 +226,7 @@ namespace gd3d.framework
                 this.webgl.flush();
             }
 
-            if(DrawCallInfo.BeActived)
+            if (DrawCallInfo.BeActived)
             {
                 DrawCallInfo.inc.showPerFrame();
                 DrawCallInfo.inc.reset();
@@ -268,7 +271,8 @@ namespace gd3d.framework
                     {
                         overlay.start(targetcamera);
                         overlay.update(delta);
-                        if(this.app && this.app.beRendering){
+                        if (this.app && this.app.beRendering)
+                        {
                             overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
                         }
                     }
@@ -383,8 +387,8 @@ namespace gd3d.framework
             {
                 node.gameObject.renderer.update(delta);//update 了啥
             }
-            var c = node.gameObject.camera;
-            if (c != null)
+            
+            if (node.gameObject.camera)
             {
                 node.gameObject.camera.update(delta);//update 了啥
             }
@@ -399,13 +403,36 @@ namespace gd3d.framework
                 }
             }
         }
+
+        private objupdate(node: transform, delta)
+        {
+            var queue=[];
+            while(node)
+            {
+                if (!(node.hasComponent == false && node.hasComponentChild == false))
+                {
+                    node.gameObject.init(this.app.bePlay);//组件还未初始化的初始化
+                    if (node.gameObject.haveComponet)
+                    {   
+                        node.gameObject.update(delta);
+                        this.collectCameraAndLight(node);
+                    }
+                }
+
+                for(var i=0,l = node.children.length;i<l;++i)
+                    queue.push(node.children[i]);
+                node = queue.shift();
+            }
+        }
+
+        /*
         private objupdate(node: transform, delta)//play状态下
         {
-            if(!node) return;
+            if (!node) return;
             if (node.hasComponent == false && node.hasComponentChild == false)
                 return;
             node.gameObject.init(this.app.bePlay);//组件还未初始化的初始化
-            if (node.gameObject.components.length > 0)
+            if (node.gameObject.haveComponet)
             {
                 node.gameObject.update(delta);
 
@@ -413,15 +440,14 @@ namespace gd3d.framework
             }
             if (node.children)
             {
-                for (let item of node.children)
-                    this.objupdate(item, delta);
-                // for (var i = 0; i < node.children.length; i++)
-                // {
-                //     this.objupdate(node.children[i], delta);
-                // }
+
+                for (var i = 0, l = node.children.length; i < l; i++)
+                {
+                    this.objupdate(node.children[i], delta);
+                }
             }
         }
-
+        */
         private collectCameraAndLight(node: transform)
         {
             //update 的时候只收集摄像机和灯光信息
@@ -719,16 +745,19 @@ namespace gd3d.framework
          */
         enablePhysics(gravity: math.vector3, plugin?: IPhysicsEnginePlugin)
         {
-            if (physics) {
+            if (physics)
+            {
                 return true;
             }
 
-            if(!plugin) plugin = new OimoJSPlugin();
+            if (!plugin) plugin = new OimoJSPlugin();
 
-            try {
+            try
+            {
                 physics = new PhysicsEngine(gravity, plugin);
                 return true;
-            } catch (e) {
+            } catch (e)
+            {
                 console.error(e.message);
                 return false;
             }
@@ -736,16 +765,19 @@ namespace gd3d.framework
             //physic=new PhysicsEngine(new math.vector3(0,-9.8,0),new OimoJSPlugin());
         }
 
-        enable2DPhysics(gravity: math.vector2 , physicOption : IEngine2DOP = null)
+        enable2DPhysics(gravity: math.vector2, physicOption: IEngine2DOP = null)
         {
-            if(physics2D){
+            if (physics2D)
+            {
                 return true;
             }
-            try{
+            try
+            {
                 physics2D = new physicEngine2D(physicOption);
-                physics2D.setGravity(gravity.x , gravity.y);
+                physics2D.setGravity(gravity.x, gravity.y);
                 return true;
-            }catch(e){
+            } catch (e)
+            {
                 console.error(e.message);
                 return false;
             }

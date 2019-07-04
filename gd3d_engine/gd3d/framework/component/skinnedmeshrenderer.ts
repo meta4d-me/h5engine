@@ -13,7 +13,7 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class skinnedMeshRenderer implements IRenderer
     {
-        static readonly ClassName:string="skinnedMeshRenderer";
+        static readonly ClassName: string = "skinnedMeshRenderer";
 
         constructor()
         {
@@ -128,10 +128,12 @@ namespace gd3d.framework
         private _skeletonMatrixData: Float32Array = new Float32Array(8 * this.maxBoneCount);
 
         _aabb: aabb;
-        get aabb() {
-            if(!this._aabb) {
+        get aabb()
+        {
+            if (!this._aabb)
+            {
                 // calculate aabb from bounds
-                const {size, center} = this;
+                const { size, center } = this;
                 let max = gd3d.math.pool.new_vector3();
                 let min = gd3d.math.pool.new_vector3();
                 let temp = gd3d.math.pool.new_vector3();
@@ -265,13 +267,13 @@ namespace gd3d.framework
             else
             {
                 let mat0 = gd3d.math.pool.new_matrix();
-                mat0.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v0, 16 * data.blendIndex[index].v0 + 16);
+                mat0.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v0, 16 * data.blendIndex[index].v0 + 16) as any;
                 let mat1 = gd3d.math.pool.new_matrix();
-                mat1.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v1, 16 * data.blendIndex[index].v1 + 16);
+                mat1.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v1, 16 * data.blendIndex[index].v1 + 16) as any;
                 let mat2 = gd3d.math.pool.new_matrix();
-                mat2.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v2, 16 * data.blendIndex[index].v2 + 16);
+                mat2.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v2, 16 * data.blendIndex[index].v2 + 16) as any;
                 let mat3 = gd3d.math.pool.new_matrix();
-                mat3.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v3, 16 * data.blendIndex[index].v3 + 16);
+                mat3.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v3, 16 * data.blendIndex[index].v3 + 16) as any;
 
                 gd3d.math.matrixScaleByNum(data.blendWeight[index].v0, mat0);
                 gd3d.math.matrixScaleByNum(data.blendWeight[index].v1, mat1);
@@ -290,13 +292,14 @@ namespace gd3d.framework
             return mat;
         }
 
-        calActualVertexByIndex(index: number, t: gd3d.math.vector3) {
+        calActualVertexByIndex(index: number, t: gd3d.math.vector3)
+        {
             let data = this.mesh.data;
             let verindex = data.trisindex[index];
             var p = data.pos[verindex];
             let mat = this.getMatByIndex(verindex);
             // gd3d.math.matrixMultiply(this.gameObject.transform.getLocalMatrix(), mat, mat);
-            if(mat == null)
+            if (mat == null)
                 debugger
             gd3d.math.matrixTransformVector3(p, mat, t);
         }
@@ -312,7 +315,8 @@ namespace gd3d.framework
         {
             let ishided = false;
             let lastDistance = Number.MAX_VALUE;
-            if (this.player != null && this.player.gameObject) {
+            if (this.player != null && this.player.gameObject)
+            {
                 let mvpmat = this.player.gameObject.transform.getWorldMatrix();
                 let data = this.mesh.data;
                 for (var i = 0; i < this.mesh.submesh.length; i++)
@@ -403,7 +407,7 @@ namespace gd3d.framework
 
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-            DrawCallInfo.inc.currentState=DrawCallEnum.SKinrender;
+            DrawCallInfo.inc.currentState = DrawCallEnum.SKinrender;
 
             if (this.player != null && this.player.gameObject)
             {
@@ -449,7 +453,7 @@ namespace gd3d.framework
             if (this.mesh)
                 this.mesh.unuse(true);
             this.bones.length = 0;
-            this._skeletonMatrixData=null;
+            this._skeletonMatrixData = null;
         }
         /**
          * @private

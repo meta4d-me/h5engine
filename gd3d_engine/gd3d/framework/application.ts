@@ -59,7 +59,7 @@ namespace gd3d.framework
         stats: Stats.Stats;
         container: HTMLDivElement;
         outcontainer: HTMLDivElement;
-        edModel:boolean;
+        edModel: boolean;
         /**
          * @public
          * @language zh_CN
@@ -243,8 +243,8 @@ namespace gd3d.framework
 
         startForCanvas(canvas: HTMLCanvasElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false)
         {
-            this.ccWidth = this.ccWidth == undefined ?  canvas.clientWidth : this.ccWidth;
-            this.ccHeight =this.ccHeight == undefined ?  canvas.clientHeight : this.ccHeight ;
+            this.ccWidth = this.ccWidth == undefined ? canvas.clientWidth : this.ccWidth;
+            this.ccHeight = this.ccHeight == undefined ? canvas.clientHeight : this.ccHeight;
 
             this._timeScale = 1;
             sceneMgr.app = this;
@@ -257,7 +257,8 @@ namespace gd3d.framework
                 throw Error("Failed to get webgl at the application.start()");
             }
 
-            switch (type){
+            switch (type)
+            {
                 case CanvasFixedType.FixedWidthType: this.canvasFixWidth = val; break;
                 case CanvasFixedType.FixedHeightType: this.canvasFixHeight = val; break;
             }
@@ -418,12 +419,12 @@ namespace gd3d.framework
             DrawCallInfo.inc.closeDrawCallInfo();
         }
         private _frameID = 0;
-        get frameID () {return this._frameID;};
+        get frameID() { return this._frameID; };
         private beStepNumber = 0;
         //delta 单位秒
         private update(delta: number)
         {
-            this._frameID ++;
+            this._frameID++;
 
             //if (this.outcontainer.clientWidth != this._canvasClientWidth || this.outcontainer.clientHeight != this._canvasClientHeight)
             {
@@ -444,7 +445,7 @@ namespace gd3d.framework
                 }
                 else
                 {
-                    if(this._inputmgr)
+                    if (this._inputmgr)
                         this._inputmgr.update(delta);
                     this.updateUserCode(delta);
                 }
@@ -461,9 +462,10 @@ namespace gd3d.framework
         {
             if (!this.outcontainer)
                 return;
-            if(this.webgl && this.webgl.canvas ){
-                this.ccWidth = this.webgl.canvas.clientWidth != null ?  this.webgl.canvas.clientWidth : this.ccWidth;
-                this.ccHeight = this.webgl.canvas.clientHeight != null ? this.webgl.canvas.clientHeight :this.ccHeight;
+            if (this.webgl && this.webgl.canvas)
+            {
+                this.ccWidth = this.webgl.canvas.clientWidth != null ? this.webgl.canvas.clientWidth : this.ccWidth;
+                this.ccHeight = this.webgl.canvas.clientHeight != null ? this.webgl.canvas.clientHeight : this.ccHeight;
             }
 
             if (this.ccWidth != this._canvasClientWidth || this.ccHeight != this._canvasClientHeight)
@@ -497,8 +499,9 @@ namespace gd3d.framework
         }
 
         //设置屏幕的 ASP
-        private setScreenAsp(){
-            if(!this.webgl || !this.webgl.canvas) return;
+        private setScreenAsp()
+        {
+            if (!this.webgl || !this.webgl.canvas) return;
             let canvas = this.webgl.canvas;
             let devicePixelRatio = window.devicePixelRatio || 1;
             let type = this.canvasFixedType;
@@ -506,20 +509,20 @@ namespace gd3d.framework
             {
                 case CanvasFixedType.Free:
                     this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
-                    canvas.width = this.ccWidth*devicePixelRatio;
-                    canvas.height = this.ccHeight*devicePixelRatio;
+                    canvas.width = this.ccWidth * devicePixelRatio;
+                    canvas.height = this.ccHeight * devicePixelRatio;
                     this._scaleFromPandding = 1;
                     break;
                 case CanvasFixedType.FixedWidthType:
                     this.screenAdaptiveType = "宽度自适应(宽度固定,一般横屏使用)";
-                    canvas.width = this._fixWidth*devicePixelRatio;
+                    canvas.width = this._fixWidth * devicePixelRatio;
                     canvas.height = canvas.width * this.ccHeight / this.ccWidth;
                     //this._scaleFromPandding = this.ccHeight / this.webgl.canvas.height;
                     this._scaleFromPandding = this.ccHeight * devicePixelRatio / this.webgl.canvas.height;
                     break;
                 case CanvasFixedType.FixedHeightType:
                     this.screenAdaptiveType = "高度自适应(高度固定，一般竖屏使用)";
-                    canvas.height = this._fixHeight*devicePixelRatio;
+                    canvas.height = this._fixHeight * devicePixelRatio;
                     canvas.width = this.ccWidth * canvas.height / this.ccHeight;
                     this._scaleFromPandding = this.ccHeight * devicePixelRatio / this.webgl.canvas.height;
                     break;
@@ -743,9 +746,33 @@ namespace gd3d.framework
         {
             this._beStepForward = value;
         }
+
         private updateUserCode(delta: number)
         {
             //add new code;
+            while (this._userCodeNew.length > 0)
+            {
+                var c = this._userCodeNew.pop();//this._userCodeNew[i];
+                if (c.isClosed() == false)
+                {                   
+                    c.onStart(this);
+                    this._userCode.push(c);
+                }
+            }
+
+            for (let i = 0, len = this._userCode.length; i < len; ++i)
+            {
+                c = this._userCode[i];
+                if (c.isClosed() == false)
+                {
+                    c.onUpdate(delta);
+                } else
+                {
+                    this._userCode.splice(i, 1);
+                }
+            }
+
+            /*
             for (var i = this._userCodeNew.length - 1; i >= 0; i--)
             {
                 var c = this._userCodeNew[i];
@@ -778,6 +805,7 @@ namespace gd3d.framework
             {
                 this._userCode.splice(closeindex, 1);
             }
+            */
         }
 
         private updateEditorCode(delta: number)
@@ -810,8 +838,8 @@ namespace gd3d.framework
         /**
          * 渲染开关
          */
-        get beRendering(){return this._beRendering;}
-        set beRendering(val: boolean){ this._beRendering = val;};
+        get beRendering() { return this._beRendering; }
+        set beRendering(val: boolean) { this._beRendering = val; };
 
         /**
          * @public

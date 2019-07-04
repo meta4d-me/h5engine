@@ -107,10 +107,12 @@ namespace gd3d.framework
     @reflect.nodeCamera
     export class camera implements INodeComponent
     {
-        static readonly ClassName:string="camera";
+        static readonly ClassName: string = "camera";
 
-        constructor(){
-            for(let i=0; i < 8 ;i++){
+        constructor()
+        {
+            for (let i = 0; i < 8; i++)
+            {
                 this.frameVecs.push(new math.vector3());
             }
         }
@@ -234,7 +236,8 @@ namespace gd3d.framework
         }
 
         /** overLays update */
-        private _updateOverLays(delta: number){
+        private _updateOverLays(delta: number)
+        {
             for (var i = 0; i < this.overlays.length; i++)
             {
                 if (!this.overlays[i].init)
@@ -432,7 +435,7 @@ namespace gd3d.framework
             gd3d.math.matrixClone(this.matProj, matrix);
         }
 
-        private static _shareRay : ray ;
+        private static _shareRay: ray;
         /**
          * @public
          * @language zh_CN
@@ -443,13 +446,13 @@ namespace gd3d.framework
          * 由屏幕坐标发射射线
          * @version egret-gd3d 1.0
          */
-        public creatRayByScreen(screenpos: gd3d.math.vector2, app: application , shareRayCache :boolean = true ): ray
+        public creatRayByScreen(screenpos: gd3d.math.vector2, app: application, shareRayCache: boolean = true): ray
         {
             let src1 = camera.helpv3;
-            math.vec3Set(src1,screenpos.x,screenpos.y,0);
+            math.vec3Set(src1, screenpos.x, screenpos.y, 0);
 
             let src2 = camera.helpv3_1;
-            math.vec3Set(src2,screenpos.x,screenpos.y,1);
+            math.vec3Set(src2, screenpos.x, screenpos.y, 1);
 
             let dest1 = camera.helpv3_2;
             let dest2 = camera.helpv3_3;
@@ -459,14 +462,17 @@ namespace gd3d.framework
             let dir = camera.helpv3_4;
             gd3d.math.vec3Subtract(dest2, dest1, dir);
             gd3d.math.vec3Normalize(dir, dir);
-            let ray : ray;
-            if(shareRayCache) {
-                if(!camera._shareRay) {
+            let ray: ray;
+            if (shareRayCache)
+            {
+                if (!camera._shareRay)
+                {
                     camera._shareRay = new gd3d.framework.ray(dest1, dir);
                 }
                 ray = camera._shareRay;
-                ray.set(dest1,dir);
-            }else{
+                ray.set(dest1, dir);
+            } else
+            {
                 ray = new gd3d.framework.ray(dest1, dir);
             }
 
@@ -489,7 +495,7 @@ namespace gd3d.framework
             this.calcViewPortPixel(app, vpp);
             let vppos = poolv2();
             vppos.x = screenPos.x / vpp.w * 2 - 1;
-            vppos.y =  1 - screenPos.y / vpp.h * 2;
+            vppos.y = 1 - screenPos.y / vpp.h * 2;
             // new math.vector2(screenPos.x / vpp.w * 2 - 1, 1 - screenPos.y / vpp.h * 2);
             let matrixView = camera.helpmtx;
             let matrixProject = camera.helpmtx_1;
@@ -539,7 +545,7 @@ namespace gd3d.framework
 
         private lastCamMtx = new math.matrix();
         private lastCamRect = new math.rect();
-        private paraArr = [0,0,0];
+        private paraArr = [0, 0, 0];
         /**
          * @private 计算相机框
          * @param app
@@ -550,8 +556,9 @@ namespace gd3d.framework
             let _vpp = math.pool.new_rect();
             this.calcViewPortPixel(app, _vpp);
             //检查是否需要更新
-            if(math.matrixEqual(this.lastCamMtx,matrix) && math.rectEqul(this.lastCamRect,_vpp) &&
-                this.paraArr[0] == this.fov && this.paraArr[1] == this.near && this.paraArr[2] == this.far){
+            if (math.matrixEqual(this.lastCamMtx, matrix) && math.rectEqul(this.lastCamRect, _vpp) &&
+                this.paraArr[0] == this.fov && this.paraArr[1] == this.near && this.paraArr[2] == this.far)
+            {
                 return;
             }
 
@@ -563,10 +570,10 @@ namespace gd3d.framework
             let nearLD = camera.helpv3_1;
             let nearRT = camera.helpv3_2;
             let nearRD = camera.helpv3_3;
-            math.vec3Set(nearLT,-near_w, near_h, this.near);
-            math.vec3Set(nearLD,-near_w, -near_h, this.near);
-            math.vec3Set(nearRT,near_w, near_h, this.near);
-            math.vec3Set(nearRD,near_w, -near_h, this.near);
+            math.vec3Set(nearLT, -near_w, near_h, this.near);
+            math.vec3Set(nearLD, -near_w, -near_h, this.near);
+            math.vec3Set(nearRT, near_w, near_h, this.near);
+            math.vec3Set(nearRD, near_w, -near_h, this.near);
 
             let far_h = this.far * Math.tan(this.fov * 0.5);
             let far_w = far_h * asp;
@@ -575,10 +582,10 @@ namespace gd3d.framework
             let farLD = camera.helpv3_5;
             let farRT = camera.helpv3_6;
             let farRD = camera.helpv3_7;
-            math.vec3Set(farLT,-far_w, far_h, this.far);
-            math.vec3Set(farLD,-far_w, -far_h, this.far);
-            math.vec3Set(farRT,far_w, far_h, this.far);
-            math.vec3Set(farRD,far_w, -far_h, this.far);
+            math.vec3Set(farLT, -far_w, far_h, this.far);
+            math.vec3Set(farLD, -far_w, -far_h, this.far);
+            math.vec3Set(farRT, far_w, far_h, this.far);
+            math.vec3Set(farRD, far_w, -far_h, this.far);
 
             gd3d.math.matrixTransformVector3(farLD, matrix, farLD);
             gd3d.math.matrixTransformVector3(nearLD, matrix, nearLD);
@@ -588,18 +595,18 @@ namespace gd3d.framework
             gd3d.math.matrixTransformVector3(nearLT, matrix, nearLT);
             gd3d.math.matrixTransformVector3(farRT, matrix, farRT);
             gd3d.math.matrixTransformVector3(nearRT, matrix, nearRT);
-            math.vec3Clone(farLD,this. frameVecs[0]);
-            math.vec3Clone(nearLD,this.frameVecs[1]);
-            math.vec3Clone(farRD,this. frameVecs[2]);
-            math.vec3Clone(nearRD,this.frameVecs[3]);
-            math.vec3Clone(farLT,this. frameVecs[4]);
-            math.vec3Clone(nearLT,this.frameVecs[5]);
-            math.vec3Clone(farRT,this. frameVecs[6]);
-            math.vec3Clone(nearRT,this.frameVecs[7]);
+            math.vec3Clone(farLD, this.frameVecs[0]);
+            math.vec3Clone(nearLD, this.frameVecs[1]);
+            math.vec3Clone(farRD, this.frameVecs[2]);
+            math.vec3Clone(nearRD, this.frameVecs[3]);
+            math.vec3Clone(farLT, this.frameVecs[4]);
+            math.vec3Clone(nearLT, this.frameVecs[5]);
+            math.vec3Clone(farRT, this.frameVecs[6]);
+            math.vec3Clone(nearRT, this.frameVecs[7]);
 
             //同步
-            math.matrixClone(matrix,this.lastCamMtx);
-            math.rectClone(_vpp,this.lastCamRect);
+            math.matrixClone(matrix, this.lastCamMtx);
+            math.rectClone(_vpp, this.lastCamRect);
             this.paraArr[0] = this.fov;
             this.paraArr[1] = this.near;
             this.paraArr[2] = this.far;
@@ -690,78 +697,98 @@ namespace gd3d.framework
             if (scene.app.isFrustumCulling)
                 this.calcCameraFrame(scene.app);
             let fID = scene.app.frameID;
-            if(camera.lastFID != fID) {
+            if (camera.lastFID != fID)
+            {
                 this.needUpdateWpos = true;
                 camera.lastFID = fID;
             }
+            // this._fillRenderer1(scene, scene.getRoot());
             this._fillRenderer(scene, scene.getRoot());
+
             this.needUpdateWpos = false;
             camera.lastFID = fID;
-            if(this.gameObject.transform.dirtiedOfFrustumCulling)
+            if (this.gameObject.transform.dirtiedOfFrustumCulling)
                 this.gameObject.transform.dirtiedOfFrustumCulling = false;
         }
 
+
+
         private static lastFID = -1;
         private needUpdateWpos = false;
-        private _fillRenderer(scene: scene, node: transform)
+
+       
+        private _fillRenderer(scene: scene, node: transform, _isStatic: boolean = false)
         {
             if (!node.gameObject.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false)) return;  //自己没有渲染组件 且 子物体也没有 return
 
             // if (scene.app.isFrustumCulling && !this.testFrustumCulling(scene, node)) return;//视锥测试不通过 直接return
-
+            node.gameObject.isStatic = _isStatic || node.gameObject.isStatic;
             const id = node.insId.getInsID();
-            if(node.dirtiedOfFrustumCulling || this.gameObject.transform.dirtiedOfFrustumCulling) {
-                if (this.needUpdateWpos) { // 更新世界坐标
+            if (node.dirtiedOfFrustumCulling || this.gameObject.transform.dirtiedOfFrustumCulling)
+            {
+                if (this.needUpdateWpos)
+                { // 更新世界坐标
                     node.getWorldTranslate();
                 }
+                // if (!isStatic)
                 this.cullingMap[id] = this.isCulling(node);
-                if(this.isLastCamera)
+                if (this.isLastCamera)
                     node.dirtiedOfFrustumCulling = false;
             }
 
-            if (node.gameObject != null && node.gameObject.renderer != null )
+            if (node.gameObject != null && node.gameObject.renderer != null)
             {
-                if (scene.app.isFrustumCulling) {
-                    if (!this.cullingMap[id]) {
+                if (scene.app.isFrustumCulling)
+                {
+                    if (!this.cullingMap[id])
+                    {
                         scene.renderList.addRenderer(node.gameObject.renderer);
                     }
-                } else {
+                } else
+                {
                     scene.renderList.addRenderer(node.gameObject.renderer);
                 }
             }
-            if (node.children != null )
+            if (node.children)
             {
-                for (var i = 0; i < node.children.length; i++)
-                {
-                    this._fillRenderer(scene, node.children[i]);
-                }
+                for (var i = 0, l = node.children.length; i < l; ++i)
+                    this._fillRenderer(scene, node.children[i], node.gameObject.isStatic);
             }
+            // if (node.children != null)
+            // {
+            //     for (var i = 0; i < node.children.length; i++)
+            //     {
+            //         this._fillRenderer(scene, node.children[i]);
+            //     }
+            // }
         }
         private fruMap = {
-            farLD:  0,
+            farLD: 0,
             nearLD: 1,
-            farRD:  2,
+            farRD: 2,
             nearRD: 3,
-            farLT:  4,
+            farLT: 4,
             nearLT: 5,
-            farRT:  6,
+            farRT: 6,
             nearRT: 7,
         }
         private _vec3cache = new gd3d.math.vector3();
-        isCulling(node: transform) {
-            if(node.gameObject.hideFlags & HideFlags.DontFrustumCulling) return false;
+        isCulling(node: transform)
+        {
+            if (node.gameObject.hideFlags & HideFlags.DontFrustumCulling) return false;
             const vec3cache = this._vec3cache;
-            let  {aabb} = node;
+            let { aabb } = node;
             //var skinmesh = node.gameObject.getComponent("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer;
             var skinmesh = node.gameObject.renderer as any; //skinnedMeshRenderer noly
-            if(skinmesh != null && skinmesh.size && skinmesh.aabb) {
+            if (skinmesh != null && skinmesh.size && skinmesh.aabb)
+            {
                 // 有些模型没有size, 会报错
                 // 如果有骨骼动画, 使用unity导出的aabb
                 // if (skinmesh.aabb != null)
                 aabb = skinmesh.aabb;
             }
             gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, vec3cache);
-            const radius = gd3d.math.vec3Length(vec3cache)/2;
+            const radius = gd3d.math.vec3Length(vec3cache) / 2;
             const center = node.aabb.center;
             // Left
             if (this.isRight(
@@ -822,7 +849,8 @@ namespace gd3d.framework
 
         private _edge1 = new gd3d.math.vector3();
         private _edge2 = new gd3d.math.vector3();
-        private isRight(v0: gd3d.math.vector3, v1: gd3d.math.vector3, v2: gd3d.math.vector3, pos: gd3d.math.vector3, radius: number) {
+        private isRight(v0: gd3d.math.vector3, v1: gd3d.math.vector3, v2: gd3d.math.vector3, pos: gd3d.math.vector3, radius: number)
+        {
             const edge1 = this._edge1;
             const edge2 = this._edge2;
             const vec3cache = this._vec3cache;
@@ -844,7 +872,7 @@ namespace gd3d.framework
         {
             if (!node.gameObject.getComponent("frustumculling")) return true;//没挂识别组件即为通过测试
             let spherecol = node.gameObject.getComponent("spherecollider") as spherecollider;
-            let worldPos = node.getWorldTranslate();
+            // let worldPos = node.getWorldTranslate();
 
             if (!spherecol.caclPlaneInDir(this.frameVecs[0], this.frameVecs[1], this.frameVecs[5])) return false;
             if (!spherecol.caclPlaneInDir(this.frameVecs[1], this.frameVecs[3], this.frameVecs[7])) return false;
@@ -887,10 +915,10 @@ namespace gd3d.framework
                     {
                         context.webgl.depthMask(true);//zwrite 會影響clear depth，這個查了好一陣
                         gd3d.render.glDrawPass.lastZWrite = true;
-                        if(scene.fog)
+                        if (scene.fog)
                         {
                             context.webgl.clearColor(scene.fog._Color.x, scene.fog._Color.y, scene.fog._Color.z, scene.fog._Color.w);
-                        }else
+                        } else
                         {
                             context.webgl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
                         }
@@ -907,10 +935,10 @@ namespace gd3d.framework
                     }
                     else if (this.clearOption_Color)
                     {
-                        if(scene.fog)
+                        if (scene.fog)
                         {
                             context.webgl.clearColor(scene.fog._Color.x, scene.fog._Color.y, scene.fog._Color.z, scene.fog._Color.w);
-                        }else
+                        } else
                         {
                             context.webgl.clearColor(this.backgroundColor.r, this.backgroundColor.g, this.backgroundColor.b, this.backgroundColor.a);
                         }
@@ -935,10 +963,15 @@ namespace gd3d.framework
             context.drawtype = drawtype;
 
             let assetmgr = scene.app.getAssetMgr();
-            for (let layer of scene.renderList.renderLayers)
+            // for (let layer of scene.renderList.renderLayers)
+            let rlayers = scene.renderList.renderLayers;
+            for (let i = 0, l = rlayers.length; i < l; ++i)
             {
-                for (let item of layer.list)
+                let ls = rlayers[i].list;
+                for (let j = 0, jl = ls.length; j < jl; ++j)
+                // for (let item of layer.list)
                 {
+                    let item = ls[j];
                     if (item.gameObject.visible == true && this.CullingMask & (1 << item.renderLayer))
                     {
                         if (item.gameObject && item.gameObject.visible == true)
@@ -971,9 +1004,10 @@ namespace gd3d.framework
         renderScene(scene: scene, context: renderContext)
         {
             this._contextIdx = scene.renderContext.indexOf(context);
-            for (var i = 0; i < scene.renderList.renderLayers.length; i++)
+            let rlayers = scene.renderList.renderLayers;
+            for (var i = 0, l = rlayers.length; i < l; ++i)
             {
-                let layer = scene.renderList.renderLayers[i];
+                let layer = rlayers[i];
                 let list = layer.list;
                 if (layer.needSort)
                 {
@@ -995,9 +1029,11 @@ namespace gd3d.framework
                                 let bz = camera.helpv3_1;
 
                                 // gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
-                                // gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
-                                gd3d.math.matrixTransformVector3(a.gameObject.transform['worldTranslate'], matrixView, az);
-                                gd3d.math.matrixTransformVector3(b.gameObject.transform['worldTranslate'], matrixView, bz);
+                                // gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);                                
+                                // gd3d.math.matrixTransformVector3(a.gameObject.transform['worldTranslate'], matrixView, az);
+                                // gd3d.math.matrixTransformVector3(b.gameObject.transform['worldTranslate'], matrixView, bz);
+                                gd3d.math.matrixTransformVector3(a.gameObject.transform.worldTranslate, matrixView, az);
+                                gd3d.math.matrixTransformVector3(b.gameObject.transform.worldTranslate, matrixView, bz);
                                 return bz.z - az.z;
                             }
                         })
@@ -1006,31 +1042,16 @@ namespace gd3d.framework
             }
             if (this.postQueues.length == 0)
             {
-                // setTimeout(() =>
-                // {
-                    this._targetAndViewport(this.renderTarget, scene, context, false);
-                    this._renderOnce(scene, context, "");
-                // });
+                this._targetAndViewport(this.renderTarget, scene, context, false);
+                this._renderOnce(scene, context, "");
 
-                //context.webgl.flush();
             }
             else
             {
-
-                // for (var i = 0; i < this.postQueues.length; i++)
-                // {
-                //     this.postQueues[i].render(scene, context, this);
-                // }
-                // let count = 0;
-                for (let item of this.postQueues)
+                // for (let item of this.postQueues)
+                for (let i = 0, l = this.postQueues.length; i < l; ++i)
                 {
-                    // setTimeout(() =>
-                    // {
-
-                        item.render(scene, context, this);
-                        // if (++count >= this.postQueues.length)
-                            // context.webgl.flush();
-                    // });
+                    this.postQueues[i].render(scene, context, this);
                 }
                 context.webgl.flush();
             }

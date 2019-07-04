@@ -287,80 +287,72 @@ declare namespace gd3d.math {
     function Double(v?: number | string): double;
     class vector2 implements Ivec2 {
         static readonly ClassName: string;
-        rawData: Float32Array;
-        constructor(x?: float, y?: float);
-        x: float;
-        y: float;
-        toString(): string;
+        constructor(x?: number, y?: number);
+        x: number;
+        y: number;
     }
     class rect {
         static readonly ClassName: string;
-        rawData: Float32Array;
         constructor(x?: float, y?: float, w?: float, h?: float);
-        x: float;
-        y: float;
-        w: float;
-        h: float;
+        x: number;
+        y: number;
+        w: number;
+        h: number;
         toString(): string;
     }
     class border {
         static readonly ClassName: string;
-        rawData: Float32Array;
         constructor(l?: float, t?: float, r?: float, b?: float);
-        l: float;
-        t: float;
-        r: float;
-        b: float;
+        l: number;
+        t: number;
+        r: number;
+        b: number;
         toString(): string;
     }
     class color {
         static readonly ClassName: string;
-        rawData: Float32Array;
         constructor(r?: float, g?: float, b?: float, a?: float);
-        r: float;
-        g: float;
-        b: float;
-        a: float;
+        r: number;
+        g: number;
+        b: number;
+        a: number;
         toString(): string;
     }
     class vector3 implements Ivec3 {
         static readonly ClassName: string;
-        rawData: Float32Array;
         constructor(x?: float, y?: float, z?: float);
-        x: float;
-        y: float;
-        z: float;
+        x: number;
+        y: number;
+        z: number;
         toString(): string;
     }
     class vector4 {
         static readonly ClassName: string;
-        rawData: Float32Array;
         constructor(x?: float, y?: float, z?: float, w?: float);
-        x: float;
-        y: float;
-        z: float;
-        w: float;
+        x: number;
+        y: number;
+        z: number;
+        w: number;
         toString(): string;
     }
     class quaternion implements Iquat {
         static readonly ClassName: string;
-        rawData: Float32Array;
         constructor(x?: float, y?: float, z?: float, w?: float);
-        x: float;
-        y: float;
-        z: float;
-        w: float;
+        x: number;
+        y: number;
+        z: number;
+        w: number;
         toString(): string;
     }
     class matrix {
         static readonly ClassName: string;
-        rawData: Float32Array;
-        constructor(datas?: Float32Array);
+        rawData: Array<number>;
+        constructor(datas?: Array<number>);
         toString(): string;
     }
     class matrix3x2 {
-        rawData: Float32Array;
-        constructor(datas?: Float32Array);
+        rawData: Array<number>;
+        constructor(datas?: Array<number>);
         toString(): string;
     }
     function vec4FormJson(json: string, vec4: vector4): void;
@@ -1923,7 +1915,6 @@ declare namespace gd3d.framework {
         readonly aabb: aabb;
         private static readonly aabbCareTypes;
         private _buildAABB;
-        private _children;
         children: transform[];
         private _physicsImpostor;
         physicsImpostor: PhysicsImpostor;
@@ -1961,10 +1952,11 @@ declare namespace gd3d.framework {
         localEulerAngles: math.vector3;
         private worldMatrix;
         private worldRotate;
-        private worldTranslate;
+        worldTranslate: math.vector3;
         private worldScale;
         getWorldRotate(): math.quaternion;
         setWorldRotate(rotate: math.quaternion): void;
+        firstCalc: boolean;
         getWorldTranslate(): math.vector3;
         getWorldPosition(): math.vector3;
         setWorldPosition(pos: math.vector3): void;
@@ -1980,8 +1972,8 @@ declare namespace gd3d.framework {
         lookat(trans: transform): void;
         lookatPoint(point: math.vector3): void;
         private calcLookAt;
-        private _gameObject;
-        readonly gameObject: gameObject;
+        constructor();
+        gameObject: gameObject;
         clone(): transform;
         readonly beDispose: boolean;
         private _beDispose;
@@ -2240,6 +2232,7 @@ declare namespace gd3d.framework {
         updateByEffect: boolean;
         data: gd3d.render.meshData;
         submesh: subMeshInfo[];
+        static useThead: boolean;
         onReadFinish: () => void;
         private reading;
         private readProcess;
@@ -4339,7 +4332,6 @@ declare namespace gd3d.math {
 }
 declare namespace gd3d.math {
     function vec3Clone(from: vector3, to: vector3): void;
-    function vec3ToString(result: string): void;
     function vec3Add(a: vector3, b: vector3, out: vector3): void;
     function vec3Subtract(a: vector3, b: vector3, out: vector3): void;
     function vec3Minus(a: vector3, out: vector3): void;
@@ -4384,7 +4376,7 @@ declare namespace gd3d.math {
     function vec4SLerp(vector: vector4, vector2: vector4, v: number, out: vector4): void;
     function vec4Add(a: gd3d.math.vector4, b: gd3d.math.vector4, out: gd3d.math.vector4): void;
     function vec4ScaleByNum(from: gd3d.math.vector4, scale: number, out: gd3d.math.vector4): void;
-    function vec4SetAll(vector: vector3, value: number): void;
+    function vec4SetAll(vector: vector4, value: number): void;
     function vec4Set(vector: vector4, x: number, y: number, z: number, w: number): void;
 }
 declare namespace gd3d.framework {
@@ -5905,6 +5897,7 @@ declare namespace gd3d.framework {
         components: nodeComponent[];
         private componentsInit;
         private componentsPlayed;
+        haveComponet: boolean;
         renderer: IRenderer;
         camera: camera;
         light: light;

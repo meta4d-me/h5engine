@@ -10,7 +10,7 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class mesh implements IAsset
     {
-        static readonly ClassName:string="mesh";
+        static readonly ClassName: string = "mesh";
 
         private name: constText;
         private id: resID = new resID();
@@ -124,6 +124,10 @@ namespace gd3d.framework
          */
         submesh: subMeshInfo[] = [];
 
+        /**
+         * 是否使用多线程解析
+         */
+        static useThead: boolean = true;
         //加载完成事件
         public onReadFinish: () => void;
         // //分片加载状态变量
@@ -335,7 +339,9 @@ namespace gd3d.framework
             for (var i = 0; i < subcount; i++)
             {
                 var _submeshinfo: subMeshInfo = new subMeshInfo();
-                var tv = read.readUInt32();//代表之前submesh中的drawstyle
+                
+                // var tv = read.readUInt32();//代表之前submesh中的drawstyle
+                read.readUInt32();
 
                 var sublen = read.readUInt32();
                 _submeshinfo.start = data.trisindex.length;
@@ -378,41 +384,66 @@ namespace gd3d.framework
         {
             return new threading.gdPromise((reslove) =>
             {
-                threading.thread.Instance.Call("meshDataHandle", buf, (result) =>
+                if (mesh.useThead)
                 {
 
-                    let objVF = result.objVF;
-                    let data = result.meshData;
-                    data.originVF = objVF.vf;
-                    // this.data = new gd3d.render.meshData();
-                    this.data = render.meshData.cloneByObj(data);
-                    // for (let k in data)
-                    //     this.data[k] = data[k];
-                    this.submesh = result.subMesh;
+                    threading.thread.Instance.Call("meshDataHandle", buf, (result) =>
+                    {
 
-                    this.glMesh = new gd3d.render.glMesh();
-                    var vertexs = this.data.genVertexDataArray(objVF.vf);
-                    var indices = this.data.genIndexDataArray();
+                        let objVF = result.objVF;
+                        let data = result.meshData;
+                        data.originVF = objVF.vf;
+                        // this.data = new gd3d.render.meshData();
+                        this.data = render.meshData.cloneByObj(data);
+                        // for (let k in data)
+                        //     this.data[k] = data[k];
+                        this.submesh = result.subMesh;
 
-                    let __webgl = sceneMgr.app.getAssetMgr().webgl;
-                    this.glMesh.initBuffer(webgl, objVF.vf, this.data.pos.length);
-                    this.glMesh.uploadVertexData(webgl, vertexs);
-                    this.glMesh.addIndex(webgl, indices.length);
-                    this.glMesh.uploadIndexData(webgl, 0, indices);
-                    reslove();
-                });
+                        this.glMesh = new gd3d.render.glMesh();
+                        var vertexs = this.data.genVertexDataArray(objVF.vf);
+                        var indices = this.data.genIndexDataArray();
+
+                        // let __webgl = sceneMgr.app.getAssetMgr().webgl;
+                        this.glMesh.initBuffer(webgl, objVF.vf, this.data.pos.length);
+                        this.glMesh.uploadVertexData(webgl, vertexs);
+                        this.glMesh.addIndex(webgl, indices.length);
+                        this.glMesh.uploadIndexData(webgl, 0, indices);
+                        reslove();
+                    });
+                } else
+                {
+
+                    var objVF = { vf: 0 };//顶点属性
+                    var data: gd3d.render.meshData = new gd3d.render.meshData();
+                    var read: gd3d.io.binReader = new gd3d.io.binReader(buf);
+                    // var meshName = read.readStringAnsi();
+                    read.readStringAnsi();
+
+                    read.position = read.position + 24;
+
+                    var vcount = read.readUInt32();
+
+                    var vec10tpose: number[] = [];
+
+                    //分片加载 
+                    this.readProcess(read, data, objVF, vcount, vec10tpose, () =>
+                    {
+                        this.readFinish(read, data, buf, objVF, webgl);
+                        reslove();
+                    });
+                }
             });
 
             // return new threading.gdPromise((reslove) =>
             // {
 
-                
+
             //     var objVF = { vf: 0 };//顶点属性
             //     var data: gd3d.render.meshData = new gd3d.render.meshData();
             //     var read: gd3d.io.binReader = new gd3d.io.binReader(buf);              
 
             //     var meshName = read.readStringAnsi();
-                
+
             //     read.position = read.position + 24;
 
             //     var vcount = read.readUInt32();
@@ -652,8 +683,8 @@ namespace gd3d.framework
             return _result;
         }
 
-        private _cacheMinP : math.vector3;
-        private _cacheMaxP : math.vector3;
+        private _cacheMinP: math.vector3;
+        private _cacheMaxP: math.vector3;
         /**
          * @public
          * @language zh_CN
@@ -663,9 +694,11 @@ namespace gd3d.framework
          * @param outMax 输出最大
          * @version egret-gd3d 1.0
          */
-        calcVectexMinMax(outMin:math.vector3,outMax:math.vector3){
-            if(!outMin || !outMax) return;
-            if(!this._cacheMinP || !this._cacheMaxP){
+        calcVectexMinMax(outMin: math.vector3, outMax: math.vector3)
+        {
+            if (!outMin || !outMax) return;
+            if (!this._cacheMinP || !this._cacheMaxP)
+            {
                 this._cacheMinP = new math.vector3();
                 this._cacheMaxP = new math.vector3();
                 let meshdata = this.data;
@@ -673,12 +706,12 @@ namespace gd3d.framework
                 gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, this._cacheMaxP);
                 for (var i = 0; i < meshdata.pos.length; i++)
                 {
-                    gd3d.math.vec3Max(meshdata.pos[i], this._cacheMaxP , this._cacheMaxP );
+                    gd3d.math.vec3Max(meshdata.pos[i], this._cacheMaxP, this._cacheMaxP);
                     gd3d.math.vec3Min(meshdata.pos[i], this._cacheMinP, this._cacheMinP);
                 }
             }
-            math.vec3Clone(this._cacheMinP,outMin);
-            math.vec3Clone(this._cacheMaxP,outMax);
+            math.vec3Clone(this._cacheMinP, outMin);
+            math.vec3Clone(this._cacheMaxP, outMax);
         }
     }
     /**

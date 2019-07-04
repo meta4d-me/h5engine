@@ -1,4 +1,5 @@
-﻿namespace gd3d.math
+﻿"use strict";
+namespace gd3d.math
 {
     export function vec2Subtract(a: vector2, b: vector2, out: vector2) {
         out.x = a.x - b.x;
@@ -9,11 +10,11 @@
         out.y = a.y + b.y;
     }
     export function vec2Clone(from: vector2, to: vector2) {
-        // to.x = from.x;
-        // to.y = from.y;
+        to.x = from.x;
+        to.y = from.y;
         //to.rawData.set(from.rawData);
-        to.rawData[0]=from.rawData[0];
-        to.rawData[1]=from.rawData[1];
+        // to.rawData[0]=from.rawData[0];
+        // to.rawData[1]=from.rawData[1];
     }
     export function vec2Distance(a: vector2, b: vector2): number
     {
@@ -75,12 +76,18 @@
     }
 
     export function vec2SetAll(vector : vector2 , value : number){
-        vector.rawData[0] = value;
-        vector.rawData[1] = value;
+        vector.x = value;
+        vector.y = value;
+        
+        // vector.rawData[0] = value;
+        // vector.rawData[1] = value;
     }
 
     export function vec2Set (vector : vector2 , x : number ,  y : number){
-        vector.rawData[0] = x;
-        vector.rawData[1] = y;
+        vector.x = x;
+        vector.y = y; 
+        
+        // vector.rawData[0] = x;
+        // vector.rawData[1] = y;
     }
 }

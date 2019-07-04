@@ -594,7 +594,7 @@ namespace gd3d.framework {
             }
 
             if (this._children != null) {
-                for (var i = 0; i < this._children.length; i++) {
+                for (var i = 0,l=this._children.length; i < l; i++) {
                     this._children[i].updateTran(parentChange || this.dirty);
                 }
             }

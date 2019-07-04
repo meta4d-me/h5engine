@@ -1,10 +1,16 @@
-﻿namespace gd3d.math
+﻿
+"use strict";
+namespace gd3d.math
 {
     export function matrixGetTranslation(src: matrix, out: vector3)
     {
-        out.rawData[0] = src.rawData[12];
-        out.rawData[1] = src.rawData[13];
-        out.rawData[2] = src.rawData[14];
+        out.x = src.rawData[12];
+        out.y = src.rawData[13];
+        out.z = src.rawData[14];
+
+        // out.rawData[0] = src.rawData[12];
+        // out.rawData[1] = src.rawData[13];
+        // out.rawData[2] = src.rawData[14];
         //out.rawData.set(src.rawData.subarray(12, 15));
     }
 
@@ -33,10 +39,10 @@
 
     export function matrixDecompose(src: matrix, scale: vector3, rotation: quaternion, translation: vector3): boolean
     {
-        // translation.x = src.rawData[12];
-        // translation.y = src.rawData[13];
-        // translation.z = src.rawData[14];
-        translation.rawData.set(src.rawData.subarray(12, 15));
+        translation.x = src.rawData[12];
+        translation.y = src.rawData[13];
+        translation.z = src.rawData[14];
+        // translation.rawData.set(src.rawData.subarray(12, 15));
 
         let xs = sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
         let ys = sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
@@ -127,7 +133,8 @@
         return true;
     }
 
-    export function matrixGetRotation(src: matrix, result: quaternion):void{
+    export function matrixGetRotation(src: matrix, result: quaternion): void
+    {
         let xs = sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
         let ys = sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
         let zs = sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
@@ -147,12 +154,12 @@
         mat.rawData[6] = src.rawData[6] / scale_y;
         mat.rawData[7] = 0;
 
-        mat.rawData[8] = src.rawData[8]   / scale_z;
-        mat.rawData[9] = src.rawData[9]   / scale_z;
+        mat.rawData[8] = src.rawData[8] / scale_z;
+        mat.rawData[9] = src.rawData[9] / scale_z;
         mat.rawData[10] = src.rawData[10] / scale_z;
         mat.rawData[11] = 0;
 
-        matrix2Quaternion(mat,result);
+        matrix2Quaternion(mat, result);
         pool.delete_matrix(mat);
     }
 
@@ -449,13 +456,14 @@
         let ys = sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
         let zs = sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
 
-        scale.rawData[0] = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
-        scale.rawData[1] = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
-        scale.rawData[2] = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
+        scale.x = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
+        scale.y = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
+        scale.z = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
 
-        // scale.rawData[0] = src.rawData[0];
-        // scale.rawData[1] = src.rawData[5];
-        // scale.rawData[2] = src.rawData[10];
+        // scale.rawData[0] = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
+        // scale.rawData[1] = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
+        // scale.rawData[2] = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
+
     }
     export function matrixMakeScale(xScale: number, yScale: number, zScale: number, out: matrix): void
     {
@@ -668,15 +676,18 @@
         out.rawData[4] = temp_4;
         out.rawData[5] = temp_5;
     }
-    
-    export function matrix3x2Equal(mtx1: matrix3x2, mtx2: matrix3x2, threshold = 0.00001): boolean {
-        for(let i = 0;i < 6 ;i++){
-            if(Math.abs(mtx1.rawData[i] - mtx2.rawData[i]) > threshold){
+
+    export function matrix3x2Equal(mtx1: matrix3x2, mtx2: matrix3x2, threshold = 0.00001): boolean
+    {
+        for (let i = 0; i < 6; i++)
+        {
+            if (Math.abs(mtx1.rawData[i] - mtx2.rawData[i]) > threshold)
+            {
                 return false;
             }
         }
         return true;
-     }
+    }
     export function matrixProject_PerspectiveLH(fov: number, aspect: number, znear: number, zfar: number, out: matrix)
     {
         var tan = 1.0 / (Math.tan(fov * 0.5));
@@ -750,7 +761,7 @@
             vec3Normalize(x, x);
         }
         // Y axis
-        vec3Clone(pool.vector3_zero,y);
+        vec3Clone(pool.vector3_zero, y);
 
         vec3Cross(z, x, y);
         vec3Normalize(y, y);
@@ -800,7 +811,7 @@
             vec3Normalize(x, x);
         }
         // Y axis
-        vec3Clone(pool.vector3_zero,y);
+        vec3Clone(pool.vector3_zero, y);
 
         vec3Cross(z, x, y);
         vec3Normalize(y, y);
@@ -847,17 +858,28 @@
         let z = (vector.x * transformation.rawData[2]) + (vector.y * transformation.rawData[6]) + (vector.z * transformation.rawData[10]) + transformation.rawData[14];
         let w = (vector.x * transformation.rawData[3]) + (vector.y * transformation.rawData[7]) + (vector.z * transformation.rawData[11]) + transformation.rawData[15];
 
-        result.rawData[0] = x / w;
-        result.rawData[1] = y / w;
-        result.rawData[2] = z / w;
+        result.x = x / w;
+        result.y = y / w;
+        result.z = z / w;
+
+        // result.rawData[0] = x / w;
+        // result.rawData[1] = y / w;
+        // result.rawData[2] = z / w;
     }
 
-    export function matrixTransformVector4(src:gd3d.math.vector4,mtx:gd3d.math.matrix,out:gd3d.math.vector4){
-        let x = (src.rawData[0] * mtx.rawData[0]) + (src.rawData[1] * mtx.rawData[4]) + (src.rawData[2] * mtx.rawData[8]) +  (src.rawData[3] * mtx.rawData[12]);
-        let y = (src.rawData[0] * mtx.rawData[1]) + (src.rawData[1] * mtx.rawData[5]) + (src.rawData[2] * mtx.rawData[9]) +  (src.rawData[3] * mtx.rawData[13]);
-        let z = (src.rawData[0] * mtx.rawData[2]) + (src.rawData[1] * mtx.rawData[6]) + (src.rawData[2] * mtx.rawData[10]) + (src.rawData[3] * mtx.rawData[14]);
-        let w = (src.rawData[0] * mtx.rawData[3]) + (src.rawData[1] * mtx.rawData[7]) + (src.rawData[2] * mtx.rawData[11]) + (src.rawData[3] * mtx.rawData[15]);
-        out.rawData[0] = x; out.rawData[1] = y; out.rawData[2] = z; out.rawData[3] = w;
+    export function matrixTransformVector4(src: gd3d.math.vector4, mtx: gd3d.math.matrix, out: gd3d.math.vector4)
+    {
+        out.x = (src.x * mtx.rawData[0]) + (src.y * mtx.rawData[4]) + (src.z * mtx.rawData[8]) + (src.w * mtx.rawData[12]);
+        out.y = (src.x * mtx.rawData[1]) + (src.y * mtx.rawData[5]) + (src.z * mtx.rawData[9]) + (src.w * mtx.rawData[13]);
+        out.z = (src.x * mtx.rawData[2]) + (src.y * mtx.rawData[6]) + (src.z * mtx.rawData[10]) + (src.w * mtx.rawData[14]);
+        out.w = (src.x * mtx.rawData[3]) + (src.y * mtx.rawData[7]) + (src.z * mtx.rawData[11]) + (src.w * mtx.rawData[15]);
+
+
+        // let x = (src.rawData[0] * mtx.rawData[0]) + (src.rawData[1] * mtx.rawData[4]) + (src.rawData[2] * mtx.rawData[8]) +  (src.rawData[3] * mtx.rawData[12]);
+        // let y = (src.rawData[0] * mtx.rawData[1]) + (src.rawData[1] * mtx.rawData[5]) + (src.rawData[2] * mtx.rawData[9]) +  (src.rawData[3] * mtx.rawData[13]);
+        // let z = (src.rawData[0] * mtx.rawData[2]) + (src.rawData[1] * mtx.rawData[6]) + (src.rawData[2] * mtx.rawData[10]) + (src.rawData[3] * mtx.rawData[14]);
+        // let w = (src.rawData[0] * mtx.rawData[3]) + (src.rawData[1] * mtx.rawData[7]) + (src.rawData[2] * mtx.rawData[11]) + (src.rawData[3] * mtx.rawData[15]);
+        // out.rawData[0] = x; out.rawData[1] = y; out.rawData[2] = z; out.rawData[3] = w;
     }
 
     //变换向量
@@ -867,15 +889,23 @@
         let y = (vector.x * transformation.rawData[1]) + (vector.y * transformation.rawData[5]) + (vector.z * transformation.rawData[9]);
         let z = (vector.x * transformation.rawData[2]) + (vector.y * transformation.rawData[6]) + (vector.z * transformation.rawData[10]);
 
-        result.rawData[0] = x;
-        result.rawData[1] = y;
-        result.rawData[2] = z;
+        result.x = x;
+        result.y = y;
+        result.z = z;
+
+        // result.rawData[0] = x;
+        // result.rawData[1] = y;
+        // result.rawData[2] = z;
     }
     export function matrixGetVector3ByOffset(src: matrix, offset: number, result: vector3): void
     {
-        result.rawData[0] = src.rawData[offset];
-        result.rawData[1] = src.rawData[offset + 1];
-        result.rawData[2] = src.rawData[offset + 2];
+        result.x = src.rawData[offset];
+        result.y = src.rawData[offset + 1];
+        result.z = src.rawData[offset + 2];
+
+        // result.rawData[0] = src.rawData[offset];
+        // result.rawData[1] = src.rawData[offset + 1];
+        // result.rawData[2] = src.rawData[offset + 2]
     }
     export function matrixReset(mat: matrix)
     {
@@ -969,18 +999,22 @@
         out.rawData[15] = left.rawData[15] + right.rawData[15];
     }
 
-    export function matrixEqual(mtx1: matrix, mtx2: matrix, threshold = 0.00001): boolean {
-        for(let i = 0;i < 16 ;i++){
-            if(Math.abs(mtx1.rawData[i] - mtx2.rawData[i]) > threshold){
+    export function matrixEqual(mtx1: matrix, mtx2: matrix, threshold = 0.00001): boolean
+    {
+        for (let i = 0; i < 16; i++)
+        {
+            if (Math.abs(mtx1.rawData[i] - mtx2.rawData[i]) > threshold)
+            {
                 return false;
             }
         }
         return true;
-     }
+    }
 
-     export function matrixIsIdentity(mtx: matrix){
-         let m = mtx.rawData;
-         let _isIdentity = (
+    export function matrixIsIdentity(mtx: matrix)
+    {
+        let m = mtx.rawData;
+        let _isIdentity = (
             m[0] === 1.0 && m[1] === 0.0 && m[2] === 0.0 && m[3] === 0.0 &&
             m[4] === 0.0 && m[5] === 1.0 && m[6] === 0.0 && m[7] === 0.0 &&
             m[8] === 0.0 && m[9] === 0.0 && m[10] === 1.0 && m[11] === 0.0 &&
@@ -988,5 +1022,5 @@
         )
 
         return _isIdentity;
-     }
+    }
 }

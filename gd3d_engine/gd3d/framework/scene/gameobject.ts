@@ -58,7 +58,7 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class nodeComponent
     {
-        static readonly ClassName:string="nodeComponent";
+        static readonly ClassName: string = "nodeComponent";
 
         /**
          * @public
@@ -95,7 +95,7 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class gameObject
     {
-        static readonly ClassName:string="gameObject";
+        static readonly ClassName: string = "gameObject";
         /**
          * @public
          * @language zh_CN
@@ -171,6 +171,7 @@ namespace gd3d.framework
         components: nodeComponent[] = [];
         private componentsInit: nodeComponent[] = [];
         private componentsPlayed: nodeComponent[] = [];
+        haveComponet: boolean = false;
         /**
          * @public
          * @language zh_CN
@@ -290,8 +291,10 @@ namespace gd3d.framework
                 this.componentsInit.length = 0;
             }
 
-            if(this.componentsPlayed.length > 0 && bePlay){
-                this.componentsPlayed.forEach(item => {
+            if (this.componentsPlayed.length > 0 && bePlay)
+            {
+                this.componentsPlayed.forEach(item =>
+                {
                     item.comp.onPlay();
                 });
                 this.componentsPlayed.length = 0;
@@ -309,8 +312,9 @@ namespace gd3d.framework
         update(delta: number)
         {
             let len = this.components.length;
-            for(var i=0;i < len ;i++){
-                if(!this.components[i])continue;
+            for (var i = 0; i < len; i++)
+            {
+                if (!this.components[i]) continue;
                 this.components[i].comp.update(delta);
             }
         }
@@ -407,6 +411,7 @@ namespace gd3d.framework
                 if (reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1")
                     sceneMgr.app.markNotify(this.transform, NotifyType.AddCanvasRender);
             }
+            this.haveComponet = true;
             return comp;
         }
         /**
@@ -530,7 +535,8 @@ namespace gd3d.framework
          */
         removeComponent(comp: INodeComponent)
         {
-            for (var i = 0; i < this.components.length; i++)
+            let len = this.components.length;
+            for (var i = 0; i < len; i++)
             {
                 if (this.components[i].comp == comp)
                 {
@@ -544,6 +550,8 @@ namespace gd3d.framework
                     break;
                 }
             }
+            if (len < 1)
+                this.haveComponet = false;
         }
 
         private remove(comp: INodeComponent)
@@ -611,10 +619,10 @@ namespace gd3d.framework
                 this.remove(this.components[i].comp);
             }
 
-            if(this.camera) this.camera = null;
-            if(this.renderer)   this.renderer = null;
-            if(this.light)  this.light = null;
-            if(this.collider) this.collider = null;
+            if (this.camera) this.camera = null;
+            if (this.renderer) this.renderer = null;
+            if (this.light) this.light = null;
+            if (this.collider) this.collider = null;
 
             this.components.length = 0;
         }

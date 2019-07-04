@@ -1,3 +1,4 @@
+"use strict";
 var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
     var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
     if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
@@ -450,26 +451,21 @@ var gd3d;
                 configurable: true
             });
             application.prototype.updateUserCode = function (delta) {
-                for (var i = this._userCodeNew.length - 1; i >= 0; i--) {
-                    var c = this._userCodeNew[i];
+                while (this._userCodeNew.length > 0) {
+                    var c = this._userCodeNew.pop();
                     if (c.isClosed() == false) {
                         c.onStart(this);
                         this._userCode.push(c);
-                        this._userCodeNew.splice(i, 1);
                     }
                 }
-                var closeindex = -1;
-                for (var i = 0; i < this._userCode.length; i++) {
-                    var c = this._userCode[i];
+                for (var i = 0, len = this._userCode.length; i < len; ++i) {
+                    c = this._userCode[i];
                     if (c.isClosed() == false) {
                         c.onUpdate(delta);
                     }
-                    else if (closeindex < 0) {
-                        closeindex = i;
+                    else {
+                        this._userCode.splice(i, 1);
                     }
-                }
-                if (closeindex >= 0) {
-                    this._userCode.splice(closeindex, 1);
                 }
             };
             application.prototype.updateEditorCode = function (delta) {
@@ -1283,46 +1279,18 @@ var gd3d;
             function vector2(x, y) {
                 if (x === void 0) { x = 0; }
                 if (y === void 0) { y = 0; }
-                this.rawData = new Float32Array(2);
-                this.rawData[0] = x;
-                this.rawData[1] = y;
+                this.x = x;
+                this.y = y;
             }
-            Object.defineProperty(vector2.prototype, "x", {
-                get: function () {
-                    return this.rawData[0];
-                },
-                set: function (x) {
-                    this.rawData[0] = x;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(vector2.prototype, "y", {
-                get: function () {
-                    return this.rawData[1];
-                },
-                set: function (y) {
-                    this.rawData[1] = y;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            vector2.prototype.toString = function () {
-                return this.x + "," + this.y;
-            };
             vector2.ClassName = "vector2";
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], vector2.prototype, "x", null);
+                __metadata("design:type", Number)
+            ], vector2.prototype, "x", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], vector2.prototype, "y", null);
+                __metadata("design:type", Number)
+            ], vector2.prototype, "y", void 0);
             vector2 = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [Number, Number])
@@ -1336,80 +1304,31 @@ var gd3d;
                 if (y === void 0) { y = 0; }
                 if (w === void 0) { w = 0; }
                 if (h === void 0) { h = 0; }
-                this.rawData = new Float32Array(4);
-                this.rawData[0] = x;
-                this.rawData[1] = y;
-                this.rawData[2] = w;
-                this.rawData[3] = h;
+                this.x = x;
+                this.y = y;
+                this.w = w;
+                this.h = h;
             }
-            Object.defineProperty(rect.prototype, "x", {
-                get: function () {
-                    return this.rawData[0];
-                },
-                set: function (x) {
-                    this.rawData[0] = x;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(rect.prototype, "y", {
-                get: function () {
-                    return this.rawData[1];
-                },
-                set: function (y) {
-                    this.rawData[1] = y;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(rect.prototype, "w", {
-                get: function () {
-                    return this.rawData[2];
-                },
-                set: function (w) {
-                    this.rawData[2] = w;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(rect.prototype, "h", {
-                get: function () {
-                    return this.rawData[3];
-                },
-                set: function (h) {
-                    this.rawData[3] = h;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
             rect.prototype.toString = function () {
-                return this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "," + this.rawData[3];
+                return this.x + "," + this.y + "," + this.w + "," + this.h;
             };
             rect.ClassName = "rect";
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], rect.prototype, "x", null);
+                __metadata("design:type", Number)
+            ], rect.prototype, "x", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], rect.prototype, "y", null);
+                __metadata("design:type", Number)
+            ], rect.prototype, "y", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], rect.prototype, "w", null);
+                __metadata("design:type", Number)
+            ], rect.prototype, "w", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], rect.prototype, "h", null);
+                __metadata("design:type", Number)
+            ], rect.prototype, "h", void 0);
             rect = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [Number, Number, Number, Number])
@@ -1423,80 +1342,31 @@ var gd3d;
                 if (t === void 0) { t = 0; }
                 if (r === void 0) { r = 0; }
                 if (b === void 0) { b = 0; }
-                this.rawData = new Float32Array(4);
-                this.rawData[0] = l;
-                this.rawData[1] = t;
-                this.rawData[2] = r;
-                this.rawData[3] = b;
+                this.l = l;
+                this.t = t;
+                this.r = r;
+                this.b = b;
             }
-            Object.defineProperty(border.prototype, "l", {
-                get: function () {
-                    return this.rawData[0];
-                },
-                set: function (l) {
-                    this.rawData[0] = l;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(border.prototype, "t", {
-                get: function () {
-                    return this.rawData[1];
-                },
-                set: function (t) {
-                    this.rawData[1] = t;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(border.prototype, "r", {
-                get: function () {
-                    return this.rawData[2];
-                },
-                set: function (r) {
-                    this.rawData[2] = r;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(border.prototype, "b", {
-                get: function () {
-                    return this.rawData[3];
-                },
-                set: function (b) {
-                    this.rawData[3] = b;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
             border.prototype.toString = function () {
                 return this.r + "," + this.t + "," + this.r + "," + this.b;
             };
             border.ClassName = "border";
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], border.prototype, "l", null);
+                __metadata("design:type", Number)
+            ], border.prototype, "l", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], border.prototype, "t", null);
+                __metadata("design:type", Number)
+            ], border.prototype, "t", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], border.prototype, "r", null);
+                __metadata("design:type", Number)
+            ], border.prototype, "r", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], border.prototype, "b", null);
+                __metadata("design:type", Number)
+            ], border.prototype, "b", void 0);
             border = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [Number, Number, Number, Number])
@@ -1510,80 +1380,31 @@ var gd3d;
                 if (g === void 0) { g = 1; }
                 if (b === void 0) { b = 1; }
                 if (a === void 0) { a = 1; }
-                this.rawData = new Float32Array(4);
-                this.rawData[0] = r;
-                this.rawData[1] = g;
-                this.rawData[2] = b;
-                this.rawData[3] = a;
+                this.r = r;
+                this.g = g;
+                this.b = b;
+                this.a = a;
             }
-            Object.defineProperty(color.prototype, "r", {
-                get: function () {
-                    return this.rawData[0];
-                },
-                set: function (r) {
-                    this.rawData[0] = r;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(color.prototype, "g", {
-                get: function () {
-                    return this.rawData[1];
-                },
-                set: function (g) {
-                    this.rawData[1] = g;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(color.prototype, "b", {
-                get: function () {
-                    return this.rawData[2];
-                },
-                set: function (b) {
-                    this.rawData[2] = b;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(color.prototype, "a", {
-                get: function () {
-                    return this.rawData[3];
-                },
-                set: function (a) {
-                    this.rawData[3] = a;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
             color.prototype.toString = function () {
                 return this.r + "," + this.g + "," + this.b + "," + this.a;
             };
             color.ClassName = "color";
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], color.prototype, "r", null);
+                __metadata("design:type", Number)
+            ], color.prototype, "r", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], color.prototype, "g", null);
+                __metadata("design:type", Number)
+            ], color.prototype, "g", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], color.prototype, "b", null);
+                __metadata("design:type", Number)
+            ], color.prototype, "b", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], color.prototype, "a", null);
+                __metadata("design:type", Number)
+            ], color.prototype, "a", void 0);
             color = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [Number, Number, Number, Number])
@@ -1596,63 +1417,26 @@ var gd3d;
                 if (x === void 0) { x = 0; }
                 if (y === void 0) { y = 0; }
                 if (z === void 0) { z = 0; }
-                this.rawData = new Float32Array(3);
-                this.rawData[0] = x;
-                this.rawData[1] = y;
-                this.rawData[2] = z;
+                this.x = x;
+                this.y = y;
+                this.z = z;
             }
-            Object.defineProperty(vector3.prototype, "x", {
-                get: function () {
-                    return this.rawData[0];
-                },
-                set: function (x) {
-                    this.rawData[0] = x;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(vector3.prototype, "y", {
-                get: function () {
-                    return this.rawData[1];
-                },
-                set: function (y) {
-                    this.rawData[1] = y;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(vector3.prototype, "z", {
-                get: function () {
-                    return this.rawData[2];
-                },
-                set: function (z) {
-                    this.rawData[2] = z;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
             vector3.prototype.toString = function () {
-                return this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2];
+                return this.x + "," + this.y + "," + this.z;
             };
             vector3.ClassName = "vector3";
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], vector3.prototype, "x", null);
+                __metadata("design:type", Number)
+            ], vector3.prototype, "x", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], vector3.prototype, "y", null);
+                __metadata("design:type", Number)
+            ], vector3.prototype, "y", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], vector3.prototype, "z", null);
+                __metadata("design:type", Number)
+            ], vector3.prototype, "z", void 0);
             vector3 = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [Number, Number, Number])
@@ -1666,80 +1450,31 @@ var gd3d;
                 if (y === void 0) { y = 0; }
                 if (z === void 0) { z = 0; }
                 if (w === void 0) { w = 0; }
-                this.rawData = new Float32Array(4);
-                this.rawData[0] = x;
-                this.rawData[1] = y;
-                this.rawData[2] = z;
-                this.rawData[3] = w;
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.w = w;
             }
-            Object.defineProperty(vector4.prototype, "x", {
-                get: function () {
-                    return this.rawData[0];
-                },
-                set: function (x) {
-                    this.rawData[0] = x;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(vector4.prototype, "y", {
-                get: function () {
-                    return this.rawData[1];
-                },
-                set: function (y) {
-                    this.rawData[1] = y;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(vector4.prototype, "z", {
-                get: function () {
-                    return this.rawData[2];
-                },
-                set: function (z) {
-                    this.rawData[2] = z;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(vector4.prototype, "w", {
-                get: function () {
-                    return this.rawData[3];
-                },
-                set: function (w) {
-                    this.rawData[3] = w;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
             vector4.prototype.toString = function () {
-                return this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "," + this.rawData[3];
+                return this.x + "," + this.y + "," + this.z + "," + this.w;
             };
             vector4.ClassName = "vector4";
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], vector4.prototype, "x", null);
+                __metadata("design:type", Number)
+            ], vector4.prototype, "x", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], vector4.prototype, "y", null);
+                __metadata("design:type", Number)
+            ], vector4.prototype, "y", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], vector4.prototype, "z", null);
+                __metadata("design:type", Number)
+            ], vector4.prototype, "z", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], vector4.prototype, "w", null);
+                __metadata("design:type", Number)
+            ], vector4.prototype, "w", void 0);
             vector4 = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [Number, Number, Number, Number])
@@ -1753,80 +1488,31 @@ var gd3d;
                 if (y === void 0) { y = 0; }
                 if (z === void 0) { z = 0; }
                 if (w === void 0) { w = 1; }
-                this.rawData = new Float32Array(4);
-                this.rawData[0] = x;
-                this.rawData[1] = y;
-                this.rawData[2] = z;
-                this.rawData[3] = w;
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.w = w;
             }
-            Object.defineProperty(quaternion.prototype, "x", {
-                get: function () {
-                    return this.rawData[0];
-                },
-                set: function (x) {
-                    this.rawData[0] = x;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(quaternion.prototype, "y", {
-                get: function () {
-                    return this.rawData[1];
-                },
-                set: function (y) {
-                    this.rawData[1] = y;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(quaternion.prototype, "z", {
-                get: function () {
-                    return this.rawData[2];
-                },
-                set: function (z) {
-                    this.rawData[2] = z;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            Object.defineProperty(quaternion.prototype, "w", {
-                get: function () {
-                    return this.rawData[3];
-                },
-                set: function (w) {
-                    this.rawData[3] = w;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ;
             quaternion.prototype.toString = function () {
-                return this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "," + this.rawData[3];
+                return this.x + "," + this.y + "," + this.z + "," + this.w;
             };
             quaternion.ClassName = "quaternion";
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], quaternion.prototype, "x", null);
+                __metadata("design:type", Number)
+            ], quaternion.prototype, "x", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], quaternion.prototype, "y", null);
+                __metadata("design:type", Number)
+            ], quaternion.prototype, "y", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], quaternion.prototype, "z", null);
+                __metadata("design:type", Number)
+            ], quaternion.prototype, "z", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number),
-                __metadata("design:paramtypes", [Number])
-            ], quaternion.prototype, "w", null);
+                __metadata("design:type", Number)
+            ], quaternion.prototype, "w", void 0);
             quaternion = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [Number, Number, Number, Number])
@@ -1841,7 +1527,7 @@ var gd3d;
                     this.rawData = datas;
                 }
                 else
-                    this.rawData = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+                    this.rawData = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
             }
             matrix.prototype.toString = function () {
                 return "[" + this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "," + this.rawData[3] + "],"
@@ -1860,7 +1546,7 @@ var gd3d;
                     this.rawData = datas;
                 }
                 else
-                    this.rawData = new Float32Array([1, 0, 0, 1, 0, 0]);
+                    this.rawData = [1, 0, 0, 1, 0, 0];
             }
             matrix3x2.prototype.toString = function () {
                 return "[" + this.rawData[0] + "," + this.rawData[1] + "," + this.rawData[2] + "],"
@@ -3126,7 +2812,7 @@ var gd3d;
                     }
                 }
                 if (this._children != null) {
-                    for (var i = 0; i < this._children.length; i++) {
+                    for (var i = 0, l = this._children.length; i < l; i++) {
                         this._children[i].updateTran(parentChange || this.dirty);
                     }
                 }
@@ -10204,8 +9890,8 @@ var gd3d;
                 return pt;
             };
             PoseBoneMatrix.prototype.copyFrom = function (src) {
-                this.r.rawData.set(src.r.rawData);
-                this.t.rawData.set(src.t.rawData);
+                gd3d.math.quatClone(src.r, this.r);
+                gd3d.math.vec3Clone(src.t, this.t);
             };
             PoseBoneMatrix.prototype.copyFromData = function (src, seek) {
                 this.r.x = src[seek + 0];
@@ -10642,7 +10328,7 @@ var gd3d;
                 this.insId = new insID();
                 this.prefab = "";
                 this._dirtyAABB = true;
-                this._children = [];
+                this.children = [];
                 this.dirtiedOfFrustumCulling = false;
                 this.dirtyLocal = false;
                 this.dirtyWorld = false;
@@ -10659,26 +10345,27 @@ var gd3d;
                 this.worldRotate = new gd3d.math.quaternion();
                 this.worldTranslate = new gd3d.math.vector3(0, 0, 0);
                 this.worldScale = new gd3d.math.vector3(1, 1, 1);
+                this.firstCalc = true;
                 this._beDispose = false;
+                this.gameObject = new framework.gameObject();
+                this.gameObject.transform = this;
             }
             transform_2 = transform;
             transform.prototype.checkLRTSChange = function () {
-                if (!this.fastEqual(this.helpLPos.rawData, this._localTranslate.rawData))
+                if (!this.fastEqual(this.helpLPos, this._localTranslate))
                     return true;
-                if (!this.fastEqual(this.helpLRotate.rawData, this._localRotate.rawData))
+                if (!this.fastEqual(this.helpLRotate, this._localRotate))
                     return true;
-                if (!this.fastEqual(this.helpLScale.rawData, this._localScale.rawData))
+                if (!this.fastEqual(this.helpLScale, this._localScale))
                     return true;
                 return false;
             };
             transform.prototype.fastEqual = function (d_0, d_1) {
-                if (d_0[0] != d_1[0])
+                if (d_0.x != d_1.x)
                     return false;
-                if (d_0[1] != d_1[1])
+                if (d_0.y != d_1.y)
                     return false;
-                if (d_0[2] != d_1[2])
-                    return false;
-                if (d_0.length == 4 && d_0[3] != d_1[3])
+                if (d_0.z != d_1.z)
                     return false;
                 return true;
             };
@@ -10780,16 +10467,6 @@ var gd3d;
                 var _aabb = new framework.aabb(minimum, maximum);
                 return _aabb;
             };
-            Object.defineProperty(transform.prototype, "children", {
-                get: function () {
-                    return this._children;
-                },
-                set: function (children) {
-                    this._children = children;
-                },
-                enumerable: true,
-                configurable: true
-            });
             Object.defineProperty(transform.prototype, "physicsImpostor", {
                 get: function () {
                     return this._physicsImpostor;
@@ -10808,7 +10485,7 @@ var gd3d;
                 configurable: true
             });
             transform.prototype.addChild = function (node) {
-                this.addChildAt(node, this._children.length);
+                this.addChildAt(node, this.children.length);
             };
             transform.prototype.addChildAt = function (node, index) {
                 if (index < 0)
@@ -10816,9 +10493,9 @@ var gd3d;
                 if (node._parent != null) {
                     node._parent.removeChild(node);
                 }
-                if (this._children == null)
-                    this._children = [];
-                this._children.splice(index, 0, node);
+                if (this.children == null)
+                    this.children = [];
+                this.children.splice(index, 0, node);
                 node.scene = this.scene;
                 node._parent = this;
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
@@ -10830,22 +10507,22 @@ var gd3d;
             };
             transform.prototype.removeAllChild = function (needDispose) {
                 if (needDispose === void 0) { needDispose = false; }
-                if (this._children == undefined)
+                if (this.children == undefined)
                     return;
-                while (this._children.length > 0) {
+                while (this.children.length > 0) {
                     if (needDispose)
-                        this._children[0].dispose();
+                        this.children[0].dispose();
                     else
-                        this.removeChild(this._children[0]);
+                        this.removeChild(this.children[0]);
                 }
             };
             transform.prototype.removeChild = function (node) {
-                if (node._parent != this || this._children == null) {
+                if (node._parent != this || this.children == null) {
                     throw new Error("not my child.");
                 }
-                var i = this._children.indexOf(node);
+                var i = this.children.indexOf(node);
                 if (i >= 0) {
-                    this._children.splice(i, 1);
+                    this.children.splice(i, 1);
                     framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
                     node._parent = null;
                 }
@@ -10854,9 +10531,9 @@ var gd3d;
                 if (this.name == name)
                     return this;
                 else {
-                    if (this._children != undefined) {
-                        for (var i in this._children) {
-                            var res = this._children[i].find(name);
+                    if (this.children != undefined) {
+                        for (var i in this.children) {
+                            var res = this.children[i].find(name);
                             if (res != null)
                                 return res;
                             else {
@@ -10885,9 +10562,9 @@ var gd3d;
                         impacted.push(tran);
                     }
                 }
-                if (tran._children != null) {
-                    for (var i = 0; i < tran._children.length; i++) {
-                        this.doImpact(tran._children[i], impacted);
+                if (tran.children != null) {
+                    for (var i = 0; i < tran.children.length; i++) {
+                        this.doImpact(tran.children[i], impacted);
                     }
                 }
             };
@@ -11039,12 +10716,16 @@ var gd3d;
                 }
             };
             transform.prototype.getWorldTranslate = function () {
+                if (!this.firstCalc && this.gameObject.isStatic)
+                    return this.worldTranslate;
                 if (!this._parent || !this._parent._parent) {
                     gd3d.math.vec3Clone(this._localTranslate, this.worldTranslate);
                 }
                 else {
                     gd3d.math.matrixGetTranslation(this.getWorldMatrix(), this.worldTranslate);
                 }
+                if (this.firstCalc)
+                    this.firstCalc = false;
                 return this.worldTranslate;
             };
             transform.prototype.getWorldPosition = function () {
@@ -11169,17 +10850,6 @@ var gd3d;
                 gd3d.math.quatLookat(this.getWorldTranslate(), point, this.worldRotate);
                 this.setWorldRotate(this.worldRotate);
             };
-            Object.defineProperty(transform.prototype, "gameObject", {
-                get: function () {
-                    if (this._gameObject == null) {
-                        this._gameObject = new framework.gameObject();
-                        this._gameObject.transform = this;
-                    }
-                    return this._gameObject;
-                },
-                enumerable: true,
-                configurable: true
-            });
             transform.prototype.clone = function () {
                 return gd3d.io.cloneObj(this);
             };
@@ -11198,15 +10868,15 @@ var gd3d;
             transform.prototype._dispose = function () {
                 if (this._beDispose)
                     return;
-                if (this._children) {
-                    for (var k in this._children) {
-                        this._children[k]._dispose();
-                    }
+                {
+                    for (var i = 0, l = this.children.length; i < l; ++i)
+                        this.children[i]._dispose();
+                    this.children = [];
                 }
                 if (this._physicsImpostor) {
                     this._physicsImpostor.dispose();
                 }
-                this._gameObject.dispose();
+                this.gameObject.dispose();
                 this._physicsImpostor = null;
                 this._beDispose = true;
                 if (this.onDispose)
@@ -11234,9 +10904,8 @@ var gd3d;
             ], transform.prototype, "prefab", void 0);
             __decorate([
                 gd3d.reflect.Field("transform[]"),
-                __metadata("design:type", Array),
-                __metadata("design:paramtypes", [Array])
-            ], transform.prototype, "children", null);
+                __metadata("design:type", Array)
+            ], transform.prototype, "children", void 0);
             __decorate([
                 gd3d.reflect.Field("quaternion"),
                 __metadata("design:type", gd3d.math.quaternion),
@@ -11254,11 +10923,11 @@ var gd3d;
             ], transform.prototype, "localScale", null);
             __decorate([
                 gd3d.reflect.Field("gameObject"),
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [])
-            ], transform.prototype, "gameObject", null);
+                __metadata("design:type", framework.gameObject)
+            ], transform.prototype, "gameObject", void 0);
             transform = transform_2 = __decorate([
-                gd3d.reflect.SerializeType
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [])
             ], transform);
             return transform;
         }());
@@ -12535,7 +12204,7 @@ var gd3d;
                             return;
                     }
                 }
-                for (var i = 0; i < drawPasses.length; i++) {
+                for (var i = 0, l = drawPasses.length; i < l; i++) {
                     var pass = drawPasses[i];
                     pass.use(context.webgl);
                     this.uploadUnifoms(pass, context);
@@ -12889,7 +12558,7 @@ var gd3d;
                 this.submesh = [];
                 for (var i = 0; i < subcount; i++) {
                     var _submeshinfo = new subMeshInfo();
-                    var tv = read.readUInt32();
+                    read.readUInt32();
                     var sublen = read.readUInt32();
                     _submeshinfo.start = data.trisindex.length;
                     _submeshinfo.size = sublen;
@@ -12914,22 +12583,36 @@ var gd3d;
             mesh.prototype.Parse = function (buf, webgl) {
                 var _this = this;
                 return new gd3d.threading.gdPromise(function (reslove) {
-                    gd3d.threading.thread.Instance.Call("meshDataHandle", buf, function (result) {
-                        var objVF = result.objVF;
-                        var data = result.meshData;
-                        data.originVF = objVF.vf;
-                        _this.data = gd3d.render.meshData.cloneByObj(data);
-                        _this.submesh = result.subMesh;
-                        _this.glMesh = new gd3d.render.glMesh();
-                        var vertexs = _this.data.genVertexDataArray(objVF.vf);
-                        var indices = _this.data.genIndexDataArray();
-                        var __webgl = framework.sceneMgr.app.getAssetMgr().webgl;
-                        _this.glMesh.initBuffer(webgl, objVF.vf, _this.data.pos.length);
-                        _this.glMesh.uploadVertexData(webgl, vertexs);
-                        _this.glMesh.addIndex(webgl, indices.length);
-                        _this.glMesh.uploadIndexData(webgl, 0, indices);
-                        reslove();
-                    });
+                    if (mesh_1.useThead) {
+                        gd3d.threading.thread.Instance.Call("meshDataHandle", buf, function (result) {
+                            var objVF = result.objVF;
+                            var data = result.meshData;
+                            data.originVF = objVF.vf;
+                            _this.data = gd3d.render.meshData.cloneByObj(data);
+                            _this.submesh = result.subMesh;
+                            _this.glMesh = new gd3d.render.glMesh();
+                            var vertexs = _this.data.genVertexDataArray(objVF.vf);
+                            var indices = _this.data.genIndexDataArray();
+                            _this.glMesh.initBuffer(webgl, objVF.vf, _this.data.pos.length);
+                            _this.glMesh.uploadVertexData(webgl, vertexs);
+                            _this.glMesh.addIndex(webgl, indices.length);
+                            _this.glMesh.uploadIndexData(webgl, 0, indices);
+                            reslove();
+                        });
+                    }
+                    else {
+                        var objVF = { vf: 0 };
+                        var data = new gd3d.render.meshData();
+                        var read = new gd3d.io.binReader(buf);
+                        read.readStringAnsi();
+                        read.position = read.position + 24;
+                        var vcount = read.readUInt32();
+                        var vec10tpose = [];
+                        _this.readProcess(read, data, objVF, vcount, vec10tpose, function () {
+                            _this.readFinish(read, data, buf, objVF, webgl);
+                            reslove();
+                        });
+                    }
                 });
             };
             mesh.prototype.intersects = function (ray, matrix, outInfo) {
@@ -13015,6 +12698,7 @@ var gd3d;
             };
             var mesh_1;
             mesh.ClassName = "mesh";
+            mesh.useThead = true;
             mesh = mesh_1 = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
@@ -15264,9 +14948,11 @@ var gd3d;
                 if (this.gameObject.transform.dirtiedOfFrustumCulling)
                     this.gameObject.transform.dirtiedOfFrustumCulling = false;
             };
-            camera.prototype._fillRenderer = function (scene, node) {
+            camera.prototype._fillRenderer = function (scene, node, _isStatic) {
+                if (_isStatic === void 0) { _isStatic = false; }
                 if (!node.gameObject.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false))
                     return;
+                node.gameObject.isStatic = _isStatic || node.gameObject.isStatic;
                 var id = node.insId.getInsID();
                 if (node.dirtiedOfFrustumCulling || this.gameObject.transform.dirtiedOfFrustumCulling) {
                     if (this.needUpdateWpos) {
@@ -15286,10 +14972,9 @@ var gd3d;
                         scene.renderList.addRenderer(node.gameObject.renderer);
                     }
                 }
-                if (node.children != null) {
-                    for (var i = 0; i < node.children.length; i++) {
-                        this._fillRenderer(scene, node.children[i]);
-                    }
+                if (node.children) {
+                    for (var i = 0, l = node.children.length; i < l; ++i)
+                        this._fillRenderer(scene, node.children[i], node.gameObject.isStatic);
                 }
             };
             camera.prototype.isCulling = function (node) {
@@ -15334,7 +15019,6 @@ var gd3d;
                 if (!node.gameObject.getComponent("frustumculling"))
                     return true;
                 var spherecol = node.gameObject.getComponent("spherecollider");
-                var worldPos = node.getWorldTranslate();
                 if (!spherecol.caclPlaneInDir(this.frameVecs[0], this.frameVecs[1], this.frameVecs[5]))
                     return false;
                 if (!spherecol.caclPlaneInDir(this.frameVecs[1], this.frameVecs[3], this.frameVecs[7]))
@@ -15400,10 +15084,11 @@ var gd3d;
             camera.prototype._renderOnce = function (scene, context, drawtype) {
                 context.drawtype = drawtype;
                 var assetmgr = scene.app.getAssetMgr();
-                for (var _i = 0, _a = scene.renderList.renderLayers; _i < _a.length; _i++) {
-                    var layer = _a[_i];
-                    for (var _b = 0, _c = layer.list; _b < _c.length; _b++) {
-                        var item = _c[_b];
+                var rlayers = scene.renderList.renderLayers;
+                for (var i = 0, l = rlayers.length; i < l; ++i) {
+                    var ls = rlayers[i].list;
+                    for (var j = 0, jl = ls.length; j < jl; ++j) {
+                        var item = ls[j];
                         if (item.gameObject.visible == true && this.CullingMask & (1 << item.renderLayer)) {
                             if (item.gameObject && item.gameObject.visible == true)
                                 item.render(context, assetmgr, this);
@@ -15413,8 +15098,9 @@ var gd3d;
             };
             camera.prototype.renderScene = function (scene, context) {
                 this._contextIdx = scene.renderContext.indexOf(context);
-                for (var i = 0; i < scene.renderList.renderLayers.length; i++) {
-                    var layer = scene.renderList.renderLayers[i];
+                var rlayers = scene.renderList.renderLayers;
+                for (var i = 0, l = rlayers.length; i < l; ++i) {
+                    var layer = rlayers[i];
                     var list = layer.list;
                     if (layer.needSort) {
                         if (list.length > 1) {
@@ -15426,8 +15112,8 @@ var gd3d;
                                     var matrixView = context.matrixView;
                                     var az = camera_1.helpv3;
                                     var bz = camera_1.helpv3_1;
-                                    gd3d.math.matrixTransformVector3(a.gameObject.transform['worldTranslate'], matrixView, az);
-                                    gd3d.math.matrixTransformVector3(b.gameObject.transform['worldTranslate'], matrixView, bz);
+                                    gd3d.math.matrixTransformVector3(a.gameObject.transform.worldTranslate, matrixView, az);
+                                    gd3d.math.matrixTransformVector3(b.gameObject.transform.worldTranslate, matrixView, bz);
                                     return bz.z - az.z;
                                 }
                             });
@@ -15439,9 +15125,8 @@ var gd3d;
                     this._renderOnce(scene, context, "");
                 }
                 else {
-                    for (var _i = 0, _a = this.postQueues; _i < _a.length; _i++) {
-                        var item = _a[_i];
-                        item.render(scene, context, this);
+                    for (var i_2 = 0, l_1 = this.postQueues.length; i_2 < l_1; ++i_2) {
+                        this.postQueues[i_2].render(scene, context, this);
                     }
                     context.webgl.flush();
                 }
@@ -16002,9 +15687,9 @@ var gd3d;
                     return;
                 var index = -1;
                 if (_initFrameData.attrsData.mat != null) {
-                    for (var i_2 = 0; i_2 < this.matDataGroups.length; i_2++) {
-                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_2], _initFrameData.attrsData.mat)) {
-                            index = i_2;
+                    for (var i_3 = 0; i_3 < this.matDataGroups.length; i_3++) {
+                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_3], _initFrameData.attrsData.mat)) {
+                            index = i_3;
                             break;
                         }
                     }
@@ -16062,41 +15747,41 @@ var gd3d;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
                 element.update();
                 subEffectBatcher.effectElements.push(element);
-                for (var i_3 = 0; i_3 < vertexCount; i_3++) {
+                for (var i_4 = 0; i_4 < vertexCount; i_4++) {
                     {
                         var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = vertexArr[i_3 * vertexSize + 0];
-                        vertex.y = vertexArr[i_3 * vertexSize + 1];
-                        vertex.z = vertexArr[i_3 * vertexSize + 2];
+                        vertex.x = vertexArr[i_4 * vertexSize + 0];
+                        vertex.y = vertexArr[i_4 * vertexSize + 1];
+                        vertex.z = vertexArr[i_4 * vertexSize + 2];
                         gd3d.math.matrixTransformVector3(vertex, element.curAttrData.matrix, vertex);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 0] = vertex.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 1] = vertex.y;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 2] = vertex.z;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 0] = vertex.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 1] = vertex.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 2] = vertex.z;
                         gd3d.math.pool.delete_vector3(vertex);
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 3] = vertexArr[i_3 * vertexSize + 3];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 4] = vertexArr[i_3 * vertexSize + 4];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 5] = vertexArr[i_3 * vertexSize + 5];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 3] = vertexArr[i_4 * vertexSize + 3];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 4] = vertexArr[i_4 * vertexSize + 4];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 5] = vertexArr[i_4 * vertexSize + 5];
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 6] = vertexArr[i_3 * vertexSize + 6];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 7] = vertexArr[i_3 * vertexSize + 7];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 8] = vertexArr[i_3 * vertexSize + 8];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 6] = vertexArr[i_4 * vertexSize + 6];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 7] = vertexArr[i_4 * vertexSize + 7];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 8] = vertexArr[i_4 * vertexSize + 8];
                     }
                     {
                         var r = gd3d.math.floatClamp(element.curAttrData.color.x, 0, 1);
                         var g = gd3d.math.floatClamp(element.curAttrData.color.y, 0, 1);
                         var b = gd3d.math.floatClamp(element.curAttrData.color.z, 0, 1);
-                        var a = gd3d.math.floatClamp(vertexArr[i_3 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 9] = r;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 10] = g;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 11] = b;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * 15 + 12] = a;
+                        var a = gd3d.math.floatClamp(vertexArr[i_4 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 9] = r;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 10] = g;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 11] = b;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 12] = a;
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 13] = vertexArr[i_3 * vertexSize + 13] * element.curAttrData.tilling.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_3) * vertexSize + 14] = vertexArr[i_3 * vertexSize + 14] * element.curAttrData.tilling.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 13] = vertexArr[i_4 * vertexSize + 13] * element.curAttrData.tilling.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 14] = vertexArr[i_4 * vertexSize + 14] * element.curAttrData.tilling.y;
                     }
                 }
                 var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
@@ -16267,11 +15952,11 @@ var gd3d;
                 if (this.delayElements.length > 0) {
                     if (this.refElements.length > 0)
                         this.refElements = [];
-                    for (var i_4 = this.delayElements.length - 1; i_4 >= 0; i_4--) {
-                        var data = this.delayElements[i_4];
+                    for (var i_5 = this.delayElements.length - 1; i_5 >= 0; i_5--) {
+                        var data = this.delayElements[i_5];
                         if (data.delayTime <= this.playTimer) {
-                            this.addElement(this.delayElements[i_4]);
-                            this.delayElements.splice(i_4, 1);
+                            this.addElement(this.delayElements[i_5]);
+                            this.delayElements.splice(i_5, 1);
                         }
                     }
                 }
@@ -22809,10 +22494,10 @@ var gd3d;
         }
         math.scaleToRef = scaleToRef;
         function colorClone(src, out) {
-            out.rawData[0] = src.rawData[0];
-            out.rawData[1] = src.rawData[1];
-            out.rawData[2] = src.rawData[2];
-            out.rawData[3] = src.rawData[3];
+            out.a = src.a;
+            out.r = src.r;
+            out.g = src.g;
+            out.b = src.b;
         }
         math.colorClone = colorClone;
         function colorLerp(srca, srcb, t, out) {
@@ -22908,9 +22593,9 @@ var gd3d;
     var math;
     (function (math) {
         function matrixGetTranslation(src, out) {
-            out.rawData[0] = src.rawData[12];
-            out.rawData[1] = src.rawData[13];
-            out.rawData[2] = src.rawData[14];
+            out.x = src.rawData[12];
+            out.y = src.rawData[13];
+            out.z = src.rawData[14];
         }
         math.matrixGetTranslation = matrixGetTranslation;
         function matrixTranspose(src, out) {
@@ -22929,7 +22614,9 @@ var gd3d;
         }
         math.matrixTranspose = matrixTranspose;
         function matrixDecompose(src, scale, rotation, translation) {
-            translation.rawData.set(src.rawData.subarray(12, 15));
+            translation.x = src.rawData[12];
+            translation.y = src.rawData[13];
+            translation.z = src.rawData[14];
             var xs = math.sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
             var ys = math.sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
             var zs = math.sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
@@ -23257,9 +22944,9 @@ var gd3d;
             var xs = math.sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
             var ys = math.sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
             var zs = math.sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
-            scale.rawData[0] = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
-            scale.rawData[1] = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
-            scale.rawData[2] = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
+            scale.x = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
+            scale.y = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
+            scale.z = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
         }
         math.matrixGetScale = matrixGetScale;
         function matrixMakeScale(xScale, yScale, zScale, out) {
@@ -23548,35 +23235,31 @@ var gd3d;
             var y = (vector.x * transformation.rawData[1]) + (vector.y * transformation.rawData[5]) + (vector.z * transformation.rawData[9]) + transformation.rawData[13];
             var z = (vector.x * transformation.rawData[2]) + (vector.y * transformation.rawData[6]) + (vector.z * transformation.rawData[10]) + transformation.rawData[14];
             var w = (vector.x * transformation.rawData[3]) + (vector.y * transformation.rawData[7]) + (vector.z * transformation.rawData[11]) + transformation.rawData[15];
-            result.rawData[0] = x / w;
-            result.rawData[1] = y / w;
-            result.rawData[2] = z / w;
+            result.x = x / w;
+            result.y = y / w;
+            result.z = z / w;
         }
         math.matrixTransformVector3 = matrixTransformVector3;
         function matrixTransformVector4(src, mtx, out) {
-            var x = (src.rawData[0] * mtx.rawData[0]) + (src.rawData[1] * mtx.rawData[4]) + (src.rawData[2] * mtx.rawData[8]) + (src.rawData[3] * mtx.rawData[12]);
-            var y = (src.rawData[0] * mtx.rawData[1]) + (src.rawData[1] * mtx.rawData[5]) + (src.rawData[2] * mtx.rawData[9]) + (src.rawData[3] * mtx.rawData[13]);
-            var z = (src.rawData[0] * mtx.rawData[2]) + (src.rawData[1] * mtx.rawData[6]) + (src.rawData[2] * mtx.rawData[10]) + (src.rawData[3] * mtx.rawData[14]);
-            var w = (src.rawData[0] * mtx.rawData[3]) + (src.rawData[1] * mtx.rawData[7]) + (src.rawData[2] * mtx.rawData[11]) + (src.rawData[3] * mtx.rawData[15]);
-            out.rawData[0] = x;
-            out.rawData[1] = y;
-            out.rawData[2] = z;
-            out.rawData[3] = w;
+            out.x = (src.x * mtx.rawData[0]) + (src.y * mtx.rawData[4]) + (src.z * mtx.rawData[8]) + (src.w * mtx.rawData[12]);
+            out.y = (src.x * mtx.rawData[1]) + (src.y * mtx.rawData[5]) + (src.z * mtx.rawData[9]) + (src.w * mtx.rawData[13]);
+            out.z = (src.x * mtx.rawData[2]) + (src.y * mtx.rawData[6]) + (src.z * mtx.rawData[10]) + (src.w * mtx.rawData[14]);
+            out.w = (src.x * mtx.rawData[3]) + (src.y * mtx.rawData[7]) + (src.z * mtx.rawData[11]) + (src.w * mtx.rawData[15]);
         }
         math.matrixTransformVector4 = matrixTransformVector4;
         function matrixTransformNormal(vector, transformation, result) {
             var x = (vector.x * transformation.rawData[0]) + (vector.y * transformation.rawData[4]) + (vector.z * transformation.rawData[8]);
             var y = (vector.x * transformation.rawData[1]) + (vector.y * transformation.rawData[5]) + (vector.z * transformation.rawData[9]);
             var z = (vector.x * transformation.rawData[2]) + (vector.y * transformation.rawData[6]) + (vector.z * transformation.rawData[10]);
-            result.rawData[0] = x;
-            result.rawData[1] = y;
-            result.rawData[2] = z;
+            result.x = x;
+            result.y = y;
+            result.z = z;
         }
         math.matrixTransformNormal = matrixTransformNormal;
         function matrixGetVector3ByOffset(src, offset, result) {
-            result.rawData[0] = src.rawData[offset];
-            result.rawData[1] = src.rawData[offset + 1];
-            result.rawData[2] = src.rawData[offset + 2];
+            result.x = src.rawData[offset];
+            result.y = src.rawData[offset + 1];
+            result.z = src.rawData[offset + 2];
         }
         math.matrixGetVector3ByOffset = matrixGetVector3ByOffset;
         function matrixReset(mat) {
@@ -23786,10 +23469,10 @@ var gd3d;
         }
         math.quatMagnitude = quatMagnitude;
         function quatClone(src, out) {
-            out.rawData[0] = src.rawData[0];
-            out.rawData[1] = src.rawData[1];
-            out.rawData[2] = src.rawData[2];
-            out.rawData[3] = src.rawData[3];
+            out.x = src.x;
+            out.y = src.y;
+            out.z = src.z;
+            out.w = src.w;
         }
         math.quatClone = quatClone;
         function quatEqual(quat, quat2, threshold) {
@@ -24195,10 +23878,10 @@ var gd3d;
         }
         math.rectCollided = rectCollided;
         function rectClone(src, out) {
-            out.rawData[0] = src.rawData[0];
-            out.rawData[1] = src.rawData[1];
-            out.rawData[2] = src.rawData[2];
-            out.rawData[3] = src.rawData[3];
+            out.x = src.x;
+            out.y = src.y;
+            out.h = src.h;
+            out.w = src.w;
         }
         math.rectClone = rectClone;
     })(math = gd3d.math || (gd3d.math = {}));
@@ -24287,8 +23970,8 @@ var gd3d;
         }
         math.vec2Add = vec2Add;
         function vec2Clone(from, to) {
-            to.rawData[0] = from.rawData[0];
-            to.rawData[1] = from.rawData[1];
+            to.x = from.x;
+            to.y = from.y;
         }
         math.vec2Clone = vec2Clone;
         function vec2Distance(a, b) {
@@ -24348,13 +24031,13 @@ var gd3d;
         }
         math.vec2Equal = vec2Equal;
         function vec2SetAll(vector, value) {
-            vector.rawData[0] = value;
-            vector.rawData[1] = value;
+            vector.x = value;
+            vector.y = value;
         }
         math.vec2SetAll = vec2SetAll;
         function vec2Set(vector, x, y) {
-            vector.rawData[0] = x;
-            vector.rawData[1] = y;
+            vector.x = x;
+            vector.y = y;
         }
         math.vec2Set = vec2Set;
     })(math = gd3d.math || (gd3d.math = {}));
@@ -24364,31 +24047,27 @@ var gd3d;
     var math;
     (function (math) {
         function vec3Clone(from, to) {
-            to.rawData[0] = from.rawData[0];
-            to.rawData[1] = from.rawData[1];
-            to.rawData[2] = from.rawData[2];
+            to.x = from.x;
+            to.y = from.y;
+            to.z = from.z;
         }
         math.vec3Clone = vec3Clone;
-        function vec3ToString(result) {
-            result = this.x + "," + this.y + "," + this.z;
-        }
-        math.vec3ToString = vec3ToString;
         function vec3Add(a, b, out) {
-            out.rawData[0] = a.x + b.x;
-            out.rawData[1] = a.y + b.y;
-            out.rawData[2] = a.z + b.z;
+            out.x = a.x + b.x;
+            out.y = a.y + b.y;
+            out.z = a.z + b.z;
         }
         math.vec3Add = vec3Add;
         function vec3Subtract(a, b, out) {
-            out.rawData[0] = a.x - b.x;
-            out.rawData[1] = a.y - b.y;
-            out.rawData[2] = a.z - b.z;
+            out.x = a.x - b.x;
+            out.y = a.y - b.y;
+            out.z = a.z - b.z;
         }
         math.vec3Subtract = vec3Subtract;
         function vec3Minus(a, out) {
-            out.rawData[0] = -a.x;
-            out.rawData[1] = -a.y;
-            out.rawData[2] = -a.z;
+            out.x = -a.x;
+            out.y = -a.y;
+            out.z = -a.z;
         }
         math.vec3Minus = vec3Minus;
         function vec3Length(a) {
@@ -24400,78 +24079,78 @@ var gd3d;
         }
         math.vec3SqrLength = vec3SqrLength;
         function vec3Set_One(out) {
-            out.rawData[0] = out.rawData[1] = out.rawData[2] = 1;
+            out.x = out.y = out.z = 1;
         }
         math.vec3Set_One = vec3Set_One;
         function vec3Set_Forward(out) {
-            out.rawData[0] = out.rawData[1] = 0;
-            out.rawData[2] = 1;
+            out.x = out.y = 0;
+            out.z = 1;
         }
         math.vec3Set_Forward = vec3Set_Forward;
         function vec3Set_Back(out) {
-            out.rawData[0] = out.rawData[1] = 0;
-            out.rawData[2] = -1;
+            out.x = out.y = 0;
+            out.z = -1;
         }
         math.vec3Set_Back = vec3Set_Back;
         function vec3Set_Up(out) {
-            out.rawData[0] = out.rawData[2] = 0;
-            out.rawData[1] = 1;
+            out.x = out.z = 0;
+            out.y = 1;
         }
         math.vec3Set_Up = vec3Set_Up;
         function vec3Set_Down(out) {
-            out.rawData[0] = out.rawData[2] = 0;
-            out.rawData[1] = -1;
+            out.x = out.z = 0;
+            out.y = -1;
         }
         math.vec3Set_Down = vec3Set_Down;
         function vec3Set_Left(out) {
-            out.rawData[0] = -1;
-            out.rawData[1] = out.rawData[2] = 0;
+            out.x = -1;
+            out.y = out.z = 0;
         }
         math.vec3Set_Left = vec3Set_Left;
         function vec3Set_Right(out) {
-            out.rawData[0] = 1;
-            out.rawData[1] = out.rawData[2] = 0;
+            out.x = 1;
+            out.y = out.z = 0;
         }
         math.vec3Set_Right = vec3Set_Right;
         function vec3Normalize(value, out) {
             var num = vec3Length(value);
             if (num > Number.MIN_VALUE) {
-                out.rawData[0] = value.x / num;
-                out.rawData[1] = value.y / num;
-                out.rawData[2] = value.z / num;
+                out.x = value.x / num;
+                out.y = value.y / num;
+                out.z = value.z / num;
             }
             else {
-                out.rawData[0] = 0;
-                out.rawData[1] = 0;
-                out.rawData[2] = 0;
+                out.x = 0;
+                out.y = 0;
+                out.z = 0;
             }
         }
         math.vec3Normalize = vec3Normalize;
         function vec3ScaleByVec3(from, scale, out) {
-            out.rawData[0] = from.x * scale.x;
-            out.rawData[1] = from.y * scale.y;
-            out.rawData[2] = from.z * scale.z;
+            out.x = from.x * scale.x;
+            out.y = from.y * scale.y;
+            out.z = from.z * scale.z;
         }
         math.vec3ScaleByVec3 = vec3ScaleByVec3;
         function vec3ScaleByNum(from, scale, out) {
-            out.rawData[0] = from.x * scale;
-            out.rawData[1] = from.y * scale;
-            out.rawData[2] = from.z * scale;
+            out.x = from.x * scale;
+            out.y = from.y * scale;
+            out.z = from.z * scale;
         }
         math.vec3ScaleByNum = vec3ScaleByNum;
         function vec3Product(a, b, out) {
-            out.rawData[0] = a.x * b.x;
-            out.rawData[1] = a.y * b.y;
-            out.rawData[2] = a.z * b.z;
+            out.x = a.x * b.x;
+            out.y = a.y * b.y;
+            out.z = a.z * b.z;
         }
         math.vec3Product = vec3Product;
         function vec3Cross(lhs, rhs, out) {
             var x = lhs.y * rhs.z - lhs.z * rhs.y;
             var y = lhs.z * rhs.x - lhs.x * rhs.z;
             var z = lhs.x * rhs.y - lhs.y * rhs.x;
-            out.rawData[0] = x;
-            out.rawData[1] = y;
-            out.rawData[2] = z;
+            out.x = x;
+            out.y = y;
+            out.z = z;
         }
         math.vec3Cross = vec3Cross;
         function vec3Reflect(inDirection, inNormal, out) {
@@ -24489,7 +24168,7 @@ var gd3d;
             var num = 0;
             num = vec3Dot(onNormal, onNormal);
             if (num < Number.MIN_VALUE) {
-                out.rawData[0] = out.rawData[1] = out.rawData[2] = 0;
+                out.x = out.y = out.z = 0;
             }
             else {
                 var num2 = 0;
@@ -24536,19 +24215,21 @@ var gd3d;
                 vec3Normalize(vector, out);
                 vec3ScaleByNum(out, maxLength, out);
             }
-            out.rawData.set(vector.rawData);
+            out.x = vector.x;
+            out.y = vector.y;
+            out.z = vector.z;
         }
         math.vec3ClampLength = vec3ClampLength;
         function vec3Min(v0, v1, out) {
-            out.rawData[0] = Math.min(v0.x, v1.x);
-            out.rawData[1] = Math.min(v0.y, v1.y);
-            out.rawData[2] = Math.min(v0.z, v1.z);
+            out.x = Math.min(v0.x, v1.x);
+            out.y = Math.min(v0.y, v1.y);
+            out.z = Math.min(v0.z, v1.z);
         }
         math.vec3Min = vec3Min;
         function vec3Max(v0, v1, out) {
-            out.rawData[0] = Math.max(v0.x, v1.x);
-            out.rawData[1] = Math.max(v0.y, v1.y);
-            out.rawData[2] = Math.max(v0.z, v1.z);
+            out.x = Math.max(v0.x, v1.x);
+            out.y = Math.max(v0.y, v1.y);
+            out.z = Math.max(v0.z, v1.z);
         }
         math.vec3Max = vec3Max;
         function vec3AngleBetween(from, to) {
@@ -24561,34 +24242,34 @@ var gd3d;
         }
         math.vec3AngleBetween = vec3AngleBetween;
         function vec3Reset(out) {
-            out.rawData[0] = 0;
-            out.rawData[1] = 0;
-            out.rawData[2] = 0;
+            out.x = 0;
+            out.y = 0;
+            out.z = 0;
         }
         math.vec3Reset = vec3Reset;
         function vec3SLerp(vector, vector2, v, out) {
-            out.rawData[0] = vector.x * (1 - v) + vector2.x * v;
-            out.rawData[1] = vector.y * (1 - v) + vector2.y * v;
-            out.rawData[2] = vector.z * (1 - v) + vector2.z * v;
+            out.x = vector.x * (1 - v) + vector2.x * v;
+            out.y = vector.y * (1 - v) + vector2.y * v;
+            out.z = vector.z * (1 - v) + vector2.z * v;
         }
         math.vec3SLerp = vec3SLerp;
         function vec3SetByFloat(x, y, z, out) {
-            out.rawData[0] = x;
-            out.rawData[1] = y;
-            out.rawData[2] = z;
+            out.x = x;
+            out.y = y;
+            out.z = z;
         }
         math.vec3SetByFloat = vec3SetByFloat;
         function vec3Format(vector, maxDot, out) {
-            out.rawData[0] = floatFormat(vector.x, maxDot);
-            out.rawData[1] = floatFormat(vector.y, maxDot);
-            out.rawData[2] = floatFormat(vector.z, maxDot);
+            out.x = floatFormat(vector.x, maxDot);
+            out.y = floatFormat(vector.y, maxDot);
+            out.z = floatFormat(vector.z, maxDot);
         }
         math.vec3Format = vec3Format;
         function quaternionFormat(vector, maxDot, out) {
-            out.rawData[0] = floatFormat(vector.x, maxDot);
-            out.rawData[1] = floatFormat(vector.y, maxDot);
-            out.rawData[2] = floatFormat(vector.z, maxDot);
-            out.rawData[3] = floatFormat(vector.w, maxDot);
+            out.x = floatFormat(vector.x, maxDot);
+            out.y = floatFormat(vector.y, maxDot);
+            out.z = floatFormat(vector.z, maxDot);
+            out.w = floatFormat(vector.w, maxDot);
         }
         math.quaternionFormat = quaternionFormat;
         function floatFormat(num, maxDot) {
@@ -24608,15 +24289,15 @@ var gd3d;
         }
         math.vec3Equal = vec3Equal;
         function vec3SetAll(vector, value) {
-            vector.rawData[0] = value;
-            vector.rawData[1] = value;
-            vector.rawData[2] = value;
+            vector.x = value;
+            vector.y = value;
+            vector.z = value;
         }
         math.vec3SetAll = vec3SetAll;
         function vec3Set(vector, x, y, z) {
-            vector.rawData[0] = x;
-            vector.rawData[1] = y;
-            vector.rawData[2] = z;
+            vector.x = x;
+            vector.y = y;
+            vector.z = z;
         }
         math.vec3Set = vec3Set;
         function vec3Perpendicular(vector, out) {
@@ -24634,10 +24315,10 @@ var gd3d;
     var math;
     (function (math) {
         function vec4Clone(from, to) {
-            to.rawData[0] = from.rawData[0];
-            to.rawData[1] = from.rawData[1];
-            to.rawData[2] = from.rawData[2];
-            to.rawData[3] = from.rawData[3];
+            to.x = from.x;
+            to.y = from.y;
+            to.z = from.z;
+            to.w = from.w;
         }
         math.vec4Clone = vec4Clone;
         function vec4SLerp(vector, vector2, v, out) {
@@ -24648,31 +24329,31 @@ var gd3d;
         }
         math.vec4SLerp = vec4SLerp;
         function vec4Add(a, b, out) {
-            out.rawData[0] = a.rawData[0] + b.rawData[0];
-            out.rawData[1] = a.rawData[1] + b.rawData[1];
-            out.rawData[2] = a.rawData[2] + b.rawData[2];
-            out.rawData[3] = a.rawData[3] + b.rawData[3];
+            out.x = a.x + b.x;
+            out.y = a.y + b.y;
+            out.z = a.z + b.z;
+            out.w = a.w + b.w;
         }
         math.vec4Add = vec4Add;
         function vec4ScaleByNum(from, scale, out) {
-            out.rawData[0] = from.rawData[0] * scale;
-            out.rawData[1] = from.rawData[1] * scale;
-            out.rawData[2] = from.rawData[2] * scale;
-            out.rawData[3] = from.rawData[3] * scale;
+            out.x = from.x * scale;
+            out.y = from.y * scale;
+            out.z = from.z * scale;
+            out.w = from.w * scale;
         }
         math.vec4ScaleByNum = vec4ScaleByNum;
         function vec4SetAll(vector, value) {
-            vector.rawData[0] = value;
-            vector.rawData[1] = value;
-            vector.rawData[2] = value;
-            vector.rawData[3] = value;
+            vector.x = value;
+            vector.y = value;
+            vector.z = value;
+            vector.w = value;
         }
         math.vec4SetAll = vec4SetAll;
         function vec4Set(vector, x, y, z, w) {
-            vector.rawData[0] = x;
-            vector.rawData[1] = y;
-            vector.rawData[2] = z;
-            vector.rawData[3] = w;
+            vector.x = x;
+            vector.y = y;
+            vector.z = z;
+            vector.w = w;
         }
         math.vec4Set = vec4Set;
     })(math = gd3d.math || (gd3d.math = {}));
@@ -30463,15 +30144,15 @@ var gd3d;
                 return returnValue;
             };
             CannonJSPlugin.prototype.vec3Copy = function (from, to) {
-                to.rawData[0] = from.x;
-                to.rawData[1] = from.y;
-                to.rawData[2] = from.z;
+                to.x = from.x;
+                to.y = from.y;
+                to.z = from.z;
             };
             CannonJSPlugin.prototype.QuatCopy = function (from, to) {
-                to.rawData[0] = from.x;
-                to.rawData[1] = from.y;
-                to.rawData[2] = from.z;
-                to.rawData[3] = from.w;
+                to.x = from.x;
+                to.y = from.y;
+                to.z = from.z;
+                to.w = from.w;
             };
             CannonJSPlugin.prototype.setTransformationFromPhysicsBody = function (impostor) {
                 this.vec3Copy(impostor.physicsBody.position, impostor.object.localPosition);
@@ -31758,9 +31439,9 @@ var gd3d;
             };
             physicTool.vec3AsArray = function (vec3) {
                 var result = [];
-                result[0] = vec3.rawData[0];
-                result[1] = vec3.rawData[1];
-                result[2] = vec3.rawData[2];
+                result[0] = vec3.x;
+                result[1] = vec3.y;
+                result[2] = vec3.z;
                 return result;
             };
             return physicTool;
@@ -31812,6 +31493,7 @@ var gd3d;
                 this.components = [];
                 this.componentsInit = [];
                 this.componentsPlayed = [];
+                this.haveComponet = false;
                 this._visible = true;
             }
             gameObject.prototype.getScene = function () {
@@ -31927,6 +31609,7 @@ var gd3d;
                     if (gd3d.reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1")
                         framework.sceneMgr.app.markNotify(this.transform, framework.NotifyType.AddCanvasRender);
                 }
+                this.haveComponet = true;
                 return comp;
             };
             gameObject.prototype.getComponent = function (type) {
@@ -31957,8 +31640,8 @@ var gd3d;
                         array.push(obj.components[i].comp);
                     }
                 }
-                for (var i_5 = 0; obj.transform.children != undefined && i_5 < obj.transform.children.length; i_5++) {
-                    var _obj = obj.transform.children[i_5].gameObject;
+                for (var i_6 = 0; obj.transform.children != undefined && i_6 < obj.transform.children.length; i_6++) {
+                    var _obj = obj.transform.children[i_6].gameObject;
                     this._getComponentsInChildren(type, _obj, array);
                 }
             };
@@ -31983,7 +31666,8 @@ var gd3d;
                 return this.addComponentDirect(comp);
             };
             gameObject.prototype.removeComponent = function (comp) {
-                for (var i = 0; i < this.components.length; i++) {
+                var len = this.components.length;
+                for (var i = 0; i < len; i++) {
                     if (this.components[i].comp == comp) {
                         if (this.components[i].init) {
                             this.components[i].comp.remove();
@@ -31994,6 +31678,8 @@ var gd3d;
                         break;
                     }
                 }
+                if (len < 1)
+                    this.haveComponet = false;
             };
             gameObject.prototype.remove = function (comp) {
                 if (gd3d.reflect.getClassTag(comp["__proto__"], "renderer") == "1") {
@@ -32450,8 +32136,7 @@ var gd3d;
                 if (node.gameObject.renderer != null) {
                     node.gameObject.renderer.update(delta);
                 }
-                var c = node.gameObject.camera;
-                if (c != null) {
+                if (node.gameObject.camera) {
                     node.gameObject.camera.update(delta);
                 }
                 this.collectCameraAndLight(node);
@@ -32462,20 +32147,18 @@ var gd3d;
                 }
             };
             scene.prototype.objupdate = function (node, delta) {
-                if (!node)
-                    return;
-                if (node.hasComponent == false && node.hasComponentChild == false)
-                    return;
-                node.gameObject.init(this.app.bePlay);
-                if (node.gameObject.components.length > 0) {
-                    node.gameObject.update(delta);
-                    this.collectCameraAndLight(node);
-                }
-                if (node.children) {
-                    for (var _i = 0, _a = node.children; _i < _a.length; _i++) {
-                        var item = _a[_i];
-                        this.objupdate(item, delta);
+                var queue = [];
+                while (node) {
+                    if (!(node.hasComponent == false && node.hasComponentChild == false)) {
+                        node.gameObject.init(this.app.bePlay);
+                        if (node.gameObject.haveComponet) {
+                            node.gameObject.update(delta);
+                            this.collectCameraAndLight(node);
+                        }
                     }
+                    for (var i = 0, l = node.children.length; i < l; ++i)
+                        queue.push(node.children[i]);
+                    node = queue.shift();
                 }
             };
             scene.prototype.collectCameraAndLight = function (node) {
@@ -35402,7 +35085,10 @@ var gd3d;
             pool.clone_vector4 = function (src) {
                 if (pool.unused_vector4.length > 0) {
                     var v = pool.unused_vector4.pop();
-                    v.rawData.set(src.rawData);
+                    v.x = src.x;
+                    v.y = src.y;
+                    v.z = src.z;
+                    v.w = src.w;
                     return v;
                 }
                 else
@@ -35451,7 +35137,10 @@ var gd3d;
             pool.clone_color = function (col) {
                 if (pool.unused_color.length > 0) {
                     var c = pool.unused_color.pop();
-                    c.rawData.set(col.rawData);
+                    c.r = col.r;
+                    c.g = col.g;
+                    c.b = col.b;
+                    c.a = col.r;
                     return c;
                 }
                 else
@@ -35546,7 +35235,9 @@ var gd3d;
             pool.clone_vector3 = function (src) {
                 if (pool.unused_vector3.length > 0) {
                     var v = pool.unused_vector3.pop();
-                    v.rawData.set(src.rawData);
+                    v.x = src.x;
+                    v.y = src.y;
+                    v.z = src.z;
                     return v;
                 }
                 else
@@ -35623,12 +35314,8 @@ var gd3d;
             pool.clone_vector2 = function (src) {
                 if (pool.unused_vector2.length > 0) {
                     var v = pool.unused_vector2.pop();
-                    if (src.rawData.length > v.rawData.length) {
-                        src.rawData[0] = v.rawData[0];
-                        src.rawData[1] = v.rawData[1];
-                    }
-                    else
-                        v.rawData.set(src.rawData);
+                    v.x = src.x;
+                    v.y = src.y;
                     return v;
                 }
                 else
@@ -35663,7 +35350,8 @@ var gd3d;
             };
             pool.clone_matrix3x2 = function (src) {
                 var v = pool.new_matrix3x2();
-                v.rawData.set(src.rawData);
+                for (var i = 0; i < 6; i++)
+                    v.rawData[i] = src.rawData[i];
                 return v;
             };
             pool.delete_matrix3x2 = function (v) {
@@ -35693,7 +35381,8 @@ var gd3d;
             };
             pool.clone_matrix = function (src) {
                 var v = pool.new_matrix();
-                v.rawData.set(src.rawData);
+                for (var i = 0; i < 16; i++)
+                    v.rawData[i] = src.rawData[i];
                 return v;
             };
             pool.delete_matrix = function (v) {
@@ -35743,7 +35432,10 @@ var gd3d;
             pool.clone_quaternion = function (src) {
                 if (pool.unused_quaternion.length > 0) {
                     var v = pool.unused_quaternion.pop();
-                    v.rawData.set(src.rawData);
+                    v.x = src.x;
+                    v.y = src.y;
+                    v.z = src.z;
+                    v.w = src.w;
                     return v;
                 }
                 else

@@ -1,4 +1,5 @@
-﻿namespace gd3d.math
+﻿"use strict";
+namespace gd3d.math
 {
     //重构原则2，一个函数，一种用法，不给默认值
     //重构原则3，内部不new，所有计算函数需要外部提供out 参数，最后一个参数为out 参数
@@ -14,36 +15,48 @@
 
     export function vec3Clone(from: vector3, to: vector3)
     {
-        // to.x = from.x;
-        // to.y = from.y;
-        // to.z = from.z;
+        to.x = from.x;
+        to.y = from.y;
+        to.z = from.z;
         //to.rawData.set(from.rawData);
-        to.rawData[0]=from.rawData[0];
-        to.rawData[1]=from.rawData[1];
-        to.rawData[2]=from.rawData[2];
+        // to.rawData[0]=from.rawData[0];
+        // to.rawData[1]=from.rawData[1];
+        // to.rawData[2]=from.rawData[2]; 
     }
-    export function vec3ToString(result: string)
-    {
-        result = this.x + "," + this.y + "," + this.z;
-    }
+    // export function vec3ToString(result: string)
+    // {
+    //     result = this.x + "," + this.y + "," + this.z;
+    // }
 
     export function vec3Add(a: vector3, b: vector3, out: vector3)
     {
-        out.rawData[0] = a.x + b.x;
-        out.rawData[1] = a.y + b.y;
-        out.rawData[2] = a.z + b.z;
+        out.x = a.x + b.x;
+        out.y = a.y + b.y;
+        out.z = a.z + b.z;
+        
+        // out.rawData[0] = a.x + b.x;
+        // out.rawData[1] = a.y + b.y;
+        // out.rawData[2] = a.z + b.z;
     }
     export function vec3Subtract(a: vector3, b: vector3, out: vector3)
     {
-        out.rawData[0] = a.x - b.x;
-        out.rawData[1] = a.y - b.y;
-        out.rawData[2] = a.z - b.z;
+        out.x = a.x - b.x;
+        out.y = a.y - b.y;
+        out.z = a.z - b.z;
+        
+        // out.rawData[0] = a.x - b.x;
+        // out.rawData[1] = a.y - b.y;
+        // out.rawData[2] = a.z - b.z;
     }
     export function vec3Minus(a: vector3, out: vector3)
     {
-        out.rawData[0] = -a.x;
-        out.rawData[1] = -a.y;
-        out.rawData[2] = -a.z;
+        out.x = -a.x;
+        out.y = -a.y;
+        out.z = -a.z;
+        
+        // out.rawData[0] = -a.x;
+        // out.rawData[1] = -a.y;
+        // out.rawData[2] = -a.z;
     }
     export function vec3Length(a: vector3): number
     {
@@ -55,80 +68,122 @@
     }
     export function vec3Set_One(out: vector3)
     {
-        out.rawData[0] = out.rawData[1] = out.rawData[2] = 1;
+        // out.rawData[0] = out.rawData[1] = out.rawData[2] = 1;
+        out.x = out.y = out.z = 1;
     }
     export function vec3Set_Forward(out: vector3)
     {
-        out.rawData[0] = out.rawData[1] = 0;
-        out.rawData[2] = 1;
+        out.x = out.y = 0;
+        out.z = 1;
+        
+        // out.rawData[0] = out.rawData[1] = 0;
+        // out.rawData[2] = 1;
     }
     export function vec3Set_Back(out: vector3)
     {
-        out.rawData[0] = out.rawData[1] = 0;
-        out.rawData[2] = -1;
+        out.x = out.y = 0;
+        out.z = -1;
+        
+        // out.rawData[0] = out.rawData[1] = 0;
+        // out.rawData[2] = -1;
     }
     export function vec3Set_Up(out: vector3)
     {
-        out.rawData[0] = out.rawData[2] = 0;
-        out.rawData[1] = 1;
+        out.x = out.z = 0;
+        out.y = 1;
+        
+        // out.rawData[0] = out.rawData[2] = 0;
+        // out.rawData[1] = 1;
     }
     export function vec3Set_Down(out: vector3)
     {
-        out.rawData[0] = out.rawData[2] = 0;
-        out.rawData[1] = -1;
+        out.x = out.z = 0;
+        out.y = -1;
+        
+        // out.rawData[0] = out.rawData[2] = 0;
+        // out.rawData[1] = -1;
     }
     export function vec3Set_Left(out: vector3)
     {
-        out.rawData[0] = -1;
-        out.rawData[1] = out.rawData[2] = 0;
+        out.x = -1;
+        out.y = out.z = 0; 
+        
+        // out.rawData[0] = -1;
+        // out.rawData[1] = out.rawData[2] = 0;
     }
     export function vec3Set_Right(out: vector3)
     {
-        out.rawData[0] = 1;
-        out.rawData[1] = out.rawData[2] = 0;
+        out.x = 1;
+        out.y = out.z = 0; 
+        
+        // out.rawData[0] = 1;
+        // out.rawData[1] = out.rawData[2] = 0;
     }
     export function vec3Normalize(value: vector3, out: vector3)
     {
         var num: number = vec3Length(value);
         if (num > Number.MIN_VALUE)
         {
-            out.rawData[0] = value.x / num;
-            out.rawData[1] = value.y / num;
-            out.rawData[2] = value.z / num;
+            out.x = value.x / num;
+            out.y = value.y / num;
+            out.z = value.z / num;
+            
+            // out.rawData[0] = value.x / num;
+            // out.rawData[1] = value.y / num;
+            // out.rawData[2] = value.z / num;
         } else
         {
-            out.rawData[0] = 0;
-            out.rawData[1] = 0;
-            out.rawData[2] = 0;
+            out.x = 0;
+            out.y = 0;
+            out.z = 0;
+            
+            // out.rawData[0] = 0;
+            // out.rawData[1] = 0;
+            // out.rawData[2] = 0;
         }
     }
 
     export function vec3ScaleByVec3(from: vector3, scale: vector3, out: vector3)
     {
-        out.rawData[0] = from.x * scale.x;
-        out.rawData[1] = from.y * scale.y;
-        out.rawData[2] = from.z * scale.z;
+        out.x = from.x * scale.x;
+        out.y = from.y * scale.y;
+        out.z = from.z * scale.z;
+        
+        // out.rawData[0] = from.x * scale.x;
+        // out.rawData[1] = from.y * scale.y;
+        // out.rawData[2] = from.z * scale.z;
     }
     export function vec3ScaleByNum(from: vector3, scale: number, out: vector3)
     {
-        out.rawData[0] = from.x * scale;
-        out.rawData[1] = from.y * scale;
-        out.rawData[2] = from.z * scale;
+        out.x = from.x * scale;
+        out.y = from.y * scale;
+        out.z = from.z * scale; 
+        
+        // out.rawData[0] = from.x * scale;
+        // out.rawData[1] = from.y * scale;
+        // out.rawData[2] = from.z * scale;
     }
     export function vec3Product(a: vector3, b: vector3, out: vector3)
     {
-        out.rawData[0] = a.x * b.x;
-        out.rawData[1] = a.y * b.y;
-        out.rawData[2] = a.z * b.z;
+        out.x = a.x * b.x;
+        out.y = a.y * b.y;
+        out.z = a.z * b.z; 
+        
+        // out.rawData[0] = a.x * b.x;
+        // out.rawData[1] = a.y * b.y;
+        // out.rawData[2] = a.z * b.z;
     }
     export function vec3Cross(lhs: vector3, rhs: vector3, out: vector3)
     {
         let x = lhs.y * rhs.z - lhs.z * rhs.y;
         let y = lhs.z * rhs.x - lhs.x * rhs.z;
         let z = lhs.x * rhs.y - lhs.y * rhs.x;
-        out.rawData[0] = x;
-        out.rawData[1] = y;
-        out.rawData[2] = z;
+        // out.rawData[0] = x;
+        // out.rawData[1] = y;
+        // out.rawData[2] = z;
+        out.x = x;
+        out.y = y;
+        out.z = z;
     }
     export function vec3Reflect(inDirection: vector3, inNormal: vector3, out: vector3)
     {
@@ -148,7 +203,8 @@
         num = vec3Dot(onNormal, onNormal);
         if (num < Number.MIN_VALUE)
         {
-            out.rawData[0] = out.rawData[1] = out.rawData[2] = 0;
+            // out.rawData[0] = out.rawData[1] = out.rawData[2] = 0;
+            out.x = out.y = out.z = 0;
         } else
         {
             //return onNormal * vector3.Dot(vector, onNormal) / num;
@@ -199,19 +255,23 @@
             vec3Normalize(vector, out);
             vec3ScaleByNum(out, maxLength, out);
         }
-        out.rawData.set(vector.rawData);
+        // out.rawData.set(vector.rawData);
+        out.x = vector.x;
+        out.y = vector.y;
+        out.z = vector.z;
+        
     }
     export function vec3Min(v0: vector3, v1: vector3, out: vector3)
     {
-        out.rawData[0] = Math.min(v0.x, v1.x);
-        out.rawData[1] = Math.min(v0.y, v1.y);
-        out.rawData[2] = Math.min(v0.z, v1.z);
+        out.x = Math.min(v0.x, v1.x);
+        out.y = Math.min(v0.y, v1.y);
+        out.z = Math.min(v0.z, v1.z);
     }
     export function vec3Max(v0: vector3, v1: vector3, out: vector3)
     {
-        out.rawData[0] = Math.max(v0.x, v1.x);
-        out.rawData[1] = Math.max(v0.y, v1.y);
-        out.rawData[2] = Math.max(v0.z, v1.z);
+        out.x = Math.max(v0.x, v1.x);
+        out.y = Math.max(v0.y, v1.y);
+        out.z = Math.max(v0.z, v1.z);
     }
     export function vec3AngleBetween(from: vector3, to: vector3): number
     {
@@ -224,36 +284,36 @@
     }
     export function vec3Reset(out: vector3)
     {
-        out.rawData[0] = 0;
-        out.rawData[1] = 0;
-        out.rawData[2] = 0;
+        out.x = 0;
+        out.y = 0;
+        out.z = 0;
     }
     export function vec3SLerp(vector: vector3, vector2: vector3, v: number, out: vector3)
     {
-        out.rawData[0] = vector.x * (1 - v) + vector2.x * v;
-        out.rawData[1] = vector.y * (1 - v) + vector2.y * v;
-        out.rawData[2] = vector.z * (1 - v) + vector2.z * v;
+        out.x = vector.x * (1 - v) + vector2.x * v;
+        out.y = vector.y * (1 - v) + vector2.y * v;
+        out.z = vector.z * (1 - v) + vector2.z * v;
     }
     export function vec3SetByFloat(x: number, y: number, z: number, out: vector3)
     {
-        out.rawData[0] = x;
-        out.rawData[1] = y;
-        out.rawData[2] = z;
+        out.x = x;
+        out.y = y;
+        out.z = z;
     }
 
     export function vec3Format(vector: vector3, maxDot: number, out: vector3)
     {
-        out.rawData[0] = floatFormat(vector.x, maxDot);
-        out.rawData[1] = floatFormat(vector.y, maxDot);
-        out.rawData[2] = floatFormat(vector.z, maxDot);
+        out.x = floatFormat(vector.x, maxDot);
+        out.y = floatFormat(vector.y, maxDot);
+        out.z = floatFormat(vector.z, maxDot);
     }
 
     export function quaternionFormat(vector: quaternion, maxDot: number, out: quaternion)
     {
-        out.rawData[0] = floatFormat(vector.x, maxDot);
-        out.rawData[1] = floatFormat(vector.y, maxDot);
-        out.rawData[2] = floatFormat(vector.z, maxDot);
-        out.rawData[3] = floatFormat(vector.w, maxDot);
+        out.x = floatFormat(vector.x, maxDot);
+        out.y = floatFormat(vector.y, maxDot);
+        out.z = floatFormat(vector.z, maxDot);
+        out.w = floatFormat(vector.w, maxDot);
     }
     export function floatFormat(num: number, maxDot: number)
     {
@@ -306,15 +366,21 @@
     }
 
     export function vec3SetAll(vector : vector3 , value : number){
-        vector.rawData[0] = value;
-        vector.rawData[1] = value;
-        vector.rawData[2] = value;
+        // vector.rawData[0] = value;
+        // vector.rawData[1] = value;
+        // vector.rawData[2] = value;
+        vector.x = value;
+        vector.y = value;
+        vector.z = value;
     }
 
     export function vec3Set(vector : vector3 , x : number ,  y : number , z : number){
-        vector.rawData[0] = x;
-        vector.rawData[1] = y;
-        vector.rawData[2] = z;
+        // vector.rawData[0] = x;
+        // vector.rawData[1] = y;
+        // vector.rawData[2] = z;
+        vector.x = x;
+        vector.y = y;
+        vector.z = z;
     }
 
     /** 获取指定 向量的 垂直向量 */

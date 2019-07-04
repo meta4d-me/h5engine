@@ -52,7 +52,7 @@ namespace gd3d.framework
         }
 
         //buffer 最大限制
-        private static limitCount = 2048 * 64; 
+        private static limitCount = 2048 * 64;
         /**
          * @private
          */
@@ -115,7 +115,8 @@ namespace gd3d.framework
         {
             if (this.vboCount == 0) return;
             this.mesh.uploadVertexData(webgl, this.dataForVbo);
-            if (this.eboCount > 0){
+            if (this.eboCount > 0)
+            {
                 this.mesh.uploadIndexData(webgl, 0, this.dataForEbo);
             }
 
@@ -155,7 +156,7 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class canvas
     {
-        static readonly ClassName:string="canvas";
+        static readonly ClassName: string = "canvas";
 
         /**
          * @public
@@ -171,8 +172,8 @@ namespace gd3d.framework
         }
 
 
-        private _peCareListBuoy : number = -1;
-        private _pointEventCareList : number[] = [];
+        private _peCareListBuoy: number = -1;
+        private _pointEventCareList: number[] = [];
 
         /**
          * @public
@@ -182,7 +183,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         is2dUI: boolean = true;
-        
+
         /**
          * @public
          * @language zh_CN
@@ -192,7 +193,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         isDrawByDepth = false;
-        
+
         /**
          * @public
          * @language zh_CN
@@ -300,7 +301,7 @@ namespace gd3d.framework
 
         private lastWidth = 0;
         private lastHeight = 0;
-        
+
         /**
          * @public
          * @language zh_CN
@@ -323,7 +324,8 @@ namespace gd3d.framework
             this.rootNode.localTranslate.y = 1;
             this.rootNode.localTranslate.x = -1;
 
-            if(this.pixelWidth != this.lastWidth || this.pixelHeight != this.lastHeight){
+            if (this.pixelWidth != this.lastWidth || this.pixelHeight != this.lastHeight)
+            {
                 this.lastWidth = this.rootNode.width = this.pixelWidth;
                 this.lastHeight = this.rootNode.height = this.pixelHeight;
                 this.rootNode.markDirty();
@@ -331,7 +333,7 @@ namespace gd3d.framework
 
             this.rootNode.pivot.x = 0;
             this.rootNode.pivot.y = 0;
-            
+
             {//updateinput
                 //重置event
                 this.pointEvent.eated = false;
@@ -339,7 +341,7 @@ namespace gd3d.framework
                 tv2.x = this.pointEvent.x = XOnModelSpace;
                 tv2.y = this.pointEvent.y = YOnModelSpace;
                 this.pointEvent.selected = null;
-                this.ModelPosToCanvasPos(tv2,tv2);
+                this.ModelPosToCanvasPos(tv2, tv2);
                 this.pointEvent.c_x = tv2.x;
                 this.pointEvent.c_y = tv2.y;
                 var skip = false;
@@ -367,10 +369,11 @@ namespace gd3d.framework
                 //事件走的是flash U型圈
                 if (!skip)
                 {
-                    if(this.scene.app.bePlay){
+                    if (this.scene.app.bePlay)
+                    {
                         // this.rootNode.onCapturePointEvent(this, this.pointEvent);
                         // this.rootNode.onPointEvent(this, this.pointEvent);
-                        
+
                         //优化
                         // this.capturePointFlow();  //多余 flow
                         this.popPointFlow();
@@ -388,65 +391,78 @@ namespace gd3d.framework
             if (this.scene.app.bePlay)
             {
                 this._peCareListBuoy = -1;
-                this.objupdate(this.rootNode,delta);
+                this.objupdate(this.rootNode, delta);
             }
         }
 
         //捕获阶段流
-        private capturePointFlow(){
+        private capturePointFlow()
+        {
             //event 捕捉阶段，自上而下
             var list = this._pointEventCareList;
             var buoy = this._peCareListBuoy;
             var ev = this.pointEvent;
             var Eated = false;
-            while(buoy >= 0 ){
+            while (buoy >= 0)
+            {
                 let idx = this._peCareListBuoy - buoy;
                 let node = transform2D.getTransform2DById(list[idx]);
-                if (node.components ) {
-                    for (var i = 0; i <= node.components.length; i++) {
-                        if (ev.eated == false) {
+                if (node.components)
+                {
+                    for (var i = 0; i <= node.components.length; i++)
+                    {
+                        if (ev.eated == false)
+                        {
                             var comp = node.components[i];
-                            if (comp && comp.init && instanceOfI2DPointListener(comp.comp) ) {
+                            if (comp && comp.init && instanceOfI2DPointListener(comp.comp))
+                            {
                                 (comp.comp as any).onPointEvent(canvas, ev, true);
                                 Eated = ev.eated;
-                                if(ev.eated)   break;
+                                if (ev.eated) break;
                             }
                         }
                     }
                 }
                 buoy--;
-                if(Eated) break;
+                if (Eated) break;
             }
         }
 
         //冒泡阶段流
-        private popPointFlow(){
+        private popPointFlow()
+        {
             var list = this._pointEventCareList;
             var buoy = this._peCareListBuoy;
             var ev = this.pointEvent;
             var Eated = false;
-            while(buoy >= 0 ){
+            while (buoy >= 0)
+            {
                 let node = transform2D.getTransform2DById(list[buoy]);
-                if (node && node.components ) {
-                    for (var i = 0; i <= node.components.length; i++) {
-                        if (ev.eated == false) {
+                if (node && node.components)
+                {
+                    for (var i = 0; i <= node.components.length; i++)
+                    {
+                        if (ev.eated == false)
+                        {
                             var comp = node.components[i];
-                            if (comp && comp.init && instanceOfI2DPointListener(comp.comp) ) {
+                            if (comp && comp.init && instanceOfI2DPointListener(comp.comp))
+                            {
                                 (comp.comp as any).onPointEvent(canvas, ev, false);
                                 Eated = ev.eated;
-                                if(ev.eated)   break;
+                                if (ev.eated) break;
                             }
                         }
                     }
                 }
                 buoy--;
-                if(Eated) break;
+                if (Eated) break;
             }
         }
 
 
-        private objupdate(node: transform2D, delta){
-            if(!node || !node.visible) return;
+        private objupdate(node: transform2D, delta)
+        {
+            if (!node || !node.visible) return;
 
             node.init(this.scene.app.bePlay);//组件还未初始化的初始化
             let compLen = node.components.length;
@@ -454,17 +470,20 @@ namespace gd3d.framework
             {
                 for (let i = 0; i < compLen; i++)
                 {
-                    if(!node.components[i]) continue;  //能在有对象在update环节dispose
+                    if (!node.components[i]) continue;  //能在有对象在update环节dispose
                     var comp = node.components[i].comp;
                     comp.update(delta);
-                    if(instanceOfI2DPointListener(comp)){  //判断是否为
+                    if (instanceOfI2DPointListener(comp))
+                    {  //判断是否为
                         this._peCareListBuoy++;
                         var insId = node.insId.getInsID();
                         var plist = this._pointEventCareList;
                         var pBuoy = this._peCareListBuoy;
-                        if(plist.length <= pBuoy){
+                        if (plist.length <= pBuoy)
+                        {
                             plist.push(insId);
-                        }else{
+                        } else
+                        {
                             plist[pBuoy] = insId;
                         }
                         plist[pBuoy];
@@ -475,7 +494,7 @@ namespace gd3d.framework
             if (node.children != null)
             {
                 let chiLen = node.children.length;
-                for (let i = 0; i < chiLen ; i++)
+                for (let i = 0; i < chiLen; i++)
                 {
                     this.objupdate(node.children[i], delta);
                 }
@@ -514,7 +533,7 @@ namespace gd3d.framework
          */
         render(context: renderContext, assetmgr: assetMgr)
         {
-            DrawCallInfo.inc.currentState=DrawCallEnum.UI;
+            DrawCallInfo.inc.currentState = DrawCallEnum.UI;
             this.context = context;
             this.assetmgr = assetmgr;
             // context.updateModel(this.gameObject.transform);
@@ -537,20 +556,22 @@ namespace gd3d.framework
 
             //this.pushDrawData(canvas.defmat, this.vbod);
 
-            if(this.beforeRender != null)
+            if (this.beforeRender != null)
                 this.beforeRender();
 
             //begin
-            if(!this.isDrawByDepth){
+            if (!this.isDrawByDepth)
+            {
                 this.drawScene(this.rootNode, context, assetmgr);
             }
-            else{
+            else
+            {
                 this.drawSceneByDepth(this.rootNode, context, assetmgr);
             }
 
             this.batcher.end(context.webgl);
 
-            
+
             if (this.afterRender != null)
                 this.afterRender();
         }
@@ -580,36 +601,39 @@ namespace gd3d.framework
                 //mat.uploadUniform(pass);
                 // //mvp 信号
                 pass.use(this.webgl);
-                mat.uploadUnifoms(pass,this.context);
+                mat.uploadUnifoms(pass, this.context);
 
                 // this.batcher.begin(context.webgl, pass);
 
                 // this.batcher.push(context.webgl, this.vbod, null);
                 // this.batcher.end(context.webgl);
                 this.batcher.begin(this.webgl, pass);
-            }else{
-                let msta = mat.statedMapUniforms["MaskState"]; 
+            } else
+            {
+                let msta = mat.statedMapUniforms["MaskState"];
                 let mr = mat.statedMapUniforms["_maskRect"];
-                if(msta != null && msta.value != null && mr != null && mr.value != null){
+                if (msta != null && msta.value != null && mr != null && mr.value != null)
+                {
                     let rect = mr.value as math.vector4;
-                    if(this.lastMaskV4 == null) this.lastMaskV4 = new math.vector4();
-                    if(msta.value != this.lastMaskSta || this.lastMaskV4.x != rect.x || this.lastMaskV4.y != rect.y || this.lastMaskV4.z != rect.z || this.lastMaskV4.w != rect.w){
+                    if (this.lastMaskV4 == null) this.lastMaskV4 = new math.vector4();
+                    if (msta.value != this.lastMaskSta || this.lastMaskV4.x != rect.x || this.lastMaskV4.y != rect.y || this.lastMaskV4.z != rect.z || this.lastMaskV4.w != rect.w)
+                    {
                         this.lastMaskSta = msta.value;
-                        math.vec4Clone(rect,this.lastMaskV4);
+                        math.vec4Clone(rect, this.lastMaskV4);
                         this.batcher.end(this.webgl);
                         let pass = this.lastMat.getShader().passes["base"][0];
                         //mat.uploadUniform(pass);
-                        mat.uploadUnifoms(pass,this.context);
+                        mat.uploadUnifoms(pass, this.context);
                     }
                 }
             }
-            
+
             this.batcher.push(this.webgl, data, null);
         }
         private context: renderContext;
 
-        private lastMaskSta:number = -1;
-        private lastMaskV4:math.vector4;
+        private lastMaskSta: number = -1;
+        private lastMaskV4: math.vector4;
         /**
          * @public
          * @language zh_CN
@@ -632,7 +656,7 @@ namespace gd3d.framework
         drawScene(node: transform2D, context: renderContext, assetmgr: assetMgr)
         {
             //context.updateModel(this.gameObject.transform);
-            if(!node.visible)return;
+            if (!node.visible) return;
             if (node.renderer != null)
             {
                 node.renderer.render(this);
@@ -649,23 +673,24 @@ namespace gd3d.framework
         //深度渲染层列表
         static readonly depthTag = "__depthTag__";
         static readonly flowIndexTag = "__flowIndexTag__";
-        private rendererDic : {[fIdx:number]: IRectRenderer} = {}; //渲染对象字典容器
-        private depthList : IRectRenderer[][] = [];
-        private sortedList : IRectRenderer[] = [];
-        private canvasBounds : math.rect = new math.rect(); //canvas 全局边框矩形
-        private readonly qt_maxObjNum =  5; //四叉树节点最大的对象数量
-        private readonly qt_maxlevel=  6; //四叉树最大的深度
-        private depthQTree : quadTree ; //深度的四叉树
+        private rendererDic: { [fIdx: number]: IRectRenderer } = {}; //渲染对象字典容器
+        private depthList: IRectRenderer[][] = [];
+        private sortedList: IRectRenderer[] = [];
+        private canvasBounds: math.rect = new math.rect(); //canvas 全局边框矩形
+        private readonly qt_maxObjNum = 5; //四叉树节点最大的对象数量
+        private readonly qt_maxlevel = 6; //四叉树最大的深度
+        private depthQTree: quadTree; //深度的四叉树
         /** 按深度层 合批渲染 */
-        private drawSceneByDepth(node: transform2D, context: renderContext, assetmgr: assetMgr){
+        private drawSceneByDepth(node: transform2D, context: renderContext, assetmgr: assetMgr)
+        {
             //更新 canvasBounds
             this.canvasBounds.w = this.pixelWidth;
             this.canvasBounds.h = this.pixelHeight;
-            if(!this.depthQTree) this.depthQTree = new quadTree(this.canvasBounds , this.qt_maxObjNum, this.qt_maxlevel);
+            if (!this.depthQTree) this.depthQTree = new quadTree(this.canvasBounds, this.qt_maxObjNum, this.qt_maxlevel);
             this.depthQTree.clear();
 
             //所有Renderer 计算 深度
-                
+
             this.flowCount = 0;
             //test 
             this.collectToDepthL(node);
@@ -673,98 +698,114 @@ namespace gd3d.framework
             //按队列顺序 逐各渲染
             this.sortDepthList();
 
-            this.sortedList.forEach(rnode=>{
-                if(rnode) rnode.render(this);
+            this.sortedList.forEach(rnode =>
+            {
+                if (rnode) rnode.render(this);
             });
 
             this.depthList.length = this.sortedList.length = 0;
         }
 
 
-        private helpMap : {[id:number]:IRectRenderer[]} = {};
+        private helpMap: { [id: number]: IRectRenderer[] } = {};
         /** 排序Depth列表 */
-        private sortDepthList(){
+        private sortDepthList()
+        {
             let len = this.depthList.length;
-            let lastGuid : number = -1;
-            let idList : number[] = [];
-            for(let i = 0 ;i < len ;i++){
+            let lastGuid: number = -1;
+            let idList: number[] = [];
+            for (let i = 0; i < len; i++)
+            {
                 idList.length = 0;
                 //逐层按相同材质连续排序 
                 //不同层首尾连接规则 1.队列头部 放置 和上一层同材质类型 2.尾部放置 数量最多的类型 
 
                 let arr = this.depthList[i];
                 let tempM = {};
-                arr.forEach((rn,idx)=>{
-                    if(rn && rn.getMaterial()){
+                arr.forEach((rn, idx) =>
+                {
+                    if (rn && rn.getMaterial())
+                    {
                         let guid = rn.getMaterial().getGUID();
-                        if(!this.helpMap[guid]) this.helpMap[guid] = [];
+                        if (!this.helpMap[guid]) this.helpMap[guid] = [];
                         this.helpMap[guid].push(rn);
-                        if(!tempM[guid]){
+                        if (!tempM[guid])
+                        {
                             idList.push(guid);
                             tempM[guid] = true;
                         }
                     }
-                });       
-                
+                });
+
                 //排序  1.队列头部 放置 和上一层同材质类型 2.尾部放置 数量最多的类型 
                 //1.队列头部 放置 和上一层同材质类型
-                if(lastGuid != -1 && this.helpMap[lastGuid] && this.helpMap[lastGuid].length > 0 ){
+                if (lastGuid != -1 && this.helpMap[lastGuid] && this.helpMap[lastGuid].length > 0)
+                {
                     let sidx = idList.indexOf(lastGuid);
-                    if(sidx != -1)  idList.splice(sidx,1);
+                    if (sidx != -1) idList.splice(sidx, 1);
                     idList.unshift(lastGuid);
                 }
 
                 //2.尾部放置 数量最多的类型
                 let tempLastLen = 0;
                 let endGuid = -1;
-                for(const key in this.helpMap){
+                for (const key in this.helpMap)
+                {
                     let temparr = this.helpMap[key];
-                    if(temparr && temparr.length > tempLastLen){
+                    if (temparr && temparr.length > tempLastLen)
+                    {
                         endGuid = Number(key);
                         tempLastLen = temparr.length;
                     }
                 }
                 //尾部 ,优先 头部规则
-                if(lastGuid != endGuid  && endGuid != -1 && !isNaN(endGuid) ){
+                if (lastGuid != endGuid && endGuid != -1 && !isNaN(endGuid))
+                {
                     let sidx = idList.indexOf(endGuid);
-                    if(sidx != -1)  idList.splice(sidx,1);
+                    if (sidx != -1) idList.splice(sidx, 1);
                     idList.push(endGuid);
                 }
 
-                idList.forEach(id=>{
+                idList.forEach(id =>
+                {
                     let rArr = this.helpMap[id];
-                    if(rArr && rArr.length > 0){
-                        rArr.forEach(rn=>{
-                            if(rn) this.sortedList.push(rn);
+                    if (rArr && rArr.length > 0)
+                    {
+                        rArr.forEach(rn =>
+                        {
+                            if (rn) this.sortedList.push(rn);
                         });
                     }
                 });
 
-                if(idList.length > 0){
-                    lastGuid = idList[idList.length -1];
+                if (idList.length > 0)
+                {
+                    lastGuid = idList[idList.length - 1];
                 }
 
                 //清理map
-                for(const key in this.helpMap){
+                for (const key in this.helpMap)
+                {
                     let temparr = this.helpMap[key];
-                    if(temparr) temparr.length = 0;
+                    if (temparr) temparr.length = 0;
                 }
             }
 
             this.helpMap = {};
         }
 
-        private flowCount : number;
+        private flowCount: number;
         /**收集到深度列表 */
-        private collectToDepthL (node: transform2D){
-            if(!node.visible)return;
+        private collectToDepthL(node: transform2D)
+        {
+            if (!node.visible) return;
             if (node.renderer)
             {
                 let bounds = node.renderer.getDrawBounds();
                 bounds[canvas.flowIndexTag] = this.flowCount;
                 this.rendererDic[this.flowCount] = node.renderer; //引用 存入字典
                 this.checkBottomUI(node.renderer);
-                this.flowCount ++;
+                this.flowCount++;
             }
 
             if (node.children)
@@ -779,27 +820,32 @@ namespace gd3d.framework
         /**
          * 检查BottomUI 
          */
-        private checkBottomUI (rd: IRectRenderer){
+        private checkBottomUI(rd: IRectRenderer)
+        {
             //检测 bottomUI  (逐当前 depthList 层检测 rect 碰撞 ，优化工具 四叉树 )
             //无 ，depth = 0
             //有 ，depth = bottomUI.depth + 1 
-            let tempCup : math.rect []  = [];
+            let tempCup: math.rect[] = [];
             let myr = rd.getDrawBounds();
-            this.depthQTree.retrieve(myr,tempCup);
+            this.depthQTree.retrieve(myr, tempCup);
             let lastIdx = -1;
             //确定 深度
-            while(tempCup.length > 0){
+            while (tempCup.length > 0)
+            {
                 let temp = tempCup.pop();
-                if(math.rectCollided(temp,myr)){
-                    if(temp[canvas.flowIndexTag] > lastIdx){
+                if (math.rectCollided(temp, myr))
+                {
+                    if (temp[canvas.flowIndexTag] > lastIdx)
+                    {
                         lastIdx = temp[canvas.flowIndexTag];
-                        if(temp[canvas.flowIndexTag] == (myr[canvas.flowIndexTag] - 1)) break; //相邻的bottomUI ，其他不用找了
+                        if (temp[canvas.flowIndexTag] == (myr[canvas.flowIndexTag] - 1)) break; //相邻的bottomUI ，其他不用找了
                     }
                 }
             }
 
             let depth = 0
-            if(lastIdx != -1){
+            if (lastIdx != -1)
+            {
                 let wrd = this.rendererDic[lastIdx];
                 depth = wrd[canvas.depthTag] + 1;
             }
@@ -807,7 +853,7 @@ namespace gd3d.framework
             rd[canvas.depthTag] = depth;
             //填入 到四叉树 
             this.depthQTree.insert(myr);
-            if(!this.depthList[depth] ) this.depthList[depth] = [];
+            if (!this.depthList[depth]) this.depthList[depth] = [];
             this.depthList[depth].push(rd);
         }
 
@@ -830,7 +876,7 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("number")
         pixelHeight: number = 480;
-        
+
         @gd3d.reflect.Field("transform2D")
         private rootNode: transform2D;
 
@@ -847,7 +893,7 @@ namespace gd3d.framework
             {
                 this.rootNode = new transform2D();
                 this.rootNode.canvas = this;
-                this.scene.app.markNotify(this.rootNode,NotifyType.AddChild);
+                this.scene.app.markNotify(this.rootNode, NotifyType.AddChild);
             }
             return this.rootNode;
         }
@@ -861,10 +907,11 @@ namespace gd3d.framework
          * @param outP canvas 坐标
          * @version egret-gd3d 1.0
          */
-        ModelPosToCanvasPos(fromP:math.vector2,outP:math.vector2){
-            if(fromP == null || outP == null) return;
-            let scalx = 1 - (fromP.x - 1)/-2;  
-            let scaly =  (fromP.y - 1)/-2;
+        ModelPosToCanvasPos(fromP: math.vector2, outP: math.vector2)
+        {
+            if (fromP == null || outP == null) return;
+            let scalx = 1 - (fromP.x - 1) / -2;
+            let scaly = (fromP.y - 1) / -2;
             outP.x = scalx * this.pixelWidth;
             outP.y = scaly * this.pixelHeight;
         }
@@ -878,11 +925,12 @@ namespace gd3d.framework
          * @param outModelPos model空间坐标
          * @version egret-gd3d 1.0
          */
-        CanvasPosToModelPos(canvasPos : math.vector2 , outModelPos : math.vector2){
-            if(!canvasPos|| !outModelPos) return;
-            let scalx = canvasPos.x/ this.pixelWidth;
-            let scaly = canvasPos.y/ this.pixelHeight;
-            outModelPos.x = scalx * 2  - 1;
+        CanvasPosToModelPos(canvasPos: math.vector2, outModelPos: math.vector2)
+        {
+            if (!canvasPos || !outModelPos) return;
+            let scalx = canvasPos.x / this.pixelWidth;
+            let scaly = canvasPos.y / this.pixelHeight;
+            outModelPos.x = scalx * 2 - 1;
             outModelPos.y = 1 - scaly * 2;
         }
 

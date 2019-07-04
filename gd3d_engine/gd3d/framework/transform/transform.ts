@@ -10,11 +10,11 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class transform
     {
-        static readonly ClassName:string="transform";
+        static readonly ClassName: string = "transform";
 
-        private helpLRotate:math.quaternion = new math.quaternion();
-        private helpLPos:math.vector3 = new math.vector3();
-        private helpLScale:math.vector3 = new math.vector3(1,1,1);
+        private helpLRotate: math.quaternion = new math.quaternion();
+        private helpLPos: math.vector3 = new math.vector3();
+        private helpLScale: math.vector3 = new math.vector3(1, 1, 1);
 
         private static helpv2 = new math.vector2();
         private static helpv3 = new math.vector3();
@@ -26,9 +26,10 @@ namespace gd3d.framework
         private static helpquat = new math.quaternion();
         private static helpquat_1 = new math.quaternion();
 
-        private static helpmtx = new gd3d.math.matrix(); 
+        private static helpmtx = new gd3d.math.matrix();
 
-        private checkLRTSChange():boolean{
+        private checkLRTSChange(): boolean
+        {
             // if(!math.vec3Equal(this.helpLPos,this._localTranslate,Number.MIN_VALUE))
             //     return true;
             // if(!math.quatEqual(this.helpLRotate,this._localRotate,Number.MIN_VALUE))
@@ -36,22 +37,33 @@ namespace gd3d.framework
             // if(!math.vec3Equal(this.helpLScale,this._localScale,Number.MIN_VALUE))
             //     return true;
 
-            if(!this.fastEqual(this.helpLPos.rawData,this._localTranslate.rawData))
+            // if (!this.fastEqual(this.helpLPos.rawData, this._localTranslate.rawData))
+            //     return true;
+            // if (!this.fastEqual(this.helpLRotate.rawData, this._localRotate.rawData))
+            //     return true;
+            // if (!this.fastEqual(this.helpLScale.rawData, this._localScale.rawData))
+            //     return true;
+            if (!this.fastEqual(this.helpLPos, this._localTranslate))
                 return true;
-            if(!this.fastEqual(this.helpLRotate.rawData,this._localRotate.rawData))
+            if (!this.fastEqual(this.helpLRotate, this._localRotate))
                 return true;
-            if(!this.fastEqual(this.helpLScale.rawData,this._localScale.rawData))
+            if (!this.fastEqual(this.helpLScale, this._localScale))
                 return true;
             return false;
         }
 
-        private fastEqual(d_0,d_1):boolean{
-            if(d_0[0] != d_1[0])    return false;
-            if(d_0[1] != d_1[1])    return false;
-            if(d_0[2] != d_1[2])    return false;
+        private fastEqual(d_0, d_1): boolean
+        {
+            if (d_0.x != d_1.x) return false;
+            if (d_0.y != d_1.y) return false;
+            if (d_0.z != d_1.z) return false;
 
-            if(d_0.length == 4 && d_0[3] != d_1[3])
-                return false;
+            // if (d_0[0] != d_1[0]) return false;
+            // if (d_0[1] != d_1[1]) return false;
+            // if (d_0[2] != d_1[2]) return false;
+
+            // if (d_0.length == 4 && d_0[3] != d_1[3])
+            //     return false;
             return true;
         }
 
@@ -118,14 +130,16 @@ namespace gd3d.framework
         /**
          * [过时接口,完全弃用]
          */
-        updateWorldTran(){
+        updateWorldTran()
+        {
         }
 
         /**
          * [过时接口,完全弃用]
          * @param bool
          */
-        updateTran(bool:boolean){
+        updateTran(bool: boolean)
+        {
 
         }
 
@@ -173,7 +187,8 @@ namespace gd3d.framework
          * 自己的aabb
          * @version egret-gd3d 1.0
          */
-        get aabb(){
+        get aabb()
+        {
             // if (this.aabbdirty)   //没考虑 aabb 阶段 改
             // {
             //     //transform里只更新自己的aabb
@@ -182,10 +197,12 @@ namespace gd3d.framework
             // }
             // return this._aabb;
 
-            if (!this._aabb) {
+            if (!this._aabb)
+            {
                 this._aabb = this._buildAABB();
             }
-            if(this._dirtyAABB) {
+            if (this._dirtyAABB)
+            {
                 this._aabb.update(this.getWorldMatrix());
                 this._dirtyAABB = false;
             }
@@ -244,7 +261,7 @@ namespace gd3d.framework
         // }
 
 
-        private static readonly aabbCareTypes = ["meshFilter","skinnedMeshRenderer","canvasRenderer"];
+        private static readonly aabbCareTypes = ["meshFilter", "skinnedMeshRenderer", "canvasRenderer"];
         /**
         * @private
         * @language zh_CN
@@ -258,26 +275,28 @@ namespace gd3d.framework
             let _types = transform.aabbCareTypes;
             let len = _types.length;
             let matched = false;
-            for(var i=0; i < len ;i++){
+            for (var i = 0; i < len; i++)
+            {
                 let t = _types[i];
-                switch (t){
-                    case meshFilter.ClassName: 
+                switch (t)
+                {
+                    case meshFilter.ClassName:
                         var filter = this.gameObject.getComponent("meshFilter") as meshFilter;
                         if (filter != null && filter.mesh != null && filter.mesh.data != null && filter.mesh.data.pos != null)
                         {
                             var meshdata: gd3d.render.meshData = filter.mesh.data;
                             math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
                             math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-            
+
                             for (var i = 0; i < meshdata.pos.length; i++)
                             {
                                 math.vec3Max(meshdata.pos[i], maximum, maximum);
                                 math.vec3Min(meshdata.pos[i], minimum, minimum);
                             }
-                            matched =  true;
+                            matched = true;
                         }
-                    break;
-                    case skinnedMeshRenderer.ClassName: 
+                        break;
+                    case skinnedMeshRenderer.ClassName:
                         var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer;
                         if (skinmesh != null && skinmesh.mesh != null && skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null)
                         {
@@ -285,7 +304,7 @@ namespace gd3d.framework
                             var skinmeshdata: gd3d.render.meshData = skinmesh.mesh.data;
                             math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
                             math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-        
+
                             var p0 = gd3d.math.pool.new_vector3();
                             for (var i = 0; i < skinmeshdata.pos.length; i++)
                             {
@@ -294,37 +313,39 @@ namespace gd3d.framework
                                 math.vec3Min(p0, minimum, minimum);
                             }
                             gd3d.math.pool.delete_vector3(p0);
-                            
-                            matched =  true;
+
+                            matched = true;
                         }
-                    break;
-                    case canvasRenderer.ClassName: 
+                        break;
+                    case canvasRenderer.ClassName:
                         var canvasR = this.gameObject.getComponent("canvasRenderer") as gd3d.framework.canvasRenderer;
-                        if(canvasR && canvasR.canvas){
+                        if (canvasR && canvasR.canvas)
+                        {
                             var cvs = canvasR.canvas;
                             var cPos = transform.helpv2;
-                            gd3d.math.vec2Set(cPos,0,0);
+                            gd3d.math.vec2Set(cPos, 0, 0);
                             var wPos_0 = transform.helpv3;
-                            canvasR.calCanvasPosToWorldPos(cPos,wPos_0);
+                            canvasR.calCanvasPosToWorldPos(cPos, wPos_0);
 
                             var wPos_1 = transform.helpv3_1;
-                            gd3d.math.vec2Set(cPos,cvs.pixelWidth,cvs.pixelHeight);
-                            canvasR.calCanvasPosToWorldPos(cPos,wPos_1);
-                            
-                            gd3d.math.vec3Min(wPos_0,wPos_1,minimum);
-                            gd3d.math.vec3Max(wPos_0,wPos_1,maximum);
-                            
-                            matched =  true;
+                            gd3d.math.vec2Set(cPos, cvs.pixelWidth, cvs.pixelHeight);
+                            canvasR.calCanvasPosToWorldPos(cPos, wPos_1);
+
+                            gd3d.math.vec3Min(wPos_0, wPos_1, minimum);
+                            gd3d.math.vec3Max(wPos_0, wPos_1, maximum);
+
+                            matched = true;
                         }
 
-                    break;
+                        break;
                 }
-                
-                if(matched) break;
+
+                if (matched) break;
             }
-            
-            if(!matched){
-                minimum.x =  minimum.y = minimum.z = -1;
+
+            if (!matched)
+            {
+                minimum.x = minimum.y = minimum.z = -1;
                 maximum.x = maximum.y = maximum.z = 1;
             }
 
@@ -377,7 +398,7 @@ namespace gd3d.framework
             return _aabb;
         }
 
-        private _children: transform[] = [];
+        // private _children: transform[] = [];
         /**
          * @public
          * @language zh_CN
@@ -386,14 +407,17 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("transform[]")
-        get children(){
-            return this._children;
-        }
-        set children(children:transform[]){
-            this._children = children;
-        }
+        children: transform[] = [];
+        // get children()
+        // {
+        //     return this._children;
+        // }
+        // set children(children: transform[])
+        // {
+        //     this._children = children;
+        // }
 
-        private _physicsImpostor: PhysicsImpostor ;
+        private _physicsImpostor: PhysicsImpostor;
         /**
          * @public
          * @language zh_CN
@@ -401,10 +425,12 @@ namespace gd3d.framework
          * 物理代理对象
          * @version egret-gd3d 1.0
          */
-        get physicsImpostor(){
+        get physicsImpostor()
+        {
             return this._physicsImpostor;
         }
-        set physicsImpostor(physicsImp : PhysicsImpostor){
+        set physicsImpostor(physicsImp: PhysicsImpostor)
+        {
             this._physicsImpostor = physicsImp;
         }
 
@@ -416,7 +442,8 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         private _parent: transform;
-        get parent(){
+        get parent()
+        {
             return this._parent;
         }
 
@@ -439,8 +466,9 @@ namespace gd3d.framework
          */
         addChild(node: transform)
         {
-            this.addChildAt(node,this._children.length);
+            this.addChildAt(node, this.children.length);
         }
+
         /**
          * @public
          * @language zh_CN
@@ -458,20 +486,21 @@ namespace gd3d.framework
             {
                 node._parent.removeChild(node);
             }
-            if (this._children == null)
-                this._children = [];
+            if (this.children == null)
+                this.children = [];
 
-            this._children.splice(index, 0, node);
+            this.children.splice(index, 0, node);
             node.scene = this.scene;
             node._parent = this;
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
             if (node.hasComponent || node.hasComponentChild)
                 this.markHaveComponent();
 
-            if(node.hasRendererComp || node.hasRendererCompChild)
+            if (node.hasRendererComp || node.hasRendererCompChild)
                 this.markHaveRendererComp();
 
             node.dirtify(true);
+
         }
         /**
          * @public
@@ -480,16 +509,17 @@ namespace gd3d.framework
          * 移除所有子物体
          * @version egret-gd3d 1.0
          */
-        removeAllChild(needDispose:boolean = false)
+        removeAllChild(needDispose: boolean = false)
         {
-            if(this._children==undefined) return;
-            while (this._children.length > 0)
+            if (this.children == undefined) return;
+            while (this.children.length > 0)
             {
-                if(needDispose)
-                    this._children[0].dispose();
+                if (needDispose)
+                    this.children[0].dispose();
                 else
-                    this.removeChild(this._children[0]);
+                    this.removeChild(this.children[0]);
             }
+
         }
         /**
          * @public
@@ -501,17 +531,18 @@ namespace gd3d.framework
          */
         removeChild(node: transform)
         {
-            if (node._parent != this || this._children == null)
+            if (node._parent != this || this.children == null)
             {
                 throw new Error("not my child.");
             }
-            var i = this._children.indexOf(node);
+            var i = this.children.indexOf(node);
             if (i >= 0)
             {
-                this._children.splice(i, 1);
+                this.children.splice(i, 1);
                 sceneMgr.app.markNotify(node, NotifyType.RemoveChild);
                 node._parent = null;
             }
+
         }
         /**
          * @public
@@ -527,11 +558,11 @@ namespace gd3d.framework
                 return this;
             else
             {
-                if (this._children != undefined)
+                if (this.children != undefined)
                 {
-                    for (let i in this._children)
+                    for (let i in this.children)
                     {
-                        let res = this._children[i].find(name);
+                        let res = this.children[i].find(name);
                         if (res != null)
                             return res;
                         else
@@ -582,33 +613,39 @@ namespace gd3d.framework
                     impacted.push(tran);
                 }
             }
-            if (tran._children != null)
+            if (tran.children != null)
             {
-                for (var i = 0; i < tran._children.length; i++)
+                for (var i = 0; i < tran.children.length; i++)
                 {
-                    this.doImpact(tran._children[i], impacted);
+                    this.doImpact(tran.children[i], impacted);
                 }
             }
         }
 
-        private dirtyLocal : boolean = false;
-        private dirtyWorld : boolean = false;
+        private dirtyLocal: boolean = false;
+        private dirtyWorld: boolean = false;
 
-        private dirtify(local = false){
+        private dirtify(local = false)
+        {
             this.dirtiedOfFrustumCulling = true;
-            if ((!local || (local && this.dirtyLocal)) && this.dirtyWorld) {
+            if ((!local || (local && this.dirtyLocal)) && this.dirtyWorld)
+            {
                 return;
             }
 
-            if(local){
+            if (local)
+            {
                 this.dirtyLocal = true;
             }
 
-            if (!this.dirtyWorld) {
+            if (!this.dirtyWorld)
+            {
                 this.dirtyWorld = true;
                 let i = this.children.length;
-                while (i--) {
-                    if (this.children[i].dirtyWorld) {
+                while (i--)
+                {
+                    if (this.children[i].dirtyWorld)
+                    {
                         continue;
                     }
                     this.children[i].dirtify();
@@ -621,20 +658,25 @@ namespace gd3d.framework
         }
 
         //同步自己的 W 、L 矩阵
-        private sync(){
-            if (this.dirtyLocal) {
-                math.matrixMakeTransformRTS(this._localTranslate,this._localScale,this._localRotate,this.localMatrix);
-                math.vec3Clone(this._localTranslate,this.helpLPos);
-                math.vec3Clone(this._localScale,this.helpLScale);
-                math.quatClone(this._localRotate,this.helpLRotate);
+        private sync()
+        {
+            if (this.dirtyLocal)
+            {
+                math.matrixMakeTransformRTS(this._localTranslate, this._localScale, this._localRotate, this.localMatrix);
+                math.vec3Clone(this._localTranslate, this.helpLPos);
+                math.vec3Clone(this._localScale, this.helpLScale);
+                math.quatClone(this._localRotate, this.helpLRotate);
                 this.dirtyLocal = false;
             }
 
-            if (this.dirtyWorld) {
-                if (!this._parent) {
-                    math.matrixClone(this.localMatrix,this.worldMatrix);
-                } else {
-                    math.matrixMultiply(this._parent.worldMatrix,this.localMatrix,this.worldMatrix);
+            if (this.dirtyWorld)
+            {
+                if (!this._parent)
+                {
+                    math.matrixClone(this.localMatrix, this.worldMatrix);
+                } else
+                {
+                    math.matrixMultiply(this._parent.worldMatrix, this.localMatrix, this.worldMatrix);
                 }
 
                 this.dirtyWorld = false;
@@ -664,16 +706,17 @@ namespace gd3d.framework
             var p = this._parent;
             while (p != null)
             {
-				p.hasComponentChild = true;
+                p.hasComponentChild = true;
                 p = p._parent;
             }
         }
-        markHaveRendererComp(){
+        markHaveRendererComp()
+        {
             this.hasRendererComp = true;
             var p = this._parent;
             while (p != null)
             {
-				p.hasRendererCompChild = true;
+                p.hasRendererCompChild = true;
                 p = p._parent;
             }
         }
@@ -703,8 +746,8 @@ namespace gd3d.framework
 
         public hasComponent: boolean = false; //自己是否有组件
         public hasComponentChild: boolean = false;  //子对象是否有组件
-        public hasRendererComp:boolean = false; //自己是否有渲染器组件
-        public hasRendererCompChild:boolean = false; //子对象是否有渲染器组件
+        public hasRendererComp: boolean = false; //自己是否有渲染器组件
+        public hasRendererCompChild: boolean = false; //子对象是否有渲染器组件
 
         private _localRotate: math.quaternion = new math.quaternion();
         /**
@@ -715,12 +758,15 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("quaternion")
-        get localRotate(){
+        get localRotate()
+        {
             return this._localRotate;
         }
-        set localRotate(rotate:math.quaternion){
-            math.quatClone(rotate,this._localRotate);
-            if (!this.dirtyLocal) {
+        set localRotate(rotate: math.quaternion)
+        {
+            math.quatClone(rotate, this._localRotate);
+            if (!this.dirtyLocal)
+            {
                 this.dirtify(true);
             }
         }
@@ -734,29 +780,35 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("vector3")
-        get localTranslate(){
+        get localTranslate()
+        {
             return this._localTranslate;
         }
-        set localTranslate(position:math.vector3){
-            math.vec3Clone(position,this._localTranslate);
-            if (!this.dirtyLocal) {
+        set localTranslate(position: math.vector3)
+        {
+            math.vec3Clone(position, this._localTranslate);
+            if (!this.dirtyLocal)
+            {
                 this.dirtify(true);
             }
         }
 
-         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 本地位移
-         * @version egret-gd3d 1.0
-         */
-        get localPosition(){
+        /**
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 本地位移
+        * @version egret-gd3d 1.0
+        */
+        get localPosition()
+        {
             return this._localTranslate;
         }
-        set localPosition(position:math.vector3){
-            math.vec3Clone(position,this._localTranslate);
-            if (!this.dirtyLocal) {
+        set localPosition(position: math.vector3)
+        {
+            math.vec3Clone(position, this._localTranslate);
+            if (!this.dirtyLocal)
+            {
                 this.dirtify(true);
             }
         }
@@ -770,12 +822,15 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("vector3")
-        get localScale(){
+        get localScale()
+        {
             return this._localScale;
         }
-        set localScale(scale:math.vector3){
-            math.vec3Clone(scale,this._localScale);
-            if (!this.dirtyLocal) {
+        set localScale(scale: math.vector3)
+        {
+            math.vec3Clone(scale, this._localScale);
+            if (!this.dirtyLocal)
+            {
                 this.dirtify(true);
             }
         }
@@ -797,7 +852,8 @@ namespace gd3d.framework
         set localEulerAngles(angles: math.vector3)
         {
             math.quatFromEulerAngles(angles.x, angles.y, angles.z, this._localRotate);
-            if (!this.dirtyLocal) {
+            if (!this.dirtyLocal)
+            {
                 this.dirtify(true);
             }
         }
@@ -805,7 +861,7 @@ namespace gd3d.framework
         //这个是如果爹改了就要跟着算的
         private worldMatrix: math.matrix = new math.matrix();
         private worldRotate: math.quaternion = new math.quaternion();
-        private worldTranslate: math.vector3 = new math.vector3(0, 0, 0);
+        public worldTranslate: math.vector3 = new math.vector3(0, 0, 0);
         private worldScale: math.vector3 = new math.vector3(1, 1, 1);
         /**
          * @public
@@ -816,10 +872,12 @@ namespace gd3d.framework
          */
         getWorldRotate()
         {
-            if(!this._parent || !this._parent._parent){
-                math.quatClone(this._localRotate,this.worldRotate);
-            }else{
-                math.matrixGetRotation(this.getWorldMatrix(),this.worldRotate);
+            if (!this._parent || !this._parent._parent)
+            {
+                math.quatClone(this._localRotate, this.worldRotate);
+            } else
+            {
+                math.matrixGetRotation(this.getWorldMatrix(), this.worldRotate);
             }
             return this.worldRotate;
         }
@@ -831,22 +889,27 @@ namespace gd3d.framework
          * 设置transform世界空间下的旋转
          *
          */
-        setWorldRotate(rotate:math.quaternion){
-            if (!this._parent || !this._parent._parent) {
-                math.quatClone(rotate,this._localRotate);
-            } else{
+        setWorldRotate(rotate: math.quaternion)
+        {
+            if (!this._parent || !this._parent._parent)
+            {
+                math.quatClone(rotate, this._localRotate);
+            } else
+            {
                 let tquat = transform.helpquat;
                 let tquat_1 = transform.helpquat_1;
                 math.quatClone(this._parent.getWorldRotate(), tquat);
-                math.quatInverse(tquat,tquat_1);
-                math.quatMultiply(tquat_1,rotate,this._localRotate);
+                math.quatInverse(tquat, tquat_1);
+                math.quatMultiply(tquat_1, rotate, this._localRotate);
             }
 
-            if (!this.dirtyLocal) {
+            if (!this.dirtyLocal)
+            {
                 this.dirtify(true);
             }
         }
-
+        //第一次计算世界坐标
+        firstCalc: boolean = true;
         /**
          * @public
          * @language zh_CN
@@ -856,11 +919,18 @@ namespace gd3d.framework
          */
         getWorldTranslate()
         {
-            if(!this._parent || !this._parent._parent){
-                math.vec3Clone(this._localTranslate,this.worldTranslate);
-            }else{
-                math.matrixGetTranslation(this.getWorldMatrix(),this.worldTranslate);
+            if (!this.firstCalc && this.gameObject.isStatic)
+                return this.worldTranslate;
+
+            if (!this._parent || !this._parent._parent)
+            {
+                math.vec3Clone(this._localTranslate, this.worldTranslate);
+            } else
+            {
+                math.matrixGetTranslation(this.getWorldMatrix(), this.worldTranslate);
             }
+            if (this.firstCalc)
+                this.firstCalc = false;
             return this.worldTranslate;
         }
         /**
@@ -872,10 +942,12 @@ namespace gd3d.framework
          */
         getWorldPosition()
         {
-            if(!this._parent || !this._parent._parent){
-                math.vec3Clone(this._localTranslate,this.worldTranslate);
-            }else{
-                math.matrixGetTranslation(this.getWorldMatrix(),this.worldTranslate);
+            if (!this._parent || !this._parent._parent)
+            {
+                math.vec3Clone(this._localTranslate, this.worldTranslate);
+            } else
+            {
+                math.matrixGetTranslation(this.getWorldMatrix(), this.worldTranslate);
             }
             return this.worldTranslate;
         }
@@ -888,16 +960,20 @@ namespace gd3d.framework
          * @param pos 世界空间下的坐标
          * @version egret-gd3d 1.0
          */
-        setWorldPosition(pos: math.vector3){
-            if (!this._parent || !this._parent._parent) {
-                math.vec3Clone(pos,this._localTranslate);
-            } else{
+        setWorldPosition(pos: math.vector3)
+        {
+            if (!this._parent || !this._parent._parent)
+            {
+                math.vec3Clone(pos, this._localTranslate);
+            } else
+            {
                 let tmtx = transform.helpmtx;
-                math.matrixInverse(this._parent.getWorldMatrix(),tmtx);
-                math.matrixTransformVector3(pos,tmtx,this._localTranslate);
+                math.matrixInverse(this._parent.getWorldMatrix(), tmtx);
+                math.matrixTransformVector3(pos, tmtx, this._localTranslate);
             }
 
-            if (!this.dirtyLocal) {
+            if (!this.dirtyLocal)
+            {
                 this.dirtify(true);
             }
         }
@@ -911,10 +987,12 @@ namespace gd3d.framework
          */
         getWorldScale()
         {
-            if(!this._parent || !this._parent._parent){
-                math.vec3Clone(this._localScale,this.worldScale);
-            }else{
-                math.matrixGetScale(this.getWorldMatrix(),this.worldScale);
+            if (!this._parent || !this._parent._parent)
+            {
+                math.vec3Clone(this._localScale, this.worldScale);
+            } else
+            {
+                math.matrixGetScale(this.getWorldMatrix(), this.worldScale);
             }
             return this.worldScale;
         }
@@ -926,18 +1004,22 @@ namespace gd3d.framework
          * 设置世界坐标系下的缩放
          * @version egret-gd3d 1.0
          */
-        setWorldScale(scale:math.vector3){
-            if (!this._parent || !this._parent._parent) {
-                math.vec3Clone(scale,this._localScale);
-            } else{
+        setWorldScale(scale: math.vector3)
+        {
+            if (!this._parent || !this._parent._parent)
+            {
+                math.vec3Clone(scale, this._localScale);
+            } else
+            {
                 let tv3 = transform.helpv3;
-                math.vec3Clone(this._parent.getWorldScale(),tv3);
+                math.vec3Clone(this._parent.getWorldScale(), tv3);
                 this._localScale.x = scale.x / tv3.x;
                 this._localScale.y = scale.y / tv3.y;
                 this._localScale.z = scale.z / tv3.z;
             }
 
-            if (!this.dirtyLocal) {
+            if (!this.dirtyLocal)
+            {
                 this.dirtify(true);
             }
         }
@@ -951,11 +1033,12 @@ namespace gd3d.framework
          */
         getLocalMatrix(): math.matrix
         {
-            if (this.dirtyLocal) {
-                math.matrixMakeTransformRTS(this._localTranslate,this._localScale,this._localRotate,this.localMatrix);
-                math.vec3Clone(this._localTranslate,this.helpLPos);
-                math.vec3Clone(this._localScale,this.helpLScale);
-                math.quatClone(this._localRotate,this.helpLRotate);
+            if (this.dirtyLocal)
+            {
+                math.matrixMakeTransformRTS(this._localTranslate, this._localScale, this._localRotate, this.localMatrix);
+                math.vec3Clone(this._localTranslate, this.helpLPos);
+                math.vec3Clone(this._localScale, this.helpLScale);
+                math.quatClone(this._localRotate, this.helpLRotate);
                 this.dirtyLocal = false;
             }
             return this.localMatrix;
@@ -975,18 +1058,21 @@ namespace gd3d.framework
             //     }
             // }
 
-            if(!this.dirtyLocal && !this.dirtyWorld){
+            if (!this.dirtyLocal && !this.dirtyWorld)
+            {
                 this.checkToTop();
             }
 
-            if (!this.dirtyLocal && !this.dirtyWorld) {
+            if (!this.dirtyLocal && !this.dirtyWorld)
+            {
                 return this.worldMatrix;
             }
 
             this.dirtiedOfFrustumCulling = true;
 
             //找dirty标记的 顶 ， 再刷新
-            if (this._parent) {
+            if (this._parent)
+            {
                 this._parent.getWorldMatrix();
             }
 
@@ -995,20 +1081,24 @@ namespace gd3d.framework
             return this.worldMatrix;
         }
 
-        private checkToTop(){
-            let top : transform ;
-            let temp : transform = this;
-            while(true){
-                if(temp.checkLRTSChange()){
+        private checkToTop()
+        {
+            let top: transform;
+            let temp: transform = this;
+            while (true)
+            {
+                if (temp.checkLRTSChange())
+                {
                     temp.dirtyLocal = true;
                     //temp.dirtify(true);
                     top = temp;
                 }
 
-                if(!temp._parent) break;
+                if (!temp._parent) break;
                 temp = temp._parent;
             }
-            if(top){
+            if (top)
+            {
                 top.dirtify(true);
             }
         }
@@ -1062,16 +1152,19 @@ namespace gd3d.framework
          */
         setWorldMatrix(mat: math.matrix)
         {
-            if (!this._parent) {
+            if (!this._parent)
+            {
                 math.matrixDecompose(mat, this._localScale, this._localRotate, this._localTranslate);
-            } else {
+            } else
+            {
                 let tmtx = transform.helpmtx;
                 math.matrixInverse(this._parent.getWorldMatrix(), tmtx);
                 math.matrixMultiply(tmtx, mat, this.localMatrix);
                 math.matrixDecompose(this.localMatrix, this._localScale, this._localRotate, this._localTranslate);
             }
 
-            if (!this.dirtyLocal) {
+            if (!this.dirtyLocal)
+            {
                 this.dirtify(true);
             }
         }
@@ -1101,12 +1194,17 @@ namespace gd3d.framework
             this.calcLookAt(point);
         }
 
-        private calcLookAt(point: math.vector3){
+        private calcLookAt(point: math.vector3)
+        {
             math.quatLookat(this.getWorldTranslate(), point, this.worldRotate);
             this.setWorldRotate(this.worldRotate);
         }
-
-        private _gameObject: gameObject;
+        constructor()
+        {
+            this.gameObject = new gameObject();
+            this.gameObject.transform = this;
+        }
+        // private _gameObject: gameObject;
         /**
          * @public
          * @language zh_CN
@@ -1115,15 +1213,16 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         @gd3d.reflect.Field("gameObject")
-        get gameObject()
-        {
-            if (this._gameObject == null)
-            {
-                this._gameObject = new gameObject();
-                this._gameObject.transform = this;
-            }
-            return this._gameObject;
-        }
+        gameObject: gameObject;
+        // get gameObject()
+        // {
+        //     if (this._gameObject == null)
+        //     {
+        //         this._gameObject = new gameObject();
+        //         this._gameObject.transform = this;
+        //     }
+        //     return this._gameObject;
+        // }
 
         /**
          * @public
@@ -1144,13 +1243,13 @@ namespace gd3d.framework
          * 获取当前transform是否被释放掉了
          * @version egret-gd3d 1.0
          */
-        get beDispose():boolean
+        get beDispose(): boolean
         {
             return this._beDispose;
         }
-        private _beDispose:boolean = false;//是否被释放了
+        private _beDispose: boolean = false;//是否被释放了
 
-        public onDispose:()=>void;
+        public onDispose: () => void;
         /**
          * @public
          * @language zh_CN
@@ -1160,28 +1259,34 @@ namespace gd3d.framework
          */
         dispose()
         {
-            if(this._parent)    this._parent.removeChild(this);
-            this._dispose();            
+            if (this._parent) this._parent.removeChild(this);
+            this._dispose();
         }
 
-        private _dispose(){
-            if(this._beDispose)  return;
-            if (this._children)
+        private _dispose()
+        {
+            if (this._beDispose) return;
+            // if (this.children)
             {
-                for (var k in this._children)
-                {
-                    this._children[k]._dispose();
-                }
+                // for (var k in this.children)
+                // {
+                //     this.children[k]._dispose();
+                // }
                 //this.removeAllChild();
+                for (let i = 0, l = this.children.length; i < l; ++i)
+                    this.children[i]._dispose();
+                this.children = [];
             }
-            if(this._physicsImpostor){
+            if (this._physicsImpostor)
+            {
                 this._physicsImpostor.dispose();
             }
-            this._gameObject.dispose();
+            // this._gameObject.dispose();
+            this.gameObject.dispose();
 
             this._physicsImpostor = null;
             this._beDispose = true;
-            if(this.onDispose)
+            if (this.onDispose)
                 this.onDispose();
 
         }

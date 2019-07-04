@@ -475,7 +475,7 @@ namespace gd3d.framework
                     return;
                 }
             }
-            for (var i = 0; i < drawPasses.length; i++)
+            for (var i = 0,l=drawPasses.length; i <l ; i++)
             {
                 var pass = drawPasses[i];
                 pass.use(context.webgl);

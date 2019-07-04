@@ -2,9 +2,9 @@
 
 namespace gd3d.math
 {
-    export interface Ivec2{x:number,y:number};
-    export interface Ivec3{x:number,y:number,z:number};
-    export interface Iquat{x:number,y:number,z:number,w:number};
+    export interface Ivec2 { x: number, y: number };
+    export interface Ivec3 { x: number, y: number, z: number };
+    export interface Iquat { x: number, y: number, z: number, w: number };
 
     export type byte = number;
     export type ubyte = number;
@@ -95,36 +95,46 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class vector2 implements Ivec2
     {
-        static readonly ClassName:string="vector2";
-
-        public rawData = new Float32Array(2);
-        constructor(x: float = 0, y: float = 0)
+        static readonly ClassName: string = "vector2";
+        constructor(x: number = 0, y: number = 0)
         {
-            this.rawData[0] = x;
-            this.rawData[1] = y;
+            this.x = x;
+            this.y = y;
         }
         @gd3d.reflect.Field("number")
-        get x(): float
-        {
-            return this.rawData[0];
-        };
-        set x(x: float)
-        {
-            this.rawData[0] = x;
-        }
+        x: number;
         @gd3d.reflect.Field("number")
-        get y(): float
-        {
-            return this.rawData[1];
-        };
-        set y(y: float)
-        {
-            this.rawData[1] = y;
-        }
-        toString(): string
-        {
-            return `${this.x},${this.y}`;
-        }
+        y: number;
+        /*
+                public rawData = new Float32Array(2);
+                constructor(x: float = 0, y: float = 0)
+                {
+                    this.rawData[0] = x;
+                    this.rawData[1] = y;
+                }
+                @gd3d.reflect.Field("number")
+                get x(): float
+                {
+                    return this.rawData[0];
+                };
+                set x(x: float)
+                {
+                    this.rawData[0] = x;
+                }
+                @gd3d.reflect.Field("number")
+                get y(): float
+                {
+                    return this.rawData[1];
+                };
+                set y(y: float)
+                {
+                    this.rawData[1] = y;
+                }
+                toString(): string
+                {
+                    return `${this.x},${this.y}`;
+                }
+                */
     }
 
     /**
@@ -133,57 +143,65 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class rect
     {
-        static readonly ClassName:string="rect";
+        static readonly ClassName: string = "rect";
 
-        public rawData = new Float32Array(4);
+        // public rawData = new Float32Array(4);
         constructor(x: float = 0, y: float = 0, w: float = 0, h: float = 0)
         {
-            this.rawData[0] = x;
-            this.rawData[1] = y;
-            this.rawData[2] = w;
-            this.rawData[3] = h;
+            // this.rawData[0] = x;
+            // this.rawData[1] = y;
+            // this.rawData[2] = w;
+            // this.rawData[3] = h;
+            this.x = x;
+            this.y = y;
+            this.w = w;
+            this.h = h;
         }
         @gd3d.reflect.Field("number")
-        get x(): float
-        {
-            return this.rawData[0];
-        };
-        set x(x: float)
-        {
-            this.rawData[0] = x;
-        }
+        x: number;
+        // get x(): float
+        // {
+        //     return this.rawData[0];
+        // };
+        // set x(x: float)
+        // {
+        //     this.rawData[0] = x;
+        // }
         @gd3d.reflect.Field("number")
-        get y(): float
-        {
-            return this.rawData[1];
-        };
-        set y(y: float)
-        {
-            this.rawData[1] = y;
-        }
+        y: number;
+        // get y(): float
+        // {
+        //     return this.rawData[1];
+        // };
+        // set y(y: float)
+        // {
+        //     this.rawData[1] = y;
+        // }
         @gd3d.reflect.Field("number")
-        get w(): float
-        {
-            return this.rawData[2];
-        };
-        set w(w: float)
-        {
-            this.rawData[2] = w;
-        }
+        w: number;
+        // get w(): float
+        // {
+        //     return this.rawData[2];
+        // };
+        // set w(w: float)
+        // {
+        //     this.rawData[2] = w;
+        // }
 
         @gd3d.reflect.Field("number")
-        get h(): float
-        {
-            return this.rawData[3];
-        };
-        set h(h: float)
-        {
-            this.rawData[3] = h;
-        }
+        h: number;
+        // get h(): float
+        // {
+        //     return this.rawData[3];
+        // };
+        // set h(h: float)
+        // {
+        //     this.rawData[3] = h;
+        // }
 
         toString(): string
         {
-            return `${this.rawData[0]},${this.rawData[1]},${this.rawData[2]},${this.rawData[3]}`;
+            return `${this.x},${this.y},${this.w},${this.h}`;
         }
     }
 
@@ -193,52 +211,60 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class border
     {
-        static readonly ClassName:string="border";
+        static readonly ClassName: string = "border";
 
-        public rawData = new Float32Array(4);
+        // public rawData = new Float32Array(4);
         constructor(l: float = 0, t: float = 0, r: float = 0, b: float = 0)
         {
-            this.rawData[0] = l;
-            this.rawData[1] = t;
-            this.rawData[2] = r;
-            this.rawData[3] = b;
+            // this.rawData[0] = l;
+            // this.rawData[1] = t;
+            // this.rawData[2] = r;
+            // this.rawData[3] = b;
+            this.l = l;
+            this.t = t;
+            this.r = r;
+            this.b = b;
         }
         @gd3d.reflect.Field("number")
-        get l(): float
-        {
-            return this.rawData[0];
-        };
-        set l(l: float)
-        {
-            this.rawData[0] = l;
-        }
+        l: number;
+        // get l(): float
+        // {
+        //     return this.rawData[0];
+        // };
+        // set l(l: float)
+        // {
+        //     this.rawData[0] = l;
+        // }
         @gd3d.reflect.Field("number")
-        get t(): float
-        {
-            return this.rawData[1];
-        };
-        set t(t: float)
-        {
-            this.rawData[1] = t;
-        }
+        t: number;
+        // get t(): float
+        // {
+        //     return this.rawData[1];
+        // };
+        // set t(t: float)
+        // {
+        //     this.rawData[1] = t;
+        // }
         @gd3d.reflect.Field("number")
-        get r(): float
-        {
-            return this.rawData[2];
-        };
-        set r(r: float)
-        {
-            this.rawData[2] = r;
-        }
+        r: number;
+        // get r(): float
+        // {
+        //     return this.rawData[2];
+        // };
+        // set r(r: float)
+        // {
+        //     this.rawData[2] = r;
+        // }
         @gd3d.reflect.Field("number")
-        get b(): float
-        {
-            return this.rawData[3];
-        };
-        set b(b: float)
-        {
-            this.rawData[3] = b;
-        }
+        b: number;
+        // get b(): float
+        // {
+        //     return this.rawData[3];
+        // };
+        // set b(b: float)
+        // {
+        //     this.rawData[3] = b;
+        // }
 
         toString(): string
         {
@@ -252,52 +278,60 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class color
     {
-        static readonly ClassName:string="color";
+        static readonly ClassName: string = "color";
 
-        public rawData = new Float32Array(4);
+        // public rawData = new Float32Array(4);
         constructor(r: float = 1, g: float = 1, b: float = 1, a: float = 1)
         {
-            this.rawData[0] = r;
-            this.rawData[1] = g;
-            this.rawData[2] = b;
-            this.rawData[3] = a;
+            // this.rawData[0] = r;
+            // this.rawData[1] = g;
+            // this.rawData[2] = b;
+            // this.rawData[3] = a;
+            this.r = r;
+            this.g = g;
+            this.b = b;
+            this.a = a;
         }
         @gd3d.reflect.Field("number")
-        get r(): float
-        {
-            return this.rawData[0];
-        };
-        set r(r: float)
-        {
-            this.rawData[0] = r;
-        }
+        r: number;
+        // get r(): float
+        // {
+        //     return this.rawData[0];
+        // };
+        // set r(r: float)
+        // {
+        //     this.rawData[0] = r;
+        // }
         @gd3d.reflect.Field("number")
-        get g(): float
-        {
-            return this.rawData[1];
-        };
-        set g(g: float)
-        {
-            this.rawData[1] = g;
-        }
+        g: number;
+        // get g(): float
+        // {
+        //     return this.rawData[1];
+        // };
+        // set g(g: float)
+        // {
+        //     this.rawData[1] = g;
+        // }
         @gd3d.reflect.Field("number")
-        get b(): float
-        {
-            return this.rawData[2];
-        };
-        set b(b: float)
-        {
-            this.rawData[2] = b;
-        }
+        b: number;
+        // get b(): float
+        // {
+        //     return this.rawData[2];
+        // };
+        // set b(b: float)
+        // {
+        //     this.rawData[2] = b;
+        // }
         @gd3d.reflect.Field("number")
-        get a(): float
-        {
-            return this.rawData[3];
-        };
-        set a(a: float)
-        {
-            this.rawData[3] = a;
-        }
+        a: number;
+        // get a(): float
+        // {
+        //     return this.rawData[3];
+        // };
+        // set a(a: float)
+        // {
+        //     this.rawData[3] = a;
+        // }
         toString(): string
         {
             return `${this.r},${this.g},${this.b},${this.a}`;
@@ -310,46 +344,55 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class vector3 implements Ivec3
     {
-        static readonly ClassName:string="vector3";
-
-        public rawData = new Float32Array(3);
+        static readonly ClassName: string = "vector3";
         constructor(x: float = 0, y: float = 0, z: float = 0)
         {
-            this.rawData[0] = x;
-            this.rawData[1] = y;
-            this.rawData[2] = z;
+            this.x = x;
+            this.y = y;
+            this.z = z;
         }
+        // public rawData = new Float32Array(3);
+        // constructor(x: float = 0, y: float = 0, z: float = 0)
+        // {
+        // this.rawData[0] = x;
+        // this.rawData[1] = y;
+        // this.rawData[2] = z;
+        // }
         @gd3d.reflect.Field("number")
-        get x(): float
-        {
-            return this.rawData[0];
-        };
-        set x(x: float)
-        {
-            this.rawData[0] = x;
-        }
+        x: number;
+        // get x(): float
+        // {
+        //     return this.rawData[0];
+        // };
+        // set x(x: float)
+        // {
+        //     this.rawData[0] = x;
+        // }
         @gd3d.reflect.Field("number")
-        get y(): float
-        {
-            return this.rawData[1];
-        };
-        set y(y: float)
-        {
-            this.rawData[1] = y;
-        }
+        y: number;
+        // get y(): float
+        // {
+        //     return this.rawData[1];
+        // };
+        // set y(y: float)
+        // {
+        //     this.rawData[1] = y;
+        // }
         @gd3d.reflect.Field("number")
-        get z(): float
-        {
-            return this.rawData[2];
-        };
-        set z(z: float)
-        {
-            this.rawData[2] = z;
-        }
+        z: number;
+        // get z(): float
+        // {
+        //     return this.rawData[2];
+        // };
+        // set z(z: float)
+        // {
+        //     this.rawData[2] = z;
+        // }
 
         toString(): string
         {
-            return `${this.rawData[0]},${this.rawData[1]},${this.rawData[2]}`;
+            // return `${this.rawData[0]},${this.rawData[1]},${this.rawData[2]}`;
+            return `${this.x},${this.y},${this.z}`;
         }
     }
 
@@ -359,55 +402,63 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class vector4
     {
-        static readonly ClassName:string="vector4";
+        static readonly ClassName: string = "vector4";
 
-        public rawData = new Float32Array(4);
+        // public rawData = new Float32Array(4);
         constructor(x: float = 0, y: float = 0, z: float = 0, w: float = 0)
         {
-            this.rawData[0] = x;
-            this.rawData[1] = y;
-            this.rawData[2] = z;
-            this.rawData[3] = w;
+            // this.rawData[0] = x;
+            // this.rawData[1] = y;
+            // this.rawData[2] = z;
+            // this.rawData[3] = w;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.w = w;
         }
         @gd3d.reflect.Field("number")
-        get x(): float
-        {
-            return this.rawData[0];
-        };
-        set x(x: float)
-        {
-            this.rawData[0] = x;
-        }
+        x: number;
+        // get x(): float
+        // {
+        //     return this.rawData[0];
+        // };
+        // set x(x: float)
+        // {
+        //     this.rawData[0] = x;
+        // }
         @gd3d.reflect.Field("number")
-        get y(): float
-        {
-            return this.rawData[1];
-        };
-        set y(y: float)
-        {
-            this.rawData[1] = y;
-        }
+        y: number;
+        // get y(): float
+        // {
+        //     return this.rawData[1];
+        // };
+        // set y(y: float)
+        // {
+        //     this.rawData[1] = y;
+        // }
         @gd3d.reflect.Field("number")
-        get z(): float
-        {
-            return this.rawData[2];
-        };
-        set z(z: float)
-        {
-            this.rawData[2] = z;
-        }
+        z: number;
+        // get z(): float
+        // {
+        //     return this.rawData[2];
+        // };
+        // set z(z: float)
+        // {
+        //     this.rawData[2] = z;
+        // }
         @gd3d.reflect.Field("number")
-        get w(): float
-        {
-            return this.rawData[3];
-        };
-        set w(w: float)
-        {
-            this.rawData[3] = w;
-        }
+        w: number;
+        // get w(): float
+        // {
+        //     return this.rawData[3];
+        // };
+        // set w(w: float)
+        // {
+        //     this.rawData[3] = w;
+        // }
         toString(): string
         {
-            return `${this.rawData[0]},${this.rawData[1]},${this.rawData[2]},${this.rawData[3]}`;
+            return `${this.x},${this.y},${this.z},${this.w}`;
         }
     }
 
@@ -417,55 +468,64 @@ namespace gd3d.math
     @gd3d.reflect.SerializeType
     export class quaternion implements Iquat
     {
-        static readonly ClassName:string="quaternion";
+        static readonly ClassName: string = "quaternion";
 
-        public rawData = new Float32Array(4);
+        // public rawData = new Float32Array(4);
         constructor(x: float = 0, y: float = 0, z: float = 0, w: float = 1)
         {
-            this.rawData[0] = x;
-            this.rawData[1] = y;
-            this.rawData[2] = z;
-            this.rawData[3] = w;
+            // this.rawData[0] = x;
+            // this.rawData[1] = y;
+            // this.rawData[2] = z;
+            // this.rawData[3] = w;
+            this.x = x;
+            this.y = y;
+            this.z = z;
+            this.w = w;
         }
         @gd3d.reflect.Field("number")
-        get x(): float
-        {
-            return this.rawData[0];
-        };
-        set x(x: float)
-        {
-            this.rawData[0] = x;
-        }
+        x: number;
+        // get x(): float
+        // {
+        //     return this.rawData[0];
+        // };
+        // set x(x: float)
+        // {
+        //     this.rawData[0] = x;
+        // }
         @gd3d.reflect.Field("number")
-        get y(): float
-        {
-            return this.rawData[1];
-        };
-        set y(y: float)
-        {
-            this.rawData[1] = y;
-        }
+        y: number;
+        // get y(): float
+        // {
+        //     return this.rawData[1];
+        // };
+        // set y(y: float)
+        // {
+        //     this.rawData[1] = y;
+        // }
         @gd3d.reflect.Field("number")
-        get z(): float
-        {
-            return this.rawData[2];
-        };
-        set z(z: float)
-        {
-            this.rawData[2] = z;
-        }
+        z: number;
+        // get z(): float
+        // {
+        //     return this.rawData[2];
+        // };
+        // set z(z: float)
+        // {
+        //     this.rawData[2] = z;
+        // }
         @gd3d.reflect.Field("number")
-        get w(): float
-        {
-            return this.rawData[3];
-        };
-        set w(w: float)
-        {
-            this.rawData[3] = w;
-        }
+        w: number;
+        // get w(): float
+        // {
+        //     return this.rawData[3];
+        // };
+        // set w(w: float)
+        // {
+        //     this.rawData[3] = w;
+        // }
         toString(): string
         {
-            return `${this.rawData[0]},${this.rawData[1]},${this.rawData[2]},${this.rawData[3]}`;
+            // return `${this.rawData[0]},${this.rawData[1]},${this.rawData[2]},${this.rawData[3]}`;
+            return `${this.x},${this.y},${this.z},${this.w}`;
         }
     }
 
@@ -474,17 +534,24 @@ namespace gd3d.math
      */
     export class matrix
     {
-        static readonly ClassName:string="matrix";
+        static readonly ClassName: string = "matrix";
 
-        public rawData: Float32Array;
-        constructor(datas: Float32Array = null)
+        public rawData: Array<number>;
+        // public rawData: Float32Array;
+        constructor(datas: Array<number> = null)//: Float32Array = null)
         {
+            // if (datas)
+            // {
+            //     this.rawData = datas;
+            // }
+            // else
+            //     this.rawData = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
             if (datas)
             {
                 this.rawData = datas;
             }
             else
-                this.rawData = new Float32Array([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
+                this.rawData = [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1];
         }
         toString(): string
         {
@@ -499,15 +566,22 @@ namespace gd3d.math
      */
     export class matrix3x2
     {
-        public rawData: Float32Array;
-        constructor(datas: Float32Array = null)
+        // public rawData: Float32Array;
+        public rawData: Array<number>;
+        constructor(datas: Array<number> = null)//datas: Float32Array = null)
         {
+            // if (datas)
+            // {
+            //     this.rawData = datas;
+            // }
+            // else
+            //     this.rawData = new Float32Array([1, 0, 0, 1, 0, 0]);
             if (datas)
             {
                 this.rawData = datas;
             }
             else
-                this.rawData = new Float32Array([1, 0, 0, 1, 0, 0]);
+                this.rawData = [1, 0, 0, 1, 0, 0];
         }
         toString(): string
         {
