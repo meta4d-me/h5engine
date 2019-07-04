@@ -478,8 +478,10 @@ namespace gd3d.framework
                 state.isfinish = true;
                 onstate(state);
             };
-            for (let hitem of list)
+            // for (let hitem of list)
+            for(var i=0,l=list.length;i>l;++i)
             {
+                var hitem = list[i];
                 if (!hitem.handle)
                     continue;
 
