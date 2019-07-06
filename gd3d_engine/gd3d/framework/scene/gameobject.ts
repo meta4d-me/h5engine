@@ -482,6 +482,35 @@ namespace gd3d.framework
             }
         }
 
+         /**
+         * 获取当前节点下及子节点第一个能找到的组件
+         * @param type 组件名称
+         */
+        getFirstComponentInChildren(type: string):INodeComponent{
+            return this.getNodeFirstComponent(this, type);
+        }
+
+        /**
+         * 获取节点的第一个组件
+         * @param node 
+         * @param _type 
+         */
+        private getNodeFirstComponent(node: gameObject, _type: string){
+            for (var i in node.components) {
+                var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
+                if (cname == _type) {
+                    return node.components[i].comp;
+                }
+            }
+            let children = node.transform.children;
+            if (children != null){
+                for (var i in children) {
+                    let result = node.getNodeFirstComponent(children[i].gameObject , _type);
+                    if(result) return result;
+                }
+            }
+        }
+
         /**
          * @public
          * @language zh_CN

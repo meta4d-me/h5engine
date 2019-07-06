@@ -489,6 +489,8 @@ namespace gd3d.framework {
         bounds: { max: { x: number, y: number }, min: { x: number, y: number } };
         /** 成员 */
         parts: Ibody[];
+        /** 顶点集合 */
+        vertices:math.Ivec2[];
         /** 睡眠状态 */
         isSleeping: boolean;
         /** 传感器的标志 , 开启时触发碰撞事件*/
@@ -506,24 +508,39 @@ namespace gd3d.framework {
         type: string;
         tag: string;
         name: string;
+        /** 旋转角度 */
         angle: number;
+        /** 位移速度值 */
         speed: number;
+        /** 角速度值 */
         angularSpeed: number;
+        /** 空气摩擦力 */
         frictionAir: number;
+        /** 摩擦力 */
         friction: number;
+        /** 静态摩擦力 */
         frictionStatic: number;
+        /** 弹性值 */
         restitution: number;
+        /** 角速度向量 */
         angularVelocity: number;
+        /** 身份ID */
         id: number;
         motion: number;
+        /** 扭矩  */
         torque: number;
+        /** 睡眠阈值  */
         sleepThreshold: number;
+        /** 密度 */
         density: number;
+        /** 质量 */
         mass: number;
         inverseMass: number;
+        /** 惯性值 */
         inertia: number;
         inverseInertia: number;
         slop: number;
+        /** 时间缩放 */
         timeScale: number;
     }
 

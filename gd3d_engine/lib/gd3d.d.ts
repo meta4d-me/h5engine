@@ -629,6 +629,8 @@ declare namespace gd3d.framework {
         getComponents(): I2DComponent[];
         getComponentsInChildren(type: string): I2DComponent[];
         private getNodeCompoents;
+        getFirstComponentInChildren(type: string): I2DComponent;
+        private getNodeFirstComponent;
         ContainsCanvasPoint(ModelPos: math.vector2, tolerance?: number): boolean;
         private readonly optionArr;
         private _layoutState;
@@ -1243,6 +1245,7 @@ declare namespace gd3d.framework {
             };
         };
         parts: Ibody[];
+        vertices: math.Ivec2[];
         isSleeping: boolean;
         isSensor: boolean;
         isStatic: boolean;
@@ -5916,6 +5919,8 @@ declare namespace gd3d.framework {
         getComponents(): INodeComponent[];
         getComponentsInChildren(type: string): INodeComponent[];
         private _getComponentsInChildren;
+        getFirstComponentInChildren(type: string): INodeComponent;
+        private getNodeFirstComponent;
         getComponentInParent(type: string): INodeComponent;
         addComponent(type: string): INodeComponent;
         removeComponent(comp: INodeComponent): void;
