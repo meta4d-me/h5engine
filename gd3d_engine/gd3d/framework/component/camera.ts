@@ -221,8 +221,12 @@ namespace gd3d.framework
         {
 
         }
+
+        isEditorCam:boolean = false;
+
         start()
         {
+            this.isEditorCam = this.gameObject.transform.name.toLowerCase().indexOf("editor") >= 0
         }
 
         onPlay()
@@ -716,7 +720,7 @@ namespace gd3d.framework
         private static lastFID = -1;
         private needUpdateWpos = false;
 
-       
+
         private _fillRenderer(scene: scene, node: transform, _isStatic: boolean = false)
         {
             if (!node.gameObject.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false)) return;  //自己没有渲染组件 且 子物体也没有 return
@@ -730,8 +734,9 @@ namespace gd3d.framework
                 { // 更新世界坐标
                     node.getWorldTranslate();
                 }
-                // if (!isStatic)
-                this.cullingMap[id] = this.isCulling(node);
+                
+                this.cullingMap[id] =  this.isCulling(node);
+
                 if (this.isLastCamera)
                     node.dirtiedOfFrustumCulling = false;
             }
@@ -741,7 +746,7 @@ namespace gd3d.framework
                 if (scene.app.isFrustumCulling)
                 {
                     if (!this.cullingMap[id])
-                    {
+                    {                        
                         scene.renderList.addRenderer(node.gameObject.renderer);
                     }
                 } else
@@ -775,6 +780,7 @@ namespace gd3d.framework
         private _vec3cache = new gd3d.math.vector3();
         isCulling(node: transform)
         {
+
             if (node.gameObject.hideFlags & HideFlags.DontFrustumCulling) return false;
             const vec3cache = this._vec3cache;
             let { aabb } = node;

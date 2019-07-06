@@ -919,9 +919,9 @@ namespace gd3d.framework
          */
         getWorldTranslate()
         {
-            if (!this.firstCalc && this.gameObject.isStatic)
+            if (!this.firstCalc && this.gameObject.isStatic){             
                 return this.worldTranslate;
-
+            }
             if (!this._parent || !this._parent._parent)
             {
                 math.vec3Clone(this._localTranslate, this.worldTranslate);

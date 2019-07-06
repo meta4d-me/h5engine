@@ -450,7 +450,9 @@ namespace gd3d.framework
                     this.updateUserCode(delta);
                 }
             }
-            this.updateEditorCode(delta);
+            
+            if(this.updateEditorCode)
+                this.updateEditorCode(delta);
 
             if (this._scene != null)
             {
@@ -696,7 +698,7 @@ namespace gd3d.framework
         private _userCodeNew: IUserCode[] = [];
         private _editorCode: IUserCode[] = [];
         private _editorCodeNew: IUserCode[] = [];
-        private _bePlay: boolean = false;
+        // private _bePlay: boolean = false;
         /**
          * @private
          */
@@ -705,17 +707,18 @@ namespace gd3d.framework
         /**
          * 运行开关
          */
-        public get bePlay()
-        {
-            return this._bePlay;
-        }
-        /**
-         * @private
-         */
-        public set bePlay(value: boolean)
-        {
-            this._bePlay = value;
-        }
+        bePlay: boolean = false;
+        // public get bePlay()
+        // {
+        //     return this._bePlay;
+        // }
+        // /**
+        //  * @private
+        //  */
+        // public set bePlay(value: boolean)
+        // {
+        //     this._bePlay = value;
+        // }
         private _bePause: boolean = false;
         /**
          * @private

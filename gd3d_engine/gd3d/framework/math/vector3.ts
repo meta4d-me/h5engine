@@ -420,4 +420,21 @@ namespace gd3d.math
     //}
 
 
+    var tagMap :{[key:string]:{count:number,time:number}}= {};
+    var tagMap1 :{[key:string]:number}= {};
+    export function countStart(tag:string)
+    {
+        tagMap[tag] = {count:0, time:Date.now()};
+    }
+    export function count(tag:string)
+    {
+        ++tagMap[tag].count;
+    }
+    export function countEnd(tag:string)
+    {
+        if(tagMap1[tag] == undefined|| tagMap1[tag] != tagMap[tag].count){
+            tagMap1[tag] = tagMap[tag].count;
+            console.log(`tag:${tag},count:${tagMap[tag].count},time:${Date.now()- tagMap[tag].time}/ms`);
+        }
+    }
 }

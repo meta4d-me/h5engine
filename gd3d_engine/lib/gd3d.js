@@ -56,9 +56,9 @@ var gd3d;
                 this._userCodeNew = [];
                 this._editorCode = [];
                 this._editorCodeNew = [];
-                this._bePlay = false;
                 this.be2dstate = false;
                 this.curcameraindex = -1;
+                this.bePlay = false;
                 this._bePause = false;
                 this._beStepForward = false;
                 this._beRendering = true;
@@ -296,7 +296,8 @@ var gd3d;
                         this.updateUserCode(delta);
                     }
                 }
-                this.updateEditorCode(delta);
+                if (this.updateEditorCode)
+                    this.updateEditorCode(delta);
                 if (this._scene != null) {
                     this._scene.update(delta);
                 }
@@ -420,16 +421,6 @@ var gd3d;
             application.prototype.getInputMgr = function () {
                 return this._inputmgr;
             };
-            Object.defineProperty(application.prototype, "bePlay", {
-                get: function () {
-                    return this._bePlay;
-                },
-                set: function (value) {
-                    this._bePlay = value;
-                },
-                enumerable: true,
-                configurable: true
-            });
             Object.defineProperty(application.prototype, "bePause", {
                 get: function () {
                     return this._bePause;
@@ -7135,8 +7126,8 @@ var gd3d;
                     state.isfinish = true;
                     onstate(state);
                 };
-                for (var _i = 0, list_2 = list; _i < list_2.length; _i++) {
-                    var hitem = list_2[_i];
+                for (var i = 0, l = list.length; i < l; ++i) {
+                    var hitem = list[i];
                     if (!hitem.handle)
                         continue;
                     if (hitem.type == framework.AssetTypeEnum.Scene || hitem.type == framework.AssetTypeEnum.Prefab || hitem.type == framework.AssetTypeEnum.F14Effect) {
@@ -10716,8 +10707,9 @@ var gd3d;
                 }
             };
             transform.prototype.getWorldTranslate = function () {
-                if (!this.firstCalc && this.gameObject.isStatic)
+                if (!this.firstCalc && this.gameObject.isStatic) {
                     return this.worldTranslate;
+                }
                 if (!this._parent || !this._parent._parent) {
                     gd3d.math.vec3Clone(this._localTranslate, this.worldTranslate);
                 }
@@ -14640,6 +14632,7 @@ var gd3d;
                 this._far = 1000;
                 this.CullingMask = framework.CullingMask.everything ^ framework.CullingMask.editor;
                 this._contextIdx = -1;
+                this.isEditorCam = false;
                 this.clearOption_Color = true;
                 this.clearOption_Depth = true;
                 this.backgroundColor = new gd3d.math.color(0.5, 0.8, 1, 1);
@@ -14716,6 +14709,7 @@ var gd3d;
             camera.prototype.markDirty = function () {
             };
             camera.prototype.start = function () {
+                this.isEditorCam = this.gameObject.transform.name.toLowerCase().indexOf("editor") >= 0;
             };
             camera.prototype.onPlay = function () {
             };
@@ -24308,6 +24302,23 @@ var gd3d;
             }
         }
         math.vec3Perpendicular = vec3Perpendicular;
+        var tagMap = {};
+        var tagMap1 = {};
+        function countStart(tag) {
+            tagMap[tag] = { count: 0, time: Date.now() };
+        }
+        math.countStart = countStart;
+        function count(tag) {
+            ++tagMap[tag].count;
+        }
+        math.count = count;
+        function countEnd(tag) {
+            if (tagMap1[tag] == undefined || tagMap1[tag] != tagMap[tag].count) {
+                tagMap1[tag] = tagMap[tag].count;
+                console.log("tag:" + tag + ",count:" + tagMap[tag].count + ",time:" + (Date.now() - tagMap[tag].time) + "/ms");
+            }
+        }
+        math.countEnd = countEnd;
     })(math = gd3d.math || (gd3d.math = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -31910,9 +31921,9 @@ var gd3d;
                 this.renderLayers.push(overlay);
             }
             renderList.prototype.clear = function () {
-                for (var i = 0; i < this.renderLayers.length; i++) {
-                    this.renderLayers[i].list.length = 0;
-                }
+                this.renderLayers[0].list.length =
+                    this.renderLayers[1].list.length =
+                        this.renderLayers[2].list.length = 0;
             };
             renderList.prototype.addRenderer = function (renderer) {
                 if (renderer.layer == RenderLayerEnum.Common) {
@@ -32013,12 +32024,13 @@ var gd3d;
                     });
                 }
                 this.RealCameraNumber = 0;
-                for (var i = 0; i < this.renderCameras.length; i++) {
+                var len = this.renderCameras.length;
+                for (var i = 0; i < len; i++) {
                     gd3d.render.glDrawPass.resetLastState();
-                    if (i == this.renderCameras.length - 1) {
+                    if (i == len - 1) {
                         this.renderCameras[i].isLastCamera = true;
                     }
-                    if (this.app && this.app.beRendering) {
+                    if (this.app.beRendering) {
                         this._renderCamera(i);
                     }
                     this.renderCameras[i].isLastCamera = false;
@@ -32036,7 +32048,6 @@ var gd3d;
                 }
             };
             scene.prototype.updateSceneOverLay = function (delta) {
-                var _this = this;
                 if (!this._overlay2d || this._overlay2d.length < 1)
                     return;
                 var targetcamera = this.mainCamera;
@@ -32046,7 +32057,7 @@ var gd3d;
                 if (mainCamIdx == -1) {
                     var cname = targetcamera.gameObject.getName();
                     var oktag = false;
-                    for (var i = 0; i < this.renderCameras.length; i++) {
+                    for (var i = 0, l = this.renderCameras.length; i < l; i++) {
                         var cam = this.renderCameras[i];
                         if (cam && cam.gameObject.getName() == cname) {
                             targetcamera = this.mainCamera = cam;
@@ -32063,21 +32074,22 @@ var gd3d;
                 if (!targetcamera)
                     return;
                 if (this._overlay2d) {
-                    this._overlay2d.forEach(function (overlay) {
+                    for (var i = 0, l = this._overlay2d.length;; ++i) {
+                        var overlay = this._overlay2d[i];
                         if (overlay) {
                             overlay.start(targetcamera);
                             overlay.update(delta);
-                            if (_this.app && _this.app.beRendering) {
-                                overlay.render(_this.renderContext[mainCamIdx], _this.assetmgr, targetcamera);
+                            if (this.app && this.app.beRendering) {
+                                overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
                             }
                         }
-                    });
+                    }
                 }
             };
             scene.prototype._renderCamera = function (camindex) {
                 var cam = this.renderCameras[camindex];
                 var context = this.renderContext[camindex];
-                if (this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") < 0) {
+                if ((this.app.bePlay && !cam.isEditorCam) || (!this.app.bePlay && cam.isEditorCam)) {
                     context.updateCamera(this.app, cam);
                     context.updateLights(this.renderLights);
                     cam.fillRenderer(this);
@@ -32087,21 +32099,6 @@ var gd3d;
                     for (var i = 0; i < overLays.length; i++) {
                         if (cam.CullingMask & framework.CullingMask.ui) {
                             overLays[i].render(context, this.assetmgr, cam);
-                        }
-                    }
-                }
-                else if (!this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") >= 0) {
-                    context.updateCamera(this.app, cam);
-                    context.updateLights(this.renderLights);
-                    cam.fillRenderer(this);
-                    cam.renderScene(this, context);
-                    this.RealCameraNumber++;
-                    if (this.app.be2dstate) {
-                        var overLays = cam.getOverLays();
-                        for (var i = 0; i < overLays.length; i++) {
-                            if (cam.CullingMask & framework.CullingMask.ui) {
-                                overLays[i].render(context, this.assetmgr, cam);
-                            }
                         }
                     }
                 }
@@ -32166,7 +32163,8 @@ var gd3d;
                 if (c != null && c.gameObject.visibleInScene) {
                     this.renderCameras.push(c);
                 }
-                while (this.renderContext.length < this.renderCameras.length) {
+                var cl = this.renderCameras.length;
+                while (this.renderContext.length < cl) {
                     this.renderContext.push(new framework.renderContext(this.webgl));
                 }
                 var l = node.gameObject.light;

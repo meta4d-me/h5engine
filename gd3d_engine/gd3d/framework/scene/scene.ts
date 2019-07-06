@@ -202,14 +202,15 @@ namespace gd3d.framework
 
 
             this.RealCameraNumber = 0;
-            for (var i = 0; i < this.renderCameras.length; i++)
+            var len = this.renderCameras.length;
+            for (var i = 0; i < len; i++)
             {
                 render.glDrawPass.resetLastState();
-                if (i == this.renderCameras.length - 1)
+                if (i == len - 1)
                 {
                     this.renderCameras[i].isLastCamera = true;
                 }
-                if (this.app && this.app.beRendering)
+                if (this.app.beRendering)
                 {
                     this._renderCamera(i);
                 }
@@ -245,7 +246,7 @@ namespace gd3d.framework
             {
                 let cname = targetcamera.gameObject.getName();
                 let oktag = false;
-                for (var i = 0; i < this.renderCameras.length; i++)
+                for (var i = 0, l = this.renderCameras.length; i < l; i++)
                 {
                     let cam = this.renderCameras[i];
                     if (cam && cam.gameObject.getName() == cname)
@@ -265,8 +266,9 @@ namespace gd3d.framework
             if (!targetcamera) return;
             if (this._overlay2d)
             {
-                this._overlay2d.forEach(overlay =>
+                for (var i = 0, l = this._overlay2d.length; ; ++i)
                 {
+                    var overlay = this._overlay2d[i];
                     if (overlay)
                     {
                         overlay.start(targetcamera);
@@ -276,7 +278,19 @@ namespace gd3d.framework
                             overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
                         }
                     }
-                });
+                }
+                // this._overlay2d.forEach(overlay =>
+                // {
+                //     if (overlay)
+                //     {
+                //         overlay.start(targetcamera);
+                //         overlay.update(delta);
+                //         if (this.app && this.app.beRendering)
+                //         {
+                //             overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
+                //         }
+                //     }
+                // });
             }
 
             //test----
@@ -305,7 +319,9 @@ namespace gd3d.framework
             var cam = this.renderCameras[camindex];
             var context = this.renderContext[camindex];
             //sceneMgr.camera=cam;
-            if (this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") < 0)
+            /*
+            // if (this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") < 0)
+            if(this.app.bePlay && !cam.isEditorCam)
             {
                 context.updateCamera(this.app, cam);
                 context.updateLights(this.renderLights);
@@ -323,7 +339,8 @@ namespace gd3d.framework
                     }
                 }
             }
-            else if (!this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") >= 0)
+            else if (!this.app.bePlay && cam.isEditorCam)
+            // else if (!this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") >= 0)
             {
                 context.updateCamera(this.app, cam);
                 context.updateLights(this.renderLights);
@@ -340,6 +357,25 @@ namespace gd3d.framework
                         {
                             overLays[i].render(context, this.assetmgr, cam);
                         }
+                    }
+                }
+            }
+*/
+            if ((this.app.bePlay && !cam.isEditorCam) || (!this.app.bePlay && cam.isEditorCam))
+            {
+                context.updateCamera(this.app, cam);
+                context.updateLights(this.renderLights);
+                cam.fillRenderer(this);
+                cam.renderScene(this, context);
+                this.RealCameraNumber++;
+
+                // //还有overlay
+                let overLays: IOverLay[] = cam.getOverLays();
+                for (var i = 0; i < overLays.length; i++)
+                {
+                    if (cam.CullingMask & CullingMask.ui)
+                    {
+                        overLays[i].render(context, this.assetmgr, cam);
                     }
                 }
             }
@@ -387,7 +423,7 @@ namespace gd3d.framework
             {
                 node.gameObject.renderer.update(delta);//update 了啥
             }
-            
+
             if (node.gameObject.camera)
             {
                 node.gameObject.camera.update(delta);//update 了啥
@@ -406,20 +442,20 @@ namespace gd3d.framework
 
         private objupdate(node: transform, delta)
         {
-            var queue=[];
-            while(node)
+            var queue = [];
+            while (node)
             {
                 if (!(node.hasComponent == false && node.hasComponentChild == false))
                 {
                     node.gameObject.init(this.app.bePlay);//组件还未初始化的初始化
                     if (node.gameObject.haveComponet)
-                    {   
+                    {
                         node.gameObject.update(delta);
                         this.collectCameraAndLight(node);
                     }
                 }
 
-                for(var i=0,l = node.children.length;i<l;++i)
+                for (var i = 0, l = node.children.length; i < l; ++i)
                     queue.push(node.children[i]);
                 node = queue.shift();
             }
@@ -457,7 +493,8 @@ namespace gd3d.framework
             {
                 this.renderCameras.push(c);
             }
-            while (this.renderContext.length < this.renderCameras.length)
+            var cl = this.renderCameras.length;
+            while (this.renderContext.length < cl)
             {
                 this.renderContext.push(new renderContext(this.webgl));
             }

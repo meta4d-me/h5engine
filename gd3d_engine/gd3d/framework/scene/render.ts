@@ -240,10 +240,13 @@ namespace gd3d.framework
         }
         clear()
         {
-            for (var i = 0; i < this.renderLayers.length; i++)
-            {
-                this.renderLayers[i].list.length = 0;
-            }
+            // for (var i = 0; i < this.renderLayers.length; i++)
+            // {
+            //     this.renderLayers[i].list.length = 0;
+            // }
+            this.renderLayers[0].list.length = 
+            this.renderLayers[1].list.length =
+            this.renderLayers[2].list.length =0;
         }
         addRenderer(renderer: IRenderer)
         {

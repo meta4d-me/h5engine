@@ -89,7 +89,6 @@ declare namespace gd3d.framework {
         private _userCodeNew;
         private _editorCode;
         private _editorCodeNew;
-        private _bePlay;
         be2dstate: boolean;
         curcameraindex: number;
         bePlay: boolean;
@@ -2693,6 +2692,7 @@ declare namespace gd3d.framework {
         readonly CurrContextIndex: number;
         private _contextIdx;
         markDirty(): void;
+        isEditorCam: boolean;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
@@ -4370,6 +4370,9 @@ declare namespace gd3d.math {
     function vec3SetAll(vector: vector3, value: number): void;
     function vec3Set(vector: vector3, x: number, y: number, z: number): void;
     function vec3Perpendicular(vector: vector3, out: vector3): void;
+    function countStart(tag: string): void;
+    function count(tag: string): void;
+    function countEnd(tag: string): void;
 }
 declare namespace gd3d.math {
     function vec4Clone(from: vector4, to: vector4): void;

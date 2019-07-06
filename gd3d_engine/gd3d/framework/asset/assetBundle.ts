@@ -479,7 +479,7 @@ namespace gd3d.framework
                 onstate(state);
             };
             // for (let hitem of list)
-            for(var i=0,l=list.length;i>l;++i)
+            for(var i=0,l=list.length;i<l;++i)
             {
                 var hitem = list[i];
                 if (!hitem.handle)
