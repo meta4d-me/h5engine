@@ -266,7 +266,7 @@ namespace gd3d.framework
             if (!targetcamera) return;
             if (this._overlay2d)
             {
-                for (var i = 0, l = this._overlay2d.length; ; ++i)
+                for (var i = 0, l = this._overlay2d.length;i<l ; ++i)
                 {
                     var overlay = this._overlay2d[i];
                     if (overlay)
