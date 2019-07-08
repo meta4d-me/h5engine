@@ -21,12 +21,23 @@ namespace gd3d.framework {
         /** 默认值 : {bucketWidth: 48, bucketHeight: 48} */
         broadphase? : {bucketWidth:number,bucketHeight:number};  
     }
+    export interface IWorld{
+        gravity:{
+            x: number,
+            y: number,
+            scale: number
+        }
+        bounds:{
+            min:math.Ivec2,
+            max:math.Ivec2
+        }
+    }
     declare var Matter: any;
     export class physicEngine2D {
         private _Matter: any;
         get Matter() { return this._Matter };
         matterEngine: any;
-        private engineWorld: any;
+        public engineWorld: IWorld;
         private matterVector: math.Ivec2;
         private eventer: event.Physic2dEvent = new event.Physic2dEvent();
         public constructor(op: IEngine2DOP = null) {

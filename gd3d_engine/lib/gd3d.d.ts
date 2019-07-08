@@ -1184,11 +1184,22 @@ declare namespace gd3d.framework {
             bucketHeight: number;
         };
     }
+    interface IWorld {
+        gravity: {
+            x: number;
+            y: number;
+            scale: number;
+        };
+        bounds: {
+            min: math.Ivec2;
+            max: math.Ivec2;
+        };
+    }
     class physicEngine2D {
         private _Matter;
         readonly Matter: any;
         matterEngine: any;
-        private engineWorld;
+        engineWorld: IWorld;
         private matterVector;
         private eventer;
         constructor(op?: IEngine2DOP);
