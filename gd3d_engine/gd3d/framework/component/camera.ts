@@ -734,8 +734,8 @@ namespace gd3d.framework
                 { // 更新世界坐标
                     node.getWorldTranslate();
                 }
-                
-                this.cullingMap[id] =  this.isCulling(node);
+
+                this.cullingMap[id] = node.enableCulling && this.isCulling(node);
 
                 if (this.isLastCamera)
                     node.dirtiedOfFrustumCulling = false;
@@ -746,7 +746,7 @@ namespace gd3d.framework
                 if (scene.app.isFrustumCulling)
                 {
                     if (!this.cullingMap[id])
-                    {                        
+                    {
                         scene.renderList.addRenderer(node.gameObject.renderer);
                     }
                 } else
@@ -1035,7 +1035,7 @@ namespace gd3d.framework
                                 let bz = camera.helpv3_1;
 
                                 // gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
-                                // gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);                                
+                                // gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
                                 // gd3d.math.matrixTransformVector3(a.gameObject.transform['worldTranslate'], matrixView, az);
                                 // gd3d.math.matrixTransformVector3(b.gameObject.transform['worldTranslate'], matrixView, bz);
                                 gd3d.math.matrixTransformVector3(a.gameObject.transform.worldTranslate, matrixView, az);

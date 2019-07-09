@@ -10339,6 +10339,7 @@ var gd3d;
                 this._dirtyAABB = true;
                 this.children = [];
                 this.dirtiedOfFrustumCulling = false;
+                this.enableCulling = true;
                 this.dirtyLocal = false;
                 this.dirtyWorld = false;
                 this.hasComponent = false;
@@ -14971,7 +14972,7 @@ var gd3d;
                     if (this.needUpdateWpos) {
                         node.getWorldTranslate();
                     }
-                    this.cullingMap[id] = this.isCulling(node);
+                    this.cullingMap[id] = node.enableCulling && this.isCulling(node);
                     if (this.isLastCamera)
                         node.dirtiedOfFrustumCulling = false;
                 }
@@ -32112,7 +32113,7 @@ var gd3d;
                 if (!targetcamera)
                     return;
                 if (this._overlay2d) {
-                    for (var i = 0, l = this._overlay2d.length;; ++i) {
+                    for (var i = 0, l = this._overlay2d.length; i < l; ++i) {
                         var overlay = this._overlay2d[i];
                         if (overlay) {
                             overlay.start(targetcamera);

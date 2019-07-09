@@ -1934,6 +1934,7 @@ declare namespace gd3d.framework {
         private _parent;
         readonly parent: transform;
         dirtiedOfFrustumCulling: boolean;
+        enableCulling: boolean;
         addChild(node: transform): void;
         addChildAt(node: transform, index: number): void;
         removeAllChild(needDispose?: boolean): void;
@@ -2250,7 +2251,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess;
         private readFinish;
-        Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): threading.gdPromise<{}>;
+        Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): threading.gdPromise<unknown>;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
         private _cacheMinP;
