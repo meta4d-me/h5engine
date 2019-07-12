@@ -14977,13 +14977,11 @@ var gd3d;
                         node.dirtiedOfFrustumCulling = false;
                 }
                 if (node.gameObject != null && node.gameObject.renderer != null) {
-                    if (scene.app.isFrustumCulling) {
-                        if (!this.cullingMap[id]) {
-                            scene.renderList.addRenderer(node.gameObject.renderer);
+                    if (scene.app.isFrustumCulling && !this.cullingMap[id]) {
+                        var _renderer = node.gameObject.renderer;
+                        if (this.CullingMask & (1 << _renderer.renderLayer)) {
+                            scene.renderList.addRenderer(_renderer);
                         }
-                    }
-                    else {
-                        scene.renderList.addRenderer(node.gameObject.renderer);
                     }
                 }
                 if (node.children) {
@@ -15103,10 +15101,7 @@ var gd3d;
                     var ls = rlayers[i].list;
                     for (var j = 0, jl = ls.length; j < jl; ++j) {
                         var item = ls[j];
-                        if (item.gameObject.visible == true && this.CullingMask & (1 << item.renderLayer)) {
-                            if (item.gameObject && item.gameObject.visible == true)
-                                item.render(context, assetmgr, this);
-                        }
+                        item.render(context, assetmgr, this);
                     }
                 }
             };
