@@ -96,6 +96,7 @@ namespace gd3d.framework {
         @gd3d.reflect.Field("I2DComponent")
         comp: I2DComponent;
         init: boolean;
+        OnPlayed : boolean = false;
         constructor(comp: I2DComponent, init: boolean = false) {
             this.comp = comp;
             this.init = init;
@@ -888,26 +889,32 @@ namespace gd3d.framework {
          * 组件的初始化
          * @version egret-gd3d 1.0
          */
-        init(bePlayed = false) {
+        init(bePlay = false) {
             if(this.componentsInit.length>0)
             {
-                for(var i=0;i<this.componentsInit.length;i++)
+                let len = this.componentsInit.length;
+                for(var i=0; i< len ; i++)
                 {
-                    this.componentsInit[i].comp.start();
-                    this.componentsInit[i].init = true;
-                    if(bePlayed)
-                        this.componentsInit[i].comp.onPlay();
-                    else
-                        this.componentplayed.push(this.componentsInit[i]);
+                    let c = this.componentsInit[i];
+                    c.comp.start();
+                    c.init = true;
+                    if(bePlay){
+                        if((StringUtil.ENABLED in c.comp) && !c.comp[StringUtil.ENABLED]) continue;  //组件enable影响
+                        c.comp.onPlay();
+                        c.OnPlayed = true;
+                    }
+                    //     c.comp.onPlay();
+                    // else
+                    //     this.componentplayed.push(c);
                 }
                 this.componentsInit.length=0;
             }
-            if(this.componentplayed.length > 0 && bePlayed){
-                this.componentplayed.forEach(item=>{
-                    item.comp.onPlay();
-                });
-                this.componentplayed.length = 0;
-            }
+            // if(this.componentplayed.length > 0 && bePlay){
+            //     this.componentplayed.forEach(item=>{
+            //         item.comp.onPlay();
+            //     });
+            //     this.componentplayed.length = 0;
+            // }
         }
 
         /**

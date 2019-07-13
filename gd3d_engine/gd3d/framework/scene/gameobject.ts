@@ -78,6 +78,11 @@ namespace gd3d.framework
          */
         init: boolean;
 
+        /**
+         * onPlay是否调用过了
+         */
+        OnPlayed : boolean = false;
+
         constructor(comp: INodeComponent, init: boolean = false)
         {
             this.comp = comp;
@@ -279,26 +284,31 @@ namespace gd3d.framework
         {
             if (this.componentsInit.length > 0)
             {
-                for (var i = 0; i < this.componentsInit.length; i++)
+                let len = this.componentsInit.length;
+                for (var i = 0; i < len; i++)
                 {
-                    this.componentsInit[i].comp.start();
-                    this.componentsInit[i].init = true;
-                    if (bePlay)
-                        this.componentsInit[i].comp.onPlay();
-                    else
-                        this.componentsPlayed.push(this.componentsInit[i]);
+                    let c = this.componentsInit[i];
+                    c.comp.start();
+                    c.init = true;
+                    if (bePlay){
+                        if((StringUtil.ENABLED in c.comp) && !c.comp[StringUtil.ENABLED]) continue;  //组件enable影响
+                        c.comp.onPlay();
+                        c.OnPlayed = true;
+                    }
+                    // else
+                    //     this.componentsPlayed.push(this.componentsInit[i]);
                 }
                 this.componentsInit.length = 0;
             }
 
-            if (this.componentsPlayed.length > 0 && bePlay)
-            {
-                this.componentsPlayed.forEach(item =>
-                {
-                    item.comp.onPlay();
-                });
-                this.componentsPlayed.length = 0;
-            }
+            // if (this.componentsPlayed.length > 0 && bePlay)
+            // {
+            //     this.componentsPlayed.forEach(item =>
+            //     {
+            //         item.comp.onPlay();
+            //     });
+            //     this.componentsPlayed.length = 0;
+            // }
         }
 
         /**
@@ -314,8 +324,14 @@ namespace gd3d.framework
             let len = this.components.length;
             for (var i = 0; i < len; i++)
             {
-                if (!this.components[i]) continue;
-                this.components[i].comp.update(delta);
+                let c = this.components[i];
+                if (!c ) continue;
+                if(StringUtil.ENABLED in c.comp && !c.comp[StringUtil.ENABLED]) continue;
+                if(!c.OnPlayed){
+                    c.comp.onPlay();
+                    c.OnPlayed = true;
+                }
+                c.comp.update(delta);
             }
         }
         /**

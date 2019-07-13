@@ -1830,7 +1830,16 @@ var gd3d;
                     for (var i = 0; i < compLen; i++) {
                         if (!node.components[i])
                             continue;
-                        var comp = node.components[i].comp;
+                        var c = node.components[i];
+                        if (!c)
+                            continue;
+                        var comp = c.comp;
+                        if (framework.StringUtil.ENABLED in c.comp && !c.comp[framework.StringUtil.ENABLED])
+                            continue;
+                        if (!c.OnPlayed) {
+                            c.comp.onPlay();
+                            c.OnPlayed = true;
+                        }
                         comp.update(delta);
                         if (framework.instanceOfI2DPointListener(comp)) {
                             this._peCareListBuoy++;
@@ -2518,6 +2527,7 @@ var gd3d;
         var C2DComponent = (function () {
             function C2DComponent(comp, init) {
                 if (init === void 0) { init = false; }
+                this.OnPlayed = false;
                 this.comp = comp;
                 this.init = init;
             }
@@ -2936,24 +2946,22 @@ var gd3d;
                 if (this.onDispose)
                     this.onDispose();
             };
-            transform2D.prototype.init = function (bePlayed) {
-                if (bePlayed === void 0) { bePlayed = false; }
+            transform2D.prototype.init = function (bePlay) {
+                if (bePlay === void 0) { bePlay = false; }
                 if (this.componentsInit.length > 0) {
-                    for (var i = 0; i < this.componentsInit.length; i++) {
-                        this.componentsInit[i].comp.start();
-                        this.componentsInit[i].init = true;
-                        if (bePlayed)
-                            this.componentsInit[i].comp.onPlay();
-                        else
-                            this.componentplayed.push(this.componentsInit[i]);
+                    var len = this.componentsInit.length;
+                    for (var i = 0; i < len; i++) {
+                        var c = this.componentsInit[i];
+                        c.comp.start();
+                        c.init = true;
+                        if (bePlay) {
+                            if ((framework.StringUtil.ENABLED in c.comp) && !c.comp[framework.StringUtil.ENABLED])
+                                continue;
+                            c.comp.onPlay();
+                            c.OnPlayed = true;
+                        }
                     }
                     this.componentsInit.length = 0;
-                }
-                if (this.componentplayed.length > 0 && bePlayed) {
-                    this.componentplayed.forEach(function (item) {
-                        item.comp.onPlay();
-                    });
-                    this.componentplayed.length = 0;
                 }
             };
             transform2D.prototype.addComponent = function (type) {
@@ -3361,6 +3369,7 @@ var gd3d;
     (function (framework) {
         var behaviour2d = (function () {
             function behaviour2d() {
+                this.enabled = true;
             }
             behaviour2d.prototype.start = function () {
             };
@@ -14375,6 +14384,7 @@ var gd3d;
     (function (framework) {
         var behaviour = (function () {
             function behaviour() {
+                this.enabled = true;
             }
             behaviour.prototype.start = function () {
             };
@@ -31495,6 +31505,7 @@ var gd3d;
         var nodeComponent = (function () {
             function nodeComponent(comp, init) {
                 if (init === void 0) { init = false; }
+                this.OnPlayed = false;
                 this.comp = comp;
                 this.init = init;
             }
@@ -31556,29 +31567,34 @@ var gd3d;
             gameObject.prototype.init = function (bePlay) {
                 if (bePlay === void 0) { bePlay = false; }
                 if (this.componentsInit.length > 0) {
-                    for (var i = 0; i < this.componentsInit.length; i++) {
-                        this.componentsInit[i].comp.start();
-                        this.componentsInit[i].init = true;
-                        if (bePlay)
-                            this.componentsInit[i].comp.onPlay();
-                        else
-                            this.componentsPlayed.push(this.componentsInit[i]);
+                    var len = this.componentsInit.length;
+                    for (var i = 0; i < len; i++) {
+                        var c = this.componentsInit[i];
+                        c.comp.start();
+                        c.init = true;
+                        if (bePlay) {
+                            if ((framework.StringUtil.ENABLED in c.comp) && !c.comp[framework.StringUtil.ENABLED])
+                                continue;
+                            c.comp.onPlay();
+                            c.OnPlayed = true;
+                        }
                     }
                     this.componentsInit.length = 0;
-                }
-                if (this.componentsPlayed.length > 0 && bePlay) {
-                    this.componentsPlayed.forEach(function (item) {
-                        item.comp.onPlay();
-                    });
-                    this.componentsPlayed.length = 0;
                 }
             };
             gameObject.prototype.update = function (delta) {
                 var len = this.components.length;
                 for (var i = 0; i < len; i++) {
-                    if (!this.components[i])
+                    var c = this.components[i];
+                    if (!c)
                         continue;
-                    this.components[i].comp.update(delta);
+                    if (framework.StringUtil.ENABLED in c.comp && !c.comp[framework.StringUtil.ENABLED])
+                        continue;
+                    if (!c.OnPlayed) {
+                        c.comp.onPlay();
+                        c.OnPlayed = true;
+                    }
+                    c.comp.update(delta);
                 }
             };
             gameObject.prototype.addComponentDirect = function (comp) {
@@ -34153,6 +34169,7 @@ var gd3d;
                 }
                 return true;
             };
+            StringUtil.ENABLED = "enabled";
             StringUtil.builtinTag_Untagged = "Untagged";
             StringUtil.builtinTag_Player = "Player";
             StringUtil.builtinTag_EditorOnly = "EditorOnly";

@@ -471,8 +471,16 @@ namespace gd3d.framework
                 for (let i = 0; i < compLen; i++)
                 {
                     if (!node.components[i]) continue;  //能在有对象在update环节dispose
-                    var comp = node.components[i].comp;
+                    var c =node.components[i];
+                    if (!c ) continue;
+                    var comp = c.comp;
+                    if(StringUtil.ENABLED in c.comp && !c.comp[StringUtil.ENABLED]) continue;
+                    if(!c.OnPlayed){
+                        c.comp.onPlay();
+                        c.OnPlayed = true;
+                    }
                     comp.update(delta);
+                    
                     if (instanceOfI2DPointListener(comp))
                     {  //判断是否为
                         this._peCareListBuoy++;

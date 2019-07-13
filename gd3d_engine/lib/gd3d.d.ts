@@ -166,6 +166,11 @@ declare namespace gd3d.framework {
         closeDrawCallInfo(): void;
     }
 }
+declare namespace gd3d {
+    interface IEnabled {
+        enabled: boolean;
+    }
+}
 declare namespace gd3d.framework {
     class sceneMgr {
         private static _ins;
@@ -545,6 +550,7 @@ declare namespace gd3d.framework {
         static readonly ClassName: string;
         comp: I2DComponent;
         init: boolean;
+        OnPlayed: boolean;
         constructor(comp: I2DComponent, init?: boolean);
     }
     class transform2D {
@@ -619,7 +625,7 @@ declare namespace gd3d.framework {
         components: C2DComponent[];
         private componentsInit;
         private componentplayed;
-        init(bePlayed?: boolean): void;
+        init(bePlay?: boolean): void;
         addComponent(type: string): I2DComponent;
         addComponentDirect(comp: I2DComponent): I2DComponent;
         removeComponent(comp: I2DComponent): void;
@@ -663,7 +669,8 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class behaviour2d implements I2DComponent {
+    class behaviour2d implements I2DComponent, IEnabled {
+        enabled: boolean;
         transform: transform2D;
         start(): void;
         onPlay(): void;
@@ -2618,7 +2625,8 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class behaviour implements INodeComponent {
+    class behaviour implements INodeComponent, IEnabled {
+        enabled: boolean;
         gameObject: gameObject;
         start(): void;
         onPlay(): void;
@@ -5902,6 +5910,7 @@ declare namespace gd3d.framework {
         static readonly ClassName: string;
         comp: INodeComponent;
         init: boolean;
+        OnPlayed: boolean;
         constructor(comp: INodeComponent, init?: boolean);
     }
     class gameObject {
@@ -6416,28 +6425,29 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class StringUtil {
-        static builtinTag_Untagged: string;
-        static builtinTag_Player: string;
-        static builtinTag_EditorOnly: string;
-        static builtinTag_MainCamera: string;
-        static COMPONENT_CAMERA: string;
-        static COMPONENT_BOXCOLLIDER: string;
-        static COMPONENT_LIGHT: string;
-        static COMPONENT_MESHFILTER: string;
-        static COMPONENT_MESHRENDER: string;
-        static COMPONENT_EFFECTSYSTEM: string;
-        static COMPONENT_LABEL: string;
-        static COMPONENT_uirect: string;
-        static COMPONENT_IMAGE: string;
-        static COMPONENT_RAWIMAGE: string;
-        static COMPONENT_BUTTON: string;
-        static COMPONENT_SKINMESHRENDER: string;
-        static COMPONENT_AUDIOPLAYER: string;
-        static COMPONENT_CAMERACONTROLLER: string;
-        static COMPONENT_CANVASRENDER: string;
-        static UIStyle_RangeFloat: string;
-        static UIStyle_Enum: string;
-        static RESOURCES_MESH_CUBE: string;
+        static readonly ENABLED = "enabled";
+        static readonly builtinTag_Untagged = "Untagged";
+        static readonly builtinTag_Player = "Player";
+        static readonly builtinTag_EditorOnly = "EditorOnly";
+        static readonly builtinTag_MainCamera = "MainCamera";
+        static readonly COMPONENT_CAMERA = "camera";
+        static readonly COMPONENT_BOXCOLLIDER = "boxcollider";
+        static readonly COMPONENT_LIGHT = "light";
+        static readonly COMPONENT_MESHFILTER = "meshFilter";
+        static readonly COMPONENT_MESHRENDER = "meshRenderer";
+        static readonly COMPONENT_EFFECTSYSTEM = "effectSystem";
+        static readonly COMPONENT_LABEL = "label";
+        static readonly COMPONENT_uirect = "uirect";
+        static readonly COMPONENT_IMAGE = "image2D";
+        static readonly COMPONENT_RAWIMAGE = "rawImage2D";
+        static readonly COMPONENT_BUTTON = "button";
+        static readonly COMPONENT_SKINMESHRENDER = "skinnedMeshRenderer";
+        static readonly COMPONENT_AUDIOPLAYER = "AudioPlayer";
+        static readonly COMPONENT_CAMERACONTROLLER = "cameraController";
+        static readonly COMPONENT_CANVASRENDER = "canvasRenderer";
+        static readonly UIStyle_RangeFloat = "rangeFloat";
+        static readonly UIStyle_Enum = "enum";
+        static readonly RESOURCES_MESH_CUBE = "cube";
         static replaceAll(srcStr: string, fromStr: string, toStr: string): string;
         static trimAll(str: string): string;
         static firstCharToLowerCase(str: string): string;

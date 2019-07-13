@@ -9,6 +9,9 @@ namespace gd3d.framework
      */
     export class StringUtil
     {
+        /** 启用标记 */
+        static readonly ENABLED = "enabled";
+
         /**
          * @public
          * @language zh_CN
@@ -16,7 +19,7 @@ namespace gd3d.framework
          * 内建TAG “Untagged”
          * @version egret-gd3d 1.0
          */
-        static builtinTag_Untagged = "Untagged";
+        static readonly builtinTag_Untagged = "Untagged";
 
         /**
          * @public
@@ -25,7 +28,7 @@ namespace gd3d.framework
          * 内建TAG “Player”
          * @version egret-gd3d 1.0
          */
-        static builtinTag_Player = "Player";
+        static readonly builtinTag_Player = "Player";
 
         /**
          * @public
@@ -34,7 +37,7 @@ namespace gd3d.framework
          * 内建TAG “EditorOnly”
          * @version egret-gd3d 1.0
          */
-        static builtinTag_EditorOnly = "EditorOnly";
+        static readonly builtinTag_EditorOnly = "EditorOnly";
 
         /**
          * @public
@@ -43,7 +46,7 @@ namespace gd3d.framework
          * 内建TAG “MainCamera”
          * @version egret-gd3d 1.0
          */
-        static builtinTag_MainCamera = "MainCamera";
+        static readonly builtinTag_MainCamera = "MainCamera";
 
         /**
          * @public
@@ -52,7 +55,7 @@ namespace gd3d.framework
          * 获取camera组件的名字
          * @version egret-gd3d 1.0
          */
-        public static COMPONENT_CAMERA = "camera";
+        public static readonly COMPONENT_CAMERA = "camera";
 
         /**
          * @public
@@ -61,7 +64,7 @@ namespace gd3d.framework
          * 获取boxcollider组件的名字
          * @version egret-gd3d 1.0
          */
-        public static COMPONENT_BOXCOLLIDER = "boxcollider";
+        public static readonly COMPONENT_BOXCOLLIDER = "boxcollider";
 
         /**
          * @public
@@ -70,7 +73,7 @@ namespace gd3d.framework
          * 获取light组件的名字
          * @version egret-gd3d 1.0
          */
-        public static COMPONENT_LIGHT = "light";
+        public static readonly COMPONENT_LIGHT = "light";
 
         /**
          * @public
@@ -79,7 +82,7 @@ namespace gd3d.framework
          * 获取meshFilter组件的名字
          * @version egret-gd3d 1.0
          */
-        public static COMPONENT_MESHFILTER = "meshFilter";
+        public static readonly COMPONENT_MESHFILTER = "meshFilter";
 
         /**
          * @public
@@ -88,7 +91,7 @@ namespace gd3d.framework
          * 获取meshRenderer组件的名字
          * @version egret-gd3d 1.0
          */
-        public static COMPONENT_MESHRENDER = "meshRenderer";
+        public static readonly COMPONENT_MESHRENDER = "meshRenderer";
 
         /**
          * @public
@@ -97,7 +100,7 @@ namespace gd3d.framework
          * 获取effectSystem组件的名字
          * @version egret-gd3d 1.0
          */
-        public static COMPONENT_EFFECTSYSTEM = "effectSystem";
+        public static readonly COMPONENT_EFFECTSYSTEM = "effectSystem";
 
         /**
          * @public
@@ -106,8 +109,8 @@ namespace gd3d.framework
          * 获取label组件的名字
          * @version egret-gd3d 1.0
          */
-        public static COMPONENT_LABEL = "label";
-        public static COMPONENT_uirect = "uirect";
+        public static readonly COMPONENT_LABEL = "label";
+        public static readonly COMPONENT_uirect = "uirect";
         /**
          * @public
          * @language zh_CN
@@ -115,7 +118,7 @@ namespace gd3d.framework
          * 获取image2D组件的名字
          * @version egret-gd3d 1.0
          */
-        public static COMPONENT_IMAGE = "image2D";
+        public static readonly COMPONENT_IMAGE = "image2D";
 
         /**
          * @public
@@ -124,7 +127,7 @@ namespace gd3d.framework
          * 获取rawImage2D组件的名字
          * @version egret-gd3d 1.0
          */
-        public static COMPONENT_RAWIMAGE = "rawImage2D";
+        public static readonly COMPONENT_RAWIMAGE = "rawImage2D";
 
         /**
          * @public
@@ -133,7 +136,7 @@ namespace gd3d.framework
          * 获取button组件的名字
          * @version egret-gd3d 1.0
          */
-        public static COMPONENT_BUTTON = "button";
+        public static readonly COMPONENT_BUTTON = "button";
 
         /**
          * @public
@@ -142,7 +145,7 @@ namespace gd3d.framework
          * 获取skinnedMeshRenderer组件的名字
          * @version egret-gd3d 1.0
          */
-        public static COMPONENT_SKINMESHRENDER = "skinnedMeshRenderer";
+        public static readonly COMPONENT_SKINMESHRENDER = "skinnedMeshRenderer";
 
         /**
          * @public
@@ -151,7 +154,7 @@ namespace gd3d.framework
          * 获取AudioPlayer组件的名字
          * @version egret-gd3d 1.0
          */
-        public static COMPONENT_AUDIOPLAYER = "AudioPlayer";
+        public static readonly COMPONENT_AUDIOPLAYER = "AudioPlayer";
 
         /**
          * @public
@@ -160,7 +163,7 @@ namespace gd3d.framework
          * 获取cameraController组件的名字
          * @version egret-gd3d 1.0
          */
-        public static COMPONENT_CAMERACONTROLLER = "cameraController";
+        public static readonly COMPONENT_CAMERACONTROLLER = "cameraController";
 
         /**
          * @public
@@ -169,22 +172,22 @@ namespace gd3d.framework
          * 获取canvasRenderer组件的名字
          * @version egret-gd3d 1.0
          */
-        public static COMPONENT_CANVASRENDER = "canvasRenderer";
+        public static readonly COMPONENT_CANVASRENDER = "canvasRenderer";
 
         /**
          * @private
          */
-        public static UIStyle_RangeFloat = "rangeFloat";
+        public static readonly UIStyle_RangeFloat = "rangeFloat";
 
         /**
          * @private
          */
-        public static UIStyle_Enum = "enum";
+        public static readonly UIStyle_Enum = "enum";
 
         /**
          * @private
          */
-        public static RESOURCES_MESH_CUBE = "cube";
+        public static readonly RESOURCES_MESH_CUBE = "cube";
 
         /**
          * @public
