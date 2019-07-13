@@ -166,9 +166,41 @@ declare namespace gd3d.framework {
         closeDrawCallInfo(): void;
     }
 }
-declare namespace gd3d {
+declare namespace gd3d.framework {
     interface IEnabled {
         enabled: boolean;
+    }
+    interface INodeComponent {
+        onPlay(): any;
+        start(): any;
+        update(delta: number): any;
+        gameObject: gameObject;
+        remove(): any;
+        clone(): any;
+    }
+    interface I2DComponent {
+        onPlay(): any;
+        start(): any;
+        update(delta: number): any;
+        transform: transform2D;
+        remove(): any;
+    }
+    interface ICollider2d {
+        transform: transform2D;
+        getBound(): obb2d;
+        intersectsTransform(tran: transform2D): boolean;
+    }
+    interface IRectRenderer extends I2DComponent {
+        render(canvas: canvas): any;
+        updateTran(): any;
+        getMaterial(): material;
+        getDrawBounds(): gd3d.math.rect;
+    }
+    interface IRenderer extends INodeComponent {
+        layer: RenderLayerEnum;
+        renderLayer: number;
+        queue: number;
+        render(context: renderContext, assetmgr: assetMgr, camera: camera): any;
     }
 }
 declare namespace gd3d.framework {
@@ -528,24 +560,6 @@ declare namespace gd3d.framework {
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): any;
     }
     function instanceOfI2DPointListener(object: any): boolean;
-    interface I2DComponent {
-        onPlay(): any;
-        start(): any;
-        update(delta: number): any;
-        transform: transform2D;
-        remove(): any;
-    }
-    interface ICollider2d {
-        transform: transform2D;
-        getBound(): obb2d;
-        intersectsTransform(tran: transform2D): boolean;
-    }
-    interface IRectRenderer extends I2DComponent {
-        render(canvas: canvas): any;
-        updateTran(): any;
-        getMaterial(): gd3d.framework.material;
-        getDrawBounds(): gd3d.math.rect;
-    }
     class C2DComponent {
         static readonly ClassName: string;
         comp: I2DComponent;
@@ -5898,14 +5912,6 @@ declare namespace gd3d.framework {
         DontSave = 52,
         HideAndDontSave = 61
     }
-    interface INodeComponent {
-        onPlay(): any;
-        start(): any;
-        update(delta: number): any;
-        gameObject: gameObject;
-        remove(): any;
-        clone(): any;
-    }
     class nodeComponent {
         static readonly ClassName: string;
         comp: INodeComponent;
@@ -5999,12 +6005,6 @@ declare namespace gd3d.framework {
         Common = 0,
         Transparent = 1,
         Overlay = 2
-    }
-    interface IRenderer extends INodeComponent {
-        layer: RenderLayerEnum;
-        renderLayer: number;
-        queue: number;
-        render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): any;
     }
     class renderList {
         constructor();

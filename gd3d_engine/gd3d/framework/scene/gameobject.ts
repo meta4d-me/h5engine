@@ -30,23 +30,23 @@ namespace gd3d.framework
         HideAndDontSave = 0x0000003D
     }
 
-    /**
-     * @public
-     * @language zh_CN
-     * @classdesc
-     * 组件实例接口
-     * @version egret-gd3d 1.0
-     */
-    export interface INodeComponent
-    {
-        onPlay();
-        start();
-        update(delta: number);
-        gameObject: gameObject;
-        remove();
-        clone();
-        // jsonToAttribute(json: any, assetmgr: assetMgr);
-    }
+    // /**
+    //  * @public
+    //  * @language zh_CN
+    //  * @classdesc
+    //  * 组件实例接口
+    //  * @version egret-gd3d 1.0
+    //  */
+    // export interface INodeComponent
+    // {
+    //     onPlay();
+    //     start();
+    //     update(delta: number);
+    //     gameObject: gameObject;
+    //     remove();
+    //     clone();
+    //     // jsonToAttribute(json: any, assetmgr: assetMgr);
+    // }
 
     /**
      * @public

@@ -207,21 +207,21 @@ namespace gd3d.framework
          */
         Overlay,
     }
-    /**
-     * @public
-     * @language zh_CN
-     * @classdesc
-     * 渲染器接口 继承自组件接口
-     * @version egret-gd3d 1.0
-     */
-    export interface IRenderer extends INodeComponent
-    {
-        layer: RenderLayerEnum;
-        renderLayer: number;  //后期发现 和 gameObject.layer 概念冲突 ，实现时 对接处理
-        queue: number;
+    // /**
+    //  * @public
+    //  * @language zh_CN
+    //  * @classdesc
+    //  * 渲染器接口 继承自组件接口
+    //  * @version egret-gd3d 1.0
+    //  */
+    // export interface IRenderer extends INodeComponent
+    // {
+    //     layer: RenderLayerEnum;
+    //     renderLayer: number;  //后期发现 和 gameObject.layer 概念冲突 ，实现时 对接处理
+    //     queue: number;
 
-        render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera);
-    }
+    //     render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera);
+    // }
 
     /**
      * @private
