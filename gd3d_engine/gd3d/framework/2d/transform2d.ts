@@ -880,7 +880,7 @@ namespace gd3d.framework {
         components: C2DComponent[] = [];
 
         private componentsInit :C2DComponent[]=[];
-        private componentplayed :C2DComponent[]=[];
+        // private componentplayed :C2DComponent[]=[];
 
         /**
          * @public
@@ -1039,6 +1039,7 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         removeAllComponents() {
+            this.componentsInit.length = 0;
             let len = this.components.length;
             for (var i = 0; i < len; i++) {
                 this.components[i].comp.remove();

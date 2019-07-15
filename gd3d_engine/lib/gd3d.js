@@ -2574,7 +2574,6 @@ var gd3d;
                 this._beDispose = false;
                 this.components = [];
                 this.componentsInit = [];
-                this.componentplayed = [];
                 this.optionArr = [layoutOption.LEFT, layoutOption.TOP, layoutOption.RIGHT, layoutOption.BOTTOM, layoutOption.H_CENTER, layoutOption.V_CENTER];
                 this._layoutState = 0;
                 this.layoutValueMap = {};
@@ -3043,6 +3042,7 @@ var gd3d;
                 }
             };
             transform2D.prototype.removeAllComponents = function () {
+                this.componentsInit.length = 0;
                 var len = this.components.length;
                 for (var i = 0; i < len; i++) {
                     this.components[i].comp.remove();
@@ -31529,7 +31529,6 @@ var gd3d;
                 this.isStatic = false;
                 this.components = [];
                 this.componentsInit = [];
-                this.componentsPlayed = [];
                 this.haveComponet = false;
                 this._visible = true;
             }
@@ -31770,6 +31769,7 @@ var gd3d;
                 }
             };
             gameObject.prototype.removeAllComponents = function () {
+                this.componentsInit.length = 0;
                 var len = this.components.length;
                 for (var i = 0; i < len; i++) {
                     {
