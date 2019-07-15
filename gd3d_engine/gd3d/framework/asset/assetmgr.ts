@@ -546,6 +546,17 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         mapNamed: { [id: string]: number[] } = {};
+
+        /**
+         * 资源Md5的字典，key为资源的ID
+         */
+        mapMd5Id : { [md5 : string] : number } = {};
+
+        /**
+         * 等待加载完毕后 统一回调 字典
+         */
+        mapMd5WaitLoaded : {[md5 : string] : any}
+
         /**
         * @public
         * @language zh_CN
@@ -727,6 +738,12 @@ namespace gd3d.framework
             }
         }
         private readonly _loadingTag = "_AssetLoingTag_";
+
+        /** 判断是否在加载中 */
+        assetIsLoing(asRef: assetRef){
+            if(asRef) return false;
+            return this._loadingTag in asRef;
+        }
 
         regRes(name: string, asset: IAsset)
         {
