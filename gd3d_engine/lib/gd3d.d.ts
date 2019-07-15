@@ -638,7 +638,6 @@ declare namespace gd3d.framework {
         physicsBody: I2DPhysicsBody;
         components: C2DComponent[];
         private componentsInit;
-        private componentplayed;
         init(bePlay?: boolean): void;
         addComponent(type: string): I2DComponent;
         addComponentDirect(comp: I2DComponent): I2DComponent;
@@ -5929,7 +5928,6 @@ declare namespace gd3d.framework {
         transform: transform;
         components: nodeComponent[];
         private componentsInit;
-        private componentsPlayed;
         haveComponet: boolean;
         renderer: IRenderer;
         camera: camera;

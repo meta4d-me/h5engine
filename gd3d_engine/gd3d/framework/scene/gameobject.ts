@@ -175,7 +175,7 @@ namespace gd3d.framework
         @gd3d.reflect.Field("nodeComponent[]")
         components: nodeComponent[] = [];
         private componentsInit: nodeComponent[] = [];
-        private componentsPlayed: nodeComponent[] = [];
+        // private componentsPlayed: nodeComponent[] = [];
         haveComponet: boolean = false;
         /**
          * @public
@@ -653,6 +653,8 @@ namespace gd3d.framework
          */
         removeAllComponents()
         {
+            this.componentsInit.length = 0;
+            
             let len = this.components.length;
             for (var i = 0; i < len; i++)
             {
