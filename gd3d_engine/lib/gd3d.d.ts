@@ -1362,8 +1362,18 @@ declare namespace gd3d.framework {
         parse(json: any, totalLength?: number): void;
         unload(): void;
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
-        downloadFinsih(state: any, list: any, haveBin: boolean, onstate: any, packlist: any, mapPackes: any, assetmgr: assetMgr, handles: any): void;
-        NextHandle(list: any, state: any, onstate: any): void;
+        downloadFinsih(state: any, list: {
+            url: string;
+            type: AssetTypeEnum;
+            asset: IAsset;
+            handle: () => any;
+        }[], haveBin: boolean, onstate: any, packlist: any, mapPackes: any, assetmgr: assetMgr, handles: any): void;
+        NextHandle(list: {
+            url: string;
+            type: AssetTypeEnum;
+            asset: IAsset;
+            handle: () => any;
+        }[], state: any, onstate: any, assetmgr: assetMgr): void;
         private mapIsNull;
         mapNamed: {
             [id: string]: number;
@@ -1465,6 +1475,12 @@ declare namespace gd3d.framework {
         mapNamed: {
             [id: string]: number[];
         };
+        mapMd5Id: {
+            [md5: string]: number;
+        };
+        mapMd5WaitLoaded: {
+            [md5: string]: Function[];
+        };
         getAsset(id: number): IAsset;
         getAssetByName(name: string, bundlename?: string): IAsset;
         getAssetBundle(bundlename: string): assetBundle;
@@ -1476,6 +1492,7 @@ declare namespace gd3d.framework {
         unuse(res: IAsset, disposeNow?: boolean): void;
         use(res: IAsset): void;
         private readonly _loadingTag;
+        assetIsLoing(asRef: assetRef): boolean;
         regRes(name: string, asset: IAsset): void;
         releaseUnuseAsset(): void;
         getAssetsRefcount(): {

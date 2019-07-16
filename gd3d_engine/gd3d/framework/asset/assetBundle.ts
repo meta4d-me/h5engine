@@ -196,56 +196,64 @@ namespace gd3d.framework {
                 packs.push({ url: url, type: type, asset: null });
             }
             
-            let list: { url: string, type: AssetTypeEnum, asset: IAsset, handle: () => void }[] = [];
+            let list: { url: string, type: AssetTypeEnum, asset: IAsset, handle: () => any }[] = [];
             for (let fitem of this.files) {
-                let md5 = fitem.md5;
-                let mapMd5 = assetmgr.mapMd5Id;
                 let url = this.path + "/" + fitem.name;
                 let fileName = assetmgr.getFileName(url);
-                // md5重复性检查
+                
+                let md5 = fitem.md5;
+                if(md5 != undefined){
+                    let mapMd5 = assetmgr.mapMd5Id;
+                    let mAssId = mapMd5[md5];
+                    // md5重复性检查
                     //是否md5_map 中包含
-                let mAssId = mapMd5[md5];
-                if(mAssId!= undefined){
-                    //是否 正在加载
-                    let sRef = assetmgr.mapRes[mAssId];
-                    if(sRef && assetmgr.assetIsLoing(sRef)){
-                        //是 加入 md5_waitLoad_map
-                        //关联到 bundle 的 加载状态队列
-                        state.resstate[fileName] = new ResourceState();
-
-                        //考虑-- 失败 情况
-                            //等待执行 前后时间
-
-                        let opt : any = {} 
-                        let _handle = ()=>{
-                            return new threading.gdPromise((resolve,reject)=>{
-                                if(opt["xxTag"]){
-                                    resolve();
+                    if(mAssId!= undefined){
+                        //是否 正在加载
+                        let sRef = assetmgr.mapRes[mAssId];
+                        if(sRef && assetmgr.assetIsLoing(sRef)){
+                            //是 加入 md5_waitLoad_map
+                            //关联到 bundle 的 加载状态队列
+                            state.resstate[fileName] = new ResourceState();
+    
+                            //考虑-- 失败 情况
+                                //等待执行 前后时间
+                            let opt : any = {} 
+                            let _handle = ()=>{
+                                return new threading.gdPromise((resolve,reject)=>{
+                                    if(opt["xxTag"]){
+                                        resolve();
+                                    }else{
+                                        opt["resolve"] = resolve;
+                                    }
+                                });
+                            };
+                            opt = {url : null, type : null , asset : null , handle : _handle };
+    
+                            
+                            let waitLoaded = ()=>{
+                                if(opt["resolve"]){
+                                    opt["resolve"]();
                                 }else{
-                                    opt["resolve"] = resolve;
+                                    opt["xxTag"] = true; 
                                 }
-                            });
-                        };
-                        opt = {url : null, type : null , asset : null , handle : _handle };
-
-                        
-                        let waitLoaded = ()=>{
-                            if(opt["resolve"]){
-                                opt["resolve"]();
-                            }else{
-                                opt["xxTag"] = true; 
+                            };
+                            
+                            opt["md5"] = md5;
+                            opt["waitLoaded"] = waitLoaded;
+                            opt["resolve"] = null;
+                            list.push(opt);
+                            
+                            let waitList : any[] ;
+                            if(!assetmgr.mapMd5WaitLoaded[md5]){
+                                assetmgr.mapMd5WaitLoaded[md5] = [];
                             }
-                        };
-                        
-                        opt["waitLoaded"] = waitLoaded;
-                        opt["resolve"] = null;
-                        list.push(opt);
-
-                        assetmgr.mapMd5WaitLoaded[md5] = waitLoaded;
-                        
-                    }else{
-                        //否 不放入加载队列
-                        continue;
+                            waitList = assetmgr.mapMd5WaitLoaded[md5];
+                            waitList.push(waitLoaded);//等待同md5资源加完 回调处理
+    
+                        }else{
+                            //否 不放入加载队列
+                            continue;
+                        }
                     }
                 }
 
@@ -437,7 +445,7 @@ namespace gd3d.framework {
 
         }
 
-        downloadFinsih(state, list, haveBin: boolean, onstate, packlist, mapPackes, assetmgr: assetMgr, handles) {
+        downloadFinsih(state, list : { url: string, type: AssetTypeEnum, asset: IAsset, handle: () => any }[] , haveBin: boolean, onstate, packlist, mapPackes, assetmgr: assetMgr, handles) {
             if (haveBin) {
                 let respackCall = (fcall: () => void) => {
                     if (packlist.length < 1)
@@ -467,13 +475,13 @@ namespace gd3d.framework {
                     }
                 };
                 respackCall(() => {
-                    this.NextHandle(list, state, onstate);
+                    this.NextHandle(list, state, onstate , assetmgr);
                 });
             }
             else
-                this.NextHandle(list, state, onstate);
+                this.NextHandle(list, state, onstate,assetmgr);
         }
-        NextHandle(list, state, onstate) {
+        NextHandle(list : { url: string, type: AssetTypeEnum, asset: IAsset, handle: () => any }[] , state, onstate , assetmgr: assetMgr) {
             let waitArrs = [];
             let count = 0;
             let lastHandle = [];
@@ -481,6 +489,21 @@ namespace gd3d.framework {
                 // console.log(`资源包 :${this.url} 加载完成`);
                 state.isfinish = true;
                 onstate(state);
+                //回调 md5列表
+                let len = list.length;
+                for(let i=0;i < len ;i++){
+                    let item = list[i];
+                    if(item["md5"] == undefined) continue;
+                    let md5 = item["md5"] ;
+                    let waitList = assetmgr.mapMd5WaitLoaded[md5];
+                    if(waitList){
+                        waitList.forEach(element => {
+                            element();
+                        });
+                        waitList.length = 0;
+                        delete assetmgr.mapMd5WaitLoaded[md5];
+                    }
+                }
             };
             // for (let hitem of list)
             for (var i = 0, l = list.length; i < l; ++i) {

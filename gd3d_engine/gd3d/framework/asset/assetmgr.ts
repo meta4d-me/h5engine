@@ -555,7 +555,7 @@ namespace gd3d.framework
         /**
          * 等待加载完毕后 统一回调 字典
          */
-        mapMd5WaitLoaded : {[md5 : string] : any}
+        mapMd5WaitLoaded : {[md5 : string] : Function[]}
 
         /**
         * @public
