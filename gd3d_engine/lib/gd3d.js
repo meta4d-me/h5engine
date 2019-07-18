@@ -6835,7 +6835,9 @@ var gd3d;
                 this.bundlePackBin = {};
                 this.totalLength = 0;
                 this.loadLightMap = true;
+                this.waitMd5Count = 0;
                 this.mapNamed = {};
+                this.mapNameMD5 = {};
                 this.url = url;
                 var i = url.lastIndexOf("/");
                 this.path = url.substring(0, i);
@@ -6878,6 +6880,9 @@ var gd3d;
                         continue;
                     }
                     this.files.push({ name: item.name, length: item.length, packes: packes, md5: item.md5, zip_Length: item.zip_Length });
+                    if (item.md5 != undefined) {
+                        this.mapNameMD5[item.name] = item.md5;
+                    }
                 }
                 if (json["packes"] != undefined) {
                     var packes = json["packes"];
@@ -6904,9 +6909,11 @@ var gd3d;
             };
             assetBundle.prototype.load = function (assetmgr, onstate, state) {
                 var _this = this;
+                if (assetmgr && assetmgr != this.assetmgr) {
+                    this.assetmgr = assetmgr;
+                }
                 state.totalByteLength = this.totalLength;
                 var total = this.files.length;
-                this.assetmgr = assetmgr;
                 var glvshaders = [];
                 var glfshaders = [];
                 var shaders = [];
@@ -6939,6 +6946,9 @@ var gd3d;
                     var url = this_2.path + "/" + fitem.name;
                     var fileName = assetmgr.getFileName(url);
                     var md5 = fitem.md5;
+                    if (md5 == "976a671f5fae4addacade82d9fde669c") {
+                        debugger;
+                    }
                     if (md5 != undefined) {
                         var mapMd5 = assetmgr.mapMd5Id;
                         var mAssId = mapMd5[md5];
@@ -6946,30 +6956,15 @@ var gd3d;
                             var sRef = assetmgr.mapRes[mAssId];
                             if (sRef && assetmgr.assetIsLoing(sRef)) {
                                 state.resstate[fileName] = new framework.ResourceState();
-                                var opt_1 = {};
-                                var _handle = function () {
-                                    return new gd3d.threading.gdPromise(function (resolve, reject) {
-                                        if (opt_1["xxTag"]) {
-                                            resolve();
-                                        }
-                                        else {
-                                            opt_1["resolve"] = resolve;
-                                        }
-                                    });
-                                };
-                                opt_1 = { url: null, type: null, asset: null, handle: _handle };
+                                this_2.waitMd5Count++;
                                 var waitLoaded = function () {
-                                    if (opt_1["resolve"]) {
-                                        opt_1["resolve"]();
+                                    var old = _this.waitMd5Count;
+                                    _this.waitMd5Count--;
+                                    if (md5 == "976a671f5fae4addacade82d9fde669c") {
+                                        debugger;
                                     }
-                                    else {
-                                        opt_1["xxTag"] = true;
-                                    }
+                                    _this.CkNextHandleOfMd5(list, state, onstate);
                                 };
-                                opt_1["md5"] = md5;
-                                opt_1["waitLoaded"] = waitLoaded;
-                                opt_1["resolve"] = null;
-                                list.push(opt_1);
                                 var waitList = void 0;
                                 if (!assetmgr.mapMd5WaitLoaded[md5]) {
                                     assetmgr.mapMd5WaitLoaded[md5] = [];
@@ -6977,9 +6972,7 @@ var gd3d;
                                 waitList = assetmgr.mapMd5WaitLoaded[md5];
                                 waitList.push(waitLoaded);
                             }
-                            else {
-                                return "continue";
-                            }
+                            return "continue";
                         }
                     }
                     var type = assetmgr.calcType(fitem.name);
@@ -6988,74 +6981,76 @@ var gd3d;
                     }
                     {
                         var asset = null;
+                        var _item = { url: url, type: type, md5: md5, asset: null };
                         switch (type) {
                             case framework.AssetTypeEnum.GLFragmentShader:
-                                glfshaders.push({ url: url, type: type, asset: null });
+                                glfshaders.push(_item);
                                 break;
                             case framework.AssetTypeEnum.GLVertexShader:
-                                glvshaders.push({ url: url, type: type, asset: null });
+                                glvshaders.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Shader:
                                 asset = new framework.shader(fileName);
-                                shaders.push({ url: url, type: type, asset: asset });
+                                shaders.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Texture:
                                 asset = new framework.texture(fileName);
-                                textures.push({ url: url, type: type, asset: asset });
+                                textures.push(_item);
                                 break;
                             case framework.AssetTypeEnum.TextureDesc:
                                 asset = new framework.texture(fileName);
-                                texturedescs.push({ url: url, type: type, asset: asset });
+                                texturedescs.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Mesh:
                                 asset = new framework.mesh(fileName);
-                                meshs.push({ url: url, type: type, asset: asset });
+                                meshs.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Material:
                                 asset = new framework.material(fileName);
-                                materials.push({ url: url, type: type, asset: asset });
+                                materials.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Aniclip:
                                 asset = new framework.animationClip(fileName);
-                                anclips.push({ url: url, type: type, asset: asset });
+                                anclips.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Prefab:
                                 asset = new framework.prefab(fileName);
-                                prefabs.push({ url: url, type: type, asset: asset });
+                                prefabs.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Scene:
                                 asset = new framework.rawscene(fileName);
-                                scenes.push({ url: url, type: type, asset: asset });
+                                scenes.push(_item);
                                 break;
                             case framework.AssetTypeEnum.TextAsset:
                                 asset = new framework.textasset(fileName);
-                                textassets.push({ url: url, type: type, asset: asset });
+                                textassets.push(_item);
                                 break;
                             case framework.AssetTypeEnum.PVR:
                                 asset = new framework.texture(fileName);
-                                pvrs.push({ url: url, type: type, asset: asset });
+                                pvrs.push(_item);
                                 break;
                             case framework.AssetTypeEnum.F14Effect:
                                 asset = new framework.f14eff(fileName);
-                                f14effs.push({ url: url, type: type, asset: asset });
+                                f14effs.push(_item);
                                 break;
                             case framework.AssetTypeEnum.DDS:
                                 asset = new framework.texture(fileName);
-                                ddss.push({ url: url, type: type, asset: asset });
+                                ddss.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Font:
                                 asset = new framework.font(fileName);
-                                fonts.push({ url: url, type: type, asset: asset });
+                                fonts.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Atlas:
                                 asset = new framework.atlas(fileName);
-                                atlass.push({ url: url, type: type, asset: asset });
+                                atlass.push(_item);
                                 break;
                             case framework.AssetTypeEnum.KeyFrameAniclip:
                                 asset = new framework.keyFrameAniClip(fileName);
-                                kfaniclips.push({ url: url, type: type, asset: asset });
+                                kfaniclips.push(_item);
                                 break;
                         }
+                        _item.asset = asset;
                         if (type != framework.AssetTypeEnum.GLVertexShader && type != framework.AssetTypeEnum.GLFragmentShader && type != framework.AssetTypeEnum.Shader
                             && type != framework.AssetTypeEnum.PackBin && type != framework.AssetTypeEnum.PackTxt && type != framework.AssetTypeEnum.Prefab) {
                             if (!asset)
@@ -7063,7 +7058,9 @@ var gd3d;
                             var assId = asset.getGUID();
                             this_2.mapNamed[fileName] = assId;
                             assetmgr.regRes(fileName, asset);
-                            assetmgr.mapMd5Id[md5] = assId;
+                            if (md5 && assetmgr.mapMd5Id[md5] == undefined) {
+                                assetmgr.mapMd5Id[md5] = assId;
+                            }
                         }
                     }
                 };
@@ -7077,7 +7074,7 @@ var gd3d;
                     for (var j = 0, clen = asslist[i].length; j < clen; ++j) {
                         var item = asslist[i][j];
                         handles[item.url] = list.length;
-                        list.push({ url: item.url, type: item.type, asset: item.asset, handle: undefined });
+                        list.push({ url: item.url, type: item.type, md5: item.md5, asset: item.asset, handle: undefined });
                     }
                 }
                 var packlist = [];
@@ -7092,7 +7089,7 @@ var gd3d;
                         packlist.push({ surl: surl, type: type, asset: asset });
                         delete tempMap[surl];
                         if (this_3.mapIsNull(tempMap))
-                            this_3.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
+                            this_3.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, handles);
                     }
                     else {
                         if (type == framework.AssetTypeEnum.PackBin) {
@@ -7121,7 +7118,7 @@ var gd3d;
                                 }
                                 delete tempMap[surl];
                                 if (_this.mapIsNull(tempMap))
-                                    _this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
+                                    _this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, handles);
                             }, function (loadedLength, totalLength) {
                                 state.compressBinLoaded = loadedLength;
                                 onstate(state);
@@ -7143,7 +7140,7 @@ var gd3d;
                                 list[handles[data.url]].handle = data.handle;
                                 delete tempMap[data.url];
                                 if (_this.mapIsNull(tempMap))
-                                    _this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
+                                    _this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, handles);
                             });
                         }
                     }
@@ -7154,7 +7151,7 @@ var gd3d;
                     _loop_3(item);
                 }
             };
-            assetBundle.prototype.downloadFinsih = function (state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles) {
+            assetBundle.prototype.downloadFinsih = function (state, list, haveBin, onstate, packlist, mapPackes, handles) {
                 var _this = this;
                 if (haveBin) {
                     var respackCall = function (fcall) {
@@ -7169,7 +7166,7 @@ var gd3d;
                                 respack = _this.bundlePackBin;
                             else
                                 console.log("未识别的packnum: " + mapPackes[uitem.surl]);
-                            assetmgr.loadResByPack(respack, uitem.surl, uitem.type, function (s) {
+                            _this.assetmgr.loadResByPack(respack, uitem.surl, uitem.type, function (s) {
                                 if (s.progressCall) {
                                     s.progressCall = false;
                                     onstate(state);
@@ -7189,34 +7186,26 @@ var gd3d;
                         }
                     };
                     respackCall(function () {
-                        _this.NextHandle(list, state, onstate, assetmgr);
+                        _this.CkNextHandleOfMd5(list, state, onstate);
                     });
                 }
                 else
-                    this.NextHandle(list, state, onstate, assetmgr);
+                    this.CkNextHandleOfMd5(list, state, onstate);
             };
-            assetBundle.prototype.NextHandle = function (list, state, onstate, assetmgr) {
+            assetBundle.prototype.CkNextHandleOfMd5 = function (list, state, onstate) {
+                if (this.waitMd5Count > 0)
+                    return;
+                this.NextHandle(list, state, onstate);
+            };
+            assetBundle.prototype.NextHandle = function (list, state, onstate) {
+                var _this = this;
                 var waitArrs = [];
                 var count = 0;
                 var lastHandle = [];
                 var finish = function () {
                     state.isfinish = true;
                     onstate(state);
-                    var len = list.length;
-                    for (var i_1 = 0; i_1 < len; i_1++) {
-                        var item = list[i_1];
-                        if (item["md5"] == undefined)
-                            continue;
-                        var md5 = item["md5"];
-                        var waitList = assetmgr.mapMd5WaitLoaded[md5];
-                        if (waitList) {
-                            waitList.forEach(function (element) {
-                                element();
-                            });
-                            waitList.length = 0;
-                            delete assetmgr.mapMd5WaitLoaded[md5];
-                        }
-                    }
+                    _this.endWaitList(list);
                 };
                 for (var i = 0, l = list.length; i < l; ++i) {
                     var hitem = list[i];
@@ -7246,6 +7235,26 @@ var gd3d;
                     while (lastHandle.length > 0)
                         lastHandle.shift().handle();
                     finish();
+                }
+            };
+            assetBundle.prototype.endWaitList = function (list) {
+                var len = list.length;
+                for (var i = 0; i < len; i++) {
+                    var item = list[i];
+                    if (item.md5 == undefined)
+                        continue;
+                    var md5 = item.md5;
+                    var wlMap = this.assetmgr.mapMd5WaitLoaded;
+                    if (wlMap[md5] == undefined)
+                        continue;
+                    var waitList = wlMap[md5];
+                    if (waitList) {
+                        waitList.forEach(function (element) {
+                            element();
+                        });
+                        waitList.length = 0;
+                        delete wlMap[md5];
+                    }
                 }
             };
             assetBundle.prototype.mapIsNull = function (map) {
@@ -7371,6 +7380,7 @@ var gd3d;
                 this.mapRes = {};
                 this.mapNamed = {};
                 this.mapMd5Id = {};
+                this.mapMd5WaitLoaded = {};
                 this._loadingTag = "_AssetLoingTag_";
                 this.mapInLoad = {};
                 this.assetUrlDic = {};
@@ -7424,9 +7434,17 @@ var gd3d;
                     id = this.mapNamed[name][this.mapNamed[name].length - 1];
                 }
                 if (bundlename != null) {
-                    var assetbundle = this.mapBundle[bundlename];
-                    if (assetbundle != null)
-                        id = assetbundle.mapNamed[name] || id;
+                    var ab = this.mapBundle[bundlename];
+                    if (ab != null) {
+                        if (ab.mapNamed[name]) {
+                            id = ab.mapNamed[name];
+                        }
+                        else if (ab.mapNameMD5[name]) {
+                            var md5 = ab.mapNameMD5[name];
+                            if (this.mapMd5Id[md5] != undefined)
+                                id = this.mapMd5Id[md5];
+                        }
+                    }
                 }
                 var flag = true;
                 if (id != null) {
@@ -7520,7 +7538,7 @@ var gd3d;
                 }
             };
             assetMgr.prototype.assetIsLoing = function (asRef) {
-                if (asRef)
+                if (!asRef)
                     return false;
                 return this._loadingTag in asRef;
             };
@@ -9905,15 +9923,15 @@ var gd3d;
                         var _frame = new Float32Array(_this.boneCount * 7 + 1);
                         _frame[0] = _key ? 1 : 0;
                         var _boneInfo = new PoseBoneMatrix();
-                        for (var i_2 = 0; i_2 < _this.boneCount; i_2++) {
+                        for (var i_1 = 0; i_1 < _this.boneCount; i_1++) {
                             _boneInfo.load(read);
-                            _frame[i_2 * 7 + 1] = _boneInfo.r.x;
-                            _frame[i_2 * 7 + 2] = _boneInfo.r.y;
-                            _frame[i_2 * 7 + 3] = _boneInfo.r.z;
-                            _frame[i_2 * 7 + 4] = _boneInfo.r.w;
-                            _frame[i_2 * 7 + 5] = _boneInfo.t.x;
-                            _frame[i_2 * 7 + 6] = _boneInfo.t.y;
-                            _frame[i_2 * 7 + 7] = _boneInfo.t.z;
+                            _frame[i_1 * 7 + 1] = _boneInfo.r.x;
+                            _frame[i_1 * 7 + 2] = _boneInfo.r.y;
+                            _frame[i_1 * 7 + 3] = _boneInfo.r.z;
+                            _frame[i_1 * 7 + 4] = _boneInfo.r.w;
+                            _frame[i_1 * 7 + 5] = _boneInfo.t.x;
+                            _frame[i_1 * 7 + 6] = _boneInfo.t.y;
+                            _frame[i_1 * 7 + 7] = _boneInfo.t.z;
                         }
                         _this.frames[_fid] = _frame;
                     }
@@ -15215,8 +15233,8 @@ var gd3d;
                     this._renderOnce(scene, context, "");
                 }
                 else {
-                    for (var i_3 = 0, l_1 = this.postQueues.length; i_3 < l_1; ++i_3) {
-                        this.postQueues[i_3].render(scene, context, this);
+                    for (var i_2 = 0, l_1 = this.postQueues.length; i_2 < l_1; ++i_2) {
+                        this.postQueues[i_2].render(scene, context, this);
                     }
                     context.webgl.flush();
                 }
@@ -15777,9 +15795,9 @@ var gd3d;
                     return;
                 var index = -1;
                 if (_initFrameData.attrsData.mat != null) {
-                    for (var i_4 = 0; i_4 < this.matDataGroups.length; i_4++) {
-                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_4], _initFrameData.attrsData.mat)) {
-                            index = i_4;
+                    for (var i_3 = 0; i_3 < this.matDataGroups.length; i_3++) {
+                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_3], _initFrameData.attrsData.mat)) {
+                            index = i_3;
                             break;
                         }
                     }
@@ -15837,41 +15855,41 @@ var gd3d;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
                 element.update();
                 subEffectBatcher.effectElements.push(element);
-                for (var i_5 = 0; i_5 < vertexCount; i_5++) {
+                for (var i_4 = 0; i_4 < vertexCount; i_4++) {
                     {
                         var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = vertexArr[i_5 * vertexSize + 0];
-                        vertex.y = vertexArr[i_5 * vertexSize + 1];
-                        vertex.z = vertexArr[i_5 * vertexSize + 2];
+                        vertex.x = vertexArr[i_4 * vertexSize + 0];
+                        vertex.y = vertexArr[i_4 * vertexSize + 1];
+                        vertex.z = vertexArr[i_4 * vertexSize + 2];
                         gd3d.math.matrixTransformVector3(vertex, element.curAttrData.matrix, vertex);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 0] = vertex.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 1] = vertex.y;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 2] = vertex.z;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 0] = vertex.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 1] = vertex.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 2] = vertex.z;
                         gd3d.math.pool.delete_vector3(vertex);
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 3] = vertexArr[i_5 * vertexSize + 3];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 4] = vertexArr[i_5 * vertexSize + 4];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 5] = vertexArr[i_5 * vertexSize + 5];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 3] = vertexArr[i_4 * vertexSize + 3];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 4] = vertexArr[i_4 * vertexSize + 4];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 5] = vertexArr[i_4 * vertexSize + 5];
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 6] = vertexArr[i_5 * vertexSize + 6];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 7] = vertexArr[i_5 * vertexSize + 7];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 8] = vertexArr[i_5 * vertexSize + 8];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 6] = vertexArr[i_4 * vertexSize + 6];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 7] = vertexArr[i_4 * vertexSize + 7];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 8] = vertexArr[i_4 * vertexSize + 8];
                     }
                     {
                         var r = gd3d.math.floatClamp(element.curAttrData.color.x, 0, 1);
                         var g = gd3d.math.floatClamp(element.curAttrData.color.y, 0, 1);
                         var b = gd3d.math.floatClamp(element.curAttrData.color.z, 0, 1);
-                        var a = gd3d.math.floatClamp(vertexArr[i_5 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 9] = r;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 10] = g;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 11] = b;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 12] = a;
+                        var a = gd3d.math.floatClamp(vertexArr[i_4 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 9] = r;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 10] = g;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 11] = b;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 12] = a;
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 13] = vertexArr[i_5 * vertexSize + 13] * element.curAttrData.tilling.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 14] = vertexArr[i_5 * vertexSize + 14] * element.curAttrData.tilling.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 13] = vertexArr[i_4 * vertexSize + 13] * element.curAttrData.tilling.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 14] = vertexArr[i_4 * vertexSize + 14] * element.curAttrData.tilling.y;
                     }
                 }
                 var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
@@ -16042,11 +16060,11 @@ var gd3d;
                 if (this.delayElements.length > 0) {
                     if (this.refElements.length > 0)
                         this.refElements = [];
-                    for (var i_6 = this.delayElements.length - 1; i_6 >= 0; i_6--) {
-                        var data = this.delayElements[i_6];
+                    for (var i_5 = this.delayElements.length - 1; i_5 >= 0; i_5--) {
+                        var data = this.delayElements[i_5];
                         if (data.delayTime <= this.playTimer) {
-                            this.addElement(this.delayElements[i_6]);
-                            this.delayElements.splice(i_6, 1);
+                            this.addElement(this.delayElements[i_5]);
+                            this.delayElements.splice(i_5, 1);
                         }
                     }
                 }
@@ -31752,8 +31770,8 @@ var gd3d;
                         array.push(obj.components[i].comp);
                     }
                 }
-                for (var i_7 = 0; obj.transform.children != undefined && i_7 < obj.transform.children.length; i_7++) {
-                    var _obj = obj.transform.children[i_7].gameObject;
+                for (var i_6 = 0; obj.transform.children != undefined && i_6 < obj.transform.children.length; i_6++) {
+                    var _obj = obj.transform.children[i_6].gameObject;
                     this._getComponentsInChildren(type, _obj, array);
                 }
             };

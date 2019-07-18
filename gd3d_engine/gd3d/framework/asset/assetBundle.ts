@@ -57,6 +57,9 @@ namespace gd3d.framework {
 
         loadLightMap: boolean = true;
 
+        //md5等待加载完毕回调 资源计数
+        private waitMd5Count = 0;
+
         constructor(url: string) {
             this.url = url;
             let i = url.lastIndexOf("/");
@@ -113,6 +116,9 @@ namespace gd3d.framework {
                     continue;
                 }
                 this.files.push({ name: item.name, length: item.length, packes: packes, md5: item.md5, zip_Length: item.zip_Length });
+                if(item.md5 != undefined){
+                    this.mapNameMD5[item.name] = item.md5;
+                }
             }
             if (json["packes"] != undefined) {
                 let packes = json["packes"];
@@ -153,10 +159,11 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad) {
+            if(assetmgr && assetmgr != this.assetmgr){
+                this.assetmgr = assetmgr;
+            }
             state.totalByteLength = this.totalLength;
-
             let total = this.files.length;
-            this.assetmgr = assetmgr;
 
             let glvshaders: { url: string, type: AssetTypeEnum, asset: IAsset }[] = [];
             let glfshaders: { url: string, type: AssetTypeEnum, asset: IAsset }[] = [];
@@ -189,18 +196,17 @@ namespace gd3d.framework {
             
             
             //合并的包要先加载
-            
             for (let pack of this.packages) {
                 let type: AssetTypeEnum = assetmgr.calcType(pack);
                 let url = this.path + "/" + pack;
                 packs.push({ url: url, type: type, asset: null });
             }
             
-            let list: { url: string, type: AssetTypeEnum, asset: IAsset, handle: () => any }[] = [];
+            let list: { url: string, type: AssetTypeEnum, md5 : string , asset: IAsset, handle: () => any }[] = [];
+            //遍历每项资源 整理到加载列表
             for (let fitem of this.files) {
                 let url = this.path + "/" + fitem.name;
                 let fileName = assetmgr.getFileName(url);
-                
                 let md5 = fitem.md5;
                 if(md5 != undefined){
                     let mapMd5 = assetmgr.mapMd5Id;
@@ -217,31 +223,40 @@ namespace gd3d.framework {
     
                             //考虑-- 失败 情况
                                 //等待执行 前后时间
-                            let opt : any = {} 
-                            let _handle = ()=>{
-                                return new threading.gdPromise((resolve,reject)=>{
-                                    if(opt["xxTag"]){
-                                        resolve();
-                                    }else{
-                                        opt["resolve"] = resolve;
-                                    }
-                                });
-                            };
-                            opt = {url : null, type : null , asset : null , handle : _handle };
+                            // let opt : any = {} 
+                            // let _handle = ()=>{
+                            //     return new threading.gdPromise((resolve,reject)=>{
+                            //         if(opt["xxTag"]){
+                            //             resolve();
+                            //         }else{
+                            //             opt["resolve"] = resolve;
+                            //         }
+                            //     });
+                            // };
+                            // opt = {url : null, type : null , asset : null , handle : _handle };
     
                             
+                            // let waitLoaded = ()=>{
+                            //     if(opt["resolve"]){
+                            //         opt["resolve"]();
+                            //     }else{
+                            //         opt["xxTag"] = true; 
+                            //     }
+                            // };
+
+                            this.waitMd5Count++; //加入等待列表 ，计数增加
+
                             let waitLoaded = ()=>{
-                                if(opt["resolve"]){
-                                    opt["resolve"]();
-                                }else{
-                                    opt["xxTag"] = true; 
-                                }
+                                let old = this.waitMd5Count;
+                               this.waitMd5Count --; //减少计数
+                               //检查加载结束to解析资源
+                               this.CkNextHandleOfMd5(list,state,onstate);
                             };
                             
-                            opt["md5"] = md5;
-                            opt["waitLoaded"] = waitLoaded;
-                            opt["resolve"] = null;
-                            list.push(opt);
+                            // opt["md5"] = md5;
+                            // opt["waitLoaded"] = waitLoaded;
+                            // opt["resolve"] = null;
+                            // list.push(opt);
                             
                             let waitList : any[] ;
                             if(!assetmgr.mapMd5WaitLoaded[md5]){
@@ -250,10 +265,8 @@ namespace gd3d.framework {
                             waitList = assetmgr.mapMd5WaitLoaded[md5];
                             waitList.push(waitLoaded);//等待同md5资源加完 回调处理
     
-                        }else{
-                            //否 不放入加载队列
-                            continue;
                         }
+                        continue;  //跳过 不放入加载队列
                     }
                 }
 
@@ -267,74 +280,77 @@ namespace gd3d.framework {
 
                 {
                     let asset = null;
+                    let _item = {url, type, md5 , asset: null }; 
                     switch (type) {
                         case AssetTypeEnum.GLFragmentShader:
-                            glfshaders.push({ url, type, asset: null });
+                            glfshaders.push(_item);
                             break;
                         case AssetTypeEnum.GLVertexShader:
-                            glvshaders.push({ url, type, asset: null });
+                            glvshaders.push(_item);
                             break;
                         case AssetTypeEnum.Shader:
                             asset = new shader(fileName);
-                            shaders.push({ url, type, asset: asset });
+                            shaders.push(_item);
                             break;
                         case AssetTypeEnum.Texture:
                             asset = new texture(fileName);
-                            textures.push({ url, type, asset: asset });
+                            textures.push(_item);
                             break;
                         case AssetTypeEnum.TextureDesc:
                             asset = new texture(fileName);
-                            texturedescs.push({ url, type, asset: asset });
+                            texturedescs.push(_item);
                             break;
                         case AssetTypeEnum.Mesh:
                             asset = new mesh(fileName);
-                            meshs.push({ url, type, asset: asset });
+                            meshs.push(_item);
                             break;
                         case AssetTypeEnum.Material:
                             asset = new material(fileName);
-                            materials.push({ url, type, asset: asset });
+                            materials.push(_item);
                             break;
                         case AssetTypeEnum.Aniclip:
                             asset = new animationClip(fileName);
-                            anclips.push({ url, type, asset: asset });
+                            anclips.push(_item);
                             break;
                         case AssetTypeEnum.Prefab:
                             asset = new prefab(fileName);
-                            prefabs.push({ url, type, asset: asset });
+                            prefabs.push(_item);
                             break;
                         case AssetTypeEnum.Scene:
                             asset = new rawscene(fileName);
-                            scenes.push({ url, type, asset: asset });
+                            scenes.push(_item);
                             break;
                         case AssetTypeEnum.TextAsset:
                             asset = new textasset(fileName);
-                            textassets.push({ url, type, asset: asset });
+                            textassets.push(_item);
                             break;
                         case AssetTypeEnum.PVR:
                             asset = new texture(fileName);
-                            pvrs.push({ url, type, asset: asset });
+                            pvrs.push(_item);
                             break;
                         case AssetTypeEnum.F14Effect:
                             asset = new f14eff(fileName);
-                            f14effs.push({ url, type, asset: asset });
+                            f14effs.push(_item);
                             break;
                         case AssetTypeEnum.DDS:
                             asset = new texture(fileName);
-                            ddss.push({ url, type, asset: asset });
+                            ddss.push(_item);
                             break;
                         case AssetTypeEnum.Font:
                             asset = new font(fileName);
-                            fonts.push({ url, type, asset: asset });
+                            fonts.push(_item);
                             break;
                         case AssetTypeEnum.Atlas:
                             asset = new atlas(fileName);
-                            atlass.push({ url, type, asset: asset });
+                            atlass.push(_item);
                             break;
                         case AssetTypeEnum.KeyFrameAniclip:
                             asset = new keyFrameAniClip(fileName);
-                            kfaniclips.push({ url, type, asset: asset });
+                            kfaniclips.push(_item);
                             break;
                     }
+                    _item.asset = asset;
+
                     if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
                         && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt && type != AssetTypeEnum.Prefab) {
                         if (!asset)
@@ -343,18 +359,20 @@ namespace gd3d.framework {
                         this.mapNamed[fileName] = assId;
                         assetmgr.regRes(fileName, asset);
                         //注册 md5_map  {md5 : AssetId}
-                        assetmgr.mapMd5Id[md5] = assId;
+                        if(md5 && assetmgr.mapMd5Id[md5] == undefined){
+                            assetmgr.mapMd5Id[md5] = assId;
+                        }
                     }
                 }
             }
 
             let handles = {};
-
+            //按类型整理顺序到list 
             for (let i = 0, len = asslist.length; i < len; ++i) {
                 for (let j = 0, clen = asslist[i].length; j < clen; ++j) {
                     let item = asslist[i][j];
                     handles[item.url] = list.length;
-                    list.push({ url: item.url, type: item.type, asset: item.asset, handle: undefined });
+                    list.push({ url: item.url, type: item.type, md5: item.md5 ,asset: item.asset, handle: undefined });
                 }
             }
 
@@ -362,6 +380,7 @@ namespace gd3d.framework {
             let packlist = [];
             let haveBin = false;
             let tempMap = {};
+            //按list 顺序加载
             for (let item of list) {
                 let surl = item.url;
                 let type = item.type;
@@ -371,7 +390,7 @@ namespace gd3d.framework {
                     packlist.push({ surl, type, asset });
                     delete tempMap[surl];
                     if (this.mapIsNull(tempMap))
-                        this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
+                        this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, handles);
                 }
                 else {
                     if (type == AssetTypeEnum.PackBin) {
@@ -406,7 +425,7 @@ namespace gd3d.framework {
 
                             delete tempMap[surl];
                             if (this.mapIsNull(tempMap))
-                                this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
+                                this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, handles);
 
                         },
                             (loadedLength, totalLength) => {
@@ -436,7 +455,7 @@ namespace gd3d.framework {
                                 list[handles[data.url]].handle = data.handle;
                                 delete tempMap[data.url];
                                 if (this.mapIsNull(tempMap))
-                                    this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
+                                    this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, handles);
                             });
                     }
 
@@ -444,8 +463,9 @@ namespace gd3d.framework {
             }
 
         }
-
-        downloadFinsih(state, list : { url: string, type: AssetTypeEnum, asset: IAsset, handle: () => any }[] , haveBin: boolean, onstate, packlist, mapPackes, assetmgr: assetMgr, handles) {
+        
+        //加载完毕处理
+        private downloadFinsih(state, list, haveBin: boolean, onstate, packlist, mapPackes, handles) {
             if (haveBin) {
                 let respackCall = (fcall: () => void) => {
                     if (packlist.length < 1)
@@ -457,7 +477,7 @@ namespace gd3d.framework {
                         if (mapPackes[uitem.surl] == 0) respack = this.bundlePackJson;
                         else if (mapPackes[uitem.surl] == 1) respack = this.bundlePackBin;
                         else console.log("未识别的packnum: " + mapPackes[uitem.surl]);
-                        assetmgr.loadResByPack(respack, uitem.surl, uitem.type, (s) => {
+                        this.assetmgr.loadResByPack(respack, uitem.surl, uitem.type, (s) => {
                             if (s.progressCall) {
                                 s.progressCall = false;
                                 onstate(state);
@@ -475,13 +495,22 @@ namespace gd3d.framework {
                     }
                 };
                 respackCall(() => {
-                    this.NextHandle(list, state, onstate , assetmgr);
+                    // this.NextHandle(list, state, onstate , assetmgr);
+                    this.CkNextHandleOfMd5(list, state, onstate);
                 });
             }
             else
-                this.NextHandle(list, state, onstate,assetmgr);
+                // this.NextHandle(list, state, onstate,assetmgr);
+                this.CkNextHandleOfMd5(list, state, onstate);
         }
-        NextHandle(list : { url: string, type: AssetTypeEnum, asset: IAsset, handle: () => any }[] , state, onstate , assetmgr: assetMgr) {
+
+        private CkNextHandleOfMd5(list , state, onstate){
+            if(this.waitMd5Count > 0) return;
+            this.NextHandle(list , state, onstate);
+        }
+
+        //文件加载完毕后统一解析处理 
+        private NextHandle(list : { url: string, type: AssetTypeEnum, md5 : string , asset: IAsset, handle: () => any }[] , state, onstate ) {
             let waitArrs = [];
             let count = 0;
             let lastHandle = [];
@@ -490,20 +519,21 @@ namespace gd3d.framework {
                 state.isfinish = true;
                 onstate(state);
                 //回调 md5列表
-                let len = list.length;
-                for(let i=0;i < len ;i++){
-                    let item = list[i];
-                    if(item["md5"] == undefined) continue;
-                    let md5 = item["md5"] ;
-                    let waitList = assetmgr.mapMd5WaitLoaded[md5];
-                    if(waitList){
-                        waitList.forEach(element => {
-                            element();
-                        });
-                        waitList.length = 0;
-                        delete assetmgr.mapMd5WaitLoaded[md5];
-                    }
-                }
+                // let len = list.length;
+                // for(let i=0;i < len ;i++){
+                //     let item = list[i];
+                //     if(item["md5"] == undefined) continue;
+                //     let md5 = item["md5"] ;
+                //     let waitList = assetmgr.mapMd5WaitLoaded[md5];
+                //     if(waitList){
+                //         waitList.forEach(element => {
+                //             element();
+                //         });
+                //         waitList.length = 0;
+                //         delete assetmgr.mapMd5WaitLoaded[md5];
+                //     }
+                // }
+                this.endWaitList(list );
             };
             // for (let hitem of list)
             for (var i = 0, l = list.length; i < l; ++i) {
@@ -538,7 +568,26 @@ namespace gd3d.framework {
                     lastHandle.shift().handle();
                 finish();
             }
+        }
 
+        private endWaitList( list : { url: string, type: AssetTypeEnum, md5 : string , asset: IAsset, handle: () => any }[]){
+            //回调 md5列表
+            let len = list.length;
+            for(let i=0;i < len ;i++){
+                let item = list[i];
+                if(item.md5 == undefined) continue;
+                let md5 = item.md5;
+                let wlMap = this.assetmgr.mapMd5WaitLoaded; 
+                if(wlMap[md5] == undefined) continue;
+                let waitList = wlMap[md5];
+                if(waitList){
+                    waitList.forEach(element => {
+                        element();  
+                    });
+                    waitList.length = 0;
+                    delete wlMap[md5];
+                }
+            }
         }
 
         private mapIsNull(map): boolean {
@@ -554,6 +603,11 @@ namespace gd3d.framework {
          * 资源GUID的字典，key为资源的名称
          * @version egret-gd3d 1.0
          */
-        mapNamed: { [id: string]: number } = {};
+        mapNamed: { [name: string]: number } = {};
+
+        /**
+         * 资源名- MD5 字典
+         */
+        mapNameMD5 : { [name : string] : string } = {};  
     }
 }

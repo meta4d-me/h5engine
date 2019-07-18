@@ -555,7 +555,7 @@ namespace gd3d.framework
         /**
          * 等待加载完毕后 统一回调 字典
          */
-        mapMd5WaitLoaded : {[md5 : string] : Function[]}
+        mapMd5WaitLoaded : {[md5 : string] : Function[]} = {};
 
         /**
         * @public
@@ -589,9 +589,16 @@ namespace gd3d.framework
             }
             if (bundlename != null)
             {
-                let assetbundle = this.mapBundle[bundlename] as assetBundle;
-                if (assetbundle != null)
-                    id = assetbundle.mapNamed[name] || id;
+                let ab = this.mapBundle[bundlename] as assetBundle;
+                if (ab != null){
+                    if(ab.mapNamed[name]){  //尝试从Name 列表中取
+                        id = ab.mapNamed[name] 
+                    }else if(ab.mapNameMD5[name]){  //尝试从MD5 列表中取
+                        let md5 = ab.mapNameMD5[name];
+                        if(this.mapMd5Id[md5] != undefined)
+                            id = this.mapMd5Id[md5];
+                    }
+                }
             }
 
             let flag: boolean = true;
@@ -741,7 +748,7 @@ namespace gd3d.framework
 
         /** 判断是否在加载中 */
         assetIsLoing(asRef: assetRef){
-            if(asRef) return false;
+            if(!asRef) return false;
             return this._loadingTag in asRef;
         }
 

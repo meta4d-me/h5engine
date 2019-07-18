@@ -1357,26 +1357,22 @@ declare namespace gd3d.framework {
         path: string;
         totalLength: number;
         loadLightMap: boolean;
+        private waitMd5Count;
         constructor(url: string);
         loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr): void;
         parse(json: any, totalLength?: number): void;
         unload(): void;
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
-        downloadFinsih(state: any, list: {
-            url: string;
-            type: AssetTypeEnum;
-            asset: IAsset;
-            handle: () => any;
-        }[], haveBin: boolean, onstate: any, packlist: any, mapPackes: any, assetmgr: assetMgr, handles: any): void;
-        NextHandle(list: {
-            url: string;
-            type: AssetTypeEnum;
-            asset: IAsset;
-            handle: () => any;
-        }[], state: any, onstate: any, assetmgr: assetMgr): void;
+        private downloadFinsih;
+        private CkNextHandleOfMd5;
+        private NextHandle;
+        private endWaitList;
         private mapIsNull;
         mapNamed: {
-            [id: string]: number;
+            [name: string]: number;
+        };
+        mapNameMD5: {
+            [name: string]: string;
         };
     }
 }
