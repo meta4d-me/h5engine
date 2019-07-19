@@ -877,7 +877,7 @@ namespace gd3d.framework {
          */
         @gd3d.reflect.Field("C2DComponent[]")
         components: C2DComponent[] = [];
-
+        componentTypes:{[key:string]:boolean} = {};
         private componentsInit :C2DComponent[]=[];
         private componentplayed :C2DComponent[]=[];
 
@@ -919,16 +919,19 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         addComponent(type: string): I2DComponent {
-            if (this.components == null)
-                this.components = [];
-            for (var key in this.components) {
-                var st = this.components[key]["comp"]["constructor"]["name"];
-                if (st == type) {
-                    throw new Error("已经有一个" + type + "的组件了，不能俩");
-                }
-            }
+            if(this.componentTypes[type])
+                throw new Error("已经有一个" + type + "的组件了，不能俩"); 
+            // for (var key in this.components) {
+            //     var st = this.components[key]["comp"]["constructor"]["name"];
+            //     if (st == type) {
+            //         throw new Error("已经有一个" + type + "的组件了，不能俩");
+            //     }
+            // }
             var pp = gd3d.reflect.getPrototype(type);
+            if(!pp)
+                return;
             var comp = gd3d.reflect.createInstance(pp, { "2dcomp": "1" });
+            this.componentTypes[type] = true;
             return this.addComponentDirect(comp);
         }
 
@@ -989,17 +992,20 @@ namespace gd3d.framework {
          */
         removeComponent(comp: I2DComponent) {
             if (!comp) return;
+            let typeName =  reflect.getClassName(comp);         
+            if(!this.componentTypes[typeName])
+                return;
             for (var i = 0; i < this.components.length; i++) {
-                if (this.components[i].comp == comp) {
-                    if (this.components[i].init) {//已经初始化过
-
-                    }
-                    let p = this.components.splice(i, 1);
+                if (this.components[i].comp == comp) {                    
+                    this.components.splice(i, 1);
                     comp.remove();
                     comp.transform = null;
                     break;
                 }
             }
+
+              
+            delete this.componentTypes[typeName];
         }
 
         /**
@@ -1011,6 +1017,8 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         removeComponentByTypeName(type: string) {
+            if(!this.componentTypes[type])
+                return;
             for (var i = 0; i < this.components.length; i++) {
                 if (reflect.getClassName(this.components[i].comp) == type) {
                     var p = this.components.splice(i, 1);
@@ -1021,6 +1029,7 @@ namespace gd3d.framework {
                     return p[0];
                 }
             }
+            delete this.componentTypes[type];
         }
 
         /**
@@ -1041,6 +1050,7 @@ namespace gd3d.framework {
             if (this.collider) this.collider = null;
             if (this.physicsBody) this.physicsBody = null;
             this.components.length = 0;
+            this.componentTypes = {};
         }
 
         /**

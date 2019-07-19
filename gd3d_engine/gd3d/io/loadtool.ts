@@ -1,7 +1,8 @@
 ﻿namespace gd3d.io
 {
-    class loadRetryMgr{
-        public static urlCaseDic:{[url:string]:number};
+    class loadRetryMgr
+    {
+        public static urlCaseDic: { [url: string]: number };
 
     }
     /**
@@ -11,7 +12,8 @@
      * @param onprocess 加载进度
      * @param loadedFun 正常加载完成后回调
      */
-    export function xhrLoad(url: string, fun: (ContentData: any, _err: Error,isloadFail?:boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null,responseType:XMLHttpRequestResponseType,loadedFun:(req:XMLHttpRequest)=>void){
+    export function xhrLoad(url: string, fun: (ContentData: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null, responseType: XMLHttpRequestResponseType, loadedFun: (req: XMLHttpRequest) => void)
+    {
         let req = new XMLHttpRequest();
         let isLoaded = false;
         req.open("GET", url);
@@ -20,50 +22,59 @@
         {
             if (req.readyState == 4)
             {
-                if(req.status == 200){
+                if (req.status == 200)
+                {
                     loadedFun(req);
                     isLoaded = true;
-                }else{
-                    switch(req.status){
+                } else
+                {
+                    switch (req.status)
+                    {
                         case 404:
-                        fun(null, new Error("got a 404:" + url));
-                        //return;
-                        break;
+                            fun(null, new Error("got a 404:" + url));
+                            //return;
+                            break;
                     }
                 }
             }
         };
         req.onprogress = (ev) =>
         {
-            if (onprocess)  onprocess(ev.loaded, ev.total);
+            if (onprocess) onprocess(ev.loaded, ev.total);
         }
         req.onerror = (ev) =>
         {
-            fun(null, new Error(`URL : ${url} \n onerr on req: ` ));
+            fun(null, new Error(`URL : ${url} \n onerr on req: `));
         };
-        req.onloadend = ()=>{
+        req.onloadend = () =>
+        {
             //console.error(" is onload");
-            if(!isLoaded){
+            if (!isLoaded)
+            {
                 //retry some times
-                if(!loadRetryMgr.urlCaseDic) loadRetryMgr.urlCaseDic = {};
+                if (!loadRetryMgr.urlCaseDic) loadRetryMgr.urlCaseDic = {};
                 let dic = loadRetryMgr.urlCaseDic;
-                dic[url] = isNaN(dic[url]) || dic[url]<0 ? 0 : dic[url];
-                if(dic[url] >= 2){
+                dic[url] = isNaN(dic[url]) || dic[url] < 0 ? 0 : dic[url];
+                if (dic[url] >= 2)
+                {
                     dic[url] = 0;
-                    fun(null,new Error("load this url fail  ：" + url),true);  //throw error after retry some times
+                    fun(null, new Error("load this url fail  ：" + url), true);  //throw error after retry some times
                     //console.error(`------ load this url fail URL:${url}  `);
-                }else{
-                    gd3d.io.xhrLoad(url,fun,onprocess,responseType,loadedFun);
+                } else
+                {
+                    gd3d.io.xhrLoad(url, fun, onprocess, responseType, loadedFun);
                     dic[url]++;
                     //console.warn(` retryLoad URL:${url} \n times ${dic[url]} `);
                 }
             }
         };
 
-        try {
+        try
+        {
             req.send();
-        }catch(err){
-            fun(null,err);
+        } catch (err)
+        {
+            fun(null, err);
         }
     }
 
@@ -77,18 +88,42 @@
      * @param onprocess 加载进度
      * @version egret-gd3d 1.0
      */
-    export function loadText(url: string, fun: (_txt: string, _err: Error,isloadFail?:boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void 
+    export function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void 
     {
-        if(framework.assetMgr.useBinJs)
+        if (framework.assetMgr.useBinJs)
         {
-            url=framework.assetMgr.correctTxtFileName(url);
+            url = framework.assetMgr.correctTxtFileName(url);
         }
-        gd3d.io.xhrLoad(url,fun,onprocess,"text",(req)=>{
+        gd3d.io.xhrLoad(url, fun, onprocess, "text", (req) =>
+        {
             fun(req.responseText, null);
         });
     }
 
+    var cachedMap;
+    var cachedTime = 0;
+    export function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void 
+    {
+        if (framework.assetMgr.useBinJs)
+        {
+            url = framework.assetMgr.correctTxtFileName(url);
+        }
+        if (Date.now() - cachedTime > 60000)
+        {
+            cachedMap = {};
+            cachedTime = Date.now();
+        }
 
+        if (cachedMap[url])
+            return fun(cachedMap[url], null);
+
+        gd3d.io.xhrLoad(url, fun, onprocess, "text", (req) =>
+        {
+            var obj = JSON.parse(req.response);
+            cachedMap[url] = obj;
+            fun(obj, null);
+        });
+    }
     /**
      * @public
      * @language zh_CN
@@ -99,14 +134,15 @@
      * @param onprocess 加载进度
      * @version egret-gd3d 1.0
      */
-    export function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error,isloadFail?:boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
+    export function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {
-        if(framework.assetMgr.useBinJs)
+        if (framework.assetMgr.useBinJs)
         {
-            url=framework.assetMgr.correctFileName(url);
+            url = framework.assetMgr.correctFileName(url);
         }
         //req.responseType = "arraybuffer";//ie 一定要在open之后修改responseType
-        gd3d.io.xhrLoad(url,fun,onprocess,"arraybuffer", (req)=>{
+        gd3d.io.xhrLoad(url, fun, onprocess, "arraybuffer", (req) =>
+        {
             fun(req.response, null);
         });
     }
@@ -121,9 +157,10 @@
      * @param onprocess 加载进度
      * @version egret-gd3d 1.0
      */
-    export function loadBlob(url: string, fun: (_blob: Blob, _err: Error,isloadFail?:boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
+    export function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {
-        gd3d.io.xhrLoad(url,fun,onprocess,"blob",(req)=>{
+        gd3d.io.xhrLoad(url, fun, onprocess, "blob", (req) =>
+        {
             fun(req.response, null);
         });
     }
@@ -138,9 +175,10 @@
      * @param progress 加载进度
      * @version egret-gd3d 1.0
      */
-    export function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error,loadFail?:boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
+    export function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error, loadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {
-        gd3d.io.xhrLoad(url,fun,onprocess,"blob",(req)=>{
+        gd3d.io.xhrLoad(url, fun, onprocess, "blob", (req) =>
+        {
             var blob = req.response;
             var img = document.createElement("img");
             //img.crossOrigin = "anonymous";
@@ -153,10 +191,12 @@
             {
                 fun(null, new Error("error when blob to img:" + url));
             }
-            try{
+            try
+            {
                 img.src = window.URL.createObjectURL(blob);
-            }catch(e){
-                fun(null,e);
+            } catch (e)
+            {
+                fun(null, e);
             }
         });
     }

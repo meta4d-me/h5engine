@@ -808,6 +808,9 @@ namespace gd3d.io
                         continue;
                     }
                     let baseType: string = arrayObj[newkey].type;
+                    if(!baseType)
+                        continue;
+
                     switch (baseType.toLowerCase())
                     {
                         case "number":
@@ -974,6 +977,8 @@ namespace gd3d.io
 
                 for (var newkey in arrayObj)
                 {
+                    if(!arrayObj[newkey])
+                        continue;
                     let baseType: string = arrayObj[newkey].type;
                     switch (baseType.toLowerCase())
                     {
@@ -1057,7 +1062,7 @@ namespace gd3d.io
                 assetName = assetName.replace("SystemDefaultAsset-", "");
                 if (type == "mesh")
                 {
-                    assetName = assetName.replace(".mesh.bin", "");
+                    assetName = assetName.replace(".mesh.bin", "").replace(".mesh.json","");
                     _asset = assetMgr.getDefaultMesh(assetName);
                 }
                 else if (type == "texture")
@@ -1067,7 +1072,7 @@ namespace gd3d.io
             }
             else
             {
-                _asset = assetMgr.getAssetByName(assetName, bundlename);
+                _asset = assetMgr.getAssetByName(assetName, bundlename) || assetMgr.getAssetByName(assetName.replace(".mesh.bin",".mesh.json"), bundlename);
             }
 
             // if (type == "mesh" && _parentType == "meshFilter")

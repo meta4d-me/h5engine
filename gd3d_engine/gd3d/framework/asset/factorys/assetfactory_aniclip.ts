@@ -25,12 +25,15 @@ namespace gd3d.framework
                         state.isloadFail = isloadFail ? true : false;
                         if (AssetFactoryTools.catchError(err, onstate, state))
                             return;
+                        let time = Date.now();
                         let _clip = asset ? asset : new animationClip(filename);
                         // _clip.Parse(_buffer);
 
                         // AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
                         return _clip.Parse(_buffer).then(() =>
                         {
+                            let calc = Date.now() - time;
+                            console.log(`[animiclip]解析:${url}  耗时:${calc}/ms`);
                             AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
                         });
                     });
@@ -51,6 +54,7 @@ namespace gd3d.framework
             {
                 state.resstateFirst=state.resstate[filename];
             }
+            let time = Date.now();
             let _buffer = respack[filename];
             let _clip = asset ? asset : new animationClip(filename);
             // _clip.Parse(_buffer);
@@ -60,6 +64,8 @@ namespace gd3d.framework
             {
                return _clip.Parse(_buffer).then(() =>
                 {
+                    let calc = Date.now() - time;
+                    console.log(`[animiclip]解析:${url}  耗时:${calc}/ms`);
                     AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
                 });
             });

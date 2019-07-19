@@ -189,10 +189,8 @@ namespace gd3d.framework
         public _parseProperties(assetmgr: assetMgr, properties: any)
         {
             this.defaultMapUniform = {};
-            for (var index in properties)
+            for(var property of properties)
             {
-                let property = properties[index] as string;
-
                 //检测字符串格式有无错误
                 let words = property.match(RegexpUtil.floatRegexp);
                 if (words == null)

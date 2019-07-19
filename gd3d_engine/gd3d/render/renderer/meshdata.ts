@@ -5,7 +5,7 @@
      */
     export class meshData
     {
-        originVF:number;
+        originVF: number;
 
         pos: gd3d.math.vector3[];//use pos.length 作为定点数量
         color: gd3d.math.color[];
@@ -18,6 +18,9 @@
         blendWeight: number4[];
         //三角形索引
         trisindex: number[];
+
+        tmpVArr: Float32Array;
+        tmpInxArr: Uint16Array; 
         static addQuadPos(data: meshData, quad: gd3d.math.vector3[]): void
         {
             var istart = data.pos.length;
@@ -103,8 +106,8 @@
             meshData.addQuadPos(data, [
                 new math.vector3(0, half, 0),
                 new math.vector3(0, -half, 0),
-                new math.vector3(2*half, half, 0),
-                new math.vector3(2*half, -half, 0)
+                new math.vector3(2 * half, half, 0),
+                new math.vector3(2 * half, -half, 0)
             ]);
             meshData.addQuadVec2(data.uv, [
                 new math.vector2(0, 0),
@@ -327,8 +330,8 @@
             data.tangent = [];
             data.uv = [];
 
-            widthSegments = Math.max( 3, Math.floor( widthSegments ));
-            heightSegments = Math.max( 2, Math.floor( heightSegments ));
+            widthSegments = Math.max(3, Math.floor(widthSegments));
+            heightSegments = Math.max(2, Math.floor(heightSegments));
 
             var ix, iy;
 
@@ -503,9 +506,9 @@
 
             return data;
         }
-        static genBoxByArray(array: gd3d.math.vector3[] , outData: meshData )
+        static genBoxByArray(array: gd3d.math.vector3[], outData: meshData)
         {
-            if(!outData) return;
+            if (!outData) return;
             // var data = new meshData();
             outData.pos = [];
             outData.trisindex = [];
@@ -705,21 +708,27 @@
             if (vf & VertexFormatMask.ColorEX) total += 16;
             return total;
         }
+       
+        
         genVertexDataArray(vf: VertexFormatMask): Float32Array
-        {
-            var vertexCount = this.pos.length;
+        {   
+            var _this = this;
+            if (_this.tmpVArr)
+                return _this.tmpVArr;
+            var vertexCount = _this.pos.length;
             var total = meshData.calcByteSize(vf) / 4;
             var varray = new Float32Array(total * vertexCount);
+            _this.tmpVArr = varray;
             for (var i = 0; i < vertexCount; i++)
             {
                 var nseek = 0;
                 //pos
-                varray[i * total + nseek] = this.pos[i].x; nseek++;
-                varray[i * total + nseek] = this.pos[i].y; nseek++;
-                varray[i * total + nseek] = this.pos[i].z; nseek++;
+                varray[i * total + nseek] = _this.pos[i].x; nseek++;
+                varray[i * total + nseek] = _this.pos[i].y; nseek++;
+                varray[i * total + nseek] = _this.pos[i].z; nseek++;
                 if (vf & VertexFormatMask.Normal)
                 {
-                    if (this.normal == undefined || this.normal.length == 0)
+                    if (_this.normal == undefined || _this.normal.length == 0)
                     {
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
@@ -727,14 +736,14 @@
                     }
                     else
                     {
-                        varray[i * total + nseek] = this.normal[i].x; nseek++;
-                        varray[i * total + nseek] = this.normal[i].y; nseek++;
-                        varray[i * total + nseek] = this.normal[i].z; nseek++;
+                        varray[i * total + nseek] = _this.normal[i].x; nseek++;
+                        varray[i * total + nseek] = _this.normal[i].y; nseek++;
+                        varray[i * total + nseek] = _this.normal[i].z; nseek++;
                     }
                 }
                 if (vf & VertexFormatMask.Tangent)
                 {
-                    if (this.tangent == undefined || this.tangent.length == 0)
+                    if (_this.tangent == undefined || _this.tangent.length == 0)
                     {
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
@@ -742,14 +751,14 @@
                     }
                     else
                     {
-                        varray[i * total + nseek] = this.tangent[i].x; nseek++;
-                        varray[i * total + nseek] = this.tangent[i].y; nseek++;
-                        varray[i * total + nseek] = this.tangent[i].z; nseek++;
+                        varray[i * total + nseek] = _this.tangent[i].x; nseek++;
+                        varray[i * total + nseek] = _this.tangent[i].y; nseek++;
+                        varray[i * total + nseek] = _this.tangent[i].z; nseek++;
                     }
                 }
                 if (vf & VertexFormatMask.Color)
                 {
-                    if (this.color == undefined || this.color.length == 0)
+                    if (_this.color == undefined || _this.color.length == 0)
                     {
                         varray[i * total + nseek] = 1; nseek++;
                         varray[i * total + nseek] = 1; nseek++;
@@ -758,43 +767,43 @@
                     }
                     else
                     {
-                        varray[i * total + nseek] = this.color[i].r; nseek++;
-                        varray[i * total + nseek] = this.color[i].g; nseek++;
-                        varray[i * total + nseek] = this.color[i].b; nseek++;
-                        varray[i * total + nseek] = this.color[i].a; nseek++;
+                        varray[i * total + nseek] = _this.color[i].r; nseek++;
+                        varray[i * total + nseek] = _this.color[i].g; nseek++;
+                        varray[i * total + nseek] = _this.color[i].b; nseek++;
+                        varray[i * total + nseek] = _this.color[i].a; nseek++;
                     }
                 }
 
                 if (vf & VertexFormatMask.UV0)
                 {
-                    if (this.uv == undefined || this.uv.length == 0)
+                    if (_this.uv == undefined || _this.uv.length == 0)
                     {
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
                     }
                     else
                     {
-                        varray[i * total + nseek] = this.uv[i].x; nseek++;
-                        varray[i * total + nseek] = this.uv[i].y; nseek++;
+                        varray[i * total + nseek] = _this.uv[i].x; nseek++;
+                        varray[i * total + nseek] = _this.uv[i].y; nseek++;
                     }
                 }
                 if (vf & VertexFormatMask.UV1)
                 {
-                    if (this.uv2 == undefined || this.uv2.length == 0)
+                    if (_this.uv2 == undefined || _this.uv2.length == 0)
                     {
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
                     }
                     else
                     {
-                        varray[i * total + nseek] = this.uv2[i].x; nseek++;
-                        varray[i * total + nseek] = this.uv2[i].y; nseek++;
+                        varray[i * total + nseek] = _this.uv2[i].x; nseek++;
+                        varray[i * total + nseek] = _this.uv2[i].y; nseek++;
                     }
                 }
 
                 if (vf & VertexFormatMask.BlendIndex4)
                 {
-                    if (this.blendIndex == undefined || this.blendIndex.length == 0)
+                    if (_this.blendIndex == undefined || _this.blendIndex.length == 0)
                     {
                         varray[i * total + nseek] = 0; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
@@ -803,15 +812,15 @@
                     }
                     else
                     {
-                        varray[i * total + nseek] = this.blendIndex[i].v0; nseek++;
-                        varray[i * total + nseek] = this.blendIndex[i].v1; nseek++;
-                        varray[i * total + nseek] = this.blendIndex[i].v2; nseek++;
-                        varray[i * total + nseek] = this.blendIndex[i].v3; nseek++;
+                        varray[i * total + nseek] = _this.blendIndex[i].v0; nseek++;
+                        varray[i * total + nseek] = _this.blendIndex[i].v1; nseek++;
+                        varray[i * total + nseek] = _this.blendIndex[i].v2; nseek++;
+                        varray[i * total + nseek] = _this.blendIndex[i].v3; nseek++;
                     }
                 }
                 if (vf & VertexFormatMask.BlendWeight4)
                 {
-                    if (this.blendWeight == undefined || this.blendWeight.length == 0)
+                    if (_this.blendWeight == undefined || _this.blendWeight.length == 0)
                     {
                         varray[i * total + nseek] = 1; nseek++;
                         varray[i * total + nseek] = 0; nseek++;
@@ -820,15 +829,15 @@
                     }
                     else
                     {
-                        varray[i * total + nseek] = this.blendWeight[i].v0; nseek++;
-                        varray[i * total + nseek] = this.blendWeight[i].v1; nseek++;
-                        varray[i * total + nseek] = this.blendWeight[i].v2; nseek++;
-                        varray[i * total + nseek] = this.blendWeight[i].v3; nseek++;
+                        varray[i * total + nseek] = _this.blendWeight[i].v0; nseek++;
+                        varray[i * total + nseek] = _this.blendWeight[i].v1; nseek++;
+                        varray[i * total + nseek] = _this.blendWeight[i].v2; nseek++;
+                        varray[i * total + nseek] = _this.blendWeight[i].v3; nseek++;
                     }
                 }
                 if (vf & VertexFormatMask.ColorEX)
                 {
-                    if (this.colorex == undefined || this.colorex.length == 0)
+                    if (_this.colorex == undefined || _this.colorex.length == 0)
                     {
                         varray[i * total + nseek] = 1; nseek++;
                         varray[i * total + nseek] = 1; nseek++;
@@ -837,10 +846,10 @@
                     }
                     else
                     {
-                        varray[i * total + nseek] = this.colorex[i].r; nseek++;
-                        varray[i * total + nseek] = this.colorex[i].g; nseek++;
-                        varray[i * total + nseek] = this.colorex[i].b; nseek++;
-                        varray[i * total + nseek] = this.colorex[i].a; nseek++;
+                        varray[i * total + nseek] = _this.colorex[i].r; nseek++;
+                        varray[i * total + nseek] = _this.colorex[i].g; nseek++;
+                        varray[i * total + nseek] = _this.colorex[i].b; nseek++;
+                        varray[i * total + nseek] = _this.colorex[i].a; nseek++;
                     }
                 }
             }
@@ -848,7 +857,9 @@
         }
         genIndexDataArray(): Uint16Array
         {
-            return new Uint16Array(this.trisindex);
+            if (this.tmpInxArr)
+                return this.tmpInxArr;
+            return this.tmpInxArr = new Uint16Array(this.trisindex);
         }
         genIndexDataArrayTri2Line(): Uint16Array
         {
@@ -879,21 +890,26 @@
             return new Uint16Array(line);
         }
 
-        static cloneByObj(target:meshData):meshData{
+        static cloneByObj(target: meshData): meshData
+        {
             let md = new meshData();
             target.originVF = md.originVF;
-            if(target.pos){
+            if (target.pos)
+            {
                 md.pos = [];
-                target.pos.forEach((element,idx) => {
+                target.pos.forEach((element, idx) =>
+                {
                     md.pos[idx] = new math.vector3();
                     md.pos[idx].x = element.x;
                     md.pos[idx].y = element.y;
                     md.pos[idx].z = element.z;
                 });
             }
-            if(target.color){
+            if (target.color)
+            {
                 md.color = [];
-                target.color.forEach((element,idx) => {
+                target.color.forEach((element, idx) =>
+                {
                     md.color[idx] = new math.color();
                     md.color[idx].r = element.r;
                     md.color[idx].g = element.g;
@@ -901,9 +917,11 @@
                     md.color[idx].a = element.a;
                 });
             }
-            if(target.colorex){
+            if (target.colorex)
+            {
                 md.colorex = [];
-                target.colorex.forEach((element,idx) => {
+                target.colorex.forEach((element, idx) =>
+                {
                     md.colorex[idx] = new math.color();
                     md.colorex[idx].r = element.r;
                     md.colorex[idx].g = element.g;
@@ -911,43 +929,53 @@
                     md.colorex[idx].a = element.a;
                 });
             }
-            if(target.uv){
+            if (target.uv)
+            {
                 md.uv = [];
-                target.uv.forEach((element,idx) => {
+                target.uv.forEach((element, idx) =>
+                {
                     md.uv[idx] = new math.vector2();
                     md.uv[idx].x = element.x;
                     md.uv[idx].y = element.y;
                 });
             }
-            if(target.uv2){
+            if (target.uv2)
+            {
                 md.uv2 = [];
-                target.uv2.forEach((element,idx) => {
+                target.uv2.forEach((element, idx) =>
+                {
                     md.uv2[idx] = new math.vector2();
                     md.uv2[idx].x = element.x;
                     md.uv2[idx].y = element.y;
                 });
             }
-            if(target.normal){
+            if (target.normal)
+            {
                 md.normal = [];
-                target.normal.forEach((element,idx) => {
+                target.normal.forEach((element, idx) =>
+                {
                     md.normal[idx] = new math.vector3();
                     md.normal[idx].x = element.x;
                     md.normal[idx].y = element.y;
                     md.normal[idx].z = element.z;
                 });
             }
-            if(target.tangent){
+            if (target.tangent)
+            {
                 md.tangent = [];
-                target.tangent.forEach((element,idx) => {
+                target.tangent.forEach((element, idx) =>
+                {
                     md.tangent[idx] = new math.vector3();
                     md.tangent[idx].x = element.x;
                     md.tangent[idx].y = element.y;
                     md.tangent[idx].z = element.z;
                 });
             }
-            if(target.blendIndex){
+            if (target.blendIndex)
+            {
                 md.blendIndex = [];
-                target.blendIndex.forEach((element,idx) => {
+                target.blendIndex.forEach((element, idx) =>
+                {
                     md.blendIndex[idx] = new render.number4();
                     md.blendIndex[idx].v0 = element.v0;
                     md.blendIndex[idx].v1 = element.v1;
@@ -955,9 +983,11 @@
                     md.blendIndex[idx].v3 = element.v3;
                 });
             }
-            if(target.blendWeight){
+            if (target.blendWeight)
+            {
                 md.blendWeight = [];
-                target.blendWeight.forEach((element,idx) => {
+                target.blendWeight.forEach((element, idx) =>
+                {
                     md.blendWeight[idx] = new render.number4();
                     md.blendWeight[idx].v0 = element.v0;
                     md.blendWeight[idx].v1 = element.v1;
@@ -965,14 +995,16 @@
                     md.blendWeight[idx].v3 = element.v3;
                 });
             }
-            if(target.trisindex){
+            if (target.trisindex)
+            {
                 md.trisindex = [];
-                target.trisindex.forEach(element=>{
+                target.trisindex.forEach(element =>
+                {
                     md.trisindex.push(element);
                 });
             }
 
-            return md; 
+            return md;
         }
     }
 

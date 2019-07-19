@@ -24,10 +24,12 @@ namespace gd3d.framework
                     state.isloadFail = isloadFail ? true : false;
                     if (AssetFactoryTools.catchError(err, onstate, state))
                         return;
-
+                    let time = Date.now();
                     let _f14eff = asset ? asset : new f14eff(filename);
                     _f14eff.assetbundle = bundlename;
                     _f14eff.Parse(txt, assetMgr);
+                    let calc = Date.now() - time;
+                    console.log(`[特效]解析:${url}  耗时:${calc}/ms`);
                     AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
                     // _f14eff.Parse(txt, assetMgr).then(() =>
                     // {
@@ -54,10 +56,13 @@ namespace gd3d.framework
                 {
                     state.resstateFirst=state.resstate[filename];
                 }
+                let time = Date.now();
                 let txt = respack[filename];
                 let _f14eff = asset ? asset : new f14eff(filename);
                 _f14eff.assetbundle = bundlename;
                 _f14eff.Parse(txt, assetMgr);
+                let calc = Date.now() - time;
+                console.log(`[特效]解析:${url}  耗时:${calc}/ms`);
                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _f14eff, url);
                 // _f14eff.Parse(txt, assetMgr).then(() =>
                 // {

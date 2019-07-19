@@ -617,6 +617,9 @@ declare namespace gd3d.framework {
         collider: ICollider2d;
         physicsBody: I2DPhysicsBody;
         components: C2DComponent[];
+        componentTypes: {
+            [key: string]: boolean;
+        };
         private componentsInit;
         private componentplayed;
         init(bePlayed?: boolean): void;
@@ -2250,7 +2253,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess;
         private readFinish;
-        Parse(buf: ArrayBuffer, webgl: WebGLRenderingContext): threading.gdPromise<{}>;
+        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): void;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
         private _cacheMinP;
@@ -5912,6 +5915,9 @@ declare namespace gd3d.framework {
         isStatic: boolean;
         transform: transform;
         components: nodeComponent[];
+        componentTypes: {
+            [key: string]: boolean;
+        };
         private componentsInit;
         private componentsPlayed;
         haveComponet: boolean;
@@ -6677,6 +6683,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.io {
     function xhrLoad(url: string, fun: (ContentData: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void, responseType: XMLHttpRequestResponseType, loadedFun: (req: XMLHttpRequest) => void): void;
     function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+    function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error, loadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
@@ -6944,6 +6951,8 @@ declare namespace gd3d.render {
         blendIndex: number4[];
         blendWeight: number4[];
         trisindex: number[];
+        tmpVArr: Float32Array;
+        tmpInxArr: Uint16Array;
         static addQuadPos(data: meshData, quad: gd3d.math.vector3[]): void;
         static addQuadPos_Quad(data: meshData, quad: gd3d.math.vector3[]): void;
         static addQuadVec3ByValue(array: gd3d.math.vector3[], value: gd3d.math.vector3): void;

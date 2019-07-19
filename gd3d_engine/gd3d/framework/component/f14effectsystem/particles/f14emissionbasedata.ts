@@ -105,7 +105,8 @@ namespace gd3d.framework
                     this.loopenum=LoopEnum.TimeContinue;
                     break;
             }
-            this.mesh=assetmgr.getAssetByName(json.mesh,assetbundle) as gd3d.framework.mesh;
+            this.mesh= (assetmgr.getAssetByName(json.mesh,assetbundle)||assetmgr.getAssetByName(json.mesh.replace(".bin",".json"),assetbundle)) as gd3d.framework.mesh;
+            
             this.material=assetmgr.getAssetByName(json.material,assetbundle) as gd3d.framework.material;
             gd3d.math.vec3FormJson(json.rotPosition,this.rotPosition);
             gd3d.math.vec3FormJson(json.rotScale,this.rotScale);
@@ -256,7 +257,7 @@ namespace gd3d.framework
 
         public static getRandomDirAndPosByZEmission(emission:F14EmissionBaseData,outDir:gd3d.math.vector3,outPos:gd3d.math.vector3)
         {
-
+            var o,o1;
             switch(emission.shapeType)
             {
                 case ParticleSystemShape.NORMAL:
@@ -264,22 +265,22 @@ namespace gd3d.framework
                     gd3d.math.vec3Clone(gd3d.math.pool.vector3_up,outDir);
                     break;
                 case ParticleSystemShape.SPHERE:
-                    var θ = Math.random()*Math.PI*2;
-                    var φ = Math.random()*Math.PI;
-                    outDir.x=Math.sin(φ)*Math.cos(θ);
-                    outDir.y=Math.cos(φ);         
-                    outDir.z=Math.sin(φ)*Math.sin(θ);
+                    o = Math.random()*Math.PI*2;
+                    o1 = Math.random()*Math.PI;
+                    outDir.x=Math.sin(o1)*Math.cos(o);
+                    outDir.y=Math.cos(o1);         
+                    outDir.z=Math.sin(o1)*Math.sin(o);
                     var radius=Math.random()*emission.radius;
                     
                     gd3d.math.vec3ScaleByNum(outDir,radius,outPos);
                     break;
                 case ParticleSystemShape.HEMISPHERE:
-                    var θ = Math.random()*Math.PI*2;
-                    var φ = Math.random()*Math.PI*0.5;
+                    o = Math.random()*Math.PI*2;
+                    o1 = Math.random()*Math.PI*0.5;
                     var radius=Math.random()*emission.radius;
-                    outDir.x=Math.sin(φ)*Math.cos(θ);
-                    outDir.y=Math.cos(φ);         
-                    outDir.z=Math.sin(φ)*Math.sin(θ);
+                    outDir.x=Math.sin(o1)*Math.cos(o);
+                    outDir.y=Math.cos(o1);         
+                    outDir.z=Math.sin(o1)*Math.sin(o);
                     gd3d.math.vec3ScaleByNum(outDir,radius,outPos);
                     break;
                 case ParticleSystemShape.BOX:
