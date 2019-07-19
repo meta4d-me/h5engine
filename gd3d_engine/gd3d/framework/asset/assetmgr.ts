@@ -548,14 +548,14 @@ namespace gd3d.framework
         mapNamed: { [id: string]: number[] } = {};
 
         /**
-         * 资源Md5的字典，key为资源的ID
+         * 资源guid的字典，key为资源的ID
          */
-        mapMd5Id : { [md5 : string] : number } = {};
+        mapGuidId : { [guid : string] : number } = {};
 
         /**
          * 等待加载完毕后 统一回调 字典
          */
-        mapMd5WaitLoaded : {[md5 : string] : Function[]} = {};
+        mapGuidWaitLoaded : {[guid : string] : Function[]} = {};
 
         /**
         * @public
@@ -593,10 +593,10 @@ namespace gd3d.framework
                 if (ab != null){
                     if(ab.mapNamed[name]){  //尝试从Name 列表中取
                         id = ab.mapNamed[name] 
-                    }else if(ab.mapNameMD5[name]){  //尝试从MD5 列表中取
-                        let md5 = ab.mapNameMD5[name];
-                        if(this.mapMd5Id[md5] != undefined)
-                            id = this.mapMd5Id[md5];
+                    }else if(ab.mapNameGuid[name]){  //尝试从guid 列表中取
+                        let guid = ab.mapNameGuid[name];
+                        if(this.mapGuidId[guid] != undefined)
+                            id = this.mapGuidId[guid];
                     }
                 }
             }

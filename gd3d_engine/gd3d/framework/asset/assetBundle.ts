@@ -24,7 +24,7 @@ namespace gd3d.framework {
          * @version egret-gd3d 1.0
          */
         assetmgr: assetMgr;
-        private files: { name: string, length: number, packes: number, md5: string, zip_Length: number }[] = [];
+        private files: { name: string, length: number, packes: number, guid: string, zip_Length: number }[] = [];
         private packages: string[] = [];
 
         private bundlePackBin: { [name: string]: ArrayBuffer } = {};
@@ -57,8 +57,8 @@ namespace gd3d.framework {
 
         loadLightMap: boolean = true;
 
-        //md5等待加载完毕回调 资源计数
-        private waitMd5Count = 0;
+        //guid等待加载完毕回调 资源计数
+        private waitGuidCount = 0;
 
         constructor(url: string) {
             this.url = url;
@@ -115,9 +115,9 @@ namespace gd3d.framework {
                     this.assetmgr.waitlightmapScene[this.url].push(this.path + "/" + item.name);
                     continue;
                 }
-                this.files.push({ name: item.name, length: item.length, packes: packes, md5: item.md5, zip_Length: item.zip_Length });
-                if(item.md5 != undefined){
-                    this.mapNameMD5[item.name] = item.md5;
+                this.files.push({ name: item.name, length: item.length, packes: packes, guid: item.guid, zip_Length: item.zip_Length });
+                if(item.guid != undefined){
+                    this.mapNameGuid[item.name] = item.guid;
                 }
             }
             if (json["packes"] != undefined) {
@@ -202,22 +202,22 @@ namespace gd3d.framework {
                 packs.push({ url: url, type: type, asset: null });
             }
             
-            let list: { url: string, type: AssetTypeEnum, md5 : string , asset: IAsset, handle: () => any }[] = [];
+            let list: { url: string, type: AssetTypeEnum, guid : string , asset: IAsset, handle: () => any }[] = [];
             //遍历每项资源 整理到加载列表
             for (let fitem of this.files) {
                 let url = this.path + "/" + fitem.name;
                 let fileName = assetmgr.getFileName(url);
-                let md5 = fitem.md5;
-                if(md5 != undefined){
-                    let mapMd5 = assetmgr.mapMd5Id;
-                    let mAssId = mapMd5[md5];
-                    // md5重复性检查
-                    //是否md5_map 中包含
+                let guid = fitem.guid;
+                if(guid != undefined){
+                    let mapGuid = assetmgr.mapGuidId;
+                    let mAssId = mapGuid[guid];
+                    // guid重复性检查
+                    //是否guid_map 中包含
                     if(mAssId!= undefined){
                         //是否 正在加载
                         let sRef = assetmgr.mapRes[mAssId];
                         if(sRef && assetmgr.assetIsLoing(sRef)){
-                            //是 加入 md5_waitLoad_map
+                            //是 加入 guid_waitLoad_map
                             //关联到 bundle 的 加载状态队列
                             state.resstate[fileName] = new ResourceState();
     
@@ -244,26 +244,26 @@ namespace gd3d.framework {
                             //     }
                             // };
 
-                            this.waitMd5Count++; //加入等待列表 ，计数增加
+                            this.waitGuidCount++; //加入等待列表 ，计数增加
 
                             let waitLoaded = ()=>{
-                                let old = this.waitMd5Count;
-                               this.waitMd5Count --; //减少计数
+                                let old = this.waitGuidCount;
+                               this.waitGuidCount --; //减少计数
                                //检查加载结束to解析资源
-                               this.CkNextHandleOfMd5(list,state,onstate);
+                               this.CkNextHandleOfGuid(list,state,onstate);
                             };
                             
-                            // opt["md5"] = md5;
+                            // opt["guid"] = guid;
                             // opt["waitLoaded"] = waitLoaded;
                             // opt["resolve"] = null;
                             // list.push(opt);
                             
                             let waitList : any[] ;
-                            if(!assetmgr.mapMd5WaitLoaded[md5]){
-                                assetmgr.mapMd5WaitLoaded[md5] = [];
+                            if(!assetmgr.mapGuidWaitLoaded[guid]){
+                                assetmgr.mapGuidWaitLoaded[guid] = [];
                             }
-                            waitList = assetmgr.mapMd5WaitLoaded[md5];
-                            waitList.push(waitLoaded);//等待同md5资源加完 回调处理
+                            waitList = assetmgr.mapGuidWaitLoaded[guid];
+                            waitList.push(waitLoaded);//等待同guid资源加完 回调处理
     
                         }
                         continue;  //跳过 不放入加载队列
@@ -280,7 +280,7 @@ namespace gd3d.framework {
 
                 {
                     let asset = null;
-                    let _item = {url, type, md5 , asset: null }; 
+                    let _item = {url, type, guid , asset: null }; 
                     switch (type) {
                         case AssetTypeEnum.GLFragmentShader:
                             glfshaders.push(_item);
@@ -358,9 +358,9 @@ namespace gd3d.framework {
                         let assId = asset.getGUID();
                         this.mapNamed[fileName] = assId;
                         assetmgr.regRes(fileName, asset);
-                        //注册 md5_map  {md5 : AssetId}
-                        if(md5 && assetmgr.mapMd5Id[md5] == undefined){
-                            assetmgr.mapMd5Id[md5] = assId;
+                        //注册 guid_map  {guid : AssetId}
+                        if(guid && assetmgr.mapGuidId[guid] == undefined){
+                            assetmgr.mapGuidId[guid] = assId;
                         }
                     }
                 }
@@ -372,7 +372,7 @@ namespace gd3d.framework {
                 for (let j = 0, clen = asslist[i].length; j < clen; ++j) {
                     let item = asslist[i][j];
                     handles[item.url] = list.length;
-                    list.push({ url: item.url, type: item.type, md5: item.md5 ,asset: item.asset, handle: undefined });
+                    list.push({ url: item.url, type: item.type, guid: item.guid ,asset: item.asset, handle: undefined });
                 }
             }
 
@@ -496,21 +496,21 @@ namespace gd3d.framework {
                 };
                 respackCall(() => {
                     // this.NextHandle(list, state, onstate , assetmgr);
-                    this.CkNextHandleOfMd5(list, state, onstate);
+                    this.CkNextHandleOfGuid(list, state, onstate);
                 });
             }
             else
                 // this.NextHandle(list, state, onstate,assetmgr);
-                this.CkNextHandleOfMd5(list, state, onstate);
+                this.CkNextHandleOfGuid(list, state, onstate);
         }
 
-        private CkNextHandleOfMd5(list , state, onstate){
-            if(this.waitMd5Count > 0) return;
+        private CkNextHandleOfGuid(list , state, onstate){
+            if(this.waitGuidCount > 0) return;
             this.NextHandle(list , state, onstate);
         }
 
         //文件加载完毕后统一解析处理 
-        private NextHandle(list : { url: string, type: AssetTypeEnum, md5 : string , asset: IAsset, handle: () => any }[] , state, onstate ) {
+        private NextHandle(list : { url: string, type: AssetTypeEnum, guid : string , asset: IAsset, handle: () => any }[] , state, onstate ) {
             let waitArrs = [];
             let count = 0;
             let lastHandle = [];
@@ -518,21 +518,7 @@ namespace gd3d.framework {
                 // console.log(`资源包 :${this.url} 加载完成`);
                 state.isfinish = true;
                 onstate(state);
-                //回调 md5列表
-                // let len = list.length;
-                // for(let i=0;i < len ;i++){
-                //     let item = list[i];
-                //     if(item["md5"] == undefined) continue;
-                //     let md5 = item["md5"] ;
-                //     let waitList = assetmgr.mapMd5WaitLoaded[md5];
-                //     if(waitList){
-                //         waitList.forEach(element => {
-                //             element();
-                //         });
-                //         waitList.length = 0;
-                //         delete assetmgr.mapMd5WaitLoaded[md5];
-                //     }
-                // }
+                //回调 guid列表
                 this.endWaitList(list );
             };
             // for (let hitem of list)
@@ -570,22 +556,22 @@ namespace gd3d.framework {
             }
         }
 
-        private endWaitList( list : { url: string, type: AssetTypeEnum, md5 : string , asset: IAsset, handle: () => any }[]){
-            //回调 md5列表
+        private endWaitList( list : { url: string, type: AssetTypeEnum, guid : string , asset: IAsset, handle: () => any }[]){
+            //回调guid列表
             let len = list.length;
             for(let i=0;i < len ;i++){
                 let item = list[i];
-                if(item.md5 == undefined) continue;
-                let md5 = item.md5;
-                let wlMap = this.assetmgr.mapMd5WaitLoaded; 
-                if(wlMap[md5] == undefined) continue;
-                let waitList = wlMap[md5];
+                if(item.guid == undefined) continue;
+                let guid = item.guid;
+                let wlMap = this.assetmgr.mapGuidWaitLoaded; 
+                if(wlMap[guid] == undefined) continue;
+                let waitList = wlMap[guid];
                 if(waitList){
                     waitList.forEach(element => {
                         element();  
                     });
                     waitList.length = 0;
-                    delete wlMap[md5];
+                    delete wlMap[guid];
                 }
             }
         }
@@ -606,8 +592,8 @@ namespace gd3d.framework {
         mapNamed: { [name: string]: number } = {};
 
         /**
-         * 资源名- MD5 字典
+         * 资源名- Guid 字典
          */
-        mapNameMD5 : { [name : string] : string } = {};  
+        mapNameGuid : { [name : string] : string } = {};  
     }
 }

@@ -6835,9 +6835,9 @@ var gd3d;
                 this.bundlePackBin = {};
                 this.totalLength = 0;
                 this.loadLightMap = true;
-                this.waitMd5Count = 0;
+                this.waitGuidCount = 0;
                 this.mapNamed = {};
-                this.mapNameMD5 = {};
+                this.mapNameGuid = {};
                 this.url = url;
                 var i = url.lastIndexOf("/");
                 this.path = url.substring(0, i);
@@ -6879,9 +6879,9 @@ var gd3d;
                         this.assetmgr.waitlightmapScene[this.url].push(this.path + "/" + item.name);
                         continue;
                     }
-                    this.files.push({ name: item.name, length: item.length, packes: packes, md5: item.md5, zip_Length: item.zip_Length });
-                    if (item.md5 != undefined) {
-                        this.mapNameMD5[item.name] = item.md5;
+                    this.files.push({ name: item.name, length: item.length, packes: packes, guid: item.guid, zip_Length: item.zip_Length });
+                    if (item.guid != undefined) {
+                        this.mapNameGuid[item.name] = item.guid;
                     }
                 }
                 if (json["packes"] != undefined) {
@@ -6942,37 +6942,32 @@ var gd3d;
                     packs.push({ url: url, type: type, asset: null });
                 }
                 var list = [];
-                var _loop_2 = function (fitem) {
-                    var url = this_2.path + "/" + fitem.name;
+                for (var _b = 0, _c = this.files; _b < _c.length; _b++) {
+                    var fitem = _c[_b];
+                    var url = this.path + "/" + fitem.name;
                     var fileName = assetmgr.getFileName(url);
-                    var md5 = fitem.md5;
-                    if (md5 == "976a671f5fae4addacade82d9fde669c") {
-                        debugger;
-                    }
-                    if (md5 != undefined) {
-                        var mapMd5 = assetmgr.mapMd5Id;
-                        var mAssId = mapMd5[md5];
+                    var guid = fitem.guid;
+                    if (guid != undefined) {
+                        var mapGuid = assetmgr.mapGuidId;
+                        var mAssId = mapGuid[guid];
                         if (mAssId != undefined) {
                             var sRef = assetmgr.mapRes[mAssId];
                             if (sRef && assetmgr.assetIsLoing(sRef)) {
                                 state.resstate[fileName] = new framework.ResourceState();
-                                this_2.waitMd5Count++;
+                                this.waitGuidCount++;
                                 var waitLoaded = function () {
-                                    var old = _this.waitMd5Count;
-                                    _this.waitMd5Count--;
-                                    if (md5 == "976a671f5fae4addacade82d9fde669c") {
-                                        debugger;
-                                    }
-                                    _this.CkNextHandleOfMd5(list, state, onstate);
+                                    var old = _this.waitGuidCount;
+                                    _this.waitGuidCount--;
+                                    _this.CkNextHandleOfGuid(list, state, onstate);
                                 };
                                 var waitList = void 0;
-                                if (!assetmgr.mapMd5WaitLoaded[md5]) {
-                                    assetmgr.mapMd5WaitLoaded[md5] = [];
+                                if (!assetmgr.mapGuidWaitLoaded[guid]) {
+                                    assetmgr.mapGuidWaitLoaded[guid] = [];
                                 }
-                                waitList = assetmgr.mapMd5WaitLoaded[md5];
+                                waitList = assetmgr.mapGuidWaitLoaded[guid];
                                 waitList.push(waitLoaded);
                             }
-                            return "continue";
+                            continue;
                         }
                     }
                     var type = assetmgr.calcType(fitem.name);
@@ -6981,7 +6976,7 @@ var gd3d;
                     }
                     {
                         var asset = null;
-                        var _item = { url: url, type: type, md5: md5, asset: null };
+                        var _item = { url: url, type: type, guid: guid, asset: null };
                         switch (type) {
                             case framework.AssetTypeEnum.GLFragmentShader:
                                 glfshaders.push(_item);
@@ -7054,33 +7049,28 @@ var gd3d;
                         if (type != framework.AssetTypeEnum.GLVertexShader && type != framework.AssetTypeEnum.GLFragmentShader && type != framework.AssetTypeEnum.Shader
                             && type != framework.AssetTypeEnum.PackBin && type != framework.AssetTypeEnum.PackTxt && type != framework.AssetTypeEnum.Prefab) {
                             if (!asset)
-                                return "continue";
+                                continue;
                             var assId = asset.getGUID();
-                            this_2.mapNamed[fileName] = assId;
+                            this.mapNamed[fileName] = assId;
                             assetmgr.regRes(fileName, asset);
-                            if (md5 && assetmgr.mapMd5Id[md5] == undefined) {
-                                assetmgr.mapMd5Id[md5] = assId;
+                            if (guid && assetmgr.mapGuidId[guid] == undefined) {
+                                assetmgr.mapGuidId[guid] = assId;
                             }
                         }
                     }
-                };
-                var this_2 = this;
-                for (var _b = 0, _c = this.files; _b < _c.length; _b++) {
-                    var fitem = _c[_b];
-                    _loop_2(fitem);
                 }
                 var handles = {};
                 for (var i = 0, len = asslist.length; i < len; ++i) {
                     for (var j = 0, clen = asslist[i].length; j < clen; ++j) {
                         var item = asslist[i][j];
                         handles[item.url] = list.length;
-                        list.push({ url: item.url, type: item.type, md5: item.md5, asset: item.asset, handle: undefined });
+                        list.push({ url: item.url, type: item.type, guid: item.guid, asset: item.asset, handle: undefined });
                     }
                 }
                 var packlist = [];
                 var haveBin = false;
                 var tempMap = {};
-                var _loop_3 = function (item) {
+                var _loop_2 = function (item) {
                     var surl = item.url;
                     var type = item.type;
                     var asset = item.asset;
@@ -7088,8 +7078,8 @@ var gd3d;
                     if (mapPackes[surl] != undefined) {
                         packlist.push({ surl: surl, type: type, asset: asset });
                         delete tempMap[surl];
-                        if (this_3.mapIsNull(tempMap))
-                            this_3.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, handles);
+                        if (this_2.mapIsNull(tempMap))
+                            this_2.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, handles);
                     }
                     else {
                         if (type == framework.AssetTypeEnum.PackBin) {
@@ -7145,10 +7135,10 @@ var gd3d;
                         }
                     }
                 };
-                var this_3 = this;
+                var this_2 = this;
                 for (var _d = 0, list_1 = list; _d < list_1.length; _d++) {
                     var item = list_1[_d];
-                    _loop_3(item);
+                    _loop_2(item);
                 }
             };
             assetBundle.prototype.downloadFinsih = function (state, list, haveBin, onstate, packlist, mapPackes, handles) {
@@ -7158,7 +7148,7 @@ var gd3d;
                         if (packlist.length < 1)
                             fcall();
                         var count = 0;
-                        var _loop_4 = function (uitem) {
+                        var _loop_3 = function (uitem) {
                             var respack = void 0;
                             if (mapPackes[uitem.surl] == 0)
                                 respack = _this.bundlePackJson;
@@ -7182,18 +7172,18 @@ var gd3d;
                         };
                         for (var _i = 0, packlist_1 = packlist; _i < packlist_1.length; _i++) {
                             var uitem = packlist_1[_i];
-                            _loop_4(uitem);
+                            _loop_3(uitem);
                         }
                     };
                     respackCall(function () {
-                        _this.CkNextHandleOfMd5(list, state, onstate);
+                        _this.CkNextHandleOfGuid(list, state, onstate);
                     });
                 }
                 else
-                    this.CkNextHandleOfMd5(list, state, onstate);
+                    this.CkNextHandleOfGuid(list, state, onstate);
             };
-            assetBundle.prototype.CkNextHandleOfMd5 = function (list, state, onstate) {
-                if (this.waitMd5Count > 0)
+            assetBundle.prototype.CkNextHandleOfGuid = function (list, state, onstate) {
+                if (this.waitGuidCount > 0)
                     return;
                 this.NextHandle(list, state, onstate);
             };
@@ -7241,19 +7231,19 @@ var gd3d;
                 var len = list.length;
                 for (var i = 0; i < len; i++) {
                     var item = list[i];
-                    if (item.md5 == undefined)
+                    if (item.guid == undefined)
                         continue;
-                    var md5 = item.md5;
-                    var wlMap = this.assetmgr.mapMd5WaitLoaded;
-                    if (wlMap[md5] == undefined)
+                    var guid = item.guid;
+                    var wlMap = this.assetmgr.mapGuidWaitLoaded;
+                    if (wlMap[guid] == undefined)
                         continue;
-                    var waitList = wlMap[md5];
+                    var waitList = wlMap[guid];
                     if (waitList) {
                         waitList.forEach(function (element) {
                             element();
                         });
                         waitList.length = 0;
-                        delete wlMap[md5];
+                        delete wlMap[guid];
                     }
                 }
             };
@@ -7379,8 +7369,8 @@ var gd3d;
                 this.mapBundle = {};
                 this.mapRes = {};
                 this.mapNamed = {};
-                this.mapMd5Id = {};
-                this.mapMd5WaitLoaded = {};
+                this.mapGuidId = {};
+                this.mapGuidWaitLoaded = {};
                 this._loadingTag = "_AssetLoingTag_";
                 this.mapInLoad = {};
                 this.assetUrlDic = {};
@@ -7439,10 +7429,10 @@ var gd3d;
                         if (ab.mapNamed[name]) {
                             id = ab.mapNamed[name];
                         }
-                        else if (ab.mapNameMD5[name]) {
-                            var md5 = ab.mapNameMD5[name];
-                            if (this.mapMd5Id[md5] != undefined)
-                                id = this.mapMd5Id[md5];
+                        else if (ab.mapNameGuid[name]) {
+                            var guid = ab.mapNameGuid[name];
+                            if (this.mapGuidId[guid] != undefined)
+                                id = this.mapGuidId[guid];
                         }
                     }
                 }
