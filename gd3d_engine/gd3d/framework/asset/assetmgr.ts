@@ -546,6 +546,17 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         mapNamed: { [id: string]: number[] } = {};
+
+        /**
+         * 资源guid的字典，key为资源的ID
+         */
+        mapGuidId : { [guid : string] : number } = {};
+
+        /**
+         * 等待加载完毕后 统一回调 字典
+         */
+        mapGuidWaitLoaded : {[guid : string] : Function[]} = {};
+
         /**
         * @public
         * @language zh_CN
@@ -578,9 +589,16 @@ namespace gd3d.framework
             }
             if (bundlename != null)
             {
-                let assetbundle = this.mapBundle[bundlename] as assetBundle;
-                if (assetbundle != null)
-                    id = assetbundle.mapNamed[name] || id;
+                let ab = this.mapBundle[bundlename] as assetBundle;
+                if (ab != null){
+                    if(ab.mapNamed[name]){  //尝试从Name 列表中取
+                        id = ab.mapNamed[name] 
+                    }else if(ab.mapNameGuid[name]){  //尝试从guid 列表中取
+                        let guid = ab.mapNameGuid[name];
+                        if(this.mapGuidId[guid] != undefined)
+                            id = this.mapGuidId[guid];
+                    }
+                }
             }
 
             let flag: boolean = true;
@@ -727,6 +745,12 @@ namespace gd3d.framework
             }
         }
         private readonly _loadingTag = "_AssetLoingTag_";
+
+        /** 判断是否在加载中 */
+        assetIsLoing(asRef: assetRef){
+            if(!asRef) return false;
+            return this._loadingTag in asRef;
+        }
 
         regRes(name: string, asset: IAsset)
         {

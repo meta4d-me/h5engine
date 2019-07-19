@@ -460,6 +460,16 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
+         * 当前物体视锥剔除开关
+         * @version egret-gd3d 1.0
+         */
+        enableCulling = true;
+
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * 添加子物体实例
          * @param node 子物体实例
          * @version egret-gd3d 1.0
@@ -919,7 +929,7 @@ namespace gd3d.framework
          */
         getWorldTranslate()
         {
-            if (!this.firstCalc && this.gameObject.isStatic){             
+            if (!this.firstCalc && this.gameObject.isStatic){
                 return this.worldTranslate;
             }
             if (!this._parent || !this._parent._parent)

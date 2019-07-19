@@ -1830,7 +1830,16 @@ var gd3d;
                     for (var i = 0; i < compLen; i++) {
                         if (!node.components[i])
                             continue;
-                        var comp = node.components[i].comp;
+                        var c = node.components[i];
+                        if (!c)
+                            continue;
+                        var comp = c.comp;
+                        if (framework.StringUtil.ENABLED in c.comp && !c.comp[framework.StringUtil.ENABLED])
+                            continue;
+                        if (!c.OnPlayed) {
+                            c.comp.onPlay();
+                            c.OnPlayed = true;
+                        }
                         comp.update(delta);
                         if (framework.instanceOfI2DPointListener(comp)) {
                             this._peCareListBuoy++;
@@ -2518,6 +2527,7 @@ var gd3d;
         var C2DComponent = (function () {
             function C2DComponent(comp, init) {
                 if (init === void 0) { init = false; }
+                this.OnPlayed = false;
                 this.comp = comp;
                 this.init = init;
             }
@@ -2565,7 +2575,6 @@ var gd3d;
                 this.components = [];
                 this.componentTypes = {};
                 this.componentsInit = [];
-                this.componentplayed = [];
                 this.optionArr = [layoutOption.LEFT, layoutOption.TOP, layoutOption.RIGHT, layoutOption.BOTTOM, layoutOption.H_CENTER, layoutOption.V_CENTER];
                 this._layoutState = 0;
                 this.layoutValueMap = {};
@@ -2937,24 +2946,22 @@ var gd3d;
                 if (this.onDispose)
                     this.onDispose();
             };
-            transform2D.prototype.init = function (bePlayed) {
-                if (bePlayed === void 0) { bePlayed = false; }
+            transform2D.prototype.init = function (bePlay) {
+                if (bePlay === void 0) { bePlay = false; }
                 if (this.componentsInit.length > 0) {
-                    for (var i = 0; i < this.componentsInit.length; i++) {
-                        this.componentsInit[i].comp.start();
-                        this.componentsInit[i].init = true;
-                        if (bePlayed)
-                            this.componentsInit[i].comp.onPlay();
-                        else
-                            this.componentplayed.push(this.componentsInit[i]);
+                    var len = this.componentsInit.length;
+                    for (var i = 0; i < len; i++) {
+                        var c = this.componentsInit[i];
+                        c.comp.start();
+                        c.init = true;
+                        if (bePlay) {
+                            if ((framework.StringUtil.ENABLED in c.comp) && !c.comp[framework.StringUtil.ENABLED])
+                                continue;
+                            c.comp.onPlay();
+                            c.OnPlayed = true;
+                        }
                     }
                     this.componentsInit.length = 0;
-                }
-                if (this.componentplayed.length > 0 && bePlayed) {
-                    this.componentplayed.forEach(function (item) {
-                        item.comp.onPlay();
-                    });
-                    this.componentplayed.length = 0;
                 }
             };
             transform2D.prototype.addComponent = function (type) {
@@ -3038,6 +3045,7 @@ var gd3d;
                 delete this.componentTypes[type];
             };
             transform2D.prototype.removeAllComponents = function () {
+                this.componentsInit.length = 0;
                 var len = this.components.length;
                 for (var i = 0; i < len; i++) {
                     this.components[i].comp.remove();
@@ -3365,6 +3373,7 @@ var gd3d;
     (function (framework) {
         var behaviour2d = (function () {
             function behaviour2d() {
+                this.enabled = true;
             }
             behaviour2d.prototype.start = function () {
             };
@@ -6830,7 +6839,9 @@ var gd3d;
                 this.bundlePackBin = {};
                 this.totalLength = 0;
                 this.loadLightMap = true;
+                this.waitGuidCount = 0;
                 this.mapNamed = {};
+                this.mapNameGuid = {};
                 this.url = url;
                 var i = url.lastIndexOf("/");
                 this.path = url.substring(0, i);
@@ -6872,7 +6883,10 @@ var gd3d;
                         this.assetmgr.waitlightmapScene[this.url].push(this.path + "/" + item.name);
                         continue;
                     }
-                    this.files.push({ name: item.name, length: item.length, packes: packes });
+                    this.files.push({ name: item.name, length: item.length, packes: packes, guid: item.guid, zip_Length: item.zip_Length });
+                    if (item.guid != undefined) {
+                        this.mapNameGuid[item.name] = item.guid;
+                    }
                 }
                 if (json["packes"] != undefined) {
                     var packes = json["packes"];
@@ -6899,9 +6913,11 @@ var gd3d;
             };
             assetBundle.prototype.load = function (assetmgr, onstate, state) {
                 var _this = this;
+                if (assetmgr && assetmgr != this.assetmgr) {
+                    this.assetmgr = assetmgr;
+                }
                 state.totalByteLength = this.totalLength;
                 var total = this.files.length;
-                this.assetmgr = assetmgr;
                 var glvshaders = [];
                 var glfshaders = [];
                 var shaders = [];
@@ -6929,100 +6945,130 @@ var gd3d;
                     var url = this.path + "/" + pack;
                     packs.push({ url: url, type: type, asset: null });
                 }
+                var list = [];
                 for (var _b = 0, _c = this.files; _b < _c.length; _b++) {
                     var fitem = _c[_b];
-                    var type = assetmgr.calcType(fitem.name);
                     var url = this.path + "/" + fitem.name;
                     var fileName = assetmgr.getFileName(url);
+                    var guid = fitem.guid;
+                    if (guid != undefined) {
+                        var mapGuid = assetmgr.mapGuidId;
+                        var mAssId = mapGuid[guid];
+                        if (mAssId != undefined) {
+                            var sRef = assetmgr.mapRes[mAssId];
+                            if (sRef && assetmgr.assetIsLoing(sRef)) {
+                                state.resstate[fileName] = new framework.ResourceState();
+                                this.waitGuidCount++;
+                                var waitLoaded = function () {
+                                    var old = _this.waitGuidCount;
+                                    _this.waitGuidCount--;
+                                    _this.CkNextHandleOfGuid(list, state, onstate);
+                                };
+                                var waitList = void 0;
+                                if (!assetmgr.mapGuidWaitLoaded[guid]) {
+                                    assetmgr.mapGuidWaitLoaded[guid] = [];
+                                }
+                                waitList = assetmgr.mapGuidWaitLoaded[guid];
+                                waitList.push(waitLoaded);
+                            }
+                            continue;
+                        }
+                    }
+                    var type = assetmgr.calcType(fitem.name);
                     if (fitem.packes != -1) {
                         mapPackes[url] = fitem.packes;
                     }
                     {
                         var asset = null;
+                        var _item = { url: url, type: type, guid: guid, asset: null };
                         switch (type) {
                             case framework.AssetTypeEnum.GLFragmentShader:
-                                glfshaders.push({ url: url, type: type, asset: null });
+                                glfshaders.push(_item);
                                 break;
                             case framework.AssetTypeEnum.GLVertexShader:
-                                glvshaders.push({ url: url, type: type, asset: null });
+                                glvshaders.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Shader:
                                 asset = new framework.shader(fileName);
-                                shaders.push({ url: url, type: type, asset: asset });
+                                shaders.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Texture:
                                 asset = new framework.texture(fileName);
-                                textures.push({ url: url, type: type, asset: asset });
+                                textures.push(_item);
                                 break;
                             case framework.AssetTypeEnum.TextureDesc:
                                 asset = new framework.texture(fileName);
-                                texturedescs.push({ url: url, type: type, asset: asset });
+                                texturedescs.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Mesh:
                                 asset = new framework.mesh(fileName);
-                                meshs.push({ url: url, type: type, asset: asset });
+                                meshs.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Material:
                                 asset = new framework.material(fileName);
-                                materials.push({ url: url, type: type, asset: asset });
+                                materials.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Aniclip:
                                 asset = new framework.animationClip(fileName);
-                                anclips.push({ url: url, type: type, asset: asset });
+                                anclips.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Prefab:
                                 asset = new framework.prefab(fileName);
-                                prefabs.push({ url: url, type: type, asset: asset });
+                                prefabs.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Scene:
                                 asset = new framework.rawscene(fileName);
-                                scenes.push({ url: url, type: type, asset: asset });
+                                scenes.push(_item);
                                 break;
                             case framework.AssetTypeEnum.TextAsset:
                                 asset = new framework.textasset(fileName);
-                                textassets.push({ url: url, type: type, asset: asset });
+                                textassets.push(_item);
                                 break;
                             case framework.AssetTypeEnum.PVR:
                                 asset = new framework.texture(fileName);
-                                pvrs.push({ url: url, type: type, asset: asset });
+                                pvrs.push(_item);
                                 break;
                             case framework.AssetTypeEnum.F14Effect:
                                 asset = new framework.f14eff(fileName);
-                                f14effs.push({ url: url, type: type, asset: asset });
+                                f14effs.push(_item);
                                 break;
                             case framework.AssetTypeEnum.DDS:
                                 asset = new framework.texture(fileName);
-                                ddss.push({ url: url, type: type, asset: asset });
+                                ddss.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Font:
                                 asset = new framework.font(fileName);
-                                fonts.push({ url: url, type: type, asset: asset });
+                                fonts.push(_item);
                                 break;
                             case framework.AssetTypeEnum.Atlas:
                                 asset = new framework.atlas(fileName);
-                                atlass.push({ url: url, type: type, asset: asset });
+                                atlass.push(_item);
                                 break;
                             case framework.AssetTypeEnum.KeyFrameAniclip:
                                 asset = new framework.keyFrameAniClip(fileName);
-                                kfaniclips.push({ url: url, type: type, asset: asset });
+                                kfaniclips.push(_item);
                                 break;
                         }
+                        _item.asset = asset;
                         if (type != framework.AssetTypeEnum.GLVertexShader && type != framework.AssetTypeEnum.GLFragmentShader && type != framework.AssetTypeEnum.Shader
                             && type != framework.AssetTypeEnum.PackBin && type != framework.AssetTypeEnum.PackTxt && type != framework.AssetTypeEnum.Prefab) {
                             if (!asset)
                                 continue;
-                            this.mapNamed[fileName] = asset.getGUID();
+                            var assId = asset.getGUID();
+                            this.mapNamed[fileName] = assId;
                             assetmgr.regRes(fileName, asset);
+                            if (guid && assetmgr.mapGuidId[guid] == undefined) {
+                                assetmgr.mapGuidId[guid] = assId;
+                            }
                         }
                     }
                 }
-                var list = [];
                 var handles = {};
                 for (var i = 0, len = asslist.length; i < len; ++i) {
                     for (var j = 0, clen = asslist[i].length; j < clen; ++j) {
                         var item = asslist[i][j];
                         handles[item.url] = list.length;
-                        list.push({ url: item.url, type: item.type, asset: item.asset, handle: undefined });
+                        list.push({ url: item.url, type: item.type, guid: item.guid, asset: item.asset, handle: undefined });
                     }
                 }
                 var packlist = [];
@@ -7037,7 +7083,7 @@ var gd3d;
                         packlist.push({ surl: surl, type: type, asset: asset });
                         delete tempMap[surl];
                         if (this_2.mapIsNull(tempMap))
-                            this_2.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
+                            this_2.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, handles);
                     }
                     else {
                         if (type == framework.AssetTypeEnum.PackBin) {
@@ -7066,7 +7112,7 @@ var gd3d;
                                 }
                                 delete tempMap[surl];
                                 if (_this.mapIsNull(tempMap))
-                                    _this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
+                                    _this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, handles);
                             }, function (loadedLength, totalLength) {
                                 state.compressBinLoaded = loadedLength;
                                 onstate(state);
@@ -7088,7 +7134,7 @@ var gd3d;
                                 list[handles[data.url]].handle = data.handle;
                                 delete tempMap[data.url];
                                 if (_this.mapIsNull(tempMap))
-                                    _this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
+                                    _this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, handles);
                             });
                         }
                     }
@@ -7099,7 +7145,7 @@ var gd3d;
                     _loop_2(item);
                 }
             };
-            assetBundle.prototype.downloadFinsih = function (state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles) {
+            assetBundle.prototype.downloadFinsih = function (state, list, haveBin, onstate, packlist, mapPackes, handles) {
                 var _this = this;
                 if (haveBin) {
                     var respackCall = function (fcall) {
@@ -7114,7 +7160,7 @@ var gd3d;
                                 respack = _this.bundlePackBin;
                             else
                                 console.log("未识别的packnum: " + mapPackes[uitem.surl]);
-                            assetmgr.loadResByPack(respack, uitem.surl, uitem.type, function (s) {
+                            _this.assetmgr.loadResByPack(respack, uitem.surl, uitem.type, function (s) {
                                 if (s.progressCall) {
                                     s.progressCall = false;
                                     onstate(state);
@@ -7134,19 +7180,26 @@ var gd3d;
                         }
                     };
                     respackCall(function () {
-                        _this.NextHandle(list, state, onstate);
+                        _this.CkNextHandleOfGuid(list, state, onstate);
                     });
                 }
                 else
-                    this.NextHandle(list, state, onstate);
+                    this.CkNextHandleOfGuid(list, state, onstate);
+            };
+            assetBundle.prototype.CkNextHandleOfGuid = function (list, state, onstate) {
+                if (this.waitGuidCount > 0)
+                    return;
+                this.NextHandle(list, state, onstate);
             };
             assetBundle.prototype.NextHandle = function (list, state, onstate) {
+                var _this = this;
                 var waitArrs = [];
                 var count = 0;
                 var lastHandle = [];
                 var finish = function () {
                     state.isfinish = true;
                     onstate(state);
+                    _this.endWaitList(list);
                 };
                 for (var i = 0, l = list.length; i < l; ++i) {
                     var hitem = list[i];
@@ -7176,6 +7229,26 @@ var gd3d;
                     while (lastHandle.length > 0)
                         lastHandle.shift().handle();
                     finish();
+                }
+            };
+            assetBundle.prototype.endWaitList = function (list) {
+                var len = list.length;
+                for (var i = 0; i < len; i++) {
+                    var item = list[i];
+                    if (item.guid == undefined)
+                        continue;
+                    var guid = item.guid;
+                    var wlMap = this.assetmgr.mapGuidWaitLoaded;
+                    if (wlMap[guid] == undefined)
+                        continue;
+                    var waitList = wlMap[guid];
+                    if (waitList) {
+                        waitList.forEach(function (element) {
+                            element();
+                        });
+                        waitList.length = 0;
+                        delete wlMap[guid];
+                    }
                 }
             };
             assetBundle.prototype.mapIsNull = function (map) {
@@ -7300,6 +7373,8 @@ var gd3d;
                 this.mapBundle = {};
                 this.mapRes = {};
                 this.mapNamed = {};
+                this.mapGuidId = {};
+                this.mapGuidWaitLoaded = {};
                 this._loadingTag = "_AssetLoingTag_";
                 this.mapInLoad = {};
                 this.assetUrlDic = {};
@@ -7353,9 +7428,17 @@ var gd3d;
                     id = this.mapNamed[name][this.mapNamed[name].length - 1];
                 }
                 if (bundlename != null) {
-                    var assetbundle = this.mapBundle[bundlename];
-                    if (assetbundle != null)
-                        id = assetbundle.mapNamed[name] || id;
+                    var ab = this.mapBundle[bundlename];
+                    if (ab != null) {
+                        if (ab.mapNamed[name]) {
+                            id = ab.mapNamed[name];
+                        }
+                        else if (ab.mapNameGuid[name]) {
+                            var guid = ab.mapNameGuid[name];
+                            if (this.mapGuidId[guid] != undefined)
+                                id = this.mapGuidId[guid];
+                        }
+                    }
                 }
                 var flag = true;
                 if (id != null) {
@@ -7447,6 +7530,11 @@ var gd3d;
                 if (this.mapRes[id][this._loadingTag]) {
                     delete this.mapRes[id][this._loadingTag];
                 }
+            };
+            assetMgr.prototype.assetIsLoing = function (asRef) {
+                if (!asRef)
+                    return false;
+                return this._loadingTag in asRef;
             };
             assetMgr.prototype.regRes = function (name, asset) {
                 var id = asset.getGUID();
@@ -10361,6 +10449,7 @@ var gd3d;
                 this._dirtyAABB = true;
                 this.children = [];
                 this.dirtiedOfFrustumCulling = false;
+                this.enableCulling = true;
                 this.dirtyLocal = false;
                 this.dirtyWorld = false;
                 this.hasComponent = false;
@@ -14383,6 +14472,7 @@ var gd3d;
     (function (framework) {
         var behaviour = (function () {
             function behaviour() {
+                this.enabled = true;
             }
             behaviour.prototype.start = function () {
             };
@@ -14980,18 +15070,16 @@ var gd3d;
                     if (this.needUpdateWpos) {
                         node.getWorldTranslate();
                     }
-                    this.cullingMap[id] = this.isCulling(node);
+                    this.cullingMap[id] = node.enableCulling && this.isCulling(node);
                     if (this.isLastCamera)
                         node.dirtiedOfFrustumCulling = false;
                 }
                 if (node.gameObject != null && node.gameObject.renderer != null) {
-                    if (scene.app.isFrustumCulling) {
-                        if (!this.cullingMap[id]) {
-                            scene.renderList.addRenderer(node.gameObject.renderer);
+                    if (scene.app.isFrustumCulling && !this.cullingMap[id]) {
+                        var _renderer = node.gameObject.renderer;
+                        if (this.CullingMask & (1 << _renderer.renderLayer)) {
+                            scene.renderList.addRenderer(_renderer);
                         }
-                    }
-                    else {
-                        scene.renderList.addRenderer(node.gameObject.renderer);
                     }
                 }
                 if (node.children) {
@@ -15111,10 +15199,7 @@ var gd3d;
                     var ls = rlayers[i].list;
                     for (var j = 0, jl = ls.length; j < jl; ++j) {
                         var item = ls[j];
-                        if (item.gameObject.visible == true && this.CullingMask & (1 << item.renderLayer)) {
-                            if (item.gameObject && item.gameObject.visible == true)
-                                item.render(context, assetmgr, this);
-                        }
+                        item.render(context, assetmgr, this);
                     }
                 }
             };
@@ -31513,6 +31598,7 @@ var gd3d;
         var nodeComponent = (function () {
             function nodeComponent(comp, init) {
                 if (init === void 0) { init = false; }
+                this.OnPlayed = false;
                 this.comp = comp;
                 this.init = init;
             }
@@ -31537,7 +31623,6 @@ var gd3d;
                 this.components = [];
                 this.componentTypes = {};
                 this.componentsInit = [];
-                this.componentsPlayed = [];
                 this.haveComponet = false;
                 this._visible = true;
             }
@@ -31575,29 +31660,34 @@ var gd3d;
             gameObject.prototype.init = function (bePlay) {
                 if (bePlay === void 0) { bePlay = false; }
                 if (this.componentsInit.length > 0) {
-                    for (var i = 0; i < this.componentsInit.length; i++) {
-                        this.componentsInit[i].comp.start();
-                        this.componentsInit[i].init = true;
-                        if (bePlay)
-                            this.componentsInit[i].comp.onPlay();
-                        else
-                            this.componentsPlayed.push(this.componentsInit[i]);
+                    var len = this.componentsInit.length;
+                    for (var i = 0; i < len; i++) {
+                        var c = this.componentsInit[i];
+                        c.comp.start();
+                        c.init = true;
+                        if (bePlay) {
+                            if ((framework.StringUtil.ENABLED in c.comp) && !c.comp[framework.StringUtil.ENABLED])
+                                continue;
+                            c.comp.onPlay();
+                            c.OnPlayed = true;
+                        }
                     }
                     this.componentsInit.length = 0;
-                }
-                if (this.componentsPlayed.length > 0 && bePlay) {
-                    this.componentsPlayed.forEach(function (item) {
-                        item.comp.onPlay();
-                    });
-                    this.componentsPlayed.length = 0;
                 }
             };
             gameObject.prototype.update = function (delta) {
                 var len = this.components.length;
                 for (var i = 0; i < len; i++) {
-                    if (!this.components[i])
+                    var c = this.components[i];
+                    if (!c)
                         continue;
-                    this.components[i].comp.update(delta);
+                    if (framework.StringUtil.ENABLED in c.comp && !c.comp[framework.StringUtil.ENABLED])
+                        continue;
+                    if (!c.OnPlayed) {
+                        c.comp.onPlay();
+                        c.OnPlayed = true;
+                    }
+                    c.comp.update(delta);
                 }
             };
             gameObject.prototype.addComponentDirect = function (comp) {
@@ -31782,6 +31872,7 @@ var gd3d;
                     this.haveComponet = false;
             };
             gameObject.prototype.removeAllComponents = function () {
+                this.componentsInit.length = 0;
                 var len = this.components.length;
                 for (var i = 0; i < len; i++) {
                     {
@@ -34183,6 +34274,7 @@ var gd3d;
                 }
                 return true;
             };
+            StringUtil.ENABLED = "enabled";
             StringUtil.builtinTag_Untagged = "Untagged";
             StringUtil.builtinTag_Player = "Player";
             StringUtil.builtinTag_EditorOnly = "EditorOnly";

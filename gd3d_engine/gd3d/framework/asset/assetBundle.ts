@@ -1,5 +1,4 @@
-namespace gd3d.framework
-{
+namespace gd3d.framework {
     /**
      * @public
      * @language zh_CN
@@ -7,8 +6,8 @@ namespace gd3d.framework
      * 资源包
      * @version egret-gd3d 1.0
      */
-    export class assetBundle
-    {
+    export class assetBundle {
+
         /**
          * @public
          * @language zh_CN
@@ -25,7 +24,7 @@ namespace gd3d.framework
          * @version egret-gd3d 1.0
          */
         assetmgr: assetMgr;
-        private files: { name: string, length: number, packes: number }[] = [];
+        private files: { name: string, length: number, packes: number, guid: string, zip_Length: number }[] = [];
         private packages: string[] = [];
 
         private bundlePackBin: { [name: string]: ArrayBuffer } = {};
@@ -58,26 +57,24 @@ namespace gd3d.framework
 
         loadLightMap: boolean = true;
 
-        constructor(url: string)
-        {
+        //guid等待加载完毕回调 资源计数
+        private waitGuidCount = 0;
+
+        constructor(url: string) {
             this.url = url;
             let i = url.lastIndexOf("/");
             this.path = url.substring(0, i);
 
             this.assetmgr = gd3d.framework.sceneMgr.app.getAssetMgr();
-            if (this.assetmgr.waitlightmapScene[url])
-            {
+            if (this.assetmgr.waitlightmapScene[url]) {
                 this.loadLightMap = false;
             }
         }
-        loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr)
-        {
+        loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr) {
             state.totalByteLength = this.totalLength;
             // console.log(`ab loadCompressBundle ${url}`);
-            gd3d.io.loadText(url, (txt, err,isloadFail) =>
-            {
-                if (err != null)
-                {
+            gd3d.io.loadText(url, (txt, err, isloadFail) => {
+                if (err != null) {
                     state.isloadFail = isloadFail ? true : false;
                     state.iserror = true;
                     state.errs.push(new Error(err.message));
@@ -93,8 +90,7 @@ namespace gd3d.framework
 
                 assetmgr.mapBundle[this.name] = this;
             },
-                (loadedLength, totalLength) =>
-                {
+                (loadedLength, totalLength) => {
                     state.compressTextLoaded = loadedLength;
                     onstate(state);
                 });
@@ -108,35 +104,30 @@ namespace gd3d.framework
          * @param json 
          * @version egret-gd3d 1.0
          */
-        parse(json: any, totalLength: number = 0)
-        {
+        parse(json: any, totalLength: number = 0) {
             let files = json["files"];
-            for (let i = 0; i < files.length; i++)
-            {
+            for (let i = 0; i < files.length; i++) {
                 let item = files[i];
                 let packes = -1;
                 if (item.packes != undefined)
                     packes = item.packes;
-                if (!this.loadLightMap && (item.name as string).indexOf("LightmapFar-") >= 0)
-                {
+                if (!this.loadLightMap && (item.name as string).indexOf("LightmapFar-") >= 0) {
                     this.assetmgr.waitlightmapScene[this.url].push(this.path + "/" + item.name);
                     continue;
                 }
-                this.files.push({ name: item.name, length: item.length, packes: packes });
+                this.files.push({ name: item.name, length: item.length, packes: packes, guid: item.guid, zip_Length: item.zip_Length });
+                if(item.guid != undefined){
+                    this.mapNameGuid[item.name] = item.guid;
+                }
             }
-            if (json["packes"] != undefined)
-            {
+            if (json["packes"] != undefined) {
                 let packes = json["packes"];
-                for (let i = 0; i < packes.length; i++)
-                {
+                for (let i = 0; i < packes.length; i++) {
                     this.packages.push(packes[i]);
                 }
-            } else
-            {
-                if (json["totalLength"] != undefined)
-                {
-                    if (totalLength == 0)
-                    {
+            } else {
+                if (json["totalLength"] != undefined) {
+                    if (totalLength == 0) {
                         this.totalLength = json["totalLength"];
                     }
                 }
@@ -149,13 +140,10 @@ namespace gd3d.framework
          * 卸载包 包内对应的资源引用计数减一
          * @version egret-gd3d 1.0
          */
-        unload()
-        {
-            for (let key in this.mapNamed)
-            {
+        unload() {
+            for (let key in this.mapNamed) {
                 let asset = this.assetmgr.getAssetByName(key, this.name);
-                if (asset)
-                {
+                if (asset) {
                     this.assetmgr.unuse(asset);
                 }
             }
@@ -170,12 +158,12 @@ namespace gd3d.framework
          * @param stateinfo 加载的状态信息实例
          * @version egret-gd3d 1.0
          */
-        load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad)
-        {
+        load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad) {
+            if(assetmgr && assetmgr != this.assetmgr){
+                this.assetmgr = assetmgr;
+            }
             state.totalByteLength = this.totalLength;
-
             let total = this.files.length;
-            this.assetmgr = assetmgr;
 
             let glvshaders: { url: string, type: AssetTypeEnum, asset: IAsset }[] = [];
             let glfshaders: { url: string, type: AssetTypeEnum, asset: IAsset }[] = [];
@@ -205,121 +193,186 @@ namespace gd3d.framework
                 materials, anclips, kfaniclips, f14effs, prefabs, scenes);
 
             let mapPackes: { [id: string]: number } = {};
-
-
+            
+            
             //合并的包要先加载
-
-            for (let pack of this.packages)
-            {
+            for (let pack of this.packages) {
                 let type: AssetTypeEnum = assetmgr.calcType(pack);
                 let url = this.path + "/" + pack;
                 packs.push({ url: url, type: type, asset: null });
             }
-
-            for (let fitem of this.files)
-            {
-
-                let type: AssetTypeEnum = assetmgr.calcType(fitem.name);
+            
+            let list: { url: string, type: AssetTypeEnum, guid : string , asset: IAsset, handle: () => any }[] = [];
+            //遍历每项资源 整理到加载列表
+            for (let fitem of this.files) {
                 let url = this.path + "/" + fitem.name;
                 let fileName = assetmgr.getFileName(url);
-                if (fitem.packes != -1)
-                {
+                let guid = fitem.guid;
+                if(guid != undefined){
+                    let mapGuid = assetmgr.mapGuidId;
+                    let mAssId = mapGuid[guid];
+                    // guid重复性检查
+                    //是否guid_map 中包含
+                    if(mAssId!= undefined){
+                        //是否 正在加载
+                        let sRef = assetmgr.mapRes[mAssId];
+                        if(sRef && assetmgr.assetIsLoing(sRef)){
+                            //是 加入 guid_waitLoad_map
+                            //关联到 bundle 的 加载状态队列
+                            state.resstate[fileName] = new ResourceState();
+    
+                            //考虑-- 失败 情况
+                                //等待执行 前后时间
+                            // let opt : any = {} 
+                            // let _handle = ()=>{
+                            //     return new threading.gdPromise((resolve,reject)=>{
+                            //         if(opt["xxTag"]){
+                            //             resolve();
+                            //         }else{
+                            //             opt["resolve"] = resolve;
+                            //         }
+                            //     });
+                            // };
+                            // opt = {url : null, type : null , asset : null , handle : _handle };
+    
+                            
+                            // let waitLoaded = ()=>{
+                            //     if(opt["resolve"]){
+                            //         opt["resolve"]();
+                            //     }else{
+                            //         opt["xxTag"] = true; 
+                            //     }
+                            // };
+
+                            this.waitGuidCount++; //加入等待列表 ，计数增加
+
+                            let waitLoaded = ()=>{
+                                let old = this.waitGuidCount;
+                               this.waitGuidCount --; //减少计数
+                               //检查加载结束to解析资源
+                               this.CkNextHandleOfGuid(list,state,onstate);
+                            };
+                            
+                            // opt["guid"] = guid;
+                            // opt["waitLoaded"] = waitLoaded;
+                            // opt["resolve"] = null;
+                            // list.push(opt);
+                            
+                            let waitList : any[] ;
+                            if(!assetmgr.mapGuidWaitLoaded[guid]){
+                                assetmgr.mapGuidWaitLoaded[guid] = [];
+                            }
+                            waitList = assetmgr.mapGuidWaitLoaded[guid];
+                            waitList.push(waitLoaded);//等待同guid资源加完 回调处理
+    
+                        }
+                        continue;  //跳过 不放入加载队列
+                    }
+                }
+
+                let type: AssetTypeEnum = assetmgr.calcType(fitem.name);
+                // let url = this.path + "/" + fitem.name;
+                // let fileName = assetmgr.getFileName(url);
+                if (fitem.packes != -1) {
                     //压缩在包里的
                     mapPackes[url] = fitem.packes;
                 }
 
                 {
                     let asset = null;
-                    switch (type)
-                    {
+                    let _item = {url, type, guid , asset: null }; 
+                    switch (type) {
                         case AssetTypeEnum.GLFragmentShader:
-                            glfshaders.push({ url, type, asset: null });
+                            glfshaders.push(_item);
                             break;
                         case AssetTypeEnum.GLVertexShader:
-                            glvshaders.push({ url, type, asset: null });
+                            glvshaders.push(_item);
                             break;
                         case AssetTypeEnum.Shader:
                             asset = new shader(fileName);
-                            shaders.push({ url, type, asset: asset });
+                            shaders.push(_item);
                             break;
                         case AssetTypeEnum.Texture:
                             asset = new texture(fileName);
-                            textures.push({ url, type, asset: asset });
+                            textures.push(_item);
                             break;
                         case AssetTypeEnum.TextureDesc:
                             asset = new texture(fileName);
-                            texturedescs.push({ url, type, asset: asset });
+                            texturedescs.push(_item);
                             break;
                         case AssetTypeEnum.Mesh:
                             asset = new mesh(fileName);
-                            meshs.push({ url, type, asset: asset });
+                            meshs.push(_item);
                             break;
                         case AssetTypeEnum.Material:
                             asset = new material(fileName);
-                            materials.push({ url, type, asset: asset });
+                            materials.push(_item);
                             break;
                         case AssetTypeEnum.Aniclip:
                             asset = new animationClip(fileName);
-                            anclips.push({ url, type, asset: asset });
+                            anclips.push(_item);
                             break;
                         case AssetTypeEnum.Prefab:
                             asset = new prefab(fileName);
-                            prefabs.push({ url, type, asset: asset });
+                            prefabs.push(_item);
                             break;
                         case AssetTypeEnum.Scene:
                             asset = new rawscene(fileName);
-                            scenes.push({ url, type, asset: asset });
+                            scenes.push(_item);
                             break;
                         case AssetTypeEnum.TextAsset:
                             asset = new textasset(fileName);
-                            textassets.push({ url, type, asset: asset });
+                            textassets.push(_item);
                             break;
                         case AssetTypeEnum.PVR:
                             asset = new texture(fileName);
-                            pvrs.push({ url, type, asset: asset });
+                            pvrs.push(_item);
                             break;
                         case AssetTypeEnum.F14Effect:
                             asset = new f14eff(fileName);
-                            f14effs.push({ url, type, asset: asset });
+                            f14effs.push(_item);
                             break;
                         case AssetTypeEnum.DDS:
                             asset = new texture(fileName);
-                            ddss.push({ url, type, asset: asset });
+                            ddss.push(_item);
                             break;
                         case AssetTypeEnum.Font:
                             asset = new font(fileName);
-                            fonts.push({ url, type, asset: asset });
+                            fonts.push(_item);
                             break;
                         case AssetTypeEnum.Atlas:
                             asset = new atlas(fileName);
-                            atlass.push({ url, type, asset: asset });
+                            atlass.push(_item);
                             break;
                         case AssetTypeEnum.KeyFrameAniclip:
                             asset = new keyFrameAniClip(fileName);
-                            kfaniclips.push({ url, type, asset: asset });
+                            kfaniclips.push(_item);
                             break;
                     }
+                    _item.asset = asset;
+
                     if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
-                        && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt && type != AssetTypeEnum.Prefab)
-                    {
+                        && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt && type != AssetTypeEnum.Prefab) {
                         if (!asset)
                             continue;
-                        this.mapNamed[fileName] = asset.getGUID();
+                        let assId = asset.getGUID();
+                        this.mapNamed[fileName] = assId;
                         assetmgr.regRes(fileName, asset);
+                        //注册 guid_map  {guid : AssetId}
+                        if(guid && assetmgr.mapGuidId[guid] == undefined){
+                            assetmgr.mapGuidId[guid] = assId;
+                        }
                     }
                 }
             }
 
-            let list: { url: string, type: AssetTypeEnum, asset: IAsset, handle: () => void }[] = [];
             let handles = {};
-
-            for (let i = 0, len = asslist.length; i < len; ++i)
-            {
-                for (let j = 0, clen = asslist[i].length; j < clen; ++j)
-                {
+            //按类型整理顺序到list 
+            for (let i = 0, len = asslist.length; i < len; ++i) {
+                for (let j = 0, clen = asslist[i].length; j < clen; ++j) {
                     let item = asslist[i][j];
                     handles[item.url] = list.length;
-                    list.push({ url: item.url, type: item.type, asset: item.asset, handle: undefined });
+                    list.push({ url: item.url, type: item.type, guid: item.guid ,asset: item.asset, handle: undefined });
                 }
             }
 
@@ -327,29 +380,24 @@ namespace gd3d.framework
             let packlist = [];
             let haveBin = false;
             let tempMap = {};
-            for (let item of list)
-            {
+            //按list 顺序加载
+            for (let item of list) {
                 let surl = item.url;
                 let type = item.type;
                 let asset = item.asset;
                 tempMap[surl] = 1;
-                if (mapPackes[surl] != undefined)
-                {
+                if (mapPackes[surl] != undefined) {
                     packlist.push({ surl, type, asset });
                     delete tempMap[surl];
                     if (this.mapIsNull(tempMap))
-                        this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
+                        this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, handles);
                 }
-                else
-                {
-                    if (type == AssetTypeEnum.PackBin)
-                    {
+                else {
+                    if (type == AssetTypeEnum.PackBin) {
                         haveBin = true;
-                        gd3d.io.loadArrayBuffer(surl, (_buffer, err,isloadFail) =>
-                        {
+                        gd3d.io.loadArrayBuffer(surl, (_buffer, err, isloadFail) => {
 
-                            if (err != null)
-                            {
+                            if (err != null) {
                                 state.isloadFail = isloadFail ? true : false;
                                 state.iserror = true;
                                 state.errs.push(new Error(err.message));
@@ -360,8 +408,7 @@ namespace gd3d.framework
                             let read: gd3d.io.binReader = new gd3d.io.binReader(_buffer);
                             let index = read.readInt32();
                             read.position = index;
-                            while (read.canread())
-                            {
+                            while (read.canread()) {
                                 let indindex = read.readInt32();
                                 if (index == 0) break;
 
@@ -378,29 +425,24 @@ namespace gd3d.framework
 
                             delete tempMap[surl];
                             if (this.mapIsNull(tempMap))
-                                this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
+                                this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, handles);
 
                         },
-                            (loadedLength, totalLength) =>
-                            {
+                            (loadedLength, totalLength) => {
                                 state.compressBinLoaded = loadedLength;
                                 onstate(state);
                             });
                     }
-                    else
-                    {
+                    else {
 
-                        assetmgr.loadSingleRes(surl, type, (s) =>
-                        {
-                            if (s.iserror)
-                            {
+                        assetmgr.loadSingleRes(surl, type, (s) => {
+                            if (s.iserror) {
                                 state.iserror = true;
                                 onstate(state);
                                 return;
                             }
 
-                            if (s.progressCall)
-                            {
+                            if (s.progressCall) {
                                 s.progressCall = false;
                                 onstate(state);
                                 return;
@@ -408,13 +450,12 @@ namespace gd3d.framework
 
 
 
-                        }, state, asset, (data) =>
-                            {
+                        }, state, asset, (data) => {
 
                                 list[handles[data.url]].handle = data.handle;
                                 delete tempMap[data.url];
                                 if (this.mapIsNull(tempMap))
-                                    this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, assetmgr, handles);
+                                    this.downloadFinsih(state, list, haveBin, onstate, packlist, mapPackes, handles);
                             });
                     }
 
@@ -422,27 +463,22 @@ namespace gd3d.framework
             }
 
         }
-
-        downloadFinsih(state, list, haveBin: boolean, onstate, packlist, mapPackes, assetmgr: assetMgr, handles)
-        {
-            if (haveBin)
-            {
-                let respackCall = (fcall: () => void) =>
-                {
+        
+        //加载完毕处理
+        private downloadFinsih(state, list, haveBin: boolean, onstate, packlist, mapPackes, handles) {
+            if (haveBin) {
+                let respackCall = (fcall: () => void) => {
                     if (packlist.length < 1)
                         fcall();
                     let count = 0;
-                    for (let uitem of packlist)
-                    {
+                    for (let uitem of packlist) {
                         //在pack里
                         let respack;
                         if (mapPackes[uitem.surl] == 0) respack = this.bundlePackJson;
                         else if (mapPackes[uitem.surl] == 1) respack = this.bundlePackBin;
                         else console.log("未识别的packnum: " + mapPackes[uitem.surl]);
-                        assetmgr.loadResByPack(respack, uitem.surl, uitem.type, (s) =>
-                        {
-                            if (s.progressCall)
-                            {
+                        this.assetmgr.loadResByPack(respack, uitem.surl, uitem.type, (s) => {
+                            if (s.progressCall) {
                                 s.progressCall = false;
                                 onstate(state);
                                 return;
@@ -451,60 +487,61 @@ namespace gd3d.framework
                             if (state != undefined)
                                 state.bundleLoadState |= uitem.loadstate;
 
-                        }, state, uitem.asset, (data) =>
-                            {
+                        }, state, uitem.asset, (data) => {
                                 list[handles[data.url]].handle = data.handle;
                                 if (++count >= packlist.length)
                                     fcall();
                             });
                     }
                 };
-                respackCall(() =>
-                {
-                    this.NextHandle(list, state, onstate);
+                respackCall(() => {
+                    // this.NextHandle(list, state, onstate , assetmgr);
+                    this.CkNextHandleOfGuid(list, state, onstate);
                 });
             }
             else
-                this.NextHandle(list, state, onstate);
+                // this.NextHandle(list, state, onstate,assetmgr);
+                this.CkNextHandleOfGuid(list, state, onstate);
         }
-        NextHandle(list, state, onstate)
-        {
+
+        private CkNextHandleOfGuid(list , state, onstate){
+            if(this.waitGuidCount > 0) return;
+            this.NextHandle(list , state, onstate);
+        }
+
+        //文件加载完毕后统一解析处理 
+        private NextHandle(list : { url: string, type: AssetTypeEnum, guid : string , asset: IAsset, handle: () => any }[] , state, onstate ) {
             let waitArrs = [];
             let count = 0;
             let lastHandle = [];
-            let finish = () =>
-            {
+            let finish = () => {
                 // console.log(`资源包 :${this.url} 加载完成`);
                 state.isfinish = true;
                 onstate(state);
+                //回调 guid列表
+                this.endWaitList(list );
             };
             // for (let hitem of list)
-            for(var i=0,l=list.length;i<l;++i)
-            {
+            for (var i = 0, l = list.length; i < l; ++i) {
                 var hitem = list[i];
                 if (!hitem.handle)
                     continue;
 
-                if (hitem.type == AssetTypeEnum.Scene || hitem.type == AssetTypeEnum.Prefab || hitem.type == AssetTypeEnum.F14Effect)
-                {
+                if (hitem.type == AssetTypeEnum.Scene || hitem.type == AssetTypeEnum.Prefab || hitem.type == AssetTypeEnum.F14Effect) {
                     lastHandle.push(hitem)
                     continue;
                 }
 
                 let waiting = hitem.handle();
-                if (waiting instanceof threading.gdPromise)
-                {
+                if (waiting instanceof threading.gdPromise) {
                     waitArrs.push(waiting);
-                    waiting.then(() =>
-                    {
-                        if (++count >= waitArrs.length)
-                        {
-                            lastHandle.sort((a, b) =>
-                            {
+                    waiting.then(() => {
+                        if (++count >= waitArrs.length) {
+                            lastHandle.sort((a, b) => {
                                 return b.type - a.type;
                             })
-                            while (lastHandle.length > 0)                            
-                                lastHandle.shift().handle();                            
+                            while (lastHandle.length > 0)
+                                lastHandle.shift().handle();
                             waitArrs = [];
                             finish();
                         }
@@ -512,17 +549,34 @@ namespace gd3d.framework
 
                 }
             }
-            if (waitArrs.length < 1)
-            {
+            if (waitArrs.length < 1) {
                 while (lastHandle.length > 0)
                     lastHandle.shift().handle();
                 finish();
             }
-
         }
 
-        private mapIsNull(map): boolean
-        {
+        private endWaitList( list : { url: string, type: AssetTypeEnum, guid : string , asset: IAsset, handle: () => any }[]){
+            //回调guid列表
+            let len = list.length;
+            for(let i=0;i < len ;i++){
+                let item = list[i];
+                if(item.guid == undefined) continue;
+                let guid = item.guid;
+                let wlMap = this.assetmgr.mapGuidWaitLoaded; 
+                if(wlMap[guid] == undefined) continue;
+                let waitList = wlMap[guid];
+                if(waitList){
+                    waitList.forEach(element => {
+                        element();  
+                    });
+                    waitList.length = 0;
+                    delete wlMap[guid];
+                }
+            }
+        }
+
+        private mapIsNull(map): boolean {
             if (!map)
                 return true;
             for (let k in map)
@@ -535,6 +589,11 @@ namespace gd3d.framework
          * 资源GUID的字典，key为资源的名称
          * @version egret-gd3d 1.0
          */
-        mapNamed: { [id: string]: number } = {};
+        mapNamed: { [name: string]: number } = {};
+
+        /**
+         * 资源名- Guid 字典
+         */
+        mapNameGuid : { [name : string] : string } = {};  
     }
 }

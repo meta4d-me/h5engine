@@ -734,8 +734,8 @@ namespace gd3d.framework
                 { // 更新世界坐标
                     node.getWorldTranslate();
                 }
-                
-                this.cullingMap[id] =  this.isCulling(node);
+
+                this.cullingMap[id] = node.enableCulling && this.isCulling(node) ;
 
                 if (this.isLastCamera)
                     node.dirtiedOfFrustumCulling = false;
@@ -743,15 +743,12 @@ namespace gd3d.framework
 
             if (node.gameObject != null && node.gameObject.renderer != null)
             {
-                if (scene.app.isFrustumCulling)
+                if (scene.app.isFrustumCulling && !this.cullingMap[id])
                 {
-                    if (!this.cullingMap[id])
-                    {                        
-                        scene.renderList.addRenderer(node.gameObject.renderer);
+                    let _renderer = node.gameObject.renderer;
+                    if(this.CullingMask & (1 << _renderer.renderLayer)){  //层遮罩
+                        scene.renderList.addRenderer(_renderer);
                     }
-                } else
-                {
-                    scene.renderList.addRenderer(node.gameObject.renderer);
                 }
             }
             if (node.children)
@@ -978,11 +975,13 @@ namespace gd3d.framework
                 // for (let item of layer.list)
                 {
                     let item = ls[j];
-                    if (item.gameObject.visible == true && this.CullingMask & (1 << item.renderLayer))
-                    {
-                        if (item.gameObject && item.gameObject.visible == true)
-                            item.render(context, assetmgr, this);
-                    }
+                    item.render(context, assetmgr, this);  //过滤判断 _fillRenderer 过程几经做了
+
+                    // if (item.gameObject.visible == true && this.CullingMask & (1 << item.renderLayer))
+                    // {
+                    //     if (item.gameObject && item.gameObject.visible == true)
+                    //         item.render(context, assetmgr, this);
+                    // }
                 }
             }
             // for (var i = 0; i < scene.renderList.renderLayers.length; i++)
@@ -1035,7 +1034,7 @@ namespace gd3d.framework
                                 let bz = camera.helpv3_1;
 
                                 // gd3d.math.matrixTransformVector3(a.gameObject.transform.getWorldTranslate(), matrixView, az);
-                                // gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);                                
+                                // gd3d.math.matrixTransformVector3(b.gameObject.transform.getWorldTranslate(), matrixView, bz);
                                 // gd3d.math.matrixTransformVector3(a.gameObject.transform['worldTranslate'], matrixView, az);
                                 // gd3d.math.matrixTransformVector3(b.gameObject.transform['worldTranslate'], matrixView, bz);
                                 gd3d.math.matrixTransformVector3(a.gameObject.transform.worldTranslate, matrixView, az);
