@@ -91,7 +91,7 @@ namespace gd3d.framework
                 //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
 
                 // });
-                _mesh.Parse(_buffer, assetMgr.webgl);
+                _mesh.Parse(io.GetJSON(url,_buffer), assetMgr.webgl);
                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
             });
         }

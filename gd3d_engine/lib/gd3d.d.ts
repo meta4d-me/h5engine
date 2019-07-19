@@ -167,6 +167,43 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    interface IEnabled {
+        enabled: boolean;
+    }
+    interface INodeComponent {
+        onPlay(): any;
+        start(): any;
+        update(delta: number): any;
+        gameObject: gameObject;
+        remove(): any;
+        clone(): any;
+    }
+    interface I2DComponent {
+        onPlay(): any;
+        start(): any;
+        update(delta: number): any;
+        transform: transform2D;
+        remove(): any;
+    }
+    interface ICollider2d {
+        transform: transform2D;
+        getBound(): obb2d;
+        intersectsTransform(tran: transform2D): boolean;
+    }
+    interface IRectRenderer extends I2DComponent {
+        render(canvas: canvas): any;
+        updateTran(): any;
+        getMaterial(): material;
+        getDrawBounds(): gd3d.math.rect;
+    }
+    interface IRenderer extends INodeComponent {
+        layer: RenderLayerEnum;
+        renderLayer: number;
+        queue: number;
+        render(context: renderContext, assetmgr: assetMgr, camera: camera): any;
+    }
+}
+declare namespace gd3d.framework {
     class sceneMgr {
         private static _ins;
         static readonly ins: sceneMgr;
@@ -523,28 +560,11 @@ declare namespace gd3d.framework {
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): any;
     }
     function instanceOfI2DPointListener(object: any): boolean;
-    interface I2DComponent {
-        onPlay(): any;
-        start(): any;
-        update(delta: number): any;
-        transform: transform2D;
-        remove(): any;
-    }
-    interface ICollider2d {
-        transform: transform2D;
-        getBound(): obb2d;
-        intersectsTransform(tran: transform2D): boolean;
-    }
-    interface IRectRenderer extends I2DComponent {
-        render(canvas: canvas): any;
-        updateTran(): any;
-        getMaterial(): gd3d.framework.material;
-        getDrawBounds(): gd3d.math.rect;
-    }
     class C2DComponent {
         static readonly ClassName: string;
         comp: I2DComponent;
         init: boolean;
+        OnPlayed: boolean;
         constructor(comp: I2DComponent, init?: boolean);
     }
     class transform2D {
@@ -621,8 +641,7 @@ declare namespace gd3d.framework {
             [key: string]: boolean;
         };
         private componentsInit;
-        private componentplayed;
-        init(bePlayed?: boolean): void;
+        init(bePlay?: boolean): void;
         addComponent(type: string): I2DComponent;
         addComponentDirect(comp: I2DComponent): I2DComponent;
         removeComponent(comp: I2DComponent): void;
@@ -666,7 +685,8 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class behaviour2d implements I2DComponent {
+    class behaviour2d implements I2DComponent, IEnabled {
+        enabled: boolean;
         transform: transform2D;
         start(): void;
         onPlay(): void;
@@ -1340,16 +1360,22 @@ declare namespace gd3d.framework {
         path: string;
         totalLength: number;
         loadLightMap: boolean;
+        private waitGuidCount;
         constructor(url: string);
         loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr): void;
         parse(json: any, totalLength?: number): void;
         unload(): void;
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
-        downloadFinsih(state: any, list: any, haveBin: boolean, onstate: any, packlist: any, mapPackes: any, assetmgr: assetMgr, handles: any): void;
-        NextHandle(list: any, state: any, onstate: any): void;
+        private downloadFinsih;
+        private CkNextHandleOfGuid;
+        private NextHandle;
+        private endWaitList;
         private mapIsNull;
         mapNamed: {
-            [id: string]: number;
+            [name: string]: number;
+        };
+        mapNameGuid: {
+            [name: string]: string;
         };
     }
 }
@@ -1448,6 +1474,12 @@ declare namespace gd3d.framework {
         mapNamed: {
             [id: string]: number[];
         };
+        mapGuidId: {
+            [guid: string]: number;
+        };
+        mapGuidWaitLoaded: {
+            [guid: string]: Function[];
+        };
         getAsset(id: number): IAsset;
         getAssetByName(name: string, bundlename?: string): IAsset;
         getAssetBundle(bundlename: string): assetBundle;
@@ -1459,6 +1491,7 @@ declare namespace gd3d.framework {
         unuse(res: IAsset, disposeNow?: boolean): void;
         use(res: IAsset): void;
         private readonly _loadingTag;
+        assetIsLoing(asRef: assetRef): boolean;
         regRes(name: string, asset: IAsset): void;
         releaseUnuseAsset(): void;
         getAssetsRefcount(): {
@@ -1937,6 +1970,7 @@ declare namespace gd3d.framework {
         private _parent;
         readonly parent: transform;
         dirtiedOfFrustumCulling: boolean;
+        enableCulling: boolean;
         addChild(node: transform): void;
         addChildAt(node: transform, index: number): void;
         removeAllChild(needDispose?: boolean): void;
@@ -2620,7 +2654,8 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class behaviour implements INodeComponent {
+    class behaviour implements INodeComponent, IEnabled {
+        enabled: boolean;
         gameObject: gameObject;
         start(): void;
         onPlay(): void;
@@ -5892,18 +5927,11 @@ declare namespace gd3d.framework {
         DontSave = 52,
         HideAndDontSave = 61
     }
-    interface INodeComponent {
-        onPlay(): any;
-        start(): any;
-        update(delta: number): any;
-        gameObject: gameObject;
-        remove(): any;
-        clone(): any;
-    }
     class nodeComponent {
         static readonly ClassName: string;
         comp: INodeComponent;
         init: boolean;
+        OnPlayed: boolean;
         constructor(comp: INodeComponent, init?: boolean);
     }
     class gameObject {
@@ -5919,7 +5947,6 @@ declare namespace gd3d.framework {
             [key: string]: boolean;
         };
         private componentsInit;
-        private componentsPlayed;
         haveComponet: boolean;
         renderer: IRenderer;
         camera: camera;
@@ -5995,12 +6022,6 @@ declare namespace gd3d.framework {
         Common = 0,
         Transparent = 1,
         Overlay = 2
-    }
-    interface IRenderer extends INodeComponent {
-        layer: RenderLayerEnum;
-        renderLayer: number;
-        queue: number;
-        render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): any;
     }
     class renderList {
         constructor();
@@ -6421,28 +6442,29 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class StringUtil {
-        static builtinTag_Untagged: string;
-        static builtinTag_Player: string;
-        static builtinTag_EditorOnly: string;
-        static builtinTag_MainCamera: string;
-        static COMPONENT_CAMERA: string;
-        static COMPONENT_BOXCOLLIDER: string;
-        static COMPONENT_LIGHT: string;
-        static COMPONENT_MESHFILTER: string;
-        static COMPONENT_MESHRENDER: string;
-        static COMPONENT_EFFECTSYSTEM: string;
-        static COMPONENT_LABEL: string;
-        static COMPONENT_uirect: string;
-        static COMPONENT_IMAGE: string;
-        static COMPONENT_RAWIMAGE: string;
-        static COMPONENT_BUTTON: string;
-        static COMPONENT_SKINMESHRENDER: string;
-        static COMPONENT_AUDIOPLAYER: string;
-        static COMPONENT_CAMERACONTROLLER: string;
-        static COMPONENT_CANVASRENDER: string;
-        static UIStyle_RangeFloat: string;
-        static UIStyle_Enum: string;
-        static RESOURCES_MESH_CUBE: string;
+        static readonly ENABLED = "enabled";
+        static readonly builtinTag_Untagged = "Untagged";
+        static readonly builtinTag_Player = "Player";
+        static readonly builtinTag_EditorOnly = "EditorOnly";
+        static readonly builtinTag_MainCamera = "MainCamera";
+        static readonly COMPONENT_CAMERA = "camera";
+        static readonly COMPONENT_BOXCOLLIDER = "boxcollider";
+        static readonly COMPONENT_LIGHT = "light";
+        static readonly COMPONENT_MESHFILTER = "meshFilter";
+        static readonly COMPONENT_MESHRENDER = "meshRenderer";
+        static readonly COMPONENT_EFFECTSYSTEM = "effectSystem";
+        static readonly COMPONENT_LABEL = "label";
+        static readonly COMPONENT_uirect = "uirect";
+        static readonly COMPONENT_IMAGE = "image2D";
+        static readonly COMPONENT_RAWIMAGE = "rawImage2D";
+        static readonly COMPONENT_BUTTON = "button";
+        static readonly COMPONENT_SKINMESHRENDER = "skinnedMeshRenderer";
+        static readonly COMPONENT_AUDIOPLAYER = "AudioPlayer";
+        static readonly COMPONENT_CAMERACONTROLLER = "cameraController";
+        static readonly COMPONENT_CANVASRENDER = "canvasRenderer";
+        static readonly UIStyle_RangeFloat = "rangeFloat";
+        static readonly UIStyle_Enum = "enum";
+        static readonly RESOURCES_MESH_CUBE = "cube";
         static replaceAll(srcStr: string, fromStr: string, toStr: string): string;
         static trimAll(str: string): string;
         static firstCharToLowerCase(str: string): string;
@@ -6683,6 +6705,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.io {
     function xhrLoad(url: string, fun: (ContentData: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void, responseType: XMLHttpRequestResponseType, loadedFun: (req: XMLHttpRequest) => void): void;
     function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+    function GetJSON(url: string, text?: string): any;
     function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;

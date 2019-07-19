@@ -9313,7 +9313,7 @@ var gd3d;
                 var _buffer = respack[filename];
                 var _mesh = asset ? asset : new framework.mesh(filename);
                 call(function () {
-                    _mesh.Parse(_buffer, assetMgr.webgl);
+                    _mesh.Parse(gd3d.io.GetJSON(url, _buffer), assetMgr.webgl);
                     framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
                 });
             };
@@ -18485,7 +18485,7 @@ var gd3d;
                         this.loopenum = framework.LoopEnum.TimeContinue;
                         break;
                 }
-                this.mesh = (assetmgr.getAssetByName(json.mesh, assetbundle) || assetmgr.getAssetByName(json.mesh.replace(".bin", ".json"), assetbundle));
+                this.mesh = (assetmgr.getAssetByName(json.mesh, assetbundle) || assetmgr.getAssetByName(json.mesh.replace("mesh.bin", "mesh.json"), assetbundle));
                 this.material = assetmgr.getAssetByName(json.material, assetbundle);
                 gd3d.math.vec3FormJson(json.rotPosition, this.rotPosition);
                 gd3d.math.vec3FormJson(json.rotScale, this.rotScale);
@@ -35066,21 +35066,27 @@ var gd3d;
         io.loadText = loadText;
         var cachedMap;
         var cachedTime = 0;
-        function loadJSON(url, fun, onprocess) {
-            if (onprocess === void 0) { onprocess = null; }
-            if (gd3d.framework.assetMgr.useBinJs) {
-                url = gd3d.framework.assetMgr.correctTxtFileName(url);
-            }
+        function GetJSON(url, text) {
+            if (text === void 0) { text = undefined; }
             if (Date.now() - cachedTime > 60000) {
                 cachedMap = {};
                 cachedTime = Date.now();
             }
             if (cachedMap[url])
-                return fun(cachedMap[url], null);
+                return cachedMap[url];
+            return cachedMap[url] = JSON.parse(text);
+        }
+        io.GetJSON = GetJSON;
+        function loadJSON(url, fun, onprocess) {
+            if (onprocess === void 0) { onprocess = null; }
+            if (gd3d.framework.assetMgr.useBinJs) {
+                url = gd3d.framework.assetMgr.correctTxtFileName(url);
+            }
+            var obj = GetJSON(url);
+            if (obj)
+                return fun(obj, null);
             gd3d.io.xhrLoad(url, fun, onprocess, "text", function (req) {
-                var obj = JSON.parse(req.response);
-                cachedMap[url] = obj;
-                fun(obj, null);
+                fun(GetJSON(url, req.response), null);
             });
         }
         io.loadJSON = loadJSON;

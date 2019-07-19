@@ -102,26 +102,30 @@
 
     var cachedMap;
     var cachedTime = 0;
+    export function GetJSON(url:string,text:string = undefined):any
+    {
+        if (Date.now() - cachedTime > 60000)
+        {
+            cachedMap = {};
+            cachedTime = Date.now();
+        }
+        if (cachedMap[url])
+            return cachedMap[url];
+        return cachedMap[url] = JSON.parse(text);
+    }
     export function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void 
     {
         if (framework.assetMgr.useBinJs)
         {
             url = framework.assetMgr.correctTxtFileName(url);
         }
-        if (Date.now() - cachedTime > 60000)
-        {
-            cachedMap = {};
-            cachedTime = Date.now();
-        }
-
-        if (cachedMap[url])
-            return fun(cachedMap[url], null);
+        let obj = GetJSON(url);
+        if(obj)
+            return fun(obj,null);
 
         gd3d.io.xhrLoad(url, fun, onprocess, "text", (req) =>
-        {
-            var obj = JSON.parse(req.response);
-            cachedMap[url] = obj;
-            fun(obj, null);
+        {            
+            fun(GetJSON(url,req.response), null);
         });
     }
     /**
