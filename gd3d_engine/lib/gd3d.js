@@ -35074,6 +35074,8 @@ var gd3d;
             }
             if (cachedMap[url])
                 return cachedMap[url];
+            if (!text)
+                return;
             return cachedMap[url] = JSON.parse(text);
         }
         io.GetJSON = GetJSON;

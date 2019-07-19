@@ -111,6 +111,8 @@
         }
         if (cachedMap[url])
             return cachedMap[url];
+        if(!text)
+            return;
         return cachedMap[url] = JSON.parse(text);
     }
     export function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void 
