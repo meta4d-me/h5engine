@@ -19673,7 +19673,7 @@ var gd3d;
                         this.loopenum = LoopEnum.TimeContinue;
                         break;
                 }
-                this.mesh = assetmgr.getAssetByName(json.mesh, assetbundle);
+                this.mesh = (assetmgr.getAssetByName(json.mesh, assetbundle) || assetmgr.getAssetByName(json.mesh.replace(".mesh.bin", ".mesh.json"), assetbundle));
                 this.material = assetmgr.getAssetByName(json.material, assetbundle);
                 gd3d.math.vec3FormJson(json.position, this.position);
                 gd3d.math.vec3FormJson(json.scale, this.scale);
