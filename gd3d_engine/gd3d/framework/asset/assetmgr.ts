@@ -1118,8 +1118,8 @@ namespace gd3d.framework
         // }
         private unPkg(type: AssetTypeEnum, url: string, state: stateLoad, onstate: (state: stateLoad) => void)
         {
-
-            if (type == AssetTypeEnum.Bundle)//加载包
+            //加载AB bundle 包
+            if (type == AssetTypeEnum.Bundle)
             {
                 gd3d.io.loadText(url, (txt, err,isloadFail) =>
                 {
@@ -1156,7 +1156,7 @@ namespace gd3d.framework
                     this.mapBundle[filename] = ab;
                 });
             }
-            else if (type == AssetTypeEnum.CompressBundle)
+            else if (type == AssetTypeEnum.CompressBundle)   //加载 压缩的 AB bundle 包
             {
                 gd3d.io.loadText(url, (txt, err,isloadFail) =>
                 {
