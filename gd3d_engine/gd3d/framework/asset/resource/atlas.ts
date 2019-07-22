@@ -5,7 +5,7 @@
      * @language zh_CN
      * @classdesc
      * 图集资源
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
     export class atlas implements IAsset
@@ -20,7 +20,7 @@
          * @language zh_CN
          * @classdesc
          * 是否为默认资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         defaultAsset: boolean;//是否为系统默认资源
         constructor(assetName: string = null)
@@ -36,7 +36,7 @@
          * @language zh_CN
          * @classdesc
          * 获取资源名称
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getName(): string
         {
@@ -47,7 +47,7 @@
          * @language zh_CN
          * @classdesc
          * 获取资源唯一id
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getGUID(): number
         {
@@ -58,7 +58,7 @@
          * @language zh_CN
          * @classdesc
          * 引用计数加一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         use()
         {
@@ -69,7 +69,7 @@
          * @language zh_CN
          * @classdesc
          * 引用计数减一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         unuse(disposeNow: boolean = false)
         {
@@ -80,7 +80,7 @@
          * @language zh_CN
          * @classdesc
          * 释放资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         dispose()
         {
@@ -96,7 +96,7 @@
          * @language zh_CN
          * @classdesc
          * 计算资源字节大小
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         caclByteLength(): number
         {
@@ -113,7 +113,7 @@
          * @language zh_CN
          * @classdesc
          * 贴图像素宽度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         texturewidth: number;
         /**
@@ -121,7 +121,7 @@
          * @language zh_CN
          * @classdesc
          * 贴图像素高度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         textureheight: number;
 
@@ -132,7 +132,7 @@
          * @language zh_CN
          * @classdesc
          * 获取当前texture
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public get texture()
         {
@@ -144,7 +144,7 @@
          * @classdesc
          * 设置当前texture
          * @param value
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public set texture(value: texture)
         {
@@ -160,7 +160,7 @@
          * @language zh_CN
          * @classdesc
          * 解析得到的sprite列表 key-->name
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         sprites: { [id: string]: sprite } = {};
 
@@ -171,7 +171,7 @@
          * 解析资源
          * @param jsonStr json数据
          * @param assetmgr 资源管理实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Parse(jsonStr: string, assetmgr: assetMgr)
         {

@@ -5,7 +5,7 @@
      * @language zh_CN
      * @classdesc
      * 射线
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class ray
     {
@@ -18,7 +18,7 @@
         * 构建射线
         * @param _origin 射线起点
         * @param _dir 射线方向
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         * @platform Web,Native
         */
         constructor(_origin: gd3d.math.vector3, _dir: gd3d.math.vector3)
@@ -33,7 +33,7 @@
         * 设置射线的属性
         * @param _origin 射线起点
         * @param _dir 射线方向
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         * @platform Web,Native
         */
         set(_origin: gd3d.math.vector3, _dir: gd3d.math.vector3 ){
@@ -47,7 +47,7 @@
         * @classdesc
         * 与aabb碰撞相交检测
         * @param _aabb 待检测aabb
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         * @platform Web,Native
         */
         public intersectAABB(_aabb: aabb): boolean
@@ -61,7 +61,7 @@
         * @classdesc
         * 与transform表示的plane碰撞相交检测，主要用于2d检测
         * @param tran transform
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         * @platform Web,Native
         */
         public intersectPlaneTransform(tran: transform,outInfo:pickinfo):boolean
@@ -123,7 +123,7 @@
         * @classdesc
         * 与碰撞盒相交检测
         * @param tran 待检测带碰撞盒的transform
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         * @platform Web,Native
         */
         public intersectCollider(tran: transform , outInfo: pickinfo):boolean
@@ -198,7 +198,7 @@
         * 与最大最小点表示的box相交检测
         * @param minimum
         * @param maximum
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         * @platform Web,Native
         */
         public intersectBoxMinMax(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): boolean
@@ -318,7 +318,7 @@
         * 与球相交检测
         * @param center 球圆心坐标
         * @param radius 球半径
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         * @platform Web,Native
         */
         public intersectsSphere(center: gd3d.math.vector3, radius: number): boolean
@@ -349,7 +349,7 @@
         * @param vertex1 
         * @param vertex2 
         * @param outInfo 
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         * @platform Web,Native
         */
         public intersectsTriangle(vertex0: gd3d.math.vector3, vertex1: gd3d.math.vector3, vertex2: gd3d.math.vector3 , outInfo:pickinfo):boolean

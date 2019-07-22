@@ -86,7 +86,7 @@
      * @param url 加载路径
      * @param fun 加载结果回调函数
      * @param onprocess 加载进度
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void 
     {
@@ -138,7 +138,7 @@
      * @param url 加载路径
      * @param fun 加载结果回调函数
      * @param onprocess 加载进度
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {
@@ -161,7 +161,7 @@
      * @param url 加载路径
      * @param fun 加载结果回调函数
      * @param onprocess 加载进度
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {
@@ -179,7 +179,7 @@
      * @param url 加载路径
      * @param fun 加载结果回调函数
      * @param progress 加载进度
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error, loadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {

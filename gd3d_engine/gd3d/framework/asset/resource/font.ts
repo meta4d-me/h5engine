@@ -5,7 +5,7 @@
      * @language zh_CN
      * @classdesc
      * 字体资源
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
     export class font implements IAsset
@@ -19,7 +19,7 @@
          * @language zh_CN
          * @classdesc
          * 是否为默认资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         defaultAsset: boolean;//是否为系统默认资源
         constructor(assetName: string = null)
@@ -35,7 +35,7 @@
          * @language zh_CN
          * @classdesc
          * 获取资源名称
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getName(): string
         {
@@ -46,7 +46,7 @@
          * @language zh_CN
          * @classdesc
          * 获取资源唯一id
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getGUID(): number
         {
@@ -57,7 +57,7 @@
          * @language zh_CN
          * @classdesc
          * 引用计数加一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         use()
         {
@@ -68,7 +68,7 @@
          * @language zh_CN
          * @classdesc
          * 引用计数减一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         unuse(disposeNow: boolean = false)
         {
@@ -79,7 +79,7 @@
          * @language zh_CN
          * @classdesc
          * 释放资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         dispose()
         {
@@ -95,7 +95,7 @@
          * @language zh_CN
          * @classdesc
          * 计算资源字节大小
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         caclByteLength(): number
         {
@@ -129,7 +129,7 @@
          * @language zh_CN
          * @classdesc
          * 字体信息map
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         cmap: { [id: string]: charinfo };
         fontname: string;
@@ -147,7 +147,7 @@
          * 解析资源
          * @param jsonStr json数据
          * @param assetmgr 资源管理实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Parse(jsonStr: string, assetmgr: assetMgr)
         {

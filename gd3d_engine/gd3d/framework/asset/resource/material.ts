@@ -31,7 +31,7 @@ namespace gd3d.framework
      * @classdesc
      * 材质资源
      * @param buf buffer数组
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
     export class material implements IAsset
@@ -46,7 +46,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 是否为默认资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         defaultAsset: boolean = false;
 
@@ -66,7 +66,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取资源名称
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getName(): string
         {
@@ -81,7 +81,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取资源唯一id
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getGUID(): number
         {
@@ -93,7 +93,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 释放资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         dispose()
         {
@@ -115,7 +115,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 引用计数加一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         use()
         {
@@ -126,7 +126,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 引用计数减一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         unuse(disposeNow: boolean = false)
         {
@@ -138,7 +138,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 计算资源字节大小
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         caclByteLength(): number
         {
@@ -223,7 +223,7 @@ namespace gd3d.framework
          * @classdesc
          * 设置shader 不保留原有数据
          * @param shader shader实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         setShader(shader: shader)
         {
@@ -237,7 +237,7 @@ namespace gd3d.framework
         //  * @classdesc
         //  * 修改shader 保留原有数据
         //  * @param shader shader实例
-        //  * @version egret-gd3d 1.0
+        //  * @version gd3d 1.0
         //  */
         // changeShader(shader: shader)
         // {
@@ -266,7 +266,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取shader的layer
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getLayer()
         {
@@ -278,7 +278,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取shader的queue
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getQueue()
         {
@@ -293,7 +293,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取shader
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getShader()
         {
@@ -460,7 +460,7 @@ namespace gd3d.framework
          * @param context 渲染上下文
          * @param mesh 渲染的mesh
          * @param sm 渲染的submesh信息
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base", useGLobalLightMap: boolean = true)
         {
@@ -516,7 +516,7 @@ namespace gd3d.framework
          * 解析资源
          * @param assetmgr 资源管理实例
          * @param json json数据
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Parse(assetmgr: assetMgr, json: any, bundleName: string = null)
         {
@@ -587,7 +587,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 克隆
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public clone(): material
         {

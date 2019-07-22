@@ -8,7 +8,7 @@ namespace gd3d.framework
      * @classdesc
      * 2d图片组件</p>
      * 参照UGUI的思路，rawImage只拿整个图片来显示，不关心Sprite、九宫、填充等。这些统一都在iamge中处理
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.node2DComponent
     @reflect.nodeRender
@@ -34,7 +34,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 图片
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("texture")
         public get image()
@@ -60,7 +60,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 颜色
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @reflect.Field("color")
         @reflect.UIStyle("vector4")
@@ -77,7 +77,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 设置rander Shader名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         setShaderByName(shaderName:string){
             this._CustomShaderName = shaderName;
@@ -88,7 +88,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取rander 的材质
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getMaterial(){
             if(!this._uimat){
@@ -104,7 +104,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取渲染绘制矩形边界
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getDrawBounds(){
             if(!this._darwRect){
@@ -319,7 +319,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 当前组件的2d节点
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         transform: transform2D;
 

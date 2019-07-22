@@ -10,7 +10,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 关键帧动画数组
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @reflect.Field("keyFrameAniClip[]")
         clips: keyFrameAniClip[];
@@ -136,7 +136,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 动画是否在播放
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         isPlaying(ClipName: string) {
             return (this.nowClip && this.nowClip.getName() == ClipName);
@@ -147,7 +147,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 播放指定动画 
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         playByName(ClipName: string) {
             if (!this.clips || this.clips.length < 1) return;
@@ -166,7 +166,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 播放默认动画 
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         play() {
             if (!this.clips || this.clips.length < 1) return;
@@ -180,7 +180,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 停止默认动画 
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         stop(){
            this.nowClip = null;
@@ -191,7 +191,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 倒带默认动画
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         rewind(){
             if(!this.nowClip) return ;

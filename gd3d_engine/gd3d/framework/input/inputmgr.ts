@@ -6,7 +6,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 鼠标(触屏)点击信息
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class pointinfo
     {
@@ -20,7 +20,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 键盘、鼠标(触屏)事件管理类 应用状态机区分状态
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class inputMgr
     {
@@ -380,7 +380,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取 指定按键是否Down
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         GetKeyDown(name:string)
         GetKeyDown(key:event.KeyCode)
@@ -401,7 +401,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取 指定按键是否UP
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         GetKeyUP(name:string)
         GetKeyUP(key:event.KeyCode)

@@ -4,7 +4,7 @@ namespace gd3d.framework {
      * @language zh_CN
      * @classdesc
      * 资源包
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class assetBundle {
 
@@ -13,7 +13,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 包名
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public name: string;
         private id: number;
@@ -21,7 +21,7 @@ namespace gd3d.framework {
          * @public
          * @language zh_CN
          * 资源管理器实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         assetmgr: assetMgr;
         private files: { name: string, length: number, packes: number, guid: string, zip_Length: number }[] = [];
@@ -34,7 +34,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 包完整路径
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         url: string;
         /**
@@ -42,7 +42,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 不带包名路径
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         path: string;
 
@@ -51,7 +51,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 资源的总字节数
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         totalLength: number = 0;
 
@@ -102,7 +102,7 @@ namespace gd3d.framework {
          * @classdesc
          * 解析包
          * @param json 
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         parse(json: any, totalLength: number = 0) {
             let files = json["files"];
@@ -138,7 +138,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 卸载包 包内对应的资源引用计数减一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         unload() {
             for (let key in this.mapNamed) {
@@ -156,7 +156,7 @@ namespace gd3d.framework {
          * 加载包
          * @param assetmgr 资源管理器实例
          * @param stateinfo 加载的状态信息实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad) {
             if(assetmgr && assetmgr != this.assetmgr){
@@ -587,7 +587,7 @@ namespace gd3d.framework {
          * @public
          * @language zh_CN
          * 资源GUID的字典，key为资源的名称
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         mapNamed: { [name: string]: number } = {};
 

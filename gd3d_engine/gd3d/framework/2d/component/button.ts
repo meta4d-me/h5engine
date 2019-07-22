@@ -7,7 +7,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 按钮变换类型
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export enum TransitionType
     {
@@ -21,7 +21,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 2d按钮组件
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.node2DComponent
     export class button implements I2DComponent ,event.IUIEventer ,I2DPointListener
@@ -34,7 +34,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 按钮变换类型
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @reflect.Field("number")
         get transition()
@@ -71,7 +71,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 默认显示图像
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("reference",null,"image2D")
         get targetImage()
@@ -109,7 +109,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 按下时要显示的sprite
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get pressedGraphic()
         {
@@ -129,7 +129,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 正常的显示颜色
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @reflect.Field("color")
         @reflect.UIStyle("color")
@@ -152,7 +152,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 按下后的颜色
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @reflect.Field("color")
         @reflect.UIStyle("color")
@@ -171,7 +171,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 颜色淡出持续时间
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @reflect.Field("number")
         get fadeDuration()
@@ -299,7 +299,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 点击事件
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         //onClick: UIEvent = new UIEvent();
         private UIEventer: event.UIEvent = new event.UIEvent();

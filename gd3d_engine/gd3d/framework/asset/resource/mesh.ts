@@ -5,7 +5,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * mesh资源
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
     export class mesh implements IAsset
@@ -28,7 +28,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取资源名称
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getName(): string
         {
@@ -43,7 +43,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取资源唯一id
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getGUID(): number
         {
@@ -54,7 +54,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 引用计数加一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         use()
         {
@@ -65,7 +65,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 引用计数减一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         unuse(disposeNow: boolean = false)
         {
@@ -76,7 +76,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 释放资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         dispose()
         {
@@ -89,7 +89,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 计算资源字节大小
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         caclByteLength(): number
         {
@@ -112,7 +112,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * mesh数据实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         data: gd3d.render.meshData;
         /**
@@ -120,7 +120,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * submesh信息列表
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         submesh: subMeshInfo[] = [];
 
@@ -378,7 +378,7 @@ namespace gd3d.framework
          * 解析资源
          * @param buf buffer数组
          * @param webgl webgl实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext)
         {
@@ -471,7 +471,7 @@ namespace gd3d.framework
          * 检测射线碰撞
          * @param ray 射线
          * @param matrix 所在transform的矩阵
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean
         {
@@ -540,7 +540,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 克隆mesh
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         clone(): mesh
         {
@@ -695,7 +695,7 @@ namespace gd3d.framework
          * 计算模型顶点的 最大最小值
          * @param outMin 输出最小
          * @param outMax 输出最大
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         calcVectexMinMax(outMin: math.vector3, outMax: math.vector3)
         {

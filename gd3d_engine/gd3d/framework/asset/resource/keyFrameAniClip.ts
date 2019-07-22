@@ -21,7 +21,7 @@ namespace gd3d.framework {
      * @language zh_CN
      * @classdesc
      * 关键帧动画片段资源
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
     export class keyFrameAniClip implements IAsset {
@@ -35,7 +35,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 是否为默认资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         defaultAsset: boolean = false;
         constructor(assetName: string = null) {
@@ -49,7 +49,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 获取资源名称
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getName(): string {
             return this.name.getText();
@@ -59,7 +59,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 获取资源唯一id
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getGUID(): number {
             return this.id.getID();
@@ -69,7 +69,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 引用计数加一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         use() {
             sceneMgr.app.getAssetMgr().use(this);
@@ -79,7 +79,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 引用计数减一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         unuse(disposeNow: boolean = false) {
             sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
@@ -89,7 +89,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 释放资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         dispose() {
             this.curves.length = 0;
@@ -100,7 +100,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 计算资源字节大小
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         caclByteLength(): number {
             let total = 0;
@@ -127,7 +127,7 @@ namespace gd3d.framework {
          * @classdesc
          * 解析资源
          * @param jsonStr 动画json数据
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Parse(jsonStr: string): void {
             let obj = JSON.parse(jsonStr);
@@ -174,7 +174,7 @@ namespace gd3d.framework {
          * @public
          * @language zh_CN
          * 循环模式
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get wrapMode() { return this._wrapMode; }
         _wrapMode: WrapMode;
@@ -183,7 +183,7 @@ namespace gd3d.framework {
          * @public
          * @language zh_CN
          * 动画片段的帧率
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get fps() {
             return this.frameRate;
@@ -195,7 +195,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 播放时长
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get time() {
             return this.length;
@@ -206,7 +206,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 最大帧数
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get frameCount() { return Math.floor(this.frameRate * this.length); }
         /**
@@ -214,7 +214,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 属性变化曲线数组
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         curves: AnimationCurve[] = [];
     }

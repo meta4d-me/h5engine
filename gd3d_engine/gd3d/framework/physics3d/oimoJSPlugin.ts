@@ -21,7 +21,7 @@ namespace gd3d.framework
         * OimoJS 物理引擎插件
         * @param option Oimo world 构造选项
         * @param oimoInjection Omio对象
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         public constructor(iterations ?: number, oimoInjection = OIMO) {
             this.BJSOIMO = oimoInjection;

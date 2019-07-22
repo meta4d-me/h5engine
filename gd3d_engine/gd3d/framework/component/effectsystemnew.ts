@@ -5,7 +5,7 @@
 //      * @language zh_CN
 //      * @classdesc
 //      * 特效组件
-//      * @version egret-gd3d 1.0
+//      * @version gd3d 1.0
 //      */
 //     @reflect.nodeRender
 //     @reflect.nodeComponent
@@ -17,7 +17,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 挂载的gameobject
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         gameObject: gameObject;
 //         layer: RenderLayerEnum = RenderLayerEnum.Transparent;
@@ -26,7 +26,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 渲染层级
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         renderLayer: CullingMask = CullingMask.default;
 //         /**
@@ -34,7 +34,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 同层级渲染排序依据
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         queue: number = 0;
 //         /**
@@ -42,7 +42,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 自动播放
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         @gd3d.reflect.Field("boolean")
 //         autoplay: boolean = true;
@@ -51,7 +51,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 特效是否循环
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         @gd3d.reflect.Field("boolean")
 //         beLoop: boolean;
@@ -66,7 +66,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 特效播放速度
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         public static fps: number = 30;
 //         private playTimer: number = 0;
@@ -104,7 +104,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 设置特效数据 textasset
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         setJsonData(_jsonData: textasset)
 //         {
@@ -442,7 +442,7 @@
 //          * @param speed 播放速度
 //          * @classdesc
 //          * 播放特效
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         play(speed: number = 1)
 //         {
@@ -457,7 +457,7 @@
 //          * @param speed 播放速度
 //          * @classdesc
 //          * 暂停播放
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         pause()
 //         {
@@ -469,7 +469,7 @@
 //          * @param speed 播放速度
 //          * @classdesc
 //          * 停止播放
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         stop()
 //         {
@@ -482,7 +482,7 @@
 //          * @param speed 播放速度
 //          * @classdesc
 //          * 重置到初始状态
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         reset(restSinglemesh: boolean = true, resetParticle: boolean = true)
 //         {

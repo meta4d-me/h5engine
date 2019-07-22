@@ -10,7 +10,7 @@ namespace gd3d.io
      * 对可序列化实例的克隆
      * @param instanceObj 被克隆实例
      * @param clonedObj 克隆实例引用
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export function cloneObj(instanceObj: any, clonedObj: any = undefined): any
     {

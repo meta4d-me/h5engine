@@ -4,7 +4,7 @@ namespace gd3d.framework {
     * @language zh_CN
     * @classdesc
     * 滑动区域
-    * @version egret-gd3d 1.0
+    * @version gd3d 1.0
     */
     @reflect.node2DComponent
     export class slideArea implements I2DComponent, I2DPointListener {
@@ -17,7 +17,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 水平滑动开启
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
         horizontal: boolean = false;
@@ -27,7 +27,7 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 垂直滑动开启
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
         vertical: boolean = false;

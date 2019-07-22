@@ -6,7 +6,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * Bloom后期效果 控制器
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @gd3d.reflect.nodeComponent
     export class bloomctr implements  INodeComponent
@@ -22,7 +22,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 发光阈值 - 图像中亮度高于该阈值的区域将产生泛光效果
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @reflect.Field("number")
         get bloomThreshold(){ return this._bloomThreshold};
@@ -37,7 +37,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 强度 - 附加光（影响到该特效的光源）的全局光强
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @reflect.Field("number")
         get bloomIntensity(){ return this._bloomIntensity};
@@ -53,7 +53,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 模糊扩散 - Frag down sample 的偏移距离
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get blurSpread(){ return this._blurSpread};
         set blurSpread(value:number){
@@ -83,7 +83,7 @@ namespace gd3d.framework
              * @language zh_CN
              * @classdesc
              * 挂载的gameobject
-             * @version egret-gd3d 1.0
+             * @version gd3d 1.0
              */
         gameObject:  gameObject;
     

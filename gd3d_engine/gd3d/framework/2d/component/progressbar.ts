@@ -7,7 +7,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 进度条
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.node2DComponent
     export class progressbar implements I2DComponent
@@ -111,7 +111,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 当前组件的2d节点
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         transform: transform2D;
 

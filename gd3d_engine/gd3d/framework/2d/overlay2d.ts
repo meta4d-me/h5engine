@@ -18,7 +18,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 2DUI的容器类，与canvasrender(3DUI)相对应。
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
     export class overlay2D implements IOverLay
@@ -30,7 +30,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 构造函数
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         constructor()
         {
@@ -43,7 +43,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 是否初始化完成，在执行完start之后设置为true
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         init: boolean = false;
 
@@ -74,7 +74,7 @@ namespace gd3d.framework
         //  * @language zh_CN
         //  * @classdesc
         //  * 是否自适应
-        //  * @version egret-gd3d 1.0
+        //  * @version gd3d 1.0
         //  */
         // @gd3d.reflect.Field("boolean")
         // autoAsp: boolean = true;
@@ -84,7 +84,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 屏幕宽高匹配模式 (range 0-1  =0:固定宽  =1:固定高)
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         screenMatchRate : number = 0;
@@ -94,7 +94,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 屏幕匹配参考宽度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         matchReference_width = 800;
@@ -104,7 +104,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 屏幕匹配参考高度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         matchReference_height =600;
@@ -119,7 +119,7 @@ namespace gd3d.framework
          * matchReference_height
          * matchReference_width
          * screenMatchRate
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         scaleMode : UIScaleMode = UIScaleMode.CONSTANT_PIXEL_SIZE;
@@ -129,7 +129,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 渲染排序
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         @gd3d.reflect.Field("number")
         sortOrder: number = 0;
@@ -140,7 +140,7 @@ namespace gd3d.framework
          * @classdesc
          * 添加2d子节点
          * @param node 2d节点实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         addChild(node: transform2D)
         {
@@ -153,7 +153,7 @@ namespace gd3d.framework
          * @classdesc
          * 移除2d子节点
          * @param node 2d节点实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         removeChild(node: transform2D)
         {
@@ -165,7 +165,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取所有的2d子节点
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getChildren(): transform2D[]
         {
@@ -177,7 +177,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取2d子节点的数量
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getChildCount(): number
         {
@@ -190,7 +190,7 @@ namespace gd3d.framework
          * @classdesc
          * 获取2d子节点
          * @param index 索引
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getChild(index: number): transform2D
         {
@@ -310,7 +310,7 @@ namespace gd3d.framework
          * 事件检测
          * @param mx x偏移
          * @param my y偏移
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         pick2d(mx: number, my: number, tolerance: number = 0): transform2D
         {
@@ -360,7 +360,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 屏幕空间坐标 转到 canvas坐标
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         calScreenPosToCanvasPos(screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2)
         {
@@ -385,7 +385,7 @@ namespace gd3d.framework
          * canvas坐标 转到 屏幕空间坐标
          * @param canvasPos canvas坐标
          * @param outScreenPos 输出的屏幕空间坐标
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         calCanvasPosToScreenPos(canvasPos: gd3d.math.vector2, outScreenPos: gd3d.math.vector2){
             if(!this.camera || !this.canvas)    return;
@@ -399,7 +399,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 屏幕空间坐标 转到 Model坐标
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         calScreenPosToModelPos(screenPos: gd3d.math.vector2 , outModelPos : gd3d.math.vector2){
             if(!screenPos || !outModelPos || !this.camera)    return;
@@ -419,7 +419,7 @@ namespace gd3d.framework
          * Model坐标 转到 屏幕空间坐标
          * @param modelPos Model坐标
          * @param outScreenPos 输出的屏幕空间坐标
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         calModelPosToScreenPos(modelPos: gd3d.math.vector2 , outScreenPos : gd3d.math.vector2){
             if(!modelPos || !outScreenPos || !this.camera)    return;

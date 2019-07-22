@@ -27,7 +27,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 设定画布的渲染大小，选择长或者宽作为标准锁定画布大小进行渲染。横屏选择FixedWidthType，竖屏选择FixedHeightType。目的是锁定屏幕大小，防止分辨率过高导致渲染压力过大
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export enum CanvasFixedType
     {
@@ -43,7 +43,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 引擎的主入口
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class application
     {
@@ -53,7 +53,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 全局webgl实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         webgl: WebGLRenderingContext;
         stats: Stats.Stats;
@@ -65,7 +65,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 绘制区域宽度 像素单位
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get width()
         {
@@ -77,7 +77,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 绘制区域高度 像素单位
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get height()
         {
@@ -92,7 +92,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 设置timescale
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         set timeScale(val: number)
         {
@@ -103,7 +103,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取timescale
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get timeScale(): number
         {
@@ -118,7 +118,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 设置固定帧数 不设置即为不限制帧数
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         set targetFrame(val: number)
         {
@@ -133,7 +133,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取当前固定帧数
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get targetFrame()
         {
@@ -176,7 +176,7 @@ namespace gd3d.framework
          * @classdesc
          * 引擎的启动方法
          * @param div 绘制区域的dom
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         start(div: HTMLDivElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false)
         {
@@ -375,7 +375,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 显示性能参数面板
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         showFps()
         {
@@ -400,7 +400,7 @@ namespace gd3d.framework
          * @classdesc
          * 关闭性能参数面板
          * @param div 绘制区域的dom
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         closeFps()
         {
@@ -645,7 +645,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取场景实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getScene(): scene
         {
@@ -666,7 +666,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取资源管理器实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getAssetMgr()
         {
@@ -686,7 +686,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取输入管理器实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getInputMgr()
         {
@@ -850,7 +850,7 @@ namespace gd3d.framework
          * @classdesc
          * 直接添加usercode实例
          * @param program usercode实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         addUserCodeDirect(program: IUserCode)
         {
@@ -862,7 +862,7 @@ namespace gd3d.framework
          * @classdesc
          * 根据classname添加usercode
          * @param classname usercode类名
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         addUserCode(classname: string)
         {
@@ -881,7 +881,7 @@ namespace gd3d.framework
          * @classdesc
          * 根据classname添加editorcode
          * @param classname editorcode类名
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         addEditorCode(classname: string)
         {
@@ -899,7 +899,7 @@ namespace gd3d.framework
          * @classdesc
          * 直接添加editorcode实例
          * @param program editorcode实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         addEditorCodeDirect(program: IEditorCode)
         {
@@ -976,7 +976,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * usercode接口
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export interface IUserCode
     {
@@ -990,7 +990,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * editorcode接口
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export interface IEditorCode
     {

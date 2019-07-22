@@ -5,7 +5,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * layer mask 
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export enum CullingMask
     {
@@ -63,7 +63,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 剔除mask工具类
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class cullingmaskutil
     {

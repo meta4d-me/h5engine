@@ -5,7 +5,7 @@
      * @language zh_CN
      * @classdesc
      * 表示定向包围盒
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class obb
     {
@@ -26,7 +26,7 @@
         * @language zh_CN
         * @classdesc
         * 包围盒中心坐标
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         center:  math.vector3;
         /**
@@ -34,7 +34,7 @@
         * @language zh_CN
         * @classdesc
         * 包围盒各轴向半长
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         halfsize:  math.vector3;
        
@@ -43,7 +43,7 @@
         * @language zh_CN
         * @classdesc
         * 包围盒世界空间下各个点坐标
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         vectors:  math.vector3[] = new Array< math.vector3>();
 
@@ -59,7 +59,7 @@
         * @language zh_CN
         * @classdesc
         * 包围盒世界空间下各个点坐标
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         get vectorsWorld(){
             let needInit = this._vectorsWorld.length < 1;
@@ -86,7 +86,7 @@
         * @language zh_CN
         * @classdesc
         * 在世界空间的中心点
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         get worldCenter(){
             if(this.dirtyMap[obb.tag_wCenter]){
@@ -101,7 +101,7 @@
         * @language zh_CN
         * @classdesc
         * 包围盒在世界坐标中各轴向半长
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         get halfSizeWorld(){
             if(this.dirtyMap[obb.tag_wHalfSize]){
@@ -135,7 +135,7 @@
         * @language zh_CN
         * @classdesc
         * x,y,z 轴方向 
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         get directions(){
             if(this.dirtyMap[obb.tag_directions]){
@@ -152,7 +152,7 @@
         * @language zh_CN
         * @classdesc
         * 获取obb世界矩阵
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
          */
         getWorldMatrix(){
             return this._worldMatrix;
@@ -165,7 +165,7 @@
         * 由最大最小点构建定向包围盒
         * @param minimum 最小点坐标
         * @param maximum 最大点坐标
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         buildByMaxMin(minimum:  math.vector3, maximum:  math.vector3)
         {
@@ -201,7 +201,7 @@
         * 由中心点和各轴向长度构建定向包围盒
         * @param center 中心点坐标
         * @param size 各轴向长度
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         buildByCenterSize(center: math.vector3, size: math.vector3)
         {
@@ -231,7 +231,7 @@
         * @classdesc
         * 刷新定向包围盒
         * @param worldmatrix 物体的世界矩阵
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         public update(worldmatrix: math.matrix)
         {
@@ -254,7 +254,7 @@
          * @param bound 碰撞体
          * @classdesc
          * 碰撞体检测碰撞
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public intersects(bound: any)
         {
@@ -276,7 +276,7 @@
          * @param out 长度范围
          * @classdesc
          * 计算到指定轴上投影的长度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         computeExtentsByAxis(axis: math.vector3 , out : math.vector2){
             let p =  math.vec3Dot(this.worldCenter, axis);
@@ -296,7 +296,7 @@
         * @language zh_CN
         * @classdesc
         * 克隆一个obb
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         clone():obb
         {
@@ -330,7 +330,7 @@
         * @language zh_CN
         * @classdesc
         * 释放
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         dispose()
         {

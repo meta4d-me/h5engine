@@ -5,7 +5,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 拖尾组件，废弃
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.nodeRender
     @reflect.nodeComponent

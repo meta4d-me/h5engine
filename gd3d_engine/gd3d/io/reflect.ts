@@ -340,7 +340,7 @@ namespace gd3d {
          * @language zh_CN
          * @classdesc
          * Field 
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param valueType 值类型
          * @param defaultValue 默认值
          * @param referenceType valueType 为 reference类型时 的具体类型
@@ -392,7 +392,7 @@ namespace gd3d {
          * @language zh_CN
          * @classdesc
          * 属性面板提示修饰
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         export function UIComment(comment: string) {
             return function (target: Object, propertyKey: string) {
@@ -417,7 +417,7 @@ namespace gd3d {
          * @language zh_CN
          * @classdesc
          * 属性面板显示方式修饰
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         export function UIStyle(style: string, min?: number, max?: number, defvalue?: any) {
             return function (target: Object, propertyKey: string) {

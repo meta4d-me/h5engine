@@ -7,7 +7,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 2d图片组件
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.node2DComponent
     @reflect.nodeRender
@@ -43,7 +43,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 颜色
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @reflect.Field("color")
         @reflect.UIStyle("color")
@@ -58,7 +58,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 设置rander Shader名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         setShaderByName(shaderName:string){
             this._CustomShaderName = shaderName;
@@ -69,7 +69,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取rander 的材质
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getMaterial(){
             if(!this._uimat){
@@ -85,7 +85,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取渲染绘制矩形边界
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getDrawBounds(){
             if(!this._darwRect){
@@ -139,7 +139,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 图片显示模式
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @reflect.Field("number")
         @reflect.UIStyle("enum")
@@ -161,7 +161,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 图片填充方式
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @reflect.Field("number")
         @reflect.UIStyle("enum")
@@ -183,7 +183,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 填充率
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         get fillAmmount()
@@ -207,7 +207,7 @@ namespace gd3d.framework
         //  * @param texture 图片
         //  * @param border 切片信息
         //  * @param rect 显示范围
-        //  * @version egret-gd3d 1.0
+        //  * @version gd3d 1.0
         //  */
         // setTexture(texture: texture, border?: math.border, rect?: math.rect)
         // {   //image 不应该有setTexture
@@ -241,7 +241,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 精灵
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public set sprite(sprite: sprite)
         {
@@ -289,7 +289,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 9宫格边距
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get imageBorder(){
             return this._imageBorder;
@@ -1354,7 +1354,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 贴图的显示方式
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export enum ImageType
     {
@@ -1369,7 +1369,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 更新瓦片数据。这里只是没有border的瓦片。如果有border就要复杂很多
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export enum FillMethod
     {

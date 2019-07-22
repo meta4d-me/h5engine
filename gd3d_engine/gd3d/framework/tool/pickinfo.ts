@@ -5,7 +5,7 @@
     * @language zh_CN
     * @classdesc
     * 拾取到的信息
-    * @version egret-gd3d 1.0
+    * @version gd3d 1.0
     */
     export class pickinfo
     {

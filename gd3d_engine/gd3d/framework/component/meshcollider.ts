@@ -5,7 +5,7 @@
      * @language zh_CN
      * @classdesc
      * 碰撞组件
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.nodeComponent
     @reflect.nodeMeshCollider
@@ -18,7 +18,7 @@
          * @language zh_CN
          * @classdesc
          * 挂载的gameobject
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         gameObject: gameObject;
          /**
@@ -63,7 +63,7 @@
          * @language zh_CN
          * @classdesc
          * 碰撞体的可见性
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get colliderVisible(): boolean
         {
@@ -75,7 +75,7 @@
          * @param value boolbean
          * @classdesc
          * 碰撞体的可见性
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         set colliderVisible(value: boolean)
         {

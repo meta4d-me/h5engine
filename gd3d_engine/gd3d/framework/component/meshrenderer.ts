@@ -7,7 +7,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * mesh的渲染组件
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.nodeRender
     @reflect.nodeComponent
@@ -24,7 +24,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 挂载的gameobject
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         gameObject: gameObject;
 
@@ -33,7 +33,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * mesh的材质数组
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("material[]")
         materials: material[]=[];
@@ -58,7 +58,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 场景渲染层级（common、transparent、overlay）
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         layer: RenderLayerEnum = RenderLayerEnum.Common;
@@ -67,7 +67,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 渲染mask层级（和相机相对应）
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         // @gd3d.reflect.Field("number")
         // renderLayer: gd3d.framework.CullingMask = CullingMask.default;
@@ -85,7 +85,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 返回此组件的场景渲染层级排序依据queue大小
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get queue(): number
         {
@@ -96,7 +96,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 设置此组件的场景渲染层级排序number大小
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         set queue(value: number)
         {

@@ -5,7 +5,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * UI画布容器组件
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.nodeComponent
     export class canvascontainer implements INodeComponent
@@ -20,7 +20,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 挂载的gameobject
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         gameObject: gameObject;
         
@@ -29,7 +29,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * UI canvas 
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get canvas(){
             if(this._overlay2d && this._overlay2d.canvas) 
@@ -73,7 +73,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * renderMode UI render模式
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @reflect.Field("number")
         get renderMode(){return this._renderMode;}
@@ -138,7 +138,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * UI画布容器RenderMode
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export enum canvasRenderMode{
         ScreenSpaceOverlay,

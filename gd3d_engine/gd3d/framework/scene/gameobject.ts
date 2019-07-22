@@ -35,7 +35,7 @@ namespace gd3d.framework
     //  * @language zh_CN
     //  * @classdesc
     //  * 组件实例接口
-    //  * @version egret-gd3d 1.0
+    //  * @version gd3d 1.0
     //  */
     // export interface INodeComponent
     // {
@@ -53,7 +53,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 组件接口
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
     export class nodeComponent
@@ -65,7 +65,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 组件实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("INodeComponent")
         comp: INodeComponent;
@@ -74,7 +74,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 是否初始化过
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         init: boolean;
 
@@ -95,7 +95,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * gameObject类 对应unity中gameObject概念
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
     export class gameObject
@@ -106,7 +106,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取物体所在场景实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getScene(): scene
         {
@@ -118,7 +118,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 对象layer (取值范围0~31)
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         @gd3d.reflect.UIStyle("enum")
@@ -128,7 +128,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 对象字符标签
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("string")
         tag: string = StringUtil.builtinTag_Untagged;
@@ -138,7 +138,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 隐匿标记
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         hideFlags: HideFlags = HideFlags.None;
@@ -148,7 +148,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 对象是静态
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
         isStatic: boolean = false;
@@ -159,7 +159,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * gameObject必须依赖transform存在
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         transform: transform;
         // dontdestroyonload:boolean = false;//加载新场景的时候是否销毁。
@@ -170,7 +170,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 组件列表
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("nodeComponent[]")
         components: nodeComponent[] = [];
@@ -183,7 +183,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 渲染组件 可为空
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         renderer: IRenderer;
         /**
@@ -191,7 +191,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 相机组件 可为空
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         camera: camera;
 
@@ -201,7 +201,7 @@ namespace gd3d.framework
          * @classdesc
          * 灯光组件 可为空
          * @param
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         light: light;
 
@@ -210,7 +210,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 碰撞盒组件 可为空
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         collider: ICollider;
         @gd3d.reflect.Field("boolean")
@@ -221,7 +221,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取在场景中的可见状态
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get visibleInScene()
         {
@@ -237,7 +237,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取自身的可见状态
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get visible(): boolean
         {
@@ -250,7 +250,7 @@ namespace gd3d.framework
          * @classdesc
          * 设置自身的可见状态
          * @param val
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         set visible(val: boolean)
         {
@@ -266,7 +266,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取对应transform的name
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getName(): string
         {
@@ -279,7 +279,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 初始化 主要是组件的初始化
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         init(bePlay = false)
         {
@@ -318,7 +318,7 @@ namespace gd3d.framework
          * @classdesc
          * 主update
          * @param delta
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         update(delta: number)
         {
@@ -341,7 +341,7 @@ namespace gd3d.framework
          * @classdesc
          * 添加组件实例
          * @param comp 组件实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         addComponentDirect(comp: INodeComponent): INodeComponent
         {
@@ -437,7 +437,7 @@ namespace gd3d.framework
          * @classdesc
          * 根据类型获取组件 只是自己身上找到的第一个
          * @param type 组件类型
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getComponent(type: string): INodeComponent
         {
@@ -456,7 +456,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取身上所有的组件
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getComponents(): INodeComponent[]
         {
@@ -473,7 +473,7 @@ namespace gd3d.framework
          * @classdesc
          * 获取自己和所有子物体中 所有该类型的组件
          * @param type 组件类型
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getComponentsInChildren(type: string): INodeComponent[]
         {
@@ -540,7 +540,7 @@ namespace gd3d.framework
          * @classdesc
          * 根据组件类型获取自己这条分支上父物体中该类型的组件 一直上溯到根节点
          * @param type 组件类型
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getComponentInParent(type: string): INodeComponent
         {
@@ -559,7 +559,7 @@ namespace gd3d.framework
          * @classdesc
          * 根据组件类型添加一个组件
          * @param type 组件类型
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         addComponent(type: string): INodeComponent
         {
@@ -579,7 +579,7 @@ namespace gd3d.framework
          * @classdesc
          * 根据组件实例移出组件
          * @param comp 组件实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         removeComponent(comp: INodeComponent)
         {
@@ -634,7 +634,7 @@ namespace gd3d.framework
          * @classdesc
          * 根据组件类型移出组件
          * @param type 组件类型
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         removeComponentByTypeName(type: string)
         {
@@ -667,7 +667,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 移出所有组件
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         removeAllComponents()
         {
@@ -699,7 +699,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 释放gameObject
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         dispose()
         {
