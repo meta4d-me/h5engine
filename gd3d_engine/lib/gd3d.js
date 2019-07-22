@@ -13329,7 +13329,8 @@ var gd3d;
                 return total;
             };
             shader.prototype.parse = function (assetmgr, json) {
-                this._parseProperties(assetmgr, json.properties);
+                if (json.properties)
+                    this._parseProperties(assetmgr, json.properties);
                 if (json.layer) {
                     var layer = json.layer;
                     if (layer == "transparent")
