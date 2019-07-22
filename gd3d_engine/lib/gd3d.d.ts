@@ -7001,30 +7001,6 @@ declare namespace gd3d.render {
     }
 }
 declare namespace gd3d.render {
-    class staticMeshRenderer {
-        material: glDrawPass;
-        mesh: glMesh;
-        eboIndex: number;
-        drawMode: DrawModeEnum;
-        drawbegin: number;
-        drawcount: number;
-        draw(webgl: WebGLRenderingContext): void;
-    }
-    class batchRenderer {
-        curmaterial: glDrawPass;
-        mesh: glMesh;
-        drawMode: DrawModeEnum;
-        vboCount: number;
-        eboCount: number;
-        dataForVbo: Float32Array;
-        dataForEbo: Uint16Array;
-        initBuffer(webgl: WebGLRenderingContext, vf: VertexFormatMask, drawMode: DrawModeEnum): void;
-        begin(webgl: WebGLRenderingContext, mat: glDrawPass): void;
-        push(webgl: WebGLRenderingContext, vbodata: number[], ebodata: number[]): void;
-        end(webgl: WebGLRenderingContext): void;
-    }
-}
-declare namespace gd3d.render {
     class shaderUniform {
         static texindex: number;
         static applyuniformFunc: {

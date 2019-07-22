@@ -17,33 +17,33 @@ namespace gd3d.framework
                 state.resstateFirst = state.resstate[filename];
             }
 
-            // if (url.lastIndexOf(".bin") != -1)
-            // {
-            //     gd3d.io.loadArrayBuffer(url,
-            //         (_buffer, err, isloadFail) =>
-            //         {
+            if (url.lastIndexOf(".bin") != -1)
+            {
+                gd3d.io.loadArrayBuffer(url,
+                    (_buffer, err, isloadFail) =>
+                    {
 
-            //             call(() =>
-            //             {
-            //                 state.isloadFail = isloadFail ? true : false;
-            //                 if (AssetFactoryTools.catchError(err, onstate, state))
-            //                     return;
-            //                 let _mesh = asset ? asset : new mesh(filename);
+                        call(() =>
+                        {
+                            state.isloadFail = isloadFail ? true : false;
+                            if (AssetFactoryTools.catchError(err, onstate, state))
+                                return;
+                            let _mesh = asset ? asset : new mesh(filename);
 
-            //                 let time = Date.now();
-            //                 return _mesh.Parse(_buffer, assetMgr.webgl).then(() =>
-            //                 {
-            //                     let calc = Date.now() - time;
-            //                     console.log(`[bin]加载:${url}  耗时:${calc}/ms`);
-            //                     AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
-            //                 });
-            //             });
-            //         },
-            //         (loadedLength, totalLength) =>
-            //         {
-            //             AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
-            //         })
-            // } else if (url.lastIndexOf(".json") != -1)
+                            let time = Date.now();
+                            return _mesh.Parse(_buffer, assetMgr.webgl).then(() =>
+                            {
+                                let calc = Date.now() - time;
+                                console.log(`[bin]加载:${url}  耗时:${calc}/ms`);
+                                AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                            });
+                        });
+                    },
+                    (loadedLength, totalLength) =>
+                    {
+                        AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                    })
+            } else if (url.lastIndexOf(".json") != -1)
             {
                 gd3d.io.loadJSON(url, (_buffer, err, isloadFail) =>
                 {
@@ -55,12 +55,12 @@ namespace gd3d.framework
                         let _mesh = asset ? asset : new mesh(filename);
 
                         // let time = Date.now();
-                        // return _mesh.Parse(_buffer, assetMgr.webgl).then(() =>
-                        // {                            
-                        //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
-                        // });
-                        _mesh.Parse(_buffer, assetMgr.webgl);
-                        AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                        return _mesh.Parse(_buffer, assetMgr.webgl).then(() =>
+                        {                            
+                            AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                        });
+                        // _mesh.Parse(_buffer, assetMgr.webgl);
+                        // AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
                         // let calc = Date.now() - time;
                         // console.log(`[json]加载:${url}  耗时:${calc}/ms`);
                     });
@@ -85,14 +85,16 @@ namespace gd3d.framework
            
             call(() =>
             {
-                // return _mesh.Parse(_buffer, assetMgr.webgl).then(() =>
-                // {
+                if(typeof(_buffer)==_buffer)
+                    _buffer = JSON.parse(_buffer);
+                return _mesh.Parse(_buffer, assetMgr.webgl).then(() =>
+                {
 
-                //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                    AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
 
-                // });
-                _mesh.Parse(io.GetJSON(url,_buffer), assetMgr.webgl);
-                AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
+                });
+                // _mesh.Parse(io.GetJSON(url,_buffer), assetMgr.webgl);
+                // AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
             });
         }
     }
