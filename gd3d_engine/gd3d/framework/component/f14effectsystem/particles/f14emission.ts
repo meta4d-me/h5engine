@@ -38,7 +38,7 @@ namespace gd3d.framework
         colorArr: math.color[];
         uvArr: math.vector2[];
 
-        public constructor(effect: f14EffectSystem, layer: F14Layer)
+        constructor(effect: f14EffectSystem, layer: F14Layer)
         {
             this.type = F14TypeEnum.particlesType;
             this.effect = effect;

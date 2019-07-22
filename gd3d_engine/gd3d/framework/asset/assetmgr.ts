@@ -1764,7 +1764,7 @@ namespace gd3d.framework
                 {
                     return AssetTypeEnum.Material;
                 }
-                else if (extname == ".mesh.bin" || extname == ".mesh.bin.js")
+                else if (extname == ".mesh.bin" || extname == ".mesh.bin.js"|| extname == ".mesh.json")
                 {
                     return AssetTypeEnum.Mesh;
                 }

@@ -131,12 +131,12 @@
 
         public get sphereDirection(): gd3d.math.vector3
         {
-            let θ = Math.random()*Math.PI*2;
-            let φ = Math.random()*Math.PI;
+            let o = Math.random()*Math.PI*2;
+            let o1 = Math.random()*Math.PI;
             let radius=Math.random()*this.radius;
-            this.direction.x=Math.sin(φ)*Math.cos(θ);
-            this.direction.y=Math.cos(φ);         
-            this.direction.z=Math.sin(φ)*Math.sin(θ);
+            this.direction.x=Math.sin(o1)*Math.cos(o);
+            this.direction.y=Math.cos(o1);         
+            this.direction.z=Math.sin(o1)*Math.sin(o);
             
             gd3d.math.vec3ScaleByNum(this.direction,radius,this.position);
             return this.direction;
@@ -144,12 +144,12 @@
 
         public get hemisphereDirection(): gd3d.math.vector3
         {
-            let θ = Math.random()*Math.PI*2;
-            let φ = Math.random()*Math.PI*0.5;
+            let o = Math.random()*Math.PI*2;
+            let o1 = Math.random()*Math.PI*0.5;
             let radius=Math.random()*this.radius;
-            this.direction.x=Math.sin(φ)*Math.cos(θ);
-            this.direction.y=Math.cos(φ);         
-            this.direction.z=Math.sin(φ)*Math.sin(θ);
+            this.direction.x=Math.sin(o1)*Math.cos(o);
+            this.direction.y=Math.cos(o1);         
+            this.direction.z=Math.sin(o1)*Math.sin(o);
             
             gd3d.math.vec3ScaleByNum(this.direction,radius,this.position);
             return this.direction;

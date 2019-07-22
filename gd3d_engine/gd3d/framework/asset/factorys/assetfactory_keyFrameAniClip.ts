@@ -24,9 +24,11 @@ namespace gd3d.framework
                         state.isloadFail = isloadFail ? true : false;
                         if (AssetFactoryTools.catchError(err, onstate, state))
                             return;
+                        let time = Date.now();
                         let _clip = asset ? asset : new keyFrameAniClip(filename);
                         _clip.Parse(text);
-
+                        let calc = Date.now() - time;
+                        console.log(`[序列帧动画]解析:${url}  耗时:${calc}/ms`);
                         AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
                     });
                 },
@@ -47,10 +49,12 @@ namespace gd3d.framework
                 {
                     state.resstateFirst=state.resstate[filename];
                 }
+                let time = Date.now();
                 let _buffer = respack[filename];
                 let _clip = asset ? asset : new keyFrameAniClip(filename);
                 _clip.Parse(_buffer);
-
+                let calc = Date.now() - time;
+                console.log(`[序列帧动画]解析:${url}  耗时:${calc}/ms`);
                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
             });
         }

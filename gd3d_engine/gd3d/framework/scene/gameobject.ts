@@ -174,6 +174,7 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("nodeComponent[]")
         components: nodeComponent[] = [];
+        componentTypes: { [key: string]: boolean } = {};
         private componentsInit: nodeComponent[] = [];
         // private componentsPlayed: nodeComponent[] = [];
         haveComponet: boolean = false;
@@ -498,11 +499,12 @@ namespace gd3d.framework
             }
         }
 
-         /**
-         * 获取当前节点下及子节点第一个能找到的组件
-         * @param type 组件名称
-         */
-        getFirstComponentInChildren(type: string):INodeComponent{
+        /**
+        * 获取当前节点下及子节点第一个能找到的组件
+        * @param type 组件名称
+        */
+        getFirstComponentInChildren(type: string): INodeComponent
+        {
             return this.getNodeFirstComponent(this, type);
         }
 
@@ -511,18 +513,23 @@ namespace gd3d.framework
          * @param node 
          * @param _type 
          */
-        private getNodeFirstComponent(node: gameObject, _type: string){
-            for (var i in node.components) {
+        private getNodeFirstComponent(node: gameObject, _type: string)
+        {
+            for (var i in node.components)
+            {
                 var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
-                if (cname == _type) {
+                if (cname == _type)
+                {
                     return node.components[i].comp;
                 }
             }
             let children = node.transform.children;
-            if (children != null){
-                for (var i in children) {
-                    let result = node.getNodeFirstComponent(children[i].gameObject , _type);
-                    if(result) return result;
+            if (children != null)
+            {
+                for (var i in children)
+                {
+                    let result = node.getNodeFirstComponent(children[i].gameObject, _type);
+                    if (result) return result;
                 }
             }
         }
@@ -558,16 +565,12 @@ namespace gd3d.framework
         {
             // if (this.components == null)
             //     this.components = [];
-            for (var key in this.components)
-            {
-                var st = this.components[key]["comp"]["constructor"]["name"];
-                if (st == type)
-                {
-                    throw new Error("已经有一个" + type + "的组件了，不能俩");
-                }
-            }
+            if (this.componentTypes[type])
+                throw new Error("已经有一个" + type + "的组件了，不能俩");
+
             var pp = gd3d.reflect.getPrototype(type);
             var comp = gd3d.reflect.createInstance(pp, { "nodecomp": "1" });
+            this.componentTypes[type] = true;
             return this.addComponentDirect(comp);
         }
         /**
@@ -580,8 +583,12 @@ namespace gd3d.framework
          */
         removeComponent(comp: INodeComponent)
         {
-            let len = this.components.length;
-            for (var i = 0; i < len; i++)
+            let type = reflect.getClassName(comp);
+            if (this.componentTypes[type])
+                return;
+            delete this.components[type];
+            var i = 0, len = this.components.length;
+            while (i < len)
             {
                 if (this.components[i].comp == comp)
                 {
@@ -594,9 +601,11 @@ namespace gd3d.framework
                     this.components.splice(i, 1);
                     break;
                 }
+                ++i;
             }
             if (len < 1)
                 this.haveComponet = false;
+
         }
 
         private remove(comp: INodeComponent)
@@ -629,7 +638,11 @@ namespace gd3d.framework
          */
         removeComponentByTypeName(type: string)
         {
-            for (var i = 0; i < this.components.length; i++)
+            if (!this.componentTypes[type])
+                return;
+            delete this.componentTypes[type];
+            var i = 0, len = this.components.length;
+            while (i < len)
             {
                 if (reflect.getClassName(this.components[i].comp) == type)
                 {
@@ -642,8 +655,13 @@ namespace gd3d.framework
                     this.components.splice(i, 1);
                     break;
                 }
+                ++i;
             }
+            if (len < 1)
+                this.haveComponet = false;
         }
+
+
         /**
          * @public
          * @language zh_CN
@@ -672,6 +690,9 @@ namespace gd3d.framework
             if (this.collider) this.collider = null;
 
             this.components.length = 0;
+            this.componentTypes = {};
+            this.haveComponet = false;
+
         }
         /**
          * @public

@@ -119,22 +119,22 @@ namespace gd3d.framework
                     gd3d.math.vec3Clone(gd3d.math.pool.vector3_up,outDir);
                     break;
                 case ParticleSystemShape.SPHERE:
-                    var θ = Math.random()*Math.PI*2;
-                    var φ = Math.random()*Math.PI;
-                    outDir.x=Math.sin(φ)*Math.cos(θ);
-                    outDir.y=Math.cos(φ);         
-                    outDir.z=Math.sin(φ)*Math.sin(θ);
+                    var o = Math.random()*Math.PI*2;
+                    var o1 = Math.random()*Math.PI;
+                    outDir.x=Math.sin(o1)*Math.cos(o);
+                    outDir.y=Math.cos(o1);         
+                    outDir.z=Math.sin(o1)*Math.sin(o);
                     var radius=Math.random()*emission.radius;
                     
                     gd3d.math.vec3ScaleByNum(outDir,radius,outPos);
                     break;
                 case ParticleSystemShape.HEMISPHERE:
-                    var θ = Math.random()*Math.PI*2;
-                    var φ = Math.random()*Math.PI*0.5;
+                    var o = Math.random()*Math.PI*2;
+                    var o1 = Math.random()*Math.PI*0.5;
                     var radius=Math.random()*emission.radius;
-                    outDir.x=Math.sin(φ)*Math.cos(θ);
-                    outDir.y=Math.cos(φ);         
-                    outDir.z=Math.sin(φ)*Math.sin(θ);
+                    outDir.x=Math.sin(o1)*Math.cos(o);
+                    outDir.y=Math.cos(o1);         
+                    outDir.z=Math.sin(o1)*Math.sin(o);
                     gd3d.math.vec3ScaleByNum(outDir,radius,outPos);
                     break;
                 case ParticleSystemShape.BOX:
