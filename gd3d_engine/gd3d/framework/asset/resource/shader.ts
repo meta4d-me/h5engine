@@ -137,7 +137,8 @@ namespace gd3d.framework
          */
         parse(assetmgr: assetMgr, json: any)
         {
-            this._parseProperties(assetmgr, json.properties);
+            if(json.properties)
+                this._parseProperties(assetmgr, json.properties);
 
             if (json.layer)
             {
