@@ -85,7 +85,7 @@ namespace gd3d.framework
            
             call(() =>
             {
-                if(typeof(_buffer)==_buffer)
+                if(typeof(_buffer)=="string")
                     _buffer = JSON.parse(_buffer);
                 return _mesh.Parse(_buffer, assetMgr.webgl).then(() =>
                 {
