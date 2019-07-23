@@ -366,8 +366,14 @@ namespace gd3d.framework {
         @gd3d.reflect.Field("number")
         localRotate: number = 0;//旋转
 
+        private _maskrectId = "";
+        /** 裁剪遮罩矩形 ID */
+        get maskRectId () {return this._maskrectId; }
+        
+        
         private _maskRect: math.rect;
         private _temp_maskRect: math.rect;
+        /** 裁剪遮罩矩形 */
         get maskRect() {
             if (this._temp_maskRect == null) this._temp_maskRect = new math.rect();
             if (this._maskRect != null) {
@@ -406,7 +412,13 @@ namespace gd3d.framework {
             } else
                 this._parentIsMask = false;
             if (this.isMask || this.parentIsMask) {
+                this._maskrectId = "";
+                if(this.parentIsMask){
+                    this._maskrectId = this._parent._maskrectId;
+                }
+
                 if (this.isMask) {
+                    this._maskrectId += `_${this.insId.getInsID()}`;
                     //计算 maskrect 
                     let wPos = this.getWorldTranslate();
                     let wW = this.canvas.pixelWidth;

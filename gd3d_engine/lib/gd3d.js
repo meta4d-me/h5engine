@@ -2563,6 +2563,7 @@ var gd3d;
                 this.localTranslate = new gd3d.math.vector2(0, 0);
                 this.localScale = new gd3d.math.vector2(1, 1);
                 this.localRotate = 0;
+                this._maskrectId = "";
                 this._isMask = false;
                 this._parentIsMask = false;
                 this.localMatrix = new gd3d.math.matrix3x2;
@@ -2657,6 +2658,11 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(transform2D.prototype, "maskRectId", {
+                get: function () { return this._maskrectId; },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(transform2D.prototype, "maskRect", {
                 get: function () {
                     if (this._temp_maskRect == null)
@@ -2698,7 +2704,12 @@ var gd3d;
                 else
                     this._parentIsMask = false;
                 if (this.isMask || this.parentIsMask) {
+                    this._maskrectId = "";
+                    if (this.parentIsMask) {
+                        this._maskrectId = this._parent._maskrectId;
+                    }
                     if (this.isMask) {
+                        this._maskrectId += "_" + this.insId.getInsID();
                         var wPos = this.getWorldTranslate();
                         var wW = this.canvas.pixelWidth;
                         var wH = this.canvas.pixelHeight;
@@ -3792,8 +3803,8 @@ var gd3d;
                         var rectTag = "";
                         var uiTag = "_ui";
                         if (pMask) {
-                            var prect = this.transform.maskRect;
-                            rectTag = "mask(" + prect.x + "_" + prect.y + "_" + prect.w + "_" + prect.h + ")";
+                            var rId = this.transform.maskRectId;
+                            rectTag = "mask(" + rId + ")";
                         }
                         var matName = this._sprite.texture.getName() + uiTag + rectTag;
                         if (!mat || mat.getName() != matName) {
@@ -5369,8 +5380,8 @@ var gd3d;
                         var rectTag = "";
                         var uiTag = "_ui";
                         if (pMask) {
-                            var prect = this.transform.maskRect;
-                            rectTag = "mask(" + prect.x + "_" + prect.y + "_" + prect.w + "_" + prect.h + ")";
+                            var rId = this.transform.maskRectId;
+                            rectTag = "mask(" + rId + ")";
                         }
                         var matName = this.font.texture.getName() + uiTag + rectTag;
                         if (!mat || mat.getName() != matName) {
@@ -5746,8 +5757,8 @@ var gd3d;
                         var rectTag = "";
                         var uiTag = "_ui";
                         if (pMask) {
-                            var prect = this.transform.maskRect;
-                            rectTag = "mask(" + prect.x + "_" + prect.y + "_" + prect.w + "_" + prect.h + ")";
+                            var rId = this.transform.maskRectId;
+                            rectTag = "mask(" + rId + ")";
                         }
                         var matName = this._image.getName() + uiTag + rectTag;
                         if (!mat || mat.getName() != matName) {

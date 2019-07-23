@@ -506,8 +506,9 @@ namespace gd3d.framework
                 let rectTag = "";
                 let uiTag = "_ui";
                 if(pMask){
-                    let prect = this.transform.maskRect;
-                    rectTag = `mask(${prect.x}_${prect.y}_${prect.w}_${prect.h})`; //when parentIsMask,can't multiplexing material , can be multiplexing when parent equal
+                    //when parentIsMask,can't multiplexing material , can be multiplexing when parent equal
+                    let rId = this.transform.maskRectId;
+                    rectTag = `mask(${rId})`;
                 }
                 let matName =this.font.texture.getName() + uiTag + rectTag;
                 if(!mat || mat.getName() != matName){

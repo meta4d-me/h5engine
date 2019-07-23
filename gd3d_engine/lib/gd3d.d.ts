@@ -597,6 +597,8 @@ declare namespace gd3d.framework {
         localTranslate: math.vector2;
         localScale: math.vector2;
         localRotate: number;
+        private _maskrectId;
+        readonly maskRectId: string;
         private _maskRect;
         private _temp_maskRect;
         readonly maskRect: math.rect;
