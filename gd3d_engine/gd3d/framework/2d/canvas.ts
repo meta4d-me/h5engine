@@ -8,7 +8,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 2d批处理类
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class batcher2D
     {
@@ -151,7 +151,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 2d节点的容器类
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
     export class canvas
@@ -163,7 +163,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 构造函数
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         constructor()
         {
@@ -180,7 +180,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 用于区分当前容器是在overlay(2D)还是canvasrenderer(3D)下
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         is2dUI: boolean = true;
 
@@ -190,7 +190,7 @@ namespace gd3d.framework
          * @classdesc
          * UI绘制使用深度排序规则 
          * (可以降低drawcall , 但是会一定程度增加CPU计算量,视情况使用)
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         isDrawByDepth = false;
 
@@ -199,7 +199,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 如果是在canvasrenderer下，这里可以获取到canvasrenderer所在的transform节点
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         parentTrans: transform;
 
@@ -208,7 +208,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 2d批处理类，用来收集2d节点，完成绘制
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         batcher: batcher2D;
 
@@ -217,7 +217,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * webgl实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         webgl: WebGLRenderingContext;
 
@@ -226,7 +226,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 当前所在场景
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         scene: scene;
 
@@ -236,7 +236,7 @@ namespace gd3d.framework
          * @classdesc
          * 添加2d节点
          * @param node 要添加的2d节点实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         addChild(node: transform2D)
         {
@@ -249,7 +249,7 @@ namespace gd3d.framework
          * @classdesc
          * 移除2d节点
          * @param node 要移除的2d节点实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         removeChild(node: transform2D)
         {
@@ -261,7 +261,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取所有孩子节点
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getChildren(): transform2D[]
         {
@@ -273,7 +273,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取孩子节点的数量
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getChildCount(): number
         {
@@ -287,7 +287,7 @@ namespace gd3d.framework
          * @classdesc
          * 获取指定的孩子节点
          * @param index 位置索引
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getChild(index: number): transform2D
         {
@@ -311,7 +311,7 @@ namespace gd3d.framework
          * @param touch 是否接收到事件
          * @param XOnModelSpace 模型空间下的x偏移
          * @param YOnModelSpace 模型空间下的y偏移
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         update(delta: number, touch: Boolean, XOnModelSpace: number, YOnModelSpace: number)
         {
@@ -517,7 +517,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 渲染完成后的回调
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public afterRender: Function;
 
@@ -526,7 +526,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 渲染前回调
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public beforeRender: Function;
 
@@ -537,7 +537,7 @@ namespace gd3d.framework
          * 渲染
          * @param context 渲染上下文
          * @param assetmgr 资源管理类的实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         render(context: renderContext, assetmgr: assetMgr)
         {
@@ -593,7 +593,7 @@ namespace gd3d.framework
          * 最后由批处理完成绘制
          * @param mat 材质
          * @param data 2d渲染组件的顶点数据
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         pushRawData(mat: material, data: number[])
         {
@@ -647,7 +647,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 资源管理类的实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         assetmgr: assetMgr;
 
@@ -659,7 +659,7 @@ namespace gd3d.framework
          * @param node 要绘制的2d节点
          * @param context 渲染上下文
          * @param assetmgr 资源管理类的实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         drawScene(node: transform2D, context: renderContext, assetmgr: assetMgr)
         {
@@ -870,7 +870,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 画布使用的像素宽度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         pixelWidth: number = 640;
@@ -880,7 +880,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 画布使用的像素高度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         pixelHeight: number = 480;
@@ -893,7 +893,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取canvas的根节点
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getRoot(): transform2D
         {
@@ -913,7 +913,7 @@ namespace gd3d.framework
          * model空间坐标 转到 canvas 坐标
          * @param fromP 屏幕空间坐标
          * @param outP canvas 坐标
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         ModelPosToCanvasPos(fromP: math.vector2, outP: math.vector2)
         {
@@ -931,7 +931,7 @@ namespace gd3d.framework
          * canvas坐标 转到 model空间坐标 
          * @param canvasPos canvas坐标
          * @param outModelPos model空间坐标
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         CanvasPosToModelPos(canvasPos: math.vector2, outModelPos: math.vector2)
         {

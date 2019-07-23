@@ -5,7 +5,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 路径组件
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.nodeComponent
     export class guidpath implements INodeComponent
@@ -19,7 +19,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 设置路径组件需要的路径资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         set pathasset(pathasset:pathasset){
             if(this._pathasset)
@@ -37,7 +37,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 路径组件的pathasset
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get pathasset()
         {
@@ -48,7 +48,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 移动速度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public speed:number=1;
 
@@ -58,7 +58,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 按照路径开始移动
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         play(loopCount:number=1)
         {
@@ -70,7 +70,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 暂停移动
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         pause()
         {
@@ -81,7 +81,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 停止移动
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         stop()
         {
@@ -93,7 +93,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 重新按照路径移动
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         replay(loopCount:number=1)
         {
@@ -111,7 +111,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 挂载此组件的gameobject是否朝向前方
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         lookforward:boolean=false;
         private loopCount:number=1;
@@ -125,7 +125,7 @@ namespace gd3d.framework
          * @param oncomplete 按照路径移动结束需要执行的事件
          * @classdesc
          * 设置路径组件的需要的参数
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         setpathasset(pathasset:pathasset,speed:number=1,oncomplete:()=>void=null)
         {
@@ -223,7 +223,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 挂载的gameobject
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         gameObject: gameObject;
          /**

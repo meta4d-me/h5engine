@@ -7,7 +7,7 @@ namespace gd3d.framework
     * @language zh_CN
     * @classdesc
     * 蒙皮网格渲染组件
-    * @version egret-gd3d 1.0
+    * @version gd3d 1.0
     */
     @reflect.nodeRender
     @reflect.nodeComponent
@@ -119,7 +119,7 @@ namespace gd3d.framework
         size: math.vector3;
         /**
          * 最大骨骼数量
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         maxBoneCount: number = 55;
         //是否高效
@@ -309,7 +309,7 @@ namespace gd3d.framework
          * @param ray 射线
          * @classdesc
          * 射线检测
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         intersects(ray: ray, outInfo: pickinfo): boolean
         {

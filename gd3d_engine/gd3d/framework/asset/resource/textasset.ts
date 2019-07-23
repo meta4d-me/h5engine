@@ -7,7 +7,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 文本资源
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
     export class textasset implements IAsset
@@ -22,7 +22,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 是否为默认资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         defaultAsset: boolean = false;
         constructor(assetName: string = null)
@@ -38,7 +38,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取资源名称
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getName(): string
         {
@@ -49,7 +49,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取资源唯一id
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getGUID(): number
         {
@@ -60,7 +60,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 引用计数加一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         use()
         {
@@ -71,7 +71,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 引用计数减一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         unuse()
         {
@@ -82,7 +82,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 释放资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         dispose()
         {
@@ -94,7 +94,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 文本内容
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         content: string;
 
@@ -103,7 +103,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 计算资源字节大小
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         caclByteLength(): number
         {

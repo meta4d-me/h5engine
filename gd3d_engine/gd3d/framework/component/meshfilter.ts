@@ -7,7 +7,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * mesh组件
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.nodeComponent
     export class meshFilter implements INodeComponent
@@ -19,7 +19,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 挂载的gameobject
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         gameObject: gameObject;
         start()
@@ -57,7 +57,7 @@ namespace gd3d.framework
          * @param mesh 此组件的mesh
          * @classdesc
          * 设置mesh数据
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         set mesh(mesh: mesh)
         {
@@ -76,7 +76,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 返回mesh数据
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getMeshOutput()
         {

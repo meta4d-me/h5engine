@@ -7,7 +7,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 2d文本组件
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.node2DComponent
     @reflect.nodeRender
@@ -21,7 +21,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 文字内容
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("string")
         get text(): string
@@ -63,7 +63,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 字体
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get font()
         {
@@ -96,7 +96,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 字体大小
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         get fontsize()
@@ -113,7 +113,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 行高
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         linespace: number = 1;//fontsize的倍数
@@ -123,7 +123,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 水平排列方式
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         horizontalType: HorizontalType = HorizontalType.Left;
@@ -133,7 +133,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 垂直排列方式
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         verticalType: VerticalType = VerticalType.Center;
@@ -143,7 +143,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 是否横向溢出
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
         horizontalOverflow :boolean = false;
@@ -153,7 +153,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 是否竖向溢出
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
         verticalOverflow :boolean = false;
@@ -426,7 +426,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 填充颜色
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @reflect.Field("color")
         @reflect.UIStyle("color")
@@ -437,7 +437,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 描边颜色
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @reflect.Field("color")
         @reflect.UIStyle("color")
@@ -452,7 +452,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 设置rander Shader名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         setShaderByName(shaderName:string){
             this._CustomShaderName = shaderName;
@@ -463,7 +463,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取rander 的材质
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getMaterial(){
             if(!this._uimat){
@@ -479,7 +479,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取渲染绘制矩形边界
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getDrawBounds(){
             if(!this._darwRect){
@@ -668,7 +668,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 当前组件的2d节点
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         transform: transform2D;
 
@@ -693,7 +693,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 横向显示方式
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export enum HorizontalType
     {
@@ -707,7 +707,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 纵向显示方式
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export enum VerticalType
     {

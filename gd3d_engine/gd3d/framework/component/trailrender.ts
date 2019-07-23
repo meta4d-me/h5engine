@@ -5,7 +5,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 拖尾组件
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.nodeRender
     @reflect.nodeComponent
@@ -18,7 +18,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 场景渲染层级（common、transparent、overlay）
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         layer: RenderLayerEnum = RenderLayerEnum.Common;
         /**
@@ -26,7 +26,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 渲染mask层级（和相机相对应）
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         //renderLayer: gd3d.framework.CullingMask = CullingMask.default;
         get renderLayer() {return this.gameObject.layer;}
@@ -38,7 +38,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 同场景渲染层级时候先后排序依据
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         queue: number = 0;
 
@@ -60,7 +60,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * start
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         start()
         {
@@ -83,7 +83,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 拖尾mesh是否向经过路径的单边延展
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         extenedOneSide: boolean = true;//延展方向
          /**
@@ -91,7 +91,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * update
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         update(delta: number)
         {
@@ -159,7 +159,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 挂载的gameobject
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         gameObject: gameObject;
 
@@ -170,7 +170,7 @@ namespace gd3d.framework
         * @param material 材质
          * @classdesc
          * 设置拖尾的材质
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public set material(material: gd3d.framework.material)
         {
@@ -182,7 +182,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 得到拖尾上的材质
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public get material()
         {
@@ -203,7 +203,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          *  返回 matrial调色
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */        
         public get color()
         {
@@ -218,7 +218,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          *设置 matrial颜色
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */    
         public set color(color: gd3d.math.color)
         {
@@ -229,7 +229,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 拖尾速度，调节拖尾长短（0-1）
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */  
         public setspeed(upspeed: number)
         {
@@ -240,7 +240,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 调节拖尾宽度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */ 
         public setWidth(Width: number)
         {
@@ -251,7 +251,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 开始拖尾
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */ 
         public play()
         {
@@ -264,7 +264,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 关闭拖尾
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */ 
         public stop()
         {
@@ -275,7 +275,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 拖尾是否朝向相机
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */ 
         lookAtCamera: boolean = false;
         //------------------------------------------------------------------------------------------------------
@@ -442,7 +442,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * render
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         render(context: renderContext, assetmgr: assetMgr, camera: camera)
         {

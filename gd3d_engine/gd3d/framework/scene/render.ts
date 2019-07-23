@@ -178,7 +178,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 渲染的层级
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export enum RenderLayerEnum
     {
@@ -187,7 +187,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 不透明
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Common,
         /**
@@ -195,7 +195,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 半透明
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Transparent,
         /**
@@ -203,7 +203,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * Overlay层
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Overlay,
     }
@@ -212,7 +212,7 @@ namespace gd3d.framework
     //  * @language zh_CN
     //  * @classdesc
     //  * 渲染器接口 继承自组件接口
-    //  * @version egret-gd3d 1.0
+    //  * @version gd3d 1.0
     //  */
     // export interface IRenderer extends INodeComponent
     // {

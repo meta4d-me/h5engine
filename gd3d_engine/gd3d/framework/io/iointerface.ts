@@ -12,7 +12,7 @@ namespace gd3d.io
      * @language zh_CN
      * @classdesc
      * string转换为blob
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export function stringToBlob(content:string)
     {
@@ -26,7 +26,7 @@ namespace gd3d.io
      * @language zh_CN
      * @classdesc
      * string转换为utf8数组
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export function stringToUtf8Array(str: string): number[]
     {

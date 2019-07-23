@@ -9,7 +9,7 @@ namespace gd3d.framework {
      * @language zh_CN
      * @classdesc
      * 组件实例接口
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export interface INodeComponent {
         onPlay();
@@ -26,7 +26,7 @@ namespace gd3d.framework {
      * @language zh_CN
      * @classdesc
      * 2d组件的接口
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export interface I2DComponent {
         onPlay();
@@ -41,7 +41,7 @@ namespace gd3d.framework {
      * @language zh_CN
      * @classdesc
      * 2d碰撞器接口
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export interface ICollider2d {
         transform: transform2D;
@@ -54,7 +54,7 @@ namespace gd3d.framework {
      * @language zh_CN
      * @classdesc
      * 2D渲染组件的接口
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export interface IRectRenderer extends I2DComponent {
         render(canvas: canvas);
@@ -71,7 +71,7 @@ namespace gd3d.framework {
      * @language zh_CN
      * @classdesc
      * 渲染器接口 继承自组件接口
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export interface IRenderer extends INodeComponent {
         layer: RenderLayerEnum;

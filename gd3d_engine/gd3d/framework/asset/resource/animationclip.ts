@@ -7,7 +7,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 动画片段资源
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
     export class animationClip implements IAsset
@@ -22,7 +22,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 是否为默认资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         defaultAsset: boolean = false;
         constructor(assetName: string = null)
@@ -38,7 +38,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取资源名称
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getName(): string
         {
@@ -49,7 +49,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取资源唯一id
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getGUID(): number
         {
@@ -60,7 +60,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 引用计数加一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         use()
         {
@@ -71,7 +71,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 引用计数减一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         unuse(disposeNow: boolean = false)
         {
@@ -82,7 +82,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 释放资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         dispose()
         {
@@ -96,7 +96,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 计算资源字节大小
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         caclByteLength(): number
         {
@@ -124,7 +124,7 @@ namespace gd3d.framework
          * @classdesc
          * 解析资源
          * @param buf buffer数组
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Parse(buf: ArrayBuffer): threading.gdPromise<any>
         {
@@ -211,7 +211,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 动画片段的帧率
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         fps: number;
 
@@ -220,7 +220,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 是否循环
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         loop: boolean;
 
@@ -229,7 +229,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 播放时长
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get time()
         {
@@ -242,7 +242,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 骨骼数量
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         boneCount: number;
         /**

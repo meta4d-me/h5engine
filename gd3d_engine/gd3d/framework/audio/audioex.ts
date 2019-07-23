@@ -31,7 +31,7 @@
          * @language zh_CN
          * @classdesc
          * 初始化声音api，注意：在ios上面必须手动点击某个按钮来调用初始化，否则无法播放声音
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         clickInit()
         {
@@ -59,7 +59,7 @@
          * @language zh_CN
          * @classdesc
          * 从arraybuffer转成audiobuffer
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param ab  二进制声音数据
          * @param fun 
          */
@@ -76,7 +76,7 @@
          * @language zh_CN
          * @classdesc
          * 从本地文件加载音频数据，返回audiobuffer
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param url  文件地址
          * @param fun 
          */
@@ -102,7 +102,7 @@
         * @language zh_CN
         * @classdesc
         * 初始化声音api，注意：在ios上面必须手动点击某个按钮来调用初始化，否则无法播放声音
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         isAvailable(): boolean
         {
@@ -177,7 +177,7 @@
         * @language zh_CN
         * @classdesc
         * 获取音量大小
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         get volume(): number
         {
@@ -189,7 +189,7 @@
          * @classdesc
          * 设置音量大小
          * @param value 音量值
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         set volume(val: number)//0-100
         {
@@ -203,7 +203,7 @@
          * @language zh_CN
          * @classdesc
          * 停止播放声音
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         stop()
         {

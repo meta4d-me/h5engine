@@ -5,7 +5,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 正则表达式的工具类，提供一些引擎用到的正则表达式
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class StringUtil
     {
@@ -17,7 +17,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 内建TAG “Untagged”
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         static readonly builtinTag_Untagged = "Untagged";
 
@@ -26,7 +26,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 内建TAG “Player”
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         static readonly builtinTag_Player = "Player";
 
@@ -35,7 +35,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 内建TAG “EditorOnly”
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         static readonly builtinTag_EditorOnly = "EditorOnly";
 
@@ -44,7 +44,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 内建TAG “MainCamera”
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         static readonly builtinTag_MainCamera = "MainCamera";
 
@@ -53,7 +53,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取camera组件的名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public static readonly COMPONENT_CAMERA = "camera";
 
@@ -62,7 +62,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取boxcollider组件的名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public static readonly COMPONENT_BOXCOLLIDER = "boxcollider";
 
@@ -71,7 +71,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取light组件的名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public static readonly COMPONENT_LIGHT = "light";
 
@@ -80,7 +80,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取meshFilter组件的名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public static readonly COMPONENT_MESHFILTER = "meshFilter";
 
@@ -89,7 +89,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取meshRenderer组件的名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public static readonly COMPONENT_MESHRENDER = "meshRenderer";
 
@@ -98,7 +98,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取effectSystem组件的名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public static readonly COMPONENT_EFFECTSYSTEM = "effectSystem";
 
@@ -107,7 +107,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取label组件的名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public static readonly COMPONENT_LABEL = "label";
         public static readonly COMPONENT_uirect = "uirect";
@@ -116,7 +116,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取image2D组件的名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public static readonly COMPONENT_IMAGE = "image2D";
 
@@ -125,7 +125,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取rawImage2D组件的名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public static readonly COMPONENT_RAWIMAGE = "rawImage2D";
 
@@ -134,7 +134,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取button组件的名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public static readonly COMPONENT_BUTTON = "button";
 
@@ -143,7 +143,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取skinnedMeshRenderer组件的名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public static readonly COMPONENT_SKINMESHRENDER = "skinnedMeshRenderer";
 
@@ -152,7 +152,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取AudioPlayer组件的名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public static readonly COMPONENT_AUDIOPLAYER = "AudioPlayer";
 
@@ -161,7 +161,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取cameraController组件的名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public static readonly COMPONENT_CAMERACONTROLLER = "cameraController";
 
@@ -170,7 +170,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取canvasRenderer组件的名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public static readonly COMPONENT_CANVASRENDER = "canvasRenderer";
 
@@ -197,7 +197,7 @@ namespace gd3d.framework
          * @param srcStr 要处理的字符串
          * @param fromStr 原字符串中的指定字符串
          * @param toStr 将被替换为的字符串
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         static replaceAll(srcStr: string, fromStr: string, toStr: string)
         {
@@ -210,7 +210,7 @@ namespace gd3d.framework
          * @classdesc
          * 剔除掉字符串中所有的空格
          * @param str 要处理的字符串
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         static trimAll(str: string)
         {
@@ -226,7 +226,7 @@ namespace gd3d.framework
          * @classdesc
          * 将一个字符串中的第一个字符转为小写
          * @param str 要处理的字符串
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         static firstCharToLowerCase(str: string)
         {

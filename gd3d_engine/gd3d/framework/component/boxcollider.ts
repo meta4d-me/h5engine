@@ -14,7 +14,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 表示矩形碰撞盒
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.nodeComponent
     @reflect.nodeBoxCollider
@@ -27,7 +27,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 挂载的gameobject
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         gameObject: gameObject;
         /**
@@ -35,7 +35,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 子transform
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         subTran: transform;
          /**
@@ -51,7 +51,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 碰撞盒中心点
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         @gd3d.reflect.Field("vector3")
         center: math.vector3 = new math.vector3(0,0,0);
@@ -60,7 +60,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 碰撞盒大小
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         @gd3d.reflect.Field("vector3")
         size: math.vector3 =  new math.vector3(1,1,1);
@@ -78,7 +78,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 获取该碰撞盒物体的世界矩阵
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         public get matrix(): gd3d.math.matrix
         {
@@ -119,7 +119,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 碰撞盒的可见性
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         get colliderVisible(): boolean
         {
@@ -130,7 +130,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 设置碰撞盒的可见性
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         set colliderVisible(value: boolean)
         {
@@ -158,7 +158,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 检测碰撞
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         intersectsTransform(tran: transform): boolean
         {
@@ -173,7 +173,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 构建碰撞盒
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         private build()
         {
@@ -218,7 +218,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 构建碰撞盒mesh 并显示
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         private buildMesh()
         {
@@ -242,7 +242,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 获取碰撞盒mesh
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         private getColliderMesh(): mesh
         {

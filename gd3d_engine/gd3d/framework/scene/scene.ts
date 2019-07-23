@@ -7,7 +7,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 场景是基础的功能，有场景图，相当于Unity的Level
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class scene
     {
@@ -16,7 +16,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 全局的application实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         app: application;
         /**
@@ -24,7 +24,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 全局的webgl实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         webgl: WebGLRenderingContext;
         /**
@@ -46,7 +46,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 场景名称
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         name: string;
         private rootNode: transform;
@@ -55,7 +55,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 渲染列表
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         renderList: renderList;
         private assetmgr: assetMgr;
@@ -65,7 +65,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 添加ScreenSpaceOverlay
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         addScreenSpaceOverlay(overlay: overlay2D)
         {
@@ -81,7 +81,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 删除ScreenSpaceOverlay
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         removeScreenSpaceOverlay(overlay)
         {
@@ -95,7 +95,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 参与渲染的相机
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public renderCameras: camera[] = [];//需要camera class
 
@@ -105,7 +105,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取当前主相机
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public get mainCamera()
         {
@@ -121,7 +121,7 @@ namespace gd3d.framework
          * @classdesc
          * 设置当前主相机
          * @param _camera 相机组件实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public set mainCamera(_camera: camera)
         {
@@ -140,7 +140,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * lightmap列表
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         lightmaps: texture[] = [];//lightmap
         /**
@@ -148,7 +148,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 雾效
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         fog: Fog;
 
@@ -159,7 +159,7 @@ namespace gd3d.framework
          * @classdesc
          * 场景的刷新函数
          * @param delta
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         update(delta: number)
         {
@@ -512,7 +512,7 @@ namespace gd3d.framework
          * @classdesc
          * 场景根节点下添加物体
          * @param node 要添加的transform
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         addChild(node: transform)
         {
@@ -525,7 +525,7 @@ namespace gd3d.framework
          * @classdesc
          * 场景根节点下移出物体
          * @param node 要移出的transform
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         removeChild(node: transform)
         {
@@ -537,7 +537,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取children列表
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getChildren(): transform[]
         {
@@ -549,7 +549,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取children数量
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getChildCount(): number
         {
@@ -563,7 +563,7 @@ namespace gd3d.framework
          * @classdesc
          * 根据索引获取child
          * @param index 索引
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getChild(index: number): transform
         {
@@ -576,7 +576,7 @@ namespace gd3d.framework
          * @classdesc
          * 根据name获取child
          * @param name
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getChildByName(name: string): transform
         {
@@ -589,7 +589,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取场景根节点
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getRoot()
         {
@@ -603,7 +603,7 @@ namespace gd3d.framework
          * 获取射线路径上的所有物体
          * @param ray 射线实例
          * @param isPickMesh 是否为拾取mesh 否为拾取collider
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public pickAll(ray: ray, outInfos: pickinfo[], isPickMesh: boolean = false, root: transform = this.getRoot(), layermask: number = NaN): boolean
         {
@@ -619,7 +619,7 @@ namespace gd3d.framework
          * 获取射线拾取到的最近物体
          * @param ray 射线实例
          * @param isPickMesh 是否为拾取mesh 否为拾取collider
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public pick(ray: ray, outInfo: pickinfo, isPickMesh: boolean = false, root: transform = this.getRoot(), layermask: number = NaN): boolean
         {
@@ -778,7 +778,7 @@ namespace gd3d.framework
          * 启用物理到当前场景
          * @param gravity 定义场景物理世界的重力向量
          * @param plugin 定义场景物理世界引擎插件
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         enablePhysics(gravity: math.vector3, plugin?: IPhysicsEnginePlugin)
         {

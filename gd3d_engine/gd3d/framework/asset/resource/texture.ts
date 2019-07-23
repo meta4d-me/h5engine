@@ -7,7 +7,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * texture资源
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
     export class texture implements IAsset
@@ -22,7 +22,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 是否为默认资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         defaultAsset: boolean = false;
         constructor(assetName: string = null)
@@ -38,7 +38,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取资源名称
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getName(): string
         {
@@ -50,7 +50,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取资源唯一id
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getGUID(): number
         {
@@ -61,7 +61,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 引用计数加一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         use()
         {
@@ -72,7 +72,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 引用计数减一
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         unuse(disposeNow: boolean = false)
         {
@@ -83,7 +83,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 释放资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         dispose()
         {
@@ -101,7 +101,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 计算资源字节大小
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         caclByteLength(): number
         {
@@ -117,7 +117,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 如果是imgdesc加载来的图片，通过这个可以获取到真实的图片名字
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get realName(): string
         {
@@ -128,7 +128,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 设置图片名称
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         set realName(name: string)
         {

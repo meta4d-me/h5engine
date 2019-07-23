@@ -114,7 +114,7 @@ namespace gd3d.framework {
         * @language zh_CN
         * 插入节点
         * @param rect 矩形区域
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         insert(rect: math.rect, maxObjNum: number, maxLevel: number) {
             let objs = this.objects;
@@ -226,7 +226,7 @@ namespace gd3d.framework {
      * @language zh_CN
      * @classdesc
      * 四叉树
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class quadTree {
         private rootNode: qtNode; //root节点
@@ -239,7 +239,7 @@ namespace gd3d.framework {
          * @param bounds 全局的矩形范围
          * @param maxObjNum 每个节点(象限) 能包含的最大物体数量
          * @param maxLevel 树的最大深度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         constructor(bounds: math.rect, maxObjNum: number = 5, maxLevel: number = 5) {
             this.rootNode = new qtNode(bounds, 0);
@@ -252,7 +252,7 @@ namespace gd3d.framework {
         * @language zh_CN
         * 插入节点
         * @param rect 矩形区域
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         insert(rect: math.rect) {
             this.rootNode.insert(rect, this.MAX_OBJECTS, this.MAX_LEVELS);
@@ -266,7 +266,7 @@ namespace gd3d.framework {
          * 检索结果
          * @param bounds 检测矩形
          * @param outRects 返回结果矩形数组
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         retrieve(bounds: math.rect ,  outRects: math.rect[] ){
             if(!bounds || !outRects)    return;
@@ -278,7 +278,7 @@ namespace gd3d.framework {
         * @public
         * @language zh_CN
         * 清理所有节点
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         clear(){
             if(! this.rootNode) return;

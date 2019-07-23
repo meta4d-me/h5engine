@@ -5,7 +5,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 资源类型
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export enum AssetTypeEnum
     {
@@ -13,126 +13,126 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 未知
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Unknown,
         /**
          * @public
          * @language zh_CN
          * 根据后缀 动态识别
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Auto,
         /**
          * @public
          * @language zh_CN
          * 资源包
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Bundle,
         /**
          * @public
          * @language zh_CN
          * 压缩的资源包
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         CompressBundle,
         /**
          * @public
          * @language zh_CN
          * glsl vs
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         GLVertexShader,
         /**
          * @public
          * @language zh_CN
          * glsl fs
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         GLFragmentShader,
         /**
          * @public
          * @language zh_CN
          * shader
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Shader,
         /**
          * @public
          * @language zh_CN
          * 贴图
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Texture,
         /**
          * @public
          * @language zh_CN
          * 贴图desc
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         TextureDesc,
         /**
          * @public
          * @language zh_CN
          * 模型
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Mesh,
         /**
          * @public
          * @language zh_CN
          * 预设
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Prefab,
         /**
          * @public
          * @language zh_CN
          * 材质
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Material,
         /**
          * @public
          * @language zh_CN
          * 动画片段
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Aniclip,
         /**
          * @public
          * @language zh_CN
          * 关键帧动画片段
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         KeyFrameAniclip,
         /**
          * @public
          * @language zh_CN
          * 场景
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Scene,
         /**
          * @public
          * @language zh_CN
          * 图集
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Atlas,
         /**
          * @public
          * @language zh_CN
          * 字体
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         Font,
         /**
          * @public
          * @language zh_CN
          * 文本
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         TextAsset,
         /**
@@ -147,14 +147,14 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 可编辑路径
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         PathAsset,
         /**
          * @public
          * @language zh_CN
          * pvr贴图
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         PVR,
 
@@ -164,7 +164,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * dds贴图
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         DDS
     }
@@ -174,7 +174,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 资源加载状态
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class ResourceState
     {
@@ -189,7 +189,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 带引用的资源加载状态
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class RefResourceState extends ResourceState
     {
@@ -201,7 +201,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 加载状态
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class stateLoad
     {
@@ -209,7 +209,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 加载是否失败
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         isloadFail: boolean = false;
 
@@ -217,14 +217,14 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 加载是否遇到错误
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         iserror: boolean = false;
         /**
          * @public
          * @language zh_CN
          * 加载是否完成
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         isfinish: boolean = false;
 
@@ -232,7 +232,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 记录需要加载的每一个的状态和资源引用
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         resstate: { [id: string]: ResourceState } = {};
 
@@ -240,21 +240,21 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 记录加载的第一个的状态和资源引用
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         resstateFirst: ResourceState = null;
         /**
          * @public
          * @language zh_CN
          * 当前的文件数进度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         curtask: number = 0;
         /**
          * @public
          * @language zh_CN
          * 文件数的总进度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         totaltask: number = 0;
 
@@ -262,7 +262,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 获取文件数加载进度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get fileProgress(): number
         {
@@ -273,7 +273,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 已加载的字节长度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get curByteLength(): number
         {
@@ -295,7 +295,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 总字节长度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         totalByteLength: number = 0;
 
@@ -303,7 +303,7 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 获取文件真实加载进度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get progress(): number
         {
@@ -320,21 +320,21 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * 加载过程中记录的log
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         logs: string[] = [];
         /**
          * @public
          * @language zh_CN
          * 加载过程中记录的错误信息
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         errs: Error[] = [];
         /**
          * @public
          * @language zh_CN
          * 源url地址
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         url: string;
     }
@@ -350,7 +350,7 @@ namespace gd3d.framework
      * js 语法层面不能提供可靠的自动引用计数机制，所以如果你用乱了，哪啊就是乱了<p/>
      * 所有的资源都是从资源管理器get出来的<p/>
      * 所有的资源不用的时候都要还到资源管理器<p/>
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class assetMgr
     {
@@ -381,7 +381,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 初始化默认资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         initDefAsset()
         {
@@ -396,7 +396,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * shader字典
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         mapShader: { [id: string]: shader } = {};
         /**
@@ -405,7 +405,7 @@ namespace gd3d.framework
          * @classdesc
          * 通过name获取shader资源
          * @param name 
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getShader(name: string): shader
         {
@@ -417,7 +417,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 默认Mesh资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         mapDefaultMesh: { [id: string]: mesh } = {};
         /**
@@ -426,7 +426,7 @@ namespace gd3d.framework
          * @classdesc
          * 通过name获取默认mesh资源
          * @param name
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getDefaultMesh(name: string): mesh
         {
@@ -438,7 +438,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 默认图片资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         mapDefaultTexture: { [id: string]: texture } = {};
 
@@ -448,7 +448,7 @@ namespace gd3d.framework
          * @classdesc
          * 通过name获取默认贴图资源
          * @param name
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getDefaultTexture(name: string): texture
         {
@@ -460,7 +460,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 默认cube贴图资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         mapDefaultCubeTexture: { [id: string]: texture } = {};
 
@@ -470,7 +470,7 @@ namespace gd3d.framework
          * @classdesc
          * 通过name获取默认cube贴图资源
          * @param name
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getDefaultCubeTexture(name: string): texture
         {
@@ -482,7 +482,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 默认sprite资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         mapDefaultSprite: { [id: string]: sprite } = {};
 
@@ -492,7 +492,7 @@ namespace gd3d.framework
          * @classdesc
          * 通过name获取默认sprite资源
          * @param name
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getDefaultSprite(name: string): sprite
         {
@@ -504,7 +504,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 默认材质资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         mapMaterial: { [id: string]: material } = {};
         /**
@@ -513,7 +513,7 @@ namespace gd3d.framework
          * @classdesc
          * 通过name获取材质资源
          * @param name
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getMaterial(name: string): material
         {
@@ -526,7 +526,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * assetbundle的字典，key为bundlename
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         mapBundle: { [id: string]: assetBundle } = {};
 
@@ -535,7 +535,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 资源的字典，key为资源的GUID
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         mapRes: { [id: number]: assetRef } = {};
         /**
@@ -543,7 +543,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 资源GUID的字典，key为资源的名称
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         mapNamed: { [id: string]: number[] } = {};
 
@@ -560,7 +560,7 @@ namespace gd3d.framework
         /**
         * @public
         * @language zh_CN
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
          * @classdesc
         * 通过资源的GUID获取资源
         * @param id 资源的GUID
@@ -576,7 +576,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 通过资源的名称获取资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param name 资源的名称
          */
         getAssetByName(name: string, bundlename: string = null): IAsset
@@ -624,7 +624,7 @@ namespace gd3d.framework
          * @classdesc
          * 通过assetbundle的名称获取包
          * @param bundlename 包的名称
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getAssetBundle(bundlename: string): assetBundle
         {
@@ -672,7 +672,7 @@ namespace gd3d.framework
          * 取消资源的引用，当前资源的引用计数减一
          * @param res 需要取消引用的资源
          * @param disposeNow 如果引用计数归零则立即释放
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         unuse(res: IAsset, disposeNow: boolean = false)
         {
@@ -714,7 +714,7 @@ namespace gd3d.framework
          * @classdesc
          * 引用资源，当前资源的引用计数加一
          * @param res 需要引用的资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         use(res: IAsset)
         {
@@ -772,7 +772,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 释放所有引用为零的资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         releaseUnuseAsset()
         {
@@ -808,7 +808,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 返回所有资源引用计数
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getAssetsRefcount(): { [id: string]: number }
         {
@@ -849,7 +849,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 设置资源的url
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param asset 资源
          * @param url url
          */
@@ -863,7 +863,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取资源的url
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param asset 资源
          */
         getAssetUrl(asset: IAsset): string
@@ -879,7 +879,7 @@ namespace gd3d.framework
          * 加载单个资源
          * 所有load进来的资源，均use一遍，引用计数为1
          * 再unload 一次 归0，则可dispose（）
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param url 资源的url
          * @param type 资源的类型
          * @param onstate 状态返回的回调
@@ -1215,7 +1215,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 加载压缩后的包
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param url 资源的url
          * @param type 资源的类型
          * @param onstate 状态返回的回调
@@ -1255,7 +1255,7 @@ namespace gd3d.framework
          * @classdesc
          * 加载资源
          * 这里来区分assetbundle和单个资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param url 资源的url
          * @param type 资源的类型
          * @param onstate 状态返回的回调
@@ -1342,7 +1342,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 卸载资源
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param url 资源的url
          * @param onstate 状态返回的回调
          */
@@ -1418,7 +1418,7 @@ namespace gd3d.framework
          * @classdesc
          * 加载场景
          * 只有先load完包含场景的assetbundle，才能load场景
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param sceneName 场景名称
          * @param onComplete 加载完成回调
          */
@@ -1468,7 +1468,7 @@ namespace gd3d.framework
          * 这里只是把场景序列化
          * 具体保存要编辑器来进行
          * 保存的地址和内容通过回调返回
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param fun 回调
          */
         saveScene(fun: (data: SaveInfo, resourses?: string[]) => void)
@@ -1528,7 +1528,7 @@ namespace gd3d.framework
          * 这里只是把预设序列化
          * 具体保存要编辑器来进行
          * 保存的地址和内容通过回调返回
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param fun 回调
          */
         savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[], contents?: any[]) => void)
@@ -1597,7 +1597,7 @@ namespace gd3d.framework
          * @classdesc
          * 同步加载单个资源（伪同步，只是创建了一个资源的实例返回，还是要等待资源数据加载完成来填充数据）
          * 这个接口还需要完善
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param url 资源的url
          * @param type 资源的类型
          */
@@ -1669,7 +1669,7 @@ namespace gd3d.framework
          * 同步加载资源（伪同步，只是创建了一个资源的实例返回，还是要等待资源数据加载完成来填充数据）
          * 这个接口还需要完善
          * 这里有个问题，如果是assetbundle，那么实例究竟是个啥东西。
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param url 资源的url
          * @param type 资源的类型
          */
@@ -1705,7 +1705,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 通过url获取资源的名称
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param url 资源的url
          */
         getFileName(url: string): string
@@ -1719,7 +1719,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 通过url获取资源的类型
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          * @param url 资源的url
          */
         calcType(url: string | any): AssetTypeEnum
@@ -1925,7 +1925,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 资源引用计数的结构
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class assetRef
     {

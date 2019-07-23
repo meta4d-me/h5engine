@@ -4,7 +4,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 2d定向包围盒
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class obb2d
     {
@@ -16,7 +16,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 中心点偏移量
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         @reflect.Field("vector2")
         offset:gd3d.math.vector2;
@@ -29,7 +29,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 包围盒大小
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         @reflect.Field("vector2")
         get size(){return this._size;}
@@ -48,7 +48,7 @@ namespace gd3d.framework
         * @param center 中心点坐标
         * @param width 包围盒宽度
         * @param height 包围盒高度
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         buildByCenterSize(center:gd3d.math.vector2,width:number,height:number){
             this.center = gd3d.math.pool.clone_vector2(center);
@@ -67,7 +67,7 @@ namespace gd3d.framework
         * @classdesc
         * 刷新定向包围盒
         * @param canvasWorldMtx Canvas世界矩阵
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         update(canvasWorldMtx:gd3d.math.matrix3x2){
             //getTranslation
@@ -95,7 +95,7 @@ namespace gd3d.framework
         * @classdesc
         * obb2d的碰撞检测
         * @param _obb 待检测obb2d
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         intersects(_obb:obb2d){
             if (_obb == null) return false;
@@ -142,7 +142,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 克隆一个obb
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         clone():obb2d
         {
@@ -165,7 +165,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 释放
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         dispose()
         {

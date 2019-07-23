@@ -7,7 +7,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 动画播放器
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.nodeComponent
     export class aniplayer implements INodeComponent
@@ -266,7 +266,7 @@ namespace gd3d.framework
          * @param beRevert 是否倒播
          * @classdesc
          * 根据动画片段名字播放动画
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         play(animName: string, onPlayEnd: () => void = null, speed: number = 1.0, beRevert: boolean = false)
         {
@@ -293,7 +293,7 @@ namespace gd3d.framework
          * @param beRevert 是否倒播
          * @classdesc
          * 根据动画片段名字播放动画
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         playCross(animName: string, crosstimer: number, onPlayEnd: () => void = null, speed: number = 1.0, beRevert: boolean = false)
         {
@@ -390,7 +390,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 停止播放动画
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         stop(): void
         {

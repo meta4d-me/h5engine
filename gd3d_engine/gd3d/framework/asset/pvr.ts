@@ -24,7 +24,7 @@ class PvrParse
      * @classdesc
      * 解析pvr图片
      * @param _buffer 图片二进制数据
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     public parse(_buffer: ArrayBuffer): gd3d.render.glTexture2D
     {

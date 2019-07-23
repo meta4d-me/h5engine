@@ -7,7 +7,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 2d文本输入框
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.node2DComponent
     export class inputField implements I2DComponent , I2DPointListener
@@ -19,7 +19,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 当前组件的2d节点
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         transform: transform2D;
         
@@ -29,7 +29,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 底框显示图像
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("reference",null,"image2D")
         get frameImage()
@@ -49,7 +49,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 文字内容
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get text(): string
         {
@@ -63,7 +63,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 限制输入字符数
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         get characterLimit(){return this._charlimit;}
@@ -78,7 +78,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 文本行格式
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
          get LineType(){  return this._lineType; }
@@ -92,7 +92,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 文本内容格式
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         get ContentType(){  return this._contentType; }
@@ -106,7 +106,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 输入内容label
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("reference",null,"label")
         get TextLabel():label{
@@ -124,7 +124,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 输入内容label
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("reference",null,"label")
         get PlaceholderLabel():label{
@@ -393,7 +393,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 文本行显示方式
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export enum lineType
     {
@@ -405,7 +405,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 文本内容类型
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export enum contentType
     {

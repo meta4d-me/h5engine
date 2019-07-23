@@ -6,7 +6,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 矩形卷轴
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.node2DComponent
     export class scrollRect implements I2DComponent , I2DPointListener
@@ -22,7 +22,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 输入内容label
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("reference",null,"transform2D")
         get content():transform2D{
@@ -37,7 +37,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 水平滑动开启
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
         horizontal:boolean = true;
@@ -47,7 +47,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 垂直滑动开启
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
         vertical:boolean = true;
@@ -57,7 +57,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 滑动惯性
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
         inertia:boolean = true;
@@ -67,7 +67,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 惯性减速率
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         decelerationRate:number = 0.135;

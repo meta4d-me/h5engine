@@ -6,7 +6,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * Vignetting后期效果 控制器
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @gd3d.reflect.nodeComponent
     export class vignettingCtr implements  INodeComponent
@@ -26,7 +26,7 @@ namespace gd3d.framework
              * @language zh_CN
              * @classdesc
              * 挂载的gameobject
-             * @version egret-gd3d 1.0
+             * @version gd3d 1.0
              */
         gameObject:  gameObject;
 

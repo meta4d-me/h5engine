@@ -7,7 +7,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 2d矩形碰撞盒
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.node2DComponent
     @reflect.nodeBoxCollider2d
@@ -24,7 +24,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 获取obb2d
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         getBound()
         {
@@ -36,7 +36,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 检测碰撞
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         intersectsTransform(tran: transform2D): boolean
         {
@@ -51,7 +51,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 构建碰撞盒
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         private build()
         {
@@ -66,7 +66,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 刷新成碰撞框完全覆盖transform
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         refreshTofullOver(){
             if(!this._obb || !this._obb.size || !this._obb.offset) return;

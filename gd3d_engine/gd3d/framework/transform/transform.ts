@@ -5,7 +5,7 @@ namespace gd3d.framework
      * @public
      * @language zh_CN
      * transform类 对应unity中transform概念
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
     export class transform
@@ -74,7 +74,7 @@ namespace gd3d.framework
          * @classdesc
          * 设置所在场景实例
          * @param value 场景实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public set scene(value: scene)
         {
@@ -86,7 +86,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取所在场景
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public get scene(): scene
         {
@@ -103,7 +103,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * transform名称
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("string")
         name: string = "noname";
@@ -113,7 +113,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * transform唯一的insid
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public insId: insID = new insID();
 
@@ -122,7 +122,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 当前节点依赖的prefab路径，如果不依赖，则为空
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("string")
         prefab: string = "";
@@ -149,7 +149,7 @@ namespace gd3d.framework
         // * @private
         // * @language zh_CN
         // * 标记aabb已修改
-        // * @version egret-gd3d 1.0
+        // * @version gd3d 1.0
         // */
         // markAABBDirty()
         // {
@@ -170,7 +170,7 @@ namespace gd3d.framework
         // * @private
         // * @language zh_CN
         // * 标记aabb集合已修改
-        // * @version egret-gd3d 1.0
+        // * @version gd3d 1.0
         // */
         // markAABBChildDirty()
         // {
@@ -185,7 +185,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 自己的aabb
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get aabb()
         {
@@ -215,7 +215,7 @@ namespace gd3d.framework
         //  * @language zh_CN
         //  * @classdesc
         //  * 包含自己和所有子物体的aabb
-        //  * @version egret-gd3d 1.0
+        //  * @version gd3d 1.0
         //  */
         // get aabbchild(){
         //     return this._aabbchild;
@@ -225,7 +225,7 @@ namespace gd3d.framework
         * @private
         * @language zh_CN
         * 计算aabb
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         // caclAABB()
         // {
@@ -243,7 +243,7 @@ namespace gd3d.framework
         // * @private
         // * @language zh_CN
         // * 计算aabb集合
-        // * @version egret-gd3d 1.0
+        // * @version gd3d 1.0
         // */
         // caclAABBChild()
         // {
@@ -266,7 +266,7 @@ namespace gd3d.framework
         * @private
         * @language zh_CN
         * 构建aabb
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         private _buildAABB(): aabb
         {
@@ -404,7 +404,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 子物体列表
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("transform[]")
         children: transform[] = [];
@@ -423,7 +423,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 物理代理对象
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get physicsImpostor()
         {
@@ -439,7 +439,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 父物体实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         private _parent: transform;
         get parent()
@@ -452,7 +452,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 对象RTS有变化了,视锥剔除使用
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         dirtiedOfFrustumCulling = false;
 
@@ -461,7 +461,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 当前物体视锥剔除开关
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         enableCulling = true;
 
@@ -472,7 +472,7 @@ namespace gd3d.framework
          * @classdesc
          * 添加子物体实例
          * @param node 子物体实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         addChild(node: transform)
         {
@@ -486,7 +486,7 @@ namespace gd3d.framework
          * 添加子物体实例到索引位置
          * @param node 场景实例
          * @param index 索引位置
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         addChildAt(node: transform, index: number)
         {
@@ -517,7 +517,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 移除所有子物体
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         removeAllChild(needDispose: boolean = false)
         {
@@ -537,7 +537,7 @@ namespace gd3d.framework
          * @classdesc
          * 移除指定子物体
          * @param node 子物体实例
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         removeChild(node: transform)
         {
@@ -560,7 +560,7 @@ namespace gd3d.framework
          * @classdesc
          * 查找自己以及子物体中是否有指定名称的transform
          * @param name
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         find(name: string): transform
         {
@@ -591,7 +591,7 @@ namespace gd3d.framework
          * @classdesc
          * 判断是否与给定的transform有碰撞
          * @param tran 指定的transform
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         checkImpactTran(tran: transform): boolean
         {
@@ -605,7 +605,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 返回场景中所有与当前tranform碰撞的transform
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         checkImpact(): Array<transform>
         {
@@ -698,7 +698,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * [ 过时接口,现不需要标记变化]
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         markDirty()
         {
@@ -736,7 +736,7 @@ namespace gd3d.framework
         // * @language zh_CN
         // * @classdesc
         // * 刷新自己的aabb集合
-        // * @version egret-gd3d 1.0
+        // * @version gd3d 1.0
         // */
         // updateAABBChild()
         // {
@@ -765,7 +765,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 本地旋转四元数
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("quaternion")
         get localRotate()
@@ -787,7 +787,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 本地位移
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("vector3")
         get localTranslate()
@@ -808,7 +808,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 本地位移
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         get localPosition()
         {
@@ -829,7 +829,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 本地缩放
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("vector3")
         get localScale()
@@ -852,7 +852,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 本地旋转的欧拉角
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get localEulerAngles(): math.vector3
         {
@@ -878,7 +878,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取世界坐标系下的旋转
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getWorldRotate()
         {
@@ -925,7 +925,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取世界坐标系下的位移
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getWorldTranslate()
         {
@@ -948,7 +948,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取世界坐标系下的位移
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getWorldPosition()
         {
@@ -968,7 +968,7 @@ namespace gd3d.framework
          * @classdesc
          * 设置transform世界空间下的位移
          * @param pos 世界空间下的坐标
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         setWorldPosition(pos: math.vector3)
         {
@@ -993,7 +993,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取世界坐标系下的缩放
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getWorldScale()
         {
@@ -1012,7 +1012,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 设置世界坐标系下的缩放
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         setWorldScale(scale: math.vector3)
         {
@@ -1039,7 +1039,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取本地矩阵
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getLocalMatrix(): math.matrix
         {
@@ -1058,7 +1058,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取世界矩阵
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getWorldMatrix(): math.matrix
         {
@@ -1118,7 +1118,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取世界坐标系下当前z轴的朝向
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getForwardInWorld(out: math.vector3)
         {
@@ -1131,7 +1131,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取世界坐标系下当前x轴的朝向
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getRightInWorld(out: math.vector3)
         {
@@ -1144,7 +1144,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取世界坐标系下y轴的朝向
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getUpInWorld(out: math.vector3)
         {
@@ -1158,7 +1158,7 @@ namespace gd3d.framework
          * @classdesc
          * 设置transform的世界矩阵 通过计算得到本地矩阵实现
          * @param mat 世界空间下矩阵
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         setWorldMatrix(mat: math.matrix)
         {
@@ -1185,7 +1185,7 @@ namespace gd3d.framework
          * @classdesc
          * 旋转当前transform到z轴指向给定transform
          * @param trans 给定的transform
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         lookat(trans: transform)
         {
@@ -1197,7 +1197,7 @@ namespace gd3d.framework
          * @classdesc
          * 旋转当前transform到z轴指向给定坐标
          * @param point 给定的坐标
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         lookatPoint(point: math.vector3)
         {
@@ -1220,7 +1220,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取绑定的gameObject
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("gameObject")
         gameObject: gameObject;
@@ -1239,7 +1239,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取当前transform的克隆
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         clone(): transform
         {
@@ -1251,7 +1251,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取当前transform是否被释放掉了
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         get beDispose(): boolean
         {
@@ -1265,7 +1265,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 释放当前transform
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         dispose()
         {
@@ -1307,7 +1307,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 作为引擎实例的唯一id使用 自增
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class insID
     {
@@ -1328,7 +1328,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取唯一id
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getInsID(): number
         {

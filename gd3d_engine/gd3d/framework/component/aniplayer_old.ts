@@ -7,7 +7,7 @@ namespace gd3d.framework
     //  * @language zh_CN
     //  * @classdesc
     //  * 动画播放器
-    //  * @version egret-gd3d 1.0
+    //  * @version gd3d 1.0
     //  */
     // @reflect.nodeComponent
     // export class aniplayer implements INodeComponent
@@ -17,7 +17,7 @@ namespace gd3d.framework
     //      * @language zh_CN
     //      * @classdesc
     //      * 挂载的gameobject
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     gameObject: gameObject;
 
@@ -28,7 +28,7 @@ namespace gd3d.framework
     //      * @language zh_CN
     //      * @classdesc
     //      * 返回动画数组（clips）所有动画的名字
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     get clipnames()
     //     {
@@ -49,7 +49,7 @@ namespace gd3d.framework
     //      * @language zh_CN
     //      * @classdesc
     //      * 动画数组
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     @reflect.Field("animationClip[]")
     //     clips: animationClip[];
@@ -58,7 +58,7 @@ namespace gd3d.framework
     //      * @language zh_CN
     //      * @classdesc
     //      * 是否自动播放
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     @reflect.Field("boolean")
     //     public autoplay: boolean = true;
@@ -77,7 +77,7 @@ namespace gd3d.framework
     //      * @language zh_CN
     //      * @classdesc
     //      * 骨骼数组
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     @reflect.Field("tPoseInfo[]")
     //     bones: tPoseInfo[];
@@ -86,7 +86,7 @@ namespace gd3d.framework
     //      * @language zh_CN
     //      * @classdesc
     //      * 初始位置
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     @reflect.Field("PoseBoneMatrix[]")
     //     startPos: PoseBoneMatrix[];
@@ -121,7 +121,7 @@ namespace gd3d.framework
     //      * @language zh_CN
     //      * @classdesc
     //      * 播放速度
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     speed: number = 1.0;
     //     /**
@@ -141,7 +141,7 @@ namespace gd3d.framework
     //      * @language zh_CN
     //      * @classdesc
     //      * 是否动画融合
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     public mix: boolean = false;
 
@@ -154,7 +154,7 @@ namespace gd3d.framework
     //      * @language zh_CN
     //      * @classdesc
     //      * 动画循环播放次数
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     public get playCount() { return this._playCount; }
 
@@ -163,7 +163,7 @@ namespace gd3d.framework
     //      * @language zh_CN
     //      * @classdesc
     //      * 返回当前播放帧数
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     get cacheKey()
     //     {
@@ -316,7 +316,7 @@ namespace gd3d.framework
     //      * @param beRevert 是否倒播
     //      * @classdesc
     //      * 根据动画片段索引播放普通动画
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     playByIndex(animIndex: number, speed: number = 1.0, beRevert: boolean = false)
     //     {
@@ -339,7 +339,7 @@ namespace gd3d.framework
     //      * @param beRevert 是否倒播
     //      * @classdesc
     //      * 根据动画片段索引播放动画
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     playCrossByIndex(animIndex: number, crosstimer: number, speed: number = 1.0, beRevert: boolean = false)
     //     {
@@ -361,7 +361,7 @@ namespace gd3d.framework
     //      * @param beRevert 是否倒播
     //      * @classdesc
     //      * 根据动画片段名字播放动画
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     play(animName: string, speed: number = 1.0, beRevert: boolean = false)
     //     {
@@ -390,7 +390,7 @@ namespace gd3d.framework
     //      * @param beRevert 是否倒播
     //      * @classdesc
     //      * 根据动画片段名字播放动画
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     playCross(animName: string, crosstimer: number, speed: number = 1.0, beRevert: boolean = false)
     //     {
@@ -419,7 +419,7 @@ namespace gd3d.framework
     //      * @param beRevert 是否倒播
     //      * @classdesc
     //      * 根据动画片段索引播放动画
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     private playAniamtion(index: string, speed: number = 1.0, beRevert: boolean = false)
     //     {
@@ -510,7 +510,7 @@ namespace gd3d.framework
     //      * @language zh_CN
     //      * @classdesc
     //      * 停止播放动画
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     stop(): void
     //     {
@@ -525,7 +525,7 @@ namespace gd3d.framework
     //      * @language zh_CN
     //      * @classdesc
     //      * 是否在播放动画
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     isPlay(): boolean
     //     {
@@ -536,7 +536,7 @@ namespace gd3d.framework
     //      * @language zh_CN
     //      * @classdesc
     //      * 是否在停止动画
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     isStop(): boolean
     //     {
@@ -584,7 +584,7 @@ namespace gd3d.framework
     //      * @param thisObject 对象
     //      * @classdesc
     //      * 给动画添加结束事件
-    //      * @version egret-gd3d 1.0
+    //      * @version gd3d 1.0
     //      */
     //     public addFinishedEventListener(finishCallBack: Function, thisObject: any): void
     //     {

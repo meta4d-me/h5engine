@@ -5,7 +5,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 脚本行文类
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class behaviour implements INodeComponent , IEnabled
     {
@@ -14,7 +14,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 组件启用
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         // @reflect.Field("boolean")  //有问题 ，待处理组件继承后 开启
         enabled : boolean = true;
@@ -24,7 +24,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 挂载的gameobject
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         gameObject: gameObject;
 

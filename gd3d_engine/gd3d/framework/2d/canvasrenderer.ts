@@ -10,7 +10,7 @@ namespace gd3d.framework
      * 3DUI的容器类</p>
      * 3d组件</p>
      * 与overlay(2DUI)相对应。
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     @reflect.nodeRender
     @reflect.nodeComponent
@@ -39,7 +39,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 不受视锥剔除
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
         get dontFrustumCulling(){
@@ -85,7 +85,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * layer类型
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         layer: RenderLayerEnum = RenderLayerEnum.Common;
 
@@ -121,7 +121,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 添加2d子节点
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         addChild(node: transform2D)
         {
@@ -133,7 +133,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 移除2d子节点
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         removeChild(node: transform2D)
         {
@@ -145,7 +145,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取所有2d子节点
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getChildren(): transform2D[]
         {
@@ -157,7 +157,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获取2d子节点的数量
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getChildCount(): number
         {
@@ -170,7 +170,7 @@ namespace gd3d.framework
          * @classdesc
          * 获取2d子节点
          * @param index 索引
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getChild(index: number): transform2D
         {
@@ -218,7 +218,7 @@ namespace gd3d.framework
          * 射线碰撞 获取 Model坐标点
          * @param ray 射线
          * @param outModel Pos out获取到的Model坐标
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         pickModelPos(ray:gd3d.framework.ray,outModelPos:math.vector2):boolean{
             let result = false;
@@ -249,7 +249,7 @@ namespace gd3d.framework
          * @classdesc
          * 射线拣选 全部 transform2D
          * @param ray 射线
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         pickAll2d(ray:gd3d.framework.ray):transform2D[]{
             let result :transform2D[];
@@ -270,7 +270,7 @@ namespace gd3d.framework
          * @classdesc
          * 射线拣选transform2D
          * @param ray 射线
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         pick2d(ray:gd3d.framework.ray):transform2D
         {
@@ -312,7 +312,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 屏幕空间坐标 转到 canvas坐标
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         calScreenPosToCanvasPos(camera:framework.camera,screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2)
         {
@@ -332,7 +332,7 @@ namespace gd3d.framework
          * canvas坐标 转到 世界空间坐标
          * @param from Transform2D世界坐标
          * @param out 返回结果v2
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         calCanvasPosToWorldPos(from:math.vector2,out:math.vector3){
             if(!this.canvas || !from || !out) return;

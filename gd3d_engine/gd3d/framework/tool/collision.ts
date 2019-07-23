@@ -5,7 +5,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 碰撞检测Tool
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class collision{ 
         private static helpv3 = new math.vector3();
@@ -18,7 +18,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * obb 碰 obb
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         static obbVsObb(a:obb,b:obb):boolean{
             if (!a || !b) return false;
@@ -63,7 +63,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * sphere 碰 sphere
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         static sphereVsSphere(a:spherestruct,b:spherestruct){
             if(!a || !b)    return false;
@@ -76,7 +76,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * obb 碰 sphere
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         static obbVsSphere(a:obb,b:spherestruct):boolean{
             if(!a || !b)    return false;

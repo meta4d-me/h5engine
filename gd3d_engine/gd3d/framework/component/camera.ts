@@ -101,7 +101,7 @@ namespace gd3d.framework
     * @language zh_CN
     * @classdesc
     * 视锥剔除组件，作为标记存在
-    * @version egret-gd3d 1.0
+    * @version gd3d 1.0
     */
     @reflect.nodeComponent
     @reflect.nodeCamera
@@ -138,7 +138,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 挂载的gameobject
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         gameObject: gameObject;
 
@@ -148,7 +148,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 相机到近裁剪面距离
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 2)//加上这个标记，编辑器就能读取这个显示ui了
         @gd3d.reflect.Field("number")
@@ -161,7 +161,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 设置相机到近裁剪面距离
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         set near(val: number)
         {
@@ -178,7 +178,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 相机到远裁剪面距离
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.UIStyle("rangeFloat", 1, 1000, 999)
         @gd3d.reflect.Field("number")
@@ -191,7 +191,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 设置相机到远裁剪面距离
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         set far(val: number)
         {
@@ -203,7 +203,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 相机渲染剔除mask
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         CullingMask: CullingMask = CullingMask.everything ^ CullingMask.editor;
@@ -257,7 +257,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 是否清除颜色缓冲区
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         clearOption_Color: boolean = true;
         /**
@@ -265,7 +265,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 是否清除深度缓冲区
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         clearOption_Depth: boolean = true;
         // backgroundColor: gd3d.math.color = new gd3d.math.color(0.11, 0.11, 0.11, 1.0);
@@ -274,7 +274,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 背景色
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         backgroundColor: gd3d.math.color = new gd3d.math.color(0.5, 0.8, 1, 1);
         /**
@@ -282,7 +282,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 相机视窗
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         // @gd3d.reflect.Field("rect")
         viewport: gd3d.math.rect = new gd3d.math.rect(0, 0, 1, 1);
@@ -291,7 +291,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 渲染目标
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         renderTarget: gd3d.render.glRenderTarget = null;
         /**
@@ -299,7 +299,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * camera 渲染排序标记
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         order: number = 0;//camera 渲染顺序
         @gd3d.reflect.Field("IOverLay[]")
@@ -310,7 +310,7 @@ namespace gd3d.framework
          * @param overlay 2d组件
          * @classdesc
          * 添加2d渲染组件
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         addOverLay(overLay: IOverLay)
         {
@@ -330,7 +330,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 返回此相机上的overlays数组
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         getOverLays()
         {
@@ -341,7 +341,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 移除相机上的所有overly
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         removeOverLay(overLay: IOverLay)
         {
@@ -369,7 +369,7 @@ namespace gd3d.framework
          * @param matrix 返回的视矩阵
          * @classdesc
          * 计算相机的viewmatrix（视矩阵）
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         calcViewMatrix(matrix: gd3d.math.matrix)
         {
@@ -389,7 +389,7 @@ namespace gd3d.framework
          * @param viewportpixel 视口rect
          * @classdesc
          * 计算相机视口像素rect
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         calcViewPortPixel(app: application, viewPortPixel: math.rect)
         {
@@ -420,7 +420,7 @@ namespace gd3d.framework
          * @param matrix projectmatrix（投影矩阵）
          * @classdesc
          * 计算相机投影矩阵
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         calcProjectMatrix(asp: number, matrix: gd3d.math.matrix)
         {
@@ -448,7 +448,7 @@ namespace gd3d.framework
          * @param shareRayCache 返回ray 实例 共用一个缓存射线对象 ，默认开启
          * @classdesc
          * 由屏幕坐标发射射线
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         public creatRayByScreen(screenpos: gd3d.math.vector2, app: application, shareRayCache: boolean = true): ray
         {
@@ -490,7 +490,7 @@ namespace gd3d.framework
          * @param outWorldPos model空间坐标
          * @classdesc
          * 由屏幕坐标得到model空间坐标
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         calcModelPosFromScreenPos(app: application, screenPos: math.vector3, outModelPos: math.vector3)
         {
@@ -527,7 +527,7 @@ namespace gd3d.framework
          * @param outScreenPos 屏幕坐标
          * @classdesc
          * 由世界坐标得到屏幕坐标
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         calcScreenPosFromWorldPos(app: application, worldPos: math.vector3, outScreenPos: math.vector2)
         {
@@ -626,7 +626,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 透视投影的fov
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         fov: number = 60 * Math.PI / 180;//透视投影的fov
@@ -635,7 +635,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 正交投影的竖向size
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         size: number = 2;//正交投影的竖向size
@@ -646,7 +646,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 0=正交， 1=透视 中间值可以在两种相机间过度
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
         set opvalue(val: number)

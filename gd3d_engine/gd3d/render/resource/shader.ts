@@ -5,7 +5,7 @@ namespace gd3d.render
      * @language zh_CN
      * @classdesc
      * uniform类型枚举
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export enum UniformTypeEnum
     {

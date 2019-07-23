@@ -69,7 +69,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 停止播放
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         stop()
         {
@@ -83,7 +83,7 @@ namespace gd3d.framework
         * @language zh_CN
         * @classdesc
         * 获取音量大小
-        * @version egret-gd3d 1.0
+        * @version gd3d 1.0
         */
         get volume(): number
         {
@@ -95,7 +95,7 @@ namespace gd3d.framework
          * @classdesc
          * 设置音量大小
          * @param value 音量值
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         set volume(val: number)//-1~1
         {
@@ -107,7 +107,7 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * 获得当前音频播放器是否在播放
-         * @version egret-gd3d 1.0
+         * @version gd3d 1.0
          */
         isPlaying()
         {

@@ -5,7 +5,7 @@ namespace gd3d.framework
      * @language zh_CN
      * @classdesc
      * 2d事件对象
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class PointEvent
     {

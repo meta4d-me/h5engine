@@ -24,7 +24,7 @@ namespace gd3d.event
      * @language zh_CN
      * @classdesc
      * ui事件
-     * @version egret-gd3d 1.0
+     * @version gd3d 1.0
      */
     export class UIEvent extends AEvent
     {
