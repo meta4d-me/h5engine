@@ -6956,6 +6956,7 @@ var gd3d;
                     var url = this.path + "/" + pack;
                     packs.push({ url: url, type: type, asset: null });
                 }
+                var guidList = {};
                 var list = [];
                 for (var _b = 0, _c = this.files; _b < _c.length; _b++) {
                     var fitem = _c[_b];
@@ -6966,6 +6967,9 @@ var gd3d;
                         var mapGuid = assetmgr.mapGuidId;
                         var mAssId = mapGuid[guid];
                         if (mAssId != undefined) {
+                            if (guidList[guid]) {
+                                continue;
+                            }
                             var sRef = assetmgr.mapRes[mAssId];
                             if (sRef && assetmgr.assetIsLoing(sRef)) {
                                 state.resstate[fileName] = new framework.ResourceState();
@@ -6985,6 +6989,7 @@ var gd3d;
                             continue;
                         }
                     }
+                    guidList[guid] = true;
                     var type = assetmgr.calcType(fitem.name);
                     if (fitem.packes != -1) {
                         mapPackes[url] = fitem.packes;

@@ -202,6 +202,7 @@ namespace gd3d.framework {
                 packs.push({ url: url, type: type, asset: null });
             }
             
+            let guidList : {[guid:string] : boolean} = {};
             let list: { url: string, type: AssetTypeEnum, guid : string , asset: IAsset, handle: () => any }[] = [];
             //遍历每项资源 整理到加载列表
             for (let fitem of this.files) {
@@ -212,38 +213,21 @@ namespace gd3d.framework {
                     let mapGuid = assetmgr.mapGuidId;
                     let mAssId = mapGuid[guid];
                     // guid重复性检查
-                    //是否guid_map 中包含
+                    //是否guid_map 中包含 (重复资源)
                     if(mAssId!= undefined){
-                        //是否 正在加载
+                        //如果是来自同一个ab包的 guid重复资源 ，则不放入等待列表
+                        if(guidList[guid]){
+                            continue;
+                        }
+
                         let sRef = assetmgr.mapRes[mAssId];
+                        //同guid 资源 是否 正在加载中 
                         if(sRef && assetmgr.assetIsLoing(sRef)){
                             //是 加入 guid_waitLoad_map
                             //关联到 bundle 的 加载状态队列
                             state.resstate[fileName] = new ResourceState();
-    
                             //考虑-- 失败 情况
                                 //等待执行 前后时间
-                            // let opt : any = {} 
-                            // let _handle = ()=>{
-                            //     return new threading.gdPromise((resolve,reject)=>{
-                            //         if(opt["xxTag"]){
-                            //             resolve();
-                            //         }else{
-                            //             opt["resolve"] = resolve;
-                            //         }
-                            //     });
-                            // };
-                            // opt = {url : null, type : null , asset : null , handle : _handle };
-    
-                            
-                            // let waitLoaded = ()=>{
-                            //     if(opt["resolve"]){
-                            //         opt["resolve"]();
-                            //     }else{
-                            //         opt["xxTag"] = true; 
-                            //     }
-                            // };
-
                             this.waitGuidCount++; //加入等待列表 ，计数增加
 
                             let waitLoaded = ()=>{
@@ -252,11 +236,6 @@ namespace gd3d.framework {
                                //检查加载结束to解析资源
                                this.CkNextHandleOfGuid(list,state,onstate);
                             };
-                            
-                            // opt["guid"] = guid;
-                            // opt["waitLoaded"] = waitLoaded;
-                            // opt["resolve"] = null;
-                            // list.push(opt);
                             
                             let waitList : any[] ;
                             if(!assetmgr.mapGuidWaitLoaded[guid]){
@@ -269,6 +248,8 @@ namespace gd3d.framework {
                         continue;  //跳过 不放入加载队列
                     }
                 }
+
+                guidList[guid] = true; //
 
                 let type: AssetTypeEnum = assetmgr.calcType(fitem.name);
                 // let url = this.path + "/" + fitem.name;
@@ -594,6 +575,6 @@ namespace gd3d.framework {
         /**
          * 资源名- Guid 字典
          */
-        mapNameGuid : { [name : string] : string } = {};  
+        mapNameGuid : { [name : string] : string } = {};
     }
 }
