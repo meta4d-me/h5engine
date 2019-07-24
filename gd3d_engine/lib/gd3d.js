@@ -9348,7 +9348,7 @@ var gd3d;
                 var _buffer = respack[filename];
                 var _mesh = asset ? asset : new framework.mesh(filename);
                 call(function () {
-                    if (typeof (_buffer) == _buffer)
+                    if (typeof (_buffer) == "string")
                         _buffer = JSON.parse(_buffer);
                     return _mesh.Parse(_buffer, assetMgr.webgl).then(function () {
                         framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
