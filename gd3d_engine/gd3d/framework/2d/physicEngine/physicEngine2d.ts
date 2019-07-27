@@ -32,14 +32,19 @@ namespace gd3d.framework {
             max:math.Ivec2
         }
     }
+
+    export interface IRunner{
+        tick ();
+    }
     declare var Matter: any;
     export class physicEngine2D {
         private _Matter: any;
         get Matter() { return this._Matter };
         matterEngine: any;
-        public engineWorld: IWorld;
-        private matterVector: math.Ivec2;
+        engineWorld: IWorld;
+        engineRunner: IRunner;
         private eventer: event.Physic2dEvent = new event.Physic2dEvent();
+        private _bodysObjMap: { [id: number]: I2DPhysicsBody } = {};
         public constructor(op: IEngine2DOP = null) {
             if (Matter == undefined) {
                 console.error(" Matter not found , create physicEngine2D fail");
@@ -52,10 +57,25 @@ namespace gd3d.framework {
                 this.matterEngine = Matter.Engine.create();
             }
             this.engineWorld = this.matterEngine.world;
-            this.matterVector = Matter.Vector;
+            let engine = this.matterEngine;
+            let runner = Matter.Runner.create();
 
             //---------run the engine
-            Matter.Engine.run(this.matterEngine);
+            let modeSceneCtr = true;
+            if(modeSceneCtr){
+                this.engineRunner = runner;
+                let getNow = Matter.Common.now;
+                this.engineRunner.tick = ()=>{
+                    //beforeStep
+                    this.beforeStep();
+                    Matter.Runner.tick(runner , engine , getNow);
+                    //aftereStep
+                    this.afterStep();
+                }
+            }else{
+                // Matter.Engine.run(this.matterEngine);
+                Matter.Runner.run(runner, engine);
+            }
 
             //Event
             Matter.Events.on(this.matterEngine, "beforeUpdate", this.beforeUpdate.bind(this));
@@ -63,6 +83,26 @@ namespace gd3d.framework {
             Matter.Events.on(this.matterEngine, "collisionStart", this.collisionStart.bind(this));
             Matter.Events.on(this.matterEngine, "collisionActive", this.collisionActive.bind(this));
             Matter.Events.on(this.matterEngine, "collisionEnd", this.collisionEnd.bind(this));
+        }
+
+        private beforeStep(){
+            let omap = this._bodysObjMap;
+            for(var key in omap){
+                let phyBody = omap[key];
+                if(phyBody){
+                    phyBody.beforeStep();
+                }
+            }
+        }
+
+        private afterStep(){
+            let omap = this._bodysObjMap;
+            for(var key in omap){
+                let phyBody = omap[key];
+                if(phyBody){
+                    phyBody.afterStep();
+                }
+            }
         }
 
         update(delta: number) {
@@ -350,7 +390,6 @@ namespace gd3d.framework {
             return Matter.Body.create(Matter.Common.extend({}, createCapsule, options));
         }
 
-        private _bodysObjMap: { [id: number]: I2DPhysicsBody } = {};
         /** 添加 I2DPhysicsBody 实例到 2d物理世界*/
         addBody(_Pbody: I2DPhysicsBody) {
             if (!_Pbody) return;
@@ -492,6 +531,22 @@ namespace gd3d.framework {
         */
         public setCentre(body: Ibody, centre: math.Ivec2, relative = false) {
             Matter.Body.setCentre(body, centre, relative);
+        }
+
+        /**
+         * 设置缩放
+         * Scales the body, including updating physical properties (mass, area, axes, inertia), from a world-space point (default is body centre).
+         */
+        public setScale(body : Ibody, scaleX : number , scaleY : number, point : math.Ivec2 = null ){
+            Matter.Body.scale(body , scaleX, scaleY, point);
+        }
+
+        /**
+         * 复合体缩放
+         * Scales all children in the composite, including updating physical properties (mass, area, axes, inertia), from a world-space point.
+         */
+        public compositeScale(composite : any, scaleX : number, scaleY : number, point : math.Ivec2, recursive = false){
+            Matter.Composite.scale(composite,scaleX,scaleY,point,recursive);
         }
 
     }
