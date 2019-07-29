@@ -1197,7 +1197,9 @@ declare namespace gd3d.framework {
         options: I2dPhyBodyData;
         setInitData(options: I2dPhyBodyData): void;
         setPosition(pos: math.Ivec2): void;
+        private setPositionByPhy;
         setAngle(angle: number): void;
+        private setAngleByPhy;
         private bodyWorldScale;
         setScale(scale: math.Ivec2): void;
         setStatic(isStatic: boolean): void;

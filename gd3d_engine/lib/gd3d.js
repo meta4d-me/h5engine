@@ -7089,9 +7089,30 @@ var gd3d;
                 this.options = options;
             };
             physics2DBody.prototype.setPosition = function (pos) {
-                this.physicsEngine.setPosition(this.body, pos);
+                if (this.enableBT) {
+                    var trans = this.transform;
+                    trans.localTranslate.x = pos.x;
+                    trans.localTranslate.y = pos.y;
+                    trans.markDirty();
+                }
+                else {
+                    this.setPositionByPhy(pos);
+                }
+            };
+            physics2DBody.prototype.setPositionByPhy = function (pos) {
+                this._physicsEngine.setPosition(this.body, pos);
             };
             physics2DBody.prototype.setAngle = function (angle) {
+                if (this.enableBT) {
+                    var trans = this.transform;
+                    trans.localRotate = angle;
+                    trans.markDirty();
+                }
+                else {
+                    this.setAngleByPhy(angle);
+                }
+            };
+            physics2DBody.prototype.setAngleByPhy = function (angle) {
                 this._physicsEngine.setAngle(this.body, angle);
             };
             physics2DBody.prototype.setScale = function (scale) {
@@ -7164,8 +7185,8 @@ var gd3d;
                     mPos = tran.localTranslate;
                     mAngle = tran.localRotate;
                 }
-                this.setPosition(mPos);
-                this.setAngle(mAngle);
+                this.setPositionByPhy(mPos);
+                this.setAngleByPhy(mAngle);
                 var bPos = this.body.position;
                 gd3d.math.vec2Set(this.beforePos, bPos.x, bPos.y);
                 this.beforeAngle = this.body.angle;
