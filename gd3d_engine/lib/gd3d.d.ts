@@ -1045,6 +1045,53 @@ declare namespace gd3d.framework {
         remove(): void;
     }
 }
+declare namespace gd3d.math {
+    function matrixGetTranslation(src: matrix, out: vector3): void;
+    function matrixTranspose(src: matrix, out: matrix): void;
+    function matrixDecompose(src: matrix, scale: vector3, rotation: quaternion, translation: vector3): boolean;
+    class angelref {
+        v: number;
+    }
+    function matrix3x2Decompose(src: matrix3x2, scale: vector2, rotation: angelref, translation: vector2): boolean;
+    function matrixGetRotation(src: matrix, result: quaternion): void;
+    function matrix2Quaternion(matrix: matrix, result: quaternion): void;
+    function unitxyzToRotation(xAxis: vector3, yAxis: vector3, zAxis: vector3, out: quaternion): void;
+    function matrixClone(src: matrix, out: matrix): void;
+    function matrix3x2Clone(src: matrix3x2, out: matrix3x2): void;
+    function matrixMakeIdentity(out: matrix): void;
+    function matrix3x2MakeIdentity(out: matrix3x2): void;
+    function matrixInverse(src: matrix, out: matrix): void;
+    function matrix3x2Inverse(src: matrix3x2, out: matrix3x2): void;
+    function matrixMakeTransformRTS(pos: vector3, scale: vector3, rot: quaternion, out: matrix): void;
+    function matrix3x2MakeTransformRTS(pos: vector2, scale: vector2, rot: number, out: matrix3x2): void;
+    function matrixMakeTranslate(x: number, y: number, z: number, out: matrix): void;
+    function matrix3x2MakeTranslate(x: number, y: number, out: matrix3x2): void;
+    function matrixGetScale(src: matrix, scale: vector3): void;
+    function matrixMakeScale(xScale: number, yScale: number, zScale: number, out: matrix): void;
+    function matrix3x2TransformVector2(mat: matrix, inp: vector2, out: vector2): void;
+    function matrix3x2TransformNormal(mat: matrix, inp: vector2, out: vector2): void;
+    function matrix3x2MakeScale(xScale: number, yScale: number, out: matrix3x2): void;
+    function matrixMakeRotateAxisAngle(axis: vector3, angle: number, out: matrix): void;
+    function matrix3x2MakeRotate(angle: number, out: matrix3x2): void;
+    function matrixMultiply(lhs: matrix, rhs: matrix, out: matrix): void;
+    function matrix3x2Multiply(lhs: matrix3x2, rhs: matrix3x2, out: matrix3x2): void;
+    function matrix3x2Equal(mtx1: matrix3x2, mtx2: matrix3x2, threshold?: number): boolean;
+    function matrixProject_PerspectiveLH(fov: number, aspect: number, znear: number, zfar: number, out: matrix): void;
+    function matrixProject_OrthoLH(width: number, height: number, znear: number, zfar: number, out: matrix): void;
+    function matrixLookatLH(forward: vector3, up: vector3, out: matrix): void;
+    function matrixViewLookatLH(eye: vector3, forward: vector3, up: vector3, out: matrix): void;
+    function matrixLerp(left: matrix, right: matrix, v: number, out: matrix): void;
+    function matrixTransformVector3(vector: vector3, transformation: matrix, result: vector3): void;
+    function matrixTransformVector4(src: gd3d.math.vector4, mtx: gd3d.math.matrix, out: gd3d.math.vector4): void;
+    function matrixTransformNormal(vector: vector3, transformation: matrix, result: vector3): void;
+    function matrixGetVector3ByOffset(src: matrix, offset: number, result: vector3): void;
+    function matrixReset(mat: matrix): void;
+    function matrixZero(mat: matrix): void;
+    function matrixScaleByNum(value: number, mat: matrix): void;
+    function matrixAdd(left: matrix, right: matrix, out: matrix): void;
+    function matrixEqual(mtx1: matrix, mtx2: matrix, threshold?: number): boolean;
+    function matrixIsIdentity(mtx: matrix): boolean;
+}
 declare namespace gd3d.framework {
     interface I2DPhysicsBody {
         onInit: (phy2dBody: I2DPhysicsBody) => any;
@@ -1069,6 +1116,8 @@ declare namespace gd3d.framework {
         isSleeping(): boolean;
         isSensor(): boolean;
         isStatic(): boolean;
+        beforeStep(): any;
+        afterStep(): any;
     }
     interface I2dPhyBodyData {
         mass?: number;
@@ -1116,12 +1165,23 @@ declare namespace gd3d.framework {
         _original?: any;
     }
     abstract class physics2DBody extends behaviour2d implements I2DPhysicsBody {
+        private static helpV2;
+        private static helpV2_1;
+        private static helpRefAngle;
         readonly physicsEngine: physicEngine2D;
         protected _physicsEngine: physicEngine2D;
         constructor();
+        private lastScale;
+        private beforePos;
+        private beforeAngle;
+        private _bodyLocalMtx;
+        private _bodyWorldMtx;
+        private enableBT;
         transform: transform2D;
         body: Ibody;
         onInit: (phy2dBody: I2DPhysicsBody) => any;
+        private _positionOffset;
+        positionOffset: math.vector2;
         isSleeping(): boolean;
         isStatic(): boolean;
         isSensor(): boolean;
@@ -1138,6 +1198,8 @@ declare namespace gd3d.framework {
         setInitData(options: I2dPhyBodyData): void;
         setPosition(pos: math.Ivec2): void;
         setAngle(angle: number): void;
+        private bodyWorldScale;
+        setScale(scale: math.Ivec2): void;
         setStatic(isStatic: boolean): void;
         setSleeping(isSleeping: boolean): void;
         setInertia(Inertia: number): void;
@@ -1146,6 +1208,12 @@ declare namespace gd3d.framework {
         setCentre(centre: math.Ivec2, relative?: boolean): void;
         start(): void;
         update(delta: number): void;
+        beforeStep(): void;
+        afterStep(): void;
+        private lastPos;
+        private lastRot;
+        private setPhyBodyTransformation;
+        private setTransformationFormPhyBody;
         remove(): void;
     }
 }
@@ -1220,14 +1288,20 @@ declare namespace gd3d.framework {
             max: math.Ivec2;
         };
     }
+    interface IRunner {
+        tick(): any;
+    }
     class physicEngine2D {
         private _Matter;
         readonly Matter: any;
         matterEngine: any;
         engineWorld: IWorld;
-        private matterVector;
+        engineRunner: IRunner;
         private eventer;
+        private _bodysObjMap;
         constructor(op?: IEngine2DOP);
+        private beforeStep;
+        private afterStep;
         update(delta: number): void;
         private beforeUpdate;
         private afterUpdate;
@@ -1247,7 +1321,6 @@ declare namespace gd3d.framework {
         createPolygon(x: number, y: number, sides: number, radius: number, options: I2dPhyBodyData): Ibody;
         createFromVertices(x: number, y: number, vertexSets: math.Ivec2[], options: I2dPhyBodyData, flagInternal?: boolean, removeCollinear?: number, minimumArea?: number): Ibody;
         createCapsule(x: number, y: number, radius: number, height: number, options: I2dPhyBodyData, rotation?: number, maxSides?: number): any;
-        private _bodysObjMap;
         addBody(_Pbody: I2DPhysicsBody): void;
         removeBody(_Pbody: I2DPhysicsBody): void;
         getBody(bodyId: number): I2DPhysicsBody;
@@ -1268,6 +1341,8 @@ declare namespace gd3d.framework {
         setVertices(body: Ibody, vertices: math.Ivec2[]): void;
         setParts(body: Ibody, parts: Ibody[], autoHull?: boolean): void;
         setCentre(body: Ibody, centre: math.Ivec2, relative?: boolean): void;
+        setScale(body: Ibody, scaleX: number, scaleY: number, point?: math.Ivec2): void;
+        compositeScale(composite: any, scaleX: number, scaleY: number, point: math.Ivec2, recursive?: boolean): void;
     }
     interface Ibody {
         bounds: {
@@ -2289,7 +2364,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess;
         private readFinish;
-        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<{}>;
+        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<unknown>;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
         private _cacheMinP;
@@ -4263,53 +4338,6 @@ declare namespace gd3d.math {
     function calPlaneLineIntersectPoint(planeVector: vector3, planePoint: vector3, lineVector: vector3, linePoint: vector3, out: vector3): void;
     function isContain(p1: vector2, p2: vector2, p3: vector2, p4: vector2, mp: vector2): boolean;
     function Multiply(p1: vector2, p2: vector2, p0: vector2): number;
-}
-declare namespace gd3d.math {
-    function matrixGetTranslation(src: matrix, out: vector3): void;
-    function matrixTranspose(src: matrix, out: matrix): void;
-    function matrixDecompose(src: matrix, scale: vector3, rotation: quaternion, translation: vector3): boolean;
-    class angelref {
-        v: number;
-    }
-    function matrix3x2Decompose(src: matrix3x2, scale: vector2, rotation: angelref, translation: vector2): boolean;
-    function matrixGetRotation(src: matrix, result: quaternion): void;
-    function matrix2Quaternion(matrix: matrix, result: quaternion): void;
-    function unitxyzToRotation(xAxis: vector3, yAxis: vector3, zAxis: vector3, out: quaternion): void;
-    function matrixClone(src: matrix, out: matrix): void;
-    function matrix3x2Clone(src: matrix3x2, out: matrix3x2): void;
-    function matrixMakeIdentity(out: matrix): void;
-    function matrix3x2MakeIdentity(out: matrix3x2): void;
-    function matrixInverse(src: matrix, out: matrix): void;
-    function matrix3x2Inverse(src: matrix3x2, out: matrix3x2): void;
-    function matrixMakeTransformRTS(pos: vector3, scale: vector3, rot: quaternion, out: matrix): void;
-    function matrix3x2MakeTransformRTS(pos: vector2, scale: vector2, rot: number, out: matrix3x2): void;
-    function matrixMakeTranslate(x: number, y: number, z: number, out: matrix): void;
-    function matrix3x2MakeTranslate(x: number, y: number, out: matrix3x2): void;
-    function matrixGetScale(src: matrix, scale: vector3): void;
-    function matrixMakeScale(xScale: number, yScale: number, zScale: number, out: matrix): void;
-    function matrix3x2TransformVector2(mat: matrix, inp: vector2, out: vector2): void;
-    function matrix3x2TransformNormal(mat: matrix, inp: vector2, out: vector2): void;
-    function matrix3x2MakeScale(xScale: number, yScale: number, out: matrix3x2): void;
-    function matrixMakeRotateAxisAngle(axis: vector3, angle: number, out: matrix): void;
-    function matrix3x2MakeRotate(angle: number, out: matrix3x2): void;
-    function matrixMultiply(lhs: matrix, rhs: matrix, out: matrix): void;
-    function matrix3x2Multiply(lhs: matrix3x2, rhs: matrix3x2, out: matrix3x2): void;
-    function matrix3x2Equal(mtx1: matrix3x2, mtx2: matrix3x2, threshold?: number): boolean;
-    function matrixProject_PerspectiveLH(fov: number, aspect: number, znear: number, zfar: number, out: matrix): void;
-    function matrixProject_OrthoLH(width: number, height: number, znear: number, zfar: number, out: matrix): void;
-    function matrixLookatLH(forward: vector3, up: vector3, out: matrix): void;
-    function matrixViewLookatLH(eye: vector3, forward: vector3, up: vector3, out: matrix): void;
-    function matrixLerp(left: matrix, right: matrix, v: number, out: matrix): void;
-    function matrixTransformVector3(vector: vector3, transformation: matrix, result: vector3): void;
-    function matrixTransformVector4(src: gd3d.math.vector4, mtx: gd3d.math.matrix, out: gd3d.math.vector4): void;
-    function matrixTransformNormal(vector: vector3, transformation: matrix, result: vector3): void;
-    function matrixGetVector3ByOffset(src: matrix, offset: number, result: vector3): void;
-    function matrixReset(mat: matrix): void;
-    function matrixZero(mat: matrix): void;
-    function matrixScaleByNum(value: number, mat: matrix): void;
-    function matrixAdd(left: matrix, right: matrix, out: matrix): void;
-    function matrixEqual(mtx1: matrix, mtx2: matrix, threshold?: number): boolean;
-    function matrixIsIdentity(mtx: matrix): boolean;
 }
 declare namespace gd3d.math {
     function floatClamp(v: number, min?: number, max?: number): number;

@@ -25,7 +25,8 @@ namespace gd3d.framework
             this.options.angle = this.transform.localRotate;
             let body = this.physicsEngine.createCapsuleByPBody(this,this.maxSides);
             this.physicsEngine.addBody(this);
-            if(this.onInit) this.onInit(this);
+
+            super.start();
         }
         onPlay(){
 
