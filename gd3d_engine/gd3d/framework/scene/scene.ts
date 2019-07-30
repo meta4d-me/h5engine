@@ -181,6 +181,10 @@ namespace gd3d.framework
             if (this.onLateUpdate)
                 this.onLateUpdate(delta);
 
+            if(physics2D && physics2D.engineRunner){
+                physics2D.engineRunner.tick();
+            }
+
             if (physics)
             {
                 physics._step(delta);

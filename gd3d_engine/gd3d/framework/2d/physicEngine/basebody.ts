@@ -1,3 +1,5 @@
+/// <reference path="../../math/matrix.ts" />
+
 namespace gd3d.framework {
     export interface I2DPhysicsBody {
         /** 初始化完成回调 */
@@ -44,6 +46,9 @@ namespace gd3d.framework {
         isSensor():boolean;
         /**是否是静态 */
         isStatic():boolean;
+
+        beforeStep();
+        afterStep();
     }
     export interface I2dPhyBodyData {
         mass?: number;
@@ -96,6 +101,10 @@ namespace gd3d.framework {
      * （本组件不会创建具体物理对象，需要使用子类对象 或者 自行在onInit回调中创建）
      */
     export abstract class physics2DBody extends behaviour2d implements I2DPhysicsBody {
+        private static helpV2 = new math.vector2();
+        private static helpV2_1 = new math.vector2();
+        private static helpRefAngle = new math.angelref();
+
         /** 2d物理引擎实例对象 */
         get physicsEngine() {
             if (this._physicsEngine) {
@@ -110,11 +119,43 @@ namespace gd3d.framework {
             super();
             this._physicsEngine = physics2D;
         }
+        private lastScale = new math.vector2(1,1);
+        private beforePos = new gd3d.math.vector2();
+        private beforeAngle = 0;
+
+        private _bodyLocalMtx : math.matrix3x2;
+        private _bodyWorldMtx : math.matrix3x2;
+        private enableBT : boolean = false; 
+
         // beStatic:boolean=false;
         transform: transform2D;
         body: Ibody;
         /** 物理对象初始化完成回调 */
         onInit : (phy2dBody : I2DPhysicsBody)=>any;
+
+        private _positionOffset = new math.vector2();
+        /** 物理对象 碰撞体位置偏移量 */
+        get positionOffset () { return this._positionOffset; } ;
+        set positionOffset(pos: math.vector2){
+            if(!pos) return;
+            math.vec2Clone(pos , this._positionOffset);
+            if(pos.x !=0 || pos.y !=0 ){
+                this.enableBT = true;
+                if(!this._bodyWorldMtx) this._bodyWorldMtx = new math.matrix3x2();
+                if(!this._bodyLocalMtx) {
+                    this._bodyLocalMtx = new math.matrix3x2();
+                    //偏移矩阵
+                    let sV2 = math.pool.new_vector2(1,1);
+                    gd3d.math.matrix3x2MakeTransformRTS(pos, sV2, 0, this._bodyLocalMtx);
+                    math.pool.delete_vector2(sV2);
+                }
+                this._bodyLocalMtx.rawData[4] = pos.x;
+                this._bodyLocalMtx.rawData[5] = pos.y;
+                
+            }else{
+                this.enableBT = false;
+            }
+        }
 
         /** 是否已休眠
         * A flag that indicates whether the body is considered sleeping. A sleeping body acts similar to a static body, except it is only temporary and can be awoken.
@@ -232,6 +273,15 @@ namespace gd3d.framework {
             this._physicsEngine.setAngle(this.body,angle);
         }
 
+        private bodyWorldScale = new gd3d.math.vector2(1,1);
+        setScale(scale: math.Ivec2){
+            let wScal = this.bodyWorldScale;
+            let sX = Math.pow(wScal.x , -1) * scale.x;
+            let sY = Math.pow(wScal.y , -1) * scale.y;
+            this._physicsEngine.setScale(this.body, sX , sY );
+            math.vec2Set(this.bodyWorldScale, sX , sY);
+        }
+
         /** 设置静态状态
          * Sets the body as static, including isStatic flag and setting mass and inertia to Infinity.
          */
@@ -289,13 +339,92 @@ namespace gd3d.framework {
         start (){
             if(this.onInit) this.onInit(this);
         }
-
+        
         update(delta: number) {
-            if (!this.body) return;
-            physicTool.Ivec2Copy(this.body.position, this.transform.localTranslate);
-            this.transform.localRotate = this.body.angle;
-            this.transform.markDirty();
+
         }
+
+        beforeStep(){
+            if (!this.body || this.body.isStatic) return;
+            //缩放
+            let tSca = this.transform.localScale;
+            if(!math.vec2Equal(this.lastScale , tSca)){
+                this.setScale(tSca);
+            }
+            math.vec2Clone(tSca , this.lastScale);
+
+            //位移、旋转
+            if(this.enableBT){
+                this.setPhyBodyTransformation();
+            }
+
+        }
+
+        afterStep(){
+            if (!this.body) return;
+            this.setTransformationFormPhyBody();
+
+        }
+
+        
+        private lastPos = new math.vector2();
+        private lastRot = 0;
+        //设置物理的 旋转、位移
+        private setPhyBodyTransformation(){
+            let tran = this.transform;
+            let lpos = tran.localTranslate;
+            if(lpos.x == this.lastPos.x && lpos.y == this.lastPos.y && this.lastRot == tran.localRotate) return;  //没有变化
+
+            //同步到物理对象
+            let posOs = this._positionOffset;
+            let mPos : math.vector2;
+            let mAngle : number;
+            if(posOs.x !=0 || posOs.y !=0){
+                let _scalR = physics2DBody.helpV2;
+                mPos = physics2DBody.helpV2_1;
+                let _angleR = physics2DBody.helpRefAngle;
+                gd3d.math.matrix3x2Multiply(tran.getLocalMatrix() , this._bodyLocalMtx, this._bodyWorldMtx);
+                math.matrix3x2Decompose(this._bodyWorldMtx  , _scalR , _angleR , mPos);
+                mAngle = _angleR.v;
+            }else{
+                mPos = tran.localTranslate;
+                mAngle = tran.localRotate;
+            }
+
+            this.setPosition( mPos );
+            this.setAngle( mAngle );
+            
+            //记录 before数据
+            let bPos = this.body.position;
+            gd3d.math.vec2Set(this.beforePos , bPos.x, bPos.y );
+            this.beforeAngle = this.body.angle;
+        }
+
+        //从物理 设置 旋转、位移
+        private setTransformationFormPhyBody(){
+            let trans = this.transform;
+            let bPos = this.body.position;
+            if(this.enableBT){
+                let bfPos = this.beforePos;
+                let deltaX = bPos.x - bfPos.x ;
+                let deltaY = bPos.y - bfPos.y ;
+                let deltaRot = this.body.angle - this.beforeAngle;
+                if(deltaX== 0 && deltaY == 0 && deltaRot == 0) return;  //没有变化退出
+                let lPos = trans.localTranslate;
+                gd3d.math.vec2Set(lPos, lPos.x + deltaX , lPos.y + deltaY);
+                trans.localRotate += deltaRot;
+            }else{
+                let tPos = trans.localTranslate;
+                if(bPos.x == tPos.x && bPos.y == tPos.y && trans.localRotate == this.body.angle ){  //没有变化退出
+                    return;
+                }
+                physicTool.Ivec2Copy(this.body.position, trans.localTranslate);
+                trans.localRotate = this.body.angle;
+            }
+
+            trans.markDirty();
+        }
+
         remove() {
             this.physicsEngine.removeBody(this);
             this.body = null;

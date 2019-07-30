@@ -41,8 +41,8 @@ namespace gd3d.framework
             this.body  = engine.createBody(this.options);
 
             engine.addBody(this);
-            if(this.onInit) this.onInit(this);
             poolv2_del(tempv2);
+            super.start();
         }
 
         /** 添加部分 body */
