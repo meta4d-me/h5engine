@@ -1831,7 +1831,8 @@ var gd3d;
                             c.comp.onPlay();
                             c.OnPlayed = true;
                         }
-                        comp.update(delta);
+                        if (comp.update)
+                            comp.update(delta);
                         if (framework.instanceOfI2DPointListener(comp)) {
                             this._peCareListBuoy++;
                             var insId = node.insId.getInsID();
@@ -2554,6 +2555,7 @@ var gd3d;
                 this.localTranslate = new gd3d.math.vector2(0, 0);
                 this.localScale = new gd3d.math.vector2(1, 1);
                 this.localRotate = 0;
+                this._maskrectId = "";
                 this._isMask = false;
                 this._parentIsMask = false;
                 this.localMatrix = new gd3d.math.matrix3x2;
@@ -2648,6 +2650,11 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(transform2D.prototype, "maskRectId", {
+                get: function () { return this._maskrectId; },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(transform2D.prototype, "maskRect", {
                 get: function () {
                     if (this._temp_maskRect == null)
@@ -2689,7 +2696,12 @@ var gd3d;
                 else
                     this._parentIsMask = false;
                 if (this.isMask || this.parentIsMask) {
+                    this._maskrectId = "";
+                    if (this.parentIsMask) {
+                        this._maskrectId = this._parent._maskrectId;
+                    }
                     if (this.isMask) {
+                        this._maskrectId += "_" + this.insId.getInsID();
                         var wPos = this.getWorldTranslate();
                         var wW = this.canvas.pixelWidth;
                         var wH = this.canvas.pixelHeight;
@@ -2999,37 +3011,54 @@ var gd3d;
                         throw new Error("已经有一个碰撞组件了，不能俩");
                     }
                 }
+                if (comp.update.toString().length < 35)
+                    comp.update = undefined;
                 return comp;
             };
             transform2D.prototype.removeComponent = function (comp) {
                 if (!comp)
                     return;
-                var typeName = gd3d.reflect.getClassName(comp);
+                var constructor = Object.getPrototypeOf(comp).constructor;
+                if (!constructor)
+                    return;
+                var typeName = constructor.name;
                 if (!this.componentTypes[typeName])
                     return;
                 for (var i = 0; i < this.components.length; i++) {
                     if (this.components[i].comp == comp) {
+                        this.removeCompOfInit(this.components[i]);
                         this.components.splice(i, 1);
-                        comp.remove();
-                        comp.transform = null;
                         break;
                     }
                 }
                 delete this.componentTypes[typeName];
+            };
+            transform2D.prototype.removeCompOfInit = function (cComp) {
+                var comp = cComp.comp;
+                if (cComp.init) {
+                    if (comp == this.renderer)
+                        this.renderer = null;
+                    if (comp == this.collider)
+                        this.collider = null;
+                    if (comp == this.physicsBody)
+                        this.physicsBody = null;
+                    comp.remove();
+                }
+                else {
+                    var i = this.componentsInit.indexOf(cComp);
+                    if (i != -1)
+                        this.componentsInit.splice(i, 1);
+                }
+                comp.transform = null;
             };
             transform2D.prototype.removeComponentByTypeName = function (type) {
                 if (!this.componentTypes[type])
                     return;
                 for (var i = 0; i < this.components.length; i++) {
                     if (gd3d.reflect.getClassName(this.components[i].comp) == type) {
+                        this.removeCompOfInit(this.components[i]);
                         var p = this.components.splice(i, 1);
-                        if (p[0].comp == this.renderer)
-                            this.renderer = null;
-                        if (p[0].comp == this.collider)
-                            this.collider = null;
-                        if (p[0].comp == this.physicsBody)
-                            this.physicsBody = null;
-                        p[0].comp.remove();
+                        this.removeCompOfInit(this.components[i]);
                         return p[0];
                     }
                 }
@@ -3783,8 +3812,8 @@ var gd3d;
                         var rectTag = "";
                         var uiTag = "_ui";
                         if (pMask) {
-                            var prect = this.transform.maskRect;
-                            rectTag = "mask(" + prect.x + "_" + prect.y + "_" + prect.w + "_" + prect.h + ")";
+                            var rId = this.transform.maskRectId;
+                            rectTag = "mask(" + rId + ")";
                         }
                         var matName = this._sprite.texture.getName() + uiTag + rectTag;
                         if (!mat || mat.getName() != matName) {
@@ -5360,8 +5389,8 @@ var gd3d;
                         var rectTag = "";
                         var uiTag = "_ui";
                         if (pMask) {
-                            var prect = this.transform.maskRect;
-                            rectTag = "mask(" + prect.x + "_" + prect.y + "_" + prect.w + "_" + prect.h + ")";
+                            var rId = this.transform.maskRectId;
+                            rectTag = "mask(" + rId + ")";
                         }
                         var matName = this.font.texture.getName() + uiTag + rectTag;
                         if (!mat || mat.getName() != matName) {
@@ -5737,8 +5766,8 @@ var gd3d;
                         var rectTag = "";
                         var uiTag = "_ui";
                         if (pMask) {
-                            var prect = this.transform.maskRect;
-                            rectTag = "mask(" + prect.x + "_" + prect.y + "_" + prect.w + "_" + prect.h + ")";
+                            var rId = this.transform.maskRectId;
+                            rectTag = "mask(" + rId + ")";
                         }
                         var matName = this._image.getName() + uiTag + rectTag;
                         if (!mat || mat.getName() != matName) {
@@ -6200,13 +6229,792 @@ var gd3d;
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
+    var math;
+    (function (math) {
+        function matrixGetTranslation(src, out) {
+            out.x = src.rawData[12];
+            out.y = src.rawData[13];
+            out.z = src.rawData[14];
+        }
+        math.matrixGetTranslation = matrixGetTranslation;
+        function matrixTranspose(src, out) {
+            out.rawData[1] = src.rawData[4];
+            out.rawData[2] = src.rawData[8];
+            out.rawData[3] = src.rawData[12];
+            out.rawData[4] = src.rawData[1];
+            out.rawData[6] = src.rawData[9];
+            out.rawData[7] = src.rawData[13];
+            out.rawData[8] = src.rawData[2];
+            out.rawData[9] = src.rawData[6];
+            out.rawData[11] = src.rawData[14];
+            out.rawData[12] = src.rawData[3];
+            out.rawData[13] = src.rawData[7];
+            out.rawData[14] = src.rawData[11];
+        }
+        math.matrixTranspose = matrixTranspose;
+        function matrixDecompose(src, scale, rotation, translation) {
+            translation.x = src.rawData[12];
+            translation.y = src.rawData[13];
+            translation.z = src.rawData[14];
+            var xs = math.sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
+            var ys = math.sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
+            var zs = math.sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
+            scale.x = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
+            scale.y = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
+            scale.z = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
+            if (scale.x === 0 || scale.y === 0 || scale.z === 0) {
+                rotation.x = 0;
+                rotation.y = 0;
+                rotation.z = 0;
+                rotation.w = 1;
+                return false;
+            }
+            var mat = math.pool.new_matrix();
+            mat.rawData[0] = src.rawData[0] / scale.x;
+            mat.rawData[1] = src.rawData[1] / scale.x;
+            mat.rawData[2] = src.rawData[2] / scale.x;
+            mat.rawData[3] = 0;
+            mat.rawData[4] = src.rawData[4] / scale.y;
+            mat.rawData[5] = src.rawData[5] / scale.y;
+            mat.rawData[6] = src.rawData[6] / scale.y;
+            mat.rawData[7] = 0;
+            mat.rawData[8] = src.rawData[8] / scale.z;
+            mat.rawData[9] = src.rawData[9] / scale.z;
+            mat.rawData[10] = src.rawData[10] / scale.z;
+            mat.rawData[11] = 0;
+            matrix2Quaternion(mat, rotation);
+            math.pool.delete_matrix(mat);
+            return true;
+        }
+        math.matrixDecompose = matrixDecompose;
+        var angelref = (function () {
+            function angelref() {
+            }
+            return angelref;
+        }());
+        math.angelref = angelref;
+        function matrix3x2Decompose(src, scale, rotation, translation) {
+            translation.x = src.rawData[4];
+            translation.y = src.rawData[5];
+            scale.x = Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1]);
+            scale.y = Math.sqrt(src.rawData[2] * src.rawData[2] + src.rawData[3] * src.rawData[3]);
+            if (scale.x === 0 || scale.y === 0) {
+                rotation.v = 0;
+                return false;
+            }
+            var sx = src.rawData[0] / scale.x;
+            var r1 = Math.acos(sx);
+            var sxs = src.rawData[1] / scale.x;
+            var r2 = Math.asin(sxs);
+            if (sxs < 0) {
+                r1 = 2 * Math.PI - r1;
+            }
+            rotation.v = r1;
+            return true;
+        }
+        math.matrix3x2Decompose = matrix3x2Decompose;
+        function matrixGetRotation(src, result) {
+            var xs = math.sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
+            var ys = math.sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
+            var zs = math.sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
+            var scale_x = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
+            var scale_y = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
+            var scale_z = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
+            var mat = math.pool.new_matrix();
+            mat.rawData[0] = src.rawData[0] / scale_x;
+            mat.rawData[1] = src.rawData[1] / scale_x;
+            mat.rawData[2] = src.rawData[2] / scale_x;
+            mat.rawData[3] = 0;
+            mat.rawData[4] = src.rawData[4] / scale_y;
+            mat.rawData[5] = src.rawData[5] / scale_y;
+            mat.rawData[6] = src.rawData[6] / scale_y;
+            mat.rawData[7] = 0;
+            mat.rawData[8] = src.rawData[8] / scale_z;
+            mat.rawData[9] = src.rawData[9] / scale_z;
+            mat.rawData[10] = src.rawData[10] / scale_z;
+            mat.rawData[11] = 0;
+            matrix2Quaternion(mat, result);
+            math.pool.delete_matrix(mat);
+        }
+        math.matrixGetRotation = matrixGetRotation;
+        function matrix2Quaternion(matrix, result) {
+            var data = matrix.rawData;
+            var m11 = data[0], m12 = data[4], m13 = data[8];
+            var m21 = data[1], m22 = data[5], m23 = data[9];
+            var m31 = data[2], m32 = data[6], m33 = data[10];
+            var trace = m11 + m22 + m33;
+            var s;
+            if (trace > 0) {
+                s = 0.5 / Math.sqrt(trace + 1.0);
+                result.w = 0.25 / s;
+                result.x = (m32 - m23) * s;
+                result.y = (m13 - m31) * s;
+                result.z = (m21 - m12) * s;
+            }
+            else if (m11 > m22 && m11 > m33) {
+                s = 2.0 * Math.sqrt(1.0 + m11 - m22 - m33);
+                result.w = (m32 - m23) / s;
+                result.x = 0.25 * s;
+                result.y = (m12 + m21) / s;
+                result.z = (m13 + m31) / s;
+            }
+            else if (m22 > m33) {
+                s = 2.0 * Math.sqrt(1.0 + m22 - m11 - m33);
+                result.w = (m13 - m31) / s;
+                result.x = (m12 + m21) / s;
+                result.y = 0.25 * s;
+                result.z = (m23 + m32) / s;
+            }
+            else {
+                s = 2.0 * Math.sqrt(1.0 + m33 - m11 - m22);
+                result.w = (m21 - m12) / s;
+                result.x = (m13 + m31) / s;
+                result.y = (m23 + m32) / s;
+                result.z = 0.25 * s;
+            }
+        }
+        math.matrix2Quaternion = matrix2Quaternion;
+        function unitxyzToRotation(xAxis, yAxis, zAxis, out) {
+            var m11 = xAxis.x, m12 = yAxis.x, m13 = zAxis.x;
+            var m21 = xAxis.y, m22 = yAxis.y, m23 = zAxis.y;
+            var m31 = xAxis.z, m32 = yAxis.z, m33 = zAxis.z;
+            var trace = m11 + m22 + m33;
+            var s;
+            if (trace > 0) {
+                s = 0.5 / Math.sqrt(trace + 1.0);
+                out.w = 0.25 / s;
+                out.x = (m32 - m23) * s;
+                out.y = (m13 - m31) * s;
+                out.z = (m21 - m12) * s;
+            }
+            else if (m11 > m22 && m11 > m33) {
+                s = 2.0 * Math.sqrt(1.0 + m11 - m22 - m33);
+                out.w = (m32 - m23) / s;
+                out.x = 0.25 * s;
+                out.y = (m12 + m21) / s;
+                out.z = (m13 + m31) / s;
+            }
+            else if (m22 > m33) {
+                s = 2.0 * Math.sqrt(1.0 + m22 - m11 - m33);
+                out.w = (m13 - m31) / s;
+                out.x = (m12 + m21) / s;
+                out.y = 0.25 * s;
+                out.z = (m23 + m32) / s;
+            }
+            else {
+                s = 2.0 * Math.sqrt(1.0 + m33 - m11 - m22);
+                out.w = (m21 - m12) / s;
+                out.x = (m13 + m31) / s;
+                out.y = (m23 + m32) / s;
+                out.z = 0.25 * s;
+            }
+        }
+        math.unitxyzToRotation = unitxyzToRotation;
+        function matrixClone(src, out) {
+            for (var i = 0; i < 16; i++) {
+                out.rawData[i] = src.rawData[i];
+            }
+        }
+        math.matrixClone = matrixClone;
+        function matrix3x2Clone(src, out) {
+            for (var i = 0; i < 6; i++) {
+                out.rawData[i] = src.rawData[i];
+            }
+        }
+        math.matrix3x2Clone = matrix3x2Clone;
+        function matrixMakeIdentity(out) {
+            out.rawData[0] = 1;
+            out.rawData[1] = 0;
+            out.rawData[2] = 0;
+            out.rawData[3] = 0;
+            out.rawData[4] = 0;
+            out.rawData[5] = 1;
+            out.rawData[6] = 0;
+            out.rawData[7] = 0;
+            out.rawData[8] = 0;
+            out.rawData[9] = 0;
+            out.rawData[10] = 1;
+            out.rawData[11] = 0;
+            out.rawData[12] = 0;
+            out.rawData[13] = 0;
+            out.rawData[14] = 0;
+            out.rawData[15] = 1;
+        }
+        math.matrixMakeIdentity = matrixMakeIdentity;
+        function matrix3x2MakeIdentity(out) {
+            out.rawData[0] = 1;
+            out.rawData[1] = 0;
+            out.rawData[2] = 0;
+            out.rawData[3] = 1;
+            out.rawData[4] = 0;
+            out.rawData[5] = 0;
+        }
+        math.matrix3x2MakeIdentity = matrix3x2MakeIdentity;
+        function matrixInverse(src, out) {
+            var l1 = src.rawData[0];
+            var l2 = src.rawData[1];
+            var l3 = src.rawData[2];
+            var l4 = src.rawData[3];
+            var l5 = src.rawData[4];
+            var l6 = src.rawData[5];
+            var l7 = src.rawData[6];
+            var l8 = src.rawData[7];
+            var l9 = src.rawData[8];
+            var l10 = src.rawData[9];
+            var l11 = src.rawData[10];
+            var l12 = src.rawData[11];
+            var l13 = src.rawData[12];
+            var l14 = src.rawData[13];
+            var l15 = src.rawData[14];
+            var l16 = src.rawData[15];
+            var l17 = (l11 * l16) - (l12 * l15);
+            var l18 = (l10 * l16) - (l12 * l14);
+            var l19 = (l10 * l15) - (l11 * l14);
+            var l20 = (l9 * l16) - (l12 * l13);
+            var l21 = (l9 * l15) - (l11 * l13);
+            var l22 = (l9 * l14) - (l10 * l13);
+            var l23 = ((l6 * l17) - (l7 * l18)) + (l8 * l19);
+            var l24 = -(((l5 * l17) - (l7 * l20)) + (l8 * l21));
+            var l25 = ((l5 * l18) - (l6 * l20)) + (l8 * l22);
+            var l26 = -(((l5 * l19) - (l6 * l21)) + (l7 * l22));
+            var l27 = 1.0 / ((((l1 * l23) + (l2 * l24)) + (l3 * l25)) + (l4 * l26));
+            var l28 = (l7 * l16) - (l8 * l15);
+            var l29 = (l6 * l16) - (l8 * l14);
+            var l30 = (l6 * l15) - (l7 * l14);
+            var l31 = (l5 * l16) - (l8 * l13);
+            var l32 = (l5 * l15) - (l7 * l13);
+            var l33 = (l5 * l14) - (l6 * l13);
+            var l34 = (l7 * l12) - (l8 * l11);
+            var l35 = (l6 * l12) - (l8 * l10);
+            var l36 = (l6 * l11) - (l7 * l10);
+            var l37 = (l5 * l12) - (l8 * l9);
+            var l38 = (l5 * l11) - (l7 * l9);
+            var l39 = (l5 * l10) - (l6 * l9);
+            out.rawData[0] = l23 * l27;
+            out.rawData[4] = l24 * l27;
+            out.rawData[8] = l25 * l27;
+            out.rawData[12] = l26 * l27;
+            out.rawData[1] = -(((l2 * l17) - (l3 * l18)) + (l4 * l19)) * l27;
+            out.rawData[5] = (((l1 * l17) - (l3 * l20)) + (l4 * l21)) * l27;
+            out.rawData[9] = -(((l1 * l18) - (l2 * l20)) + (l4 * l22)) * l27;
+            out.rawData[13] = (((l1 * l19) - (l2 * l21)) + (l3 * l22)) * l27;
+            out.rawData[2] = (((l2 * l28) - (l3 * l29)) + (l4 * l30)) * l27;
+            out.rawData[6] = -(((l1 * l28) - (l3 * l31)) + (l4 * l32)) * l27;
+            out.rawData[10] = (((l1 * l29) - (l2 * l31)) + (l4 * l33)) * l27;
+            out.rawData[14] = -(((l1 * l30) - (l2 * l32)) + (l3 * l33)) * l27;
+            out.rawData[3] = -(((l2 * l34) - (l3 * l35)) + (l4 * l36)) * l27;
+            out.rawData[7] = (((l1 * l34) - (l3 * l37)) + (l4 * l38)) * l27;
+            out.rawData[11] = -(((l1 * l35) - (l2 * l37)) + (l4 * l39)) * l27;
+            out.rawData[15] = (((l1 * l36) - (l2 * l38)) + (l3 * l39)) * l27;
+        }
+        math.matrixInverse = matrixInverse;
+        function matrix3x2Inverse(src, out) {
+            var l1 = src.rawData[0];
+            var l2 = src.rawData[1];
+            var l5 = src.rawData[2];
+            var l6 = src.rawData[3];
+            var l13 = src.rawData[4];
+            var l14 = src.rawData[5];
+            var l26 = -(((l5 * -l14) - (l6 * -l13)));
+            var l27 = 1.0 / ((((l1 * l6) + (l2 * -l5))));
+            out.rawData[0] = l6 * l27;
+            out.rawData[2] = -l5 * l27;
+            out.rawData[4] = l26 * l27;
+            out.rawData[1] = -(((l2))) * l27;
+            out.rawData[3] = (((l1))) * l27;
+            out.rawData[5] = (((l1 * -l14) - (l2 * -l13))) * l27;
+        }
+        math.matrix3x2Inverse = matrix3x2Inverse;
+        function matrixMakeTransformRTS(pos, scale, rot, out) {
+            var matS = gd3d.math.pool.new_matrix();
+            matrixMakeScale(scale.x, scale.y, scale.z, matS);
+            var matR = gd3d.math.pool.new_matrix();
+            math.quatToMatrix(rot, matR);
+            matrixMultiply(matR, matS, out);
+            out.rawData[12] = pos.x;
+            out.rawData[13] = pos.y;
+            out.rawData[14] = pos.z;
+            out.rawData[15] = 1;
+            gd3d.math.pool.delete_matrix(matS);
+            gd3d.math.pool.delete_matrix(matR);
+        }
+        math.matrixMakeTransformRTS = matrixMakeTransformRTS;
+        function matrix3x2MakeTransformRTS(pos, scale, rot, out) {
+            var matS = gd3d.math.pool.new_matrix3x2();
+            matrix3x2MakeScale(scale.x, scale.y, matS);
+            var matR = gd3d.math.pool.new_matrix3x2();
+            matrix3x2MakeRotate(rot, matR);
+            matrix3x2Multiply(matR, matS, out);
+            out.rawData[4] = pos.x;
+            out.rawData[5] = pos.y;
+            gd3d.math.pool.delete_matrix3x2(matS);
+            gd3d.math.pool.delete_matrix3x2(matR);
+        }
+        math.matrix3x2MakeTransformRTS = matrix3x2MakeTransformRTS;
+        function matrixMakeTranslate(x, y, z, out) {
+            out.rawData[0] = 1.0;
+            out.rawData[1] = 0.0;
+            out.rawData[2] = 0.0;
+            out.rawData[3] = 0;
+            out.rawData[4] = 0.0;
+            out.rawData[5] = 1.0;
+            out.rawData[6] = 0.0;
+            out.rawData[7] = 0.0;
+            out.rawData[8] = 0.0;
+            out.rawData[9] = 0.0;
+            out.rawData[10] = 1.0;
+            out.rawData[11] = 0.0;
+            out.rawData[12] = x;
+            out.rawData[13] = y;
+            out.rawData[14] = z;
+            out.rawData[15] = 1.0;
+        }
+        math.matrixMakeTranslate = matrixMakeTranslate;
+        function matrix3x2MakeTranslate(x, y, out) {
+            out.rawData[0] = 1.0;
+            out.rawData[1] = 0.0;
+            out.rawData[2] = 0.0;
+            out.rawData[3] = 1.0;
+            out.rawData[4] = x;
+            out.rawData[5] = y;
+        }
+        math.matrix3x2MakeTranslate = matrix3x2MakeTranslate;
+        function matrixGetScale(src, scale) {
+            var xs = math.sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
+            var ys = math.sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
+            var zs = math.sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
+            scale.x = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
+            scale.y = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
+            scale.z = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
+        }
+        math.matrixGetScale = matrixGetScale;
+        function matrixMakeScale(xScale, yScale, zScale, out) {
+            out.rawData[0] = xScale;
+            out.rawData[1] = 0.0;
+            out.rawData[2] = 0.0;
+            out.rawData[3] = 0.0;
+            out.rawData[4] = 0.0;
+            out.rawData[5] = yScale;
+            out.rawData[6] = 0.0;
+            out.rawData[7] = 0.0;
+            out.rawData[8] = 0.0;
+            out.rawData[9] = 0.0;
+            out.rawData[10] = zScale;
+            out.rawData[11] = 0.0;
+            out.rawData[12] = 0.0;
+            out.rawData[13] = 0.0;
+            out.rawData[14] = 0.0;
+            out.rawData[15] = 1.0;
+        }
+        math.matrixMakeScale = matrixMakeScale;
+        function matrix3x2TransformVector2(mat, inp, out) {
+            var x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2] + mat.rawData[4];
+            var y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3] + mat.rawData[5];
+            out.x = x;
+            out.y = y;
+        }
+        math.matrix3x2TransformVector2 = matrix3x2TransformVector2;
+        function matrix3x2TransformNormal(mat, inp, out) {
+            var x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2];
+            var y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3];
+            out.x = x;
+            out.y = y;
+        }
+        math.matrix3x2TransformNormal = matrix3x2TransformNormal;
+        function matrix3x2MakeScale(xScale, yScale, out) {
+            out.rawData[0] = xScale;
+            out.rawData[1] = 0.0;
+            out.rawData[2] = 0.0;
+            out.rawData[3] = yScale;
+            out.rawData[4] = 0.0;
+            out.rawData[5] = 0.0;
+        }
+        math.matrix3x2MakeScale = matrix3x2MakeScale;
+        function matrixMakeRotateAxisAngle(axis, angle, out) {
+            var x = axis.x, y = axis.y, z = axis.z;
+            var length = Math.sqrt(x * x + y * y + z * z);
+            if (!length)
+                return;
+            if (length !== 1) {
+                length = 1 / length;
+                x *= length;
+                y *= length;
+                z *= length;
+            }
+            var s = Math.sin(angle);
+            var c = Math.cos(angle);
+            var t = 1.0 - c;
+            var b00 = x * x * t + c, b01 = y * x * t + z * s, b02 = z * x * t - y * s, b10 = x * y * t - z * s, b11 = y * y * t + c, b12 = z * y * t + x * s, b20 = x * z * t + y * s, b21 = y * z * t - x * s, b22 = z * z * t + c;
+            out.rawData[0] = b00;
+            out.rawData[1] = b01;
+            out.rawData[2] = b02;
+            out.rawData[3] = 0;
+            out.rawData[4] = b10;
+            out.rawData[5] = b11;
+            out.rawData[6] = b12;
+            out.rawData[7] = 0;
+            out.rawData[8] = b20;
+            out.rawData[9] = b21;
+            out.rawData[10] = b22;
+            out.rawData[11] = 0;
+            out.rawData[12] = 0;
+            out.rawData[13] = 0;
+            out.rawData[14] = 0;
+            out.rawData[15] = 1;
+        }
+        math.matrixMakeRotateAxisAngle = matrixMakeRotateAxisAngle;
+        function matrix3x2MakeRotate(angle, out) {
+            var x = 0, y = 0, z = 1;
+            var s = Math.sin(angle);
+            var c = Math.cos(angle);
+            out.rawData[0] = c;
+            out.rawData[1] = s;
+            out.rawData[2] = -s;
+            out.rawData[3] = c;
+            out.rawData[4] = 0;
+            out.rawData[5] = 0;
+        }
+        math.matrix3x2MakeRotate = matrix3x2MakeRotate;
+        function matrixMultiply(lhs, rhs, out) {
+            var a00 = lhs.rawData[0], a01 = lhs.rawData[1], a02 = lhs.rawData[2], a03 = lhs.rawData[3];
+            var a10 = lhs.rawData[4], a11 = lhs.rawData[5], a12 = lhs.rawData[6], a13 = lhs.rawData[7];
+            var a20 = lhs.rawData[8], a21 = lhs.rawData[9], a22 = lhs.rawData[10], a23 = lhs.rawData[11];
+            var a30 = lhs.rawData[12], a31 = lhs.rawData[13], a32 = lhs.rawData[14], a33 = lhs.rawData[15];
+            var b0 = rhs.rawData[0], b1 = rhs.rawData[1], b2 = rhs.rawData[2], b3 = rhs.rawData[3];
+            out.rawData[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+            out.rawData[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+            out.rawData[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+            out.rawData[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+            b0 = rhs.rawData[4];
+            b1 = rhs.rawData[5];
+            b2 = rhs.rawData[6];
+            b3 = rhs.rawData[7];
+            out.rawData[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+            out.rawData[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+            out.rawData[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+            out.rawData[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+            b0 = rhs.rawData[8];
+            b1 = rhs.rawData[9];
+            b2 = rhs.rawData[10];
+            b3 = rhs.rawData[11];
+            out.rawData[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+            out.rawData[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+            out.rawData[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+            out.rawData[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+            b0 = rhs.rawData[12];
+            b1 = rhs.rawData[13];
+            b2 = rhs.rawData[14];
+            b3 = rhs.rawData[15];
+            out.rawData[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+            out.rawData[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+            out.rawData[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+            out.rawData[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+        }
+        math.matrixMultiply = matrixMultiply;
+        function matrix3x2Multiply(lhs, rhs, out) {
+            var a00 = lhs.rawData[0], a01 = lhs.rawData[1], a02 = 0;
+            var a10 = lhs.rawData[2], a11 = lhs.rawData[3], a12 = 0;
+            var a30 = lhs.rawData[4], a31 = lhs.rawData[5], a32 = 1;
+            var b0 = rhs.rawData[0], b1 = rhs.rawData[1], b3 = 0;
+            var temp_0 = b0 * a00 + b1 * a10 + b3 * a30;
+            var temp_1 = b0 * a01 + b1 * a11 + b3 * a31;
+            b0 = rhs.rawData[2];
+            b1 = rhs.rawData[3];
+            b3 = 0;
+            var temp_2 = b0 * a00 + b1 * a10 + b3 * a30;
+            var temp_3 = b0 * a01 + b1 * a11 + b3 * a31;
+            b0 = rhs.rawData[4];
+            b1 = rhs.rawData[5];
+            b3 = 1;
+            var temp_4 = b0 * a00 + b1 * a10 + b3 * a30;
+            var temp_5 = b0 * a01 + b1 * a11 + b3 * a31;
+            out.rawData[0] = temp_0;
+            out.rawData[1] = temp_1;
+            out.rawData[2] = temp_2;
+            out.rawData[3] = temp_3;
+            out.rawData[4] = temp_4;
+            out.rawData[5] = temp_5;
+        }
+        math.matrix3x2Multiply = matrix3x2Multiply;
+        function matrix3x2Equal(mtx1, mtx2, threshold) {
+            if (threshold === void 0) { threshold = 0.00001; }
+            for (var i = 0; i < 6; i++) {
+                if (Math.abs(mtx1.rawData[i] - mtx2.rawData[i]) > threshold) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        math.matrix3x2Equal = matrix3x2Equal;
+        function matrixProject_PerspectiveLH(fov, aspect, znear, zfar, out) {
+            var tan = 1.0 / (Math.tan(fov * 0.5));
+            out.rawData[0] = tan / aspect;
+            out.rawData[1] = out.rawData[2] = out.rawData[3] = 0.0;
+            out.rawData[4] = out.rawData[6] = out.rawData[7] = 0.0;
+            out.rawData[5] = tan;
+            out.rawData[8] = out.rawData[9] = 0.0;
+            out.rawData[10] = -zfar / (znear - zfar);
+            out.rawData[11] = 1.0;
+            out.rawData[12] = out.rawData[13] = out.rawData[15] = 0.0;
+            out.rawData[14] = (znear * zfar) / (znear - zfar);
+        }
+        math.matrixProject_PerspectiveLH = matrixProject_PerspectiveLH;
+        function matrixProject_OrthoLH(width, height, znear, zfar, out) {
+            var hw = 2.0 / width;
+            var hh = 2.0 / height;
+            var id = 2.0 / (zfar - znear);
+            var nid = (zfar + znear) / (znear - zfar);
+            out.rawData[0] = hw;
+            out.rawData[1] = 0;
+            out.rawData[2] = 0;
+            out.rawData[3] = 0;
+            out.rawData[4] = 0;
+            out.rawData[5] = hh;
+            out.rawData[6] = 0;
+            out.rawData[7] = 0;
+            out.rawData[8] = 0;
+            out.rawData[9] = 0;
+            out.rawData[10] = id;
+            out.rawData[11] = 0;
+            out.rawData[12] = 0;
+            out.rawData[13] = 0;
+            out.rawData[14] = nid;
+            out.rawData[15] = 1;
+        }
+        math.matrixProject_OrthoLH = matrixProject_OrthoLH;
+        function matrixLookatLH(forward, up, out) {
+            var z = math.pool.new_vector3(-forward.x, -forward.y, -forward.z);
+            math.vec3Normalize(z, z);
+            var y = math.pool.new_vector3();
+            math.vec3Clone(up, y);
+            math.vec3Normalize(y, y);
+            var x = math.pool.new_vector3();
+            math.vec3Cross(y, z, x);
+            math.vec3SqrLength(x);
+            if (math.vec3SqrLength(x) == 0) {
+                x.x = 1;
+            }
+            else {
+                math.vec3Normalize(x, x);
+            }
+            math.vec3Clone(math.pool.vector3_zero, y);
+            math.vec3Cross(z, x, y);
+            math.vec3Normalize(y, y);
+            out.rawData[0] = x.x;
+            out.rawData[1] = y.x;
+            out.rawData[2] = z.x;
+            out.rawData[3] = 0;
+            out.rawData[4] = x.y;
+            out.rawData[5] = y.y;
+            out.rawData[6] = z.y;
+            out.rawData[7] = 0;
+            out.rawData[8] = x.z;
+            out.rawData[9] = y.z;
+            out.rawData[10] = z.z;
+            out.rawData[11] = 0;
+            out.rawData[12] = 0;
+            out.rawData[13] = 0;
+            out.rawData[14] = 0;
+            out.rawData[15] = 1;
+            math.pool.delete_vector3(x);
+            math.pool.delete_vector3(y);
+            math.pool.delete_vector3(z);
+        }
+        math.matrixLookatLH = matrixLookatLH;
+        function matrixViewLookatLH(eye, forward, up, out) {
+            var z = math.pool.new_vector3(forward.x, forward.y, forward.z);
+            math.vec3Normalize(z, z);
+            var y = math.pool.new_vector3();
+            math.vec3Clone(up, y);
+            math.vec3Normalize(y, y);
+            var x = math.pool.new_vector3();
+            math.vec3Cross(y, z, x);
+            math.vec3SqrLength(x);
+            if (math.vec3SqrLength(x) == 0) {
+                x.x = 1;
+            }
+            else {
+                math.vec3Normalize(x, x);
+            }
+            math.vec3Clone(math.pool.vector3_zero, y);
+            math.vec3Cross(z, x, y);
+            math.vec3Normalize(y, y);
+            var ex = -math.vec3Dot(x, eye);
+            var ey = -math.vec3Dot(y, eye);
+            var ez = -math.vec3Dot(z, eye);
+            out.rawData[0] = x.x;
+            out.rawData[1] = y.x;
+            out.rawData[2] = z.x;
+            out.rawData[3] = 0;
+            out.rawData[4] = x.y;
+            out.rawData[5] = y.y;
+            out.rawData[6] = z.y;
+            out.rawData[7] = 0;
+            out.rawData[8] = x.z;
+            out.rawData[9] = y.z;
+            out.rawData[10] = z.z;
+            out.rawData[11] = 0;
+            out.rawData[12] = ex;
+            out.rawData[13] = ey;
+            out.rawData[14] = ez;
+            out.rawData[15] = 1;
+            math.pool.delete_vector3(x);
+            math.pool.delete_vector3(y);
+            math.pool.delete_vector3(z);
+        }
+        math.matrixViewLookatLH = matrixViewLookatLH;
+        function matrixLerp(left, right, v, out) {
+            for (var i = 0; i < 16; i++) {
+                out.rawData[i] = left.rawData[i] * (1 - v) + right.rawData[i] * v;
+            }
+        }
+        math.matrixLerp = matrixLerp;
+        function matrixTransformVector3(vector, transformation, result) {
+            var x = (vector.x * transformation.rawData[0]) + (vector.y * transformation.rawData[4]) + (vector.z * transformation.rawData[8]) + transformation.rawData[12];
+            var y = (vector.x * transformation.rawData[1]) + (vector.y * transformation.rawData[5]) + (vector.z * transformation.rawData[9]) + transformation.rawData[13];
+            var z = (vector.x * transformation.rawData[2]) + (vector.y * transformation.rawData[6]) + (vector.z * transformation.rawData[10]) + transformation.rawData[14];
+            var w = (vector.x * transformation.rawData[3]) + (vector.y * transformation.rawData[7]) + (vector.z * transformation.rawData[11]) + transformation.rawData[15];
+            result.x = x / w;
+            result.y = y / w;
+            result.z = z / w;
+        }
+        math.matrixTransformVector3 = matrixTransformVector3;
+        function matrixTransformVector4(src, mtx, out) {
+            out.x = (src.x * mtx.rawData[0]) + (src.y * mtx.rawData[4]) + (src.z * mtx.rawData[8]) + (src.w * mtx.rawData[12]);
+            out.y = (src.x * mtx.rawData[1]) + (src.y * mtx.rawData[5]) + (src.z * mtx.rawData[9]) + (src.w * mtx.rawData[13]);
+            out.z = (src.x * mtx.rawData[2]) + (src.y * mtx.rawData[6]) + (src.z * mtx.rawData[10]) + (src.w * mtx.rawData[14]);
+            out.w = (src.x * mtx.rawData[3]) + (src.y * mtx.rawData[7]) + (src.z * mtx.rawData[11]) + (src.w * mtx.rawData[15]);
+        }
+        math.matrixTransformVector4 = matrixTransformVector4;
+        function matrixTransformNormal(vector, transformation, result) {
+            var x = (vector.x * transformation.rawData[0]) + (vector.y * transformation.rawData[4]) + (vector.z * transformation.rawData[8]);
+            var y = (vector.x * transformation.rawData[1]) + (vector.y * transformation.rawData[5]) + (vector.z * transformation.rawData[9]);
+            var z = (vector.x * transformation.rawData[2]) + (vector.y * transformation.rawData[6]) + (vector.z * transformation.rawData[10]);
+            result.x = x;
+            result.y = y;
+            result.z = z;
+        }
+        math.matrixTransformNormal = matrixTransformNormal;
+        function matrixGetVector3ByOffset(src, offset, result) {
+            result.x = src.rawData[offset];
+            result.y = src.rawData[offset + 1];
+            result.z = src.rawData[offset + 2];
+        }
+        math.matrixGetVector3ByOffset = matrixGetVector3ByOffset;
+        function matrixReset(mat) {
+            mat.rawData[0] = 1;
+            mat.rawData[1] = 0;
+            mat.rawData[2] = 0;
+            mat.rawData[3] = 0;
+            mat.rawData[4] = 0;
+            mat.rawData[5] = 1;
+            mat.rawData[6] = 0;
+            mat.rawData[7] = 0;
+            mat.rawData[8] = 0;
+            mat.rawData[9] = 0;
+            mat.rawData[10] = 1;
+            mat.rawData[11] = 0;
+            mat.rawData[12] = 0;
+            mat.rawData[13] = 0;
+            mat.rawData[14] = 0;
+            mat.rawData[15] = 1;
+        }
+        math.matrixReset = matrixReset;
+        function matrixZero(mat) {
+            mat.rawData[0] = 0;
+            mat.rawData[1] = 0;
+            mat.rawData[2] = 0;
+            mat.rawData[3] = 0;
+            mat.rawData[4] = 0;
+            mat.rawData[5] = 0;
+            mat.rawData[6] = 0;
+            mat.rawData[7] = 0;
+            mat.rawData[8] = 0;
+            mat.rawData[9] = 0;
+            mat.rawData[10] = 0;
+            mat.rawData[11] = 0;
+            mat.rawData[12] = 0;
+            mat.rawData[13] = 0;
+            mat.rawData[14] = 0;
+            mat.rawData[15] = 1;
+        }
+        math.matrixZero = matrixZero;
+        function matrixScaleByNum(value, mat) {
+            mat.rawData[0] *= value;
+            mat.rawData[1] *= value;
+            mat.rawData[2] *= value;
+            mat.rawData[3] *= value;
+            mat.rawData[4] *= value;
+            mat.rawData[5] *= value;
+            mat.rawData[6] *= value;
+            mat.rawData[7] *= value;
+            mat.rawData[8] *= value;
+            mat.rawData[9] *= value;
+            mat.rawData[10] *= value;
+            mat.rawData[11] *= value;
+            mat.rawData[12] *= value;
+            mat.rawData[13] *= value;
+            mat.rawData[14] *= value;
+            mat.rawData[15] *= value;
+        }
+        math.matrixScaleByNum = matrixScaleByNum;
+        function matrixAdd(left, right, out) {
+            out.rawData[0] = left.rawData[0] + right.rawData[0];
+            out.rawData[1] = left.rawData[1] + right.rawData[1];
+            out.rawData[2] = left.rawData[2] + right.rawData[2];
+            out.rawData[3] = left.rawData[3] + right.rawData[3];
+            out.rawData[4] = left.rawData[4] + right.rawData[4];
+            out.rawData[5] = left.rawData[5] + right.rawData[5];
+            out.rawData[6] = left.rawData[6] + right.rawData[6];
+            out.rawData[7] = left.rawData[7] + right.rawData[7];
+            out.rawData[8] = left.rawData[8] + right.rawData[8];
+            out.rawData[9] = left.rawData[9] + right.rawData[9];
+            out.rawData[10] = left.rawData[10] + right.rawData[10];
+            out.rawData[11] = left.rawData[11] + right.rawData[11];
+            out.rawData[12] = left.rawData[12] + right.rawData[12];
+            out.rawData[13] = left.rawData[13] + right.rawData[13];
+            out.rawData[14] = left.rawData[14] + right.rawData[14];
+            out.rawData[15] = left.rawData[15] + right.rawData[15];
+        }
+        math.matrixAdd = matrixAdd;
+        function matrixEqual(mtx1, mtx2, threshold) {
+            if (threshold === void 0) { threshold = 0.00001; }
+            for (var i = 0; i < 16; i++) {
+                if (Math.abs(mtx1.rawData[i] - mtx2.rawData[i]) > threshold) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        math.matrixEqual = matrixEqual;
+        function matrixIsIdentity(mtx) {
+            var m = mtx.rawData;
+            var _isIdentity = (m[0] === 1.0 && m[1] === 0.0 && m[2] === 0.0 && m[3] === 0.0 &&
+                m[4] === 0.0 && m[5] === 1.0 && m[6] === 0.0 && m[7] === 0.0 &&
+                m[8] === 0.0 && m[9] === 0.0 && m[10] === 1.0 && m[11] === 0.0 &&
+                m[12] === 0.0 && m[13] === 0.0 && m[14] === 0.0 && m[15] === 1.0);
+            return _isIdentity;
+        }
+        math.matrixIsIdentity = matrixIsIdentity;
+    })(math = gd3d.math || (gd3d.math = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
     var framework;
     (function (framework) {
         var physics2DBody = (function (_super) {
             __extends(physics2DBody, _super);
             function physics2DBody() {
                 var _this = _super.call(this) || this;
+                _this.lastScale = new gd3d.math.vector2(1, 1);
+                _this.beforePos = new gd3d.math.vector2();
+                _this.beforeAngle = 0;
+                _this.enableBT = false;
+                _this._positionOffset = new gd3d.math.vector2();
                 _this.options = {};
+                _this.bodyWorldScale = new gd3d.math.vector2(1, 1);
+                _this.lastPos = new gd3d.math.vector2();
+                _this.lastRot = 0;
                 _this._physicsEngine = framework.physics2D;
                 return _this;
             }
@@ -6217,6 +7025,33 @@ var gd3d;
                     }
                     else {
                         console.error("Physics not enabled. Please use scene.enable2DPhysics(...) before creating 2dPhysicsBody.");
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            Object.defineProperty(physics2DBody.prototype, "positionOffset", {
+                get: function () { return this._positionOffset; },
+                set: function (pos) {
+                    if (!pos)
+                        return;
+                    gd3d.math.vec2Clone(pos, this._positionOffset);
+                    if (pos.x != 0 || pos.y != 0) {
+                        this.enableBT = true;
+                        if (!this._bodyWorldMtx)
+                            this._bodyWorldMtx = new gd3d.math.matrix3x2();
+                        if (!this._bodyLocalMtx) {
+                            this._bodyLocalMtx = new gd3d.math.matrix3x2();
+                            var sV2 = gd3d.math.pool.new_vector2(1, 1);
+                            gd3d.math.matrix3x2MakeTransformRTS(pos, sV2, 0, this._bodyLocalMtx);
+                            gd3d.math.pool.delete_vector2(sV2);
+                        }
+                        this._bodyLocalMtx.rawData[4] = pos.x;
+                        this._bodyLocalMtx.rawData[5] = pos.y;
+                    }
+                    else {
+                        this.enableBT = false;
                     }
                 },
                 enumerable: true,
@@ -6268,6 +7103,13 @@ var gd3d;
             physics2DBody.prototype.setAngle = function (angle) {
                 this._physicsEngine.setAngle(this.body, angle);
             };
+            physics2DBody.prototype.setScale = function (scale) {
+                var wScal = this.bodyWorldScale;
+                var sX = Math.pow(wScal.x, -1) * scale.x;
+                var sY = Math.pow(wScal.y, -1) * scale.y;
+                this._physicsEngine.setScale(this.body, sX, sY);
+                gd3d.math.vec2Set(this.bodyWorldScale, sX, sY);
+            };
             physics2DBody.prototype.setStatic = function (isStatic) {
                 this.physicsEngine.setStatic(this.body, isStatic);
             };
@@ -6293,16 +7135,81 @@ var gd3d;
                     this.onInit(this);
             };
             physics2DBody.prototype.update = function (delta) {
+            };
+            physics2DBody.prototype.beforeStep = function () {
+                if (!this.body || this.body.isStatic)
+                    return;
+                var tSca = this.transform.localScale;
+                if (!gd3d.math.vec2Equal(this.lastScale, tSca)) {
+                    this.setScale(tSca);
+                }
+                gd3d.math.vec2Clone(tSca, this.lastScale);
+                if (this.enableBT) {
+                    this.setPhyBodyTransformation();
+                }
+            };
+            physics2DBody.prototype.afterStep = function () {
                 if (!this.body)
                     return;
-                framework.physicTool.Ivec2Copy(this.body.position, this.transform.localTranslate);
-                this.transform.localRotate = this.body.angle;
-                this.transform.markDirty();
+                this.setTransformationFormPhyBody();
+            };
+            physics2DBody.prototype.setPhyBodyTransformation = function () {
+                var tran = this.transform;
+                var lpos = tran.localTranslate;
+                if (lpos.x == this.lastPos.x && lpos.y == this.lastPos.y && this.lastRot == tran.localRotate)
+                    return;
+                var posOs = this._positionOffset;
+                var mPos;
+                var mAngle;
+                if (posOs.x != 0 || posOs.y != 0) {
+                    var _scalR = physics2DBody.helpV2;
+                    mPos = physics2DBody.helpV2_1;
+                    var _angleR = physics2DBody.helpRefAngle;
+                    gd3d.math.matrix3x2Multiply(tran.getLocalMatrix(), this._bodyLocalMtx, this._bodyWorldMtx);
+                    gd3d.math.matrix3x2Decompose(this._bodyWorldMtx, _scalR, _angleR, mPos);
+                    mAngle = _angleR.v;
+                }
+                else {
+                    mPos = tran.localTranslate;
+                    mAngle = tran.localRotate;
+                }
+                this.setPosition(mPos);
+                this.setAngle(mAngle);
+                var bPos = this.body.position;
+                gd3d.math.vec2Set(this.beforePos, bPos.x, bPos.y);
+                this.beforeAngle = this.body.angle;
+            };
+            physics2DBody.prototype.setTransformationFormPhyBody = function () {
+                var trans = this.transform;
+                var bPos = this.body.position;
+                if (this.enableBT) {
+                    var bfPos = this.beforePos;
+                    var deltaX = bPos.x - bfPos.x;
+                    var deltaY = bPos.y - bfPos.y;
+                    var deltaRot = this.body.angle - this.beforeAngle;
+                    if (deltaX == 0 && deltaY == 0 && deltaRot == 0)
+                        return;
+                    var lPos = trans.localTranslate;
+                    gd3d.math.vec2Set(lPos, lPos.x + deltaX, lPos.y + deltaY);
+                    trans.localRotate += deltaRot;
+                }
+                else {
+                    var tPos = trans.localTranslate;
+                    if (bPos.x == tPos.x && bPos.y == tPos.y && trans.localRotate == this.body.angle) {
+                        return;
+                    }
+                    framework.physicTool.Ivec2Copy(this.body.position, trans.localTranslate);
+                    trans.localRotate = this.body.angle;
+                }
+                trans.markDirty();
             };
             physics2DBody.prototype.remove = function () {
                 this.physicsEngine.removeBody(this);
                 this.body = null;
             };
+            physics2DBody.helpV2 = new gd3d.math.vector2();
+            physics2DBody.helpV2_1 = new gd3d.math.vector2();
+            physics2DBody.helpRefAngle = new gd3d.math.angelref();
             return physics2DBody;
         }(framework.behaviour2d));
         framework.physics2DBody = physics2DBody;
@@ -6329,8 +7236,7 @@ var gd3d;
                 this.options.angle = this.transform.localRotate;
                 var body = this.physicsEngine.createCapsuleByPBody(this, this.maxSides);
                 this.physicsEngine.addBody(this);
-                if (this.onInit)
-                    this.onInit(this);
+                _super.prototype.start.call(this);
             };
             capsuleBody2d.prototype.onPlay = function () {
             };
@@ -6371,8 +7277,7 @@ var gd3d;
                 this.options.angle = this.transform.localRotate;
                 var body = this.physicsEngine.createCircleByPBody(this, this.maxSides);
                 this.physicsEngine.addBody(this);
-                if (this.onInit)
-                    this.onInit(this);
+                _super.prototype.start.call(this);
             };
             circleBody2d.prototype.onPlay = function () {
             };
@@ -6416,9 +7321,8 @@ var gd3d;
                 this.options.angle = this.transform.localRotate;
                 this.body = engine.createBody(this.options);
                 engine.addBody(this);
-                if (this.onInit)
-                    this.onInit(this);
                 gd3d.poolv2_del(tempv2);
+                _super.prototype.start.call(this);
             };
             compoundBody2d.prototype.addPart = function (body) {
                 if (!body)
@@ -6456,8 +7360,7 @@ var gd3d;
                 var body = this.physicsEngine.ConvexHullByPBody(this, this.vertexSets, this.flagInternal, this.removeCollinear, this.minimumArea);
                 this.fixCenter();
                 this.physicsEngine.addBody(this);
-                if (this.onInit)
-                    this.onInit(this);
+                _super.prototype.start.call(this);
             };
             convexHullBody2d.prototype.fixCenter = function () {
                 var max = this.body.bounds.max;
@@ -6511,6 +7414,7 @@ var gd3d;
     (function (framework) {
         var physicEngine2D = (function () {
             function physicEngine2D(op) {
+                var _this = this;
                 if (op === void 0) { op = null; }
                 this.eventer = new gd3d.event.Physic2dEvent();
                 this._bodysObjMap = {};
@@ -6526,8 +7430,21 @@ var gd3d;
                     this.matterEngine = Matter.Engine.create();
                 }
                 this.engineWorld = this.matterEngine.world;
-                this.matterVector = Matter.Vector;
-                Matter.Engine.run(this.matterEngine);
+                var engine = this.matterEngine;
+                var runner = Matter.Runner.create();
+                var modeSceneCtr = true;
+                if (modeSceneCtr) {
+                    this.engineRunner = runner;
+                    var getNow_1 = Matter.Common.now;
+                    this.engineRunner.tick = function () {
+                        _this.beforeStep();
+                        Matter.Runner.tick(runner, engine, getNow_1);
+                        _this.afterStep();
+                    };
+                }
+                else {
+                    Matter.Runner.run(runner, engine);
+                }
                 Matter.Events.on(this.matterEngine, "beforeUpdate", this.beforeUpdate.bind(this));
                 Matter.Events.on(this.matterEngine, "afterUpdate", this.afterUpdate.bind(this));
                 Matter.Events.on(this.matterEngine, "collisionStart", this.collisionStart.bind(this));
@@ -6540,6 +7457,24 @@ var gd3d;
                 configurable: true
             });
             ;
+            physicEngine2D.prototype.beforeStep = function () {
+                var omap = this._bodysObjMap;
+                for (var key in omap) {
+                    var phyBody = omap[key];
+                    if (phyBody) {
+                        phyBody.beforeStep();
+                    }
+                }
+            };
+            physicEngine2D.prototype.afterStep = function () {
+                var omap = this._bodysObjMap;
+                for (var key in omap) {
+                    var phyBody = omap[key];
+                    if (phyBody) {
+                        phyBody.afterStep();
+                    }
+                }
+            };
             physicEngine2D.prototype.update = function (delta) {
                 Matter.Engine.update(this.matterEngine, delta);
             };
@@ -6750,6 +7685,14 @@ var gd3d;
                 if (relative === void 0) { relative = false; }
                 Matter.Body.setCentre(body, centre, relative);
             };
+            physicEngine2D.prototype.setScale = function (body, scaleX, scaleY, point) {
+                if (point === void 0) { point = null; }
+                Matter.Body.scale(body, scaleX, scaleY, point);
+            };
+            physicEngine2D.prototype.compositeScale = function (composite, scaleX, scaleY, point, recursive) {
+                if (recursive === void 0) { recursive = false; }
+                Matter.Composite.scale(composite, scaleX, scaleY, point, recursive);
+            };
             return physicEngine2D;
         }());
         framework.physicEngine2D = physicEngine2D;
@@ -6768,8 +7711,7 @@ var gd3d;
                 this.options.angle = this.transform.localRotate;
                 var body = this.physicsEngine.createRectByPBody(this);
                 this.physicsEngine.addBody(this);
-                if (this.onInit)
-                    this.onInit(this);
+                _super.prototype.start.call(this);
             };
             rectBody2d.prototype.onPlay = function () {
             };
@@ -6936,6 +7878,7 @@ var gd3d;
                     var url = this.path + "/" + pack;
                     packs.push({ url: url, type: type, asset: null });
                 }
+                var guidList = {};
                 var list = [];
                 for (var _b = 0, _c = this.files; _b < _c.length; _b++) {
                     var fitem = _c[_b];
@@ -6946,6 +7889,9 @@ var gd3d;
                         var mapGuid = assetmgr.mapGuidId;
                         var mAssId = mapGuid[guid];
                         if (mAssId != undefined) {
+                            if (guidList[guid]) {
+                                continue;
+                            }
                             var sRef = assetmgr.mapRes[mAssId];
                             if (sRef && assetmgr.assetIsLoing(sRef)) {
                                 state.resstate[fileName] = new framework.ResourceState();
@@ -6965,6 +7911,7 @@ var gd3d;
                             continue;
                         }
                     }
+                    guidList[guid] = true;
                     var type = assetmgr.calcType(fitem.name);
                     if (fitem.packes != -1) {
                         mapPackes[url] = fitem.packes;
@@ -9323,7 +10270,7 @@ var gd3d;
                 var _buffer = respack[filename];
                 var _mesh = asset ? asset : new framework.mesh(filename);
                 call(function () {
-                    if (typeof (_buffer) == _buffer)
+                    if (typeof (_buffer) == "string")
                         _buffer = JSON.parse(_buffer);
                     return _mesh.Parse(_buffer, assetMgr.webgl).then(function () {
                         framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
@@ -22754,777 +23701,6 @@ var gd3d;
 (function (gd3d) {
     var math;
     (function (math) {
-        function matrixGetTranslation(src, out) {
-            out.x = src.rawData[12];
-            out.y = src.rawData[13];
-            out.z = src.rawData[14];
-        }
-        math.matrixGetTranslation = matrixGetTranslation;
-        function matrixTranspose(src, out) {
-            out.rawData[1] = src.rawData[4];
-            out.rawData[2] = src.rawData[8];
-            out.rawData[3] = src.rawData[12];
-            out.rawData[4] = src.rawData[1];
-            out.rawData[6] = src.rawData[9];
-            out.rawData[7] = src.rawData[13];
-            out.rawData[8] = src.rawData[2];
-            out.rawData[9] = src.rawData[6];
-            out.rawData[11] = src.rawData[14];
-            out.rawData[12] = src.rawData[3];
-            out.rawData[13] = src.rawData[7];
-            out.rawData[14] = src.rawData[11];
-        }
-        math.matrixTranspose = matrixTranspose;
-        function matrixDecompose(src, scale, rotation, translation) {
-            translation.x = src.rawData[12];
-            translation.y = src.rawData[13];
-            translation.z = src.rawData[14];
-            var xs = math.sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
-            var ys = math.sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
-            var zs = math.sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
-            scale.x = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
-            scale.y = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
-            scale.z = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
-            if (scale.x === 0 || scale.y === 0 || scale.z === 0) {
-                rotation.x = 0;
-                rotation.y = 0;
-                rotation.z = 0;
-                rotation.w = 1;
-                return false;
-            }
-            var mat = math.pool.new_matrix();
-            mat.rawData[0] = src.rawData[0] / scale.x;
-            mat.rawData[1] = src.rawData[1] / scale.x;
-            mat.rawData[2] = src.rawData[2] / scale.x;
-            mat.rawData[3] = 0;
-            mat.rawData[4] = src.rawData[4] / scale.y;
-            mat.rawData[5] = src.rawData[5] / scale.y;
-            mat.rawData[6] = src.rawData[6] / scale.y;
-            mat.rawData[7] = 0;
-            mat.rawData[8] = src.rawData[8] / scale.z;
-            mat.rawData[9] = src.rawData[9] / scale.z;
-            mat.rawData[10] = src.rawData[10] / scale.z;
-            mat.rawData[11] = 0;
-            matrix2Quaternion(mat, rotation);
-            math.pool.delete_matrix(mat);
-            return true;
-        }
-        math.matrixDecompose = matrixDecompose;
-        var angelref = (function () {
-            function angelref() {
-            }
-            return angelref;
-        }());
-        math.angelref = angelref;
-        function matrix3x2Decompose(src, scale, rotation, translation) {
-            translation.x = src.rawData[4];
-            translation.y = src.rawData[5];
-            scale.x = Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1]);
-            scale.y = Math.sqrt(src.rawData[2] * src.rawData[2] + src.rawData[3] * src.rawData[3]);
-            if (scale.x === 0 || scale.y === 0) {
-                rotation.v = 0;
-                return false;
-            }
-            var sx = src.rawData[0] / scale.x;
-            var r1 = Math.acos(sx);
-            var sxs = src.rawData[1] / scale.x;
-            var r2 = Math.asin(sxs);
-            if (sxs < 0) {
-                r1 = 2 * Math.PI - r1;
-            }
-            rotation.v = r1;
-            return true;
-        }
-        math.matrix3x2Decompose = matrix3x2Decompose;
-        function matrixGetRotation(src, result) {
-            var xs = math.sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
-            var ys = math.sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
-            var zs = math.sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
-            var scale_x = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
-            var scale_y = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
-            var scale_z = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
-            var mat = math.pool.new_matrix();
-            mat.rawData[0] = src.rawData[0] / scale_x;
-            mat.rawData[1] = src.rawData[1] / scale_x;
-            mat.rawData[2] = src.rawData[2] / scale_x;
-            mat.rawData[3] = 0;
-            mat.rawData[4] = src.rawData[4] / scale_y;
-            mat.rawData[5] = src.rawData[5] / scale_y;
-            mat.rawData[6] = src.rawData[6] / scale_y;
-            mat.rawData[7] = 0;
-            mat.rawData[8] = src.rawData[8] / scale_z;
-            mat.rawData[9] = src.rawData[9] / scale_z;
-            mat.rawData[10] = src.rawData[10] / scale_z;
-            mat.rawData[11] = 0;
-            matrix2Quaternion(mat, result);
-            math.pool.delete_matrix(mat);
-        }
-        math.matrixGetRotation = matrixGetRotation;
-        function matrix2Quaternion(matrix, result) {
-            var data = matrix.rawData;
-            var m11 = data[0], m12 = data[4], m13 = data[8];
-            var m21 = data[1], m22 = data[5], m23 = data[9];
-            var m31 = data[2], m32 = data[6], m33 = data[10];
-            var trace = m11 + m22 + m33;
-            var s;
-            if (trace > 0) {
-                s = 0.5 / Math.sqrt(trace + 1.0);
-                result.w = 0.25 / s;
-                result.x = (m32 - m23) * s;
-                result.y = (m13 - m31) * s;
-                result.z = (m21 - m12) * s;
-            }
-            else if (m11 > m22 && m11 > m33) {
-                s = 2.0 * Math.sqrt(1.0 + m11 - m22 - m33);
-                result.w = (m32 - m23) / s;
-                result.x = 0.25 * s;
-                result.y = (m12 + m21) / s;
-                result.z = (m13 + m31) / s;
-            }
-            else if (m22 > m33) {
-                s = 2.0 * Math.sqrt(1.0 + m22 - m11 - m33);
-                result.w = (m13 - m31) / s;
-                result.x = (m12 + m21) / s;
-                result.y = 0.25 * s;
-                result.z = (m23 + m32) / s;
-            }
-            else {
-                s = 2.0 * Math.sqrt(1.0 + m33 - m11 - m22);
-                result.w = (m21 - m12) / s;
-                result.x = (m13 + m31) / s;
-                result.y = (m23 + m32) / s;
-                result.z = 0.25 * s;
-            }
-        }
-        math.matrix2Quaternion = matrix2Quaternion;
-        function unitxyzToRotation(xAxis, yAxis, zAxis, out) {
-            var m11 = xAxis.x, m12 = yAxis.x, m13 = zAxis.x;
-            var m21 = xAxis.y, m22 = yAxis.y, m23 = zAxis.y;
-            var m31 = xAxis.z, m32 = yAxis.z, m33 = zAxis.z;
-            var trace = m11 + m22 + m33;
-            var s;
-            if (trace > 0) {
-                s = 0.5 / Math.sqrt(trace + 1.0);
-                out.w = 0.25 / s;
-                out.x = (m32 - m23) * s;
-                out.y = (m13 - m31) * s;
-                out.z = (m21 - m12) * s;
-            }
-            else if (m11 > m22 && m11 > m33) {
-                s = 2.0 * Math.sqrt(1.0 + m11 - m22 - m33);
-                out.w = (m32 - m23) / s;
-                out.x = 0.25 * s;
-                out.y = (m12 + m21) / s;
-                out.z = (m13 + m31) / s;
-            }
-            else if (m22 > m33) {
-                s = 2.0 * Math.sqrt(1.0 + m22 - m11 - m33);
-                out.w = (m13 - m31) / s;
-                out.x = (m12 + m21) / s;
-                out.y = 0.25 * s;
-                out.z = (m23 + m32) / s;
-            }
-            else {
-                s = 2.0 * Math.sqrt(1.0 + m33 - m11 - m22);
-                out.w = (m21 - m12) / s;
-                out.x = (m13 + m31) / s;
-                out.y = (m23 + m32) / s;
-                out.z = 0.25 * s;
-            }
-        }
-        math.unitxyzToRotation = unitxyzToRotation;
-        function matrixClone(src, out) {
-            for (var i = 0; i < 16; i++) {
-                out.rawData[i] = src.rawData[i];
-            }
-        }
-        math.matrixClone = matrixClone;
-        function matrix3x2Clone(src, out) {
-            for (var i = 0; i < 6; i++) {
-                out.rawData[i] = src.rawData[i];
-            }
-        }
-        math.matrix3x2Clone = matrix3x2Clone;
-        function matrixMakeIdentity(out) {
-            out.rawData[0] = 1;
-            out.rawData[1] = 0;
-            out.rawData[2] = 0;
-            out.rawData[3] = 0;
-            out.rawData[4] = 0;
-            out.rawData[5] = 1;
-            out.rawData[6] = 0;
-            out.rawData[7] = 0;
-            out.rawData[8] = 0;
-            out.rawData[9] = 0;
-            out.rawData[10] = 1;
-            out.rawData[11] = 0;
-            out.rawData[12] = 0;
-            out.rawData[13] = 0;
-            out.rawData[14] = 0;
-            out.rawData[15] = 1;
-        }
-        math.matrixMakeIdentity = matrixMakeIdentity;
-        function matrix3x2MakeIdentity(out) {
-            out.rawData[0] = 1;
-            out.rawData[1] = 0;
-            out.rawData[2] = 0;
-            out.rawData[3] = 1;
-            out.rawData[4] = 0;
-            out.rawData[5] = 0;
-        }
-        math.matrix3x2MakeIdentity = matrix3x2MakeIdentity;
-        function matrixInverse(src, out) {
-            var l1 = src.rawData[0];
-            var l2 = src.rawData[1];
-            var l3 = src.rawData[2];
-            var l4 = src.rawData[3];
-            var l5 = src.rawData[4];
-            var l6 = src.rawData[5];
-            var l7 = src.rawData[6];
-            var l8 = src.rawData[7];
-            var l9 = src.rawData[8];
-            var l10 = src.rawData[9];
-            var l11 = src.rawData[10];
-            var l12 = src.rawData[11];
-            var l13 = src.rawData[12];
-            var l14 = src.rawData[13];
-            var l15 = src.rawData[14];
-            var l16 = src.rawData[15];
-            var l17 = (l11 * l16) - (l12 * l15);
-            var l18 = (l10 * l16) - (l12 * l14);
-            var l19 = (l10 * l15) - (l11 * l14);
-            var l20 = (l9 * l16) - (l12 * l13);
-            var l21 = (l9 * l15) - (l11 * l13);
-            var l22 = (l9 * l14) - (l10 * l13);
-            var l23 = ((l6 * l17) - (l7 * l18)) + (l8 * l19);
-            var l24 = -(((l5 * l17) - (l7 * l20)) + (l8 * l21));
-            var l25 = ((l5 * l18) - (l6 * l20)) + (l8 * l22);
-            var l26 = -(((l5 * l19) - (l6 * l21)) + (l7 * l22));
-            var l27 = 1.0 / ((((l1 * l23) + (l2 * l24)) + (l3 * l25)) + (l4 * l26));
-            var l28 = (l7 * l16) - (l8 * l15);
-            var l29 = (l6 * l16) - (l8 * l14);
-            var l30 = (l6 * l15) - (l7 * l14);
-            var l31 = (l5 * l16) - (l8 * l13);
-            var l32 = (l5 * l15) - (l7 * l13);
-            var l33 = (l5 * l14) - (l6 * l13);
-            var l34 = (l7 * l12) - (l8 * l11);
-            var l35 = (l6 * l12) - (l8 * l10);
-            var l36 = (l6 * l11) - (l7 * l10);
-            var l37 = (l5 * l12) - (l8 * l9);
-            var l38 = (l5 * l11) - (l7 * l9);
-            var l39 = (l5 * l10) - (l6 * l9);
-            out.rawData[0] = l23 * l27;
-            out.rawData[4] = l24 * l27;
-            out.rawData[8] = l25 * l27;
-            out.rawData[12] = l26 * l27;
-            out.rawData[1] = -(((l2 * l17) - (l3 * l18)) + (l4 * l19)) * l27;
-            out.rawData[5] = (((l1 * l17) - (l3 * l20)) + (l4 * l21)) * l27;
-            out.rawData[9] = -(((l1 * l18) - (l2 * l20)) + (l4 * l22)) * l27;
-            out.rawData[13] = (((l1 * l19) - (l2 * l21)) + (l3 * l22)) * l27;
-            out.rawData[2] = (((l2 * l28) - (l3 * l29)) + (l4 * l30)) * l27;
-            out.rawData[6] = -(((l1 * l28) - (l3 * l31)) + (l4 * l32)) * l27;
-            out.rawData[10] = (((l1 * l29) - (l2 * l31)) + (l4 * l33)) * l27;
-            out.rawData[14] = -(((l1 * l30) - (l2 * l32)) + (l3 * l33)) * l27;
-            out.rawData[3] = -(((l2 * l34) - (l3 * l35)) + (l4 * l36)) * l27;
-            out.rawData[7] = (((l1 * l34) - (l3 * l37)) + (l4 * l38)) * l27;
-            out.rawData[11] = -(((l1 * l35) - (l2 * l37)) + (l4 * l39)) * l27;
-            out.rawData[15] = (((l1 * l36) - (l2 * l38)) + (l3 * l39)) * l27;
-        }
-        math.matrixInverse = matrixInverse;
-        function matrix3x2Inverse(src, out) {
-            var l1 = src.rawData[0];
-            var l2 = src.rawData[1];
-            var l5 = src.rawData[2];
-            var l6 = src.rawData[3];
-            var l13 = src.rawData[4];
-            var l14 = src.rawData[5];
-            var l26 = -(((l5 * -l14) - (l6 * -l13)));
-            var l27 = 1.0 / ((((l1 * l6) + (l2 * -l5))));
-            out.rawData[0] = l6 * l27;
-            out.rawData[2] = -l5 * l27;
-            out.rawData[4] = l26 * l27;
-            out.rawData[1] = -(((l2))) * l27;
-            out.rawData[3] = (((l1))) * l27;
-            out.rawData[5] = (((l1 * -l14) - (l2 * -l13))) * l27;
-        }
-        math.matrix3x2Inverse = matrix3x2Inverse;
-        function matrixMakeTransformRTS(pos, scale, rot, out) {
-            var matS = gd3d.math.pool.new_matrix();
-            matrixMakeScale(scale.x, scale.y, scale.z, matS);
-            var matR = gd3d.math.pool.new_matrix();
-            math.quatToMatrix(rot, matR);
-            matrixMultiply(matR, matS, out);
-            out.rawData[12] = pos.x;
-            out.rawData[13] = pos.y;
-            out.rawData[14] = pos.z;
-            out.rawData[15] = 1;
-            gd3d.math.pool.delete_matrix(matS);
-            gd3d.math.pool.delete_matrix(matR);
-        }
-        math.matrixMakeTransformRTS = matrixMakeTransformRTS;
-        function matrix3x2MakeTransformRTS(pos, scale, rot, out) {
-            var matS = gd3d.math.pool.new_matrix3x2();
-            matrix3x2MakeScale(scale.x, scale.y, matS);
-            var matR = gd3d.math.pool.new_matrix3x2();
-            matrix3x2MakeRotate(rot, matR);
-            matrix3x2Multiply(matR, matS, out);
-            out.rawData[4] = pos.x;
-            out.rawData[5] = pos.y;
-            gd3d.math.pool.delete_matrix3x2(matS);
-            gd3d.math.pool.delete_matrix3x2(matR);
-        }
-        math.matrix3x2MakeTransformRTS = matrix3x2MakeTransformRTS;
-        function matrixMakeTranslate(x, y, z, out) {
-            out.rawData[0] = 1.0;
-            out.rawData[1] = 0.0;
-            out.rawData[2] = 0.0;
-            out.rawData[3] = 0;
-            out.rawData[4] = 0.0;
-            out.rawData[5] = 1.0;
-            out.rawData[6] = 0.0;
-            out.rawData[7] = 0.0;
-            out.rawData[8] = 0.0;
-            out.rawData[9] = 0.0;
-            out.rawData[10] = 1.0;
-            out.rawData[11] = 0.0;
-            out.rawData[12] = x;
-            out.rawData[13] = y;
-            out.rawData[14] = z;
-            out.rawData[15] = 1.0;
-        }
-        math.matrixMakeTranslate = matrixMakeTranslate;
-        function matrix3x2MakeTranslate(x, y, out) {
-            out.rawData[0] = 1.0;
-            out.rawData[1] = 0.0;
-            out.rawData[2] = 0.0;
-            out.rawData[3] = 1.0;
-            out.rawData[4] = x;
-            out.rawData[5] = y;
-        }
-        math.matrix3x2MakeTranslate = matrix3x2MakeTranslate;
-        function matrixGetScale(src, scale) {
-            var xs = math.sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
-            var ys = math.sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
-            var zs = math.sign(src.rawData[8] * src.rawData[9] * src.rawData[10] * src.rawData[11]) < 0 ? -1 : 1;
-            scale.x = xs * Math.sqrt(src.rawData[0] * src.rawData[0] + src.rawData[1] * src.rawData[1] + src.rawData[2] * src.rawData[2]);
-            scale.y = ys * Math.sqrt(src.rawData[4] * src.rawData[4] + src.rawData[5] * src.rawData[5] + src.rawData[6] * src.rawData[6]);
-            scale.z = zs * Math.sqrt(src.rawData[8] * src.rawData[8] + src.rawData[9] * src.rawData[9] + src.rawData[10] * src.rawData[10]);
-        }
-        math.matrixGetScale = matrixGetScale;
-        function matrixMakeScale(xScale, yScale, zScale, out) {
-            out.rawData[0] = xScale;
-            out.rawData[1] = 0.0;
-            out.rawData[2] = 0.0;
-            out.rawData[3] = 0.0;
-            out.rawData[4] = 0.0;
-            out.rawData[5] = yScale;
-            out.rawData[6] = 0.0;
-            out.rawData[7] = 0.0;
-            out.rawData[8] = 0.0;
-            out.rawData[9] = 0.0;
-            out.rawData[10] = zScale;
-            out.rawData[11] = 0.0;
-            out.rawData[12] = 0.0;
-            out.rawData[13] = 0.0;
-            out.rawData[14] = 0.0;
-            out.rawData[15] = 1.0;
-        }
-        math.matrixMakeScale = matrixMakeScale;
-        function matrix3x2TransformVector2(mat, inp, out) {
-            var x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2] + mat.rawData[4];
-            var y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3] + mat.rawData[5];
-            out.x = x;
-            out.y = y;
-        }
-        math.matrix3x2TransformVector2 = matrix3x2TransformVector2;
-        function matrix3x2TransformNormal(mat, inp, out) {
-            var x = inp.x * mat.rawData[0] + inp.y * mat.rawData[2];
-            var y = inp.x * mat.rawData[1] + inp.y * mat.rawData[3];
-            out.x = x;
-            out.y = y;
-        }
-        math.matrix3x2TransformNormal = matrix3x2TransformNormal;
-        function matrix3x2MakeScale(xScale, yScale, out) {
-            out.rawData[0] = xScale;
-            out.rawData[1] = 0.0;
-            out.rawData[2] = 0.0;
-            out.rawData[3] = yScale;
-            out.rawData[4] = 0.0;
-            out.rawData[5] = 0.0;
-        }
-        math.matrix3x2MakeScale = matrix3x2MakeScale;
-        function matrixMakeRotateAxisAngle(axis, angle, out) {
-            var x = axis.x, y = axis.y, z = axis.z;
-            var length = Math.sqrt(x * x + y * y + z * z);
-            if (!length)
-                return;
-            if (length !== 1) {
-                length = 1 / length;
-                x *= length;
-                y *= length;
-                z *= length;
-            }
-            var s = Math.sin(angle);
-            var c = Math.cos(angle);
-            var t = 1.0 - c;
-            var b00 = x * x * t + c, b01 = y * x * t + z * s, b02 = z * x * t - y * s, b10 = x * y * t - z * s, b11 = y * y * t + c, b12 = z * y * t + x * s, b20 = x * z * t + y * s, b21 = y * z * t - x * s, b22 = z * z * t + c;
-            out.rawData[0] = b00;
-            out.rawData[1] = b01;
-            out.rawData[2] = b02;
-            out.rawData[3] = 0;
-            out.rawData[4] = b10;
-            out.rawData[5] = b11;
-            out.rawData[6] = b12;
-            out.rawData[7] = 0;
-            out.rawData[8] = b20;
-            out.rawData[9] = b21;
-            out.rawData[10] = b22;
-            out.rawData[11] = 0;
-            out.rawData[12] = 0;
-            out.rawData[13] = 0;
-            out.rawData[14] = 0;
-            out.rawData[15] = 1;
-        }
-        math.matrixMakeRotateAxisAngle = matrixMakeRotateAxisAngle;
-        function matrix3x2MakeRotate(angle, out) {
-            var x = 0, y = 0, z = 1;
-            var s = Math.sin(angle);
-            var c = Math.cos(angle);
-            out.rawData[0] = c;
-            out.rawData[1] = s;
-            out.rawData[2] = -s;
-            out.rawData[3] = c;
-            out.rawData[4] = 0;
-            out.rawData[5] = 0;
-        }
-        math.matrix3x2MakeRotate = matrix3x2MakeRotate;
-        function matrixMultiply(lhs, rhs, out) {
-            var a00 = lhs.rawData[0], a01 = lhs.rawData[1], a02 = lhs.rawData[2], a03 = lhs.rawData[3];
-            var a10 = lhs.rawData[4], a11 = lhs.rawData[5], a12 = lhs.rawData[6], a13 = lhs.rawData[7];
-            var a20 = lhs.rawData[8], a21 = lhs.rawData[9], a22 = lhs.rawData[10], a23 = lhs.rawData[11];
-            var a30 = lhs.rawData[12], a31 = lhs.rawData[13], a32 = lhs.rawData[14], a33 = lhs.rawData[15];
-            var b0 = rhs.rawData[0], b1 = rhs.rawData[1], b2 = rhs.rawData[2], b3 = rhs.rawData[3];
-            out.rawData[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
-            out.rawData[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
-            out.rawData[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
-            out.rawData[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
-            b0 = rhs.rawData[4];
-            b1 = rhs.rawData[5];
-            b2 = rhs.rawData[6];
-            b3 = rhs.rawData[7];
-            out.rawData[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
-            out.rawData[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
-            out.rawData[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
-            out.rawData[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
-            b0 = rhs.rawData[8];
-            b1 = rhs.rawData[9];
-            b2 = rhs.rawData[10];
-            b3 = rhs.rawData[11];
-            out.rawData[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
-            out.rawData[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
-            out.rawData[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
-            out.rawData[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
-            b0 = rhs.rawData[12];
-            b1 = rhs.rawData[13];
-            b2 = rhs.rawData[14];
-            b3 = rhs.rawData[15];
-            out.rawData[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
-            out.rawData[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
-            out.rawData[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
-            out.rawData[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
-        }
-        math.matrixMultiply = matrixMultiply;
-        function matrix3x2Multiply(lhs, rhs, out) {
-            var a00 = lhs.rawData[0], a01 = lhs.rawData[1], a02 = 0;
-            var a10 = lhs.rawData[2], a11 = lhs.rawData[3], a12 = 0;
-            var a30 = lhs.rawData[4], a31 = lhs.rawData[5], a32 = 1;
-            var b0 = rhs.rawData[0], b1 = rhs.rawData[1], b3 = 0;
-            var temp_0 = b0 * a00 + b1 * a10 + b3 * a30;
-            var temp_1 = b0 * a01 + b1 * a11 + b3 * a31;
-            b0 = rhs.rawData[2];
-            b1 = rhs.rawData[3];
-            b3 = 0;
-            var temp_2 = b0 * a00 + b1 * a10 + b3 * a30;
-            var temp_3 = b0 * a01 + b1 * a11 + b3 * a31;
-            b0 = rhs.rawData[4];
-            b1 = rhs.rawData[5];
-            b3 = 1;
-            var temp_4 = b0 * a00 + b1 * a10 + b3 * a30;
-            var temp_5 = b0 * a01 + b1 * a11 + b3 * a31;
-            out.rawData[0] = temp_0;
-            out.rawData[1] = temp_1;
-            out.rawData[2] = temp_2;
-            out.rawData[3] = temp_3;
-            out.rawData[4] = temp_4;
-            out.rawData[5] = temp_5;
-        }
-        math.matrix3x2Multiply = matrix3x2Multiply;
-        function matrix3x2Equal(mtx1, mtx2, threshold) {
-            if (threshold === void 0) { threshold = 0.00001; }
-            for (var i = 0; i < 6; i++) {
-                if (Math.abs(mtx1.rawData[i] - mtx2.rawData[i]) > threshold) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        math.matrix3x2Equal = matrix3x2Equal;
-        function matrixProject_PerspectiveLH(fov, aspect, znear, zfar, out) {
-            var tan = 1.0 / (Math.tan(fov * 0.5));
-            out.rawData[0] = tan / aspect;
-            out.rawData[1] = out.rawData[2] = out.rawData[3] = 0.0;
-            out.rawData[4] = out.rawData[6] = out.rawData[7] = 0.0;
-            out.rawData[5] = tan;
-            out.rawData[8] = out.rawData[9] = 0.0;
-            out.rawData[10] = -zfar / (znear - zfar);
-            out.rawData[11] = 1.0;
-            out.rawData[12] = out.rawData[13] = out.rawData[15] = 0.0;
-            out.rawData[14] = (znear * zfar) / (znear - zfar);
-        }
-        math.matrixProject_PerspectiveLH = matrixProject_PerspectiveLH;
-        function matrixProject_OrthoLH(width, height, znear, zfar, out) {
-            var hw = 2.0 / width;
-            var hh = 2.0 / height;
-            var id = 2.0 / (zfar - znear);
-            var nid = (zfar + znear) / (znear - zfar);
-            out.rawData[0] = hw;
-            out.rawData[1] = 0;
-            out.rawData[2] = 0;
-            out.rawData[3] = 0;
-            out.rawData[4] = 0;
-            out.rawData[5] = hh;
-            out.rawData[6] = 0;
-            out.rawData[7] = 0;
-            out.rawData[8] = 0;
-            out.rawData[9] = 0;
-            out.rawData[10] = id;
-            out.rawData[11] = 0;
-            out.rawData[12] = 0;
-            out.rawData[13] = 0;
-            out.rawData[14] = nid;
-            out.rawData[15] = 1;
-        }
-        math.matrixProject_OrthoLH = matrixProject_OrthoLH;
-        function matrixLookatLH(forward, up, out) {
-            var z = math.pool.new_vector3(-forward.x, -forward.y, -forward.z);
-            math.vec3Normalize(z, z);
-            var y = math.pool.new_vector3();
-            math.vec3Clone(up, y);
-            math.vec3Normalize(y, y);
-            var x = math.pool.new_vector3();
-            math.vec3Cross(y, z, x);
-            math.vec3SqrLength(x);
-            if (math.vec3SqrLength(x) == 0) {
-                x.x = 1;
-            }
-            else {
-                math.vec3Normalize(x, x);
-            }
-            math.vec3Clone(math.pool.vector3_zero, y);
-            math.vec3Cross(z, x, y);
-            math.vec3Normalize(y, y);
-            out.rawData[0] = x.x;
-            out.rawData[1] = y.x;
-            out.rawData[2] = z.x;
-            out.rawData[3] = 0;
-            out.rawData[4] = x.y;
-            out.rawData[5] = y.y;
-            out.rawData[6] = z.y;
-            out.rawData[7] = 0;
-            out.rawData[8] = x.z;
-            out.rawData[9] = y.z;
-            out.rawData[10] = z.z;
-            out.rawData[11] = 0;
-            out.rawData[12] = 0;
-            out.rawData[13] = 0;
-            out.rawData[14] = 0;
-            out.rawData[15] = 1;
-            math.pool.delete_vector3(x);
-            math.pool.delete_vector3(y);
-            math.pool.delete_vector3(z);
-        }
-        math.matrixLookatLH = matrixLookatLH;
-        function matrixViewLookatLH(eye, forward, up, out) {
-            var z = math.pool.new_vector3(forward.x, forward.y, forward.z);
-            math.vec3Normalize(z, z);
-            var y = math.pool.new_vector3();
-            math.vec3Clone(up, y);
-            math.vec3Normalize(y, y);
-            var x = math.pool.new_vector3();
-            math.vec3Cross(y, z, x);
-            math.vec3SqrLength(x);
-            if (math.vec3SqrLength(x) == 0) {
-                x.x = 1;
-            }
-            else {
-                math.vec3Normalize(x, x);
-            }
-            math.vec3Clone(math.pool.vector3_zero, y);
-            math.vec3Cross(z, x, y);
-            math.vec3Normalize(y, y);
-            var ex = -math.vec3Dot(x, eye);
-            var ey = -math.vec3Dot(y, eye);
-            var ez = -math.vec3Dot(z, eye);
-            out.rawData[0] = x.x;
-            out.rawData[1] = y.x;
-            out.rawData[2] = z.x;
-            out.rawData[3] = 0;
-            out.rawData[4] = x.y;
-            out.rawData[5] = y.y;
-            out.rawData[6] = z.y;
-            out.rawData[7] = 0;
-            out.rawData[8] = x.z;
-            out.rawData[9] = y.z;
-            out.rawData[10] = z.z;
-            out.rawData[11] = 0;
-            out.rawData[12] = ex;
-            out.rawData[13] = ey;
-            out.rawData[14] = ez;
-            out.rawData[15] = 1;
-            math.pool.delete_vector3(x);
-            math.pool.delete_vector3(y);
-            math.pool.delete_vector3(z);
-        }
-        math.matrixViewLookatLH = matrixViewLookatLH;
-        function matrixLerp(left, right, v, out) {
-            for (var i = 0; i < 16; i++) {
-                out.rawData[i] = left.rawData[i] * (1 - v) + right.rawData[i] * v;
-            }
-        }
-        math.matrixLerp = matrixLerp;
-        function matrixTransformVector3(vector, transformation, result) {
-            var x = (vector.x * transformation.rawData[0]) + (vector.y * transformation.rawData[4]) + (vector.z * transformation.rawData[8]) + transformation.rawData[12];
-            var y = (vector.x * transformation.rawData[1]) + (vector.y * transformation.rawData[5]) + (vector.z * transformation.rawData[9]) + transformation.rawData[13];
-            var z = (vector.x * transformation.rawData[2]) + (vector.y * transformation.rawData[6]) + (vector.z * transformation.rawData[10]) + transformation.rawData[14];
-            var w = (vector.x * transformation.rawData[3]) + (vector.y * transformation.rawData[7]) + (vector.z * transformation.rawData[11]) + transformation.rawData[15];
-            result.x = x / w;
-            result.y = y / w;
-            result.z = z / w;
-        }
-        math.matrixTransformVector3 = matrixTransformVector3;
-        function matrixTransformVector4(src, mtx, out) {
-            out.x = (src.x * mtx.rawData[0]) + (src.y * mtx.rawData[4]) + (src.z * mtx.rawData[8]) + (src.w * mtx.rawData[12]);
-            out.y = (src.x * mtx.rawData[1]) + (src.y * mtx.rawData[5]) + (src.z * mtx.rawData[9]) + (src.w * mtx.rawData[13]);
-            out.z = (src.x * mtx.rawData[2]) + (src.y * mtx.rawData[6]) + (src.z * mtx.rawData[10]) + (src.w * mtx.rawData[14]);
-            out.w = (src.x * mtx.rawData[3]) + (src.y * mtx.rawData[7]) + (src.z * mtx.rawData[11]) + (src.w * mtx.rawData[15]);
-        }
-        math.matrixTransformVector4 = matrixTransformVector4;
-        function matrixTransformNormal(vector, transformation, result) {
-            var x = (vector.x * transformation.rawData[0]) + (vector.y * transformation.rawData[4]) + (vector.z * transformation.rawData[8]);
-            var y = (vector.x * transformation.rawData[1]) + (vector.y * transformation.rawData[5]) + (vector.z * transformation.rawData[9]);
-            var z = (vector.x * transformation.rawData[2]) + (vector.y * transformation.rawData[6]) + (vector.z * transformation.rawData[10]);
-            result.x = x;
-            result.y = y;
-            result.z = z;
-        }
-        math.matrixTransformNormal = matrixTransformNormal;
-        function matrixGetVector3ByOffset(src, offset, result) {
-            result.x = src.rawData[offset];
-            result.y = src.rawData[offset + 1];
-            result.z = src.rawData[offset + 2];
-        }
-        math.matrixGetVector3ByOffset = matrixGetVector3ByOffset;
-        function matrixReset(mat) {
-            mat.rawData[0] = 1;
-            mat.rawData[1] = 0;
-            mat.rawData[2] = 0;
-            mat.rawData[3] = 0;
-            mat.rawData[4] = 0;
-            mat.rawData[5] = 1;
-            mat.rawData[6] = 0;
-            mat.rawData[7] = 0;
-            mat.rawData[8] = 0;
-            mat.rawData[9] = 0;
-            mat.rawData[10] = 1;
-            mat.rawData[11] = 0;
-            mat.rawData[12] = 0;
-            mat.rawData[13] = 0;
-            mat.rawData[14] = 0;
-            mat.rawData[15] = 1;
-        }
-        math.matrixReset = matrixReset;
-        function matrixZero(mat) {
-            mat.rawData[0] = 0;
-            mat.rawData[1] = 0;
-            mat.rawData[2] = 0;
-            mat.rawData[3] = 0;
-            mat.rawData[4] = 0;
-            mat.rawData[5] = 0;
-            mat.rawData[6] = 0;
-            mat.rawData[7] = 0;
-            mat.rawData[8] = 0;
-            mat.rawData[9] = 0;
-            mat.rawData[10] = 0;
-            mat.rawData[11] = 0;
-            mat.rawData[12] = 0;
-            mat.rawData[13] = 0;
-            mat.rawData[14] = 0;
-            mat.rawData[15] = 1;
-        }
-        math.matrixZero = matrixZero;
-        function matrixScaleByNum(value, mat) {
-            mat.rawData[0] *= value;
-            mat.rawData[1] *= value;
-            mat.rawData[2] *= value;
-            mat.rawData[3] *= value;
-            mat.rawData[4] *= value;
-            mat.rawData[5] *= value;
-            mat.rawData[6] *= value;
-            mat.rawData[7] *= value;
-            mat.rawData[8] *= value;
-            mat.rawData[9] *= value;
-            mat.rawData[10] *= value;
-            mat.rawData[11] *= value;
-            mat.rawData[12] *= value;
-            mat.rawData[13] *= value;
-            mat.rawData[14] *= value;
-            mat.rawData[15] *= value;
-        }
-        math.matrixScaleByNum = matrixScaleByNum;
-        function matrixAdd(left, right, out) {
-            out.rawData[0] = left.rawData[0] + right.rawData[0];
-            out.rawData[1] = left.rawData[1] + right.rawData[1];
-            out.rawData[2] = left.rawData[2] + right.rawData[2];
-            out.rawData[3] = left.rawData[3] + right.rawData[3];
-            out.rawData[4] = left.rawData[4] + right.rawData[4];
-            out.rawData[5] = left.rawData[5] + right.rawData[5];
-            out.rawData[6] = left.rawData[6] + right.rawData[6];
-            out.rawData[7] = left.rawData[7] + right.rawData[7];
-            out.rawData[8] = left.rawData[8] + right.rawData[8];
-            out.rawData[9] = left.rawData[9] + right.rawData[9];
-            out.rawData[10] = left.rawData[10] + right.rawData[10];
-            out.rawData[11] = left.rawData[11] + right.rawData[11];
-            out.rawData[12] = left.rawData[12] + right.rawData[12];
-            out.rawData[13] = left.rawData[13] + right.rawData[13];
-            out.rawData[14] = left.rawData[14] + right.rawData[14];
-            out.rawData[15] = left.rawData[15] + right.rawData[15];
-        }
-        math.matrixAdd = matrixAdd;
-        function matrixEqual(mtx1, mtx2, threshold) {
-            if (threshold === void 0) { threshold = 0.00001; }
-            for (var i = 0; i < 16; i++) {
-                if (Math.abs(mtx1.rawData[i] - mtx2.rawData[i]) > threshold) {
-                    return false;
-                }
-            }
-            return true;
-        }
-        math.matrixEqual = matrixEqual;
-        function matrixIsIdentity(mtx) {
-            var m = mtx.rawData;
-            var _isIdentity = (m[0] === 1.0 && m[1] === 0.0 && m[2] === 0.0 && m[3] === 0.0 &&
-                m[4] === 0.0 && m[5] === 1.0 && m[6] === 0.0 && m[7] === 0.0 &&
-                m[8] === 0.0 && m[9] === 0.0 && m[10] === 1.0 && m[11] === 0.0 &&
-                m[12] === 0.0 && m[13] === 0.0 && m[14] === 0.0 && m[15] === 1.0);
-            return _isIdentity;
-        }
-        math.matrixIsIdentity = matrixIsIdentity;
-    })(math = gd3d.math || (gd3d.math = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var math;
-    (function (math) {
         function floatClamp(v, min, max) {
             if (min === void 0) { min = 0; }
             if (max === void 0) { max = 1; }
@@ -31871,7 +32047,12 @@ var gd3d;
                 return this.addComponentDirect(comp);
             };
             gameObject.prototype.removeComponent = function (comp) {
-                var type = gd3d.reflect.getClassName(comp);
+                if (!comp)
+                    return;
+                var constructor = Object.getPrototypeOf(comp).constructor;
+                if (!constructor)
+                    return;
+                var type = constructor.name;
                 if (this.componentTypes[type])
                     return;
                 delete this.components[type];
@@ -31879,10 +32060,10 @@ var gd3d;
                 while (i < len) {
                     if (this.components[i].comp == comp) {
                         if (this.components[i].init) {
-                            this.components[i].comp.remove();
-                            this.components[i].comp.gameObject = null;
+                            comp.remove();
+                            comp.gameObject = null;
                         }
-                        this.remove(this.components[i].comp);
+                        this.remove(comp);
                         this.components.splice(i, 1);
                         break;
                     }
@@ -32221,6 +32402,9 @@ var gd3d;
                 this.updateScene(this.rootNode, delta);
                 if (this.onLateUpdate)
                     this.onLateUpdate(delta);
+                if (framework.physics2D && framework.physics2D.engineRunner) {
+                    framework.physics2D.engineRunner.tick();
+                }
                 if (framework.physics) {
                     framework.physics._step(delta);
                 }

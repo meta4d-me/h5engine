@@ -998,6 +998,9 @@ namespace gd3d.framework {
                     throw new Error("已经有一个碰撞组件了，不能俩");
                 }
             }
+
+            if(comp.update.toString().length < 35)
+                comp.update =undefined;//update空转
             return comp;
         }
 

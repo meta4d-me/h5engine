@@ -479,7 +479,8 @@ namespace gd3d.framework
                         c.comp.onPlay();
                         c.OnPlayed = true;
                     }
-                    comp.update(delta);
+                    if(comp.update)
+                        comp.update(delta);
                     
                     if (instanceOfI2DPointListener(comp))
                     {  //判断是否为
