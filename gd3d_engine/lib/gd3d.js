@@ -3024,12 +3024,21 @@ var gd3d;
             transform2D.prototype.removeComponent = function (comp) {
                 if (!comp)
                     return;
-                var typeName = gd3d.reflect.getClassName(comp);
+                var constructor = Object.getPrototypeOf(comp).constructor;
+                if (!constructor)
+                    return;
+                var typeName = constructor.name;
                 if (!this.componentTypes[typeName])
                     return;
                 for (var i = 0; i < this.components.length; i++) {
                     if (this.components[i].comp == comp) {
                         this.components.splice(i, 1);
+                        if (comp == this.renderer)
+                            this.renderer = null;
+                        if (comp == this.collider)
+                            this.collider = null;
+                        if (comp == this.physicsBody)
+                            this.physicsBody = null;
                         comp.remove();
                         comp.transform = null;
                         break;
@@ -3050,6 +3059,7 @@ var gd3d;
                         if (p[0].comp == this.physicsBody)
                             this.physicsBody = null;
                         p[0].comp.remove();
+                        p[0].comp.transform = null;
                         return p[0];
                     }
                 }
@@ -32037,7 +32047,12 @@ var gd3d;
                 return this.addComponentDirect(comp);
             };
             gameObject.prototype.removeComponent = function (comp) {
-                var type = gd3d.reflect.getClassName(comp);
+                if (!comp)
+                    return;
+                var constructor = Object.getPrototypeOf(comp).constructor;
+                if (!constructor)
+                    return;
+                var type = constructor.name;
                 if (this.componentTypes[type])
                     return;
                 delete this.components[type];
