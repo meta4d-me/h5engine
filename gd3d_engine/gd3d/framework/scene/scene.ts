@@ -266,7 +266,7 @@ namespace gd3d.framework
             if (!targetcamera) return;
             if (this._overlay2d)
             {
-                for (var i = 0, l = this._overlay2d.length;i<l ; ++i)
+                for (var i = 0, l = this._overlay2d.length; i < l; ++i)
                 {
                     var overlay = this._overlay2d[i];
                     if (overlay)
@@ -318,55 +318,12 @@ namespace gd3d.framework
             //一个camera 不是一次单纯的绘制，camera 还有多个绘制遍
             var cam = this.renderCameras[camindex];
             var context = this.renderContext[camindex];
-            //sceneMgr.camera=cam;
-            /*
-            // if (this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") < 0)
-            if(this.app.bePlay && !cam.isEditorCam)
-            {
-                context.updateCamera(this.app, cam);
-                context.updateLights(this.renderLights);
-                cam.fillRenderer(this);
-                cam.renderScene(this, context);
-                this.RealCameraNumber++;
-
-                // //还有overlay
-                let overLays: IOverLay[] = cam.getOverLays();
-                for (var i = 0; i < overLays.length; i++)
-                {
-                    if (cam.CullingMask & CullingMask.ui)
-                    {
-                        overLays[i].render(context, this.assetmgr, cam);
-                    }
-                }
-            }
-            else if (!this.app.bePlay && cam.isEditorCam)
-            // else if (!this.app.bePlay && cam.gameObject.transform.name.toLowerCase().indexOf("editor") >= 0)
-            {
-                context.updateCamera(this.app, cam);
-                context.updateLights(this.renderLights);
-                cam.fillRenderer(this);
-                cam.renderScene(this, context);
-                this.RealCameraNumber++;
-                //----------------------------------场编相机的overlay展示----------------------------------------------------
-                if (this.app.be2dstate)
-                {
-                    let overLays: IOverLay[] = cam.getOverLays();
-                    for (var i = 0; i < overLays.length; i++)
-                    {
-                        if (cam.CullingMask & CullingMask.ui)
-                        {
-                            overLays[i].render(context, this.assetmgr, cam);
-                        }
-                    }
-                }
-            }
-*/
             if ((this.app.bePlay && !cam.isEditorCam) || (!this.app.bePlay && cam.isEditorCam))
             {
                 context.updateCamera(this.app, cam);
                 context.updateLights(this.renderLights);
                 cam.fillRenderer(this);
-                cam.renderScene(this, context);
+                cam.renderScene(this, context, camindex);
                 this.RealCameraNumber++;
 
                 // //还有overlay

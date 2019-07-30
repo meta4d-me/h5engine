@@ -36,7 +36,7 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class material implements IAsset
     {
-        static readonly ClassName:string="material";
+        static readonly ClassName: string = "material";
 
         @gd3d.reflect.Field("constText")
         private name: constText = null;
@@ -194,6 +194,7 @@ namespace gd3d.framework
             for (let key in pass.mapuniforms)
             {
                 let unifom = pass.mapuniforms[key];
+
                 let func = render.shaderUniform.applyuniformFunc[unifom.type];
                 let unifomValue: any;
                 if (uniformSetter.autoUniformDic[unifom.name] != null)
@@ -307,8 +308,8 @@ namespace gd3d.framework
          */
         //@gd3d.reflect.Field("UniformDataDic")
         //mapUniform: {[id: string]: UniformData} = {};//参数
-        defaultMapUniform:{ [key: string]: { type: render.UniformTypeEnum, value?: any,becolor?:boolean,min?:number,max?:number}};
-        statedMapUniforms:{[id:string]:any}={};
+        defaultMapUniform: { [key: string]: { type: render.UniformTypeEnum, value?: any, becolor?: boolean, min?: number, max?: number } };
+        statedMapUniforms: { [id: string]: any } = {};
         //private mapUniformTemp: {[id: string]: UniformData}={};
         /**
          * @private
@@ -393,7 +394,7 @@ namespace gd3d.framework
          */
         setTexture(_id: string, _texture: gd3d.framework.texture, resname: string = "")
         {
-            if ((this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture)||_id=="_LightmapTex")
+            if ((this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) || _id == "_LightmapTex")
             {
                 if (this.statedMapUniforms[_id] != null && (!this.statedMapUniforms[_id].defaultAsset))
                 {
@@ -402,7 +403,8 @@ namespace gd3d.framework
                 this.statedMapUniforms[_id] = _texture;
                 if (_texture != null)
                 {
-                    if(_texture.getName() == "_color" ){
+                    if (_texture.getName() == "_color")
+                    {
                         _texture;
                     }
                     if (!_texture.defaultAsset)
@@ -412,7 +414,7 @@ namespace gd3d.framework
                     //图片的尺寸信息(1/width,1/height,width,height)
                     let _texelsizeName = _id + "_TexelSize";
                     let _gltexture = _texture.glTexture;
-                    if (_gltexture != null&&this.defaultMapUniform[_texelsizeName] != null)
+                    if (_gltexture != null && this.defaultMapUniform[_texelsizeName] != null)
                     {
                         this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
@@ -424,7 +426,8 @@ namespace gd3d.framework
 
         }
 
-        setCubeTexture(_id: string, _texture: gd3d.framework.texture) {
+        setCubeTexture(_id: string, _texture: gd3d.framework.texture)
+        {
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.CubeTexture)
             {
                 if (this.statedMapUniforms[_id] != null && (!this.statedMapUniforms[_id].defaultAsset))
@@ -441,7 +444,7 @@ namespace gd3d.framework
                     //图片的尺寸信息(1/width,1/height,width,height)
                     let _texelsizeName = _id + "_TexelSize";
                     let _gltexture = _texture.glTexture;
-                    if ( _gltexture != null)
+                    if (_gltexture != null)
                     {
                         this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
@@ -464,18 +467,20 @@ namespace gd3d.framework
          */
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base", useGLobalLightMap: boolean = true)
         {
-            
+
             let drawPasses = this.shader.passes[basetype + context.drawtype];
-            if (drawPasses == undefined){
-                basetype = basetype.indexOf("fog") != -1 ? "base_fog":"base";
+            if (drawPasses == undefined)
+            {
+                basetype = basetype.indexOf("fog") != -1 ? "base_fog" : "base";
                 drawPasses = this.shader.passes[basetype + context.drawtype];
-                if (drawPasses == undefined){
+                if (drawPasses == undefined)
+                {
                     drawPasses = this.shader.passes["base" + context.drawtype];
                     if (drawPasses == undefined)
-                    return;
+                        return;
                 }
             }
-            for (var i = 0,l=drawPasses.length; i <l ; i++)
+            for (var i = 0, l = drawPasses.length; i < l; i++)
             {
                 var pass = drawPasses[i];
                 pass.use(context.webgl);
@@ -596,7 +601,7 @@ namespace gd3d.framework
             for (var i in this.statedMapUniforms)
             {
                 var _uniformType: render.UniformTypeEnum = this.defaultMapUniform[i].type;
-                let value=this.statedMapUniforms[i];
+                let value = this.statedMapUniforms[i];
                 switch (_uniformType)
                 {
                     case render.UniformTypeEnum.Texture:

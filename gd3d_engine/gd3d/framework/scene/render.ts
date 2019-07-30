@@ -12,7 +12,7 @@ namespace gd3d.framework
 
 
 
-        drawtype: string; 
+        drawtype: string;
         webgl: WebGLRenderingContext;
         viewPortPixel: gd3d.math.rect = new gd3d.math.rect(0, 0, 0, 0);//像素的viewport
         eyePos: gd3d.math.vector4 = new gd3d.math.vector4();
@@ -21,8 +21,9 @@ namespace gd3d.framework
         matrixProject: gd3d.math.matrix = new gd3d.math.matrix();
         matrixModel: gd3d.math.matrix = new gd3d.math.matrix();
         private _matrixWorld2Object: gd3d.math.matrix = new gd3d.math.matrix();
-        get matrixWorld2Object(){
-            gd3d.math.matrixInverse(this.matrixModel,this._matrixWorld2Object);
+        get matrixWorld2Object()
+        {
+            gd3d.math.matrixInverse(this.matrixModel, this._matrixWorld2Object);
             return this._matrixWorld2Object;
         }
         matrixModelViewProject: gd3d.math.matrix = new gd3d.math.matrix;
@@ -38,8 +39,8 @@ namespace gd3d.framework
         floatLightRange: Float32Array = new Float32Array(8);
         floatLightIntensity: Float32Array = new Float32Array(8);
         floatLightSpotAngleCos: Float32Array = new Float32Array(8);
-        private _intLightCount:number = 0;
-        private _lightCullingMask:number[] = [];
+        private _intLightCount: number = 0;
+        private _lightCullingMask: number[] = [];
         private _vec4LightPos: Float32Array = new Float32Array(32);
         private _vec4LightDir: Float32Array = new Float32Array(32);
         private _vec4LightColor: Float32Array = new Float32Array(32);
@@ -51,11 +52,11 @@ namespace gd3d.framework
         lightmap: gd3d.framework.texture = null;
         lightmapUV: number = 1;
         lightmapOffset: gd3d.math.vector4 = new gd3d.math.vector4(1, 1, 0, 0);
-        fog:Fog;
+        fog: Fog;
 
         //skin auto uniform
-        vec4_bones:Float32Array;
-        matrix_bones:Float32Array;
+        vec4_bones: Float32Array;
+        matrix_bones: Float32Array;
         updateCamera(app: application, camera: camera)
         {
             camera.calcViewPortPixel(app, this.viewPortPixel);
@@ -77,7 +78,7 @@ namespace gd3d.framework
             this._intLightCount = lights.length;
             this._lightCullingMask.length = 0;
             var dirt = math.pool.new_vector3();
-            for (var i = 0; i < lights.length; i++)
+            for (var i = 0, len = lights.length; i < len; i++)
             {
                 this._lightCullingMask.push(lights[i].cullingMask);
                 {
@@ -140,17 +141,20 @@ namespace gd3d.framework
         }
 
         //更新 光照剔除mask
-        updateLightMask(layer:number){
+        updateLightMask(layer: number)
+        {
             this.intLightCount = 0;
-            if(this._intLightCount == 0) return ;
-            let num = 1 << layer; 
-            let indexList:number[] = [];
-            for(var i = 0;i<this._lightCullingMask.length ;i++){
+            if (this._intLightCount == 0) return;
+            let num = 1 << layer;
+            let indexList: number[] = [];
+            for (var i = 0; i < this._lightCullingMask.length; i++)
+            {
                 let mask = this._lightCullingMask[i];
-                if(mask & num) indexList.push(i);
+                if (mask & num) indexList.push(i);
             }
             this.intLightCount = indexList.length;
-            for(var i=0;i<indexList.length;i++){
+            for (var i = 0; i < indexList.length; i++)
+            {
                 let idx = indexList[i];
                 this.floatLightSpotAngleCos[i] = this._floatLightSpotAngleCos[idx];
                 this.floatLightRange[i] = this._floatLightRange[idx];
@@ -239,14 +243,10 @@ namespace gd3d.framework
             this.renderLayers.push(overlay);
         }
         clear()
-        {
-            // for (var i = 0; i < this.renderLayers.length; i++)
-            // {
-            //     this.renderLayers[i].list.length = 0;
-            // }
-            this.renderLayers[0].list.length = 
-            this.renderLayers[1].list.length =
-            this.renderLayers[2].list.length =0;
+        {            
+            this.renderLayers[0].list.length =
+                this.renderLayers[1].list.length =
+                this.renderLayers[2].list.length = 0;
         }
         addRenderer(renderer: IRenderer)
         {
@@ -263,6 +263,8 @@ namespace gd3d.framework
                 this.renderLayers[2].list.push(renderer);
             }
         }
+
+        
         //此处应该根据绘制分类处理
         renderLayers: renderLayer[];
     }

@@ -68,20 +68,6 @@ var gd3d;
                 this.lastHeight = 0;
                 this.OffOrientationUpdate = false;
             }
-            Object.defineProperty(application.prototype, "width", {
-                get: function () {
-                    return this.webgl.canvas.width;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(application.prototype, "height", {
-                get: function () {
-                    return this.webgl.canvas.height;
-                },
-                enumerable: true,
-                configurable: true
-            });
             Object.defineProperty(application.prototype, "timeScale", {
                 get: function () {
                     return this._timeScale;
@@ -180,6 +166,9 @@ var gd3d;
                 if (webglDebug === void 0) { webglDebug = false; }
                 this.ccWidth = this.ccWidth == undefined ? canvas.clientWidth : this.ccWidth;
                 this.ccHeight = this.ccHeight == undefined ? canvas.clientHeight : this.ccHeight;
+                var rect = canvas.getBoundingClientRect();
+                this.width = rect.width;
+                this.height = rect.height;
                 this._timeScale = 1;
                 framework.sceneMgr.app = this;
                 var tempWebGlUtil = new framework.WebGLUtils();
@@ -451,7 +440,7 @@ var gd3d;
                 }
                 for (var i = 0, len = this._userCode.length; i < len; ++i) {
                     c = this._userCode[i];
-                    if (c.isClosed() == false) {
+                    if (c.isClosed() == false && c.onUpdate) {
                         c.onUpdate(delta);
                     }
                     else {
@@ -487,6 +476,8 @@ var gd3d;
             });
             ;
             application.prototype.addUserCodeDirect = function (program) {
+                if (program.onUpdate.toString().length < 35)
+                    program.onUpdate = undefined;
                 this._userCodeNew.push(program);
             };
             application.prototype.addUserCode = function (classname) {
@@ -10403,7 +10394,6 @@ var gd3d;
                 configurable: true
             });
             font.prototype.Parse = function (jsonStr, assetmgr) {
-                var d1 = new Date().valueOf();
                 var json = JSON.parse(jsonStr);
                 var font = json["font"];
                 this.fontname = font[0];
@@ -10432,8 +10422,6 @@ var gd3d;
                 }
                 map = null;
                 json = null;
-                var d2 = new Date().valueOf();
-                var n = d2 - d1;
             };
             font.ClassName = "font";
             font = __decorate([
@@ -15265,8 +15253,8 @@ var gd3d;
                     }
                 }
             };
-            camera.prototype.renderScene = function (scene, context) {
-                this._contextIdx = scene.renderContext.indexOf(context);
+            camera.prototype.renderScene = function (scene, context, contextIdx) {
+                this._contextIdx = contextIdx;
                 var rlayers = scene.renderList.renderLayers;
                 for (var i = 0, l = rlayers.length; i < l; ++i) {
                     var layer = rlayers[i];
@@ -31749,7 +31737,8 @@ var gd3d;
                         c.comp.onPlay();
                         c.OnPlayed = true;
                     }
-                    c.comp.update(delta);
+                    if (c.comp.update)
+                        c.comp.update(delta);
                 }
             };
             gameObject.prototype.addComponentDirect = function (comp) {
@@ -31798,6 +31787,9 @@ var gd3d;
                         console.warn("已经有一个碰撞盒的组件了，不能俩");
                     }
                 }
+                if (comp.update.toString().length < 35) {
+                    comp.update = undefined;
+                }
                 if (add) {
                     this.components.push(nodeObj);
                     this.componentsInit.push(nodeObj);
@@ -31805,8 +31797,8 @@ var gd3d;
                         framework.sceneMgr.app.markNotify(this.transform, framework.NotifyType.AddCamera);
                     if (gd3d.reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1")
                         framework.sceneMgr.app.markNotify(this.transform, framework.NotifyType.AddCanvasRender);
+                    this.haveComponet = true;
                 }
-                this.haveComponet = true;
                 return comp;
             };
             gameObject.prototype.getComponent = function (type) {
@@ -32052,7 +32044,7 @@ var gd3d;
                 this._intLightCount = lights.length;
                 this._lightCullingMask.length = 0;
                 var dirt = gd3d.math.pool.new_vector3();
-                for (var i = 0; i < lights.length; i++) {
+                for (var i = 0, len = lights.length; i < len; i++) {
                     this._lightCullingMask.push(lights[i].cullingMask);
                     {
                         var pos = lights[i].gameObject.transform.getWorldTranslate();
@@ -32310,7 +32302,7 @@ var gd3d;
                     context.updateCamera(this.app, cam);
                     context.updateLights(this.renderLights);
                     cam.fillRenderer(this);
-                    cam.renderScene(this, context);
+                    cam.renderScene(this, context, camindex);
                     this.RealCameraNumber++;
                     var overLays = cam.getOverLays();
                     for (var i = 0; i < overLays.length; i++) {

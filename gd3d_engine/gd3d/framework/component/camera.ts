@@ -222,7 +222,7 @@ namespace gd3d.framework
 
         }
 
-        isEditorCam:boolean = false;
+        isEditorCam: boolean = false;
 
         start()
         {
@@ -735,7 +735,7 @@ namespace gd3d.framework
                     node.getWorldTranslate();
                 }
 
-                this.cullingMap[id] = node.enableCulling && this.isCulling(node) ;
+                this.cullingMap[id] = node.enableCulling && this.isCulling(node);
 
                 if (this.isLastCamera)
                     node.dirtiedOfFrustumCulling = false;
@@ -746,7 +746,8 @@ namespace gd3d.framework
                 if (scene.app.isFrustumCulling && !this.cullingMap[id])
                 {
                     let _renderer = node.gameObject.renderer;
-                    if(this.CullingMask & (1 << _renderer.renderLayer)){  //层遮罩
+                    if (this.CullingMask & (1 << _renderer.renderLayer))
+                    {  //层遮罩
                         scene.renderList.addRenderer(_renderer);
                     }
                 }
@@ -1006,9 +1007,9 @@ namespace gd3d.framework
         /**
         * @private
         */
-        renderScene(scene: scene, context: renderContext)
+        renderScene(scene: scene, context: renderContext, contextIdx: number)
         {
-            this._contextIdx = scene.renderContext.indexOf(context);
+            this._contextIdx = contextIdx;// scene.renderContext.indexOf(context);
             let rlayers = scene.renderList.renderLayers;
             for (var i = 0, l = rlayers.length; i < l; ++i)
             {

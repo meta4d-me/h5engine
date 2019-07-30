@@ -151,7 +151,7 @@
          */
         Parse(jsonStr: string, assetmgr: assetMgr)
         {
-            let d1 = new Date().valueOf();
+            // let d1 = new Date().valueOf();
             let json = JSON.parse(jsonStr);
 
             //parse fontinfo
@@ -187,8 +187,8 @@
             json = null;
 
 
-            let d2 = new Date().valueOf();
-            let n = d2 - d1;
+            // let d2 = new Date().valueOf();
+            // let n = d2 - d1;
         }
 
     }
