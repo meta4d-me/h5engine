@@ -1011,12 +1011,19 @@ namespace gd3d.framework {
          */
         removeComponent(comp: I2DComponent) {
             if (!comp) return;
-            let typeName =  reflect.getClassName(comp);         
+            // let typeName =  reflect.getClassName(comp); //组件继承时remove fial
+            let constructor = Object.getPrototypeOf(comp).constructor;
+            if(!constructor) return;
+            let typeName = constructor.name;
+
             if(!this.componentTypes[typeName])
                 return;
             for (var i = 0; i < this.components.length; i++) {
                 if (this.components[i].comp == comp) {                    
                     this.components.splice(i, 1);
+                    if (comp == this.renderer) this.renderer = null;
+                    if (comp == (this.collider as any)) this.collider = null;
+                    if (comp == (this.physicsBody as any)) this.physicsBody = null;
                     comp.remove();
                     comp.transform = null;
                     break;
@@ -1045,6 +1052,7 @@ namespace gd3d.framework {
                     if (p[0].comp == (this.collider as any)) this.collider = null;
                     if (p[0].comp == (this.physicsBody as any)) this.physicsBody = null;
                     p[0].comp.remove();
+                    p[0].comp.transform = null;
                     return p[0];
                 }
             }
