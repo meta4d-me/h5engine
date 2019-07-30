@@ -599,10 +599,10 @@ namespace gd3d.framework
                 {
                     if (this.components[i].init)
                     {//已经初始化过
-                        this.components[i].comp.remove();
-                        this.components[i].comp.gameObject = null;
+                        comp.remove();
+                        comp.gameObject = null;
                     }
-                    this.remove(this.components[i].comp);
+                    this.remove(comp);
                     this.components.splice(i, 1);
                     break;
                 }
