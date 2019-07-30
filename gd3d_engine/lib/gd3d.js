@@ -2979,20 +2979,23 @@ var gd3d;
                 }
             };
             transform2D.prototype.addComponent = function (type) {
-                if (this.componentTypes[type])
-                    throw new Error("已经有一个" + type + "的组件了，不能俩");
                 var pp = gd3d.reflect.getPrototype(type);
                 if (!pp)
-                    return;
+                    throw new Error("get null of " + type + " to getPrototype");
                 var comp = gd3d.reflect.createInstance(pp, { "2dcomp": "1" });
-                this.componentTypes[type] = true;
                 return this.addComponentDirect(comp);
             };
             transform2D.prototype.addComponentDirect = function (comp) {
+                if (!comp)
+                    throw new Error("this component is null");
                 if (comp.transform != null) {
                     throw new Error("this components has added to a  gameObject");
                 }
                 comp.transform = this;
+                var typeStr = framework.getClassName(comp);
+                if (this.componentTypes[typeStr]) {
+                    throw new Error("已经有一个" + typeStr + "的组件了，不能俩");
+                }
                 if (this.components == null)
                     this.components = [];
                 var _comp = new C2DComponent(comp, false);
@@ -3024,35 +3027,27 @@ var gd3d;
                 }
                 if (comp.update.toString().length < 35)
                     comp.update = undefined;
+                this.componentTypes[typeStr] = true;
                 return comp;
             };
             transform2D.prototype.removeComponent = function (comp) {
                 if (!comp)
                     return;
-                var constructor = Object.getPrototypeOf(comp).constructor;
-                if (!constructor)
-                    return;
-                var typeName = constructor.name;
+                var typeName = framework.getClassName(comp);
                 if (!this.componentTypes[typeName])
                     return;
+                delete this.componentTypes[typeName];
                 for (var i = 0; i < this.components.length; i++) {
                     if (this.components[i].comp == comp) {
-                        this.removeCompOfInit(this.components[i]);
+                        this.clearOfCompRemove(this.components[i]);
                         this.components.splice(i, 1);
                         break;
                     }
                 }
-                delete this.componentTypes[typeName];
             };
-            transform2D.prototype.removeCompOfInit = function (cComp) {
+            transform2D.prototype.clearOfCompRemove = function (cComp) {
                 var comp = cComp.comp;
                 if (cComp.init) {
-                    if (comp == this.renderer)
-                        this.renderer = null;
-                    if (comp == this.collider)
-                        this.collider = null;
-                    if (comp == this.physicsBody)
-                        this.physicsBody = null;
                     comp.remove();
                 }
                 else {
@@ -3060,20 +3055,25 @@ var gd3d;
                     if (i != -1)
                         this.componentsInit.splice(i, 1);
                 }
+                if (comp == this.renderer)
+                    this.renderer = null;
+                if (comp == this.collider)
+                    this.collider = null;
+                if (comp == this.physicsBody)
+                    this.physicsBody = null;
                 comp.transform = null;
             };
             transform2D.prototype.removeComponentByTypeName = function (type) {
                 if (!this.componentTypes[type])
                     return;
+                delete this.componentTypes[type];
                 for (var i = 0; i < this.components.length; i++) {
                     if (gd3d.reflect.getClassName(this.components[i].comp) == type) {
-                        this.removeCompOfInit(this.components[i]);
+                        this.clearOfCompRemove(this.components[i]);
                         var p = this.components.splice(i, 1);
-                        this.removeCompOfInit(this.components[i]);
                         return p[0];
                     }
                 }
-                delete this.componentTypes[type];
             };
             transform2D.prototype.removeAllComponents = function () {
                 this.componentsInit.length = 0;
@@ -3093,9 +3093,10 @@ var gd3d;
             };
             transform2D.prototype.getComponent = function (type) {
                 for (var i = 0; i < this.components.length; i++) {
-                    var cname = gd3d.reflect.getClassName(this.components[i].comp["__proto__"]);
+                    var comp = this.components[i].comp;
+                    var cname = framework.getClassName(comp);
                     if (cname == type) {
-                        return this.components[i].comp;
+                        return comp;
                     }
                 }
                 return null;
@@ -3113,31 +3114,37 @@ var gd3d;
                 return components;
             };
             transform2D.prototype.getNodeCompoents = function (node, _type, comps) {
-                for (var i in node.components) {
-                    var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
+                var len = node.components.length;
+                for (var i = 0; i < len; i++) {
+                    var comp = node.components[i].comp;
+                    var cname = framework.getClassName(comp);
                     if (cname == _type) {
-                        comps.push(node.components[i].comp);
+                        comps.push(comp);
                     }
                 }
                 if (node._children != null) {
-                    for (var i in node._children) {
-                        this.getNodeCompoents(node._children[i], _type, comps);
+                    var len_1 = node._children.length;
+                    for (var j = 0; j < len_1; j++) {
+                        this.getNodeCompoents(node._children[j], _type, comps);
                     }
                 }
             };
             transform2D.prototype.getFirstComponentInChildren = function (type) {
                 return this.getNodeFirstComponent(this, type);
             };
-            transform2D.prototype.getNodeFirstComponent = function (node, _type) {
-                for (var i in node.components) {
-                    var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
-                    if (cname == _type) {
-                        return node.components[i].comp;
+            transform2D.prototype.getNodeFirstComponent = function (node, type) {
+                var len = node.components.length;
+                for (var i = 0; i < len; i++) {
+                    var comp = node.components[i].comp;
+                    var cname = framework.getClassName(comp);
+                    if (cname == type) {
+                        return comp;
                     }
                 }
                 if (node._children != null) {
-                    for (var i in node._children) {
-                        var result = node.getNodeFirstComponent(node._children[i], _type);
+                    var len_1 = node._children.length;
+                    for (var j = 0; j < len_1; j++) {
+                        var result = node.getNodeFirstComponent(node._children[j], type);
                         if (result)
                             return result;
                     }
@@ -7109,9 +7116,30 @@ var gd3d;
                 this.options = options;
             };
             physics2DBody.prototype.setPosition = function (pos) {
-                this.physicsEngine.setPosition(this.body, pos);
+                if (this.enableBT) {
+                    var trans = this.transform;
+                    trans.localTranslate.x = pos.x;
+                    trans.localTranslate.y = pos.y;
+                    trans.markDirty();
+                }
+                else {
+                    this.setPositionByPhy(pos);
+                }
+            };
+            physics2DBody.prototype.setPositionByPhy = function (pos) {
+                this._physicsEngine.setPosition(this.body, pos);
             };
             physics2DBody.prototype.setAngle = function (angle) {
+                if (this.enableBT) {
+                    var trans = this.transform;
+                    trans.localRotate = angle;
+                    trans.markDirty();
+                }
+                else {
+                    this.setAngleByPhy(angle);
+                }
+            };
+            physics2DBody.prototype.setAngleByPhy = function (angle) {
                 this._physicsEngine.setAngle(this.body, angle);
             };
             physics2DBody.prototype.setScale = function (scale) {
@@ -7184,8 +7212,8 @@ var gd3d;
                     mPos = tran.localTranslate;
                     mAngle = tran.localRotate;
                 }
-                this.setPosition(mPos);
-                this.setAngle(mAngle);
+                this.setPositionByPhy(mPos);
+                this.setAngleByPhy(mAngle);
                 var bPos = this.body.position;
                 gd3d.math.vec2Set(this.beforePos, bPos.x, bPos.y);
                 this.beforeAngle = this.body.angle;
@@ -31929,11 +31957,17 @@ var gd3d;
                 }
             };
             gameObject.prototype.addComponentDirect = function (comp) {
+                if (!comp)
+                    throw new Error("this component is null");
                 this.transform.markHaveComponent();
                 if (comp.gameObject != null) {
                     throw new Error("this components has added to a  gameObject");
                 }
                 comp.gameObject = this;
+                var typeStr = framework.getClassName(comp);
+                if (this.componentTypes[typeStr]) {
+                    throw new Error("已经有一个" + typeStr + "的组件了，不能俩");
+                }
                 var nodeObj = new nodeComponent(comp, false);
                 var add = true;
                 if (gd3d.reflect.getClassTag(comp["__proto__"], "renderer") == "1" || gd3d.reflect.getClassTag(comp["__proto__"], "effectbatcher") == "1") {
@@ -31986,13 +32020,15 @@ var gd3d;
                         framework.sceneMgr.app.markNotify(this.transform, framework.NotifyType.AddCanvasRender);
                     this.haveComponet = true;
                 }
+                this.componentTypes[typeStr] = true;
                 return comp;
             };
             gameObject.prototype.getComponent = function (type) {
                 for (var i = 0; i < this.components.length; i++) {
-                    var cname = gd3d.reflect.getClassName(this.components[i].comp["__proto__"]);
+                    var comp = this.components[i].comp;
+                    var cname = framework.getClassName(comp);
                     if (cname == type) {
-                        return this.components[i].comp;
+                        return comp;
                     }
                 }
                 return null;
@@ -32010,31 +32046,40 @@ var gd3d;
                 return components;
             };
             gameObject.prototype._getComponentsInChildren = function (type, obj, array) {
-                for (var i = 0; i < obj.components.length; i++) {
-                    var cname = gd3d.reflect.getClassName(obj.components[i].comp["__proto__"]);
+                var len = obj.components.length;
+                for (var i = 0; i < len; i++) {
+                    var comp = obj.components[i].comp;
+                    var cname = framework.getClassName(comp);
                     if (cname == type) {
-                        array.push(obj.components[i].comp);
+                        array.push(comp);
                     }
                 }
-                for (var i_6 = 0; obj.transform.children != undefined && i_6 < obj.transform.children.length; i_6++) {
-                    var _obj = obj.transform.children[i_6].gameObject;
-                    this._getComponentsInChildren(type, _obj, array);
+                var children = obj.transform.children;
+                if (children != null) {
+                    var len_2 = children.length;
+                    for (var i = 0; i < len_2; i++) {
+                        var _obj = children[i].gameObject;
+                        this._getComponentsInChildren(type, _obj, array);
+                    }
                 }
             };
             gameObject.prototype.getFirstComponentInChildren = function (type) {
                 return this.getNodeFirstComponent(this, type);
             };
-            gameObject.prototype.getNodeFirstComponent = function (node, _type) {
-                for (var i in node.components) {
-                    var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
-                    if (cname == _type) {
-                        return node.components[i].comp;
+            gameObject.prototype.getNodeFirstComponent = function (node, type) {
+                var len = node.components.length;
+                for (var i = 0; i < len; i++) {
+                    var comp = node.components[i].comp;
+                    var cname = framework.getClassName(comp);
+                    if (cname == type) {
+                        return comp;
                     }
                 }
                 var children = node.transform.children;
                 if (children != null) {
-                    for (var i in children) {
-                        var result = node.getNodeFirstComponent(children[i].gameObject, _type);
+                    var len_1 = children.length;
+                    for (var j = 0; j < len_1; j++) {
+                        var result = node.getNodeFirstComponent(children[j].gameObject, type);
                         if (result)
                             return result;
                     }
@@ -32050,11 +32095,10 @@ var gd3d;
                 return result;
             };
             gameObject.prototype.addComponent = function (type) {
-                if (this.componentTypes[type])
-                    throw new Error("已经有一个" + type + "的组件了，不能俩");
                 var pp = gd3d.reflect.getPrototype(type);
+                if (!pp)
+                    throw new Error("get null of " + type + " to getPrototype");
                 var comp = gd3d.reflect.createInstance(pp, { "nodecomp": "1" });
-                this.componentTypes[type] = true;
                 return this.addComponentDirect(comp);
             };
             gameObject.prototype.removeComponent = function (comp) {
@@ -32066,15 +32110,11 @@ var gd3d;
                 var type = constructor.name;
                 if (this.componentTypes[type])
                     return;
-                delete this.components[type];
+                delete this.componentTypes[type];
                 var i = 0, len = this.components.length;
                 while (i < len) {
                     if (this.components[i].comp == comp) {
-                        if (this.components[i].init) {
-                            comp.remove();
-                            comp.gameObject = null;
-                        }
-                        this.remove(comp);
+                        this.clearOfCompRemove(this.components[i]);
                         this.components.splice(i, 1);
                         break;
                     }
@@ -32082,62 +32122,62 @@ var gd3d;
                 }
                 if (len < 1)
                     this.haveComponet = false;
-            };
-            gameObject.prototype.remove = function (comp) {
-                if (gd3d.reflect.getClassTag(comp["__proto__"], "renderer") == "1") {
-                    this.renderer = null;
-                }
-                if (gd3d.reflect.getClassTag(comp["__proto__"], "camera") == "1") {
-                    this.camera = null;
-                }
-                if (gd3d.reflect.getClassTag(comp["__proto__"], "light") == "1") {
-                    this.light = null;
-                }
-                if (gd3d.reflect.getClassTag(comp["__proto__"], "boxcollider") == "1" || gd3d.reflect.getClassTag(comp["__proto__"], "meshcollider") == "1" || gd3d.reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1") {
-                    this.collider = null;
-                }
             };
             gameObject.prototype.removeComponentByTypeName = function (type) {
                 if (!this.componentTypes[type])
                     return;
                 delete this.componentTypes[type];
+                var result = null;
                 var i = 0, len = this.components.length;
                 while (i < len) {
                     if (gd3d.reflect.getClassName(this.components[i].comp) == type) {
-                        if (this.components[i].init) {
-                            this.components[i].comp.remove();
-                            this.components[i].comp.gameObject = null;
-                        }
-                        this.remove(this.components[i].comp);
-                        this.components.splice(i, 1);
+                        this.clearOfCompRemove(this.components[i]);
+                        var results = this.components.splice(i, 1);
+                        if (results[0].comp)
+                            result = results[0].comp;
                         break;
                     }
                     ++i;
                 }
                 if (len < 1)
                     this.haveComponet = false;
+                return result;
             };
             gameObject.prototype.removeAllComponents = function () {
                 this.componentsInit.length = 0;
                 var len = this.components.length;
                 for (var i = 0; i < len; i++) {
-                    {
-                        this.components[i].comp.remove();
-                        this.components[i].comp.gameObject = null;
-                    }
-                    this.remove(this.components[i].comp);
+                    var comp = this.components[i].comp;
+                    comp.remove();
+                    comp.gameObject = null;
                 }
-                if (this.camera)
-                    this.camera = null;
-                if (this.renderer)
-                    this.renderer = null;
-                if (this.light)
-                    this.light = null;
-                if (this.collider)
-                    this.collider = null;
+                this.camera = null;
+                this.renderer = null;
+                this.light = null;
+                this.collider = null;
                 this.components.length = 0;
                 this.componentTypes = {};
                 this.haveComponet = false;
+            };
+            gameObject.prototype.clearOfCompRemove = function (cComp) {
+                var comp = cComp.comp;
+                if (cComp.init) {
+                    comp.remove();
+                }
+                else {
+                    var i = this.componentsInit.indexOf(cComp);
+                    if (i != -1)
+                        this.componentsInit.splice(i, 1);
+                }
+                if (comp == this.camera)
+                    this.camera = null;
+                if (comp == this.renderer)
+                    this.renderer = null;
+                if (comp == this.light)
+                    this.light = null;
+                if (comp == this.collider)
+                    this.collider = null;
+                comp.gameObject = null;
             };
             gameObject.prototype.dispose = function () {
                 this.removeAllComponents();
@@ -34592,6 +34632,15 @@ var gd3d;
             Primitive2DType[Primitive2DType["Label"] = 2] = "Label";
             Primitive2DType[Primitive2DType["Button"] = 3] = "Button";
         })(Primitive2DType = framework.Primitive2DType || (framework.Primitive2DType = {}));
+        function getClassName(obj) {
+            if (!obj)
+                return "";
+            var constructor = Object.getPrototypeOf(obj).constructor;
+            if (!constructor)
+                return "";
+            return constructor.name;
+        }
+        framework.getClassName = getClassName;
         var TransformUtil = (function () {
             function TransformUtil() {
             }
