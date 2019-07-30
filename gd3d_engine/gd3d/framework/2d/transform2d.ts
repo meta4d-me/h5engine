@@ -1011,20 +1011,45 @@ namespace gd3d.framework {
          */
         removeComponent(comp: I2DComponent) {
             if (!comp) return;
-            let typeName =  reflect.getClassName(comp);         
+            // let typeName =  reflect.getClassName(comp); //组件继承时remove fial
+            let constructor = Object.getPrototypeOf(comp).constructor;
+            if(!constructor) return;
+            let typeName = constructor.name;
+
             if(!this.componentTypes[typeName])
                 return;
             for (var i = 0; i < this.components.length; i++) {
                 if (this.components[i].comp == comp) {                    
+                    // if(this.components[i].init){
+                    //     if (comp == this.renderer) this.renderer = null;
+                    //     if (comp == (this.collider as any)) this.collider = null;
+                    //     if (comp == (this.physicsBody as any)) this.physicsBody = null;
+                    // }
+                    
+                    // comp.remove();
+                    // comp.transform = null;
+                    this.removeCompOfInit(this.components[i]);
                     this.components.splice(i, 1);
-                    comp.remove();
-                    comp.transform = null;
                     break;
                 }
             }
 
               
             delete this.componentTypes[typeName];
+        }
+
+        private removeCompOfInit(cComp: C2DComponent){
+            let comp = cComp.comp;
+            if(cComp.init){
+                if (comp == this.renderer) this.renderer = null;
+                if (comp == (this.collider as any)) this.collider = null;
+                if (comp == (this.physicsBody as any)) this.physicsBody = null;
+                comp.remove();
+            }else{
+                let i = this.componentsInit.indexOf(cComp);
+                if(i != -1) this.componentsInit.splice(i, 1);
+            }
+            comp.transform = null;
         }
 
         /**
@@ -1040,11 +1065,14 @@ namespace gd3d.framework {
                 return;
             for (var i = 0; i < this.components.length; i++) {
                 if (reflect.getClassName(this.components[i].comp) == type) {
+                    this.removeCompOfInit(this.components[i]);
                     var p = this.components.splice(i, 1);
-                    if (p[0].comp == this.renderer) this.renderer = null;
-                    if (p[0].comp == (this.collider as any)) this.collider = null;
-                    if (p[0].comp == (this.physicsBody as any)) this.physicsBody = null;
-                    p[0].comp.remove();
+                    this.removeCompOfInit(this.components[i]);
+                    // if (p[0].comp == this.renderer) this.renderer = null;
+                    // if (p[0].comp == (this.collider as any)) this.collider = null;
+                    // if (p[0].comp == (this.physicsBody as any)) this.physicsBody = null;
+                    // p[0].comp.remove();
+                    // p[0].comp.transform = null;
                     return p[0];
                 }
             }

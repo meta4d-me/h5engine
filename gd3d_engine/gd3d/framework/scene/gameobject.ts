@@ -583,7 +583,12 @@ namespace gd3d.framework
          */
         removeComponent(comp: INodeComponent)
         {
-            let type = reflect.getClassName(comp);
+            if(!comp) return;
+            // let type = reflect.getClassName(comp); //组件继承时remove fial
+            let constructor = Object.getPrototypeOf(comp).constructor;
+            if(!constructor) return;
+            let type = constructor.name;
+
             if (this.componentTypes[type])
                 return;
             delete this.components[type];
@@ -594,10 +599,10 @@ namespace gd3d.framework
                 {
                     if (this.components[i].init)
                     {//已经初始化过
-                        this.components[i].comp.remove();
-                        this.components[i].comp.gameObject = null;
+                        comp.remove();
+                        comp.gameObject = null;
                     }
-                    this.remove(this.components[i].comp);
+                    this.remove(comp);
                     this.components.splice(i, 1);
                     break;
                 }
