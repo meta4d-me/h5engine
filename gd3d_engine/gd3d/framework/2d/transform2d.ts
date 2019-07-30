@@ -938,19 +938,9 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         addComponent(type: string): I2DComponent {
-            if(this.componentTypes[type])
-                throw new Error("已经有一个" + type + "的组件了，不能俩"); 
-            // for (var key in this.components) {
-            //     var st = this.components[key]["comp"]["constructor"]["name"];
-            //     if (st == type) {
-            //         throw new Error("已经有一个" + type + "的组件了，不能俩");
-            //     }
-            // }
-            var pp = gd3d.reflect.getPrototype(type);
-            if(!pp)
-                return;
-            var comp = gd3d.reflect.createInstance(pp, { "2dcomp": "1" });
-            this.componentTypes[type] = true;
+            let pp = gd3d.reflect.getPrototype(type);
+            if(!pp) throw new Error(`get null of ${type} to getPrototype`);
+            let comp = gd3d.reflect.createInstance(pp, { "2dcomp": "1" });
             return this.addComponentDirect(comp);
         }
 
@@ -963,10 +953,16 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         addComponentDirect(comp: I2DComponent): I2DComponent {
+            if(!comp) throw new Error("this component is null");
             if (comp.transform != null) {
                 throw new Error("this components has added to a  gameObject");
             }
             comp.transform = this;
+            let typeStr = getClassName(comp);
+            if(this.componentTypes[typeStr]){
+                throw new Error("已经有一个" + typeStr + "的组件了，不能俩"); 
+            }
+
             if (this.components == null)
                 this.components = [];
             let _comp: C2DComponent = new C2DComponent(comp, false);
@@ -998,6 +994,8 @@ namespace gd3d.framework {
                     throw new Error("已经有一个碰撞组件了，不能俩");
                 }
             }
+
+            this.componentTypes[typeStr] = true;
             return comp;
         }
 
@@ -1012,43 +1010,32 @@ namespace gd3d.framework {
         removeComponent(comp: I2DComponent) {
             if (!comp) return;
             // let typeName =  reflect.getClassName(comp); //组件继承时remove fial
-            let constructor = Object.getPrototypeOf(comp).constructor;
-            if(!constructor) return;
-            let typeName = constructor.name;
+            let typeName = getClassName(comp);
 
             if(!this.componentTypes[typeName])
                 return;
+            delete this.componentTypes[typeName];
             for (var i = 0; i < this.components.length; i++) {
                 if (this.components[i].comp == comp) {                    
-                    // if(this.components[i].init){
-                    //     if (comp == this.renderer) this.renderer = null;
-                    //     if (comp == (this.collider as any)) this.collider = null;
-                    //     if (comp == (this.physicsBody as any)) this.physicsBody = null;
-                    // }
-                    
-                    // comp.remove();
-                    // comp.transform = null;
-                    this.removeCompOfInit(this.components[i]);
+                    this.clearOfCompRemove(this.components[i]);
                     this.components.splice(i, 1);
                     break;
                 }
             }
-
-              
-            delete this.componentTypes[typeName];
         }
 
-        private removeCompOfInit(cComp: C2DComponent){
+        private clearOfCompRemove(cComp: C2DComponent){
             let comp = cComp.comp;
             if(cComp.init){
-                if (comp == this.renderer) this.renderer = null;
-                if (comp == (this.collider as any)) this.collider = null;
-                if (comp == (this.physicsBody as any)) this.physicsBody = null;
                 comp.remove();
             }else{
                 let i = this.componentsInit.indexOf(cComp);
                 if(i != -1) this.componentsInit.splice(i, 1);
             }
+
+            if (comp == this.renderer) this.renderer = null;
+            if (comp == (this.collider as any)) this.collider = null;
+            if (comp == (this.physicsBody as any)) this.physicsBody = null;
             comp.transform = null;
         }
 
@@ -1062,21 +1049,15 @@ namespace gd3d.framework {
          */
         removeComponentByTypeName(type: string) {
             if(!this.componentTypes[type])
-                return;
+            return;
+            delete this.componentTypes[type];
             for (var i = 0; i < this.components.length; i++) {
                 if (reflect.getClassName(this.components[i].comp) == type) {
-                    this.removeCompOfInit(this.components[i]);
+                    this.clearOfCompRemove(this.components[i]);
                     var p = this.components.splice(i, 1);
-                    this.removeCompOfInit(this.components[i]);
-                    // if (p[0].comp == this.renderer) this.renderer = null;
-                    // if (p[0].comp == (this.collider as any)) this.collider = null;
-                    // if (p[0].comp == (this.physicsBody as any)) this.physicsBody = null;
-                    // p[0].comp.remove();
-                    // p[0].comp.transform = null;
                     return p[0];
                 }
             }
-            delete this.componentTypes[type];
         }
 
         /**
@@ -1111,9 +1092,11 @@ namespace gd3d.framework {
          */
         getComponent(type: string): I2DComponent {
             for (var i = 0; i < this.components.length; i++) {
-                var cname = gd3d.reflect.getClassName(this.components[i].comp["__proto__"]);
+                let comp = this.components[i].comp;
+                let cname = getClassName(comp);
+                // var cname = gd3d.reflect.getClassName(this.components[i].comp["__proto__"]);
                 if (cname == type) {
-                    return this.components[i].comp;
+                    return comp;
                 }
             }
             return null;
@@ -1157,15 +1140,19 @@ namespace gd3d.framework {
          * @param comps 
          */
         private getNodeCompoents(node: transform2D, _type: string, comps: I2DComponent[]) {
-            for (var i in node.components) {
-                var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
+            let len = node.components.length;
+            for(let i = 0; i < len ;i++){
+                let comp = node.components[i].comp;
+                let cname = getClassName(comp);
+                // var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
                 if (cname == _type) {
-                    comps.push(node.components[i].comp);
+                    comps.push(comp);
                 }
             }
             if (node._children != null) {
-                for (var i in node._children) {
-                    this.getNodeCompoents(node._children[i], _type, comps);
+                let len_1 = node._children.length;
+                for(let j = 0; j < len_1 ;j++){
+                    this.getNodeCompoents(node._children[j], _type, comps);
                 }
             }
         }
@@ -1181,18 +1168,22 @@ namespace gd3d.framework {
         /**
          * 获取节点的第一个组件
          * @param node 
-         * @param _type 
+         * @param type 
          */
-        private getNodeFirstComponent(node: transform2D, _type: string){
-            for (var i in node.components) {
-                var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
-                if (cname == _type) {
-                    return node.components[i].comp;
+        private getNodeFirstComponent(node: transform2D, type: string){
+            let len = node.components.length;
+            for(let i = 0; i < len ;i++){
+                let comp = node.components[i].comp;
+                let cname = getClassName(comp);
+                // var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
+                if (cname == type) {
+                    return comp;
                 }
             }
             if (node._children != null){
-                for (var i in node._children) {
-                    let result = node.getNodeFirstComponent(node._children[i], _type);
+                let len_1 = node._children.length;
+                for(let j = 0; j < len_1 ;j++){
+                    let result = node.getNodeFirstComponent(node._children[j], type);
                     if(result) return result;
                 }
             }

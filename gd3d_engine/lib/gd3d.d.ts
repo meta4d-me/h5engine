@@ -647,7 +647,7 @@ declare namespace gd3d.framework {
         addComponent(type: string): I2DComponent;
         addComponentDirect(comp: I2DComponent): I2DComponent;
         removeComponent(comp: I2DComponent): void;
-        private removeCompOfInit;
+        private clearOfCompRemove;
         removeComponentByTypeName(type: string): C2DComponent;
         removeAllComponents(): void;
         getComponent(type: string): I2DComponent;
@@ -2367,7 +2367,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess;
         private readFinish;
-        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<{}>;
+        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<unknown>;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
         private _cacheMinP;
@@ -6001,9 +6001,9 @@ declare namespace gd3d.framework {
         getComponentInParent(type: string): INodeComponent;
         addComponent(type: string): INodeComponent;
         removeComponent(comp: INodeComponent): void;
-        private remove;
-        removeComponentByTypeName(type: string): void;
+        removeComponentByTypeName(type: string): INodeComponent;
         removeAllComponents(): void;
+        private clearOfCompRemove;
         dispose(): void;
     }
 }
@@ -6525,6 +6525,7 @@ declare namespace gd3d.framework {
         Label = 2,
         Button = 3
     }
+    function getClassName(obj: Object): any;
     class TransformUtil {
         static CreatePrimitive(type: PrimitiveType, app: application): transform;
         static Create2DPrimitive(type: Primitive2DType, app: application): transform2D;

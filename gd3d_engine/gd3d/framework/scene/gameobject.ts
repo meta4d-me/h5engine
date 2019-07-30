@@ -345,12 +345,20 @@ namespace gd3d.framework
          */
         addComponentDirect(comp: INodeComponent): INodeComponent
         {
+            if(!comp) throw new Error("this component is null");
             this.transform.markHaveComponent();
             if (comp.gameObject != null)
             {
                 throw new Error("this components has added to a  gameObject");
             }
             comp.gameObject = this;
+
+            let typeStr = getClassName(comp);
+            if(this.componentTypes[typeStr]){
+                throw new Error("已经有一个" + typeStr + "的组件了，不能俩"); 
+            }
+            
+
             // if (this.components == null)
             //     this.components = [];
 
@@ -429,6 +437,7 @@ namespace gd3d.framework
                     sceneMgr.app.markNotify(this.transform, NotifyType.AddCanvasRender);
             }
             this.haveComponet = true;
+            this.componentTypes[typeStr] = true;
             return comp;
         }
         /**
@@ -443,10 +452,12 @@ namespace gd3d.framework
         {
             for (var i = 0; i < this.components.length; i++)
             {
-                var cname = gd3d.reflect.getClassName(this.components[i].comp["__proto__"]);
+                // var cname = gd3d.reflect.getClassName(this.components[i].comp["__proto__"]);
+                let comp = this.components[i].comp;
+                let cname = getClassName(comp);
                 if (cname == type)
                 {
-                    return this.components[i].comp;
+                    return comp;
                 }
             }
             return null;
@@ -484,18 +495,24 @@ namespace gd3d.framework
 
         private _getComponentsInChildren(type: string, obj: gameObject, array: INodeComponent[])
         {
-            for (var i = 0; i < obj.components.length; i++)
+            let len = obj.components.length;
+            for(let i = 0; i < len ;i++)
             {
-                var cname = gd3d.reflect.getClassName(obj.components[i].comp["__proto__"]);
+                let comp = obj.components[i].comp;
+                let cname = getClassName(comp);
                 if (cname == type)
                 {
-                    array.push(obj.components[i].comp);
+                    array.push(comp);
                 }
             }
-            for (let i = 0; obj.transform.children != undefined && i < obj.transform.children.length; i++)
-            {
-                let _obj = obj.transform.children[i].gameObject;
-                this._getComponentsInChildren(type, _obj, array);
+            let children = obj.transform.children;
+            if(children != null){
+                let len = children.length;
+                for (let i = 0; i < len; i++)
+                {
+                    let _obj = children[i].gameObject;
+                    this._getComponentsInChildren(type, _obj, array);
+                }
             }
         }
 
@@ -513,22 +530,26 @@ namespace gd3d.framework
          * @param node 
          * @param _type 
          */
-        private getNodeFirstComponent(node: gameObject, _type: string)
+        private getNodeFirstComponent(node: gameObject, type: string)
         {
-            for (var i in node.components)
+            let len = node.components.length;
+            // for (var i in node.components)
+            for(let i =0 ;i < len ;i++)
             {
-                var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
-                if (cname == _type)
+                let comp = node.components[i].comp;
+                let cname = getClassName(comp);
+                if (cname == type)
                 {
-                    return node.components[i].comp;
+                    return comp;
                 }
             }
             let children = node.transform.children;
             if (children != null)
             {
-                for (var i in children)
+                let len_1 = children.length;
+                for (let j = 0; j < len_1; j++)
                 {
-                    let result = node.getNodeFirstComponent(children[i].gameObject, _type);
+                    let result = node.getNodeFirstComponent(children[j].gameObject, type);
                     if (result) return result;
                 }
             }
@@ -563,14 +584,13 @@ namespace gd3d.framework
          */
         addComponent(type: string): INodeComponent
         {
-            // if (this.components == null)
-            //     this.components = [];
-            if (this.componentTypes[type])
-                throw new Error("已经有一个" + type + "的组件了，不能俩");
+            // if (this.componentTypes[type])
+            //     throw new Error("已经有一个" + type + "的组件了，不能俩");
 
             var pp = gd3d.reflect.getPrototype(type);
+            if(!pp) throw new Error(`get null of ${type} to getPrototype`);
             var comp = gd3d.reflect.createInstance(pp, { "nodecomp": "1" });
-            this.componentTypes[type] = true;
+            // this.componentTypes[type] = true;
             return this.addComponentDirect(comp);
         }
         /**
@@ -591,18 +611,19 @@ namespace gd3d.framework
 
             if (this.componentTypes[type])
                 return;
-            delete this.components[type];
+            delete this.componentTypes[type];
             var i = 0, len = this.components.length;
             while (i < len)
             {
                 if (this.components[i].comp == comp)
                 {
-                    if (this.components[i].init)
-                    {//已经初始化过
-                        comp.remove();
-                        comp.gameObject = null;
-                    }
-                    this.remove(comp);
+                    // if (this.components[i].init)
+                    // {//已经初始化过
+                    //     comp.remove();
+                    //     comp.gameObject = null;
+                    // }
+                    // this.remove(comp);
+                    this.clearOfCompRemove(this.components[i]);
                     this.components.splice(i, 1);
                     break;
                 }
@@ -610,27 +631,6 @@ namespace gd3d.framework
             }
             if (len < 1)
                 this.haveComponet = false;
-
-        }
-
-        private remove(comp: INodeComponent)
-        {
-            if (reflect.getClassTag(comp["__proto__"], "renderer") == "1")
-            {//这货是个渲染器
-                this.renderer = null;
-            }
-            if (reflect.getClassTag(comp["__proto__"], "camera") == "1")
-            {//这货是个摄像机
-                this.camera = null;
-            }
-            if (reflect.getClassTag(comp["__proto__"], "light") == "1")
-            {//这货是个light
-                this.light = null;
-            }
-            if (reflect.getClassTag(comp["__proto__"], "boxcollider") == "1" || reflect.getClassTag(comp["__proto__"], "meshcollider") == "1" || reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1")
-            {//这货是个collider
-                this.collider = null;
-            }
         }
 
         /**
@@ -646,24 +646,31 @@ namespace gd3d.framework
             if (!this.componentTypes[type])
                 return;
             delete this.componentTypes[type];
+            let result : INodeComponent = null;
             var i = 0, len = this.components.length;
             while (i < len)
             {
                 if (reflect.getClassName(this.components[i].comp) == type)
                 {
-                    if (this.components[i].init)
-                    {//已经初始化过
-                        this.components[i].comp.remove();
-                        this.components[i].comp.gameObject = null;
-                    }
-                    this.remove(this.components[i].comp);
-                    this.components.splice(i, 1);
+                    // if (this.components[i].init)
+                    // {//已经初始化过
+                    //     this.components[i].comp.remove();
+                    //     this.components[i].comp.gameObject = null;
+                    // }
+                    // this.remove(this.components[i].comp);
+                    this.clearOfCompRemove(this.components[i]);
+                    let results = this.components.splice(i, 1);
+                    if(results[0].comp) 
+                        result = results[0].comp;
+
                     break;
                 }
                 ++i;
             }
             if (len < 1)
                 this.haveComponet = false;
+
+            return result;
         }
 
 
@@ -681,24 +688,37 @@ namespace gd3d.framework
             let len = this.components.length;
             for (var i = 0; i < len; i++)
             {
-                // if (this.components[i].init)
-                {//已经初始化过
-                    this.components[i].comp.remove();
-                    this.components[i].comp.gameObject = null;
-                }
-                this.remove(this.components[i].comp);
+                let comp = this.components[i].comp; 
+                comp.remove();
+                comp.gameObject = null;
             }
 
-            if (this.camera) this.camera = null;
-            if (this.renderer) this.renderer = null;
-            if (this.light) this.light = null;
-            if (this.collider) this.collider = null;
+            this.camera = null;
+            this.renderer = null;
+            this.light = null;
+            this.collider = null;
 
             this.components.length = 0;
             this.componentTypes = {};
             this.haveComponet = false;
-
         }
+
+        private clearOfCompRemove(cComp: nodeComponent){
+            let comp = cComp.comp;
+            if(cComp.init){
+                comp.remove();
+            }else{
+                let i = this.componentsInit.indexOf(cComp);
+                if(i != -1) this.componentsInit.splice(i, 1);
+            }
+
+            if (comp == this.camera ) this.camera = null;
+            if (comp == this.renderer) this.renderer = null;
+            if (comp == this.light ) this.light = null;
+            if (comp == (this.collider as any)) this.collider = null;
+            comp.gameObject = null;
+        }
+
         /**
          * @public
          * @language zh_CN
