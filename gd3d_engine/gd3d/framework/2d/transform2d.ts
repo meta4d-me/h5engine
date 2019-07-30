@@ -995,7 +995,10 @@ namespace gd3d.framework {
                 }
             }
 
-            this.componentTypes[typeStr] = true;
+            if(comp.update.toString().length < 35)
+                comp.update =undefined;//update空转
+
+			this.componentTypes[typeStr] = true;
             return comp;
         }
 

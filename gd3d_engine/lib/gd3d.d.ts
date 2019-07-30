@@ -2877,7 +2877,7 @@ declare namespace gd3d.framework {
         _targetAndViewport(target: render.glRenderTarget, scene: scene, context: renderContext, withoutClear: boolean): void;
         _renderOnce(scene: scene, context: renderContext, drawtype: string): void;
         postQueues: ICameraPostQueue[];
-        renderScene(scene: scene, context: renderContext): void;
+        renderScene(scene: scene, context: renderContext, contextIdx: number): void;
         remove(): void;
         clone(): void;
     }

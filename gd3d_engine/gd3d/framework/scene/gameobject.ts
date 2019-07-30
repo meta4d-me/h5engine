@@ -81,7 +81,7 @@ namespace gd3d.framework
         /**
          * onPlay是否调用过了
          */
-        OnPlayed : boolean = false;
+        OnPlayed: boolean = false;
 
         constructor(comp: INodeComponent, init: boolean = false)
         {
@@ -291,8 +291,9 @@ namespace gd3d.framework
                     let c = this.componentsInit[i];
                     c.comp.start();
                     c.init = true;
-                    if (bePlay){
-                        if((StringUtil.ENABLED in c.comp) && !c.comp[StringUtil.ENABLED]) continue;  //组件enable影响
+                    if (bePlay)
+                    {
+                        if ((StringUtil.ENABLED in c.comp) && !c.comp[StringUtil.ENABLED]) continue;  //组件enable影响
                         c.comp.onPlay();
                         c.OnPlayed = true;
                     }
@@ -326,13 +327,16 @@ namespace gd3d.framework
             for (var i = 0; i < len; i++)
             {
                 let c = this.components[i];
-                if (!c ) continue;
-                if(StringUtil.ENABLED in c.comp && !c.comp[StringUtil.ENABLED]) continue;
-                if(!c.OnPlayed){
+                if (!c) continue;
+                if (StringUtil.ENABLED in c.comp && !c.comp[StringUtil.ENABLED]) continue;
+                if (!c.OnPlayed)
+                {
                     c.comp.onPlay();
                     c.OnPlayed = true;
                 }
-                c.comp.update(delta);
+                if (c.comp.update)                
+                    c.comp.update(delta);
+                
             }
         }
         /**
@@ -425,7 +429,11 @@ namespace gd3d.framework
                     //throw new Error("已经有一个碰撞盒的组件了，不能俩");
                 }
             }
-
+            if (comp.update.toString().length < 35)
+            {
+                //update 空转
+                comp.update = undefined;                
+            }
 
             if (add)
             {
@@ -435,8 +443,9 @@ namespace gd3d.framework
                     sceneMgr.app.markNotify(this.transform, NotifyType.AddCamera);
                 if (reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1")
                     sceneMgr.app.markNotify(this.transform, NotifyType.AddCanvasRender);
+                this.haveComponet = true;
             }
-            this.haveComponet = true;
+
             this.componentTypes[typeStr] = true;
             return comp;
         }
@@ -684,7 +693,7 @@ namespace gd3d.framework
         removeAllComponents()
         {
             this.componentsInit.length = 0;
-            
+
             let len = this.components.length;
             for (var i = 0; i < len; i++)
             {

@@ -72,18 +72,20 @@ namespace gd3d.framework
             return this.webgl.canvas.width;
             // return this.webgl.canvas.getBoundingClientRect().width;
         }
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 绘制区域高度 像素单位
-         * @version gd3d 1.0
-         */
+        
+        // /**
+        //  * @public
+        //  * @language zh_CN
+        //  * @classdesc
+        //  * 绘制区域高度 像素单位
+        //  * @version gd3d 1.0
+        //  */
         get height()
         {
             return this.webgl.canvas.height;
             // return this.webgl.canvas.getBoundingClientRect().height;
         }
+        
         limitFrame: boolean = true;
         notify: INotify;
         private _timeScale: number;
@@ -245,7 +247,7 @@ namespace gd3d.framework
         {
             this.ccWidth = this.ccWidth == undefined ? canvas.clientWidth : this.ccWidth;
             this.ccHeight = this.ccHeight == undefined ? canvas.clientHeight : this.ccHeight;
-
+            
             this._timeScale = 1;
             sceneMgr.app = this;
             let tempWebGlUtil = new WebGLUtils();
@@ -450,8 +452,8 @@ namespace gd3d.framework
                     this.updateUserCode(delta);
                 }
             }
-            
-            if(this.updateEditorCode)
+
+            if (this.updateEditorCode)
                 this.updateEditorCode(delta);
 
             if (this._scene != null)
@@ -757,7 +759,7 @@ namespace gd3d.framework
             {
                 var c = this._userCodeNew.pop();//this._userCodeNew[i];
                 if (c.isClosed() == false)
-                {                   
+                {
                     c.onStart(this);
                     this._userCode.push(c);
                 }
@@ -766,7 +768,7 @@ namespace gd3d.framework
             for (let i = 0, len = this._userCode.length; i < len; ++i)
             {
                 c = this._userCode[i];
-                if (c.isClosed() == false)
+                if (c.isClosed() == false && c.onUpdate)
                 {
                     c.onUpdate(delta);
                 } else
@@ -854,6 +856,8 @@ namespace gd3d.framework
          */
         addUserCodeDirect(program: IUserCode)
         {
+            if (program.onUpdate.toString().length < 35)
+                program.onUpdate = undefined;
             this._userCodeNew.push(program);
         }
         /**
