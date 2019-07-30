@@ -68,6 +68,20 @@ var gd3d;
                 this.lastHeight = 0;
                 this.OffOrientationUpdate = false;
             }
+            Object.defineProperty(application.prototype, "width", {
+                get: function () {
+                    return this.webgl.canvas.width;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(application.prototype, "height", {
+                get: function () {
+                    return this.webgl.canvas.height;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(application.prototype, "timeScale", {
                 get: function () {
                     return this._timeScale;
@@ -166,9 +180,6 @@ var gd3d;
                 if (webglDebug === void 0) { webglDebug = false; }
                 this.ccWidth = this.ccWidth == undefined ? canvas.clientWidth : this.ccWidth;
                 this.ccHeight = this.ccHeight == undefined ? canvas.clientHeight : this.ccHeight;
-                var rect = canvas.getBoundingClientRect();
-                this.width = rect.width;
-                this.height = rect.height;
                 this._timeScale = 1;
                 framework.sceneMgr.app = this;
                 var tempWebGlUtil = new framework.WebGLUtils();

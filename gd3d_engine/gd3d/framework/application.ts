@@ -67,12 +67,12 @@ namespace gd3d.framework
          * 绘制区域宽度 像素单位
          * @version gd3d 1.0
          */
-        // get width()
-        // {
-        //     return this.webgl.canvas.width;
-        //     // return this.webgl.canvas.getBoundingClientRect().width;
-        // }
-        width: number;
+        get width()
+        {
+            return this.webgl.canvas.width;
+            // return this.webgl.canvas.getBoundingClientRect().width;
+        }
+        
         // /**
         //  * @public
         //  * @language zh_CN
@@ -80,12 +80,12 @@ namespace gd3d.framework
         //  * 绘制区域高度 像素单位
         //  * @version gd3d 1.0
         //  */
-        // get height()
-        // {
-        //     return this.webgl.canvas.height;
-        //     // return this.webgl.canvas.getBoundingClientRect().height;
-        // }
-        height: number;
+        get height()
+        {
+            return this.webgl.canvas.height;
+            // return this.webgl.canvas.getBoundingClientRect().height;
+        }
+        
         limitFrame: boolean = true;
         notify: INotify;
         private _timeScale: number;
@@ -247,9 +247,7 @@ namespace gd3d.framework
         {
             this.ccWidth = this.ccWidth == undefined ? canvas.clientWidth : this.ccWidth;
             this.ccHeight = this.ccHeight == undefined ? canvas.clientHeight : this.ccHeight;
-            let rect = canvas.getBoundingClientRect();
-            this.width = rect.width;
-            this.height = rect.height;
+            
             this._timeScale = 1;
             sceneMgr.app = this;
             let tempWebGlUtil = new WebGLUtils();

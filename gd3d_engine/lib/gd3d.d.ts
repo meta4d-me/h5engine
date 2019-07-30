@@ -21,8 +21,8 @@ declare namespace gd3d.framework {
         container: HTMLDivElement;
         outcontainer: HTMLDivElement;
         edModel: boolean;
-        width: number;
-        height: number;
+        readonly width: number;
+        readonly height: number;
         limitFrame: boolean;
         notify: INotify;
         private _timeScale;
