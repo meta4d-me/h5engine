@@ -178,6 +178,7 @@ namespace gd3d.framework
         private componentsInit: nodeComponent[] = [];
         // private componentsPlayed: nodeComponent[] = [];
         haveComponet: boolean = false;
+        needInit:boolean = false;
         /**
          * @public
          * @language zh_CN
@@ -297,20 +298,10 @@ namespace gd3d.framework
                         c.comp.onPlay();
                         c.OnPlayed = true;
                     }
-                    // else
-                    //     this.componentsPlayed.push(this.componentsInit[i]);
                 }
                 this.componentsInit.length = 0;
-            }
-
-            // if (this.componentsPlayed.length > 0 && bePlay)
-            // {
-            //     this.componentsPlayed.forEach(item =>
-            //     {
-            //         item.comp.onPlay();
-            //     });
-            //     this.componentsPlayed.length = 0;
-            // }
+                this.needInit = false;
+            }         
         }
 
         /**
@@ -434,8 +425,8 @@ namespace gd3d.framework
                 if (reflect.getClassTag(comp["__proto__"], "camera") == "1")
                     sceneMgr.app.markNotify(this.transform, NotifyType.AddCamera);
                 if (reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1")
-                    sceneMgr.app.markNotify(this.transform, NotifyType.AddCanvasRender);
-                this.haveComponet = true;
+                    sceneMgr.app.markNotify(this.transform, NotifyType.AddCanvasRender);                
+                this.needInit = this.haveComponet = true;
             }
 
             return comp;
