@@ -125,7 +125,7 @@ namespace gd3d.framework {
 
         private _bodyLocalMtx : math.matrix3x2;
         private _bodyWorldMtx : math.matrix3x2;
-        private enableBT : boolean = false; 
+        private enableBT : boolean = false;
 
         // beStatic:boolean=false;
         transform: transform2D;
@@ -262,7 +262,20 @@ namespace gd3d.framework {
          * @param pos 位置vec2
          */
         setPosition(pos: math.Ivec2) {
-            this.physicsEngine.setPosition(this.body, pos);
+            // this.physicsEngine.setPosition(this.body, pos);
+            if(this.enableBT){
+                let trans = this.transform;
+                trans.localTranslate.x = pos.x;
+                trans.localTranslate.y = pos.y;
+                trans.markDirty();
+            }else{
+                this.setPositionByPhy(pos);
+            }
+        }
+
+        //通过 物理设置角度
+        private setPositionByPhy(pos: math.Ivec2){
+            this._physicsEngine.setPosition(this.body , pos);
         }
 
         /**
@@ -270,6 +283,17 @@ namespace gd3d.framework {
          * @param angle
          */
         setAngle(angle:number){
+            if(this.enableBT){
+                let trans = this.transform;
+                trans.localRotate = angle;
+                trans.markDirty();
+            }else{
+                this.setAngleByPhy(angle);
+            }
+        }
+
+        //通过 物理设置角度
+        private setAngleByPhy(angle:number){
             this._physicsEngine.setAngle(this.body,angle);
         }
 
@@ -391,8 +415,8 @@ namespace gd3d.framework {
                 mAngle = tran.localRotate;
             }
 
-            this.setPosition( mPos );
-            this.setAngle( mAngle );
+            this.setPositionByPhy( mPos );
+            this.setAngleByPhy( mAngle );
             
             //记录 before数据
             let bPos = this.body.position;

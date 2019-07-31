@@ -34,6 +34,17 @@ namespace gd3d.framework
     }
 
     /**
+     * 获取实例对象的类名字符串
+     * @param obj 对象实例
+     */
+    export function getClassName(obj:Object){
+        if(!obj) return "";
+        let constructor = Object.getPrototypeOf(obj).constructor;
+        if(!constructor) return "";
+        return constructor.name;
+    }
+
+    /**
      * @public
      * @language zh_CN
      * @classdesc
