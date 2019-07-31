@@ -181,7 +181,8 @@ namespace gd3d.framework
             if (this.onLateUpdate)
                 this.onLateUpdate(delta);
 
-            if(physics2D && physics2D.engineRunner){
+            if (physics2D && physics2D.engineRunner)
+            {
                 physics2D.engineRunner.tick();
             }
 
@@ -408,7 +409,8 @@ namespace gd3d.framework
             {
                 if (!(node.hasComponent == false && node.hasComponentChild == false))
                 {
-                    node.gameObject.init(this.app.bePlay);//组件还未初始化的初始化
+                    if (node.gameObject.needInit)
+                        node.gameObject.init(this.app.bePlay);//组件还未初始化的初始化
                     if (node.gameObject.haveComponet)
                     {
                         node.gameObject.update(delta);
