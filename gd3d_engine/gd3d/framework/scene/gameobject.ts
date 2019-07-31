@@ -618,7 +618,7 @@ namespace gd3d.framework
             if(!constructor) return;
             let type = constructor.name;
 
-            if (this.componentTypes[type])
+            if (!this.componentTypes[type])
                 return;
             delete this.componentTypes[type];
             var i = 0, len = this.components.length;
