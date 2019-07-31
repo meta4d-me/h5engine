@@ -183,7 +183,7 @@ namespace gd3d.framework
 
             if (physics2D && physics2D.engineRunner)
             {
-                physics2D.engineRunner.tick();
+                physics2D.engineRunner.tick(delta);
             }
 
             if (physics)
@@ -758,7 +758,8 @@ namespace gd3d.framework
                 return true;
             } catch (e)
             {
-                console.error(e.message);
+                // console.error(e.message);
+                throw e;
                 return false;
             }
 
@@ -778,7 +779,8 @@ namespace gd3d.framework
                 return true;
             } catch (e)
             {
-                console.error(e.message);
+                // console.error(e.message);
+                throw e;
                 return false;
             }
         }

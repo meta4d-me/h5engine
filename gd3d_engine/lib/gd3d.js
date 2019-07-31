@@ -7457,27 +7457,26 @@ var gd3d;
                 if (op === void 0) { op = null; }
                 this.eventer = new gd3d.event.Physic2dEvent();
                 this._bodysObjMap = {};
+                op = op || {};
                 if (Matter == undefined) {
                     console.error(" Matter not found , create physicEngine2D fail");
                     return;
                 }
                 this._Matter = Matter;
-                if (op != null) {
-                    this.matterEngine = Matter.Engine.create(op);
-                }
-                else {
-                    this.matterEngine = Matter.Engine.create();
-                }
+                this.matterEngine = Matter.Engine.create(op);
                 this.engineWorld = this.matterEngine.world;
                 var engine = this.matterEngine;
-                var runner = Matter.Runner.create();
+                var runnerOp = { fps: op.runnerFps || 60, isFixed: op.runnerIsFixed == true };
+                var runner = Matter.Runner.create(runnerOp);
                 var modeSceneCtr = true;
                 if (modeSceneCtr) {
                     this.engineRunner = runner;
-                    var getNow_1 = Matter.Common.now;
-                    this.engineRunner.tick = function () {
+                    var dt = 1 / runner.fps;
+                    runner.deltaMin = dt;
+                    runner.deltaMax = dt * 3;
+                    this.engineRunner.tick = function (delta) {
                         _this.beforeStep();
-                        Matter.Runner.tick(runner, engine, getNow_1);
+                        _this.RunnerTick(runner, engine, delta);
                         _this.afterStep();
                     };
                 }
@@ -7496,6 +7495,42 @@ var gd3d;
                 configurable: true
             });
             ;
+            physicEngine2D.prototype.RunnerTick = function (runner, engine, delta) {
+                var Events = Matter.Events;
+                var Engine = Matter.Engine;
+                var timing = engine.timing;
+                var correction = 1;
+                var event = {
+                    timestamp: timing.timestamp
+                };
+                Events.trigger(runner, 'beforeTick', event);
+                Events.trigger(engine, 'beforeTick', event);
+                if (runner.isFixed) {
+                    delta = runner.delta;
+                }
+                else {
+                    runner.deltaHistory.push(delta);
+                    runner.deltaHistory = runner.deltaHistory.slice(-runner.deltaSampleSize);
+                    delta = Math.min.apply(null, runner.deltaHistory);
+                    delta = delta < runner.deltaMin ? runner.deltaMin : delta;
+                    delta = delta > runner.deltaMax ? runner.deltaMax : delta;
+                    correction = delta / runner.delta;
+                    runner.delta = delta;
+                }
+                if (runner.timeScalePrev !== 0)
+                    correction *= timing.timeScale / runner.timeScalePrev;
+                if (timing.timeScale === 0)
+                    correction = 0;
+                runner.timeScalePrev = timing.timeScale;
+                runner.correction = correction;
+                Events.trigger(runner, 'tick', event);
+                Events.trigger(engine, 'tick', event);
+                Events.trigger(runner, 'beforeUpdate', event);
+                Engine.update(engine, delta * 1000, correction);
+                Events.trigger(runner, 'afterUpdate', event);
+                Events.trigger(runner, 'afterTick', event);
+                Events.trigger(engine, 'afterTick', event);
+            };
             physicEngine2D.prototype.beforeStep = function () {
                 var omap = this._bodysObjMap;
                 for (var key in omap) {
@@ -31889,6 +31924,7 @@ var gd3d;
                 this.componentTypes = {};
                 this.componentsInit = [];
                 this.haveComponet = false;
+                this.needInit = false;
                 this._visible = true;
             }
             gameObject.prototype.getScene = function () {
@@ -31938,6 +31974,7 @@ var gd3d;
                         }
                     }
                     this.componentsInit.length = 0;
+                    this.needInit = false;
                 }
             };
             gameObject.prototype.update = function (delta) {
@@ -32018,7 +32055,7 @@ var gd3d;
                         framework.sceneMgr.app.markNotify(this.transform, framework.NotifyType.AddCamera);
                     if (gd3d.reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1")
                         framework.sceneMgr.app.markNotify(this.transform, framework.NotifyType.AddCanvasRender);
-                    this.haveComponet = true;
+                    this.needInit = this.haveComponet = true;
                 }
                 this.componentTypes[typeStr] = true;
                 return comp;
@@ -32454,7 +32491,7 @@ var gd3d;
                 if (this.onLateUpdate)
                     this.onLateUpdate(delta);
                 if (framework.physics2D && framework.physics2D.engineRunner) {
-                    framework.physics2D.engineRunner.tick();
+                    framework.physics2D.engineRunner.tick(delta);
                 }
                 if (framework.physics) {
                     framework.physics._step(delta);
@@ -32591,7 +32628,8 @@ var gd3d;
                 var queue = [];
                 while (node) {
                     if (!(node.hasComponent == false && node.hasComponentChild == false)) {
-                        node.gameObject.init(this.app.bePlay);
+                        if (node.gameObject.needInit)
+                            node.gameObject.init(this.app.bePlay);
                         if (node.gameObject.haveComponet) {
                             node.gameObject.update(delta);
                             this.collectCameraAndLight(node);
@@ -32778,7 +32816,7 @@ var gd3d;
                     return true;
                 }
                 catch (e) {
-                    console.error(e.message);
+                    throw e;
                     return false;
                 }
             };
@@ -32793,7 +32831,7 @@ var gd3d;
                     return true;
                 }
                 catch (e) {
-                    console.error(e.message);
+                    throw e;
                     return false;
                 }
             };
