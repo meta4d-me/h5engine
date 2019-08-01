@@ -7922,11 +7922,12 @@ var gd3d;
                     }
                 }
             };
-            assetBundle.prototype.unload = function () {
+            assetBundle.prototype.unload = function (disposeNow) {
+                if (disposeNow === void 0) { disposeNow = false; }
                 for (var key in this.mapNamed) {
                     var asset = this.assetmgr.getAssetByName(key, this.name);
                     if (asset) {
-                        this.assetmgr.unuse(asset);
+                        this.assetmgr.unuse(asset, disposeNow);
                     }
                 }
                 this.assetmgr.removeAssetBundle(this.name);
