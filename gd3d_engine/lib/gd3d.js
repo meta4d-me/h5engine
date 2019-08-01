@@ -7471,13 +7471,26 @@ var gd3d;
                 var modeSceneCtr = true;
                 if (modeSceneCtr) {
                     this.engineRunner = runner;
+                    var nowTime_1 = 0;
+                    var frameCounter_1 = 0;
+                    var counterTimestamp_1 = 0;
                     var dt = 1 / runner.fps;
-                    runner.deltaMin = dt;
-                    runner.deltaMax = dt * 3;
+                    runner.delta = dt;
+                    runner.deltaMin = dt * 0.5;
+                    runner.deltaMax = dt * 4;
                     this.engineRunner.tick = function (delta) {
                         _this.beforeStep();
                         _this.RunnerTick(runner, engine, delta);
                         _this.afterStep();
+                        if (!runnerOp.isFixed) {
+                            nowTime_1 += delta;
+                            frameCounter_1 += 1;
+                            if (nowTime_1 - counterTimestamp_1 >= 1) {
+                                runner.fps = frameCounter_1 * ((nowTime_1 - counterTimestamp_1));
+                                counterTimestamp_1 = nowTime_1;
+                                frameCounter_1 = 0;
+                            }
+                        }
                     };
                 }
                 else {

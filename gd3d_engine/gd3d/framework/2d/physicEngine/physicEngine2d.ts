@@ -67,9 +67,13 @@ namespace gd3d.framework {
             let modeSceneCtr = true;
             if(modeSceneCtr){
                 this.engineRunner = runner;
+                let nowTime = 0;
+                let frameCounter =0;
+                let counterTimestamp =0;
                 let dt = 1 / runner.fps;
-                runner.deltaMin =  dt;
-                runner.deltaMax =  dt * 3;
+                runner.delta = dt;
+                runner.deltaMin =  dt * 0.5;
+                runner.deltaMax =  dt * 4;
                 this.engineRunner.tick = (delta:number)=>{
                     //beforeStep
                     this.beforeStep();
@@ -77,6 +81,18 @@ namespace gd3d.framework {
                     this.RunnerTick(runner,engine,delta);
                     //aftereStep
                     this.afterStep();
+                    
+                    if(!runnerOp.isFixed){
+                        // fps counter
+                        nowTime += delta;
+                        frameCounter += 1;
+                        if (nowTime - counterTimestamp >= 1) {
+                            runner.fps = frameCounter * ((nowTime - counterTimestamp));
+                            // console.log(`fps : ${runner.fps} , delta: ${runner.delta}`);
+                            counterTimestamp = nowTime;
+                            frameCounter = 0;
+                        }
+                    }
                 }
             }else{
                 // Matter.Engine.run(this.matterEngine);
