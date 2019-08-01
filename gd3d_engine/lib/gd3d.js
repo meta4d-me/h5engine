@@ -8518,7 +8518,7 @@ var gd3d;
                 if (!this.mapRes[id])
                     return;
                 this.mapRes[id].refcount--;
-                if (disposeNow && this.mapRes[id].refcount <= 0) {
+                if (disposeNow || this.mapRes[id].refcount <= 0) {
                     this.mapRes[id].asset.dispose();
                     if (name != null) {
                         if (this.mapNamed[name].length <= 1) {
@@ -11224,9 +11224,9 @@ var gd3d;
             };
             atlas.prototype.dispose = function () {
                 for (var key in this.sprites) {
-                    this.sprites[key].unuse();
+                    this.sprites[key].unuse(true);
                 }
-                this.texture.unuse();
+                this.texture.unuse(true);
                 delete this.sprites;
             };
             atlas.prototype.caclByteLength = function () {

@@ -86,9 +86,9 @@
         {
             for (var key in this.sprites)
             {
-                this.sprites[key].unuse();
+                this.sprites[key].unuse(true);
             }
-            this.texture.unuse();
+            this.texture.unuse(true);
             delete this.sprites;
         }
         /**
