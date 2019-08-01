@@ -1279,6 +1279,8 @@ declare namespace gd3d.framework {
             bucketWidth: number;
             bucketHeight: number;
         };
+        runnerFps?: any;
+        runnerIsFixed?: any;
     }
     interface IWorld {
         gravity: {
@@ -1292,7 +1294,7 @@ declare namespace gd3d.framework {
         };
     }
     interface IRunner {
-        tick(): any;
+        tick(delta: number): any;
     }
     class physicEngine2D {
         private _Matter;
@@ -1303,6 +1305,7 @@ declare namespace gd3d.framework {
         private eventer;
         private _bodysObjMap;
         constructor(op?: IEngine2DOP);
+        private RunnerTick;
         private beforeStep;
         private afterStep;
         update(delta: number): void;
@@ -5981,6 +5984,7 @@ declare namespace gd3d.framework {
         };
         private componentsInit;
         haveComponet: boolean;
+        needInit: boolean;
         renderer: IRenderer;
         camera: camera;
         light: light;

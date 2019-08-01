@@ -181,8 +181,9 @@ namespace gd3d.framework
             if (this.onLateUpdate)
                 this.onLateUpdate(delta);
 
-            if(physics2D && physics2D.engineRunner){
-                physics2D.engineRunner.tick();
+            if (physics2D && physics2D.engineRunner)
+            {
+                physics2D.engineRunner.tick(delta);
             }
 
             if (physics)
@@ -408,7 +409,8 @@ namespace gd3d.framework
             {
                 if (!(node.hasComponent == false && node.hasComponentChild == false))
                 {
-                    node.gameObject.init(this.app.bePlay);//组件还未初始化的初始化
+                    if (node.gameObject.needInit)
+                        node.gameObject.init(this.app.bePlay);//组件还未初始化的初始化
                     if (node.gameObject.haveComponet)
                     {
                         node.gameObject.update(delta);
@@ -756,7 +758,8 @@ namespace gd3d.framework
                 return true;
             } catch (e)
             {
-                console.error(e.message);
+                // console.error(e.message);
+                throw e;
                 return false;
             }
 
@@ -776,7 +779,8 @@ namespace gd3d.framework
                 return true;
             } catch (e)
             {
-                console.error(e.message);
+                // console.error(e.message);
+                throw e;
                 return false;
             }
         }
