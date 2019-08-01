@@ -138,13 +138,14 @@ namespace gd3d.framework {
          * @language zh_CN
          * @classdesc
          * 卸载包 包内对应的资源引用计数减一
+         * @param disposeNow 如果引用计数归零则立即释放
          * @version gd3d 1.0
          */
-        unload() {
+        unload(disposeNow: boolean = false) {
             for (let key in this.mapNamed) {
                 let asset = this.assetmgr.getAssetByName(key, this.name);
                 if (asset) {
-                    this.assetmgr.unuse(asset);
+                    this.assetmgr.unuse(asset , disposeNow);
                 }
             }
             this.assetmgr.removeAssetBundle(this.name);
