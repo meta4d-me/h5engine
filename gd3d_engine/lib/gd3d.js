@@ -12404,7 +12404,7 @@ var gd3d;
             };
             meshFilter.prototype.remove = function () {
                 if (this.mesh)
-                    this.mesh.unuse(true);
+                    this.mesh.unuse();
             };
             meshFilter.prototype.clone = function () {
             };
@@ -12864,7 +12864,7 @@ var gd3d;
                         element.unuse();
                 });
                 if (this.mesh)
-                    this.mesh.unuse(true);
+                    this.mesh.unuse();
                 this.bones.length = 0;
                 this._skeletonMatrixData = null;
             };
@@ -13169,7 +13169,7 @@ var gd3d;
                         case gd3d.render.UniformTypeEnum.Texture:
                         case gd3d.render.UniformTypeEnum.CubeTexture:
                             if (this.statedMapUniforms[id] != null)
-                                this.statedMapUniforms[id].unuse(true);
+                                this.statedMapUniforms[id].unuse();
                             break;
                     }
                 }
@@ -17654,6 +17654,11 @@ var gd3d;
             keyFrameAniPlayer.prototype.clone = function () {
             };
             keyFrameAniPlayer.prototype.remove = function () {
+                this.gameObject = null;
+                this.pathPropertyMap = null;
+                this.nowClip = null;
+                this.clips.length = 0;
+                this.clips = null;
             };
             keyFrameAniPlayer.ClassName = "keyFrameAniPlayer";
             __decorate([
