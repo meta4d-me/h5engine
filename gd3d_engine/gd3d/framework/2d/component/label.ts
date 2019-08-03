@@ -677,8 +677,8 @@ namespace gd3d.framework
          */
         remove()
         {
-            if(this._font)  this._font.unuse(true);
-            if(this._uimat) this._uimat.unuse(true);
+            if(this._font)  this._font.unuse();
+            if(this._uimat) this._uimat.unuse();
             this.indexarr.length = 0;
             this.remainarrx.length = 0;
             this.datar.length = 0;

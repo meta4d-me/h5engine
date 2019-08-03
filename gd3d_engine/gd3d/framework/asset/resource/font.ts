@@ -85,7 +85,7 @@
         {
             if (this.texture)
             {
-                this.texture.unuse(true);
+                this.texture.unuse();
             }
             delete this.cmap;
         }
