@@ -1448,10 +1448,15 @@ declare namespace gd3d.framework {
         loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr): void;
         parse(json: any, totalLength?: number): void;
         unload(disposeNow?: boolean): void;
+        private isTextureRepeat;
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
         private downloadFinsih;
         private CkNextHandleOfGuid;
+        static needParsing: boolean;
+        private static needParsesArr;
+        static startParseByUrl(url: string): boolean;
         private NextHandle;
+        private NextHandleParsing;
         private endWaitList;
         private mapIsNull;
         mapNamed: {
@@ -2374,7 +2379,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess;
         private readFinish;
-        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<unknown>;
+        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<{}>;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
         private _cacheMinP;

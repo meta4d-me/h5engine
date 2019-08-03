@@ -7932,13 +7932,21 @@ var gd3d;
                 }
                 this.assetmgr.removeAssetBundle(this.name);
             };
+            assetBundle.prototype.isTextureRepeat = function (_type, name, list) {
+                if (_type != framework.AssetTypeEnum.Texture && _type != framework.AssetTypeEnum.PVR && _type != framework.AssetTypeEnum.DDS)
+                    return false;
+                var idx = name.indexOf(".");
+                var decName = name.substr(0, idx) + ".imgdesc.json";
+                return list[decName] == true;
+            };
             assetBundle.prototype.load = function (assetmgr, onstate, state) {
                 var _this = this;
                 if (assetmgr && assetmgr != this.assetmgr) {
                     this.assetmgr = assetmgr;
                 }
                 state.totalByteLength = this.totalLength;
-                var total = this.files.length;
+                var filse = this.files;
+                var fLen = filse.length;
                 var glvshaders = [];
                 var glfshaders = [];
                 var shaders = [];
@@ -7966,10 +7974,18 @@ var gd3d;
                     var url = this.path + "/" + pack;
                     packs.push({ url: url, type: type, asset: null });
                 }
+                var nameMap = {};
+                for (var i = 0; i < fLen; i++) {
+                    var file = filse[i];
+                    nameMap[file.name] = true;
+                }
                 var guidList = {};
                 var list = [];
-                for (var _b = 0, _c = this.files; _b < _c.length; _b++) {
-                    var fitem = _c[_b];
+                for (var i = 0; i < fLen; i++) {
+                    var fitem = filse[i];
+                    var type = assetmgr.calcType(fitem.name);
+                    if (this.isTextureRepeat(type, fitem.name, nameMap))
+                        continue;
                     var url = this.path + "/" + fitem.name;
                     var fileName = assetmgr.getFileName(url);
                     var guid = fitem.guid;
@@ -8000,7 +8016,6 @@ var gd3d;
                         }
                     }
                     guidList[guid] = true;
-                    var type = assetmgr.calcType(fitem.name);
                     if (fitem.packes != -1) {
                         mapPackes[url] = fitem.packes;
                     }
@@ -8166,8 +8181,8 @@ var gd3d;
                     }
                 };
                 var this_2 = this;
-                for (var _d = 0, list_1 = list; _d < list_1.length; _d++) {
-                    var item = list_1[_d];
+                for (var _b = 0, list_1 = list; _b < list_1.length; _b++) {
+                    var item = list_1[_b];
                     _loop_2(item);
                 }
             };
@@ -8217,7 +8232,28 @@ var gd3d;
                     return;
                 this.NextHandle(list, state, onstate);
             };
+            assetBundle.startParseByUrl = function (url) {
+                var source = this.needParsesArr[url];
+                if (source) {
+                    source.call(source.list, source.state, source.onstate);
+                    delete this.needParsesArr[url];
+                    return true;
+                }
+            };
             assetBundle.prototype.NextHandle = function (list, state, onstate) {
+                if (assetBundle.needParsing) {
+                    this.NextHandleParsing(list, state, onstate);
+                }
+                else {
+                    assetBundle.needParsesArr[this.url] = {
+                        list: list,
+                        state: state,
+                        onstate: onstate,
+                        call: this.NextHandleParsing.bind(this)
+                    };
+                }
+            };
+            assetBundle.prototype.NextHandleParsing = function (list, state, onstate) {
                 var _this = this;
                 var waitArrs = [];
                 var count = 0;
@@ -8284,6 +8320,8 @@ var gd3d;
                     return false;
                 return true;
             };
+            assetBundle.needParsing = true;
+            assetBundle.needParsesArr = {};
             return assetBundle;
         }());
         framework.assetBundle = assetBundle;
