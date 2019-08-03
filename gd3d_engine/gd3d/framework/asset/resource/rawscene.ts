@@ -266,7 +266,7 @@ namespace gd3d.framework
             }
             for (let key in this.lightmaps)
             {
-                this.lightmaps[key].unuse(true);
+                this.lightmaps[key].unuse();
             }
         }
 

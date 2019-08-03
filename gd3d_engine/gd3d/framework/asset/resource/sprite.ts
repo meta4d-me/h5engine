@@ -85,7 +85,7 @@
         {
             if (this.texture != null)
             {
-                this.texture.unuse(true);
+                this.texture.unuse();
             }
         }
 

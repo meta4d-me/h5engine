@@ -3612,7 +3612,7 @@ var gd3d;
                 this._originalColor = null;
                 this._pressedColor = null;
                 if (this.pressedGraphic)
-                    this.pressedGraphic.unuse(true);
+                    this.pressedGraphic.unuse();
             };
             button.prototype.onPointEvent = function (canvas, ev, oncap) {
                 if (oncap == false) {
@@ -3986,9 +3986,9 @@ var gd3d;
             };
             image2D.prototype.remove = function () {
                 if (this._sprite)
-                    this._sprite.unuse(true);
+                    this._sprite.unuse();
                 if (this._uimat)
-                    this._uimat.unuse(true);
+                    this._uimat.unuse();
                 this.datar.length = 0;
                 this.transform = null;
                 this._imageBorder = null;
@@ -5525,9 +5525,9 @@ var gd3d;
             };
             label.prototype.remove = function () {
                 if (this._font)
-                    this._font.unuse(true);
+                    this._font.unuse();
                 if (this._uimat)
-                    this._uimat.unuse(true);
+                    this._uimat.unuse();
                 this.indexarr.length = 0;
                 this.remainarrx.length = 0;
                 this.datar.length = 0;
@@ -5904,9 +5904,9 @@ var gd3d;
             };
             rawImage2D.prototype.remove = function () {
                 if (this._image)
-                    this._image.unuse(true);
+                    this._image.unuse();
                 if (this._uimat)
-                    this._uimat.unuse(true);
+                    this._uimat.unuse();
                 this._image = null;
                 this._cacheMaskV4 = null;
                 this.transform = null;
@@ -11141,9 +11141,9 @@ var gd3d;
             };
             atlas.prototype.dispose = function () {
                 for (var key in this.sprites) {
-                    this.sprites[key].unuse(true);
+                    this.sprites[key].unuse();
                 }
-                this.texture.unuse(true);
+                this.texture.unuse();
                 delete this.sprites;
             };
             atlas.prototype.caclByteLength = function () {
@@ -11318,7 +11318,7 @@ var gd3d;
             };
             font.prototype.dispose = function () {
                 if (this.texture) {
-                    this.texture.unuse(true);
+                    this.texture.unuse();
                 }
                 delete this.cmap;
             };
@@ -14212,7 +14212,7 @@ var gd3d;
                     this.rootNode.dispose();
                 }
                 for (var key in this.lightmaps) {
-                    this.lightmaps[key].unuse(true);
+                    this.lightmaps[key].unuse();
                 }
             };
             rawscene.ClassName = "rawscene";
@@ -14507,7 +14507,7 @@ var gd3d;
             };
             sprite.prototype.dispose = function () {
                 if (this.texture != null) {
-                    this.texture.unuse(true);
+                    this.texture.unuse();
                 }
             };
             sprite.prototype.caclByteLength = function () {
