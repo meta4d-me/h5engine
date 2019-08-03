@@ -10724,100 +10724,16 @@ var gd3d;
     (function (framework) {
         var AssetFactory_TextureDesc = (function () {
             function AssetFactory_TextureDesc() {
+                this.t_Normal = "t_Normal";
+                this.t_PVR = "t_PVR";
+                this.t_DDS = "t_DDS";
             }
             AssetFactory_TextureDesc.prototype.newAsset = function () {
                 return null;
             };
-            AssetFactory_TextureDesc.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
+            AssetFactory_TextureDesc.prototype.parseTexture = function (txt, url, call, onstate, state, assetMgr, asset) {
+                var _this = this;
                 var filename = framework.getFileName(url);
-                state.resstate[filename] = new framework.RefResourceState();
-                if (state.resstateFirst == null) {
-                    state.resstateFirst = state.resstate[filename];
-                }
-                gd3d.io.loadText(url, function (txt, err, isloadFail) {
-                    state.isloadFail = isloadFail ? true : false;
-                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                        return;
-                    var _texturedesc = JSON.parse(txt);
-                    var _name = _texturedesc["name"];
-                    var _filterMode = _texturedesc["filterMode"];
-                    var _format = _texturedesc["format"];
-                    var _mipmap = _texturedesc["mipmap"];
-                    var _wrap = _texturedesc["wrap"];
-                    var _premultiplyAlpha = _texturedesc["premultiplyAlpha"];
-                    if (_premultiplyAlpha == undefined) {
-                        _premultiplyAlpha = true;
-                    }
-                    var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
-                    if (_format == "RGB")
-                        _textureFormat = gd3d.render.TextureFormatEnum.RGB;
-                    else if (_format == "Gray")
-                        _textureFormat = gd3d.render.TextureFormatEnum.Gray;
-                    var _linear = true;
-                    if (_filterMode.indexOf("linear") < 0)
-                        _linear = false;
-                    var _repeat = false;
-                    if (_wrap.indexOf("Repeat") >= 0)
-                        _repeat = true;
-                    var _textureSrc = url.replace(filename, _name);
-                    if (_textureSrc.indexOf(".pvr.bin") >= 0) {
-                        gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
-                            call(function () {
-                                if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                                    return;
-                                var _texture = asset ? asset : new framework.texture(filename);
-                                var pvr = new PvrParse(assetMgr.webgl);
-                                _texture.glTexture = pvr.parse(_buffer);
-                                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
-                            });
-                        }, function (loadedLength, totalLength) {
-                            framework.AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
-                        });
-                    }
-                    else if (_textureSrc.indexOf(".dds.bin") >= 0) {
-                        gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
-                            call(function () {
-                                if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                                    return;
-                                var _texture = asset ? asset : new framework.texture(filename);
-                                assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
-                                var textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
-                                textureUtil.loadDDS(_textureSrc, null, function (texture, error, stats) {
-                                    var t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
-                                    t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
-                                    t2d.texture = texture;
-                                    _texture.glTexture = t2d;
-                                });
-                                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
-                            });
-                        }, function (loadedLength, totalLength) {
-                            framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
-                        });
-                    }
-                    else {
-                        gd3d.io.loadImg(_textureSrc, function (_tex, _err, isloadFail) {
-                            call(function () {
-                                state.isloadFail = isloadFail ? true : false;
-                                if (framework.AssetFactoryTools.catchError(_err, onstate, state))
-                                    return;
-                                var _texture = asset ? asset : new framework.texture(filename);
-                                _texture.realName = _name;
-                                var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
-                                t2d.uploadImage(_tex, _mipmap, _linear, _premultiplyAlpha, _repeat);
-                                _texture.glTexture = t2d;
-                                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
-                            });
-                        }, function (loadedLength, totalLength) {
-                            framework.AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
-                        });
-                    }
-                }, function (loadedLength, totalLength) {
-                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
-                });
-            };
-            AssetFactory_TextureDesc.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
-                var filename = framework.getFileName(url);
-                var txt = respack[filename];
                 var _texturedesc = JSON.parse(txt);
                 var _name = _texturedesc["name"];
                 var _filterMode = _texturedesc["filterMode"];
@@ -10829,77 +10745,78 @@ var gd3d;
                     _premultiplyAlpha = true;
                 }
                 var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
-                if (_format == "RGB") {
+                if (_format == "RGB")
                     _textureFormat = gd3d.render.TextureFormatEnum.RGB;
-                }
-                else if (_format == "Gray") {
+                else if (_format == "Gray")
                     _textureFormat = gd3d.render.TextureFormatEnum.Gray;
-                }
                 var _linear = true;
-                if (_filterMode.indexOf("linear") < 0) {
+                if (_filterMode.indexOf("linear") < 0)
                     _linear = false;
-                }
                 var _repeat = false;
-                if (_wrap.indexOf("Repeat") >= 0) {
+                if (_wrap.indexOf("Repeat") >= 0)
                     _repeat = true;
-                }
                 var _textureSrc = url.replace(filename, _name);
-                state.resstate[filename] = new framework.ResourceState();
+                var loadFun;
+                var tType = this.t_Normal;
+                if (_textureSrc.indexOf(".pvr.bin") >= 0) {
+                    tType = this.t_PVR;
+                }
+                else if (_textureSrc.indexOf(".dds.bin") >= 0) {
+                    tType = this.t_DDS;
+                }
+                loadFun = tType == this.t_Normal ? gd3d.io.loadImg : gd3d.io.loadArrayBuffer;
+                loadFun(_textureSrc, function (data, _err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(_err, onstate, state))
+                            return;
+                        var _texture = asset ? asset : new framework.texture(filename);
+                        _texture.realName = _name;
+                        switch (tType) {
+                            case _this.t_Normal:
+                                var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
+                                t2d.uploadImage(data, _mipmap, _linear, _premultiplyAlpha, _repeat);
+                                _texture.glTexture = t2d;
+                                break;
+                            case _this.t_PVR:
+                                var pvr = new PvrParse(assetMgr.webgl);
+                                _texture.glTexture = pvr.parse(data);
+                                break;
+                            case _this.t_DDS:
+                                assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+                                var textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
+                                textureUtil.loadDDS(_textureSrc, null, function (texture, error, stats) {
+                                    var t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
+                                    t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
+                                    t2d.texture = texture;
+                                    _texture.glTexture = t2d;
+                                });
+                                break;
+                        }
+                        framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
+                    });
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onRefProgress(loadedLength, totalLength, onstate, state, filename);
+                });
+            };
+            AssetFactory_TextureDesc.prototype.load = function (url, onstate, state, assetMgr, asset, call) {
+                var _this = this;
+                var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.RefResourceState();
                 if (state.resstateFirst == null) {
                     state.resstateFirst = state.resstate[filename];
                 }
-                if (_textureSrc.indexOf(".pvr.bin") >= 0) {
-                    gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
-                        call(function () {
-                            if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                                return;
-                            var _texture = asset ? asset : new framework.texture(filename);
-                            var pvr = new PvrParse(assetMgr.webgl);
-                            console.log(_textureSrc);
-                            _texture.glTexture = pvr.parse(_buffer);
-                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
-                        });
-                    }, function (loadedLength, totalLength) {
-                        framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
-                    });
-                }
-                else if (_textureSrc.indexOf(".dds.bin") >= 0) {
-                    gd3d.io.loadArrayBuffer(_textureSrc, function (_buffer, err) {
-                        call(function () {
-                            if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                                return;
-                            var _texture = asset ? asset : new framework.texture(filename);
-                            assetMgr.webgl.pixelStorei(assetMgr.webgl.UNPACK_FLIP_Y_WEBGL, 1);
-                            var textureUtil = new WebGLTextureUtil(assetMgr.webgl, true);
-                            textureUtil.loadDDS(_textureSrc, null, function (texture, error, stats) {
-                                var t2d = new gd3d.render.glTexture2D(assetMgr.webgl);
-                                t2d.format = gd3d.render.TextureFormatEnum.PVRTC2_RGB;
-                                t2d.texture = texture;
-                                _texture.glTexture = t2d;
-                            });
-                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
-                        });
-                    }, function (loadedLength, totalLength) {
-                        framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
-                    });
-                }
-                else {
-                    gd3d.io.loadImg(_textureSrc, function (_tex, _err, isloadFail) {
-                        call(function () {
-                            state.isloadFail = isloadFail ? true : false;
-                            if (framework.AssetFactoryTools.catchError(_err, onstate, state))
-                                return;
-                            var _texture = asset ? asset : new framework.texture(filename);
-                            _texture.realName = _name;
-                            var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
-                            t2d.uploadImage(_tex, _mipmap, _linear, _premultiplyAlpha, _repeat);
-                            _texture.glTexture = t2d;
-                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _texture, url);
-                        });
-                    }, function (loadedLength, totalLength) {
-                        framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
-                    });
-                }
+                gd3d.io.loadText(url, function (txt, err, isloadFail) {
+                    state.isloadFail = isloadFail ? true : false;
+                    if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                        return;
+                    _this.parseTexture(txt, url, call, onstate, state, assetMgr, asset);
+                }, function (loadedLength, totalLength) { framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename); });
+            };
+            AssetFactory_TextureDesc.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
+                var filename = framework.getFileName(url);
+                var txt = respack[filename];
+                this.parseTexture(txt, url, call, onstate, state, assetMgr, asset);
             };
             return AssetFactory_TextureDesc;
         }());

@@ -1867,7 +1867,11 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AssetFactory_TextureDesc implements IAssetFactory {
+        private readonly t_Normal;
+        private readonly t_PVR;
+        private readonly t_DDS;
         newAsset(): texture;
+        private parseTexture;
         load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void): void;
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void): void;
     }
@@ -2370,7 +2374,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess;
         private readFinish;
-        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<{}>;
+        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<unknown>;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
         private _cacheMinP;
