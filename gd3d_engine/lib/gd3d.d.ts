@@ -1448,6 +1448,7 @@ declare namespace gd3d.framework {
         loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr): void;
         parse(json: any, totalLength?: number): void;
         unload(disposeNow?: boolean): void;
+        private isTextureRepeat;
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
         private downloadFinsih;
         private CkNextHandleOfGuid;

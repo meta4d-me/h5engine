@@ -65,7 +65,7 @@ namespace gd3d.framework
 
                         //构建贴图
                         switch(tType){
-                            case this.t_Normal:  
+                            case this.t_Normal:
                                 var t2d = new gd3d.render.glTexture2D(assetMgr.webgl, _textureFormat);
                                 t2d.uploadImage( data as any , _mipmap, _linear, _premultiplyAlpha, _repeat);
                                 _texture.glTexture = t2d;

@@ -150,6 +150,15 @@ namespace gd3d.framework {
             }
             this.assetmgr.removeAssetBundle(this.name);
         }
+
+        private isTextureRepeat(_type : AssetTypeEnum , name : string , list : {[name:string] : boolean }):boolean{
+            //是否是图片资源
+            if(_type != AssetTypeEnum.Texture && _type != AssetTypeEnum.PVR && _type != AssetTypeEnum.DDS) return false;
+            let idx = name.indexOf(".");
+            let decName = name.substr(0,idx) + `.imgdesc.json`;
+            return list[decName] == true;
+        }
+
         /**
          * @public
          * @language zh_CN
@@ -164,7 +173,8 @@ namespace gd3d.framework {
                 this.assetmgr = assetmgr;
             }
             state.totalByteLength = this.totalLength;
-            let total = this.files.length;
+            let filse = this.files;
+            let fLen = filse.length;
 
             let glvshaders: { url: string, type: AssetTypeEnum, asset: IAsset }[] = [];
             let glfshaders: { url: string, type: AssetTypeEnum, asset: IAsset }[] = [];
@@ -202,11 +212,23 @@ namespace gd3d.framework {
                 let url = this.path + "/" + pack;
                 packs.push({ url: url, type: type, asset: null });
             }
+
+            //name map 重复贴图资源需要使用
+            let nameMap = {};
+            for(let i=0; i < fLen ;i++){
+                let file = filse[i];
+                nameMap[file.name] = true;
+            }            
             
             let guidList : {[guid:string] : boolean} = {};
             let list: { url: string, type: AssetTypeEnum, guid : string , asset: IAsset, handle: () => any }[] = [];
             //遍历每项资源 整理到加载列表
-            for (let fitem of this.files) {
+            for(let i=0; i < fLen ;i++){
+                let fitem = filse[i];
+                let type: AssetTypeEnum = assetmgr.calcType(fitem.name);
+                //检查重复贴图资源
+                if(this.isTextureRepeat(type,fitem.name,nameMap)) continue;
+
                 let url = this.path + "/" + fitem.name;
                 let fileName = assetmgr.getFileName(url);
                 let guid = fitem.guid;
@@ -252,7 +274,6 @@ namespace gd3d.framework {
 
                 guidList[guid] = true; //
 
-                let type: AssetTypeEnum = assetmgr.calcType(fitem.name);
                 // let url = this.path + "/" + fitem.name;
                 // let fileName = assetmgr.getFileName(url);
                 if (fitem.packes != -1) {
