@@ -121,6 +121,7 @@ namespace gd3d.framework
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void)
         {
             let filename = getFileName(url);
+            state.resstate[filename] = new RefResourceState();
             
             let txt = respack[filename];
 

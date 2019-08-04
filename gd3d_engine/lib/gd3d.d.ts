@@ -1455,6 +1455,7 @@ declare namespace gd3d.framework {
         static needParsing: boolean;
         private static needParsesArr;
         static startParseByUrl(url: string): boolean;
+        static preloadCompleteFun: Function;
         private NextHandle;
         private NextHandleParsing;
         private endWaitList;

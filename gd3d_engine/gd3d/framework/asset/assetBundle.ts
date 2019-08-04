@@ -532,6 +532,8 @@ namespace gd3d.framework {
                 return true;
             }
         }
+
+        static preloadCompleteFun:Function;
         //文件加载完毕后统一解析处理 
         private NextHandle(list: { url: string, type: AssetTypeEnum, guid: string, asset: IAsset, handle: () => any }[], state, onstate) {
             if (assetBundle.needParsing) {
@@ -543,6 +545,10 @@ namespace gd3d.framework {
                     state: state,
                     onstate: onstate,
                     call: this.NextHandleParsing.bind(this)
+                }
+                if(assetBundle.preloadCompleteFun)
+                {
+                    assetBundle.preloadCompleteFun(this.url);
                 }
             }
         }

@@ -8251,6 +8251,9 @@ var gd3d;
                         onstate: onstate,
                         call: this.NextHandleParsing.bind(this)
                     };
+                    if (assetBundle.preloadCompleteFun) {
+                        assetBundle.preloadCompleteFun(this.url);
+                    }
                 }
             };
             assetBundle.prototype.NextHandleParsing = function (list, state, onstate) {
@@ -10853,6 +10856,7 @@ var gd3d;
             };
             AssetFactory_TextureDesc.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
+                state.resstate[filename] = new framework.RefResourceState();
                 var txt = respack[filename];
                 this.parseTexture(txt, url, call, onstate, state, assetMgr, asset);
             };
