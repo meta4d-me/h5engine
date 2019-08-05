@@ -350,7 +350,7 @@ namespace gd3d.framework
 
             let typeStr = getClassName(comp);
             if(this.componentTypes[typeStr]){
-                throw new Error("已经有一个" + typeStr + "的组件了，不能俩"); 
+                throw new Error(this.getName()+"   已经有一个" + typeStr + "的组件了，不能俩"); 
             }
             
 
