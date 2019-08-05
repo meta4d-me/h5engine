@@ -420,11 +420,15 @@ namespace gd3d.framework
                     //throw new Error("已经有一个碰撞盒的组件了，不能俩");
                 }
             }
-            if (comp.update.toString().length < 35)
-            {
-                //update 空转
-                comp.update = undefined;                
-            }
+
+            if(functionIsEmpty(comp.update))
+                comp.update =undefined;//update空转
+
+            // if (comp.update.toString().length < 35)
+            // {
+            //     //update 空转
+            //     comp.update = undefined;                
+            // }
 
             if (add)
             {

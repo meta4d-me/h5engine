@@ -3025,7 +3025,7 @@ var gd3d;
                         throw new Error("已经有一个碰撞组件了，不能俩");
                     }
                 }
-                if (comp.update.toString().length < 35)
+                if (framework.functionIsEmpty(comp.update))
                     comp.update = undefined;
                 this.componentTypes[typeStr] = true;
                 return comp;
@@ -32023,9 +32023,8 @@ var gd3d;
                         console.warn("已经有一个碰撞盒的组件了，不能俩");
                     }
                 }
-                if (comp.update.toString().length < 35) {
+                if (framework.functionIsEmpty(comp.update))
                     comp.update = undefined;
-                }
                 if (add) {
                     this.components.push(nodeObj);
                     this.componentsInit.push(nodeObj);
@@ -34648,6 +34647,17 @@ var gd3d;
             Primitive2DType[Primitive2DType["Label"] = 2] = "Label";
             Primitive2DType[Primitive2DType["Button"] = 3] = "Button";
         })(Primitive2DType = framework.Primitive2DType || (framework.Primitive2DType = {}));
+        function functionIsEmpty(fun) {
+            if (!fun)
+                true;
+            var funStr = fun.toString().replace(/\s/g, "");
+            var idx = funStr.indexOf("{");
+            var idx_1 = funStr.indexOf("}");
+            if (idx == -1 || idx_1 == -1)
+                return true;
+            return (idx_1 - idx) <= 1;
+        }
+        framework.functionIsEmpty = functionIsEmpty;
         function getClassName(obj) {
             if (!obj)
                 return "";

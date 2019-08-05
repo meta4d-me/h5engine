@@ -6539,6 +6539,7 @@ declare namespace gd3d.framework {
         Label = 2,
         Button = 3
     }
+    function functionIsEmpty(fun: Function): boolean;
     function getClassName(obj: Object): any;
     class TransformUtil {
         static CreatePrimitive(type: PrimitiveType, app: application): transform;

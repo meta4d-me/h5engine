@@ -995,7 +995,8 @@ namespace gd3d.framework {
                 }
             }
 
-            if(comp.update.toString().length < 35)
+            
+            if(functionIsEmpty(comp.update))
                 comp.update =undefined;//update空转
 
 			this.componentTypes[typeStr] = true;
