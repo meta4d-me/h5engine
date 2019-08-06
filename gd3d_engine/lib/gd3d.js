@@ -2994,7 +2994,7 @@ var gd3d;
                 comp.transform = this;
                 var typeStr = framework.getClassName(comp);
                 if (this.componentTypes[typeStr]) {
-                    throw new Error("已经有一个" + typeStr + "的组件了，不能俩");
+                    throw new Error(this.name + "   已经有一个" + typeStr + "的组件了，不能俩");
                 }
                 if (this.components == null)
                     this.components = [];
@@ -31981,7 +31981,7 @@ var gd3d;
                 comp.gameObject = this;
                 var typeStr = framework.getClassName(comp);
                 if (this.componentTypes[typeStr]) {
-                    throw new Error("已经有一个" + typeStr + "的组件了，不能俩");
+                    throw new Error(this.getName() + "   已经有一个" + typeStr + "的组件了，不能俩");
                 }
                 var nodeObj = new nodeComponent(comp, false);
                 var add = true;
@@ -32288,6 +32288,8 @@ var gd3d;
             };
             renderContext.prototype.updateLights = function (lights) {
                 this._intLightCount = lights.length;
+                if (this._intLightCount < 1)
+                    return;
                 this._lightCullingMask.length = 0;
                 var dirt = gd3d.math.pool.new_vector3();
                 for (var i = 0, len = lights.length; i < len; i++) {
@@ -32412,6 +32414,7 @@ var gd3d;
     (function (framework) {
         var scene = (function () {
             function scene(app) {
+                this.autoCollectlightCamera = true;
                 this.renderCameras = [];
                 this._mainCamera = null;
                 this.renderContext = [];
@@ -32594,7 +32597,8 @@ var gd3d;
                 if (node.gameObject.camera) {
                     node.gameObject.camera.update(delta);
                 }
-                this.collectCameraAndLight(node);
+                if (this.autoCollectlightCamera)
+                    this.collectCameraAndLight(node);
                 if (node.children != null) {
                     for (var i = 0; i < node.children.length; i++) {
                         this.objupdateInEditor(node.children[i], delta);
@@ -32609,7 +32613,8 @@ var gd3d;
                             node.gameObject.init(this.app.bePlay);
                         if (node.gameObject.haveComponet) {
                             node.gameObject.update(delta);
-                            this.collectCameraAndLight(node);
+                            if (this.autoCollectlightCamera)
+                                this.collectCameraAndLight(node);
                         }
                     }
                     for (var i = 0, l = node.children.length; i < l; ++i)
@@ -32630,6 +32635,24 @@ var gd3d;
                 if (l != null && node.gameObject.visible) {
                     this.renderLights.push(l);
                 }
+            };
+            scene.prototype.addLight = function (l) {
+                if (this.renderLights.indexOf(l) != -1)
+                    return;
+                this.renderLights.push(l);
+            };
+            scene.prototype.clearLights = function () {
+                this.renderLights.length = 0;
+            };
+            scene.prototype.addCamera = function (cam) {
+                if (this.renderCameras.indexOf(cam) != -1)
+                    return;
+                this.renderCameras.push(cam);
+                this.renderContext.push(new framework.renderContext(this.webgl));
+            };
+            scene.prototype.clearCameras = function () {
+                this.renderCameras.length = 0;
+                this.renderContext.length = 0;
             };
             scene.prototype.addChild = function (node) {
                 this.rootNode.addChild(node);

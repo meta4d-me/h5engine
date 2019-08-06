@@ -6090,6 +6090,7 @@ declare namespace gd3d.framework {
         webgl: WebGLRenderingContext;
         constructor(app: application);
         name: string;
+        autoCollectlightCamera: boolean;
         private rootNode;
         renderList: renderList;
         private assetmgr;
@@ -6113,6 +6114,10 @@ declare namespace gd3d.framework {
         private objupdateInEditor;
         private objupdate;
         private collectCameraAndLight;
+        addLight(l: light): void;
+        clearLights(): void;
+        addCamera(cam: camera): void;
+        clearCameras(): void;
         addChild(node: transform): void;
         removeChild(node: transform): void;
         getChildren(): transform[];
