@@ -32464,8 +32464,10 @@ var gd3d;
                 configurable: true
             });
             scene.prototype.update = function (delta) {
-                this.renderCameras.length = 0;
-                this.renderLights.length = 0;
+                if (this.autoCollectlightCamera) {
+                    this.renderCameras.length = 0;
+                    this.renderLights.length = 0;
+                }
                 this.renderList.clear();
                 this.updateScene(this.rootNode, delta);
                 if (this.onLateUpdate)
