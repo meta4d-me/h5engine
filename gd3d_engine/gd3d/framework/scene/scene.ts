@@ -49,6 +49,9 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         name: string;
+
+        /** 自动收集场景中灯光 和 相机 */
+        autoCollectlightCamera = true;
         private rootNode: transform;
         /**
          * @public
@@ -391,7 +394,8 @@ namespace gd3d.framework
                 node.gameObject.camera.update(delta);//update 了啥
             }
 
-            this.collectCameraAndLight(node);
+            if(this.autoCollectlightCamera)
+                this.collectCameraAndLight(node);
 
             if (node.children != null)
             {
@@ -414,7 +418,9 @@ namespace gd3d.framework
                     if (node.gameObject.haveComponet)
                     {
                         node.gameObject.update(delta);
-                        this.collectCameraAndLight(node);
+
+                        if(this.autoCollectlightCamera)
+                            this.collectCameraAndLight(node);
                     }
                 }
 
@@ -467,6 +473,38 @@ namespace gd3d.framework
             {
                 this.renderLights.push(l);
             }
+        }
+
+        /**
+         * 添加灯光到场景中（autoCollectlightCamera : false 时  有效 ）
+         * @param l 灯光组件
+         */
+        addLight(l : light){
+            if(this.renderLights.indexOf(l) != -1) return;
+            this.renderLights.push(l);
+        }
+        /**
+         * 清除场景中添加过的灯光 （autoCollectlightCamera : false 时  有效 ）
+        */
+        clearLights(){
+            this.renderLights.length = 0;
+        }
+
+        /**
+         * 添加相机到场景中（autoCollectlightCamera : false 时  有效 ）
+         * @param l 灯光组件
+         */
+        addCamera(cam : camera){
+            if(this.renderCameras.indexOf(cam) != -1) return;
+            this.renderCameras.push(cam);
+            this.renderContext.push(new renderContext(this.webgl));
+        }
+        /**
+         * 清除场景中添加过的相机 （autoCollectlightCamera : false 时 有效 ）
+        */
+        clearCameras(){
+            this.renderCameras.length = 0;
+            this.renderContext.length = 0;
         }
 
         /**
