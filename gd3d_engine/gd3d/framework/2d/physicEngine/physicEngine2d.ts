@@ -471,14 +471,14 @@ namespace gd3d.framework {
 
         /** 添加 I2DPhysicsBody 实例到 2d物理世界*/
         addBody(_Pbody: I2DPhysicsBody) {
-            if (!_Pbody) return;
+            if (!_Pbody || !_Pbody.body) return;
             this._bodysObjMap[_Pbody.body.id] = _Pbody;
             Matter.World.add(this.engineWorld, _Pbody.body);
         }
 
         /** 移除 指定 I2DPhysicsBody 实例 */
         removeBody(_Pbody: I2DPhysicsBody) {
-            if (!_Pbody) return;
+            if (!_Pbody || !_Pbody.body) return;
             delete this._bodysObjMap[_Pbody.body.id];
             Matter.World.remove(this.engineWorld, _Pbody.body);
         }

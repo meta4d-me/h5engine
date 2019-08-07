@@ -7696,13 +7696,13 @@ var gd3d;
                 return Matter.Body.create(Matter.Common.extend({}, createCapsule, options));
             };
             physicEngine2D.prototype.addBody = function (_Pbody) {
-                if (!_Pbody)
+                if (!_Pbody || !_Pbody.body)
                     return;
                 this._bodysObjMap[_Pbody.body.id] = _Pbody;
                 Matter.World.add(this.engineWorld, _Pbody.body);
             };
             physicEngine2D.prototype.removeBody = function (_Pbody) {
-                if (!_Pbody)
+                if (!_Pbody || !_Pbody.body)
                     return;
                 delete this._bodysObjMap[_Pbody.body.id];
                 Matter.World.remove(this.engineWorld, _Pbody.body);
