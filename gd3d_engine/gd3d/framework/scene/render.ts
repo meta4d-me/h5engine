@@ -76,6 +76,8 @@ namespace gd3d.framework
         updateLights(lights: light[])
         {
             this._intLightCount = lights.length;
+            if(this._intLightCount < 1) return;
+            
             this._lightCullingMask.length = 0;
             var dirt = math.pool.new_vector3();
             for (var i = 0, len = lights.length; i < len; i++)

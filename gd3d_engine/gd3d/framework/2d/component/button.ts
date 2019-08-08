@@ -211,7 +211,7 @@ namespace gd3d.framework
             this._normalColor = null;
             this._originalColor = null;
             this._pressedColor = null;
-            if(this.pressedGraphic) this.pressedGraphic.unuse(true);
+            if(this.pressedGraphic) this.pressedGraphic.unuse();
         }
         
         private downPointV2 = new gd3d.math.vector2();

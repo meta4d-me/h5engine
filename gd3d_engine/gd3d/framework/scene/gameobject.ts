@@ -350,7 +350,7 @@ namespace gd3d.framework
 
             let typeStr = getClassName(comp);
             if(this.componentTypes[typeStr]){
-                throw new Error("已经有一个" + typeStr + "的组件了，不能俩"); 
+                throw new Error(this.getName()+"   已经有一个" + typeStr + "的组件了，不能俩"); 
             }
             
 
@@ -420,11 +420,15 @@ namespace gd3d.framework
                     //throw new Error("已经有一个碰撞盒的组件了，不能俩");
                 }
             }
-            if (comp.update.toString().length < 35)
-            {
-                //update 空转
-                comp.update = undefined;                
-            }
+
+            if(functionIsEmpty(comp.update))
+                comp.update =undefined;//update空转
+
+            // if (comp.update.toString().length < 35)
+            // {
+            //     //update 空转
+            //     comp.update = undefined;                
+            // }
 
             if (add)
             {
@@ -609,7 +613,7 @@ namespace gd3d.framework
             if(!constructor) return;
             let type = constructor.name;
 
-            if (this.componentTypes[type])
+            if (!this.componentTypes[type])
                 return;
             delete this.componentTypes[type];
             var i = 0, len = this.components.length;

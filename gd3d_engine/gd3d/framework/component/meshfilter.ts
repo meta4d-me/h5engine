@@ -88,7 +88,7 @@ namespace gd3d.framework
         remove()
         {
             if(this.mesh)
-                this.mesh.unuse(true);
+                this.mesh.unuse();
         }
         /**
          * @private

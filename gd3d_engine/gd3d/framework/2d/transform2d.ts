@@ -960,7 +960,7 @@ namespace gd3d.framework {
             comp.transform = this;
             let typeStr = getClassName(comp);
             if(this.componentTypes[typeStr]){
-                throw new Error("已经有一个" + typeStr + "的组件了，不能俩"); 
+                throw new Error(this.name+"   已经有一个" + typeStr + "的组件了，不能俩"); 
             }
 
             if (this.components == null)
@@ -995,7 +995,8 @@ namespace gd3d.framework {
                 }
             }
 
-            if(comp.update.toString().length < 35)
+            
+            if(functionIsEmpty(comp.update))
                 comp.update =undefined;//update空转
 
 			this.componentTypes[typeStr] = true;

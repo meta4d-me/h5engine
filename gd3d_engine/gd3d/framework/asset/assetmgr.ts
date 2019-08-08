@@ -685,7 +685,7 @@ namespace gd3d.framework
             if (!this.mapRes[id]) return;
 
             this.mapRes[id].refcount--;
-            if (disposeNow && this.mapRes[id].refcount <= 0)
+            if (disposeNow || this.mapRes[id].refcount <= 0)
             {
                 this.mapRes[id].asset.dispose();
                 if (name != null)

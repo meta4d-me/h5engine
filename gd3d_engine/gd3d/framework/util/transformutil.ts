@@ -34,6 +34,19 @@ namespace gd3d.framework
     }
 
     /**
+     * 判断 函数对象代码实现内容是否是空的
+     * @param fun 
+     */
+    export function functionIsEmpty(fun : Function){
+        if(!fun) true; 
+        let funStr = fun.toString().replace(/\s/g,"");
+        let idx = funStr.indexOf("{");
+        let idx_1 = funStr.indexOf("}");
+        if(idx == -1 || idx_1 == -1) return true;
+        return (idx_1 - idx ) <= 1;
+    }
+
+    /**
      * 获取实例对象的类名字符串
      * @param obj 对象实例
      */

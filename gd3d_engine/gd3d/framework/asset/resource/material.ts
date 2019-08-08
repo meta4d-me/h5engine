@@ -104,7 +104,7 @@ namespace gd3d.framework
                     case render.UniformTypeEnum.Texture:
                     case render.UniformTypeEnum.CubeTexture:
                         if (this.statedMapUniforms[id] != null)
-                            this.statedMapUniforms[id].unuse(true);
+                            this.statedMapUniforms[id].unuse();
                         break;
                 }
             }

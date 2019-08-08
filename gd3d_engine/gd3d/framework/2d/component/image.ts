@@ -378,8 +378,8 @@ namespace gd3d.framework
          */
         remove()
         {
-            if(this._sprite) this._sprite.unuse(true);
-            if(this._uimat) this._uimat.unuse(true);
+            if(this._sprite) this._sprite.unuse();
+            if(this._uimat) this._uimat.unuse();
             this.datar.length = 0;
             this.transform = null;
             this._imageBorder = null;

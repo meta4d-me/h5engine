@@ -19,7 +19,11 @@ namespace gd3d.framework {
         enableSleeping?:boolean;
         timing?: Itiming; 
         /** 默认值 : {bucketWidth: 48, bucketHeight: 48} */
-        broadphase? : {bucketWidth:number,bucketHeight:number};  
+        broadphase? : {bucketWidth:number,bucketHeight:number};
+        /** 循环器的设定帧率 , 默认值 : 60 */
+        runnerFps?;
+        /** 循环器是否应使用固定的timestep（deltaTime），默认值：false   */
+        runnerIsFixed?;
     }
     export interface IWorld{
         gravity:{
@@ -34,7 +38,7 @@ namespace gd3d.framework {
     }
 
     export interface IRunner{
-        tick ();
+        tick (delta:number);
     }
     declare var Matter: any;
     export class physicEngine2D {
@@ -46,31 +50,49 @@ namespace gd3d.framework {
         private eventer: event.Physic2dEvent = new event.Physic2dEvent();
         private _bodysObjMap: { [id: number]: I2DPhysicsBody } = {};
         public constructor(op: IEngine2DOP = null) {
+            op = op || {};
             if (Matter == undefined) {
                 console.error(" Matter not found , create physicEngine2D fail");
                 return;
             }
             this._Matter = Matter;
-            if (op != null) {
-                this.matterEngine = Matter.Engine.create(op);
-            } else {
-                this.matterEngine = Matter.Engine.create();
-            }
+            this.matterEngine = Matter.Engine.create(op);
+
             this.engineWorld = this.matterEngine.world;
-            let engine = this.matterEngine;
-            let runner = Matter.Runner.create();
+            let engine = this.matterEngine; 
+            let runnerOp = {fps:op.runnerFps || 60, isFixed : op.runnerIsFixed == true };
+            let runner = Matter.Runner.create(runnerOp);
 
             //---------run the engine
             let modeSceneCtr = true;
             if(modeSceneCtr){
                 this.engineRunner = runner;
-                let getNow = Matter.Common.now;
-                this.engineRunner.tick = ()=>{
+                let nowTime = 0;
+                let frameCounter =0;
+                let counterTimestamp =0;
+                let dt = 1 / runner.fps;
+                runner.delta = dt;
+                runner.deltaMin =  dt * 0.5;
+                runner.deltaMax =  dt * 4;
+                this.engineRunner.tick = (delta:number)=>{
                     //beforeStep
                     this.beforeStep();
-                    Matter.Runner.tick(runner , engine , getNow);
+                    // Matter.Runner.tick(runner , engine , nowTime);
+                    this.RunnerTick(runner,engine,delta);
                     //aftereStep
                     this.afterStep();
+                    
+                    if(!runnerOp.isFixed){
+                        // fps counter
+                        nowTime += delta;
+                        frameCounter += 1;
+                        if (nowTime - counterTimestamp >= 1) {
+                            runner.fps = frameCounter * ((nowTime - counterTimestamp));
+                            // console.log(`fps : ${runner.fps} , delta: ${runner.delta}`);
+                            counterTimestamp = nowTime;
+                            frameCounter = 0;
+                        }
+                    }
                 }
             }else{
                 // Matter.Engine.run(this.matterEngine);
@@ -83,6 +105,63 @@ namespace gd3d.framework {
             Matter.Events.on(this.matterEngine, "collisionStart", this.collisionStart.bind(this));
             Matter.Events.on(this.matterEngine, "collisionActive", this.collisionActive.bind(this));
             Matter.Events.on(this.matterEngine, "collisionEnd", this.collisionEnd.bind(this));
+        }
+
+        private RunnerTick(runner , engine , delta:number){
+            var Events = Matter.Events;
+            var Engine = Matter.Engine;
+            var timing = engine.timing;
+            var correction = 1;
+
+            // create an event object
+            var event = {
+                timestamp: timing.timestamp
+            };
+
+            Events.trigger(runner, 'beforeTick', event);
+            Events.trigger(engine, 'beforeTick', event); // @deprecated
+
+            if (runner.isFixed) {
+                // fixed timestep
+                delta = runner.delta;
+            } else {
+                // optimistically filter delta over a few frames, to improve stability
+                runner.deltaHistory.push(delta);
+                runner.deltaHistory = runner.deltaHistory.slice(-runner.deltaSampleSize);
+                delta = Math.min.apply(null, runner.deltaHistory);
+                
+                // limit delta
+                delta = delta < runner.deltaMin ? runner.deltaMin : delta;
+                delta = delta > runner.deltaMax ? runner.deltaMax : delta;
+
+                // correction for delta
+                correction = delta / runner.delta;
+
+                // update engine timing object
+                runner.delta = delta;
+            }
+
+            // time correction for time scaling
+            if (runner.timeScalePrev !== 0)
+                correction *= timing.timeScale / runner.timeScalePrev;
+
+            if (timing.timeScale === 0)
+                correction = 0;
+
+            runner.timeScalePrev = timing.timeScale;
+            runner.correction = correction;
+
+            // fps counter
+            Events.trigger(runner, 'tick', event);
+            Events.trigger(engine, 'tick', event); // @deprecated
+
+            // update
+            Events.trigger(runner, 'beforeUpdate', event);
+            Engine.update(engine, delta * 1000, correction);
+            Events.trigger(runner, 'afterUpdate', event);
+            //afterTick
+            Events.trigger(runner, 'afterTick', event);
+            Events.trigger(engine, 'afterTick', event); // @deprecated
         }
 
         private beforeStep(){
@@ -392,14 +471,14 @@ namespace gd3d.framework {
 
         /** 添加 I2DPhysicsBody 实例到 2d物理世界*/
         addBody(_Pbody: I2DPhysicsBody) {
-            if (!_Pbody) return;
+            if (!_Pbody || !_Pbody.body) return;
             this._bodysObjMap[_Pbody.body.id] = _Pbody;
             Matter.World.add(this.engineWorld, _Pbody.body);
         }
 
         /** 移除 指定 I2DPhysicsBody 实例 */
         removeBody(_Pbody: I2DPhysicsBody) {
-            if (!_Pbody) return;
+            if (!_Pbody || !_Pbody.body) return;
             delete this._bodysObjMap[_Pbody.body.id];
             Matter.World.remove(this.engineWorld, _Pbody.body);
         }

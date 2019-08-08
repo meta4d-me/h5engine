@@ -451,7 +451,7 @@ namespace gd3d.framework
                 if (element) element.unuse();
             });
             if (this.mesh)
-                this.mesh.unuse(true);
+                this.mesh.unuse();
             this.bones.length = 0;
             this._skeletonMatrixData = null;
         }

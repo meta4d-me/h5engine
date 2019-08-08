@@ -331,8 +331,8 @@ namespace gd3d.framework
          */
         remove()
         {
-            if(this._image) this._image.unuse(true);
-            if(this._uimat) this._uimat.unuse(true);
+            if(this._image) this._image.unuse();
+            if(this._uimat) this._uimat.unuse();
             this._image = null;   
             this._cacheMaskV4 = null; 
             this.transform = null;
