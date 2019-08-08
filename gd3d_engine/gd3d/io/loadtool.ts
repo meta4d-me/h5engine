@@ -102,8 +102,9 @@
 
     var cachedMap;
     var cachedTime = 0;
-    export function GetJSON(url:string,text:string = undefined):any
+    export async function GetJSON(url: string, text: string = undefined)
     {
+
         if (Date.now() - cachedTime > 60000)
         {
             cachedMap = {};
@@ -111,23 +112,31 @@
         }
         if (cachedMap[url])
             return cachedMap[url];
-        if(!text)
+        if (!text)
             return;
-        return cachedMap[url] = JSON.parse(text);
+        return cachedMap[url] = await JSONParse(text);// JSON.parse(text);
     }
-    export function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void 
+
+    export function JSONParse(text: string)
+    {
+        return new Promise<any>((resolve) =>
+        {
+            resolve(JSON.parse(text));
+        });
+    }
+    export async function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null) 
     {
         if (framework.assetMgr.useBinJs)
         {
             url = framework.assetMgr.correctTxtFileName(url);
         }
-        let obj = GetJSON(url);
-        if(obj)
-            return fun(obj,null);
+        let obj = await GetJSON(url);
+        if (obj)
+            return fun(obj, null);
 
-        gd3d.io.xhrLoad(url, fun, onprocess, "text", (req) =>
-        {            
-            fun(GetJSON(url,req.response), null);
+        gd3d.io.xhrLoad(url, fun, onprocess, "text", async (req) =>
+        {
+            fun(await GetJSON(url, req.response), null);
         });
     }
     /**

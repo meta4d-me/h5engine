@@ -13,13 +13,13 @@ namespace gd3d.framework
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
-            if(state.resstateFirst==null)
+            if (state.resstateFirst == null)
             {
-                state.resstateFirst=state.resstate[filename];
+                state.resstateFirst = state.resstate[filename];
             }
             gd3d.io.loadText(url, (txt, err, isloadFail) =>
             {
-                call(() =>
+                call(async () =>
                 {
                     state.isloadFail = isloadFail ? true : false;
                     if (AssetFactoryTools.catchError(err, onstate, state))
@@ -27,7 +27,7 @@ namespace gd3d.framework
 
                     let _prefab = asset ? asset : new prefab(filename);
                     _prefab.assetbundle = bundlename;
-                    _prefab.Parse(txt, assetMgr);                  
+                    await _prefab.Parse(txt, assetMgr);
                     AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
                     // _prefab.Parse(txt, assetMgr).then(() =>
                     // {
@@ -46,15 +46,15 @@ namespace gd3d.framework
 
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: prefab, call: (handle: () => void) => void)
         {
-            call(() =>
+            call(async () =>
             {
                 let bundlename = getFileName(state.url);
                 let filename = getFileName(url);
 
                 state.resstate[filename] = new ResourceState();
-                if(state.resstateFirst==null)
+                if (state.resstateFirst == null)
                 {
-                    state.resstateFirst=state.resstate[filename];
+                    state.resstateFirst = state.resstate[filename];
                 }
                 let txt = respack[filename];
                 let _prefab = asset ? asset : new prefab(filename);
@@ -64,7 +64,7 @@ namespace gd3d.framework
                 // {
                 //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
                 // });
-                _prefab.Parse(txt, assetMgr);
+                await _prefab.Parse(txt, assetMgr);
                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
             });
         }

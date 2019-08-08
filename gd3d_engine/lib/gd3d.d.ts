@@ -1449,6 +1449,7 @@ declare namespace gd3d.framework {
         private downloadFinsih;
         private CkNextHandleOfGuid;
         private NextHandle;
+        private ReadyFinish;
         private endWaitList;
         private mapIsNull;
         mapNamed: {
@@ -2367,7 +2368,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess;
         private readFinish;
-        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<unknown>;
+        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<{}>;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
         private _cacheMinP;
@@ -2438,7 +2439,7 @@ declare namespace gd3d.framework {
         getCloneTrans2D(): transform2D;
         apply(trans: transform): void;
         jsonstr: string;
-        Parse(jsonStr: string, assetmgr: assetMgr): void;
+        Parse(jsonStr: string, assetmgr: assetMgr): Promise<void>;
     }
 }
 declare namespace gd3d.framework {
@@ -5981,6 +5982,7 @@ declare namespace gd3d.framework {
         };
         private componentsInit;
         haveComponet: boolean;
+        needInit: boolean;
         renderer: IRenderer;
         camera: camera;
         light: light;
@@ -6739,8 +6741,9 @@ declare namespace gd3d.framework {
 declare namespace gd3d.io {
     function xhrLoad(url: string, fun: (ContentData: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void, responseType: XMLHttpRequestResponseType, loadedFun: (req: XMLHttpRequest) => void): void;
     function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
-    function GetJSON(url: string, text?: string): any;
-    function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+    function GetJSON(url: string, text?: string): Promise<any>;
+    function JSONParse(text: string): Promise<any>;
+    function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): Promise<void>;
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error, loadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
@@ -6862,7 +6865,7 @@ declare namespace gd3d.render {
         private static _maxVertexAttribArray;
         static SetMaxVertexAttribArray(webgl: WebGLRenderingContext, count: number): void;
         private static _texNumber;
-        static GetTextureNumber(webgl: WebGLRenderingContext, index: number): number;
+        static GetTextureNumber(index: number): number;
         static FUNC_ADD: number;
         static FUNC_SUBTRACT: number;
         static FUNC_REVERSE_SUBTRACT: number;

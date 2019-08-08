@@ -514,27 +514,50 @@ namespace gd3d.framework {
                 }
 
                 let waiting = hitem.handle();
-                if (waiting instanceof threading.gdPromise) {
+                if (waiting&&waiting.then) {
                     waitArrs.push(waiting);
                     waiting.then(() => {
                         if (++count >= waitArrs.length) {
                             lastHandle.sort((a, b) => {
                                 return b.type - a.type;
                             })
-                            while (lastHandle.length > 0)
-                                lastHandle.shift().handle();
-                            waitArrs = [];
-                            finish();
+                            this.ReadyFinish(lastHandle,finish);
+                            // while (lastHandle.length > 0)
+                            //     lastHandle.shift().handle();
+                            // finish();
+                            waitArrs = [];                            
                         }
                     });
 
                 }
             }
             if (waitArrs.length < 1) {
-                while (lastHandle.length > 0)
-                    lastHandle.shift().handle();
-                finish();
+                this.ReadyFinish(lastHandle,finish);
+                // while (lastHandle.length > 0)
+                //     lastHandle.shift().handle();
+                // finish();
             }
+        }
+
+        private ReadyFinish(lastHandle:any[],finish:()=>void)
+        {
+            let awaits = [];
+            let count = 0;
+            while (lastHandle.length > 0){
+                let awaiting =  lastHandle.shift().handle();
+                if(awaiting&&awaiting.then)
+                {
+                    awaits.push(awaiting);
+                    awaiting.then(() => {
+                        if (++count >= awaits.length) {
+                            finish();
+                            awaits.length = 0;
+                        }
+                    });
+                }
+            }
+            if(awaits.length == 0)
+                finish();
         }
 
         private endWaitList( list : { url: string, type: AssetTypeEnum, guid : string , asset: IAsset, handle: () => any }[]){

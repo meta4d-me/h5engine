@@ -404,24 +404,20 @@ namespace gd3d.framework
 
         private objupdate(node: transform, delta)
         {
-            var queue = [];
-            while (node)
-            {
-                if (!(node.hasComponent == false && node.hasComponentChild == false))
-                {
-                    if (node.gameObject.needInit)
-                        node.gameObject.init(this.app.bePlay);//组件还未初始化的初始化
-                    if (node.gameObject.haveComponet)
-                    {
-                        node.gameObject.update(delta);
-                        this.collectCameraAndLight(node);
-                    }
-                }
 
-                for (var i = 0, l = node.children.length; i < l; ++i)
-                    queue.push(node.children[i]);
-                node = queue.shift();
+            if (!(node.hasComponent == false && node.hasComponentChild == false))
+            {
+                if (node.gameObject.needInit)
+                    node.gameObject.init(this.app.bePlay);//组件还未初始化的初始化
+                if (node.gameObject.haveComponet)
+                {
+                    node.gameObject.update(delta);
+                    this.collectCameraAndLight(node);
+                }
             }
+            //这里要检测长度 因为在update 或init中 children会改变
+            for (var i = 0 ; i < node.children.length; ++i)
+                this.objupdate(node.children[i], delta);
         }
 
         /*

@@ -169,12 +169,13 @@
          * @param assetmgr 资源管理实例
          * @version gd3d 1.0
          */
-        Parse(jsonStr: string, assetmgr: assetMgr)
+        async Parse(jsonStr: string, assetmgr: assetMgr)
         {
             //    return new threading.gdPromise((resolve) =>
             //     {
             this.jsonstr = jsonStr;
-            let jsonObj = JSON.parse(jsonStr);
+            let jsonObj = await io.JSONParse(jsonStr);
+            // let jsonObj = JSON.parse(jsonStr);
             let type = jsonObj["type"];
             switch (type)
             {

@@ -1245,6 +1245,7 @@ var main = (function () {
             demoList.addBtn("使用加载资源的Demo列表", function () { return new UseAssetByLoadDemoList(); });
             demoList.addBtn("tesrtss", function () { return new dome.testCJ(); });
             demoList.addBtn("表面贴花(弹痕)", function () { return new test_Decal(); });
+            demoList.addBtn("test_01", function () { return new test_01(); });
             return new demoList();
         });
         this.addBtn("项目Demo==>", function () {
@@ -1303,12 +1304,11 @@ var test_01 = (function () {
         this.timer = 0;
     }
     test_01.prototype.start = function (app) {
-        var _this = this;
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
         var cuber;
-        for (var i = 0; i < 5; i++) {
+        for (var i = 0; i < 1; i++) {
             var cube = new gd3d.framework.transform();
             cube.name = "cube";
             cube.localScale.x = cube.localScale.y = cube.localScale.z = 1;
@@ -1322,49 +1322,6 @@ var test_01 = (function () {
             cube.markDirty();
             cuber = renderer;
             console.warn("Finish it.");
-            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
-                if (state.isfinish) {
-                    var sh = _this.app.getAssetMgr().getShader("color.shader.json");
-                    if (sh != null) {
-                        cuber.materials = [];
-                        cuber.materials.push(new gd3d.framework.material());
-                        cuber.materials[0].setShader(sh);
-                        _this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                            if (s.isfinish) {
-                                console.warn("Finish load img.");
-                                var texture = _this.app.getAssetMgr().getAssetByName("zg256.png");
-                                cuber.materials[0].setTexture("_MainTex", texture);
-                            }
-                        });
-                    }
-                }
-            });
-            gd3d.math.quatFromAxisAngle(new gd3d.math.vector3(0, 0, 1), 45, cube.localRotate);
-            this.cube = cube;
-            this.cube.setWorldPosition(new gd3d.math.vector3(i, 0, 0));
-        }
-        {
-            this.cube2 = new gd3d.framework.transform();
-            this.cube2.name = "cube2";
-            this.scene.addChild(this.cube2);
-            this.cube2.localScale.x = this.cube2.localScale.y = this.cube2.localScale.z = 0.5;
-            var mesh = this.cube2.gameObject.addComponent("meshFilter");
-            mesh.mesh = (smesh);
-            var renderer = this.cube2.gameObject.addComponent("meshRenderer");
-            var collider = this.cube2.gameObject.addComponent("boxcollider");
-            {
-                var cube = new gd3d.framework.transform();
-                cube.name = "cubesub";
-                this.cube2.addChild(cube);
-                var mesh = cube.gameObject.addComponent("meshFilter");
-                mesh.mesh = (smesh);
-                var renderer = cube.gameObject.addComponent("meshRenderer");
-                cube.localTranslate.z = 1;
-                cube.localScale.x = 0.5;
-                cube.localScale.y = 0.5;
-                var collider = cube.gameObject.addComponent("boxcollider");
-                cube.markDirty();
-            }
         }
         {
         }
@@ -1382,6 +1339,7 @@ var test_01 = (function () {
         }
     };
     test_01.prototype.update = function (delta) {
+        return;
         this.timer += delta;
         var x = Math.sin(this.timer);
         var z = Math.cos(this.timer);

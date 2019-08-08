@@ -7,6 +7,11 @@
     "removeComments": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "outFile": "../lib/gd3d.js"
+    "outFile": "../lib/gd3d.js",
+    "lib": [
+      "es2015.promise",
+      "dom",
+      "es5"
+    ]
   }
 }

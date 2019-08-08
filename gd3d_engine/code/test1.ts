@@ -10,7 +10,7 @@ class test_01 implements IState {
 
         let cuber: gd3d.framework.meshRenderer;
 
-        for (var i = 0; i < 5; i++) {
+        for (var i = 0; i < 1; i++) {
             //添加一个盒子
             var cube = new gd3d.framework.transform();
             cube.name = "cube";
@@ -40,56 +40,56 @@ class test_01 implements IState {
             //然后用shader 构造材质，和unity相同
             // 配置代码如下
 
-            this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) => {
-                if (state.isfinish) {
-                    var sh = this.app.getAssetMgr().getShader("color.shader.json");
-                    if (sh != null) {
-                        //用了从资源里加载出来的shader
-                        cuber.materials = [];
-                        cuber.materials.push(new gd3d.framework.material());
-                        cuber.materials[0].setShader(sh);
-                        //shader 修改为 不和一般资源一样加载,而是统一用getShader方法
-                        //cuber.materials[0].shader = this.app.getAssetMgr().getResourceByName("color") as gd3d.framework.shader;
-                        this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, (s) => {
-                            if (s.isfinish) {
-                                console.warn("Finish load img.");
-                                let texture = this.app.getAssetMgr().getAssetByName("zg256.png") as gd3d.framework.texture;
-                                cuber.materials[0].setTexture("_MainTex", texture);
-                            }
-                        })
-                    }
-                }
-            });
+            // this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) => {
+            //     if (state.isfinish) {
+            //         var sh = this.app.getAssetMgr().getShader("color.shader.json");
+            //         if (sh != null) {
+            //             //用了从资源里加载出来的shader
+            //             cuber.materials = [];
+            //             cuber.materials.push(new gd3d.framework.material());
+            //             cuber.materials[0].setShader(sh);
+            //             //shader 修改为 不和一般资源一样加载,而是统一用getShader方法
+            //             //cuber.materials[0].shader = this.app.getAssetMgr().getResourceByName("color") as gd3d.framework.shader;
+            //             this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, (s) => {
+            //                 if (s.isfinish) {
+            //                     console.warn("Finish load img.");
+            //                     let texture = this.app.getAssetMgr().getAssetByName("zg256.png") as gd3d.framework.texture;
+            //                     cuber.materials[0].setTexture("_MainTex", texture);
+            //                 }
+            //             })
+            //         }
+            //     }
+            // });
 
-            gd3d.math.quatFromAxisAngle(new gd3d.math.vector3(0, 0, 1), 45, cube.localRotate);
-            this.cube = cube;
-            this.cube.setWorldPosition(new gd3d.math.vector3(i, 0, 0));
+            // gd3d.math.quatFromAxisAngle(new gd3d.math.vector3(0, 0, 1), 45, cube.localRotate);
+            // this.cube = cube;
+            // this.cube.setWorldPosition(new gd3d.math.vector3(i, 0, 0));
         }
-        {
-            this.cube2 = new gd3d.framework.transform();
-            this.cube2.name = "cube2";
-            this.scene.addChild(this.cube2);
-            this.cube2.localScale.x = this.cube2.localScale.y = this.cube2.localScale.z = 0.5;
-            var mesh = this.cube2.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-            mesh.mesh = (smesh);
-            var renderer = this.cube2.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-            var collider = this.cube2.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
-            {
-                var cube = new gd3d.framework.transform();
-                cube.name = "cubesub";
-                this.cube2.addChild(cube);
-                var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-                mesh.mesh = (smesh);
-                var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+        // {
+        //     this.cube2 = new gd3d.framework.transform();
+        //     this.cube2.name = "cube2";
+        //     this.scene.addChild(this.cube2);
+        //     this.cube2.localScale.x = this.cube2.localScale.y = this.cube2.localScale.z = 0.5;
+        //     var mesh = this.cube2.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+        //     mesh.mesh = (smesh);
+        //     var renderer = this.cube2.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+        //     var collider = this.cube2.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
+        //     {
+        //         var cube = new gd3d.framework.transform();
+        //         cube.name = "cubesub";
+        //         this.cube2.addChild(cube);
+        //         var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+        //         mesh.mesh = (smesh);
+        //         var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
 
-                cube.localTranslate.z = 1;
-                cube.localScale.x = 0.5;
-                cube.localScale.y = 0.5;
-                //cube.localScale.z = 0.5;
-                var collider = cube.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
-                cube.markDirty();
-            }
-        }
+        //         cube.localTranslate.z = 1;
+        //         cube.localScale.x = 0.5;
+        //         cube.localScale.y = 0.5;
+        //         //cube.localScale.z = 0.5;
+        //         var collider = cube.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
+        //         cube.markDirty();
+        //     }
+        // }
         {
             //this.cube3 = new gd3d.framework.transform();
             //this.cube3.localScale.x = this.cube3.localScale.y = this.cube3.localScale.z = 0.7;
@@ -134,6 +134,7 @@ class test_01 implements IState {
     cube3: gd3d.framework.transform;
     timer: number = 0;
     update(delta: number) {
+        return;
         this.timer += delta;
         var x = Math.sin(this.timer);
         var z = Math.cos(this.timer);

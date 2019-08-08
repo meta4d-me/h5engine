@@ -30,14 +30,14 @@ namespace gd3d.render
             };
             this.applyuniformFunc[UniformTypeEnum.Texture]=(location,value)=>{//texture
                 var tex = value.glTexture.texture;
-                this.webgl.activeTexture(render.webglkit.GetTextureNumber(this.webgl, this.texindex));
+                this.webgl.activeTexture(render.webglkit.GetTextureNumber( this.texindex));
                 this.webgl.bindTexture(this.webgl.TEXTURE_2D, tex);
                 this.webgl.uniform1i(location, this.texindex);
                 this.texindex++;
             };
             this.applyuniformFunc[UniformTypeEnum.CubeTexture]=(location,value)=>{//cubetexture
                 var tex = value.glTexture.texture;
-                this.webgl.activeTexture(render.webglkit.GetTextureNumber(this.webgl, this.texindex));
+                this.webgl.activeTexture(render.webglkit.GetTextureNumber( this.texindex));
                 this.webgl.bindTexture(this.webgl.TEXTURE_CUBE_MAP, tex);
                 this.webgl.uniform1i(location, this.texindex);
                 this.texindex++;
