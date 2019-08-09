@@ -1136,10 +1136,9 @@ namespace gd3d.framework
                     if (json["files"])
                     {
                         filename = this.getFileName(url);
-
                         var ab = new assetBundle(url);
                         ab.name = filename;
-                        ab.parse(JSON.parse(txt));
+                        ab.parse(json);
                         ab.load(this, onstate, state);
                     } else
                     {
@@ -1266,11 +1265,10 @@ namespace gd3d.framework
         {
             if (onstate == null)
                 onstate = () => { };
-            // if (!this.time)
-            //     this.time = Date.now();
 
-            // console.log(`assetmgr:${url} ${((Date.now() - this.time))}ms ${Date.now()}`);
-            // this.time = Date.now();
+            let parsed =  assetBundle.tryParsePreloadAB(url , onstate);
+            if(parsed) return;   //尝试 直接解析之前加载完毕的资源
+
             // console.log(`资源包 : ${url} 开始加载`);
             if(this.maploaded[url])
             {

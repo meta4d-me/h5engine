@@ -1452,12 +1452,15 @@ declare namespace gd3d.framework {
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
         private downloadFinsih;
         private CkNextHandleOfGuid;
-        static needParsing: boolean;
+        static addNoParsing(url: string, assetmgr: assetMgr): boolean;
+        private static noParsingDic;
         private static needParsesArr;
-        static startParseByUrl(url: string): boolean;
-        static preloadCompleteFun: Function;
+        private static noParsingLoadedGUID;
+        static tryParsePreloadAB(url: string, onstate: (state: stateLoad) => void): boolean;
+        static preloadCompleteFun: (url: string) => any;
         private NextHandle;
         private NextHandleParsing;
+        private ReadyFinish;
         private endWaitList;
         private mapIsNull;
         mapNamed: {

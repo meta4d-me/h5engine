@@ -7996,6 +7996,9 @@ var gd3d;
                             if (guidList[guid]) {
                                 continue;
                             }
+                            if (assetBundle.noParsingLoadedGUID[guid]) {
+                                continue;
+                            }
                             var sRef = assetmgr.mapRes[mAssId];
                             if (sRef && assetmgr.assetIsLoing(sRef)) {
                                 state.resstate[fileName] = new framework.ResourceState();
@@ -8232,28 +8235,47 @@ var gd3d;
                     return;
                 this.NextHandle(list, state, onstate);
             };
-            assetBundle.startParseByUrl = function (url) {
+            assetBundle.addNoParsing = function (url, assetmgr) {
+                if (!url || assetmgr["maploaded"][url])
+                    return false;
+                var fname = assetmgr.getFileName(url);
+                if (assetmgr["mapInLoad"][fname])
+                    return false;
+                this.noParsingDic[url] = true;
+                return true;
+            };
+            assetBundle.tryParsePreloadAB = function (url, onstate) {
                 var source = this.needParsesArr[url];
-                if (source) {
-                    source.call(source.list, source.state, source.onstate);
-                    delete this.needParsesArr[url];
-                    return true;
-                }
+                if (!source)
+                    return false;
+                source.call(source.list, source.state, onstate);
+                delete this.needParsesArr[url];
+                return true;
             };
             assetBundle.prototype.NextHandle = function (list, state, onstate) {
-                if (assetBundle.needParsing) {
+                if (!assetBundle.noParsingDic[this.url]) {
                     this.NextHandleParsing(list, state, onstate);
                 }
                 else {
+                    delete assetBundle.noParsingDic[this.url];
+                    var fname = this.assetmgr.getFileName(this.url);
+                    delete this.assetmgr["mapInLoad"][fname];
                     assetBundle.needParsesArr[this.url] = {
                         list: list,
                         state: state,
                         onstate: onstate,
                         call: this.NextHandleParsing.bind(this)
                     };
-                    if (assetBundle.preloadCompleteFun) {
-                        assetBundle.preloadCompleteFun(this.url);
+                    var len = list.length;
+                    for (var i = 0; i < len; i++) {
+                        var l = list[i];
+                        if (!l || !l.guid)
+                            continue;
+                        assetBundle.noParsingLoadedGUID[l.guid] = true;
                     }
+                    this.endWaitList(list);
+                    if (assetBundle.preloadCompleteFun)
+                        assetBundle.preloadCompleteFun(this.url);
                 }
             };
             assetBundle.prototype.NextHandleParsing = function (list, state, onstate) {
@@ -8282,19 +8304,33 @@ var gd3d;
                                 lastHandle.sort(function (a, b) {
                                     return b.type - a.type;
                                 });
-                                while (lastHandle.length > 0)
-                                    lastHandle.shift().handle();
-                                waitArrs = [];
-                                finish();
+                                _this.ReadyFinish(lastHandle, finish);
+                                waitArrs.length = 0;
                             }
                         });
                     }
                 }
                 if (waitArrs.length < 1) {
-                    while (lastHandle.length > 0)
-                        lastHandle.shift().handle();
-                    finish();
+                    this.ReadyFinish(lastHandle, finish);
                 }
+            };
+            assetBundle.prototype.ReadyFinish = function (lastHandle, finish) {
+                var awaits = [];
+                var count = 0;
+                while (lastHandle.length > 0) {
+                    var awaiting = lastHandle.shift().handle();
+                    if (awaiting && awaiting.then) {
+                        awaits.push(awaiting);
+                        awaiting.then(function () {
+                            if (++count >= awaits.length) {
+                                finish();
+                                awaits.length = 0;
+                            }
+                        });
+                    }
+                }
+                if (awaits.length == 0)
+                    finish();
             };
             assetBundle.prototype.endWaitList = function (list) {
                 var len = list.length;
@@ -8323,8 +8359,9 @@ var gd3d;
                     return false;
                 return true;
             };
-            assetBundle.needParsing = true;
+            assetBundle.noParsingDic = {};
             assetBundle.needParsesArr = {};
+            assetBundle.noParsingLoadedGUID = {};
             return assetBundle;
         }());
         framework.assetBundle = assetBundle;
@@ -8760,7 +8797,7 @@ var gd3d;
                             filename = _this.getFileName(url);
                             var ab = new framework.assetBundle(url);
                             ab.name = filename;
-                            ab.parse(JSON.parse(txt));
+                            ab.parse(json);
                             ab.load(_this, onstate, state);
                         }
                         else {
@@ -8845,6 +8882,9 @@ var gd3d;
                 if (onstate === void 0) { onstate = null; }
                 if (onstate == null)
                     onstate = function () { };
+                var parsed = framework.assetBundle.tryParsePreloadAB(url, onstate);
+                if (parsed)
+                    return;
                 if (this.maploaded[url]) {
                     if (onstate) {
                         var state = new stateLoad();
