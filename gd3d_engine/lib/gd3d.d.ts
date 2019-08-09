@@ -1455,13 +1455,16 @@ declare namespace gd3d.framework {
         static addNoParsing(url: string, assetmgr: assetMgr): boolean;
         private static noParsingDic;
         private static needParsesArr;
-        private static noParsingLoadedGUID;
-        static tryParsePreloadAB(url: string, onstate: (state: stateLoad) => void): boolean;
+        private static noParsingLoadedDic;
+        private static pardingGuidDic;
+        static tryParsePreloadAB(url: string, onstate: (state: stateLoad) => void, assetmgr: assetMgr): boolean;
         static preloadCompleteFun: (url: string) => any;
+        private noParsingUrls;
         private NextHandle;
         private NextHandleParsing;
         private ReadyFinish;
-        private endWaitList;
+        private static addToWaitList;
+        private static endWaitList;
         private mapIsNull;
         mapNamed: {
             [name: string]: number;
@@ -1589,7 +1592,9 @@ declare namespace gd3d.framework {
         getAssetsRefcount(): {
             [id: string]: number;
         };
-        private mapInLoad;
+        mapInLoad: {
+            [id: string]: stateLoad;
+        };
         removeAssetBundle(name: string): void;
         private assetUrlDic;
         setAssetUrl(asset: IAsset, url: string): void;
@@ -2383,7 +2388,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess;
         private readFinish;
-        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<unknown>;
+        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<{}>;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
         private _cacheMinP;

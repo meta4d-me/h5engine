@@ -833,7 +833,7 @@ namespace gd3d.framework
             return mapRefcout;
         }
 
-        private mapInLoad: { [id: string]: stateLoad } = {};
+        mapInLoad: { [id: string]: stateLoad } = {};
         removeAssetBundle(name: string)
         {
             if (this.mapBundle[name] != null)
@@ -1266,7 +1266,7 @@ namespace gd3d.framework
             if (onstate == null)
                 onstate = () => { };
 
-            let parsed =  assetBundle.tryParsePreloadAB(url , onstate);
+            let parsed =  assetBundle.tryParsePreloadAB(url , onstate , this);
             if(parsed) return;   //尝试 直接解析之前加载完毕的资源
 
             // console.log(`资源包 : ${url} 开始加载`);

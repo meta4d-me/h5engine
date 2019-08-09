@@ -232,7 +232,7 @@ namespace gd3d.framework {
                 let url = this.path + "/" + fitem.name;
                 let fileName = assetmgr.getFileName(url);
                 let guid = fitem.guid;
-                if (guid != undefined) {
+                if (guid != undefined && !assetBundle.noParsingLoadedDic[guid]) {   //已预载过 处理
                     let mapGuid = assetmgr.mapGuidId;
                     let mAssId = mapGuid[guid];
                     // guid重复性检查
@@ -240,11 +240,6 @@ namespace gd3d.framework {
                     if (mAssId != undefined) {
                         //如果是来自同一个ab包的 guid重复资源 ，则不放入等待列表
                         if (guidList[guid]) {
-                            continue;
-                        }
-                        
-                        //判断是否在 不解析加载流程中 已经完成
-                        if(assetBundle.noParsingLoadedGUID[guid]){
                             continue;
                         }
 
@@ -265,12 +260,7 @@ namespace gd3d.framework {
                                 this.CkNextHandleOfGuid(list, state, onstate);
                             };
 
-                            let waitList: any[];
-                            if (!assetmgr.mapGuidWaitLoaded[guid]) {
-                                assetmgr.mapGuidWaitLoaded[guid] = [];
-                            }
-                            waitList = assetmgr.mapGuidWaitLoaded[guid];
-                            waitList.push(waitLoaded);//等待同guid资源加完 回调处理
+                            assetBundle.addToWaitList(this.assetmgr,waitLoaded,guid);
 
                         }
                         continue;  //跳过 不放入加载队列
@@ -390,6 +380,8 @@ namespace gd3d.framework {
             let tempMap = {};
             //按list 顺序加载
             for (let item of list) {
+                let guid = item.guid;
+                if(guid != undefined && assetBundle.noParsingLoadedDic[guid]) continue; //判断是否在 不解析加载流程中 已经完成
                 let surl = item.url;
                 let type = item.type;
                 let asset = item.asset;
@@ -524,9 +516,9 @@ namespace gd3d.framework {
          * @param assetmgr 
          */
         static addNoParsing(url:string , assetmgr : assetMgr):boolean{
-            if(! url || assetmgr["maploaded"][url]) return false;  //对应资源已在 加载中或加载完成的 不处理
+            if(! url || assetmgr.maploaded[url]) return false;  //对应资源已在 加载中或加载完成的 不处理
             let fname = assetmgr.getFileName(url);
-            if(assetmgr["mapInLoad"][fname] ) return false;
+            if(assetmgr.mapInLoad[fname] ) return false;
             this.noParsingDic[url] = true;
             return true;
         }
@@ -538,6 +530,7 @@ namespace gd3d.framework {
         //待解析列表
         private static needParsesArr: {
             [key: string]: {
+                keyList : string [];
                 list: { url: string, type: AssetTypeEnum, guid: string, asset: IAsset, handle: () => any }[],
                 state,
                 onstate,
@@ -545,24 +538,70 @@ namespace gd3d.framework {
             }
         } = {};
 
-        private static noParsingLoadedGUID : {[guid:string] : boolean} = {};
+
+        //加载完毕后没解析的 字典列表
+        private static noParsingLoadedDic : {[guid:string] : { url: string, type: AssetTypeEnum, guid: string, asset: IAsset, handle: () => any }} = {};
+
+        private static pardingGuidDic : {[key:string] : boolean} = {};
 
         /**
          * 尝试解析预载过的 AB 资源 
          * return true 解析成功
          * @param url assetBundle 的 url
          */
-        static tryParsePreloadAB(url: string , onstate: (state: stateLoad) => void):boolean {
+        static tryParsePreloadAB(url: string , onstate: (state: stateLoad) => void , assetmgr : assetMgr):boolean {
             let source = this.needParsesArr[url];
             if(!source) return false;
-            source.call(source.list, source.state, onstate);
             delete this.needParsesArr[url];
+
+            // let fname = assetmgr.getFileName(url);
+            // assetmgr.mapInLoad[fname] = source.state; //inload add
+
+            let loadlist = [];
+            let keys = source.keyList;
+            let len = keys.length;
+            let guidCount = 0;
+            let waitLoaded = () => {
+                guidCount--; //减少计数
+                if(guidCount <= 0 ){
+                    //检查加载结束to解析资源
+                    source.call(loadlist, source.state, onstate);
+                }
+            };
+            for(let i=0;i < len ;i++){
+                let key = keys[i];
+                let l = assetBundle.noParsingLoadedDic[key];
+                let needWait = false;
+                if(!l){
+                    if(this.pardingGuidDic[key]) {
+                        needWait = true;
+                    }
+                }
+
+                if(l.guid == key && needWait){
+                    //guid 标记(需要等待去重解析回调)
+                    guidCount++;
+                    assetBundle.addToWaitList(assetmgr,waitLoaded,l.guid);
+                }else{
+                    if(l.guid == key){
+                        this.pardingGuidDic[key] = true;
+                        delete assetBundle.noParsingLoadedDic[key];
+                    }
+                    loadlist.push(l);
+                }
+            }
+
+            if(guidCount == 0){
+                source.call(loadlist, source.state, onstate);                           
+            }
             return true;
         }
 
         /** 仅资源加载完毕 回调 , ( 仅 addNoParsing() 调用过的有效 ) */
         static preloadCompleteFun:(url:string)=>any;
 
+
+        private noParsingUrls = [];
         //文件加载完毕后统一解析处理 
         private NextHandle(list: { url: string, type: AssetTypeEnum, guid: string, asset: IAsset, handle: () => any }[], state, onstate) {
             // if (assetBundle.needParsing) {
@@ -571,24 +610,33 @@ namespace gd3d.framework {
             } else {
                 // console.log("只预加载    " + this.url);
                 delete assetBundle.noParsingDic[this.url];  //清理记录
-                let fname = this.assetmgr.getFileName(this.url);
-                delete this.assetmgr["mapInLoad"][fname]; //inload 记录清除
+                // let fname = this.assetmgr.getFileName(this.url);
+                // delete this.assetmgr.mapInLoad[fname]; //inload 记录清除
 
+                let keyList = [];
+                let len = list.length;
+                for(let i=0; i < len ;i++){  //不解析资源 下载完毕 的guid 或者 url 标记 
+                    let l = list[i];
+                    let key = "";   
+                    if(!l )continue;
+                    key = l.guid;
+                    if(!key) key = l.url;
+                    if(!key) continue;
+                    if(!assetBundle.noParsingLoadedDic[key])    assetBundle.noParsingLoadedDic[key] = l;
+                    keyList.push(key);
+                }
+
+                //放入容器等待 以后调用解析
                 assetBundle.needParsesArr[this.url] = {
+                    keyList : keyList,
                     list: list,
                     state: state,
                     onstate: onstate,
                     call: this.NextHandleParsing.bind(this)
                 }
 
-                let len = list.length;
-                for(let i=0; i < len ;i++){  //不解析资源 下载完毕 的guid 标记
-                    let l = list[i];
-                    if(!l || !l.guid)continue;
-                    assetBundle.noParsingLoadedGUID[l.guid] = true;
-                }
 
-                this.endWaitList(list); //去重依赖调用
+                assetBundle.endWaitList(this.assetmgr,list); //去重依赖调用
 
                 if(assetBundle.preloadCompleteFun)  assetBundle.preloadCompleteFun(this.url);  //回调
             }
@@ -603,7 +651,7 @@ namespace gd3d.framework {
                 state.isfinish = true;
                 onstate(state);
                 //回调 guid列表
-                this.endWaitList(list);
+                assetBundle.endWaitList(this.assetmgr,list);
             };
             for (var i = 0, l = list.length; i < l; ++i) {
                 var hitem = list[i];
@@ -656,20 +704,33 @@ namespace gd3d.framework {
             if(awaits.length == 0)
                 finish();
         }
-        private endWaitList(list: { url: string, type: AssetTypeEnum, guid: string, asset: IAsset, handle: () => any }[]) {
+
+        private static addToWaitList(assetmgr : assetMgr,fun:Function,guid: string){
+            if(!guid)return;
+            let waitList: any[];
+            if (!assetmgr.mapGuidWaitLoaded[guid]) {
+                assetmgr.mapGuidWaitLoaded[guid] = [];
+            }
+            waitList = assetmgr.mapGuidWaitLoaded[guid];
+            waitList.push(fun);//等待同guid资源加完 回调处理
+        }
+
+        private static endWaitList(assetmgr : assetMgr , list: { url: string, type: AssetTypeEnum, guid: string, asset: IAsset, handle: () => any }[]) {
             //回调guid列表
             let len = list.length;
             for (let i = 0; i < len; i++) {
                 let item = list[i];
                 if (item.guid == undefined) continue;
                 let guid = item.guid;
-                let wlMap = this.assetmgr.mapGuidWaitLoaded;
+                if(this.pardingGuidDic[guid]) delete this.pardingGuidDic[guid];
+                let wlMap = assetmgr.mapGuidWaitLoaded;
                 if (wlMap[guid] == undefined) continue;
                 let waitList = wlMap[guid];
                 if (waitList) {
-                    waitList.forEach(element => {
-                        element();
-                    });
+                    let len = waitList.length;
+                    for(let i=0 ;i < len ; i++){
+                        waitList[i]();
+                    }
                     waitList.length = 0;
                     delete wlMap[guid];
                 }
