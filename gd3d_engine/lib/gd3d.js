@@ -7860,7 +7860,6 @@ var gd3d;
                 this.totalLength = 0;
                 this.loadLightMap = true;
                 this.waitGuidCount = 0;
-                this.noParsingUrls = [];
                 this.mapNamed = {};
                 this.mapNameGuid = {};
                 this.url = url;
@@ -7990,7 +7989,7 @@ var gd3d;
                     var url = this.path + "/" + fitem.name;
                     var fileName = assetmgr.getFileName(url);
                     var guid = fitem.guid;
-                    if (guid != undefined && !assetBundle.noParsingLoadedDic[guid]) {
+                    if (guid != undefined) {
                         var mapGuid = assetmgr.mapGuidId;
                         var mAssId = mapGuid[guid];
                         if (mAssId != undefined) {
@@ -8112,9 +8111,6 @@ var gd3d;
                 var haveBin = false;
                 var tempMap = {};
                 var _loop_2 = function (item) {
-                    var guid = item.guid;
-                    if (guid != undefined && assetBundle.noParsingLoadedDic[guid])
-                        return "continue";
                     var surl = item.url;
                     var type = item.type;
                     var asset = item.asset;
@@ -8229,90 +8225,7 @@ var gd3d;
             assetBundle.prototype.CkNextHandleOfGuid = function (list, state, onstate) {
                 if (this.waitGuidCount > 0)
                     return;
-                this.NextHandle(list, state, onstate);
-            };
-            assetBundle.addNoParsing = function (url, assetmgr) {
-                if (!url || assetmgr.maploaded[url])
-                    return false;
-                var fname = assetmgr.getFileName(url);
-                if (assetmgr.mapInLoad[fname])
-                    return false;
-                this.noParsingDic[url] = true;
-                return true;
-            };
-            assetBundle.tryParsePreloadAB = function (url, onstate, assetmgr) {
-                var source = this.needParsesArr[url];
-                if (!source)
-                    return false;
-                delete this.needParsesArr[url];
-                var loadlist = [];
-                var keys = source.keyList;
-                var len = keys.length;
-                var guidCount = 0;
-                var waitLoaded = function () {
-                    guidCount--;
-                    if (guidCount <= 0) {
-                        source.call(loadlist, source.state, onstate);
-                    }
-                };
-                for (var i = 0; i < len; i++) {
-                    var key = keys[i];
-                    var l = assetBundle.noParsingLoadedDic[key];
-                    var needWait = false;
-                    if (!l) {
-                        if (this.pardingGuidDic[key]) {
-                            needWait = true;
-                        }
-                        if (needWait) {
-                            guidCount++;
-                            assetBundle.addToWaitList(assetmgr, waitLoaded, l.guid);
-                        }
-                        continue;
-                    }
-                    if (l && l.guid == key) {
-                        this.pardingGuidDic[key] = true;
-                        delete assetBundle.noParsingLoadedDic[key];
-                    }
-                    loadlist.push(l);
-                }
-                if (guidCount == 0) {
-                    source.call(loadlist, source.state, onstate);
-                }
-                return true;
-            };
-            assetBundle.prototype.NextHandle = function (list, state, onstate) {
-                if (!assetBundle.noParsingDic[this.url]) {
-                    this.NextHandleParsing(list, state, onstate);
-                }
-                else {
-                    delete assetBundle.noParsingDic[this.url];
-                    var keyList = [];
-                    var len = list.length;
-                    for (var i = 0; i < len; i++) {
-                        var l = list[i];
-                        var key = "";
-                        if (!l)
-                            continue;
-                        key = l.guid;
-                        if (!key)
-                            key = l.url;
-                        if (!key)
-                            continue;
-                        if (!assetBundle.noParsingLoadedDic[key])
-                            assetBundle.noParsingLoadedDic[key] = l;
-                        keyList.push(key);
-                    }
-                    assetBundle.needParsesArr[this.url] = {
-                        keyList: keyList,
-                        list: list,
-                        state: state,
-                        onstate: onstate,
-                        call: this.NextHandleParsing.bind(this)
-                    };
-                    assetBundle.endWaitList(this.assetmgr, list);
-                    if (assetBundle.preloadCompleteFun)
-                        assetBundle.preloadCompleteFun(this.url);
-                }
+                this.NextHandleParsing(list, state, onstate);
             };
             assetBundle.prototype.NextHandleParsing = function (list, state, onstate) {
                 var _this = this;
@@ -8385,8 +8298,6 @@ var gd3d;
                     if (item.guid == undefined)
                         continue;
                     var guid = item.guid;
-                    if (this.pardingGuidDic[guid])
-                        delete this.pardingGuidDic[guid];
                     var wlMap = assetmgr.mapGuidWaitLoaded;
                     if (wlMap[guid] == undefined)
                         continue;
@@ -8408,10 +8319,6 @@ var gd3d;
                     return false;
                 return true;
             };
-            assetBundle.noParsingDic = {};
-            assetBundle.needParsesArr = {};
-            assetBundle.noParsingLoadedDic = {};
-            assetBundle.pardingGuidDic = {};
             return assetBundle;
         }());
         framework.assetBundle = assetBundle;
@@ -8932,9 +8839,6 @@ var gd3d;
                 if (onstate === void 0) { onstate = null; }
                 if (onstate == null)
                     onstate = function () { };
-                var parsed = framework.assetBundle.tryParsePreloadAB(url, onstate, this);
-                if (parsed)
-                    return;
                 if (this.maploaded[url]) {
                     if (onstate) {
                         var state = new stateLoad();
