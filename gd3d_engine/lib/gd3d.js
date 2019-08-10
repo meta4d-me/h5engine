@@ -8263,18 +8263,17 @@ var gd3d;
                         if (this.pardingGuidDic[key]) {
                             needWait = true;
                         }
-                    }
-                    if (l.guid == key && needWait) {
-                        guidCount++;
-                        assetBundle.addToWaitList(assetmgr, waitLoaded, l.guid);
-                    }
-                    else {
-                        if (l.guid == key) {
-                            this.pardingGuidDic[key] = true;
-                            delete assetBundle.noParsingLoadedDic[key];
+                        if (needWait) {
+                            guidCount++;
+                            assetBundle.addToWaitList(assetmgr, waitLoaded, l.guid);
                         }
-                        loadlist.push(l);
+                        continue;
                     }
+                    if (l && l.guid == key) {
+                        this.pardingGuidDic[key] = true;
+                        delete assetBundle.noParsingLoadedDic[key];
+                    }
+                    loadlist.push(l);
                 }
                 if (guidCount == 0) {
                     source.call(loadlist, source.state, onstate);

@@ -576,19 +576,21 @@ namespace gd3d.framework {
                     if(this.pardingGuidDic[key]) {
                         needWait = true;
                     }
+
+                    if(needWait){
+                        guidCount++;
+                        assetBundle.addToWaitList(assetmgr,waitLoaded,l.guid);
+                    }
+
+                    continue;
                 }
 
-                if(l.guid == key && needWait){
+                if(l && l.guid == key){
                     //guid 标记(需要等待去重解析回调)
-                    guidCount++;
-                    assetBundle.addToWaitList(assetmgr,waitLoaded,l.guid);
-                }else{
-                    if(l.guid == key){
-                        this.pardingGuidDic[key] = true;
-                        delete assetBundle.noParsingLoadedDic[key];
-                    }
-                    loadlist.push(l);
+                    this.pardingGuidDic[key] = true;
+                    delete assetBundle.noParsingLoadedDic[key];
                 }
+                loadlist.push(l);
             }
 
             if(guidCount == 0){
