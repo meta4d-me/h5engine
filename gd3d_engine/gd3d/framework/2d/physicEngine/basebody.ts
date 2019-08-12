@@ -378,7 +378,7 @@ namespace gd3d.framework {
             math.vec2Clone(tSca , this.lastScale);
 
             //位移、旋转
-            if(this.enableBT && this.body.isSleeping){
+            if(this.enableBT){
                 this.setPhyBodyTransformation();
             }
 
@@ -428,7 +428,7 @@ namespace gd3d.framework {
         private setTransformationFormPhyBody(){
             let trans = this.transform;
             let bPos = this.body.position;
-            if(this.enableBT && !this.body.isSleeping){
+            if(this.enableBT){
                 let bfPos = this.beforePos;
                 let deltaX = bPos.x - bfPos.x ;
                 let deltaY = bPos.y - bfPos.y ;
