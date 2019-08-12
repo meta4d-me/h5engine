@@ -1433,7 +1433,6 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class assetBundle {
         name: string;
-        private id;
         assetmgr: assetMgr;
         private files;
         private packages;
@@ -1452,15 +1451,6 @@ declare namespace gd3d.framework {
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
         private downloadFinsih;
         private CkNextHandleOfGuid;
-        static addNoParsing(url: string, assetmgr: assetMgr): boolean;
-        private static noParsingDic;
-        private static needParsesArr;
-        private static noParsingLoadedDic;
-        private static pardingGuidDic;
-        static tryParsePreloadAB(url: string, onstate: (state: stateLoad) => void, assetmgr: assetMgr): boolean;
-        static preloadCompleteFun: (url: string) => any;
-        private noParsingUrls;
-        private NextHandle;
         private NextHandleParsing;
         private ReadyFinish;
         private static addToWaitList;
@@ -2388,7 +2378,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess;
         private readFinish;
-        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<unknown>;
+        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<{}>;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
         private _cacheMinP;

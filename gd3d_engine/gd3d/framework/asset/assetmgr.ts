@@ -1266,8 +1266,8 @@ namespace gd3d.framework
             if (onstate == null)
                 onstate = () => { };
 
-            let parsed =  assetBundle.tryParsePreloadAB(url , onstate , this);
-            if(parsed) return;   //尝试 直接解析之前加载完毕的资源
+            // let parsed =  assetBundle.tryParsePreloadAB(url , onstate , this);
+            // if(parsed) return;   //尝试 直接解析之前加载完毕的资源
 
             // console.log(`资源包 : ${url} 开始加载`);
             if(this.maploaded[url])
