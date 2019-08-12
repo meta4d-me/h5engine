@@ -3067,10 +3067,12 @@ var gd3d;
                 if (!this.componentTypes[type])
                     return;
                 delete this.componentTypes[type];
-                for (var i = 0; i < this.components.length; i++) {
-                    if (gd3d.reflect.getClassName(this.components[i].comp) == type) {
-                        this.clearOfCompRemove(this.components[i]);
-                        var p = this.components.splice(i, 1);
+                var comps = this.components;
+                var len = comps.length;
+                for (var i = 0; i < len; i++) {
+                    if (framework.getClassName(comps[i].comp) == type) {
+                        this.clearOfCompRemove(comps[i]);
+                        var p = comps.splice(i, 1);
                         return p[0];
                     }
                 }
@@ -32234,7 +32236,7 @@ var gd3d;
                 var result = null;
                 var i = 0, len = this.components.length;
                 while (i < len) {
-                    if (gd3d.reflect.getClassName(this.components[i].comp) == type) {
+                    if (framework.getClassName(this.components[i].comp) == type) {
                         this.clearOfCompRemove(this.components[i]);
                         var results = this.components.splice(i, 1);
                         if (results[0].comp)

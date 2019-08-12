@@ -654,7 +654,8 @@ namespace gd3d.framework
             var i = 0, len = this.components.length;
             while (i < len)
             {
-                if (reflect.getClassName(this.components[i].comp) == type)
+                // if (reflect.getClassName(this.components[i].comp) == type)
+                if (getClassName(this.components[i].comp) == type)
                 {
                     // if (this.components[i].init)
                     // {//已经初始化过

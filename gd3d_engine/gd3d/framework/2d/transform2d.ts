@@ -1055,10 +1055,13 @@ namespace gd3d.framework {
             if(!this.componentTypes[type])
             return;
             delete this.componentTypes[type];
-            for (var i = 0; i < this.components.length; i++) {
-                if (reflect.getClassName(this.components[i].comp) == type) {
-                    this.clearOfCompRemove(this.components[i]);
-                    var p = this.components.splice(i, 1);
+            let comps = this.components;
+            let len = comps.length;
+            for (var i = 0; i < len; i++) {
+                // if (reflect.getClassName(this.components[i].comp) == type) {
+                if (getClassName(comps[i].comp) == type) {
+                    this.clearOfCompRemove(comps[i]);
+                    var p = comps.splice(i, 1);
                     return p[0];
                 }
             }
