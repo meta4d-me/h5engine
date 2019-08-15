@@ -86,6 +86,7 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         Prefab,
+        cPrefab,
         /**
          * @public
          * @language zh_CN
@@ -947,6 +948,7 @@ namespace gd3d.framework
             this.regAssetFactory(AssetTypeEnum.TextureDesc, new AssetFactory_TextureDesc());
             this.regAssetFactory(AssetTypeEnum.Mesh, new AssetFactory_Mesh());
             this.regAssetFactory(AssetTypeEnum.Prefab, new AssetFactory_Prefab());
+            this.regAssetFactory(AssetTypeEnum.cPrefab, new AssetFactory_cPrefab());
             this.regAssetFactory(AssetTypeEnum.Material, new AssetFactory_Material());
             this.regAssetFactory(AssetTypeEnum.Aniclip, new AssetFactory_Aniclip());
             this.regAssetFactory(AssetTypeEnum.Scene, new AssetFactory_Scene());
@@ -1775,6 +1777,9 @@ namespace gd3d.framework
                 else if (extname == ".prefab.json")
                 {
                     return AssetTypeEnum.Prefab;
+                }else if (extname == ".cprefab.json")
+                {
+                    return AssetTypeEnum.cPrefab;
                 }
                 else if (extname == ".scene.json")
                 {

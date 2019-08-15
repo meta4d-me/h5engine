@@ -319,6 +319,10 @@ namespace gd3d.framework {
                             asset = new prefab(fileName);
                             prefabs.push(_item);
                             break;
+                        case AssetTypeEnum.cPrefab:
+                            asset = new prefab(fileName);
+                            prefabs.push(_item);
+                            break;
                         case AssetTypeEnum.Scene:
                             asset = new rawscene(fileName);
                             scenes.push(_item);
@@ -354,8 +358,14 @@ namespace gd3d.framework {
                     }
                     _item.asset = asset;
 
-                    if (type != AssetTypeEnum.GLVertexShader && type != AssetTypeEnum.GLFragmentShader && type != AssetTypeEnum.Shader
-                        && type != AssetTypeEnum.PackBin && type != AssetTypeEnum.PackTxt && type != AssetTypeEnum.Prefab) {
+                    if (type != AssetTypeEnum.GLVertexShader && 
+                        type != AssetTypeEnum.GLFragmentShader && 
+                        type != AssetTypeEnum.Shader&& 
+                        type != AssetTypeEnum.PackBin && 
+                        type != AssetTypeEnum.PackTxt && 
+                        type != AssetTypeEnum.Prefab&&
+                        type != AssetTypeEnum.cPrefab
+                        ) {
                         if (!asset)
                             continue;
                         let assId = asset.getGUID();
@@ -569,7 +579,10 @@ namespace gd3d.framework {
                 if (!hitem.handle)
                     continue;
 
-                if (hitem.type == AssetTypeEnum.Scene || hitem.type == AssetTypeEnum.Prefab || hitem.type == AssetTypeEnum.F14Effect) {
+                if (hitem.type == AssetTypeEnum.Scene || 
+                    hitem.type == AssetTypeEnum.Prefab || 
+                    hitem.type == AssetTypeEnum.cPrefab || 
+                    hitem.type == AssetTypeEnum.F14Effect) {
                     lastHandle.push(hitem)
                     continue;
                 }

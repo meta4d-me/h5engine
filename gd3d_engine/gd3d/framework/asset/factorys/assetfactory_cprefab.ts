@@ -1,6 +1,6 @@
 namespace gd3d.framework
 {
-    export class AssetFactory_Prefab implements IAssetFactory
+    export class AssetFactory_cPrefab implements IAssetFactory
     {
         newAsset(): prefab
         {
@@ -11,13 +11,13 @@ namespace gd3d.framework
         {
             let bundlename = getFileName(state.url);
             let filename = getFileName(url);
-
+            filename = filename.replace("cprefab","prefab");
             state.resstate[filename] = new ResourceState();
             if (state.resstateFirst == null)
             {
                 state.resstateFirst = state.resstate[filename];
             }
-            gd3d.io.loadText(url, (txt, err, isloadFail) =>
+            gd3d.io.loadJSON(url, (json, err, isloadFail) =>
             {
                 call(() =>
                 {
@@ -28,10 +28,8 @@ namespace gd3d.framework
                     _prefab.assetbundle = bundlename;
                     // _prefab.Parse(txt, assetMgr);
                     // AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
-                    return _prefab.Parse(txt, assetMgr).then(() =>
-                    {
-                        AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
-                    });
+                    _prefab.cParse(json, assetMgr);
+                    AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url.replace("cprefab","prefab"));
                 });
 
 
@@ -47,27 +45,28 @@ namespace gd3d.framework
         {
             call(() =>
             {
-                
-                    let bundlename = getFileName(state.url);
-                    let filename = getFileName(url);
 
-                    state.resstate[filename] = new ResourceState();
-                    if (state.resstateFirst == null)
-                    {
-                        state.resstateFirst = state.resstate[filename];
-                    }
-                    let txt = respack[filename];
-                    let _prefab = asset ? asset : new prefab(filename);
-                    _prefab.assetbundle = bundlename;
+                let bundlename = getFileName(state.url);
+                let filename = getFileName(url);
+                let oldName = filename;
+                filename = filename.replace("cprefab","prefab");
+                state.resstate[filename] = new ResourceState();
+                if (state.resstateFirst == null)
+                {
+                    state.resstateFirst = state.resstate[filename];
+                }
+                let txt = respack[oldName];
+                let _prefab = asset ? asset : new prefab(filename);
+                _prefab.assetbundle = bundlename;
 
-                    return _prefab.Parse(txt, assetMgr).then(() =>
-                    {
-                        AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
-                        
-                    });
-                    // await _prefab.Parse(txt, assetMgr);
-                    // AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
-                
+                return io.JSONParse(txt).then((json) =>
+                {
+                    _prefab.cParse(json, assetMgr);
+                    AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url.replace("cprefab","prefab"));
+                });
+                // await _prefab.Parse(txt, assetMgr);
+                // AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+
             });
         }
     }

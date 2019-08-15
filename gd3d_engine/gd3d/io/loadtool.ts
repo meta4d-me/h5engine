@@ -100,44 +100,116 @@
         });
     }
 
-    var cachedMap;
-    var cachedTime = 0;
-    export async function GetJSON(url: string, text: string = undefined)
+    var cachedMap = {};
+    var checkClsTime = 0;
+    function GetJSON(url: string, text: string = undefined)
     {
-
-        if (Date.now() - cachedTime > 60000)
+        return new threading.gdPromise<any>((r) =>
         {
-            cachedMap = {};
-            cachedTime = Date.now();
-        }
-        if (cachedMap[url])
-            return cachedMap[url];
-        if (!text)
-            return;
-        return cachedMap[url] = await JSONParse(text);// JSON.parse(text);
+            let cached = cachedMap[url];
+            if (cached.ready)
+                return r(cachedMap[url].json);
+
+            JSONParse(text).then((json) =>
+            {
+                //cachedMap[url] = json;
+                cached.ready = true;
+                cached.json = json;
+                cached.useTime = Date.now();
+                r(json);
+            });
+
+        });
+        // return JSONParse(text);
     }
 
     export function JSONParse(text: string)
     {
-        return new Promise<any>((resolve) =>
+        return new threading.gdPromise<any>((resolve, resaon) =>
         {
-            resolve(JSON.parse(text));
+            let json;
+            try
+            {
+                json = JSON.parse(text);
+            } catch (e)
+            {
+                resaon(e);
+            }
+            resolve(json);
         });
     }
-    export async function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null) 
+    export function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null) 
     {
-        if (framework.assetMgr.useBinJs)
-        {
-            url = framework.assetMgr.correctTxtFileName(url);
-        }
-        let obj = await GetJSON(url);
-        if (obj)
-            return fun(obj, null);
 
-        gd3d.io.xhrLoad(url, fun, onprocess, "text", async (req) =>
+        return new threading.gdPromise((r) =>
         {
-            fun(await GetJSON(url, req.response), null);
+            if (framework.assetMgr.useBinJs)
+                url = framework.assetMgr.correctTxtFileName(url);
+            let now = Date.now();
+            if (now - checkClsTime > 15000)//15秒检查缓存
+            {
+                // console.log("检查json缓存");
+                checkClsTime = now;
+                for (let k in cachedMap)
+                {
+                    let cached = cachedMap[k];
+                    if (cached.ready && now - cachedMap[k].useTime >= 60000)//1分钟 未使用自动清除
+                    {
+                        // console.log(`json 超时 ${k} ${(now - cached.useTime) / 1000}/秒`);
+                        delete cachedMap[k];
+                    }
+                }
+            }
+            let cached = cachedMap[url];
+            if (!cached)
+            {
+                cached = cachedMap[url] = {
+                    queue: [],
+                    // ready: false,
+                    init: true,
+                    useTime: now
+                };
+            }
+
+            if (!cached.ready)
+                cached.queue.push(fun);
+
+            if (cached.ready)
+            {
+                fun(cached.json, null);
+                r();
+                return;
+            }
+
+
+            if (cached.init)
+            {
+                cached.init = false;
+
+                gd3d.io.xhrLoad(url, fun, onprocess, "text", (req) =>
+                {
+                    GetJSON(url, req.response).then(() =>
+                    {
+                        let cached = cachedMap[url];
+                        const slowOut = function ()
+                        {
+                            if (cached.queue.length > 0)
+                                cached.queue.shift()(cached.json, null);
+
+                            if (cached.queue.length > 0)
+                                setTimeout(slowOut, 10);
+                        }
+                        // while (cached.queue.length > 0)
+                        if (cached.queue.length == 1)
+                            cached.queue.shift()(cached.json, null);
+                        else
+                            slowOut();
+                    });
+                });
+            }
+
         });
+
     }
     /**
      * @public

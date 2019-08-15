@@ -1,16 +1,19 @@
 /// <reference path="../lib/gd3d.d.ts" />
 
-class test_01 implements IState {
+class test_01 implements IState
+{
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
-    start(app: gd3d.framework.application) {
+    start(app: gd3d.framework.application)
+    {
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
 
         let cuber: gd3d.framework.meshRenderer;
 
-        for (var i = 0; i < 1; i++) {
+        for (var i = 0; i < 1; i++)
+        {
             //添加一个盒子
             var cube = new gd3d.framework.transform();
             cube.name = "cube";
@@ -26,14 +29,67 @@ class test_01 implements IState {
             var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
             mesh.mesh = smesh;
             var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-
+            let v3 = cube.localEulerAngles;
+            console.log(cube.getWorldMatrix());
+            v3.x += 50;
+            cube.localEulerAngles = v3;
 
             //var collider = cube.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
 
-            cube.markDirty();
+            // cube.markDirty();
+            console.log(cube.getWorldMatrix());
             cuber = renderer;
 
             console.warn("Finish it.");
+            let assetMgr = this.app.getAssetMgr();
+            assetMgr.load("res/test/customShader/customShader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+            {
+                if (state.isfinish)
+                {
+                    // assetMgr.load("res/test/1/ui/yingdao_page/yingdao_page.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                    // {
+                    //     if (state.isfinish)
+                    //     {
+                    //         let prefab = assetMgr.getAssetByName("yingdao_page.prefab.json") as gd3d.framework.prefab;
+                    //         let trans = prefab.getCloneTrans();
+                    //         console.log("###", trans);
+                    //     }
+                    // });
+                    var cloneCount = 1;//1000;
+                    // assetMgr.load("res/test/0/PF_PlayerSharkReef/PF_PlayerSharkReef.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                    // {
+                    //     if (state.isfinish)
+                    //     {
+                    //         let prefab = assetMgr.getAssetByName("PF_PlayerSharkReef.prefab.json") as gd3d.framework.prefab;
+                    //         let time = Date.now();
+                    //         for (let i = 0; i < cloneCount; ++i)
+                    //         {
+                    //             let shark = prefab.getCloneTrans();
+                    //         }
+                    //         let useTime = Date.now() - time;
+                    //         console.log(`old clone trans:${useTime}/ms count:${cloneCount}`);
+                    //         // this.scene.addChild(shark);
+                    //     }
+                    // });
+
+                    assetMgr.load("res/test/1/PF_PlayerSharkReef/PF_PlayerSharkReef1.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                    {
+                        if (state.isfinish)
+                        {
+                            let prefab = assetMgr.getAssetByName("PF_PlayerSharkReef1.prefab.json") as gd3d.framework.prefab;
+                            let time = Date.now();
+                            for (let i = 0; i < cloneCount; ++i)
+                            {
+                                let shark = prefab.getCloneTrans();
+                                this.scene.addChild(shark);
+                            }
+                            let useTime = Date.now() - time;
+                            console.log(`new clone trans:${useTime}/ms count:${cloneCount}`);
+                            // this.scene.addChild(shark);
+                        }
+                    });
+                }
+            });
 
             //目前材质是内置配置的，
             //这个加载机制弄完之后，就可以根据name 访问资源包里的shader
@@ -133,7 +189,8 @@ class test_01 implements IState {
     cube2: gd3d.framework.transform;
     cube3: gd3d.framework.transform;
     timer: number = 0;
-    update(delta: number) {
+    update(delta: number)
+    {
         return;
         this.timer += delta;
         var x = Math.sin(this.timer);

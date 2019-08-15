@@ -3,10 +3,16 @@
 
 namespace gd3d {
 
-    export var gd3d_reflect_root = {};
+    export var gd3d_reflect_root:any = {};
     
     export namespace reflect {
 
+        export function isComp(type:string)
+        {
+           return gd3d_reflect_root.__gdmeta__[type] && 
+            gd3d_reflect_root.__gdmeta__[type].__gdmeta__&&
+            gd3d_reflect_root.__gdmeta__[type].__gdmeta__.class.custom.nodecomp;
+        }
         /**
          * @private
          */
