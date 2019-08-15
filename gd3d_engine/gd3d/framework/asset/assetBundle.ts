@@ -711,20 +711,15 @@ namespace gd3d.framework {
                     awaits.push(awaiting);
                     awaiting.then(() => {
                         if (++count >= awaits.length) {
-                    awaits.push(awaiting);
-                    awaiting.then(() => {
-                        if (++count >= awaits.length) {
                             finish();
                             awaits.length = 0;
                         }
-                    });
+                    });                   
                 }
             }
-            if(awaits.length == 0)
+            if(awaits.length == 0){
                 finish();
             }
-            if(awaits.length == 0)
-                finish();
         }
 
         private static addToWaitList(assetmgr : assetMgr,fun:Function,guid: string){

@@ -1434,7 +1434,6 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class assetBundle {
         name: string;
-        private id;
         assetmgr: assetMgr;
         private files;
         private packages;
@@ -1453,14 +1452,10 @@ declare namespace gd3d.framework {
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
         private downloadFinsih;
         private CkNextHandleOfGuid;
-        static needParsing: boolean;
-        private static needParsesArr;
-        static startParseByUrl(url: string): boolean;
-        static preloadCompleteFun: Function;
-        private NextHandle;
         private NextHandleParsing;
         private ReadyFinish;
-        private endWaitList;
+        private static addToWaitList;
+        private static endWaitList;
         private mapIsNull;
         mapNamed: {
             [name: string]: number;
@@ -1589,7 +1584,9 @@ declare namespace gd3d.framework {
         getAssetsRefcount(): {
             [id: string]: number;
         };
-        private mapInLoad;
+        mapInLoad: {
+            [id: string]: stateLoad;
+        };
         removeAssetBundle(name: string): void;
         private assetUrlDic;
         setAssetUrl(asset: IAsset, url: string): void;
@@ -6774,7 +6771,6 @@ declare namespace gd3d.framework {
 declare namespace gd3d.io {
     function xhrLoad(url: string, fun: (ContentData: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void, responseType: XMLHttpRequestResponseType, loadedFun: (req: XMLHttpRequest) => void): void;
     function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
-    function GetJSON(url: string, text?: string): threading.gdPromise<any>;
     function JSONParse(text: string): threading.gdPromise<any>;
     function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): threading.gdPromise<{}>;
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;

@@ -3108,10 +3108,12 @@ var gd3d;
                 if (!this.componentTypes[type])
                     return;
                 delete this.componentTypes[type];
-                for (var i = 0; i < this.components.length; i++) {
-                    if (gd3d.reflect.getClassName(this.components[i].comp) == type) {
-                        this.clearOfCompRemove(this.components[i]);
-                        var p = this.components.splice(i, 1);
+                var comps = this.components;
+                var len = comps.length;
+                for (var i = 0; i < len; i++) {
+                    if (framework.getClassName(comps[i].comp) == type) {
+                        this.clearOfCompRemove(comps[i]);
+                        var p = comps.splice(i, 1);
                         return p[0];
                     }
                 }
@@ -8046,12 +8048,7 @@ var gd3d;
                                     _this.waitGuidCount--;
                                     _this.CkNextHandleOfGuid(list, state, onstate);
                                 };
-                                var waitList = void 0;
-                                if (!assetmgr.mapGuidWaitLoaded[guid]) {
-                                    assetmgr.mapGuidWaitLoaded[guid] = [];
-                                }
-                                waitList = assetmgr.mapGuidWaitLoaded[guid];
-                                waitList.push(waitLoaded);
+                                assetBundle.addToWaitList(this.assetmgr, waitLoaded, guid);
                             }
                             continue;
                         }
@@ -8280,31 +8277,7 @@ var gd3d;
             assetBundle.prototype.CkNextHandleOfGuid = function (list, state, onstate) {
                 if (this.waitGuidCount > 0)
                     return;
-                this.NextHandle(list, state, onstate);
-            };
-            assetBundle.startParseByUrl = function (url) {
-                var source = this.needParsesArr[url];
-                if (source) {
-                    source.call(source.list, source.state, source.onstate);
-                    delete this.needParsesArr[url];
-                    return true;
-                }
-            };
-            assetBundle.prototype.NextHandle = function (list, state, onstate) {
-                if (assetBundle.needParsing) {
-                    this.NextHandleParsing(list, state, onstate);
-                }
-                else {
-                    assetBundle.needParsesArr[this.url] = {
-                        list: list,
-                        state: state,
-                        onstate: onstate,
-                        call: this.NextHandleParsing.bind(this)
-                    };
-                    if (assetBundle.preloadCompleteFun) {
-                        assetBundle.preloadCompleteFun(this.url);
-                    }
-                }
+                this.NextHandleParsing(list, state, onstate);
             };
             assetBundle.prototype.NextHandleParsing = function (list, state, onstate) {
                 var _this = this;
@@ -8314,7 +8287,7 @@ var gd3d;
                 var finish = function () {
                     state.isfinish = true;
                     onstate(state);
-                    _this.endWaitList(list);
+                    assetBundle.endWaitList(_this.assetmgr, list);
                 };
                 for (var i = 0, l = list.length; i < l; ++i) {
                     var hitem = list[i];
@@ -8336,7 +8309,7 @@ var gd3d;
                                     return b.type - a.type;
                                 });
                                 _this.ReadyFinish(lastHandle, finish);
-                                waitArrs = [];
+                                waitArrs.length = 0;
                             }
                         });
                     }
@@ -8360,24 +8333,36 @@ var gd3d;
                         });
                     }
                 }
-                if (awaits.length == 0)
+                if (awaits.length == 0) {
                     finish();
+                }
             };
-            assetBundle.prototype.endWaitList = function (list) {
+            assetBundle.addToWaitList = function (assetmgr, fun, guid) {
+                if (!guid)
+                    return;
+                var waitList;
+                if (!assetmgr.mapGuidWaitLoaded[guid]) {
+                    assetmgr.mapGuidWaitLoaded[guid] = [];
+                }
+                waitList = assetmgr.mapGuidWaitLoaded[guid];
+                waitList.push(fun);
+            };
+            assetBundle.endWaitList = function (assetmgr, list) {
                 var len = list.length;
                 for (var i = 0; i < len; i++) {
                     var item = list[i];
                     if (item.guid == undefined)
                         continue;
                     var guid = item.guid;
-                    var wlMap = this.assetmgr.mapGuidWaitLoaded;
+                    var wlMap = assetmgr.mapGuidWaitLoaded;
                     if (wlMap[guid] == undefined)
                         continue;
                     var waitList = wlMap[guid];
                     if (waitList) {
-                        waitList.forEach(function (element) {
-                            element();
-                        });
+                        var len_1 = waitList.length;
+                        for (var i_1 = 0; i_1 < len_1; i_1++) {
+                            waitList[i_1]();
+                        }
                         waitList.length = 0;
                         delete wlMap[guid];
                     }
@@ -8390,8 +8375,6 @@ var gd3d;
                     return false;
                 return true;
             };
-            assetBundle.needParsing = true;
-            assetBundle.needParsesArr = {};
             return assetBundle;
         }());
         framework.assetBundle = assetBundle;
@@ -8829,7 +8812,7 @@ var gd3d;
                             filename = _this.getFileName(url);
                             var ab = new framework.assetBundle(url);
                             ab.name = filename;
-                            ab.parse(JSON.parse(txt));
+                            ab.parse(json);
                             ab.load(_this, onstate, state);
                         }
                         else {
@@ -11074,15 +11057,15 @@ var gd3d;
                         var _frame = new Float32Array(_this.boneCount * 7 + 1);
                         _frame[0] = _key ? 1 : 0;
                         var _boneInfo = new PoseBoneMatrix();
-                        for (var i_1 = 0; i_1 < _this.boneCount; i_1++) {
+                        for (var i_2 = 0; i_2 < _this.boneCount; i_2++) {
                             _boneInfo.load(read);
-                            _frame[i_1 * 7 + 1] = _boneInfo.r.x;
-                            _frame[i_1 * 7 + 2] = _boneInfo.r.y;
-                            _frame[i_1 * 7 + 3] = _boneInfo.r.z;
-                            _frame[i_1 * 7 + 4] = _boneInfo.r.w;
-                            _frame[i_1 * 7 + 5] = _boneInfo.t.x;
-                            _frame[i_1 * 7 + 6] = _boneInfo.t.y;
-                            _frame[i_1 * 7 + 7] = _boneInfo.t.z;
+                            _frame[i_2 * 7 + 1] = _boneInfo.r.x;
+                            _frame[i_2 * 7 + 2] = _boneInfo.r.y;
+                            _frame[i_2 * 7 + 3] = _boneInfo.r.z;
+                            _frame[i_2 * 7 + 4] = _boneInfo.r.w;
+                            _frame[i_2 * 7 + 5] = _boneInfo.t.x;
+                            _frame[i_2 * 7 + 6] = _boneInfo.t.y;
+                            _frame[i_2 * 7 + 7] = _boneInfo.t.z;
                         }
                         _this.frames[_fid] = _frame;
                     }
@@ -14239,7 +14222,7 @@ var gd3d;
             };
             prefab.prototype.getCloneTrans = function () {
                 if (this.isCab) {
-                    var t = gd3d.io.ndeSerialize(this.jsonstr, this.assetbundle);
+                    var t = gd3d.io.ndeSerialize(this.jsonstr, this.assetbundle, true);
                     return t;
                 }
                 var temp = gd3d.io.cloneObj(this.trans);
@@ -14247,7 +14230,7 @@ var gd3d;
             };
             prefab.prototype.getCloneTrans2D = function () {
                 if (this.isCab) {
-                    var t = gd3d.io.ndeSerialize(this.jsonstr, this.assetbundle);
+                    var t = gd3d.io.ndeSerialize(this.jsonstr, this.assetbundle, true);
                     return t;
                 }
                 var temp = gd3d.io.cloneObj(this.trans);
@@ -16438,8 +16421,8 @@ var gd3d;
                     this._renderOnce(scene, context, "");
                 }
                 else {
-                    for (var i_2 = 0, l_1 = this.postQueues.length; i_2 < l_1; ++i_2) {
-                        this.postQueues[i_2].render(scene, context, this);
+                    for (var i_3 = 0, l_1 = this.postQueues.length; i_3 < l_1; ++i_3) {
+                        this.postQueues[i_3].render(scene, context, this);
                     }
                     context.webgl.flush();
                 }
@@ -17000,9 +16983,9 @@ var gd3d;
                     return;
                 var index = -1;
                 if (_initFrameData.attrsData.mat != null) {
-                    for (var i_3 = 0; i_3 < this.matDataGroups.length; i_3++) {
-                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_3], _initFrameData.attrsData.mat)) {
-                            index = i_3;
+                    for (var i_4 = 0; i_4 < this.matDataGroups.length; i_4++) {
+                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_4], _initFrameData.attrsData.mat)) {
+                            index = i_4;
                             break;
                         }
                     }
@@ -17060,41 +17043,41 @@ var gd3d;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
                 element.update();
                 subEffectBatcher.effectElements.push(element);
-                for (var i_4 = 0; i_4 < vertexCount; i_4++) {
+                for (var i_5 = 0; i_5 < vertexCount; i_5++) {
                     {
                         var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = vertexArr[i_4 * vertexSize + 0];
-                        vertex.y = vertexArr[i_4 * vertexSize + 1];
-                        vertex.z = vertexArr[i_4 * vertexSize + 2];
+                        vertex.x = vertexArr[i_5 * vertexSize + 0];
+                        vertex.y = vertexArr[i_5 * vertexSize + 1];
+                        vertex.z = vertexArr[i_5 * vertexSize + 2];
                         gd3d.math.matrixTransformVector3(vertex, element.curAttrData.matrix, vertex);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 0] = vertex.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 1] = vertex.y;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 2] = vertex.z;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 0] = vertex.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 1] = vertex.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 2] = vertex.z;
                         gd3d.math.pool.delete_vector3(vertex);
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 3] = vertexArr[i_4 * vertexSize + 3];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 4] = vertexArr[i_4 * vertexSize + 4];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 5] = vertexArr[i_4 * vertexSize + 5];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 3] = vertexArr[i_5 * vertexSize + 3];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 4] = vertexArr[i_5 * vertexSize + 4];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 5] = vertexArr[i_5 * vertexSize + 5];
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 6] = vertexArr[i_4 * vertexSize + 6];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 7] = vertexArr[i_4 * vertexSize + 7];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 8] = vertexArr[i_4 * vertexSize + 8];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 6] = vertexArr[i_5 * vertexSize + 6];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 7] = vertexArr[i_5 * vertexSize + 7];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 8] = vertexArr[i_5 * vertexSize + 8];
                     }
                     {
                         var r = gd3d.math.floatClamp(element.curAttrData.color.x, 0, 1);
                         var g = gd3d.math.floatClamp(element.curAttrData.color.y, 0, 1);
                         var b = gd3d.math.floatClamp(element.curAttrData.color.z, 0, 1);
-                        var a = gd3d.math.floatClamp(vertexArr[i_4 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 9] = r;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 10] = g;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 11] = b;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * 15 + 12] = a;
+                        var a = gd3d.math.floatClamp(vertexArr[i_5 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 9] = r;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 10] = g;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 11] = b;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 12] = a;
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 13] = vertexArr[i_4 * vertexSize + 13] * element.curAttrData.tilling.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_4) * vertexSize + 14] = vertexArr[i_4 * vertexSize + 14] * element.curAttrData.tilling.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 13] = vertexArr[i_5 * vertexSize + 13] * element.curAttrData.tilling.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 14] = vertexArr[i_5 * vertexSize + 14] * element.curAttrData.tilling.y;
                     }
                 }
                 var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
@@ -17265,11 +17248,11 @@ var gd3d;
                 if (this.delayElements.length > 0) {
                     if (this.refElements.length > 0)
                         this.refElements = [];
-                    for (var i_5 = this.delayElements.length - 1; i_5 >= 0; i_5--) {
-                        var data = this.delayElements[i_5];
+                    for (var i_6 = this.delayElements.length - 1; i_6 >= 0; i_6--) {
+                        var data = this.delayElements[i_6];
                         if (data.delayTime <= this.playTimer) {
-                            this.addElement(this.delayElements[i_5]);
-                            this.delayElements.splice(i_5, 1);
+                            this.addElement(this.delayElements[i_6]);
+                            this.delayElements.splice(i_6, 1);
                         }
                     }
                 }
@@ -22477,11 +22460,21 @@ var gd3d;
             var instMap = {};
             var gos = [];
             var root = createTrasn(json, gos, instMap);
+            var is2d = json.cls == "transform2D";
+            var coms;
+            if (is2d)
+                coms = [];
             fullTrasn(json, root, gos, instMap, bundlename);
             var god;
             for (var i = 0, len = gos.length; i < len; ++i) {
                 god = gos[i];
-                fullGO(god.data, god.go, bundlename, instMap, useAsset);
+                fullGO(god.data, god.go, bundlename, instMap, useAsset, is2d, coms);
+            }
+            if (is2d) {
+                for (var i = 0, len = coms.length; i < len; ++i) {
+                    var com = coms[i];
+                    com.src[com.key] = com.cls == "transform2D" ? instMap[com.refid] : instMap[com.refid].getComponent(com.cls);
+                }
             }
             return root;
         }
@@ -22511,17 +22504,17 @@ var gd3d;
             instMap[json.insid] = trans;
             return trans;
         }
-        function fullGO(json, go, bundlename, instMap, useAsset) {
+        function fullGO(json, go, bundlename, instMap, useAsset, is2d, comps) {
             go.layer = json.layer;
             go.tag = json.tag;
             for (var i = 0, len = json.components.length; i < len; ++i) {
                 var jcomp = json.components[i];
                 var comp = go.addComponent(jcomp.cls);
                 for (var k in jcomp)
-                    fullProp(comp, jcomp, k, bundlename, instMap, useAsset);
+                    fullProp(comp, jcomp, k, bundlename, instMap, useAsset, is2d, comps);
             }
         }
-        function fullProp(comp, jcomp, k, bundlename, instMap, useAsset) {
+        function fullProp(comp, jcomp, k, bundlename, instMap, useAsset, is2d, comps) {
             var prop = jcomp[k];
             if (prop instanceof Array) {
                 var arrProp = comp[k] || (comp[k] = []);
@@ -22529,9 +22522,10 @@ var gd3d;
                     var ele = prop[i];
                     var value = void 0;
                     if (ele.cls && io.isAsset(ele.cls))
-                        value = getAssetValue(ele.value, ele.cls, bundlename);
-                    else if (ele.refid)
+                        value = getAssetValue(ele.value, ele.cls, bundlename, useAsset);
+                    else if (ele.refid) {
                         value = instMap[ele.refid];
+                    }
                     else
                         value = ele;
                     if (value)
@@ -22540,12 +22534,24 @@ var gd3d;
             }
             else if (prop.cls && io.isAsset(prop.cls))
                 comp[k] = getAssetValue(prop.value, prop.cls, bundlename, useAsset);
-            else if (prop.refid)
-                comp[k] = instMap[prop.refid];
-            else if (prop.cls && gd3d.reflect.isComp(prop.cls)) {
-                var trans = instMap[prop.value];
-                var comp_1 = trans.gameObject.getComponent(prop.cls);
-                comp_1[k] = comp_1;
+            else if (prop.refid) {
+                if (is2d) {
+                    comps.push({
+                        refid: prop.refid,
+                        cls: prop.cls,
+                        src: comp,
+                        key: k
+                    });
+                }
+                else {
+                    if (prop.cls && gd3d.reflect.isComp(prop.cls)) {
+                        var trans = instMap[prop.refid];
+                        var comp_1 = trans.gameObject.getComponent(prop.cls);
+                        comp_1[k] = comp_1;
+                    }
+                    else
+                        comp[k] = instMap[prop.refid];
+                }
             }
             else
                 comp[k] = prop;
@@ -22562,6 +22568,12 @@ var gd3d;
             else
                 asset = assetMgr.getAssetByName(assetName, bundlename) ||
                     assetMgr.getAssetByName(assetName.replace(".mesh.bin", ".mesh.json"), bundlename);
+            if (!asset && type == "animationClip") {
+                var clip = new gd3d.framework.animationClip(assetName);
+                clip.bones = [];
+                clip.subclips = [];
+                asset = clip;
+            }
             if (useAsset && asset)
                 asset.use();
             return asset;
@@ -32410,7 +32422,7 @@ var gd3d;
                 var result = null;
                 var i = 0, len = this.components.length;
                 while (i < len) {
-                    if (gd3d.reflect.getClassName(this.components[i].comp) == type) {
+                    if (framework.getClassName(this.components[i].comp) == type) {
                         this.clearOfCompRemove(this.components[i]);
                         var results = this.components.splice(i, 1);
                         if (results[0].comp)
@@ -35675,11 +35687,22 @@ var gd3d;
             });
         }
         io.loadText = loadText;
+        var cachedMap = {};
+        var checkClsTime = 0;
         function GetJSON(url, text) {
             if (text === void 0) { text = undefined; }
-            return JSONParse(text);
+            return new gd3d.threading.gdPromise(function (r) {
+                var cached = cachedMap[url];
+                if (cached.ready)
+                    return r(cachedMap[url].json);
+                JSONParse(text).then(function (json) {
+                    cached.ready = true;
+                    cached.json = json;
+                    cached.useTime = Date.now();
+                    r(json);
+                });
+            });
         }
-        io.GetJSON = GetJSON;
         function JSONParse(text) {
             return new gd3d.threading.gdPromise(function (resolve, resaon) {
                 var json;
@@ -35696,14 +35719,51 @@ var gd3d;
         function loadJSON(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
             return new gd3d.threading.gdPromise(function (r) {
-                if (gd3d.framework.assetMgr.useBinJs) {
+                if (gd3d.framework.assetMgr.useBinJs)
                     url = gd3d.framework.assetMgr.correctTxtFileName(url);
+                var now = Date.now();
+                if (now - checkClsTime > 15000) {
+                    checkClsTime = now;
+                    for (var k in cachedMap) {
+                        var cached_1 = cachedMap[k];
+                        if (cached_1.ready && now - cachedMap[k].useTime >= 60000) {
+                            delete cachedMap[k];
+                        }
+                    }
                 }
-                gd3d.io.xhrLoad(url, fun, onprocess, "text", function (req) {
-                    GetJSON(url, req.response).then(function (json) {
-                        fun(json, null);
+                var cached = cachedMap[url];
+                if (!cached) {
+                    cached = cachedMap[url] = {
+                        queue: [],
+                        init: true,
+                        useTime: now
+                    };
+                }
+                if (!cached.ready)
+                    cached.queue.push(fun);
+                if (cached.ready) {
+                    fun(cached.json, null);
+                    r();
+                    return;
+                }
+                if (cached.init) {
+                    cached.init = false;
+                    gd3d.io.xhrLoad(url, fun, onprocess, "text", function (req) {
+                        GetJSON(url, req.response).then(function () {
+                            var cached = cachedMap[url];
+                            var slowOut = function () {
+                                if (cached.queue.length > 0)
+                                    cached.queue.shift()(cached.json, null);
+                                if (cached.queue.length > 0)
+                                    setTimeout(slowOut, 10);
+                            };
+                            if (cached.queue.length == 1)
+                                cached.queue.shift()(cached.json, null);
+                            else
+                                slowOut();
+                        });
                     });
-                });
+                }
             });
         }
         io.loadJSON = loadJSON;
