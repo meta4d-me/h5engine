@@ -16,6 +16,7 @@ namespace gd3d.io
         if (is2d)
             coms = [];
         fullTrasn(json, root, gos, instMap, bundlename);
+        //先收集transform 再赋值gameobject 
         var god: { go: framework.gameObject, data: any };
         for (let i = 0, len = gos.length; i < len; ++i)
         {
@@ -27,11 +28,7 @@ namespace gd3d.io
             for (let i = 0, len = coms.length; i < len; ++i)
             {
                 let com = coms[i];
-                com.src[com.key] = com.cls == "transform2D" ? instMap[com.refid] : instMap[com.refid].getComponent(com.cls);
-                // refid: prop.refid,
-                // cls: prop.cls,
-                // src: comp,
-                // key: k
+                com.src[com.key] = com.cls == "transform2D" ? instMap[com.refid] : instMap[com.refid].getComponent(com.cls);             
             }
         }
         return root;

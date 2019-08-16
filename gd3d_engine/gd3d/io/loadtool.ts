@@ -107,15 +107,12 @@
         return new threading.gdPromise<any>((r) =>
         {
             let cached = cachedMap[url];
-            if (cached.ready)
-                return r(cachedMap[url].json);
-
-            JSONParse(text).then((json) =>
+            cached.ready = true;
+            cached.useTime = Date.now();
+            JSONParse(text || cached.text).then((json) =>
             {
                 //cachedMap[url] = json;
-                cached.ready = true;
-                cached.json = json;
-                cached.useTime = Date.now();
+                // cached.json = json;                
                 r(json);
             });
 
@@ -177,7 +174,10 @@
             if (cached.ready)
             {
                 fun(cached.json, null);
-                r();
+                GetJSON(url).then((json) =>
+                {
+                    r(json);
+                });
                 return;
             }
 
@@ -188,20 +188,21 @@
 
                 gd3d.io.xhrLoad(url, fun, onprocess, "text", (req) =>
                 {
-                    GetJSON(url, req.response).then(() =>
+                    GetJSON(url, req.response).then((json) =>
                     {
                         let cached = cachedMap[url];
+                        cached.text = req.responseText;
                         const slowOut = function ()
                         {
                             if (cached.queue.length > 0)
-                                cached.queue.shift()(cached.json, null);
+                                cached.queue.shift()(json, null);
 
                             if (cached.queue.length > 0)
                                 setTimeout(slowOut, 10);
                         }
                         // while (cached.queue.length > 0)
                         if (cached.queue.length == 1)
-                            cached.queue.shift()(cached.json, null);
+                            cached.queue.shift()(json, null);
                         else
                             slowOut();
                     });
