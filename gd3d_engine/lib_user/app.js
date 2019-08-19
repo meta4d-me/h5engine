@@ -1361,18 +1361,6 @@ var test_01 = (function () {
                             }
                         });
                     };
-                    assetMgr.load("res/test/1/fx_sh_shuimian/fx_sh_shuimian.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
-                        if (state.isfinish) {
-                            var prefab = assetMgr.getAssetByName("fx_sh_shuimian.prefab.json");
-                            var time = Date.now();
-                            for (var i_5 = 0; i_5 < cloneCount; ++i_5) {
-                                var shark = prefab.getCloneTrans();
-                                cube.addChild(shark);
-                            }
-                            var useTime = Date.now() - time;
-                            console.log("new clone trans:" + useTime + "/ms count:" + cloneCount);
-                        }
-                    });
                 }
             });
         };
@@ -1721,8 +1709,8 @@ var t;
                 for (var i = 0; i < _this.parentlist.length; i++) {
                     _this.parentlist[i].gameObject.visible = true;
                 }
-                for (var i_6 = 0; i_6 < _this.traillist.length; i_6++) {
-                    _this.traillist[i_6].play();
+                for (var i_5 = 0; i_5 < _this.traillist.length; i_5++) {
+                    _this.traillist[i_5].play();
                 }
                 _this.guippaths[0].play(2);
                 _this.guippaths[1].play();
@@ -1732,9 +1720,9 @@ var t;
                 for (var i = 0; i < _this.parentlist.length; i++) {
                     _this.parentlist[i].gameObject.visible = false;
                 }
-                for (var i_7 = 0; i_7 < _this.guippaths.length; i_7++) {
-                    _this.traillist[i_7].stop();
-                    _this.guippaths[i_7].stop();
+                for (var i_6 = 0; i_6 < _this.guippaths.length; i_6++) {
+                    _this.traillist[i_6].stop();
+                    _this.guippaths[i_6].stop();
                 }
             });
         };

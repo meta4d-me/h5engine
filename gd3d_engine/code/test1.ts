@@ -112,22 +112,38 @@ class test_01 implements IState
                         });
                     }
 
-                    assetMgr.load("res/test/1/fx_sh_shuimian/fx_sh_shuimian.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
-                    {
-                        if (state.isfinish)
-                        {
-                            let prefab = assetMgr.getAssetByName("fx_sh_shuimian.prefab.json") as gd3d.framework.prefab;
-                            let time = Date.now();
-                            for (let i = 0; i < cloneCount; ++i)
-                            {
-                                let shark = prefab.getCloneTrans();
-                                cube.addChild(shark);
-                            }
-                            let useTime = Date.now() - time;
-                            console.log(`new clone trans:${useTime}/ms count:${cloneCount}`);
-                            // this.scene.addChild(shark);
-                        }
-                    });
+                    // assetMgr.load("res/test/0/7/7.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                    // {
+                    //     if (state.isfinish)
+                    //     {
+                    //         let prefab = assetMgr.getAssetByName("7.prefab.json") as gd3d.framework.prefab;
+                    //         let time = Date.now();
+                    //         for (let i = 0; i < cloneCount; ++i)
+                    //         {
+                    //             let shark = prefab.getCloneTrans();
+                    //             cube.addChild(shark);
+                    //         }
+                    //         let useTime = Date.now() - time;
+                    //         console.log(`new clone trans:${useTime}/ms count:${cloneCount}`);
+                    //         // this.scene.addChild(shark);
+                    //     }
+                    // });
+                    // assetMgr.load("res/test/1/7/7.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                    // {
+                    //     if (state.isfinish)
+                    //     {
+                    //         let prefab = assetMgr.getAssetByName("7.prefab.json") as gd3d.framework.prefab;
+                    //         let time = Date.now();
+                    //         for (let i = 0; i < cloneCount; ++i)
+                    //         {
+                    //             let shark = prefab.getCloneTrans();
+                    //             cube.addChild(shark);
+                    //         }
+                    //         let useTime = Date.now() - time;
+                    //         console.log(`new clone trans:${useTime}/ms count:${cloneCount}`);
+                    //         // this.scene.addChild(shark);
+                    //     }
+                    // });
                 }
             });
 

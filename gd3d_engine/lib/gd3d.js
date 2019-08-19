@@ -13823,81 +13823,85 @@ var gd3d;
                 var data = new gd3d.render.meshData();
                 var read = new gd3d.io.binReader(inData);
                 data.originVF = read.readUInt16();
+                var vertexCount = read.readUInt32();
+                var fmt = gd3d.render.VertexFormatMask;
                 data.pos = [];
-                var vector3 = gd3d.math.vector3, color = gd3d.math.color, vector2 = gd3d.math.vector2, number4 = gd3d.render.number4;
-                var len;
-                len = read.readUInt32();
-                for (var i = 0; i < len; ++i) {
-                    var v3 = new vector3(read.readSingle(), read.readSingle(), read.readSingle());
-                    data.pos.push(v3);
-                }
-                len = read.readUInt32();
-                if (len > 0) {
-                    data.color = [];
-                    for (var i = 0; i < len; ++i) {
-                        var c = new color(read.readSingle(), read.readSingle(), read.readSingle(), read.readSingle());
-                        data.color.push(c);
+                for (var i_3 = 0; i_3 < vertexCount; ++i_3) {
+                    data.pos.push({
+                        x: read.readSingle(),
+                        y: read.readSingle(),
+                        z: read.readSingle()
+                    });
+                    if (data.originVF & fmt.Normal) {
+                        data.normal = data.normal || [];
+                        data.normal.push({
+                            x: read.readSingle(),
+                            y: read.readSingle(),
+                            z: read.readSingle()
+                        });
+                    }
+                    if (data.originVF & fmt.Tangent) {
+                        data.tangent = data.tangent || [];
+                        data.tangent.push({
+                            x: read.readSingle(),
+                            y: read.readSingle(),
+                            z: read.readSingle()
+                        });
+                    }
+                    if (data.originVF & fmt.Color) {
+                        data.color = data.color || [];
+                        data.color.push({
+                            r: read.readSingle(),
+                            g: read.readSingle(),
+                            b: read.readSingle(),
+                            a: read.readSingle()
+                        });
+                    }
+                    if (data.originVF & fmt.UV0) {
+                        data.uv = data.uv || [];
+                        data.uv.push({
+                            x: read.readSingle(),
+                            y: read.readSingle()
+                        });
+                    }
+                    if (data.originVF & fmt.UV1) {
+                        data.uv2 = data.uv2 || [];
+                        data.uv2.push({
+                            x: read.readSingle(),
+                            y: read.readSingle()
+                        });
+                    }
+                    if (data.originVF & fmt.BlendIndex4) {
+                        data.blendIndex = data.blendIndex || [];
+                        data.blendIndex.push({
+                            v0: read.readUInt32(),
+                            v1: read.readUInt32(),
+                            v2: read.readUInt32(),
+                            v3: read.readUInt32()
+                        });
+                    }
+                    if (data.originVF & fmt.BlendWeight4) {
+                        data.blendWeight = data.blendWeight || [];
+                        data.blendWeight.push({
+                            v0: read.readSingle(),
+                            v1: read.readSingle(),
+                            v2: read.readSingle(),
+                            v3: read.readSingle()
+                        });
+                    }
+                    if (data.originVF & fmt.ColorEX) {
+                        data.colorex = data.colorex || [];
+                        data.colorex.push({
+                            r: read.readSingle(),
+                            g: read.readSingle(),
+                            b: read.readSingle(),
+                            a: read.readSingle()
+                        });
                     }
                 }
-                len = read.readUInt32();
-                if (len > 0) {
-                    data.uv = [];
-                    for (var i = 0; i < len; ++i) {
-                        var uv = new vector2(read.readSingle(), read.readSingle());
-                        data.uv.push(uv);
-                    }
-                }
-                len = read.readUInt32();
-                if (len > 0) {
-                    data.uv2 = [];
-                    for (var i = 0; i < len; ++i) {
-                        var uv2 = new vector2(read.readSingle(), read.readSingle());
-                        data.uv2.push(uv2);
-                    }
-                }
-                len = read.readUInt32();
-                if (len > 0) {
-                    data.normal = [];
-                    for (var i = 0; i < len; ++i) {
-                        var normal = new vector3(read.readSingle(), read.readSingle(), read.readSingle());
-                        data.normal.push(normal);
-                    }
-                }
-                len = read.readUInt32();
-                if (len > 0) {
-                    data.tangent = [];
-                    for (var i = 0; i < len; ++i) {
-                        var tangent = new vector3(read.readSingle(), read.readSingle(), read.readSingle());
-                        data.tangent.push(tangent);
-                    }
-                }
-                len = read.readUInt32();
-                if (len > 0) {
-                    data.blendIndex = [];
-                    for (var i = 0; i < len; ++i) {
-                        var bi = new number4();
-                        bi.v0 = read.readUInt32();
-                        bi.v1 = read.readUInt32();
-                        bi.v2 = read.readUInt32();
-                        bi.v3 = read.readUInt32();
-                        data.blendIndex.push(bi);
-                    }
-                }
-                len = read.readUInt32();
-                if (len > 0) {
-                    data.blendWeight = [];
-                    for (var i = 0; i < len; ++i) {
-                        var bi = new number4();
-                        bi.v0 = read.readSingle();
-                        bi.v1 = read.readSingle();
-                        bi.v2 = read.readSingle();
-                        bi.v3 = read.readSingle();
-                        data.blendWeight.push(bi);
-                    }
-                }
+                var len = read.readUInt8();
                 data.trisindex = [];
                 this.submesh = [];
-                len = read.readUInt8();
                 for (var i = 0; i < len; ++i) {
                     var _submeshinfo = new subMeshInfo();
                     _submeshinfo.start = read.readUInt16();
@@ -16461,8 +16465,8 @@ var gd3d;
                     this._renderOnce(scene, context, "");
                 }
                 else {
-                    for (var i_3 = 0, l_1 = this.postQueues.length; i_3 < l_1; ++i_3) {
-                        this.postQueues[i_3].render(scene, context, this);
+                    for (var i_4 = 0, l_1 = this.postQueues.length; i_4 < l_1; ++i_4) {
+                        this.postQueues[i_4].render(scene, context, this);
                     }
                     context.webgl.flush();
                 }
@@ -17023,9 +17027,9 @@ var gd3d;
                     return;
                 var index = -1;
                 if (_initFrameData.attrsData.mat != null) {
-                    for (var i_4 = 0; i_4 < this.matDataGroups.length; i_4++) {
-                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_4], _initFrameData.attrsData.mat)) {
-                            index = i_4;
+                    for (var i_5 = 0; i_5 < this.matDataGroups.length; i_5++) {
+                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_5], _initFrameData.attrsData.mat)) {
+                            index = i_5;
                             break;
                         }
                     }
@@ -17083,41 +17087,41 @@ var gd3d;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
                 element.update();
                 subEffectBatcher.effectElements.push(element);
-                for (var i_5 = 0; i_5 < vertexCount; i_5++) {
+                for (var i_6 = 0; i_6 < vertexCount; i_6++) {
                     {
                         var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = vertexArr[i_5 * vertexSize + 0];
-                        vertex.y = vertexArr[i_5 * vertexSize + 1];
-                        vertex.z = vertexArr[i_5 * vertexSize + 2];
+                        vertex.x = vertexArr[i_6 * vertexSize + 0];
+                        vertex.y = vertexArr[i_6 * vertexSize + 1];
+                        vertex.z = vertexArr[i_6 * vertexSize + 2];
                         gd3d.math.matrixTransformVector3(vertex, element.curAttrData.matrix, vertex);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 0] = vertex.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 1] = vertex.y;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 2] = vertex.z;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 0] = vertex.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 1] = vertex.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 2] = vertex.z;
                         gd3d.math.pool.delete_vector3(vertex);
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 3] = vertexArr[i_5 * vertexSize + 3];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 4] = vertexArr[i_5 * vertexSize + 4];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 5] = vertexArr[i_5 * vertexSize + 5];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 3] = vertexArr[i_6 * vertexSize + 3];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 4] = vertexArr[i_6 * vertexSize + 4];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 5] = vertexArr[i_6 * vertexSize + 5];
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 6] = vertexArr[i_5 * vertexSize + 6];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 7] = vertexArr[i_5 * vertexSize + 7];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 8] = vertexArr[i_5 * vertexSize + 8];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 6] = vertexArr[i_6 * vertexSize + 6];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 7] = vertexArr[i_6 * vertexSize + 7];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 8] = vertexArr[i_6 * vertexSize + 8];
                     }
                     {
                         var r = gd3d.math.floatClamp(element.curAttrData.color.x, 0, 1);
                         var g = gd3d.math.floatClamp(element.curAttrData.color.y, 0, 1);
                         var b = gd3d.math.floatClamp(element.curAttrData.color.z, 0, 1);
-                        var a = gd3d.math.floatClamp(vertexArr[i_5 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 9] = r;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 10] = g;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 11] = b;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 12] = a;
+                        var a = gd3d.math.floatClamp(vertexArr[i_6 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 9] = r;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 10] = g;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 11] = b;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 12] = a;
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 13] = vertexArr[i_5 * vertexSize + 13] * element.curAttrData.tilling.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 14] = vertexArr[i_5 * vertexSize + 14] * element.curAttrData.tilling.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 13] = vertexArr[i_6 * vertexSize + 13] * element.curAttrData.tilling.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 14] = vertexArr[i_6 * vertexSize + 14] * element.curAttrData.tilling.y;
                     }
                 }
                 var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
@@ -17288,11 +17292,11 @@ var gd3d;
                 if (this.delayElements.length > 0) {
                     if (this.refElements.length > 0)
                         this.refElements = [];
-                    for (var i_6 = this.delayElements.length - 1; i_6 >= 0; i_6--) {
-                        var data = this.delayElements[i_6];
+                    for (var i_7 = this.delayElements.length - 1; i_7 >= 0; i_7--) {
+                        var data = this.delayElements[i_7];
                         if (data.delayTime <= this.playTimer) {
-                            this.addElement(this.delayElements[i_6]);
-                            this.delayElements.splice(i_6, 1);
+                            this.addElement(this.delayElements[i_7]);
+                            this.delayElements.splice(i_7, 1);
                         }
                     }
                 }
