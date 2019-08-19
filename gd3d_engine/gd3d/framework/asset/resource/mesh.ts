@@ -396,8 +396,8 @@ namespace gd3d.framework
                 //             this.parseMesh(inData, webgl, reslove);
                 //     } else
                 //     {
-                        this.parseCMesh(inData, webgl);
-                        reslove();
+                this.parseCMesh(inData, webgl);
+                reslove();
                 //     }
 
                 // } else
@@ -466,6 +466,118 @@ namespace gd3d.framework
             var len;
 
             len = read.readUInt32();
+            // let vecCount = len, tag;
+            // let baseseek = 6;
+            // console.log(`buffer len:${inData.byteLength}`);
+            // for (var i = 1, c = len + 1; i < c; ++i)
+            // {
+            //     console.log(`start ${i} ,${read._seek}`);
+            //     if (read._seek != 6)
+            //         read._seek = baseseek + i * 12;
+
+            //     data.pos.push({
+            //         x: read.readSingle(),
+            //         y: read.readSingle(),
+            //         z: read.readSingle()
+            //     });
+
+            //     read._seek = baseseek + 12 * vecCount;
+
+            //     tag = read.readUInt32();
+            //     if (tag)
+            //     {
+            //         data.color = data.color || [];
+            //         data.color.push({
+            //             r: read.readSingle(),
+            //             g: read.readSingle(),
+            //             b: read.readSingle(),
+            //             a: read.readSingle()
+            //         });
+
+            //         read._seek += i * (16 * vecCount - 16);
+            //         console.log("color");
+            //     }
+
+            //     tag = read.readUInt32();
+            //     if (tag)
+            //     {
+            //         data.uv = data.uv || [];
+            //         data.uv.push({
+            //             x: read.readSingle(),
+            //             y: read.readSingle()
+            //         });
+            //         read._seek += i * (8 * vecCount - 8);
+            //         console.log("uv");
+            //     }
+
+            //     tag = read.readUInt32();
+            //     if (tag)
+            //     {
+            //         data.uv2 = data.uv2 || [];
+            //         data.uv2.push({
+            //             x: read.readSingle(),
+            //             y: read.readSingle()
+            //         });
+            //         read._seek = baseseek + (i * 8 * vecCount);
+            //         console.log("uv2");
+            //     }
+
+            //     tag = read.readUInt32();
+            //     if (tag)
+            //     {
+            //         data.normal = data.normal || [];
+            //         data.normal.push({
+            //             x: read.readSingle(),
+            //             y: read.readSingle(),
+            //             z: read.readSingle()
+            //         });
+            //         read._seek = baseseek + (i * 12 * vecCount);
+            //         console.log("normal");
+            //     }
+
+            //     tag = read.readUInt32();
+            //     if (tag)
+            //     {
+            //         data.tangent = data.tangent || [];
+            //         data.tangent.push({
+            //             x: read.readSingle(),
+            //             y: read.readSingle(),
+            //             z: read.readSingle()
+            //         });
+            //         read._seek = baseseek + (i * 12 * vecCount);
+            //         console.log("tangent");
+            //     }
+            //     tag = read.readUInt32();
+            //     if (tag)
+            //     {
+            //         data.blendIndex = data.blendIndex || [];
+            //         data.blendIndex.push({
+            //             v0: read.readUInt32(),
+            //             v1: read.readUInt32(),
+            //             v2: read.readUInt32(),
+            //             v3: read.readUInt32()
+            //         });
+            //         read._seek = baseseek + (i * 16 * vecCount);
+            //         console.log("blendIndex");
+            //     }
+
+            //     tag = read.readUInt32();
+            //     if (tag)
+            //     {
+            //         data.blendWeight = data.blendWeight || [];
+            //         data.blendWeight.push({
+            //             v0: read.readSingle(),
+            //             v1: read.readSingle(),
+            //             v2: read.readSingle(),
+            //             v3: read.readSingle()
+            //         });
+            //         read._seek = baseseek + (i * 16 * vecCount);
+            //         console.log("blendWeight");
+            //     }
+
+            //     console.log(`end ${i} ,${read._seek}`);
+            // }
+
 
             for (var i = 0; i < len; ++i)
             {
@@ -555,6 +667,7 @@ namespace gd3d.framework
                     data.blendWeight.push(bi);
                 }
             }
+
             data.trisindex = [];
             this.submesh = [];
             len = read.readUInt8();

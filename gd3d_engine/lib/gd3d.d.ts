@@ -4287,7 +4287,7 @@ declare namespace gd3d.io {
     class binReader {
         private _data;
         constructor(buf: ArrayBuffer, seek?: number);
-        private _seek;
+        _seek: number;
         seek(seek: number): void;
         peek(): number;
         length(): number;
