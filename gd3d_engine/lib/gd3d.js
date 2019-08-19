@@ -3983,15 +3983,17 @@ var gd3d;
                     img = this._sprite.texture;
                 }
                 if (img) {
+                    var needRMask = false;
                     if (this.needRefreshImg) {
                         mat.setTexture("_MainTex", img);
                         this.needRefreshImg = false;
+                        needRMask = true;
                     }
                     if (this.transform.parentIsMask) {
                         if (!this._cacheMaskV4)
                             this._cacheMaskV4 = new gd3d.math.vector4();
                         var rect = this.transform.maskRect;
-                        if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h) {
+                        if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h || needRMask) {
                             this._cacheMaskV4.x = rect.x;
                             this._cacheMaskV4.y = rect.y;
                             this._cacheMaskV4.z = rect.w;
@@ -5491,15 +5493,17 @@ var gd3d;
                     img = this._font.texture;
                 }
                 if (img) {
+                    var needRMask = false;
                     if (this.needRefreshFont) {
                         mat.setTexture("_MainTex", img);
                         this.needRefreshFont = false;
+                        needRMask = true;
                     }
                     if (this.transform.parentIsMask) {
                         if (this._cacheMaskV4 == null)
                             this._cacheMaskV4 = new gd3d.math.vector4();
                         var rect = this.transform.maskRect;
-                        if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h) {
+                        if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h || needRMask) {
                             this._cacheMaskV4.x = rect.x;
                             this._cacheMaskV4.y = rect.y;
                             this._cacheMaskV4.z = rect.w;
@@ -5859,15 +5863,17 @@ var gd3d;
                     return;
                 var img = this.image;
                 if (img != null) {
+                    var needRMask = false;
                     if (this.needRefreshImg) {
                         mat.setTexture("_MainTex", img);
                         this.needRefreshImg = false;
+                        needRMask = true;
                     }
                     if (this.transform.parentIsMask) {
                         if (this._cacheMaskV4 == null)
                             this._cacheMaskV4 = new gd3d.math.vector4();
                         var rect = this.transform.maskRect;
-                        if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h) {
+                        if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h || needRMask) {
                             this._cacheMaskV4.x = rect.x;
                             this._cacheMaskV4.y = rect.y;
                             this._cacheMaskV4.z = rect.w;
@@ -15139,6 +15145,10 @@ var gd3d;
                     }
                 }
                 this.curFrame = this._playClip.frames[this._playFrameid];
+                if (!this.curFrame) {
+                    console.error("frames of null on aniplayer.update() , framesIsNull :" + (this._playClip.frames == null) + " , GameObjectName: " + this.gameObject.getName() + " , _playFrameid:" + this._playFrameid + " , clipName : " + this._playClip.getName());
+                    return;
+                }
                 if (this._playClip.indexDic.len)
                     for (var bonename in this.carelist) {
                         var trans = this.carelist[bonename];
