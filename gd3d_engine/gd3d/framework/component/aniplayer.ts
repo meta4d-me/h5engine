@@ -209,6 +209,11 @@ namespace gd3d.framework
             }
             this.curFrame = this._playClip.frames[this._playFrameid];
 
+            if(!this.curFrame) {
+                console.error(`frames of null on aniplayer.update() , framesIsNull :${this._playClip.frames == null } , GameObjectName: ${this.gameObject.getName()} , _playFrameid:${this._playFrameid} , clipName : ${this._playClip.getName()}`);
+                return;
+            }
+
             if (this._playClip.indexDic.len)
                 for (let bonename in this.carelist)
                 {
