@@ -20,25 +20,21 @@ class test_01 implements IState
 
 
 
-            cube.localScale.x = cube.localScale.y = cube.localScale.z = 1;
-            cube.localTranslate.x = 2;
-            var collider = cube.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
+            // cube.localScale.x = cube.localScale.y = cube.localScale.z = 1;
+            // cube.localTranslate.x = 2;
+            // var collider = cube.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
             this.scene.addChild(cube);
-            var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+            // var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
 
-            var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
-            mesh.mesh = smesh;
-            var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-            let v3 = cube.localEulerAngles;
-            console.log(cube.getWorldMatrix());
-            v3.x += 50;
-            cube.localEulerAngles = v3;
-
-            //var collider = cube.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
-
-            // cube.markDirty();
-            console.log(cube.getWorldMatrix());
-            cuber = renderer;
+            // var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+            // mesh.mesh = smesh;
+            // var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+            // let v3 = cube.localEulerAngles;
+            // console.log(cube.getWorldMatrix());
+            // v3.x += 50;
+            // cube.localEulerAngles = v3;
+            // console.log(cube.getWorldMatrix());
+            // cuber = renderer;
 
             console.warn("Finish it.");
             let assetMgr = this.app.getAssetMgr();
@@ -55,33 +51,77 @@ class test_01 implements IState
                     //         console.log("###", trans);
                     //     }
                     // });
-                    var cloneCount = 1;//1000;
-                    // assetMgr.load("res/test/0/PF_PlayerSharkReef/PF_PlayerSharkReef.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
-                    // {
-                    //     if (state.isfinish)
-                    //     {
-                    //         let prefab = assetMgr.getAssetByName("PF_PlayerSharkReef.prefab.json") as gd3d.framework.prefab;
-                    //         let time = Date.now();
-                    //         for (let i = 0; i < cloneCount; ++i)
-                    //         {
-                    //             let shark = prefab.getCloneTrans();
-                    //         }
-                    //         let useTime = Date.now() - time;
-                    //         console.log(`old clone trans:${useTime}/ms count:${cloneCount}`);
-                    //         // this.scene.addChild(shark);
-                    //     }
-                    // });
+                    var cloneCount = 1;
+                    gd3d.framework.mesh.useThead = false;
+                    window["test0"] = function (cloneCount)
+                    {
+                        assetMgr.load("res/test/0/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                        {
+                            if (state.isfinish)
+                            {
+                                let prefab = assetMgr.getAssetByName("Background.prefab.json") as gd3d.framework.prefab;
+                                let time = Date.now();
+                                for (let i = 0; i < cloneCount; ++i)
+                                {
+                                    let shark = prefab.getCloneTrans();
+                                    cube.addChild(shark);
+                                }
+                                let useTime = Date.now() - time;
+                                console.log(`old clone trans:${useTime}/ms count:${cloneCount}`);
+                                // this.scene.addChild(shark);
+                            }
+                        });
+                    }
+                    window["test1"] = function (cloneCount)
+                    {
+                        assetMgr.load("res/test/1/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                        {
+                            if (state.isfinish)
+                            {
+                                let prefab = assetMgr.getAssetByName("Background.prefab.json") as gd3d.framework.prefab;
+                                let time = Date.now();
+                                for (let i = 0; i < cloneCount; ++i)
+                                {
+                                    let shark = prefab.getCloneTrans();
+                                    cube.addChild(shark);
+                                }
+                                let useTime = Date.now() - time;
+                                console.log(`new clone trans:${useTime}/ms count:${cloneCount}`);
+                                // this.scene.addChild(shark);
+                            }
+                        });
+                    }
+                    window["test2"] = function (cloneCount)
+                    {
 
-                    assetMgr.load("res/test/1/PF_PlayerSharkReef/PF_PlayerSharkReef1.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                        assetMgr.load("res/test/2/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                        {
+                            if (state.isfinish)
+                            {
+                                let prefab = assetMgr.getAssetByName("Background.prefab.json") as gd3d.framework.prefab;
+                                let time = Date.now();
+                                for (let i = 0; i < cloneCount; ++i)
+                                {
+                                    let shark = prefab.getCloneTrans();
+                                    cube.addChild(shark);
+                                }
+                                let useTime = Date.now() - time;
+                                console.log(`new clone trans:${useTime}/ms count:${cloneCount}`);
+                                // this.scene.addChild(shark);
+                            }
+                        });
+                    }
+
+                    assetMgr.load("res/test/1/fx_sh_shuimian/fx_sh_shuimian.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
                     {
                         if (state.isfinish)
                         {
-                            let prefab = assetMgr.getAssetByName("PF_PlayerSharkReef1.prefab.json") as gd3d.framework.prefab;
+                            let prefab = assetMgr.getAssetByName("fx_sh_shuimian.prefab.json") as gd3d.framework.prefab;
                             let time = Date.now();
                             for (let i = 0; i < cloneCount; ++i)
                             {
                                 let shark = prefab.getCloneTrans();
-                                this.scene.addChild(shark);
+                                cube.addChild(shark);
                             }
                             let useTime = Date.now() - time;
                             console.log(`new clone trans:${useTime}/ms count:${cloneCount}`);
@@ -158,16 +198,19 @@ class test_01 implements IState
         }
 
         //添加一个摄像机
-        var objCam = new gd3d.framework.transform();
-        objCam.name = "sth.";
-        this.scene.addChild(objCam);
-        this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
-        this.camera.near = 0.01;
-        this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
-        objCam.lookat(cube);
-        objCam.markDirty();//标记为需要刷新
+        setTimeout(() =>
+        {
+            var objCam = new gd3d.framework.transform();
+            objCam.name = "sth.";
+            this.scene.addChild(objCam);
+            this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
+            this.camera.near = 0.01;
+            this.camera.far = 100;
+            objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+            objCam.lookat(cube);
+            objCam.markDirty();//标记为需要刷新
 
+        }, 1000);
         {
             var testQuat: gd3d.math.quaternion = gd3d.math.pool.new_quaternion();
 

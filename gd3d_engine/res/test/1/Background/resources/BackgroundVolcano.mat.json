@@ -1,0 +1,1 @@
+{"shader":"skyplanebackgroundblend.shader.json","srcshader":"","mapUniform":{"_MainTex_ST":{"type":3,"value":"(65,1,0,0)"},"_MainTex":{"type":0,"value":"sky-above.imgdesc.json"},"_BlendValue":{"type":1,"value":0}}}

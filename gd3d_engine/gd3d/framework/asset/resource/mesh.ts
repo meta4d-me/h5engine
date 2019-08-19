@@ -385,85 +385,229 @@ namespace gd3d.framework
             return new threading.gdPromise((reslove) =>
             {
 
-                if (inData instanceof ArrayBuffer)
-                {
-                    let buf = inData;
-                    if (mesh.useThead)
-                    {
+                // if (inData instanceof ArrayBuffer)
+                // {
 
-                        threading.thread.Instance.Call("meshDataHandle", buf, (result) =>
-                        {
+                //     if (this.getName().lastIndexOf(".cmesh") == -1)
+                //     {
+                //         if (mesh.useThead)
+                //             this.parseTMesh(inData, webgl, reslove);
+                //         else
+                //             this.parseMesh(inData, webgl, reslove);
+                //     } else
+                //     {
+                        this.parseCMesh(inData, webgl);
+                        reslove();
+                //     }
 
-                            let objVF = result.objVF;
-                            let data = result.meshData;
-                            data.originVF = objVF.vf;
-                            // this.data = new gd3d.render.meshData();
-                            this.data = render.meshData.cloneByObj(data);
-                            // for (let k in data)
-                            //     this.data[k] = data[k];
-                            this.submesh = result.subMesh;
-
-                            this.glMesh = new gd3d.render.glMesh();
-                            var vertexs = this.data.genVertexDataArray(objVF.vf);
-                            var indices = this.data.genIndexDataArray();
-
-                            // let __webgl = sceneMgr.app.getAssetMgr().webgl;
-                            this.glMesh.initBuffer(webgl, objVF.vf, this.data.pos.length);
-                            this.glMesh.uploadVertexData(webgl, vertexs);
-                            this.glMesh.addIndex(webgl, indices.length);
-                            this.glMesh.uploadIndexData(webgl, 0, indices);
-                            reslove();
-                        });
-                    } else
-                    {
-
-                        var objVF = { vf: 0 };//顶点属性
-                        var data: gd3d.render.meshData = new gd3d.render.meshData();
-                        var read: gd3d.io.binReader = new gd3d.io.binReader(buf);
-                        // var meshName = read.readStringAnsi();
-                        read.readStringAnsi();
-
-                        read.position = read.position + 24;
-
-                        var vcount = read.readUInt32();
-
-                        var vec10tpose: number[] = [];
-
-                        //分片加载 
-                        this.readProcess(read, data, objVF, vcount, vec10tpose, () =>
-                        {
-                            this.readFinish(read, data, buf, objVF, webgl);
-                            reslove();
-                        });
-                    }
-                } else
-                {
-                    this.data = new gd3d.render.meshData();
-                    this.data.originVF = inData.meshData.originVF;
-                    this.data.pos = inData.meshData.pos;
-                    this.data.color = inData.meshData.color;
-                    this.data.colorex = inData.meshData.colorex;
-                    this.data.uv = inData.meshData.uv;
-                    this.data.uv2 = inData.meshData.uv2;
-                    this.data.normal = inData.meshData.normal;
-                    this.data.tangent = inData.meshData.tangent;
-                    this.data.blendIndex = inData.meshData.blendIndex;
-                    this.data.blendWeight = inData.meshData.blendWeight;
-                    this.data.trisindex = inData.meshData.trisindex;
-                    this.submesh = inData.submesh;
-        
-                    this.glMesh = new gd3d.render.glMesh();
-                    var vertexs = this.data.genVertexDataArray(this.data.originVF);
-                    var indices = this.data.genIndexDataArray();
-                    this.glMesh.initBuffer(webgl, this.data.originVF, this.data.pos.length);
-                    this.glMesh.uploadVertexData(webgl, vertexs);
-                    this.glMesh.addIndex(webgl, indices.length);
-                    this.glMesh.uploadIndexData(webgl, 0, indices);
-                    reslove();
-                }
+                // } else
+                // {
+                //     this.parseJSON(inData, webgl);
+                //     reslove();
+                // }
             });
         }
-      
+
+        /*
+        parseTMesh(inData, webgl, reslove)
+        {
+            threading.thread.Instance.Call("meshDataHandle", inData, (result) =>
+            {
+                let objVF = result.objVF;
+                let data = result.meshData;
+                data.originVF = objVF.vf;
+                // this.data = new gd3d.render.meshData();
+                this.data = render.meshData.cloneByObj(data);
+                // for (let k in data)
+                //     this.data[k] = data[k];
+                this.submesh = result.subMesh;
+
+                this.glMesh = new gd3d.render.glMesh();
+                var vertexs = this.data.genVertexDataArray(objVF.vf);
+                var indices = this.data.genIndexDataArray();
+
+                // let __webgl = sceneMgr.app.getAssetMgr().webgl;
+                this.glMesh.initBuffer(webgl, objVF.vf, this.data.pos.length);
+                this.glMesh.uploadVertexData(webgl, vertexs);
+                this.glMesh.addIndex(webgl, indices.length);
+                this.glMesh.uploadIndexData(webgl, 0, indices);
+                reslove();
+            });
+        }
+        parseMesh(inData, webgl, reslove)
+        {
+            var objVF = { vf: 0 };//顶点属性
+            var data: gd3d.render.meshData = new gd3d.render.meshData();
+            var read: gd3d.io.binReader = new gd3d.io.binReader(inData);
+            // var meshName = read.readStringAnsi();
+            read.readStringAnsi();
+
+            read.position = read.position + 24;
+
+            var vcount = read.readUInt32();
+
+            var vec10tpose: number[] = [];
+
+            //分片加载 
+            this.readProcess(read, data, objVF, vcount, vec10tpose, () =>
+            {
+                this.readFinish(read, data, inData, objVF, webgl);
+                reslove();
+            });
+        }*/
+        parseCMesh(inData, webgl)
+        {
+            var data: gd3d.render.meshData = new gd3d.render.meshData();
+            var read: gd3d.io.binReader = new gd3d.io.binReader(inData);
+            data.originVF = read.readUInt16();
+            data.pos = [];
+
+            let vector3 = math.vector3, color = math.color, vector2 = math.vector2, number4 = render.number4;
+            var len;
+
+            len = read.readUInt32();
+
+            for (var i = 0; i < len; ++i)
+            {
+                var v3 = new vector3(read.readSingle(), read.readSingle(), read.readSingle());
+                data.pos.push(v3);
+            }
+
+
+            len = read.readUInt32();
+            if (len > 0)
+            {
+                data.color = [];
+                for (var i = 0; i < len; ++i)
+                {
+                    var c = new color(read.readSingle(), read.readSingle(), read.readSingle(), read.readSingle());
+                    data.color.push(c);
+                }
+            }
+            len = read.readUInt32();
+            if (len > 0)
+            {
+                data.uv = [];
+                for (var i = 0; i < len; ++i)
+                {
+                    var uv = new vector2(read.readSingle(), read.readSingle());
+                    data.uv.push(uv);
+                }
+            }
+
+            len = read.readUInt32();
+            if (len > 0)
+            {
+                data.uv2 = [];
+                for (var i = 0; i < len; ++i)
+                {
+                    var uv2 = new vector2(read.readSingle(), read.readSingle());
+                    data.uv2.push(uv2);
+                }
+            }
+
+            len = read.readUInt32();
+            if (len > 0)
+            {
+                data.normal = [];
+                for (var i = 0; i < len; ++i)
+                {
+                    var normal = new vector3(read.readSingle(), read.readSingle(), read.readSingle());
+                    data.normal.push(normal);
+                }
+            }
+
+            len = read.readUInt32();
+            if (len > 0)
+            {
+                data.tangent = [];
+                for (var i = 0; i < len; ++i)
+                {
+                    var tangent = new vector3(read.readSingle(), read.readSingle(), read.readSingle());
+                    data.tangent.push(tangent);
+                }
+            }
+            len = read.readUInt32();
+            if (len > 0)
+            {
+                data.blendIndex = [];
+                for (var i = 0; i < len; ++i)
+                {
+                    var bi = new number4();
+                    bi.v0 = read.readUInt32();
+                    bi.v1 = read.readUInt32();
+                    bi.v2 = read.readUInt32();
+                    bi.v3 = read.readUInt32();
+                    data.blendIndex.push(bi);
+                }
+            }
+            len = read.readUInt32();
+            if (len > 0)
+            {
+                data.blendWeight = [];
+                for (var i = 0; i < len; ++i)
+                {
+                    var bi = new number4();
+                    bi.v0 = read.readSingle();
+                    bi.v1 = read.readSingle();
+                    bi.v2 = read.readSingle();
+                    bi.v3 = read.readSingle();
+                    data.blendWeight.push(bi);
+                }
+            }
+            data.trisindex = [];
+            this.submesh = [];
+            len = read.readUInt8();
+            for (var i = 0; i < len; ++i)
+            {
+                var _submeshinfo: subMeshInfo = new subMeshInfo();
+                _submeshinfo.start = read.readUInt16();
+                _submeshinfo.size = read.readUInt32();
+                _submeshinfo.matIndex = i;//read.readUInt8();
+                this.submesh.push(_submeshinfo);
+                for (var j = 0; j < _submeshinfo.size; j++)
+                {
+                    data.trisindex.push(read.readUInt32());
+                }
+
+            }
+
+            this.data = data;
+            this.glMesh = new gd3d.render.glMesh();
+            var vertexs = this.data.genVertexDataArray(this.data.originVF);
+            var indices = this.data.genIndexDataArray();
+
+            this.glMesh.initBuffer(webgl, this.data.originVF, this.data.pos.length);
+            this.glMesh.uploadVertexData(webgl, vertexs);
+            this.glMesh.addIndex(webgl, indices.length);
+            this.glMesh.uploadIndexData(webgl, 0, indices);
+
+        }
+        /*
+        parseJSON(inData, webgl)
+        {
+            this.data = new gd3d.render.meshData();
+            this.data.originVF = inData.meshData.originVF;
+            this.data.pos = inData.meshData.pos;
+            this.data.color = inData.meshData.color;
+            this.data.colorex = inData.meshData.colorex;
+            this.data.uv = inData.meshData.uv;
+            this.data.uv2 = inData.meshData.uv2;
+            this.data.normal = inData.meshData.normal;
+            this.data.tangent = inData.meshData.tangent;
+            this.data.blendIndex = inData.meshData.blendIndex;
+            this.data.blendWeight = inData.meshData.blendWeight;
+            this.data.trisindex = inData.meshData.trisindex;
+            this.submesh = inData.submesh;
+
+            this.glMesh = new gd3d.render.glMesh();
+            var vertexs = this.data.genVertexDataArray(this.data.originVF);
+            var indices = this.data.genIndexDataArray();
+            this.glMesh.initBuffer(webgl, this.data.originVF, this.data.pos.length);
+            this.glMesh.uploadVertexData(webgl, vertexs);
+            this.glMesh.addIndex(webgl, indices.length);
+            this.glMesh.uploadIndexData(webgl, 0, indices);
+        }*/
         /**
          * @public
          * @language zh_CN

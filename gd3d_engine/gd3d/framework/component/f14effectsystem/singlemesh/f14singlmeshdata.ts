@@ -68,7 +68,7 @@ namespace gd3d.framework
                     this.loopenum=LoopEnum.TimeContinue;
                     break;
             }
-            this.mesh=(assetmgr.getAssetByName(json.mesh,assetbundle)||assetmgr.getAssetByName(json.mesh.replace(".mesh.bin",".mesh.json"),assetbundle) ) as gd3d.framework.mesh;
+            this.mesh=(assetmgr.getAssetByName(json.mesh,assetbundle)||assetmgr.getAssetByName(json.mesh.replace(".mesh.bin",".cmesh.bin"),assetbundle) ) as gd3d.framework.mesh;
             this.material=assetmgr.getAssetByName(json.material,assetbundle) as gd3d.framework.material;
             gd3d.math.vec3FormJson(json.position,this.position);
             gd3d.math.vec3FormJson(json.scale,this.scale);

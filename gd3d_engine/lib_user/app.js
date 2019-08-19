@@ -1312,32 +1312,62 @@ var test_01 = (function () {
         var _loop_1 = function () {
             cube = new gd3d.framework.transform();
             cube.name = "cube";
-            cube.localScale.x = cube.localScale.y = cube.localScale.z = 1;
-            cube.localTranslate.x = 2;
-            collider = cube.gameObject.addComponent("boxcollider");
             this_1.scene.addChild(cube);
-            mesh = cube.gameObject.addComponent("meshFilter");
-            smesh = this_1.app.getAssetMgr().getDefaultMesh("cube");
-            mesh.mesh = smesh;
-            renderer = cube.gameObject.addComponent("meshRenderer");
-            var v3 = cube.localEulerAngles;
-            console.log(cube.getWorldMatrix());
-            v3.x += 50;
-            cube.localEulerAngles = v3;
-            console.log(cube.getWorldMatrix());
-            cuber = renderer;
             console.warn("Finish it.");
             var assetMgr = this_1.app.getAssetMgr();
             assetMgr.load("res/test/customShader/customShader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
                 if (state.isfinish) {
                     var cloneCount = 1;
-                    assetMgr.load("res/test/1/PF_PlayerSharkReef/PF_PlayerSharkReef1.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                    gd3d.framework.mesh.useThead = false;
+                    window["test0"] = function (cloneCount) {
+                        assetMgr.load("res/test/0/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                            if (state.isfinish) {
+                                var prefab = assetMgr.getAssetByName("Background.prefab.json");
+                                var time = Date.now();
+                                for (var i_2 = 0; i_2 < cloneCount; ++i_2) {
+                                    var shark = prefab.getCloneTrans();
+                                    cube.addChild(shark);
+                                }
+                                var useTime = Date.now() - time;
+                                console.log("old clone trans:" + useTime + "/ms count:" + cloneCount);
+                            }
+                        });
+                    };
+                    window["test1"] = function (cloneCount) {
+                        assetMgr.load("res/test/1/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                            if (state.isfinish) {
+                                var prefab = assetMgr.getAssetByName("Background.prefab.json");
+                                var time = Date.now();
+                                for (var i_3 = 0; i_3 < cloneCount; ++i_3) {
+                                    var shark = prefab.getCloneTrans();
+                                    cube.addChild(shark);
+                                }
+                                var useTime = Date.now() - time;
+                                console.log("new clone trans:" + useTime + "/ms count:" + cloneCount);
+                            }
+                        });
+                    };
+                    window["test2"] = function (cloneCount) {
+                        assetMgr.load("res/test/2/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                            if (state.isfinish) {
+                                var prefab = assetMgr.getAssetByName("Background.prefab.json");
+                                var time = Date.now();
+                                for (var i_4 = 0; i_4 < cloneCount; ++i_4) {
+                                    var shark = prefab.getCloneTrans();
+                                    cube.addChild(shark);
+                                }
+                                var useTime = Date.now() - time;
+                                console.log("new clone trans:" + useTime + "/ms count:" + cloneCount);
+                            }
+                        });
+                    };
+                    assetMgr.load("res/test/1/fx_sh_shuimian/fx_sh_shuimian.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
                         if (state.isfinish) {
-                            var prefab = assetMgr.getAssetByName("PF_PlayerSharkReef1.prefab.json");
+                            var prefab = assetMgr.getAssetByName("fx_sh_shuimian.prefab.json");
                             var time = Date.now();
-                            for (var i_2 = 0; i_2 < cloneCount; ++i_2) {
+                            for (var i_5 = 0; i_5 < cloneCount; ++i_5) {
                                 var shark = prefab.getCloneTrans();
-                                _this.scene.addChild(shark);
+                                cube.addChild(shark);
                             }
                             var useTime = Date.now() - time;
                             console.log("new clone trans:" + useTime + "/ms count:" + cloneCount);
@@ -1346,21 +1376,23 @@ var test_01 = (function () {
                 }
             });
         };
-        var this_1 = this, cube, collider, mesh, smesh, renderer;
+        var this_1 = this, cube;
         for (var i = 0; i < 1; i++) {
             _loop_1();
         }
         {
         }
-        var objCam = new gd3d.framework.transform();
-        objCam.name = "sth.";
-        this.scene.addChild(objCam);
-        this.camera = objCam.gameObject.addComponent("camera");
-        this.camera.near = 0.01;
-        this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
-        objCam.lookat(cube);
-        objCam.markDirty();
+        setTimeout(function () {
+            var objCam = new gd3d.framework.transform();
+            objCam.name = "sth.";
+            _this.scene.addChild(objCam);
+            _this.camera = objCam.gameObject.addComponent("camera");
+            _this.camera.near = 0.01;
+            _this.camera.far = 100;
+            objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+            objCam.lookat(cube);
+            objCam.markDirty();
+        }, 1000);
         {
             var testQuat = gd3d.math.pool.new_quaternion();
         }
@@ -1689,8 +1721,8 @@ var t;
                 for (var i = 0; i < _this.parentlist.length; i++) {
                     _this.parentlist[i].gameObject.visible = true;
                 }
-                for (var i_3 = 0; i_3 < _this.traillist.length; i_3++) {
-                    _this.traillist[i_3].play();
+                for (var i_6 = 0; i_6 < _this.traillist.length; i_6++) {
+                    _this.traillist[i_6].play();
                 }
                 _this.guippaths[0].play(2);
                 _this.guippaths[1].play();
@@ -1700,9 +1732,9 @@ var t;
                 for (var i = 0; i < _this.parentlist.length; i++) {
                     _this.parentlist[i].gameObject.visible = false;
                 }
-                for (var i_4 = 0; i_4 < _this.guippaths.length; i_4++) {
-                    _this.traillist[i_4].stop();
-                    _this.guippaths[i_4].stop();
+                for (var i_7 = 0; i_7 < _this.guippaths.length; i_7++) {
+                    _this.traillist[i_7].stop();
+                    _this.guippaths[i_7].stop();
                 }
             });
         };

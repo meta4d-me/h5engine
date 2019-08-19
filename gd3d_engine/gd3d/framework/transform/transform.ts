@@ -492,6 +492,12 @@ namespace gd3d.framework
         {
             if (index < 0)
                 return;
+            if(!node)
+            {
+                console.error(`node is null?? ${this.name}`);
+                console.error(new Error().stack);
+                return;
+            }
             if (node._parent != null)
             {
                 node._parent.removeChild(node);

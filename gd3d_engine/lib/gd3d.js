@@ -9187,7 +9187,7 @@ var gd3d;
                     else if (extname == ".mat.json") {
                         return AssetTypeEnum.Material;
                     }
-                    else if (extname == ".mesh.bin" || extname == ".mesh.bin.js" || extname == ".mesh.json") {
+                    else if (extname == ".mesh.bin" || extname == ".cmesh.bin" || extname == ".mesh.bin.js" || extname == ".mesh.json") {
                         return AssetTypeEnum.Mesh;
                     }
                     else if (extname == ".aniclip.bin" || extname == ".aniclip.bin.js") {
@@ -10467,39 +10467,22 @@ var gd3d;
                 if (state.resstateFirst == null) {
                     state.resstateFirst = state.resstate[filename];
                 }
-                if (url.lastIndexOf(".bin") != -1) {
-                    gd3d.io.loadArrayBuffer(url, function (_buffer, err, isloadFail) {
-                        call(function () {
-                            state.isloadFail = isloadFail ? true : false;
-                            if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                                return;
-                            var _mesh = asset ? asset : new framework.mesh(filename);
-                            var time = Date.now();
-                            return _mesh.Parse(_buffer, assetMgr.webgl).then(function () {
-                                var calc = Date.now() - time;
-                                console.log("[bin]\u52A0\u8F7D:" + url + "  \u8017\u65F6:" + calc + "/ms");
-                                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
-                            });
+                gd3d.io.loadArrayBuffer(url, function (_buffer, err, isloadFail) {
+                    call(function () {
+                        state.isloadFail = isloadFail ? true : false;
+                        if (framework.AssetFactoryTools.catchError(err, onstate, state))
+                            return;
+                        var _mesh = asset ? asset : new framework.mesh(filename);
+                        var time = Date.now();
+                        return _mesh.Parse(_buffer, assetMgr.webgl).then(function () {
+                            var calc = Date.now() - time;
+                            console.log("[bin]\u52A0\u8F7D:" + url + "  \u8017\u65F6:" + calc + "/ms");
+                            framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
                         });
-                    }, function (loadedLength, totalLength) {
-                        framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                     });
-                }
-                else if (url.lastIndexOf(".json") != -1) {
-                    gd3d.io.loadJSON(url, function (_buffer, err, isloadFail) {
-                        call(function () {
-                            state.isloadFail = isloadFail ? true : false;
-                            if (framework.AssetFactoryTools.catchError(err, onstate, state))
-                                return;
-                            var _mesh = asset ? asset : new framework.mesh(filename);
-                            return _mesh.Parse(_buffer, assetMgr.webgl).then(function () {
-                                framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
-                            });
-                        });
-                    }, function (loadedLength, totalLength) {
-                        framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
-                    });
-                }
+                }, function (loadedLength, totalLength) {
+                    framework.AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+                });
             };
             AssetFactory_Mesh.prototype.loadByPack = function (respack, url, onstate, state, assetMgr, asset, call) {
                 var filename = framework.getFileName(url);
@@ -10510,8 +10493,6 @@ var gd3d;
                 var _buffer = respack[filename];
                 var _mesh = asset ? asset : new framework.mesh(filename);
                 call(function () {
-                    if (typeof (_buffer) == "string")
-                        _buffer = JSON.parse(_buffer);
                     return _mesh.Parse(_buffer, assetMgr.webgl).then(function () {
                         framework.AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
                     });
@@ -11729,6 +11710,11 @@ var gd3d;
             transform.prototype.addChildAt = function (node, index) {
                 if (index < 0)
                     return;
+                if (!node) {
+                    console.error("node is null?? " + this.name);
+                    console.error(new Error().stack);
+                    return;
+                }
                 if (node._parent != null) {
                     node._parent.removeChild(node);
                 }
@@ -13823,63 +13809,107 @@ var gd3d;
             mesh.prototype.Parse = function (inData, webgl) {
                 var _this = this;
                 return new gd3d.threading.gdPromise(function (reslove) {
-                    if (inData instanceof ArrayBuffer) {
-                        var buf_1 = inData;
-                        if (mesh_1.useThead) {
-                            gd3d.threading.thread.Instance.Call("meshDataHandle", buf_1, function (result) {
-                                var objVF = result.objVF;
-                                var data = result.meshData;
-                                data.originVF = objVF.vf;
-                                _this.data = gd3d.render.meshData.cloneByObj(data);
-                                _this.submesh = result.subMesh;
-                                _this.glMesh = new gd3d.render.glMesh();
-                                var vertexs = _this.data.genVertexDataArray(objVF.vf);
-                                var indices = _this.data.genIndexDataArray();
-                                _this.glMesh.initBuffer(webgl, objVF.vf, _this.data.pos.length);
-                                _this.glMesh.uploadVertexData(webgl, vertexs);
-                                _this.glMesh.addIndex(webgl, indices.length);
-                                _this.glMesh.uploadIndexData(webgl, 0, indices);
-                                reslove();
-                            });
-                        }
-                        else {
-                            var objVF = { vf: 0 };
-                            var data = new gd3d.render.meshData();
-                            var read = new gd3d.io.binReader(buf_1);
-                            read.readStringAnsi();
-                            read.position = read.position + 24;
-                            var vcount = read.readUInt32();
-                            var vec10tpose = [];
-                            _this.readProcess(read, data, objVF, vcount, vec10tpose, function () {
-                                _this.readFinish(read, data, buf_1, objVF, webgl);
-                                reslove();
-                            });
-                        }
-                    }
-                    else {
-                        _this.data = new gd3d.render.meshData();
-                        _this.data.originVF = inData.meshData.originVF;
-                        _this.data.pos = inData.meshData.pos;
-                        _this.data.color = inData.meshData.color;
-                        _this.data.colorex = inData.meshData.colorex;
-                        _this.data.uv = inData.meshData.uv;
-                        _this.data.uv2 = inData.meshData.uv2;
-                        _this.data.normal = inData.meshData.normal;
-                        _this.data.tangent = inData.meshData.tangent;
-                        _this.data.blendIndex = inData.meshData.blendIndex;
-                        _this.data.blendWeight = inData.meshData.blendWeight;
-                        _this.data.trisindex = inData.meshData.trisindex;
-                        _this.submesh = inData.submesh;
-                        _this.glMesh = new gd3d.render.glMesh();
-                        var vertexs = _this.data.genVertexDataArray(_this.data.originVF);
-                        var indices = _this.data.genIndexDataArray();
-                        _this.glMesh.initBuffer(webgl, _this.data.originVF, _this.data.pos.length);
-                        _this.glMesh.uploadVertexData(webgl, vertexs);
-                        _this.glMesh.addIndex(webgl, indices.length);
-                        _this.glMesh.uploadIndexData(webgl, 0, indices);
-                        reslove();
-                    }
+                    _this.parseCMesh(inData, webgl);
+                    reslove();
                 });
+            };
+            mesh.prototype.parseCMesh = function (inData, webgl) {
+                var data = new gd3d.render.meshData();
+                var read = new gd3d.io.binReader(inData);
+                data.originVF = read.readUInt16();
+                data.pos = [];
+                var vector3 = gd3d.math.vector3, color = gd3d.math.color, vector2 = gd3d.math.vector2, number4 = gd3d.render.number4;
+                var len;
+                len = read.readUInt32();
+                for (var i = 0; i < len; ++i) {
+                    var v3 = new vector3(read.readSingle(), read.readSingle(), read.readSingle());
+                    data.pos.push(v3);
+                }
+                len = read.readUInt32();
+                if (len > 0) {
+                    data.color = [];
+                    for (var i = 0; i < len; ++i) {
+                        var c = new color(read.readSingle(), read.readSingle(), read.readSingle(), read.readSingle());
+                        data.color.push(c);
+                    }
+                }
+                len = read.readUInt32();
+                if (len > 0) {
+                    data.uv = [];
+                    for (var i = 0; i < len; ++i) {
+                        var uv = new vector2(read.readSingle(), read.readSingle());
+                        data.uv.push(uv);
+                    }
+                }
+                len = read.readUInt32();
+                if (len > 0) {
+                    data.uv2 = [];
+                    for (var i = 0; i < len; ++i) {
+                        var uv2 = new vector2(read.readSingle(), read.readSingle());
+                        data.uv2.push(uv2);
+                    }
+                }
+                len = read.readUInt32();
+                if (len > 0) {
+                    data.normal = [];
+                    for (var i = 0; i < len; ++i) {
+                        var normal = new vector3(read.readSingle(), read.readSingle(), read.readSingle());
+                        data.normal.push(normal);
+                    }
+                }
+                len = read.readUInt32();
+                if (len > 0) {
+                    data.tangent = [];
+                    for (var i = 0; i < len; ++i) {
+                        var tangent = new vector3(read.readSingle(), read.readSingle(), read.readSingle());
+                        data.tangent.push(tangent);
+                    }
+                }
+                len = read.readUInt32();
+                if (len > 0) {
+                    data.blendIndex = [];
+                    for (var i = 0; i < len; ++i) {
+                        var bi = new number4();
+                        bi.v0 = read.readUInt32();
+                        bi.v1 = read.readUInt32();
+                        bi.v2 = read.readUInt32();
+                        bi.v3 = read.readUInt32();
+                        data.blendIndex.push(bi);
+                    }
+                }
+                len = read.readUInt32();
+                if (len > 0) {
+                    data.blendWeight = [];
+                    for (var i = 0; i < len; ++i) {
+                        var bi = new number4();
+                        bi.v0 = read.readSingle();
+                        bi.v1 = read.readSingle();
+                        bi.v2 = read.readSingle();
+                        bi.v3 = read.readSingle();
+                        data.blendWeight.push(bi);
+                    }
+                }
+                data.trisindex = [];
+                this.submesh = [];
+                len = read.readUInt8();
+                for (var i = 0; i < len; ++i) {
+                    var _submeshinfo = new subMeshInfo();
+                    _submeshinfo.start = read.readUInt16();
+                    _submeshinfo.size = read.readUInt32();
+                    _submeshinfo.matIndex = i;
+                    this.submesh.push(_submeshinfo);
+                    for (var j = 0; j < _submeshinfo.size; j++) {
+                        data.trisindex.push(read.readUInt32());
+                    }
+                }
+                this.data = data;
+                this.glMesh = new gd3d.render.glMesh();
+                var vertexs = this.data.genVertexDataArray(this.data.originVF);
+                var indices = this.data.genIndexDataArray();
+                this.glMesh.initBuffer(webgl, this.data.originVF, this.data.pos.length);
+                this.glMesh.uploadVertexData(webgl, vertexs);
+                this.glMesh.addIndex(webgl, indices.length);
+                this.glMesh.uploadIndexData(webgl, 0, indices);
             };
             mesh.prototype.intersects = function (ray, matrix, outInfo) {
                 var ishided = false;
@@ -19679,7 +19709,7 @@ var gd3d;
                         this.loopenum = framework.LoopEnum.TimeContinue;
                         break;
                 }
-                this.mesh = (assetmgr.getAssetByName(json.mesh, assetbundle) || assetmgr.getAssetByName(json.mesh.replace("mesh.bin", "mesh.json"), assetbundle));
+                this.mesh = (assetmgr.getAssetByName(json.mesh, assetbundle) || assetmgr.getAssetByName(json.mesh.replace("mesh.bin", "cmesh.bin"), assetbundle));
                 this.material = assetmgr.getAssetByName(json.material, assetbundle);
                 gd3d.math.vec3FormJson(json.rotPosition, this.rotPosition);
                 gd3d.math.vec3FormJson(json.rotScale, this.rotScale);
@@ -20867,7 +20897,7 @@ var gd3d;
                         this.loopenum = LoopEnum.TimeContinue;
                         break;
                 }
-                this.mesh = (assetmgr.getAssetByName(json.mesh, assetbundle) || assetmgr.getAssetByName(json.mesh.replace(".mesh.bin", ".mesh.json"), assetbundle));
+                this.mesh = (assetmgr.getAssetByName(json.mesh, assetbundle) || assetmgr.getAssetByName(json.mesh.replace(".mesh.bin", ".cmesh.bin"), assetbundle));
                 this.material = assetmgr.getAssetByName(json.material, assetbundle);
                 gd3d.math.vec3FormJson(json.position, this.position);
                 gd3d.math.vec3FormJson(json.scale, this.scale);
@@ -22453,6 +22483,7 @@ var gd3d;
     (function (io) {
         var assetMgr;
         var filter = { cls: true, insid: true, gameObject: true, components: true, children: true };
+        var baseType = { string: true, number: true, boolean: true };
         function ndeSerialize(json, assetbundle, useAsset) {
             if (!assetMgr)
                 assetMgr = gd3d.framework.sceneMgr.app.getAssetMgr();
@@ -22493,7 +22524,7 @@ var gd3d;
             trans.name = json.name;
             for (var k in json) {
                 if (!filter[k])
-                    trans[k] = json[k];
+                    fullValue(trans, k, json[k]);
             }
             if (json.components || (json.gameObject && json.gameObject.components)) {
                 gos.push({
@@ -22526,8 +22557,10 @@ var gd3d;
                     else if (ele.refid) {
                         value = instMap[ele.refid];
                     }
-                    else
-                        value = ele;
+                    else {
+                        arrProp.push(null);
+                        fullValue(arrProp, i, prop[i]);
+                    }
                     if (value)
                         arrProp.push(value);
                 }
@@ -22554,20 +22587,34 @@ var gd3d;
                 }
             }
             else
-                comp[k] = prop;
+                fullValue(comp, k, prop);
+        }
+        function fullValue(obj, key, json) {
+            if (!json.cls || baseType[json.cls])
+                obj[key] = json;
+            else {
+                var ctor = gd3d.math[json.cls] || gd3d.framework[json.cls];
+                var inst = new ctor();
+                for (var k in json) {
+                    if (k == "cls")
+                        continue;
+                    fullValue(inst, k, json[k]);
+                }
+                obj[key] = inst;
+            }
         }
         function getAssetValue(assetName, type, bundlename, useAsset) {
             var asset;
             if (assetName.indexOf("SystemDefaultAsset-") >= 0) {
                 assetName = assetName.replace("SystemDefaultAsset-", "");
                 if (type == "mesh")
-                    asset = assetMgr.getDefaultMesh(assetName.replace(".mesh.bin", "").replace(".mesh.json", ""));
+                    asset = assetMgr.getDefaultMesh(assetName.replace(".mesh.bin", "").replace(".cmesh.bin", ""));
                 else if (type == "texture")
                     asset = assetMgr.getDefaultTexture(assetName);
             }
             else
                 asset = assetMgr.getAssetByName(assetName, bundlename) ||
-                    assetMgr.getAssetByName(assetName.replace(".mesh.bin", ".mesh.json"), bundlename);
+                    assetMgr.getAssetByName(assetName.replace(".mesh.bin", ".cmesh.bin"), bundlename);
             if (!asset && type == "animationClip") {
                 var clip = new gd3d.framework.animationClip(assetName);
                 clip.bones = [];
@@ -23366,7 +23413,7 @@ var gd3d;
                 if (assetName.indexOf("SystemDefaultAsset-") >= 0) {
                     assetName = assetName.replace("SystemDefaultAsset-", "");
                     if (type == "mesh") {
-                        assetName = assetName.replace(".mesh.bin", "").replace(".mesh.json", "");
+                        assetName = assetName.replace(".mesh.bin", "").replace(".cmesh.bin", "");
                         _asset = assetMgr.getDefaultMesh(assetName);
                     }
                     else if (type == "texture") {
@@ -23374,7 +23421,7 @@ var gd3d;
                     }
                 }
                 else {
-                    _asset = assetMgr.getAssetByName(assetName, bundlename) || assetMgr.getAssetByName(assetName.replace(".mesh.bin", ".mesh.json"), bundlename);
+                    _asset = assetMgr.getAssetByName(assetName, bundlename) || assetMgr.getAssetByName(assetName.replace(".mesh.bin", ".cmesh.bin"), bundlename);
                 }
                 if (_asset == null && type == "animationClip") {
                     _asset = assetMgr.getAssetByName(assetName);
@@ -29524,7 +29571,7 @@ var gd3d;
                         return billboardType;
                     case "mesh":
                         var str = content;
-                        if (content.toString().indexOf(".mesh.bin") >= 0 && content.toString().indexOf(".mesh.json") >= 0)
+                        if (content.toString().indexOf(".mesh.bin") >= 0 || content.toString().indexOf(".cmesh.bin") >= 0)
                             return this.asMgr.getAssetByName(content);
                         else
                             return this.asMgr.getDefaultMesh(content);
@@ -35693,12 +35740,9 @@ var gd3d;
             if (text === void 0) { text = undefined; }
             return new gd3d.threading.gdPromise(function (r) {
                 var cached = cachedMap[url];
-                if (cached.ready)
-                    return r(cachedMap[url].json);
-                JSONParse(text).then(function (json) {
-                    cached.ready = true;
-                    cached.json = json;
-                    cached.useTime = Date.now();
+                cached.ready = true;
+                cached.useTime = Date.now();
+                JSONParse(text || cached.text).then(function (json) {
                     r(json);
                 });
             });
@@ -35743,22 +35787,25 @@ var gd3d;
                     cached.queue.push(fun);
                 if (cached.ready) {
                     fun(cached.json, null);
-                    r();
+                    GetJSON(url).then(function (json) {
+                        r(json);
+                    });
                     return;
                 }
                 if (cached.init) {
                     cached.init = false;
                     gd3d.io.xhrLoad(url, fun, onprocess, "text", function (req) {
-                        GetJSON(url, req.response).then(function () {
+                        GetJSON(url, req.response).then(function (json) {
                             var cached = cachedMap[url];
+                            cached.text = req.responseText;
                             var slowOut = function () {
                                 if (cached.queue.length > 0)
-                                    cached.queue.shift()(cached.json, null);
+                                    cached.queue.shift()(json, null);
                                 if (cached.queue.length > 0)
                                     setTimeout(slowOut, 10);
                             };
                             if (cached.queue.length == 1)
-                                cached.queue.shift()(cached.json, null);
+                                cached.queue.shift()(json, null);
                             else
                                 slowOut();
                         });
