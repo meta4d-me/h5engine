@@ -5994,7 +5994,7 @@ var gd3d;
                 this.vertical = true;
                 this.inertia = true;
                 this.decelerationRate = 0.135;
-                this.pauseSlide = true;
+                this.pauseSlide = false;
                 this.isPointDown = false;
                 this.lastPoint = new gd3d.math.vector2();
                 this.strPoint = new gd3d.math.vector2();
