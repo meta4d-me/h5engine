@@ -84,7 +84,7 @@ namespace gd3d.framework
         }
         transform: transform2D;
         //暂停滑动
-        pauseSlide:boolean=true;
+        pauseSlide:boolean=false;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean) {
             if(this.pauseSlide)
             {
