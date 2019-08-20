@@ -83,7 +83,14 @@ namespace gd3d.framework
             this.flyingSlidr(delta);
         }
         transform: transform2D;
+        //暂停滑动
+        pauseSlide:boolean=true;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean) {
+            if(this.pauseSlide)
+            {
+                this.isPointDown = false;
+                return;
+            }
             //oncap==true 是捕获阶段，一般的行为，只在pop阶段处理
             if (oncap == false)
             {

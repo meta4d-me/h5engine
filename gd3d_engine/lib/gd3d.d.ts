@@ -995,6 +995,7 @@ declare namespace gd3d.framework {
         onPlay(): void;
         update(delta: number): void;
         transform: transform2D;
+        pauseSlide: boolean;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         private isPointDown;
         private lastPoint;
