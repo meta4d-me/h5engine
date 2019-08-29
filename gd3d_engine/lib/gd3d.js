@@ -5994,6 +5994,7 @@ var gd3d;
                 this.vertical = true;
                 this.inertia = true;
                 this.decelerationRate = 0.135;
+                this.pauseSlide = false;
                 this.isPointDown = false;
                 this.lastPoint = new gd3d.math.vector2();
                 this.strPoint = new gd3d.math.vector2();
@@ -6026,6 +6027,10 @@ var gd3d;
                 this.flyingSlidr(delta);
             };
             scrollRect.prototype.onPointEvent = function (canvas, ev, oncap) {
+                if (this.pauseSlide) {
+                    this.isPointDown = false;
+                    return;
+                }
                 if (oncap == false) {
                     var tv2 = scrollRect_1.helpv2;
                     tv2.x = ev.x;
