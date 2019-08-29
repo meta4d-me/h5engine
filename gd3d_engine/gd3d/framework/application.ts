@@ -72,7 +72,7 @@ namespace gd3d.framework
             return this.webgl.canvas.width;
             // return this.webgl.canvas.getBoundingClientRect().width;
         }
-        
+
         // /**
         //  * @public
         //  * @language zh_CN
@@ -85,7 +85,7 @@ namespace gd3d.framework
             return this.webgl.canvas.height;
             // return this.webgl.canvas.getBoundingClientRect().height;
         }
-        
+
         limitFrame: boolean = true;
         notify: INotify;
         private _timeScale: number;
@@ -220,7 +220,7 @@ namespace gd3d.framework
             var canvas = document.createElement("canvas");
             if (canvas == null)
             {
-                alert("Failed to create canvas at the application.start()");
+                console.error("Failed to create canvas at the application.start()");
                 throw Error("Failed to create canvas at the application.start()");
             }
             canvas.className = "full";
@@ -247,7 +247,7 @@ namespace gd3d.framework
         {
             this.ccWidth = this.ccWidth == undefined ? canvas.clientWidth : this.ccWidth;
             this.ccHeight = this.ccHeight == undefined ? canvas.clientHeight : this.ccHeight;
-            
+
             this._timeScale = 1;
             sceneMgr.app = this;
             let tempWebGlUtil = new WebGLUtils();
@@ -255,7 +255,7 @@ namespace gd3d.framework
             // console.error(" i am ---tempWebGlUtil-" + webglDebug);
             if (this.webgl == null)
             {
-                alert("Failed to get webgl at the application.start()");
+                console.error("Failed to get webgl at the application.start()");
                 throw Error("Failed to get webgl at the application.start()");
             }
 
@@ -659,7 +659,7 @@ namespace gd3d.framework
         {
             if (this._assetmgr == null)
             {
-                this._assetmgr = new assetMgr(this);
+                assetMgr.Instance = this._assetmgr = new assetMgr(this);
                 this._assetmgr.initDefAsset();
             }
         }
@@ -674,6 +674,8 @@ namespace gd3d.framework
         {
             return this._assetmgr;
         }
+
+
 
         private _inputmgr: inputMgr
         private initInputMgr()
@@ -789,7 +791,7 @@ namespace gd3d.framework
                 }
             }
             // this._userCodeNew.length = 0;
-
+    
             //update logic
             var closeindex = -1;
             for (var i = 0; i < this._userCode.length; i++)
@@ -804,7 +806,7 @@ namespace gd3d.framework
                     closeindex = i;
                 }
             }
-
+    
             //remove closed
             if (closeindex >= 0)
             {

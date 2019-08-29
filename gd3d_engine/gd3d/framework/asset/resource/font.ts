@@ -10,7 +10,7 @@
     @gd3d.reflect.SerializeType
     export class font implements IAsset
     {
-        static readonly ClassName:string="font";
+        static readonly ClassName: string = "font";
 
         private name: constText;
         private id: resID = new resID();
@@ -119,7 +119,7 @@
                 this._texture.unuse();
             }
             this._texture = value;
-            if(this._texture)
+            if (this._texture)
                 this._texture.use();
         }
         //mat: spriteMat;
@@ -185,10 +185,7 @@
             }
             map = null;
             json = null;
-
-
-            // let d2 = new Date().valueOf();
-            // let n = d2 - d1;
+            return this;
         }
 
     }
@@ -224,11 +221,11 @@
         /**
          * 偏移
          */
-        xOffset: number=0;//偏移
+        xOffset: number = 0;//偏移
         /**
          * 相对基线的偏移
          */
-        yOffset: number=0;//相对基线的偏移
+        yOffset: number = 0;//相对基线的偏移
         /**
          * 字符宽度
          */

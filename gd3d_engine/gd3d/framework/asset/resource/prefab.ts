@@ -204,7 +204,7 @@
             // });
         }
 
-        cParse(data: any, assetmgr: assetMgr)
+        cParse(data: any)
         {
             this.jsonstr = data;
             if (data.cls == "transform")

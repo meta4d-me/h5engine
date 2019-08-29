@@ -369,7 +369,7 @@ namespace gd3d.framework
         }
 
         private tryGetSprite(spriteName:string){
-            let temp = this.transform.canvas.assetmgr.mapNamed[spriteName];
+            let temp = assetMgr.mapNamed[spriteName];
             if(temp != null){
                 let tsprite = this.transform.canvas.assetmgr.getAssetByName(spriteName) as gd3d.framework.sprite;
                 if(tsprite)   return tsprite;

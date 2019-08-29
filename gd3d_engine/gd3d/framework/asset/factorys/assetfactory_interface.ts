@@ -2,9 +2,11 @@ namespace gd3d.framework
 {
     export interface IAssetFactory
     {
-        newAsset(assetName?: string): IAsset;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
+        newAsset?(assetName?: string): IAsset;
+        load?(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
+        loadByPack?(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
+        parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: string | ArrayBuffer, dwguid?: number): IAsset | gd3d.threading.gdPromise<IAsset> | void;
+        needDownload?(textJSON: string): string;
     }
 
     export class AssetFactoryTools
@@ -26,8 +28,8 @@ namespace gd3d.framework
             let fileName = getFileName(url);
 
             assetMgr.setAssetUrl(asset, url);
-            assetMgr.maploaded[url]=asset;
-            
+            assetMgr.maploaded[url] = asset;
+
             assetMgr.use(asset);
             state.resstate[fileName].state = 1;
             state.resstate[fileName].res = asset;

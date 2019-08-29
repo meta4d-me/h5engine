@@ -585,6 +585,7 @@ namespace gd3d.framework
                         break;
                 }
             }
+            return this;
         }
 
         /**

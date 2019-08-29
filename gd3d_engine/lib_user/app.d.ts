@@ -153,6 +153,8 @@ declare class test_01 implements IState {
     cube3: gd3d.framework.transform;
     timer: number;
     update(delta: number): void;
+    private testPrefab;
+    private testNRes;
 }
 declare class test_loadScene implements IState {
     app: gd3d.framework.application;

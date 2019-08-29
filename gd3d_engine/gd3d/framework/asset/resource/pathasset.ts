@@ -159,6 +159,7 @@ namespace gd3d.framework
                 var arr=pointlocation.split(",");
                 item.point=new gd3d.math.vector3(parseFloat(arr[0]),parseFloat(arr[1]),parseFloat(arr[2]));
                 this.items.push(item);
+                return this;
            }
            this.getpaths();
            //------------------------------------------------
