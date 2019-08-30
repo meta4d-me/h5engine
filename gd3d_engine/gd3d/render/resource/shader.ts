@@ -9,14 +9,14 @@ namespace gd3d.render
      */
     export enum UniformTypeEnum
     {
-        Texture=0,
-        Float=1,
-        Floatv=2,
-        Float4=3,
-        Float4v=4,
-        Float4x4=5,
-        Float4x4v=6,
-        CubeTexture=7
+        Texture = 0,
+        Float = 1,
+        Floatv = 2,
+        Float4 = 3,
+        Float4v = 4,
+        Float4x4 = 5,
+        Float4x4v = 6,
+        CubeTexture = 7
     }
     /**
      * @private
@@ -180,42 +180,51 @@ namespace gd3d.render
                 // remove the array suffix.
                 if (name.substr(-3) === "[0]") 
                 {
-                  name = name.substr(0, name.length - 3);
+                    name = name.substr(0, name.length - 3);
                 }
 
                 var location = webgl.getUniformLocation(this.program, uniformInfo.name);
                 var type = uniformInfo.type;
                 var isArray = (uniformInfo.size > 1 && uniformInfo.name.substr(-3) === "[0]");
 
-                let _uniform=new uniform();
-                _uniform.name=name;
-                _uniform.location=location;
-                this.mapUniform[name]=_uniform;
-                
-                if (type === webgl.FLOAT && isArray) {
-                    _uniform.type=UniformTypeEnum.Floatv;
+                let _uniform = new uniform();
+                _uniform.name = name;
+                _uniform.location = location;
+                this.mapUniform[name] = _uniform;
+
+                if (type === webgl.FLOAT && isArray)
+                {
+                    _uniform.type = UniformTypeEnum.Floatv;
                 }
-                else if (type === webgl.FLOAT) {
-                    _uniform.type=UniformTypeEnum.Float;
+                else if (type === webgl.FLOAT)
+                {
+                    _uniform.type = UniformTypeEnum.Float;
                 }
-                else if (type === webgl.FLOAT_VEC4 && isArray) {
-                    _uniform.type=UniformTypeEnum.Float4v;
+                else if (type === webgl.FLOAT_VEC4 && isArray)
+                {
+                    _uniform.type = UniformTypeEnum.Float4v;
                 }
-                else if (type === webgl.FLOAT_VEC4) {
-                    _uniform.type=UniformTypeEnum.Float4;
+                else if (type === webgl.FLOAT_VEC4)
+                {
+                    _uniform.type = UniformTypeEnum.Float4;
                 }
-                else if (type === webgl.FLOAT_MAT4 && isArray) {
-                    _uniform.type=UniformTypeEnum.Float4x4v;
+                else if (type === webgl.FLOAT_MAT4 && isArray)
+                {
+                    _uniform.type = UniformTypeEnum.Float4x4v;
                 }
-                else if (type === webgl.FLOAT_MAT4) {
-                    _uniform.type=UniformTypeEnum.Float4x4;
+                else if (type === webgl.FLOAT_MAT4)
+                {
+                    _uniform.type = UniformTypeEnum.Float4x4;
                 }
-                else if (type === webgl.SAMPLER_2D) {
-                    _uniform.type=UniformTypeEnum.Texture;
+                else if (type === webgl.SAMPLER_2D)
+                {
+                    _uniform.type = UniformTypeEnum.Texture;
                 }
-                else if (type === webgl.SAMPLER_CUBE) {
-                    _uniform.type=UniformTypeEnum.CubeTexture;
-                }else{
+                else if (type === webgl.SAMPLER_CUBE)
+                {
+                    _uniform.type = UniformTypeEnum.CubeTexture;
+                } else
+                {
                     console.log("Unifrom parse Erorr : not have this type!");
                 }
             }
@@ -268,12 +277,10 @@ namespace gd3d.render
             webgl.compileShader(vs);
             var r1 = webgl.getShaderParameter(vs, webgl.COMPILE_STATUS);
             if (r1 == false)
-            {
-                if (confirm("a vs:" + name + " error!!!" + webgl.getShaderInfoLog(vs) + "\n" + "did you want see the code?"))
-                {
-                    webgl.deleteShader(vs);
-                    alert(code);
-                }
+            {               
+                webgl.deleteShader(vs);
+                console.error(code);
+             
                 return null;
             }
             var s = new glShader(name, ShaderTypeEnum.VS, vs, code);
@@ -289,11 +296,9 @@ namespace gd3d.render
             var r1 = webgl.getShaderParameter(fs, webgl.COMPILE_STATUS);
             if (r1 == false)
             {
-                if (confirm("a fs:" + name + " error!!!" + webgl.getShaderInfoLog(fs) + "\n" + "did you want see the code?"))
-                {
-                    webgl.deleteShader(fs);
-                    alert(code);
-                }
+
+                webgl.deleteShader(fs);
+                console.error(code);
                 return null;
             }
 
@@ -313,7 +318,7 @@ namespace gd3d.render
             var r3 = webgl.getProgramParameter(program, webgl.LINK_STATUS);
             if (r3 == false)
             {
-                alert("vs:" + nameVS + "   fs:" + nameFS + "a webgl program error:" + webgl.getProgramInfoLog(program));
+                console.error("vs:" + nameVS + "   fs:" + nameFS + "a webgl program error:" + webgl.getProgramInfoLog(program));
                 webgl.deleteProgram(program);
                 return null;
             }
@@ -345,44 +350,44 @@ namespace gd3d.render
         //--------------------------------------shader 版本2
         mapVSString: { [id: string]: string } = {};
         mapFSString: { [id: string]: string } = {};
-        
-        linkProgrambyPassType(webgl: WebGLRenderingContext, type:string,nameVS: string, nameFS: string):glProgram
-        {
-            let vsStr=this.mapVSString[nameVS];
-            let fsStr=this.mapFSString[nameFS];
 
-            if(type=="base")
+        linkProgrambyPassType(webgl: WebGLRenderingContext, type: string, nameVS: string, nameFS: string): glProgram
+        {
+            let vsStr = this.mapVSString[nameVS];
+            let fsStr = this.mapFSString[nameFS];
+
+            if (type == "base")
             {
-                
-            }else if(type=="base_fog"||type=="fog")
+
+            } else if (type == "base_fog" || type == "fog")
             {
-                vsStr="#define FOG \n"+vsStr;
-                fsStr="#define FOG \n"+fsStr;
-            }else if(type=="skin")
+                vsStr = "#define FOG \n" + vsStr;
+                fsStr = "#define FOG \n" + fsStr;
+            } else if (type == "skin")
             {
-                vsStr="#define SKIN \n"+vsStr;
-                fsStr="#define SKIN \n"+fsStr;   
-            }else if(type=="skin_fog")
+                vsStr = "#define SKIN \n" + vsStr;
+                fsStr = "#define SKIN \n" + fsStr;
+            } else if (type == "skin_fog")
             {
-                vsStr="#define SKIN \n"+"#define FOG \n"+vsStr;
-                fsStr="#define SKIN \n"+"#define FOG \n"+fsStr;  
-            }else if(type=="lightmap")
+                vsStr = "#define SKIN \n" + "#define FOG \n" + vsStr;
+                fsStr = "#define SKIN \n" + "#define FOG \n" + fsStr;
+            } else if (type == "lightmap")
             {
-                vsStr="#define LIGHTMAP \n"+vsStr;
-                fsStr="#define LIGHTMAP \n"+fsStr;     
-            }else if(type=="lightmap_fog")
+                vsStr = "#define LIGHTMAP \n" + vsStr;
+                fsStr = "#define LIGHTMAP \n" + fsStr;
+            } else if (type == "lightmap_fog")
             {
-                vsStr="#define LIGHTMAP \n"+"#define FOG \n"+vsStr;
-                fsStr="#define LIGHTMAP \n"+"#define FOG \n"+fsStr;    
-            }else if(type=="quad")
+                vsStr = "#define LIGHTMAP \n" + "#define FOG \n" + vsStr;
+                fsStr = "#define LIGHTMAP \n" + "#define FOG \n" + fsStr;
+            } else if (type == "quad")
             {
-                vsStr="#define QUAD \n"+vsStr;
-                fsStr="#define QUAD \n"+fsStr; 
+                vsStr = "#define QUAD \n" + vsStr;
+                fsStr = "#define QUAD \n" + fsStr;
             }
-            this.compileVS(webgl,nameVS+type,vsStr);
-            this.compileFS(webgl,nameFS+type,fsStr);
-            
-            let pro=this.linkProgram(webgl,nameVS+type,nameFS+type);
+            this.compileVS(webgl, nameVS + type, vsStr);
+            this.compileFS(webgl, nameFS + type, fsStr);
+
+            let pro = this.linkProgram(webgl, nameVS + type, nameFS + type);
             return pro;
         }
 

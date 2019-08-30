@@ -339,7 +339,7 @@ namespace gd3d.framework
         private searchTexture(){
             if(this._sprite) return;
             let assetmgr = this.transform.canvas.assetmgr;
-            let temp = assetmgr.mapNamed[this._spriteName];
+            let temp = assetMgr.mapNamed[this._spriteName];
             let tspr:sprite;
             if(temp != null){
                 tspr = assetmgr.getAssetByName(this._spriteName) as gd3d.framework.sprite;

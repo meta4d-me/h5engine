@@ -1309,64 +1309,11 @@ var test_01 = (function () {
         this.app = app;
         this.scene = this.app.getScene();
         var cuber;
-        var _loop_1 = function () {
-            cube = new gd3d.framework.transform();
-            cube.name = "cube";
-            this_1.scene.addChild(cube);
-            console.warn("Finish it.");
-            var assetMgr = this_1.app.getAssetMgr();
-            assetMgr.load("res/test/customShader/customShader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
-                if (state.isfinish) {
-                    var cloneCount = 1;
-                    gd3d.framework.mesh.useThead = false;
-                    window["test0"] = function (cloneCount) {
-                        assetMgr.load("res/test/0/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
-                            if (state.isfinish) {
-                                var prefab = assetMgr.getAssetByName("Background.prefab.json");
-                                var time = Date.now();
-                                for (var i_2 = 0; i_2 < cloneCount; ++i_2) {
-                                    var shark = prefab.getCloneTrans();
-                                    cube.addChild(shark);
-                                }
-                                var useTime = Date.now() - time;
-                                console.log("old clone trans:" + useTime + "/ms count:" + cloneCount);
-                            }
-                        });
-                    };
-                    window["test1"] = function (cloneCount) {
-                        assetMgr.load("res/test/1/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
-                            if (state.isfinish) {
-                                var prefab = assetMgr.getAssetByName("Background.prefab.json");
-                                var time = Date.now();
-                                for (var i_3 = 0; i_3 < cloneCount; ++i_3) {
-                                    var shark = prefab.getCloneTrans();
-                                    cube.addChild(shark);
-                                }
-                                var useTime = Date.now() - time;
-                                console.log("new clone trans:" + useTime + "/ms count:" + cloneCount);
-                            }
-                        });
-                    };
-                    window["test2"] = function (cloneCount) {
-                        assetMgr.load("res/test/2/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
-                            if (state.isfinish) {
-                                var prefab = assetMgr.getAssetByName("Background.prefab.json");
-                                var time = Date.now();
-                                for (var i_4 = 0; i_4 < cloneCount; ++i_4) {
-                                    var shark = prefab.getCloneTrans();
-                                    cube.addChild(shark);
-                                }
-                                var useTime = Date.now() - time;
-                                console.log("new clone trans:" + useTime + "/ms count:" + cloneCount);
-                            }
-                        });
-                    };
-                }
-            });
-        };
-        var this_1 = this, cube;
         for (var i = 0; i < 1; i++) {
-            _loop_1();
+            var cube = new gd3d.framework.transform();
+            cube.name = "cube";
+            this.scene.addChild(cube);
+            this.testNRes(cube);
         }
         {
         }
@@ -1395,6 +1342,79 @@ var test_01 = (function () {
         var objCam = this.camera.gameObject.transform;
         this.cube2.localTranslate = new gd3d.math.vector3(this.timer, 0, 0);
         this.cube2.markDirty();
+    };
+    test_01.prototype.testPrefab = function (cube) {
+        console.warn("Finish it.");
+        var assetMgr = this.app.getAssetMgr();
+        assetMgr.load("res/test/customShader/customShader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+            if (state.isfinish) {
+                var cloneCount = 1;
+                gd3d.framework.mesh.useThead = false;
+                window["test0"] = function (cloneCount) {
+                    assetMgr.load("res/test/0/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                        if (state.isfinish) {
+                            var prefab = assetMgr.getAssetByName("Background.prefab.json");
+                            var time = Date.now();
+                            for (var i = 0; i < cloneCount; ++i) {
+                                var shark = prefab.getCloneTrans();
+                                cube.addChild(shark);
+                            }
+                            var useTime = Date.now() - time;
+                            console.log("old clone trans:" + useTime + "/ms count:" + cloneCount);
+                        }
+                    });
+                };
+                window["test1"] = function (cloneCount) {
+                    assetMgr.load("res/test/1/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                        if (state.isfinish) {
+                            var prefab = assetMgr.getAssetByName("Background.prefab.json");
+                            var time = Date.now();
+                            for (var i = 0; i < cloneCount; ++i) {
+                                var shark = prefab.getCloneTrans();
+                                cube.addChild(shark);
+                            }
+                            var useTime = Date.now() - time;
+                            console.log("new clone trans:" + useTime + "/ms count:" + cloneCount);
+                        }
+                    });
+                };
+                window["test2"] = function (cloneCount) {
+                    assetMgr.load("res/test/2/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                        if (state.isfinish) {
+                            var prefab = assetMgr.getAssetByName("Background.prefab.json");
+                            var time = Date.now();
+                            for (var i = 0; i < cloneCount; ++i) {
+                                var shark = prefab.getCloneTrans();
+                                cube.addChild(shark);
+                            }
+                            var useTime = Date.now() - time;
+                            console.log("new clone trans:" + useTime + "/ms count:" + cloneCount);
+                        }
+                    });
+                };
+            }
+        });
+    };
+    test_01.prototype.testNRes = function (root) {
+        var _this = this;
+        var cndroot = "http://192.168.88.68:8088/public/1/hungryshark/Resources_new/";
+        var assetMgr = this.app.getAssetMgr();
+        assetMgr.load(cndroot + "shader/customShader/customShader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                if (state.isfinish) {
+                    assetMgr.mapShader = this.app.getAssetMgr().mapShader;
+                    assetMgr.load(cndroot + "props/PC/role/PF_PlayerSharkReef/PF_PlayerSharkReef.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                        if (state.isfinish) {
+                            console.log("资源加载结束");
+                            var prefab = assetMgr.getAssetByName("PF_PlayerSharkReef.prefab.json");
+                            var trans = prefab.getCloneTrans();
+                            root.addChild(trans);
+                        }
+                    });
+                }
+                return [2];
+            });
+        }); });
     };
     return test_01;
 }());
@@ -1709,8 +1729,8 @@ var t;
                 for (var i = 0; i < _this.parentlist.length; i++) {
                     _this.parentlist[i].gameObject.visible = true;
                 }
-                for (var i_5 = 0; i_5 < _this.traillist.length; i_5++) {
-                    _this.traillist[i_5].play();
+                for (var i_2 = 0; i_2 < _this.traillist.length; i_2++) {
+                    _this.traillist[i_2].play();
                 }
                 _this.guippaths[0].play(2);
                 _this.guippaths[1].play();
@@ -1720,9 +1740,9 @@ var t;
                 for (var i = 0; i < _this.parentlist.length; i++) {
                     _this.parentlist[i].gameObject.visible = false;
                 }
-                for (var i_6 = 0; i_6 < _this.guippaths.length; i_6++) {
-                    _this.traillist[i_6].stop();
-                    _this.guippaths[i_6].stop();
+                for (var i_3 = 0; i_3 < _this.guippaths.length; i_3++) {
+                    _this.traillist[i_3].stop();
+                    _this.guippaths[i_3].stop();
                 }
             });
         };
@@ -8645,12 +8665,12 @@ var test_effect = (function () {
             _this.app.getAssetMgr().savePrefab(_this.tr, name, function (data, resourses) {
                 console.log(data.files);
                 console.log(resourses.length);
-                var _loop_2 = function (key) {
+                var _loop_1 = function (key) {
                     var val = data.files[key];
                     var blob = localSave.Instance.file_str2blob(val);
                     var files = [];
                     var resPath = path + "/resources/";
-                    var _loop_3 = function (i) {
+                    var _loop_2 = function (i) {
                         var resourceUrl = resourses[i];
                         var resourceName = _this.getNameFromURL(resourceUrl);
                         var resourceLength = 0;
@@ -8669,7 +8689,7 @@ var test_effect = (function () {
                         files.push(fileInfo_1);
                     };
                     for (var i = 0; i < resourses.length; i++) {
-                        _loop_3(i);
+                        _loop_2(i);
                     }
                     localSave.Instance.save(resPath + name + ".prefab.json", blob);
                     var fileInfo = { "name": "resources/" + name + ".prefab.json", "length": 100 };
@@ -8679,7 +8699,7 @@ var test_effect = (function () {
                     localSave.Instance.save(path + "/" + name + ".assetbundle.json", assetBundleBlob);
                 };
                 for (var key in data.files) {
-                    _loop_2(key);
+                    _loop_1(key);
                 }
             });
         };
@@ -15452,12 +15472,12 @@ var test_effecteditor = (function () {
             _this.app.getAssetMgr().savePrefab(_this.tr, name, function (data, resourses) {
                 console.log(data.files);
                 console.log(resourses.length);
-                var _loop_4 = function (key) {
+                var _loop_3 = function (key) {
                     var val = data.files[key];
                     var blob = localSave.Instance.file_str2blob(val);
                     var files = [];
                     var resPath = path + "/resources/";
-                    var _loop_5 = function (i) {
+                    var _loop_4 = function (i) {
                         var resourceUrl = resourses[i];
                         var resourceName = _this.getNameFromURL(resourceUrl);
                         var resourceLength = 0;
@@ -15476,7 +15496,7 @@ var test_effecteditor = (function () {
                         files.push(fileInfo_2);
                     };
                     for (var i = 0; i < resourses.length; i++) {
-                        _loop_5(i);
+                        _loop_4(i);
                     }
                     localSave.Instance.save(resPath + name + ".prefab.json", blob);
                     var fileInfo = { "name": "resources/" + name + ".prefab.json", "length": 100 };
@@ -15486,7 +15506,7 @@ var test_effecteditor = (function () {
                     localSave.Instance.save(path + "/" + name + ".assetbundle.json", assetBundleBlob);
                 };
                 for (var key in data.files) {
-                    _loop_4(key);
+                    _loop_3(key);
                 }
             });
         };

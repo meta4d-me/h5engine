@@ -382,7 +382,7 @@ namespace gd3d.framework
          */
         Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext)
         {
-            return new threading.gdPromise((reslove) =>
+            return new threading.gdPromise<mesh>((reslove) =>
             {
 
                 // if (inData instanceof ArrayBuffer)
@@ -397,7 +397,7 @@ namespace gd3d.framework
                 // } else
                 // {
                     this.parseCMesh(inData, webgl);
-                    reslove();
+                    reslove(this);
                 // }
 
                 // } else

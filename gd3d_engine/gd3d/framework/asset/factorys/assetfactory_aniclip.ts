@@ -1,7 +1,10 @@
 namespace gd3d.framework
 {
+    @assetF(AssetTypeEnum.Aniclip)
     export class AssetFactory_Aniclip implements IAssetFactory
     {
+        //#region 废弃de参考代码
+        /*
         newAsset(): animationClip
         {
             return null;
@@ -69,6 +72,14 @@ namespace gd3d.framework
                     AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
                 });
             });
+        }        
+        */
+        //#endregion
+
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, bytes: ArrayBuffer)
+        {            
+            return new animationClip(filename).Parse(bytes);
         }
+
     }
 }

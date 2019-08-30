@@ -17,135 +17,9 @@ class test_01 implements IState
             //添加一个盒子
             var cube = new gd3d.framework.transform();
             cube.name = "cube";
-
-
-
-            // cube.localScale.x = cube.localScale.y = cube.localScale.z = 1;
-            // cube.localTranslate.x = 2;
-            // var collider = cube.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
             this.scene.addChild(cube);
-            // var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+            this.testNRes(cube);
 
-            // var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
-            // mesh.mesh = smesh;
-            // var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-            // let v3 = cube.localEulerAngles;
-            // console.log(cube.getWorldMatrix());
-            // v3.x += 50;
-            // cube.localEulerAngles = v3;
-            // console.log(cube.getWorldMatrix());
-            // cuber = renderer;
-
-            console.warn("Finish it.");
-            let assetMgr = this.app.getAssetMgr();
-            assetMgr.load("res/test/customShader/customShader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
-            {
-                if (state.isfinish)
-                {
-                    // assetMgr.load("res/test/1/ui/yingdao_page/yingdao_page.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
-                    // {
-                    //     if (state.isfinish)
-                    //     {
-                    //         let prefab = assetMgr.getAssetByName("yingdao_page.prefab.json") as gd3d.framework.prefab;
-                    //         let trans = prefab.getCloneTrans();
-                    //         console.log("###", trans);
-                    //     }
-                    // });
-                    var cloneCount = 1;
-                    gd3d.framework.mesh.useThead = false;
-                    window["test0"] = function (cloneCount)
-                    {
-                        assetMgr.load("res/test/0/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
-                        {
-                            if (state.isfinish)
-                            {
-                                let prefab = assetMgr.getAssetByName("Background.prefab.json") as gd3d.framework.prefab;
-                                let time = Date.now();
-                                for (let i = 0; i < cloneCount; ++i)
-                                {
-                                    let shark = prefab.getCloneTrans();
-                                    cube.addChild(shark);
-                                }
-                                let useTime = Date.now() - time;
-                                console.log(`old clone trans:${useTime}/ms count:${cloneCount}`);
-                                // this.scene.addChild(shark);
-                            }
-                        });
-                    }
-                    window["test1"] = function (cloneCount)
-                    {
-                        assetMgr.load("res/test/1/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
-                        {
-                            if (state.isfinish)
-                            {
-                                let prefab = assetMgr.getAssetByName("Background.prefab.json") as gd3d.framework.prefab;
-                                let time = Date.now();
-                                for (let i = 0; i < cloneCount; ++i)
-                                {
-                                    let shark = prefab.getCloneTrans();
-                                    cube.addChild(shark);
-                                }
-                                let useTime = Date.now() - time;
-                                console.log(`new clone trans:${useTime}/ms count:${cloneCount}`);
-                                // this.scene.addChild(shark);
-                            }
-                        });
-                    }
-                    window["test2"] = function (cloneCount)
-                    {
-
-                        assetMgr.load("res/test/2/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
-                        {
-                            if (state.isfinish)
-                            {
-                                let prefab = assetMgr.getAssetByName("Background.prefab.json") as gd3d.framework.prefab;
-                                let time = Date.now();
-                                for (let i = 0; i < cloneCount; ++i)
-                                {
-                                    let shark = prefab.getCloneTrans();
-                                    cube.addChild(shark);
-                                }
-                                let useTime = Date.now() - time;
-                                console.log(`new clone trans:${useTime}/ms count:${cloneCount}`);
-                                // this.scene.addChild(shark);
-                            }
-                        });
-                    }
-
-                    // assetMgr.load("res/test/0/7/7.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
-                    // {
-                    //     if (state.isfinish)
-                    //     {
-                    //         let prefab = assetMgr.getAssetByName("7.prefab.json") as gd3d.framework.prefab;
-                    //         let time = Date.now();
-                    //         for (let i = 0; i < cloneCount; ++i)
-                    //         {
-                    //             let shark = prefab.getCloneTrans();
-                    //             cube.addChild(shark);
-                    //         }
-                    //         let useTime = Date.now() - time;
-                    //         console.log(`new clone trans:${useTime}/ms count:${cloneCount}`);
-                    //         // this.scene.addChild(shark);
-                    //     }
-                    // });
-                    // assetMgr.load("res/test/1/7/7.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
-                    // {
-                    //     if (state.isfinish)
-                    //     {
-                    //         let prefab = assetMgr.getAssetByName("7.prefab.json") as gd3d.framework.prefab;
-                    //         let time = Date.now();
-                    //         for (let i = 0; i < cloneCount; ++i)
-                    //         {
-                    //             let shark = prefab.getCloneTrans();
-                    //             cube.addChild(shark);
-                    //         }
-                    //         let useTime = Date.now() - time;
-                    //         console.log(`new clone trans:${useTime}/ms count:${cloneCount}`);
-                    //         // this.scene.addChild(shark);
-                    //     }
-                    // });
-                }
-            });
 
             //目前材质是内置配置的，
             //这个加载机制弄完之后，就可以根据name 访问资源包里的shader
@@ -267,6 +141,168 @@ class test_01 implements IState
         this.cube2.markDirty();
         //this.cube3.localTranslate = new gd3d.math.vector3(x * 2, 0, z * 2);
         //this.cube3.markDirty();
+
+    }
+
+    private testPrefab(cube: gd3d.framework.transform)
+    {
+
+        // cube.localScale.x = cube.localScale.y = cube.localScale.z = 1;
+        // cube.localTranslate.x = 2;
+        // var collider = cube.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
+
+        // var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+
+        // var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+        // mesh.mesh = smesh;
+        // var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+        // let v3 = cube.localEulerAngles;
+        // console.log(cube.getWorldMatrix());
+        // v3.x += 50;
+        // cube.localEulerAngles = v3;
+        // console.log(cube.getWorldMatrix());
+        // cuber = renderer;
+
+        console.warn("Finish it.");
+        let assetMgr = this.app.getAssetMgr();
+        assetMgr.load("res/test/customShader/customShader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+        {
+            if (state.isfinish)
+            {
+                // assetMgr.load("res/test/1/ui/yingdao_page/yingdao_page.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                // {
+                //     if (state.isfinish)
+                //     {
+                //         let prefab = assetMgr.getAssetByName("yingdao_page.prefab.json") as gd3d.framework.prefab;
+                //         let trans = prefab.getCloneTrans();
+                //         console.log("###", trans);
+                //     }
+                // });
+                var cloneCount = 1;
+                gd3d.framework.mesh.useThead = false;
+                window["test0"] = function (cloneCount)
+                {
+                    assetMgr.load("res/test/0/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                    {
+                        if (state.isfinish)
+                        {
+                            let prefab = assetMgr.getAssetByName("Background.prefab.json") as gd3d.framework.prefab;
+                            let time = Date.now();
+                            for (let i = 0; i < cloneCount; ++i)
+                            {
+                                let shark = prefab.getCloneTrans();
+                                cube.addChild(shark);
+                            }
+                            let useTime = Date.now() - time;
+                            console.log(`old clone trans:${useTime}/ms count:${cloneCount}`);
+                            // this.scene.addChild(shark);
+                        }
+                    });
+                }
+                window["test1"] = function (cloneCount)
+                {
+                    assetMgr.load("res/test/1/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                    {
+                        if (state.isfinish)
+                        {
+                            let prefab = assetMgr.getAssetByName("Background.prefab.json") as gd3d.framework.prefab;
+                            let time = Date.now();
+                            for (let i = 0; i < cloneCount; ++i)
+                            {
+                                let shark = prefab.getCloneTrans();
+                                cube.addChild(shark);
+                            }
+                            let useTime = Date.now() - time;
+                            console.log(`new clone trans:${useTime}/ms count:${cloneCount}`);
+                            // this.scene.addChild(shark);
+                        }
+                    });
+                }
+                window["test2"] = function (cloneCount)
+                {
+
+                    assetMgr.load("res/test/2/Background/Background.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                    {
+                        if (state.isfinish)
+                        {
+                            let prefab = assetMgr.getAssetByName("Background.prefab.json") as gd3d.framework.prefab;
+                            let time = Date.now();
+                            for (let i = 0; i < cloneCount; ++i)
+                            {
+                                let shark = prefab.getCloneTrans();
+                                cube.addChild(shark);
+                            }
+                            let useTime = Date.now() - time;
+                            console.log(`new clone trans:${useTime}/ms count:${cloneCount}`);
+                            // this.scene.addChild(shark);
+                        }
+                    });
+                }
+
+                // assetMgr.load("res/test/0/7/7.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                // {
+                //     if (state.isfinish)
+                //     {
+                //         let prefab = assetMgr.getAssetByName("7.prefab.json") as gd3d.framework.prefab;
+                //         let time = Date.now();
+                //         for (let i = 0; i < cloneCount; ++i)
+                //         {
+                //             let shark = prefab.getCloneTrans();
+                //             cube.addChild(shark);
+                //         }
+                //         let useTime = Date.now() - time;
+                //         console.log(`new clone trans:${useTime}/ms count:${cloneCount}`);
+                //         // this.scene.addChild(shark);
+                //     }
+                // });
+                // assetMgr.load("res/test/1/7/7.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                // {
+                //     if (state.isfinish)
+                //     {
+                //         let prefab = assetMgr.getAssetByName("7.prefab.json") as gd3d.framework.prefab;
+                //         let time = Date.now();
+                //         for (let i = 0; i < cloneCount; ++i)
+                //         {
+                //             let shark = prefab.getCloneTrans();
+                //             cube.addChild(shark);
+                //         }
+                //         let useTime = Date.now() - time;
+                //         console.log(`new clone trans:${useTime}/ms count:${cloneCount}`);
+                //         // this.scene.addChild(shark);
+                //     }
+                // });
+            }
+        });
+    }
+
+    private testNRes(root: gd3d.framework.transform)
+    {
+        let cndroot = "http://192.168.88.68:8088/public/1/hungryshark/Resources_new/";
+        let assetMgr = this.app.getAssetMgr();
+        assetMgr.load(`${cndroot}shader/customShader/customShader.assetbundle.json`, gd3d.framework.AssetTypeEnum.Auto, async (state) =>
+        {
+            if (state.isfinish)
+            {
+                
+
+                assetMgr.mapShader = this.app.getAssetMgr().mapShader;
+                // assetMgr.cdnRoot = cndroot;
+                // await assetMgr.initGuidList(`${assetMgr.cdnRoot}guidlist.json`);
+
+                assetMgr.load(`${cndroot}props/PC/role/PF_PlayerSharkReef/PF_PlayerSharkReef.assetbundle.json`, gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                {
+                    if (state.isfinish)
+                    {
+                        console.log("资源加载结束");
+                        let prefab: gd3d.framework.prefab = assetMgr.getAssetByName("PF_PlayerSharkReef.prefab.json");
+                        let trans = prefab.getCloneTrans();
+                        root.addChild(trans);
+                        // debugger;
+                    }
+                });
+
+            }
+        });
 
     }
 }
