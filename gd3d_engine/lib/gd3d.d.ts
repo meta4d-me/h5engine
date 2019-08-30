@@ -1412,8 +1412,8 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class resID {
         constructor();
-        private static idAll;
-        private static next;
+        static idAll: number;
+        static next(): number;
         private id;
         getID(): number;
     }
@@ -1430,212 +1430,7 @@ declare namespace gd3d.framework {
         unuse(disposeNow?: boolean): void;
         dispose(): any;
         caclByteLength(): number;
-    }
-}
-declare namespace gd3d.framework {
-    class assetBundle {
-        name: string;
-        assetmgr: assetMgr;
-        private files;
-        private packages;
-        private bundlePackBin;
-        private bundlePackJson;
-        url: string;
-        path: string;
-        totalLength: number;
-        loadLightMap: boolean;
-        private waitGuidCount;
-        constructor(url: string);
-        loadCompressBundle(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetmgr: assetMgr): void;
-        parse(json: any, totalLength?: number): void;
-        unload(disposeNow?: boolean): void;
-        private isTextureRepeat;
-        load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
-        private downloadFinsih;
-        private CkNextHandleOfGuid;
-        private NextHandleParsing;
-        private ReadyFinish;
-        private static addToWaitList;
-        private static endWaitList;
-        private mapIsNull;
-        mapNamed: {
-            [name: string]: number;
-        };
-        mapNameGuid: {
-            [name: string]: string;
-        };
-    }
-}
-declare namespace gd3d.framework {
-    enum AssetTypeEnum {
-        Unknown = 0,
-        Auto = 1,
-        Bundle = 2,
-        CompressBundle = 3,
-        GLVertexShader = 4,
-        GLFragmentShader = 5,
-        Shader = 6,
-        Texture = 7,
-        TextureDesc = 8,
-        Mesh = 9,
-        Prefab = 10,
-        cPrefab = 11,
-        Material = 12,
-        Aniclip = 13,
-        KeyFrameAniclip = 14,
-        Scene = 15,
-        Atlas = 16,
-        Font = 17,
-        TextAsset = 18,
-        PackBin = 19,
-        PackTxt = 20,
-        PathAsset = 21,
-        PVR = 22,
-        F14Effect = 23,
-        DDS = 24
-    }
-    class ResourceState {
-        res: IAsset;
-        state: number;
-        loadedLength: number;
-    }
-    class RefResourceState extends ResourceState {
-        refLoadedLength: number;
-    }
-    class stateLoad {
-        isloadFail: boolean;
-        iserror: boolean;
-        isfinish: boolean;
-        resstate: {
-            [id: string]: ResourceState;
-        };
-        resstateFirst: ResourceState;
-        curtask: number;
-        totaltask: number;
-        readonly fileProgress: number;
-        readonly curByteLength: number;
-        totalByteLength: number;
-        readonly progress: number;
-        progressCall: boolean;
-        compressTextLoaded: number;
-        compressBinLoaded: number;
-        logs: string[];
-        errs: Error[];
-        url: string;
-    }
-    class assetMgr {
-        app: application;
-        webgl: WebGLRenderingContext;
-        shaderPool: gd3d.render.shaderPool;
-        constructor(app: application);
-        initDefAsset(): void;
-        mapShader: {
-            [id: string]: shader;
-        };
-        getShader(name: string): shader;
-        mapDefaultMesh: {
-            [id: string]: mesh;
-        };
-        getDefaultMesh(name: string): mesh;
-        mapDefaultTexture: {
-            [id: string]: texture;
-        };
-        getDefaultTexture(name: string): texture;
-        mapDefaultCubeTexture: {
-            [id: string]: texture;
-        };
-        getDefaultCubeTexture(name: string): texture;
-        mapDefaultSprite: {
-            [id: string]: sprite;
-        };
-        getDefaultSprite(name: string): sprite;
-        mapMaterial: {
-            [id: string]: material;
-        };
-        getMaterial(name: string): material;
-        mapBundle: {
-            [id: string]: assetBundle;
-        };
-        mapRes: {
-            [id: number]: assetRef;
-        };
-        mapNamed: {
-            [id: string]: number[];
-        };
-        mapGuidId: {
-            [guid: string]: number;
-        };
-        mapGuidWaitLoaded: {
-            [guid: string]: Function[];
-        };
-        getAsset(id: number): IAsset;
-        getAssetByName(name: string, bundlename?: string): IAsset;
-        getAssetBundle(bundlename: string): assetBundle;
-        static useBinJs: boolean;
-        private static bin;
-        static correctFileName(name: string): string;
-        static txt: string;
-        static correctTxtFileName(name: string): string;
-        unuse(res: IAsset, disposeNow?: boolean): void;
-        use(res: IAsset): void;
-        private readonly _loadingTag;
-        assetIsLoing(asRef: assetRef): boolean;
-        regRes(name: string, asset: IAsset): void;
-        releaseUnuseAsset(): void;
-        getAssetsRefcount(): {
-            [id: string]: number;
-        };
-        mapInLoad: {
-            [id: string]: stateLoad;
-        };
-        removeAssetBundle(name: string): void;
-        private assetUrlDic;
-        setAssetUrl(asset: IAsset, url: string): void;
-        getAssetUrl(asset: IAsset): string;
-        loadSingleRes(url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad, asset: IAsset, call: (handle: any) => void): void;
-        loadResByPack(respack: any, url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad, asset: IAsset, call: (handle: any) => void): void;
-        private assetFactorys;
-        private regAssetFactory;
-        private getAssetFactory;
-        private initAssetFactorys;
-        private waitStateDic;
-        doWaitState(name: string, state: stateLoad): void;
-        private waitQueueState;
-        private loadingQueueState;
-        private loadingCountLimit;
-        private checkFreeChannel;
-        private unPkg;
-        loadCompressBundle(url: string, onstate?: (state: stateLoad) => void): void;
-        maploaded: {
-            [url: string]: IAsset;
-        };
-        load(url: string, type?: AssetTypeEnum, onstate?: (state: stateLoad) => void): void;
-        private loadForNoCache;
-        unload(url: string, onstate?: () => void): void;
-        waitlightmapScene: {
-            [sceneurl: string]: string[];
-        };
-        loadSceneAssetbundleWithoutLightMap(url: string, type?: AssetTypeEnum, onstate?: (state: stateLoad) => void): void;
-        loadSceneLightmap(sceneurl: string): void;
-        loadScene(sceneName: string, onComplete: (firstChilds: Array<transform>) => void): void;
-        saveScene(fun: (data: SaveInfo, resourses?: string[]) => void): void;
-        savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[], contents?: any[]) => void): void;
-        saveMaterial(mat: material, fun: (data: SaveInfo) => void): void;
-        loadSingleResImmediate(url: string, type: AssetTypeEnum): any;
-        loadImmediate(url: string, type?: AssetTypeEnum): any;
-        getFileName(url: string): string;
-        calcType(url: string | any): AssetTypeEnum;
-        private particlemat;
-        getDefParticleMat(): material;
-    }
-    class assetRef {
-        asset: IAsset;
-        refcount: number;
-    }
-    class SaveInfo {
-        files: {
-            [key: string]: string;
-        };
+        init?(): any;
     }
 }
 declare class PvrParse {
@@ -1671,6 +1466,215 @@ declare enum ChannelTypes {
     SignedFloat = 12,
     Float = 12,
     UnsignedFloat = 13
+}
+declare namespace gd3d.framework {
+    enum AssetTypeEnum {
+        Unknown = 0,
+        Auto = 1,
+        Bundle = 2,
+        CompressBundle = 3,
+        GLVertexShader = 4,
+        GLFragmentShader = 5,
+        Shader = 6,
+        Texture = 7,
+        TextureDesc = 8,
+        Mesh = 9,
+        Material = 10,
+        Aniclip = 11,
+        KeyFrameAniclip = 12,
+        Atlas = 13,
+        Font = 14,
+        TextAsset = 15,
+        PackBin = 16,
+        PackTxt = 17,
+        PathAsset = 18,
+        PVR = 19,
+        F14Effect = 20,
+        DDS = 21,
+        Scene = 22,
+        Prefab = 23,
+        cPrefab = 24
+    }
+    class ResourceState {
+        res: IAsset;
+        state: number;
+        loadedLength: number;
+    }
+    class RefResourceState extends ResourceState {
+        refLoadedLength: number;
+    }
+    class stateLoad {
+        isloadFail: boolean;
+        iserror: boolean;
+        isfinish: boolean;
+        resstate: {
+            [id: string]: ResourceState;
+        };
+        resstateFirst: ResourceState;
+        curtask: number;
+        totaltask: number;
+        readonly fileProgress: number;
+        readonly curByteLength: number;
+        totalByteLength: number;
+        readonly progress: number;
+        progressCall: boolean;
+        compressTextLoaded: number;
+        compressBinLoaded: number;
+        logs: string[];
+        errs: Error[];
+        url: string;
+    }
+    class assetRef {
+        asset: IAsset;
+        refcount: number;
+    }
+}
+declare namespace gd3d.framework {
+    class assetBundle {
+        private assetmgr;
+        static idNext: number;
+        files: {
+            [key: string]: number;
+        };
+        texs: {
+            [name: string]: number;
+        };
+        pkgs: string[];
+        pkgsGuid: number[];
+        url: string;
+        baseUrl: string;
+        guid: number;
+        name: string;
+        dw_imgCount: number;
+        dw_fileCount: number;
+        onReady: () => void;
+        ready: boolean;
+        subpkg: any;
+        constructor(url: string, assetmgr: assetMgr, guid?: number);
+        static buildGuid(): number;
+        parseBundle(data: string): void;
+        private unpkg;
+        parseFile(): Promise<void>;
+    }
+}
+declare namespace gd3d.framework {
+    type loadCallback = (state?: stateLoad) => void;
+    type downloadBindType = (guid: number, url: string, type: AssetTypeEnum, finish: () => void) => void;
+    const assetParseMap: {
+        [key: number]: IAssetFactory;
+    };
+    function assetF(type: AssetTypeEnum): (ctor: any) => void;
+    function calcType(url: string | any): AssetTypeEnum;
+    function calcReqType(type: AssetTypeEnum): "text" | "arraybuffer";
+    class assetMgr {
+        static urlmapGuid: {
+            [key: string]: number;
+        };
+        static cdnRoot: string;
+        static guidlistURL: string;
+        static onGuidInit: () => void;
+        static Instance: assetMgr;
+        static mapLoading: {
+            [key: number]: {
+                url?: string;
+                readyok: boolean;
+                data?: any;
+                cbQueue?: loadCallback[];
+                subRes?: number[];
+            };
+        };
+        static mapGuid: {
+            [key: number]: assetRef;
+        };
+        static mapImage: {
+            [key: number]: HTMLImageElement;
+        };
+        static mapNamed: {
+            [key: string]: IAsset;
+        };
+        static noparseBundle: Array<assetBundle>;
+        static atonceParse: boolean;
+        concurrent: number;
+        execCount: number;
+        watingQueue: Array<downloadBindType>;
+        name_bundles: {
+            [key: string]: assetBundle;
+        };
+        guid_bundles: {
+            [key: string]: assetBundle;
+        };
+        mapShader: {
+            [id: string]: shader;
+        };
+        static initGuidList(): void;
+        load(url: string, type?: AssetTypeEnum, onstate?: loadCallback): void;
+        download(guid: number, url: string, type: AssetTypeEnum, finish: () => void): void;
+        loadImg(guid: number, url: string, cb: (img: any) => void): void;
+        protected _loadImg(url: string, cb: (img: any) => void): void;
+        private checkConcurrent;
+        use(asset: IAsset): void;
+        unuse(asset: IAsset, disposeNow?: boolean): void;
+        parseRes(asset: {
+            guid: number;
+            type: number;
+            name: string;
+            dwguid?: number;
+        }, bundle?: assetBundle): Promise<void>;
+        getAssetByName<T extends IAsset>(name: string, bundlename?: string): T;
+        mapDefaultMesh: {
+            [id: string]: mesh;
+        };
+        mapDefaultTexture: {
+            [id: string]: texture;
+        };
+        mapDefaultCubeTexture: {
+            [id: string]: texture;
+        };
+        mapDefaultSprite: {
+            [id: string]: sprite;
+        };
+        mapMaterial: {
+            [id: string]: material;
+        };
+        getDefaultMesh(name: string): mesh;
+        getDefaultTexture(name: string): texture;
+        getDefaultCubeTexture(name: string): texture;
+        getDefaultSprite(name: string): sprite;
+        getMaterial(name: string): material;
+        static useBinJs: boolean;
+        static txt: string;
+        private static bin;
+        app: gd3d.framework.application;
+        shaderPool: gd3d.render.shaderPool;
+        webgl: WebGLRenderingContext;
+        mapRes: {
+            [id: number]: any;
+        };
+        constructor(app: application);
+        static correctFileName(name: string): string;
+        static correctTxtFileName(name: string): string;
+        getShader(name: string): gd3d.framework.shader;
+        private particlemat;
+        getDefParticleMat(): material;
+        private assetUrlDic;
+        setAssetUrl(asset: IAsset, url: string): void;
+        getAssetUrl(asset: IAsset): string;
+        maploaded: {
+            [url: string]: IAsset;
+        };
+        savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[], contents?: any[]) => void): void;
+        loadCompressBundle(url: string, a?: any): void;
+        loadImmediate(url: string): any;
+        getAssetBundle(url: string): any;
+        releaseUnuseAsset(): void;
+        initDefAsset(): void;
+        loadScene(sceneName: string, onComplete: (firstChilds: Array<transform>) => void): void;
+    }
+    class SaveInfo {
+        files: {
+            [key: string]: string;
+        };
+    }
 }
 declare namespace gd3d.framework {
     class defmaterial {
@@ -1738,66 +1742,52 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AssetFactory_Aniclip implements IAssetFactory {
-        newAsset(): animationClip;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: animationClip, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: animationClip, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, bytes: ArrayBuffer): threading.gdPromise<animationClip>;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_Atlas implements IAssetFactory {
-        newAsset(): atlas;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: atlas, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: atlas, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_cPrefab implements IAssetFactory {
-        newAsset(): prefab;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: prefab, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: prefab, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): threading.gdPromise<prefab>;
     }
 }
 declare var WebGLTextureUtil: any;
 declare namespace gd3d.framework {
     class AssetFactory_DDS implements IAssetFactory {
-        newAsset(): texture;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void): void;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, bytes: ArrayBuffer): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_f14eff implements IAssetFactory {
-        newAsset(): f14eff;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: f14eff, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: f14eff, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): f14eff;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_Font implements IAssetFactory {
-        newAsset(filename?: string): font;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: font, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: font, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): font;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_GLFragmentShader implements IAssetFactory {
-        newAsset(): IAsset;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_GLVertexShader implements IAssetFactory {
-        newAsset(): IAsset;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): void;
     }
 }
 declare namespace gd3d.framework {
     interface IAssetFactory {
-        newAsset(assetName?: string): IAsset;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
+        newAsset?(assetName?: string): IAsset;
+        load?(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
+        loadByPack?(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
+        parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: string | ArrayBuffer, dwguid?: number): IAsset | gd3d.threading.gdPromise<IAsset> | void;
+        needDownload?(textJSON: string): string;
     }
     class AssetFactoryTools {
         static catchError(err: Error, onstate: (state: stateLoad) => void, state: stateLoad): boolean;
@@ -1809,74 +1799,49 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class assetfactory_keyFrameAniClip implements IAssetFactory {
-        newAsset(): keyFrameAniClip;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: keyFrameAniClip, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: keyFrameAniClip, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): void;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_Material implements IAssetFactory {
-        newAsset(filename?: string): material;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: material, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: material, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, txt: string): material;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_Mesh implements IAssetFactory {
-        newAsset(): mesh;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: mesh, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: mesh, call: (handle: () => void) => void): void;
+        parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: ArrayBuffer): threading.gdPromise<mesh>;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_PathAsset implements IAssetFactory {
-        newAsset(): pathasset;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: pathasset, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: pathasset, call: (handle: () => void) => void): void;
-    }
-}
-declare namespace gd3d.framework {
-    class AssetFactory_Prefab implements IAssetFactory {
-        newAsset(): prefab;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: prefab, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: prefab, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, txt: string): pathasset;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_PVR implements IAssetFactory {
-        newAsset(): texture;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer): texture;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_Scene implements IAssetFactory {
-        newAsset(): rawscene;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: rawscene, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: rawscene, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, txt: string): threading.gdPromise<rawscene>;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_Shader implements IAssetFactory {
-        newAsset(): shader;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: shader, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: shader, call: (handle: () => void) => void): void;
         private TryParseMap;
         private parseShader;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): shader;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_TextAsset implements IAssetFactory {
-        newAsset(): textasset;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: textasset, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: textasset, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): textasset;
     }
 }
 declare namespace gd3d.framework {
     class AssetFactory_Texture implements IAssetFactory {
-        newAsset(): texture;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): texture;
     }
 }
 declare namespace gd3d.framework {
@@ -1884,10 +1849,8 @@ declare namespace gd3d.framework {
         private readonly t_Normal;
         private readonly t_PVR;
         private readonly t_DDS;
-        newAsset(): texture;
-        private parseTexture;
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void): void;
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: texture, call: (handle: () => void) => void): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, data: string, dwguid: number): texture;
+        needDownload(text: string): any;
     }
 }
 declare namespace gd3d.framework {
@@ -1903,7 +1866,7 @@ declare namespace gd3d.framework {
         unuse(disposeNow?: boolean): void;
         dispose(): void;
         caclByteLength(): number;
-        Parse(buf: ArrayBuffer): threading.gdPromise<any>;
+        Parse(buf: ArrayBuffer): threading.gdPromise<animationClip>;
         fps: number;
         loop: boolean;
         readonly time: number;
@@ -2021,7 +1984,7 @@ declare namespace gd3d.framework {
         baseline: number;
         atlasWidth: number;
         atlasHeight: number;
-        Parse(jsonStr: string, assetmgr: assetMgr): void;
+        Parse(jsonStr: string, assetmgr: assetMgr): this;
     }
     class charinfo {
         x: number;
@@ -2361,7 +2324,7 @@ declare namespace gd3d.framework {
         setTexture(_id: string, _texture: gd3d.framework.texture, resname?: string): void;
         setCubeTexture(_id: string, _texture: gd3d.framework.texture): void;
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, useGLobalLightMap?: boolean): void;
-        Parse(assetmgr: assetMgr, json: any, bundleName?: string): void;
+        Parse(assetmgr: assetMgr, json: any, bundleName?: string): this;
         clone(): material;
         save(): string;
     }
@@ -2388,7 +2351,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess;
         private readFinish;
-        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<unknown>;
+        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<mesh>;
         parseCMesh(inData: any, webgl: any): void;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
@@ -2421,7 +2384,7 @@ declare namespace gd3d.framework {
         private type;
         private instertPointcount;
         private items;
-        Parse(json: JSON): void;
+        Parse(json: JSON): this;
         private lines;
         private getpaths;
         private getBeisaierPointAlongCurve;
@@ -2462,7 +2425,7 @@ declare namespace gd3d.framework {
         apply(trans: transform): void;
         jsonstr: string;
         Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<any>;
-        cParse(data: any, assetmgr: assetMgr): void;
+        cParse(data: any): void;
     }
 }
 declare namespace gd3d.framework {
@@ -2481,7 +2444,7 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         resetLightMap(assetmgr: assetMgr): void;
         private lightmapData;
-        Parse(txt: string, assetmgr: assetMgr): Promise<void>;
+        Parse(txt: string, assetmgr: assetMgr): threading.gdPromise<rawscene>;
         getSceneRoot(): transform;
         useLightMap(scene: scene): void;
         useFog(scene: scene): void;
@@ -4311,6 +4274,7 @@ declare namespace gd3d.io {
         readBoolean(): boolean;
         readByte(): number;
         readBytes(target?: Uint8Array, offset?: number, length?: number): Uint8Array;
+        readBytesRef(length?: number): Uint8Array;
         readUnsignedShort(): number;
         readUnsignedInt(): number;
         readFloat(): number;
@@ -6774,10 +6738,10 @@ declare namespace gd3d.io {
     function xhrLoad(url: string, fun: (ContentData: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void, responseType: XMLHttpRequestResponseType, loadedFun: (req: XMLHttpRequest) => void): void;
     function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function JSONParse(text: string): threading.gdPromise<any>;
-    function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): threading.gdPromise<unknown>;
+    function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): threading.gdPromise<{}>;
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
-    function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error, loadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+    function loadImg(url: string, fun: (_tex: HTMLImageElement, _err?: Error, loadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
 }
 declare namespace gd3d {
     function poolv2(clone?: math.vector2): math.vector2;

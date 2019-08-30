@@ -14104,6 +14104,7 @@ var gd3d;
                 if (this.beRevert) {
                     this._playFrameid = clipFrameCount - this._playFrameid - 1;
                 }
+                this._playFrameid = this._playFrameid < 0 ? 0 : this._playFrameid;
             };
             aniplayer.prototype.OnClipPlayEnd = function () {
                 var Clipame = this._playClip ? this._playClip.getName() : "";
@@ -14122,6 +14123,8 @@ var gd3d;
                 this.boneCache = {};
             };
             aniplayer.prototype.fillPoseData = function (data, bones) {
+                if (!this.curFrame || !bones || !data)
+                    return;
                 if (!this.bePlay) {
                     if (this.beActived)
                         return;
