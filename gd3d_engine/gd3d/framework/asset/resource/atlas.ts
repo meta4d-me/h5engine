@@ -202,6 +202,7 @@
                 r.atlas = this.getName();
                 this.sprites[spriteName] = r;
             }
+            return this;
         }
     }
 }
