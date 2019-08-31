@@ -317,7 +317,7 @@ namespace gd3d.framework
                 ref.refcount = 1;
                 assetMgr.mapGuid[guid] = ref;
                 if (assetMgr.mapNamed[asset.getName()])
-                    return console.warn(`资源命名冲突:${asset.getName()}`);
+                    console.warn(`资源命名冲突:${asset.getName()}`);
                 assetMgr.mapNamed[asset.getName()] = asset;
                 // delete assetMgr.mapLoading[guid];
             } else
