@@ -1669,6 +1669,7 @@ declare namespace gd3d.framework {
         releaseUnuseAsset(): void;
         initDefAsset(): void;
         loadScene(sceneName: string, onComplete: (firstChilds: Array<transform>) => void): void;
+        unload(url: string): void;
     }
     class SaveInfo {
         files: {

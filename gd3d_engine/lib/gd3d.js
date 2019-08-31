@@ -8743,6 +8743,8 @@ var gd3d;
                 scene.getRoot().markDirty();
                 onComplete(firstChilds);
             };
+            assetMgr.prototype.unload = function (url) {
+            };
             assetMgr.urlmapGuid = {};
             assetMgr.mapLoading = {};
             assetMgr.mapGuid = {};
