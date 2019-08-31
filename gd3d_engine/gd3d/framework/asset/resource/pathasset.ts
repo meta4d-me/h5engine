@@ -169,6 +169,7 @@ namespace gd3d.framework
                this.lines[i].length=0;
            }
            this.lines.length=0;
+           return  this;
         }
         private lines:Array<gd3d.math.vector3>[]=[];
         private getpaths()
