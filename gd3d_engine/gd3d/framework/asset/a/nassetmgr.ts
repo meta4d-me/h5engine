@@ -526,6 +526,10 @@ namespace gd3d.framework
             scene.getRoot().markDirty();
             onComplete(firstChilds);
         }
+
+        unload(url:string):void{
+
+        }
         //#endregion
     }
     //#region api保留
