@@ -1747,7 +1747,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AssetFactory_Atlas implements IAssetFactory {
-        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): atlas;
     }
 }
 declare namespace gd3d.framework {
@@ -1931,7 +1931,7 @@ declare namespace gd3d.framework {
         sprites: {
             [id: string]: sprite;
         };
-        Parse(jsonStr: string, assetmgr: assetMgr): void;
+        Parse(jsonStr: string, assetmgr: assetMgr): this;
     }
 }
 declare namespace gd3d.framework {

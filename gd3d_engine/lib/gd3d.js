@@ -10063,6 +10063,7 @@ var gd3d;
                     r.atlas = this.getName();
                     this.sprites[spriteName] = r;
                 }
+                return this;
             };
             atlas.ClassName = "atlas";
             __decorate([
