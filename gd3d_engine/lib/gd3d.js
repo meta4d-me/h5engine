@@ -8450,6 +8450,7 @@ var gd3d;
                 this.execCount = 0;
                 this.watingQueue = [];
                 this.name_bundles = {};
+                this.kurl_bundles = {};
                 this.guid_bundles = {};
                 this.mapShader = {};
                 this.mapDefaultMesh = {};
@@ -8485,6 +8486,7 @@ var gd3d;
                 type = type == framework.AssetTypeEnum.Auto ? calcType(url) : type;
                 if (assetMgr.mapGuid[guid]) {
                     var state = new framework.stateLoad();
+                    state.bundle = this.guid_bundles[guid];
                     state.isfinish = true;
                     onstate(state);
                     return;
@@ -8494,10 +8496,11 @@ var gd3d;
                     if (type == framework.AssetTypeEnum.Bundle) {
                         var bundle_1 = new framework.assetBundle(url, _this, guid);
                         bundle_1.onReady = function () {
-                            if (_this.name_bundles[bundle_1.name])
-                                console.warn("assetbundle\u547D\u540D\u51B2\u7A81:" + bundle_1.name + "," + bundle_1.url);
-                            _this.name_bundles[bundle_1.name] = bundle_1;
+                            if (_this.name_bundles[keyUrl])
+                                console.warn("assetbundle\u547D\u540D\u51B2\u7A81:" + keyUrl + "," + bundle_1.url);
+                            _this.name_bundles[bundle_1.name] = _this.kurl_bundles[keyUrl] = _this.guid_bundles[bundle_1.guid] = bundle_1;
                             var state = new framework.stateLoad();
+                            state.bundle = bundle_1;
                             state.isfinish = true;
                             onstate(state);
                         };
@@ -8639,9 +8642,9 @@ var gd3d;
             };
             assetMgr.prototype.getAssetByName = function (name, bundlename) {
                 if (bundlename) {
-                    var bundle = this.name_bundles[bundlename];
+                    var bundle = this.kurl_bundles[bundlename] || this.name_bundles[bundlename];
                     if (bundle) {
-                        var guid = bundle.files[name];
+                        var guid = bundle.files[name.replace(".prefab", ".cprefab")];
                         if (guid && assetMgr.mapGuid[guid])
                             return assetMgr.mapGuid[guid].asset;
                     }

@@ -1504,6 +1504,7 @@ declare namespace gd3d.framework {
         refLoadedLength: number;
     }
     class stateLoad {
+        bundle?: assetBundle;
         isloadFail: boolean;
         iserror: boolean;
         isfinish: boolean;
@@ -1598,6 +1599,9 @@ declare namespace gd3d.framework {
         execCount: number;
         watingQueue: Array<downloadBindType>;
         name_bundles: {
+            [key: string]: assetBundle;
+        };
+        kurl_bundles: {
             [key: string]: assetBundle;
         };
         guid_bundles: {
