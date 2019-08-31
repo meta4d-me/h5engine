@@ -8589,7 +8589,7 @@ var gd3d;
                     ref.refcount = 1;
                     assetMgr.mapGuid[guid] = ref;
                     if (assetMgr.mapNamed[asset.getName()])
-                        return console.warn("\u8D44\u6E90\u547D\u540D\u51B2\u7A81:" + asset.getName());
+                        console.warn("\u8D44\u6E90\u547D\u540D\u51B2\u7A81:" + asset.getName());
                     assetMgr.mapNamed[asset.getName()] = asset;
                 }
                 else
