@@ -1799,7 +1799,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class assetfactory_keyFrameAniClip implements IAssetFactory {
-        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): void;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): keyFrameAniClip;
     }
 }
 declare namespace gd3d.framework {
@@ -1954,7 +1954,7 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         data: F14EffectData;
         delayTime: number;
-        Parse(jsonStr: string, assetmgr: assetMgr): void;
+        Parse(jsonStr: string, assetmgr: assetMgr): F14EffectData;
         getDependents(): IAsset[];
         private doSearch;
     }
@@ -2251,7 +2251,7 @@ declare namespace gd3d.framework {
         unuse(disposeNow?: boolean): void;
         dispose(): void;
         caclByteLength(): number;
-        Parse(jsonStr: string): void;
+        Parse(jsonStr: string): this;
         private length;
         readonly wrapMode: WrapMode;
         _wrapMode: WrapMode;
@@ -3386,7 +3386,7 @@ declare namespace gd3d.framework {
         beloop: boolean;
         lifeTime: number;
         layers: F14LayerData[];
-        parsejson(json: any, assetmgr: assetMgr, assetbundle: string): void;
+        parsejson(json: any, assetmgr: assetMgr, assetbundle: string): this;
     }
     class F14LayerData {
         Name: string;

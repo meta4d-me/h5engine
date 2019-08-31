@@ -11780,6 +11780,7 @@ var gd3d;
                     }
                     this.curves.push(curve);
                 }
+                return this;
             };
             Object.defineProperty(keyFrameAniClip.prototype, "wrapMode", {
                 get: function () { return this._wrapMode; },
@@ -12833,6 +12834,7 @@ var gd3d;
                     this.lines[i].length = 0;
                 }
                 this.lines.length = 0;
+                return this;
             };
             pathasset.prototype.getpaths = function () {
                 var line = new Array();
@@ -18004,6 +18006,7 @@ var gd3d;
                     layer.parse(jsonlayer[i], assetmgr, assetbundle);
                     this.layers.push(layer);
                 }
+                return this;
             };
             return F14EffectData;
         }());
