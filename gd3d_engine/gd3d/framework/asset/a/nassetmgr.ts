@@ -527,8 +527,16 @@ namespace gd3d.framework
             onComplete(firstChilds);
         }
 
-        unload(url:string):void{
-
+        unload(url: string): void
+        {
+            let guid = assetMgr.urlmapGuid[url];
+            if (guid)
+            {
+                let name = getFileName(url);
+                delete assetMgr.mapNamed[name];
+                delete assetMgr.mapLoading[guid];
+                delete assetMgr.mapGuid[guid];
+            }
         }
         //#endregion
     }
