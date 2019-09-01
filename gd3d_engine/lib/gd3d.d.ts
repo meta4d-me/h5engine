@@ -1504,6 +1504,7 @@ declare namespace gd3d.framework {
         refLoadedLength: number;
     }
     class stateLoad {
+        bundle?: assetBundle;
         isloadFail: boolean;
         iserror: boolean;
         isfinish: boolean;
@@ -1600,6 +1601,9 @@ declare namespace gd3d.framework {
         name_bundles: {
             [key: string]: assetBundle;
         };
+        kurl_bundles: {
+            [key: string]: assetBundle;
+        };
         guid_bundles: {
             [key: string]: assetBundle;
         };
@@ -1669,6 +1673,7 @@ declare namespace gd3d.framework {
         releaseUnuseAsset(): void;
         initDefAsset(): void;
         loadScene(sceneName: string, onComplete: (firstChilds: Array<transform>) => void): void;
+        unload(url: string): void;
     }
     class SaveInfo {
         files: {

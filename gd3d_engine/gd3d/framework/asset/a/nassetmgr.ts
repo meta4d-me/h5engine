@@ -144,6 +144,7 @@ namespace gd3d.framework
         watingQueue: Array<downloadBindType> = [];//等待队列
 
         name_bundles: { [key: string]: assetBundle } = {};
+        kurl_bundles: { [key: string]: assetBundle } = {};
         guid_bundles: { [key: string]: assetBundle } = {};
 
         mapShader: { [id: string]: shader } = {};
@@ -182,6 +183,7 @@ namespace gd3d.framework
             if (assetMgr.mapGuid[guid])//已下载的资源
             {
                 let state = new stateLoad();
+                state.bundle =  this.guid_bundles[guid] ;
                 state.isfinish = true;
                 onstate(state);
                 return;
@@ -196,10 +198,11 @@ namespace gd3d.framework
                     let bundle = new assetBundle(url, this, guid);
                     bundle.onReady = () =>
                     {
-                        if (this.name_bundles[bundle.name])
-                            console.warn(`assetbundle命名冲突:${bundle.name},${bundle.url}`);
-                        this.name_bundles[bundle.name] = bundle;
+                        if (this.name_bundles[keyUrl])
+                            console.warn(`assetbundle命名冲突:${keyUrl},${bundle.url}`);
+                        this.name_bundles[bundle.name] = this.kurl_bundles[keyUrl] =this.guid_bundles[bundle.guid] = bundle;                        
                         let state = new stateLoad();
+                        state.bundle = bundle;
                         state.isfinish = true;
                         onstate(state);
                     };
@@ -364,14 +367,15 @@ namespace gd3d.framework
             // console.log(`解析完成[${AssetTypeEnum[asset.type]}]${Date.now() - ctime}ms,解析器:${factory.constructor.name},guid:${asset.guid},name:${asset.name}`);
         }
 
+    
         getAssetByName<T extends IAsset>(name: string, bundlename?: string): T
         {
             if (bundlename)
             {
-                let bundle = this.name_bundles[bundlename];
+                let bundle = this.kurl_bundles[bundlename]|| this.name_bundles[bundlename] ;
                 if (bundle)
                 {
-                    let guid = bundle.files[name];
+                    let guid = bundle.files[name.replace(".prefab",".cprefab")];
                     if (guid && assetMgr.mapGuid[guid])
                         return assetMgr.mapGuid[guid].asset as T;
                 }

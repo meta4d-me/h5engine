@@ -207,6 +207,7 @@ namespace gd3d.framework
      */
     export class stateLoad
     {
+        bundle?:assetBundle;
         /**
          * @public
          * @language zh_CN
