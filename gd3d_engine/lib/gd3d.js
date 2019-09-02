@@ -8747,6 +8747,13 @@ var gd3d;
                 onComplete(firstChilds);
             };
             assetMgr.prototype.unload = function (url) {
+                var guid = assetMgr.urlmapGuid[url];
+                if (guid) {
+                    var name_1 = framework.getFileName(url);
+                    delete assetMgr.mapNamed[name_1];
+                    delete assetMgr.mapLoading[guid];
+                    delete assetMgr.mapGuid[guid];
+                }
             };
             assetMgr.urlmapGuid = {};
             assetMgr.mapLoading = {};
@@ -13818,13 +13825,13 @@ var gd3d;
             aniplayer.prototype.init = function () {
                 for (var i = 0; i < this.bones.length; i++) {
                     var _info = this.bones[i];
-                    var name_1 = _info.name;
+                    var name_2 = _info.name;
                     var nb = framework.PoseBoneMatrix.create();
                     nb.r = _info.tposeq;
                     nb.t = _info.tposep;
                     nb.invert();
-                    this.inversTpos[name_1] = nb;
-                    this.startepose[name_1] = this.startPos[i];
+                    this.inversTpos[name_2] = nb;
+                    this.startepose[name_2] = this.startPos[i];
                 }
                 var asbones = this.gameObject.getComponentsInChildren("asbone");
                 for (var key in asbones) {
@@ -15715,8 +15722,8 @@ var gd3d;
             effectSystem.prototype.resetparticle = function () {
                 if (this.particles != undefined)
                     this.particles.dispose();
-                for (var name_2 in this.particleElementDic) {
-                    var data = this.data.elementDic[name_2];
+                for (var name_3 in this.particleElementDic) {
+                    var data = this.data.elementDic[name_3];
                     if (data.delayTime > 0) {
                         this.delayElements.push(data);
                         continue;
@@ -15733,8 +15740,8 @@ var gd3d;
                 }
             };
             effectSystem.prototype.addElements = function () {
-                for (var name_3 in this.data.elementDic) {
-                    var data = this.data.elementDic[name_3];
+                for (var name_4 in this.data.elementDic) {
+                    var data = this.data.elementDic[name_4];
                     if (data.delayTime > 0) {
                         this.delayElements.push(data);
                         continue;
@@ -16096,8 +16103,8 @@ var gd3d;
                 }
             };
             TestEffectSystem.prototype.addElements = function () {
-                for (var name_4 in this.data.elementDic) {
-                    var data = this.data.elementDic[name_4];
+                for (var name_5 in this.data.elementDic) {
+                    var data = this.data.elementDic[name_5];
                     if (data.delayTime > 0) {
                         this.delayElements.push(data);
                         continue;
@@ -18052,25 +18059,25 @@ var gd3d;
                     switch (this.type) {
                         case framework.F14TypeEnum.SingleMeshType:
                             for (var k = 0; k < framejson.vec3Atts.length; k++) {
-                                var name_5 = framejson.vec3Atts[k].name;
+                                var name_6 = framejson.vec3Atts[k].name;
                                 var strValue = framejson.vec3Atts[k].value;
                                 var v3 = new gd3d.math.vector3();
                                 gd3d.math.vec3FormJson(strValue, v3);
-                                frameitem.singlemeshAttDic[name_5] = v3;
+                                frameitem.singlemeshAttDic[name_6] = v3;
                             }
                             for (var k = 0; k < framejson.vec4Atts.length; k++) {
-                                var name_6 = framejson.vec4Atts[k].name;
+                                var name_7 = framejson.vec4Atts[k].name;
                                 var strValue = framejson.vec4Atts[k].value;
                                 var v4 = new gd3d.math.vector4();
                                 gd3d.math.vec4FormJson(strValue, v4);
-                                frameitem.singlemeshAttDic[name_6] = v4;
+                                frameitem.singlemeshAttDic[name_7] = v4;
                             }
                             for (var k = 0; k < framejson.colorAtts.length; k++) {
-                                var name_7 = framejson.colorAtts[k].name;
+                                var name_8 = framejson.colorAtts[k].name;
                                 var strValue = framejson.colorAtts[k].value;
                                 var color = new gd3d.math.color();
                                 gd3d.math.colorFormJson(strValue, color);
-                                frameitem.singlemeshAttDic[name_7] = color;
+                                frameitem.singlemeshAttDic[name_8] = color;
                             }
                             break;
                         case framework.F14TypeEnum.particlesType:
@@ -27828,11 +27835,11 @@ var gd3d;
                     var elements = content["elements"];
                     for (var i in elements) {
                         var elementData = elements[i];
-                        var name_8 = "";
+                        var name_9 = "";
                         if (elementData["name"] != undefined) {
-                            name_8 = elementData["name"];
-                            if (effectData.elementDic[name_8] != undefined || refOriDic[name_8] != undefined) {
-                                console.error("特效中元素的名字重复：" + name_8);
+                            name_9 = elementData["name"];
+                            if (effectData.elementDic[name_9] != undefined || refOriDic[name_9] != undefined) {
+                                console.error("特效中元素的名字重复：" + name_9);
                                 continue;
                             }
                         }
@@ -27841,13 +27848,13 @@ var gd3d;
                             continue;
                         }
                         if (elementData["ref"] != undefined) {
-                            refOriDic[name_8] = elementData;
+                            refOriDic[name_9] = elementData;
                             refCount++;
                             continue;
                         }
                         else {
-                            effectData.elementDic[name_8] = this._parse(elementData);
-                            unRefOriDic[name_8] = elementData;
+                            effectData.elementDic[name_9] = this._parse(elementData);
+                            unRefOriDic[name_9] = elementData;
                         }
                     }
                     while (refCount > 0) {
