@@ -8604,6 +8604,7 @@ var gd3d;
                 var assetref = assetMgr.mapGuid[guid];
                 if (disposeNow && assetref && assetref.refcount < 1) {
                     delete assetMgr.mapGuid[guid];
+                    delete assetMgr.mapLoading[asset.getGUID()];
                     delete assetMgr.mapNamed[assetref.asset.getName()];
                 }
             };

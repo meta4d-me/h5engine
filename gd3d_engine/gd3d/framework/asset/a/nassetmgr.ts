@@ -334,7 +334,7 @@ namespace gd3d.framework
             if (disposeNow && assetref && assetref.refcount < 1)
             {
                 delete assetMgr.mapGuid[guid];
-                // delete assetMgr.mapLoading[asset.getGUID()];
+                delete assetMgr.mapLoading[asset.getGUID()];
                 delete assetMgr.mapNamed[assetref.asset.getName()];
             }
         }
