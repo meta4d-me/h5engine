@@ -369,7 +369,7 @@ namespace gd3d.framework {
         }
 
         beforeStep(){
-            if (!this.body || this.body.isStatic) return;
+            if (!this.body ) return;
             //缩放
             let tSca = this.transform.localScale;
             if(!math.vec2Equal(this.lastScale , tSca)){
