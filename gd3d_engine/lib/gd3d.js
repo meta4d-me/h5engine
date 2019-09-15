@@ -7230,7 +7230,7 @@ var gd3d;
             physics2DBody.prototype.update = function (delta) {
             };
             physics2DBody.prototype.beforeStep = function () {
-                if (!this.body || this.body.isStatic)
+                if (!this.body)
                     return;
                 var tSca = this.transform.localScale;
                 if (!gd3d.math.vec2Equal(this.lastScale, tSca)) {
@@ -8328,6 +8328,16 @@ var gd3d;
                     });
                 });
             };
+            assetBundle.prototype.unload = function (disposeNow) {
+                if (disposeNow === void 0) { disposeNow = false; }
+                while (this.pkgsGuid.length > 0) {
+                    var guid = this.pkgsGuid.pop();
+                    var ref = framework.assetMgr.mapGuid[guid];
+                    if (ref)
+                        this.assetmgr.unuse(ref.asset, disposeNow);
+                    delete framework.assetMgr.mapLoading[guid];
+                }
+            };
             assetBundle.idNext = -1;
             return assetBundle;
         }());
@@ -8509,9 +8519,16 @@ var gd3d;
                     else {
                         var filename = framework.getFileName(url);
                         var next = function (name, guid, type, dwguid) {
-                            this.parseRes({ name: name, guid: guid, type: type, dwguid: dwguid }).then(function () {
+                            this.parseRes({ name: name, guid: guid, type: type, dwguid: dwguid }).then(function (asset) {
                                 var state = new framework.stateLoad();
                                 state.isfinish = true;
+                                if (asset) {
+                                    state.resstateFirst = {
+                                        res: asset,
+                                        state: 0,
+                                        loadedLength: 0
+                                    };
+                                }
                                 onstate(state);
                             });
                         };
@@ -8527,7 +8544,7 @@ var gd3d;
                                 _this.download(nguid, nurl, ntype, next.bind(_this, filename, guid, type, nguid));
                         }
                         else
-                            next(filename, guid, type);
+                            next.call(_this, filename, guid, type);
                     }
                 });
             };
@@ -8636,7 +8653,7 @@ var gd3d;
                                         __asset["id"].id = asset.guid;
                                     this.use(__asset);
                                 }
-                                return [2];
+                                return [2, __asset];
                         }
                     });
                 });
@@ -8709,7 +8726,7 @@ var gd3d;
                 return null;
             };
             assetMgr.prototype.getAssetBundle = function (url) {
-                return null;
+                return this.name_bundles[url];
             };
             assetMgr.prototype.releaseUnuseAsset = function () {
             };

@@ -489,9 +489,9 @@ namespace gd3d.framework
         {
             return null;
         }
-        getAssetBundle(url: string)
+        getAssetBundle(url: string):assetBundle
         {
-            return null;
+            return this.name_bundles[url];
         }
         releaseUnuseAsset()
         {

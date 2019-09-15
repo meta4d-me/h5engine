@@ -1556,6 +1556,7 @@ declare namespace gd3d.framework {
         parseBundle(data: string): void;
         private unpkg;
         parseFile(): Promise<void>;
+        unload(disposeNow?: boolean): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1623,7 +1624,7 @@ declare namespace gd3d.framework {
             type: number;
             name: string;
             dwguid?: number;
-        }, bundle?: assetBundle): Promise<void>;
+        }, bundle?: assetBundle): Promise<void | IAsset>;
         getAssetByName<T extends IAsset>(name: string, bundlename?: string): T;
         mapDefaultMesh: {
             [id: string]: mesh;
@@ -1669,7 +1670,7 @@ declare namespace gd3d.framework {
         savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[], contents?: any[]) => void): void;
         loadCompressBundle(url: string, a?: any): void;
         loadImmediate(url: string): any;
-        getAssetBundle(url: string): any;
+        getAssetBundle(url: string): assetBundle;
         releaseUnuseAsset(): void;
         initDefAsset(): void;
         loadScene(sceneName: string, onComplete: (firstChilds: Array<transform>) => void): void;

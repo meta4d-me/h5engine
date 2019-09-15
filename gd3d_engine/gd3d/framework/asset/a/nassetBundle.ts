@@ -222,5 +222,17 @@ namespace gd3d.framework
                 this.onReady = null;
             }
         }
+
+        unload(disposeNow:boolean = false)
+        {
+            while(this.pkgsGuid.length>0)
+            {
+                let guid = this.pkgsGuid.pop();
+                let ref = assetMgr.mapGuid[guid];
+                if(ref)
+                    this.assetmgr.unuse(ref.asset,disposeNow);
+                delete assetMgr.mapLoading[guid];
+            }
+        }
     }
 }
