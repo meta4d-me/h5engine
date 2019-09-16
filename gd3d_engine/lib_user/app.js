@@ -8183,6 +8183,7 @@ var test_anim = (function () {
         var _this = this;
         console.log("i am here.");
         this.app = app;
+        window['app'] = app;
         this.scene = this.app.getScene();
         this._assetMgr = this.app.getAssetMgr();
         var prefabObj = new gd3d.framework.transform();
@@ -8198,72 +8199,6 @@ var test_anim = (function () {
             lighttran.localTranslate.y = 3;
             lighttran.markDirty();
         }
-        var resName = "PF_CrabNormal";
-        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
-            if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/prefabs/" + resName + "/" + resName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                    if (s.isfinish) {
-                        var _prefab = _this.app.getAssetMgr().getAssetByName(resName + ".prefab.json");
-                        prefabObj = _prefab.getCloneTrans();
-                        _this.player = prefabObj;
-                        _this.scene.addChild(prefabObj);
-                        prefabObj.localScale = new gd3d.math.vector3(3.8, 3.8, 3.8);
-                        prefabObj.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                        prefabObj.markDirty();
-                        console.log(prefabObj);
-                        objCam.lookat(prefabObj);
-                        objCam.markDirty();
-                        var ap = (prefabObj.gameObject.getComponentsInChildren("aniplayer"))[0];
-                        var list = ap.awaitLoadClipNames();
-                        _this.list = list;
-                        var resPath_1 = "res/prefabs/" + resName + "/resources/";
-                        if (list.length > 0) {
-                            var awaitload_1 = function (cname) { return new Promise(function (res, rej) {
-                                ap.addClipByNameLoad(_this._assetMgr, resPath_1, cname, function (sta, clipName) {
-                                    if (sta.isfinish) {
-                                        res();
-                                    }
-                                });
-                            }); };
-                            Promise.all(list.map(function (cname) { return awaitload_1(cname); })).then(window['a_finished'] = true);
-                        }
-                        document.onkeydown = function (ev) {
-                            if (!window['a_finished'])
-                                return;
-                            if (ev.code == "KeyM") {
-                                ap.play(_this.list[0]);
-                            }
-                            else if (ev.code == "KeyN") {
-                                ap.play(_this.list[1]);
-                            }
-                            else if (ev.code == "KeyS") {
-                                ap.play(_this.list[2]);
-                            }
-                            else if (ev.code == "KeyA") {
-                                ap.play(_this.list[3]);
-                            }
-                        };
-                        var wingroot = prefabObj.find("Bip001 R Toe0");
-                        if (wingroot) {
-                            wingroot.gameObject.addComponent("asbone");
-                            var trans = new gd3d.framework.transform();
-                            trans.name = "cube11";
-                            var mesh = trans.gameObject.addComponent("meshFilter");
-                            var smesh = _this.app.getAssetMgr().getDefaultMesh("cube");
-                            mesh.mesh = smesh;
-                            var renderer = trans.gameObject.addComponent("meshRenderer");
-                            wingroot.addChild(trans);
-                            trans.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                            trans.localScale = new gd3d.math.vector3(0.3, 0.3, 0.3);
-                            renderer.materials = [];
-                            renderer.materials.push(new gd3d.framework.material());
-                            renderer.materials[0].setShader(_this.app.getAssetMgr().getShader("shader/def"));
-                        }
-                    }
-                });
-            }
-        });
-        this.cube = prefabObj;
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
         this.scene.addChild(objCam);
@@ -8273,6 +8208,66 @@ var test_anim = (function () {
         objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
         objCam.lookat(prefabObj);
         objCam.markDirty();
+        gd3d.framework.assetMgr.cdnRoot = "res/";
+        gd3d.framework.assetMgr.guidlistURL = "res/guidlist.json";
+        gd3d.framework.assetMgr.onGuidInit = function () {
+            var resName = "PF_Puffer";
+            _this.app.getAssetMgr().load("res/shader/MainShader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                if (state.isfinish) {
+                    _this.app.getAssetMgr().load("res/" + resName + "/" + resName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                        if (s.isfinish) {
+                            var _prefab = _this.app.getAssetMgr().getAssetByName(resName + ".prefab.json");
+                            prefabObj = _prefab.getCloneTrans();
+                            _this.player = prefabObj;
+                            _this.scene.addChild(prefabObj);
+                            prefabObj.localScale = new gd3d.math.vector3(50.2, 50.2, 50.2);
+                            prefabObj.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                            objCam.lookat(prefabObj);
+                            objCam.markDirty();
+                            var aps = prefabObj.gameObject.getComponentsInChildren("aniplayer");
+                            var ap = aps[0];
+                            var list_1 = ap.awaitLoadClipNames();
+                            var resPath_1 = "res/prefabs/" + resName + "/resources";
+                            var isloadedAllclip_1 = false;
+                            if (list_1.length > 0) {
+                                var len_1 = list_1.length;
+                                list_1.forEach(function (str) {
+                                    ap.addClipByNameLoad(_this._assetMgr, resPath_1, str, function () {
+                                        len_1--;
+                                        isloadedAllclip_1 = len_1 <= 0;
+                                    });
+                                });
+                            }
+                            document.onkeydown = function (ev) {
+                                if (!isloadedAllclip_1)
+                                    return;
+                                console.log("" + ev.code);
+                                var cname = list_1[ev.code.substr(5, 1)];
+                                ap.play(cname);
+                            };
+                            var wingroot = prefabObj.find("Bip001 R Toe0");
+                            if (wingroot) {
+                                wingroot.gameObject.addComponent("asbone");
+                                var trans = new gd3d.framework.transform();
+                                trans.name = "cube11";
+                                var mesh = trans.gameObject.addComponent("meshFilter");
+                                var smesh = _this.app.getAssetMgr().getDefaultMesh("cube");
+                                mesh.mesh = smesh;
+                                var renderer = trans.gameObject.addComponent("meshRenderer");
+                                wingroot.addChild(trans);
+                                trans.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                                trans.localScale = new gd3d.math.vector3(0.3, 0.3, 0.3);
+                                renderer.materials = [];
+                                renderer.materials.push(new gd3d.framework.material());
+                                renderer.materials[0].setShader(_this.app.getAssetMgr().getShader("shader/def"));
+                            }
+                        }
+                    });
+                }
+            });
+            _this.cube = prefabObj;
+        };
+        gd3d.framework.assetMgr.initGuidList();
     };
     test_anim.prototype.update = function (delta) {
         this.timer += delta;
@@ -8281,6 +8276,9 @@ var test_anim = (function () {
         var x2 = Math.sin(this.timer * 1.1);
         var z2 = Math.cos(this.timer * 1.1);
         var objCam = this.camera.gameObject.transform;
+        objCam.localTranslate = new gd3d.math.vector3(x2 * 1, 0.25, -z2 * 1);
+        if (!this.cube)
+            return;
         objCam.lookat(this.cube);
         objCam.markDirty();
         objCam.updateWorldTran();

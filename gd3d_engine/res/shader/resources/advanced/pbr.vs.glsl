@@ -34,10 +34,11 @@ mat4 buildMat4(int index)
 	float yy = 2.0*quat.y * quat.y;
 	float zz = 2.0*quat.z * quat.z;
 	float ww = 2.0*quat.w * quat.w;
+	float s = translation.w;
 	mat4 matrix = mat4(
-	1.0-yy-zz, xy+zw, xz-yw, 0,
-	xy-zw, 1.0-xx-zz, yz + xw, 0,
-	xz + yw, yz - xw, 1.0-xx-yy, 0,
+	(1.0-yy-zz)*s, (xy+zw)*s, (xz-yw)*s, 0,
+	(xy-zw)*s, (1.0-xx-zz)*s, (yz + xw)*s, 0,
+	(xz + yw)*s, (yz - xw)*s, (1.0-xx-yy)*s, 0,
 	translation.x, translation.y, translation.z, 1);
 	return matrix;
 }

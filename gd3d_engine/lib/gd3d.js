@@ -9777,7 +9777,15 @@ var gd3d;
                     var read = new gd3d.io.binReader(buf);
                     read.readStringAnsi();
                     _this.fps = read.readFloat();
-                    _this.loop = read.readBoolean();
+                    var scaleMagic = read.readByte();
+                    _this.hasScaled = scaleMagic == 0xFA;
+                    if (_this.hasScaled) {
+                        console.log("动画有缩放");
+                        _this.loop = read.readBoolean();
+                    }
+                    else {
+                        _this.loop = scaleMagic > 0;
+                    }
                     _this.boneCount = read.readInt();
                     _this.bones = [];
                     for (var i = 0; i < _this.boneCount; i++) {
@@ -9796,21 +9804,27 @@ var gd3d;
                     }
                     _this.frameCount = read.readInt();
                     _this.frames = {};
+                    var bs = _this.hasScaled
+                        ? 8
+                        : 7;
                     for (var i = 0; i < _this.frameCount; i++) {
                         var _fid = read.readInt().toString();
                         var _key = read.readBoolean();
-                        var _frame = new Float32Array(_this.boneCount * 7 + 1);
+                        var _frame = new Float32Array(_this.boneCount * bs + 1);
                         _frame[0] = _key ? 1 : 0;
                         var _boneInfo = new PoseBoneMatrix();
                         for (var i_1 = 0; i_1 < _this.boneCount; i_1++) {
-                            _boneInfo.load(read);
-                            _frame[i_1 * 7 + 1] = _boneInfo.r.x;
-                            _frame[i_1 * 7 + 2] = _boneInfo.r.y;
-                            _frame[i_1 * 7 + 3] = _boneInfo.r.z;
-                            _frame[i_1 * 7 + 4] = _boneInfo.r.w;
-                            _frame[i_1 * 7 + 5] = _boneInfo.t.x;
-                            _frame[i_1 * 7 + 6] = _boneInfo.t.y;
-                            _frame[i_1 * 7 + 7] = _boneInfo.t.z;
+                            _boneInfo.load(read, _this.hasScaled);
+                            _frame[i_1 * bs + 1] = _boneInfo.r.x;
+                            _frame[i_1 * bs + 2] = _boneInfo.r.y;
+                            _frame[i_1 * bs + 3] = _boneInfo.r.z;
+                            _frame[i_1 * bs + 4] = _boneInfo.r.w;
+                            _frame[i_1 * bs + 5] = _boneInfo.t.x;
+                            _frame[i_1 * bs + 6] = _boneInfo.t.y;
+                            _frame[i_1 * bs + 7] = _boneInfo.t.z;
+                            if (_this.hasScaled) {
+                                _frame[i_1 * bs + 8] = _boneInfo.s;
+                            }
                         }
                         _this.frames[_fid] = _frame;
                     }
@@ -9854,7 +9868,8 @@ var gd3d;
                 gd3d.math.quatClone(this.r, p.r);
                 return p;
             };
-            PoseBoneMatrix.prototype.load = function (read) {
+            PoseBoneMatrix.prototype.load = function (read, hasScaled) {
+                if (hasScaled === void 0) { hasScaled = false; }
                 {
                     var x = read.readSingle();
                     var y = read.readSingle();
@@ -9867,6 +9882,11 @@ var gd3d;
                     var y = read.readSingle();
                     var z = read.readSingle();
                     this.t = new gd3d.math.vector3(x, y, z);
+                }
+                {
+                    if (hasScaled) {
+                        this.s = read.readSingle();
+                    }
                 }
             };
             PoseBoneMatrix.createDefault = function () {
@@ -9993,6 +10013,10 @@ var gd3d;
                 gd3d.reflect.Field("quaternion"),
                 __metadata("design:type", gd3d.math.quaternion)
             ], PoseBoneMatrix.prototype, "r", void 0);
+            __decorate([
+                gd3d.reflect.Field("scale"),
+                __metadata("design:type", Number)
+            ], PoseBoneMatrix.prototype, "s", void 0);
             PoseBoneMatrix = PoseBoneMatrix_1 = __decorate([
                 gd3d.reflect.SerializeType
             ], PoseBoneMatrix);
@@ -13858,6 +13882,7 @@ var gd3d;
                     this.careBoneMat[trans.name] = framework.PoseBoneMatrix.create();
                     this.careBoneMat[trans.name].r = gd3d.math.pool.new_quaternion();
                     this.careBoneMat[trans.name].t = gd3d.math.pool.new_vector3();
+                    this.careBoneMat[trans.name].s = 1;
                 }
             };
             aniplayer.prototype.addToCareList = function (bone) {
@@ -13938,6 +13963,9 @@ var gd3d;
                     }
                 }
                 this.curFrame = this._playClip.frames[this._playFrameid];
+                var bs = this._playClip.hasScaled
+                    ? 8
+                    : 7;
                 if (!this.curFrame) {
                     console.error("frames of null on aniplayer.update() , framesIsNull :" + (this._playClip.frames == null) + " , GameObjectName: " + this.gameObject.getName() + " , _playFrameid:" + this._playFrameid + " , clipName : " + this._playClip.getName());
                     return;
@@ -13952,13 +13980,16 @@ var gd3d;
                                 transMat.lerpInWorldWithData(this.inversTpos[bonename], this.lastFrame[bonename], this.curFrame, index * 7 + 1, 1 - this.crossPercentage);
                             }
                             else {
-                                transMat.r.x = this.curFrame[index * 7 + 1];
-                                transMat.r.y = this.curFrame[index * 7 + 2];
-                                transMat.r.z = this.curFrame[index * 7 + 3];
-                                transMat.r.w = this.curFrame[index * 7 + 4];
-                                transMat.t.x = this.curFrame[index * 7 + 5];
-                                transMat.t.y = this.curFrame[index * 7 + 6];
-                                transMat.t.z = this.curFrame[index * 7 + 7];
+                                transMat.r.x = this.curFrame[index * bs + 1];
+                                transMat.r.y = this.curFrame[index * bs + 2];
+                                transMat.r.z = this.curFrame[index * bs + 3];
+                                transMat.r.w = this.curFrame[index * bs + 4];
+                                transMat.t.x = this.curFrame[index * bs + 5];
+                                transMat.t.y = this.curFrame[index * bs + 6];
+                                transMat.t.z = this.curFrame[index * bs + 7];
+                                if (this._playClip.hasScaled) {
+                                    transMat.s = this.curFrame[index * bs + 8];
+                                }
                             }
                             var fmat = framework.PoseBoneMatrix.sMultiply(transMat, this.inversTpos[bonename]);
                             gd3d.math.matrixMakeTransformRTS(fmat.t, gd3d.math.pool.vector3_one, fmat.r, this.temptMat);
@@ -14171,7 +14202,7 @@ var gd3d;
                         data[i * 8 + 4] = boneMat.t.x;
                         data[i * 8 + 5] = boneMat.t.y;
                         data[i * 8 + 6] = boneMat.t.z;
-                        data[i * 8 + 7] = 1;
+                        data[i * 8 + 7] = boneMat.s ? boneMat.s : 1;
                     }
                     return;
                 }
@@ -14200,17 +14231,22 @@ var gd3d;
                                 data[i * 8 + 4] = boneMat.t.x;
                                 data[i * 8 + 5] = boneMat.t.y;
                                 data[i * 8 + 6] = boneMat.t.z;
-                                data[i * 8 + 7] = 1;
+                                data[i * 8 + 7] = boneMat.s ? boneMat.s : 1;
                             }
                             else {
-                                data[i * 8 + 0] = this.curFrame[index * 7 + 1];
-                                data[i * 8 + 1] = this.curFrame[index * 7 + 2];
-                                data[i * 8 + 2] = this.curFrame[index * 7 + 3];
-                                data[i * 8 + 3] = this.curFrame[index * 7 + 4];
-                                data[i * 8 + 4] = this.curFrame[index * 7 + 5];
-                                data[i * 8 + 5] = this.curFrame[index * 7 + 6];
-                                data[i * 8 + 6] = this.curFrame[index * 7 + 7];
-                                data[i * 8 + 7] = 1;
+                                var bs = this._playClip.hasScaled
+                                    ? 8
+                                    : 7;
+                                data[i * 8 + 0] = this.curFrame[index * bs + 1];
+                                data[i * 8 + 1] = this.curFrame[index * bs + 2];
+                                data[i * 8 + 2] = this.curFrame[index * bs + 3];
+                                data[i * 8 + 3] = this.curFrame[index * bs + 4];
+                                data[i * 8 + 4] = this.curFrame[index * bs + 5];
+                                data[i * 8 + 5] = this.curFrame[index * bs + 6];
+                                data[i * 8 + 6] = this.curFrame[index * bs + 7];
+                                data[i * 8 + 7] = this._playClip.hasScaled
+                                    ? this.curFrame[index * bs + 8]
+                                    : 1;
                             }
                         }
                         else {
