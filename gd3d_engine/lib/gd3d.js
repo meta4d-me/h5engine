@@ -7230,7 +7230,7 @@ var gd3d;
             physics2DBody.prototype.update = function (delta) {
             };
             physics2DBody.prototype.beforeStep = function () {
-                if (!this.body || this.body.isStatic)
+                if (!this.body)
                     return;
                 var tSca = this.transform.localScale;
                 if (!gd3d.math.vec2Equal(this.lastScale, tSca)) {
