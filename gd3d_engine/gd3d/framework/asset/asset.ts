@@ -57,7 +57,8 @@ namespace gd3d.framework
      */
     export interface IAsset //
     {
-        
+        bundle?:assetBundle;
+
         defaultAsset:boolean;//是否为系统默认资源
         //setName(name: string);//名字只能设置一次
         getName(): string;//资源自己解决命名问题，比如构造函数，不能改资源的名字

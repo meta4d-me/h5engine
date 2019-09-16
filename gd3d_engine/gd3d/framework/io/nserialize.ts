@@ -177,8 +177,7 @@ namespace gd3d.io
             clip.bones = [];
             clip.subclips = [];
             asset = clip;
-        }
-
+        }        
         if (useAsset && asset)
             asset.use();
         return asset;
