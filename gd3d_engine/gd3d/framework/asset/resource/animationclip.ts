@@ -143,8 +143,8 @@ namespace gd3d.framework
             //         // this.subclips = result.subclips;
             //         // this.frameCount = math.UInt16(result.frameCount);
             //         // this.frames = {};
-            //         // for (let key in result.frames)                     
-            //         //     this.frames[key] = new Float32Array(result.frames[key]);                   
+            //         // for (let key in result.frames)
+            //         //     this.frames[key] = new Float32Array(result.frames[key]);
             //         for(let key in result)
             //             this[key] = result[key];
             //         resolve();
@@ -158,7 +158,14 @@ namespace gd3d.framework
                 var _name = read.readStringAnsi();
 
                 this.fps = read.readFloat();
-                this.loop = read.readBoolean();
+                const scaleMagic = read.readByte();
+                this.hasScaled = scaleMagic == 0xFA
+                if (this.hasScaled) {
+                    console.log("动画有缩放");
+                    this.loop = read.readBoolean();
+                } else {
+                    this.loop = scaleMagic > 0;
+                }
 
                 this.boneCount = read.readInt();
                 this.bones = [];
@@ -182,24 +189,32 @@ namespace gd3d.framework
 
                 this.frameCount = read.readInt();
                 this.frames = {};
+                // byte stride
+                const bs = this.hasScaled
+                    ? 8
+                    : 7;
+
                 for (let i = 0; i < this.frameCount; i++)
                 {
                     let _fid = read.readInt().toString();
                     let _key = read.readBoolean();
-                    let _frame = new Float32Array(this.boneCount * 7 + 1);
+                    let _frame = new Float32Array(this.boneCount * bs + 1);
                     _frame[0] = _key ? 1 : 0;
 
                     let _boneInfo = new PoseBoneMatrix();
                     for (let i = 0; i < this.boneCount; i++)
                     {
-                        _boneInfo.load(read);
-                        _frame[i * 7 + 1] = _boneInfo.r.x;
-                        _frame[i * 7 + 2] = _boneInfo.r.y;
-                        _frame[i * 7 + 3] = _boneInfo.r.z;
-                        _frame[i * 7 + 4] = _boneInfo.r.w;
-                        _frame[i * 7 + 5] = _boneInfo.t.x;
-                        _frame[i * 7 + 6] = _boneInfo.t.y;
-                        _frame[i * 7 + 7] = _boneInfo.t.z;
+                        _boneInfo.load(read, this.hasScaled);
+                        _frame[i * bs + 1] = _boneInfo.r.x;
+                        _frame[i * bs + 2] = _boneInfo.r.y;
+                        _frame[i * bs + 3] = _boneInfo.r.z;
+                        _frame[i * bs + 4] = _boneInfo.r.w;
+                        _frame[i * bs + 5] = _boneInfo.t.x;
+                        _frame[i * bs + 6] = _boneInfo.t.y;
+                        _frame[i * bs + 7] = _boneInfo.t.z;
+                        if (this.hasScaled) {
+                            _frame[i * bs + 8] = _boneInfo.s;
+                        }
                     }
                     this.frames[_fid] = _frame;
                 }
@@ -223,6 +238,15 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         loop: boolean;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否含有缩放
+         * @version gd3d 1.0
+         */
+        hasScaled: boolean;
 
         /**
          * @public
@@ -283,6 +307,8 @@ namespace gd3d.framework
         t: math.vector3;
         @reflect.Field("quaternion")
         r: math.quaternion;
+        @reflect.Field("scale")
+        s: math.float;
         static caclByteLength(): number
         {
             let total = 12 + 16;
@@ -297,7 +323,7 @@ namespace gd3d.framework
             math.quatClone(this.r, p.r);
             return p;
         }
-        load(read: io.binReader)
+        load(read: io.binReader, hasScaled = false)
         {
             {
                 var x = read.readSingle();
@@ -311,6 +337,11 @@ namespace gd3d.framework
                 var y = read.readSingle();
                 var z = read.readSingle();
                 this.t = new math.vector3(x, y, z);
+            }
+            {
+                if (hasScaled) {
+                    this.s = read.readSingle();
+                }
             }
         }
         static createDefault(): PoseBoneMatrix
@@ -336,6 +367,8 @@ namespace gd3d.framework
             this.t.x = src[seek + 4];
             this.t.y = src[seek + 5];
             this.t.z = src[seek + 6];
+                        // TODO:
+            // this.s = src[seek + 7];
         }
         invert()
         {

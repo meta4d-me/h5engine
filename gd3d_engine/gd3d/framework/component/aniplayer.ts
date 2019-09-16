@@ -107,6 +107,7 @@ namespace gd3d.framework
                 this.careBoneMat[trans.name] = PoseBoneMatrix.create();
                 this.careBoneMat[trans.name].r = math.pool.new_quaternion();
                 this.careBoneMat[trans.name].t = math.pool.new_vector3();
+                this.careBoneMat[trans.name].s = 1;
             }
         }
         addToCareList(bone: transform)
@@ -209,6 +210,9 @@ namespace gd3d.framework
             }
             this.curFrame = this._playClip.frames[this._playFrameid];
 
+            const bs = this._playClip.hasScaled
+                ? 8 // TODO: 8
+                : 7;
             if (this._playClip.indexDic.len)
                 for (let bonename in this.carelist)
                 {
@@ -223,14 +227,17 @@ namespace gd3d.framework
                             transMat.lerpInWorldWithData(this.inversTpos[bonename], this.lastFrame[bonename], this.curFrame, index * 7 + 1, 1 - this.crossPercentage);
                         } else
                         {
-                            transMat.r.x = this.curFrame[index * 7 + 1];
-                            transMat.r.y = this.curFrame[index * 7 + 2];
-                            transMat.r.z = this.curFrame[index * 7 + 3];
-                            transMat.r.w = this.curFrame[index * 7 + 4];
+                            transMat.r.x = this.curFrame[index * bs + 1];
+                            transMat.r.y = this.curFrame[index * bs + 2];
+                            transMat.r.z = this.curFrame[index * bs + 3];
+                            transMat.r.w = this.curFrame[index * bs + 4];
 
-                            transMat.t.x = this.curFrame[index * 7 + 5];
-                            transMat.t.y = this.curFrame[index * 7 + 6];
-                            transMat.t.z = this.curFrame[index * 7 + 7];
+                            transMat.t.x = this.curFrame[index * bs + 5];
+                            transMat.t.y = this.curFrame[index * bs + 6];
+                            transMat.t.z = this.curFrame[index * bs + 7];
+                            if(this._playClip.hasScaled) {
+                                transMat.s = this.curFrame[index * bs + 8];
+                            }
                         }
                         //------------todo 待优化
                         let fmat = PoseBoneMatrix.sMultiply(transMat, this.inversTpos[bonename]);
@@ -467,7 +474,7 @@ namespace gd3d.framework
         {
 
         }
-        private checkFrameId(delay: number): void 
+        private checkFrameId(delay: number): void
         {
             let lastFid = this._playFrameid;
             this._playTimer += delay * this.speed;
@@ -504,7 +511,7 @@ namespace gd3d.framework
             // this.lastFrame=null;
             this.bePlay = false;
             this.beCross = false;
-            
+
             let endFunc = this.playEndDic[Clipame];
             if (endFunc)
             {
@@ -538,7 +545,7 @@ namespace gd3d.framework
                     data[i * 8 + 4] = boneMat.t.x;
                     data[i * 8 + 5] = boneMat.t.y;
                     data[i * 8 + 6] = boneMat.t.z;
-                    data[i * 8 + 7] = 1;
+                    data[i * 8 + 7] = boneMat.s ? boneMat.s : 1;
                 }
                 return;
             }
@@ -575,17 +582,24 @@ namespace gd3d.framework
                             data[i * 8 + 4] = boneMat.t.x;
                             data[i * 8 + 5] = boneMat.t.y;
                             data[i * 8 + 6] = boneMat.t.z;
-                            data[i * 8 + 7] = 1;
+                            // data[i * 8 + 7] = 1;
+                            data[i * 8 + 7] = boneMat.s ? boneMat.s : 1;
                         } else
                         {
-                            data[i * 8 + 0] = this.curFrame[index * 7 + 1];
-                            data[i * 8 + 1] = this.curFrame[index * 7 + 2];
-                            data[i * 8 + 2] = this.curFrame[index * 7 + 3];
-                            data[i * 8 + 3] = this.curFrame[index * 7 + 4];
-                            data[i * 8 + 4] = this.curFrame[index * 7 + 5];
-                            data[i * 8 + 5] = this.curFrame[index * 7 + 6];
-                            data[i * 8 + 6] = this.curFrame[index * 7 + 7];
-                            data[i * 8 + 7] = 1;
+                            const bs = this._playClip.hasScaled
+                                ? 8
+                                : 7;
+                            data[i * 8 + 0] = this.curFrame[index * bs + 1];
+                            data[i * 8 + 1] = this.curFrame[index * bs + 2];
+                            data[i * 8 + 2] = this.curFrame[index * bs + 3];
+                            data[i * 8 + 3] = this.curFrame[index * bs + 4];
+                            data[i * 8 + 4] = this.curFrame[index * bs + 5];
+                            data[i * 8 + 5] = this.curFrame[index * bs + 6];
+                            data[i * 8 + 6] = this.curFrame[index * bs + 7];
+                            data[i * 8 + 7] = this._playClip.hasScaled
+                                ? this.curFrame[index * bs + 8]
+                                : 1;
+                            // data[i * 8 + 7] = 1;
                         }
                     } else
                     {
