@@ -555,15 +555,17 @@ namespace gd3d.framework
 
             if (img)
             {
+                let needRMask = false;
                 if(this.needRefreshFont){
                     mat.setTexture("_MainTex", img);
                     this.needRefreshFont = false;
+                    needRMask = true;
                 }
 
                 if(this.transform.parentIsMask){
                     if(this._cacheMaskV4 == null) this._cacheMaskV4 = new math.vector4();
                     let rect = this.transform.maskRect;
-                    if(this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h){
+                    if(this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h || needRMask){
                         this._cacheMaskV4.x = rect.x; this._cacheMaskV4.y = rect.y;this._cacheMaskV4.z = rect.w;this._cacheMaskV4.w = rect.h;
                         mat.setVector4("_maskRect",this._cacheMaskV4);
                     }

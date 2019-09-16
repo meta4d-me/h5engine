@@ -86,6 +86,7 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         Prefab,
+        cPrefab,
         /**
          * @public
          * @language zh_CN
@@ -168,7 +169,7 @@ namespace gd3d.framework
          */
         DDS
     }
-    
+
     /**
      * @public
      * @language zh_CN
@@ -550,12 +551,12 @@ namespace gd3d.framework
         /**
          * 资源guid的字典，key为资源的ID
          */
-        mapGuidId : { [guid : string] : number } = {};
+        mapGuidId: { [guid: string]: number } = {};
 
         /**
          * 等待加载完毕后 统一回调 字典
          */
-        mapGuidWaitLoaded : {[guid : string] : Function[]} = {};
+        mapGuidWaitLoaded: { [guid: string]: Function[] } = {};
 
         /**
         * @public
@@ -590,12 +591,15 @@ namespace gd3d.framework
             if (bundlename != null)
             {
                 let ab = this.mapBundle[bundlename] as assetBundle;
-                if (ab != null){
-                    if(ab.mapNamed[name]){  //尝试从Name 列表中取
-                        id = ab.mapNamed[name] 
-                    }else if(ab.mapNameGuid[name]){  //尝试从guid 列表中取
+                if (ab != null)
+                {
+                    if (ab.mapNamed[name])
+                    {  //尝试从Name 列表中取
+                        id = ab.mapNamed[name]
+                    } else if (ab.mapNameGuid[name])
+                    {  //尝试从guid 列表中取
                         let guid = ab.mapNameGuid[name];
-                        if(this.mapGuidId[guid] != undefined)
+                        if (this.mapGuidId[guid] != undefined)
                             id = this.mapGuidId[guid];
                     }
                 }
@@ -605,7 +609,7 @@ namespace gd3d.framework
             if (id != null)
             {
                 var r = this.mapRes[id];
-                if (r != null && !r[this._loadingTag] )//)
+                if (r != null && !r[this._loadingTag])//)
                     return r.asset;
             }
             if (flag)
@@ -747,8 +751,9 @@ namespace gd3d.framework
         private readonly _loadingTag = "_AssetLoingTag_";
 
         /** 判断是否在加载中 */
-        assetIsLoing(asRef: assetRef){
-            if(!asRef) return false;
+        assetIsLoing(asRef: assetRef)
+        {
+            if (!asRef) return false;
             return this._loadingTag in asRef;
         }
 
@@ -833,7 +838,7 @@ namespace gd3d.framework
             return mapRefcout;
         }
 
-        private mapInLoad: { [id: string]: stateLoad } = {};
+        mapInLoad: { [id: string]: stateLoad } = {};
         removeAssetBundle(name: string)
         {
             if (this.mapBundle[name] != null)
@@ -947,6 +952,7 @@ namespace gd3d.framework
             this.regAssetFactory(AssetTypeEnum.TextureDesc, new AssetFactory_TextureDesc());
             this.regAssetFactory(AssetTypeEnum.Mesh, new AssetFactory_Mesh());
             this.regAssetFactory(AssetTypeEnum.Prefab, new AssetFactory_Prefab());
+            this.regAssetFactory(AssetTypeEnum.cPrefab, new AssetFactory_cPrefab());
             this.regAssetFactory(AssetTypeEnum.Material, new AssetFactory_Material());
             this.regAssetFactory(AssetTypeEnum.Aniclip, new AssetFactory_Aniclip());
             this.regAssetFactory(AssetTypeEnum.Scene, new AssetFactory_Scene());
@@ -1121,7 +1127,7 @@ namespace gd3d.framework
             //加载AB bundle 包
             if (type == AssetTypeEnum.Bundle)
             {
-                gd3d.io.loadText(url, (txt, err,isloadFail) =>
+                gd3d.io.loadText(url, (txt, err, isloadFail) =>
                 {
                     if (err != null)
                     {
@@ -1136,10 +1142,9 @@ namespace gd3d.framework
                     if (json["files"])
                     {
                         filename = this.getFileName(url);
-
                         var ab = new assetBundle(url);
                         ab.name = filename;
-                        ab.parse(JSON.parse(txt));
+                        ab.parse(json);
                         ab.load(this, onstate, state);
                     } else
                     {
@@ -1158,7 +1163,7 @@ namespace gd3d.framework
             }
             else if (type == AssetTypeEnum.CompressBundle)   //加载 压缩的 AB bundle 包
             {
-                gd3d.io.loadText(url, (txt, err,isloadFail) =>
+                gd3d.io.loadText(url, (txt, err, isloadFail) =>
                 {
                     if (err != null)
                     {
@@ -1222,12 +1227,12 @@ namespace gd3d.framework
          */
         loadCompressBundle(url: string, onstate: (state: stateLoad) => void = null)
         {
-            if(this.maploaded[url])
+            if (this.maploaded[url])
             {
-                if(onstate)
+                if (onstate)
                 {
                     let state = new stateLoad();
-                    state.isfinish=true;
+                    state.isfinish = true;
                     onstate(state);
                 }
                 return;
@@ -1261,23 +1266,22 @@ namespace gd3d.framework
          * @param onstate 状态返回的回调
          */
         // private time: number;
-        maploaded:{[url:string]:IAsset}={};
+        maploaded: { [url: string]: IAsset } = {};
         load(url: string, type: AssetTypeEnum = AssetTypeEnum.Auto, onstate: (state: stateLoad) => void = null)
         {
             if (onstate == null)
                 onstate = () => { };
-            // if (!this.time)
-            //     this.time = Date.now();
 
-            // console.log(`assetmgr:${url} ${((Date.now() - this.time))}ms ${Date.now()}`);
-            // this.time = Date.now();
+            // let parsed =  assetBundle.tryParsePreloadAB(url , onstate , this);
+            // if(parsed) return;   //尝试 直接解析之前加载完毕的资源
+
             // console.log(`资源包 : ${url} 开始加载`);
-            if(this.maploaded[url])
+            if (this.maploaded[url])
             {
-                if(onstate)
+                if (onstate)
                 {
                     var state = new stateLoad();
-                    state.isfinish=true;
+                    state.isfinish = true;
                     onstate(state);
                 }
                 return;
@@ -1308,7 +1312,7 @@ namespace gd3d.framework
                 return;
             }
 
-            this.unPkg(type, url, state, onstate);           
+            this.unPkg(type, url, state, onstate);
         }
 
 
@@ -1335,7 +1339,7 @@ namespace gd3d.framework
                 return;
             }
             this.unPkg(type, url, state, onstate);
-           
+
         }
         /**
          * @public
@@ -1355,7 +1359,8 @@ namespace gd3d.framework
             let state: stateLoad = this.mapInLoad[name];
             for (let key in state.resstate)
             {
-                if(state.resstate[key] && state.resstate[key].res){
+                if (state.resstate[key] && state.resstate[key].res)
+                {
                     state.resstate[key].res.unuse();
                 }
             }
@@ -1764,7 +1769,7 @@ namespace gd3d.framework
                 {
                     return AssetTypeEnum.Material;
                 }
-                else if (extname == ".mesh.bin" || extname == ".mesh.bin.js"|| extname == ".mesh.json")
+                else if (extname == ".mesh.bin" || extname == ".cmesh.bin" || extname == ".mesh.bin.js" || extname == ".mesh.json")
                 {
                     return AssetTypeEnum.Mesh;
                 }
@@ -1775,6 +1780,9 @@ namespace gd3d.framework
                 else if (extname == ".prefab.json")
                 {
                     return AssetTypeEnum.Prefab;
+                } else if (extname == ".cprefab.json")
+                {
+                    return AssetTypeEnum.cPrefab;
                 }
                 else if (extname == ".scene.json")
                 {

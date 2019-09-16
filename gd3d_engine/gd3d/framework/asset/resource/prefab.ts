@@ -10,7 +10,7 @@
     @gd3d.reflect.SerializeType
     export class prefab implements IAsset
     {
-        static readonly ClassName:string="prefab";
+        static readonly ClassName: string = "prefab";
 
         private name: constText;
         private id: resID = new resID();
@@ -23,13 +23,15 @@
          */
         defaultAsset: boolean = false;
 
-
+        isCab = false;
         constructor(assetName: string = null)
         {
             if (!assetName)
             {
                 assetName = "prefab_" + this.getGUID();
             }
+            if (this.isCab = assetName.lastIndexOf("cprefab") != -1)
+                assetName = assetName.replace("cprefab", "prefab");
             this.name = new constText(assetName);
         }
         /**
@@ -119,10 +121,15 @@
          */
         getCloneTrans(): transform 
         {
-         
+
+            if (this.isCab)
+            {
+                let t = io.ndeSerialize<transform>(this.jsonstr, this.assetbundle, true);
+                return t;
+            }
             let temp = io.cloneObj(this.trans);
-            if (temp instanceof transform)
-                return temp;
+            // if (temp instanceof transform)
+            return temp;
         }
 
         /**
@@ -134,7 +141,12 @@
          */
         getCloneTrans2D(): transform2D 
         {
-            
+            if (this.isCab)
+            {
+                let t = io.ndeSerialize<transform2D>(this.jsonstr, this.assetbundle, true);
+                return t;
+            }
+
             let temp = io.cloneObj(this.trans);
             if (temp instanceof transform2D)
                 return temp;
@@ -174,18 +186,32 @@
             //    return new threading.gdPromise((resolve) =>
             //     {
             this.jsonstr = jsonStr;
-            let jsonObj = JSON.parse(jsonStr);
-            let type = jsonObj["type"];
-            switch (type)
+            return io.JSONParse(jsonStr).then((jsonObj) =>
             {
-                case "transform": this.trans = new transform; break;
-                case "transform2D": this.trans = new transform2D; break;
-            }
+                let type = jsonObj["type"];
+                switch (type)
+                {
+                    case "transform": this.trans = new transform; break;
+                    case "transform2D": this.trans = new transform2D; break;
+                }
 
-            if (type != null)
-                io.deSerialize(jsonObj, this.trans, assetmgr, this.assetbundle);
+                if (type != null)
+                    io.deSerialize(jsonObj, this.trans, assetmgr, this.assetbundle);
+            });
+            // let jsonObj = JSON.parse(jsonStr);
+
             //     resolve();
             // });
+        }
+
+        cParse(data: any, assetmgr: assetMgr)
+        {
+            this.jsonstr = data;
+            if (data.cls == "transform")
+                this.trans = new transform;
+            else
+                this.trans = new transform2D;
+            this.trans.addChild(io.ndeSerialize(data, this.assetbundle));
         }
     }
 }

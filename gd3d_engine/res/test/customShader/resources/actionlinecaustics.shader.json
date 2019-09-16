@@ -1,0 +1,40 @@
+{
+    "layer": "geometry",
+    "properties": [
+        "_MainTex('MainTex',Texture)='white'{}",
+        "_CausticsTex('Light',Texture) = 'white' {}",
+        "_LightingIntensity('LightRate',Range(0.0,1.0)) = 1.0",
+        "_CausticsIntensity('LightRate',Range(0.0,1.0)) = 1.0",
+        "_UnitTime('LightRate',Range(0.0,1.0)) = 1.0"
+    ],
+    "passes": {
+        "base": [
+            {
+                "showface": "ccw",
+                "vs": "actionlinecaustics",
+                "fs": "actionlinecaustics"
+            }
+        ],
+        "base_fog": [
+            {
+                "showface": "ccw",
+                "vs": "actionlinecaustics",
+                "fs": "actionlinecaustics"
+            }
+        ],
+        "skin": [
+            {
+                "showface": "ccw",
+                "vs": "actionlinecaustics",
+                "fs": "actionlinecaustics"
+            }
+        ],
+        "skin_fog": [
+            {
+                "showface": "ccw",
+                "vs": "actionlinecaustics",
+                "fs": "actionlinecaustics"
+            }
+        ]
+    }
+}

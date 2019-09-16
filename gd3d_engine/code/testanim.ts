@@ -33,9 +33,9 @@ class test_anim implements IState
         //let resName = "taidao@qirenzhan"; //elong
         // let resName = "elong"; //
         // let resName = "PF_Angler"; //
-        let resName = "PF_PufferFish"; //
+        // let resName = "PF_PufferFish"; //
         // let resName = "PF_Stingray"; //
-        // let resName = "PF_CrabNormal"; //
+        let resName = "PF_CrabNormal"; //
         // let resName = "PF_EnemySharkMosasaurus"; //
         this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
         {

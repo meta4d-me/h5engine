@@ -234,8 +234,9 @@ declare namespace Stats {
     }
 }
 declare namespace gd3d {
-    var gd3d_reflect_root: {};
+    var gd3d_reflect_root: any;
     namespace reflect {
+        function isComp(type: string): any;
         function getPrototypes(): {
             [id: string]: any;
         };
@@ -994,6 +995,7 @@ declare namespace gd3d.framework {
         onPlay(): void;
         update(delta: number): void;
         transform: transform2D;
+        pauseSlide: boolean;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         private isPointDown;
         private lastPoint;
@@ -1433,7 +1435,6 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class assetBundle {
         name: string;
-        private id;
         assetmgr: assetMgr;
         private files;
         private packages;
@@ -1452,13 +1453,10 @@ declare namespace gd3d.framework {
         load(assetmgr: assetMgr, onstate: (state: stateLoad) => void, state: stateLoad): void;
         private downloadFinsih;
         private CkNextHandleOfGuid;
-        static needParsing: boolean;
-        private static needParsesArr;
-        static startParseByUrl(url: string): boolean;
-        static preloadCompleteFun: Function;
-        private NextHandle;
         private NextHandleParsing;
-        private endWaitList;
+        private ReadyFinish;
+        private static addToWaitList;
+        private static endWaitList;
         private mapIsNull;
         mapNamed: {
             [name: string]: number;
@@ -1481,19 +1479,20 @@ declare namespace gd3d.framework {
         TextureDesc = 8,
         Mesh = 9,
         Prefab = 10,
-        Material = 11,
-        Aniclip = 12,
-        KeyFrameAniclip = 13,
-        Scene = 14,
-        Atlas = 15,
-        Font = 16,
-        TextAsset = 17,
-        PackBin = 18,
-        PackTxt = 19,
-        PathAsset = 20,
-        PVR = 21,
-        F14Effect = 22,
-        DDS = 23
+        cPrefab = 11,
+        Material = 12,
+        Aniclip = 13,
+        KeyFrameAniclip = 14,
+        Scene = 15,
+        Atlas = 16,
+        Font = 17,
+        TextAsset = 18,
+        PackBin = 19,
+        PackTxt = 20,
+        PathAsset = 21,
+        PVR = 22,
+        F14Effect = 23,
+        DDS = 24
     }
     class ResourceState {
         res: IAsset;
@@ -1586,7 +1585,9 @@ declare namespace gd3d.framework {
         getAssetsRefcount(): {
             [id: string]: number;
         };
-        private mapInLoad;
+        mapInLoad: {
+            [id: string]: stateLoad;
+        };
         removeAssetBundle(name: string): void;
         private assetUrlDic;
         setAssetUrl(asset: IAsset, url: string): void;
@@ -1749,6 +1750,13 @@ declare namespace gd3d.framework {
         loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: atlas, call: (handle: () => void) => void): void;
     }
 }
+declare namespace gd3d.framework {
+    class AssetFactory_cPrefab implements IAssetFactory {
+        newAsset(): prefab;
+        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: prefab, call: (handle: () => void) => void): void;
+        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: prefab, call: (handle: () => void) => void): void;
+    }
+}
 declare var WebGLTextureUtil: any;
 declare namespace gd3d.framework {
     class AssetFactory_DDS implements IAssetFactory {
@@ -1898,6 +1906,7 @@ declare namespace gd3d.framework {
         Parse(buf: ArrayBuffer): threading.gdPromise<any>;
         fps: number;
         loop: boolean;
+        hasScaled: boolean;
         readonly time: number;
         boneCount: number;
         bones: string[];
@@ -1915,9 +1924,10 @@ declare namespace gd3d.framework {
         static readonly ClassName: string;
         t: math.vector3;
         r: math.quaternion;
+        s: math.float;
         static caclByteLength(): number;
         Clone(): PoseBoneMatrix;
-        load(read: io.binReader): void;
+        load(read: io.binReader, hasScaled?: boolean): void;
         static createDefault(): PoseBoneMatrix;
         copyFrom(src: PoseBoneMatrix): void;
         copyFromData(src: Float32Array, seek: number): void;
@@ -2381,6 +2391,7 @@ declare namespace gd3d.framework {
         private readProcess;
         private readFinish;
         Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<unknown>;
+        parseCMesh(inData: any, webgl: any): void;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
         private _cacheMinP;
@@ -2438,6 +2449,7 @@ declare namespace gd3d.framework {
         private name;
         private id;
         defaultAsset: boolean;
+        isCab: boolean;
         constructor(assetName?: string);
         getName(): string;
         getGUID(): number;
@@ -2451,7 +2463,8 @@ declare namespace gd3d.framework {
         getCloneTrans2D(): transform2D;
         apply(trans: transform): void;
         jsonstr: string;
-        Parse(jsonStr: string, assetmgr: assetMgr): void;
+        Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<any>;
+        cParse(data: any, assetmgr: assetMgr): void;
     }
 }
 declare namespace gd3d.framework {
@@ -2470,7 +2483,7 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         resetLightMap(assetmgr: assetMgr): void;
         private lightmapData;
-        Parse(txt: string, assetmgr: assetMgr): void;
+        Parse(txt: string, assetmgr: assetMgr): Promise<void>;
         getSceneRoot(): transform;
         useLightMap(scene: scene): void;
         useFog(scene: scene): void;
@@ -4222,6 +4235,9 @@ declare namespace gd3d.io {
     function stringToUtf8Array(str: string): number[];
 }
 declare namespace gd3d.io {
+    function ndeSerialize<T extends framework.transform | framework.transform2D>(json: any, assetbundle: string, useAsset?: boolean): T;
+}
+declare namespace gd3d.io {
     enum SaveAssetType {
         FullUrl = 0,
         NameAndContent = 1,
@@ -4274,7 +4290,7 @@ declare namespace gd3d.io {
     class binReader {
         private _data;
         constructor(buf: ArrayBuffer, seek?: number);
-        private _seek;
+        _seek: number;
         seek(seek: number): void;
         peek(): number;
         length(): number;
@@ -6759,8 +6775,8 @@ declare namespace gd3d.framework {
 declare namespace gd3d.io {
     function xhrLoad(url: string, fun: (ContentData: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void, responseType: XMLHttpRequestResponseType, loadedFun: (req: XMLHttpRequest) => void): void;
     function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
-    function GetJSON(url: string, text?: string): any;
-    function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
+    function JSONParse(text: string): threading.gdPromise<any>;
+    function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): threading.gdPromise<unknown>;
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error, loadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
@@ -6882,7 +6898,7 @@ declare namespace gd3d.render {
         private static _maxVertexAttribArray;
         static SetMaxVertexAttribArray(webgl: WebGLRenderingContext, count: number): void;
         private static _texNumber;
-        static GetTextureNumber(webgl: WebGLRenderingContext, index: number): number;
+        static GetTextureNumber(index: number): number;
         static FUNC_ADD: number;
         static FUNC_SUBTRACT: number;
         static FUNC_REVERSE_SUBTRACT: number;

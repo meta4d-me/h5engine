@@ -133,12 +133,13 @@ namespace gd3d.framework
          * @param assetmgr 资源管理实例
          * @version gd3d 1.0
          */
-        Parse(txt: string, assetmgr: assetMgr)
+        async Parse(txt: string, assetmgr: assetMgr)
         {
             // return new threading.gdPromise((resolve) =>
             // {
 
-                let _json = JSON.parse(txt);
+                // let _json = JSON.parse(txt);
+                let _json = await io.JSONParse(txt);
                 this.rootNode = new transform();
                 this.rootNode.name = this.getName();
                 io.deSerialize(_json["rootNode"], this.rootNode, assetmgr, this.assetbundle);

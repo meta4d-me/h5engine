@@ -3,12 +3,12 @@
 window.onload = () =>
 {
     //gd system lib
-    gd3d.jsLoader.instance().addImportScript("lib/Reflect.js"); //微软反射库
-    gd3d.jsLoader.instance().addImportScript("lib/gd3d.js");
+    // gd3d.jsLoader.instance().addImportScript("lib/Reflect.js"); //微软反射库
+    // gd3d.jsLoader.instance().addImportScript("lib/gd3d.js");
 
 
-    //user code
-    gd3d.jsLoader.instance().addImportScript("lib_user/app.js");
+    // //user code
+    // gd3d.jsLoader.instance().addImportScript("lib_user/app.js");
 
     document.body.style.msUserSelect = "none";
     document.body.style.webkitUserSelect = "none";

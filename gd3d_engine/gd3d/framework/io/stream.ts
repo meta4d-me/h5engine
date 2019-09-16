@@ -13,7 +13,7 @@ namespace gd3d.io
             this._seek = seek;
             this._data = new DataView(buf, seek);
         }
-        private _seek: number;
+        public _seek: number;
 
 
         seek(seek: number)

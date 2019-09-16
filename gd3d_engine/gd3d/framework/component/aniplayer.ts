@@ -213,6 +213,11 @@ namespace gd3d.framework
             const bs = this._playClip.hasScaled
                 ? 8 // TODO: 8
                 : 7;
+            if(!this.curFrame) {
+                console.error(`frames of null on aniplayer.update() , framesIsNull :${this._playClip.frames == null } , GameObjectName: ${this.gameObject.getName()} , _playFrameid:${this._playFrameid} , clipName : ${this._playClip.getName()}`);
+                return;
+            }
+
             if (this._playClip.indexDic.len)
                 for (let bonename in this.carelist)
                 {

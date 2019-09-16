@@ -693,7 +693,7 @@ namespace gd3d.framework
                     return billboardType;
                 case "mesh":
                     let str: string = content;
-                    if (content.toString().indexOf(".mesh.bin") >= 0 && content.toString().indexOf(".mesh.json") >= 0)
+                    if (content.toString().indexOf(".mesh.bin") >= 0 || content.toString().indexOf(".cmesh.bin") >= 0)
                         return this.asMgr.getAssetByName(content) as mesh;
                     else
                         return this.asMgr.getDefaultMesh(content);

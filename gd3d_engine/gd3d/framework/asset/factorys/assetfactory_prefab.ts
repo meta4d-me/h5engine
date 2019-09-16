@@ -13,9 +13,9 @@ namespace gd3d.framework
             let filename = getFileName(url);
 
             state.resstate[filename] = new ResourceState();
-            if(state.resstateFirst==null)
+            if (state.resstateFirst == null)
             {
-                state.resstateFirst=state.resstate[filename];
+                state.resstateFirst = state.resstate[filename];
             }
             gd3d.io.loadText(url, (txt, err, isloadFail) =>
             {
@@ -24,15 +24,14 @@ namespace gd3d.framework
                     state.isloadFail = isloadFail ? true : false;
                     if (AssetFactoryTools.catchError(err, onstate, state))
                         return;
-
                     let _prefab = asset ? asset : new prefab(filename);
                     _prefab.assetbundle = bundlename;
-                    _prefab.Parse(txt, assetMgr);                  
-                    AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
-                    // _prefab.Parse(txt, assetMgr).then(() =>
-                    // {
-                    //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
-                    // });
+                    // _prefab.Parse(txt, assetMgr);
+                    // AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+                    return _prefab.Parse(txt, assetMgr).then(() =>
+                    {
+                        AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+                    });
                 });
 
 
@@ -48,24 +47,27 @@ namespace gd3d.framework
         {
             call(() =>
             {
-                let bundlename = getFileName(state.url);
-                let filename = getFileName(url);
+                
+                    let bundlename = getFileName(state.url);
+                    let filename = getFileName(url);
 
-                state.resstate[filename] = new ResourceState();
-                if(state.resstateFirst==null)
-                {
-                    state.resstateFirst=state.resstate[filename];
-                }
-                let txt = respack[filename];
-                let _prefab = asset ? asset : new prefab(filename);
-                _prefab.assetbundle = bundlename;
+                    state.resstate[filename] = new ResourceState();
+                    if (state.resstateFirst == null)
+                    {
+                        state.resstateFirst = state.resstate[filename];
+                    }
+                    let txt = respack[filename];
+                    let _prefab = asset ? asset : new prefab(filename);
+                    _prefab.assetbundle = bundlename;
 
-                // _prefab.Parse(txt, assetMgr).then(() =>
-                // {
-                //     AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
-                // });
-                _prefab.Parse(txt, assetMgr);
-                AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+                    return _prefab.Parse(txt, assetMgr).then(() =>
+                    {
+                        AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+                        
+                    });
+                    // await _prefab.Parse(txt, assetMgr);
+                    // AssetFactoryTools.useAsset(assetMgr, onstate, state, _prefab, url);
+                
             });
         }
     }

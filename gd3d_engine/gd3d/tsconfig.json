@@ -7,6 +7,13 @@
     "removeComments": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "outFile": "../lib/gd3d.js"
+    "outFile": "../lib/gd3d.js",
+    // "outFile": "C:/Users/qingruibin/Documents/CurDeveloper/jes/hungryshark_ubi/editor/server/public/1/hungryshark/lib/gd3d.js",
+    "lib": [
+      "es2015.promise",
+      "dom",
+      "es5",
+      "es2015.iterable"
+    ]
   }
 }

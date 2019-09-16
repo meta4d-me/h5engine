@@ -103,6 +103,7 @@ class main implements gd3d.framework.IUserCode
             demoList.addBtn("使用加载资源的Demo列表",()=>new UseAssetByLoadDemoList());
             demoList.addBtn("tesrtss",()=>new dome.testCJ());
             demoList.addBtn("表面贴花(弹痕)",()=>new test_Decal());
+            demoList.addBtn("test_01",()=>new test_01());  //屏幕拆分
             return new demoList();
         });
 

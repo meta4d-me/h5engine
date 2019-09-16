@@ -41,9 +41,8 @@ namespace gd3d.render
         }
         private static _texNumber: number[] = null;
 
-        static GetTextureNumber(webgl: WebGLRenderingContext, index: number): number
-        {
-            webglkit.initConst(webgl);
+        static GetTextureNumber(index: number): number
+        {            
             return webglkit._texNumber[index];
         }
         static FUNC_ADD: number;
