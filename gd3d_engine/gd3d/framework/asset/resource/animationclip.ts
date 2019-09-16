@@ -126,37 +126,13 @@ namespace gd3d.framework
          * @param buf buffer数组
          * @version gd3d 1.0
          */
-        Parse(buf: ArrayBuffer): threading.gdPromise<any>
+        Parse(buf: ArrayBuffer): threading.gdPromise<animationClip>
         {
-            // return new threading.gdPromise((resolve) =>
-            // {
-            //     threading.thread.Instance.Call("animiclipHandle", buf, (result) =>
-            //     {
-            //         // this.fps = math.Int16(result.fps);
-            //         // this.loop = Boolean(result.loop);
-            //         // this.boneCount = result.boneCount;
-
-            //         // this.bones = result.bones.slice();
-
-            //         // this.subclipCount = math.UInt16(result.subclipCount);
-            //         // this.subclips = null;
-            //         // this.subclips = result.subclips;
-            //         // this.frameCount = math.UInt16(result.frameCount);
-            //         // this.frames = {};
-            //         // for (let key in result.frames)
-            //         //     this.frames[key] = new Float32Array(result.frames[key]);
-            //         for(let key in result)
-            //             this[key] = result[key];
-            //         resolve();
-            //     });
-            // });
-
             return new threading.gdPromise((resolve) =>
             {
                 var read: gd3d.io.binReader = new gd3d.io.binReader(buf);
-
-                var _name = read.readStringAnsi();
-
+                // var _name =
+                read.readStringAnsi();
                 this.fps = read.readFloat();
                 const scaleMagic = read.readByte();
                 this.hasScaled = scaleMagic == 0xFA
@@ -218,7 +194,7 @@ namespace gd3d.framework
                     }
                     this.frames[_fid] = _frame;
                 }
-                resolve();
+                resolve(this);
             });
         }
 

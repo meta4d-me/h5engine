@@ -169,7 +169,7 @@ namespace gd3d.io
             return target;
         }
 
-        readUint8ArrayByOffset(target:Uint8Array, offset:number, length:number = 0): Uint8Array
+        readUint8ArrayByOffset(target: Uint8Array, offset: number, length: number = 0): Uint8Array
         {
             if (length < 0) length = target.length;
             for (var i = 0; i < length; i++)
@@ -202,6 +202,13 @@ namespace gd3d.io
         readBytes(target: Uint8Array = null, offset: number = 0, length: number = -1): Uint8Array
         {
             return this.readUint8Array(target, offset, length);
+        }
+
+        readBytesRef(length: number = 0): Uint8Array
+        {
+            let bytes = new Uint8Array(this._data.buffer.slice(this._seek, this._seek + length));
+            this._seek += length;
+            return bytes;
         }
 
         readUnsignedShort(): number

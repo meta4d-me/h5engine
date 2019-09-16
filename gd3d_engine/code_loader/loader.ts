@@ -52,11 +52,11 @@ window.onload = () =>
             //完成加载
             var gdapp = new gd3d.framework.application();
             var div = document.getElementById("drawarea") as HTMLDivElement;
-            gdapp.start(div,gd3d.framework.CanvasFixedType.FixedWidthType,720);
+            gdapp.start(div, gd3d.framework.CanvasFixedType.Free,720);
             //gdapp.showFps();
             gdapp.bePlay = true;
             gdapp.addUserCode("main");
-            
+
         }
         ,
         //进度变化

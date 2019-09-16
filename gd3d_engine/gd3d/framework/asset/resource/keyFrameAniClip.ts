@@ -129,7 +129,7 @@ namespace gd3d.framework {
          * @param jsonStr 动画json数据
          * @version gd3d 1.0
          */
-        Parse(jsonStr: string): void {
+        Parse(jsonStr: string) {
             let obj = JSON.parse(jsonStr);
             let tag = obj["tag"];
             this.length = obj["length"];
@@ -165,6 +165,7 @@ namespace gd3d.framework {
                 }
                 this.curves.push(curve);
             }
+            return this;
         }
 
         //总时长 /s

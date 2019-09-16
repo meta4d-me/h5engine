@@ -507,6 +507,9 @@ namespace gd3d.framework
             {
                 this._playFrameid = clipFrameCount - this._playFrameid - 1;
             }
+
+            //避免 _playFrameid 为负
+            this._playFrameid = this._playFrameid < 0 ? 0 : this._playFrameid;
         }
 
         private OnClipPlayEnd()
@@ -536,6 +539,7 @@ namespace gd3d.framework
 
         fillPoseData(data: Float32Array, bones: transform[]): void
         {
+            if(!this.curFrame || !bones || !data) return;
             if (!this.bePlay)
             {
                 if (this.beActived) return;

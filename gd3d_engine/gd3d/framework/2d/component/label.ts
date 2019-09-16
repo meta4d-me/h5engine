@@ -581,10 +581,10 @@ namespace gd3d.framework
             if(this._font) return;
             let assetmgr = this.transform.canvas.assetmgr; 
             let resName = this._fontName;
-            let temp = assetmgr.mapNamed[resName];
+            let temp = assetMgr.mapNamed[resName];
             if(temp == undefined){
                 resName = `${this._fontName}.font.json`
-                temp = assetmgr.mapNamed[resName];
+                temp = assetMgr.mapNamed[resName];
             }
             if(temp != null){
                 let tfont = assetmgr.getAssetByName(resName) as gd3d.framework.font;

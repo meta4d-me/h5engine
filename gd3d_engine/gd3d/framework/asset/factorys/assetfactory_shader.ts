@@ -1,85 +1,88 @@
 namespace gd3d.framework
 {
+    @assetF(AssetTypeEnum.Shader)
     export class AssetFactory_Shader implements IAssetFactory
     {
-        newAsset(): shader
-        {
-            return null;
-        }
+        //#region 废弃de参考代码
+        // newAsset(): shader
+        // {
+        //     return null;
+        // }
 
-        load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: shader, call: (handle: () => void) => void)
-        {
-            let filename = getFileName(url);
+        // load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: shader, call: (handle: () => void) => void)
+        // {
+        //     let filename = getFileName(url);
 
-            state.resstate[filename] = new ResourceState();
-            if(state.resstateFirst==null)
-            {
-                state.resstateFirst=state.resstate[filename];
-            }
-            gd3d.io.loadText(url,
-                (txt, err, isloadFail) =>
-                {
-                    call(() =>
-                    {
-                        state.isloadFail = isloadFail ? true : false;
-                        if (AssetFactoryTools.catchError(err, onstate, state))
-                            return;
+        //     state.resstate[filename] = new ResourceState();
+        //     if(state.resstateFirst==null)
+        //     {
+        //         state.resstateFirst=state.resstate[filename];
+        //     }
+        //     gd3d.io.loadText(url,
+        //         (txt, err, isloadFail) =>
+        //         {
+        //             call(() =>
+        //             {
+        //                 state.isloadFail = isloadFail ? true : false;
+        //                 if (AssetFactoryTools.catchError(err, onstate, state))
+        //                     return;
 
-                        var _shader = new shader(filename);
-                        // try
-                        // {
-                        //     _shader.parse(assetMgr, JSON.parse(txt));
-                        // }
-                        // catch (e)
-                        // {
-                        //     console.error("error  filename :" + filename);
-                        //     throw new Error("shader on parse");
-                        // }
-                        this.parseShader(_shader,assetMgr,txt,filename);
+        //                 var _shader = new shader(filename);
+        //                 // try
+        //                 // {
+        //                 //     _shader.parse(assetMgr, JSON.parse(txt));
+        //                 // }
+        //                 // catch (e)
+        //                 // {
+        //                 //     console.error("error  filename :" + filename);
+        //                 //     throw new Error("shader on parse");
+        //                 // }
+        //                 this.parseShader(_shader,assetMgr,txt,filename);
 
-                        assetMgr.setAssetUrl(_shader, url);
-                        assetMgr.mapShader[filename] = _shader;
-                        state.resstate[filename].state = 1;//完成
-                        onstate(state);
-                    });
-                },
-                (loadedLength, totalLength) =>
-                {
-                    AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
-                });
-        }
+        //                 assetMgr.setAssetUrl(_shader, url);
+        //                 assetMgr.mapShader[filename] = _shader;
+        //                 state.resstate[filename].state = 1;//完成
+        //                 onstate(state);
+        //             });
+        //         },
+        //         (loadedLength, totalLength) =>
+        //         {
+        //             AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
+        //         });
+        // }
 
-        loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: shader, call: (handle: () => void) => void)
-        {
-            call(() =>
-            {
-                let filename = getFileName(url);
-                let name = filename.substring(0, filename.indexOf("."));
+        // loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: shader, call: (handle: () => void) => void)
+        // {
+        //     call(() =>
+        //     {
+        //         let filename = getFileName(url);
+        //         let name = filename.substring(0, filename.indexOf("."));
 
-                state.resstate[filename] = new ResourceState();
-                if(state.resstateFirst==null)
-                {
-                    state.resstateFirst=state.resstate[filename];
-                }
-                let txt = respack[filename];
-                state.resstate[filename].state = 1;//完成
-                var _shader = new shader(filename);
-                // try
-                // {
-                //     _shader.parse(assetMgr, JSON.parse(txt));
-                // }
-                // catch (e)
-                // {
-                //     console.error("error  filename :" + filename);
-                //     throw new Error("shader on parse");
-                // }
-                this.parseShader(_shader,assetMgr,txt,filename);
+        //         state.resstate[filename] = new ResourceState();
+        //         if(state.resstateFirst==null)
+        //         {
+        //             state.resstateFirst=state.resstate[filename];
+        //         }
+        //         let txt = respack[filename];
+        //         state.resstate[filename].state = 1;//完成
+        //         var _shader = new shader(filename);
+        //         // try
+        //         // {
+        //         //     _shader.parse(assetMgr, JSON.parse(txt));
+        //         // }
+        //         // catch (e)
+        //         // {
+        //         //     console.error("error  filename :" + filename);
+        //         //     throw new Error("shader on parse");
+        //         // }
+        //         this.parseShader(_shader,assetMgr,txt,filename);
 
-                assetMgr.setAssetUrl(_shader, url);
-                assetMgr.mapShader[filename] = _shader;
-                onstate(state);
-            });
-        }
+        //         assetMgr.setAssetUrl(_shader, url);
+        //         assetMgr.mapShader[filename] = _shader;
+        //         onstate(state);
+        //     });
+        // }
+        //#endregion
 
         private TryParseMap = {};
         private parseShader(sd : shader , assetMgr: assetMgr , txt : string , filename : string){
@@ -94,11 +97,20 @@ namespace gd3d.framework
 
                 if( this.TryParseMap[filename]  < 3){  //可以尝试三次
                     this.TryParseMap[filename] ++;
-                    this.parseShader(sd,assetMgr,txt,filename);
+                    this.parseShader(sd,assetMgr,txt,filename);                    
                 }else{
                     throw new Error(`shader on parse , filename :${filename}   :\n${txt}` );
                 }
             }
+        }
+
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string)
+        {
+            var _shader = new shader(filename);
+            this.parseShader(_shader,assetmgr,txt,filename);            
+            // assetmgr.setAssetUrl(_shader, url);
+            assetmgr.mapShader[filename] = _shader;
+            return _shader;
         }
     }
 }
