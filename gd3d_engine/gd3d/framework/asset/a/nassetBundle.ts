@@ -237,11 +237,14 @@ namespace gd3d.framework
                 let ref = assetMgr.mapGuid[guid];
                 if (ref)
                     this.assetmgr.unuse(ref.asset, disposeNow);
+                else 
+                    delete assetMgr.mapLoading[guid];
             }
             delete this.assetmgr.guid_bundles[this.guid];
             delete this.assetmgr.name_bundles[this.name];
             delete this.assetmgr.kurl_bundles[this.keyUrl];
             delete assetMgr.mapBundleNamed[this.guid];
+            
         }
 
     }
