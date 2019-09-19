@@ -8342,6 +8342,8 @@ var gd3d;
                     var ref_1 = framework.assetMgr.mapGuid[guid];
                     if (ref_1)
                         this.assetmgr.unuse(ref_1.asset, disposeNow);
+                    else
+                        delete framework.assetMgr.mapLoading[guid];
                 }
                 delete this.assetmgr.guid_bundles[this.guid];
                 delete this.assetmgr.name_bundles[this.name];
