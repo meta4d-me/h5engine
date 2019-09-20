@@ -59,7 +59,7 @@ namespace gd3d.framework
         //#endregion
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string)
         {
-            return new atlas(filename).Parse(txt, assetmgr);
+            return new atlas(filename).Parse(txt, assetmgr, bundle.name);
         }
     }
 }

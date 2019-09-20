@@ -59,8 +59,8 @@ namespace gd3d.framework
         // }
         //#endregion
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string)
-        {            
-            return new font(filename).Parse(txt,assetmgr);
+        {
+            return new font(filename).Parse(txt, assetmgr, bundle.name);
         }
     }
 }

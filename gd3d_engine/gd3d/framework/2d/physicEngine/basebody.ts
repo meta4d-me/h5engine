@@ -151,7 +151,7 @@ namespace gd3d.framework {
                 }
                 this._bodyLocalMtx.rawData[4] = pos.x;
                 this._bodyLocalMtx.rawData[5] = pos.y;
-                
+
             }else{
                 this.enableBT = false;
             }
@@ -164,7 +164,7 @@ namespace gd3d.framework {
         isSleeping() {
             return this.body.isSleeping;
         }
-        
+
         /** 是否是静态
         * A flag that indicates whether a body is considered static. A static body can never change position or angle and is completely fixed.
         * If you need to set a body as static after its creation, you should use `Body.setStatic` as this requires more than just setting this flag.
@@ -182,14 +182,14 @@ namespace gd3d.framework {
 
         /**
          * 施加作用力
-         * @param Force 
+         * @param Force
          */
         addForce(Force: math.Ivec2) {
             this.physicsEngine.applyForceAtCenter(this.body, Force);
         }
         /**
          * 设置速度
-         * @param velocity 
+         * @param velocity
          */
         setVelocity(velocity: math.Ivec2) {
             this.physicsEngine.setVelocity(this.body, velocity);
@@ -197,7 +197,7 @@ namespace gd3d.framework {
 
         /**
          * 设置角速度
-         * @param velocity 
+         * @param velocity
          */
         setAngularVelocity(velocity: number) {
             this.physicsEngine.setAngularVelocity(this.body, velocity);
@@ -205,7 +205,7 @@ namespace gd3d.framework {
 
         /**
          * 设置密度
-         * @param Desity 
+         * @param Desity
          */
         setDensity(Desity: number) {
             this.physicsEngine.setDensity(this.body, Desity);
@@ -213,28 +213,28 @@ namespace gd3d.framework {
 
         /**
          * 设置空气摩擦力
-         * @param frictionAir 
+         * @param frictionAir
          */
         setFrictionAir(frictionAir: number) {
             this.body.frictionAir = frictionAir;
         }
         /**
          * 设置摩擦力
-         * @param friction 
+         * @param friction
          */
         setFriction(friction: number) {
             this.body.friction = friction;
         }
         /**
          * 设置静态摩擦力
-         * @param frictionStatic 
+         * @param frictionStatic
          */
         setFrictionStatic(frictionStatic: number) {
             this.body.frictionStatic = frictionStatic;
         }
         /**
          * 设置还原张力
-         * @param restitution 
+         * @param restitution
          */
         setRestitution(restitution: number) {
             this.body.restitution = restitution;
@@ -242,7 +242,7 @@ namespace gd3d.framework {
 
         /**
          * 设置质量
-         * @param mass 
+         * @param mass
          */
         setMass(mass: number) {
             this.physicsEngine.setMass(this.body, mass);
@@ -258,7 +258,7 @@ namespace gd3d.framework {
         }
 
         /**
-         * 设置位置 
+         * 设置位置
          * @param pos 位置vec2
          */
         setPosition(pos: math.Ivec2) {
@@ -320,7 +320,7 @@ namespace gd3d.framework {
         }
 
         /** 设置惯性值
-         * Sets the moment of inertia (i.e. second moment of area) of the body. 
+         * Sets the moment of inertia (i.e. second moment of area) of the body.
          * Inverse inertia is automatically updated to reflect the change. Mass is not changed.
          */
         public setInertia(Inertia: number) {
@@ -339,7 +339,7 @@ namespace gd3d.framework {
             this.physicsEngine.setVertices(this.body, vertices);
         }
 
-        /** 设置成员 
+        /** 设置成员
         * Sets the parts of the `body` and updates mass, inertia and centroid.
         * Each part will have its parent set to `body`.
         * By default the convex hull will be automatically computed and set on `body`, unless `autoHull` is set to `false.`
@@ -349,8 +349,8 @@ namespace gd3d.framework {
             this.physicsEngine.setParts(this.body, parts, autoHull);
         }
 
-        /** 设置中心点 
-        * Set the centre of mass of the body. 
+        /** 设置中心点
+        * Set the centre of mass of the body.
         * The `centre` is a vector in world-space unless `relative` is set, in which case it is a translation.
         * The centre of mass is the point the body rotates about and can be used to simulate non-uniform density.
         * This is equal to moving `body.position` but not the `body.vertices`.
@@ -363,7 +363,7 @@ namespace gd3d.framework {
         start (){
             if(this.onInit) this.onInit(this);
         }
-        
+
         update(delta: number) {
 
         }
@@ -390,7 +390,7 @@ namespace gd3d.framework {
 
         }
 
-        
+
         private lastPos = new math.vector2();
         private lastRot = 0;
         //设置物理的 旋转、位移
@@ -417,7 +417,7 @@ namespace gd3d.framework {
 
             this.setPositionByPhy( mPos );
             this.setAngleByPhy( mAngle );
-            
+
             //记录 before数据
             let bPos = this.body.position;
             gd3d.math.vec2Set(this.beforePos , bPos.x, bPos.y );

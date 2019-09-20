@@ -136,12 +136,11 @@ namespace gd3d.framework
         static mapGuid: { [key: number]: assetRef } = {};//解析好的资源
         static mapImage: { [key: number]: HTMLImageElement } = {};//图片缓存
         static mapNamed: { [key: string]: IAsset } = {};//资源名是 ,系统资源类型的名字 或自己定义的名字
+        static mapBundleNamed: { [key: number]: { [name: string]: assetRef } } = {};
+
         static noparseBundle: Array<assetBundle> = [];//未解析的资源包
 
-        static atonceParse: boolean = true;//是否立即解析
-        concurrent: number;//最大并发 不填不控制并发
-        execCount: number = 0;//当前并发数
-        watingQueue: Array<downloadBindType> = [];//等待队列
+        static atonceParse: boolean = true;//是否立即解析        
 
         name_bundles: { [key: string]: assetBundle } = {};
         kurl_bundles: { [key: string]: assetBundle } = {};
@@ -183,7 +182,7 @@ namespace gd3d.framework
             if (assetMgr.mapGuid[guid])//已下载的资源
             {
                 let state = new stateLoad();
-                state.bundle =  this.guid_bundles[guid] ;
+                state.bundle = this.guid_bundles[guid];
                 state.isfinish = true;
                 onstate(state);
                 return;
@@ -196,11 +195,11 @@ namespace gd3d.framework
                 if (type == AssetTypeEnum.Bundle)
                 {
                     let bundle = new assetBundle(url, this, guid);
+                    this.name_bundles[bundle.name] = this.kurl_bundles[keyUrl] = this.guid_bundles[bundle.guid] = bundle;
                     bundle.onReady = () =>
                     {
                         if (this.name_bundles[keyUrl])
                             console.warn(`assetbundle命名冲突:${keyUrl},${bundle.url}`);
-                        this.name_bundles[bundle.name] = this.kurl_bundles[keyUrl] =this.guid_bundles[bundle.guid] = bundle;
                         let state = new stateLoad();
                         state.bundle = bundle;
                         state.isfinish = true;
@@ -210,19 +209,19 @@ namespace gd3d.framework
                 } else
                 {
                     let filename = getFileName(url);
-                    const next = function (name, guid, type, dwguid?: number)
+                    const next = (name, guid, type, dwguid?: number) =>
                     {
-                        this.parseRes({ name, guid, type, dwguid }).then((asset:IAsset) =>
+                        this.parseRes({ name, guid, type, dwguid }).then((asset: IAsset) =>
                         {
                             //解析完毕
                             let state = new stateLoad();
                             state.isfinish = true;
-                            if(asset)
+                            if (asset)
                             {
-                                state.resstateFirst={
+                                state.resstateFirst = {
                                     res: asset,
-                                    state:0,
-                                    loadedLength:0
+                                    state: 0,
+                                    loadedLength: 0
                                 };
                             }
                             onstate(state);
@@ -241,7 +240,7 @@ namespace gd3d.framework
                         else
                             this.download(nguid, nurl, ntype, next.bind(this, filename, guid, type, nguid));//不一样的是这里带了一个需要下载的GUID
                     } else
-                        next.call(this,filename, guid, type);
+                        next.call(this, filename, guid, type);
 
                 }
             });
@@ -255,30 +254,20 @@ namespace gd3d.framework
                 return finish();
             else if (!loading)
                 assetMgr.mapLoading[guid] = loading = { readyok: false, url: url };
-            //并发上限放入等待队列
-            if (this.checkConcurrent())
-            {
-                this.watingQueue.push(this.download.bind(this, guid, url, type));
-                return;
-            }
+
             let repType: "text" | "arraybuffer" = calcReqType(type);
-            ++this.execCount;
+
             io.xhrLoad(url, (data, err) =>
             {
                 console.error(err.stack);
-                --this.execCount;
-                if (!this.checkConcurrent() && this.watingQueue.length > 0)
-                    this.watingQueue.shift().apply(null);
+
             }, () => { }, repType, (xhr) =>
-                {
-                    --this.execCount;
-                    let loading = assetMgr.mapLoading[guid];
-                    loading.readyok = true;
-                    loading.data = xhr.response;
-                    finish();
-                    if (!this.checkConcurrent() && this.watingQueue.length > 0)
-                        this.watingQueue.shift().apply(null);
-                });
+            {
+                let loading = assetMgr.mapLoading[guid];
+                loading.readyok = true;
+                loading.data = xhr.response;
+                finish();
+            });
         }
 
         //加载图片
@@ -310,13 +299,6 @@ namespace gd3d.framework
             img.onload = cb.bind(this, img);
         }
 
-        //检查并发
-        private checkConcurrent(): boolean
-        {
-            return this.concurrent && this.execCount >= this.concurrent;
-        }
-
-
         use(asset: IAsset)
         {
             let guid = asset.getGUID();
@@ -327,19 +309,34 @@ namespace gd3d.framework
                 ref.asset = asset;
                 ref.refcount = 1;
                 assetMgr.mapGuid[guid] = ref;
-                if (assetMgr.mapNamed[asset.getName()])
-                    console.warn(`资源命名冲突:${asset.getName()}`);
-                assetMgr.mapNamed[asset.getName()] = asset;
-                // delete assetMgr.mapLoading[guid];
+                if (asset.bundle)
+                {
+                    if (!assetMgr.mapBundleNamed[asset.bundle.guid])
+                    {
+                        assetMgr.mapBundleNamed[asset.bundle.guid] = {};
+                        assetMgr.mapBundleNamed[asset.bundle.guid][asset.getName()] = ref;
+                    } else
+                    {
+                        if (!assetMgr.mapBundleNamed[asset.bundle.guid][asset.getName()])
+                            assetMgr.mapBundleNamed[asset.bundle.guid][asset.getName()] = ref;
+                        else
+                            console.warn(`资源命名冲突:${asset.getName()}`);
+                    }
+                } else
+                {
+                    if (assetMgr.mapNamed[asset.getName()])
+                        console.warn(`资源命名冲突:${asset.getName()}`);
+                    assetMgr.mapNamed[asset.getName()] = asset;
+                }
             } else
                 ++ref.refcount;
         }
 
-        unuse(asset: IAsset, disposeNow: boolean = false)
+        unuse(asset: IAsset, disposeNow: boolean = true)
         {
             let guid = asset.getGUID();
             let assetref = assetMgr.mapGuid[guid];
-            if (disposeNow && assetref && assetref.refcount < 1)
+            if (disposeNow && assetref && --assetref.refcount < 1)
             {
                 delete assetMgr.mapGuid[guid];
                 delete assetMgr.mapLoading[asset.getGUID()];
@@ -370,6 +367,7 @@ namespace gd3d.framework
             {
                 if (bundle)
                     __asset["id"].id = asset.guid;
+                __asset.bundle = bundle;
                 this.use(__asset);
             }
             return __asset;
@@ -381,10 +379,10 @@ namespace gd3d.framework
         {
             if (bundlename)
             {
-                let bundle = this.kurl_bundles[bundlename]|| this.name_bundles[bundlename] ;
+                let bundle = this.kurl_bundles[bundlename] || this.name_bundles[bundlename];
                 if (bundle)
                 {
-                    let guid = bundle.files[name.replace(".prefab",".cprefab")];
+                    let guid = bundle.files[name.replace(".prefab", ".cprefab")];
                     if (guid && assetMgr.mapGuid[guid])
                         return assetMgr.mapGuid[guid].asset as T;
                 }
@@ -489,9 +487,9 @@ namespace gd3d.framework
         {
             return null;
         }
-        getAssetBundle(url: string)
+        getAssetBundle(url: string): assetBundle
         {
-            return null;
+            return this.name_bundles[url];
         }
         releaseUnuseAsset()
         {
@@ -510,7 +508,7 @@ namespace gd3d.framework
             let scene = this.app.getScene();
             if (sceneName.length > 0)
             {
-                var _rawscene: rawscene = this.getAssetByName(sceneName) as rawscene;
+                var _rawscene: rawscene = this.getAssetByName(sceneName, sceneName.replace(".scene.json", ".assetbundle.json")) as rawscene;
                 let willLoadRoot = _rawscene.getSceneRoot();
                 while (willLoadRoot.children.length > 0)
                 {

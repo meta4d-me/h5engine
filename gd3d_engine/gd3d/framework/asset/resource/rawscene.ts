@@ -103,7 +103,7 @@ namespace gd3d.framework
             let total = 0;
             return total;
         }
-        resetLightMap(assetmgr: assetMgr)
+        resetLightMap(assetmgr: assetMgr, bundleName: string = null)
         {
             this.lightmaps.length = 0;
             let lightmapCount = this.lightmapData.length;
@@ -116,7 +116,7 @@ namespace gd3d.framework
                 else
                 {
                     let lightmapName = this.lightmapData[i].name;
-                    let lightmap = assetmgr.getAssetByName(lightmapName) as texture;
+                    let lightmap = assetmgr.getAssetByName(lightmapName, bundleName) as texture;
                     if (lightmap)
                         lightmap.use();
                     this.lightmaps.push(lightmap);

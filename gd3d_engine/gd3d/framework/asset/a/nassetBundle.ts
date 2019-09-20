@@ -17,6 +17,8 @@ namespace gd3d.framework
 
         baseUrl: string;
 
+        keyUrl: string;
+
         guid: number; //bundle 的guid和普通资源的guid 是靠起始位置区分的        
 
         name: string;
@@ -29,14 +31,13 @@ namespace gd3d.framework
 
         ready: boolean;
 
-        subpkg;
-
         constructor(url: string, private assetmgr: assetMgr, guid?: number)
         {
             this.guid = guid || assetBundle.buildGuid();
             this.url = url;
             this.baseUrl = url.substring(0, url.lastIndexOf("/") + 1);
             this.name = url.substring(url.lastIndexOf("/") + 1);
+            this.keyUrl = url.replace(assetMgr.cdnRoot, "");
         }
         public static buildGuid()
         {
@@ -211,7 +212,6 @@ namespace gd3d.framework
                         continue;//已经解析好的资源不需要再解析
                     await this.assetmgr.parseRes(asset, this);
                 }
-
                 this.ready = true;
                 // console.log(`资源包:${this.name} 准备完毕. 解析耗时${Date.now() - time}/ms`);
             }
@@ -222,5 +222,30 @@ namespace gd3d.framework
                 this.onReady = null;
             }
         }
+
+        unload(disposeNow: boolean = false)
+        {
+            for (let k in this.files)
+            {
+                var ref = assetMgr.mapGuid[this.files[k]];
+                if (ref)
+                    this.assetmgr.unuse(ref.asset, disposeNow);
+            }
+            while (this.pkgsGuid.length > 0)
+            {
+                let guid = this.pkgsGuid.pop();
+                let ref = assetMgr.mapGuid[guid];
+                if (ref)
+                    this.assetmgr.unuse(ref.asset, disposeNow);
+                else 
+                    delete assetMgr.mapLoading[guid];
+            }
+            delete this.assetmgr.guid_bundles[this.guid];
+            delete this.assetmgr.name_bundles[this.name];
+            delete this.assetmgr.kurl_bundles[this.keyUrl];
+            delete assetMgr.mapBundleNamed[this.guid];
+            
+        }
+
     }
 }

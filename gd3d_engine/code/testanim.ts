@@ -7,6 +7,7 @@ class test_anim implements IState
     player: gd3d.framework.transform;
     cubes: { [id: string]: gd3d.framework.transform } = {};
     _assetMgr : gd3d.framework.assetMgr;
+    list = [];
     start(app: gd3d.framework.application)
     {
         console.log("i am here.");

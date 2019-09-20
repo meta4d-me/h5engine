@@ -8176,12 +8176,14 @@ var AlignType;
 var test_anim = (function () {
     function test_anim() {
         this.cubes = {};
+        this.list = [];
         this.timer = 0;
     }
     test_anim.prototype.start = function (app) {
         var _this = this;
         console.log("i am here.");
         this.app = app;
+        window['app'] = app;
         this.scene = this.app.getScene();
         this._assetMgr = this.app.getAssetMgr();
         var prefabObj = new gd3d.framework.transform();
@@ -8197,54 +8199,6 @@ var test_anim = (function () {
             lighttran.localTranslate.y = 3;
             lighttran.markDirty();
         }
-        var resName = "elong";
-        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
-            if (state.isfinish) {
-                _this.app.getAssetMgr().load("res/prefabs/" + resName + "/" + resName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                    if (s.isfinish) {
-                        var _prefab = _this.app.getAssetMgr().getAssetByName(resName + ".prefab.json");
-                        prefabObj = _prefab.getCloneTrans();
-                        _this.player = prefabObj;
-                        _this.scene.addChild(prefabObj);
-                        prefabObj.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
-                        prefabObj.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                        objCam.lookat(prefabObj);
-                        objCam.markDirty();
-                        var ap = prefabObj.gameObject.getComponent("aniplayer");
-                        var list = ap.awaitLoadClipNames();
-                        var resPath = "res/prefabs/" + resName + "/resources/";
-                        if (list.length > 0) {
-                            var cname_2 = list[1];
-                            ap.addClipByNameLoad(_this._assetMgr, resPath, cname_2, function (sta, clipName) {
-                                if (sta.isfinish) {
-                                    var clip = ap.getClip(cname_2);
-                                    ap.play(cname_2);
-                                }
-                            });
-                        }
-                        document.onkeydown = function (ev) {
-                        };
-                        var wingroot = prefabObj.find("Bip001 R Toe0");
-                        if (wingroot) {
-                            wingroot.gameObject.addComponent("asbone");
-                            var trans = new gd3d.framework.transform();
-                            trans.name = "cube11";
-                            var mesh = trans.gameObject.addComponent("meshFilter");
-                            var smesh = _this.app.getAssetMgr().getDefaultMesh("cube");
-                            mesh.mesh = smesh;
-                            var renderer = trans.gameObject.addComponent("meshRenderer");
-                            wingroot.addChild(trans);
-                            trans.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                            trans.localScale = new gd3d.math.vector3(0.3, 0.3, 0.3);
-                            renderer.materials = [];
-                            renderer.materials.push(new gd3d.framework.material());
-                            renderer.materials[0].setShader(_this.app.getAssetMgr().getShader("shader/def"));
-                        }
-                    }
-                });
-            }
-        });
-        this.cube = prefabObj;
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
         this.scene.addChild(objCam);
@@ -8254,6 +8208,66 @@ var test_anim = (function () {
         objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
         objCam.lookat(prefabObj);
         objCam.markDirty();
+        gd3d.framework.assetMgr.cdnRoot = "res/";
+        gd3d.framework.assetMgr.guidlistURL = "res/guidlist.json";
+        gd3d.framework.assetMgr.onGuidInit = function () {
+            var resName = "PF_Puffer";
+            _this.app.getAssetMgr().load("res/shader/MainShader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                if (state.isfinish) {
+                    _this.app.getAssetMgr().load("res/" + resName + "/" + resName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                        if (s.isfinish) {
+                            var _prefab = _this.app.getAssetMgr().getAssetByName(resName + ".prefab.json");
+                            prefabObj = _prefab.getCloneTrans();
+                            _this.player = prefabObj;
+                            _this.scene.addChild(prefabObj);
+                            prefabObj.localScale = new gd3d.math.vector3(50.2, 50.2, 50.2);
+                            prefabObj.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                            objCam.lookat(prefabObj);
+                            objCam.markDirty();
+                            var aps = prefabObj.gameObject.getComponentsInChildren("aniplayer");
+                            var ap = aps[0];
+                            var list_1 = ap.awaitLoadClipNames();
+                            var resPath_1 = "res/prefabs/" + resName + "/resources";
+                            var isloadedAllclip_1 = false;
+                            if (list_1.length > 0) {
+                                var len_1 = list_1.length;
+                                list_1.forEach(function (str) {
+                                    ap.addClipByNameLoad(_this._assetMgr, resPath_1, str, function () {
+                                        len_1--;
+                                        isloadedAllclip_1 = len_1 <= 0;
+                                    });
+                                });
+                            }
+                            document.onkeydown = function (ev) {
+                                if (!isloadedAllclip_1)
+                                    return;
+                                console.log("" + ev.code);
+                                var cname = list_1[ev.code.substr(5, 1)];
+                                ap.play(cname);
+                            };
+                            var wingroot = prefabObj.find("Bip001 R Toe0");
+                            if (wingroot) {
+                                wingroot.gameObject.addComponent("asbone");
+                                var trans = new gd3d.framework.transform();
+                                trans.name = "cube11";
+                                var mesh = trans.gameObject.addComponent("meshFilter");
+                                var smesh = _this.app.getAssetMgr().getDefaultMesh("cube");
+                                mesh.mesh = smesh;
+                                var renderer = trans.gameObject.addComponent("meshRenderer");
+                                wingroot.addChild(trans);
+                                trans.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                                trans.localScale = new gd3d.math.vector3(0.3, 0.3, 0.3);
+                                renderer.materials = [];
+                                renderer.materials.push(new gd3d.framework.material());
+                                renderer.materials[0].setShader(_this.app.getAssetMgr().getShader("shader/def"));
+                            }
+                        }
+                    });
+                }
+            });
+            _this.cube = prefabObj;
+        };
+        gd3d.framework.assetMgr.initGuidList();
     };
     test_anim.prototype.update = function (delta) {
         this.timer += delta;
@@ -8262,7 +8276,9 @@ var test_anim = (function () {
         var x2 = Math.sin(this.timer * 1.1);
         var z2 = Math.cos(this.timer * 1.1);
         var objCam = this.camera.gameObject.transform;
-        objCam.localTranslate = new gd3d.math.vector3(x2 * 5, 2.25, -z2 * 5);
+        objCam.localTranslate = new gd3d.math.vector3(x2 * 1, 0.25, -z2 * 1);
+        if (!this.cube)
+            return;
         objCam.lookat(this.cube);
         objCam.markDirty();
         objCam.updateWorldTran();
@@ -9760,17 +9776,17 @@ var test_multipleplayer_anim = (function () {
                         var ap_3 = _this.aniplayers[0];
                         var list = ap_3.awaitLoadClipNames();
                         var resPath = _this.resPath;
-                        var cname_3 = "";
+                        var cname_2 = "";
                         if (list.length > 0) {
-                            cname_3 = list[1];
-                            ap_3.addClipByNameLoad(_this.app.getAssetMgr(), resPath, cname_3, function (sta, clipName) {
+                            cname_2 = list[1];
+                            ap_3.addClipByNameLoad(_this.app.getAssetMgr(), resPath, cname_2, function (sta, clipName) {
                                 if (sta.isfinish) {
-                                    var clip_1 = ap_3.getClip(cname_3);
+                                    var clip_1 = ap_3.getClip(cname_2);
                                     _this.aniplayers.forEach(function (sub) {
                                         sub.addClip(clip_1);
                                     });
                                     _this.aniplayers.forEach(function (sub) {
-                                        sub.play(cname_3);
+                                        sub.play(cname_2);
                                     });
                                 }
                             });

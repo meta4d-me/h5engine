@@ -1423,6 +1423,7 @@ declare namespace gd3d.framework {
         getText(): string;
     }
     interface IAsset {
+        bundle?: assetBundle;
         defaultAsset: boolean;
         getName(): string;
         getGUID(): number;
@@ -1544,23 +1545,23 @@ declare namespace gd3d.framework {
         pkgsGuid: number[];
         url: string;
         baseUrl: string;
+        keyUrl: string;
         guid: number;
         name: string;
         dw_imgCount: number;
         dw_fileCount: number;
         onReady: () => void;
         ready: boolean;
-        subpkg: any;
         constructor(url: string, assetmgr: assetMgr, guid?: number);
         static buildGuid(): number;
         parseBundle(data: string): void;
         private unpkg;
         parseFile(): Promise<void>;
+        unload(disposeNow?: boolean): void;
     }
 }
 declare namespace gd3d.framework {
     type loadCallback = (state?: stateLoad) => void;
-    type downloadBindType = (guid: number, url: string, type: AssetTypeEnum, finish: () => void) => void;
     const assetParseMap: {
         [key: number]: IAssetFactory;
     };
@@ -1593,11 +1594,13 @@ declare namespace gd3d.framework {
         static mapNamed: {
             [key: string]: IAsset;
         };
+        static mapBundleNamed: {
+            [key: number]: {
+                [name: string]: assetRef;
+            };
+        };
         static noparseBundle: Array<assetBundle>;
         static atonceParse: boolean;
-        concurrent: number;
-        execCount: number;
-        watingQueue: Array<downloadBindType>;
         name_bundles: {
             [key: string]: assetBundle;
         };
@@ -1615,7 +1618,6 @@ declare namespace gd3d.framework {
         download(guid: number, url: string, type: AssetTypeEnum, finish: () => void): void;
         loadImg(guid: number, url: string, cb: (img: any) => void): void;
         protected _loadImg(url: string, cb: (img: any) => void): void;
-        private checkConcurrent;
         use(asset: IAsset): void;
         unuse(asset: IAsset, disposeNow?: boolean): void;
         parseRes(asset: {
@@ -1669,7 +1671,7 @@ declare namespace gd3d.framework {
         savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[], contents?: any[]) => void): void;
         loadCompressBundle(url: string, a?: any): void;
         loadImmediate(url: string): any;
-        getAssetBundle(url: string): any;
+        getAssetBundle(url: string): assetBundle;
         releaseUnuseAsset(): void;
         initDefAsset(): void;
         loadScene(sceneName: string, onComplete: (firstChilds: Array<transform>) => void): void;
@@ -1874,6 +1876,7 @@ declare namespace gd3d.framework {
         Parse(buf: ArrayBuffer): threading.gdPromise<animationClip>;
         fps: number;
         loop: boolean;
+        hasScaled: boolean;
         readonly time: number;
         boneCount: number;
         bones: string[];
@@ -1891,9 +1894,10 @@ declare namespace gd3d.framework {
         static readonly ClassName: string;
         t: math.vector3;
         r: math.quaternion;
+        s: math.float;
         static caclByteLength(): number;
         Clone(): PoseBoneMatrix;
-        load(read: io.binReader): void;
+        load(read: io.binReader, hasScaled?: boolean): void;
         static createDefault(): PoseBoneMatrix;
         copyFrom(src: PoseBoneMatrix): void;
         copyFromData(src: Float32Array, seek: number): void;
@@ -1936,7 +1940,7 @@ declare namespace gd3d.framework {
         sprites: {
             [id: string]: sprite;
         };
-        Parse(jsonStr: string, assetmgr: assetMgr): this;
+        Parse(jsonStr: string, assetmgr: assetMgr, bundleName?: string): this;
     }
 }
 declare namespace gd3d.framework {
@@ -1989,7 +1993,7 @@ declare namespace gd3d.framework {
         baseline: number;
         atlasWidth: number;
         atlasHeight: number;
-        Parse(jsonStr: string, assetmgr: assetMgr): this;
+        Parse(jsonStr: string, assetmgr: assetMgr, bundleName?: string): this;
     }
     class charinfo {
         x: number;
@@ -2212,7 +2216,7 @@ declare namespace gd3d.framework {
         queue: number;
         materials: material[];
         _player: aniplayer;
-        readonly player: aniplayer;
+        player: aniplayer;
         private _mesh;
         mesh: mesh;
         bones: transform[];
@@ -2447,7 +2451,7 @@ declare namespace gd3d.framework {
         use(): void;
         unuse(disposeNow?: boolean): void;
         caclByteLength(): number;
-        resetLightMap(assetmgr: assetMgr): void;
+        resetLightMap(assetmgr: assetMgr, bundleName?: string): void;
         private lightmapData;
         Parse(txt: string, assetmgr: assetMgr): threading.gdPromise<rawscene>;
         getSceneRoot(): transform;
@@ -3268,6 +3272,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class f14EffectSystem implements IRenderer {
+        private bundleName;
         static readonly ClassName: string;
         layer: RenderLayerEnum;
         renderLayer: number;
@@ -3284,7 +3289,8 @@ declare namespace gd3d.framework {
         f14eff: f14eff;
         private _delayTime;
         delay: number;
-        setData(data: F14EffectData): void;
+        setData(data: F14EffectData, bundleName: string): void;
+        constructor(bundleName: string);
         readonly root: transform;
         _root: transform;
         private elements;
@@ -3699,7 +3705,7 @@ declare namespace gd3d.framework {
         startFrame: number;
         endFrame: number;
         effect: f14EffectSystem;
-        constructor(effect: f14EffectSystem, layer: F14Layer);
+        constructor(effect: f14EffectSystem, layer: F14Layer, bundleName: string);
         RefEffect: f14EffectSystem;
         reset(): void;
         private refreshStartEndFrame;
