@@ -549,7 +549,7 @@ namespace gd3d.framework
 
         private lastCamMtx = new math.matrix();
         private lastCamRect = new math.rect();
-        private paraArr = [0, 0, 0];
+        private paraArr = [NaN , NaN, NaN , NaN , NaN];  // [fov,near,far,opvalue,size]
         /**
          * @private 计算相机框
          * @param app
@@ -559,14 +559,37 @@ namespace gd3d.framework
             let matrix = this.gameObject.transform.getWorldMatrix();
             let _vpp = math.pool.new_rect();
             this.calcViewPortPixel(app, _vpp);
+            let tOpval = Math.ceil(this._opvalue);
             //检查是否需要更新
             if (math.matrixEqual(this.lastCamMtx, matrix) && math.rectEqul(this.lastCamRect, _vpp) &&
-                this.paraArr[0] == this.fov && this.paraArr[1] == this.near && this.paraArr[2] == this.far)
+                this.paraArr[0] == this.fov && this.paraArr[1] == this._near && this.paraArr[2] == this._far)
             {
-                return;
+                //opvalue
+                if(this.paraArr[3] == tOpval && ( tOpval == 1 || this.paraArr[4] == this.size )){
+                    return;
+                }
             }
 
-            let near_h = this.near * Math.tan(this.fov * 0.5);
+            let needSize = tOpval == 0 ;
+
+            //同步last
+            math.matrixClone(matrix, this.lastCamMtx);
+            math.rectClone(_vpp, this.lastCamRect);
+            this.paraArr[0] = this.fov;
+            this.paraArr[1] = this._near;
+            this.paraArr[2] = this._far;
+            this.paraArr[3] = this._opvalue;
+            this.paraArr[4] = this.size;
+
+            let tanFov = Math.tan(this.fov * 0.5);
+            let nearSize = this.near * tanFov;
+            let farSize  = this.far  * tanFov;
+            //set size
+            if(needSize){
+                nearSize = farSize = this.size * 0.5;
+            }
+
+            let near_h = nearSize;
             let asp = _vpp.w / _vpp.h;
             let near_w = near_h * asp;
 
@@ -579,7 +602,7 @@ namespace gd3d.framework
             math.vec3Set(nearRT, near_w, near_h, this.near);
             math.vec3Set(nearRD, near_w, -near_h, this.near);
 
-            let far_h = this.far * Math.tan(this.fov * 0.5);
+            let far_h = farSize;
             let far_w = far_h * asp;
 
             let farLT = camera.helpv3_4;
@@ -608,12 +631,6 @@ namespace gd3d.framework
             math.vec3Clone(farRT, this.frameVecs[6]);
             math.vec3Clone(nearRT, this.frameVecs[7]);
 
-            //同步
-            math.matrixClone(matrix, this.lastCamMtx);
-            math.rectClone(_vpp, this.lastCamRect);
-            this.paraArr[0] = this.fov;
-            this.paraArr[1] = this.near;
-            this.paraArr[2] = this.far;
         }
         private matView: math.matrix = new math.matrix;
         private matProjP: math.matrix = new math.matrix;
@@ -723,11 +740,14 @@ namespace gd3d.framework
 
         private _fillRenderer(scene: scene, node: transform, _isStatic: boolean = false)
         {
-            if (!node.gameObject.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false)) return;  //自己没有渲染组件 且 子物体也没有 return
+            let go = node.gameObject;
+            if (!go || !go.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false)) return;  //自己没有渲染组件 且 子物体也没有 return
 
             // if (scene.app.isFrustumCulling && !this.testFrustumCulling(scene, node)) return;//视锥测试不通过 直接return
-            node.gameObject.isStatic = _isStatic || node.gameObject.isStatic;
+            go.isStatic = _isStatic || go.isStatic;
             const id = node.insId.getInsID();
+            let renderer = go.renderer;
+            let islayerPass = renderer != null? this.CullingMask & (1 << renderer.renderLayer) : false;
             if (node.dirtiedOfFrustumCulling || this.gameObject.transform.dirtiedOfFrustumCulling)
             {
                 if (this.needUpdateWpos)
@@ -735,27 +755,24 @@ namespace gd3d.framework
                     node.getWorldTranslate();
                 }
 
-                this.cullingMap[id] = node.enableCulling && this.isCulling(node);
+                this.cullingMap[id] = false;
+                if(islayerPass && node.enableCulling && scene.app.isFrustumCulling){
+                    this.cullingMap[id] = this.isCulling(node);
+                }
 
                 if (this.isLastCamera)
                     node.dirtiedOfFrustumCulling = false;
             }
 
-            if (node.gameObject != null && node.gameObject.renderer != null)
+            if (islayerPass && !this.cullingMap[id])  //判断加入到渲染列表
             {
-                if (scene.app.isFrustumCulling && !this.cullingMap[id])
-                {
-                    let _renderer = node.gameObject.renderer;
-                    if (this.CullingMask & (1 << _renderer.renderLayer))
-                    {  //层遮罩
-                        scene.renderList.addRenderer(_renderer);
-                    }
-                }
+                scene.renderList.addRenderer(renderer);
             }
+
             if (node.children)
             {
                 for (var i = 0, l = node.children.length; i < l; ++i)
-                    this._fillRenderer(scene, node.children[i], node.gameObject.isStatic);
+                    this._fillRenderer(scene, node.children[i], go.isStatic);
             }
             // if (node.children != null)
             // {

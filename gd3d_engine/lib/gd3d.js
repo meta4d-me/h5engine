@@ -7230,7 +7230,7 @@ var gd3d;
             physics2DBody.prototype.update = function (delta) {
             };
             physics2DBody.prototype.beforeStep = function () {
-                if (!this.body || this.body.isStatic)
+                if (!this.body)
                     return;
                 var tSca = this.transform.localScale;
                 if (!gd3d.math.vec2Equal(this.lastScale, tSca)) {
@@ -8509,9 +8509,16 @@ var gd3d;
                     else {
                         var filename = framework.getFileName(url);
                         var next = function (name, guid, type, dwguid) {
-                            this.parseRes({ name: name, guid: guid, type: type, dwguid: dwguid }).then(function () {
+                            this.parseRes({ name: name, guid: guid, type: type, dwguid: dwguid }).then(function (asset) {
                                 var state = new framework.stateLoad();
                                 state.isfinish = true;
+                                if (asset) {
+                                    state.resstateFirst = {
+                                        res: asset,
+                                        state: 0,
+                                        loadedLength: 0
+                                    };
+                                }
                                 onstate(state);
                             });
                         };
@@ -8527,7 +8534,7 @@ var gd3d;
                                 _this.download(nguid, nurl, ntype, next.bind(_this, filename, guid, type, nguid));
                         }
                         else
-                            next(filename, guid, type);
+                            next.call(_this, filename, guid, type);
                     }
                 });
             };
@@ -8636,7 +8643,7 @@ var gd3d;
                                         __asset["id"].id = asset.guid;
                                     this.use(__asset);
                                 }
-                                return [2];
+                                return [2, __asset];
                         }
                     });
                 });
@@ -14738,7 +14745,7 @@ var gd3d;
                 this.overlays = [];
                 this.lastCamMtx = new gd3d.math.matrix();
                 this.lastCamRect = new gd3d.math.rect();
-                this.paraArr = [0, 0, 0];
+                this.paraArr = [NaN, NaN, NaN, NaN, NaN];
                 this.matView = new gd3d.math.matrix;
                 this.matProjP = new gd3d.math.matrix;
                 this.matProjO = new gd3d.math.matrix;
@@ -14945,11 +14952,28 @@ var gd3d;
                 var matrix = this.gameObject.transform.getWorldMatrix();
                 var _vpp = gd3d.math.pool.new_rect();
                 this.calcViewPortPixel(app, _vpp);
+                var tOpval = Math.ceil(this._opvalue);
                 if (gd3d.math.matrixEqual(this.lastCamMtx, matrix) && gd3d.math.rectEqul(this.lastCamRect, _vpp) &&
-                    this.paraArr[0] == this.fov && this.paraArr[1] == this.near && this.paraArr[2] == this.far) {
-                    return;
+                    this.paraArr[0] == this.fov && this.paraArr[1] == this._near && this.paraArr[2] == this._far) {
+                    if (this.paraArr[3] == tOpval && (tOpval == 1 || this.paraArr[4] == this.size)) {
+                        return;
+                    }
                 }
-                var near_h = this.near * Math.tan(this.fov * 0.5);
+                var needSize = tOpval == 0;
+                gd3d.math.matrixClone(matrix, this.lastCamMtx);
+                gd3d.math.rectClone(_vpp, this.lastCamRect);
+                this.paraArr[0] = this.fov;
+                this.paraArr[1] = this._near;
+                this.paraArr[2] = this._far;
+                this.paraArr[3] = this._opvalue;
+                this.paraArr[4] = this.size;
+                var tanFov = Math.tan(this.fov * 0.5);
+                var nearSize = this.near * tanFov;
+                var farSize = this.far * tanFov;
+                if (needSize) {
+                    nearSize = farSize = this.size * 0.5;
+                }
+                var near_h = nearSize;
                 var asp = _vpp.w / _vpp.h;
                 var near_w = near_h * asp;
                 var nearLT = camera_1.helpv3;
@@ -14960,7 +14984,7 @@ var gd3d;
                 gd3d.math.vec3Set(nearLD, -near_w, -near_h, this.near);
                 gd3d.math.vec3Set(nearRT, near_w, near_h, this.near);
                 gd3d.math.vec3Set(nearRD, near_w, -near_h, this.near);
-                var far_h = this.far * Math.tan(this.fov * 0.5);
+                var far_h = farSize;
                 var far_w = far_h * asp;
                 var farLT = camera_1.helpv3_4;
                 var farLD = camera_1.helpv3_5;
@@ -14986,11 +15010,6 @@ var gd3d;
                 gd3d.math.vec3Clone(nearLT, this.frameVecs[5]);
                 gd3d.math.vec3Clone(farRT, this.frameVecs[6]);
                 gd3d.math.vec3Clone(nearRT, this.frameVecs[7]);
-                gd3d.math.matrixClone(matrix, this.lastCamMtx);
-                gd3d.math.rectClone(_vpp, this.lastCamRect);
-                this.paraArr[0] = this.fov;
-                this.paraArr[1] = this.near;
-                this.paraArr[2] = this.far;
             };
             Object.defineProperty(camera.prototype, "opvalue", {
                 get: function () {
@@ -15040,29 +15059,30 @@ var gd3d;
             };
             camera.prototype._fillRenderer = function (scene, node, _isStatic) {
                 if (_isStatic === void 0) { _isStatic = false; }
-                if (!node.gameObject.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false))
+                var go = node.gameObject;
+                if (!go || !go.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false))
                     return;
-                node.gameObject.isStatic = _isStatic || node.gameObject.isStatic;
+                go.isStatic = _isStatic || go.isStatic;
                 var id = node.insId.getInsID();
+                var renderer = go.renderer;
+                var islayerPass = renderer != null ? this.CullingMask & (1 << renderer.renderLayer) : false;
                 if (node.dirtiedOfFrustumCulling || this.gameObject.transform.dirtiedOfFrustumCulling) {
                     if (this.needUpdateWpos) {
                         node.getWorldTranslate();
                     }
-                    this.cullingMap[id] = node.enableCulling && this.isCulling(node);
+                    this.cullingMap[id] = false;
+                    if (islayerPass && node.enableCulling && scene.app.isFrustumCulling) {
+                        this.cullingMap[id] = this.isCulling(node);
+                    }
                     if (this.isLastCamera)
                         node.dirtiedOfFrustumCulling = false;
                 }
-                if (node.gameObject != null && node.gameObject.renderer != null) {
-                    if (scene.app.isFrustumCulling && !this.cullingMap[id]) {
-                        var _renderer = node.gameObject.renderer;
-                        if (this.CullingMask & (1 << _renderer.renderLayer)) {
-                            scene.renderList.addRenderer(_renderer);
-                        }
-                    }
+                if (islayerPass && !this.cullingMap[id]) {
+                    scene.renderList.addRenderer(renderer);
                 }
                 if (node.children) {
                     for (var i = 0, l = node.children.length; i < l; ++i)
-                        this._fillRenderer(scene, node.children[i], node.gameObject.isStatic);
+                        this._fillRenderer(scene, node.children[i], go.isStatic);
                 }
             };
             camera.prototype.isCulling = function (node) {

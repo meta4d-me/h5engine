@@ -1623,7 +1623,7 @@ declare namespace gd3d.framework {
             type: number;
             name: string;
             dwguid?: number;
-        }, bundle?: assetBundle): Promise<void>;
+        }, bundle?: assetBundle): Promise<void | IAsset>;
         getAssetByName<T extends IAsset>(name: string, bundlename?: string): T;
         mapDefaultMesh: {
             [id: string]: mesh;
