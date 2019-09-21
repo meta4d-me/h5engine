@@ -383,7 +383,7 @@ namespace gd3d.framework
                 if (bundle)
                 {
                     let guid = bundle.files[name.replace(".prefab", ".cprefab")];
-                    if (guid && assetMgr.mapGuid[guid])
+                    if (guid!=undefined && assetMgr.mapGuid[guid])
                         return assetMgr.mapGuid[guid].asset as T;
                 }
             }
