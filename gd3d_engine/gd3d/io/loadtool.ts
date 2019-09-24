@@ -53,14 +53,14 @@
         {
             if (fun)
                 fun(null, new Error(`URL : ${url} \n onerr on req: `));
-            loadFail(url, fun, onprocess, responseType, loadedFun);
+            loadFail(req, url, fun, onprocess, responseType, loadedFun);
         };
         req.onloadend = () =>
         {
             //console.error(" is onload");
             if (!isLoaded)
             {
-                loadFail(url, fun, onprocess, responseType, loadedFun);
+                loadFail(req, url, fun, onprocess, responseType, loadedFun);
             }
         };
 
@@ -73,9 +73,9 @@
         // }
     }
 
-    function loadFail(url, fun, onprocess, responseType, loadedFun)
+    function loadFail(xhr: XMLHttpRequest, url, fun, onprocess, responseType, loadedFun)
     {
-        console.error(`下载失败: ${url} , ${retryTime}/ms 后重试`);
+        console.error(`下载失败: ${url}  status:${xhr.status}, ${retryTime}/ms 后重试`);
         urlCaseDic[url] = urlCaseDic[url] || 0;
         if (urlCaseDic[url] >= retryCount)
         {
@@ -89,7 +89,6 @@
             {
                 urlCaseDic[url]++;
                 gd3d.io.xhrLoad(url, fun, onprocess, responseType, loadedFun);
-                
             }, retryTime);
         }
     }

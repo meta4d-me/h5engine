@@ -34553,18 +34553,18 @@ var gd3d;
             req.onerror = function (ev) {
                 if (fun)
                     fun(null, new Error("URL : " + url + " \n onerr on req: "));
-                loadFail(url, fun, onprocess, responseType, loadedFun);
+                loadFail(req, url, fun, onprocess, responseType, loadedFun);
             };
             req.onloadend = function () {
                 if (!isLoaded) {
-                    loadFail(url, fun, onprocess, responseType, loadedFun);
+                    loadFail(req, url, fun, onprocess, responseType, loadedFun);
                 }
             };
             req.send();
         }
         io.xhrLoad = xhrLoad;
-        function loadFail(url, fun, onprocess, responseType, loadedFun) {
-            console.error("\u4E0B\u8F7D\u5931\u8D25: " + url + " , " + retryTime + "/ms \u540E\u91CD\u8BD5");
+        function loadFail(xhr, url, fun, onprocess, responseType, loadedFun) {
+            console.error("\u4E0B\u8F7D\u5931\u8D25: " + url + "  status:" + xhr.status + ", " + retryTime + "/ms \u540E\u91CD\u8BD5");
             urlCaseDic[url] = urlCaseDic[url] || 0;
             if (urlCaseDic[url] >= retryCount) {
                 urlCaseDic[url] = 0;
