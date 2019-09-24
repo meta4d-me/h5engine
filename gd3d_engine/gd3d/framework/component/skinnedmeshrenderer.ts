@@ -72,7 +72,10 @@ namespace gd3d.framework
             }
             return this._player;
         }
-
+        set player(p:aniplayer)
+        {
+            this._player = p;
+        }
         private _mesh: mesh;
         /**
          * 返回mesh数据

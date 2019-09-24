@@ -2216,7 +2216,7 @@ declare namespace gd3d.framework {
         queue: number;
         materials: material[];
         _player: aniplayer;
-        readonly player: aniplayer;
+        player: aniplayer;
         private _mesh;
         mesh: mesh;
         bones: transform[];

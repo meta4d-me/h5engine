@@ -17,7 +17,7 @@ namespace gd3d.io
         if (is2d)
             coms = [];
         fullTrasn(json, root, gos, instMap, bundlename);
-        //先收集transform 再赋值gameobject 
+        //先收集transform 再赋值gameobject
         var god: { go: framework.gameObject, data: any };
         for (let i = 0, len = gos.length; i < len; ++i)
         {
@@ -129,8 +129,7 @@ namespace gd3d.io
                 {
                     //引用组件
                     let trans = instMap[prop.refid] as framework.transform;
-                    let comp = trans.gameObject.getComponent(prop.cls);
-                    comp[k] = comp;
+                    comp[k] = trans.gameObject.getComponent(prop.cls);
                 } else
                     comp[k] = instMap[prop.refid];
             }
@@ -143,7 +142,7 @@ namespace gd3d.io
     {
         if (!json.cls || baseType[json.cls])
             obj[key] = json;
-        else 
+        else
         {
             let ctor = gd3d.math[json.cls] || gd3d.framework[json.cls];
             let inst = new ctor();
@@ -177,7 +176,7 @@ namespace gd3d.io
             clip.bones = [];
             clip.subclips = [];
             asset = clip;
-        }        
+        }
         if (useAsset && asset)
             asset.use();
         return asset;
