@@ -8285,10 +8285,6 @@ var gd3d;
                         switch (_a.label) {
                             case 0:
                                 if (!!this.ready) return [3, 5];
-                                if (!framework.assetMgr.atonceParse) {
-                                    framework.assetMgr.noparseBundle.push(this);
-                                    return [2];
-                                }
                                 if (this.pkgs)
                                     this.unpkg();
                                 assets = [];

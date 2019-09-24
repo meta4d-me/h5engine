@@ -180,11 +180,11 @@ namespace gd3d.framework
         {
             if (!this.ready)
             {
-                if (!assetMgr.atonceParse)
-                {
-                    assetMgr.noparseBundle.push(this);
-                    return;
-                }
+                // if (!assetMgr.atonceParse)
+                // {
+                //     assetMgr.noparseBundle.push(this);
+                //     return;
+                // }
 
                 // let time = Date.now();
                 if (this.pkgs)//如果需要解包就解
