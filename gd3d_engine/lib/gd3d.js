@@ -34536,30 +34536,34 @@ var gd3d;
                     onprocess(ev.loaded, ev.total);
             };
             req.onerror = function (ev) {
-                fun(null, new Error("URL : " + url + " \n onerr on req: "));
+                if (fun)
+                    fun(null, new Error("URL : " + url + " \n onerr on req: "));
+                loadFail(url, fun, onprocess, responseType, loadedFun);
             };
             req.onloadend = function () {
                 if (!isLoaded) {
-                    var dic_1 = urlCaseDic;
-                    dic_1[url] = dic_1[url] || 0;
-                    if (dic_1[url] >= retryCount) {
-                        dic_1[url] = 0;
-                        if (fun)
-                            fun(null, new Error("load this url fail  ：" + url), true);
-                        console.error("------ load this url fail URL:" + url + "  ");
-                    }
-                    else {
-                        console.warn("\u4E0B\u8F7D\u5931\u8D25:" + url + "," + retryTime + "/ms \u540E\u91CD\u8BD5");
-                        setTimeout(function () {
-                            gd3d.io.xhrLoad(url, fun, onprocess, responseType, loadedFun);
-                            dic_1[url]++;
-                        }, retryTime);
-                    }
+                    loadFail(url, fun, onprocess, responseType, loadedFun);
                 }
             };
             req.send();
         }
         io.xhrLoad = xhrLoad;
+        function loadFail(url, fun, onprocess, responseType, loadedFun) {
+            console.error("\u4E0B\u8F7D\u5931\u8D25: " + url + " , " + retryTime + "/ms \u540E\u91CD\u8BD5");
+            urlCaseDic[url] = urlCaseDic[url] || 0;
+            if (urlCaseDic[url] >= retryCount) {
+                urlCaseDic[url] = 0;
+                if (fun)
+                    fun(null, new Error("load this url fail  ：" + url), true);
+                console.error("------ load this url fail URL:" + url + "  ");
+            }
+            else {
+                setTimeout(function () {
+                    urlCaseDic[url]++;
+                    gd3d.io.xhrLoad(url, fun, onprocess, responseType, loadedFun);
+                }, retryTime);
+            }
+        }
         function loadText(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
             gd3d.io.xhrLoad(url, fun, onprocess, "text", function (req) {

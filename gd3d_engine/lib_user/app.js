@@ -1255,6 +1255,10 @@ var main = (function () {
             demoList.addBtn("test_long", function () { return new demo.DragonTest(); });
             return new demoList();
         });
+        this.addBtn("Effect==>", function () {
+            demoList.addBtn("trail", function () { return new testEffectTrail(); });
+            return new demoList();
+        });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -1313,7 +1317,10 @@ var test_01 = (function () {
             var cube = new gd3d.framework.transform();
             cube.name = "cube";
             this.scene.addChild(cube);
-            this.testNRes(cube);
+            var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+            var mesh = cube.gameObject.addComponent("meshFilter");
+            mesh.mesh = (smesh);
+            var renderer = cube.gameObject.addComponent("meshRenderer");
         }
         {
         }
@@ -1417,6 +1424,16 @@ var test_01 = (function () {
         }); });
     };
     return test_01;
+}());
+var testEffectTrail = (function () {
+    function testEffectTrail() {
+    }
+    testEffectTrail.prototype.start = function (app) {
+        console.log("拖拽特效...");
+    };
+    testEffectTrail.prototype.update = function (delta) {
+    };
+    return testEffectTrail;
 }());
 var test_loadScene = (function () {
     function test_loadScene() {

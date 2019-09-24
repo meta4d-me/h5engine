@@ -18,7 +18,12 @@ class test_01 implements IState
             var cube = new gd3d.framework.transform();
             cube.name = "cube";
             this.scene.addChild(cube);
-            this.testNRes(cube);
+
+            var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+            var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+            mesh.mesh = (smesh);
+            var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+            // this.testNRes(cube);
 
 
             //目前材质是内置配置的，
@@ -61,12 +66,12 @@ class test_01 implements IState
         //     var renderer = this.cube2.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
         //     var collider = this.cube2.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
         //     {
-        //         var cube = new gd3d.framework.transform();
-        //         cube.name = "cubesub";
-        //         this.cube2.addChild(cube);
-        //         var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-        //         mesh.mesh = (smesh);
-        //         var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+        // var cube = new gd3d.framework.transform();
+        // cube.name = "cubesub";
+        // this.cube2.addChild(cube);
+        // var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+        // mesh.mesh = (smesh);
+        // var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
 
         //         cube.localTranslate.z = 1;
         //         cube.localScale.x = 0.5;
@@ -283,7 +288,7 @@ class test_01 implements IState
         {
             if (state.isfinish)
             {
-                
+
 
                 assetMgr.mapShader = this.app.getAssetMgr().mapShader;
                 // assetMgr.cdnRoot = cndroot;

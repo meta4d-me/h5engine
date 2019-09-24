@@ -51,34 +51,16 @@
         }
         req.onerror = (ev) =>
         {
-            fun(null, new Error(`URL : ${url} \n onerr on req: `));
+            if (fun)
+                fun(null, new Error(`URL : ${url} \n onerr on req: `));
+            loadFail(url, fun, onprocess, responseType, loadedFun);
         };
         req.onloadend = () =>
         {
             //console.error(" is onload");
             if (!isLoaded)
             {
-                //retry some times
-                // if (!loadRetryMgr.urlCaseDic) loadRetryMgr.urlCaseDic = {};
-                let dic = urlCaseDic;
-                // dic[url] = isNaN(dic[url]) || dic[url] < 0 ? 0 : dic[url];
-                dic[url] = dic[url] || 0;
-                if (dic[url] >= retryCount)
-                {
-                    dic[url] = 0;
-                    if (fun)
-                        fun(null, new Error("load this url fail  ：" + url), true);  //throw error after retry some times
-                    console.error(`------ load this url fail URL:${url}  `);
-                } else
-                {
-                    console.warn(`下载失败:${url},${retryTime}/ms 后重试`);
-                    setTimeout(() =>
-                    {
-                        gd3d.io.xhrLoad(url, fun, onprocess, responseType, loadedFun);
-                        dic[url]++;
-                    }, retryTime);
-                    //console.warn(` retryLoad URL:${url} \n times ${dic[url]} `);
-                }
+                loadFail(url, fun, onprocess, responseType, loadedFun);
             }
         };
 
@@ -91,6 +73,26 @@
         // }
     }
 
+    function loadFail(url, fun, onprocess, responseType, loadedFun)
+    {
+        console.error(`下载失败: ${url} , ${retryTime}/ms 后重试`);
+        urlCaseDic[url] = urlCaseDic[url] || 0;
+        if (urlCaseDic[url] >= retryCount)
+        {
+            urlCaseDic[url] = 0;
+            if (fun)
+                fun(null, new Error("load this url fail  ：" + url), true);  //throw error after retry some times
+            console.error(`------ load this url fail URL:${url}  `);
+        } else
+        {
+            setTimeout(() =>
+            {
+                urlCaseDic[url]++;
+                gd3d.io.xhrLoad(url, fun, onprocess, responseType, loadedFun);
+                
+            }, retryTime);
+        }
+    }
     /**
      * @public
      * @language zh_CN
