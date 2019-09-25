@@ -122,11 +122,11 @@
         getCloneTrans(): transform 
         {
 
-            // if (this.isCab)
-            // {
-            //     let t = io.ndeSerialize<transform>(this.jsonstr, this.assetbundle, true);
-            //     return t;
-            // }
+            if (this.isCab)
+            {
+                let t = io.ndeSerialize<transform>(this.jsonstr, this.assetbundle, true);
+                return t;
+            }
             let temp = io.cloneObj(this.trans);
             // if (temp instanceof transform)
             return temp;
@@ -141,11 +141,11 @@
          */
         getCloneTrans2D(): transform2D 
         {
-            // if (this.isCab)
-            // {
-            //     let t = io.ndeSerialize<transform2D>(this.jsonstr, this.assetbundle, true);
-            //     return t;
-            // }
+            if (this.isCab)
+            {
+                let t = io.ndeSerialize<transform2D>(this.jsonstr, this.assetbundle, true);
+                return t;
+            }
 
             let temp = io.cloneObj(this.trans);
             // if (temp instanceof transform2D)
@@ -212,7 +212,7 @@
                 this.trans = new transform;
             else
                 this.trans = new transform2D;
-                
+
             console.log(`cparse:${this.name.getText()}`);
             this.trans.addChild(io.ndeSerialize(data, this.assetbundle));
         }
