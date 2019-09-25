@@ -753,11 +753,13 @@ namespace gd3d.framework
                 if (this.needUpdateWpos)
                 { // 更新世界坐标
                     node.getWorldTranslate();
+                    node.inCameraVisible = false;
                 }
 
                 this.cullingMap[id] = false;
                 if(islayerPass && node.enableCulling && scene.app.isFrustumCulling){
                     this.cullingMap[id] = this.isCulling(node);
+                    node.inCameraVisible = node.inCameraVisible || !this.cullingMap[id];
                 }
 
                 if (this.isLastCamera)

@@ -71,6 +71,8 @@ namespace gd3d.framework
         private lastFrame: number = 0;
         public update(deltaTime: number, frame: number, fps: number)
         {
+            if(!this.effect.gameObject.transform.inCameraVisible)
+                return;
             //this.drawActive = true;
             this.TotalTime += deltaTime;
 
@@ -180,7 +182,12 @@ namespace gd3d.framework
         private bursts: number[] = [];
         private updateEmission()
         {
-            let needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime - this.newStartDataTime));
+            let maxLifeTime = this.baseddata.lifeTime.isRandom
+                ? this.baseddata.lifeTime._valueLimitMax
+                : this.baseddata.lifeTime._value;
+            var needCount = Math.floor(this.currentData.rateOverTime.getValue() * ((this.TotalTime - this.newStartDataTime) % maxLifeTime));
+
+            // let needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime - this.newStartDataTime));
             let realcount = needCount - this.numcount;
             if (realcount > 0)
             {

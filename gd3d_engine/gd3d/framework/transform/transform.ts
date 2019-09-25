@@ -460,6 +460,15 @@ namespace gd3d.framework
          * @public
          * @language zh_CN
          * @classdesc
+         * 是否在任意摄像机视野内
+         * @version gd3d 1.0
+         */
+        inCameraVisible = false;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
          * 当前物体视锥剔除开关
          * @version gd3d 1.0
          */
