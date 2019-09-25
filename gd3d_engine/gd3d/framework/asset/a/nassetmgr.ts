@@ -346,6 +346,8 @@ namespace gd3d.framework
 
         async parseRes(asset: { guid: number, type: number, name: string, dwguid?: number }, bundle?: assetBundle)
         {
+            if(assetMgr.mapGuid[asset.guid])
+                return assetMgr.mapGuid[asset.guid].asset;
             // let ctime = Date.now();
             let data = assetMgr.mapLoading[asset.guid].data;
             let factory = assetParseMap[asset.type];

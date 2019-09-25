@@ -76,14 +76,8 @@ namespace gd3d.framework
         {
             let asset = new prefab(filename);
             asset.assetbundle = bundle.name;
-            return new threading.gdPromise<prefab>((resolve) =>
-            {
-                io.JSONParse(txt).then((json) =>
-                {
-                    asset.cParse(json);
-                    resolve(asset);
-                });
-            });
+            asset.cParse(JSON.parse(txt));
+            return asset;            
         }
     }
 }

@@ -166,9 +166,9 @@ namespace gd3d.framework
 
             this.currentData.rateOverTime.getValue(true);//重新随机
 
-            if(this.settedAlpha!=null)
+            if (this.settedAlpha != null)
             {
-                this.currentData.startAlpha = new NumberData(this.baseddata.startAlpha._value*this.settedAlpha);
+                this.currentData.startAlpha = new NumberData(this.baseddata.startAlpha._value * this.settedAlpha);
             }
             // for (let i = 0; i < this.baseddata.bursts.length; i++)
             // {
@@ -212,6 +212,9 @@ namespace gd3d.framework
 
         private addParticle(count: number = 1)
         {
+            if (count > 150)
+                count = 150;
+
             for (let i = 0; i < count; i++)
             {
                 if (this.deadParticles.length > 0)
@@ -247,11 +250,11 @@ namespace gd3d.framework
             this.currentData.startAlpha = new NumberData(value.a);
         }
 
-        private settedAlpha:number;
-        changeAlpha(value:number)
+        private settedAlpha: number;
+        changeAlpha(value: number)
         {
-            this.currentData.startAlpha = new NumberData(this.baseddata.startAlpha._value*value);
-            this.settedAlpha=value;
+            this.currentData.startAlpha = new NumberData(this.baseddata.startAlpha._value * value);
+            this.settedAlpha = value;
         }
 
         OnEndOnceLoop()
