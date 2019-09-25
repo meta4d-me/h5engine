@@ -183,7 +183,7 @@ namespace gd3d.framework
         private updateEmission()
         {
             let maxLifeTime = this.baseddata.lifeTime.isRandom
-                ? this.baseddata.lifeTime._valueLimitMin
+                ? this.baseddata.lifeTime._valueLimitMax
                 : this.baseddata.lifeTime._value;
             var needCount = Math.floor(this.currentData.rateOverTime.getValue() * ((this.TotalTime - this.newStartDataTime) % maxLifeTime));
 
