@@ -1759,7 +1759,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AssetFactory_cPrefab implements IAssetFactory {
-        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): threading.gdPromise<prefab>;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): prefab;
     }
 }
 declare var WebGLTextureUtil: any;
@@ -2043,6 +2043,7 @@ declare namespace gd3d.framework {
         private _parent;
         readonly parent: transform;
         dirtiedOfFrustumCulling: boolean;
+        inCameraVisible: boolean;
         enableCulling: boolean;
         addChild(node: transform): void;
         addChildAt(node: transform, index: number): void;
@@ -2433,7 +2434,7 @@ declare namespace gd3d.framework {
         getCloneTrans2D(): transform2D;
         apply(trans: transform): void;
         jsonstr: string;
-        Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<any>;
+        Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<{}>;
         cParse(data: any): void;
     }
 }

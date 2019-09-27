@@ -8636,6 +8636,8 @@ var gd3d;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
+                                if (assetMgr.mapGuid[asset.guid])
+                                    return [2, assetMgr.mapGuid[asset.guid].asset];
                                 data = assetMgr.mapLoading[asset.guid].data;
                                 factory = framework.assetParseMap[asset.type];
                                 if (!factory) {
@@ -9311,12 +9313,8 @@ var gd3d;
             AssetFactory_cPrefab.prototype.parse = function (assetmgr, bundle, filename, txt) {
                 var asset = new framework.prefab(filename);
                 asset.assetbundle = bundle.name;
-                return new gd3d.threading.gdPromise(function (resolve) {
-                    gd3d.io.JSONParse(txt).then(function (json) {
-                        asset.cParse(json);
-                        resolve(asset);
-                    });
-                });
+                asset.cParse(JSON.parse(txt));
+                return asset;
             };
             AssetFactory_cPrefab = __decorate([
                 framework.assetF(framework.AssetTypeEnum.cPrefab)
@@ -10348,6 +10346,7 @@ var gd3d;
                 this._dirtyAABB = true;
                 this.children = [];
                 this.dirtiedOfFrustumCulling = false;
+                this.inCameraVisible = false;
                 this.enableCulling = true;
                 this.dirtyLocal = false;
                 this.dirtyWorld = false;
@@ -12618,6 +12617,7 @@ var gd3d;
                 });
             };
             mesh.prototype.parseCMesh = function (inData, webgl) {
+                console.log("parseCMesh:" + this.name.getText());
                 var data = new gd3d.render.meshData();
                 var read = new gd3d.io.binReader(inData);
                 data.originVF = read.readUInt16();
@@ -13074,27 +13074,29 @@ var gd3d;
                     return t;
                 }
                 var temp = gd3d.io.cloneObj(this.trans);
-                if (temp instanceof framework.transform2D)
-                    return temp;
+                return temp;
             };
             prefab.prototype.apply = function (trans) {
                 this.trans = trans;
             };
             prefab.prototype.Parse = function (jsonStr, assetmgr) {
                 var _this = this;
-                this.jsonstr = jsonStr;
-                return gd3d.io.JSONParse(jsonStr).then(function (jsonObj) {
-                    var type = jsonObj["type"];
-                    switch (type) {
-                        case "transform":
-                            _this.trans = new framework.transform;
-                            break;
-                        case "transform2D":
-                            _this.trans = new framework.transform2D;
-                            break;
-                    }
-                    if (type != null)
-                        gd3d.io.deSerialize(jsonObj, _this.trans, assetmgr, _this.assetbundle);
+                return new gd3d.threading.gdPromise(function (resolve) {
+                    _this.jsonstr = jsonStr;
+                    gd3d.io.JSONParse(jsonStr).then(function (jsonObj) {
+                        var type = jsonObj["type"];
+                        switch (type) {
+                            case "transform":
+                                _this.trans = new framework.transform;
+                                break;
+                            case "transform2D":
+                                _this.trans = new framework.transform2D;
+                                break;
+                        }
+                        if (type != null)
+                            gd3d.io.deSerialize(jsonObj, _this.trans, assetmgr, _this.assetbundle);
+                        resolve(_this);
+                    });
                 });
             };
             prefab.prototype.cParse = function (data) {
@@ -13103,6 +13105,7 @@ var gd3d;
                     this.trans = new framework.transform;
                 else
                     this.trans = new framework.transform2D;
+                console.log("cparse:" + this.name.getText());
                 this.trans.addChild(gd3d.io.ndeSerialize(data, this.assetbundle));
             };
             prefab.ClassName = "prefab";
@@ -15128,10 +15131,12 @@ var gd3d;
                 if (node.dirtiedOfFrustumCulling || this.gameObject.transform.dirtiedOfFrustumCulling) {
                     if (this.needUpdateWpos) {
                         node.getWorldTranslate();
+                        node.inCameraVisible = false;
                     }
                     this.cullingMap[id] = false;
                     if (islayerPass && node.enableCulling && scene.app.isFrustumCulling) {
                         this.cullingMap[id] = this.isCulling(node);
+                        node.inCameraVisible = node.inCameraVisible || !this.cullingMap[id];
                     }
                     if (this.isLastCamera)
                         node.dirtiedOfFrustumCulling = false;
@@ -18343,6 +18348,8 @@ var gd3d;
                 }
             }
             F14Emission.prototype.update = function (deltaTime, frame, fps) {
+                if (!this.effect.gameObject.transform.inCameraVisible)
+                    return;
                 this.TotalTime += deltaTime;
                 this.refreshByFrameData(fps);
                 this.updateLife();
@@ -18421,7 +18428,10 @@ var gd3d;
                 this.bursts = [];
             };
             F14Emission.prototype.updateEmission = function () {
-                var needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime - this.newStartDataTime));
+                var maxLifeTime = this.baseddata.lifeTime.isRandom
+                    ? this.baseddata.lifeTime._valueLimitMax
+                    : this.baseddata.lifeTime._value;
+                var needCount = Math.floor(this.currentData.rateOverTime.getValue() * ((this.TotalTime - this.newStartDataTime) % maxLifeTime));
                 var realcount = needCount - this.numcount;
                 if (realcount > 0) {
                     this.addParticle(realcount);
@@ -18441,6 +18451,8 @@ var gd3d;
             };
             F14Emission.prototype.addParticle = function (count) {
                 if (count === void 0) { count = 1; }
+                if (count > 150)
+                    count = 150;
                 for (var i = 0; i < count; i++) {
                     if (this.deadParticles.length > 0) {
                         var pp = this.deadParticles.pop();
@@ -18972,7 +18984,8 @@ var gd3d;
                 this.life01 = this.curLife / this.totalLife;
                 if (this.life01 > 1) {
                     this.actived = false;
-                    this.element.deadParticles.push(this);
+                    if (this.element.deadParticles.length < 150)
+                        this.element.deadParticles.push(this);
                     return;
                 }
                 this.updatePos();
@@ -34590,9 +34603,14 @@ var gd3d;
                 var cached = cachedMap[url];
                 cached.ready = true;
                 cached.useTime = Date.now();
-                JSONParse(text || cached.text).then(function (json) {
-                    r(json);
-                });
+                if (cached.json) {
+                    r(cached.json);
+                }
+                else {
+                    JSONParse(text || cached.text).then(function (json) {
+                        r(json);
+                    });
+                }
             });
         }
         function JSONParse(text) {
@@ -34654,6 +34672,8 @@ var gd3d;
                                 cached.queue.shift()(json, null);
                             else
                                 slowOut();
+                            cached.json = json;
+                            cached.text = "";
                         });
                     });
                 }
@@ -36447,8 +36467,6 @@ var gd3d;
             };
             meshData.prototype.genVertexDataArray = function (vf) {
                 var _this = this;
-                if (_this.tmpVArr)
-                    return _this.tmpVArr;
                 var vertexCount = _this.pos.length;
                 var total = meshData.calcByteSize(vf) / 4;
                 var varray = new Float32Array(total * vertexCount);
@@ -36617,8 +36635,6 @@ var gd3d;
                 return varray;
             };
             meshData.prototype.genIndexDataArray = function () {
-                if (this.tmpInxArr)
-                    return this.tmpInxArr;
                 return this.tmpInxArr = new Uint16Array(this.trisindex);
             };
             meshData.prototype.genIndexDataArrayTri2Line = function () {

@@ -1255,10 +1255,6 @@ var main = (function () {
             demoList.addBtn("test_long", function () { return new demo.DragonTest(); });
             return new demoList();
         });
-        this.addBtn("Effect==>", function () {
-            demoList.addBtn("trail", function () { return new testEffectTrail(); });
-            return new demoList();
-        });
     };
     main.prototype.addBtn = function (text, act) {
         var _this = this;
@@ -1424,16 +1420,6 @@ var test_01 = (function () {
         }); });
     };
     return test_01;
-}());
-var testEffectTrail = (function () {
-    function testEffectTrail() {
-    }
-    testEffectTrail.prototype.start = function (app) {
-        console.log("拖拽特效...");
-    };
-    testEffectTrail.prototype.update = function (delta) {
-    };
-    return testEffectTrail;
 }());
 var test_loadScene = (function () {
     function test_loadScene() {
