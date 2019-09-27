@@ -148,8 +148,8 @@
             }
 
             let temp = io.cloneObj(this.trans);
-            if (temp instanceof transform2D)
-                return temp;
+            // if (temp instanceof transform2D)
+            return temp;
         }
 
         /**
@@ -183,25 +183,26 @@
          */
         Parse(jsonStr: string, assetmgr: assetMgr)
         {
-            //    return new threading.gdPromise((resolve) =>
-            //     {
-            this.jsonstr = jsonStr;
-            return io.JSONParse(jsonStr).then((jsonObj) =>
+            return new threading.gdPromise((resolve) =>
             {
-                let type = jsonObj["type"];
-                switch (type)
+                this.jsonstr = jsonStr;
+                io.JSONParse(jsonStr).then((jsonObj) =>
                 {
-                    case "transform": this.trans = new transform; break;
-                    case "transform2D": this.trans = new transform2D; break;
-                }
+                    let type = jsonObj["type"];
+                    switch (type)
+                    {
+                        case "transform": this.trans = new transform; break;
+                        case "transform2D": this.trans = new transform2D; break;
+                    }
 
-                if (type != null)
-                    io.deSerialize(jsonObj, this.trans, assetmgr, this.assetbundle);
+                    if (type != null)
+                        io.deSerialize(jsonObj, this.trans, assetmgr, this.assetbundle);
+                    resolve(this);
+                });
+                // let jsonObj = JSON.parse(jsonStr);
+
+
             });
-            // let jsonObj = JSON.parse(jsonStr);
-
-            //     resolve();
-            // });
         }
 
         cParse(data: any)
@@ -211,6 +212,8 @@
                 this.trans = new transform;
             else
                 this.trans = new transform2D;
+
+            console.log(`cparse:${this.name.getText()}`);
             this.trans.addChild(io.ndeSerialize(data, this.assetbundle));
         }
     }

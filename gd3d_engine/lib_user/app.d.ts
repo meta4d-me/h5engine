@@ -156,6 +156,10 @@ declare class test_01 implements IState {
     private testPrefab;
     private testNRes;
 }
+declare class testEffectTrail implements IState {
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
 declare class test_loadScene implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;

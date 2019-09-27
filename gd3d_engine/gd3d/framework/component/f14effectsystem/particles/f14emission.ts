@@ -71,6 +71,8 @@ namespace gd3d.framework
         private lastFrame: number = 0;
         public update(deltaTime: number, frame: number, fps: number)
         {
+            if(!this.effect.gameObject.transform.inCameraVisible)
+                return;
             //this.drawActive = true;
             this.TotalTime += deltaTime;
 
@@ -166,9 +168,9 @@ namespace gd3d.framework
 
             this.currentData.rateOverTime.getValue(true);//重新随机
 
-            if(this.settedAlpha!=null)
+            if (this.settedAlpha != null)
             {
-                this.currentData.startAlpha = new NumberData(this.baseddata.startAlpha._value*this.settedAlpha);
+                this.currentData.startAlpha = new NumberData(this.baseddata.startAlpha._value * this.settedAlpha);
             }
             // for (let i = 0; i < this.baseddata.bursts.length; i++)
             // {
@@ -180,7 +182,12 @@ namespace gd3d.framework
         private bursts: number[] = [];
         private updateEmission()
         {
-            let needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime - this.newStartDataTime));
+            let maxLifeTime = this.baseddata.lifeTime.isRandom
+                ? this.baseddata.lifeTime._valueLimitMax
+                : this.baseddata.lifeTime._value;
+            var needCount = Math.floor(this.currentData.rateOverTime.getValue() * ((this.TotalTime - this.newStartDataTime) % maxLifeTime));
+
+            // let needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime - this.newStartDataTime));
             let realcount = needCount - this.numcount;
             if (realcount > 0)
             {
@@ -212,6 +219,9 @@ namespace gd3d.framework
 
         private addParticle(count: number = 1)
         {
+            if (count > 150)
+                count = 150;
+
             for (let i = 0; i < count; i++)
             {
                 if (this.deadParticles.length > 0)
@@ -247,11 +257,11 @@ namespace gd3d.framework
             this.currentData.startAlpha = new NumberData(value.a);
         }
 
-        private settedAlpha:number;
-        changeAlpha(value:number)
+        private settedAlpha: number;
+        changeAlpha(value: number)
         {
-            this.currentData.startAlpha = new NumberData(this.baseddata.startAlpha._value*value);
-            this.settedAlpha=value;
+            this.currentData.startAlpha = new NumberData(this.baseddata.startAlpha._value * value);
+            this.settedAlpha = value;
         }
 
         OnEndOnceLoop()

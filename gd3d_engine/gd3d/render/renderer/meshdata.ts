@@ -713,8 +713,8 @@
         genVertexDataArray(vf: VertexFormatMask): Float32Array
         {   
             var _this = this;
-            if (_this.tmpVArr)
-                return _this.tmpVArr;
+            // if (_this.tmpVArr)
+            //     return _this.tmpVArr;
             var vertexCount = _this.pos.length;
             var total = meshData.calcByteSize(vf) / 4;
             var varray = new Float32Array(total * vertexCount);
@@ -857,8 +857,8 @@
         }
         genIndexDataArray(): Uint16Array
         {
-            if (this.tmpInxArr)
-                return this.tmpInxArr;
+            // if (this.tmpInxArr)
+            //     return this.tmpInxArr;
             return this.tmpInxArr = new Uint16Array(this.trisindex);
         }
         genIndexDataArrayTri2Line(): Uint16Array

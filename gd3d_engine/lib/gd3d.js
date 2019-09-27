@@ -8285,10 +8285,6 @@ var gd3d;
                         switch (_a.label) {
                             case 0:
                                 if (!!this.ready) return [3, 5];
-                                if (!framework.assetMgr.atonceParse) {
-                                    framework.assetMgr.noparseBundle.push(this);
-                                    return [2];
-                                }
                                 if (this.pkgs)
                                     this.unpkg();
                                 assets = [];
@@ -8673,7 +8669,7 @@ var gd3d;
                     var bundle = this.kurl_bundles[bundlename] || this.name_bundles[bundlename];
                     if (bundle) {
                         var guid = bundle.files[name.replace(".prefab", ".cprefab")];
-                        if (guid && assetMgr.mapGuid[guid])
+                        if (guid != undefined && assetMgr.mapGuid[guid])
                             return assetMgr.mapGuid[guid].asset;
                     }
                 }
@@ -34551,30 +34547,34 @@ var gd3d;
                     onprocess(ev.loaded, ev.total);
             };
             req.onerror = function (ev) {
-                fun(null, new Error("URL : " + url + " \n onerr on req: "));
+                if (fun)
+                    fun(null, new Error("URL : " + url + " \n onerr on req: "));
+                loadFail(req, url, fun, onprocess, responseType, loadedFun);
             };
             req.onloadend = function () {
                 if (!isLoaded) {
-                    var dic_1 = urlCaseDic;
-                    dic_1[url] = dic_1[url] || 0;
-                    if (dic_1[url] >= retryCount) {
-                        dic_1[url] = 0;
-                        if (fun)
-                            fun(null, new Error("load this url fail  ：" + url), true);
-                        console.error("------ load this url fail URL:" + url + "  ");
-                    }
-                    else {
-                        console.warn("\u4E0B\u8F7D\u5931\u8D25:" + url + "," + retryTime + "/ms \u540E\u91CD\u8BD5");
-                        setTimeout(function () {
-                            gd3d.io.xhrLoad(url, fun, onprocess, responseType, loadedFun);
-                            dic_1[url]++;
-                        }, retryTime);
-                    }
+                    loadFail(req, url, fun, onprocess, responseType, loadedFun);
                 }
             };
             req.send();
         }
         io.xhrLoad = xhrLoad;
+        function loadFail(xhr, url, fun, onprocess, responseType, loadedFun) {
+            console.error("\u4E0B\u8F7D\u5931\u8D25: " + url + "  status:" + xhr.status + ", " + retryTime + "/ms \u540E\u91CD\u8BD5");
+            urlCaseDic[url] = urlCaseDic[url] || 0;
+            if (urlCaseDic[url] >= retryCount) {
+                urlCaseDic[url] = 0;
+                if (fun)
+                    fun(null, new Error("load this url fail  ：" + url), true);
+                console.error("------ load this url fail URL:" + url + "  ");
+            }
+            else {
+                setTimeout(function () {
+                    urlCaseDic[url]++;
+                    gd3d.io.xhrLoad(url, fun, onprocess, responseType, loadedFun);
+                }, retryTime);
+            }
+        }
         function loadText(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
             gd3d.io.xhrLoad(url, fun, onprocess, "text", function (req) {
