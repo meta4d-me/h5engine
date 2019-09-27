@@ -122,13 +122,17 @@
             let cached = cachedMap[url];
             cached.ready = true;
             cached.useTime = Date.now();
-            JSONParse(text || cached.text).then((json) =>
-            {
-                //cachedMap[url] = json;
-                // cached.json = json;                
-                r(json);
-            });
 
+            if(cached.json){
+                r(cached.json);
+            }else{
+                JSONParse(text || cached.text).then((json) =>
+                {
+                    //cachedMap[url] = json;
+                    // cached.json = json;                
+                    r(json);
+                });
+            }
         });
         // return JSONParse(text);
     }
@@ -218,6 +222,10 @@
                             cached.queue.shift()(json, null);
                         else
                             slowOut();
+
+                        //缓存成josn
+                        cached.json = json;
+                        cached.text = "";
                     });
                 });
             }
