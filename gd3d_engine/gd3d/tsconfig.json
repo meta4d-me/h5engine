@@ -7,8 +7,8 @@
     "removeComments": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    // "outFile": "../lib/gd3d.js",
-    "outFile": "D:/heziwen_/weChatGames/hungryshark_ubi/editor/server/public/1/hungryshark/lib/gd3d.js",
+    "outFile": "../lib/gd3d.js",
+    // "outFile": "D:/heziwen_/weChatGames/hungryshark_ubi/editor/server/public/1/hungryshark/lib/gd3d.js",
     "lib": [
       "es2015.promise",
       "dom",

@@ -8333,6 +8333,8 @@ var gd3d;
                     if (ref)
                         this.assetmgr.unuse(ref.asset, disposeNow);
                 }
+                for (var k in this.texs)
+                    delete framework.assetMgr.mapImage[this.texs[k]];
                 while (this.pkgsGuid.length > 0) {
                     var guid = this.pkgsGuid.pop();
                     var ref_1 = framework.assetMgr.mapGuid[guid];
