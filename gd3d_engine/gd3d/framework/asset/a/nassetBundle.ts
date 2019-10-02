@@ -231,6 +231,9 @@ namespace gd3d.framework
                 if (ref)
                     this.assetmgr.unuse(ref.asset, disposeNow);
             }
+            for (let k in this.texs)
+                delete assetMgr.mapImage[this.texs[k]];
+
             while (this.pkgsGuid.length > 0)
             {
                 let guid = this.pkgsGuid.pop();
@@ -244,6 +247,7 @@ namespace gd3d.framework
             delete this.assetmgr.name_bundles[this.name];
             delete this.assetmgr.kurl_bundles[this.keyUrl];
             delete assetMgr.mapBundleNamed[this.guid];
+            
             
         }
 
