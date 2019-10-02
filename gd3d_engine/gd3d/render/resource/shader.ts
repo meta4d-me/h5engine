@@ -171,14 +171,14 @@ namespace gd3d.render
         initUniforms(webgl: WebGLRenderingContext)
         {
             var numUniforms = webgl.getProgramParameter(this.program, webgl.ACTIVE_UNIFORMS);
-            for (var i = 0; i < numUniforms; i++) 
+            for (var i = 0; i < numUniforms; i++)
             {
                 var uniformInfo = webgl.getActiveUniform(this.program, i);
                 if (!uniformInfo) break;
 
                 var name = uniformInfo.name;
                 // remove the array suffix.
-                if (name.substr(-3) === "[0]") 
+                if (name.substr(-3) === "[0]")
                 {
                     name = name.substr(0, name.length - 3);
                 }
@@ -277,10 +277,10 @@ namespace gd3d.render
             webgl.compileShader(vs);
             var r1 = webgl.getShaderParameter(vs, webgl.COMPILE_STATUS);
             if (r1 == false)
-            {               
+            {
                 webgl.deleteShader(vs);
                 console.error(code);
-             
+
                 return null;
             }
             var s = new glShader(name, ShaderTypeEnum.VS, vs, code);
@@ -351,10 +351,16 @@ namespace gd3d.render
         mapVSString: { [id: string]: string } = {};
         mapFSString: { [id: string]: string } = {};
 
-        linkProgrambyPassType(webgl: WebGLRenderingContext, type: string, nameVS: string, nameFS: string): glProgram
+        linkProgrambyPassType(webgl: WebGLRenderingContext, type: string, nameVS: string, nameFS: string, globalMacros: string[]): glProgram
         {
             let vsStr = this.mapVSString[nameVS];
             let fsStr = this.mapFSString[nameFS];
+
+            // Handle global macros
+            for (let i = 0; i < globalMacros.length; i++) {
+                vsStr = `#define ${globalMacros[i]}\n${vsStr}`;
+                fsStr = `#define ${globalMacros[i]}\n${fsStr}`;
+            }
 
             if (type == "base")
             {

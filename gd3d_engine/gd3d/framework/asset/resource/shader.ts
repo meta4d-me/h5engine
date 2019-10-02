@@ -319,7 +319,7 @@ namespace gd3d.framework
             pass.setAlphaBlend(blendmode);
 
             //var program = assetmgr.shaderPool.linkProgram(assetmgr.webgl, vs, fs);
-            var program = assetmgr.shaderPool.linkProgrambyPassType(assetmgr.webgl,type,vs, fs);
+            var program = assetmgr.shaderPool.linkProgrambyPassType(assetmgr.webgl,type,vs, fs, assetmgr.app.globalMacros);
             pass.setProgram(program);
 
             if (this.layer == RenderLayerEnum.Overlay)

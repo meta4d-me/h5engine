@@ -60,6 +60,16 @@ namespace gd3d.framework
         container: HTMLDivElement;
         outcontainer: HTMLDivElement;
         edModel: boolean;
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 全局宏定义
+         * @version gd3d 1.0
+         */
+        readonly globalMacros: string[] = [];
+
         /**
          * @public
          * @language zh_CN
@@ -791,7 +801,7 @@ namespace gd3d.framework
                 }
             }
             // this._userCodeNew.length = 0;
-    
+
             //update logic
             var closeindex = -1;
             for (var i = 0; i < this._userCode.length; i++)
@@ -806,7 +816,7 @@ namespace gd3d.framework
                     closeindex = i;
                 }
             }
-    
+
             //remove closed
             if (closeindex >= 0)
             {
