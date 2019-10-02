@@ -21,6 +21,7 @@ declare namespace gd3d.framework {
         container: HTMLDivElement;
         outcontainer: HTMLDivElement;
         edModel: boolean;
+        readonly globalMacros: string[];
         readonly width: number;
         readonly height: number;
         limitFrame: boolean;
@@ -7124,7 +7125,7 @@ declare namespace gd3d.render {
         mapFSString: {
             [id: string]: string;
         };
-        linkProgrambyPassType(webgl: WebGLRenderingContext, type: string, nameVS: string, nameFS: string): glProgram;
+        linkProgrambyPassType(webgl: WebGLRenderingContext, type: string, nameVS: string, nameFS: string, globalMacros: string[]): glProgram;
     }
 }
 declare namespace gd3d.render {

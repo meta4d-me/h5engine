@@ -76,6 +76,7 @@ var gd3d;
         })(CanvasFixedType = framework.CanvasFixedType || (framework.CanvasFixedType = {}));
         var application = (function () {
             function application() {
+                this.globalMacros = [];
                 this.limitFrame = true;
                 this.version = "v0.0.1";
                 this.build = "b000077";
@@ -13443,7 +13444,7 @@ var gd3d;
                         break;
                 }
                 pass.setAlphaBlend(blendmode);
-                var program = assetmgr.shaderPool.linkProgrambyPassType(assetmgr.webgl, type, vs, fs);
+                var program = assetmgr.shaderPool.linkProgrambyPassType(assetmgr.webgl, type, vs, fs, assetmgr.app.globalMacros);
                 pass.setProgram(program);
                 if (this.layer == framework.RenderLayerEnum.Overlay) {
                     pass.state_ztest = true;
@@ -37002,9 +37003,13 @@ var gd3d;
                 this.mapProgram[name] = glp;
                 return glp;
             };
-            shaderPool.prototype.linkProgrambyPassType = function (webgl, type, nameVS, nameFS) {
+            shaderPool.prototype.linkProgrambyPassType = function (webgl, type, nameVS, nameFS, globalMacros) {
                 var vsStr = this.mapVSString[nameVS];
                 var fsStr = this.mapFSString[nameFS];
+                for (var i = 0; i < globalMacros.length; i++) {
+                    vsStr = "#define " + globalMacros[i] + "\n" + vsStr;
+                    fsStr = "#define " + globalMacros[i] + "\n" + fsStr;
+                }
                 if (type == "base") {
                 }
                 else if (type == "base_fog" || type == "fog") {
