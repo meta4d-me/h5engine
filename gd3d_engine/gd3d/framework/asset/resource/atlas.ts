@@ -183,6 +183,7 @@
             var s = <any[]>json["s"];
 
             this.texture = assetmgr.getAssetByName(name, bundleName) as gd3d.framework.texture;
+            
             if (this.texture == null)
             {
                 console.log("atlas的图片名字不对");
@@ -192,6 +193,7 @@
                 var ss = <any[]>s[i];
                 var spriteName = ss[0];
                 var r: sprite = new sprite(this.getName() + "_" + spriteName);//用Atlas的名字的Sprite的名字拼接
+                // r.bundle = assetmgr.name_bundles[bundleName];
                 assetmgr.use(r);
                 if (this.texture)
                 {
