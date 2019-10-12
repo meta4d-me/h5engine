@@ -18495,7 +18495,7 @@ var gd3d;
                 delete this.bursts;
                 for (var i = 0, len = this.particlelist.length; i < len; ++i)
                     this.particlelist[i].dispose();
-                for (var i = 0, len = this.particlelist.length; i < len; ++i)
+                for (var i = 0, len = this.deadParticles.length; i < len; ++i)
                     this.deadParticles[i].dispose();
             };
             return F14Emission;
