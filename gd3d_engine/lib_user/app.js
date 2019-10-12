@@ -5,10 +5,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -1309,14 +1310,11 @@ var test_01 = (function () {
         this.app = app;
         this.scene = this.app.getScene();
         var cuber;
+        this.testEffect();
         for (var i = 0; i < 1; i++) {
             var cube = new gd3d.framework.transform();
             cube.name = "cube";
             this.scene.addChild(cube);
-            var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
-            var mesh = cube.gameObject.addComponent("meshFilter");
-            mesh.mesh = (smesh);
-            var renderer = cube.gameObject.addComponent("meshRenderer");
         }
         {
         }
@@ -1327,7 +1325,8 @@ var test_01 = (function () {
             _this.camera = objCam.gameObject.addComponent("camera");
             _this.camera.near = 0.01;
             _this.camera.far = 100;
-            objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+            _this.camera.backgroundColor = new gd3d.math.color(0, 0, 0, 1);
+            objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
             objCam.lookat(cube);
             objCam.markDirty();
         }, 1000);
@@ -1418,6 +1417,22 @@ var test_01 = (function () {
                 return [2];
             });
         }); });
+    };
+    test_01.prototype.testEffect = function () {
+        var _this = this;
+        var assetMgr = this.app.getAssetMgr();
+        assetMgr.load("res/f14effprefab/customShader/customShader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+            if (state.isfinish) {
+                assetMgr.load("res/f14effprefab/fx_cs/fx_cs.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                    if (state.isfinish) {
+                        var prefab = assetMgr.getAssetByName("fx_cs.prefab.json", "fx_cs.assetbundle.json");
+                        var trans = prefab.getCloneTrans();
+                        trans.localEulerAngles = new gd3d.math.vector3(0, 90, 0);
+                        _this.scene.addChild(trans);
+                    }
+                });
+            }
+        });
     };
     return test_01;
 }());

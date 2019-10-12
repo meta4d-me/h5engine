@@ -22,10 +22,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -8206,6 +8207,8 @@ var gd3d;
                         var url = nameURL + extName;
                         var kurl = url.replace(framework.assetMgr.cdnRoot, "");
                         var guid = framework.assetMgr.urlmapGuid[kurl];
+                        if (!guid)
+                            guid = assetBundle.buildGuid();
                         this.pkgsGuid.push(guid);
                         this.assetmgr.download(guid, url, framework.calcType(url), function () {
                             ++dwpkgCount;
@@ -18351,8 +18354,6 @@ var gd3d;
                 }
             }
             F14Emission.prototype.update = function (deltaTime, frame, fps) {
-                if (!this.effect.gameObject.transform.inCameraVisible)
-                    return;
                 this.TotalTime += deltaTime;
                 this.refreshByFrameData(fps);
                 this.updateLife();
@@ -18431,10 +18432,7 @@ var gd3d;
                 this.bursts = [];
             };
             F14Emission.prototype.updateEmission = function () {
-                var maxLifeTime = this.baseddata.lifeTime.isRandom
-                    ? this.baseddata.lifeTime._valueLimitMax
-                    : this.baseddata.lifeTime._value;
-                var needCount = Math.floor(this.currentData.rateOverTime.getValue() * ((this.TotalTime - this.newStartDataTime) % maxLifeTime));
+                var needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime - this.newStartDataTime));
                 var realcount = needCount - this.numcount;
                 if (realcount > 0) {
                     this.addParticle(realcount);
@@ -18495,12 +18493,10 @@ var gd3d;
                 delete this.colorArr;
                 delete this.uvArr;
                 delete this.bursts;
-                for (var key in this.particlelist) {
-                    this.particlelist[key].dispose();
-                }
-                for (var key in this.deadParticles) {
-                    this.deadParticles[key].dispose();
-                }
+                for (var i = 0, len = this.particlelist.length; i < len; ++i)
+                    this.particlelist[i].dispose();
+                for (var i = 0, len = this.particlelist.length; i < len; ++i)
+                    this.deadParticles[i].dispose();
             };
             return F14Emission;
         }());

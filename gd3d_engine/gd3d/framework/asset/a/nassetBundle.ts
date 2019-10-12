@@ -71,6 +71,8 @@ namespace gd3d.framework
                     var url = nameURL + extName;
                     var kurl = url.replace(assetMgr.cdnRoot, "");
                     var guid = assetMgr.urlmapGuid[kurl];
+                    if(!guid)
+                        guid = assetBundle.buildGuid();
                     this.pkgsGuid.push(guid);
                     // console.log(`${this.name} 开始下载分包 ,guid:${guid},${url}`);
                     this.assetmgr.download(guid, url, calcType(url), () =>

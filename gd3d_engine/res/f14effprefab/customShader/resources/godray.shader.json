@@ -1,0 +1,38 @@
+{
+    "layer": "transparent",
+    "properties": [
+        "_MainTex('MainTex',Texture)='white'{}"
+    ],
+    "passes": {
+        "base": [
+            {
+                "blendmode": "add",
+                "zwrite": "off",
+                "ztest": "off",
+                "vs": "godray",
+                "fs": "godray"
+            }
+        ],
+        "base_fog": [
+            {
+                "blendmode": "add",
+                "zwrite": "off",
+                "ztest": "off",
+                "vs": "godray",
+                "fs": "godray"
+            }
+        ],
+        "skin": [
+            {
+                "vs": "godray",
+                "fs": "godray"
+            }
+        ],
+        "skin_fog": [
+            {
+                "vs": "godray",
+                "fs": "godray"
+            }
+        ]
+    }
+}
