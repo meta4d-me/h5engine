@@ -36,6 +36,8 @@ namespace gd3d.framework {
         colorArr: math.color[];
         uvArr: math.vector2[];
 
+        private frameGap: number;
+
         constructor(effect: f14EffectSystem, layer: F14Layer) {
             this.type = F14TypeEnum.particlesType;
             this.effect = effect;
@@ -69,6 +71,9 @@ namespace gd3d.framework {
             //     return;
             //this.drawActive = true;
             this.TotalTime += deltaTime;
+            if (this.frameGap == undefined) {
+                this.frameGap = 1/fps;
+            }
 
             this.refreshByFrameData(fps);
             this.updateLife();
@@ -159,13 +164,13 @@ namespace gd3d.framework {
 
         private bursts: number[] = [];
         private updateEmission() {
-            // let maxLifeTime = this.baseddata.lifeTime.isRandom
-            //     ? this.baseddata.lifeTime._valueLimitMax
-            //     : this.baseddata.lifeTime._value;
-            // var needCount = Math.floor(this.currentData.rateOverTime.getValue() * ((this.TotalTime - this.newStartDataTime) % maxLifeTime));
-            
-            var needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime - this.newStartDataTime));
-            
+            let maxLifeTime = this.baseddata.lifeTime.isRandom
+                ? this.baseddata.lifeTime._valueLimitMax
+                : this.baseddata.lifeTime._value;
+            var needCount = Math.floor(this.currentData.rateOverTime.getValue() * ((this.TotalTime - this.newStartDataTime) % (maxLifeTime + this.frameGap)));
+
+            // var needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime - this.newStartDataTime));
+
             let realcount = needCount - this.numcount;
             if (realcount > 0) {
                 this.addParticle(realcount);
@@ -248,10 +253,10 @@ namespace gd3d.framework {
             for (var i = 0, len = this.particlelist.length; i < len; ++i)
                 this.particlelist[i].dispose();
 
-            // for (let key in this.deadParticles) 
-            for (var i = 0, len = this.deadParticles.length; i < len; ++i)            
+            // for (let key in this.deadParticles)
+            for (var i = 0, len = this.deadParticles.length; i < len; ++i)
                 this.deadParticles[i].dispose();
-            
+
         }
     }
 
