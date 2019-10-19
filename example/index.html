@@ -184,6 +184,10 @@ async function main() {
     btn_handler = (e, value) => {
         switch(e.key) {
             case ' ':
+                if(value)
+                    isRunning = !isRunning;
+                break;
+            case 'f':
                 wasmBoy._btn_select(value);
                 break;
             case 'Enter':
