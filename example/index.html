@@ -16,7 +16,8 @@
 <body style="margin: 0; padding:0;">
     <canvas id="screen"></canvas>
 </body>
-    <script src="https://cdn.jsdelivr.net/npm/ashes3d/build/ashes.main.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/ashes3d/build/ashes.main.js"></script> -->
+    <script src="render/ashes.main.js"></script>
     <script src="build/wasmBoy.js"></script>
     <!-- <script src="build/wasmBoy-debug.js"></script> -->
     <script>
@@ -39,7 +40,7 @@ let CDN = 'https://but0n.github.io/Ashes/'
 // let [,cuspath,scale, yoffset, threshold, radiu, intensity] = [,,,,];
 
 let gltf = CDN + 'gltfsamples/BoomBox.glb';
-gltf = 'gameboy/scene.gltf';
+gltf = 'render/gameboy/scene.gltf';
 // gltf = 'roms/model/gameboychallenge/scene.gltf';
 
 // scale = 1;
@@ -86,7 +87,8 @@ async function main() {
     let screen = new Screen('#screen');
     screen.bgColor = [0.23,0.23,0.23, 1];
 
-    // let skybox = await Asset.loadCubemap('roms/envmap/GoldenGateBridge2/');
+    let skybox = await Asset.loadCubemap('render/env/helipad/', 'hdr');
+    let diffenv = await Asset.loadCubemap('render/env/helipad_diff/', 'hdr');
 
     let scene = EntityMgr.create('root - (Click each bar which has yellow border to toggle visible)');
     document.querySelector('body').appendChild(scene);
@@ -140,8 +142,10 @@ async function main() {
     quadMat.shader.macros['HAS_BASECOLOR_MAP'] = '';
     // Material.setTexture(quadMat, 'metallicRoughnessTexture', floor);
     // quadMat.shader.macros['HAS_METALLIC_ROUGHNESS_MAP'] = '';
-    // Material.setTexture(quadMat, 'env', skybox);
-    // quadMat.shader.macros['HAS_ENV_MAP'] = '';
+    Material.setTexture(quadMat, 'env', skybox);
+    quadMat.shader.macros['HAS_ENV_MAP'] = '';
+    Material.setTexture(quadMat, 'diffenv', diffenv);
+    quadMat.shader.macros['HAS_DIFFENV_MAP'] = '';
     const brdfurl = 'https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Viewer/master/assets/images/brdfLUT.png';
     let brdfLUT = await Asset.loadTexture(brdfurl, { minFilter: WebGL2RenderingContext.LINEAR });
     Material.setTexture(quadMat, 'brdfLUT', Texture.clone(brdfLUT));
@@ -171,7 +175,7 @@ async function main() {
     vec3.scale(quadtrans.scale, quadtrans.scale, 0.4765);
 
     // Load a gltf model
-    let gltfroot = await Asset.loadGLTF(gltf, screen, null);
+    let gltfroot = await Asset.loadGLTF(gltf, screen, skybox, diffenv);
     let root = gltfroot.components.Transform;
     vec3.scale(root.scale, root.scale, 0.2);
     root.translate[1] = -1;
@@ -187,7 +191,7 @@ async function main() {
                 if(value)
                     isRunning = !isRunning;
                 break;
-            case 'f':
+            case 's':
                 wasmBoy._btn_select(value);
                 break;
             case 'Enter':
