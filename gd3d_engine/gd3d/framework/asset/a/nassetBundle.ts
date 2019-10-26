@@ -28,7 +28,7 @@ namespace gd3d.framework
         dw_fileCount: number;
 
         onReady: () => void;
-
+        onDownloadFinish:()=>void;
         ready: boolean;
 
         constructor(url: string, private assetmgr: assetMgr, guid?: number)
@@ -180,6 +180,8 @@ namespace gd3d.framework
         //解析
         async parseFile()
         {
+            if(this.onDownloadFinish)
+                this.onDownloadFinish();
             if (!this.ready)
             {
                 // if (!assetMgr.atonceParse)

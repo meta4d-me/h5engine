@@ -22,11 +22,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -8288,6 +8287,8 @@ var gd3d;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
+                                if (this.onDownloadFinish)
+                                    this.onDownloadFinish();
                                 if (!!this.ready) return [3, 5];
                                 if (this.pkgs)
                                     this.unpkg();
@@ -8493,10 +8494,11 @@ var gd3d;
                         assetMgr.onGuidInit();
                 });
             };
-            assetMgr.prototype.load = function (url, type, onstate) {
+            assetMgr.prototype.load = function (url, type, onstate, downloadFinish) {
                 var _this = this;
                 if (type === void 0) { type = framework.AssetTypeEnum.Auto; }
                 if (onstate === void 0) { onstate = null; }
+                if (downloadFinish === void 0) { downloadFinish = null; }
                 var keyUrl = url.replace(assetMgr.cdnRoot, "");
                 var guid = assetMgr.urlmapGuid[keyUrl];
                 if (!guid) {
@@ -8526,6 +8528,7 @@ var gd3d;
                             state.isfinish = true;
                             onstate(state);
                         };
+                        bundle_1.onDownloadFinish = downloadFinish;
                         bundle_1.parseBundle(loading.data);
                     }
                     else {
@@ -18355,6 +18358,9 @@ var gd3d;
             }
             F14Emission.prototype.update = function (deltaTime, frame, fps) {
                 this.TotalTime += deltaTime;
+                if (this.frameGap == undefined) {
+                    this.frameGap = 1 / fps;
+                }
                 this.refreshByFrameData(fps);
                 this.updateLife();
                 for (var i = 0; i < this.particlelist.length; i++) {
@@ -18432,7 +18438,10 @@ var gd3d;
                 this.bursts = [];
             };
             F14Emission.prototype.updateEmission = function () {
-                var needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime - this.newStartDataTime));
+                var maxLifeTime = this.baseddata.lifeTime.isRandom
+                    ? this.baseddata.lifeTime._valueLimitMax
+                    : this.baseddata.lifeTime._value;
+                var needCount = Math.floor(this.currentData.rateOverTime.getValue() * ((this.TotalTime - this.newStartDataTime) % (maxLifeTime + this.frameGap)));
                 var realcount = needCount - this.numcount;
                 if (realcount > 0) {
                     this.addParticle(realcount);

@@ -167,7 +167,7 @@ namespace gd3d.framework
         //加载资源
         load(url: string, type: AssetTypeEnum = AssetTypeEnum.Auto,
             /** 这是解析完成的回调 */
-            onstate: loadCallback = null)
+            onstate: loadCallback = null,downloadFinish:()=>void=null)
         {
             let keyUrl = url.replace(assetMgr.cdnRoot, "");
             let guid = assetMgr.urlmapGuid[keyUrl];
@@ -205,6 +205,7 @@ namespace gd3d.framework
                         state.isfinish = true;
                         onstate(state);
                     };
+                    bundle.onDownloadFinish = downloadFinish;
                     bundle.parseBundle(loading.data);
                 } else
                 {
