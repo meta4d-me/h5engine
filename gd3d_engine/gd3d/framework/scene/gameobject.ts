@@ -177,8 +177,12 @@ namespace gd3d.framework
         componentTypes: { [key: string]: boolean } = {};
         private componentsInit: nodeComponent[] = [];
         // private componentsPlayed: nodeComponent[] = [];
+        /** 拥有组件 */
         haveComponet: boolean = false;
+        /** 需要初始化组件 */
         needInit:boolean = false;
+        /** 渲染组件初始化过 */
+        rendererInited : boolean = false;
         /**
          * @public
          * @language zh_CN
@@ -292,6 +296,9 @@ namespace gd3d.framework
                     let c = this.componentsInit[i];
                     c.comp.start();
                     c.init = true;
+                    if(c.comp == this.renderer){
+                        this.rendererInited = true;
+                    }
                     if (bePlay)
                     {
                         if ((StringUtil.ENABLED in c.comp) && !c.comp[StringUtil.ENABLED]) continue;  //组件enable影响
@@ -320,14 +327,18 @@ namespace gd3d.framework
                 let c = this.components[i];
                 if (!c) continue;
                 if (StringUtil.ENABLED in c.comp && !c.comp[StringUtil.ENABLED]) continue;
-                if (!c.OnPlayed)
+
+                if (!c.OnPlayed)   //还没有 调用 OnPlayed 
                 {
-                    c.comp.onPlay();
-                    c.OnPlayed = true;
+                    if(this.needInit) {     //识别为新增的组件 , 需要到下一帧被 init
+                        continue;   
+                    }else{
+                        c.comp.onPlay();   //运行时的 enabled 开启 后调用 onPlay()
+                        c.OnPlayed = true;
+                    }
                 }
                 if (c.comp.update)                
                     c.comp.update(delta);
-                
             }
         }
         /**
@@ -370,6 +381,7 @@ namespace gd3d.framework
                     this.renderer = comp as any;
                     // console.warn("add renderer:" + this.transform.name);
                     this.transform.markHaveRendererComp();
+                    this.rendererInited = false;
                 }
                 else
                 {
@@ -718,7 +730,10 @@ namespace gd3d.framework
             }
 
             if (comp == this.camera ) this.camera = null;
-            if (comp == this.renderer) this.renderer = null;
+            if (comp == this.renderer){
+                this.renderer = null;
+                this.rendererInited = false;
+            } 
             if (comp == this.light ) this.light = null;
             if (comp == (this.collider as any)) this.collider = null;
             comp.gameObject = null;
