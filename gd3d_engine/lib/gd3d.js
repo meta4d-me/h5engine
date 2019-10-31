@@ -8286,6 +8286,8 @@ var gd3d;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
+                                if (this.onDownloadFinish)
+                                    this.onDownloadFinish();
                                 if (!!this.ready) return [3, 5];
                                 if (this.pkgs)
                                     this.unpkg();
@@ -8491,10 +8493,11 @@ var gd3d;
                         assetMgr.onGuidInit();
                 });
             };
-            assetMgr.prototype.load = function (url, type, onstate) {
+            assetMgr.prototype.load = function (url, type, onstate, downloadFinish) {
                 var _this = this;
                 if (type === void 0) { type = framework.AssetTypeEnum.Auto; }
                 if (onstate === void 0) { onstate = null; }
+                if (downloadFinish === void 0) { downloadFinish = null; }
                 var keyUrl = url.replace(assetMgr.cdnRoot, "");
                 var guid = assetMgr.urlmapGuid[keyUrl];
                 if (!guid) {
@@ -8524,6 +8527,7 @@ var gd3d;
                             state.isfinish = true;
                             onstate(state);
                         };
+                        bundle_1.onDownloadFinish = downloadFinish;
                         bundle_1.parseBundle(loading.data);
                     }
                     else {

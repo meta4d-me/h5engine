@@ -1552,6 +1552,7 @@ declare namespace gd3d.framework {
         dw_imgCount: number;
         dw_fileCount: number;
         onReady: () => void;
+        onDownloadFinish: () => void;
         ready: boolean;
         constructor(url: string, assetmgr: assetMgr, guid?: number);
         static buildGuid(): number;
@@ -1615,7 +1616,7 @@ declare namespace gd3d.framework {
             [id: string]: shader;
         };
         static initGuidList(): void;
-        load(url: string, type?: AssetTypeEnum, onstate?: loadCallback): void;
+        load(url: string, type?: AssetTypeEnum, onstate?: loadCallback, downloadFinish?: () => void): void;
         download(guid: number, url: string, type: AssetTypeEnum, finish: () => void): void;
         loadImg(guid: number, url: string, cb: (img: any) => void): void;
         protected _loadImg(url: string, cb: (img: any) => void): void;
