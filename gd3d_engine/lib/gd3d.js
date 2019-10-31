@@ -22,11 +22,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -3005,20 +3004,19 @@ var gd3d;
             };
             transform2D.prototype.init = function (bePlay) {
                 if (bePlay === void 0) { bePlay = false; }
-                if (this.componentsInit.length > 0) {
-                    var len = this.componentsInit.length;
-                    for (var i = 0; i < len; i++) {
-                        var c = this.componentsInit[i];
-                        c.comp.start();
-                        c.init = true;
-                        if (bePlay) {
-                            if ((framework.StringUtil.ENABLED in c.comp) && !c.comp[framework.StringUtil.ENABLED])
-                                continue;
-                            c.comp.onPlay();
-                            c.OnPlayed = true;
-                        }
+                var comps = this.componentsInit;
+                if (comps.length <= 0)
+                    return;
+                while (comps.length > 0) {
+                    var c = comps.shift();
+                    c.comp.start();
+                    c.init = true;
+                    if (bePlay) {
+                        if ((framework.StringUtil.ENABLED in c.comp) && !c.comp[framework.StringUtil.ENABLED])
+                            continue;
+                        c.comp.onPlay();
+                        c.OnPlayed = true;
                     }
-                    this.componentsInit.length = 0;
                 }
             };
             transform2D.prototype.addComponent = function (type) {
@@ -18355,6 +18353,9 @@ var gd3d;
             }
             F14Emission.prototype.update = function (deltaTime, frame, fps) {
                 this.TotalTime += deltaTime;
+                if (this.frameGap == undefined) {
+                    this.frameGap = 1 / fps;
+                }
                 this.refreshByFrameData(fps);
                 this.updateLife();
                 for (var i = 0; i < this.particlelist.length; i++) {
@@ -18432,7 +18433,10 @@ var gd3d;
                 this.bursts = [];
             };
             F14Emission.prototype.updateEmission = function () {
-                var needCount = Math.floor(this.currentData.rateOverTime.getValue() * (this.TotalTime - this.newStartDataTime));
+                var maxLifeTime = this.baseddata.lifeTime.isRandom
+                    ? this.baseddata.lifeTime._valueLimitMax
+                    : this.baseddata.lifeTime._value;
+                var needCount = Math.floor(this.currentData.rateOverTime.getValue() * ((this.TotalTime - this.newStartDataTime) % (maxLifeTime + this.frameGap)));
                 var realcount = needCount - this.numcount;
                 if (realcount > 0) {
                     this.addParticle(realcount);
@@ -31121,22 +31125,21 @@ var gd3d;
             };
             gameObject.prototype.init = function (bePlay) {
                 if (bePlay === void 0) { bePlay = false; }
-                if (this.componentsInit.length > 0) {
-                    var len = this.componentsInit.length;
-                    for (var i = 0; i < len; i++) {
-                        var c = this.componentsInit[i];
-                        c.comp.start();
-                        c.init = true;
-                        if (bePlay) {
-                            if ((framework.StringUtil.ENABLED in c.comp) && !c.comp[framework.StringUtil.ENABLED])
-                                continue;
-                            c.comp.onPlay();
-                            c.OnPlayed = true;
-                        }
+                var comps = this.componentsInit;
+                if (comps.length <= 0)
+                    return;
+                while (comps.length > 0) {
+                    var c = comps.shift();
+                    c.comp.start();
+                    c.init = true;
+                    if (bePlay) {
+                        if ((framework.StringUtil.ENABLED in c.comp) && !c.comp[framework.StringUtil.ENABLED])
+                            continue;
+                        c.comp.onPlay();
+                        c.OnPlayed = true;
                     }
-                    this.componentsInit.length = 0;
-                    this.needInit = false;
                 }
+                this.needInit = false;
             };
             gameObject.prototype.update = function (delta) {
                 var len = this.components.length;

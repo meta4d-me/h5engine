@@ -747,7 +747,7 @@ namespace gd3d.framework
             go.isStatic = _isStatic || go.isStatic;
             const id = node.insId.getInsID();
             let renderer = go.renderer;
-            let islayerPass = renderer != null && go.rendererInited ? this.CullingMask & (1 << renderer.renderLayer) : false;
+            let islayerPass = renderer != null? this.CullingMask & (1 << renderer.renderLayer) : false;
             if (node.dirtiedOfFrustumCulling || this.gameObject.transform.dirtiedOfFrustumCulling)
             {
                 if (this.needUpdateWpos)

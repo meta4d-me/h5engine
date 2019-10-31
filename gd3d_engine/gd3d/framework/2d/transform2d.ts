@@ -902,31 +902,21 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         init(bePlay = false) {
-            if(this.componentsInit.length>0)
-            {
-                let len = this.componentsInit.length;
-                for(var i=0; i< len ; i++)
+
+            let comps = this.componentsInit;
+            if(comps.length <= 0 ) return;
+
+            while(comps.length > 0){    //这里不要再改回 for循环 , 当组件init 时添加其他组件时，会造成问题
+                let c = comps.shift();
+                c.comp.start();
+                c.init = true;
+                if (bePlay)
                 {
-                    let c = this.componentsInit[i];
-                    c.comp.start();
-                    c.init = true;
-                    if(bePlay){
-                        if((StringUtil.ENABLED in c.comp) && !c.comp[StringUtil.ENABLED]) continue;  //组件enable影响
-                        c.comp.onPlay();
-                        c.OnPlayed = true;
-                    }
-                    //     c.comp.onPlay();
-                    // else
-                    //     this.componentplayed.push(c);
+                    if ((StringUtil.ENABLED in c.comp) && !c.comp[StringUtil.ENABLED]) continue;  //组件enable影响
+                    c.comp.onPlay();
+                    c.OnPlayed = true;
                 }
-                this.componentsInit.length=0;
             }
-            // if(this.componentplayed.length > 0 && bePlay){
-            //     this.componentplayed.forEach(item=>{
-            //         item.comp.onPlay();
-            //     });
-            //     this.componentplayed.length = 0;
-            // }
         }
 
         /**

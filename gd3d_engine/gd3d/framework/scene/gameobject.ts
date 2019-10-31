@@ -181,8 +181,6 @@ namespace gd3d.framework
         haveComponet: boolean = false;
         /** 需要初始化组件 */
         needInit:boolean = false;
-        /** 渲染组件初始化过 */
-        rendererInited : boolean = false;
         /**
          * @public
          * @language zh_CN
@@ -288,27 +286,22 @@ namespace gd3d.framework
          */
         init(bePlay = false)
         {
-            if (this.componentsInit.length > 0)
-            {
-                let len = this.componentsInit.length;
-                for (var i = 0; i < len; i++)
+            let comps = this.componentsInit; 
+            if(comps.length <= 0 ) return;
+
+            while(comps.length > 0){    //这里不要再改回 for循环 , 当组件init 时添加其他组件时，会造成问题
+                let c = comps.shift();
+                c.comp.start();
+                c.init = true;
+                if (bePlay)
                 {
-                    let c = this.componentsInit[i];
-                    c.comp.start();
-                    c.init = true;
-                    if(c.comp == this.renderer){
-                        this.rendererInited = true;
-                    }
-                    if (bePlay)
-                    {
-                        if ((StringUtil.ENABLED in c.comp) && !c.comp[StringUtil.ENABLED]) continue;  //组件enable影响
-                        c.comp.onPlay();
-                        c.OnPlayed = true;
-                    }
+                    if ((StringUtil.ENABLED in c.comp) && !c.comp[StringUtil.ENABLED]) continue;  //组件enable影响
+                    c.comp.onPlay();
+                    c.OnPlayed = true;
                 }
-                this.componentsInit.length = 0;
-                this.needInit = false;
-            }         
+            }
+            
+            this.needInit = false;
         }
 
         /**
@@ -330,12 +323,8 @@ namespace gd3d.framework
 
                 if (!c.OnPlayed)   //还没有 调用 OnPlayed 
                 {
-                    if(this.needInit) {     //识别为新增的组件 , 需要到下一帧被 init
-                        continue;   
-                    }else{
-                        c.comp.onPlay();   //运行时的 enabled 开启 后调用 onPlay()
-                        c.OnPlayed = true;
-                    }
+                    c.comp.onPlay();   //运行时的 enabled 开启 后调用 onPlay()
+                    c.OnPlayed = true;
                 }
                 if (c.comp.update)                
                     c.comp.update(delta);
@@ -381,7 +370,6 @@ namespace gd3d.framework
                     this.renderer = comp as any;
                     // console.warn("add renderer:" + this.transform.name);
                     this.transform.markHaveRendererComp();
-                    this.rendererInited = false;
                 }
                 else
                 {
@@ -730,10 +718,7 @@ namespace gd3d.framework
             }
 
             if (comp == this.camera ) this.camera = null;
-            if (comp == this.renderer){
-                this.renderer = null;
-                this.rendererInited = false;
-            } 
+            if (comp == this.renderer) this.renderer = null;
             if (comp == this.light ) this.light = null;
             if (comp == (this.collider as any)) this.collider = null;
             comp.gameObject = null;
