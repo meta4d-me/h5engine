@@ -17103,7 +17103,7 @@ var gd3d;
             trailRender.prototype.reInitdata = function () {
                 if (!this.inited)
                     return;
-                length = this.vertexcount / 2;
+                var length = this.vertexcount / 2;
                 for (var i = 0; i < length; i++) {
                     var sti = this.sticks[i];
                     gd3d.math.vec3Clone(this.gameObject.transform.getWorldTranslate(), sti.location);
