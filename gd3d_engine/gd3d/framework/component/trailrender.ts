@@ -309,7 +309,7 @@ namespace gd3d.framework
         private reInitdata(){
             if(!this.inited) return;
 
-            length = this.vertexcount / 2;
+            let length = this.vertexcount / 2;
             for (var i = 0; i < length; i++)
             {
                 let sti = this.sticks[i];
