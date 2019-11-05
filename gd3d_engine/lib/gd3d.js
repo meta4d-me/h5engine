@@ -2603,6 +2603,8 @@ var gd3d;
         var transform2D = (function () {
             function transform2D() {
                 this.prefab = "";
+                this.enableUILayout = true;
+                this.enableUIMaskRect = true;
                 this.layer = framework.cullingmaskutil.maskTolayer(framework.CullingMask.default);
                 this.tag = framework.StringUtil.builtinTag_Untagged;
                 this.name = "noname";
@@ -2867,7 +2869,9 @@ var gd3d;
                     gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
                 }
                 if (this.dirty || parentChange) {
-                    this.refreshLayout();
+                    if (this.enableUILayout) {
+                        this.refreshLayout();
+                    }
                     if (this.parent == null) {
                         gd3d.math.matrix3x2Clone(this.localMatrix, this.worldMatrix);
                     }
@@ -2875,7 +2879,9 @@ var gd3d;
                         gd3d.math.matrix3x2Multiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
                     }
                     this.dirtyWorldDecompose = true;
-                    this.updateMaskRect();
+                    if (this.enableUIMaskRect) {
+                        this.updateMaskRect();
+                    }
                     if (this.renderer != null) {
                         this.renderer.updateTran();
                     }

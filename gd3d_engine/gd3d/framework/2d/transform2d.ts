@@ -167,6 +167,16 @@ namespace gd3d.framework {
         }
 
         /**
+         * 启用 UI 布局功能
+         */
+        enableUILayout = true;    
+
+        /**
+         * 启用 UI 矩形遮罩裁剪显示 功能
+         */
+        enableUIMaskRect = true;
+
+        /**
          * @public
          * @language zh_CN
          * @classdesc
@@ -597,7 +607,9 @@ namespace gd3d.framework {
                 gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
             }
             if (this.dirty || parentChange) {
-                this.refreshLayout();
+                if(this.enableUILayout){
+                    this.refreshLayout();
+                }
                 if (this.parent == null) {
                     gd3d.math.matrix3x2Clone(this.localMatrix, this.worldMatrix);
                 }
@@ -606,7 +618,9 @@ namespace gd3d.framework {
                 }
                 
                 this.dirtyWorldDecompose = true;
-                this.updateMaskRect();
+                if(this.enableUIMaskRect){
+                    this.updateMaskRect();
+                }
                 if (this.renderer != null) {
                     this.renderer.updateTran();
                 }

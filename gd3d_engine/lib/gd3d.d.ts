@@ -583,6 +583,8 @@ declare namespace gd3d.framework {
         static getTransform2DById(insID: number): transform2D;
         prefab: string;
         canvas: canvas;
+        enableUILayout: boolean;
+        enableUIMaskRect: boolean;
         layer: number;
         tag: string;
         name: string;
