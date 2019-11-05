@@ -158,6 +158,8 @@ namespace gd3d.framework
     {
         static readonly ClassName: string = "canvas";
 
+        private static readonly help_v2 = new gd3d.math.vector2();
+
         /**
          * @public
          * @language zh_CN
@@ -193,6 +195,11 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         isDrawByDepth = false;
+
+        /**
+         * 启用UI事件
+         */
+        enableUIEvent = true;
 
         /**
          * @public
@@ -318,26 +325,34 @@ namespace gd3d.framework
             //canvas 的空间是左上角(-asp,1)-(asp,-1),和屏幕空间一致
             //右下角是 1*asp，1
             //这里有点状况，不应该乘以
-            var asp = this.pixelWidth / this.pixelHeight;
-            this.rootNode.localScale.x = 2 / this.pixelWidth;
-            this.rootNode.localScale.y = -2 / this.pixelHeight;
-            this.rootNode.localTranslate.y = 1;
-            this.rootNode.localTranslate.x = -1;
+            let rootnode = this.rootNode;
+            // var asp = this.pixelWidth / this.pixelHeight;
+            
+            let dirtyScale = false;
+            if((rootnode as any).dirty){
+                rootnode.localRotate = rootnode.pivot.x = rootnode.pivot.y = 0;
+                rootnode.localTranslate.y = 1;
+                rootnode.localTranslate.x = -1;
+                dirtyScale = true;
+            }
 
             if (this.pixelWidth != this.lastWidth || this.pixelHeight != this.lastHeight)
             {
-                this.lastWidth = this.rootNode.width = this.pixelWidth;
-                this.lastHeight = this.rootNode.height = this.pixelHeight;
-                this.rootNode.markDirty();
+                this.lastWidth = rootnode.width = this.pixelWidth;
+                this.lastHeight = rootnode.height = this.pixelHeight;
+                dirtyScale = true;
             }
 
-            this.rootNode.pivot.x = 0;
-            this.rootNode.pivot.y = 0;
+            if(dirtyScale){
+                rootnode.localScale.x = 2 / this.pixelWidth;
+                rootnode.localScale.y = -2 / this.pixelHeight;
+                rootnode.markDirty();
+            }
 
-            {//updateinput
+            if(this.enableUIEvent){//updateinput
                 //重置event
                 this.pointEvent.eated = false;
-                let tv2 = poolv2();
+                let tv2 = canvas.help_v2;
                 tv2.x = this.pointEvent.x = XOnModelSpace;
                 tv2.y = this.pointEvent.y = YOnModelSpace;
                 this.pointEvent.selected = null;
@@ -371,8 +386,8 @@ namespace gd3d.framework
                 {
                     if (this.scene.app.bePlay)
                     {
-                        // this.rootNode.onCapturePointEvent(this, this.pointEvent);
-                        // this.rootNode.onPointEvent(this, this.pointEvent);
+                        // rootnode.onCapturePointEvent(this, this.pointEvent);
+                        // rootnode.onPointEvent(this, this.pointEvent);
 
                         //优化
                         // this.capturePointFlow();  //多余 flow
@@ -383,15 +398,15 @@ namespace gd3d.framework
                     this.pointY = this.pointEvent.y;
                 }
 
-                gd3d.poolv2_del(tv2);
+                // gd3d.poolv2_del(tv2);
             }
 
-            this.rootNode.updateTran(false);
-            //this.rootNode.update(delta);
+            rootnode.updateTran(false);
+            //rootnode.update(delta);
             if (this.scene.app.bePlay)
             {
                 this._peCareListBuoy = -1;
-                this.objupdate(this.rootNode, delta);
+                this.objupdate(rootnode, delta);
             }
         }
 

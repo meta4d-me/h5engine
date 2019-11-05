@@ -116,6 +116,12 @@ namespace gd3d.framework {
     export class transform2D {
         static readonly ClassName:string="transform2D";
 
+        private static readonly help_v2 = new gd3d.math.vector2();
+        private static readonly help_v2_1 = new gd3d.math.vector2();
+
+        private static readonly help_mtx = new gd3d.math.matrix3x2();
+        private static readonly help_mtx_1 = new gd3d.math.matrix3x2();
+
         // public notify: INotify;
         private _canvas: canvas;
 
@@ -639,8 +645,11 @@ namespace gd3d.framework {
         //计算 to canvasMtx 矩阵
         private CalcReCanvasMtx(out: math.matrix3x2) {
             if (!out) return;
-            let tsca = gd3d.math.pool.new_vector2();
-            let ttran = gd3d.math.pool.new_vector2();
+            // let tsca = gd3d.math.pool.new_vector2();
+            // let ttran = gd3d.math.pool.new_vector2();
+
+            let tsca = transform2D.help_v2;
+            let ttran = transform2D.help_v2_1;
             tsca.x = this.canvas.pixelWidth / 2;
             tsca.y = - this.canvas.pixelHeight / 2;
             ttran.x = this.canvas.pixelWidth / 2;
@@ -654,7 +663,8 @@ namespace gd3d.framework {
          */
         private decomposeWorldMatrix() {
             if (this.dirtyWorldDecompose) {
-                let reCanvasMtx = gd3d.math.pool.new_matrix3x2();
+                // let reCanvasMtx = gd3d.math.pool.new_matrix3x2();
+                let reCanvasMtx = transform2D.help_mtx;
                 // let tsca = gd3d.math.pool.new_vector2();
                 // let ttran = gd3d.math.pool.new_vector2();
                 // tsca.x = this.canvas.pixelWidth/2;
@@ -671,7 +681,7 @@ namespace gd3d.framework {
 
                 // math.pool.delete_vector2(tsca);
                 // math.pool.delete_vector2(ttran);
-                math.pool.delete_matrix3x2(reCanvasMtx);
+                // math.pool.delete_matrix3x2(reCanvasMtx);
 
                 this.dirtyWorldDecompose = false;
             }
@@ -749,16 +759,20 @@ namespace gd3d.framework {
 
         public static getTransInfoInCanvas(trans: transform2D, out: t2dInfo)//实际上是rootnode space
         {
-            var mat = trans.getWorldMatrix();
-            var rotmat = trans.canvas.getRoot().getWorldMatrix();
-            var inversemat = gd3d.math.pool.new_matrix3x2();
+            // var rotscale = gd3d.math.pool.new_vector2();
+            // let inversemat = gd3d.math.pool.new_matrix3x2();
+            // let mattoRoot = gd3d.math.pool.new_matrix3x2();
+            // var rotPos = gd3d.math.pool.new_vector2();
+            let mat = trans.getWorldMatrix();
+            let rotmat = trans.canvas.getRoot().getWorldMatrix();
+            let inversemat = transform2D.help_mtx;
             gd3d.math.matrix3x2Inverse(rotmat, inversemat);
-            var mattoRoot = gd3d.math.pool.new_matrix3x2();
+            let mattoRoot = transform2D.help_mtx_1;
             gd3d.math.matrix3x2Multiply(inversemat, mat, mattoRoot);
 
-            var rotscale = gd3d.math.pool.new_vector2();
-            var rotRot: gd3d.math.angelref = new gd3d.math.angelref();
-            var rotPos = gd3d.math.pool.new_vector2();
+            let rotscale = transform2D.help_v2;
+            let rotRot: gd3d.math.angelref = new gd3d.math.angelref();
+            let rotPos = transform2D.help_v2_1;
             math.matrix3x2Decompose(mattoRoot, rotscale, rotRot, rotPos);
             gd3d.math.vec2Clone(trans.pivot, out.pivot);
             gd3d.math.vec2Clone(rotPos, out.pivotPos);
@@ -767,10 +781,10 @@ namespace gd3d.framework {
             out.width = trans.width * rotscale.x;
             out.height = trans.height * rotscale.y;
 
-            gd3d.math.pool.delete_matrix3x2(inversemat);
-            gd3d.math.pool.delete_matrix3x2(mattoRoot);
-            gd3d.math.pool.delete_vector2(rotscale);
-            gd3d.math.pool.delete_vector2(rotPos);
+            // gd3d.math.pool.delete_matrix3x2(inversemat);
+            // gd3d.math.pool.delete_matrix3x2(mattoRoot);
+            // gd3d.math.pool.delete_vector2(rotscale);
+            // gd3d.math.pool.delete_vector2(rotPos);
         }
 
         /**
@@ -782,33 +796,37 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         setWorldPosition(pos: math.vector2) {
+            // var dir = math.pool.new_vector2();
+            // var pworld = math.pool.new_matrix3x2();
+            // let matinv = math.pool.new_matrix3x2();
+            // let dirinv = math.pool.new_vector2();
             this.dirty = true;
             this.updateWorldTran();
 
-            var thispos = this.getWorldTranslate();
-            var dir = math.pool.new_vector2();
+            let thispos = this.getWorldTranslate();
+            let dir = transform2D.help_v2;
             dir.x = pos.x - thispos.x;
             dir.y = pos.y - thispos.y;
 
-            var pworld = math.pool.new_matrix3x2();
+            let pworld = transform2D.help_mtx;
             if (this._parent != null) {
                 math.matrix3x2Clone(this._parent.worldMatrix, pworld);
             }
             else {
                 math.matrix3x2MakeIdentity(pworld);
             }
-            var matinv = math.pool.new_matrix3x2();
+            let matinv = transform2D.help_mtx_1;
             math.matrix3x2Inverse(pworld, matinv);
 
-            var dirinv = math.pool.new_vector2();
+            let dirinv = transform2D.help_v2_1;
             math.matrix3x2TransformNormal(matinv, dir, dirinv);
 
             this.localTranslate.x += dirinv.x;
             this.localTranslate.y += dirinv.y;
 
-            math.pool.delete_matrix3x2(matinv);
-            math.pool.delete_vector2(dir);
-            math.pool.delete_vector2(dirinv);
+            // math.pool.delete_matrix3x2(matinv);
+            // math.pool.delete_vector2(dir);
+            // math.pool.delete_vector2(dirinv);
         }
 
         /**
@@ -1238,17 +1256,19 @@ namespace gd3d.framework {
         ContainsCanvasPoint(ModelPos: math.vector2, tolerance: number = 0): boolean {
             let result = false;
             var mworld = this.getWorldMatrix();
-            var mout = math.pool.new_matrix3x2();
+            // var mout = math.pool.new_matrix3x2();
+            var mout = transform2D.help_mtx;
             gd3d.math.matrix3x2Inverse(mworld, mout);
 
-            var p2 = math.pool.new_vector2();
+            // var p2 = math.pool.new_vector2();
+            var p2 = transform2D.help_v2;
             gd3d.math.matrix3x2TransformVector2(mout, ModelPos, p2);  //世界坐标 右乘 逆转worldMatrix 得到 ModelPos
             p2.x += this.pivot.x * this.width;
             p2.y += this.pivot.y * this.height;
             result = p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
 
-            math.pool.delete_matrix3x2(mout);
-            math.pool.delete_vector2(p2);
+            // math.pool.delete_matrix3x2(mout);
+            // math.pool.delete_vector2(p2);
             return result;
         }
 

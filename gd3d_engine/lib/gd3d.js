@@ -1726,6 +1726,7 @@ var gd3d;
                 this._pointEventCareList = [];
                 this.is2dUI = true;
                 this.isDrawByDepth = false;
+                this.enableUIEvent = true;
                 this.pointDown = false;
                 this.pointEvent = new framework.PointEvent();
                 this.pointX = 0;
@@ -1764,21 +1765,27 @@ var gd3d;
                 return this.rootNode.children[index];
             };
             canvas.prototype.update = function (delta, touch, XOnModelSpace, YOnModelSpace) {
-                var asp = this.pixelWidth / this.pixelHeight;
-                this.rootNode.localScale.x = 2 / this.pixelWidth;
-                this.rootNode.localScale.y = -2 / this.pixelHeight;
-                this.rootNode.localTranslate.y = 1;
-                this.rootNode.localTranslate.x = -1;
-                if (this.pixelWidth != this.lastWidth || this.pixelHeight != this.lastHeight) {
-                    this.lastWidth = this.rootNode.width = this.pixelWidth;
-                    this.lastHeight = this.rootNode.height = this.pixelHeight;
-                    this.rootNode.markDirty();
+                var rootnode = this.rootNode;
+                var dirtyScale = false;
+                if (rootnode.dirty) {
+                    rootnode.localRotate = rootnode.pivot.x = rootnode.pivot.y = 0;
+                    rootnode.localTranslate.y = 1;
+                    rootnode.localTranslate.x = -1;
+                    dirtyScale = true;
                 }
-                this.rootNode.pivot.x = 0;
-                this.rootNode.pivot.y = 0;
-                {
+                if (this.pixelWidth != this.lastWidth || this.pixelHeight != this.lastHeight) {
+                    this.lastWidth = rootnode.width = this.pixelWidth;
+                    this.lastHeight = rootnode.height = this.pixelHeight;
+                    dirtyScale = true;
+                }
+                if (dirtyScale) {
+                    rootnode.localScale.x = 2 / this.pixelWidth;
+                    rootnode.localScale.y = -2 / this.pixelHeight;
+                    rootnode.markDirty();
+                }
+                if (this.enableUIEvent) {
                     this.pointEvent.eated = false;
-                    var tv2 = gd3d.poolv2();
+                    var tv2 = canvas_1.help_v2;
                     tv2.x = this.pointEvent.x = XOnModelSpace;
                     tv2.y = this.pointEvent.y = YOnModelSpace;
                     this.pointEvent.selected = null;
@@ -1806,12 +1813,11 @@ var gd3d;
                         this.pointX = this.pointEvent.x;
                         this.pointY = this.pointEvent.y;
                     }
-                    gd3d.poolv2_del(tv2);
                 }
-                this.rootNode.updateTran(false);
+                rootnode.updateTran(false);
                 if (this.scene.app.bePlay) {
                     this._peCareListBuoy = -1;
-                    this.objupdate(this.rootNode, delta);
+                    this.objupdate(rootnode, delta);
                 }
             };
             canvas.prototype.capturePointFlow = function () {
@@ -2120,6 +2126,7 @@ var gd3d;
             };
             var canvas_1;
             canvas.ClassName = "canvas";
+            canvas.help_v2 = new gd3d.math.vector2();
             canvas.depthTag = "__depthTag__";
             canvas.flowIndexTag = "__flowIndexTag__";
             __decorate([
@@ -2151,6 +2158,7 @@ var gd3d;
             function canvasRenderer() {
                 this.layer = framework.RenderLayerEnum.Common;
                 this.queue = 0;
+                this.m_lastAsp = -1;
                 this.cupTans2ds = [];
                 this.canvas = new framework.canvas();
                 this.canvas.is2dUI = false;
@@ -2213,7 +2221,11 @@ var gd3d;
             };
             canvasRenderer.prototype.update = function (delta) {
                 var asp = this.canvas.pixelWidth / this.canvas.pixelHeight;
-                this.gameObject.transform.localScale.x = this.gameObject.transform.localScale.y * asp;
+                if (asp != this.m_lastAsp) {
+                    this.gameObject.transform.localScale.x = this.gameObject.transform.localScale.y * asp;
+                    this.gameObject.transform.localScale = this.gameObject.transform.localScale;
+                    this.m_lastAsp = asp;
+                }
                 if (this.cameraTouch != null) {
                     var scene_1 = this.gameObject.getScene();
                     var tempv2 = gd3d.math.pool.new_vector2(this.inputmgr.point.x, this.inputmgr.point.y);
@@ -2891,8 +2903,8 @@ var gd3d;
             transform2D.prototype.CalcReCanvasMtx = function (out) {
                 if (!out)
                     return;
-                var tsca = gd3d.math.pool.new_vector2();
-                var ttran = gd3d.math.pool.new_vector2();
+                var tsca = transform2D_1.help_v2;
+                var ttran = transform2D_1.help_v2_1;
                 tsca.x = this.canvas.pixelWidth / 2;
                 tsca.y = -this.canvas.pixelHeight / 2;
                 ttran.x = this.canvas.pixelWidth / 2;
@@ -2901,11 +2913,10 @@ var gd3d;
             };
             transform2D.prototype.decomposeWorldMatrix = function () {
                 if (this.dirtyWorldDecompose) {
-                    var reCanvasMtx = gd3d.math.pool.new_matrix3x2();
+                    var reCanvasMtx = transform2D_1.help_mtx;
                     this.CalcReCanvasMtx(reCanvasMtx);
                     gd3d.math.matrix3x2Multiply(reCanvasMtx, this.worldMatrix, this.canvasWorldMatrix);
                     gd3d.math.matrix3x2Decompose(this.canvasWorldMatrix, this.worldScale, this.worldRotate, this.worldTranslate);
-                    gd3d.math.pool.delete_matrix3x2(reCanvasMtx);
                     this.dirtyWorldDecompose = false;
                 }
             };
@@ -2934,47 +2945,40 @@ var gd3d;
             transform2D.getTransInfoInCanvas = function (trans, out) {
                 var mat = trans.getWorldMatrix();
                 var rotmat = trans.canvas.getRoot().getWorldMatrix();
-                var inversemat = gd3d.math.pool.new_matrix3x2();
+                var inversemat = transform2D_1.help_mtx;
                 gd3d.math.matrix3x2Inverse(rotmat, inversemat);
-                var mattoRoot = gd3d.math.pool.new_matrix3x2();
+                var mattoRoot = transform2D_1.help_mtx_1;
                 gd3d.math.matrix3x2Multiply(inversemat, mat, mattoRoot);
-                var rotscale = gd3d.math.pool.new_vector2();
+                var rotscale = transform2D_1.help_v2;
                 var rotRot = new gd3d.math.angelref();
-                var rotPos = gd3d.math.pool.new_vector2();
+                var rotPos = transform2D_1.help_v2_1;
                 gd3d.math.matrix3x2Decompose(mattoRoot, rotscale, rotRot, rotPos);
                 gd3d.math.vec2Clone(trans.pivot, out.pivot);
                 gd3d.math.vec2Clone(rotPos, out.pivotPos);
                 out.rot = rotRot.v;
                 out.width = trans.width * rotscale.x;
                 out.height = trans.height * rotscale.y;
-                gd3d.math.pool.delete_matrix3x2(inversemat);
-                gd3d.math.pool.delete_matrix3x2(mattoRoot);
-                gd3d.math.pool.delete_vector2(rotscale);
-                gd3d.math.pool.delete_vector2(rotPos);
             };
             transform2D.prototype.setWorldPosition = function (pos) {
                 this.dirty = true;
                 this.updateWorldTran();
                 var thispos = this.getWorldTranslate();
-                var dir = gd3d.math.pool.new_vector2();
+                var dir = transform2D_1.help_v2;
                 dir.x = pos.x - thispos.x;
                 dir.y = pos.y - thispos.y;
-                var pworld = gd3d.math.pool.new_matrix3x2();
+                var pworld = transform2D_1.help_mtx;
                 if (this._parent != null) {
                     gd3d.math.matrix3x2Clone(this._parent.worldMatrix, pworld);
                 }
                 else {
                     gd3d.math.matrix3x2MakeIdentity(pworld);
                 }
-                var matinv = gd3d.math.pool.new_matrix3x2();
+                var matinv = transform2D_1.help_mtx_1;
                 gd3d.math.matrix3x2Inverse(pworld, matinv);
-                var dirinv = gd3d.math.pool.new_vector2();
+                var dirinv = transform2D_1.help_v2_1;
                 gd3d.math.matrix3x2TransformNormal(matinv, dir, dirinv);
                 this.localTranslate.x += dirinv.x;
                 this.localTranslate.y += dirinv.y;
-                gd3d.math.pool.delete_matrix3x2(matinv);
-                gd3d.math.pool.delete_vector2(dir);
-                gd3d.math.pool.delete_vector2(dirinv);
             };
             Object.defineProperty(transform2D.prototype, "beDispose", {
                 get: function () {
@@ -3197,15 +3201,13 @@ var gd3d;
                 if (tolerance === void 0) { tolerance = 0; }
                 var result = false;
                 var mworld = this.getWorldMatrix();
-                var mout = gd3d.math.pool.new_matrix3x2();
+                var mout = transform2D_1.help_mtx;
                 gd3d.math.matrix3x2Inverse(mworld, mout);
-                var p2 = gd3d.math.pool.new_vector2();
+                var p2 = transform2D_1.help_v2;
                 gd3d.math.matrix3x2TransformVector2(mout, ModelPos, p2);
                 p2.x += this.pivot.x * this.width;
                 p2.y += this.pivot.y * this.height;
                 result = p2.x + tolerance >= 0 && p2.y + tolerance >= 0 && p2.x < this.width + tolerance && p2.y < this.height + tolerance;
-                gd3d.math.pool.delete_matrix3x2(mout);
-                gd3d.math.pool.delete_vector2(p2);
                 return result;
             };
             Object.defineProperty(transform2D.prototype, "layoutState", {
@@ -3350,6 +3352,10 @@ var gd3d;
             };
             var transform2D_1;
             transform2D.ClassName = "transform2D";
+            transform2D.help_v2 = new gd3d.math.vector2();
+            transform2D.help_v2_1 = new gd3d.math.vector2();
+            transform2D.help_mtx = new gd3d.math.matrix3x2();
+            transform2D.help_mtx_1 = new gd3d.math.matrix3x2();
             transform2D._transform2DMap = {};
             __decorate([
                 gd3d.reflect.Field("string"),

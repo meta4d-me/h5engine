@@ -222,9 +222,9 @@ namespace gd3d.framework
             this.canvas.render(context, assetmgr);
         }
 
-        private viewPixelrect = new math.rect();
-        private helpv2 = new gd3d.math.vector2();
-        private helpv2_1 = new gd3d.math.vector2();
+        private readonly viewPixelrect = new math.rect();
+        private readonly helpv2 = new gd3d.math.vector2();
+        private readonly helpv2_1 = new gd3d.math.vector2();
         /**
          * @private
          */

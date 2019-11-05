@@ -415,11 +415,13 @@ declare namespace gd3d.framework {
     }
     class canvas {
         static readonly ClassName: string;
+        private static readonly help_v2;
         constructor();
         private _peCareListBuoy;
         private _pointEventCareList;
         is2dUI: boolean;
         isDrawByDepth: boolean;
+        enableUIEvent: boolean;
         parentTrans: transform;
         batcher: batcher2D;
         webgl: WebGLRenderingContext;
@@ -494,6 +496,7 @@ declare namespace gd3d.framework {
         getChildren(): transform2D[];
         getChildCount(): number;
         getChild(index: number): transform2D;
+        private m_lastAsp;
         update(delta: number): void;
         pickModelPos(ray: gd3d.framework.ray, outModelPos: math.vector2): boolean;
         pickAll2d(ray: gd3d.framework.ray): transform2D[];
@@ -532,9 +535,9 @@ declare namespace gd3d.framework {
         getChildCount(): number;
         getChild(index: number): transform2D;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
-        private viewPixelrect;
-        private helpv2;
-        private helpv2_1;
+        private readonly viewPixelrect;
+        private readonly helpv2;
+        private readonly helpv2_1;
         update(delta: number): void;
         private lastVPRect;
         private lastScreenMR;
@@ -571,6 +574,10 @@ declare namespace gd3d.framework {
     }
     class transform2D {
         static readonly ClassName: string;
+        private static readonly help_v2;
+        private static readonly help_v2_1;
+        private static readonly help_mtx;
+        private static readonly help_mtx_1;
         private _canvas;
         private static _transform2DMap;
         static getTransform2DById(insID: number): transform2D;

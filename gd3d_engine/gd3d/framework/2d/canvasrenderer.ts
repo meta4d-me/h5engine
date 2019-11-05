@@ -177,14 +177,18 @@ namespace gd3d.framework
             return this.canvas.getChild(index);
         }
 
+        private m_lastAsp = -1;
         /**
          * @private
          */
         update(delta: number)
         {
             let asp = this.canvas.pixelWidth / this.canvas.pixelHeight;
-            this.gameObject.transform.localScale.x = this.gameObject.transform.localScale.y * asp;
-
+            if(asp != this.m_lastAsp){
+                this.gameObject.transform.localScale.x = this.gameObject.transform.localScale.y * asp;
+                this.gameObject.transform.localScale = this.gameObject.transform.localScale;
+                this.m_lastAsp = asp;
+            }
 
             if (this.cameraTouch != null)//需要用户代码 或者在编辑器里面绑定使用哪个camera（即设置此变量）,否则不会主动响应事件否则不会主动响应事件
             {
