@@ -117,6 +117,7 @@ namespace gd3d.render
                     webglkit.caps.standardDerivatives = (webgl.getExtension('OES_standard_derivatives') !== null);
                     webglkit.caps.pvrtcExtension = webgl.getExtension('WEBGL_compressed_texture_pvrtc');
                     webglkit.caps.atcExtension = webgl.getExtension('WEBGL_compressed_texture_atc');
+                    webglkit.caps.textureFloat = (webgl.getExtension('OES_texture_float') !== null);
                 }
 
                 //各种扩展

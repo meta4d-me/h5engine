@@ -14,16 +14,16 @@ class main implements gd3d.framework.IUserCode
     state: IState;
     onStart(app: gd3d.framework.application)
     {
-        if(!main.instance) main.instance = this; 
+        if(!main.instance) main.instance = this;
         console.log("i am here.");
         this.app = app;
-        
+
         //-------------------------------------基础
         this.addBtn("基础==>",()=>{
             demoList.addBtn("f14effect",()=>new dome.db_test_f14eff());
             demoList.addBtn("物理2d_dome",()=>new physic2d_dome());
             demoList.addBtn("test_load", () => new test_load());
-            demoList.addBtn("test_loadScene", () => new test_loadScene()); 
+            demoList.addBtn("test_loadScene", () => new test_loadScene());
             demoList.addBtn("test_pick", () => new test_pick());
             demoList.addBtn("test_anim", () => new test_anim());
             demoList.addBtn("test_sound", () => new t.test_sound());
@@ -31,12 +31,12 @@ class main implements gd3d.framework.IUserCode
             demoList.addBtn("关键帧动画",()=>new test_keyFrameAni());
             return new demoList();
         });
-        
+
         //-------------------------------------渲染
         this.addBtn("渲染==>",()=>{
             demoList.addBtn("test_posteffect(后期效果)", () => new t.test_posteffect());
             demoList.addBtn("test_blend", () => new t.test_blend());
-            demoList.addBtn("test_shadowmap", () => new test_ShadowMap()); 
+            demoList.addBtn("test_shadowmap", () => new test_ShadowMap());
             demoList.addBtn("test_tex_uv", () => new test_texuv());
             demoList.addBtn("test_PBR 展示", () => new test_pbr());
             demoList.addBtn("test_PBR 场景", () => new test_pbr_scene());
@@ -45,6 +45,7 @@ class main implements gd3d.framework.IUserCode
             demoList.addBtn("test_light1", () => new t.test_light1());
             demoList.addBtn("test_light_d1", () => new t.light_d1());
             demoList.addBtn("test_normalmap", () => new t.Test_NormalMap());
+            demoList.addBtn("test_f4skin", () => new test_f4skin());
             return new demoList();
         });
 
@@ -109,16 +110,16 @@ class main implements gd3d.framework.IUserCode
 
         //-------------------------------------炮王项目
         this.addBtn("项目Demo==>",()=>{
-            demoList.addBtn("paowuxian2", () => new dome.paowuxian2()); 
+            demoList.addBtn("paowuxian2", () => new dome.paowuxian2());
             demoList.addBtn("paowuxian", () => new dome.paowuxian());
             demoList.addBtn("test_tank", () => new demo.TankGame());
             demoList.addBtn("test_long", () => new demo.DragonTest());
             return new demoList();
         });
-        
 
-        
-        
+
+
+
         //others 历史遗留
         //this.addBtn("trans性能测试",()=>new demo.test_performance());
         // this.addBtn("testtrailrenderRecorde", () => new t.test_trailrenderrecorde()); //有问题
