@@ -134,6 +134,11 @@ namespace gd3d.framework
         private static helprect = new gd3d.math.rect();
 
         /**
+         * 相机剔除时，计算 z 轴上的平面 （far & near plane）
+         */
+        cullZPlane : boolean = true;
+
+        /**
          * @public
          * @language zh_CN
          * @classdesc
@@ -813,6 +818,15 @@ namespace gd3d.framework
             gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, vec3cache);
             const radius = gd3d.math.vec3Length(vec3cache) / 2;
             const center = node.aabb.center;
+            return this.cullTest(radius , center);
+        }
+
+        /**
+         * 剔除测试 ，返回 ture 确认为剔除
+         * @param radius 
+         * @param center 
+         */
+        cullTest(radius : number , center : math.vector3){
             // Left
             if (this.isRight(
                 this.frameVecs[this.fruMap.nearLD],
@@ -849,6 +863,8 @@ namespace gd3d.framework
                 radius
             )) return true;
 
+            if(!this.cullZPlane) return false;
+
             // Front
             if (this.isRight(
                 this.frameVecs[this.fruMap.nearLT],
@@ -867,11 +883,8 @@ namespace gd3d.framework
                 radius
             )) return true;
 
-            return false;
-        }
 
-        private cullTest(radius){
-            
+            return false;
         }
 
         private _edge1 = new gd3d.math.vector3();
