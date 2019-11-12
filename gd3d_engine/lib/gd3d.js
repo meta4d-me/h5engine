@@ -10452,12 +10452,24 @@ var gd3d;
                         case framework.meshFilter.ClassName:
                             var filter = this.gameObject.getComponent("meshFilter");
                             if (filter != null && filter.mesh != null && filter.mesh.data != null && filter.mesh.data.pos != null) {
-                                var meshdata = filter.mesh.data;
-                                gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
-                                gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-                                for (var i = 0; i < meshdata.pos.length; i++) {
-                                    gd3d.math.vec3Max(meshdata.pos[i], maximum, maximum);
-                                    gd3d.math.vec3Min(meshdata.pos[i], minimum, minimum);
+                                var m = filter.mesh;
+                                var id = m.getGUID();
+                                var min_max_v3 = transform_2.aabbStoreMap[id];
+                                if (min_max_v3) {
+                                    minimum = min_max_v3[0];
+                                    maximum = min_max_v3[1];
+                                }
+                                else {
+                                    var meshdata = m.data;
+                                    gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                                    gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+                                    var len_1 = meshdata.pos.length;
+                                    var pos = meshdata.pos;
+                                    for (var i = 0; i < len_1; i++) {
+                                        gd3d.math.vec3Max(pos[i], maximum, maximum);
+                                        gd3d.math.vec3Min(pos[i], minimum, minimum);
+                                    }
+                                    transform_2.aabbStoreMap[id] = [minimum, maximum];
                                 }
                                 matched = true;
                             }
@@ -10465,16 +10477,27 @@ var gd3d;
                         case framework.skinnedMeshRenderer.ClassName:
                             var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer");
                             if (skinmesh != null && skinmesh.mesh != null && skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null) {
-                                var skinmeshdata = skinmesh.mesh.data;
-                                gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
-                                gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-                                var p0 = gd3d.math.pool.new_vector3();
-                                for (var i = 0; i < skinmeshdata.pos.length; i++) {
-                                    skinmesh.calActualVertexByIndex(i, p0);
-                                    gd3d.math.vec3Max(p0, maximum, maximum);
-                                    gd3d.math.vec3Min(p0, minimum, minimum);
+                                var m = skinmesh.mesh;
+                                var id = m.getGUID();
+                                var min_max_v3 = transform_2.aabbStoreMap[id];
+                                if (min_max_v3) {
+                                    minimum = min_max_v3[0];
+                                    maximum = min_max_v3[1];
                                 }
-                                gd3d.math.pool.delete_vector3(p0);
+                                else {
+                                    var skinmeshdata = skinmesh.mesh.data;
+                                    gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                                    gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+                                    var p0 = gd3d.math.pool.new_vector3();
+                                    var len_2 = skinmeshdata.pos.length;
+                                    for (var i = 0; i < len_2; i++) {
+                                        skinmesh.calActualVertexByIndex(i, p0);
+                                        gd3d.math.vec3Max(p0, maximum, maximum);
+                                        gd3d.math.vec3Min(p0, minimum, minimum);
+                                    }
+                                    gd3d.math.pool.delete_vector3(p0);
+                                    transform_2.aabbStoreMap[id] = [minimum, maximum];
+                                }
                                 matched = true;
                             }
                             break;
@@ -10927,6 +10950,7 @@ var gd3d;
                     this.onDispose();
             };
             var transform_2;
+            transform.help_v3 = new gd3d.math.vector3();
             transform.ClassName = "transform";
             transform.helpv2 = new gd3d.math.vector2();
             transform.helpv3 = new gd3d.math.vector3();
@@ -10937,6 +10961,7 @@ var gd3d;
             transform.helpquat = new gd3d.math.quaternion();
             transform.helpquat_1 = new gd3d.math.quaternion();
             transform.helpmtx = new gd3d.math.matrix();
+            transform.aabbStoreMap = {};
             transform.aabbCareTypes = ["meshFilter", "skinnedMeshRenderer", "canvasRenderer"];
             __decorate([
                 gd3d.reflect.Field("string"),
@@ -11457,6 +11482,7 @@ var gd3d;
                 this._efficient = true;
                 this._skeletonMatrixData = new Float32Array(8 * this.maxBoneCount);
             }
+            skinnedMeshRenderer_1 = skinnedMeshRenderer;
             Object.defineProperty(skinnedMeshRenderer.prototype, "renderLayer", {
                 get: function () { return this.gameObject.layer; },
                 set: function (layer) {
@@ -11538,53 +11564,56 @@ var gd3d;
             };
             skinnedMeshRenderer.prototype.onPlay = function () {
             };
-            skinnedMeshRenderer.prototype.getMatByIndex = function (index) {
+            skinnedMeshRenderer.prototype.getMatByIndex = function (index, outMtx) {
                 var data = this.mesh.data;
-                if (data.blendIndex[index].v0 >= this.maxBoneCount || data.blendIndex[index].v1 >= this.maxBoneCount || data.blendIndex[index].v2 >= this.maxBoneCount || data.blendIndex[index].v3 >= this.maxBoneCount) {
+                var bIdx = data.blendIndex;
+                var skData = this._skeletonMatrixData;
+                if (bIdx[index].v0 >= this.maxBoneCount || bIdx[index].v1 >= this.maxBoneCount || bIdx[index].v2 >= this.maxBoneCount || bIdx[index].v3 >= this.maxBoneCount) {
                     return null;
                 }
-                var mat = new gd3d.math.matrix();
+                var mat = outMtx;
+                gd3d.math.matrixMakeIdentity(mat);
                 if (this._efficient) {
-                    var vec40r = gd3d.math.pool.new_vector4();
-                    var vec30p = gd3d.math.pool.new_vector3();
-                    vec40r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 0];
-                    vec40r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 1];
-                    vec40r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 2];
-                    vec40r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 3];
-                    vec30p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 4];
-                    vec30p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 5];
-                    vec30p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 6];
-                    var vec41r = gd3d.math.pool.new_vector4();
-                    var vec31p = gd3d.math.pool.new_vector3();
-                    vec41r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 0];
-                    vec41r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 1];
-                    vec41r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 2];
-                    vec41r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 3];
-                    vec31p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 4];
-                    vec31p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 5];
-                    vec31p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 6];
-                    var vec42r = gd3d.math.pool.new_vector4();
-                    var vec32p = gd3d.math.pool.new_vector3();
-                    vec42r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 0];
-                    vec42r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 1];
-                    vec42r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 2];
-                    vec42r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 3];
-                    vec32p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 4];
-                    vec32p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 5];
-                    vec32p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 6];
-                    var vec43r = gd3d.math.pool.new_vector4();
-                    var vec33p = gd3d.math.pool.new_vector3();
-                    vec43r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 0];
-                    vec43r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 1];
-                    vec43r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 2];
-                    vec43r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 3];
-                    vec33p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 4];
-                    vec33p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 5];
-                    vec33p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 6];
-                    var mat0 = gd3d.math.pool.new_matrix();
-                    var mat1 = gd3d.math.pool.new_matrix();
-                    var mat2 = gd3d.math.pool.new_matrix();
-                    var mat3 = gd3d.math.pool.new_matrix();
+                    var vec40r = skinnedMeshRenderer_1.help_v4;
+                    var vec30p = skinnedMeshRenderer_1.help_v3;
+                    vec40r.x = skData[8 * bIdx[index].v0 + 0];
+                    vec40r.y = skData[8 * bIdx[index].v0 + 1];
+                    vec40r.z = skData[8 * bIdx[index].v0 + 2];
+                    vec40r.w = skData[8 * bIdx[index].v0 + 3];
+                    vec30p.x = skData[8 * bIdx[index].v0 + 4];
+                    vec30p.y = skData[8 * bIdx[index].v0 + 5];
+                    vec30p.z = skData[8 * bIdx[index].v0 + 6];
+                    var vec41r = skinnedMeshRenderer_1.help_v4_1;
+                    var vec31p = skinnedMeshRenderer_1.help_v3_1;
+                    vec41r.x = skData[8 * bIdx[index].v1 + 0];
+                    vec41r.y = skData[8 * bIdx[index].v1 + 1];
+                    vec41r.z = skData[8 * bIdx[index].v1 + 2];
+                    vec41r.w = skData[8 * bIdx[index].v1 + 3];
+                    vec31p.x = skData[8 * bIdx[index].v1 + 4];
+                    vec31p.y = skData[8 * bIdx[index].v1 + 5];
+                    vec31p.z = skData[8 * bIdx[index].v1 + 6];
+                    var vec42r = skinnedMeshRenderer_1.help_v4_2;
+                    var vec32p = skinnedMeshRenderer_1.help_v3_2;
+                    vec42r.x = skData[8 * bIdx[index].v2 + 0];
+                    vec42r.y = skData[8 * bIdx[index].v2 + 1];
+                    vec42r.z = skData[8 * bIdx[index].v2 + 2];
+                    vec42r.w = skData[8 * bIdx[index].v2 + 3];
+                    vec32p.x = skData[8 * bIdx[index].v2 + 4];
+                    vec32p.y = skData[8 * bIdx[index].v2 + 5];
+                    vec32p.z = skData[8 * bIdx[index].v2 + 6];
+                    var vec43r = skinnedMeshRenderer_1.help_v4_3;
+                    var vec33p = skinnedMeshRenderer_1.help_v3_3;
+                    vec43r.x = skData[8 * bIdx[index].v3 + 0];
+                    vec43r.y = skData[8 * bIdx[index].v3 + 1];
+                    vec43r.z = skData[8 * bIdx[index].v3 + 2];
+                    vec43r.w = skData[8 * bIdx[index].v3 + 3];
+                    vec33p.x = skData[8 * bIdx[index].v3 + 4];
+                    vec33p.y = skData[8 * bIdx[index].v3 + 5];
+                    vec33p.z = skData[8 * bIdx[index].v3 + 6];
+                    var mat0 = skinnedMeshRenderer_1.help_mtx;
+                    var mat1 = skinnedMeshRenderer_1.help_mtx_1;
+                    var mat2 = skinnedMeshRenderer_1.help_mtx_2;
+                    var mat3 = skinnedMeshRenderer_1.help_mtx_3;
                     gd3d.math.matrixMakeTransformRTS(vec30p, gd3d.math.pool.vector3_one, vec40r, mat0);
                     gd3d.math.matrixMakeTransformRTS(vec31p, gd3d.math.pool.vector3_one, vec41r, mat1);
                     gd3d.math.matrixMakeTransformRTS(vec32p, gd3d.math.pool.vector3_one, vec42r, mat2);
@@ -11596,28 +11625,16 @@ var gd3d;
                     gd3d.math.matrixAdd(mat0, mat1, mat);
                     gd3d.math.matrixAdd(mat, mat2, mat);
                     gd3d.math.matrixAdd(mat, mat3, mat);
-                    gd3d.math.pool.delete_vector4(vec40r);
-                    gd3d.math.pool.delete_vector4(vec41r);
-                    gd3d.math.pool.delete_vector4(vec42r);
-                    gd3d.math.pool.delete_vector4(vec43r);
-                    gd3d.math.pool.delete_vector3(vec30p);
-                    gd3d.math.pool.delete_vector3(vec31p);
-                    gd3d.math.pool.delete_vector3(vec32p);
-                    gd3d.math.pool.delete_vector3(vec33p);
-                    gd3d.math.pool.delete_matrix(mat0);
-                    gd3d.math.pool.delete_matrix(mat1);
-                    gd3d.math.pool.delete_matrix(mat2);
-                    gd3d.math.pool.delete_matrix(mat3);
                 }
                 else {
                     var mat0 = gd3d.math.pool.new_matrix();
-                    mat0.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v0, 16 * data.blendIndex[index].v0 + 16);
+                    mat0.rawData = skData.slice(16 * bIdx[index].v0, 16 * bIdx[index].v0 + 16);
                     var mat1 = gd3d.math.pool.new_matrix();
-                    mat1.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v1, 16 * data.blendIndex[index].v1 + 16);
+                    mat1.rawData = skData.slice(16 * bIdx[index].v1, 16 * bIdx[index].v1 + 16);
                     var mat2 = gd3d.math.pool.new_matrix();
-                    mat2.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v2, 16 * data.blendIndex[index].v2 + 16);
+                    mat2.rawData = skData.slice(16 * bIdx[index].v2, 16 * bIdx[index].v2 + 16);
                     var mat3 = gd3d.math.pool.new_matrix();
-                    mat3.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v3, 16 * data.blendIndex[index].v3 + 16);
+                    mat3.rawData = skData.slice(16 * bIdx[index].v3, 16 * bIdx[index].v3 + 16);
                     gd3d.math.matrixScaleByNum(data.blendWeight[index].v0, mat0);
                     gd3d.math.matrixScaleByNum(data.blendWeight[index].v1, mat1);
                     gd3d.math.matrixScaleByNum(data.blendWeight[index].v2, mat2);
@@ -11630,16 +11647,14 @@ var gd3d;
                     gd3d.math.pool.delete_matrix(mat2);
                     gd3d.math.pool.delete_matrix(mat3);
                 }
-                return mat;
             };
             skinnedMeshRenderer.prototype.calActualVertexByIndex = function (index, t) {
                 var data = this.mesh.data;
                 var verindex = data.trisindex[index];
                 var p = data.pos[verindex];
-                var mat = this.getMatByIndex(verindex);
-                if (mat == null)
-                    debugger;
-                gd3d.math.matrixTransformVector3(p, mat, t);
+                var mtx = skinnedMeshRenderer_1.VertexHelpMtx;
+                this.getMatByIndex(verindex, mtx);
+                gd3d.math.matrixTransformVector3(p, mtx, t);
             };
             skinnedMeshRenderer.prototype.intersects = function (ray, outInfo) {
                 var ishided = false;
@@ -11649,9 +11664,9 @@ var gd3d;
                     var data = this.mesh.data;
                     for (var i = 0; i < this.mesh.submesh.length; i++) {
                         var submesh = this.mesh.submesh[i];
-                        var t0 = gd3d.math.pool.new_vector3();
-                        var t1 = gd3d.math.pool.new_vector3();
-                        var t2 = gd3d.math.pool.new_vector3();
+                        var t0 = skinnedMeshRenderer_1.inteRayHelp_v3;
+                        var t1 = skinnedMeshRenderer_1.inteRayHelp_v3_1;
+                        var t2 = skinnedMeshRenderer_1.inteRayHelp_v3_2;
                         for (var index = submesh.start; index < submesh.size; index += 3) {
                             var verindex0 = data.trisindex[index];
                             var verindex1 = data.trisindex[index + 1];
@@ -11659,16 +11674,19 @@ var gd3d;
                             var p0 = data.pos[verindex0];
                             var p1 = data.pos[verindex1];
                             var p2 = data.pos[verindex2];
-                            var mat0 = this.getMatByIndex(verindex0);
-                            var mat1 = this.getMatByIndex(verindex1);
-                            var mat2 = this.getMatByIndex(verindex2);
+                            var mat0 = skinnedMeshRenderer_1.inteRayHelp_mtx;
+                            this.getMatByIndex(verindex0, mat0);
+                            var mat1 = skinnedMeshRenderer_1.inteRayHelp_mtx_1;
+                            this.getMatByIndex(verindex1, mat1);
+                            var mat2 = skinnedMeshRenderer_1.inteRayHelp_mtx_2;
+                            this.getMatByIndex(verindex2, mat2);
                             if (mat0 == null || mat1 == null || mat2 == null)
                                 continue;
-                            var mat00 = gd3d.math.pool.new_matrix();
+                            var mat00 = skinnedMeshRenderer_1.help_mtx;
                             gd3d.math.matrixMultiply(mvpmat, mat0, mat00);
-                            var mat11 = gd3d.math.pool.new_matrix();
+                            var mat11 = skinnedMeshRenderer_1.help_mtx_1;
                             gd3d.math.matrixMultiply(mvpmat, mat1, mat11);
-                            var mat22 = gd3d.math.pool.new_matrix();
+                            var mat22 = skinnedMeshRenderer_1.help_mtx_2;
                             gd3d.math.matrixMultiply(mvpmat, mat2, mat22);
                             gd3d.math.matrixTransformVector3(p0, mat00, t0);
                             gd3d.math.matrixTransformVector3(p1, mat11, t1);
@@ -11684,17 +11702,13 @@ var gd3d;
                                     lastDistance = outInfo.distance;
                                     outInfo.faceId = index / 3;
                                     outInfo.subMeshId = i;
-                                    var tdir = gd3d.math.pool.new_vector3();
+                                    var tdir = skinnedMeshRenderer_1.inteRayHelp_v3_3;
                                     gd3d.math.vec3ScaleByNum(ray.direction, outInfo.distance, tdir);
                                     gd3d.math.vec3Add(ray.origin, tdir, outInfo.hitposition);
-                                    gd3d.math.pool.delete_vector3(tdir);
                                 }
                             }
                             gd3d.math.pool.delete_pickInfo(tempinfo);
                         }
-                        gd3d.math.pool.delete_vector3(t0);
-                        gd3d.math.pool.delete_vector3(t1);
-                        gd3d.math.pool.delete_vector3(t2);
                     }
                 }
                 return ishided;
@@ -11751,7 +11765,28 @@ var gd3d;
             };
             skinnedMeshRenderer.prototype.clone = function () {
             };
+            var skinnedMeshRenderer_1;
             skinnedMeshRenderer.ClassName = "skinnedMeshRenderer";
+            skinnedMeshRenderer.help_v3 = new gd3d.math.vector3();
+            skinnedMeshRenderer.help_v3_1 = new gd3d.math.vector3();
+            skinnedMeshRenderer.help_v3_2 = new gd3d.math.vector3();
+            skinnedMeshRenderer.help_v3_3 = new gd3d.math.vector3();
+            skinnedMeshRenderer.help_v4 = new gd3d.math.vector4();
+            skinnedMeshRenderer.help_v4_1 = new gd3d.math.vector4();
+            skinnedMeshRenderer.help_v4_2 = new gd3d.math.vector4();
+            skinnedMeshRenderer.help_v4_3 = new gd3d.math.vector4();
+            skinnedMeshRenderer.help_mtx = new gd3d.math.matrix();
+            skinnedMeshRenderer.help_mtx_1 = new gd3d.math.matrix();
+            skinnedMeshRenderer.help_mtx_2 = new gd3d.math.matrix();
+            skinnedMeshRenderer.help_mtx_3 = new gd3d.math.matrix();
+            skinnedMeshRenderer.VertexHelpMtx = new gd3d.math.matrix();
+            skinnedMeshRenderer.inteRayHelp_v3 = new gd3d.math.vector3();
+            skinnedMeshRenderer.inteRayHelp_v3_1 = new gd3d.math.vector3();
+            skinnedMeshRenderer.inteRayHelp_v3_2 = new gd3d.math.vector3();
+            skinnedMeshRenderer.inteRayHelp_v3_3 = new gd3d.math.vector3();
+            skinnedMeshRenderer.inteRayHelp_mtx = new gd3d.math.matrix();
+            skinnedMeshRenderer.inteRayHelp_mtx_1 = new gd3d.math.matrix();
+            skinnedMeshRenderer.inteRayHelp_mtx_2 = new gd3d.math.matrix();
             __decorate([
                 gd3d.reflect.Field("material[]"),
                 __metadata("design:type", Array)
@@ -11777,7 +11812,7 @@ var gd3d;
                 gd3d.reflect.Field("vector3"),
                 __metadata("design:type", gd3d.math.vector3)
             ], skinnedMeshRenderer.prototype, "size", void 0);
-            skinnedMeshRenderer = __decorate([
+            skinnedMeshRenderer = skinnedMeshRenderer_1 = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
                 __metadata("design:paramtypes", [])
@@ -15194,6 +15229,8 @@ var gd3d;
                 if (this.isRight(this.frameVecs[this.fruMap.farRT], this.frameVecs[this.fruMap.farLT], this.frameVecs[this.fruMap.farLD], center, radius))
                     return true;
                 return false;
+            };
+            camera.prototype.cullTest = function (radius) {
             };
             camera.prototype.isRight = function (v0, v1, v2, pos, radius) {
                 var edge1 = this._edge1;
@@ -31272,8 +31309,8 @@ var gd3d;
                 }
                 var children = obj.transform.children;
                 if (children != null) {
-                    var len_2 = children.length;
-                    for (var i = 0; i < len_2; i++) {
+                    var len_3 = children.length;
+                    for (var i = 0; i < len_3; i++) {
                         var _obj = children[i].gameObject;
                         this._getComponentsInChildren(type, _obj, array);
                     }

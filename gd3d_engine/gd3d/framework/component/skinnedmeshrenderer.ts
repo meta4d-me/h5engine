@@ -3,17 +3,32 @@
 namespace gd3d.framework
 {
     /**
-    * @public
-    * @language zh_CN
-    * @classdesc
-    * 蒙皮网格渲染组件
-    * @version gd3d 1.0
-    */
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 蒙皮网格渲染组件
+     * @version gd3d 1.0
+     */
     @reflect.nodeRender
     @reflect.nodeComponent
     export class skinnedMeshRenderer implements IRenderer
     {
         static readonly ClassName: string = "skinnedMeshRenderer";
+        private static readonly help_v3 = new gd3d.math.vector3(); 
+        private static readonly help_v3_1 = new gd3d.math.vector3(); 
+        private static readonly help_v3_2 = new gd3d.math.vector3(); 
+        private static readonly help_v3_3 = new gd3d.math.vector3(); 
+
+        private static readonly help_v4 = new gd3d.math.vector4(); 
+        private static readonly help_v4_1 = new gd3d.math.vector4(); 
+        private static readonly help_v4_2 = new gd3d.math.vector4(); 
+        private static readonly help_v4_3 = new gd3d.math.vector4(); 
+
+        private static readonly help_mtx = new gd3d.math.matrix(); 
+        private static readonly help_mtx_1 = new gd3d.math.matrix(); 
+        private static readonly help_mtx_2 = new gd3d.math.matrix(); 
+        private static readonly help_mtx_3 = new gd3d.math.matrix(); 
+
 
         constructor()
         {
@@ -181,65 +196,67 @@ namespace gd3d.framework
          * @private
          * @param index
          */
-        getMatByIndex(index: number)
+        getMatByIndex(index: number , outMtx : gd3d.math.matrix)
         {
             let data = this.mesh.data;
-
-            if (data.blendIndex[index].v0 >= this.maxBoneCount || data.blendIndex[index].v1 >= this.maxBoneCount || data.blendIndex[index].v2 >= this.maxBoneCount || data.blendIndex[index].v3 >= this.maxBoneCount)
+            let bIdx = data.blendIndex;
+            let skData = this._skeletonMatrixData;
+            if (bIdx[index].v0 >= this.maxBoneCount || bIdx[index].v1 >= this.maxBoneCount || bIdx[index].v2 >= this.maxBoneCount || bIdx[index].v3 >= this.maxBoneCount)
             {
                 return null;
             }
-            let mat = new gd3d.math.matrix();
+            let mat = outMtx;
+            gd3d.math.matrixMakeIdentity(mat);
             if (this._efficient)
             {
-                let vec40r = gd3d.math.pool.new_vector4();
-                let vec30p = gd3d.math.pool.new_vector3();
-                vec40r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 0];
-                vec40r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 1];
-                vec40r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 2];
-                vec40r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 3];
+                let vec40r = skinnedMeshRenderer.help_v4;
+                let vec30p = skinnedMeshRenderer.help_v3;
+                vec40r.x = skData[8 * bIdx[index].v0 + 0];
+                vec40r.y = skData[8 * bIdx[index].v0 + 1];
+                vec40r.z = skData[8 * bIdx[index].v0 + 2];
+                vec40r.w = skData[8 * bIdx[index].v0 + 3];
 
-                vec30p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 4];
-                vec30p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 5];
-                vec30p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v0 + 6];
+                vec30p.x = skData[8 * bIdx[index].v0 + 4];
+                vec30p.y = skData[8 * bIdx[index].v0 + 5];
+                vec30p.z = skData[8 * bIdx[index].v0 + 6];
 
-                let vec41r = gd3d.math.pool.new_vector4();
-                let vec31p = gd3d.math.pool.new_vector3();
-                vec41r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 0];
-                vec41r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 1];
-                vec41r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 2];
-                vec41r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 3];
+                let vec41r = skinnedMeshRenderer.help_v4_1;
+                let vec31p = skinnedMeshRenderer.help_v3_1;
+                vec41r.x = skData[8 * bIdx[index].v1 + 0];
+                vec41r.y = skData[8 * bIdx[index].v1 + 1];
+                vec41r.z = skData[8 * bIdx[index].v1 + 2];
+                vec41r.w = skData[8 * bIdx[index].v1 + 3];
 
-                vec31p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 4];
-                vec31p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 5];
-                vec31p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v1 + 6];
+                vec31p.x = skData[8 * bIdx[index].v1 + 4];
+                vec31p.y = skData[8 * bIdx[index].v1 + 5];
+                vec31p.z = skData[8 * bIdx[index].v1 + 6];
 
-                let vec42r = gd3d.math.pool.new_vector4();
-                let vec32p = gd3d.math.pool.new_vector3();
-                vec42r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 0];
-                vec42r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 1];
-                vec42r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 2];
-                vec42r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 3];
+                let vec42r = skinnedMeshRenderer.help_v4_2;
+                let vec32p = skinnedMeshRenderer.help_v3_2;
+                vec42r.x = skData[8 * bIdx[index].v2 + 0];
+                vec42r.y = skData[8 * bIdx[index].v2 + 1];
+                vec42r.z = skData[8 * bIdx[index].v2 + 2];
+                vec42r.w = skData[8 * bIdx[index].v2 + 3];
 
-                vec32p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 4];
-                vec32p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 5];
-                vec32p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v2 + 6];
+                vec32p.x = skData[8 * bIdx[index].v2 + 4];
+                vec32p.y = skData[8 * bIdx[index].v2 + 5];
+                vec32p.z = skData[8 * bIdx[index].v2 + 6];
 
-                let vec43r = gd3d.math.pool.new_vector4();
-                let vec33p = gd3d.math.pool.new_vector3();
-                vec43r.x = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 0];
-                vec43r.y = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 1];
-                vec43r.z = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 2];
-                vec43r.w = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 3];
+                let vec43r = skinnedMeshRenderer.help_v4_3;
+                let vec33p = skinnedMeshRenderer.help_v3_3;
+                vec43r.x = skData[8 * bIdx[index].v3 + 0];
+                vec43r.y = skData[8 * bIdx[index].v3 + 1];
+                vec43r.z = skData[8 * bIdx[index].v3 + 2];
+                vec43r.w = skData[8 * bIdx[index].v3 + 3];
 
-                vec33p.x = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 4];
-                vec33p.y = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 5];
-                vec33p.z = this._skeletonMatrixData[8 * data.blendIndex[index].v3 + 6];
+                vec33p.x = skData[8 * bIdx[index].v3 + 4];
+                vec33p.y = skData[8 * bIdx[index].v3 + 5];
+                vec33p.z = skData[8 * bIdx[index].v3 + 6];
 
-                let mat0 = gd3d.math.pool.new_matrix();
-                let mat1 = gd3d.math.pool.new_matrix();
-                let mat2 = gd3d.math.pool.new_matrix();
-                let mat3 = gd3d.math.pool.new_matrix();
+                let mat0 = skinnedMeshRenderer.help_mtx;
+                let mat1 = skinnedMeshRenderer.help_mtx_1;
+                let mat2 = skinnedMeshRenderer.help_mtx_2;
+                let mat3 = skinnedMeshRenderer.help_mtx_3;
                 gd3d.math.matrixMakeTransformRTS(vec30p, math.pool.vector3_one, vec40r, mat0);
                 gd3d.math.matrixMakeTransformRTS(vec31p, math.pool.vector3_one, vec41r, mat1);
                 gd3d.math.matrixMakeTransformRTS(vec32p, math.pool.vector3_one, vec42r, mat2);
@@ -254,29 +271,17 @@ namespace gd3d.framework
                 gd3d.math.matrixAdd(mat, mat2, mat);
                 gd3d.math.matrixAdd(mat, mat3, mat);
 
-                gd3d.math.pool.delete_vector4(vec40r);
-                gd3d.math.pool.delete_vector4(vec41r);
-                gd3d.math.pool.delete_vector4(vec42r);
-                gd3d.math.pool.delete_vector4(vec43r);
-                gd3d.math.pool.delete_vector3(vec30p);
-                gd3d.math.pool.delete_vector3(vec31p);
-                gd3d.math.pool.delete_vector3(vec32p);
-                gd3d.math.pool.delete_vector3(vec33p);
-                gd3d.math.pool.delete_matrix(mat0);
-                gd3d.math.pool.delete_matrix(mat1);
-                gd3d.math.pool.delete_matrix(mat2);
-                gd3d.math.pool.delete_matrix(mat3);
             }
             else
             {
                 let mat0 = gd3d.math.pool.new_matrix();
-                mat0.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v0, 16 * data.blendIndex[index].v0 + 16) as any;
+                mat0.rawData = skData.slice(16 * bIdx[index].v0, 16 * bIdx[index].v0 + 16) as any;
                 let mat1 = gd3d.math.pool.new_matrix();
-                mat1.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v1, 16 * data.blendIndex[index].v1 + 16) as any;
+                mat1.rawData = skData.slice(16 * bIdx[index].v1, 16 * bIdx[index].v1 + 16) as any;
                 let mat2 = gd3d.math.pool.new_matrix();
-                mat2.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v2, 16 * data.blendIndex[index].v2 + 16) as any;
+                mat2.rawData = skData.slice(16 * bIdx[index].v2, 16 * bIdx[index].v2 + 16) as any;
                 let mat3 = gd3d.math.pool.new_matrix();
-                mat3.rawData = this._skeletonMatrixData.slice(16 * data.blendIndex[index].v3, 16 * data.blendIndex[index].v3 + 16) as any;
+                mat3.rawData = skData.slice(16 * bIdx[index].v3, 16 * bIdx[index].v3 + 16) as any;
 
                 gd3d.math.matrixScaleByNum(data.blendWeight[index].v0, mat0);
                 gd3d.math.matrixScaleByNum(data.blendWeight[index].v1, mat1);
@@ -292,20 +297,30 @@ namespace gd3d.framework
                 gd3d.math.pool.delete_matrix(mat2);
                 gd3d.math.pool.delete_matrix(mat3);
             }
-            return mat;
         }
 
+        private static VertexHelpMtx = new gd3d.math.matrix();
         calActualVertexByIndex(index: number, t: gd3d.math.vector3)
         {
             let data = this.mesh.data;
             let verindex = data.trisindex[index];
             var p = data.pos[verindex];
-            let mat = this.getMatByIndex(verindex);
+            let mtx = skinnedMeshRenderer.VertexHelpMtx;
+            this.getMatByIndex(verindex,mtx);
             // gd3d.math.matrixMultiply(this.gameObject.transform.getLocalMatrix(), mat, mat);
-            if (mat == null)
-                debugger
-            gd3d.math.matrixTransformVector3(p, mat, t);
+            gd3d.math.matrixTransformVector3(p, mtx, t);
         }
+
+
+        private static readonly inteRayHelp_v3 = new gd3d.math.vector3(); 
+        private static readonly inteRayHelp_v3_1 = new gd3d.math.vector3(); 
+        private static readonly inteRayHelp_v3_2 = new gd3d.math.vector3(); 
+        private static readonly inteRayHelp_v3_3 = new gd3d.math.vector3(); 
+
+        private static readonly inteRayHelp_mtx = new gd3d.math.matrix(); 
+        private static readonly inteRayHelp_mtx_1 = new gd3d.math.matrix(); 
+        private static readonly inteRayHelp_mtx_2 = new gd3d.math.matrix(); 
+
         /**
          * @public
          * @language zh_CN
@@ -325,9 +340,9 @@ namespace gd3d.framework
                 for (var i = 0; i < this.mesh.submesh.length; i++)
                 {
                     var submesh = this.mesh.submesh[i];
-                    var t0 = gd3d.math.pool.new_vector3();
-                    var t1 = gd3d.math.pool.new_vector3();
-                    var t2 = gd3d.math.pool.new_vector3();
+                    var t0 = skinnedMeshRenderer.inteRayHelp_v3;
+                    var t1 = skinnedMeshRenderer.inteRayHelp_v3_1;
+                    var t2 = skinnedMeshRenderer.inteRayHelp_v3_2;
                     for (var index = submesh.start; index < submesh.size; index += 3)
                     {
                         let verindex0 = data.trisindex[index];
@@ -338,16 +353,19 @@ namespace gd3d.framework
                         var p1 = data.pos[verindex1];
                         var p2 = data.pos[verindex2];
 
-                        let mat0 = this.getMatByIndex(verindex0);
-                        let mat1 = this.getMatByIndex(verindex1);
-                        let mat2 = this.getMatByIndex(verindex2);
+                        let mat0 = skinnedMeshRenderer.inteRayHelp_mtx; 
+                        this.getMatByIndex(verindex0 , mat0);
+                        let mat1 = skinnedMeshRenderer.inteRayHelp_mtx_1; 
+                        this.getMatByIndex(verindex1 , mat1);
+                        let mat2 = skinnedMeshRenderer.inteRayHelp_mtx_2; 
+                        this.getMatByIndex(verindex2 , mat2);
                         if (mat0 == null || mat1 == null || mat2 == null) continue;
 
-                        let mat00 = gd3d.math.pool.new_matrix();
+                        let mat00 = skinnedMeshRenderer.help_mtx;
                         gd3d.math.matrixMultiply(mvpmat, mat0, mat00);
-                        let mat11 = gd3d.math.pool.new_matrix();
+                        let mat11 = skinnedMeshRenderer.help_mtx_1;
                         gd3d.math.matrixMultiply(mvpmat, mat1, mat11);
-                        let mat22 = gd3d.math.pool.new_matrix();
+                        let mat22 = skinnedMeshRenderer.help_mtx_2;
                         gd3d.math.matrixMultiply(mvpmat, mat2, mat22);
 
                         gd3d.math.matrixTransformVector3(p0, mat00, t0);
@@ -366,17 +384,13 @@ namespace gd3d.framework
                                 lastDistance = outInfo.distance;
                                 outInfo.faceId = index / 3;
                                 outInfo.subMeshId = i;
-                                var tdir = gd3d.math.pool.new_vector3();
+                                var tdir = skinnedMeshRenderer.inteRayHelp_v3_3;
                                 gd3d.math.vec3ScaleByNum(ray.direction, outInfo.distance, tdir);
                                 gd3d.math.vec3Add(ray.origin, tdir, outInfo.hitposition);
-                                gd3d.math.pool.delete_vector3(tdir);
                             }
                         }
                         math.pool.delete_pickInfo(tempinfo);
                     }
-                    gd3d.math.pool.delete_vector3(t0);
-                    gd3d.math.pool.delete_vector3(t1);
-                    gd3d.math.pool.delete_vector3(t2);
                 }
             }
             return ishided;

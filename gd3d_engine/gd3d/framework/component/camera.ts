@@ -870,6 +870,10 @@ namespace gd3d.framework
             return false;
         }
 
+        private cullTest(radius){
+            
+        }
+
         private _edge1 = new gd3d.math.vector3();
         private _edge2 = new gd3d.math.vector3();
         private isRight(v0: gd3d.math.vector3, v1: gd3d.math.vector3, v2: gd3d.math.vector3, pos: gd3d.math.vector3, radius: number)
@@ -889,6 +893,7 @@ namespace gd3d.framework
             return dis > 0;
         }
         /**
+         * [过时接口,完全弃用]
         * @private
         */
         testFrustumCulling(scene: scene, node: transform)

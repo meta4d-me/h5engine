@@ -2021,6 +2021,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class transform {
+        private static readonly help_v3;
         static readonly ClassName: string;
         private helpLRotate;
         private helpLPos;
@@ -2046,6 +2047,7 @@ declare namespace gd3d.framework {
         private _dirtyAABB;
         private _aabb;
         readonly aabb: aabb;
+        private static aabbStoreMap;
         private static readonly aabbCareTypes;
         private _buildAABB;
         children: transform[];
@@ -2219,6 +2221,18 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class skinnedMeshRenderer implements IRenderer {
         static readonly ClassName: string;
+        private static readonly help_v3;
+        private static readonly help_v3_1;
+        private static readonly help_v3_2;
+        private static readonly help_v3_3;
+        private static readonly help_v4;
+        private static readonly help_v4_1;
+        private static readonly help_v4_2;
+        private static readonly help_v4_3;
+        private static readonly help_mtx;
+        private static readonly help_mtx_1;
+        private static readonly help_mtx_2;
+        private static readonly help_mtx_3;
         constructor();
         gameObject: gameObject;
         layer: RenderLayerEnum;
@@ -2242,8 +2256,16 @@ declare namespace gd3d.framework {
         readonly aabb: aabb;
         start(): void;
         onPlay(): void;
-        getMatByIndex(index: number): math.matrix;
+        getMatByIndex(index: number, outMtx: gd3d.math.matrix): any;
+        private static VertexHelpMtx;
         calActualVertexByIndex(index: number, t: gd3d.math.vector3): void;
+        private static readonly inteRayHelp_v3;
+        private static readonly inteRayHelp_v3_1;
+        private static readonly inteRayHelp_v3_2;
+        private static readonly inteRayHelp_v3_3;
+        private static readonly inteRayHelp_mtx;
+        private static readonly inteRayHelp_mtx_1;
+        private static readonly inteRayHelp_mtx_2;
         intersects(ray: ray, outInfo: pickinfo): boolean;
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
@@ -2879,6 +2901,7 @@ declare namespace gd3d.framework {
         private fruMap;
         private _vec3cache;
         isCulling(node: transform): boolean;
+        private cullTest;
         private _edge1;
         private _edge2;
         private isRight;
