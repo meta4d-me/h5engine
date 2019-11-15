@@ -1,3 +1,5 @@
+/// <reference path="ParticleModule.ts" />
+
 namespace gd3d.framework
 {
     /**
