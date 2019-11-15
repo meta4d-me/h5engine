@@ -1,4 +1,4 @@
-namespace feng3d
+namespace gd3d.framework
 {
     /**
      * 粒子系统 颜色随时间变化模块

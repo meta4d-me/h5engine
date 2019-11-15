@@ -1,4 +1,4 @@
-namespace feng3d
+namespace gd3d.framework
 {
     /**
      * Shape of the emitter volume, which controls where particles are emitted and their initial direction.

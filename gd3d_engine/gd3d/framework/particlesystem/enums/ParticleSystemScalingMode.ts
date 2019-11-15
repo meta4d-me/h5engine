@@ -1,4 +1,4 @@
-namespace feng3d
+namespace gd3d.framework
 {
     /**
      * Control how particle systems apply transform scale.

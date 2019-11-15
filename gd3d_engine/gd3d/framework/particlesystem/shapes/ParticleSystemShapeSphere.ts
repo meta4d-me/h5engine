@@ -1,4 +1,4 @@
-namespace feng3d
+namespace gd3d.framework
 {
     /**
      * 从球体的体积中发射。

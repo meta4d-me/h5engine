@@ -1,4 +1,4 @@
-namespace feng3d
+namespace gd3d.framework
 {
     /**
      * The mode used to generate new points in a shape (Shuriken).

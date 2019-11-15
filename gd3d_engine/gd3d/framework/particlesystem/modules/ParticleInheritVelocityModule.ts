@@ -1,4 +1,4 @@
-namespace feng3d
+namespace gd3d.framework
 {
     /**
      * The Inherit Velocity Module controls how the velocity of the emitter is transferred to the particles as they are emitted.
