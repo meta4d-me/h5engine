@@ -188,12 +188,23 @@ namespace gd3d.framework
             return total;
         }
 
-        uploadUnifoms(pass: render.glDrawPass, context: renderContext)
+        private static sameMatPassMap = {   glstate_matrix_model:true,
+                                            glstate_matrix_world2object:true,
+                                            glstate_matrix_modelview:true,
+                                            glstate_matrix_mvp:true,
+                                            glstate_vec4_bones:true,
+                                            glstate_matrix_bones:true
+                                        }
+
+        uploadUnifoms(pass: render.glDrawPass, context: renderContext , lastMatSame = false)
         {
             render.shaderUniform.texindex = 0;
             for (let key in pass.mapuniforms)
             {
                 let unifom = pass.mapuniforms[key];
+                if(lastMatSame && !material.sameMatPassMap[unifom.name]){
+                    continue;
+                }
 
                 let func = render.shaderUniform.applyuniformFunc[unifom.type];
                 let unifomValue: any;
@@ -455,6 +466,9 @@ namespace gd3d.framework
             }
         }
 
+        private static lastDrawMatID = -1;
+        private static lastDrawMeshID = -1;
+
         /**
          * @public
          * @language zh_CN
@@ -465,8 +479,12 @@ namespace gd3d.framework
          * @param sm 渲染的submesh信息
          * @version gd3d 1.0
          */
-        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base", useGLobalLightMap: boolean = true)
+        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base")
         {
+            let matGUID= this.getGUID();
+            let meshGUID= mesh.getGUID();
+            let LastMatSame = matGUID == material.lastDrawMatID;
+            let LastMeshSame = meshGUID == material.lastDrawMeshID;
 
             let drawPasses = this.shader.passes[basetype + context.drawtype];
             if (drawPasses == undefined)
@@ -483,10 +501,13 @@ namespace gd3d.framework
             for (var i = 0, l = drawPasses.length; i < l; i++)
             {
                 var pass = drawPasses[i];
-                pass.use(context.webgl);
-                this.uploadUnifoms(pass, context);
-
-                mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
+                pass.use(context.webgl );
+                this.uploadUnifoms(pass, context , LastMatSame);
+                if(!LastMatSame || !LastMeshSame) mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
+                //test code
+                // if(LastMatSame && LastMatSame){
+                //     console.log(`matGUID :${matGUID} , matName : ${this.name.getText()}`);
+                // }
 
                 DrawCallInfo.inc.add();
                 if (sm.useVertexIndex < 0)
@@ -512,6 +533,10 @@ namespace gd3d.framework
                     }
                 }
             }
+
+            material.lastDrawMatID = matGUID;
+            material.lastDrawMeshID = meshGUID;
+
         }
 
         /**

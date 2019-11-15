@@ -11395,42 +11395,49 @@ var gd3d;
             };
             meshRenderer.prototype.render = function (context, assetmgr, camera) {
                 framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.Meshrender;
-                context.updateLightMask(this.gameObject.layer);
-                context.updateModel(this.gameObject.transform);
-                if (this.filter != null) {
-                    var mesh = this.filter.getMeshOutput();
-                    if (mesh != null && mesh.glMesh) {
-                        mesh.glMesh.bindVboBuffer(context.webgl);
-                        if (mesh.submesh != null) {
-                            for (var i = 0; i < mesh.submesh.length; i++) {
-                                var sm = mesh.submesh[i];
-                                var mid = mesh.submesh[i].matIndex;
-                                var usemat = this.materials[mid];
-                                var drawtype = this.gameObject.transform.scene.fog ? "base_fog" : "base";
-                                if (this.lightmapIndex >= 0 && this.gameObject.transform.scene.lightmaps.length > 0) {
-                                    drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
-                                    if (this.gameObject.transform.scene.lightmaps.length > this.lightmapIndex) {
-                                        context.lightmap = this.gameObject.transform.scene.lightmaps[this.lightmapIndex];
-                                        context.lightmapOffset = this.lightmapScaleOffset;
-                                        context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
-                                    }
-                                }
-                                else {
-                                    if (!this.useGlobalLightMap) {
-                                        drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
-                                        context.lightmap = usemat.statedMapUniforms["_LightmapTex"];
-                                        context.lightmapOffset = this.lightmapScaleOffset;
-                                        context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
-                                    }
-                                }
-                                if (this.gameObject.transform.scene.fog) {
-                                    context.fog = this.gameObject.transform.scene.fog;
-                                }
-                                if (usemat != null)
-                                    usemat.draw(context, mesh, sm, drawtype, this.useGlobalLightMap);
-                            }
+                var go = this.gameObject;
+                var tran = go.transform;
+                var filter = this.filter;
+                context.updateLightMask(go.layer);
+                context.updateModel(tran);
+                if (filter == null)
+                    return;
+                var mesh = this.filter.getMeshOutput();
+                if (mesh == null || mesh.glMesh == null || mesh.submesh == null)
+                    return;
+                var subMeshs = mesh.submesh;
+                if (subMeshs == null)
+                    return;
+                mesh.glMesh.bindVboBuffer(context.webgl);
+                var len = subMeshs.length;
+                var scene = tran.scene;
+                var lightIdx = this.lightmapIndex;
+                for (var i = 0; i < len; i++) {
+                    var sm = subMeshs[i];
+                    var mid = subMeshs[i].matIndex;
+                    var usemat = this.materials[mid];
+                    var drawtype = scene.fog ? "base_fog" : "base";
+                    if (lightIdx >= 0 && scene.lightmaps.length > 0) {
+                        drawtype = scene.fog ? "lightmap_fog" : "lightmap";
+                        if (scene.lightmaps.length > lightIdx) {
+                            context.lightmap = scene.lightmaps[lightIdx];
+                            context.lightmapOffset = this.lightmapScaleOffset;
+                            context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
                         }
                     }
+                    else {
+                        if (!this.useGlobalLightMap) {
+                            drawtype = scene.fog ? "lightmap_fog" : "lightmap";
+                            context.lightmap = usemat.statedMapUniforms["_LightmapTex"];
+                            context.lightmapOffset = this.lightmapScaleOffset;
+                            context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
+                        }
+                    }
+                    if (scene.fog) {
+                        context.fog = scene.fog;
+                    }
+                    if (usemat != null)
+                        usemat.draw(context, mesh, sm, drawtype);
                 }
             };
             meshRenderer.prototype.remove = function () {
@@ -12140,10 +12147,14 @@ var gd3d;
                 }
                 return total;
             };
-            material.prototype.uploadUnifoms = function (pass, context) {
+            material.prototype.uploadUnifoms = function (pass, context, lastMatSame) {
+                if (lastMatSame === void 0) { lastMatSame = false; }
                 gd3d.render.shaderUniform.texindex = 0;
                 for (var key in pass.mapuniforms) {
                     var unifom = pass.mapuniforms[key];
+                    if (lastMatSame && !material_2.sameMatPassMap[unifom.name]) {
+                        continue;
+                    }
                     var func = gd3d.render.shaderUniform.applyuniformFunc[unifom.type];
                     var unifomValue = void 0;
                     if (framework.uniformSetter.autoUniformDic[unifom.name] != null) {
@@ -12274,9 +12285,12 @@ var gd3d;
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
                 }
             };
-            material.prototype.draw = function (context, mesh, sm, basetype, useGLobalLightMap) {
+            material.prototype.draw = function (context, mesh, sm, basetype) {
                 if (basetype === void 0) { basetype = "base"; }
-                if (useGLobalLightMap === void 0) { useGLobalLightMap = true; }
+                var matGUID = this.getGUID();
+                var meshGUID = mesh.getGUID();
+                var LastMatSame = matGUID == material_2.lastDrawMatID;
+                var LastMeshSame = meshGUID == material_2.lastDrawMeshID;
                 var drawPasses = this.shader.passes[basetype + context.drawtype];
                 if (drawPasses == undefined) {
                     basetype = basetype.indexOf("fog") != -1 ? "base_fog" : "base";
@@ -12290,8 +12304,9 @@ var gd3d;
                 for (var i = 0, l = drawPasses.length; i < l; i++) {
                     var pass = drawPasses[i];
                     pass.use(context.webgl);
-                    this.uploadUnifoms(pass, context);
-                    mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
+                    this.uploadUnifoms(pass, context, LastMatSame);
+                    if (!LastMatSame || !LastMeshSame)
+                        mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
                     framework.DrawCallInfo.inc.add();
                     if (sm.useVertexIndex < 0) {
                         if (sm.line) {
@@ -12310,6 +12325,8 @@ var gd3d;
                         }
                     }
                 }
+                material_2.lastDrawMatID = matGUID;
+                material_2.lastDrawMeshID = meshGUID;
             };
             material.prototype.Parse = function (assetmgr, json, bundleName) {
                 if (bundleName === void 0) { bundleName = null; }
@@ -12421,6 +12438,15 @@ var gd3d;
             };
             var material_2;
             material.ClassName = "material";
+            material.sameMatPassMap = { glstate_matrix_model: true,
+                glstate_matrix_world2object: true,
+                glstate_matrix_modelview: true,
+                glstate_matrix_mvp: true,
+                glstate_vec4_bones: true,
+                glstate_matrix_bones: true
+            };
+            material.lastDrawMatID = -1;
+            material.lastDrawMeshID = -1;
             __decorate([
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
@@ -12672,7 +12698,6 @@ var gd3d;
                 });
             };
             mesh.prototype.parseCMesh = function (inData, webgl) {
-                console.log("parseCMesh:" + this.name.getText());
                 var data = new gd3d.render.meshData();
                 var read = new gd3d.io.binReader(inData);
                 data.originVF = read.readUInt16();
@@ -14848,6 +14873,7 @@ var gd3d;
         framework.cameraPostQueue_Color = cameraPostQueue_Color;
         var camera = (function () {
             function camera() {
+                this.cullZPlane = true;
                 this._near = 0.01;
                 this._far = 1000;
                 this.CullingMask = framework.CullingMask.everything ^ framework.CullingMask.editor;
@@ -15216,6 +15242,9 @@ var gd3d;
                 gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, vec3cache);
                 var radius = gd3d.math.vec3Length(vec3cache) / 2;
                 var center = node.aabb.center;
+                return this.cullTest(radius, center);
+            };
+            camera.prototype.cullTest = function (radius, center) {
                 if (this.isRight(this.frameVecs[this.fruMap.nearLD], this.frameVecs[this.fruMap.farLD], this.frameVecs[this.fruMap.farLT], center, radius))
                     return true;
                 if (this.isRight(this.frameVecs[this.fruMap.nearRT], this.frameVecs[this.fruMap.farRT], this.frameVecs[this.fruMap.farRD], center, radius))
@@ -15224,13 +15253,13 @@ var gd3d;
                     return true;
                 if (this.isRight(this.frameVecs[this.fruMap.nearRD], this.frameVecs[this.fruMap.farRD], this.frameVecs[this.fruMap.farLD], center, radius))
                     return true;
+                if (!this.cullZPlane)
+                    return false;
                 if (this.isRight(this.frameVecs[this.fruMap.nearLT], this.frameVecs[this.fruMap.nearRT], this.frameVecs[this.fruMap.nearRD], center, radius))
                     return true;
                 if (this.isRight(this.frameVecs[this.fruMap.farRT], this.frameVecs[this.fruMap.farLT], this.frameVecs[this.fruMap.farLD], center, radius))
                     return true;
                 return false;
-            };
-            camera.prototype.cullTest = function (radius) {
             };
             camera.prototype.isRight = function (v0, v1, v2, pos, radius) {
                 var edge1 = this._edge1;
@@ -35450,6 +35479,7 @@ var gd3d;
         })(BlendModeEnum = render.BlendModeEnum || (render.BlendModeEnum = {}));
         var glDrawPass = (function () {
             function glDrawPass() {
+                this.id = new gd3d.framework.resID();
                 this.state_showface = ShowFaceStateEnum.CCW;
                 this.state_zwrite = false;
                 this.state_ztest = false;
@@ -35513,8 +35543,12 @@ var gd3d;
                 this.lastBlend = null;
                 this.lastBlendMode = null;
             };
-            glDrawPass.prototype.use = function (webgl, applyUniForm) {
-                if (applyUniForm === void 0) { applyUniForm = true; }
+            glDrawPass.prototype.use = function (webgl) {
+                var ID = this.id.getID();
+                var lastSame = glDrawPass.lastPassID == ID;
+                glDrawPass.lastPassID = ID;
+                if (lastSame)
+                    return;
                 if (this.state_showface != glDrawPass.lastShowFace) {
                     glDrawPass.lastShowFace = this.state_showface;
                     if (this.state_showface == ShowFaceStateEnum.ALL) {
@@ -35626,6 +35660,8 @@ var gd3d;
             glDrawPass.lastZTestMethod = -1;
             glDrawPass.lastBlend = null;
             glDrawPass.lastBlendMode = null;
+            glDrawPass.useStateMap = {};
+            glDrawPass.lastPassID = -1;
             return glDrawPass;
         }());
         render.glDrawPass = glDrawPass;

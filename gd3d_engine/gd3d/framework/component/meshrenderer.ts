@@ -173,57 +173,59 @@ namespace gd3d.framework
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
             DrawCallInfo.inc.currentState=DrawCallEnum.Meshrender;
+            let go = this.gameObject;
+            let tran = go.transform;
+            let filter = this.filter; 
 
-            context.updateLightMask(this.gameObject.layer);
-            context.updateModel(this.gameObject.transform);
-            if (this.filter != null)
+            context.updateLightMask(go.layer);
+            context.updateModel(tran);
+            if(filter == null) return;
+            let mesh = this.filter.getMeshOutput();
+            if(mesh == null || mesh.glMesh == null || mesh.submesh == null) return;
+            let subMeshs = mesh.submesh;
+            if(subMeshs == null) return;
+
+            mesh.glMesh.bindVboBuffer(context.webgl);
+
+
+            let len = subMeshs.length;
+            let scene = tran.scene;
+            let lightIdx = this.lightmapIndex;
+            for (let i = 0; i < len; i++)
             {
-                var mesh = this.filter.getMeshOutput();
-                if (mesh != null && mesh.glMesh)
+                let sm = subMeshs[i];
+                let mid = subMeshs[i].matIndex;//根据这个找到使用的具体哪个材质    
+                let usemat = this.materials[mid];
+                let drawtype = scene.fog ? "base_fog" : "base";
+                if (lightIdx >= 0 && scene.lightmaps.length>0)
                 {
-                    mesh.glMesh.bindVboBuffer(context.webgl);
-                    if (mesh.submesh != null)
+                    drawtype = scene.fog ? "lightmap_fog" : "lightmap";
+                    //usemat.shaderStatus = shaderStatus.Lightmap;
+                    if (scene.lightmaps.length > lightIdx)
                     {
-                        for (var i = 0; i < mesh.submesh.length; i++)
-                        {
-                            var sm = mesh.submesh[i];
+                        context.lightmap = scene.lightmaps[lightIdx];
+                        context.lightmapOffset = this.lightmapScaleOffset;
+                        context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
+                    }
 
-                            var mid = mesh.submesh[i].matIndex;//根据这个找到使用的具体哪个材质    
-                            var usemat = this.materials[mid];
-                            var drawtype = this.gameObject.transform.scene.fog ? "base_fog" : "base";
-                            if (this.lightmapIndex >= 0&&this.gameObject.transform.scene.lightmaps.length>0)
-                            {
-                                drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
-                                //usemat.shaderStatus = shaderStatus.Lightmap;
-                                if (this.gameObject.transform.scene.lightmaps.length > this.lightmapIndex)
-                                {
-                                    context.lightmap = this.gameObject.transform.scene.lightmaps[this.lightmapIndex];
-                                    context.lightmapOffset = this.lightmapScaleOffset;
-                                    context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
-                                }
-
-                            }
-                            else
-                            {
-                                if(!this.useGlobalLightMap)
-                                {
-                                    drawtype = this.gameObject.transform.scene.fog ? "lightmap_fog" : "lightmap";
-                                    context.lightmap=usemat.statedMapUniforms["_LightmapTex"];
-                                    context.lightmapOffset = this.lightmapScaleOffset;
-                                    context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
-                                }
-                            }
-                            if (this.gameObject.transform.scene.fog)
-                            {
-                                context.fog = this.gameObject.transform.scene.fog;
-                            }
-                            if (usemat != null)
-                                usemat.draw(context, mesh, sm, drawtype,this.useGlobalLightMap);
-                        }
+                }
+                else
+                {
+                    if(!this.useGlobalLightMap)
+                    {
+                        drawtype = scene.fog ? "lightmap_fog" : "lightmap";
+                        context.lightmap = usemat.statedMapUniforms["_LightmapTex"];
+                        context.lightmapOffset = this.lightmapScaleOffset;
+                        context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
                     }
                 }
+                if (scene.fog)
+                {
+                    context.fog = scene.fog;
+                }
+                if (usemat != null)
+                    usemat.draw(context, mesh, sm, drawtype);
             }
-           
         }
          /**
          * @private

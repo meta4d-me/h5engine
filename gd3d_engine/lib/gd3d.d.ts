@@ -2338,7 +2338,8 @@ declare namespace gd3d.framework {
         use(): void;
         unuse(disposeNow?: boolean): void;
         caclByteLength(): number;
-        uploadUnifoms(pass: render.glDrawPass, context: renderContext): void;
+        private static sameMatPassMap;
+        uploadUnifoms(pass: render.glDrawPass, context: renderContext, lastMatSame?: boolean): void;
         setShader(shader: shader): void;
         getLayer(): RenderLayerEnum;
         private queue;
@@ -2366,7 +2367,9 @@ declare namespace gd3d.framework {
         setMatrixv(_id: string, _matrixv: Float32Array): void;
         setTexture(_id: string, _texture: gd3d.framework.texture, resname?: string): void;
         setCubeTexture(_id: string, _texture: gd3d.framework.texture): void;
-        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, useGLobalLightMap?: boolean): void;
+        private static lastDrawMatID;
+        private static lastDrawMeshID;
+        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string): void;
         Parse(assetmgr: assetMgr, json: any, bundleName?: string): this;
         clone(): material;
         save(): string;
@@ -2846,6 +2849,7 @@ declare namespace gd3d.framework {
         private static helpmtx_2;
         private static helpmtx_3;
         private static helprect;
+        cullZPlane: boolean;
         gameObject: gameObject;
         private _near;
         near: number;
@@ -2901,7 +2905,7 @@ declare namespace gd3d.framework {
         private fruMap;
         private _vec3cache;
         isCulling(node: transform): boolean;
-        private cullTest;
+        cullTest(radius: number, center: math.vector3): boolean;
         private _edge1;
         private _edge2;
         private isRight;
@@ -6952,6 +6956,7 @@ declare namespace gd3d.render {
         Add_PreMultiply = 4
     }
     class glDrawPass {
+        id: framework.resID;
         static lastShowFace: number;
         static lastZWrite: boolean;
         static lastZTest: boolean;
@@ -6976,7 +6981,9 @@ declare namespace gd3d.render {
         setProgram(program: glProgram, uniformDefault?: boolean): void;
         setAlphaBlend(mode: BlendModeEnum): void;
         static resetLastState(): void;
-        use(webgl: WebGLRenderingContext, applyUniForm?: boolean): void;
+        private static useStateMap;
+        private static lastPassID;
+        use(webgl: WebGLRenderingContext): void;
         draw(webgl: WebGLRenderingContext, mesh: glMesh, drawmode?: DrawModeEnum, drawindexindex?: number, drawbegin?: number, drawcount?: number): void;
         private getCurDrawState;
         private getCurBlendVal;

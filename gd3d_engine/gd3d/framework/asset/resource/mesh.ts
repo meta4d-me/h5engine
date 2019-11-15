@@ -410,7 +410,7 @@ namespace gd3d.framework
 
         parseCMesh(inData, webgl)
         {
-            console.log(`parseCMesh:${this.name.getText()}`);
+            // console.log(`parseCMesh:${this.name.getText()}`);
             var data: gd3d.render.meshData = new gd3d.render.meshData();
             var read: gd3d.io.binReader = new gd3d.io.binReader(inData);
             data.originVF = read.readUInt16();
