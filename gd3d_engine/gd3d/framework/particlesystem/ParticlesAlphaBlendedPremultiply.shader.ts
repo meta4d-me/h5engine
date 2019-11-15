@@ -10,22 +10,16 @@ namespace feng3d
         /**
          * 粒子贴图
          */
-        @serialize
-        @oav({ tooltip: "粒子贴图" })
         s_particle = Texture2D.defaultParticle;
 
         /**
          * 粒子贴图使用的UV变换
          */
-        @serialize
-        @oav({ tooltip: "粒子贴图使用的UV变换" })
         u_s_particle_transform = new Vector4(1, 1, 0, 0);
 
         /**
          * @todo
          */
-        @serialize
-        @oav()
         u_softParticlesFactor = 1.0;
     }
 

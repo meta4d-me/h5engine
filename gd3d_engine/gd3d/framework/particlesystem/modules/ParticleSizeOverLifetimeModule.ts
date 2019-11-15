@@ -11,9 +11,6 @@ namespace feng3d
          * 
          * 在每个轴上分别设置生命周期内的大小。
          */
-        @serialize
-        // @oav({ tooltip: "Set the size over lifetime on each axis separately." })
-        @oav({ tooltip: "在每个轴上分别设置生命周期内的大小。" })
         separateAxes = false;
 
         /**
@@ -21,8 +18,6 @@ namespace feng3d
          * 
          * 基于寿命的粒度控制曲线。
          */
-        // @oav({ tooltip: "Curve to control particle size based on lifetime." })
-        @oav({ tooltip: "基于寿命的粒度控制曲线。" })
         get size()
         {
             return this.size3D.xCurve;
@@ -53,9 +48,6 @@ namespace feng3d
          * 
          * 基于寿命的粒度控制曲线。
          */
-        @serialize
-        // @oav({ tooltip: "Curve to control particle size based on lifetime." })
-        @oav({ tooltip: "基于寿命的粒度控制曲线。" })
         size3D = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constant1: 1, curveMultiplier: 1 }, yCurve: { between0And1: true, constant: 1, constant1: 1, curveMultiplier: 1 }, zCurve: { between0And1: true, constant: 1, constant1: 1, curveMultiplier: 1 } });
 
         /**

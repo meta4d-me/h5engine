@@ -8,7 +8,6 @@ namespace feng3d
         /**
          * 球体半径
          */
-        @oav({ tooltip: "球体半径" })
         get radius()
         {
             return this._module.radius;
@@ -22,7 +21,6 @@ namespace feng3d
         /**
          * 是否从球面发射
          */
-        @oav({ tooltip: "是否从球面发射" })
         emitFromShell = false;
 
         /**
@@ -54,13 +52,11 @@ namespace feng3d
      */
     export class ParticleSystemShapeHemisphere extends ParticleSystemShape
     {
-        @oav({ tooltip: "球体半径" })
         radius = 1;
 
         /**
          * 是否从球面发射
          */
-        @oav({ tooltip: "是否从球面发射" })
         emitFromShell = false;
 
         /**

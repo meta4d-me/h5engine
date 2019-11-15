@@ -31,8 +31,6 @@ namespace feng3d
          */
         time = 0;
 
-        @serialize
-        @oav({ block: "main", component: "OAVObjectView" })
         get main() { return this._main; }
         set main(v)
         {
@@ -42,8 +40,6 @@ namespace feng3d
         }
         private _main: ParticleMainModule;
 
-        @serialize
-        @oav({ block: "emission", component: "OAVObjectView" })
         get emission() { return this._emission; }
         set emission(v)
         {
@@ -53,8 +49,6 @@ namespace feng3d
         }
         private _emission: ParticleEmissionModule;
 
-        @serialize
-        @oav({ block: "shape", component: "OAVObjectView" })
         get shape() { return this._shape; }
         set shape(v)
         {
@@ -64,8 +58,6 @@ namespace feng3d
         }
         private _shape: ParticleShapeModule;
 
-        @serialize
-        @oav({ block: "velocityOverLifetime", component: "OAVObjectView" })
         get velocityOverLifetime() { return this._velocityOverLifetime; }
         set velocityOverLifetime(v)
         {
@@ -75,9 +67,6 @@ namespace feng3d
         }
         private _velocityOverLifetime: ParticleVelocityOverLifetimeModule;
 
-        @serialize
-        // @oav({ tooltip: "limit velocity over lifetime module.", block: "limitVelocityOverLifetime", component: "OAVObjectView" })
-        @oav({ tooltip: "基于时间轴限制速度模块。", block: "limitVelocityOverLifetime", component: "OAVObjectView" })
         get limitVelocityOverLifetime() { return this._limitVelocityOverLifetime; }
         set limitVelocityOverLifetime(v)
         {
@@ -87,8 +76,6 @@ namespace feng3d
         }
         private _limitVelocityOverLifetime: ParticleLimitVelocityOverLifetimeModule;
 
-        @serialize
-        @oav({ block: "forceOverLifetime", component: "OAVObjectView" })
         get forceOverLifetime() { return this._forceOverLifetime; }
         set forceOverLifetime(v)
         {
@@ -98,8 +85,6 @@ namespace feng3d
         }
         private _forceOverLifetime: ParticleForceOverLifetimeModule;
 
-        @serialize
-        @oav({ block: "colorOverLifetime", component: "OAVObjectView" })
         get colorOverLifetime() { return this._colorOverLifetime; }
         set colorOverLifetime(v)
         {
@@ -109,8 +94,6 @@ namespace feng3d
         }
         private _colorOverLifetime: ParticleColorOverLifetimeModule;
 
-        @serialize
-        @oav({ block: "sizeOverLifetime", component: "OAVObjectView" })
         get sizeOverLifetime() { return this._sizeOverLifetime; }
         set sizeOverLifetime(v)
         {
@@ -120,8 +103,6 @@ namespace feng3d
         }
         private _sizeOverLifetime: ParticleSizeOverLifetimeModule;
 
-        @serialize
-        @oav({ block: "rotationOverLifetime", component: "OAVObjectView" })
         get rotationOverLifetime() { return this._rotationOverLifetime; }
         set rotationOverLifetime(v)
         {
@@ -134,8 +115,7 @@ namespace feng3d
         /**
          * 粒子系统纹理表动画模块。
          */
-        @serialize
-        @oav({ tooltip: "粒子系统纹理表动画模块。", block: "textureSheetAnimation", component: "OAVObjectView" })
+        
         get textureSheetAnimation() { return this._textureSheetAnimation; }
         set textureSheetAnimation(v)
         {
@@ -145,18 +125,12 @@ namespace feng3d
         }
         private _textureSheetAnimation: ParticleTextureSheetAnimationModule;
 
-        @oav({ block: "Renderer" })
         geometry = Geometry.billboard;
 
-        @oav({ block: "Renderer" })
         material = Material.particle;
 
-        @oav({ block: "Renderer" })
-        @serialize
         castShadows = true;
 
-        @oav({ block: "Renderer" })
-        @serialize
         receiveShadows = true;
 
         /**

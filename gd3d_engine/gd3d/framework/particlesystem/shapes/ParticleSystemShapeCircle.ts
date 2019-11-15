@@ -5,7 +5,6 @@ namespace feng3d
      */
     export class ParticleSystemShapeCircle extends ParticleSystemShape
     {
-        @oav({ tooltip: "半径" })
         get radius()
         {
             return this._module.radius;
@@ -16,7 +15,6 @@ namespace feng3d
             this._module.radius = v;
         }
 
-        @oav({ tooltip: "弧度" })
         get arc()
         {
             return this._module.arc;
@@ -32,8 +30,6 @@ namespace feng3d
          * 
          * 在弧线周围产生粒子的模式。
          */
-        // @oav({ tooltip: "The mode used for generating particles around the arc.", component: "OAVEnum", componentParam: { enumClass: ParticleSystemShapeMultiModeValue } })
-        @oav({ tooltip: "在弧线周围产生粒子的模式。", component: "OAVEnum", componentParam: { enumClass: ParticleSystemShapeMultiModeValue } })
         get arcMode()
         {
             return this._module.arcMode;
@@ -49,7 +45,6 @@ namespace feng3d
          * 
          * 控制弧线周围发射点之间的间隙。
          */
-        @oav({ tooltip: "控制弧线周围发射点之间的间隙。" })
         get arcSpread()
         {
             return this._module.arcSpread;
@@ -64,7 +59,6 @@ namespace feng3d
          * When using one of the animated modes, how quickly to move the emission position around the arc.
          * 当使用一个动画模式时，如何快速移动发射位置周围的弧。
          */
-        @oav({ tooltip: "当使用一个动画模式时，如何快速移动发射位置周围的弧。" })
         get arcSpeed()
         {
             return this._module.arcSpeed;
@@ -78,7 +72,6 @@ namespace feng3d
         /**
          * 是否从圆形边缘发射。
          */
-        @oav({ tooltip: "是否从圆形边缘发射。" })
         emitFromEdge = false;
 
         /**

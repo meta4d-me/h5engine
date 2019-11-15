@@ -24,7 +24,6 @@ namespace feng3d
         /**
          * 盒子X方向缩放。
          */
-        @oav({ tooltip: "盒子X方向缩放。" })
         get boxX()
         {
             return this._module.box.x;
@@ -38,7 +37,6 @@ namespace feng3d
         /**
          * 盒子Y方向缩放。
          */
-        @oav({ tooltip: "盒子Y方向缩放。" })
         get boxY()
         {
             return this._module.box.y;
@@ -52,7 +50,6 @@ namespace feng3d
         /**
          * 盒子Z方向缩放。
          */
-        @oav({ tooltip: "盒子Z方向缩放。" })
         get boxZ()
         {
             return this._module.box.z;
@@ -66,7 +63,6 @@ namespace feng3d
         /**
          * 粒子系统盒子发射类型。
          */
-        @oav({ tooltip: "粒子系统盒子发射类型。", component: "OAVEnum", componentParam: { enumClass: ParticleSystemShapeBoxEmitFrom } })
         emitFrom = ParticleSystemShapeBoxEmitFrom.Volume;
 
         /**

@@ -8,7 +8,6 @@ namespace feng3d
         /**
          * 边长的一半。
          */
-        @oav({ tooltip: "边长的一半。" })
         get radius()
         {
             return this._module.radius;
@@ -24,7 +23,6 @@ namespace feng3d
          * 
          * 在弧线周围产生粒子的模式。
          */
-        @oav({ tooltip: "在弧线周围产生粒子的模式。", component: "OAVEnum", componentParam: { enumClass: ParticleSystemShapeMultiModeValue } })
         get radiusMode()
         {
             return this._module.radiusMode;
@@ -40,7 +38,6 @@ namespace feng3d
          * 
          * 控制弧线周围发射点之间的间隙。
          */
-        @oav({ tooltip: "控制弧线周围发射点之间的间隙。" })
         get radiusSpread()
         {
             return this._module.radiusSpread;
@@ -56,7 +53,6 @@ namespace feng3d
          * 
          * 当使用一个动画模式时，如何快速移动发射位置周围的弧。
          */
-        @oav({ tooltip: "当使用一个动画模式时，如何快速移动发射位置周围的弧。" })
         get radiusSpeed()
         {
             return this._module.radiusSpeed;

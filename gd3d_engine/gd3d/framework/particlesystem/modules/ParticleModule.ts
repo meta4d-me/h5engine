@@ -8,8 +8,6 @@ namespace feng3d
         /**
          * 是否开启
          */
-        @oav({ tooltip: "是否开启" })
-        @serialize
         enabled = false;
 
         /**

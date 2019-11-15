@@ -10,29 +10,21 @@ namespace feng3d
         /**
          * 点绘制时点的尺寸
          */
-        @serialize
-        @oav()
         u_PointSize = 1;
 
         /**
          * 漫反射纹理
          */
-        @serialize
-        @oav({ block: "diffuse" })
         s_diffuse = Texture2D.defaultParticle;
 
         /**
          * 基本颜色
          */
-        @serialize
-        @oav({ block: "diffuse" })
         u_diffuse = new Color4(1, 1, 1, 1);
 
         /**
          * 透明阈值，透明度小于该值的像素被片段着色器丢弃
          */
-        @serialize
-        @oav({ block: "diffuse" })
         u_alphaThreshold = 0;
     }
 
