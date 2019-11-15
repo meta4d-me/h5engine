@@ -1,7 +1,5 @@
 namespace gd3d.framework
 {
-    type loadCallback = (state?: stateLoad) => void;
-    type downloadBindType = (guid: number, url: string, type: AssetTypeEnum, finish: () => void) => void;
 
     export const assetParseMap: { [key: number]: IAssetFactory } = {};
     //资源处理装饰器
@@ -132,7 +130,7 @@ namespace gd3d.framework
         static onGuidInit: () => void;
         public static Instance: assetMgr;
 
-        static mapLoading: { [key: number]: { url?: string, readyok: boolean, data?: any, cbQueue?: loadCallback[], subRes?: number[] } } = {};//下载好的,未下载好的,资源
+        static mapLoading: { [key: number]: { url?: string, readyok: boolean, data?: any, cbQueue?: ((state?: stateLoad) => void)[], subRes?: number[] } } = {};//下载好的,未下载好的,资源
         static mapGuid: { [key: number]: assetRef } = {};//解析好的资源
         static mapImage: { [key: number]: HTMLImageElement } = {};//图片缓存
         static mapNamed: { [key: string]: IAsset } = {};//资源名是 ,系统资源类型的名字 或自己定义的名字
@@ -167,7 +165,7 @@ namespace gd3d.framework
         //加载资源
         load(url: string, type: AssetTypeEnum = AssetTypeEnum.Auto,
             /** 这是解析完成的回调 */
-            onstate: loadCallback = null,downloadFinish:()=>void=null)
+            onstate: (state?: stateLoad) => void = null,downloadFinish:()=>void=null)
         {
             let keyUrl = url.replace(assetMgr.cdnRoot, "");
             let guid = assetMgr.urlmapGuid[keyUrl];

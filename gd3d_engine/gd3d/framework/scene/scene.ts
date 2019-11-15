@@ -796,7 +796,6 @@ namespace gd3d.framework
             {
                 // console.error(e.message);
                 throw e;
-                return false;
             }
 
             //physic=new PhysicsEngine(new math.vector3(0,-9.8,0),new OimoJSPlugin());
@@ -817,7 +816,6 @@ namespace gd3d.framework
             {
                 // console.error(e.message);
                 throw e;
-                return false;
             }
         }
     }
