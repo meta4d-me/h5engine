@@ -70,7 +70,7 @@ namespace gd3d.framework
     /**
      * 序列化属性函数项
      */
-    interface PropertyHandler
+    export interface PropertyHandler
     {
         /**
          * 序列化属性函数项
@@ -89,7 +89,7 @@ namespace gd3d.framework
     /**
      * 序列化属性函数项
      */
-    interface DifferentPropertyHandler
+    export interface DifferentPropertyHandler
     {
         /**
          * 序列化属性函数项
