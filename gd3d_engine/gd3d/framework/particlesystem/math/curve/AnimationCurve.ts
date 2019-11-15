@@ -6,7 +6,7 @@ namespace gd3d.framework
      * 
      * 基于时间轴的连续三阶Bézier曲线
      */
-    export class AnimationCurve
+    export class AnimationCurve1
     {
         /**
          * 最大tan值，超出该值后将会变成分段
@@ -156,7 +156,6 @@ namespace gd3d.framework
 
             if (keys.length == 0) return new AnimationCurveKeyframe({ time: t, value: 0, tangent: 0 });
 
-            debuger && console.assert(isfind);
             return new AnimationCurveKeyframe({ time: t, value: value, tangent: tangent });
         }
 

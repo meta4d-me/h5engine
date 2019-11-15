@@ -19,5 +19,12 @@ namespace gd3d.framework
          * 斜率
          */
         tangent: number
+
+        constructor(a: Partial<AnimationCurveKeyframe>)
+        {
+            a.time && (this.time = a.time);
+            a.value && (this.value = a.value);
+            a.tangent && (this.tangent = a.tangent);
+        }
     }
 }

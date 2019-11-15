@@ -23,12 +23,12 @@ namespace gd3d.framework
         /**
          * 曲线，用于 MinMaxCurveMode.RandomBetweenTwoCurves
          */
-        curve = new AnimationCurve();
+        curve = new AnimationCurve1();
 
         /**
          * 曲线1
          */
-        curve1 = serialization.setValue(new AnimationCurve(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] });
+        curve1 = serialization.setValue(new AnimationCurve1(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] });
 
         /**
          * 曲线缩放比
