@@ -14,7 +14,25 @@ namespace gd3d.framework
         /**
          * 角速度，基于生命周期的旋转。
          */
-        angularVelocity = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { constant: 45, constant1: 45, curveMultiplier: 45 }, yCurve: { constant: 45, constant1: 45, curveMultiplier: 45 }, zCurve: { constant: 45, constant1: 45, curveMultiplier: 45 } });
+        angularVelocity: MinMaxCurveVector3;
+
+        constructor()
+        {
+            super();
+            this.angularVelocity = new MinMaxCurveVector3();
+            this.angularVelocity.xCurve.between0And1 = false;
+            this.angularVelocity.xCurve.constant = 45;
+            this.angularVelocity.xCurve.constant1 = 45;
+            this.angularVelocity.xCurve.curveMultiplier = 45;
+            this.angularVelocity.yCurve.between0And1 = false;
+            this.angularVelocity.yCurve.constant = 45;
+            this.angularVelocity.yCurve.constant1 = 45;
+            this.angularVelocity.yCurve.curveMultiplier = 45;
+            this.angularVelocity.zCurve.between0And1 = false;
+            this.angularVelocity.zCurve.constant = 45;
+            this.angularVelocity.zCurve.constant1 = 45;
+            this.angularVelocity.zCurve.curveMultiplier = 45;
+        }
 
         /**
          * Rotation over lifetime curve for the X axis.
