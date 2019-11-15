@@ -8,7 +8,7 @@ namespace gd3d.framework
         /**
          * 随着时间的推移，新粒子产生的速度。
          */
-        rateOverTime: MinMaxCurve;
+        rateOverTime = serialization.setValue(new MinMaxCurve(), { between0And1: true, constant: 10, constant1: 10 });
 
         /**
          * Change the rate over time multiplier.
@@ -37,7 +37,7 @@ namespace gd3d.framework
          * 
          * @todo
          */
-        rateOverDistance: MinMaxCurve;
+        rateOverDistance = serialization.setValue(new MinMaxCurve(), { between0And1: true, constant: 0, constant1: 1 });
 
         /**
          * Change the rate over distance multiplier.
@@ -69,21 +69,6 @@ namespace gd3d.framework
         get burstCount()
         {
             return this.bursts.length;
-        }
-
-        constructor()
-        {
-            super();
-            this.rateOverTime = new MinMaxCurve();
-            this.rateOverTime.between0And1 = true;
-            this.rateOverTime.constant = 10;
-            this.rateOverTime.constant1 = 10;
-            //
-            this.rateOverDistance = new MinMaxCurve();
-            this.rateOverDistance.between0And1 = true;
-            this.rateOverDistance.constant = 0;
-            this.rateOverDistance.constant1 = 1;
-
         }
 
         /**
