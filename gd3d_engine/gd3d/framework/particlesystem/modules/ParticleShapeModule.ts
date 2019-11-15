@@ -10,7 +10,6 @@ namespace gd3d.framework
          * Type of shape to emit particles from.
          * 发射粒子的形状类型。
          */
-        
         get shapeType()
         {
             return this._shapeType;
@@ -42,7 +41,7 @@ namespace gd3d.framework
         /**
          * 当前使用的发射形状
          */
-        activeShape: ParticleSystemShape;
+        activeShape: ParticleSystemShapeBase;
 
         /**
          * Align particles based on their initial direction of travel.
@@ -269,7 +268,7 @@ namespace gd3d.framework
          * 初始化粒子状态
          * @param particle 粒子
          */
-        initParticleState(particle: Particle)
+        initParticleState(particle: Particle1)
         {
             if (!this.enabled) return;
             this.activeShape.initParticleState(particle);

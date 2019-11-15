@@ -152,7 +152,7 @@ namespace gd3d.framework
          * 
          * @param particle 粒子
          */
-        initParticleState(particle: Particle)
+        initParticleState(particle: Particle1)
         {
             particle[_LimitVelocityOverLifetime_rate] = Math.random();
         }
@@ -162,7 +162,7 @@ namespace gd3d.framework
          * 
          * @param particle 粒子
          */
-        updateParticleState(particle: Particle)
+        updateParticleState(particle: Particle1)
         {
             if (!this.enabled) return;
 

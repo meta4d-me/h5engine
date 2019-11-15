@@ -56,7 +56,7 @@ namespace gd3d.framework
     /**
      * 粒子系统发射圆锥体，用于定义基于圆锥体的粒子发射时的初始状态。
      */
-    export class ParticleSystemShapeCone extends ParticleSystemShape
+    export class ParticleSystemShapeCone extends ParticleSystemShapeBase
     {
         /**
          * Angle of the cone.
@@ -164,7 +164,7 @@ namespace gd3d.framework
          * 初始化粒子状态
          * @param particle 粒子
          */
-        initParticleState(particle: Particle)
+        initParticleState(particle: Particle1)
         {
             var speed = particle.velocity.length;
             var radius = this.radius;

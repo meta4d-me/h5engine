@@ -116,7 +116,7 @@ namespace gd3d.framework
          * 初始化粒子状态
          * @param particle 粒子
          */
-        initParticleState(particle: Particle)
+        initParticleState(particle: Particle1)
         {
             particle[_VelocityOverLifetime_rate] = Math.random();
             particle[_VelocityOverLifetime_preVelocity] = new Vector3();
@@ -126,7 +126,7 @@ namespace gd3d.framework
          * 更新粒子状态
          * @param particle 粒子
          */
-        updateParticleState(particle: Particle)
+        updateParticleState(particle: Particle1)
         {
             var preVelocity: Vector3 = particle[_VelocityOverLifetime_preVelocity];
             particle.velocity.sub(preVelocity);

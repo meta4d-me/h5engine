@@ -3,7 +3,7 @@ namespace gd3d.framework
     /**
      * 粒子系统 发射形状
      */
-    export class ParticleSystemShape
+    export class ParticleSystemShapeBase
     {
         protected _module: ParticleShapeModule;
 
@@ -16,7 +16,7 @@ namespace gd3d.framework
          * 初始化粒子状态
          * @param particle 粒子
          */
-        initParticleState(particle: Particle)
+        initParticleState(particle: Particle1)
         {
 
         }

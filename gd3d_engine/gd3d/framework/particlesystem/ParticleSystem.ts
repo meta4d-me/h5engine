@@ -344,11 +344,11 @@ namespace gd3d.framework
         /**
          * 粒子池，用于存放未发射或者死亡粒子
          */
-        private _particlePool: Particle[] = [];
+        private _particlePool: Particle1[] = [];
         /**
          * 活跃的粒子列表
          */
-        private _activeParticles: Particle[] = [];
+        private _activeParticles: Particle1[] = [];
 
         /**
          * 属性数据列表
@@ -460,7 +460,7 @@ namespace gd3d.framework
 
                 if (rateAtLifeTime < 1)
                 {
-                    var particle = this._particlePool.pop() || new Particle();
+                    var particle = this._particlePool.pop() || new Particle1();
                     particle.birthTime = birthTime;
                     particle.lifetime = lifetime;
                     particle.rateAtLifeTime = rateAtLifeTime;
@@ -498,7 +498,7 @@ namespace gd3d.framework
          * 初始化粒子状态
          * @param particle 粒子
          */
-        private _initParticleState(particle: Particle)
+        private _initParticleState(particle: Particle1)
         {
             this._modules.forEach(v => { v.initParticleState(particle) });
         }
@@ -507,7 +507,7 @@ namespace gd3d.framework
          * 更新粒子状态
          * @param particle 粒子
          */
-        private _updateParticleState(particle: Particle)
+        private _updateParticleState(particle: Particle1)
         {
             var preTime = Math.max(this._preRealTime, particle.birthTime);
             //

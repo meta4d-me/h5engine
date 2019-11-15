@@ -144,7 +144,7 @@ namespace gd3d.framework
          * 初始化粒子状态
          * @param particle 粒子
          */
-        initParticleState(particle: Particle)
+        initParticleState(particle: Particle1)
         {
             particle[_SizeOverLifetime_rate] = Math.random();
         }
@@ -153,7 +153,7 @@ namespace gd3d.framework
          * 更新粒子状态
          * @param particle 粒子
          */
-        updateParticleState(particle: Particle)
+        updateParticleState(particle: Particle1)
         {
             if (!this.enabled) return;
 

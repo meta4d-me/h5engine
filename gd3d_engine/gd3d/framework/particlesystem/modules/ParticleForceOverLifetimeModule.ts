@@ -123,7 +123,7 @@ namespace gd3d.framework
          * 初始化粒子状态
          * @param particle 粒子
          */
-        initParticleState(particle: Particle)
+        initParticleState(particle: Particle1)
         {
             particle[_ForceOverLifetime_rate] = Math.random();
             particle[_ForceOverLifetime_preForce] = new Vector3();
@@ -133,7 +133,7 @@ namespace gd3d.framework
          * 更新粒子状态
          * @param particle 粒子
          */
-        updateParticleState(particle: Particle)
+        updateParticleState(particle: Particle1)
         {
             var preForce: Vector3 = particle[_ForceOverLifetime_preForce];
             particle.acceleration.sub(preForce);

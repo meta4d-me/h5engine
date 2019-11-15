@@ -4,7 +4,7 @@ namespace gd3d.framework
 	/**
 	 * 粒子
 	 */
-	export class Particle
+	export class Particle1
 	{
 		/**
 		 * 出生时间

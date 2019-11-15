@@ -1,3 +1,5 @@
+/// <reference path="ParticleSystemShapeBase.ts" />
+
 namespace gd3d.framework
 {
     export enum ParticleSystemShapeBoxEmitFrom
@@ -19,7 +21,7 @@ namespace gd3d.framework
     /**
      * 粒子系统 发射盒子
      */
-    export class ParticleSystemShapeBox extends ParticleSystemShape
+    export class ParticleSystemShapeBox extends ParticleSystemShapeBase
     {
         /**
          * 盒子X方向缩放。
@@ -69,7 +71,7 @@ namespace gd3d.framework
          * 初始化粒子状态
          * @param particle 粒子
          */
-        initParticleState(particle: Particle)
+        initParticleState(particle: Particle1)
         {
             var speed = particle.velocity.length;
 

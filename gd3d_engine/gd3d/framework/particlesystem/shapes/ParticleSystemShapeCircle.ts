@@ -1,9 +1,11 @@
+/// <reference path="ParticleSystemShapeBase.ts" />
+
 namespace gd3d.framework
 {
     /**
      * 粒子系统 发射圆盘
      */
-    export class ParticleSystemShapeCircle extends ParticleSystemShape
+    export class ParticleSystemShapeCircle extends ParticleSystemShapeBase
     {
         get radius()
         {
@@ -78,7 +80,7 @@ namespace gd3d.framework
          * 初始化粒子状态
          * @param particle 粒子
          */
-        initParticleState(particle: Particle)
+        initParticleState(particle: Particle1)
         {
             var speed = particle.velocity.length;
             var radius = this.radius;

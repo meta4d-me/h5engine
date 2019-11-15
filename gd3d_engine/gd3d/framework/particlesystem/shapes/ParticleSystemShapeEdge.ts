@@ -3,7 +3,7 @@ namespace gd3d.framework
     /**
      * 粒子系统 发射边
      */
-    export class ParticleSystemShapeEdge extends ParticleSystemShape
+    export class ParticleSystemShapeEdge extends ParticleSystemShapeBase
     {
         /**
          * 边长的一半。
@@ -67,7 +67,7 @@ namespace gd3d.framework
          * 初始化粒子状态
          * @param particle 粒子
          */
-        initParticleState(particle: Particle)
+        initParticleState(particle: Particle1)
         {
             var speed = particle.velocity.length;
             var arc = 360 * this.radius;

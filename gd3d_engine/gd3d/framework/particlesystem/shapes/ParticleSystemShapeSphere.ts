@@ -3,7 +3,7 @@ namespace gd3d.framework
     /**
      * 从球体的体积中发射。
      */
-    export class ParticleSystemShapeSphere extends ParticleSystemShape
+    export class ParticleSystemShapeSphere extends ParticleSystemShapeBase
     {
         /**
          * 球体半径
@@ -27,7 +27,7 @@ namespace gd3d.framework
          * 初始化粒子状态
          * @param particle 粒子
          */
-        initParticleState(particle: Particle)
+        initParticleState(particle: Particle1)
         {
             var speed = particle.velocity.length;
 
@@ -50,7 +50,7 @@ namespace gd3d.framework
     /**
      * 从半球体的体积中发出。
      */
-    export class ParticleSystemShapeHemisphere extends ParticleSystemShape
+    export class ParticleSystemShapeHemisphere extends ParticleSystemShapeBase
     {
         radius = 1;
 
@@ -63,7 +63,7 @@ namespace gd3d.framework
          * 初始化粒子状态
          * @param particle 粒子
          */
-        initParticleState(particle: Particle)
+        initParticleState(particle: Particle1)
         {
             var speed = particle.velocity.length;
 
