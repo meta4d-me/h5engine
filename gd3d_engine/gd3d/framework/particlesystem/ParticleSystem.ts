@@ -15,11 +15,9 @@ namespace gd3d.framework
     /**
      * 粒子系统
      */
-    export class ParticleSystem extends EventDispatcher
+    export class ParticleSystem extends EventDispatcher implements INodeComponent
     {
         __class__: "feng3d.ParticleSystem" = "feng3d.ParticleSystem";
-
-        gameObject: gameObject;
 
         get transform()
         {
@@ -157,6 +155,28 @@ namespace gd3d.framework
          * 启动延迟(以秒为单位)。在调用.play()时初始化值。
          */
         startDelay = 0;
+
+        onPlay()
+        {
+
+        }
+
+        start()
+        {
+
+        }
+
+        remove()
+        {
+            throw "未实现";
+        }
+
+        clone()
+        {
+            throw "未实现";
+        }
+
+        gameObject: gameObject;
 
         constructor()
         {

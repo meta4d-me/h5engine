@@ -29911,8 +29911,10 @@ var gd3d;
                 renderAtomic.shaderMacro.HAS_PARTICLE_ANIMATOR = true;
                 renderAtomic.shaderMacro.ENABLED_PARTICLE_SYSTEM_textureSheetAnimation = this.textureSheetAnimation.enabled;
                 var cameraMatrix = camera.transform.localToWorldMatrix.clone();
-                var localCameraPos = this.gameObject.transform.worldToLocalMatrix.transformVector(cameraMatrix.position);
-                var localCameraUp = this.gameObject.transform.worldToLocalRotationMatrix.transformVector(cameraMatrix.up);
+                var localToWorldMatrix = new framework.Matrix4x4(this.transform.getWorldMatrix().rawData.concat());
+                var worldToLocalMatrix = localToWorldMatrix.clone().invert();
+                var localCameraPos = worldToLocalMatrix.transformVector(cameraMatrix.position);
+                var localCameraUp = worldToLocalMatrix.deltaTransformVector(cameraMatrix.up);
                 var billboardMatrix = new framework.Matrix3x3();
                 if (!this.shape.alignToDirection && this.geometry == Geometry.billboard) {
                     var matrix4x4 = new framework.Matrix4x4();
@@ -33296,7 +33298,9 @@ var gd3d;
                     return;
                 var force = this.force.getValue(particle.rateAtLifeTime, particle[_ForceOverLifetime_rate]);
                 if (this.space == framework.ParticleSystemSimulationSpace1.World) {
-                    this.particleSystem.transform.worldToLocalMatrix.deltaTransformVector(force, force);
+                    var localToWorldMatrix = new framework.Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
+                    var worldToLocalMatrix = localToWorldMatrix.clone().invert();
+                    worldToLocalMatrix.deltaTransformVector(force, force);
                 }
                 particle.acceleration.add(force);
                 preForce.copy(force);
