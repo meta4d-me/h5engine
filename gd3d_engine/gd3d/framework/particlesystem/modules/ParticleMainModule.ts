@@ -378,7 +378,7 @@ namespace gd3d.framework
          * 
          * @todo
          */
-        customSimulationSpace: Transform;
+        customSimulationSpace: transform;
 
         /**
          * Override the default playback speed of the Particle System.
@@ -455,7 +455,9 @@ namespace gd3d.framework
             // 计算重力加速度影响速度
             var gravity = new Vector3(0, -this.gravityModifier.getValue(this.particleSystem.rateAtDuration) * 9.8, 0);
             // 本地加速度
-            this.particleSystem.transform.worldToLocalMatrix.deltaTransformVector(gravity, gravity);
+            var worldToLocalMatrix = new Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
+            worldToLocalMatrix.invert();
+            worldToLocalMatrix.deltaTransformVector(gravity, gravity);
             //
             particle.acceleration.sub(preGravity).add(gravity);
             preGravity.copy(gravity);

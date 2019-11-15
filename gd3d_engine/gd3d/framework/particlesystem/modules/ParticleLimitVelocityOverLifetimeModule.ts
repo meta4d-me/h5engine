@@ -171,7 +171,10 @@ namespace gd3d.framework
             var pVelocity = particle.velocity.clone();
             if (this.space == ParticleSystemSimulationSpace1.World)
             {
-                this.particleSystem.transform.localToWorldMatrix.deltaTransformVector(pVelocity, pVelocity)
+                var localToWorldMatrix = new Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
+                var worldToLocalMatrix = localToWorldMatrix.clone().invert();
+                //
+                localToWorldMatrix.deltaTransformVector(pVelocity, pVelocity)
                 if (this.separateAxes)
                 {
                     pVelocity.clamp(limit3D.negateTo(), limit3D);
@@ -180,7 +183,7 @@ namespace gd3d.framework
                     if (pVelocity.lengthSquared > limit * limit)
                         pVelocity.normalize(limit);
                 }
-                this.particleSystem.transform.worldToLocalMatrix.deltaTransformVector(pVelocity, pVelocity);
+                worldToLocalMatrix.deltaTransformVector(pVelocity, pVelocity);
             } else
             {
                 if (this.separateAxes)

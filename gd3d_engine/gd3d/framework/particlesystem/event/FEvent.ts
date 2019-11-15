@@ -311,7 +311,7 @@ namespace gd3d.framework
 
     }
 
-    objectevent = event = new FEvent();
+    objectevent = event1 = new FEvent();
 
     interface ObjectListener
     {
@@ -373,7 +373,7 @@ namespace gd3d.framework
     /**
      * 监听数据
      */
-    interface ListenerVO
+    export interface ListenerVO
     {
         /**
          * 监听函数

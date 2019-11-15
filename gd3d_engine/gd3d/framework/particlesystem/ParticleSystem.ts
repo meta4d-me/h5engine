@@ -19,6 +19,13 @@ namespace gd3d.framework
     {
         __class__: "feng3d.ParticleSystem" = "feng3d.ParticleSystem";
 
+        gameObject: gameObject;
+
+        get transform()
+        {
+            return this.gameObject.transform;
+        }
+
         /**
          * 是否正在播放
          */
@@ -117,7 +124,7 @@ namespace gd3d.framework
         /**
          * 粒子系统纹理表动画模块。
          */
-        
+
         get textureSheetAnimation() { return this._textureSheetAnimation; }
         set textureSheetAnimation(v)
         {
@@ -129,7 +136,7 @@ namespace gd3d.framework
 
         geometry = Geometry.billboard;
 
-        material = Material.particle;
+        // material = Material.particle;
 
         castShadows = true;
 
@@ -285,8 +292,12 @@ namespace gd3d.framework
             renderAtomic.shaderMacro.ENABLED_PARTICLE_SYSTEM_textureSheetAnimation = this.textureSheetAnimation.enabled;
 
             var cameraMatrix = camera.transform.localToWorldMatrix.clone();
-            var localCameraPos = this.gameObject.transform.worldToLocalMatrix.transformVector(cameraMatrix.position);
-            var localCameraUp = this.gameObject.transform.worldToLocalRotationMatrix.transformVector(cameraMatrix.up);
+
+            var localToWorldMatrix = new Matrix4x4(this.transform.getWorldMatrix().rawData.concat());
+            var worldToLocalMatrix = localToWorldMatrix.clone().invert();
+            //
+            var localCameraPos = worldToLocalMatrix.transformVector(cameraMatrix.position);
+            var localCameraUp = worldToLocalMatrix.deltaTransformVector(cameraMatrix.up);
             // 计算公告牌矩阵
             var billboardMatrix = new Matrix3x3();
             if (!this.shape.alignToDirection && this.geometry == Geometry.billboard)

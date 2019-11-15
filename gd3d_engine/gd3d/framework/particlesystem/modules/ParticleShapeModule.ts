@@ -135,7 +135,7 @@ namespace gd3d.framework
          * 
          * @todo
          */
-        mesh: Geometry;
+        mesh: any;
 
         /**
          * Emit from a single material, or the whole mesh.

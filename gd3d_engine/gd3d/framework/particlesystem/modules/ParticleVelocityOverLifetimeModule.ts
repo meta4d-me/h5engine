@@ -136,7 +136,9 @@ namespace gd3d.framework
             var velocity = this.velocity.getValue(particle.rateAtLifeTime, particle[_VelocityOverLifetime_rate]);
             if (this.space == ParticleSystemSimulationSpace1.World)
             {
-                this.particleSystem.transform.worldToLocalMatrix.deltaTransformVector(velocity, velocity);
+                var worldToLocalMatrix = new Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
+                worldToLocalMatrix.invert();
+                worldToLocalMatrix.deltaTransformVector(velocity, velocity);
             }
 
             //

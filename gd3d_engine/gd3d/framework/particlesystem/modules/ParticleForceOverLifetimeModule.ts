@@ -143,7 +143,9 @@ namespace gd3d.framework
             var force = this.force.getValue(particle.rateAtLifeTime, particle[_ForceOverLifetime_rate]);
             if (this.space == ParticleSystemSimulationSpace1.World)
             {
-                this.particleSystem.transform.worldToLocalMatrix.deltaTransformVector(force, force);
+                var localToWorldMatrix = new Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
+                var worldToLocalMatrix = localToWorldMatrix.clone().invert();
+                worldToLocalMatrix.deltaTransformVector(force, force);
             }
             particle.acceleration.add(force);
             preForce.copy(force);

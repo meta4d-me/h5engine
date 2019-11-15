@@ -29634,6 +29634,55 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var EventDispatcher = (function () {
+            function EventDispatcher() {
+            }
+            EventDispatcher.prototype.once = function (type, listener, thisObject, priority) {
+                if (thisObject === void 0) { thisObject = null; }
+                if (priority === void 0) { priority = 0; }
+                framework.event1.on(this, type, listener, thisObject, priority, true);
+            };
+            EventDispatcher.prototype.dispatchEvent = function (e) {
+                return framework.event1.dispatchEvent(this, e);
+            };
+            EventDispatcher.prototype.dispatch = function (type, data, bubbles) {
+                if (bubbles === void 0) { bubbles = false; }
+                return framework.event1.dispatch(this, type, data, bubbles);
+            };
+            EventDispatcher.prototype.has = function (type) {
+                return framework.event1.has(this, type);
+            };
+            EventDispatcher.prototype.on = function (type, listener, thisObject, priority, once) {
+                if (priority === void 0) { priority = 0; }
+                if (once === void 0) { once = false; }
+                framework.event1.on(this, type, listener, thisObject, priority, once);
+            };
+            EventDispatcher.prototype.off = function (type, listener, thisObject) {
+                framework.event1.off(this, type, listener, thisObject);
+            };
+            EventDispatcher.prototype.onAll = function (listener, thisObject, priority) {
+                if (priority === void 0) { priority = 0; }
+                framework.event1.onAll(this, listener, thisObject, priority);
+            };
+            EventDispatcher.prototype.offAll = function (listener, thisObject) {
+                framework.event1.offAll(this, listener, thisObject);
+            };
+            EventDispatcher.prototype.handleEvent = function (e) {
+                gd3d.event["handleEvent"](this, e);
+            };
+            EventDispatcher.prototype.handelEventBubbles = function (e) {
+                gd3d.event["handelEventBubbles"](this, e);
+            };
+            return EventDispatcher;
+        }());
+        framework.EventDispatcher = EventDispatcher;
+        framework.dispatcher = new EventDispatcher();
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var ParticleSystem = (function (_super) {
             __extends(ParticleSystem, _super);
             function ParticleSystem() {
@@ -29642,7 +29691,6 @@ var gd3d;
                 _this._isPlaying = false;
                 _this.time = 0;
                 _this.geometry = Geometry.billboard;
-                _this.material = Material.particle;
                 _this.castShadows = true;
                 _this.receiveShadows = true;
                 _this.startDelay = 0;
@@ -29676,6 +29724,13 @@ var gd3d;
                 _this.shape.enabled = true;
                 return _this;
             }
+            Object.defineProperty(ParticleSystem.prototype, "transform", {
+                get: function () {
+                    return this.gameObject.transform;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(ParticleSystem.prototype, "isPlaying", {
                 get: function () {
                     return this._isPlaying;
@@ -29858,7 +29913,7 @@ var gd3d;
                 var cameraMatrix = camera.transform.localToWorldMatrix.clone();
                 var localCameraPos = this.gameObject.transform.worldToLocalMatrix.transformVector(cameraMatrix.position);
                 var localCameraUp = this.gameObject.transform.worldToLocalRotationMatrix.transformVector(cameraMatrix.up);
-                var billboardMatrix = new Matrix3x3();
+                var billboardMatrix = new framework.Matrix3x3();
                 if (!this.shape.alignToDirection && this.geometry == Geometry.billboard) {
                     var matrix4x4 = new framework.Matrix4x4();
                     matrix4x4.lookAt(localCameraPos, localCameraUp);
@@ -29985,9 +30040,8 @@ var gd3d;
                 particle.updateState(preTime, this._realTime);
             };
             return ParticleSystem;
-        }(Model));
+        }(framework.EventDispatcher));
         framework.ParticleSystem = ParticleSystem;
-        AssetData.addAssetData("Billboard-Geometry", Geometry.billboard = framework.serialization.setValue(new PlaneGeometry(), { name: "Billboard-Geometry", assetId: "Billboard-Geometry", yUp: false, hideFlags: framework.HideFlags.NotEditable }));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -30116,55 +30170,6 @@ var gd3d;
             UVChannelFlags[UVChannelFlags["UV3"] = 8] = "UV3";
             UVChannelFlags[UVChannelFlags["Everything"] = 15] = "Everything";
         })(UVChannelFlags = framework.UVChannelFlags || (framework.UVChannelFlags = {}));
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var EventDispatcher = (function () {
-            function EventDispatcher() {
-            }
-            EventDispatcher.prototype.once = function (type, listener, thisObject, priority) {
-                if (thisObject === void 0) { thisObject = null; }
-                if (priority === void 0) { priority = 0; }
-                framework.event1.on(this, type, listener, thisObject, priority, true);
-            };
-            EventDispatcher.prototype.dispatchEvent = function (e) {
-                return framework.event1.dispatchEvent(this, e);
-            };
-            EventDispatcher.prototype.dispatch = function (type, data, bubbles) {
-                if (bubbles === void 0) { bubbles = false; }
-                return framework.event1.dispatch(this, type, data, bubbles);
-            };
-            EventDispatcher.prototype.has = function (type) {
-                return framework.event1.has(this, type);
-            };
-            EventDispatcher.prototype.on = function (type, listener, thisObject, priority, once) {
-                if (priority === void 0) { priority = 0; }
-                if (once === void 0) { once = false; }
-                framework.event1.on(this, type, listener, thisObject, priority, once);
-            };
-            EventDispatcher.prototype.off = function (type, listener, thisObject) {
-                framework.event1.off(this, type, listener, thisObject);
-            };
-            EventDispatcher.prototype.onAll = function (listener, thisObject, priority) {
-                if (priority === void 0) { priority = 0; }
-                framework.event1.onAll(this, listener, thisObject, priority);
-            };
-            EventDispatcher.prototype.offAll = function (listener, thisObject) {
-                framework.event1.offAll(this, listener, thisObject);
-            };
-            EventDispatcher.prototype.handleEvent = function (e) {
-                gd3d.event["handleEvent"](this, e);
-            };
-            EventDispatcher.prototype.handelEventBubbles = function (e) {
-                gd3d.event["handelEventBubbles"](this, e);
-            };
-            return EventDispatcher;
-        }());
-        framework.EventDispatcher = EventDispatcher;
-        framework.dispatcher = new EventDispatcher();
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -30334,7 +30339,7 @@ var gd3d;
             return FEvent;
         }());
         framework.FEvent = FEvent;
-        framework.objectevent = gd3d.event = new FEvent();
+        framework.objectevent = framework.event1 = new FEvent();
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -30806,6 +30811,776 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var AnimationCurve1 = (function () {
+            function AnimationCurve1() {
+                this.maxtan = 1000;
+                this.keys = [new framework.AnimationCurveKeyframe({ time: 0, value: 1, tangent: 0 }), new framework.AnimationCurveKeyframe({ time: 1, value: 1, tangent: 0 })];
+                this.wrapMode = framework.AnimationCurveWrapMode.Clamp;
+            }
+            Object.defineProperty(AnimationCurve1.prototype, "numKeys", {
+                get: function () {
+                    return this.keys.length;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            AnimationCurve1.prototype.addKey = function (key) {
+                this.keys.push(key);
+                this.sort();
+            };
+            AnimationCurve1.prototype.sort = function () {
+                this.keys.sort(function (a, b) { return a.time - b.time; });
+            };
+            AnimationCurve1.prototype.deleteKey = function (key) {
+                var index = this.keys.indexOf(key);
+                if (index != -1)
+                    this.keys.splice(index, 1);
+            };
+            AnimationCurve1.prototype.getKey = function (index) {
+                return this.keys[index];
+            };
+            AnimationCurve1.prototype.indexOfKeys = function (key) {
+                return this.keys.indexOf(key);
+            };
+            AnimationCurve1.prototype.getPoint = function (t) {
+                switch (this.wrapMode) {
+                    case framework.AnimationCurveWrapMode.Clamp:
+                        t = Math.clamp(t, 0, 1);
+                        break;
+                    case framework.AnimationCurveWrapMode.Loop:
+                        t = Math.clamp(t - Math.floor(t), 0, 1);
+                        break;
+                    case framework.AnimationCurveWrapMode.PingPong:
+                        t = Math.clamp(t - Math.floor(t), 0, 1);
+                        if (Math.floor(t) % 2 == 1)
+                            t = 1 - t;
+                        break;
+                }
+                var keys = this.keys;
+                var maxtan = this.maxtan;
+                var value = 0, tangent = 0, isfind = false;
+                ;
+                for (var i = 0, n = keys.length; i < n; i++) {
+                    var key = keys[i];
+                    var prekey = keys[i - 1];
+                    if (i > 0 && prekey.time <= t && t <= key.time) {
+                        var xstart = prekey.time;
+                        var ystart = prekey.value;
+                        var tanstart = prekey.tangent;
+                        var xend = key.time;
+                        var yend = key.value;
+                        var tanend = key.tangent;
+                        if (maxtan > Math.abs(tanstart) && maxtan > Math.abs(tanend)) {
+                            var ct = (t - prekey.time) / (key.time - prekey.time);
+                            var sys = [ystart, ystart + tanstart * (xend - xstart) / 3, yend - tanend * (xend - xstart) / 3, yend];
+                            var fy = framework.bezierCurve.getValue(ct, sys);
+                            isfind = true;
+                            value = fy;
+                            tangent = framework.bezierCurve.getDerivative(ct, sys) / (xend - xstart);
+                            break;
+                        }
+                        else {
+                            isfind = true;
+                            value = prekey.value;
+                            tangent = 0;
+                            break;
+                        }
+                    }
+                    if (i == 0 && t <= key.time) {
+                        isfind = true;
+                        value = key.value;
+                        tangent = 0;
+                        break;
+                    }
+                    if (i == n - 1 && t >= key.time) {
+                        isfind = true;
+                        value = key.value;
+                        tangent = 0;
+                        break;
+                    }
+                }
+                if (keys.length == 0)
+                    return new framework.AnimationCurveKeyframe({ time: t, value: 0, tangent: 0 });
+                return new framework.AnimationCurveKeyframe({ time: t, value: value, tangent: tangent });
+            };
+            AnimationCurve1.prototype.getValue = function (t) {
+                var point = this.getPoint(t);
+                if (!point)
+                    return 0;
+                return point.value;
+            };
+            AnimationCurve1.prototype.findKey = function (t, y, precision) {
+                var keys = this.keys;
+                for (var i = 0; i < keys.length; i++) {
+                    if (Math.abs(keys[i].time - t) < precision && Math.abs(keys[i].value - y) < precision) {
+                        return keys[i];
+                    }
+                }
+                return null;
+            };
+            AnimationCurve1.prototype.addKeyAtCurve = function (time, value, precision) {
+                var point = this.getPoint(time);
+                if (Math.abs(value - point.value) < precision) {
+                    this.keys.push(point);
+                    this.keys.sort(function (a, b) { return a.time - b.time; });
+                    return point;
+                }
+                return null;
+            };
+            AnimationCurve1.prototype.getSamples = function (num) {
+                if (num === void 0) { num = 100; }
+                var results = [];
+                for (var i = 0; i <= num; i++) {
+                    var p = this.getPoint(i / num);
+                    results.push(p);
+                }
+                return results;
+            };
+            return AnimationCurve1;
+        }());
+        framework.AnimationCurve1 = AnimationCurve1;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimationCurveKeyframe = (function () {
+            function AnimationCurveKeyframe(param) {
+                this.init(param);
+            }
+            AnimationCurveKeyframe.prototype.init = function (param) {
+                param.time && (this.time = param.time);
+                param.value && (this.value = param.value);
+                param.tangent && (this.tangent = param.tangent);
+            };
+            return AnimationCurveKeyframe;
+        }());
+        framework.AnimationCurveKeyframe = AnimationCurveKeyframe;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimationCurveWrapMode;
+        (function (AnimationCurveWrapMode) {
+            AnimationCurveWrapMode[AnimationCurveWrapMode["Loop"] = 0] = "Loop";
+            AnimationCurveWrapMode[AnimationCurveWrapMode["PingPong"] = 1] = "PingPong";
+            AnimationCurveWrapMode[AnimationCurveWrapMode["Clamp"] = 2] = "Clamp";
+        })(AnimationCurveWrapMode = framework.AnimationCurveWrapMode || (framework.AnimationCurveWrapMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var BezierCurve = (function () {
+            function BezierCurve() {
+            }
+            BezierCurve.prototype.linear = function (t, p0, p1) {
+                return p0 + t * (p1 - p0);
+            };
+            BezierCurve.prototype.linearDerivative = function (t, p0, p1) {
+                return p1 - p0;
+            };
+            BezierCurve.prototype.linearSecondDerivative = function (t, p0, p1) {
+                return 0;
+            };
+            BezierCurve.prototype.quadratic = function (t, p0, p1, p2) {
+                return (1 - t) * (1 - t) * p0 + 2 * (1 - t) * t * p1 + t * t * p2;
+            };
+            BezierCurve.prototype.quadraticDerivative = function (t, p0, p1, p2) {
+                return 2 * (1 - t) * (p1 - p0) + 2 * t * (p2 - p1);
+            };
+            BezierCurve.prototype.quadraticSecondDerivative = function (t, p0, p1, p2) {
+                return 2 * (p2 - 2 * p1 + p0);
+            };
+            BezierCurve.prototype.cubic = function (t, p0, p1, p2, p3) {
+                return (1 - t) * (1 - t) * (1 - t) * p0 + 3 * (1 - t) * (1 - t) * t * p1 + 3 * (1 - t) * t * t * p2 + t * t * t * p3;
+            };
+            BezierCurve.prototype.cubicDerivative = function (t, p0, p1, p2, p3) {
+                return 3 * (1 - t) * (1 - t) * (p1 - p0) + 6 * (1 - t) * t * (p2 - p1) + 3 * t * t * (p3 - p2);
+            };
+            BezierCurve.prototype.cubicSecondDerivative = function (t, p0, p1, p2, p3) {
+                return 6 * (1 - t) * (p2 - 2 * p1 + p0) + 6 * t * (p3 - 2 * p2 + p1);
+            };
+            BezierCurve.prototype.bn = function (t, ps, processs) {
+                if (processs === void 0) { processs = null; }
+                ps = ps.concat();
+                if (processs)
+                    processs.push(ps.concat());
+                for (var i = ps.length - 1; i > 0; i--) {
+                    for (var j = 0; j < i; j++) {
+                        ps[j] = (1 - t) * ps[j] + t * ps[j + 1];
+                    }
+                    if (processs) {
+                        ps.length = ps.length - 1;
+                        processs.push(ps.concat());
+                    }
+                }
+                return ps[0];
+            };
+            BezierCurve.prototype.bnDerivative = function (t, ps) {
+                if (ps.length < 2)
+                    return 0;
+                ps = ps.concat();
+                for (var i = 0, n = ps.length - 1; i < n; i++) {
+                    ps[i] = ps[i + 1] - ps[i];
+                }
+                ps.length = ps.length - 1;
+                var v = ps.length * this.bn(t, ps);
+                return v;
+            };
+            BezierCurve.prototype.bnSecondDerivative = function (t, ps) {
+                if (ps.length < 3)
+                    return 0;
+                ps = ps.concat();
+                for (var i = 0, n = ps.length - 1; i < n; i++) {
+                    ps[i] = ps[i + 1] - ps[i];
+                }
+                ps.length = ps.length - 1;
+                var v = ps.length * this.bnDerivative(t, ps);
+                return v;
+            };
+            BezierCurve.prototype.bnND = function (t, dn, ps) {
+                if (ps.length < dn + 1)
+                    return 0;
+                var factorial = 1;
+                ps = ps.concat();
+                for (var j = 0; j < dn; j++) {
+                    for (var i = 0, n = ps.length - 1; i < n; i++) {
+                        ps[i] = ps[i + 1] - ps[i];
+                    }
+                    ps.length = ps.length - 1;
+                    factorial *= ps.length;
+                }
+                var v = factorial * this.bn(t, ps);
+                return v;
+            };
+            BezierCurve.prototype.getValue = function (t, ps) {
+                if (ps.length == 2) {
+                    return this.linear(t, ps[0], ps[1]);
+                }
+                if (ps.length == 3) {
+                    return this.quadratic(t, ps[0], ps[1], ps[2]);
+                }
+                if (ps.length == 4) {
+                    return this.cubic(t, ps[0], ps[1], ps[2], ps[3]);
+                }
+                return this.bn(t, ps);
+            };
+            BezierCurve.prototype.getDerivative = function (t, ps) {
+                if (ps.length == 2) {
+                    return this.linearDerivative(t, ps[0], ps[1]);
+                }
+                if (ps.length == 3) {
+                    return this.quadraticDerivative(t, ps[0], ps[1], ps[2]);
+                }
+                if (ps.length == 4) {
+                    return this.cubicDerivative(t, ps[0], ps[1], ps[2], ps[3]);
+                }
+                return this.bnDerivative(t, ps);
+            };
+            BezierCurve.prototype.getSecondDerivative = function (t, ps) {
+                if (ps.length == 2) {
+                    return this.linearSecondDerivative(t, ps[0], ps[1]);
+                }
+                if (ps.length == 3) {
+                    return this.quadraticSecondDerivative(t, ps[0], ps[1], ps[2]);
+                }
+                if (ps.length == 4) {
+                    return this.cubicSecondDerivative(t, ps[0], ps[1], ps[2], ps[3]);
+                }
+                return this.bnSecondDerivative(t, ps);
+            };
+            BezierCurve.prototype.getExtremums = function (ps, numSamples, precision) {
+                var _this = this;
+                if (numSamples === void 0) { numSamples = 10; }
+                if (precision === void 0) { precision = 0.0000001; }
+                var samples = [];
+                for (var i = 0; i <= numSamples; i++) {
+                    samples.push(this.getDerivative(i / numSamples, ps));
+                }
+                var resultTs = [];
+                var resultVs = [];
+                for (var i = 0, n = numSamples; i < n; i++) {
+                    if (samples[i] * samples[i + 1] < 0) {
+                        var guessT = framework.equationSolving.line(function (x) { return _this.getDerivative(x, ps); }, i / numSamples, (i + 1) / numSamples, precision);
+                        resultTs.push(guessT);
+                        resultVs.push(this.getValue(guessT, ps));
+                    }
+                }
+                return { ts: resultTs, vs: resultVs };
+            };
+            BezierCurve.prototype.getMonotoneIntervals = function (ps, numSamples, precision) {
+                if (numSamples === void 0) { numSamples = 10; }
+                if (precision === void 0) { precision = 0.0000001; }
+                var monotoneIntervalTs = [0, 1];
+                var monotoneIntervalVs = [ps[0], ps[ps.length - 1]];
+                var extremums = this.getExtremums(ps, numSamples, precision);
+                for (var i = 0; i < extremums.ts.length; i++) {
+                    monotoneIntervalTs.splice(i + 1, 0, extremums.ts[i]);
+                    monotoneIntervalVs.splice(i + 1, 0, extremums.vs[i]);
+                }
+                return { ts: monotoneIntervalTs, vs: monotoneIntervalVs };
+            };
+            BezierCurve.prototype.getTFromValue = function (targetV, ps, numSamples, precision) {
+                var _this = this;
+                if (numSamples === void 0) { numSamples = 10; }
+                if (precision === void 0) { precision = 0.0000001; }
+                var monotoneIntervals = this.getMonotoneIntervals(ps, numSamples, precision);
+                var monotoneIntervalTs = monotoneIntervals.ts;
+                var monotoneIntervalVs = monotoneIntervals.vs;
+                var results = [];
+                for (var i = 0, n = monotoneIntervalVs.length - 1; i < n; i++) {
+                    if ((monotoneIntervalVs[i] - targetV) * (monotoneIntervalVs[i + 1] - targetV) <= 0) {
+                        var fx = function (x) { return _this.getValue(x, ps) - targetV; };
+                        var result = framework.equationSolving.line(fx, monotoneIntervalTs[i], monotoneIntervalTs[i + 1], precision);
+                        results.push(result);
+                    }
+                }
+                return results;
+            };
+            BezierCurve.prototype.split = function (t, ps) {
+                var processs = [];
+                framework.bezierCurve.bn(t, ps, processs);
+                var fps = [];
+                var sps = [];
+                for (var i = processs.length - 1; i >= 0; i--) {
+                    if (i == processs.length - 1) {
+                        fps.push(processs[i][0]);
+                        fps.push(processs[i][0]);
+                    }
+                    else {
+                        fps.unshift(processs[i][0]);
+                        sps.push(processs[i].pop());
+                    }
+                }
+                return [fps, sps];
+            };
+            BezierCurve.prototype.merge = function (fps, sps, mergeType) {
+                if (mergeType === void 0) { mergeType = 0; }
+                fps = fps.concat();
+                sps = sps.concat();
+                var processs = [];
+                var t;
+                var pps;
+                var ps;
+                for (var i = 0, n = fps.length; i < n; i++) {
+                    ps = processs[i] = [];
+                    if (i == 0) {
+                        processs[i][0] = fps.pop();
+                        sps.shift();
+                    }
+                    else if (i == 1) {
+                        processs[i][0] = fps.pop();
+                        processs[i][1] = sps.shift();
+                        t = (processs[i - 1][0] - processs[i][0]) / (processs[i][1] - processs[i][0]);
+                    }
+                    else {
+                        pps = processs[i - 1];
+                        var nfp = fps.pop();
+                        var nsp = sps.shift();
+                        var ps0 = [];
+                        ps0[0] = nfp;
+                        for (var j = 0, n_1 = pps.length; j < n_1; j++) {
+                            ps0[j + 1] = ps0[j] + (pps[j] - ps0[j]) / t;
+                        }
+                        var ps1 = [];
+                        ps1[pps.length] = nsp;
+                        for (var j = pps.length - 1; j >= 0; j--) {
+                            ps1[j] = ps1[j + 1] - (ps1[j + 1] - pps[j]) / (1 - t);
+                        }
+                        if (mergeType == 1) {
+                            for (var j = 0, n_2 = ps0.length - 1; j <= n_2; j++) {
+                                ps[j] = (ps0[j] * (n_2 - j) + ps1[j] * j) / n_2;
+                            }
+                        }
+                        else if (mergeType == 0) {
+                            for (var j = 0, n_3 = ps0.length - 1; j <= n_3; j++) {
+                                if (j < n_3 / 2) {
+                                    ps[j] = ps0[j];
+                                }
+                                else if (j > n_3 / 2) {
+                                    ps[j] = ps1[j];
+                                }
+                                else {
+                                    ps[j] = (ps0[j] + ps1[j]) / 2;
+                                }
+                            }
+                        }
+                        else {
+                            console.error("\u5408\u5E76\u7C7B\u578B mergeType " + mergeType + " \u9519\u8BEF!");
+                        }
+                    }
+                }
+                return processs.pop();
+            };
+            BezierCurve.prototype.getSamples = function (ps, num) {
+                if (num === void 0) { num = 100; }
+                var results = [];
+                for (var i = 0; i <= num; i++) {
+                    var t = i / num;
+                    var p = this.getValue(t, ps);
+                    results.push({ t: t, v: p });
+                }
+                return results;
+            };
+            return BezierCurve;
+        }());
+        framework.BezierCurve = BezierCurve;
+        framework.bezierCurve = new BezierCurve();
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var MinMaxCurve = (function () {
+            function MinMaxCurve() {
+                this.mode = framework.MinMaxCurveMode.Constant;
+                this.constant = 0;
+                this.constant1 = 0;
+                this.curve = new framework.AnimationCurve1();
+                this.curve1 = framework.serialization.setValue(new framework.AnimationCurve1(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] });
+                this.curveMultiplier = 1;
+                this.between0And1 = false;
+            }
+            MinMaxCurve.prototype.getValue = function (time, randomBetween) {
+                if (randomBetween === void 0) { randomBetween = Math.random(); }
+                switch (this.mode) {
+                    case framework.MinMaxCurveMode.Constant:
+                        return this.constant;
+                    case framework.MinMaxCurveMode.Curve:
+                        return this.curve.getValue(time) * this.curveMultiplier;
+                    case framework.MinMaxCurveMode.RandomBetweenTwoConstants:
+                        return Math.lerp(this.constant, this.constant1, randomBetween);
+                    case framework.MinMaxCurveMode.RandomBetweenTwoCurves:
+                        return Math.lerp(this.curve.getValue(time), this.curve1.getValue(time), randomBetween) * this.curveMultiplier;
+                }
+                return this.constant;
+            };
+            return MinMaxCurve;
+        }());
+        framework.MinMaxCurve = MinMaxCurve;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var MinMaxCurveMode;
+        (function (MinMaxCurveMode) {
+            MinMaxCurveMode[MinMaxCurveMode["Constant"] = 0] = "Constant";
+            MinMaxCurveMode[MinMaxCurveMode["Curve"] = 1] = "Curve";
+            MinMaxCurveMode[MinMaxCurveMode["RandomBetweenTwoConstants"] = 2] = "RandomBetweenTwoConstants";
+            MinMaxCurveMode[MinMaxCurveMode["RandomBetweenTwoCurves"] = 3] = "RandomBetweenTwoCurves";
+        })(MinMaxCurveMode = framework.MinMaxCurveMode || (framework.MinMaxCurveMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var MinMaxCurveVector3 = (function () {
+            function MinMaxCurveVector3() {
+                this.xCurve = new framework.MinMaxCurve();
+                this.yCurve = new framework.MinMaxCurve();
+                this.zCurve = new framework.MinMaxCurve();
+            }
+            MinMaxCurveVector3.prototype.getValue = function (time, randomBetween) {
+                if (randomBetween === void 0) { randomBetween = Math.random(); }
+                return new framework.Vector3(this.xCurve.getValue(time, randomBetween), this.yCurve.getValue(time, randomBetween), this.zCurve.getValue(time, randomBetween));
+            };
+            return MinMaxCurveVector3;
+        }());
+        framework.MinMaxCurveVector3 = MinMaxCurveVector3;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var Matrix3x3 = (function () {
+            function Matrix3x3(elements) {
+                if (elements === void 0) { elements = [1, 0, 0, 0, 1, 0, 0, 0, 1]; }
+                this.elements = elements;
+            }
+            Matrix3x3.prototype.identity = function () {
+                var e = this.elements;
+                e[0] = 1;
+                e[1] = 0;
+                e[2] = 0;
+                e[3] = 0;
+                e[4] = 1;
+                e[5] = 0;
+                e[6] = 0;
+                e[7] = 0;
+                e[8] = 1;
+                return this;
+            };
+            Matrix3x3.prototype.setZero = function () {
+                var e = this.elements;
+                e[0] = 0;
+                e[1] = 0;
+                e[2] = 0;
+                e[3] = 0;
+                e[4] = 0;
+                e[5] = 0;
+                e[6] = 0;
+                e[7] = 0;
+                e[8] = 0;
+                return this;
+            };
+            Matrix3x3.prototype.setTrace = function (vec3) {
+                var e = this.elements;
+                e[0] = vec3.x;
+                e[4] = vec3.y;
+                e[8] = vec3.z;
+                return this;
+            };
+            Matrix3x3.prototype.getTrace = function (target) {
+                if (target === void 0) { target = new framework.Vector3(); }
+                var e = this.elements;
+                target.x = e[0];
+                target.y = e[4];
+                target.z = e[8];
+                return target;
+            };
+            Matrix3x3.prototype.vmult = function (v, target) {
+                if (target === void 0) { target = new framework.Vector3(); }
+                var e = this.elements, x = v.x, y = v.y, z = v.z;
+                target.x = e[0] * x + e[1] * y + e[2] * z;
+                target.y = e[3] * x + e[4] * y + e[5] * z;
+                target.z = e[6] * x + e[7] * y + e[8] * z;
+                return target;
+            };
+            Matrix3x3.prototype.smult = function (s) {
+                for (var i = 0; i < this.elements.length; i++) {
+                    this.elements[i] *= s;
+                }
+            };
+            Matrix3x3.prototype.mmult = function (m, target) {
+                if (target === void 0) { target = new Matrix3x3(); }
+                for (var i = 0; i < 3; i++) {
+                    for (var j = 0; j < 3; j++) {
+                        var sum = 0.0;
+                        for (var k = 0; k < 3; k++) {
+                            sum += m.elements[i + k * 3] * this.elements[k + j * 3];
+                        }
+                        target.elements[i + j * 3] = sum;
+                    }
+                }
+                return target;
+            };
+            Matrix3x3.prototype.scale = function (v, target) {
+                if (target === void 0) { target = new Matrix3x3(); }
+                var e = this.elements, t = target.elements;
+                for (var i = 0; i !== 3; i++) {
+                    t[3 * i + 0] = v.x * e[3 * i + 0];
+                    t[3 * i + 1] = v.y * e[3 * i + 1];
+                    t[3 * i + 2] = v.z * e[3 * i + 2];
+                }
+                return target;
+            };
+            Matrix3x3.prototype.solve = function (b, target) {
+                if (target === void 0) { target = new framework.Vector3(); }
+                var nr = 3;
+                var nc = 4;
+                var eqns = [];
+                for (var i = 0; i < nr * nc; i++) {
+                    eqns.push(0);
+                }
+                var i, j;
+                for (i = 0; i < 3; i++) {
+                    for (j = 0; j < 3; j++) {
+                        eqns[i + nc * j] = this.elements[i + 3 * j];
+                    }
+                }
+                eqns[3 + 4 * 0] = b.x;
+                eqns[3 + 4 * 1] = b.y;
+                eqns[3 + 4 * 2] = b.z;
+                var n = 3, k = n, np;
+                var kp = 4;
+                var p;
+                do {
+                    i = k - n;
+                    if (eqns[i + nc * i] === 0) {
+                        for (j = i + 1; j < k; j++) {
+                            if (eqns[i + nc * j] !== 0) {
+                                np = kp;
+                                do {
+                                    p = kp - np;
+                                    eqns[p + nc * i] += eqns[p + nc * j];
+                                } while (--np);
+                                break;
+                            }
+                        }
+                    }
+                    if (eqns[i + nc * i] !== 0) {
+                        for (j = i + 1; j < k; j++) {
+                            var multiplier = eqns[i + nc * j] / eqns[i + nc * i];
+                            np = kp;
+                            do {
+                                p = kp - np;
+                                eqns[p + nc * j] = p <= i ? 0 : eqns[p + nc * j] - eqns[p + nc * i] * multiplier;
+                            } while (--np);
+                        }
+                    }
+                } while (--n);
+                target.z = eqns[2 * nc + 3] / eqns[2 * nc + 2];
+                target.y = (eqns[1 * nc + 3] - eqns[1 * nc + 2] * target.z) / eqns[1 * nc + 1];
+                target.x = (eqns[0 * nc + 3] - eqns[0 * nc + 2] * target.z - eqns[0 * nc + 1] * target.y) / eqns[0 * nc + 0];
+                if (isNaN(target.x) || isNaN(target.y) || isNaN(target.z) || target.x === Infinity || target.y === Infinity || target.z === Infinity) {
+                    throw "Could not solve equation! Got x=[" + target.toString() + "], b=[" + b.toString() + "], A=[" + this.toString() + "]";
+                }
+                return target;
+            };
+            Matrix3x3.prototype.getElement = function (row, column) {
+                return this.elements[column + 3 * row];
+            };
+            Matrix3x3.prototype.setElement = function (row, column, value) {
+                this.elements[column + 3 * row] = value;
+            };
+            Matrix3x3.prototype.copy = function (source) {
+                for (var i = 0; i < source.elements.length; i++) {
+                    this.elements[i] = source.elements[i];
+                }
+                return this;
+            };
+            Matrix3x3.prototype.toString = function () {
+                var r = "";
+                var sep = ",";
+                for (var i = 0; i < 9; i++) {
+                    r += this.elements[i] + sep;
+                }
+                return r;
+            };
+            Matrix3x3.prototype.reverse = function () {
+                var nr = 3;
+                var nc = 6;
+                var eqns = [];
+                for (var i = 0; i < nr * nc; i++) {
+                    eqns.push(0);
+                }
+                var i, j;
+                for (i = 0; i < 3; i++) {
+                    for (j = 0; j < 3; j++) {
+                        eqns[i + nc * j] = this.elements[i + 3 * j];
+                    }
+                }
+                eqns[3 + 6 * 0] = 1;
+                eqns[3 + 6 * 1] = 0;
+                eqns[3 + 6 * 2] = 0;
+                eqns[4 + 6 * 0] = 0;
+                eqns[4 + 6 * 1] = 1;
+                eqns[4 + 6 * 2] = 0;
+                eqns[5 + 6 * 0] = 0;
+                eqns[5 + 6 * 1] = 0;
+                eqns[5 + 6 * 2] = 1;
+                var n = 3, k = n, np;
+                var kp = nc;
+                var p;
+                do {
+                    i = k - n;
+                    if (eqns[i + nc * i] === 0) {
+                        for (j = i + 1; j < k; j++) {
+                            if (eqns[i + nc * j] !== 0) {
+                                np = kp;
+                                do {
+                                    p = kp - np;
+                                    eqns[p + nc * i] += eqns[p + nc * j];
+                                } while (--np);
+                                break;
+                            }
+                        }
+                    }
+                    if (eqns[i + nc * i] !== 0) {
+                        for (j = i + 1; j < k; j++) {
+                            var multiplier = eqns[i + nc * j] / eqns[i + nc * i];
+                            np = kp;
+                            do {
+                                p = kp - np;
+                                eqns[p + nc * j] = p <= i ? 0 : eqns[p + nc * j] - eqns[p + nc * i] * multiplier;
+                            } while (--np);
+                        }
+                    }
+                } while (--n);
+                i = 2;
+                do {
+                    j = i - 1;
+                    do {
+                        var multiplier = eqns[i + nc * j] / eqns[i + nc * i];
+                        np = nc;
+                        do {
+                            p = nc - np;
+                            eqns[p + nc * j] = eqns[p + nc * j] - eqns[p + nc * i] * multiplier;
+                        } while (--np);
+                    } while (j--);
+                } while (--i);
+                i = 2;
+                do {
+                    var multiplier = 1 / eqns[i + nc * i];
+                    np = nc;
+                    do {
+                        p = nc - np;
+                        eqns[p + nc * i] = eqns[p + nc * i] * multiplier;
+                    } while (--np);
+                } while (i--);
+                i = 2;
+                do {
+                    j = 2;
+                    do {
+                        p = eqns[nr + j + nc * i];
+                        if (isNaN(p) || p === Infinity) {
+                            throw "Could not reverse! A=[" + this.toString() + "]";
+                        }
+                        this.setElement(i, j, p);
+                    } while (j--);
+                } while (i--);
+                return this;
+            };
+            Matrix3x3.prototype.reverseTo = function (target) {
+                if (target === void 0) { target = new Matrix3x3(); }
+                return target.copy(this).reverse();
+            };
+            Matrix3x3.prototype.transpose = function () {
+                var Mt = this.elements, M = this.elements.concat();
+                for (var i = 0; i !== 3; i++) {
+                    for (var j = 0; j !== 3; j++) {
+                        Mt[3 * i + j] = M[3 * j + i];
+                    }
+                }
+                return this;
+            };
+            Matrix3x3.prototype.transposeTo = function (target) {
+                if (target === void 0) { target = new Matrix3x3(); }
+                return target.copy(this).transpose();
+            };
+            Matrix3x3.prototype.formMatrix4x4 = function (matrix4x4) {
+                var arr4 = matrix4x4.rawData;
+                var arr3 = this.elements;
+                arr3[0] = arr4[0];
+                arr3[1] = arr4[1];
+                arr3[2] = arr4[2];
+                arr3[3] = arr4[4];
+                arr3[4] = arr4[5];
+                arr3[5] = arr4[6];
+                arr3[6] = arr4[8];
+                arr3[7] = arr4[9];
+                arr3[8] = arr4[10];
+                return this;
+            };
+            return Matrix3x3;
+        }());
+        framework.Matrix3x3 = Matrix3x3;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var Matrix4x4 = (function () {
             function Matrix4x4(datas) {
                 this.rawData = datas || [
@@ -30957,7 +31732,7 @@ var gd3d;
                 this.rawData[13] = m141 * m212 + m142 * m222 + m143 * m232 + m144 * m242;
                 this.rawData[14] = m141 * m213 + m142 * m223 + m143 * m233 + m144 * m243;
                 this.rawData[15] = m141 * m214 + m142 * m224 + m143 * m234 + m144 * m244;
-                debuger && console.assert(this.rawData[0] !== NaN && this.rawData[4] !== NaN && this.rawData[8] !== NaN && this.rawData[12] !== NaN);
+                console.assert(this.rawData[0] !== NaN && this.rawData[4] !== NaN && this.rawData[8] !== NaN && this.rawData[12] !== NaN);
                 return this;
             };
             Matrix4x4.prototype.appendRotation = function (axis, degrees, pivotPoint) {
@@ -31063,7 +31838,7 @@ var gd3d;
                 return this;
             };
             Matrix4x4.prototype.decompose = function (orientationStyle, result) {
-                if (orientationStyle === void 0) { orientationStyle = Orientation3D.EULER_ANGLES; }
+                if (orientationStyle === void 0) { orientationStyle = framework.Orientation3D.EULER_ANGLES; }
                 var raw = this.rawData;
                 var a = raw[0];
                 var e = raw[1];
@@ -31096,14 +31871,14 @@ var gd3d;
                 c = c / scaleZ;
                 g = g / scaleZ;
                 k = k / scaleZ;
-                if (orientationStyle == Orientation3D.EULER_ANGLES) {
+                if (orientationStyle == framework.Orientation3D.EULER_ANGLES) {
                     tx = Math.atan2(j, k);
                     ty = Math.atan2(-i, Math.sqrt(a * a + e * e));
                     var s1 = Math.sin(tx);
                     var c1 = Math.cos(tx);
                     tz = Math.atan2(s1 * c - c1 * b, c1 * f - s1 * g);
                 }
-                else if (orientationStyle == Orientation3D.AXIS_ANGLE) {
+                else if (orientationStyle == framework.Orientation3D.AXIS_ANGLE) {
                     tw = Math.acos((a + f + k - 1) / 2);
                     var len = Math.sqrt((j - g) * (j - g) + (c - i) * (c - i) + (e - b) * (e - b));
                     tx = (j - g) / len;
@@ -31467,6 +32242,18 @@ var gd3d;
             return Matrix4x4;
         }());
         framework.Matrix4x4 = Matrix4x4;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var Orientation3D;
+        (function (Orientation3D) {
+            Orientation3D["AXIS_ANGLE"] = "axisAngle";
+            Orientation3D["EULER_ANGLES"] = "eulerAngles";
+            Orientation3D["QUATERNION"] = "quaternion";
+        })(Orientation3D = framework.Orientation3D || (framework.Orientation3D = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -32185,497 +32972,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var AnimationCurve1 = (function () {
-            function AnimationCurve1() {
-                this.maxtan = 1000;
-                this.keys = [new framework.AnimationCurveKeyframe({ time: 0, value: 1, tangent: 0 }), new framework.AnimationCurveKeyframe({ time: 1, value: 1, tangent: 0 })];
-                this.wrapMode = framework.AnimationCurveWrapMode.Clamp;
-            }
-            Object.defineProperty(AnimationCurve1.prototype, "numKeys", {
-                get: function () {
-                    return this.keys.length;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            AnimationCurve1.prototype.addKey = function (key) {
-                this.keys.push(key);
-                this.sort();
-            };
-            AnimationCurve1.prototype.sort = function () {
-                this.keys.sort(function (a, b) { return a.time - b.time; });
-            };
-            AnimationCurve1.prototype.deleteKey = function (key) {
-                var index = this.keys.indexOf(key);
-                if (index != -1)
-                    this.keys.splice(index, 1);
-            };
-            AnimationCurve1.prototype.getKey = function (index) {
-                return this.keys[index];
-            };
-            AnimationCurve1.prototype.indexOfKeys = function (key) {
-                return this.keys.indexOf(key);
-            };
-            AnimationCurve1.prototype.getPoint = function (t) {
-                switch (this.wrapMode) {
-                    case framework.AnimationCurveWrapMode.Clamp:
-                        t = Math.clamp(t, 0, 1);
-                        break;
-                    case framework.AnimationCurveWrapMode.Loop:
-                        t = Math.clamp(t - Math.floor(t), 0, 1);
-                        break;
-                    case framework.AnimationCurveWrapMode.PingPong:
-                        t = Math.clamp(t - Math.floor(t), 0, 1);
-                        if (Math.floor(t) % 2 == 1)
-                            t = 1 - t;
-                        break;
-                }
-                var keys = this.keys;
-                var maxtan = this.maxtan;
-                var value = 0, tangent = 0, isfind = false;
-                ;
-                for (var i = 0, n = keys.length; i < n; i++) {
-                    var key = keys[i];
-                    var prekey = keys[i - 1];
-                    if (i > 0 && prekey.time <= t && t <= key.time) {
-                        var xstart = prekey.time;
-                        var ystart = prekey.value;
-                        var tanstart = prekey.tangent;
-                        var xend = key.time;
-                        var yend = key.value;
-                        var tanend = key.tangent;
-                        if (maxtan > Math.abs(tanstart) && maxtan > Math.abs(tanend)) {
-                            var ct = (t - prekey.time) / (key.time - prekey.time);
-                            var sys = [ystart, ystart + tanstart * (xend - xstart) / 3, yend - tanend * (xend - xstart) / 3, yend];
-                            var fy = framework.bezierCurve.getValue(ct, sys);
-                            isfind = true;
-                            value = fy;
-                            tangent = framework.bezierCurve.getDerivative(ct, sys) / (xend - xstart);
-                            break;
-                        }
-                        else {
-                            isfind = true;
-                            value = prekey.value;
-                            tangent = 0;
-                            break;
-                        }
-                    }
-                    if (i == 0 && t <= key.time) {
-                        isfind = true;
-                        value = key.value;
-                        tangent = 0;
-                        break;
-                    }
-                    if (i == n - 1 && t >= key.time) {
-                        isfind = true;
-                        value = key.value;
-                        tangent = 0;
-                        break;
-                    }
-                }
-                if (keys.length == 0)
-                    return new framework.AnimationCurveKeyframe({ time: t, value: 0, tangent: 0 });
-                return new framework.AnimationCurveKeyframe({ time: t, value: value, tangent: tangent });
-            };
-            AnimationCurve1.prototype.getValue = function (t) {
-                var point = this.getPoint(t);
-                if (!point)
-                    return 0;
-                return point.value;
-            };
-            AnimationCurve1.prototype.findKey = function (t, y, precision) {
-                var keys = this.keys;
-                for (var i = 0; i < keys.length; i++) {
-                    if (Math.abs(keys[i].time - t) < precision && Math.abs(keys[i].value - y) < precision) {
-                        return keys[i];
-                    }
-                }
-                return null;
-            };
-            AnimationCurve1.prototype.addKeyAtCurve = function (time, value, precision) {
-                var point = this.getPoint(time);
-                if (Math.abs(value - point.value) < precision) {
-                    this.keys.push(point);
-                    this.keys.sort(function (a, b) { return a.time - b.time; });
-                    return point;
-                }
-                return null;
-            };
-            AnimationCurve1.prototype.getSamples = function (num) {
-                if (num === void 0) { num = 100; }
-                var results = [];
-                for (var i = 0; i <= num; i++) {
-                    var p = this.getPoint(i / num);
-                    results.push(p);
-                }
-                return results;
-            };
-            return AnimationCurve1;
-        }());
-        framework.AnimationCurve1 = AnimationCurve1;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var AnimationCurveKeyframe = (function () {
-            function AnimationCurveKeyframe(param) {
-                this.init(param);
-            }
-            AnimationCurveKeyframe.prototype.init = function (param) {
-                param.time && (this.time = param.time);
-                param.value && (this.value = param.value);
-                param.tangent && (this.tangent = param.tangent);
-            };
-            return AnimationCurveKeyframe;
-        }());
-        framework.AnimationCurveKeyframe = AnimationCurveKeyframe;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var AnimationCurveWrapMode;
-        (function (AnimationCurveWrapMode) {
-            AnimationCurveWrapMode[AnimationCurveWrapMode["Loop"] = 0] = "Loop";
-            AnimationCurveWrapMode[AnimationCurveWrapMode["PingPong"] = 1] = "PingPong";
-            AnimationCurveWrapMode[AnimationCurveWrapMode["Clamp"] = 2] = "Clamp";
-        })(AnimationCurveWrapMode = framework.AnimationCurveWrapMode || (framework.AnimationCurveWrapMode = {}));
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var BezierCurve = (function () {
-            function BezierCurve() {
-            }
-            BezierCurve.prototype.linear = function (t, p0, p1) {
-                return p0 + t * (p1 - p0);
-            };
-            BezierCurve.prototype.linearDerivative = function (t, p0, p1) {
-                return p1 - p0;
-            };
-            BezierCurve.prototype.linearSecondDerivative = function (t, p0, p1) {
-                return 0;
-            };
-            BezierCurve.prototype.quadratic = function (t, p0, p1, p2) {
-                return (1 - t) * (1 - t) * p0 + 2 * (1 - t) * t * p1 + t * t * p2;
-            };
-            BezierCurve.prototype.quadraticDerivative = function (t, p0, p1, p2) {
-                return 2 * (1 - t) * (p1 - p0) + 2 * t * (p2 - p1);
-            };
-            BezierCurve.prototype.quadraticSecondDerivative = function (t, p0, p1, p2) {
-                return 2 * (p2 - 2 * p1 + p0);
-            };
-            BezierCurve.prototype.cubic = function (t, p0, p1, p2, p3) {
-                return (1 - t) * (1 - t) * (1 - t) * p0 + 3 * (1 - t) * (1 - t) * t * p1 + 3 * (1 - t) * t * t * p2 + t * t * t * p3;
-            };
-            BezierCurve.prototype.cubicDerivative = function (t, p0, p1, p2, p3) {
-                return 3 * (1 - t) * (1 - t) * (p1 - p0) + 6 * (1 - t) * t * (p2 - p1) + 3 * t * t * (p3 - p2);
-            };
-            BezierCurve.prototype.cubicSecondDerivative = function (t, p0, p1, p2, p3) {
-                return 6 * (1 - t) * (p2 - 2 * p1 + p0) + 6 * t * (p3 - 2 * p2 + p1);
-            };
-            BezierCurve.prototype.bn = function (t, ps, processs) {
-                if (processs === void 0) { processs = null; }
-                ps = ps.concat();
-                if (processs)
-                    processs.push(ps.concat());
-                for (var i = ps.length - 1; i > 0; i--) {
-                    for (var j = 0; j < i; j++) {
-                        ps[j] = (1 - t) * ps[j] + t * ps[j + 1];
-                    }
-                    if (processs) {
-                        ps.length = ps.length - 1;
-                        processs.push(ps.concat());
-                    }
-                }
-                return ps[0];
-            };
-            BezierCurve.prototype.bnDerivative = function (t, ps) {
-                if (ps.length < 2)
-                    return 0;
-                ps = ps.concat();
-                for (var i = 0, n = ps.length - 1; i < n; i++) {
-                    ps[i] = ps[i + 1] - ps[i];
-                }
-                ps.length = ps.length - 1;
-                var v = ps.length * this.bn(t, ps);
-                return v;
-            };
-            BezierCurve.prototype.bnSecondDerivative = function (t, ps) {
-                if (ps.length < 3)
-                    return 0;
-                ps = ps.concat();
-                for (var i = 0, n = ps.length - 1; i < n; i++) {
-                    ps[i] = ps[i + 1] - ps[i];
-                }
-                ps.length = ps.length - 1;
-                var v = ps.length * this.bnDerivative(t, ps);
-                return v;
-            };
-            BezierCurve.prototype.bnND = function (t, dn, ps) {
-                if (ps.length < dn + 1)
-                    return 0;
-                var factorial = 1;
-                ps = ps.concat();
-                for (var j = 0; j < dn; j++) {
-                    for (var i = 0, n = ps.length - 1; i < n; i++) {
-                        ps[i] = ps[i + 1] - ps[i];
-                    }
-                    ps.length = ps.length - 1;
-                    factorial *= ps.length;
-                }
-                var v = factorial * this.bn(t, ps);
-                return v;
-            };
-            BezierCurve.prototype.getValue = function (t, ps) {
-                if (ps.length == 2) {
-                    return this.linear(t, ps[0], ps[1]);
-                }
-                if (ps.length == 3) {
-                    return this.quadratic(t, ps[0], ps[1], ps[2]);
-                }
-                if (ps.length == 4) {
-                    return this.cubic(t, ps[0], ps[1], ps[2], ps[3]);
-                }
-                return this.bn(t, ps);
-            };
-            BezierCurve.prototype.getDerivative = function (t, ps) {
-                if (ps.length == 2) {
-                    return this.linearDerivative(t, ps[0], ps[1]);
-                }
-                if (ps.length == 3) {
-                    return this.quadraticDerivative(t, ps[0], ps[1], ps[2]);
-                }
-                if (ps.length == 4) {
-                    return this.cubicDerivative(t, ps[0], ps[1], ps[2], ps[3]);
-                }
-                return this.bnDerivative(t, ps);
-            };
-            BezierCurve.prototype.getSecondDerivative = function (t, ps) {
-                if (ps.length == 2) {
-                    return this.linearSecondDerivative(t, ps[0], ps[1]);
-                }
-                if (ps.length == 3) {
-                    return this.quadraticSecondDerivative(t, ps[0], ps[1], ps[2]);
-                }
-                if (ps.length == 4) {
-                    return this.cubicSecondDerivative(t, ps[0], ps[1], ps[2], ps[3]);
-                }
-                return this.bnSecondDerivative(t, ps);
-            };
-            BezierCurve.prototype.getExtremums = function (ps, numSamples, precision) {
-                var _this = this;
-                if (numSamples === void 0) { numSamples = 10; }
-                if (precision === void 0) { precision = 0.0000001; }
-                var samples = [];
-                for (var i = 0; i <= numSamples; i++) {
-                    samples.push(this.getDerivative(i / numSamples, ps));
-                }
-                var resultTs = [];
-                var resultVs = [];
-                for (var i = 0, n = numSamples; i < n; i++) {
-                    if (samples[i] * samples[i + 1] < 0) {
-                        var guessT = framework.equationSolving.line(function (x) { return _this.getDerivative(x, ps); }, i / numSamples, (i + 1) / numSamples, precision);
-                        resultTs.push(guessT);
-                        resultVs.push(this.getValue(guessT, ps));
-                    }
-                }
-                return { ts: resultTs, vs: resultVs };
-            };
-            BezierCurve.prototype.getMonotoneIntervals = function (ps, numSamples, precision) {
-                if (numSamples === void 0) { numSamples = 10; }
-                if (precision === void 0) { precision = 0.0000001; }
-                var monotoneIntervalTs = [0, 1];
-                var monotoneIntervalVs = [ps[0], ps[ps.length - 1]];
-                var extremums = this.getExtremums(ps, numSamples, precision);
-                for (var i = 0; i < extremums.ts.length; i++) {
-                    monotoneIntervalTs.splice(i + 1, 0, extremums.ts[i]);
-                    monotoneIntervalVs.splice(i + 1, 0, extremums.vs[i]);
-                }
-                return { ts: monotoneIntervalTs, vs: monotoneIntervalVs };
-            };
-            BezierCurve.prototype.getTFromValue = function (targetV, ps, numSamples, precision) {
-                var _this = this;
-                if (numSamples === void 0) { numSamples = 10; }
-                if (precision === void 0) { precision = 0.0000001; }
-                var monotoneIntervals = this.getMonotoneIntervals(ps, numSamples, precision);
-                var monotoneIntervalTs = monotoneIntervals.ts;
-                var monotoneIntervalVs = monotoneIntervals.vs;
-                var results = [];
-                for (var i = 0, n = monotoneIntervalVs.length - 1; i < n; i++) {
-                    if ((monotoneIntervalVs[i] - targetV) * (monotoneIntervalVs[i + 1] - targetV) <= 0) {
-                        var fx = function (x) { return _this.getValue(x, ps) - targetV; };
-                        var result = framework.equationSolving.line(fx, monotoneIntervalTs[i], monotoneIntervalTs[i + 1], precision);
-                        results.push(result);
-                    }
-                }
-                return results;
-            };
-            BezierCurve.prototype.split = function (t, ps) {
-                var processs = [];
-                framework.bezierCurve.bn(t, ps, processs);
-                var fps = [];
-                var sps = [];
-                for (var i = processs.length - 1; i >= 0; i--) {
-                    if (i == processs.length - 1) {
-                        fps.push(processs[i][0]);
-                        fps.push(processs[i][0]);
-                    }
-                    else {
-                        fps.unshift(processs[i][0]);
-                        sps.push(processs[i].pop());
-                    }
-                }
-                return [fps, sps];
-            };
-            BezierCurve.prototype.merge = function (fps, sps, mergeType) {
-                if (mergeType === void 0) { mergeType = 0; }
-                fps = fps.concat();
-                sps = sps.concat();
-                var processs = [];
-                var t;
-                var pps;
-                var ps;
-                for (var i = 0, n = fps.length; i < n; i++) {
-                    ps = processs[i] = [];
-                    if (i == 0) {
-                        processs[i][0] = fps.pop();
-                        sps.shift();
-                    }
-                    else if (i == 1) {
-                        processs[i][0] = fps.pop();
-                        processs[i][1] = sps.shift();
-                        t = (processs[i - 1][0] - processs[i][0]) / (processs[i][1] - processs[i][0]);
-                    }
-                    else {
-                        pps = processs[i - 1];
-                        var nfp = fps.pop();
-                        var nsp = sps.shift();
-                        var ps0 = [];
-                        ps0[0] = nfp;
-                        for (var j = 0, n_1 = pps.length; j < n_1; j++) {
-                            ps0[j + 1] = ps0[j] + (pps[j] - ps0[j]) / t;
-                        }
-                        var ps1 = [];
-                        ps1[pps.length] = nsp;
-                        for (var j = pps.length - 1; j >= 0; j--) {
-                            ps1[j] = ps1[j + 1] - (ps1[j + 1] - pps[j]) / (1 - t);
-                        }
-                        if (mergeType == 1) {
-                            for (var j = 0, n_2 = ps0.length - 1; j <= n_2; j++) {
-                                ps[j] = (ps0[j] * (n_2 - j) + ps1[j] * j) / n_2;
-                            }
-                        }
-                        else if (mergeType == 0) {
-                            for (var j = 0, n_3 = ps0.length - 1; j <= n_3; j++) {
-                                if (j < n_3 / 2) {
-                                    ps[j] = ps0[j];
-                                }
-                                else if (j > n_3 / 2) {
-                                    ps[j] = ps1[j];
-                                }
-                                else {
-                                    ps[j] = (ps0[j] + ps1[j]) / 2;
-                                }
-                            }
-                        }
-                        else {
-                            console.error("\u5408\u5E76\u7C7B\u578B mergeType " + mergeType + " \u9519\u8BEF!");
-                        }
-                    }
-                }
-                return processs.pop();
-            };
-            BezierCurve.prototype.getSamples = function (ps, num) {
-                if (num === void 0) { num = 100; }
-                var results = [];
-                for (var i = 0; i <= num; i++) {
-                    var t = i / num;
-                    var p = this.getValue(t, ps);
-                    results.push({ t: t, v: p });
-                }
-                return results;
-            };
-            return BezierCurve;
-        }());
-        framework.BezierCurve = BezierCurve;
-        framework.bezierCurve = new BezierCurve();
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var MinMaxCurve = (function () {
-            function MinMaxCurve() {
-                this.mode = framework.MinMaxCurveMode.Constant;
-                this.constant = 0;
-                this.constant1 = 0;
-                this.curve = new framework.AnimationCurve1();
-                this.curve1 = framework.serialization.setValue(new framework.AnimationCurve1(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] });
-                this.curveMultiplier = 1;
-                this.between0And1 = false;
-            }
-            MinMaxCurve.prototype.getValue = function (time, randomBetween) {
-                if (randomBetween === void 0) { randomBetween = Math.random(); }
-                switch (this.mode) {
-                    case framework.MinMaxCurveMode.Constant:
-                        return this.constant;
-                    case framework.MinMaxCurveMode.Curve:
-                        return this.curve.getValue(time) * this.curveMultiplier;
-                    case framework.MinMaxCurveMode.RandomBetweenTwoConstants:
-                        return Math.lerp(this.constant, this.constant1, randomBetween);
-                    case framework.MinMaxCurveMode.RandomBetweenTwoCurves:
-                        return Math.lerp(this.curve.getValue(time), this.curve1.getValue(time), randomBetween) * this.curveMultiplier;
-                }
-                return this.constant;
-            };
-            return MinMaxCurve;
-        }());
-        framework.MinMaxCurve = MinMaxCurve;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var MinMaxCurveMode;
-        (function (MinMaxCurveMode) {
-            MinMaxCurveMode[MinMaxCurveMode["Constant"] = 0] = "Constant";
-            MinMaxCurveMode[MinMaxCurveMode["Curve"] = 1] = "Curve";
-            MinMaxCurveMode[MinMaxCurveMode["RandomBetweenTwoConstants"] = 2] = "RandomBetweenTwoConstants";
-            MinMaxCurveMode[MinMaxCurveMode["RandomBetweenTwoCurves"] = 3] = "RandomBetweenTwoCurves";
-        })(MinMaxCurveMode = framework.MinMaxCurveMode || (framework.MinMaxCurveMode = {}));
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var MinMaxCurveVector3 = (function () {
-            function MinMaxCurveVector3() {
-                this.xCurve = new framework.MinMaxCurve();
-                this.yCurve = new framework.MinMaxCurve();
-                this.zCurve = new framework.MinMaxCurve();
-            }
-            MinMaxCurveVector3.prototype.getValue = function (time, randomBetween) {
-                if (randomBetween === void 0) { randomBetween = Math.random(); }
-                return new framework.Vector3(this.xCurve.getValue(time, randomBetween), this.yCurve.getValue(time, randomBetween), this.zCurve.getValue(time, randomBetween));
-            };
-            return MinMaxCurveVector3;
-        }());
-        framework.MinMaxCurveVector3 = MinMaxCurveVector3;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var Gradient = (function () {
             function Gradient() {
                 this.mode = framework.GradientMode.Blend;
@@ -33144,7 +33440,9 @@ var gd3d;
                 var limit = this.limit.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
                 var pVelocity = particle.velocity.clone();
                 if (this.space == framework.ParticleSystemSimulationSpace1.World) {
-                    this.particleSystem.transform.localToWorldMatrix.deltaTransformVector(pVelocity, pVelocity);
+                    var localToWorldMatrix = new framework.Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
+                    var worldToLocalMatrix = localToWorldMatrix.clone().invert();
+                    localToWorldMatrix.deltaTransformVector(pVelocity, pVelocity);
                     if (this.separateAxes) {
                         pVelocity.clamp(limit3D.negateTo(), limit3D);
                     }
@@ -33152,7 +33450,7 @@ var gd3d;
                         if (pVelocity.lengthSquared > limit * limit)
                             pVelocity.normalize(limit);
                     }
-                    this.particleSystem.transform.worldToLocalMatrix.deltaTransformVector(pVelocity, pVelocity);
+                    worldToLocalMatrix.deltaTransformVector(pVelocity, pVelocity);
                 }
                 else {
                     if (this.separateAxes) {
@@ -33395,7 +33693,9 @@ var gd3d;
             ParticleMainModule.prototype.updateParticleState = function (particle) {
                 var preGravity = particle[_Main_preGravity];
                 var gravity = new framework.Vector3(0, -this.gravityModifier.getValue(this.particleSystem.rateAtDuration) * 9.8, 0);
-                this.particleSystem.transform.worldToLocalMatrix.deltaTransformVector(gravity, gravity);
+                var worldToLocalMatrix = new framework.Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
+                worldToLocalMatrix.invert();
+                worldToLocalMatrix.deltaTransformVector(gravity, gravity);
                 particle.acceleration.sub(preGravity).add(gravity);
                 preGravity.copy(gravity);
                 particle.size.copy(particle.startSize);
@@ -34086,7 +34386,9 @@ var gd3d;
                     return;
                 var velocity = this.velocity.getValue(particle.rateAtLifeTime, particle[_VelocityOverLifetime_rate]);
                 if (this.space == framework.ParticleSystemSimulationSpace1.World) {
-                    this.particleSystem.transform.worldToLocalMatrix.deltaTransformVector(velocity, velocity);
+                    var worldToLocalMatrix = new framework.Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
+                    worldToLocalMatrix.invert();
+                    worldToLocalMatrix.deltaTransformVector(velocity, velocity);
                 }
                 particle.velocity.add(velocity);
                 preVelocity.copy(velocity);
