@@ -19,7 +19,15 @@ namespace gd3d.framework
          * 
          * 曲线，用来定义在粒子的生命周期内应用了多少发射速度。
          */
-        multiplier = serialization.setValue(new MinMaxCurve(), { constant: 1, constant1: 1 });
+        multiplier: MinMaxCurve;
+
+        constructor()
+        {
+            super();
+            this.multiplier = new MinMaxCurve();
+            this.multiplier.constant = 1;
+            this.multiplier.constant1 = 1;
+        }
 
         /**
          * Curve to define how much emitter velocity is applied during the lifetime of a particle.

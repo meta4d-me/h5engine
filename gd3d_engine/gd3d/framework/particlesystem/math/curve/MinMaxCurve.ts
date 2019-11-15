@@ -28,7 +28,7 @@ namespace gd3d.framework
         /**
          * 曲线1
          */
-        curve1 = serialization.setValue(new AnimationCurve1(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] });
+        curve1: AnimationCurve1;
 
         /**
          * 曲线缩放比
@@ -39,6 +39,13 @@ namespace gd3d.framework
          * 是否在编辑器中只显示Y轴 0-1 区域，例如 lifetime 为非负，需要设置为true
          */
         between0And1 = false;
+
+        constructor()
+        {
+            this.curve1 = new AnimationCurve1();
+            this.curve1.keys[0].init({ time: 0, value: 0, tangent: 0 });
+            this.curve1.keys[0].init({ time: 1, value: 1, tangent: 0 });
+        }
 
         /**
          * 获取值

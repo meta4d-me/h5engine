@@ -46,7 +46,7 @@ namespace gd3d.framework
          * 
          * 每个新粒子的总寿命(以秒计)。
          */
-        startLifetime = serialization.setValue(new MinMaxCurve(), { between0And1: true, constant: 5, constant1: 5 });
+        startLifetime: MinMaxCurve;
 
         /**
          * Start lifetime multiplier.
@@ -70,7 +70,7 @@ namespace gd3d.framework
          * 
          * 粒子发射时的初始速度。
          */
-        startSpeed = serialization.setValue(new MinMaxCurve(), { constant: 5, constant1: 5 });
+        startSpeed: MinMaxCurve;
 
         /**
          * A multiplier of the initial speed of particles when emitted.
@@ -133,7 +133,7 @@ namespace gd3d.framework
          * 
          * 发射时粒子的初始大小。
          */
-        startSize3D = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constant1: 1 }, yCurve: { between0And1: true, constant: 1, constant1: 1 }, zCurve: { between0And1: true, constant: 1, constant1: 1 } });
+        startSize3D: MinMaxCurveVector3;
 
         /**
          * The initial size of particles along the X axis when emitted.
@@ -258,7 +258,7 @@ namespace gd3d.framework
          * 
          * 粒子发射时的初始旋转。
          */
-        startRotation3D = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { curveMultiplier: 180 }, yCurve: { curveMultiplier: 180 }, zCurve: { curveMultiplier: 180 } });
+        startRotation3D: MinMaxCurveVector3;
 
         /**
          * The initial rotation of particles around the X axis when emitted.
@@ -407,6 +407,36 @@ namespace gd3d.framework
          * 发射粒子的最大数量。
          */
         maxParticles = 1000;
+
+        constructor()
+        {
+            super();
+            this.startLifetime = new MinMaxCurve();
+            this.startLifetime.between0And1 = true;
+            this.startLifetime.constant = 5;
+            this.startLifetime.constant1 = 5;
+            //
+            this.startSpeed = new MinMaxCurve();
+            this.startSpeed.between0And1 = false;
+            this.startSpeed.constant = 5;
+            this.startSpeed.constant1 = 5;
+            //
+            this.startSize3D = new MinMaxCurveVector3();
+            this.startSize3D.xCurve.between0And1 = true;
+            this.startSize3D.xCurve.constant = 1;
+            this.startSize3D.xCurve.constant1 = 1;
+            this.startSize3D.yCurve.between0And1 = true;
+            this.startSize3D.yCurve.constant = 1;
+            this.startSize3D.yCurve.constant1 = 1;
+            this.startSize3D.zCurve.between0And1 = true;
+            this.startSize3D.zCurve.constant = 1;
+            this.startSize3D.zCurve.constant1 = 1;
+            //
+            this.startRotation3D = new MinMaxCurveVector3();
+            this.startRotation3D.xCurve.curveMultiplier = 180;
+            this.startRotation3D.yCurve.curveMultiplier = 180;
+            this.startRotation3D.zCurve.curveMultiplier = 180;
+        }
 
         /**
          * 初始化粒子状态

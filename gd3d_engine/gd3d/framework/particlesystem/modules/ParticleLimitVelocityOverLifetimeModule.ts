@@ -19,14 +19,34 @@ namespace gd3d.framework
          * 
          * 最大速度曲线，当不使用每轴一个曲线时。
          */
-        limit = serialization.setValue(new MinMaxCurve(), { between0And1: true, constant: 1, constant1: 1 });
+        limit: MinMaxCurve;
 
         /**
          * Maximum velocity.
          * 
          * 最高速度。
          */
-        limit3D = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constant1: 1 }, yCurve: { between0And1: true, constant: 1, constant1: 1 }, zCurve: { between0And1: true, constant: 1, constant1: 1 } });
+        limit3D: MinMaxCurveVector3;
+
+        constructor()
+        {
+            super();
+            this.limit = new MinMaxCurve();
+            this.limit.between0And1 = true;
+            this.limit.constant = 1;
+            this.limit.constant1 = 1;
+            //
+            this.limit3D = new MinMaxCurveVector3();
+            this.limit3D.xCurve.between0And1 = true;
+            this.limit3D.xCurve.constant = 1;
+            this.limit3D.xCurve.constant1 = 1;
+            this.limit3D.yCurve.between0And1 = true;
+            this.limit3D.yCurve.constant = 1;
+            this.limit3D.yCurve.constant1 = 1;
+            this.limit3D.zCurve.between0And1 = true;
+            this.limit3D.zCurve.constant = 1;
+            this.limit3D.zCurve.constant1 = 1;
+        }
 
         /**
          * Specifies if the velocities are in local space (rotated with the transform) or world space.

@@ -20,11 +20,16 @@ namespace gd3d.framework
          */
         tangent: number
 
-        constructor(a: Partial<AnimationCurveKeyframe>)
+        constructor(param: Partial<AnimationCurveKeyframe>)
         {
-            a.time && (this.time = a.time);
-            a.value && (this.value = a.value);
-            a.tangent && (this.tangent = a.tangent);
+            this.init(param);
+        }
+
+        init(param: Partial<AnimationCurveKeyframe>)
+        {
+            param.time && (this.time = param.time);
+            param.value && (this.value = param.value);
+            param.tangent && (this.tangent = param.tangent);
         }
     }
 }

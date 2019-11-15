@@ -595,6 +595,19 @@ namespace gd3d.framework
         }
 
         /**
+         * 夹紧？
+         * @param min 最小值
+         * @param max 最大值
+         */
+        clamp(min: Vector3, max: Vector3)
+        {
+            this.x = Math.clamp(this.x, min.x, max.x);
+            this.y = Math.clamp(this.y, min.y, max.y);
+            this.z = Math.clamp(this.z, min.z, max.z);
+            return this;
+        }
+
+        /**
          * 取最小元素
          * @param v 向量
          */
