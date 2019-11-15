@@ -1,3 +1,5 @@
+/// <reference path="event/EventDispatcher.ts" />
+
 namespace gd3d.framework
 {
     export interface ComponentMap { ParticleSystem: ParticleSystem }
@@ -13,7 +15,7 @@ namespace gd3d.framework
     /**
      * 粒子系统
      */
-    export class ParticleSystem extends Model
+    export class ParticleSystem extends EventDispatcher
     {
         __class__: "feng3d.ParticleSystem" = "feng3d.ParticleSystem";
 
@@ -516,5 +518,5 @@ namespace gd3d.framework
         }
     }
 
-    AssetData.addAssetData("Billboard-Geometry", Geometry.billboard = serialization.setValue(new PlaneGeometry(), { name: "Billboard-Geometry", assetId: "Billboard-Geometry", yUp: false, hideFlags: HideFlags.NotEditable }));
+    // AssetData.addAssetData("Billboard-Geometry", Geometry.billboard = serialization.setValue(new PlaneGeometry(), { name: "Billboard-Geometry", assetId: "Billboard-Geometry", yUp: false, hideFlags: HideFlags.NotEditable }));
 }
