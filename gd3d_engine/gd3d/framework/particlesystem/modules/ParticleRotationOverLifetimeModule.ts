@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 粒子系统 旋转角度随时间变化模块
+     * 
+     * @author feng3d
      */
     export class ParticleRotationOverLifetimeModule extends ParticleModule
     {

@@ -3,6 +3,8 @@ namespace gd3d.framework
 
 	/**
 	 * 粒子
+	 * 
+	 * @author feng3d
 	 */
 	export class Particle1
 	{

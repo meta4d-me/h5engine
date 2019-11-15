@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 颜色渐变
+     * 
+     * @author feng3d
      */
     export class Gradient
     {

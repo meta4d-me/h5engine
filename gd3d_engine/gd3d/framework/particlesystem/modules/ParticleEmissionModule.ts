@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 粒子系统发射模块。
+     * 
+     * @author feng3d
      */
     export class ParticleEmissionModule extends ParticleModule
     {

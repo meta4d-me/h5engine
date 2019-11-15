@@ -4,6 +4,8 @@ namespace gd3d.framework
      * How to apply emitter velocity to particles.
      * 
      * 如何将发射体速度应用于粒子。
+     * 
+     * @author feng3d
      */
     export enum ParticleSystemInheritVelocityMode
     {

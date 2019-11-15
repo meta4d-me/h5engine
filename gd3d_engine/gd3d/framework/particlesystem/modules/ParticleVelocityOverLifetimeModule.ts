@@ -5,6 +5,8 @@ namespace gd3d.framework
      * 
      * Controls the velocity of each particle during its lifetime.
      * 控制每个粒子在其生命周期内的速度。
+     * 
+     * @author feng3d
      */
     export class ParticleVelocityOverLifetimeModule extends ParticleModule
     {

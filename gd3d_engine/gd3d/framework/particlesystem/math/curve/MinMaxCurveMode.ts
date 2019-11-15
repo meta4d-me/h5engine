@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 曲线模式
+     * 
+     * @author feng3d
      */
     export enum MinMaxCurveMode
     {

@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 动画关键帧
+     * 
+     * @author feng3d
      */
     export class AnimationCurveKeyframe
     {

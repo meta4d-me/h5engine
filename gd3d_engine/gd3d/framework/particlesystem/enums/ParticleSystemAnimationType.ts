@@ -4,6 +4,8 @@ namespace gd3d.framework
      * The animation type.
      * 
      * 动画类型。
+     * 
+     * @author feng3d
      */
     export enum ParticleSystemAnimationType
     {

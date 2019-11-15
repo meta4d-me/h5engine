@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 颜色
+     * 
+     * @author feng3d
      */
     export class Color3
     {

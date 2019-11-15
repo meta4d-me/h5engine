@@ -20,6 +20,8 @@ namespace gd3d.framework
 
 	/**
 	 * 事件适配器
+     * 
+     * @author feng3d
 	 */
     export class EventDispatcher
     {

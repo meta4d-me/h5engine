@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 粒子主模块
+     * 
+     * @author feng3d
      */
     export class ParticleMainModule extends ParticleModule
     {

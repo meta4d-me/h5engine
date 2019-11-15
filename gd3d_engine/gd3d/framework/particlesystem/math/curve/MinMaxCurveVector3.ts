@@ -1,5 +1,9 @@
 namespace gd3d.framework
 {
+    /**
+     * 
+     * @author feng3d
+     */
     export class MinMaxCurveVector3
     {
         /**

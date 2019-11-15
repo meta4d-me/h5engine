@@ -4,6 +4,8 @@ namespace gd3d.framework
 {
     /**
      * 粒子系统 发射圆盘
+     * 
+     * @author feng3d
      */
     export class ParticleSystemShapeCircle extends ParticleSystemShapeBase
     {

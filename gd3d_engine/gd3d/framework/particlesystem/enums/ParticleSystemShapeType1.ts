@@ -5,6 +5,8 @@ namespace gd3d.framework
      * The emission shape (Shuriken).
      * 
      * 发射的形状
+     * 
+     * @author feng3d
      */
     export enum ParticleSystemShapeType1
     {

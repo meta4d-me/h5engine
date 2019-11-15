@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 最大最小颜色渐变模式
+     * 
+     * @author feng3d
      */
     export enum MinMaxGradientMode
     {

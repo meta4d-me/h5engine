@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 渐变透明键
+     * 
+     * @author feng3d
      */
     export interface GradientAlphaKey
     {

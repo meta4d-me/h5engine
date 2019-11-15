@@ -4,6 +4,8 @@ namespace gd3d.framework
      * The mesh emission type.
      * 
      * 网格发射类型。
+     * 
+     * @author feng3d
      */
     export enum ParticleSystemMeshShapeType
     {

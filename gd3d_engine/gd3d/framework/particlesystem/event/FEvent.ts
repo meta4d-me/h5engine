@@ -36,6 +36,8 @@ namespace gd3d.framework
 
     /**
      * 事件
+     * 
+     * @author feng3d
      */
     export class FEvent
     {
@@ -321,6 +323,8 @@ namespace gd3d.framework
 
 	/**
 	 * 事件
+     * 
+     * @author feng3d
 	 */
     export interface Event<T>
     {

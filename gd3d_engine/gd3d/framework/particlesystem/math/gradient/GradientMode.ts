@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 渐变模式
+     * 
+     * @author feng3d
      */
     export enum GradientMode
     {

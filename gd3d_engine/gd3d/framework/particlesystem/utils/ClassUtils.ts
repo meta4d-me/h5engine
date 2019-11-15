@@ -9,6 +9,8 @@ namespace gd3d.framework
 
     /**
      * 类工具
+     * 
+     * @author feng3d
      */
     export class ClassUtils
     {

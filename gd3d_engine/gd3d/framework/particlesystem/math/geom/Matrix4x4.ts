@@ -20,6 +20,8 @@ namespace gd3d.framework
      *  |     12        13        14       15   |   平移
      *  ---                                   ---
      * ```
+     * 
+     * @author feng3d
      */
     export class Matrix4x4
     {

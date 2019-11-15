@@ -4,6 +4,8 @@ namespace gd3d.framework
      * Limit Velocity Over Lifetime module.
      * 
      * 基于时间轴限制速度模块。
+     * 
+     * @author feng3d
      */
     export class ParticleLimitVelocityOverLifetimeModule extends ParticleModule
     {

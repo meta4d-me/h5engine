@@ -9,7 +9,8 @@ namespace gd3d.framework
     /**
      * Bézier曲线
      * @see https://en.wikipedia.org/wiki/B%C3%A9zier_curve
-     * @author feng / http://feng3d.com 03/06/2018
+     * 
+     * @author feng3d
      */
     export class BezierCurve
     {

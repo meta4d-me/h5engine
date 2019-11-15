@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 粒子系统 发射边
+     * 
+     * @author feng3d
      */
     export class ParticleSystemShapeEdge extends ParticleSystemShapeBase
     {

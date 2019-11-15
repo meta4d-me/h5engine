@@ -4,6 +4,8 @@ namespace gd3d.framework
      * Control how particle systems apply transform scale.
      * 
      * 控制粒子系统如何应用变换尺度。
+     * 
+     * @author feng3d
      */
     export enum ParticleSystemScalingMode
     {

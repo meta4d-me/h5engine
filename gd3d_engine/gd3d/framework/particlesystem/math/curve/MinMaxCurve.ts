@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 最大最小曲线
+     * 
+     * @author feng3d
      */
     export class MinMaxCurve
     {

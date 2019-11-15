@@ -109,6 +109,8 @@ namespace gd3d.framework
 
     /**
      * 序列化
+     * 
+     * @author feng3d
      */
     export class Serialization
     {

@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 动画曲线Wrap模式，处理超出范围情况
+     * 
+     * @author feng3d
      */
     export enum AnimationCurveWrapMode
     {

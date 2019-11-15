@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 四维向量
+     * 
+     * @author feng3d
      */
     export class Vector4
     {

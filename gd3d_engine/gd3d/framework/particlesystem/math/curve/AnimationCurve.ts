@@ -5,6 +5,8 @@ namespace gd3d.framework
      * 动画曲线
      * 
      * 基于时间轴的连续三阶Bézier曲线
+     * 
+     * @author feng3d
      */
     export class AnimationCurve1
     {

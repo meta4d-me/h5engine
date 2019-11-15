@@ -3,6 +3,8 @@ namespace gd3d.framework
 
     /**
      * 粒子系统纹理表动画模块。
+     * 
+     * @author feng3d
      */
     export class ParticleTextureSheetAnimationModule extends ParticleModule
     {

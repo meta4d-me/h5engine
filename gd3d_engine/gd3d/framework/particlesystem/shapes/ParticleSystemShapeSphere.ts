@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 从球体的体积中发射。
+     * 
+     * @author feng3d
      */
     export class ParticleSystemShapeSphere extends ParticleSystemShapeBase
     {

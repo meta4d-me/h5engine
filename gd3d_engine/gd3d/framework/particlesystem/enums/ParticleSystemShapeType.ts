@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 发射形状
+     * 
+     * @author feng3d
      */
     export enum ParticleSystemShapeType
     {

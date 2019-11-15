@@ -3,6 +3,8 @@ namespace gd3d.framework
     /**
      * The mode used to generate new points in a shape (Shuriken).
      * 用于在形状中生成新点的模式
+     * 
+     * @author feng3d
      */
     export enum ParticleSystemShapeMultiModeValue
     {
@@ -32,6 +34,8 @@ namespace gd3d.framework
 
     /**
      * 粒子系统圆锥体发射类型，用于定义基于圆锥体的发射类型。
+     * 
+     * @author feng3d
      */
     export enum ParticleSystemShapeConeEmitFrom
     {
@@ -55,6 +59,8 @@ namespace gd3d.framework
 
     /**
      * 粒子系统发射圆锥体，用于定义基于圆锥体的粒子发射时的初始状态。
+     * 
+     * @author feng3d
      */
     export class ParticleSystemShapeCone extends ParticleSystemShapeBase
     {

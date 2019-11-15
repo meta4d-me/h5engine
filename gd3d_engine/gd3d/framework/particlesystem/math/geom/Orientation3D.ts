@@ -2,7 +2,8 @@ namespace gd3d.framework
 {
     /**
      * Orientation3D 类是用于表示 Matrix4x4 对象的方向样式的常量值枚举。方向的三个类型分别为欧拉角、轴角和四元数。Matrix4x4 对象的 decompose 和 recompose 方法采用其中的某一个枚举类型来标识矩阵的旋转组件。
-
+     * 
+     * @author feng3d
      */
     export enum Orientation3D
     {

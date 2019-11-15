@@ -14,6 +14,8 @@ namespace gd3d.framework
 
     /**
      * 粒子系统
+     * 
+     * @author feng3d
      */
     export class ParticleSystem extends EventDispatcher implements INodeComponent
     {
@@ -135,10 +137,6 @@ namespace gd3d.framework
         geometry = Geometry.billboard;
 
         // material = Material.particle;
-
-        castShadows = true;
-
-        receiveShadows = true;
 
         /**
          * 活跃粒子数量

@@ -3,6 +3,8 @@ namespace gd3d.framework
     /**
      * Shape of the emitter volume, which controls where particles are emitted and their initial direction.
      * 发射体体积的形状，它控制粒子发射的位置和初始方向。
+     * 
+     * @author feng3d
      */
     export class ParticleShapeModule extends ParticleModule
     {

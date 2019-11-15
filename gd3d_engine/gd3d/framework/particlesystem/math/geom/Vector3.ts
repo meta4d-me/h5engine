@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * Vector3 类使用笛卡尔坐标 x、y 和 z 表示三维空间中的点或位置
+     * 
+     * @author feng3d
      */
     export class Vector3
     {

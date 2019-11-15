@@ -4,6 +4,8 @@ namespace gd3d.framework
     /**
      * A flag representing each UV channel.
      * 一个代表每个紫外线频道的旗子。
+     * 
+     * @author feng3d
      */
     export enum UVChannelFlags
     {

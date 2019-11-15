@@ -5,6 +5,8 @@ namespace gd3d.framework
      * 
      * 控制每个粒子在其生命周期内的力。
      * Script interface for the Force Over Lifetime module.
+     * 
+     * @author feng3d
      */
     export class ParticleForceOverLifetimeModule extends ParticleModule
     {

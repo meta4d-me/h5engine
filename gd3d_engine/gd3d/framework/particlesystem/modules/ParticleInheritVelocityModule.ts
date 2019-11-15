@@ -4,6 +4,8 @@ namespace gd3d.framework
      * The Inherit Velocity Module controls how the velocity of the emitter is transferred to the particles as they are emitted.
      * 
      * 遗传速度模块控制发射体的速度在粒子发射时如何传递到粒子上。
+     * 
+     * @author feng3d
      */
     export class InheritVelocityModule extends ParticleModule
     {

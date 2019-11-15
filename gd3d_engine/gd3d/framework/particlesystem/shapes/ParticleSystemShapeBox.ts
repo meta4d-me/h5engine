@@ -2,6 +2,9 @@
 
 namespace gd3d.framework
 {
+    /**
+     * @author feng3d
+     */
     export enum ParticleSystemShapeBoxEmitFrom
     {
         /**
@@ -20,6 +23,8 @@ namespace gd3d.framework
 
     /**
      * 粒子系统 发射盒子
+     * 
+     * @author feng3d
      */
     export class ParticleSystemShapeBox extends ParticleSystemShapeBase
     {

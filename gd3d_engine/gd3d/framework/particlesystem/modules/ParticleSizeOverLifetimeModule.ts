@@ -2,6 +2,8 @@ namespace gd3d.framework
 {
     /**
      * 粒子系统 缩放随时间变化模块
+     * 
+     * @author feng3d
      */
     export class ParticleSizeOverLifetimeModule extends ParticleModule
     {
