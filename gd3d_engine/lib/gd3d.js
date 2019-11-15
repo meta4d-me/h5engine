@@ -31732,6 +31732,7 @@ var gd3d;
                 configurable: true
             });
             scene.prototype.update = function (delta) {
+                framework.material["lastDrawMatID"] = framework.material["lastDrawMeshID"] = -1;
                 if (this.autoCollectlightCamera) {
                     this.renderCameras.length = 0;
                     this.renderLights.length = 0;
