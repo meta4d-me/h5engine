@@ -4,7 +4,7 @@ namespace gd3d.framework
     /**
      * 事件
      */
-    export var event: FEvent;
+    export var event1: FEvent;
 
     /**
      * 只针对Object的事件

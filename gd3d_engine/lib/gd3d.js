@@ -1794,13 +1794,13 @@ var gd3d;
                         skip = true;
                     }
                     else if (this.pointDown == false && touch == true) {
-                        this.pointEvent.type = framework.event.PointEventEnum.PointDown;
+                        this.pointEvent.type = gd3d.event.PointEventEnum.PointDown;
                     }
                     else if (this.pointDown == true && touch == true) {
-                        this.pointEvent.type = framework.event.PointEventEnum.PointHold;
+                        this.pointEvent.type = gd3d.event.PointEventEnum.PointHold;
                     }
                     else if (this.pointDown == true && touch == false) {
-                        this.pointEvent.type = framework.event.PointEventEnum.PointUp;
+                        this.pointEvent.type = gd3d.event.PointEventEnum.PointUp;
                     }
                     if (!skip) {
                         if (this.scene.app.bePlay) {
@@ -3557,7 +3557,7 @@ var gd3d;
                 this.downPointV2 = new gd3d.math.vector2();
                 this.isMovedLimit = false;
                 this.movedLimit = 0.02;
-                this.UIEventer = new framework.event.UIEvent();
+                this.UIEventer = new gd3d.event.UIEvent();
                 this._downInThis = false;
                 this._dragOut = false;
             }
@@ -3673,11 +3673,11 @@ var gd3d;
                     tv2.y = ev.y;
                     var b = this.transform.ContainsCanvasPoint(tv2);
                     if (b) {
-                        if (ev.type == framework.event.PointEventEnum.PointDown) {
+                        if (ev.type == gd3d.event.PointEventEnum.PointDown) {
                             this._downInThis = true;
                             this.showPress();
-                            var pd = framework.event.UIEventEnum.PointerDown;
-                            if (this.UIEventer.listenerCount(framework.event.UIEventEnum[pd]) > 0) {
+                            var pd = gd3d.event.UIEventEnum.PointerDown;
+                            if (this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pd]) > 0) {
                                 ev.eated = true;
                                 this.UIEventer.EmitEnum(pd, ev);
                             }
@@ -3685,7 +3685,7 @@ var gd3d;
                             this.downPointV2.y = ev.y;
                             this.isMovedLimit = false;
                         }
-                        else if (ev.type == framework.event.PointEventEnum.PointHold && this._downInThis) {
+                        else if (ev.type == gd3d.event.PointEventEnum.PointHold && this._downInThis) {
                             if (this._dragOut == true) {
                                 this._dragOut = false;
                                 this.showPress();
@@ -3694,26 +3694,26 @@ var gd3d;
                                 this.isMovedLimit = gd3d.math.vec2Distance(tv2, this.downPointV2) > this.movedLimit;
                             }
                         }
-                        else if (ev.type == framework.event.PointEventEnum.PointUp && this._downInThis) {
+                        else if (ev.type == gd3d.event.PointEventEnum.PointUp && this._downInThis) {
                             this._downInThis = false;
                             this.showNormal();
-                            var pu = framework.event.UIEventEnum.PointerUp;
-                            if (this.UIEventer.listenerCount(framework.event.UIEventEnum[pu]) > 0) {
+                            var pu = gd3d.event.UIEventEnum.PointerUp;
+                            if (this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pu]) > 0) {
                                 ev.eated = true;
                                 this.UIEventer.EmitEnum(pu, ev);
                             }
-                            var pc = framework.event.UIEventEnum.PointerClick;
-                            if (!this.isMovedLimit && this.UIEventer.listenerCount(framework.event.UIEventEnum[pc]) > 0) {
+                            var pc = gd3d.event.UIEventEnum.PointerClick;
+                            if (!this.isMovedLimit && this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pc]) > 0) {
                                 ev.eated = true;
                                 this.UIEventer.EmitEnum(pc, ev);
                             }
                         }
                     }
                     else {
-                        if (ev.type == framework.event.PointEventEnum.PointUp) {
+                        if (ev.type == gd3d.event.PointEventEnum.PointUp) {
                             this._downInThis = false;
                         }
-                        else if (ev.type == framework.event.PointEventEnum.PointHold && this._downInThis) {
+                        else if (ev.type == gd3d.event.PointEventEnum.PointHold && this._downInThis) {
                             if (this._dragOut == false) {
                                 this._dragOut = true;
                                 this.showNormal();
@@ -3727,7 +3727,7 @@ var gd3d;
                 this.UIEventer.OnEnum(eventEnum, func, thisArg);
             };
             button.prototype.removeListener = function (eventEnum, func, thisArg) {
-                this.UIEventer.RemoveListener(framework.event.UIEventEnum[eventEnum], func, thisArg);
+                this.UIEventer.RemoveListener(gd3d.event.UIEventEnum[eventEnum], func, thisArg);
             };
             button.prototype.showNormal = function () {
                 if (this.transition == TransitionType.ColorTint) {
@@ -5150,7 +5150,7 @@ var gd3d;
             };
             inputField.prototype.onPointEvent = function (canvas, ev, oncap) {
                 if (oncap == false) {
-                    if (ev.type != framework.event.PointEventEnum.PointDown)
+                    if (ev.type != gd3d.event.PointEventEnum.PointDown)
                         return;
                     var b = this.transform.ContainsCanvasPoint(new gd3d.math.vector2(ev.x, ev.y));
                     if (b) {
@@ -6057,14 +6057,14 @@ var gd3d;
                         var tempc = scrollRect_1.helpv2_1;
                         this.transform.canvas.ModelPosToCanvasPos(temps, tempc);
                         var sp = this.strPoint;
-                        if (ev.type == framework.event.PointEventEnum.PointDown) {
+                        if (ev.type == gd3d.event.PointEventEnum.PointDown) {
                             this.isPointDown = true;
                             sp.x = tempc.x;
                             sp.y = tempc.y;
                             gd3d.math.vec2Clone(this._content.transform.localTranslate, this.strPos);
                             this.canfly = false;
                         }
-                        if (ev.type == framework.event.PointEventEnum.PointHold && this.isPointDown) {
+                        if (ev.type == gd3d.event.PointEventEnum.PointHold && this.isPointDown) {
                             var lp = this.lastPoint;
                             if (lp.x != tempc.x || lp.y != tempc.y) {
                                 lp.x = tempc.x;
@@ -6080,7 +6080,7 @@ var gd3d;
                         }
                     }
                 }
-                if (ev.type == framework.event.PointEventEnum.PointUp) {
+                if (ev.type == gd3d.event.PointEventEnum.PointUp) {
                     this.isPointDown = false;
                     if (this.inertia) {
                         this.onInertiaSliderUp();
@@ -6228,14 +6228,14 @@ var gd3d;
                         var tempc = slideArea_1.helpv2_1;
                         this.transform.canvas.ModelPosToCanvasPos(temps, tempc);
                         var sp = this.strPoint;
-                        if (ev.type == framework.event.PointEventEnum.PointDown) {
+                        if (ev.type == gd3d.event.PointEventEnum.PointDown) {
                             this.isPointDown = true;
                             sp.x = tempc.x;
                             sp.y = tempc.y;
                             if (this.onDownFun)
                                 this.onDownFun(sp.x, sp.y);
                         }
-                        if (ev.type == framework.event.PointEventEnum.PointHold && this.isPointDown) {
+                        if (ev.type == gd3d.event.PointEventEnum.PointHold && this.isPointDown) {
                             var lp = this.lastPoint;
                             if (lp.x != tempc.x || lp.y != tempc.y) {
                                 lp.x = tempc.x;
@@ -6254,7 +6254,7 @@ var gd3d;
                         }
                     }
                 }
-                if (ev.type == framework.event.PointEventEnum.PointUp) {
+                if (ev.type == gd3d.event.PointEventEnum.PointUp) {
                     this.isPointDown = false;
                     if (this.onUpFun)
                         this.onUpFun();
@@ -7519,7 +7519,7 @@ var gd3d;
             function physicEngine2D(op) {
                 if (op === void 0) { op = null; }
                 var _this = this;
-                this.eventer = new framework.event.Physic2dEvent();
+                this.eventer = new gd3d.event.Physic2dEvent();
                 this._bodysObjMap = {};
                 op = op || {};
                 if (Matter == undefined) {
@@ -7630,25 +7630,25 @@ var gd3d;
                 Matter.Engine.update(this.matterEngine, delta);
             };
             physicEngine2D.prototype.beforeUpdate = function (ev) {
-                this.eventer.EmitEnum(framework.event.Physic2dEventEnum.BeforeUpdate, ev);
+                this.eventer.EmitEnum(gd3d.event.Physic2dEventEnum.BeforeUpdate, ev);
             };
             physicEngine2D.prototype.afterUpdate = function (ev) {
-                this.eventer.EmitEnum(framework.event.Physic2dEventEnum.afterUpdate, ev);
+                this.eventer.EmitEnum(gd3d.event.Physic2dEventEnum.afterUpdate, ev);
             };
             physicEngine2D.prototype.collisionStart = function (ev) {
-                this.eventer.EmitEnum(framework.event.Physic2dEventEnum.collisionStart, ev);
+                this.eventer.EmitEnum(gd3d.event.Physic2dEventEnum.collisionStart, ev);
             };
             physicEngine2D.prototype.collisionActive = function (ev) {
-                this.eventer.EmitEnum(framework.event.Physic2dEventEnum.collisionActive, ev);
+                this.eventer.EmitEnum(gd3d.event.Physic2dEventEnum.collisionActive, ev);
             };
             physicEngine2D.prototype.collisionEnd = function (ev) {
-                this.eventer.EmitEnum(framework.event.Physic2dEventEnum.collisionEnd, ev);
+                this.eventer.EmitEnum(gd3d.event.Physic2dEventEnum.collisionEnd, ev);
             };
             physicEngine2D.prototype.addEventListener = function (eventEnum, func, thisArg) {
                 this.eventer.OnEnum(eventEnum, func, thisArg);
             };
             physicEngine2D.prototype.removeEventListener = function (eventEnum, func, thisArg) {
-                this.eventer.RemoveListener(framework.event.Physic2dEventEnum[eventEnum], func, thisArg);
+                this.eventer.RemoveListener(gd3d.event.Physic2dEventEnum[eventEnum], func, thisArg);
             };
             physicEngine2D.prototype.createRectByPBody = function (pBody) {
                 if (!pBody || !pBody.transform)
@@ -20259,7 +20259,7 @@ var gd3d;
                 this._element = null;
                 this._buttons = [false, false, false];
                 this._lastbuttons = [false, false, false];
-                this.eventer = new framework.event.InputEvent();
+                this.eventer = new gd3d.event.InputEvent();
                 this.inputlast = null;
                 this.keyboardMap = {};
                 this.handlers = [];
@@ -20448,26 +20448,26 @@ var gd3d;
             inputMgr.prototype.pointCk = function () {
                 var pt = this._point;
                 if (this.lastPoint.x != pt.x || this.lastPoint.y != pt.y) {
-                    this.eventer.EmitEnum_point(framework.event.PointEventEnum.PointMove, pt.x, pt.y);
+                    this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointMove, pt.x, pt.y);
                 }
                 if (!this.lastTouch && pt.touch) {
                     this.hasPointDown = true;
                     this.downPoint.x = pt.x;
                     this.downPoint.y = pt.y;
-                    this.eventer.EmitEnum_point(framework.event.PointEventEnum.PointDown, pt.x, pt.y);
+                    this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointDown, pt.x, pt.y);
                 }
                 else if (this.lastTouch && !pt.touch) {
                     this.hasPointUP = true;
-                    this.eventer.EmitEnum_point(framework.event.PointEventEnum.PointUp, pt.x, pt.y);
+                    this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointUp, pt.x, pt.y);
                 }
                 else if (this.lastTouch && pt.touch) {
-                    this.eventer.EmitEnum_point(framework.event.PointEventEnum.PointHold, pt.x, pt.y);
+                    this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointHold, pt.x, pt.y);
                 }
                 if (this.hasPointUP && this.hasPointDown) {
                     var isMoveTolerance = (Math.abs(this.downPoint.x - pt.x) > this.moveTolerance || Math.abs(this.downPoint.y - pt.y) > this.moveTolerance);
                     if (!isMoveTolerance) {
                         this.hasPointDown = this.hasPointUP = false;
-                        this.eventer.EmitEnum_point(framework.event.PointEventEnum.PointClick, pt.x, pt.y);
+                        this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.PointClick, pt.x, pt.y);
                     }
                 }
                 if (!pt.touch) {
@@ -20479,15 +20479,15 @@ var gd3d;
             };
             inputMgr.prototype.keyCodeCk = function () {
                 if (this.keyDownCode != -1)
-                    this.eventer.EmitEnum_key(framework.event.KeyEventEnum.KeyDown, this.keyDownCode);
+                    this.eventer.EmitEnum_key(gd3d.event.KeyEventEnum.KeyDown, this.keyDownCode);
                 if (this.keyUpCode != -1)
-                    this.eventer.EmitEnum_key(framework.event.KeyEventEnum.KeyUp, this.keyUpCode);
+                    this.eventer.EmitEnum_key(gd3d.event.KeyEventEnum.KeyUp, this.keyUpCode);
                 this.keyDownCode = this.keyUpCode = -1;
             };
             inputMgr.prototype.mouseWheelCk = function () {
                 if (this.hasWheel) {
                     this._wheel = this.lastWheel;
-                    this.eventer.EmitEnum_point(framework.event.PointEventEnum.MouseWheel, null);
+                    this.eventer.EmitEnum_point(gd3d.event.PointEventEnum.MouseWheel, null);
                 }
                 this.hasWheel = false;
                 this.lastWheel = 0;
@@ -20512,13 +20512,13 @@ var gd3d;
                 this.eventer.OnEnum_point(eventEnum, func, thisArg);
             };
             inputMgr.prototype.removePointListener = function (eventEnum, func, thisArg) {
-                this.eventer.RemoveListener(framework.event.PointEventEnum[eventEnum], func, thisArg);
+                this.eventer.RemoveListener(gd3d.event.PointEventEnum[eventEnum], func, thisArg);
             };
             inputMgr.prototype.addKeyListener = function (eventEnum, func, thisArg) {
                 this.eventer.OnEnum_key(eventEnum, func, thisArg);
             };
             inputMgr.prototype.removeKeyListener = function (eventEnum, func, thisArg) {
-                this.eventer.RemoveListener(framework.event.KeyEventEnum[eventEnum], func, thisArg);
+                this.eventer.RemoveListener(gd3d.event.KeyEventEnum[eventEnum], func, thisArg);
             };
             inputMgr.prototype.anyKey = function () {
                 if (this._point.touch)
@@ -20538,7 +20538,7 @@ var gd3d;
                         return this.keyboardMap[value];
                 }
                 else if (typeof (value) === "string") {
-                    var id = framework.event.KeyCode[value];
+                    var id = gd3d.event.KeyCode[value];
                     if (id != null && this.keyboardMap[id] != null)
                         return this.keyboardMap[id];
                 }
@@ -20549,7 +20549,7 @@ var gd3d;
                     return !this.keyboardMap[value];
                 }
                 else if (typeof (value) === "string") {
-                    var id = framework.event.KeyCode[value];
+                    var id = gd3d.event.KeyCode[value];
                     if (id != null)
                         return !this.keyboardMap[id];
                 }
@@ -29599,28 +29599,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var ParticleUniforms = (function () {
-            function ParticleUniforms() {
-                this.__class__ = "feng3d.ParticleUniforms";
-                this.u_PointSize = 1;
-                this.s_diffuse = Texture2D.defaultParticle;
-                this.u_diffuse = new framework.Color4(1, 1, 1, 1);
-                this.u_alphaThreshold = 0;
-            }
-            return ParticleUniforms;
-        }());
-        framework.ParticleUniforms = ParticleUniforms;
-        shaderConfig.shaders["particle"].cls = ParticleUniforms;
-        shaderConfig.shaders["particle"].renderParams = { enableBlend: true, depthMask: false, sfactor: BlendFactor.ONE, dfactor: BlendFactor.ONE_MINUS_SRC_COLOR, cullFace: CullFace.NONE };
-        Material.particle = AssetData.addAssetData("Particle-Material", framework.serialization.setValue(Material.create("particle"), {
-            name: "Particle-Material", assetId: "Particle-Material", hideFlags: framework.HideFlags.NotEditable,
-        }));
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var Particle1 = (function () {
             function Particle1() {
                 this.birthTime = 0;
@@ -29634,8 +29612,8 @@ var gd3d;
                 this.startSize = new framework.Vector3(1, 1, 1);
                 this.color = new framework.Color4();
                 this.startColor = new framework.Color4();
-                this.tilingOffset = new Vector4(1, 1, 0, 0);
-                this.flipUV = new Vector2();
+                this.tilingOffset = new framework.Vector4(1, 1, 0, 0);
+                this.flipUV = new framework.Vector2();
             }
             Particle1.prototype.updateState = function (preTime, time) {
                 preTime = Math.max(preTime, this.birthTime);
@@ -29650,48 +29628,6 @@ var gd3d;
             return Particle1;
         }());
         framework.Particle1 = Particle1;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var ParticlesAdditiveUniforms = (function () {
-            function ParticlesAdditiveUniforms() {
-                this.__class__ = "feng3d.ParticlesAdditiveUniforms";
-                this.u_tintColor = new framework.Color4(0.5, 0.5, 0.5, 0.5);
-                this.s_particle = Texture2D.defaultParticle;
-                this.u_s_particle_transform = new Vector4(1, 1, 0, 0);
-                this.u_softParticlesFactor = 1.0;
-            }
-            return ParticlesAdditiveUniforms;
-        }());
-        framework.ParticlesAdditiveUniforms = ParticlesAdditiveUniforms;
-        shaderConfig.shaders["Particles_Additive"].cls = ParticlesAdditiveUniforms;
-        shaderConfig.shaders["Particles_Additive"].renderParams = { enableBlend: true, sfactor: BlendFactor.SRC_ALPHA, dfactor: BlendFactor.ONE, depthMask: false };
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var ParticlesAlphaBlendedPremultiplyUniforms = (function () {
-            function ParticlesAlphaBlendedPremultiplyUniforms() {
-                this.__class__ = "feng3d.ParticlesAlphaBlendedPremultiplyUniforms";
-                this.s_particle = Texture2D.defaultParticle;
-                this.u_s_particle_transform = new Vector4(1, 1, 0, 0);
-                this.u_softParticlesFactor = 1.0;
-            }
-            return ParticlesAlphaBlendedPremultiplyUniforms;
-        }());
-        framework.ParticlesAlphaBlendedPremultiplyUniforms = ParticlesAlphaBlendedPremultiplyUniforms;
-        shaderConfig.shaders["Particles_AlphaBlendedPremultiply"].cls = ParticlesAlphaBlendedPremultiplyUniforms;
-        shaderConfig.shaders["Particles_AlphaBlendedPremultiply"].renderParams = {
-            enableBlend: true,
-            sfactor: BlendFactor.ONE,
-            dfactor: BlendFactor.ONE_MINUS_DST_ALPHA,
-            depthMask: false
-        };
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -29924,7 +29860,7 @@ var gd3d;
                 var localCameraUp = this.gameObject.transform.worldToLocalRotationMatrix.transformVector(cameraMatrix.up);
                 var billboardMatrix = new Matrix3x3();
                 if (!this.shape.alignToDirection && this.geometry == Geometry.billboard) {
-                    var matrix4x4 = new Matrix4x4();
+                    var matrix4x4 = new framework.Matrix4x4();
                     matrix4x4.lookAt(localCameraPos, localCameraUp);
                     billboardMatrix.formMatrix4x4(matrix4x4);
                 }
@@ -30192,38 +30128,38 @@ var gd3d;
             EventDispatcher.prototype.once = function (type, listener, thisObject, priority) {
                 if (thisObject === void 0) { thisObject = null; }
                 if (priority === void 0) { priority = 0; }
-                framework.event.on(this, type, listener, thisObject, priority, true);
+                framework.event1.on(this, type, listener, thisObject, priority, true);
             };
             EventDispatcher.prototype.dispatchEvent = function (e) {
-                return framework.event.dispatchEvent(this, e);
+                return framework.event1.dispatchEvent(this, e);
             };
             EventDispatcher.prototype.dispatch = function (type, data, bubbles) {
                 if (bubbles === void 0) { bubbles = false; }
-                return framework.event.dispatch(this, type, data, bubbles);
+                return framework.event1.dispatch(this, type, data, bubbles);
             };
             EventDispatcher.prototype.has = function (type) {
-                return framework.event.has(this, type);
+                return framework.event1.has(this, type);
             };
             EventDispatcher.prototype.on = function (type, listener, thisObject, priority, once) {
                 if (priority === void 0) { priority = 0; }
                 if (once === void 0) { once = false; }
-                framework.event.on(this, type, listener, thisObject, priority, once);
+                framework.event1.on(this, type, listener, thisObject, priority, once);
             };
             EventDispatcher.prototype.off = function (type, listener, thisObject) {
-                framework.event.off(this, type, listener, thisObject);
+                framework.event1.off(this, type, listener, thisObject);
             };
             EventDispatcher.prototype.onAll = function (listener, thisObject, priority) {
                 if (priority === void 0) { priority = 0; }
-                framework.event.onAll(this, listener, thisObject, priority);
+                framework.event1.onAll(this, listener, thisObject, priority);
             };
             EventDispatcher.prototype.offAll = function (listener, thisObject) {
-                framework.event.offAll(this, listener, thisObject);
+                framework.event1.offAll(this, listener, thisObject);
             };
             EventDispatcher.prototype.handleEvent = function (e) {
-                framework.event["handleEvent"](this, e);
+                gd3d.event["handleEvent"](this, e);
             };
             EventDispatcher.prototype.handelEventBubbles = function (e) {
-                framework.event["handelEventBubbles"](this, e);
+                gd3d.event["handelEventBubbles"](this, e);
             };
             return EventDispatcher;
         }());
@@ -30398,7 +30334,7 @@ var gd3d;
             return FEvent;
         }());
         framework.FEvent = FEvent;
-        framework.objectevent = framework.event = new FEvent();
+        framework.objectevent = gd3d.event = new FEvent();
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -30870,6 +30806,839 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var Matrix4x4 = (function () {
+            function Matrix4x4(datas) {
+                this.rawData = datas || [
+                    1, 0, 0, 0,
+                    0, 1, 0, 0,
+                    0, 0, 1, 0,
+                    0, 0, 0, 1
+                ];
+            }
+            Object.defineProperty(Matrix4x4.prototype, "position", {
+                get: function () {
+                    return new framework.Vector3(this.rawData[12], this.rawData[13], this.rawData[14]);
+                },
+                set: function (value) {
+                    this.rawData[12] = value.x;
+                    this.rawData[13] = value.y;
+                    this.rawData[14] = value.z;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Matrix4x4.prototype, "rotation", {
+                get: function () {
+                    var rotation = this.decompose()[1].scaleNumber(Math.RAD2DEG);
+                    return rotation;
+                },
+                set: function (v) {
+                    var comps = this.decompose();
+                    comps[1].copy(v).scaleNumber(Math.DEG2RAD);
+                    this.recompose(comps);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Matrix4x4.prototype, "determinant", {
+                get: function () {
+                    return ((this.rawData[0] * this.rawData[5] - this.rawData[4] * this.rawData[1]) * (this.rawData[10] * this.rawData[15] - this.rawData[14] * this.rawData[11])
+                        - (this.rawData[0] * this.rawData[9] - this.rawData[8] * this.rawData[1]) * (this.rawData[6] * this.rawData[15] - this.rawData[14] * this.rawData[7])
+                        + (this.rawData[0] * this.rawData[13] - this.rawData[12] * this.rawData[1]) * (this.rawData[6] * this.rawData[11] - this.rawData[10] * this.rawData[7])
+                        + (this.rawData[4] * this.rawData[9] - this.rawData[8] * this.rawData[5]) * (this.rawData[2] * this.rawData[15] - this.rawData[14] * this.rawData[3])
+                        - (this.rawData[4] * this.rawData[13] - this.rawData[12] * this.rawData[5]) * (this.rawData[2] * this.rawData[11] - this.rawData[10] * this.rawData[3])
+                        + (this.rawData[8] * this.rawData[13] - this.rawData[12] * this.rawData[9]) * (this.rawData[2] * this.rawData[7] - this.rawData[6] * this.rawData[3]));
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Matrix4x4.prototype, "forward", {
+                get: function () {
+                    return this.copyColumnToVector3(2).normalize();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Matrix4x4.prototype, "up", {
+                get: function () {
+                    return this.copyColumnToVector3(1).normalize();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Matrix4x4.prototype, "right", {
+                get: function () {
+                    return this.copyColumnToVector3(0).normalize();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Matrix4x4.prototype, "back", {
+                get: function () {
+                    return this.copyColumnToVector3(2).normalize().negate();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Matrix4x4.prototype, "down", {
+                get: function () {
+                    return this.copyColumnToVector3(1).normalize().negate();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(Matrix4x4.prototype, "left", {
+                get: function () {
+                    return this.copyColumnToVector3(0).normalize().negate();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Matrix4x4.fromAxisRotate = function (axis, degrees) {
+                var n = axis.clone();
+                n.normalize();
+                var q = degrees * Math.PI / 180;
+                var sinq = Math.sin(q);
+                var cosq = Math.cos(q);
+                var lcosq = 1 - cosq;
+                var rotationMat = new Matrix4x4([
+                    n.x * n.x * lcosq + cosq, n.x * n.y * lcosq + n.z * sinq, n.x * n.z * lcosq - n.y * sinq, 0,
+                    n.x * n.y * lcosq - n.z * sinq, n.y * n.y * lcosq + cosq, n.y * n.z * lcosq + n.x * sinq, 0,
+                    n.x * n.z * lcosq + n.y * sinq, n.y * n.z * lcosq - n.x * sinq, n.z * n.z * lcosq + cosq, 0,
+                    0, 0, 0, 1
+                ]);
+                return rotationMat;
+            };
+            Matrix4x4.fromRotation = function (rx, ry, rz) {
+                rx = Math.degToRad(rx);
+                ry = Math.degToRad(ry);
+                rz = Math.degToRad(rz);
+                var sx = Math.sin(rx), cx = Math.cos(rx), sy = Math.sin(ry), cy = Math.cos(ry), sz = Math.sin(rz), cz = Math.cos(rz);
+                return new Matrix4x4([
+                    cy * cz, cy * sz, -sy, 0,
+                    sx * sy * cz - cx * sz, sx * sy * sz + cx * cz, sx * cy, 0,
+                    cx * sy * cz + sx * sz, cx * sy * sz - sx * cz, cx * cy, 0,
+                    0, 0, 0, 1,
+                ]);
+            };
+            Matrix4x4.fromScale = function (xScale, yScale, zScale) {
+                var rotationMat = new Matrix4x4([
+                    xScale, 0.0000, 0.0000, 0,
+                    0.0000, yScale, 0.0000, 0,
+                    0.0000, 0.0000, zScale, 0,
+                    0.0000, 0.0000, 0.0000, 1
+                ]);
+                return rotationMat;
+            };
+            Matrix4x4.fromPosition = function (x, y, z) {
+                var rotationMat = new Matrix4x4([
+                    1, 0, 0, 0,
+                    0, 1, 0, 0,
+                    0, 0, 1, 0,
+                    x, y, z, 1
+                ]);
+                return rotationMat;
+            };
+            Matrix4x4.prototype.append = function (lhs) {
+                var m111 = this.rawData[0], m121 = this.rawData[4], m131 = this.rawData[8], m141 = this.rawData[12], m112 = this.rawData[1], m122 = this.rawData[5], m132 = this.rawData[9], m142 = this.rawData[13], m113 = this.rawData[2], m123 = this.rawData[6], m133 = this.rawData[10], m143 = this.rawData[14], m114 = this.rawData[3], m124 = this.rawData[7], m134 = this.rawData[11], m144 = this.rawData[15], m211 = lhs.rawData[0], m221 = lhs.rawData[4], m231 = lhs.rawData[8], m241 = lhs.rawData[12], m212 = lhs.rawData[1], m222 = lhs.rawData[5], m232 = lhs.rawData[9], m242 = lhs.rawData[13], m213 = lhs.rawData[2], m223 = lhs.rawData[6], m233 = lhs.rawData[10], m243 = lhs.rawData[14], m214 = lhs.rawData[3], m224 = lhs.rawData[7], m234 = lhs.rawData[11], m244 = lhs.rawData[15];
+                this.rawData[0] = m111 * m211 + m112 * m221 + m113 * m231 + m114 * m241;
+                this.rawData[1] = m111 * m212 + m112 * m222 + m113 * m232 + m114 * m242;
+                this.rawData[2] = m111 * m213 + m112 * m223 + m113 * m233 + m114 * m243;
+                this.rawData[3] = m111 * m214 + m112 * m224 + m113 * m234 + m114 * m244;
+                this.rawData[4] = m121 * m211 + m122 * m221 + m123 * m231 + m124 * m241;
+                this.rawData[5] = m121 * m212 + m122 * m222 + m123 * m232 + m124 * m242;
+                this.rawData[6] = m121 * m213 + m122 * m223 + m123 * m233 + m124 * m243;
+                this.rawData[7] = m121 * m214 + m122 * m224 + m123 * m234 + m124 * m244;
+                this.rawData[8] = m131 * m211 + m132 * m221 + m133 * m231 + m134 * m241;
+                this.rawData[9] = m131 * m212 + m132 * m222 + m133 * m232 + m134 * m242;
+                this.rawData[10] = m131 * m213 + m132 * m223 + m133 * m233 + m134 * m243;
+                this.rawData[11] = m131 * m214 + m132 * m224 + m133 * m234 + m134 * m244;
+                this.rawData[12] = m141 * m211 + m142 * m221 + m143 * m231 + m144 * m241;
+                this.rawData[13] = m141 * m212 + m142 * m222 + m143 * m232 + m144 * m242;
+                this.rawData[14] = m141 * m213 + m142 * m223 + m143 * m233 + m144 * m243;
+                this.rawData[15] = m141 * m214 + m142 * m224 + m143 * m234 + m144 * m244;
+                debuger && console.assert(this.rawData[0] !== NaN && this.rawData[4] !== NaN && this.rawData[8] !== NaN && this.rawData[12] !== NaN);
+                return this;
+            };
+            Matrix4x4.prototype.appendRotation = function (axis, degrees, pivotPoint) {
+                var rotationMat = Matrix4x4.fromAxisRotate(axis, degrees);
+                if (pivotPoint != null) {
+                    this.appendTranslation(-pivotPoint.x, -pivotPoint.y, -pivotPoint.z);
+                }
+                this.append(rotationMat);
+                if (pivotPoint != null) {
+                    this.appendTranslation(pivotPoint.x, pivotPoint.y, pivotPoint.z);
+                }
+                return this;
+            };
+            Matrix4x4.prototype.appendScale = function (xScale, yScale, zScale) {
+                var scaleMat = Matrix4x4.fromScale(xScale, yScale, zScale);
+                this.append(scaleMat);
+                return this;
+            };
+            Matrix4x4.prototype.appendTranslation = function (x, y, z) {
+                this.rawData[12] += x;
+                this.rawData[13] += y;
+                this.rawData[14] += z;
+                return this;
+            };
+            Matrix4x4.prototype.clone = function () {
+                var ret = new Matrix4x4();
+                ret.copyFrom(this);
+                return ret;
+            };
+            Matrix4x4.prototype.copyColumnFrom = function (column, vector3D) {
+                this.rawData[column * 4 + 0] = vector3D.x;
+                this.rawData[column * 4 + 1] = vector3D.y;
+                this.rawData[column * 4 + 2] = vector3D.z;
+                this.rawData[column * 4 + 3] = vector3D.w;
+                return this;
+            };
+            Matrix4x4.prototype.copyColumnToVector3 = function (column, vector3D) {
+                if (vector3D === void 0) { vector3D = new framework.Vector3(); }
+                this.copyColumnToVector4(column, framework.Vector4.fromVector3(vector3D)).toVector3(vector3D);
+                return vector3D;
+            };
+            Matrix4x4.prototype.copyColumnToVector4 = function (column, vector3D) {
+                if (vector3D === void 0) { vector3D = new framework.Vector4(); }
+                vector3D.x = this.rawData[column * 4 + 0];
+                vector3D.y = this.rawData[column * 4 + 1];
+                vector3D.z = this.rawData[column * 4 + 2];
+                vector3D.w = this.rawData[column * 4 + 3];
+                return vector3D;
+            };
+            Matrix4x4.prototype.copyFrom = function (sourceMatrix3D) {
+                for (var i = 0; i < 16; i++) {
+                    this.rawData[i] = sourceMatrix3D.rawData[i];
+                }
+                return this;
+            };
+            Matrix4x4.prototype.copyRawDataFrom = function (vector, index, transpose) {
+                if (index === void 0) { index = 0; }
+                if (transpose === void 0) { transpose = false; }
+                if (vector.length - index < 16) {
+                    throw new Error("vector参数数据长度不够！");
+                }
+                if (transpose) {
+                    this.transpose();
+                }
+                for (var i = 0; i < 16; i++) {
+                    this.rawData[i] = vector[index + i];
+                }
+                if (transpose) {
+                    this.transpose();
+                }
+                return this;
+            };
+            Matrix4x4.prototype.copyRawDataTo = function (vector, index, transpose) {
+                if (index === void 0) { index = 0; }
+                if (transpose === void 0) { transpose = false; }
+                if (transpose) {
+                    this.transpose();
+                }
+                for (var i = 0; i < 16; i++) {
+                    vector[i + index] = this.rawData[i];
+                }
+                if (transpose) {
+                    this.transpose();
+                }
+                return this;
+            };
+            Matrix4x4.prototype.copyRowFrom = function (row, vector3D) {
+                this.rawData[row + 4 * 0] = vector3D.x;
+                this.rawData[row + 4 * 1] = vector3D.y;
+                this.rawData[row + 4 * 2] = vector3D.z;
+                this.rawData[row + 4 * 3] = vector3D.w;
+                return this;
+            };
+            Matrix4x4.prototype.copyRowTo = function (row, vector3D) {
+                vector3D.x = this.rawData[row + 4 * 0];
+                vector3D.y = this.rawData[row + 4 * 1];
+                vector3D.z = this.rawData[row + 4 * 2];
+                vector3D.w = this.rawData[row + 4 * 3];
+                return this;
+            };
+            Matrix4x4.prototype.copyToMatrix3D = function (dest) {
+                dest.rawData = this.rawData.concat();
+                return this;
+            };
+            Matrix4x4.prototype.decompose = function (orientationStyle, result) {
+                if (orientationStyle === void 0) { orientationStyle = Orientation3D.EULER_ANGLES; }
+                var raw = this.rawData;
+                var a = raw[0];
+                var e = raw[1];
+                var i = raw[2];
+                var b = raw[4];
+                var f = raw[5];
+                var j = raw[6];
+                var c = raw[8];
+                var g = raw[9];
+                var k = raw[10];
+                var x = raw[12];
+                var y = raw[13];
+                var z = raw[14];
+                var tx = Math.sqrt(a * a + e * e + i * i);
+                var ty = Math.sqrt(b * b + f * f + j * j);
+                var tz = Math.sqrt(c * c + g * g + k * k);
+                var tw = 0;
+                var scaleX = tx;
+                var scaleY = ty;
+                var scaleZ = tz;
+                if (a * (f * k - j * g) - e * (b * k - j * c) + i * (b * g - f * c) < 0) {
+                    scaleZ = -scaleZ;
+                }
+                a = a / scaleX;
+                e = e / scaleX;
+                i = i / scaleX;
+                b = b / scaleY;
+                f = f / scaleY;
+                j = j / scaleY;
+                c = c / scaleZ;
+                g = g / scaleZ;
+                k = k / scaleZ;
+                if (orientationStyle == Orientation3D.EULER_ANGLES) {
+                    tx = Math.atan2(j, k);
+                    ty = Math.atan2(-i, Math.sqrt(a * a + e * e));
+                    var s1 = Math.sin(tx);
+                    var c1 = Math.cos(tx);
+                    tz = Math.atan2(s1 * c - c1 * b, c1 * f - s1 * g);
+                }
+                else if (orientationStyle == Orientation3D.AXIS_ANGLE) {
+                    tw = Math.acos((a + f + k - 1) / 2);
+                    var len = Math.sqrt((j - g) * (j - g) + (c - i) * (c - i) + (e - b) * (e - b));
+                    tx = (j - g) / len;
+                    ty = (c - i) / len;
+                    tz = (e - b) / len;
+                }
+                else {
+                    var tr = a + f + k;
+                    if (tr > 0) {
+                        tw = Math.sqrt(1 + tr) / 2;
+                        tx = (j - g) / (4 * tw);
+                        ty = (c - i) / (4 * tw);
+                        tz = (e - b) / (4 * tw);
+                    }
+                    else if ((a > f) && (a > k)) {
+                        tx = Math.sqrt(1 + a - f - k) / 2;
+                        tw = (j - g) / (4 * tx);
+                        ty = (e + b) / (4 * tx);
+                        tz = (c + i) / (4 * tx);
+                    }
+                    else if (f > k) {
+                        ty = Math.sqrt(1 + f - a - k) / 2;
+                        tx = (e + b) / (4 * ty);
+                        tw = (c - i) / (4 * ty);
+                        tz = (j + g) / (4 * ty);
+                    }
+                    else {
+                        tz = Math.sqrt(1 + k - a - f) / 2;
+                        tx = (c + i) / (4 * tz);
+                        ty = (j + g) / (4 * tz);
+                        tw = (e - b) / (4 * tz);
+                    }
+                }
+                result = result || [new framework.Vector3(), new framework.Vector3(), new framework.Vector3()];
+                result[0].x = x;
+                result[0].y = y;
+                result[0].z = z;
+                result[1].x = tx;
+                result[1].y = ty;
+                result[1].z = tz;
+                result[2].x = scaleX;
+                result[2].y = scaleY;
+                result[2].z = scaleZ;
+                return result;
+            };
+            Matrix4x4.prototype.deltaTransformVector = function (v, vout) {
+                if (vout === void 0) { vout = new framework.Vector3(); }
+                var v4 = framework.Vector4.fromVector3(v, 0);
+                this.transformVector4(v4, v4);
+                v4.toVector3(vout);
+                return vout;
+            };
+            Matrix4x4.prototype.identity = function () {
+                var r = this.rawData;
+                r[1] = 0;
+                r[2] = 0;
+                r[3] = 0;
+                r[4] = 0;
+                r[6] = 0;
+                r[7] = 0;
+                r[8] = 0;
+                r[9] = 0;
+                r[11] = 0;
+                r[12] = 0;
+                r[13] = 0;
+                r[14] = 0;
+                r[0] = 1;
+                r[5] = 1;
+                r[10] = 1;
+                r[15] = 1;
+                return this;
+            };
+            Matrix4x4.prototype.invert = function () {
+                var d = this.determinant;
+                if (d == 0) {
+                    console.error("无法获取逆矩阵");
+                    return this;
+                }
+                d = 1 / d;
+                var r = this.rawData;
+                var m11 = r[0];
+                var m21 = r[4];
+                var m31 = r[8];
+                var m41 = r[12];
+                var m12 = r[1];
+                var m22 = r[5];
+                var m32 = r[9];
+                var m42 = r[13];
+                var m13 = r[2];
+                var m23 = r[6];
+                var m33 = r[10];
+                var m43 = r[14];
+                var m14 = r[3];
+                var m24 = r[7];
+                var m34 = r[11];
+                var m44 = r[15];
+                r[0] = d * (m22 * (m33 * m44 - m43 * m34) - m32 * (m23 * m44 - m43 * m24) + m42 * (m23 * m34 - m33 * m24));
+                r[1] = -d * (m12 * (m33 * m44 - m43 * m34) - m32 * (m13 * m44 - m43 * m14) + m42 * (m13 * m34 - m33 * m14));
+                r[2] = d * (m12 * (m23 * m44 - m43 * m24) - m22 * (m13 * m44 - m43 * m14) + m42 * (m13 * m24 - m23 * m14));
+                r[3] = -d * (m12 * (m23 * m34 - m33 * m24) - m22 * (m13 * m34 - m33 * m14) + m32 * (m13 * m24 - m23 * m14));
+                r[4] = -d * (m21 * (m33 * m44 - m43 * m34) - m31 * (m23 * m44 - m43 * m24) + m41 * (m23 * m34 - m33 * m24));
+                r[5] = d * (m11 * (m33 * m44 - m43 * m34) - m31 * (m13 * m44 - m43 * m14) + m41 * (m13 * m34 - m33 * m14));
+                r[6] = -d * (m11 * (m23 * m44 - m43 * m24) - m21 * (m13 * m44 - m43 * m14) + m41 * (m13 * m24 - m23 * m14));
+                r[7] = d * (m11 * (m23 * m34 - m33 * m24) - m21 * (m13 * m34 - m33 * m14) + m31 * (m13 * m24 - m23 * m14));
+                r[8] = d * (m21 * (m32 * m44 - m42 * m34) - m31 * (m22 * m44 - m42 * m24) + m41 * (m22 * m34 - m32 * m24));
+                r[9] = -d * (m11 * (m32 * m44 - m42 * m34) - m31 * (m12 * m44 - m42 * m14) + m41 * (m12 * m34 - m32 * m14));
+                r[10] = d * (m11 * (m22 * m44 - m42 * m24) - m21 * (m12 * m44 - m42 * m14) + m41 * (m12 * m24 - m22 * m14));
+                r[11] = -d * (m11 * (m22 * m34 - m32 * m24) - m21 * (m12 * m34 - m32 * m14) + m31 * (m12 * m24 - m22 * m14));
+                r[12] = -d * (m21 * (m32 * m43 - m42 * m33) - m31 * (m22 * m43 - m42 * m23) + m41 * (m22 * m33 - m32 * m23));
+                r[13] = d * (m11 * (m32 * m43 - m42 * m33) - m31 * (m12 * m43 - m42 * m13) + m41 * (m12 * m33 - m32 * m13));
+                r[14] = -d * (m11 * (m22 * m43 - m42 * m23) - m21 * (m12 * m43 - m42 * m13) + m41 * (m12 * m23 - m22 * m13));
+                r[15] = d * (m11 * (m22 * m33 - m32 * m23) - m21 * (m12 * m33 - m32 * m13) + m31 * (m12 * m23 - m22 * m13));
+                return this;
+            };
+            Matrix4x4.prototype.prepend = function (rhs) {
+                var mat = this.clone();
+                this.copyFrom(rhs);
+                this.append(mat);
+                return this;
+            };
+            Matrix4x4.prototype.prependRotation = function (axis, degrees, pivotPoint) {
+                if (pivotPoint === void 0) { pivotPoint = new framework.Vector3(); }
+                var rotationMat = Matrix4x4.fromAxisRotate(axis, degrees);
+                this.prepend(rotationMat);
+                return this;
+            };
+            Matrix4x4.prototype.prependScale = function (xScale, yScale, zScale) {
+                var scaleMat = Matrix4x4.fromScale(xScale, yScale, zScale);
+                this.prepend(scaleMat);
+                return this;
+            };
+            Matrix4x4.prototype.prependTranslation = function (x, y, z) {
+                var translationMat = Matrix4x4.fromPosition(x, y, z);
+                this.prepend(translationMat);
+                return this;
+            };
+            Matrix4x4.prototype.moveRight = function (distance) {
+                var direction = this.right;
+                direction.scaleNumber(distance);
+                this.position = this.position.addTo(direction);
+                return this;
+            };
+            Matrix4x4.prototype.moveUp = function (distance) {
+                var direction = this.up;
+                direction.scaleNumber(distance);
+                this.position = this.position.addTo(direction);
+                return this;
+            };
+            Matrix4x4.prototype.moveForward = function (distance) {
+                var direction = this.forward;
+                direction.scaleNumber(distance);
+                this.position = this.position.addTo(direction);
+                return this;
+            };
+            Matrix4x4.prototype.recompose = function (components) {
+                var rx = components[1].x;
+                var ry = components[1].y;
+                var rz = components[1].z;
+                var sx = Math.sin(rx), cx = Math.cos(rx), sy = Math.sin(ry), cy = Math.cos(ry), sz = Math.sin(rz), cz = Math.cos(rz);
+                var xS = components[2].x, yS = components[2].y, zS = components[2].z;
+                this.rawData = [
+                    cy * cz * xS, cy * sz * xS, -sy * xS, 0,
+                    (sx * sy * cz - cx * sz) * yS, (sx * sy * sz + cx * cz) * yS, sx * cy * yS, 0,
+                    (cx * sy * cz + sx * sz) * zS, (cx * sy * sz - sx * cz) * zS, cx * cy * zS, 0,
+                    components[0].x, components[0].y, components[0].z, 1,
+                ];
+                return this;
+            };
+            Matrix4x4.prototype.transformVector = function (vin, vout) {
+                if (vout === void 0) { vout = new framework.Vector3(); }
+                this.transformVector4(framework.Vector4.fromVector3(vin, 1)).toVector3(vout);
+                return vout;
+            };
+            Matrix4x4.prototype.transformVector4 = function (vin, vout) {
+                if (vout === void 0) { vout = new framework.Vector4(); }
+                var x = vin.x;
+                var y = vin.y;
+                var z = vin.z;
+                var w = vin.w;
+                vout.x = x * this.rawData[0] + y * this.rawData[4] + z * this.rawData[8] + w * this.rawData[12];
+                vout.y = x * this.rawData[1] + y * this.rawData[5] + z * this.rawData[9] + w * this.rawData[13];
+                vout.z = x * this.rawData[2] + y * this.rawData[6] + z * this.rawData[10] + w * this.rawData[14];
+                vout.w = x * this.rawData[3] + y * this.rawData[7] + z * this.rawData[11] + w * this.rawData[15];
+                return vout;
+            };
+            Matrix4x4.prototype.transformVectors = function (vin, vout) {
+                var vec = new framework.Vector3();
+                for (var i = 0; i < vin.length; i += 3) {
+                    vec.init(vin[i], vin[i + 1], vin[i + 2]);
+                    vec = this.transformVector(vec);
+                    vout[i] = vec.x;
+                    vout[i + 1] = vec.y;
+                    vout[i + 2] = vec.z;
+                }
+            };
+            Matrix4x4.prototype.transformRotation = function (vin, vout) {
+                var rotationMatrix3d = Matrix4x4.fromRotation(vin.x, vin.y, vin.z);
+                rotationMatrix3d.append(this);
+                var newrotation = rotationMatrix3d.decompose()[1];
+                newrotation.scaleNumber(180 / Math.PI);
+                var v = Math.round((newrotation.x - vin.x) / 180);
+                if (v % 2 != 0) {
+                    newrotation.x += 180;
+                    newrotation.y = 180 - newrotation.y;
+                    newrotation.z += 180;
+                }
+                var toRound = function (a, b, c) {
+                    if (c === void 0) { c = 360; }
+                    return Math.round((b - a) / c) * c + a;
+                };
+                newrotation.x = toRound(newrotation.x, vin.x);
+                newrotation.y = toRound(newrotation.y, vin.y);
+                newrotation.z = toRound(newrotation.z, vin.z);
+                vout = vout || new framework.Vector3();
+                vout.x = newrotation.x;
+                vout.y = newrotation.y;
+                vout.z = newrotation.z;
+                return vout;
+            };
+            Matrix4x4.prototype.transpose = function () {
+                var swap;
+                for (var i = 0; i < 4; i++) {
+                    for (var j = 0; j < 4; j++) {
+                        if (i > j) {
+                            swap = this.rawData[i * 4 + j];
+                            this.rawData[i * 4 + j] = this.rawData[j * 4 + i];
+                            this.rawData[j * 4 + i] = swap;
+                        }
+                    }
+                }
+                return this;
+            };
+            Matrix4x4.prototype.equals = function (matrix3D, precision) {
+                if (precision === void 0) { precision = Math.PRECISION; }
+                var r2 = matrix3D.rawData;
+                for (var i = 0; i < 16; ++i) {
+                    if (!Math.equals(this.rawData[i] - r2[i], 0, precision))
+                        return false;
+                }
+                return true;
+            };
+            Matrix4x4.prototype.lookAt = function (target, upAxis) {
+                var vec = this.decompose();
+                var position = vec[0];
+                var scale = vec[2];
+                var xAxis = new framework.Vector3();
+                var yAxis = new framework.Vector3();
+                var zAxis = new framework.Vector3();
+                upAxis = upAxis || framework.Vector3.Y_AXIS;
+                zAxis.x = target.x - this.position.x;
+                zAxis.y = target.y - this.position.y;
+                zAxis.z = target.z - this.position.z;
+                zAxis.normalize();
+                xAxis.x = upAxis.y * zAxis.z - upAxis.z * zAxis.y;
+                xAxis.y = upAxis.z * zAxis.x - upAxis.x * zAxis.z;
+                xAxis.z = upAxis.x * zAxis.y - upAxis.y * zAxis.x;
+                xAxis.normalize();
+                if (xAxis.length < .05) {
+                    xAxis.x = upAxis.y;
+                    xAxis.y = upAxis.x;
+                    xAxis.z = 0;
+                    xAxis.normalize();
+                }
+                yAxis.x = zAxis.y * xAxis.z - zAxis.z * xAxis.y;
+                yAxis.y = zAxis.z * xAxis.x - zAxis.x * xAxis.z;
+                yAxis.z = zAxis.x * xAxis.y - zAxis.y * xAxis.x;
+                this.rawData[0] = scale.x * xAxis.x;
+                this.rawData[1] = scale.x * xAxis.y;
+                this.rawData[2] = scale.x * xAxis.z;
+                this.rawData[3] = 0;
+                this.rawData[4] = scale.y * yAxis.x;
+                this.rawData[5] = scale.y * yAxis.y;
+                this.rawData[6] = scale.y * yAxis.z;
+                this.rawData[7] = 0;
+                this.rawData[8] = scale.z * zAxis.x;
+                this.rawData[9] = scale.z * zAxis.y;
+                this.rawData[10] = scale.z * zAxis.z;
+                this.rawData[11] = 0;
+                this.rawData[12] = position.x;
+                this.rawData[13] = position.y;
+                this.rawData[14] = position.z;
+                this.rawData[15] = 1;
+            };
+            Matrix4x4.prototype.getMaxScaleOnAxis = function () {
+                var te = this.rawData;
+                var scaleXSq = te[0] * te[0] + te[1] * te[1] + te[2] * te[2];
+                var scaleYSq = te[4] * te[4] + te[5] * te[5] + te[6] * te[6];
+                var scaleZSq = te[8] * te[8] + te[9] * te[9] + te[10] * te[10];
+                return Math.sqrt(Math.max(scaleXSq, scaleYSq, scaleZSq));
+            };
+            Matrix4x4.prototype.setOrtho = function (left, right, top, bottom, near, far) {
+                var r = this.rawData;
+                r[0] = 2 / (right - left);
+                r[4] = 0;
+                r[8] = 0;
+                r[12] = -(right + left) / (right - left);
+                r[1] = 0;
+                r[5] = 2 / (top - bottom);
+                r[9] = 0;
+                r[13] = -(top + bottom) / (top - bottom);
+                r[2] = 0;
+                r[6] = 0;
+                r[10] = 2 / (far - near);
+                r[14] = -(far + near) / (far - near);
+                r[3] = 0;
+                r[7] = 0;
+                r[11] = 0;
+                r[15] = 1;
+                return this;
+            };
+            Matrix4x4.prototype.setPerspectiveFromFOV = function (fov, aspect, near, far) {
+                var r = this.rawData;
+                var tanfov2 = Math.tan(fov * Math.PI / 360);
+                r[0] = 1 / (aspect * tanfov2);
+                r[4] = 0;
+                r[8] = 0;
+                r[12] = 0;
+                r[1] = 0;
+                r[5] = 1 / tanfov2;
+                r[9] = 0;
+                r[13] = 0;
+                r[2] = 0;
+                r[6] = 0;
+                r[10] = (far + near) / (far - near);
+                r[14] = -2 * (far * near) / (far - near);
+                r[3] = 0;
+                r[7] = 0;
+                r[11] = 1;
+                r[15] = 0;
+                return this;
+            };
+            Matrix4x4.prototype.setPerspective = function (left, right, top, bottom, near, far) {
+                var r = this.rawData;
+                r[0] = 2 * near / (right - left);
+                r[4] = 0;
+                r[8] = 0;
+                r[12] = 0;
+                r[1] = 0;
+                r[5] = 2 * near / (top - bottom);
+                r[9] = 0;
+                r[13] = 0;
+                r[2] = 0;
+                r[6] = 0;
+                r[10] = (far + near) / (far - near);
+                r[14] = -2 * (far * near) / (far - near);
+                r[3] = 0;
+                r[7] = 0;
+                r[11] = 1;
+                r[15] = 0;
+                return this;
+            };
+            Matrix4x4.prototype.toString = function () {
+                return "Matrix4x4 [" + this.rawData.toString() + "]";
+            };
+            Matrix4x4.RAW_DATA_CONTAINER = [
+                1, 0, 0, 0,
+                0, 1, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1
+            ];
+            return Matrix4x4;
+        }());
+        framework.Matrix4x4 = Matrix4x4;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var DEG_TO_RAD = Math.PI / 180;
+        var Vector2 = (function () {
+            function Vector2(x, y) {
+                if (x === void 0) { x = 0; }
+                if (y === void 0) { y = 0; }
+                this.x = x;
+                this.y = y;
+            }
+            Vector2.polar = function (len, angle) {
+                return new Vector2(len * Math.cos(angle / DEG_TO_RAD), len * Math.sin(angle / DEG_TO_RAD));
+            };
+            Object.defineProperty(Vector2.prototype, "length", {
+                get: function () {
+                    return Math.sqrt(this.x * this.x + this.y * this.y);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Vector2.prototype.init = function (x, y) {
+                this.x = x;
+                this.y = y;
+                return this;
+            };
+            Vector2.prototype.clone = function () {
+                return new Vector2(this.x, this.y);
+            };
+            Vector2.prototype.equals = function (toCompare) {
+                return this.x == toCompare.x && this.y == toCompare.y;
+            };
+            Vector2.distance = function (p1, p2) {
+                return Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
+            };
+            Vector2.prototype.copy = function (sourcePoint) {
+                this.x = sourcePoint.x;
+                this.y = sourcePoint.y;
+                return this;
+            };
+            Vector2.prototype.addTo = function (v, vout) {
+                if (vout === void 0) { vout = new Vector2(); }
+                return vout.init(this.x + v.x, this.y + v.y);
+            };
+            Vector2.prototype.normalize = function (thickness) {
+                if (thickness === void 0) { thickness = 1; }
+                if (this.x != 0 || this.y != 0) {
+                    var relativeThickness = thickness / this.length;
+                    this.x *= relativeThickness;
+                    this.y *= relativeThickness;
+                }
+                return this;
+            };
+            Vector2.prototype.negate = function () {
+                this.x *= -1;
+                this.y *= -1;
+                return this;
+            };
+            Vector2.prototype.reciprocal = function () {
+                this.x = 1 / this.x;
+                this.y = 1 / this.y;
+                return this;
+            };
+            Vector2.prototype.reciprocalTo = function (out) {
+                if (out === void 0) { out = new Vector2(); }
+                out.copy(this).reciprocal();
+                return out;
+            };
+            Vector2.prototype.scaleNumber = function (s) {
+                this.x *= s;
+                this.y *= s;
+                return this;
+            };
+            Vector2.prototype.scaleNumberTo = function (s, vout) {
+                if (vout === void 0) { vout = new Vector2(); }
+                return vout.copy(this).scaleNumber(s);
+            };
+            Vector2.prototype.scale = function (s) {
+                this.x *= s.x;
+                this.y *= s.y;
+                return this;
+            };
+            Vector2.prototype.scaleTo = function (s, vout) {
+                if (vout === void 0) { vout = new Vector2(); }
+                if (s == vout)
+                    s = s.clone();
+                return vout.copy(this).scale(s);
+            };
+            Vector2.prototype.offset = function (dx, dy) {
+                this.x += dx;
+                this.y += dy;
+                return this;
+            };
+            Vector2.prototype.sub = function (v) {
+                this.x -= v.x;
+                this.y -= v.y;
+                return this;
+            };
+            Vector2.prototype.subTo = function (v, vout) {
+                if (vout === void 0) { vout = new Vector2(); }
+                return vout.init(this.x - v.x, this.y - v.y);
+            };
+            Vector2.prototype.multiply = function (a) {
+                this.x *= a.x;
+                this.y *= a.y;
+                return this;
+            };
+            Vector2.prototype.multiplyTo = function (a, vout) {
+                if (vout === void 0) { vout = new Vector2(); }
+                return vout.copy(this).multiply(a);
+            };
+            Vector2.prototype.lerp = function (p, alpha) {
+                this.x += (p.x - this.x) * alpha.x;
+                this.y += (p.y - this.y) * alpha.y;
+                return this;
+            };
+            Vector2.prototype.lerpTo = function (v, alpha, vout) {
+                if (vout === void 0) { vout = new Vector2(); }
+                return vout.copy(this).lerp(v, alpha);
+            };
+            Vector2.prototype.lerpNumber = function (v, alpha) {
+                this.x += (v.x - this.x) * alpha;
+                this.y += (v.y - this.y) * alpha;
+                return this;
+            };
+            Vector2.prototype.lerpNumberTo = function (v, alpha, vout) {
+                if (vout === void 0) { vout = new Vector2(); }
+                return vout.copy(this).lerpNumber(v, alpha);
+            };
+            Vector2.prototype.clamp = function (min, max) {
+                this.x = Math.clamp(this.x, min.x, max.x);
+                this.y = Math.clamp(this.y, min.y, max.y);
+                return this;
+            };
+            Vector2.prototype.clampTo = function (min, max, vout) {
+                if (vout === void 0) { vout = new Vector2(); }
+                return vout.copy(this).clamp(min, max);
+            };
+            Vector2.prototype.min = function (v) {
+                this.x = Math.min(this.x, v.x);
+                this.y = Math.min(this.y, v.y);
+                return this;
+            };
+            Vector2.prototype.max = function (v) {
+                this.x = Math.max(this.x, v.x);
+                this.y = Math.max(this.y, v.y);
+                return this;
+            };
+            Vector2.prototype.round = function () {
+                this.x = Math.round(this.x);
+                this.y = Math.round(this.y);
+                return this;
+            };
+            Vector2.prototype.toString = function () {
+                return "(x=" + this.x + ", y=" + this.y + ")";
+            };
+            Vector2.prototype.toArray = function () {
+                return [this.x, this.y];
+            };
+            Vector2.ZERO = new Vector2();
+            return Vector2;
+        }());
+        framework.Vector2 = Vector2;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var Vector3 = (function () {
             function Vector3(x, y, z) {
                 if (x === void 0) { x = 0; }
@@ -31233,6 +32002,183 @@ var gd3d;
             return Vector3;
         }());
         framework.Vector3 = Vector3;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var Vector4 = (function () {
+            function Vector4(x, y, z, w) {
+                if (x === void 0) { x = 0; }
+                if (y === void 0) { y = 0; }
+                if (z === void 0) { z = 0; }
+                if (w === void 0) { w = 0; }
+                this.x = 0;
+                this.y = 0;
+                this.z = 0;
+                this.w = 0;
+                this.init(x, y, z, w);
+            }
+            Vector4.fromArray = function (array, offset) {
+                if (offset === void 0) { offset = 0; }
+                return new Vector4().fromArray(array, offset);
+            };
+            Vector4.fromVector3 = function (vector3, w) {
+                if (w === void 0) { w = 0; }
+                return new Vector4().fromVector3(vector3, w);
+            };
+            Vector4.random = function () {
+                return new Vector4(Math.random(), Math.random(), Math.random(), Math.random());
+            };
+            Vector4.prototype.init = function (x, y, z, w) {
+                this.x = x;
+                this.y = y;
+                this.z = z;
+                this.w = w;
+                return this;
+            };
+            Vector4.prototype.fromArray = function (array, offset) {
+                if (offset === void 0) { offset = 0; }
+                this.x = array[offset];
+                this.y = array[offset + 1];
+                this.z = array[offset + 2];
+                this.w = array[offset + 3];
+                return this;
+            };
+            Vector4.prototype.fromVector3 = function (vector3, w) {
+                if (w === void 0) { w = 0; }
+                this.x = vector3.x;
+                this.y = vector3.y;
+                this.z = vector3.z;
+                this.w = w;
+                return this;
+            };
+            Vector4.prototype.toVector3 = function (v3) {
+                if (v3 === void 0) { v3 = new framework.Vector3(); }
+                v3.init(this.x, this.y, this.z);
+                return v3;
+            };
+            Vector4.prototype.toArray = function (array, offset) {
+                if (array === void 0) { array = []; }
+                if (offset === void 0) { offset = 0; }
+                array[offset] = this.x;
+                array[offset + 1] = this.y;
+                array[offset + 2] = this.z;
+                array[offset + 3] = this.w;
+                return array;
+            };
+            Vector4.prototype.add = function (v) {
+                this.x += v.x;
+                this.y += v.y;
+                this.z += v.z;
+                this.w += v.w;
+                return this;
+            };
+            Vector4.prototype.addTo = function (v, vout) {
+                if (vout === void 0) { vout = new Vector4(); }
+                return vout.copy(this).add(v);
+            };
+            Vector4.prototype.clone = function () {
+                return new Vector4(this.x, this.y, this.z, this.w);
+            };
+            Vector4.prototype.copy = function (v) {
+                this.x = v.x;
+                this.y = v.y;
+                this.z = v.z;
+                this.w = v.w;
+                return this;
+            };
+            Vector4.prototype.sub = function (v) {
+                this.x -= v.x;
+                this.y -= v.y;
+                this.z -= v.z;
+                this.w -= v.w;
+                return this;
+            };
+            Vector4.prototype.subTo = function (v, vout) {
+                if (vout === void 0) { vout = new Vector4(); }
+                return vout.copy(this).sub(v);
+            };
+            Vector4.prototype.multiply = function (v) {
+                this.x *= v.x;
+                this.y *= v.y;
+                this.z *= v.z;
+                this.w *= v.w;
+                return this;
+            };
+            Vector4.prototype.multiplyTo = function (v, vout) {
+                if (vout === void 0) { vout = new Vector4(); }
+                return vout.copy(this).multiply(v);
+            };
+            Vector4.prototype.div = function (v) {
+                this.x /= v.x;
+                this.y /= v.y;
+                this.z /= v.z;
+                this.w /= v.w;
+                return this;
+            };
+            Vector4.prototype.divTo = function (v, vout) {
+                if (vout === void 0) { vout = new Vector4(); }
+                return vout.copy(this).div(v);
+            };
+            Vector4.prototype.equals = function (v, precision) {
+                if (precision === void 0) { precision = Math.PRECISION; }
+                if (!Math.equals(this.x - v.x, 0, precision))
+                    return false;
+                if (!Math.equals(this.y - v.y, 0, precision))
+                    return false;
+                if (!Math.equals(this.z - v.z, 0, precision))
+                    return false;
+                if (!Math.equals(this.w - v.w, 0, precision))
+                    return false;
+                return true;
+            };
+            Vector4.prototype.negate = function () {
+                this.x = -this.x;
+                this.y = -this.y;
+                this.z = -this.z;
+                this.w = -this.w;
+                return this;
+            };
+            Vector4.prototype.negateTo = function (vout) {
+                if (vout === void 0) { vout = new Vector4(); }
+                return vout.copy(this).negate();
+            };
+            Vector4.prototype.scale = function (s) {
+                this.x *= s;
+                this.y *= s;
+                this.z *= s;
+                this.w *= s;
+                return this;
+            };
+            Vector4.prototype.scaleTo = function (s) {
+                return this.clone().scale(s);
+            };
+            Vector4.prototype.dot = function (a) {
+                return this.x * a.x + this.y * a.y + this.z * a.z + this.w * a.w;
+            };
+            Vector4.prototype.lerp = function (v, alpha) {
+                this.x += (v.x - this.x) * alpha;
+                this.y += (v.y - this.y) * alpha;
+                this.z += (v.z - this.z) * alpha;
+                this.w += (v.w - this.w) * alpha;
+                return this;
+            };
+            Vector4.prototype.lerpTo = function (v, alpha, vout) {
+                if (vout === void 0) { vout = new Vector4(); }
+                return vout.copy(this).lerp(v, alpha);
+            };
+            Vector4.prototype.applyMatrix4x4 = function (mat) {
+                mat.transformVector4(this, this);
+                return this;
+            };
+            Vector4.prototype.toString = function () {
+                return "<" + this.x + ", " + this.y + ", " + this.z + ", " + this.w + ">";
+            };
+            return Vector4;
+        }());
+        framework.Vector4 = Vector4;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -32644,9 +33590,9 @@ var gd3d;
                 this.activeShape.initParticleState(particle);
                 if (this.alignToDirection) {
                     var dir = particle.velocity;
-                    var mat = new Matrix4x4();
+                    var mat = new framework.Matrix4x4();
                     mat.lookAt(dir, framework.Vector3.Y_AXIS);
-                    var mat0 = Matrix4x4.fromRotation(particle.rotation.x, particle.rotation.y, particle.rotation.z);
+                    var mat0 = framework.Matrix4x4.fromRotation(particle.rotation.x, particle.rotation.y, particle.rotation.z);
                     mat0.append(mat);
                     particle.rotation = mat0.rotation;
                 }
@@ -32940,14 +33886,14 @@ var gd3d;
             __extends(ParticleTextureSheetAnimationModule, _super);
             function ParticleTextureSheetAnimationModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.tiles = new Vector2(1, 1);
+                _this.tiles = new framework.Vector2(1, 1);
                 _this.animation = framework.ParticleSystemAnimationType.WholeSheet;
                 _this.frameOverTime = framework.serialization.setValue(new framework.MinMaxCurve(), { mode: framework.MinMaxCurveMode.Curve, curve: { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] } });
                 _this.useRandomRow = true;
                 _this._rowIndex = 0;
                 _this.startFrame = new framework.MinMaxCurve();
                 _this.cycleCount = 1;
-                _this.flipUV = new Vector2();
+                _this.flipUV = new framework.Vector2();
                 _this.uvChannelMask = framework.UVChannelFlags.Everything;
                 return _this;
             }
@@ -33030,7 +33976,7 @@ var gd3d;
                 var segmentsY = this.tiles.y;
                 var step = this.tiles.clone().reciprocal();
                 var total = segmentsX * segmentsY;
-                var uvPos = new Vector2();
+                var uvPos = new framework.Vector2();
                 var frameOverTime = this.frameOverTime.getValue(particle.rateAtLifeTime, particle[_TextureSheetAnimation_frameOverTime]);
                 var frameIndex = this.startFrame.getValue(particle.rateAtLifeTime, particle[_TextureSheetAnimation_startFrame]);
                 var rowIndex = this.rowIndex;

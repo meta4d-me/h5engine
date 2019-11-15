@@ -32,7 +32,7 @@ namespace gd3d.framework
          */
         once(type: string, listener: (event: any) => void, thisObject = null, priority = 0)
         {
-            event.on(this, type, listener, thisObject, priority, true);
+            event1.on(this, type, listener, thisObject, priority, true);
         }
 
         /**
@@ -45,7 +45,7 @@ namespace gd3d.framework
          */
         dispatchEvent(e: Event<any>)
         {
-            return event.dispatchEvent(this, e);
+            return event1.dispatchEvent(this, e);
         }
 
         /**
@@ -56,7 +56,7 @@ namespace gd3d.framework
          */
         dispatch(type: string, data?: any, bubbles = false)
         {
-            return event.dispatch(this, type, data, bubbles);
+            return event1.dispatch(this, type, data, bubbles);
         }
 
         /**
@@ -67,7 +67,7 @@ namespace gd3d.framework
          */
         has(type: string): boolean
         {
-            return event.has(this, type);
+            return event1.has(this, type);
         }
 
         /**
@@ -78,7 +78,7 @@ namespace gd3d.framework
          */
         on(type: string, listener: (event: any) => void, thisObject?: any, priority = 0, once = false)
         {
-            event.on(this, type, listener, thisObject, priority, once);
+            event1.on(this, type, listener, thisObject, priority, once);
         }
 
         /**
@@ -89,7 +89,7 @@ namespace gd3d.framework
          */
         off(type?: string, listener?: (event: any) => void, thisObject?: any)
         {
-            event.off(this, type, listener, thisObject);
+            event1.off(this, type, listener, thisObject);
         }
 
         /**
@@ -101,7 +101,7 @@ namespace gd3d.framework
          */
         onAll(listener: (event: any) => void, thisObject?: any, priority = 0)
         {
-            event.onAll(this, listener, thisObject, priority);
+            event1.onAll(this, listener, thisObject, priority);
         }
 
         /**
@@ -112,7 +112,7 @@ namespace gd3d.framework
          */
         offAll(listener?: (event: any) => void, thisObject?: any)
         {
-            event.offAll(this, listener, thisObject);
+            event1.offAll(this, listener, thisObject);
         }
 
         /**
