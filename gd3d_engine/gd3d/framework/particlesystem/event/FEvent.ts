@@ -43,7 +43,7 @@ namespace gd3d.framework
     {
         private feventMap = new Map<any, ObjectListener>();
 
-        private getBubbleTargets(target)
+        private getBubbleTargets(target: Object)
         {
             return [target["parent"]];
         }

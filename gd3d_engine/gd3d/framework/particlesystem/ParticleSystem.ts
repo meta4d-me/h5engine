@@ -17,9 +17,17 @@ namespace gd3d.framework
      * 
      * @author feng3d
      */
-    export class ParticleSystem extends EventDispatcher implements INodeComponent
+    @reflect.nodeRender
+    @reflect.nodeComponent
+    export class ParticleSystem extends EventDispatcher implements IRenderer
     {
+        static readonly ClassName: string = "ParticleSystem";
+
         __class__: "feng3d.ParticleSystem" = "feng3d.ParticleSystem";
+
+        layer: RenderLayerEnum;
+        renderLayer: number;  //后期发现 和 gameObject.layer 概念冲突 ，实现时 对接处理
+        queue: number;
 
         get transform()
         {
@@ -134,9 +142,52 @@ namespace gd3d.framework
         }
         private _textureSheetAnimation: ParticleTextureSheetAnimationModule;
 
-        geometry = Geometry.billboard;
+        // geometry = Geometry.billboard;
+
+        private _mesh: mesh;
+
+        //本意mesh filter 可以弄一点 模型处理，比如lod
+        //先直进直出吧
+        /**
+         * @private
+         */
+        @gd3d.reflect.Field("mesh")
+        @gd3d.reflect.UIStyle("WidgetDragSelect")
+        get mesh()
+        {
+            return this._mesh;
+        }
+        /**
+        * @public
+        * @language zh_CN
+        * @param mesh 此组件的mesh
+        * @classdesc
+        * 设置mesh数据
+        * @version gd3d 1.0
+        */
+        set mesh(mesh: mesh)
+        {
+            if (this._mesh != null)
+            {
+                this._mesh.unuse();
+            }
+            this._mesh = mesh;
+            if (this._mesh != null)
+            {
+                this._mesh.use();
+            }
+        }
 
         // material = Material.particle;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * mesh的材质数组
+         * @version gd3d 1.0
+         */
+        @gd3d.reflect.Field("material")
+        material: material;
 
         /**
          * 活跃粒子数量
@@ -293,11 +344,22 @@ namespace gd3d.framework
             }
         }
 
-        beforeRender(gl: GL, renderAtomic: RenderAtomic, scene3d: Scene3D, camera: Camera)
+        render(context: renderContext, assetmgr: assetMgr, camera: camera)
         {
-            super.beforeRender(gl, renderAtomic, scene3d, camera);
+            DrawCallInfo.inc.currentState = DrawCallEnum.EffectSystem;
+            let go = this.gameObject;
+            let tran = go.transform;
 
-            if (Boolean(scene3d.runEnvironment & RunEnvironment.feng3d) && !this._awaked)
+            context.updateLightMask(go.layer);
+            context.updateModel(tran);
+            let mesh = this.mesh;
+            if (mesh == null || mesh.glMesh == null || mesh.submesh == null) return;
+            let subMeshs = mesh.submesh;
+            if (subMeshs == null) return;
+
+            mesh.glMesh.bindVboBuffer(context.webgl);
+
+            if (!this._awaked)
             {
                 this._isPlaying = this.main.playOnAwake;
                 this._awaked = true;
@@ -341,6 +403,23 @@ namespace gd3d.framework
                 colors.push(particle.color.r, particle.color.g, particle.color.b, particle.color.a);
                 tilingOffsets.push(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w);
                 flipUVs.push(particle.flipUV.x, particle.flipUV.y);
+
+                let len = subMeshs.length;
+                let scene = tran.scene;
+                for (let i = 0; i < len; i++)
+                {
+                    let sm = subMeshs[i];
+                    let mid = subMeshs[i].matIndex;//根据这个找到使用的具体哪个材质    
+                    // let usemat = this.materials[mid];
+                    let usemat = this.material;
+                    let drawtype = scene.fog ? "base_fog" : "base";
+                    if (scene.fog)
+                    {
+                        context.fog = scene.fog;
+                    }
+                    if (usemat != null)
+                        usemat.draw(context, mesh, sm, drawtype);
+                }
             }
 
             //
