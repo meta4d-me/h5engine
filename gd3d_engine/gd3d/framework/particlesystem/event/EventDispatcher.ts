@@ -123,7 +123,7 @@ namespace gd3d.framework
          */
         protected handleEvent(e: Event<any>)
         {
-            event["handleEvent"](this, e);
+            event1["handleEvent"](this, e);
         }
 
         /**
@@ -132,7 +132,7 @@ namespace gd3d.framework
          */
         protected handelEventBubbles(e: Event<any>)
         {
-            event["handelEventBubbles"](this, e);
+            event1["handelEventBubbles"](this, e);
         }
     }
     dispatcher = new EventDispatcher();
