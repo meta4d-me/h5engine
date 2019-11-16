@@ -212,7 +212,15 @@ namespace gd3d.framework
 
         start()
         {
+            if (!this._mesh)
+            {
+                this._mesh = sceneMgr.app.getAssetMgr().getDefaultMesh("quad_particle");
+            }
 
+            if (!this.material)
+            {
+                this.material = sceneMgr.app.getAssetMgr().getDefParticleMat();
+            }
         }
 
         remove()
@@ -352,6 +360,7 @@ namespace gd3d.framework
 
             context.updateLightMask(go.layer);
             context.updateModel(tran);
+            if (!this.material) return;
             let mesh = this.mesh;
             if (mesh == null || mesh.glMesh == null || mesh.submesh == null) return;
             let subMeshs = mesh.submesh;
@@ -365,13 +374,13 @@ namespace gd3d.framework
                 this._awaked = true;
             }
 
-            renderAtomic.instanceCount = this._activeParticles.length;
+            // renderAtomic.instanceCount = this._activeParticles.length;
             //
-            renderAtomic.shaderMacro.HAS_PARTICLE_ANIMATOR = true;
+            // renderAtomic.shaderMacro.HAS_PARTICLE_ANIMATOR = true;
 
-            renderAtomic.shaderMacro.ENABLED_PARTICLE_SYSTEM_textureSheetAnimation = this.textureSheetAnimation.enabled;
+            // renderAtomic.shaderMacro.ENABLED_PARTICLE_SYSTEM_textureSheetAnimation = this.textureSheetAnimation.enabled;
 
-            var cameraMatrix = camera.transform.localToWorldMatrix.clone();
+            var cameraMatrix = new Matrix4x4(camera.gameObject.transform.getWorldMatrix().rawData);
 
             var localToWorldMatrix = new Matrix4x4(this.transform.getWorldMatrix().rawData.concat());
             var worldToLocalMatrix = localToWorldMatrix.clone().invert();
@@ -379,12 +388,11 @@ namespace gd3d.framework
             var localCameraPos = worldToLocalMatrix.transformVector(cameraMatrix.position);
             var localCameraUp = worldToLocalMatrix.deltaTransformVector(cameraMatrix.up);
             // 计算公告牌矩阵
-            var billboardMatrix = new Matrix3x3();
-            if (!this.shape.alignToDirection && this.geometry == Geometry.billboard)
+            var billboardMatrix = new Matrix4x4();
+
+            if (!this.shape.alignToDirection && this.mesh == sceneMgr.app.getAssetMgr().getDefaultMesh("quad_particle"))
             {
-                var matrix4x4 = new Matrix4x4();
-                matrix4x4.lookAt(localCameraPos, localCameraUp);
-                billboardMatrix.formMatrix4x4(matrix4x4);
+                billboardMatrix.lookAt(localCameraPos, localCameraUp);
             }
 
             var positions: number[] = [];
@@ -393,6 +401,9 @@ namespace gd3d.framework
             var colors: number[] = [];
             var tilingOffsets: number[] = [];
             var flipUVs: number[] = [];
+
+            var matrixModelViewProject = new Matrix4x4(context.matrixModelViewProject.rawData);
+
             for (let i = 0, n = this._activeParticles.length; i < n; i++)
             {
                 var particle = this._activeParticles[i];
@@ -403,6 +414,12 @@ namespace gd3d.framework
                 colors.push(particle.color.r, particle.color.g, particle.color.b, particle.color.a);
                 tilingOffsets.push(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w);
                 flipUVs.push(particle.flipUV.x, particle.flipUV.y);
+
+                //
+                var matrix4x4_1 = new Matrix4x4().recompose([particle.position, particle.rotation.scaleNumberTo(Math.DEG2RAD), particle.size]);
+                matrix4x4_1.append(billboardMatrix).append(matrixModelViewProject);
+
+                context.matrixModelViewProject = new gd3d.math.matrix(matrix4x4_1.rawData);
 
                 let len = subMeshs.length;
                 let scene = tran.scene;
@@ -420,23 +437,6 @@ namespace gd3d.framework
                     if (usemat != null)
                         usemat.draw(context, mesh, sm, drawtype);
                 }
-            }
-
-            //
-            this._attributes.a_particle_position.data = positions;
-            this._attributes.a_particle_scale.data = scales;
-            this._attributes.a_particle_rotation.data = rotations;
-            this._attributes.a_particle_color.data = colors;
-            this._attributes.a_particle_tilingOffset.data = tilingOffsets;
-            this._attributes.a_particle_flipUV.data = flipUVs;
-
-            //
-            renderAtomic.uniforms.u_particleTime = this._realTime;
-            renderAtomic.uniforms.u_particle_billboardMatrix = billboardMatrix;
-
-            for (const key in this._attributes)
-            {
-                renderAtomic.attributes[key] = this._attributes[key];
             }
         }
 
@@ -459,18 +459,6 @@ namespace gd3d.framework
          * 活跃的粒子列表
          */
         private _activeParticles: Particle1[] = [];
-
-        /**
-         * 属性数据列表
-         */
-        private _attributes = {
-            a_particle_position: new Attribute("a_particle_position", [], 3, 1),
-            a_particle_scale: new Attribute("a_particle_scale", [], 3, 1),
-            a_particle_rotation: new Attribute("a_particle_rotation", [], 3, 1),
-            a_particle_color: new Attribute("a_particle_color", [], 4, 1),
-            a_particle_tilingOffset: new Attribute("a_particle_tilingOffset", [], 4, 1),
-            a_particle_flipUV: new Attribute("a_particle_flipUV", [], 2, 1),
-        };
 
         private readonly _modules: ParticleModule[] = [];
 
