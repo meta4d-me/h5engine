@@ -31699,20 +31699,22 @@ var gd3d;
             scene.prototype.addScreenSpaceOverlay = function (overlay) {
                 if (!overlay)
                     return;
-                if (!this._overlay2d)
-                    this._overlay2d = [];
-                if (this._overlay2d.indexOf(overlay) != -1)
+                if (!this._overlay2ds)
+                    this._overlay2ds = [];
+                var ol2ds = this._overlay2ds;
+                if (ol2ds.indexOf(overlay) != -1)
                     return;
-                this._overlay2d.push(overlay);
-                this.sortOverLays(this._overlay2d);
+                ol2ds.push(overlay);
+                this.sortOverLays(ol2ds);
             };
             scene.prototype.removeScreenSpaceOverlay = function (overlay) {
-                if (!overlay || !this._overlay2d)
+                var ol2ds = this._overlay2ds;
+                if (!overlay || !ol2ds)
                     return;
-                var idx = this._overlay2d.indexOf(overlay);
+                var idx = ol2ds.indexOf(overlay);
                 if (idx != -1)
-                    this._overlay2d.splice(idx, 1);
-                this.sortOverLays(this._overlay2d);
+                    ol2ds.splice(idx, 1);
+                this.sortOverLays(ol2ds);
             };
             Object.defineProperty(scene.prototype, "mainCamera", {
                 get: function () {
@@ -31738,6 +31740,7 @@ var gd3d;
                     this.renderLights.length = 0;
                 }
                 this.renderList.clear();
+                this.updateSceneOverLay(delta);
                 this.updateScene(this.rootNode, delta);
                 if (this.onLateUpdate)
                     this.onLateUpdate(delta);
@@ -31767,7 +31770,7 @@ var gd3d;
                     }
                     this.renderCameras[i].isLastCamera = false;
                 }
-                this.updateSceneOverLay(delta);
+                this.rendererSceneOverLay();
                 if (this.RealCameraNumber == 0 && this.app && this.app.beRendering) {
                     this.webgl.clearColor(0, 0, 0, 1);
                     this.webgl.clearDepth(1.0);
@@ -31779,18 +31782,20 @@ var gd3d;
                     framework.DrawCallInfo.inc.reset();
                 }
             };
-            scene.prototype.updateSceneOverLay = function (delta) {
-                if (!this._overlay2d || this._overlay2d.length < 1)
+            scene.prototype.rendererSceneOverLay = function () {
+                var ol2ds = this._overlay2ds;
+                if (!ol2ds || ol2ds.length < 1)
                     return;
                 var targetcamera = this.mainCamera;
-                if (!this._overlay2d || !targetcamera)
+                if (!targetcamera)
                     return;
-                var mainCamIdx = this.renderCameras.indexOf(targetcamera);
+                var rCams = this.renderCameras;
+                var mainCamIdx = rCams.indexOf(targetcamera);
                 if (mainCamIdx == -1) {
                     var cname = targetcamera.gameObject.getName();
                     var oktag = false;
-                    for (var i = 0, l = this.renderCameras.length; i < l; i++) {
-                        var cam = this.renderCameras[i];
+                    for (var i = 0, l = rCams.length; i < l; i++) {
+                        var cam = rCams[i];
                         if (cam && cam.gameObject.getName() == cname) {
                             targetcamera = this.mainCamera = cam;
                             oktag = true;
@@ -31802,19 +31807,31 @@ var gd3d;
                         targetcamera = this.mainCamera;
                     }
                 }
-                mainCamIdx = this.renderCameras.indexOf(targetcamera);
+                mainCamIdx = rCams.indexOf(targetcamera);
                 if (!targetcamera)
                     return;
-                if (this._overlay2d) {
-                    for (var i = 0, l = this._overlay2d.length; i < l; ++i) {
-                        var overlay = this._overlay2d[i];
-                        if (overlay) {
-                            overlay.start(targetcamera);
-                            overlay.update(delta);
-                            if (this.app && this.app.beRendering) {
-                                overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
-                            }
-                        }
+                var len = ol2ds.length;
+                for (var i = 0, l = len; i < l; ++i) {
+                    var overlay = ol2ds[i];
+                    if (overlay && this.app && this.app.beRendering) {
+                        overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
+                    }
+                }
+            };
+            scene.prototype.updateSceneOverLay = function (delta) {
+                var ol2ds = this._overlay2ds;
+                if (!ol2ds || ol2ds.length < 1)
+                    return;
+                var targetcamera = this.mainCamera;
+                if (!targetcamera)
+                    return;
+                if (this.renderCameras.indexOf(targetcamera) == -1)
+                    return;
+                for (var i = 0, l = ol2ds.length; i < l; ++i) {
+                    var overlay = ol2ds[i];
+                    if (overlay) {
+                        overlay.start(targetcamera);
+                        overlay.update(delta);
                     }
                 }
             };

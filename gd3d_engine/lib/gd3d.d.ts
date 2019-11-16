@@ -6124,7 +6124,7 @@ declare namespace gd3d.framework {
         private rootNode;
         renderList: renderList;
         private assetmgr;
-        private _overlay2d;
+        private _overlay2ds;
         addScreenSpaceOverlay(overlay: overlay2D): void;
         removeScreenSpaceOverlay(overlay: any): void;
         renderCameras: camera[];
@@ -6136,6 +6136,7 @@ declare namespace gd3d.framework {
         fog: Fog;
         onLateUpdate: (delta: number) => any;
         update(delta: number): void;
+        private rendererSceneOverLay;
         private updateSceneOverLay;
         private RealCameraNumber;
         private _renderCamera;
