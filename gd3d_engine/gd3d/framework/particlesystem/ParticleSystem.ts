@@ -196,7 +196,6 @@ namespace gd3d.framework
             }
         }
 
-        // material = Material.particle;
         /**
          * @public
          * @language zh_CN
