@@ -3903,10 +3903,22 @@ var test_ParticleSystem = (function () {
         this.fscode = "\n    precision mediump float;\n\n    varying vec2 v_uv;\n    \n    uniform vec4 u_tintColor;\n    uniform sampler2D _MainTex;\n    uniform vec4 _MainTex_ST;\n    \n    varying vec4 v_particle_color;\n    \n    vec4 particleAnimation(vec4 color) {\n    \n        color.xyz = color.xyz * v_particle_color.xyz;\n        color.xyz = color.xyz * v_particle_color.www;\n        return color;\n    }\n    \n    void main()\n    {\n        vec4 finalColor = vec4(1.0, 1.0, 1.0, 1.0);\n    \n        finalColor = particleAnimation(finalColor);\n    \n        vec2 uv = v_uv;\n        uv = uv * _MainTex_ST.xy + _MainTex_ST.zw;\n        finalColor = 2.0 * finalColor * u_tintColor * texture2D(_MainTex, uv);\n    \n        gl_FragColor = finalColor;\n    }\n    ";
     }
     test_ParticleSystem.prototype.start = function (app) {
-        this.app = app;
-        this.scene = this.app.getScene();
-        this.astMgr = this.app.getAssetMgr();
-        this.init();
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.app = app;
+                        this.scene = this.app.getScene();
+                        this.astMgr = this.app.getAssetMgr();
+                        return [4, demoTool.loadbySync("newRes/shader/shader.assetbundle.json", this.astMgr)];
+                    case 1:
+                        _a.sent();
+                        debugger;
+                        this.init();
+                        return [2];
+                }
+            });
+        });
     };
     test_ParticleSystem.prototype.init = function () {
         var objCam = new gd3d.framework.transform();
@@ -3941,7 +3953,6 @@ var test_ParticleSystem = (function () {
             mr = tran.gameObject.addComponent("meshRenderer");
         mr.materials[0] = mat_white;
         mf.mesh = this.astMgr.getDefaultMesh("cube");
-        this.initParticleSystem();
     };
     test_ParticleSystem.prototype.initParticleSystem = function () {
         var tran = new gd3d.framework.transform();

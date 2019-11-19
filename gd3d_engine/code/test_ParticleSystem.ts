@@ -9,11 +9,15 @@ class test_ParticleSystem implements IState
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
 
-    start(app: gd3d.framework.application)
+    async start(app: gd3d.framework.application)
     {
         this.app = app;
         this.scene = this.app.getScene();
         this.astMgr = this.app.getAssetMgr();
+        await demoTool.loadbySync(`newRes/shader/shader.assetbundle.json`,this.astMgr);
+        // await demoTool.loadbySync(`res/f14effprefab/customShader/customShader.assetbundle.json`,this.astMgr);
+        //res/f14effprefab/customShader/customShader.assetbundle.json
+        debugger;
         //
         this.init();
     }
@@ -56,7 +60,7 @@ class test_ParticleSystem implements IState
         mf.mesh = this.astMgr.getDefaultMesh("cube");
 
 
-        this.initParticleSystem();
+        // this.initParticleSystem();
     }
 
     private initParticleSystem()
