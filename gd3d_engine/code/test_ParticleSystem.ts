@@ -34,15 +34,23 @@ class test_ParticleSystem implements IState {
         hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0)
 
         let mat_white = new gd3d.framework.material("white");
-        mat_white.setShader(this.astMgr.getShader("diffuse.shader.json"));
-        mat_white.setVector4("_MainColor", new gd3d.math.vector4(1,1,1,1) );
+        mat_white.setShader(this.astMgr.getShader("shader/def"));
+        mat_white.setVector4("_MainColor", new gd3d.math.vector4(1, 1, 1, 1));
 
-        let trans = new gd3d.framework.transform();
-        trans.localScale.x = 20;
-        trans.localScale.y = 0.01;
-        trans.localScale.z = 20;
-        this.scene.addChild(trans);
-        physics3dDemoTool.attachMesh(trans, mat_white, "cube");
+        let tran = new gd3d.framework.transform();
+        tran.localScale.x = 20;
+        tran.localScale.y = 0.01;
+        tran.localScale.z = 20;
+        this.scene.addChild(tran);
+
+        let mf = tran.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
+        if (!mf) mf = tran.gameObject.addComponent("meshFilter") as any;
+        let mr = tran.gameObject.getComponent("meshRenderer") as gd3d.framework.meshRenderer;
+        if (!mr) mr = tran.gameObject.addComponent("meshRenderer") as any;
+        mr.materials[0] = mat_white;
+        mf.mesh = this.astMgr.getDefaultMesh("cube");
+
+
     }
 
     update(delta: number) {
