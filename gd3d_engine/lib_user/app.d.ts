@@ -616,8 +616,12 @@ declare class test_ParticleSystem implements IState {
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
     start(app: gd3d.framework.application): void;
+    private init;
     private initParticleSystem;
+    private initParticleShader;
     update(delta: number): void;
+    vscode: string;
+    fscode: string;
 }
 declare class test_RangeScreen implements IState {
     app: gd3d.framework.application;

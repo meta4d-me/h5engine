@@ -3899,11 +3899,16 @@ var test_Decal = (function () {
 }());
 var test_ParticleSystem = (function () {
     function test_ParticleSystem() {
+        this.vscode = "\n    precision mediump float;  \n\n    //\u5750\u6807\u5C5E\u6027\n    attribute vec3 a_position;\n    attribute vec2 a_uv;\n    \n    uniform mat4 u_modelMatrix;\n    uniform mat4 u_ITModelMatrix;\n    uniform mat4 u_viewProjection;\n    \n    varying vec2 v_uv;\n    \n    //\n    attribute vec3 a_particle_position;\n    attribute vec3 a_particle_scale;\n    attribute vec3 a_particle_rotation;\n    attribute vec4 a_particle_color;\n    \n    #ifdef ENABLED_PARTICLE_SYSTEM_textureSheetAnimation\n        attribute vec4 a_particle_tilingOffset;\n        attribute vec2 a_particle_flipUV;\n    #endif\n    \n    uniform mat3 u_particle_billboardMatrix;\n    \n    varying vec4 v_particle_color;\n    \n    mat3 makeParticleRotationMatrix(vec3 rotation)\n    {\n        float DEG2RAD = 3.1415926 / 180.0;\n        \n        float rx = rotation.x * DEG2RAD;\n        float ry = rotation.y * DEG2RAD;\n        float rz = rotation.z * DEG2RAD;\n    \n        float sx = sin(rx);\n        float cx = cos(rx);\n        float sy = sin(ry);\n        float cy = cos(ry);\n        float sz = sin(rz);\n        float cz = cos(rz);\n    \n        mat3 tmp;\n        tmp[ 0 ] = vec3(cy * cz, cy * sz, -sy);\n        tmp[ 1 ] = vec3(sx * sy * cz - cx * sz, sx * sy * sz + cx * cz, sx * cy);\n        tmp[ 2 ] = vec3(cx * sy * cz + sx * sz, cx * sy * sz - sx * cz, cx * cy);\n        return tmp;\n    }\n    \n    vec4 particleAnimation(vec4 position) \n    {\n        // \u8BA1\u7B97\u7F29\u653E\n        position.xyz = position.xyz * a_particle_scale;\n    \n        // \u8BA1\u7B97\u65CB\u8F6C\n        mat3 rMat = makeParticleRotationMatrix(a_particle_rotation);\n        position.xyz = rMat * position.xyz;\n        position.xyz = u_particle_billboardMatrix * position.xyz;\n    \n        // \u4F4D\u79FB\n        position.xyz = position.xyz + a_particle_position;\n    \n        // \u989C\u8272\n        v_particle_color = a_particle_color;\n    \n        #ifdef ENABLED_PARTICLE_SYSTEM_textureSheetAnimation\n            if(a_particle_flipUV.x > 0.5) v_uv.x = 1.0 - v_uv.x;\n            if(a_particle_flipUV.y > 0.5) v_uv.y = 1.0 - v_uv.y;\n            v_uv = v_uv * a_particle_tilingOffset.xy + a_particle_tilingOffset.zw;\n        #endif\n        \n        return position;\n    }\n    \n    void main() \n    {\n        vec4 position = vec4(a_position, 1.0);\n        //\u8F93\u51FAuv\n        v_uv = a_uv;\n        \n        position = particleAnimation(position);\n    \n        //\u83B7\u53D6\u5168\u5C40\u5750\u6807\n        vec4 worldPosition = u_modelMatrix * position;\n        //\u8BA1\u7B97\u6295\u5F71\u5750\u6807\n        gl_Position = u_viewProjection * worldPosition;\n    }\n    ";
+        this.fscode = "\n    precision mediump float;\n\n    varying vec2 v_uv;\n    \n    uniform vec4 u_tintColor;\n    uniform sampler2D _MainTex;\n    uniform vec4 _MainTex_ST;\n    \n    varying vec4 v_particle_color;\n    \n    vec4 particleAnimation(vec4 color) {\n    \n        color.xyz = color.xyz * v_particle_color.xyz;\n        color.xyz = color.xyz * v_particle_color.www;\n        return color;\n    }\n    \n    void main()\n    {\n        vec4 finalColor = vec4(1.0, 1.0, 1.0, 1.0);\n    \n        finalColor = particleAnimation(finalColor);\n    \n        vec2 uv = v_uv;\n        uv = uv * _MainTex_ST.xy + _MainTex_ST.zw;\n        finalColor = 2.0 * finalColor * u_tintColor * texture2D(_MainTex, uv);\n    \n        gl_FragColor = finalColor;\n    }\n    ";
     }
     test_ParticleSystem.prototype.start = function (app) {
         this.app = app;
         this.scene = this.app.getScene();
         this.astMgr = this.app.getAssetMgr();
+        this.init();
+    };
+    test_ParticleSystem.prototype.init = function () {
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
         this.scene.addChild(objCam);
@@ -3942,10 +3947,37 @@ var test_ParticleSystem = (function () {
         var tran = new gd3d.framework.transform();
         tran.name = "ParticleSystem";
         this.scene.addChild(tran);
+        var mat = new gd3d.framework.material("defparticle1");
+        var shader = this.initParticleShader();
+        mat.setShader(shader);
+        var tex = this.astMgr.getDefaultTexture("grid");
+        mat.setTexture("_MainTex", tex);
         var ps = tran.gameObject.getComponent("ParticleSystem");
         if (!ps)
             ps = tran.gameObject.addComponent("ParticleSystem");
+        ps.material = mat;
         ps.play();
+    };
+    test_ParticleSystem.prototype.initParticleShader = function () {
+        var assetmgr = this.astMgr;
+        var pool = this.astMgr.shaderPool;
+        pool.compileVS(assetmgr.webgl, "particles_additive1", this.vscode);
+        pool.compileFS(assetmgr.webgl, "particles_additive1", this.fscode);
+        var program = pool.linkProgram(assetmgr.webgl, "particles_additive1", "particles_additive1");
+        var sh = new gd3d.framework.shader("shader/particles_additive1");
+        sh.defaultAsset = true;
+        sh.passes["base"] = [];
+        var p = new gd3d.render.glDrawPass();
+        p.setProgram(program);
+        sh.passes["base"].push(p);
+        sh.fillUnDefUniform(p);
+        p.state_ztest = true;
+        p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
+        p.state_zwrite = true;
+        p.state_showface = gd3d.render.ShowFaceStateEnum.CCW;
+        p.setAlphaBlend(gd3d.render.BlendModeEnum.Close);
+        assetmgr.mapShader[sh.getName()] = sh;
+        return sh;
     };
     test_ParticleSystem.prototype.update = function (delta) {
     };

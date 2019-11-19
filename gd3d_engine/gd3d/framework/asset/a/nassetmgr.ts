@@ -165,7 +165,7 @@ namespace gd3d.framework
         //加载资源
         load(url: string, type: AssetTypeEnum = AssetTypeEnum.Auto,
             /** 这是解析完成的回调 */
-            onstate: (state?: stateLoad) => void = null,downloadFinish:()=>void=null)
+            onstate: (state?: stateLoad) => void = null, downloadFinish: () => void = null)
         {
             let keyUrl = url.replace(assetMgr.cdnRoot, "");
             let guid = assetMgr.urlmapGuid[keyUrl];
@@ -345,7 +345,7 @@ namespace gd3d.framework
 
         async parseRes(asset: { guid: number, type: number, name: string, dwguid?: number }, bundle?: assetBundle)
         {
-            if(assetMgr.mapGuid[asset.guid])
+            if (assetMgr.mapGuid[asset.guid])
                 return assetMgr.mapGuid[asset.guid].asset;
             // let ctime = Date.now();
             let data = assetMgr.mapLoading[asset.guid].data;
@@ -384,7 +384,7 @@ namespace gd3d.framework
                 if (bundle)
                 {
                     let guid = bundle.files[name.replace(".prefab", ".cprefab")];
-                    if (guid!=undefined && assetMgr.mapGuid[guid])
+                    if (guid != undefined && assetMgr.mapGuid[guid])
                         return assetMgr.mapGuid[guid].asset as T;
                 }
             }
