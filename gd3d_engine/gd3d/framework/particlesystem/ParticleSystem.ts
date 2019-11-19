@@ -25,9 +25,27 @@ namespace gd3d.framework
 
         __class__: "feng3d.ParticleSystem" = "feng3d.ParticleSystem";
 
-        layer: RenderLayerEnum;
-        renderLayer: number;  //后期发现 和 gameObject.layer 概念冲突 ，实现时 对接处理
-        queue: number;
+        layer: RenderLayerEnum = RenderLayerEnum.Transparent;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 渲染层级
+         * @version gd3d 1.0
+         */
+        //renderLayer: CullingMask = CullingMask.default;
+        get renderLayer() {return this.gameObject.layer;}
+        set renderLayer(layer:number){
+            this.gameObject.layer = layer;
+        }
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 同场景渲染层级时候先后排序依据
+         * @version gd3d 1.0
+         */
+        queue: number = 0;
 
         get transform()
         {

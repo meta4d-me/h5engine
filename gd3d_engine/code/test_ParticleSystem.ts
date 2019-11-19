@@ -1,14 +1,16 @@
 /** 
- * 粒子系統
+ * 粒子系統示例
  */
-class test_ParticleSystem implements IState {
+class test_ParticleSystem implements IState
+{
 
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
 
-    start(app: gd3d.framework.application) {
+    start(app: gd3d.framework.application)
+    {
 
         this.app = app;
         this.scene = this.app.getScene();
@@ -50,10 +52,24 @@ class test_ParticleSystem implements IState {
         mr.materials[0] = mat_white;
         mf.mesh = this.astMgr.getDefaultMesh("cube");
 
-
+        this.initParticleSystem();
     }
 
-    update(delta: number) {
+    private initParticleSystem()
+    {
+        let tran = new gd3d.framework.transform();
+        tran.name = "ParticleSystem";
+        this.scene.addChild(tran);
+
+        let ps = tran.gameObject.getComponent("ParticleSystem") as gd3d.framework.ParticleSystem;
+        if (!ps) ps = tran.gameObject.addComponent("ParticleSystem") as any;
+        // ps.material = mat_white;
+        // ps.mesh = this.astMgr.getDefaultMesh("cube");
+        ps.play();
+    }
+
+    update(delta: number)
+    {
 
     }
 
