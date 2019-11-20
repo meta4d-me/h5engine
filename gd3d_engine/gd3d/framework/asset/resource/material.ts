@@ -203,7 +203,7 @@ namespace gd3d.framework
             {
                 let unifom = pass.mapuniforms[key];
                 if(lastMatSame && !material.sameMatPassMap[unifom.name]){
-                    continue;
+                    // continue;
                 }
 
                 let func = render.shaderUniform.applyuniformFunc[unifom.type];

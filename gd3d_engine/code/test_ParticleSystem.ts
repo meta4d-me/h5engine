@@ -41,24 +41,6 @@ class test_ParticleSystem implements IState
         hoverc.scaleSpeed = 0.1;
         hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0)
 
-        let mat_white = new gd3d.framework.material("white");
-        mat_white.setShader(this.astMgr.getShader("shader/def"));
-        mat_white.setVector4("_MainColor", new gd3d.math.vector4(1, 1, 1, 1));
-
-        let tran = new gd3d.framework.transform();
-        tran.localScale.x = 20;
-        tran.localScale.y = 0.01;
-        tran.localScale.z = 20;
-        this.scene.addChild(tran);
-
-        let mf = tran.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
-        if (!mf) mf = tran.gameObject.addComponent("meshFilter") as any;
-        let mr = tran.gameObject.getComponent("meshRenderer") as gd3d.framework.meshRenderer;
-        if (!mr) mr = tran.gameObject.addComponent("meshRenderer") as any;
-        mr.materials[0] = mat_white;
-        mf.mesh = this.astMgr.getDefaultMesh("cube");
-
-
         this.initParticleSystem();
     }
 
@@ -117,23 +99,31 @@ class test_ParticleSystem implements IState
     }
 
     vscode = `
-    precision mediump float;
+    precision mediump float;  
+
+    //坐标属性
+    attribute vec3 _glesVertex;
+    attribute vec2 _glesMultiTexCoord0;
+    attribute vec4 _glesColor;
     
-    attribute vec4 _glesVertex;
-    attribute vec4 _glesMultiTexCoord0;   
-    attribute vec4 _glesColor;                   
-    uniform mat4 glstate_matrix_mvp;      
+    uniform mat4 glstate_matrix_mvp;
     
-    uniform vec3 a_particle_position;
-    uniform vec3 a_particle_scale;
-    uniform vec3 a_particle_rotation;
+    varying vec2 v_uv;
+    
+    //
+    uniform vec4 a_particle_position;
+    uniform vec4 a_particle_scale;
+    uniform vec4 a_particle_rotation;
     uniform vec4 a_particle_color;
+    
+    #ifdef ENABLED_PARTICLE_SYSTEM_textureSheetAnimation
+        uniform vec4 a_particle_tilingOffset;
+        uniform vec2 a_particle_flipUV;
+    #endif
     
     uniform mat4 u_particle_billboardMatrix;
     
-    varying vec4 xlv_COLOR;
-    varying vec2 xlv_TEXCOORD0;           
-    
+    varying vec4 v_particle_color;
     
     mat3 makeParticleRotationMatrix(vec3 rotation)
     {
@@ -160,47 +150,70 @@ class test_ParticleSystem implements IState
     vec4 particleAnimation(vec4 position) 
     {
         // 计算缩放
-        position.xyz = position.xyz * a_particle_scale;
+        position.xyz = position.xyz * a_particle_scale.xyz;
     
         // 计算旋转
-        mat3 rMat = makeParticleRotationMatrix(a_particle_rotation);
+        mat3 rMat = makeParticleRotationMatrix(a_particle_rotation.xyz);
         position.xyz = rMat * position.xyz;
         position = u_particle_billboardMatrix * position;
     
         // 位移
-        position.xyz = position.xyz + a_particle_position;
+        position.xyz = position.xyz + a_particle_position.xyz;
     
         // 颜色
-        // v_particle_color = a_particle_color;
+        v_particle_color = a_particle_color * _glesColor;
     
+        #ifdef ENABLED_PARTICLE_SYSTEM_textureSheetAnimation
+            if(a_particle_flipUV.x > 0.5) v_uv.x = 1.0 - v_uv.x;
+            if(a_particle_flipUV.y > 0.5) v_uv.y = 1.0 - v_uv.y;
+            v_uv = v_uv * a_particle_tilingOffset.xy + a_particle_tilingOffset.zw;
+        #endif
+        
         return position;
     }
     
-    void main()                                     
-    {                                               
-        vec4 tmpvar_1;                        
-        tmpvar_1.w = 1.0;
-        tmpvar_1.xyz = _glesVertex.xyz;      
+    void main() 
+    {
+        vec4 position = vec4(_glesVertex.xyz, 1.0);
+        //输出uv
+        v_uv = _glesMultiTexCoord0.xy;
     
-        // tmpvar_1 = particleAnimation(tmpvar_1);
-               
-        xlv_COLOR = _glesColor;
-        xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;                     
-        gl_Position = (glstate_matrix_mvp * tmpvar_1);  
+        position = particleAnimation(position);
+    
+        //计算投影坐标
+        gl_Position = glstate_matrix_mvp * position;
     }
     `;
 
     fscode = `
     precision mediump float;
+
+    varying vec2 v_uv;
     
-    uniform sampler2D _MainTex;
     uniform vec4 _TintColor;
-    varying vec4 xlv_COLOR;
-    varying vec2 xlv_TEXCOORD0;          
-    void main() 
+    uniform sampler2D _MainTex;
+    uniform vec4 _MainTex_ST;
+    
+    varying vec4 v_particle_color;
+    
+    vec4 particleAnimation(vec4 color) {
+    
+        color.xyz = color.xyz * v_particle_color.xyz;
+        color.xyz = color.xyz * v_particle_color.www;
+        return color;
+    }
+    
+    void main()
     {
-        vec4 tmpvar_3 = xlv_COLOR*_TintColor*texture2D(_MainTex, xlv_TEXCOORD0);
-        gl_FragData[0] = 4.0*tmpvar_3;
+        vec4 finalColor = vec4(1.0, 1.0, 1.0, 1.0);
+    
+        finalColor = particleAnimation(finalColor);
+    
+        vec2 uv = v_uv;
+        uv = uv * _MainTex_ST.xy + _MainTex_ST.zw;
+        finalColor = 2.0 * finalColor * _TintColor * texture2D(_MainTex, uv);
+    
+        gl_FragColor = finalColor;
     }
     `;
 }

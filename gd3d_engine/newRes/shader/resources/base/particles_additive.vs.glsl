@@ -1,27 +1,26 @@
 precision mediump float;  
 
 //坐标属性
-attribute vec3 a_position;
-attribute vec2 a_uv;
+attribute vec3 _glesVertex;
+attribute vec2 _glesMultiTexCoord0;
+attribute vec4 _glesColor;
 
-uniform mat4 u_modelMatrix;
-uniform mat4 u_ITModelMatrix;
-uniform mat4 u_viewProjection;
+uniform mat4 glstate_matrix_mvp;
 
 varying vec2 v_uv;
 
 //
-attribute vec3 a_particle_position;
-attribute vec3 a_particle_scale;
-attribute vec3 a_particle_rotation;
-attribute vec4 a_particle_color;
+uniform vec4 a_particle_position;
+uniform vec4 a_particle_scale;
+uniform vec4 a_particle_rotation;
+uniform vec4 a_particle_color;
 
 #ifdef ENABLED_PARTICLE_SYSTEM_textureSheetAnimation
-    attribute vec4 a_particle_tilingOffset;
-    attribute vec2 a_particle_flipUV;
+    uniform vec4 a_particle_tilingOffset;
+    uniform vec2 a_particle_flipUV;
 #endif
 
-uniform mat3 u_particle_billboardMatrix;
+uniform mat4 u_particle_billboardMatrix;
 
 varying vec4 v_particle_color;
 
@@ -50,18 +49,18 @@ mat3 makeParticleRotationMatrix(vec3 rotation)
 vec4 particleAnimation(vec4 position) 
 {
     // 计算缩放
-    position.xyz = position.xyz * a_particle_scale;
+    position.xyz = position.xyz * a_particle_scale.xyz;
 
     // 计算旋转
-    mat3 rMat = makeParticleRotationMatrix(a_particle_rotation);
+    mat3 rMat = makeParticleRotationMatrix(a_particle_rotation.xyz);
     position.xyz = rMat * position.xyz;
-    position.xyz = u_particle_billboardMatrix * position.xyz;
+    position = u_particle_billboardMatrix * position;
 
     // 位移
-    position.xyz = position.xyz + a_particle_position;
+    position.xyz = position.xyz + a_particle_position.xyz;
 
     // 颜色
-    v_particle_color = a_particle_color;
+    v_particle_color = a_particle_color * _glesColor;
 
     #ifdef ENABLED_PARTICLE_SYSTEM_textureSheetAnimation
         if(a_particle_flipUV.x > 0.5) v_uv.x = 1.0 - v_uv.x;
@@ -74,14 +73,12 @@ vec4 particleAnimation(vec4 position)
 
 void main() 
 {
-    vec4 position = vec4(a_position, 1.0);
+    vec4 position = vec4(_glesVertex.xyz, 1.0);
     //输出uv
-    v_uv = a_uv;
+    v_uv = _glesMultiTexCoord0.xy;
 
     position = particleAnimation(position);
 
-    //获取全局坐标
-    vec4 worldPosition = u_modelMatrix * position;
     //计算投影坐标
-    gl_Position = u_viewProjection * worldPosition;
+    gl_Position = glstate_matrix_mvp * position;
 }

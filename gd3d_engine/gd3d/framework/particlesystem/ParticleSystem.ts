@@ -420,7 +420,7 @@ namespace gd3d.framework
             var tilingOffsets: number[] = [];
             var flipUVs: number[] = [];
 
-            var matrixModelViewProject = new Matrix4x4(context.matrixModelViewProject.rawData);
+            var matrixModelViewProject = new Matrix4x4(context.matrixModelViewProject.rawData.concat());
 
             for (let i = 0, n = this._activeParticles.length; i < n; i++)
             {
@@ -433,33 +433,20 @@ namespace gd3d.framework
                 tilingOffsets.push(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w);
                 flipUVs.push(particle.flipUV.x, particle.flipUV.y);
 
+                // test
+                // var u_particle_transfrom = new Matrix4x4().recompose([particle.position, particle.rotation.scaleNumberTo(Math.DEG2RAD), particle.size]);
+                // u_particle_transfrom.append(u_particle_billboardMatrix).append(matrixModelViewProject);
+                // context.matrixModelViewProject = new gd3d.math.matrix(u_particle_transfrom.rawData.concat());
                 //
-                var u_particle_transfrom = new Matrix4x4().recompose([particle.position, particle.rotation.scaleNumberTo(Math.DEG2RAD), particle.size]);
-                u_particle_transfrom.append(u_particle_billboardMatrix).append(matrixModelViewProject);
+                // context.matrixModelViewProject = new gd3d.math.matrix(matrixModelViewProject.rawData.concat());
 
-                context.matrixModelViewProject = new gd3d.math.matrix(u_particle_transfrom.rawData);
+                this.material.setVector4("a_particle_position", new math.vector4(particle.position.x, particle.position.y, particle.position.z, 1));
+                this.material.setVector4("a_particle_scale", new math.vector4(particle.size.x, particle.size.y, particle.size.z, 1));
+                this.material.setVector4("a_particle_rotation", new math.vector4(particle.rotation.x, particle.rotation.y, particle.rotation.z, 1));
+                this.material.setVector4("a_particle_color", new math.vector4(particle.color.r, particle.color.g, particle.color.b, particle.color.a));
+                this.material.setMatrix("u_particle_billboardMatrix", new math.matrix(u_particle_billboardMatrix.rawData.concat()))
 
-                let len = subMeshs.length;
-                let scene = tran.scene;
-                for (let j = 0; j < len; j++)
-                {
-                    let sm = subMeshs[j];
-                    let mid = subMeshs[j].matIndex;//根据这个找到使用的具体哪个材质    
-                    // let usemat = this.materials[mid];
-                    let usemat = this.material;
-                    let drawtype = scene.fog ? "base_fog" : "base";
-                    if (scene.fog)
-                    {
-                        context.fog = scene.fog;
-                    }
-                    if (usemat != null)
-                    {
-                        
-                        
-                        // usemat.setMatrix("u_particle_billboardMatrix", u_particle_billboardMatrix)
-                        usemat.draw(context, mesh, sm, drawtype);
-                    }
-                }
+                this.material.draw(context, mesh, subMeshs[0]);
             }
         }
 

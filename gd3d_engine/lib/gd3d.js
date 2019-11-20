@@ -12153,7 +12153,6 @@ var gd3d;
                 for (var key in pass.mapuniforms) {
                     var unifom = pass.mapuniforms[key];
                     if (lastMatSame && !material_2.sameMatPassMap[unifom.name]) {
-                        continue;
                     }
                     var func = gd3d.render.shaderUniform.applyuniformFunc[unifom.type];
                     var unifomValue = void 0;
@@ -29966,7 +29965,7 @@ var gd3d;
                 var colors = [];
                 var tilingOffsets = [];
                 var flipUVs = [];
-                var matrixModelViewProject = new framework.Matrix4x4(context.matrixModelViewProject.rawData);
+                var matrixModelViewProject = new framework.Matrix4x4(context.matrixModelViewProject.rawData.concat());
                 for (var i = 0, n = this._activeParticles.length; i < n; i++) {
                     var particle = this._activeParticles[i];
                     positions.push(particle.position.x, particle.position.y, particle.position.z);
@@ -29975,23 +29974,12 @@ var gd3d;
                     colors.push(particle.color.r, particle.color.g, particle.color.b, particle.color.a);
                     tilingOffsets.push(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w);
                     flipUVs.push(particle.flipUV.x, particle.flipUV.y);
-                    var u_particle_transfrom = new framework.Matrix4x4().recompose([particle.position, particle.rotation.scaleNumberTo(Math.DEG2RAD), particle.size]);
-                    u_particle_transfrom.append(u_particle_billboardMatrix).append(matrixModelViewProject);
-                    context.matrixModelViewProject = new gd3d.math.matrix(u_particle_transfrom.rawData);
-                    var len = subMeshs.length;
-                    var scene_3 = tran.scene;
-                    for (var j = 0; j < len; j++) {
-                        var sm = subMeshs[j];
-                        var mid = subMeshs[j].matIndex;
-                        var usemat = this.material;
-                        var drawtype = scene_3.fog ? "base_fog" : "base";
-                        if (scene_3.fog) {
-                            context.fog = scene_3.fog;
-                        }
-                        if (usemat != null) {
-                            usemat.draw(context, mesh, sm, drawtype);
-                        }
-                    }
+                    this.material.setVector4("a_particle_position", new gd3d.math.vector4(particle.position.x, particle.position.y, particle.position.z, 1));
+                    this.material.setVector4("a_particle_scale", new gd3d.math.vector4(particle.size.x, particle.size.y, particle.size.z, 1));
+                    this.material.setVector4("a_particle_rotation", new gd3d.math.vector4(particle.rotation.x, particle.rotation.y, particle.rotation.z, 1));
+                    this.material.setVector4("a_particle_color", new gd3d.math.vector4(particle.color.r, particle.color.g, particle.color.b, particle.color.a));
+                    this.material.setMatrix("u_particle_billboardMatrix", new gd3d.math.matrix(u_particle_billboardMatrix.rawData.concat()));
+                    this.material.draw(context, mesh, subMeshs[0]);
                 }
             };
             Object.defineProperty(ParticleSystem.prototype, "rateAtDuration", {
