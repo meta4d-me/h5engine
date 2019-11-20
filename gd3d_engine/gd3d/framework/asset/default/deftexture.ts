@@ -6,6 +6,7 @@ namespace gd3d.framework
         static readonly gray = "gray";
         static readonly normal = "normal";
         static readonly grid = "grid";
+        static readonly particle = "particle";
 
         static initDefaultTexture(assetmgr: assetMgr)
         {
@@ -28,6 +29,11 @@ namespace gd3d.framework
             t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, this.grid);
             t.defaultAsset = true;
             assetmgr.mapDefaultTexture[this.grid] = t;
+
+            var t = new texture(this.particle);
+            t.glTexture = gd3d.render.glTexture2D.particleTexture(assetmgr.webgl, this.grid);
+            t.defaultAsset = true;
+            assetmgr.mapDefaultTexture[this.particle] = t;
 
             //must in end
             defTexture.initDefaultCubeTexture(assetmgr);

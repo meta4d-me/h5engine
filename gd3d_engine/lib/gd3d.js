@@ -9268,6 +9268,10 @@ var gd3d;
                 t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, this.grid);
                 t.defaultAsset = true;
                 assetmgr.mapDefaultTexture[this.grid] = t;
+                var t = new framework.texture(this.particle);
+                t.glTexture = gd3d.render.glTexture2D.particleTexture(assetmgr.webgl, this.grid);
+                t.defaultAsset = true;
+                assetmgr.mapDefaultTexture[this.particle] = t;
                 defTexture.initDefaultCubeTexture(assetmgr);
             };
             defTexture.initDefaultCubeTexture = function (assetmgr) {
@@ -9282,6 +9286,7 @@ var gd3d;
             defTexture.gray = "gray";
             defTexture.normal = "normal";
             defTexture.grid = "grid";
+            defTexture.particle = "particle";
             return defTexture;
         }());
         framework.defTexture = defTexture;
@@ -43851,6 +43856,32 @@ var gd3d;
                     }
                 }
                 t.uploadByteArray(mipmap, linear, width, height, data);
+                glTexture2D.mapTexture[name] = t;
+                return t;
+            };
+            glTexture2D.particleTexture = function (webgl, name) {
+                var t = glTexture2D.mapTexture[name];
+                if (t != undefined)
+                    return t;
+                var mipmap = false;
+                var linear = true;
+                t = new glTexture2D(webgl, TextureFormatEnum.RGBA, mipmap, linear);
+                var size = 64;
+                var data = new Uint8Array(size * size);
+                var half = size / 2;
+                for (var i = 0; i < size; i++) {
+                    for (var j = 0; j < size; j++) {
+                        var l = Math.clamp(gd3d.math.vec2Length(new gd3d.math.vector2(i - half, j - half)), 0, half) / half;
+                        var f = 1 - l;
+                        f = f * f;
+                        var pos = (i + j * size) * 4;
+                        data[pos] = f * 255;
+                        data[pos + 1] = f * 255;
+                        data[pos + 2] = f * 255;
+                        data[pos + 3] = 255;
+                    }
+                }
+                t.uploadByteArray(mipmap, linear, size, size, data);
                 glTexture2D.mapTexture[name] = t;
                 return t;
             };

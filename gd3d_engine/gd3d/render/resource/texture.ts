@@ -587,6 +587,45 @@
             glTexture2D.mapTexture[name] = t;
             return t;
         }
+        
+        static particleTexture(webgl: WebGLRenderingContext, name: string)
+        {
+            var t = glTexture2D.mapTexture[name];
+            if (t != undefined)
+                return t;
+
+            var mipmap = false;
+            var linear = true;
+            t = new glTexture2D(webgl, TextureFormatEnum.RGBA, mipmap, linear);
+
+            var size = 64
+            
+            var data = new Uint8Array(size * size);
+            var half = size / 2;
+            for (let i = 0; i < size; i++)
+            {
+                for (let j = 0; j < size; j++)
+                {
+                    var l = Math.clamp(math.vec2Length(new math.vector2(i - half, j - half)), 0, half) / half;
+                    // l = l * l;
+                    var f = 1 - l;
+                    f = f * f;
+                    // f = f * f * f;
+                    // f = - 8 / 3 * f * f * f + 4 * f * f - f / 3;
+
+                    var pos = (i + j * size) * 4;
+                    data[pos] = f * 255;
+                    data[pos + 1] = f * 255;
+                    data[pos + 2] = f * 255;
+                    data[pos + 3] = 255;
+                }
+            }
+
+            t.uploadByteArray(mipmap, linear, size, size, data);
+
+            glTexture2D.mapTexture[name] = t;
+            return t;
+        }
     }
 
     export class glTextureCube implements ITexture

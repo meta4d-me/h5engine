@@ -54,7 +54,8 @@ class test_ParticleSystem implements IState
         var mat = new gd3d.framework.material("defparticle1");
         var shader = this.initParticleShader();
         mat.setShader(shader);
-        var tex = this.astMgr.getDefaultTexture("grid");
+
+        var tex = this.astMgr.getDefaultTexture(gd3d.framework.defTexture.particle);
         mat.setTexture("_MainTex", tex);
         //
         let ps = tran.gameObject.getComponent("ParticleSystem") as gd3d.framework.ParticleSystem;
