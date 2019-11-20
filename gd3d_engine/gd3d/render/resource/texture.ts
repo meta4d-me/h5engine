@@ -588,7 +588,7 @@
             return t;
         }
         
-        static particleTexture(webgl: WebGLRenderingContext, name: string)
+        static particleTexture(webgl: WebGLRenderingContext,name = framework.defTexture.particle)
         {
             var t = glTexture2D.mapTexture[name];
             if (t != undefined)
@@ -600,7 +600,7 @@
 
             var size = 64
             
-            var data = new Uint8Array(size * size);
+            var data = new Uint8Array(size * size * 4);
             var half = size / 2;
             for (let i = 0; i < size; i++)
             {

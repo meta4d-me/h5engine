@@ -8521,7 +8521,7 @@ declare namespace gd3d.render {
         private static mapTexture;
         static formGrayArray(webgl: WebGLRenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number): glTexture2D;
         static staticTexture(webgl: WebGLRenderingContext, name: string): glTexture2D;
-        static particleTexture(webgl: WebGLRenderingContext, name: string): glTexture2D;
+        static particleTexture(webgl: WebGLRenderingContext, name?: string): glTexture2D;
     }
     class glTextureCube implements ITexture {
         constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);

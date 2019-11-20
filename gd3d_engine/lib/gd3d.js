@@ -9269,7 +9269,7 @@ var gd3d;
                 t.defaultAsset = true;
                 assetmgr.mapDefaultTexture[this.grid] = t;
                 var t = new framework.texture(this.particle);
-                t.glTexture = gd3d.render.glTexture2D.particleTexture(assetmgr.webgl, this.grid);
+                t.glTexture = gd3d.render.glTexture2D.particleTexture(assetmgr.webgl);
                 t.defaultAsset = true;
                 assetmgr.mapDefaultTexture[this.particle] = t;
                 defTexture.initDefaultCubeTexture(assetmgr);
@@ -43874,6 +43874,7 @@ var gd3d;
                 return t;
             };
             glTexture2D.particleTexture = function (webgl, name) {
+                if (name === void 0) { name = gd3d.framework.defTexture.particle; }
                 var t = glTexture2D.mapTexture[name];
                 if (t != undefined)
                     return t;
@@ -43881,7 +43882,7 @@ var gd3d;
                 var linear = true;
                 t = new glTexture2D(webgl, TextureFormatEnum.RGBA, mipmap, linear);
                 var size = 64;
-                var data = new Uint8Array(size * size);
+                var data = new Uint8Array(size * size * 4);
                 var half = size / 2;
                 for (var i = 0; i < size; i++) {
                     for (var j = 0; j < size; j++) {

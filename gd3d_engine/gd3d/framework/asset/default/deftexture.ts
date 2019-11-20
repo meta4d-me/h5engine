@@ -31,7 +31,7 @@ namespace gd3d.framework
             assetmgr.mapDefaultTexture[this.grid] = t;
 
             var t = new texture(this.particle);
-            t.glTexture = gd3d.render.glTexture2D.particleTexture(assetmgr.webgl, this.grid);
+            t.glTexture = gd3d.render.glTexture2D.particleTexture(assetmgr.webgl);
             t.defaultAsset = true;
             assetmgr.mapDefaultTexture[this.particle] = t;
 
