@@ -324,7 +324,7 @@ namespace gd3d.framework
             let ray = camera.creatRayByScreen(screenPos,this.gameObject.getScene().app);
             let ModelPos = gd3d.math.pool.new_vector2();
             this.pickModelPos(ray,ModelPos);
-            this.canvas.ModelPosToCanvasPos(ModelPos,outCanvasPos);
+            this.canvas.clipPosToCanvasPos(ModelPos,outCanvasPos);
 
             gd3d.math.pool.delete_vector2(ModelPos);
         }

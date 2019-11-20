@@ -280,12 +280,12 @@ namespace gd3d.framework
             let minPos = poolv2();
             minPos.x = this.min_x;
             minPos.y = this.max_y;
-            canvas.ModelPosToCanvasPos(minPos,minPos);
+            canvas.clipPosToCanvasPos(minPos,minPos);
 
             let maxPos = poolv2();
             maxPos.x = this.max_x;
             maxPos.y = this.min_y;
-            canvas.ModelPosToCanvasPos(maxPos,maxPos);
+            canvas.clipPosToCanvasPos(maxPos,maxPos);
 
             this._darwRect.x = minPos.x;
             this._darwRect.y = minPos.y;
