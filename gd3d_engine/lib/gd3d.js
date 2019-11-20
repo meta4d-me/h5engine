@@ -29989,7 +29989,6 @@ var gd3d;
                             context.fog = scene_3.fog;
                         }
                         if (usemat != null) {
-                            usemat.setMatrix("u_particle_billboardMatrix", u_particle_billboardMatrix);
                             usemat.draw(context, mesh, sm, drawtype);
                         }
                     }

@@ -117,23 +117,25 @@ class test_ParticleSystem implements IState
     }
 
     vscode = `
-    attribute highp vec4 _glesVertex;
-    attribute mediump vec4 _glesMultiTexCoord0;   
-    attribute lowp vec4 _glesColor;                   
-    uniform highp mat4 glstate_matrix_mvp;      
+    precision mediump float;
     
-    uniform highp vec3 a_particle_position;
-    uniform highp vec3 a_particle_scale;
-    uniform highp vec3 a_particle_rotation;
-    uniform highp vec4 a_particle_color;
+    attribute vec4 _glesVertex;
+    attribute vec4 _glesMultiTexCoord0;   
+    attribute vec4 _glesColor;                   
+    uniform mat4 glstate_matrix_mvp;      
     
-    uniform highp mat4 u_particle_billboardMatrix;
+    uniform vec3 a_particle_position;
+    uniform vec3 a_particle_scale;
+    uniform vec3 a_particle_rotation;
+    uniform vec4 a_particle_color;
     
-    varying lowp vec4 xlv_COLOR;
-    varying mediump vec2 xlv_TEXCOORD0;           
+    uniform mat4 u_particle_billboardMatrix;
+    
+    varying vec4 xlv_COLOR;
+    varying vec2 xlv_TEXCOORD0;           
     
     
-    mat3 makeParticleRotationMatrix(highp vec3 rotation)
+    mat3 makeParticleRotationMatrix(vec3 rotation)
     {
         float DEG2RAD = 3.1415926 / 180.0;
         
@@ -176,7 +178,7 @@ class test_ParticleSystem implements IState
     
     void main()                                     
     {                                               
-        highp vec4 tmpvar_1;                        
+        vec4 tmpvar_1;                        
         tmpvar_1.w = 1.0;
         tmpvar_1.xyz = _glesVertex.xyz;      
     
@@ -189,13 +191,15 @@ class test_ParticleSystem implements IState
     `;
 
     fscode = `
-    uniform mediump sampler2D _MainTex;
-    uniform lowp vec4 _TintColor;
-    varying lowp vec4 xlv_COLOR;
-    varying mediump vec2 xlv_TEXCOORD0;          
+    precision mediump float;
+    
+    uniform sampler2D _MainTex;
+    uniform vec4 _TintColor;
+    varying vec4 xlv_COLOR;
+    varying vec2 xlv_TEXCOORD0;          
     void main() 
     {
-        lowp vec4 tmpvar_3 = xlv_COLOR*_TintColor*texture2D(_MainTex, xlv_TEXCOORD0);
+        vec4 tmpvar_3 = xlv_COLOR*_TintColor*texture2D(_MainTex, xlv_TEXCOORD0);
         gl_FragData[0] = 4.0*tmpvar_3;
     }
     `;

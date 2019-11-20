@@ -456,7 +456,7 @@ namespace gd3d.framework
                     {
                         
                         
-                        usemat.setMatrix("u_particle_billboardMatrix", u_particle_billboardMatrix)
+                        // usemat.setMatrix("u_particle_billboardMatrix", u_particle_billboardMatrix)
                         usemat.draw(context, mesh, sm, drawtype);
                     }
                 }

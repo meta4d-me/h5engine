@@ -1,20 +1,31 @@
-attribute highp vec4 _glesVertex;
-attribute mediump vec4 _glesMultiTexCoord0;   
-attribute lowp vec4 _glesColor;                   
-uniform highp mat4 glstate_matrix_mvp;      
+precision mediump float;  
 
-uniform highp vec3 a_particle_position;
-uniform highp vec3 a_particle_scale;
-uniform highp vec3 a_particle_rotation;
-uniform highp vec4 a_particle_color;
+//坐标属性
+attribute vec3 a_position;
+attribute vec2 a_uv;
 
-uniform highp mat4 u_particle_billboardMatrix;
+uniform mat4 u_modelMatrix;
+uniform mat4 u_ITModelMatrix;
+uniform mat4 u_viewProjection;
 
-varying lowp vec4 xlv_COLOR;
-varying mediump vec2 xlv_TEXCOORD0;           
+varying vec2 v_uv;
 
+//
+attribute vec3 a_particle_position;
+attribute vec3 a_particle_scale;
+attribute vec3 a_particle_rotation;
+attribute vec4 a_particle_color;
 
-mat3 makeParticleRotationMatrix(highp vec3 rotation)
+#ifdef ENABLED_PARTICLE_SYSTEM_textureSheetAnimation
+    attribute vec4 a_particle_tilingOffset;
+    attribute vec2 a_particle_flipUV;
+#endif
+
+uniform mat3 u_particle_billboardMatrix;
+
+varying vec4 v_particle_color;
+
+mat3 makeParticleRotationMatrix(vec3 rotation)
 {
     float DEG2RAD = 3.1415926 / 180.0;
     
@@ -44,26 +55,33 @@ vec4 particleAnimation(vec4 position)
     // 计算旋转
     mat3 rMat = makeParticleRotationMatrix(a_particle_rotation);
     position.xyz = rMat * position.xyz;
-    position = u_particle_billboardMatrix * position;
+    position.xyz = u_particle_billboardMatrix * position.xyz;
 
     // 位移
     position.xyz = position.xyz + a_particle_position;
 
     // 颜色
-    // v_particle_color = a_particle_color;
+    v_particle_color = a_particle_color;
 
+    #ifdef ENABLED_PARTICLE_SYSTEM_textureSheetAnimation
+        if(a_particle_flipUV.x > 0.5) v_uv.x = 1.0 - v_uv.x;
+        if(a_particle_flipUV.y > 0.5) v_uv.y = 1.0 - v_uv.y;
+        v_uv = v_uv * a_particle_tilingOffset.xy + a_particle_tilingOffset.zw;
+    #endif
+    
     return position;
 }
 
-void main()                                     
-{                                               
-    highp vec4 tmpvar_1;                        
-    tmpvar_1.w = 1.0;
-    tmpvar_1.xyz = _glesVertex.xyz;      
+void main() 
+{
+    vec4 position = vec4(a_position, 1.0);
+    //输出uv
+    v_uv = a_uv;
 
-    // tmpvar_1 = particleAnimation(tmpvar_1);
-           
-    xlv_COLOR = _glesColor;
-	xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;                     
-    gl_Position = (glstate_matrix_mvp * tmpvar_1);  
+    position = particleAnimation(position);
+
+    //获取全局坐标
+    vec4 worldPosition = u_modelMatrix * position;
+    //计算投影坐标
+    gl_Position = u_viewProjection * worldPosition;
 }
