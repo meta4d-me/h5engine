@@ -3905,17 +3905,11 @@ var test_ParticleSystem = (function () {
     test_ParticleSystem.prototype.start = function (app) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        this.app = app;
-                        this.scene = this.app.getScene();
-                        this.astMgr = this.app.getAssetMgr();
-                        return [4, demoTool.loadbySync("newRes/shader/shader.assetbundle.json", this.astMgr)];
-                    case 1:
-                        _a.sent();
-                        this.init();
-                        return [2];
-                }
+                this.app = app;
+                this.scene = this.app.getScene();
+                this.astMgr = this.app.getAssetMgr();
+                this.init();
+                return [2];
             });
         });
     };
@@ -3952,6 +3946,43 @@ var test_ParticleSystem = (function () {
             mr = tran.gameObject.addComponent("meshRenderer");
         mr.materials[0] = mat_white;
         mf.mesh = this.astMgr.getDefaultMesh("cube");
+        this.initParticleSystem();
+    };
+    test_ParticleSystem.prototype.initParticleSystem = function () {
+        var tran = new gd3d.framework.transform();
+        tran.name = "ParticleSystem";
+        this.scene.addChild(tran);
+        var mat = new gd3d.framework.material("defparticle1");
+        var shader = this.initParticleShader();
+        mat.setShader(shader);
+        var tex = this.astMgr.getDefaultTexture("grid");
+        mat.setTexture("_MainTex", tex);
+        var ps = tran.gameObject.getComponent("ParticleSystem");
+        if (!ps)
+            ps = tran.gameObject.addComponent("ParticleSystem");
+        ps.material = mat;
+        ps.play();
+    };
+    test_ParticleSystem.prototype.initParticleShader = function () {
+        var assetmgr = this.astMgr;
+        var pool = this.astMgr.shaderPool;
+        pool.compileVS(assetmgr.webgl, "particles_additive1", this.vscode);
+        pool.compileFS(assetmgr.webgl, "particles_additive1", this.fscode);
+        var program = pool.linkProgram(assetmgr.webgl, "particles_additive1", "particles_additive1");
+        var sh = new gd3d.framework.shader("shader/particles_additive1");
+        sh.defaultAsset = true;
+        sh.passes["base"] = [];
+        var p = new gd3d.render.glDrawPass();
+        p.setProgram(program);
+        sh.passes["base"].push(p);
+        sh.fillUnDefUniform(p);
+        p.state_ztest = true;
+        p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
+        p.state_zwrite = true;
+        p.state_showface = gd3d.render.ShowFaceStateEnum.CCW;
+        p.setAlphaBlend(gd3d.render.BlendModeEnum.Close);
+        assetmgr.mapShader[sh.getName()] = sh;
+        return sh;
     };
     test_ParticleSystem.prototype.update = function (delta) {
     };

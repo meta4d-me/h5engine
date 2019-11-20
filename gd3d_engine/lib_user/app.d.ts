@@ -617,6 +617,8 @@ declare class test_ParticleSystem implements IState {
     astMgr: gd3d.framework.assetMgr;
     start(app: gd3d.framework.application): Promise<void>;
     private init;
+    private initParticleSystem;
+    private initParticleShader;
     update(delta: number): void;
     vscode: string;
     fscode: string;
