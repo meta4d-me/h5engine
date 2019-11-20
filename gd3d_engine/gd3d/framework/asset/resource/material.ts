@@ -199,12 +199,14 @@ namespace gd3d.framework
         uploadUnifoms(pass: render.glDrawPass, context: renderContext , lastMatSame = false)
         {
             render.shaderUniform.texindex = 0;
+            let udMap = this.uniformDirtyMap;
             for (let key in pass.mapuniforms)
             {
                 let unifom = pass.mapuniforms[key];
-                if(lastMatSame && !material.sameMatPassMap[unifom.name]){
+                if(lastMatSame && !material.sameMatPassMap[unifom.name] && !udMap[unifom.name]){
                     // continue;
                 }
+                udMap[unifom.name] = false;  //标记为 没有 变化
 
                 let func = render.shaderUniform.applyuniformFunc[unifom.type];
                 let unifomValue: any;
@@ -330,6 +332,9 @@ namespace gd3d.framework
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float)
             {
                 this.statedMapUniforms[_id] = _number;
+                if(this.statedMapUniforms[_id] != _number){
+                    this.uniformDirtyMap[_id] = true;
+                }
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -343,6 +348,7 @@ namespace gd3d.framework
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Floatv)
             {
                 this.statedMapUniforms[_id] = _numbers;
+                this.uniformDirtyMap[_id] = true;
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -356,6 +362,7 @@ namespace gd3d.framework
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4)
             {
                 this.statedMapUniforms[_id] = _vector4;
+                this.uniformDirtyMap[_id] = true;
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -369,6 +376,8 @@ namespace gd3d.framework
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4v)
             {
                 this.statedMapUniforms[_id] = _vector4v;
+                this.uniformDirtyMap[_id] = true;
+
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -382,6 +391,8 @@ namespace gd3d.framework
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4)
             {
                 this.statedMapUniforms[_id] = _matrix;
+                this.uniformDirtyMap[_id] = true;
+
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -395,6 +406,8 @@ namespace gd3d.framework
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4v)
             {
                 this.statedMapUniforms[_id] = _matrixv;
+                this.uniformDirtyMap[_id] = true;
+
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -430,6 +443,8 @@ namespace gd3d.framework
                         this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
                 }
+                this.uniformDirtyMap[_id] = true;
+
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -460,11 +475,14 @@ namespace gd3d.framework
                         this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
                 }
+                this.uniformDirtyMap[_id] = true;
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
         }
+
+        private uniformDirtyMap : {[id:string]:boolean} = {};//值变化标记map
 
         private static lastDrawMatID = -1;
         private static lastDrawMeshID = -1;
