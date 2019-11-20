@@ -204,7 +204,7 @@ namespace gd3d.framework
             {
                 let unifom = pass.mapuniforms[key];
                 if(lastMatSame && !material.sameMatPassMap[unifom.name] && !udMap[unifom.name]){
-                    // continue;
+                    continue;
                 }
                 udMap[unifom.name] = false;  //标记为 没有 变化
 

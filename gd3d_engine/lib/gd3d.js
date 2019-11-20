@@ -12076,6 +12076,7 @@ var gd3d;
                 this.defaultAsset = false;
                 this.queue = 0;
                 this.statedMapUniforms = {};
+                this.uniformDirtyMap = {};
                 if (!assetName) {
                     assetName = "material_" + this.getGUID();
                 }
@@ -12155,10 +12156,13 @@ var gd3d;
             material.prototype.uploadUnifoms = function (pass, context, lastMatSame) {
                 if (lastMatSame === void 0) { lastMatSame = false; }
                 gd3d.render.shaderUniform.texindex = 0;
+                var udMap = this.uniformDirtyMap;
                 for (var key in pass.mapuniforms) {
                     var unifom = pass.mapuniforms[key];
-                    if (lastMatSame && !material_2.sameMatPassMap[unifom.name]) {
+                    if (lastMatSame && !material_2.sameMatPassMap[unifom.name] && !udMap[unifom.name]) {
+                        continue;
                     }
+                    udMap[unifom.name] = false;
                     var func = gd3d.render.shaderUniform.applyuniformFunc[unifom.type];
                     var unifomValue = void 0;
                     if (framework.uniformSetter.autoUniformDic[unifom.name] != null) {
@@ -12198,6 +12202,9 @@ var gd3d;
             material.prototype.setFloat = function (_id, _number) {
                 if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == gd3d.render.UniformTypeEnum.Float) {
                     this.statedMapUniforms[_id] = _number;
+                    if (this.statedMapUniforms[_id] != _number) {
+                        this.uniformDirtyMap[_id] = true;
+                    }
                 }
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -12206,6 +12213,7 @@ var gd3d;
             material.prototype.setFloatv = function (_id, _numbers) {
                 if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == gd3d.render.UniformTypeEnum.Floatv) {
                     this.statedMapUniforms[_id] = _numbers;
+                    this.uniformDirtyMap[_id] = true;
                 }
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -12214,6 +12222,7 @@ var gd3d;
             material.prototype.setVector4 = function (_id, _vector4) {
                 if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == gd3d.render.UniformTypeEnum.Float4) {
                     this.statedMapUniforms[_id] = _vector4;
+                    this.uniformDirtyMap[_id] = true;
                 }
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -12222,6 +12231,7 @@ var gd3d;
             material.prototype.setVector4v = function (_id, _vector4v) {
                 if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == gd3d.render.UniformTypeEnum.Float4v) {
                     this.statedMapUniforms[_id] = _vector4v;
+                    this.uniformDirtyMap[_id] = true;
                 }
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -12230,6 +12240,7 @@ var gd3d;
             material.prototype.setMatrix = function (_id, _matrix) {
                 if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == gd3d.render.UniformTypeEnum.Float4x4) {
                     this.statedMapUniforms[_id] = _matrix;
+                    this.uniformDirtyMap[_id] = true;
                 }
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -12238,6 +12249,7 @@ var gd3d;
             material.prototype.setMatrixv = function (_id, _matrixv) {
                 if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == gd3d.render.UniformTypeEnum.Float4x4v) {
                     this.statedMapUniforms[_id] = _matrixv;
+                    this.uniformDirtyMap[_id] = true;
                 }
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -12263,6 +12275,7 @@ var gd3d;
                             this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                         }
                     }
+                    this.uniformDirtyMap[_id] = true;
                 }
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -12284,6 +12297,7 @@ var gd3d;
                             this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                         }
                     }
+                    this.uniformDirtyMap[_id] = true;
                 }
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);

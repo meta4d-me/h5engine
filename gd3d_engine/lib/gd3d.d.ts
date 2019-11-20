@@ -2368,6 +2368,7 @@ declare namespace gd3d.framework {
         setMatrixv(_id: string, _matrixv: Float32Array): void;
         setTexture(_id: string, _texture: gd3d.framework.texture, resname?: string): void;
         setCubeTexture(_id: string, _texture: gd3d.framework.texture): void;
+        private uniformDirtyMap;
         private static lastDrawMatID;
         private static lastDrawMeshID;
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string): void;
