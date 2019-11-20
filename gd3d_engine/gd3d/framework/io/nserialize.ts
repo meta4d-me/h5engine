@@ -43,7 +43,7 @@ namespace gd3d.io
             for (let i = 0, len = json.children.length; i < len; ++i)
             {
                 var ctrans = createTrasn(json.children[i], gos, instMap);
-                (<any>node).addChild(ctrans);
+                node.addChild(ctrans);
                 fullTrasn(json.children[i], ctrans, gos, instMap, bundlename);
             }
         }

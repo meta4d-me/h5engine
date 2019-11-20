@@ -17,7 +17,6 @@ class test_ParticleSystem implements IState
         await demoTool.loadbySync(`newRes/shader/shader.assetbundle.json`,this.astMgr);
         // await demoTool.loadbySync(`res/f14effprefab/customShader/customShader.assetbundle.json`,this.astMgr);
         //res/f14effprefab/customShader/customShader.assetbundle.json
-        debugger;
         //
         this.init();
     }
@@ -63,54 +62,54 @@ class test_ParticleSystem implements IState
         // this.initParticleSystem();
     }
 
-    private initParticleSystem()
-    {
-        let tran = new gd3d.framework.transform();
-        tran.name = "ParticleSystem";
-        this.scene.addChild(tran);
+    // private initParticleSystem()
+    // {
+    //     let tran = new gd3d.framework.transform();
+    //     tran.name = "ParticleSystem";
+    //     this.scene.addChild(tran);
 
-        // 新建粒子材质
-        var mat = new gd3d.framework.material("defparticle1");
-        var shader = this.initParticleShader();
-        mat.setShader(shader);
-        var tex = this.astMgr.getDefaultTexture("grid");
-        mat.setTexture("_MainTex", tex);
-        //
-        let ps = tran.gameObject.getComponent("ParticleSystem") as gd3d.framework.ParticleSystem;
-        if (!ps) ps = tran.gameObject.addComponent("ParticleSystem") as any;
-        //
-        ps.material = mat;
-        // ps.mesh = this.astMgr.getDefaultMesh("cube");
-        ps.play();
-    }
+    //     // 新建粒子材质
+    //     var mat = new gd3d.framework.material("defparticle1");
+    //     var shader = this.initParticleShader();
+    //     mat.setShader(shader);
+    //     var tex = this.astMgr.getDefaultTexture("grid");
+    //     mat.setTexture("_MainTex", tex);
+    //     //
+    //     let ps = tran.gameObject.getComponent("ParticleSystem") as gd3d.framework.ParticleSystem;
+    //     if (!ps) ps = tran.gameObject.addComponent("ParticleSystem") as any;
+    //     //
+    //     ps.material = mat;
+    //     // ps.mesh = this.astMgr.getDefaultMesh("cube");
+    //     ps.play();
+    // }
 
-    private initParticleShader()
-    {
-        var assetmgr = this.astMgr;
-        var pool = this.astMgr.shaderPool;
+    // private initParticleShader()
+    // {
+    //     var assetmgr = this.astMgr;
+    //     var pool = this.astMgr.shaderPool;
 
-        pool.compileVS(assetmgr.webgl, "particles_additive1", this.vscode);
-        pool.compileFS(assetmgr.webgl, "particles_additive1", this.fscode);
-        var program = pool.linkProgram(assetmgr.webgl, "particles_additive1", "particles_additive1");
+    //     pool.compileVS(assetmgr.webgl, "particles_additive1", this.vscode);
+    //     pool.compileFS(assetmgr.webgl, "particles_additive1", this.fscode);
+    //     var program = pool.linkProgram(assetmgr.webgl, "particles_additive1", "particles_additive1");
 
-        var sh = new gd3d.framework.shader("shader/particles_additive1");
-        sh.defaultAsset = true;
-        sh.passes["base"] = [];
-        var p = new gd3d.render.glDrawPass();
-        p.setProgram(program);
-        sh.passes["base"].push(p);
-        sh.fillUnDefUniform(p);
-        //sh._parseProperties(assetmgr,JSON.parse(this.shader0).properties);
-        p.state_ztest = true;
-        p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
-        p.state_zwrite = true;
-        p.state_showface = gd3d.render.ShowFaceStateEnum.CCW;
-        p.setAlphaBlend(gd3d.render.BlendModeEnum.Close);
-        //p.uniformTexture("_MainTex", null);
-        assetmgr.mapShader[sh.getName()] = sh;
+    //     var sh = new gd3d.framework.shader("shader/particles_additive1");
+    //     sh.defaultAsset = true;
+    //     sh.passes["base"] = [];
+    //     var p = new gd3d.render.glDrawPass();
+    //     p.setProgram(program);
+    //     sh.passes["base"].push(p);
+    //     sh.fillUnDefUniform(p);
+    //     //sh._parseProperties(assetmgr,JSON.parse(this.shader0).properties);
+    //     p.state_ztest = true;
+    //     p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
+    //     p.state_zwrite = true;
+    //     p.state_showface = gd3d.render.ShowFaceStateEnum.CCW;
+    //     p.setAlphaBlend(gd3d.render.BlendModeEnum.Close);
+    //     //p.uniformTexture("_MainTex", null);
+    //     assetmgr.mapShader[sh.getName()] = sh;
 
-        return sh;
-    }
+    //     return sh;
+    // }
 
     update(delta: number)
     {

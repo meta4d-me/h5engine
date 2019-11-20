@@ -13181,15 +13181,12 @@ var gd3d;
             };
             prefab.prototype.cParse = function (data) {
                 this.jsonstr = data;
-                if (data.cls == "transform") {
+                if (data.cls == "transform")
                     this.trans = new framework.transform;
-                    this.trans.addChild(gd3d.io.ndeSerialize(data, this.assetbundle));
-                }
-                else {
+                else
                     this.trans = new framework.transform2D;
-                    this.trans.addChild(gd3d.io.ndeSerialize(data, this.assetbundle));
-                }
                 console.log("cparse:" + this.name.getText());
+                this.trans.addChild(gd3d.io.ndeSerialize(data, this.assetbundle));
             };
             prefab.ClassName = "prefab";
             prefab = __decorate([
@@ -38391,6 +38388,7 @@ var gd3d;
                 }
                 catch (e) {
                     throw e;
+                    return false;
                 }
             };
             scene.prototype.enable2DPhysics = function (gravity, physicOption) {
@@ -38405,6 +38403,7 @@ var gd3d;
                 }
                 catch (e) {
                     throw e;
+                    return false;
                 }
             };
             return scene;

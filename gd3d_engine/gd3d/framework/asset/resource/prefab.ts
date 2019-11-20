@@ -209,17 +209,12 @@
         {
             this.jsonstr = data;
             if (data.cls == "transform")
-            {
                 this.trans = new transform;
-                this.trans.addChild(io.ndeSerialize(data, this.assetbundle));
-            }
             else
-            {
                 this.trans = new transform2D;
-                this.trans.addChild(io.ndeSerialize(data, this.assetbundle));
-            }
 
             console.log(`cparse:${this.name.getText()}`);
+            this.trans.addChild(io.ndeSerialize(data, this.assetbundle));
         }
     }
 }

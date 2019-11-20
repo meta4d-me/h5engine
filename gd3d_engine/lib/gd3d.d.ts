@@ -1572,6 +1572,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    type loadCallback = (state?: stateLoad) => void;
     const assetParseMap: {
         [key: number]: IAssetFactory;
     };
@@ -1591,7 +1592,7 @@ declare namespace gd3d.framework {
                 url?: string;
                 readyok: boolean;
                 data?: any;
-                cbQueue?: ((state?: stateLoad) => void)[];
+                cbQueue?: loadCallback[];
                 subRes?: number[];
             };
         };
@@ -1624,7 +1625,7 @@ declare namespace gd3d.framework {
             [id: string]: shader;
         };
         static initGuidList(): void;
-        load(url: string, type?: AssetTypeEnum, onstate?: (state?: stateLoad) => void, downloadFinish?: () => void): void;
+        load(url: string, type?: AssetTypeEnum, onstate?: loadCallback, downloadFinish?: () => void): void;
         download(guid: number, url: string, type: AssetTypeEnum, finish: () => void): void;
         loadImg(guid: number, url: string, cb: (img: any) => void): void;
         protected _loadImg(url: string, cb: (img: any) => void): void;
