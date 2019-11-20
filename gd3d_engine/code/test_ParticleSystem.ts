@@ -3,7 +3,6 @@
  */
 class test_ParticleSystem implements IState
 {
-
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
@@ -48,6 +47,8 @@ class test_ParticleSystem implements IState
     {
         let tran = new gd3d.framework.transform();
         tran.name = "ParticleSystem";
+        gd3d.math.quatFromAxisAngle(new gd3d.math.vector3(1, 0, 0), -90, tran.localRotate);
+        tran.localRotate = tran.localRotate;
         this.scene.addChild(tran);
 
         // 新建粒子材质
@@ -62,7 +63,15 @@ class test_ParticleSystem implements IState
         if (!ps) ps = tran.gameObject.addComponent("ParticleSystem") as any;
         //
         ps.material = mat;
-        // ps.mesh = this.astMgr.getDefaultMesh("cube");
+        ps.mesh = this.astMgr.getDefaultMesh("cube");
+
+        //
+        ps.colorOverLifetime.enabled = true;
+        ps.colorOverLifetime.color.mode = gd3d.framework.MinMaxGradientMode.Gradient;
+        ps.colorOverLifetime.color.gradient.colorKeys[0].color.setTo(1, 0, 0);
+        ps.colorOverLifetime.color.gradient.colorKeys[1].color.setTo(0, 1, 0);
+
+        //
         ps.play();
     }
 
@@ -87,7 +96,7 @@ class test_ParticleSystem implements IState
         p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
         p.state_zwrite = false;
         p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
-        p.setAlphaBlend(gd3d.render.BlendModeEnum.Close);
+        p.setAlphaBlend(gd3d.render.BlendModeEnum.Add);
         //p.uniformTexture("_MainTex", null);
         assetmgr.mapShader[sh.getName()] = sh;
 
