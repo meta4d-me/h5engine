@@ -29884,7 +29884,7 @@ var gd3d;
             ParticleSystem.prototype.update = function (interval) {
                 if (!this.isPlaying)
                     return;
-                this.time = this.time + this.main.simulationSpeed * interval / 1000;
+                this.time = this.time + this.main.simulationSpeed * interval;
                 this._realTime = this.time - this.startDelay;
                 this._updateActiveParticlesState();
                 if (this.main.loop && Math.floor(this._preRealTime / this.main.duration) < Math.floor(this._realTime / this.main.duration)) {
@@ -29956,9 +29956,9 @@ var gd3d;
                 var worldToLocalMatrix = localToWorldMatrix.clone().invert();
                 var localCameraPos = worldToLocalMatrix.transformVector(cameraMatrix.position);
                 var localCameraUp = worldToLocalMatrix.deltaTransformVector(cameraMatrix.up);
-                var billboardMatrix = new framework.Matrix4x4();
+                var u_particle_billboardMatrix = new framework.Matrix4x4();
                 if (!this.shape.alignToDirection && this.mesh == framework.sceneMgr.app.getAssetMgr().getDefaultMesh("quad_particle")) {
-                    billboardMatrix.lookAt(localCameraPos, localCameraUp);
+                    u_particle_billboardMatrix.lookAt(localCameraPos, localCameraUp);
                 }
                 var positions = [];
                 var scales = [];
@@ -29975,21 +29975,23 @@ var gd3d;
                     colors.push(particle.color.r, particle.color.g, particle.color.b, particle.color.a);
                     tilingOffsets.push(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w);
                     flipUVs.push(particle.flipUV.x, particle.flipUV.y);
-                    var matrix4x4_1 = new framework.Matrix4x4().recompose([particle.position, particle.rotation.scaleNumberTo(Math.DEG2RAD), particle.size]);
-                    matrix4x4_1.append(billboardMatrix).append(matrixModelViewProject);
-                    context.matrixModelViewProject = new gd3d.math.matrix(matrix4x4_1.rawData);
+                    var u_particle_transfrom = new framework.Matrix4x4().recompose([particle.position, particle.rotation.scaleNumberTo(Math.DEG2RAD), particle.size]);
+                    u_particle_transfrom.append(u_particle_billboardMatrix).append(matrixModelViewProject);
+                    context.matrixModelViewProject = new gd3d.math.matrix(u_particle_transfrom.rawData);
                     var len = subMeshs.length;
                     var scene_3 = tran.scene;
-                    for (var i_7 = 0; i_7 < len; i_7++) {
-                        var sm = subMeshs[i_7];
-                        var mid = subMeshs[i_7].matIndex;
+                    for (var j = 0; j < len; j++) {
+                        var sm = subMeshs[j];
+                        var mid = subMeshs[j].matIndex;
                         var usemat = this.material;
                         var drawtype = scene_3.fog ? "base_fog" : "base";
                         if (scene_3.fog) {
                             context.fog = scene_3.fog;
                         }
-                        if (usemat != null)
+                        if (usemat != null) {
+                            usemat.setMatrix("u_particle_billboardMatrix", u_particle_billboardMatrix);
                             usemat.draw(context, mesh, sm, drawtype);
+                        }
                     }
                 }
             };
@@ -30033,8 +30035,8 @@ var gd3d;
                     }
                     var inCycleStart = startTime - cycleStartTime;
                     var inCycleEnd = endTime - cycleStartTime;
-                    for (var i_8 = 0; i_8 < bursts.length; i_8++) {
-                        var burst = bursts[i_8];
+                    for (var i_7 = 0; i_7 < bursts.length; i_7++) {
+                        var burst = bursts[i_7];
                         if (burst.isProbability && inCycleStart <= burst.time && burst.time < inCycleEnd) {
                             emits.push({ time: cycleStartTime + burst.time, num: burst.count.getValue(rateAtDuration) });
                         }
@@ -43356,8 +43358,9 @@ var gd3d;
                 webgl.compileShader(vs);
                 var r1 = webgl.getShaderParameter(vs, webgl.COMPILE_STATUS);
                 if (r1 == false) {
+                    var error = webgl.getShaderInfoLog(vs);
                     webgl.deleteShader(vs);
-                    console.error(code);
+                    console.error(code, 'Failed to compile shader: ' + error);
                     return null;
                 }
                 var s = new glShader(name, ShaderTypeEnum.VS, vs, code);
@@ -43370,8 +43373,9 @@ var gd3d;
                 webgl.compileShader(fs);
                 var r1 = webgl.getShaderParameter(fs, webgl.COMPILE_STATUS);
                 if (r1 == false) {
+                    var error = webgl.getShaderInfoLog(fs);
                     webgl.deleteShader(fs);
-                    console.error(code);
+                    console.error(code, 'Failed to compile shader: ' + error);
                     return null;
                 }
                 var s = new glShader(name, ShaderTypeEnum.FS, fs, code);

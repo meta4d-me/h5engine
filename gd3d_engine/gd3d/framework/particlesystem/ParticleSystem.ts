@@ -34,8 +34,9 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         //renderLayer: CullingMask = CullingMask.default;
-        get renderLayer() {return this.gameObject.layer;}
-        set renderLayer(layer:number){
+        get renderLayer() { return this.gameObject.layer; }
+        set renderLayer(layer: number)
+        {
             this.gameObject.layer = layer;
         }
         /**
@@ -276,7 +277,7 @@ namespace gd3d.framework
         {
             if (!this.isPlaying) return;
 
-            this.time = this.time + this.main.simulationSpeed * interval / 1000;
+            this.time = this.time + this.main.simulationSpeed * interval;
             this._realTime = this.time - this.startDelay;
 
             this._updateActiveParticlesState();
@@ -405,11 +406,11 @@ namespace gd3d.framework
             var localCameraPos = worldToLocalMatrix.transformVector(cameraMatrix.position);
             var localCameraUp = worldToLocalMatrix.deltaTransformVector(cameraMatrix.up);
             // 计算公告牌矩阵
-            var billboardMatrix = new Matrix4x4();
+            var u_particle_billboardMatrix = new Matrix4x4();
 
             if (!this.shape.alignToDirection && this.mesh == sceneMgr.app.getAssetMgr().getDefaultMesh("quad_particle"))
             {
-                billboardMatrix.lookAt(localCameraPos, localCameraUp);
+                u_particle_billboardMatrix.lookAt(localCameraPos, localCameraUp);
             }
 
             var positions: number[] = [];
@@ -433,17 +434,17 @@ namespace gd3d.framework
                 flipUVs.push(particle.flipUV.x, particle.flipUV.y);
 
                 //
-                var matrix4x4_1 = new Matrix4x4().recompose([particle.position, particle.rotation.scaleNumberTo(Math.DEG2RAD), particle.size]);
-                matrix4x4_1.append(billboardMatrix).append(matrixModelViewProject);
+                var u_particle_transfrom = new Matrix4x4().recompose([particle.position, particle.rotation.scaleNumberTo(Math.DEG2RAD), particle.size]);
+                u_particle_transfrom.append(u_particle_billboardMatrix).append(matrixModelViewProject);
 
-                context.matrixModelViewProject = new gd3d.math.matrix(matrix4x4_1.rawData);
+                context.matrixModelViewProject = new gd3d.math.matrix(u_particle_transfrom.rawData);
 
                 let len = subMeshs.length;
                 let scene = tran.scene;
-                for (let i = 0; i < len; i++)
+                for (let j = 0; j < len; j++)
                 {
-                    let sm = subMeshs[i];
-                    let mid = subMeshs[i].matIndex;//根据这个找到使用的具体哪个材质    
+                    let sm = subMeshs[j];
+                    let mid = subMeshs[j].matIndex;//根据这个找到使用的具体哪个材质    
                     // let usemat = this.materials[mid];
                     let usemat = this.material;
                     let drawtype = scene.fog ? "base_fog" : "base";
@@ -452,7 +453,12 @@ namespace gd3d.framework
                         context.fog = scene.fog;
                     }
                     if (usemat != null)
+                    {
+                        
+                        
+                        usemat.setMatrix("u_particle_billboardMatrix", u_particle_billboardMatrix)
                         usemat.draw(context, mesh, sm, drawtype);
+                    }
                 }
             }
         }

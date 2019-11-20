@@ -278,8 +278,9 @@ namespace gd3d.render
             var r1 = webgl.getShaderParameter(vs, webgl.COMPILE_STATUS);
             if (r1 == false)
             {
+                var error = webgl.getShaderInfoLog(vs);
                 webgl.deleteShader(vs);
-                console.error(code);
+                console.error(code,'Failed to compile shader: ' + error);
 
                 return null;
             }
@@ -296,9 +297,9 @@ namespace gd3d.render
             var r1 = webgl.getShaderParameter(fs, webgl.COMPILE_STATUS);
             if (r1 == false)
             {
-
+                var error = webgl.getShaderInfoLog(fs);
                 webgl.deleteShader(fs);
-                console.error(code);
+                console.error(code,'Failed to compile shader: ' + error);
                 return null;
             }
 
