@@ -515,7 +515,7 @@ namespace gd3d.framework
          * 由屏幕坐标发射射线
          * @version gd3d 1.0
          */
-        public creatRayByScreen(screenpos: gd3d.math.vector2, app: application, shareRayCache: boolean = true): ray
+        creatRayByScreen(screenpos: gd3d.math.vector2, app: application, shareRayCache: boolean = true): ray
         {
             let src1 = camera.helpv3;
             math.vec3Set(src1, screenpos.x, screenpos.y, 0);
@@ -607,6 +607,32 @@ namespace gd3d.framework
             gd3d.math.matrixTransformVector3(worldPos, this.viewProjectMatrix, ndcPos);
             outScreenPos.x = (ndcPos.x + 1) * vpp.w * 0.5;
             outScreenPos.y = (1 - ndcPos.y) * vpp.h * 0.5;
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @param app 主程序
+         * @param worldPos 世界坐标
+         * @param outScreenPos 屏幕坐标
+         * @classdesc
+         * 由世界坐标得到屏幕坐标
+         * @version gd3d 1.0
+         */
+
+        /**
+         * @public
+         * @language zh_CN
+         * @param app application
+         * @param worldPos 世界空间坐标
+         * @param outClipPos 计算返回裁剪空间坐标
+         * @classdesc
+         * 由世界坐标得到裁剪空间坐标
+         * @version gd3d 1.0
+         */
+        calcClipPosFromWorldPos(app: application, worldPos: math.vector3, outClipPos: math.vector3){
+            this.calcViewProjectMatrix(app);
+            gd3d.math.matrixTransformVector3(worldPos,this.viewProjectMatrix,outClipPos);
         }
 
         private lastCamMtx = new math.matrix();
