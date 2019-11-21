@@ -447,6 +447,7 @@ namespace gd3d.framework
             this.currViewPixelASP = cvpr.w / cvpr.h;
         }
 
+        private lastAsp = -1;
         /**
          * @public
          * @language zh_CN
@@ -459,7 +460,7 @@ namespace gd3d.framework
          */
         calcProjectMatrix(asp: number, outMatrix: gd3d.math.matrix)
         {
-            if(this.projectMatrixDirty){
+            if(this.projectMatrixDirty || this.lastAsp != asp){
                 if (this._opvalue > 0)
                     math.matrixProject_PerspectiveLH(this._fov, asp, this._near, this._far, this.matProjP);
                 if (this._opvalue < 1)
@@ -474,6 +475,7 @@ namespace gd3d.framework
             }
 
             this.projectMatrixDirty = false;
+            this.lastAsp = asp;
             //投影矩阵函数缺一个
             if(outMatrix)
                 gd3d.math.matrixClone(this.projectMatrix, outMatrix);
@@ -776,9 +778,9 @@ namespace gd3d.framework
         {
             if (val > 0 && this._near < 0.01)
             {
-                this._near = 0.01;
+                this.near = 0.01;
                 if (this._far <= this._near)
-                    this._far = this._near + 0.01;
+                    this.far = this._near + 0.01;
             }
             this._opvalue = val;
             this.projectMatrixDirty = true;

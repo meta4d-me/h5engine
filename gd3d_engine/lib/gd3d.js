@@ -14914,6 +14914,7 @@ var gd3d;
                 this.LastCamWorldMtx = new gd3d.math.matrix();
                 this.currViewPixelRect = new gd3d.math.rect();
                 this.currViewPixelASP = 1;
+                this.lastAsp = -1;
                 this.lastCamMtx = new gd3d.math.matrix();
                 this.lastCamRect = new gd3d.math.rect();
                 this.paraArr = [NaN, NaN, NaN, NaN, NaN];
@@ -15059,7 +15060,7 @@ var gd3d;
                 this.currViewPixelASP = cvpr.w / cvpr.h;
             };
             camera.prototype.calcProjectMatrix = function (asp, outMatrix) {
-                if (this.projectMatrixDirty) {
+                if (this.projectMatrixDirty || this.lastAsp != asp) {
                     if (this._opvalue > 0)
                         gd3d.math.matrixProject_PerspectiveLH(this._fov, asp, this._near, this._far, this.matProjP);
                     if (this._opvalue < 1)
@@ -15072,6 +15073,7 @@ var gd3d;
                         gd3d.math.matrixLerp(this.matProjO, this.matProjP, this._opvalue, this.projectMatrix);
                 }
                 this.projectMatrixDirty = false;
+                this.lastAsp = asp;
                 if (outMatrix)
                     gd3d.math.matrixClone(this.projectMatrix, outMatrix);
                 return true;
@@ -15229,9 +15231,9 @@ var gd3d;
                 },
                 set: function (val) {
                     if (val > 0 && this._near < 0.01) {
-                        this._near = 0.01;
+                        this.near = 0.01;
                         if (this._far <= this._near)
-                            this._far = this._near + 0.01;
+                            this.far = this._near + 0.01;
                     }
                     this._opvalue = val;
                     this.projectMatrixDirty = true;

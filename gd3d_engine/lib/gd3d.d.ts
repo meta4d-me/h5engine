@@ -2885,6 +2885,7 @@ declare namespace gd3d.framework {
         readonly currViewPixelRect: math.rect;
         currViewPixelASP: number;
         calcViewPortPixel(app: application, viewPortPixel?: math.rect): void;
+        private lastAsp;
         calcProjectMatrix(asp: number, outMatrix: gd3d.math.matrix): boolean;
         calcViewProjectMatrix(app: application, outViewProjectMatrix?: math.matrix, outViewMatrix?: math.matrix, outProjectMatrix?: math.matrix): boolean;
         private static _shareRay;
