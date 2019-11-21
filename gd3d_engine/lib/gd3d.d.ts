@@ -2891,6 +2891,7 @@ declare namespace gd3d.framework {
         creatRayByScreen(screenpos: gd3d.math.vector2, app: application, shareRayCache?: boolean): ray;
         calcModelPosFromScreenPos(app: application, screenPos: math.vector3, outModelPos: math.vector3): void;
         calcScreenPosFromWorldPos(app: application, worldPos: math.vector3, outScreenPos: math.vector2): void;
+        calcClipPosFromWorldPos(app: application, worldPos: math.vector3, outClipPos: math.vector3): void;
         private lastCamMtx;
         private lastCamRect;
         private paraArr;

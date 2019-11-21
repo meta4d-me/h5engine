@@ -391,9 +391,9 @@ namespace gd3d.framework
          */
         calCanvasPosToScreenPos(canvasPos: gd3d.math.vector2, outScreenPos: gd3d.math.vector2){
             if(!this.camera || !this.canvas)    return;
-            let mPos = this.helpv2;
-            this.canvas.canvasPosToClipPos(canvasPos,mPos);
-            this.calScreenPosToClipPos(mPos,outScreenPos);
+            let clipPos = this.helpv2;
+            this.canvas.canvasPosToClipPos(canvasPos,clipPos);
+            this.calClipPosToScreenPos(clipPos,outScreenPos);
         }
 
         /**

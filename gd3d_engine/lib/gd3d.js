@@ -2511,9 +2511,9 @@ var gd3d;
             overlay2D.prototype.calCanvasPosToScreenPos = function (canvasPos, outScreenPos) {
                 if (!this.camera || !this.canvas)
                     return;
-                var mPos = this.helpv2;
-                this.canvas.canvasPosToClipPos(canvasPos, mPos);
-                this.calScreenPosToClipPos(mPos, outScreenPos);
+                var clipPos = this.helpv2;
+                this.canvas.canvasPosToClipPos(canvasPos, clipPos);
+                this.calClipPosToScreenPos(clipPos, outScreenPos);
             };
             overlay2D.prototype.calScreenPosToModelPos = function (screenPos, outClipPos) {
                 this.calScreenPosToClipPos(screenPos, outClipPos);
@@ -15133,6 +15133,10 @@ var gd3d;
                 gd3d.math.matrixTransformVector3(worldPos, this.viewProjectMatrix, ndcPos);
                 outScreenPos.x = (ndcPos.x + 1) * vpp.w * 0.5;
                 outScreenPos.y = (1 - ndcPos.y) * vpp.h * 0.5;
+            };
+            camera.prototype.calcClipPosFromWorldPos = function (app, worldPos, outClipPos) {
+                this.calcViewProjectMatrix(app);
+                gd3d.math.matrixTransformVector3(worldPos, this.viewProjectMatrix, outClipPos);
             };
             camera.prototype.calcCameraFrame = function (app) {
                 var matrix = this.gameObject.transform.getWorldMatrix();
