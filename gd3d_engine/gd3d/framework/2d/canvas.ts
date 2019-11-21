@@ -943,8 +943,8 @@ namespace gd3d.framework
         clipPosToCanvasPos(clipPos: math.vector2, outCanvasPos: math.vector2)
         {
             if (clipPos == null || outCanvasPos == null) return;
-            let scalx = 1 - (clipPos.x - 1) / -2;
-            let scaly = (clipPos.y - 1) / -2;
+            let scalx = 1 - (clipPos.x - 1) * -0.5;
+            let scaly = (clipPos.y - 1) * -0.5;
             outCanvasPos.x = scalx * this.pixelWidth;
             outCanvasPos.y = scaly * this.pixelHeight;
         }

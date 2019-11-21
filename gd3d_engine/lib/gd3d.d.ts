@@ -537,7 +537,6 @@ declare namespace gd3d.framework {
         getChildCount(): number;
         getChild(index: number): transform2D;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
-        private readonly viewPixelrect;
         private readonly helpv2;
         private readonly helpv2_1;
         update(delta: number): void;
@@ -2854,6 +2853,7 @@ declare namespace gd3d.framework {
         private static helpmtx_2;
         private static helpmtx_3;
         private static helprect;
+        private projectMatrixDirty;
         cullZPlane: boolean;
         gameObject: gameObject;
         private _near;
@@ -2880,8 +2880,11 @@ declare namespace gd3d.framework {
         getOverLays(): IOverLay[];
         removeOverLay(overLay: IOverLay): void;
         private sortOverLays;
+        private LastCamWorldMtx;
         calcViewMatrix(outMatrix?: gd3d.math.matrix): boolean;
-        calcViewPortPixel(app: application, viewPortPixel: math.rect): void;
+        readonly currViewPixelRect: math.rect;
+        currViewPixelASP: number;
+        calcViewPortPixel(app: application, viewPortPixel?: math.rect): void;
         calcProjectMatrix(asp: number, outMatrix: gd3d.math.matrix): boolean;
         calcViewProjectMatrix(app: application, outViewProjectMatrix?: math.matrix, outViewMatrix?: math.matrix, outProjectMatrix?: math.matrix): boolean;
         private static _shareRay;
@@ -2897,8 +2900,11 @@ declare namespace gd3d.framework {
         private matProjO;
         private projectMatrix;
         private viewProjectMatrix;
+        private InverseViewProjectMatrix;
         private frameVecs;
+        private _fov;
         fov: number;
+        _size: number;
         size: number;
         private _opvalue;
         opvalue: number;

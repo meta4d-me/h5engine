@@ -133,6 +133,8 @@ namespace gd3d.framework
 
         private static helprect = new gd3d.math.rect();
 
+        private projectMatrixDirty = true;
+
         /**
          * 相机剔除时，计算 z 轴上的平面 （far & near plane）
          */
@@ -170,12 +172,13 @@ namespace gd3d.framework
          */
         set near(val: number)
         {
-            if (this.opvalue > 0)
+            if (this._opvalue > 0)
             {
                 if (val < 0.01) val = 0.01;
             }
-            if (val >= this.far) val = this.far - 0.01;
+            if (val >= this._far) val = this._far - 0.01;
             this._near = val;
+            this.projectMatrixDirty = true;
         }
         private _far: number = 1000;
         /**
@@ -200,8 +203,9 @@ namespace gd3d.framework
          */
         set far(val: number)
         {
-            if (val <= this.near) val = this.near + 0.01;
+            if (val <= this._near) val = this._near + 0.01;
             this._far = val;
+            this.projectMatrixDirty = true;
         }
         /**
          * @public
@@ -369,6 +373,7 @@ namespace gd3d.framework
             });
         }
        
+        private LastCamWorldMtx = new math.matrix();
          /**
          * @public
          * @language zh_CN
@@ -380,15 +385,30 @@ namespace gd3d.framework
          */
         calcViewMatrix(outMatrix ? : gd3d.math.matrix):boolean
         {
-            let camworld = this.gameObject.transform.getWorldMatrix();
-            //视矩阵刚好是摄像机世界矩阵的逆
-            gd3d.math.matrixInverse(camworld, this.viewMatrix);
+            let wMtx = this.gameObject.transform.getWorldMatrix();
+            let dirty = ! gd3d.math.matrixEqual(wMtx,this.LastCamWorldMtx,0.000001);
+            
+            if(dirty){
+                gd3d.math.matrixClone( wMtx ,this.LastCamWorldMtx);
+                //视矩阵刚好是摄像机世界矩阵的逆
+                gd3d.math.matrixInverse(wMtx, this.viewMatrix);
+            }
 
             if(outMatrix)
                 gd3d.math.matrixClone(this.viewMatrix, outMatrix);
 
             return true;
         }
+
+        /**
+         * 当前的相机视口像素rect
+         */
+        readonly currViewPixelRect = new math.rect();
+
+        /**
+         * 当前相机视口像素asp
+         */
+        currViewPixelASP = 1;
 
         /**
          * @public
@@ -399,7 +419,7 @@ namespace gd3d.framework
          * 计算相机视口像素rect
          * @version gd3d 1.0
          */
-        calcViewPortPixel(app: application, viewPortPixel: math.rect)
+        calcViewPortPixel(app: application, viewPortPixel ?: math.rect)
         {
 
             let w: number;
@@ -414,12 +434,17 @@ namespace gd3d.framework
                 w = this.renderTarget.width;
                 h = this.renderTarget.height;
             }
-            viewPortPixel.x = w * this.viewport.x;
-            viewPortPixel.y = h * this.viewport.y;
-            viewPortPixel.w = w * this.viewport.w;
-            viewPortPixel.h = h * this.viewport.h;
-            //asp = this.viewPortPixel.w / this.viewPortPixel.h;
+            let vp = this.viewport;
+            let cvpr = this.currViewPixelRect;
+            cvpr.x = w * vp.x;
+            cvpr.y = h * vp.y;
+            cvpr.w = w * vp.w;
+            cvpr.h = h * vp.h;
+            if(viewPortPixel){
+                gd3d.math.rectClone( this.currViewPixelRect , viewPortPixel );
+            }
 
+            this.currViewPixelASP = cvpr.w / cvpr.h;
         }
 
         /**
@@ -434,18 +459,21 @@ namespace gd3d.framework
          */
         calcProjectMatrix(asp: number, outMatrix: gd3d.math.matrix)
         {
-            if (this.opvalue > 0)
-                math.matrixProject_PerspectiveLH(this.fov, asp, this.near, this.far, this.matProjP);
-            if (this.opvalue < 1)
-                math.matrixProject_OrthoLH(this.size * asp, this.size, this.near, this.far, this.matProjO);
+            if(this.projectMatrixDirty){
+                if (this._opvalue > 0)
+                    math.matrixProject_PerspectiveLH(this._fov, asp, this._near, this._far, this.matProjP);
+                if (this._opvalue < 1)
+                    math.matrixProject_OrthoLH(this._size * asp, this._size, this._near, this._far, this.matProjO);
+    
+                if (this._opvalue == 0)
+                    math.matrixClone(this.matProjO, this.projectMatrix);
+                else if (this._opvalue == 1)
+                    math.matrixClone(this.matProjP, this.projectMatrix);
+                else
+                    math.matrixLerp(this.matProjO, this.matProjP, this._opvalue, this.projectMatrix);
+            }
 
-            if (this.opvalue == 0)
-                math.matrixClone(this.matProjO, this.projectMatrix);
-            else if (this.opvalue == 1)
-                math.matrixClone(this.matProjP, this.projectMatrix);
-            else
-                math.matrixLerp(this.matProjO, this.matProjP, this.opvalue, this.projectMatrix);
-
+            this.projectMatrixDirty = false;
             //投影矩阵函数缺一个
             if(outMatrix)
                 gd3d.math.matrixClone(this.projectMatrix, outMatrix);
@@ -462,9 +490,10 @@ namespace gd3d.framework
          */
         calcViewProjectMatrix(app:application, outViewProjectMatrix? : math.matrix, outViewMatrix? : math.matrix , outProjectMatrix? : math.matrix){
             let vd = this.calcViewMatrix(outViewMatrix);
-            let vpp = camera.helprect;
-            this.calcViewPortPixel(app, vpp);
-            let asp = vpp.w / vpp.h;
+            // let vpp = camera.helprect;
+            // this.calcViewPortPixel(app, vpp);
+            // let asp = vpp.w / vpp.h;
+            let asp = this.currViewPixelASP;
             let pd = this.calcProjectMatrix(asp,outProjectMatrix);
             if(vd || pd){
                 gd3d.math.matrixMultiply(this.projectMatrix, this.viewMatrix, this.viewProjectMatrix);
@@ -530,26 +559,19 @@ namespace gd3d.framework
          */
         calcModelPosFromScreenPos(app: application, screenPos: math.vector3, outModelPos: math.vector3)
         {
-            let vpp = camera.helprect;
-            this.calcViewPortPixel(app, vpp);
-            let vpp_x = screenPos.x / vpp.w * 2 - 1;
-            let vpp_y = 1 - screenPos.y / vpp.h * 2;
-            // new math.vector2(screenPos.x / vpp.w * 2 - 1, 1 - screenPos.y / vpp.h * 2);
-            // let matrixView = camera.helpmtx;
-            // let matrixProject = camera.helpmtx_1;
-            // let asp = vpp.w / vpp.h;
-            // this.calcViewMatrix(matrixView);
-            // this.calcProjectMatrix(asp, matrixProject);
-            // let matrixViewProject = camera.helpmtx_2;
-            let matinv = camera.helpmtx_3;
-            // gd3d.math.matrixMultiply(matrixProject, matrixView, matrixViewProject);
+            // let vpp = camera.helprect;
+            let vpp = this.currViewPixelRect;
+            // this.calcViewPortPixel(app, vpp);
+            
+            let matinv = this.InverseViewProjectMatrix;
+            let vpd = this.calcViewProjectMatrix(app);
+            if(vpd){
+                gd3d.math.matrixInverse(this.viewProjectMatrix, matinv);
+            }
 
-            this.calcViewProjectMatrix(app);
-
-            gd3d.math.matrixInverse(this.viewProjectMatrix, matinv);
             let src1 = camera.helpv3;
-            src1.x = vpp_x;
-            src1.y = vpp_y;
+            src1.x = screenPos.x / vpp.w * 2 - 1;
+            src1.y = 1 - screenPos.y / vpp.h * 2;
             src1.z = screenPos.z;
             // new math.vector3(vppos.x, vppos.y, screenPos.z);
             gd3d.math.matrixTransformVector3(src1, matinv, outModelPos);
@@ -566,8 +588,10 @@ namespace gd3d.framework
          */
         calcScreenPosFromWorldPos(app: application, worldPos: math.vector3, outScreenPos: math.vector2)
         {
-            let vpp = camera.helprect;
-            this.calcViewPortPixel(app, vpp);
+            // let vpp = camera.helprect;
+            let vpp = this.currViewPixelRect;
+            // this.calcViewPortPixel(app, vpp);
+            
             // let matrixView = camera.helpmtx;
             // let matrixProject = camera.helpmtx_1;
             // let asp = vpp.w / vpp.h;
@@ -581,8 +605,8 @@ namespace gd3d.framework
             let ndcPos = camera.helpv3;
             // gd3d.math.matrixTransformVector3(worldPos, matrixViewProject, ndcPos);
             gd3d.math.matrixTransformVector3(worldPos, this.viewProjectMatrix, ndcPos);
-            outScreenPos.x = (ndcPos.x + 1) * vpp.w / 2;
-            outScreenPos.y = (1 - ndcPos.y) * vpp.h / 2;
+            outScreenPos.x = (ndcPos.x + 1) * vpp.w * 0.5;
+            outScreenPos.y = (1 - ndcPos.y) * vpp.h * 0.5;
         }
 
         private lastCamMtx = new math.matrix();
@@ -595,15 +619,15 @@ namespace gd3d.framework
         private calcCameraFrame(app: application)
         {
             let matrix = this.gameObject.transform.getWorldMatrix();
-            let _vpp = math.pool.new_rect();
+            let _vpp = camera.helprect;
             this.calcViewPortPixel(app, _vpp);
             let tOpval = Math.ceil(this._opvalue);
             //检查是否需要更新
             if (math.matrixEqual(this.lastCamMtx, matrix) && math.rectEqul(this.lastCamRect, _vpp) &&
-                this.paraArr[0] == this.fov && this.paraArr[1] == this._near && this.paraArr[2] == this._far)
+                this.paraArr[0] == this._fov && this.paraArr[1] == this._near && this.paraArr[2] == this._far)
             {
                 //opvalue
-                if(this.paraArr[3] == tOpval && ( tOpval == 1 || this.paraArr[4] == this.size )){
+                if(this.paraArr[3] == tOpval && ( tOpval == 1 || this.paraArr[4] == this._size )){
                     return;
                 }
             }
@@ -613,18 +637,18 @@ namespace gd3d.framework
             //同步last
             math.matrixClone(matrix, this.lastCamMtx);
             math.rectClone(_vpp, this.lastCamRect);
-            this.paraArr[0] = this.fov;
+            this.paraArr[0] = this._fov;
             this.paraArr[1] = this._near;
             this.paraArr[2] = this._far;
             this.paraArr[3] = this._opvalue;
-            this.paraArr[4] = this.size;
+            this.paraArr[4] = this._size;
 
-            let tanFov = Math.tan(this.fov * 0.5);
-            let nearSize = this.near * tanFov;
-            let farSize  = this.far  * tanFov;
+            let tanFov = Math.tan(this._fov * 0.5);
+            let nearSize = this._near * tanFov;
+            let farSize  = this._far  * tanFov;
             //set size
             if(needSize){
-                nearSize = farSize = this.size * 0.5;
+                nearSize = farSize = this._size * 0.5;
             }
 
             let near_h = nearSize;
@@ -635,10 +659,10 @@ namespace gd3d.framework
             let nearLD = camera.helpv3_1;
             let nearRT = camera.helpv3_2;
             let nearRD = camera.helpv3_3;
-            math.vec3Set(nearLT, -near_w, near_h, this.near);
-            math.vec3Set(nearLD, -near_w, -near_h, this.near);
-            math.vec3Set(nearRT, near_w, near_h, this.near);
-            math.vec3Set(nearRD, near_w, -near_h, this.near);
+            math.vec3Set(nearLT, -near_w, near_h, this._near);
+            math.vec3Set(nearLD, -near_w, -near_h, this._near);
+            math.vec3Set(nearRT, near_w, near_h, this._near);
+            math.vec3Set(nearRD, near_w, -near_h, this._near);
 
             let far_h = farSize;
             let far_w = far_h * asp;
@@ -647,10 +671,10 @@ namespace gd3d.framework
             let farLD = camera.helpv3_5;
             let farRT = camera.helpv3_6;
             let farRD = camera.helpv3_7;
-            math.vec3Set(farLT, -far_w, far_h, this.far);
-            math.vec3Set(farLD, -far_w, -far_h, this.far);
-            math.vec3Set(farRT, far_w, far_h, this.far);
-            math.vec3Set(farRD, far_w, -far_h, this.far);
+            math.vec3Set(farLT, -far_w, far_h, this._far);
+            math.vec3Set(farLD, -far_w, -far_h, this._far);
+            math.vec3Set(farRT, far_w, far_h, this._far);
+            math.vec3Set(farRD, far_w, -far_h, this._far);
 
             gd3d.math.matrixTransformVector3(farLD, matrix, farLD);
             gd3d.math.matrixTransformVector3(nearLD, matrix, nearLD);
@@ -675,8 +699,11 @@ namespace gd3d.framework
         private matProjO: math.matrix = new math.matrix;
         private projectMatrix: math.matrix = new math.matrix;
         private viewProjectMatrix : math.matrix = new math.matrix;
+        private InverseViewProjectMatrix : math.matrix = new math.matrix;
 
         private frameVecs: math.vector3[] = [];
+
+        private _fov : number = 60 * Math.PI / 180;//透视投影的fov
         /**
          * @public
          * @language zh_CN
@@ -685,7 +712,15 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
-        fov: number = 60 * Math.PI / 180;//透视投影的fov
+        set fov(val:number){
+            this._fov = val;
+            this.projectMatrixDirty = true;
+        }
+        get fov(){
+            return this._fov;
+        }
+
+        _size: number = 2;//正交投影的竖向size
         /**
          * @public
          * @language zh_CN
@@ -694,7 +729,13 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
-        size: number = 2;//正交投影的竖向size
+        set size(val:number){
+            this._size = val;
+            this.projectMatrixDirty = true;
+        }
+        get size(){
+            return this._size;
+        }
 
         private _opvalue = 1;
         /**
@@ -714,6 +755,7 @@ namespace gd3d.framework
                     this._far = this._near + 0.01;
             }
             this._opvalue = val;
+            this.projectMatrixDirty = true;
         }
         get opvalue(): number
         {
@@ -725,18 +767,19 @@ namespace gd3d.framework
          */
         getPosAtXPanelInViewCoordinateByScreenPos(screenPos: gd3d.math.vector2, app: application, z: number, out: gd3d.math.vector2)
         {
-            let vpp = camera.helprect;
-            this.calcViewPortPixel(app, vpp);
+            let vpp = this.currViewPixelRect;
+            // let vpp = camera.helprect;
+            // this.calcViewPortPixel(app, vpp);
 
             let nearpos = camera.helpv3;
-            nearpos.z = -this.near;
+            nearpos.z = -this._near;
             nearpos.x = screenPos.x - vpp.w * 0.5;
             nearpos.y = vpp.h * 0.5 - screenPos.y;
 
             let farpos = camera.helpv3_1;
-            farpos.z = -this.far;
-            farpos.x = this.far * nearpos.x / this.near;
-            farpos.y = this.far * nearpos.y / this.near;;
+            farpos.z = -this._far;
+            farpos.x = this._far * nearpos.x / this._near;
+            farpos.y = this._far * nearpos.y / this._near;;
 
             let rate = (nearpos.z - z) / (nearpos.z - farpos.z);
             out.x = nearpos.x - (nearpos.x - farpos.x) * rate;
@@ -850,7 +893,7 @@ namespace gd3d.framework
                 aabb = skinmesh.aabb;
             }
             gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, vec3cache);
-            const radius = gd3d.math.vec3Length(vec3cache) / 2;
+            const radius = gd3d.math.vec3Length(vec3cache) * 0.5;
             const center = node.aabb.center;
             return this.cullTest(radius , center);
         }

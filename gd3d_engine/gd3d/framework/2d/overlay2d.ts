@@ -222,7 +222,7 @@ namespace gd3d.framework
             this.canvas.render(context, assetmgr);
         }
 
-        private readonly viewPixelrect = new math.rect();
+        // private readonly viewPixelrect = new math.rect();
         private readonly helpv2 = new gd3d.math.vector2();
         private readonly helpv2_1 = new gd3d.math.vector2();
         /**
@@ -257,9 +257,11 @@ namespace gd3d.framework
         //检查缩放模式 改变
         private ckScaleMode(){
             if(!this.canvas.getRoot().visible || !this.camera) return;
-            this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+            // this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+            // gd3d.math.rectClone(this.camera.currViewPixelRect ,this.viewPixelrect);
+            let currVPR = this.camera.currViewPixelRect;
             let dirty = false;
-            if(math.rectEqul(this.lastVPRect,this.viewPixelrect)){
+            if(math.rectEqul(this.lastVPRect,currVPR)){
                 switch(this.scaleMode){
                     case UIScaleMode.CONSTANT_PIXEL_SIZE:
                     break;
@@ -277,7 +279,7 @@ namespace gd3d.framework
             if(!dirty) return;
             
             let _w = 0; let _h = 0;
-            math.rectClone(this.viewPixelrect,this.lastVPRect);
+            math.rectClone(currVPR,this.lastVPRect);
             this.lastScreenMR = this.screenMatchRate;
             this.lastMR_width = this.matchReference_width;
             this.lastMR_height = this.matchReference_height;
@@ -285,13 +287,13 @@ namespace gd3d.framework
             //计算w h
             switch(this.scaleMode){
                 case UIScaleMode.CONSTANT_PIXEL_SIZE:
-                    _w = this.viewPixelrect.w;
-                    _h = this.viewPixelrect.h;
+                    _w = currVPR.w;
+                    _h = currVPR.h;
                 break;
                 case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
                     let match = this.screenMatchRate < 0 ? 0: this.screenMatchRate;
                     match = match>1? 1:match;
-                    let asp = this.viewPixelrect.w / this.viewPixelrect.h;
+                    let asp = currVPR.w / currVPR.h;
                     _w = math.numberLerp(this.matchReference_width,this.matchReference_height * asp,match);
                     _h = math.numberLerp(this.matchReference_height,this.matchReference_width / asp, 1 - match );
                 break;
@@ -413,13 +415,14 @@ namespace gd3d.framework
          */
         calScreenPosToClipPos(screenPos: gd3d.math.vector2 , outClipPos : gd3d.math.vector2){
             if(!screenPos || !outClipPos || !this.camera)    return;
-            this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+            // this.camera.calcViewPortPixel(this.app, currVPR);
+            let currVPR = this.camera.currViewPixelRect;
             let rect = this.camera.viewport;
 
             let real_x = screenPos.x - rect.x * this.app.width;
             let real_y = screenPos.y - rect.y * this.app.height;
-            outClipPos.x = (real_x / this.viewPixelrect.w) * 2 - 1;
-            outClipPos.y = (real_y / this.viewPixelrect.h) * -2 + 1;
+            outClipPos.x = (real_x / currVPR.w) * 2 - 1;
+            outClipPos.y = (real_y / currVPR.h) * -2 + 1;
         }
 
         /**
@@ -441,11 +444,12 @@ namespace gd3d.framework
          */
         calClipPosToScreenPos(clipPos: gd3d.math.vector2 , outScreenPos : gd3d.math.vector2){
             if(!clipPos || !outScreenPos || !this.camera)    return;
-            this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+            let currVPR = this.camera.currViewPixelRect;
+            // this.camera.calcViewPortPixel(this.app, currVPR);
             let rect = this.camera.viewport;
 
-            let real_x = this.viewPixelrect.w * (clipPos.x + 1)/2; 
-            let real_y = this.viewPixelrect.h * (clipPos.y - 1)/-2; 
+            let real_x = currVPR.w * (clipPos.x + 1) * 0.5; 
+            let real_y = currVPR.h * (clipPos.y - 1) * -0.5; 
 
             outScreenPos.x = real_x + rect.x * this.app.width;
             outScreenPos.y = real_y + rect.y * this.app.height;
