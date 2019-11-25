@@ -254,7 +254,7 @@ namespace gd3d.framework
             {
                 this._sprite.unuse();
             }
-            if(!this._sprite || this._sprite.texture != sprite.texture ){
+            if(!this._sprite || !sprite || this._sprite.texture != sprite.texture ){
                 this.needRefreshImg = true;
             }
             
