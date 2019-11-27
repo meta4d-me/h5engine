@@ -7,16 +7,20 @@ namespace gd3d.framework
      */
     export class ParticleMainModule extends ParticleModule
     {
+        __class__: "feng3d.ParticleMainModule" = "feng3d.ParticleMainModule";
+
         enabled = true;
 
         /**
          * 粒子系统的持续时间(秒)。
          */
+        @serialize
         duration = 5;
 
         /**
          * 粒子系统在循环吗?
          */
+        @serialize
         loop = true;
 
         /**
@@ -24,6 +28,7 @@ namespace gd3d.framework
          * 
          * 当循环被激活时，它控制这个粒子系统在第一次出现时是否看起来像已经模拟了一个循环。
          */
+        @serialize
         prewarm = false;
 
         /**
@@ -31,6 +36,7 @@ namespace gd3d.framework
          * 
          * 启动延迟(以秒为单位)。
          */
+        @serialize
         startDelay = new MinMaxCurve();
 
         /**
@@ -48,7 +54,8 @@ namespace gd3d.framework
          * 
          * 每个新粒子的总寿命(以秒计)。
          */
-        startLifetime = serialization.setValue(new MinMaxCurve(), { between0And1: true, constant: 5, constant1: 5 });
+        @serialize
+        startLifetime = serialization.setValue(new MinMaxCurve(), { between0And1: true, constant: 5, constantMin: 5, constantMax: 5 });
 
         /**
          * Start lifetime multiplier.
@@ -72,7 +79,8 @@ namespace gd3d.framework
          * 
          * 粒子发射时的初始速度。
          */
-        startSpeed = serialization.setValue(new MinMaxCurve(), { constant: 5, constant1: 5 });
+        @serialize
+        startSpeed = serialization.setValue(new MinMaxCurve(), { constant: 5, constantMin: 5, constantMax: 5 });
 
         /**
          * A multiplier of the initial speed of particles when emitted.
@@ -96,6 +104,7 @@ namespace gd3d.framework
          * 
          * 允许为每个轴分别指定粒度大小的标志。
          */
+        @serialize
         useStartSize3D = false;
 
         /**
@@ -103,6 +112,7 @@ namespace gd3d.framework
          * 
          * 粒子发射时的初始大小。
          */
+        @serialize
         get startSize()
         {
             return this.startSize3D.xCurve;
@@ -135,7 +145,8 @@ namespace gd3d.framework
          * 
          * 发射时粒子的初始大小。
          */
-        startSize3D = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constant1: 1 }, yCurve: { between0And1: true, constant: 1, constant1: 1 }, zCurve: { between0And1: true, constant: 1, constant1: 1 } });
+        @serialize
+        startSize3D = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 } });
 
         /**
          * The initial size of particles along the X axis when emitted.
@@ -222,6 +233,7 @@ namespace gd3d.framework
          * A flag to enable 3D particle rotation.
          * 一个启用粒子3D旋转的标记。
          */
+        @serialize
         useStartRotation3D = false;
 
         /**
@@ -260,6 +272,7 @@ namespace gd3d.framework
          * 
          * 粒子发射时的初始旋转。
          */
+        @serialize
         startRotation3D = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { curveMultiplier: 180 }, yCurve: { curveMultiplier: 180 }, zCurve: { curveMultiplier: 180 } });
 
         /**
@@ -348,6 +361,7 @@ namespace gd3d.framework
          * 
          * 导致一些粒子向相反的方向旋转。设置在0和1之间，数值越大，粒子朝相反方向旋转的比例越大。
          */
+        @serialize
         randomizeRotationDirection = 0;
 
         /**
@@ -355,6 +369,7 @@ namespace gd3d.framework
          * 
          * 粒子发射时的初始颜色。
          */
+        @serialize
         startColor = new MinMaxGradient();
 
         /**
@@ -362,6 +377,7 @@ namespace gd3d.framework
          * 
          * 应用于重力加速度的缩放。
          */
+        @serialize
         gravityModifier = new MinMaxCurve();
 
         /**
@@ -371,6 +387,7 @@ namespace gd3d.framework
          * 
          * @todo
          */
+        @serialize
         simulationSpace = ParticleSystemSimulationSpace.Local;
 
         /**
@@ -380,6 +397,7 @@ namespace gd3d.framework
          * 
          * @todo
          */
+        @serialize
         customSimulationSpace: transform;
 
         /**
@@ -387,6 +405,7 @@ namespace gd3d.framework
          * 
          * 重写粒子系统的默认播放速度。
          */
+        @serialize
         simulationSpeed = 1;
 
         /**
@@ -394,6 +413,7 @@ namespace gd3d.framework
          * 
          * 控制粒子系统的变换组件如何应用于粒子系统。
          */
+        @serialize
         scalingMode = ParticleSystemScalingMode.Local;
 
         /**
@@ -401,6 +421,7 @@ namespace gd3d.framework
          * 
          * 如果设置为真，粒子系统将自动开始播放启动。
          */
+        @serialize
         playOnAwake = true;
 
         /**
@@ -408,6 +429,7 @@ namespace gd3d.framework
          * 
          * 发射粒子的最大数量。
          */
+        @serialize
         maxParticles = 1000;
 
         /**

@@ -9,11 +9,14 @@ namespace gd3d.framework
      */
     export class ParticleLimitVelocityOverLifetimeModule extends ParticleModule
     {
+        __class__: "feng3d.ParticleLimitVelocityOverLifetimeModule" = "feng3d.ParticleLimitVelocityOverLifetimeModule";
+
         /**
          * Set the size over lifetime on each axis separately.
          * 
          * 在每个轴上分别设置生命周期内的大小。
          */
+        @serialize
         separateAxes = false;
 
         /**
@@ -21,20 +24,23 @@ namespace gd3d.framework
          * 
          * 最大速度曲线，当不使用每轴一个曲线时。
          */
-        limit = serialization.setValue(new MinMaxCurve(), { between0And1: true, constant: 1, constant1: 1 });
+        @serialize
+        limit = serialization.setValue(new MinMaxCurve(), { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 });
 
         /**
          * Maximum velocity.
          * 
          * 最高速度。
          */
-        limit3D = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constant1: 1 }, yCurve: { between0And1: true, constant: 1, constant1: 1 }, zCurve: { between0And1: true, constant: 1, constant1: 1 } });
+        @serialize
+        limit3D = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 } });
 
         /**
          * Specifies if the velocities are in local space (rotated with the transform) or world space.
          * 
          * 指定速度是在局部空间(与变换一起旋转)还是在世界空间。
          */
+        @serialize
         space = ParticleSystemSimulationSpace1.Local;
 
         /**
@@ -42,6 +48,7 @@ namespace gd3d.framework
          * 
          * 控制多少速度，超过速度限制应该被抑制。
          */
+        @serialize
         dampen = 1;
 
         /**

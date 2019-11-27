@@ -11,12 +11,14 @@ namespace gd3d.framework
          * Set the rotation over lifetime on each axis separately.
          * 在每个轴上分别设置基于生命周期的旋转。
          */
+        @serialize
         separateAxes = false;
 
         /**
          * 角速度，基于生命周期的旋转。
          */
-        angularVelocity = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { constant: 45, constant1: 45, curveMultiplier: 45 }, yCurve: { constant: 45, constant1: 45, curveMultiplier: 45 }, zCurve: { constant: 45, constant1: 45, curveMultiplier: 45 } });
+        @serialize
+        angularVelocity = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 }, yCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 }, zCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 } });
 
         /**
          * Rotation over lifetime curve for the X axis.
