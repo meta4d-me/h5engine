@@ -13,6 +13,7 @@ namespace gd3d.framework
          * 
          * 在每个轴上分别设置生命周期内的大小。
          */
+        @serialize
         separateAxes = false;
 
         /**
@@ -50,7 +51,8 @@ namespace gd3d.framework
          * 
          * 基于寿命的粒度控制曲线。
          */
-        size3D = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constant1: 1, curveMultiplier: 1 }, yCurve: { between0And1: true, constant: 1, constant1: 1, curveMultiplier: 1 }, zCurve: { between0And1: true, constant: 1, constant1: 1, curveMultiplier: 1 } });
+        @serialize
+        size3D = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 } });
 
         /**
          * Size over lifetime curve for the X axis.

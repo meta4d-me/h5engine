@@ -13,6 +13,7 @@ namespace gd3d.framework
          * 
          * 定义纹理的平铺。
          */
+        @serialize
         tiles = new Vector2(1, 1);
 
         /**
@@ -20,6 +21,7 @@ namespace gd3d.framework
          * 
          * 指定动画类型。
          */
+        @serialize
         animation = ParticleSystemAnimationType.WholeSheet;
 
         /**
@@ -27,13 +29,15 @@ namespace gd3d.framework
          * 
          * 曲线控制哪个帧的纹理表动画播放。
          */
-        frameOverTime = serialization.setValue(new MinMaxCurve(), { mode: MinMaxCurveMode.Curve, curve: { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] } });
+        @serialize
+        frameOverTime = serialization.setValue(new MinMaxCurve(), { mode: MinMaxCurveMode.Curve, curveMin: { keys: [{ time: 0, value: 0, inTangent: 1, outTangent: 1 }, { time: 1, value: 1, inTangent: 1, outTangent: 1 }] } });
 
         /**
          * Use a random row of the texture sheet for each particle emitted.
          * 
          * 对每个发射的粒子使用纹理表的随机行。
          */
+        @serialize
         useRandomRow = true;
 
         /**
@@ -41,6 +45,7 @@ namespace gd3d.framework
          * 
          * 当useRandomRow设置为false时，显式选择使用纹理表的哪一行。
          */
+        @serialize
         get rowIndex() { return this._rowIndex; }
         set rowIndex(v)
         {
@@ -53,6 +58,7 @@ namespace gd3d.framework
          * 
          * 为纹理表动画定义一个随机的起始帧。
          */
+        @serialize
         startFrame = new MinMaxCurve();
 
         /**
@@ -60,6 +66,7 @@ namespace gd3d.framework
          * 
          * 指定在粒子的生命周期内动画将循环多少次。
          */
+        @serialize
         cycleCount = 1;
 
         /**
@@ -67,6 +74,7 @@ namespace gd3d.framework
          * 
          * 在粒子上翻转UV坐标，使它们呈现镜像翻转。
          */
+        @serialize
         flipUV = new Vector2();
 
         /**
@@ -76,6 +84,7 @@ namespace gd3d.framework
          * 
          * todo 目前引擎中只有一套UV
          */
+        @serialize
         uvChannelMask = UVChannelFlags.Everything;
 
         /**
@@ -176,6 +185,7 @@ namespace gd3d.framework
         {
             particle[_TextureSheetAnimation_frameOverTime] = Math.random();
             particle[_TextureSheetAnimation_startFrame] = Math.random();
+            particle[_TextureSheetAnimation_randomRow] = Math.random();
         }
 
         /**
@@ -184,12 +194,13 @@ namespace gd3d.framework
          */
         updateParticleState(particle: Particle1)
         {
+            particle.tilingOffset.init(1, 1, 0, 0);
+            particle.flipUV.init(0, 0);
             if (!this.enabled) return;
 
             var segmentsX = this.tiles.x;
             var segmentsY = this.tiles.y;
             var step = this.tiles.clone().reciprocal();
-            var total = segmentsX * segmentsY;
             var uvPos = new Vector2();
             var frameOverTime = this.frameOverTime.getValue(particle.rateAtLifeTime, particle[_TextureSheetAnimation_frameOverTime]);
             var frameIndex = this.startFrame.getValue(particle.rateAtLifeTime, particle[_TextureSheetAnimation_startFrame]);
@@ -198,15 +209,15 @@ namespace gd3d.framework
 
             if (this.animation == ParticleSystemAnimationType.WholeSheet)
             {
-                frameIndex += Math.floor(frameOverTime * total * cycleCount);
+                frameIndex = Math.round(frameIndex + frameOverTime * segmentsX * segmentsY * cycleCount);
                 uvPos.init(frameIndex % segmentsX, Math.floor(frameIndex / segmentsX) % segmentsY).scale(step);
 
             } else if (this.animation == ParticleSystemAnimationType.SingleRow)
             {
-                frameIndex += Math.floor(frameOverTime * segmentsX * cycleCount);
+                frameIndex = Math.round(frameIndex + frameOverTime * segmentsX * cycleCount);
                 if (this.useRandomRow)
                 {
-                    rowIndex = Math.floor(segmentsY * Math.random());
+                    rowIndex = Math.round(segmentsY * particle[_TextureSheetAnimation_randomRow]);
                 }
                 uvPos.init(frameIndex % segmentsX, rowIndex).scale(step);
             }
@@ -219,4 +230,5 @@ namespace gd3d.framework
 
     var _TextureSheetAnimation_frameOverTime = "_TextureSheetAnimation_rateAtLifeTime";
     var _TextureSheetAnimation_startFrame = "_TextureSheetAnimation_startFrame";
+    var _TextureSheetAnimation_randomRow = "_TextureSheetAnimation_randomRow";
 }

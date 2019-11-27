@@ -8,10 +8,12 @@ namespace gd3d.framework
      */
     export class ParticleShapeModule extends ParticleModule
     {
+        __class__: "feng3d.ParticleShapeModule" = "feng3d.ParticleShapeModule";
         /**
          * Type of shape to emit particles from.
          * 发射粒子的形状类型。
          */
+        @serialize
         get shapeType()
         {
             return this._shapeType;
@@ -43,7 +45,7 @@ namespace gd3d.framework
         /**
          * 当前使用的发射形状
          */
-        activeShape: ParticleSystemShapeBase;
+        activeShape: ParticleSystemShape;
 
         /**
          * Align particles based on their initial direction of travel.
@@ -52,18 +54,21 @@ namespace gd3d.framework
          * Using align to Direction in the Shape module forces the system to be rendered using Local Billboard Alignment.
          * 在形状模块中使用align to Direction迫使系统使用本地看板对齐方式呈现。
          */
+        @serialize
         alignToDirection = false;
 
         /**
          * Randomizes the starting direction of particles.
          * 随机化粒子的起始方向。
          */
+        @serialize
         randomDirectionAmount = 0;
 
         /**
          * Spherizes the starting direction of particles.
          * 使粒子的起始方向球面化。
          */
+        @serialize
         sphericalDirectionAmount = 0;
 
         /**
@@ -71,6 +76,7 @@ namespace gd3d.framework
          * 
          * 圆锥的角度。
          */
+        @serialize
         angle = 25;
 
         /**
@@ -78,6 +84,7 @@ namespace gd3d.framework
          * 
          * 圆弧角。
          */
+        @serialize
         arc = 360;
 
         /**
@@ -85,6 +92,7 @@ namespace gd3d.framework
          * 
          * 在弧线周围产生粒子的模式。
          */
+        @serialize
         arcMode = ParticleSystemShapeMultiModeValue.Random;
 
         /**
@@ -92,7 +100,8 @@ namespace gd3d.framework
          * 
          * 当使用一个动画模式时，如何快速移动发射位置周围的弧。
          */
-        arcSpeed = serialization.setValue(new MinMaxCurve(), { constant: 1, constant1: 1 });
+        @serialize
+        arcSpeed = serialization.setValue(new MinMaxCurve(), { constant: 1, constantMin: 1, constantMax: 1 });
 
         /**
          * A multiplier of the arc speed of the emission shape.
@@ -114,6 +123,7 @@ namespace gd3d.framework
          * 
          * 控制弧线周围发射点之间的间隙。
          */
+        @serialize
         arcSpread = 0;
 
         /**
@@ -121,6 +131,7 @@ namespace gd3d.framework
          * 
          * 盒子的缩放。
          */
+        @serialize
         box = new Vector3(1, 1, 1);
 
         /**
@@ -128,6 +139,7 @@ namespace gd3d.framework
          * 
          * 圆锥的长度（高度）。
          */
+        @serialize
         length = 5;
 
         /**
@@ -215,6 +227,7 @@ namespace gd3d.framework
          * 
          * 形状的半径。
          */
+        @serialize
         radius = 1;
 
         /**
@@ -222,6 +235,7 @@ namespace gd3d.framework
          * 
          * 在弧线周围产生粒子的模式。
          */
+        @serialize
         radiusMode = ParticleSystemShapeMultiModeValue.Random;
 
         /**
@@ -229,7 +243,8 @@ namespace gd3d.framework
          * 
          * 当使用一个动画模式时，如何快速移动发射位置周围的弧。
          */
-        radiusSpeed = serialization.setValue(new MinMaxCurve(), { constant: 1, constant1: 1 });
+        @serialize
+        radiusSpeed = serialization.setValue(new MinMaxCurve(), { constant: 1, constantMin: 1, constantMax: 1 });
 
         /**
          * A multiplier of the radius speed of the emission shape.
@@ -251,6 +266,7 @@ namespace gd3d.framework
          * 
          * 控制弧线周围发射点之间的间隙。
          */
+        @serialize
         radiusSpread = 0;
 
         private _shapeSphere = new ParticleSystemShapeSphere(this);
@@ -283,7 +299,7 @@ namespace gd3d.framework
                 var mat0 = Matrix4x4.fromRotation(particle.rotation.x, particle.rotation.y, particle.rotation.z);
                 mat0.append(mat);
 
-                particle.rotation = mat0.rotation;
+                particle.rotation = mat0.getRotation();
             }
             var length = particle.velocity.length;
             if (this.randomDirectionAmount > 0)
