@@ -67,6 +67,7 @@ namespace gd3d.framework
          */
         time = 0;
 
+        @serialize
         get main() { return this._main; }
         set main(v)
         {
@@ -76,6 +77,7 @@ namespace gd3d.framework
         }
         private _main: ParticleMainModule;
 
+        @serialize
         get emission() { return this._emission; }
         set emission(v)
         {
@@ -85,6 +87,7 @@ namespace gd3d.framework
         }
         private _emission: ParticleEmissionModule;
 
+        @serialize
         get shape() { return this._shape; }
         set shape(v)
         {
@@ -94,6 +97,7 @@ namespace gd3d.framework
         }
         private _shape: ParticleShapeModule;
 
+        @serialize
         get velocityOverLifetime() { return this._velocityOverLifetime; }
         set velocityOverLifetime(v)
         {
@@ -103,6 +107,8 @@ namespace gd3d.framework
         }
         private _velocityOverLifetime: ParticleVelocityOverLifetimeModule;
 
+        @serialize
+        // @oav({ tooltip: "limit velocity over lifetime module.", block: "limitVelocityOverLifetime", component: "OAVObjectView" })
         get limitVelocityOverLifetime() { return this._limitVelocityOverLifetime; }
         set limitVelocityOverLifetime(v)
         {
@@ -112,6 +118,7 @@ namespace gd3d.framework
         }
         private _limitVelocityOverLifetime: ParticleLimitVelocityOverLifetimeModule;
 
+        @serialize
         get forceOverLifetime() { return this._forceOverLifetime; }
         set forceOverLifetime(v)
         {
@@ -121,6 +128,7 @@ namespace gd3d.framework
         }
         private _forceOverLifetime: ParticleForceOverLifetimeModule;
 
+        @serialize
         get colorOverLifetime() { return this._colorOverLifetime; }
         set colorOverLifetime(v)
         {
@@ -130,6 +138,7 @@ namespace gd3d.framework
         }
         private _colorOverLifetime: ParticleColorOverLifetimeModule;
 
+        @serialize
         get sizeOverLifetime() { return this._sizeOverLifetime; }
         set sizeOverLifetime(v)
         {
@@ -139,6 +148,7 @@ namespace gd3d.framework
         }
         private _sizeOverLifetime: ParticleSizeOverLifetimeModule;
 
+        @serialize
         get rotationOverLifetime() { return this._rotationOverLifetime; }
         set rotationOverLifetime(v)
         {
@@ -151,7 +161,7 @@ namespace gd3d.framework
         /**
          * 粒子系统纹理表动画模块。
          */
-
+        @serialize
         get textureSheetAnimation() { return this._textureSheetAnimation; }
         set textureSheetAnimation(v)
         {
@@ -161,7 +171,6 @@ namespace gd3d.framework
         }
         private _textureSheetAnimation: ParticleTextureSheetAnimationModule;
 
-        // geometry = Geometry.billboard;
 
         private _mesh: mesh;
 
@@ -398,19 +407,20 @@ namespace gd3d.framework
 
             // renderAtomic.shaderMacro.ENABLED_PARTICLE_SYSTEM_textureSheetAnimation = this.textureSheetAnimation.enabled;
 
-            var cameraMatrix = new Matrix4x4(camera.gameObject.transform.getWorldMatrix().rawData);
-
-            var localToWorldMatrix = new Matrix4x4(this.transform.getWorldMatrix().rawData.concat());
-            var worldToLocalMatrix = localToWorldMatrix.clone().invert();
-            //
-            var localCameraPos = worldToLocalMatrix.transformVector(cameraMatrix.position);
-            var localCameraUp = worldToLocalMatrix.deltaTransformVector(cameraMatrix.up);
             // 计算公告牌矩阵
-            var u_particle_billboardMatrix = new Matrix4x4();
-
-            if (!this.shape.alignToDirection && this.mesh == sceneMgr.app.getAssetMgr().getDefaultMesh("quad_particle"))
+            var isbillboard = !this.shape.alignToDirection && this.mesh == sceneMgr.app.getAssetMgr().getDefaultMesh("quad_particle");
+            var billboardMatrix = new Matrix4x4();
+            if (isbillboard)
             {
-                u_particle_billboardMatrix.lookAt(localCameraPos, localCameraUp);
+                var cameraMatrix = new Matrix4x4(camera.gameObject.transform.getWorldMatrix().rawData);
+
+                var localToWorldMatrix = new Matrix4x4(this.transform.getWorldMatrix().rawData.concat());
+                var worldToLocalMatrix = localToWorldMatrix.clone().invert();
+                //
+                var localCameraForward = worldToLocalMatrix.deltaTransformVector(cameraMatrix.forward);
+                var localCameraUp = worldToLocalMatrix.deltaTransformVector(cameraMatrix.up);
+
+                billboardMatrix.lookAt(localCameraForward, localCameraUp);
             }
 
             var positions: number[] = [];
@@ -419,9 +429,6 @@ namespace gd3d.framework
             var colors: number[] = [];
             var tilingOffsets: number[] = [];
             var flipUVs: number[] = [];
-
-            var matrixModelViewProject = new Matrix4x4(context.matrixModelViewProject.rawData.concat());
-
             for (let i = 0, n = this._activeParticles.length; i < n; i++)
             {
                 var particle = this._activeParticles[i];
@@ -433,20 +440,21 @@ namespace gd3d.framework
                 tilingOffsets.push(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w);
                 flipUVs.push(particle.flipUV.x, particle.flipUV.y);
 
-                // test
-                // var u_particle_transfrom = new Matrix4x4().recompose([particle.position, particle.rotation.scaleNumberTo(Math.DEG2RAD), particle.size]);
-                // u_particle_transfrom.append(u_particle_billboardMatrix).append(matrixModelViewProject);
-                // context.matrixModelViewProject = new gd3d.math.matrix(u_particle_transfrom.rawData.concat());
-                //
-                // context.matrixModelViewProject = new gd3d.math.matrix(matrixModelViewProject.rawData.concat());
-
                 this.material.setVector4("a_particle_position", new math.vector4(particle.position.x, particle.position.y, particle.position.z, 1));
                 this.material.setVector4("a_particle_scale", new math.vector4(particle.size.x, particle.size.y, particle.size.z, 1));
-                this.material.setVector4("a_particle_rotation", new math.vector4(particle.rotation.x, particle.rotation.y, particle.rotation.z, 1));
+                this.material.setVector4("a_particle_rotation", new math.vector4(particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1));
                 this.material.setVector4("a_particle_color", new math.vector4(particle.color.r, particle.color.g, particle.color.b, particle.color.a));
-                this.material.setMatrix("u_particle_billboardMatrix", new math.matrix(u_particle_billboardMatrix.rawData.concat()))
+                this.material.setMatrix("u_particle_billboardMatrix", new math.matrix(billboardMatrix.rawData.concat()))
 
                 this.material.draw(context, mesh, subMeshs[0]);
+            }
+
+            if (isbillboard)
+            {
+                for (var i = 0, n = rotations.length; i < n; i += 3)
+                {
+                    rotations[i + 2] = -rotations[i + 2];
+                }
             }
         }
 
@@ -573,7 +581,7 @@ namespace gd3d.framework
                     particle.lifetime = lifetime;
                     particle.rateAtLifeTime = rateAtLifeTime;
                     //
-                    particle.birthRateAtDuration = birthRateAtDuration;
+                    particle.birthRateAtDuration = birthRateAtDuration - Math.floor(birthRateAtDuration);
 
                     this._activeParticles.push(particle);
                     this._initParticleState(particle);
@@ -624,5 +632,5 @@ namespace gd3d.framework
         }
     }
 
-    // AssetData.addAssetData("Billboard-Geometry", Geometry.billboard = serialization.setValue(new PlaneGeometry(), { name: "Billboard-Geometry", assetId: "Billboard-Geometry", yUp: false, hideFlags: HideFlags.NotEditable }));
+    // AssetData.addAssetData("Billboard-Geometry", Geometry.billboard = serialization.setValue(new QuadGeometry(), { name: "Billboard-Geometry", assetId: "Billboard-Geometry", hideFlags: HideFlags.NotEditable }));
 }
