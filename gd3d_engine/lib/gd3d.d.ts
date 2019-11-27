@@ -470,8 +470,10 @@ declare namespace gd3d.framework {
         pixelHeight: number;
         private rootNode;
         getRoot(): transform2D;
-        ModelPosToCanvasPos(fromP: math.vector2, outP: math.vector2): void;
-        CanvasPosToModelPos(canvasPos: math.vector2, outModelPos: math.vector2): void;
+        ModelPosToCanvasPos(clipPos: math.vector2, outCanvasPos: math.vector2): void;
+        clipPosToCanvasPos(clipPos: math.vector2, outCanvasPos: math.vector2): void;
+        CanvasPosToModelPos(canvasPos: math.vector2, outClipPos: math.vector2): void;
+        canvasPosToClipPos(canvasPos: math.vector2, outClipPos: math.vector2): void;
     }
 }
 declare namespace gd3d.framework {
@@ -535,7 +537,6 @@ declare namespace gd3d.framework {
         getChildCount(): number;
         getChild(index: number): transform2D;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
-        private readonly viewPixelrect;
         private readonly helpv2;
         private readonly helpv2_1;
         update(delta: number): void;
@@ -548,8 +549,10 @@ declare namespace gd3d.framework {
         private dopick2d;
         calScreenPosToCanvasPos(screenPos: gd3d.math.vector2, outCanvasPos: gd3d.math.vector2): void;
         calCanvasPosToScreenPos(canvasPos: gd3d.math.vector2, outScreenPos: gd3d.math.vector2): void;
-        calScreenPosToModelPos(screenPos: gd3d.math.vector2, outModelPos: gd3d.math.vector2): void;
-        calModelPosToScreenPos(modelPos: gd3d.math.vector2, outScreenPos: gd3d.math.vector2): void;
+        calScreenPosToModelPos(screenPos: gd3d.math.vector2, outClipPos: gd3d.math.vector2): void;
+        calScreenPosToClipPos(screenPos: gd3d.math.vector2, outClipPos: gd3d.math.vector2): void;
+        calModelPosToScreenPos(clipPos: gd3d.math.vector2, outScreenPos: gd3d.math.vector2): void;
+        calClipPosToScreenPos(clipPos: gd3d.math.vector2, outScreenPos: gd3d.math.vector2): void;
     }
 }
 declare namespace gd3d.framework {
@@ -2851,6 +2854,7 @@ declare namespace gd3d.framework {
         private static helpmtx_2;
         private static helpmtx_3;
         private static helprect;
+        private projectMatrixDirty;
         cullZPlane: boolean;
         gameObject: gameObject;
         private _near;
@@ -2877,23 +2881,33 @@ declare namespace gd3d.framework {
         getOverLays(): IOverLay[];
         removeOverLay(overLay: IOverLay): void;
         private sortOverLays;
-        calcViewMatrix(matrix: gd3d.math.matrix): void;
-        calcViewPortPixel(app: application, viewPortPixel: math.rect): void;
-        calcProjectMatrix(asp: number, matrix: gd3d.math.matrix): void;
+        private LastCamWorldMtx;
+        calcViewMatrix(outMatrix?: gd3d.math.matrix): boolean;
+        readonly currViewPixelRect: math.rect;
+        currViewPixelASP: number;
+        calcViewPortPixel(app: application, viewPortPixel?: math.rect): void;
+        private lastAsp;
+        calcProjectMatrix(asp: number, outMatrix: gd3d.math.matrix): boolean;
+        calcViewProjectMatrix(app: application, outViewProjectMatrix?: math.matrix, outViewMatrix?: math.matrix, outProjectMatrix?: math.matrix): boolean;
         private static _shareRay;
         creatRayByScreen(screenpos: gd3d.math.vector2, app: application, shareRayCache?: boolean): ray;
         calcModelPosFromScreenPos(app: application, screenPos: math.vector3, outModelPos: math.vector3): void;
         calcScreenPosFromWorldPos(app: application, worldPos: math.vector3, outScreenPos: math.vector2): void;
+        calcClipPosFromWorldPos(app: application, worldPos: math.vector3, outClipPos: math.vector3): void;
         private lastCamMtx;
         private lastCamRect;
         private paraArr;
         private calcCameraFrame;
-        private matView;
+        private viewMatrix;
         private matProjP;
         private matProjO;
-        private matProj;
+        private projectMatrix;
+        private viewProjectMatrix;
+        private InverseViewProjectMatrix;
         private frameVecs;
+        private _fov;
         fov: number;
+        _size: number;
         size: number;
         private _opvalue;
         opvalue: number;

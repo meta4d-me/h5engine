@@ -1789,7 +1789,7 @@ var gd3d;
                     tv2.x = this.pointEvent.x = XOnModelSpace;
                     tv2.y = this.pointEvent.y = YOnModelSpace;
                     this.pointEvent.selected = null;
-                    this.ModelPosToCanvasPos(tv2, tv2);
+                    this.clipPosToCanvasPos(tv2, tv2);
                     this.pointEvent.c_x = tv2.x;
                     this.pointEvent.c_y = tv2.y;
                     var skip = false;
@@ -2108,21 +2108,27 @@ var gd3d;
                 }
                 return this.rootNode;
             };
-            canvas.prototype.ModelPosToCanvasPos = function (fromP, outP) {
-                if (fromP == null || outP == null)
-                    return;
-                var scalx = 1 - (fromP.x - 1) / -2;
-                var scaly = (fromP.y - 1) / -2;
-                outP.x = scalx * this.pixelWidth;
-                outP.y = scaly * this.pixelHeight;
+            canvas.prototype.ModelPosToCanvasPos = function (clipPos, outCanvasPos) {
+                this.clipPosToCanvasPos(clipPos, outCanvasPos);
             };
-            canvas.prototype.CanvasPosToModelPos = function (canvasPos, outModelPos) {
-                if (!canvasPos || !outModelPos)
+            canvas.prototype.clipPosToCanvasPos = function (clipPos, outCanvasPos) {
+                if (clipPos == null || outCanvasPos == null)
+                    return;
+                var scalx = 1 - (clipPos.x - 1) * -0.5;
+                var scaly = (clipPos.y - 1) * -0.5;
+                outCanvasPos.x = scalx * this.pixelWidth;
+                outCanvasPos.y = scaly * this.pixelHeight;
+            };
+            canvas.prototype.CanvasPosToModelPos = function (canvasPos, outClipPos) {
+                this.canvasPosToClipPos(canvasPos, outClipPos);
+            };
+            canvas.prototype.canvasPosToClipPos = function (canvasPos, outClipPos) {
+                if (!canvasPos || !outClipPos)
                     return;
                 var scalx = canvasPos.x / this.pixelWidth;
                 var scaly = canvasPos.y / this.pixelHeight;
-                outModelPos.x = scalx * 2 - 1;
-                outModelPos.y = 1 - scaly * 2;
+                outClipPos.x = scalx * 2 - 1;
+                outClipPos.y = 1 - scaly * 2;
             };
             var canvas_1;
             canvas.ClassName = "canvas";
@@ -2311,7 +2317,7 @@ var gd3d;
                 var ray = camera.creatRayByScreen(screenPos, this.gameObject.getScene().app);
                 var ModelPos = gd3d.math.pool.new_vector2();
                 this.pickModelPos(ray, ModelPos);
-                this.canvas.ModelPosToCanvasPos(ModelPos, outCanvasPos);
+                this.canvas.clipPosToCanvasPos(ModelPos, outCanvasPos);
                 gd3d.math.pool.delete_vector2(ModelPos);
             };
             canvasRenderer.prototype.calCanvasPosToWorldPos = function (from, out) {
@@ -2371,7 +2377,6 @@ var gd3d;
                 this.matchReference_height = 600;
                 this.scaleMode = UIScaleMode.CONSTANT_PIXEL_SIZE;
                 this.sortOrder = 0;
-                this.viewPixelrect = new gd3d.math.rect();
                 this.helpv2 = new gd3d.math.vector2();
                 this.helpv2_1 = new gd3d.math.vector2();
                 this.lastVPRect = new gd3d.math.rect();
@@ -2416,15 +2421,15 @@ var gd3d;
                 this.helpv2.y = this.inputmgr.point.y;
                 var sPos = this.helpv2;
                 var mPos = this.helpv2_1;
-                this.calScreenPosToModelPos(sPos, mPos);
+                this.calScreenPosToClipPos(sPos, mPos);
                 this.canvas.update(delta, this.inputmgr.point.touch, mPos.x, mPos.y);
             };
             overlay2D.prototype.ckScaleMode = function () {
                 if (!this.canvas.getRoot().visible || !this.camera)
                     return;
-                this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+                var currVPR = this.camera.currViewPixelRect;
                 var dirty = false;
-                if (gd3d.math.rectEqul(this.lastVPRect, this.viewPixelrect)) {
+                if (gd3d.math.rectEqul(this.lastVPRect, currVPR)) {
                     switch (this.scaleMode) {
                         case UIScaleMode.CONSTANT_PIXEL_SIZE:
                             break;
@@ -2442,19 +2447,19 @@ var gd3d;
                     return;
                 var _w = 0;
                 var _h = 0;
-                gd3d.math.rectClone(this.viewPixelrect, this.lastVPRect);
+                gd3d.math.rectClone(currVPR, this.lastVPRect);
                 this.lastScreenMR = this.screenMatchRate;
                 this.lastMR_width = this.matchReference_width;
                 this.lastMR_height = this.matchReference_height;
                 switch (this.scaleMode) {
                     case UIScaleMode.CONSTANT_PIXEL_SIZE:
-                        _w = this.viewPixelrect.w;
-                        _h = this.viewPixelrect.h;
+                        _w = currVPR.w;
+                        _h = currVPR.h;
                         break;
                     case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
                         var match = this.screenMatchRate < 0 ? 0 : this.screenMatchRate;
                         match = match > 1 ? 1 : match;
-                        var asp = this.viewPixelrect.w / this.viewPixelrect.h;
+                        var asp = currVPR.w / currVPR.h;
                         _w = gd3d.math.numberLerp(this.matchReference_width, this.matchReference_height * asp, match);
                         _h = gd3d.math.numberLerp(this.matchReference_height, this.matchReference_width / asp, 1 - match);
                         break;
@@ -2472,24 +2477,24 @@ var gd3d;
                 this.helpv2.y = my;
                 var sPos = this.helpv2;
                 var mPos = this.helpv2_1;
-                this.calScreenPosToModelPos(sPos, mPos);
+                this.calScreenPosToClipPos(sPos, mPos);
                 var trans = this.dopick2d(mPos, root, tolerance);
                 return trans;
             };
-            overlay2D.prototype.dopick2d = function (ModelPos, tran, tolerance) {
+            overlay2D.prototype.dopick2d = function (clipPos, tran, tolerance) {
                 if (tolerance === void 0) { tolerance = 0; }
                 if (tran.components != null) {
                     for (var i = tran.components.length - 1; i >= 0; i--) {
                         var comp = tran.components[i];
                         if (comp != null)
-                            if (comp.comp.transform.ContainsCanvasPoint(ModelPos, tolerance)) {
+                            if (comp.comp.transform.ContainsCanvasPoint(clipPos, tolerance)) {
                                 return comp.comp.transform;
                             }
                     }
                 }
                 if (tran.children != null) {
                     for (var i = tran.children.length - 1; i >= 0; i--) {
-                        var tran2 = this.dopick2d(ModelPos, tran.children[i], tolerance);
+                        var tran2 = this.dopick2d(clipPos, tran.children[i], tolerance);
                         if (tran2 != null)
                             return tran2;
                     }
@@ -2500,33 +2505,39 @@ var gd3d;
                 if (!this.camera || !this.canvas)
                     return;
                 var mPos = this.helpv2;
-                this.calScreenPosToModelPos(screenPos, mPos);
-                this.canvas.ModelPosToCanvasPos(mPos, outCanvasPos);
+                this.calScreenPosToClipPos(screenPos, mPos);
+                this.canvas.clipPosToCanvasPos(mPos, outCanvasPos);
             };
             overlay2D.prototype.calCanvasPosToScreenPos = function (canvasPos, outScreenPos) {
                 if (!this.camera || !this.canvas)
                     return;
-                var mPos = this.helpv2;
-                this.canvas.CanvasPosToModelPos(canvasPos, mPos);
-                this.calModelPosToScreenPos(mPos, outScreenPos);
+                var clipPos = this.helpv2;
+                this.canvas.canvasPosToClipPos(canvasPos, clipPos);
+                this.calClipPosToScreenPos(clipPos, outScreenPos);
             };
-            overlay2D.prototype.calScreenPosToModelPos = function (screenPos, outModelPos) {
-                if (!screenPos || !outModelPos || !this.camera)
+            overlay2D.prototype.calScreenPosToModelPos = function (screenPos, outClipPos) {
+                this.calScreenPosToClipPos(screenPos, outClipPos);
+            };
+            overlay2D.prototype.calScreenPosToClipPos = function (screenPos, outClipPos) {
+                if (!screenPos || !outClipPos || !this.camera)
                     return;
-                this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+                var currVPR = this.camera.currViewPixelRect;
                 var rect = this.camera.viewport;
                 var real_x = screenPos.x - rect.x * this.app.width;
                 var real_y = screenPos.y - rect.y * this.app.height;
-                outModelPos.x = (real_x / this.viewPixelrect.w) * 2 - 1;
-                outModelPos.y = (real_y / this.viewPixelrect.h) * -2 + 1;
+                outClipPos.x = (real_x / currVPR.w) * 2 - 1;
+                outClipPos.y = (real_y / currVPR.h) * -2 + 1;
             };
-            overlay2D.prototype.calModelPosToScreenPos = function (modelPos, outScreenPos) {
-                if (!modelPos || !outScreenPos || !this.camera)
+            overlay2D.prototype.calModelPosToScreenPos = function (clipPos, outScreenPos) {
+                this.calClipPosToScreenPos(clipPos, outScreenPos);
+            };
+            overlay2D.prototype.calClipPosToScreenPos = function (clipPos, outScreenPos) {
+                if (!clipPos || !outScreenPos || !this.camera)
                     return;
-                this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+                var currVPR = this.camera.currViewPixelRect;
                 var rect = this.camera.viewport;
-                var real_x = this.viewPixelrect.w * (modelPos.x + 1) / 2;
-                var real_y = this.viewPixelrect.h * (modelPos.y - 1) / -2;
+                var real_x = currVPR.w * (clipPos.x + 1) * 0.5;
+                var real_y = currVPR.h * (clipPos.y - 1) * -0.5;
                 outScreenPos.x = real_x + rect.x * this.app.width;
                 outScreenPos.y = real_y + rect.y * this.app.height;
             };
@@ -4245,11 +4256,11 @@ var gd3d;
                 var minPos = gd3d.poolv2();
                 minPos.x = this.min_x;
                 minPos.y = this.max_y;
-                canvas.ModelPosToCanvasPos(minPos, minPos);
+                canvas.clipPosToCanvasPos(minPos, minPos);
                 var maxPos = gd3d.poolv2();
                 maxPos.x = this.max_x;
                 maxPos.y = this.min_y;
-                canvas.ModelPosToCanvasPos(maxPos, maxPos);
+                canvas.clipPosToCanvasPos(maxPos, maxPos);
                 this._darwRect.x = minPos.x;
                 this._darwRect.y = minPos.y;
                 this._darwRect.w = maxPos.x - minPos.x;
@@ -5563,11 +5574,11 @@ var gd3d;
                 var minPos = gd3d.poolv2();
                 minPos.x = this.min_x;
                 minPos.y = this.max_y;
-                canvas.ModelPosToCanvasPos(minPos, minPos);
+                canvas.clipPosToCanvasPos(minPos, minPos);
                 var maxPos = gd3d.poolv2();
                 maxPos.x = this.max_x;
                 maxPos.y = this.min_y;
-                canvas.ModelPosToCanvasPos(maxPos, maxPos);
+                canvas.clipPosToCanvasPos(maxPos, maxPos);
                 this._darwRect.x = minPos.x;
                 this._darwRect.y = minPos.y;
                 this._darwRect.w = maxPos.x - minPos.x;
@@ -5944,11 +5955,11 @@ var gd3d;
                 var minPos = gd3d.poolv2();
                 minPos.x = this.min_x;
                 minPos.y = this.max_y;
-                canvas.ModelPosToCanvasPos(minPos, minPos);
+                canvas.clipPosToCanvasPos(minPos, minPos);
                 var maxPos = gd3d.poolv2();
                 maxPos.x = this.max_x;
                 maxPos.y = this.min_y;
-                canvas.ModelPosToCanvasPos(maxPos, maxPos);
+                canvas.clipPosToCanvasPos(maxPos, maxPos);
                 this._darwRect.x = minPos.x;
                 this._darwRect.y = minPos.y;
                 this._darwRect.w = maxPos.x - minPos.x;
@@ -6058,7 +6069,7 @@ var gd3d;
                         var temps = scrollRect_1.helpv2;
                         gd3d.math.vec2Set(temps, ev.x, ev.y);
                         var tempc = scrollRect_1.helpv2_1;
-                        this.transform.canvas.ModelPosToCanvasPos(temps, tempc);
+                        this.transform.canvas.clipPosToCanvasPos(temps, tempc);
                         var sp = this.strPoint;
                         if (ev.type == gd3d.event.PointEventEnum.PointDown) {
                             this.isPointDown = true;
@@ -6229,7 +6240,7 @@ var gd3d;
                         var temps = slideArea_1.helpv2;
                         gd3d.math.vec2Set(temps, ev.x, ev.y);
                         var tempc = slideArea_1.helpv2_1;
-                        this.transform.canvas.ModelPosToCanvasPos(temps, tempc);
+                        this.transform.canvas.clipPosToCanvasPos(temps, tempc);
                         var sp = this.strPoint;
                         if (ev.type == gd3d.event.PointEventEnum.PointDown) {
                             this.isPointDown = true;
@@ -14891,6 +14902,7 @@ var gd3d;
         framework.cameraPostQueue_Color = cameraPostQueue_Color;
         var camera = (function () {
             function camera() {
+                this.projectMatrixDirty = true;
                 this.cullZPlane = true;
                 this._near = 0.01;
                 this._far = 1000;
@@ -14904,16 +14916,22 @@ var gd3d;
                 this.renderTarget = null;
                 this.order = 0;
                 this.overlays = [];
+                this.LastCamWorldMtx = new gd3d.math.matrix();
+                this.currViewPixelRect = new gd3d.math.rect();
+                this.currViewPixelASP = 1;
+                this.lastAsp = -1;
                 this.lastCamMtx = new gd3d.math.matrix();
                 this.lastCamRect = new gd3d.math.rect();
                 this.paraArr = [NaN, NaN, NaN, NaN, NaN];
-                this.matView = new gd3d.math.matrix;
+                this.viewMatrix = new gd3d.math.matrix;
                 this.matProjP = new gd3d.math.matrix;
                 this.matProjO = new gd3d.math.matrix;
-                this.matProj = new gd3d.math.matrix;
+                this.projectMatrix = new gd3d.math.matrix;
+                this.viewProjectMatrix = new gd3d.math.matrix;
+                this.InverseViewProjectMatrix = new gd3d.math.matrix;
                 this.frameVecs = [];
-                this.fov = 60 * Math.PI / 180;
-                this.size = 2;
+                this._fov = 60 * Math.PI / 180;
+                this._size = 2;
                 this._opvalue = 1;
                 this.cullingMap = {};
                 this.isLastCamera = false;
@@ -14942,13 +14960,14 @@ var gd3d;
                     return this._near;
                 },
                 set: function (val) {
-                    if (this.opvalue > 0) {
+                    if (this._opvalue > 0) {
                         if (val < 0.01)
                             val = 0.01;
                     }
-                    if (val >= this.far)
-                        val = this.far - 0.01;
+                    if (val >= this._far)
+                        val = this._far - 0.01;
                     this._near = val;
+                    this.projectMatrixDirty = true;
                 },
                 enumerable: true,
                 configurable: true
@@ -14958,9 +14977,10 @@ var gd3d;
                     return this._far;
                 },
                 set: function (val) {
-                    if (val <= this.near)
-                        val = this.near + 0.01;
+                    if (val <= this._near)
+                        val = this._near + 0.01;
                     this._far = val;
+                    this.projectMatrixDirty = true;
                 },
                 enumerable: true,
                 configurable: true
@@ -15011,11 +15031,16 @@ var gd3d;
                     return a.sortOrder - b.sortOrder;
                 });
             };
-            camera.prototype.calcViewMatrix = function (matrix) {
-                var camworld = this.gameObject.transform.getWorldMatrix();
-                gd3d.math.matrixInverse(camworld, this.matView);
-                gd3d.math.matrixClone(this.matView, matrix);
-                return;
+            camera.prototype.calcViewMatrix = function (outMatrix) {
+                var wMtx = this.gameObject.transform.getWorldMatrix();
+                var dirty = !gd3d.math.matrixEqual(wMtx, this.LastCamWorldMtx, 0.000001);
+                if (dirty) {
+                    gd3d.math.matrixClone(wMtx, this.LastCamWorldMtx);
+                    gd3d.math.matrixInverse(wMtx, this.viewMatrix);
+                }
+                if (outMatrix)
+                    gd3d.math.matrixClone(this.viewMatrix, outMatrix);
+                return true;
             };
             camera.prototype.calcViewPortPixel = function (app, viewPortPixel) {
                 var w;
@@ -15028,23 +15053,46 @@ var gd3d;
                     w = this.renderTarget.width;
                     h = this.renderTarget.height;
                 }
-                viewPortPixel.x = w * this.viewport.x;
-                viewPortPixel.y = h * this.viewport.y;
-                viewPortPixel.w = w * this.viewport.w;
-                viewPortPixel.h = h * this.viewport.h;
+                var vp = this.viewport;
+                var cvpr = this.currViewPixelRect;
+                cvpr.x = w * vp.x;
+                cvpr.y = h * vp.y;
+                cvpr.w = w * vp.w;
+                cvpr.h = h * vp.h;
+                if (viewPortPixel) {
+                    gd3d.math.rectClone(this.currViewPixelRect, viewPortPixel);
+                }
+                this.currViewPixelASP = cvpr.w / cvpr.h;
             };
-            camera.prototype.calcProjectMatrix = function (asp, matrix) {
-                if (this.opvalue > 0)
-                    gd3d.math.matrixProject_PerspectiveLH(this.fov, asp, this.near, this.far, this.matProjP);
-                if (this.opvalue < 1)
-                    gd3d.math.matrixProject_OrthoLH(this.size * asp, this.size, this.near, this.far, this.matProjO);
-                if (this.opvalue == 0)
-                    gd3d.math.matrixClone(this.matProjO, this.matProj);
-                else if (this.opvalue == 1)
-                    gd3d.math.matrixClone(this.matProjP, this.matProj);
-                else
-                    gd3d.math.matrixLerp(this.matProjO, this.matProjP, this.opvalue, this.matProj);
-                gd3d.math.matrixClone(this.matProj, matrix);
+            camera.prototype.calcProjectMatrix = function (asp, outMatrix) {
+                if (this.projectMatrixDirty || this.lastAsp != asp) {
+                    if (this._opvalue > 0)
+                        gd3d.math.matrixProject_PerspectiveLH(this._fov, asp, this._near, this._far, this.matProjP);
+                    if (this._opvalue < 1)
+                        gd3d.math.matrixProject_OrthoLH(this._size * asp, this._size, this._near, this._far, this.matProjO);
+                    if (this._opvalue == 0)
+                        gd3d.math.matrixClone(this.matProjO, this.projectMatrix);
+                    else if (this._opvalue == 1)
+                        gd3d.math.matrixClone(this.matProjP, this.projectMatrix);
+                    else
+                        gd3d.math.matrixLerp(this.matProjO, this.matProjP, this._opvalue, this.projectMatrix);
+                }
+                this.projectMatrixDirty = false;
+                this.lastAsp = asp;
+                if (outMatrix)
+                    gd3d.math.matrixClone(this.projectMatrix, outMatrix);
+                return true;
+            };
+            camera.prototype.calcViewProjectMatrix = function (app, outViewProjectMatrix, outViewMatrix, outProjectMatrix) {
+                var vd = this.calcViewMatrix(outViewMatrix);
+                var asp = this.currViewPixelASP;
+                var pd = this.calcProjectMatrix(asp, outProjectMatrix);
+                if (vd || pd) {
+                    gd3d.math.matrixMultiply(this.projectMatrix, this.viewMatrix, this.viewProjectMatrix);
+                    if (outViewProjectMatrix)
+                        gd3d.math.matrixClone(this.viewProjectMatrix, outViewProjectMatrix);
+                }
+                return vd || pd;
             };
             camera.prototype.creatRayByScreen = function (screenpos, app, shareRayCache) {
                 if (shareRayCache === void 0) { shareRayCache = true; }
@@ -15073,66 +15121,54 @@ var gd3d;
                 return ray;
             };
             camera.prototype.calcModelPosFromScreenPos = function (app, screenPos, outModelPos) {
-                var vpp = camera_1.helprect;
-                this.calcViewPortPixel(app, vpp);
-                var vppos = gd3d.poolv2();
-                vppos.x = screenPos.x / vpp.w * 2 - 1;
-                vppos.y = 1 - screenPos.y / vpp.h * 2;
-                var matrixView = camera_1.helpmtx;
-                var matrixProject = camera_1.helpmtx_1;
-                var asp = vpp.w / vpp.h;
-                this.calcViewMatrix(matrixView);
-                this.calcProjectMatrix(asp, matrixProject);
-                var matrixViewProject = camera_1.helpmtx_2;
-                var matinv = camera_1.helpmtx_3;
-                gd3d.math.matrixMultiply(matrixProject, matrixView, matrixViewProject);
-                gd3d.math.matrixInverse(matrixViewProject, matinv);
+                var vpp = this.currViewPixelRect;
+                var matinv = this.InverseViewProjectMatrix;
+                var vpd = this.calcViewProjectMatrix(app);
+                if (vpd) {
+                    gd3d.math.matrixInverse(this.viewProjectMatrix, matinv);
+                }
                 var src1 = camera_1.helpv3;
-                src1.x = vppos.x;
-                src1.y = vppos.y;
+                src1.x = screenPos.x / vpp.w * 2 - 1;
+                src1.y = 1 - screenPos.y / vpp.h * 2;
                 src1.z = screenPos.z;
                 gd3d.math.matrixTransformVector3(src1, matinv, outModelPos);
-                gd3d.poolv2_del(vppos);
             };
             camera.prototype.calcScreenPosFromWorldPos = function (app, worldPos, outScreenPos) {
-                var vpp = camera_1.helprect;
-                this.calcViewPortPixel(app, vpp);
-                var matrixView = camera_1.helpmtx;
-                var matrixProject = camera_1.helpmtx_1;
-                var asp = vpp.w / vpp.h;
-                this.calcViewMatrix(matrixView);
-                this.calcProjectMatrix(asp, matrixProject);
-                var matrixViewProject = camera_1.helpmtx_2;
-                gd3d.math.matrixMultiply(matrixProject, matrixView, matrixViewProject);
+                var vpp = this.currViewPixelRect;
+                this.calcViewProjectMatrix(app);
                 var ndcPos = camera_1.helpv3;
-                gd3d.math.matrixTransformVector3(worldPos, matrixViewProject, ndcPos);
-                outScreenPos.x = (ndcPos.x + 1) * vpp.w / 2;
-                outScreenPos.y = (1 - ndcPos.y) * vpp.h / 2;
+                gd3d.math.matrixTransformVector3(worldPos, this.viewProjectMatrix, ndcPos);
+                outScreenPos.x = (ndcPos.x + 1) * vpp.w * 0.5;
+                outScreenPos.y = (1 - ndcPos.y) * vpp.h * 0.5;
+            };
+            camera.prototype.calcClipPosFromWorldPos = function (app, worldPos, outClipPos) {
+                this.calcViewProjectMatrix(app);
+                gd3d.math.matrixTransformVector3(worldPos, this.viewProjectMatrix, outClipPos);
             };
             camera.prototype.calcCameraFrame = function (app) {
                 var matrix = this.gameObject.transform.getWorldMatrix();
-                var _vpp = gd3d.math.pool.new_rect();
+                var _vpp = camera_1.helprect;
                 this.calcViewPortPixel(app, _vpp);
                 var tOpval = Math.ceil(this._opvalue);
                 if (gd3d.math.matrixEqual(this.lastCamMtx, matrix) && gd3d.math.rectEqul(this.lastCamRect, _vpp) &&
-                    this.paraArr[0] == this.fov && this.paraArr[1] == this._near && this.paraArr[2] == this._far) {
-                    if (this.paraArr[3] == tOpval && (tOpval == 1 || this.paraArr[4] == this.size)) {
+                    this.paraArr[0] == this._fov && this.paraArr[1] == this._near && this.paraArr[2] == this._far) {
+                    if (this.paraArr[3] == tOpval && (tOpval == 1 || this.paraArr[4] == this._size)) {
                         return;
                     }
                 }
                 var needSize = tOpval == 0;
                 gd3d.math.matrixClone(matrix, this.lastCamMtx);
                 gd3d.math.rectClone(_vpp, this.lastCamRect);
-                this.paraArr[0] = this.fov;
+                this.paraArr[0] = this._fov;
                 this.paraArr[1] = this._near;
                 this.paraArr[2] = this._far;
                 this.paraArr[3] = this._opvalue;
-                this.paraArr[4] = this.size;
-                var tanFov = Math.tan(this.fov * 0.5);
-                var nearSize = this.near * tanFov;
-                var farSize = this.far * tanFov;
+                this.paraArr[4] = this._size;
+                var tanFov = Math.tan(this._fov * 0.5);
+                var nearSize = this._near * tanFov;
+                var farSize = this._far * tanFov;
                 if (needSize) {
-                    nearSize = farSize = this.size * 0.5;
+                    nearSize = farSize = this._size * 0.5;
                 }
                 var near_h = nearSize;
                 var asp = _vpp.w / _vpp.h;
@@ -15141,20 +15177,20 @@ var gd3d;
                 var nearLD = camera_1.helpv3_1;
                 var nearRT = camera_1.helpv3_2;
                 var nearRD = camera_1.helpv3_3;
-                gd3d.math.vec3Set(nearLT, -near_w, near_h, this.near);
-                gd3d.math.vec3Set(nearLD, -near_w, -near_h, this.near);
-                gd3d.math.vec3Set(nearRT, near_w, near_h, this.near);
-                gd3d.math.vec3Set(nearRD, near_w, -near_h, this.near);
+                gd3d.math.vec3Set(nearLT, -near_w, near_h, this._near);
+                gd3d.math.vec3Set(nearLD, -near_w, -near_h, this._near);
+                gd3d.math.vec3Set(nearRT, near_w, near_h, this._near);
+                gd3d.math.vec3Set(nearRD, near_w, -near_h, this._near);
                 var far_h = farSize;
                 var far_w = far_h * asp;
                 var farLT = camera_1.helpv3_4;
                 var farLD = camera_1.helpv3_5;
                 var farRT = camera_1.helpv3_6;
                 var farRD = camera_1.helpv3_7;
-                gd3d.math.vec3Set(farLT, -far_w, far_h, this.far);
-                gd3d.math.vec3Set(farLD, -far_w, -far_h, this.far);
-                gd3d.math.vec3Set(farRT, far_w, far_h, this.far);
-                gd3d.math.vec3Set(farRD, far_w, -far_h, this.far);
+                gd3d.math.vec3Set(farLT, -far_w, far_h, this._far);
+                gd3d.math.vec3Set(farLD, -far_w, -far_h, this._far);
+                gd3d.math.vec3Set(farRT, far_w, far_h, this._far);
+                gd3d.math.vec3Set(farRD, far_w, -far_h, this._far);
                 gd3d.math.matrixTransformVector3(farLD, matrix, farLD);
                 gd3d.math.matrixTransformVector3(nearLD, matrix, nearLD);
                 gd3d.math.matrixTransformVector3(farRD, matrix, farRD);
@@ -15172,32 +15208,54 @@ var gd3d;
                 gd3d.math.vec3Clone(farRT, this.frameVecs[6]);
                 gd3d.math.vec3Clone(nearRT, this.frameVecs[7]);
             };
+            Object.defineProperty(camera.prototype, "fov", {
+                get: function () {
+                    return this._fov;
+                },
+                set: function (val) {
+                    this._fov = val;
+                    this.projectMatrixDirty = true;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(camera.prototype, "size", {
+                get: function () {
+                    return this._size;
+                },
+                set: function (val) {
+                    this._size = val;
+                    this.projectMatrixDirty = true;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(camera.prototype, "opvalue", {
                 get: function () {
                     return this._opvalue;
                 },
                 set: function (val) {
                     if (val > 0 && this._near < 0.01) {
-                        this._near = 0.01;
+                        this.near = 0.01;
                         if (this._far <= this._near)
-                            this._far = this._near + 0.01;
+                            this.far = this._near + 0.01;
                     }
                     this._opvalue = val;
+                    this.projectMatrixDirty = true;
                 },
                 enumerable: true,
                 configurable: true
             });
             camera.prototype.getPosAtXPanelInViewCoordinateByScreenPos = function (screenPos, app, z, out) {
-                var vpp = camera_1.helprect;
-                this.calcViewPortPixel(app, vpp);
+                var vpp = this.currViewPixelRect;
                 var nearpos = camera_1.helpv3;
-                nearpos.z = -this.near;
+                nearpos.z = -this._near;
                 nearpos.x = screenPos.x - vpp.w * 0.5;
                 nearpos.y = vpp.h * 0.5 - screenPos.y;
                 var farpos = camera_1.helpv3_1;
-                farpos.z = -this.far;
-                farpos.x = this.far * nearpos.x / this.near;
-                farpos.y = this.far * nearpos.y / this.near;
+                farpos.z = -this._far;
+                farpos.x = this._far * nearpos.x / this._near;
+                farpos.y = this._far * nearpos.y / this._near;
                 ;
                 var rate = (nearpos.z - z) / (nearpos.z - farpos.z);
                 out.x = nearpos.x - (nearpos.x - farpos.x) * rate;
@@ -15258,7 +15316,7 @@ var gd3d;
                     aabb = skinmesh.aabb;
                 }
                 gd3d.math.vec3Subtract(aabb.maximum, aabb.minimum, vec3cache);
-                var radius = gd3d.math.vec3Length(vec3cache) / 2;
+                var radius = gd3d.math.vec3Length(vec3cache) * 0.5;
                 var center = node.aabb.center;
                 return this.cullTest(radius, center);
             };
@@ -15452,12 +15510,14 @@ var gd3d;
             ], camera.prototype, "overlays", void 0);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], camera.prototype, "fov", void 0);
+                __metadata("design:type", Number),
+                __metadata("design:paramtypes", [Number])
+            ], camera.prototype, "fov", null);
             __decorate([
                 gd3d.reflect.Field("number"),
-                __metadata("design:type", Number)
-            ], camera.prototype, "size", void 0);
+                __metadata("design:type", Number),
+                __metadata("design:paramtypes", [Number])
+            ], camera.prototype, "size", null);
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number),
@@ -38009,11 +38069,7 @@ var gd3d;
                 configurable: true
             });
             renderContext.prototype.updateCamera = function (app, camera) {
-                camera.calcViewPortPixel(app, this.viewPortPixel);
-                var asp = this.viewPortPixel.w / this.viewPortPixel.h;
-                camera.calcViewMatrix(this.matrixView);
-                camera.calcProjectMatrix(asp, this.matrixProject);
-                gd3d.math.matrixMultiply(this.matrixProject, this.matrixView, this.matrixViewProject);
+                camera.calcViewProjectMatrix(app, this.matrixViewProject, this.matrixView, this.matrixProject);
                 this.floatTimer = app.getTotalTime();
                 var pso = camera.gameObject.transform.getWorldTranslate();
                 this.eyePos.x = pso.x;
@@ -38200,7 +38256,7 @@ var gd3d;
                 configurable: true
             });
             scene.prototype.update = function (delta) {
-                framework.material["lastDrawMatID"] = framework.material["lastDrawMeshID"] = -1;
+                framework.material["lastDrawMatID"] = framework.material["lastDrawMeshID"] = gd3d.render.glDrawPass["lastPassID"] = -1;
                 if (this.autoCollectlightCamera) {
                     this.renderCameras.length = 0;
                     this.renderLights.length = 0;

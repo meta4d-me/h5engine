@@ -173,7 +173,7 @@ namespace gd3d.framework
             //更新矩阵
             //this.rootNode.updateTran(false);
             //this.rootNode.updateAABBChild();//更新完tarn再更新子物体aabb 确保每个transform的aabb正确
-            material["lastDrawMatID"] = material["lastDrawMeshID"] = -1;  //每帧 清理 material 的记录 ， 避免 显示bug
+            material["lastDrawMatID"] = material["lastDrawMeshID"] = render.glDrawPass["lastPassID"] = -1;  //每帧 清理 material 的记录 ， 避免 显示bug
 
             //更新跑一遍，刷出渲染列表
             if(this.autoCollectlightCamera){

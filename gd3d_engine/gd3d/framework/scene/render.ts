@@ -59,13 +59,14 @@ namespace gd3d.framework
         matrix_bones: Float32Array;
         updateCamera(app: application, camera: camera)
         {
-            camera.calcViewPortPixel(app, this.viewPortPixel);
-            var asp = this.viewPortPixel.w / this.viewPortPixel.h;
+            // camera.calcViewPortPixel(app, this.viewPortPixel);
+            // var asp = this.viewPortPixel.w / this.viewPortPixel.h;
             //update viewport
 
-            camera.calcViewMatrix(this.matrixView);
-            camera.calcProjectMatrix(asp, this.matrixProject);
-            gd3d.math.matrixMultiply(this.matrixProject, this.matrixView, this.matrixViewProject);
+            // camera.calcViewMatrix(this.matrixView);
+            // camera.calcProjectMatrix(asp, this.matrixProject);
+            // gd3d.math.matrixMultiply(this.matrixProject, this.matrixView, this.matrixViewProject);
+            camera.calcViewProjectMatrix(app,this.matrixViewProject,this.matrixView,this.matrixProject);
             this.floatTimer = app.getTotalTime();
 
             var pso = camera.gameObject.transform.getWorldTranslate();

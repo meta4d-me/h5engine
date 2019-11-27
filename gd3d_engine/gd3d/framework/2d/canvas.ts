@@ -356,7 +356,7 @@ namespace gd3d.framework
                 tv2.x = this.pointEvent.x = XOnModelSpace;
                 tv2.y = this.pointEvent.y = YOnModelSpace;
                 this.pointEvent.selected = null;
-                this.ModelPosToCanvasPos(tv2, tv2);
+                this.clipPosToCanvasPos(tv2, tv2);
                 this.pointEvent.c_x = tv2.x;
                 this.pointEvent.c_y = tv2.y;
                 var skip = false;
@@ -923,39 +923,57 @@ namespace gd3d.framework
         }
 
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * model空间坐标 转到 canvas 坐标
-         * @param fromP 屏幕空间坐标
-         * @param outP canvas 坐标
+         * [过时接口,完全弃用]
          * @version gd3d 1.0
          */
-        ModelPosToCanvasPos(fromP: math.vector2, outP: math.vector2)
+        ModelPosToCanvasPos(clipPos: math.vector2, outCanvasPos: math.vector2)
         {
-            if (fromP == null || outP == null) return;
-            let scalx = 1 - (fromP.x - 1) / -2;
-            let scaly = (fromP.y - 1) / -2;
-            outP.x = scalx * this.pixelWidth;
-            outP.y = scaly * this.pixelHeight;
+            this.clipPosToCanvasPos(clipPos,outCanvasPos);
         }
 
         /**
          * @public
          * @language zh_CN
          * @classdesc
-         * canvas坐标 转到 model空间坐标 
-         * @param canvasPos canvas坐标
-         * @param outModelPos model空间坐标
+         * 裁剪空间坐标 转到 canvas 坐标
+         * @param clipPos 屏幕空间坐标
+         * @param outCanvasPos canvas 坐标
          * @version gd3d 1.0
          */
-        CanvasPosToModelPos(canvasPos: math.vector2, outModelPos: math.vector2)
+        clipPosToCanvasPos(clipPos: math.vector2, outCanvasPos: math.vector2)
         {
-            if (!canvasPos || !outModelPos) return;
+            if (clipPos == null || outCanvasPos == null) return;
+            let scalx = 1 - (clipPos.x - 1) * -0.5;
+            let scaly = (clipPos.y - 1) * -0.5;
+            outCanvasPos.x = scalx * this.pixelWidth;
+            outCanvasPos.y = scaly * this.pixelHeight;
+        }
+
+        /**
+         * [过时接口,完全弃用]
+         * @version gd3d 1.0
+         */
+        CanvasPosToModelPos(canvasPos: math.vector2, outClipPos: math.vector2)
+        {
+            this.canvasPosToClipPos(canvasPos,outClipPos);
+        }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * canvas坐标 转到 裁剪空间坐标 
+         * @param canvasPos canvas坐标
+         * @param outClipPos model空间坐标
+         * @version gd3d 1.0
+         */
+        canvasPosToClipPos(canvasPos: math.vector2, outClipPos: math.vector2)
+        {
+            if (!canvasPos || !outClipPos) return;
             let scalx = canvasPos.x / this.pixelWidth;
             let scaly = canvasPos.y / this.pixelHeight;
-            outModelPos.x = scalx * 2 - 1;
-            outModelPos.y = 1 - scaly * 2;
+            outClipPos.x = scalx * 2 - 1;
+            outClipPos.y = 1 - scaly * 2;
         }
 
     }

@@ -108,7 +108,7 @@ namespace gd3d.framework
                     let temps = scrollRect.helpv2;
                     gd3d.math.vec2Set(temps,ev.x,ev.y);
                     let tempc = scrollRect.helpv2_1;
-                    this.transform.canvas.ModelPosToCanvasPos(temps,tempc);
+                    this.transform.canvas.clipPosToCanvasPos(temps,tempc);
 
                     let sp = this.strPoint;
                     if(ev.type == event.PointEventEnum.PointDown ) {
