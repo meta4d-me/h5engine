@@ -9,7 +9,7 @@ namespace gd3d.framework
      */
     export class ParticleLimitVelocityOverLifetimeModule extends ParticleModule
     {
-        __class__: "feng3d.ParticleLimitVelocityOverLifetimeModule" = "feng3d.ParticleLimitVelocityOverLifetimeModule";
+        __class__: "gd3d.framework.ParticleLimitVelocityOverLifetimeModule" = "gd3d.framework.ParticleLimitVelocityOverLifetimeModule";
 
         /**
          * Set the size over lifetime on each axis separately.

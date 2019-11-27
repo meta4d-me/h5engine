@@ -10,7 +10,7 @@ namespace gd3d.framework
      */
     export class AnimationCurve1
     {
-        __class__: "feng3d.AnimationCurve" = "feng3d.AnimationCurve";
+        __class__: "gd3d.framework.AnimationCurve" = "gd3d.framework.AnimationCurve";
 
         /**
          * 最大tan值，超出该值后将会变成分段

@@ -8,7 +8,7 @@ namespace gd3d.framework
     export class Color4
     {
 
-        __class__: "feng3d.Color4" = "feng3d.Color4";
+        __class__: "gd3d.framework.Color4" = "gd3d.framework.Color4";
 
         static WHITE = new Color4();
         static BLACK = new Color4(0, 0, 0);

@@ -7,7 +7,7 @@ namespace gd3d.framework
      */
     export class MinMaxCurve
     {
-        __class__: "feng3d.MinMaxCurve" = "feng3d.MinMaxCurve";
+        __class__: "gd3d.framework.MinMaxCurve" = "gd3d.framework.MinMaxCurve";
 
         /**
          * 模式

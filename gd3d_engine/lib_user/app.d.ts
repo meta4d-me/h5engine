@@ -623,6 +623,7 @@ declare class test_ParticleSystem implements IState {
     vscode: string;
     fscode: string;
 }
+declare var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem>;
 declare class test_RangeScreen implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;

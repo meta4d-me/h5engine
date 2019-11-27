@@ -8,7 +8,7 @@ namespace gd3d.framework
      */
     export class ParticleShapeModule extends ParticleModule
     {
-        __class__: "feng3d.ParticleShapeModule" = "feng3d.ParticleShapeModule";
+        __class__: "gd3d.framework.ParticleShapeModule" = "gd3d.framework.ParticleShapeModule";
         /**
          * Type of shape to emit particles from.
          * 发射粒子的形状类型。

@@ -7,7 +7,7 @@ namespace gd3d.framework
      */
     export class ParticleMainModule extends ParticleModule
     {
-        __class__: "feng3d.ParticleMainModule" = "feng3d.ParticleMainModule";
+        __class__: "gd3d.framework.ParticleMainModule" = "gd3d.framework.ParticleMainModule";
 
         enabled = true;
 

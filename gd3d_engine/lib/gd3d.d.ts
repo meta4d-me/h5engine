@@ -5685,7 +5685,7 @@ declare namespace gd3d.framework {
     }
     class ParticleSystem extends EventDispatcher implements IRenderer {
         static readonly ClassName: string;
-        __class__: "feng3d.ParticleSystem";
+        __class__: "gd3d.framework.ParticleSystem";
         layer: RenderLayerEnum;
         renderLayer: number;
         queue: number;
@@ -5897,7 +5897,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class Color3 {
-        __class__: "feng3d.Color3";
+        __class__: "gd3d.framework.Color3";
         static WHITE: Color3;
         static BLACK: Color3;
         static fromUnit(color: number): Color3;
@@ -6073,7 +6073,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class Color4 {
-        __class__: "feng3d.Color4";
+        __class__: "gd3d.framework.Color4";
         static WHITE: Color4;
         static BLACK: Color4;
         static fromUnit(color: number): Color4;
@@ -6114,7 +6114,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AnimationCurve1 {
-        __class__: "feng3d.AnimationCurve";
+        __class__: "gd3d.framework.AnimationCurve";
         maxtan: number;
         preWrapMode: AnimationCurveWrapMode;
         postWrapMode: AnimationCurveWrapMode;
@@ -6185,7 +6185,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class MinMaxCurve {
-        __class__: "feng3d.MinMaxCurve";
+        __class__: "gd3d.framework.MinMaxCurve";
         mode: MinMaxCurveMode;
         constant: number;
         constantMin: number;
@@ -6356,7 +6356,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class Vector3 {
-        __class__: "feng3d.Vector3";
+        __class__: "gd3d.framework.Vector3";
         static X_AXIS: Vector3;
         static Y_AXIS: Vector3;
         static Z_AXIS: Vector3;
@@ -6466,7 +6466,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class Gradient {
-        __class__: "feng3d.Gradient";
+        __class__: "gd3d.framework.Gradient";
         mode: GradientMode;
         alphaKeys: GradientAlphaKey[];
         colorKeys: GradientColorKey[];
@@ -6496,7 +6496,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class MinMaxGradient {
-        __class__: "feng3d.MinMaxGradient";
+        __class__: "gd3d.framework.MinMaxGradient";
         mode: MinMaxGradientMode;
         color: Color4;
         colorMin: Color4;
@@ -6533,7 +6533,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class ParticleEmissionModule extends ParticleModule {
-        __class__: "feng3d.ParticleEmissionModule";
+        __class__: "gd3d.framework.ParticleEmissionModule";
         rateOverTime: MinMaxCurve;
         rateOverTimeMultiplier: number;
         rateOverDistance: MinMaxCurve;
@@ -6569,7 +6569,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class ParticleLimitVelocityOverLifetimeModule extends ParticleModule {
-        __class__: "feng3d.ParticleLimitVelocityOverLifetimeModule";
+        __class__: "gd3d.framework.ParticleLimitVelocityOverLifetimeModule";
         separateAxes: boolean;
         limit: MinMaxCurve;
         limit3D: MinMaxCurveVector3;
@@ -6588,7 +6588,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class ParticleMainModule extends ParticleModule {
-        __class__: "feng3d.ParticleMainModule";
+        __class__: "gd3d.framework.ParticleMainModule";
         enabled: boolean;
         duration: number;
         loop: boolean;
@@ -6648,7 +6648,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class ParticleShapeModule extends ParticleModule {
-        __class__: "feng3d.ParticleShapeModule";
+        __class__: "gd3d.framework.ParticleShapeModule";
         shapeType: ParticleSystemShapeType;
         private _shapeType;
         shape: ParticleSystemShapeType1;
@@ -6731,7 +6731,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class ParticleVelocityOverLifetimeModule extends ParticleModule {
-        __class__: "feng3d.ParticleVelocityOverLifetimeModule";
+        __class__: "gd3d.framework.ParticleVelocityOverLifetimeModule";
         velocity: MinMaxCurveVector3;
         space: ParticleSystemSimulationSpace1;
         x: MinMaxCurve;
@@ -6746,7 +6746,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class ParticleEmissionBurst {
-        __class__: "feng3d.ParticleEmissionBurst";
+        __class__: "gd3d.framework.ParticleEmissionBurst";
         time: number;
         count: MinMaxCurve;
         minCount: number;

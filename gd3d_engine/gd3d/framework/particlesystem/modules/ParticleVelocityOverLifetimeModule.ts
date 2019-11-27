@@ -10,7 +10,7 @@ namespace gd3d.framework
      */
     export class ParticleVelocityOverLifetimeModule extends ParticleModule
     {
-        __class__: "feng3d.ParticleVelocityOverLifetimeModule" = "feng3d.ParticleVelocityOverLifetimeModule";
+        __class__: "gd3d.framework.ParticleVelocityOverLifetimeModule" = "gd3d.framework.ParticleVelocityOverLifetimeModule";
 
         /**
          * Curve to control particle speed based on lifetime.
