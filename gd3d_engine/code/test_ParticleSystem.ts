@@ -65,6 +65,8 @@ class test_ParticleSystem implements IState
         ps.material = mat;
         // ps.mesh = this.astMgr.getDefaultMesh("cube");
 
+        // gd3d.framework.serialization.setValue(ps, pd);
+
         //
         ps.colorOverLifetime.enabled = true;
         ps.colorOverLifetime.color.mode = gd3d.framework.MinMaxGradientMode.Gradient;
@@ -91,13 +93,11 @@ class test_ParticleSystem implements IState
         p.setProgram(program);
         sh.passes["base"].push(p);
         sh.fillUnDefUniform(p);
-        //sh._parseProperties(assetmgr,JSON.parse(this.shader0).properties);
         p.state_ztest = true;
         p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
         p.state_zwrite = false;
         p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
         p.setAlphaBlend(gd3d.render.BlendModeEnum.Add);
-        //p.uniformTexture("_MainTex", null);
         assetmgr.mapShader[sh.getName()] = sh;
 
         return sh;
