@@ -63,7 +63,7 @@ class test_ParticleSystem implements IState
         if (!ps) ps = tran.gameObject.addComponent("ParticleSystem") as any;
         //
         ps.material = mat;
-        ps.mesh = this.astMgr.getDefaultMesh("cube");
+        // ps.mesh = this.astMgr.getDefaultMesh("cube");
 
         //
         ps.colorOverLifetime.enabled = true;

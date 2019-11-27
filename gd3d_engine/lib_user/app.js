@@ -3947,7 +3947,6 @@ var test_ParticleSystem = (function () {
         if (!ps)
             ps = tran.gameObject.addComponent("ParticleSystem");
         ps.material = mat;
-        ps.mesh = this.astMgr.getDefaultMesh("cube");
         ps.colorOverLifetime.enabled = true;
         ps.colorOverLifetime.color.mode = gd3d.framework.MinMaxGradientMode.Gradient;
         ps.colorOverLifetime.color.gradient.colorKeys[0].color.setTo(1, 0, 0);
