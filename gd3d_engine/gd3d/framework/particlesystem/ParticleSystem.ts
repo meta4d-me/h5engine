@@ -67,7 +67,7 @@ namespace gd3d.framework
          */
         time = 0;
 
-        
+
         get main() { return this._main; }
         set main(v)
         {
@@ -77,7 +77,7 @@ namespace gd3d.framework
         }
         private _main: ParticleMainModule;
 
-        
+
         get emission() { return this._emission; }
         set emission(v)
         {
@@ -87,7 +87,7 @@ namespace gd3d.framework
         }
         private _emission: ParticleEmissionModule;
 
-        
+
         get shape() { return this._shape; }
         set shape(v)
         {
@@ -97,7 +97,7 @@ namespace gd3d.framework
         }
         private _shape: ParticleShapeModule;
 
-        
+
         get velocityOverLifetime() { return this._velocityOverLifetime; }
         set velocityOverLifetime(v)
         {
@@ -107,7 +107,7 @@ namespace gd3d.framework
         }
         private _velocityOverLifetime: ParticleVelocityOverLifetimeModule;
 
-        
+
         // @oav({ tooltip: "limit velocity over lifetime module.", block: "limitVelocityOverLifetime", component: "OAVObjectView" })
         get limitVelocityOverLifetime() { return this._limitVelocityOverLifetime; }
         set limitVelocityOverLifetime(v)
@@ -118,7 +118,7 @@ namespace gd3d.framework
         }
         private _limitVelocityOverLifetime: ParticleLimitVelocityOverLifetimeModule;
 
-        
+
         get forceOverLifetime() { return this._forceOverLifetime; }
         set forceOverLifetime(v)
         {
@@ -128,7 +128,7 @@ namespace gd3d.framework
         }
         private _forceOverLifetime: ParticleForceOverLifetimeModule;
 
-        
+
         get colorOverLifetime() { return this._colorOverLifetime; }
         set colorOverLifetime(v)
         {
@@ -138,7 +138,7 @@ namespace gd3d.framework
         }
         private _colorOverLifetime: ParticleColorOverLifetimeModule;
 
-        
+
         get sizeOverLifetime() { return this._sizeOverLifetime; }
         set sizeOverLifetime(v)
         {
@@ -148,7 +148,7 @@ namespace gd3d.framework
         }
         private _sizeOverLifetime: ParticleSizeOverLifetimeModule;
 
-        
+
         get rotationOverLifetime() { return this._rotationOverLifetime; }
         set rotationOverLifetime(v)
         {
@@ -161,7 +161,7 @@ namespace gd3d.framework
         /**
          * 粒子系统纹理表动画模块。
          */
-        
+
         get textureSheetAnimation() { return this._textureSheetAnimation; }
         set textureSheetAnimation(v)
         {
@@ -241,7 +241,7 @@ namespace gd3d.framework
         {
             if (!this._mesh)
             {
-                this._mesh = sceneMgr.app.getAssetMgr().getDefaultMesh("quad_particle");
+                this._mesh = sceneMgr.app.getAssetMgr().getDefaultMesh(gd3d.framework.defMesh.quad);
             }
 
             if (!this.material)
@@ -408,7 +408,7 @@ namespace gd3d.framework
             // renderAtomic.shaderMacro.ENABLED_PARTICLE_SYSTEM_textureSheetAnimation = this.textureSheetAnimation.enabled;
 
             // 计算公告牌矩阵
-            var isbillboard = !this.shape.alignToDirection && this.mesh == sceneMgr.app.getAssetMgr().getDefaultMesh("quad_particle");
+            var isbillboard = !this.shape.alignToDirection && this.mesh == sceneMgr.app.getAssetMgr().getDefaultMesh(gd3d.framework.defMesh.quad);
             var billboardMatrix = new Matrix4x4();
             if (isbillboard)
             {
@@ -444,6 +444,8 @@ namespace gd3d.framework
                 this.material.setVector4("a_particle_scale", new math.vector4(particle.size.x, particle.size.y, particle.size.z, 1));
                 this.material.setVector4("a_particle_rotation", new math.vector4(particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1));
                 this.material.setVector4("a_particle_color", new math.vector4(particle.color.r, particle.color.g, particle.color.b, particle.color.a));
+                this.material.setVector4("a_particle_tilingOffset", new math.vector4(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w));
+                this.material.setVector4("a_particle_flipUV", new math.vector4(particle.flipUV.x, particle.flipUV.y, 0, 0));
                 this.material.setMatrix("u_particle_billboardMatrix", new math.matrix(billboardMatrix.rawData.concat()))
 
                 this.material.draw(context, mesh, subMeshs[0]);

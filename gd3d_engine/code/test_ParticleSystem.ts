@@ -29,16 +29,16 @@ class test_ParticleSystem implements IState
         this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
         this.camera.near = 0.01;
         this.camera.far = 120;
-        this.camera.fov = Math.PI * 0.3;
-        this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
-        objCam.localTranslate = new gd3d.math.vector3(0, 0, -5);
+        this.camera.fov = Math.PI / 3;
+        this.camera.backgroundColor = new gd3d.math.color(0.2784, 0.2784, 0.2784, 1);
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-        let hoverc = this.camera.gameObject.addComponent("HoverCameraScript") as gd3d.framework.HoverCameraScript;
-        hoverc.panAngle = 180;
-        hoverc.tiltAngle = 45;
-        hoverc.distance = 30;
-        hoverc.scaleSpeed = 0.1;
-        hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0)
+        // let hoverc = this.camera.gameObject.addComponent("HoverCameraScript") as gd3d.framework.HoverCameraScript;
+        // hoverc.panAngle = 180;
+        // hoverc.tiltAngle = 45;
+        // hoverc.distance = 30;
+        // hoverc.scaleSpeed = 0.1;
+        // hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0)
 
         this.initParticleSystem();
     }
@@ -127,11 +127,8 @@ class test_ParticleSystem implements IState
     uniform vec4 a_particle_scale;
     uniform vec4 a_particle_rotation;
     uniform vec4 a_particle_color;
-    
-    #ifdef ENABLED_PARTICLE_SYSTEM_textureSheetAnimation
-        uniform vec4 a_particle_tilingOffset;
-        uniform vec2 a_particle_flipUV;
-    #endif
+    uniform vec4 a_particle_tilingOffset;
+    uniform vec4 a_particle_flipUV;
     
     uniform mat4 u_particle_billboardMatrix;
     
@@ -145,29 +142,49 @@ class test_ParticleSystem implements IState
         float ry = rotation.y * DEG2RAD;
         float rz = rotation.z * DEG2RAD;
     
-        float sx = sin(rx);
-        float cx = cos(rx);
-        float sy = sin(ry);
-        float cy = cos(ry);
-        float sz = sin(rz);
-        float cz = cos(rz);
+        float sinX = sin(rx);
+        float cosX = cos(rx);
+        float sinY = sin(ry);
+        float cosY = cos(ry);
+        float sinZ = sin(rz);
+        float cosZ = cos(rz);
     
         mat3 tmp;
-        tmp[ 0 ] = vec3(cy * cz, cy * sz, -sy);
-        tmp[ 1 ] = vec3(sx * sy * cz - cx * sz, sx * sy * sz + cx * cz, sx * cy);
-        tmp[ 2 ] = vec3(cx * sy * cz + sx * sz, cx * sy * sz - sx * cz, cx * cy);
+        float ce = cosY * cosZ;
+        float cf = cosY * sinZ;
+        float de = sinY * cosZ;
+        float df = sinY * sinZ;
+    
+        float te0 = ce + df * sinX;
+        float te4 = de * sinX - cf;
+        float te8 = cosX * sinY;
+    
+        float te1 = cosX * sinZ;
+        float te5 = cosX * cosZ;
+        float te9 = - sinX;
+    
+        float te2 = cf * sinX - de;
+        float te6 = df + ce * sinX;
+        float te10 = cosX * cosY;
+    
+        tmp[0] = vec3(te0, te1, te2);
+        tmp[1] = vec3(te4, te5, te6);
+        tmp[2] = vec3(te8, te9, te10);
+                
         return tmp;
     }
     
     vec4 particleAnimation(vec4 position) 
     {
+        mat3 billboardMatrix = mat3(u_particle_billboardMatrix[0].xyz,u_particle_billboardMatrix[1].xyz,u_particle_billboardMatrix[2].xyz);
+        
         // 计算缩放
         position.xyz = position.xyz * a_particle_scale.xyz;
     
         // 计算旋转
         mat3 rMat = makeParticleRotationMatrix(a_particle_rotation.xyz);
         position.xyz = rMat * position.xyz;
-        position = u_particle_billboardMatrix * position;
+        position.xyz = billboardMatrix * position.xyz;
     
         // 位移
         position.xyz = position.xyz + a_particle_position.xyz;
@@ -175,11 +192,9 @@ class test_ParticleSystem implements IState
         // 颜色
         v_particle_color = a_particle_color * _glesColor;
     
-        #ifdef ENABLED_PARTICLE_SYSTEM_textureSheetAnimation
-            if(a_particle_flipUV.x > 0.5) v_uv.x = 1.0 - v_uv.x;
-            if(a_particle_flipUV.y > 0.5) v_uv.y = 1.0 - v_uv.y;
-            v_uv = v_uv * a_particle_tilingOffset.xy + a_particle_tilingOffset.zw;
-        #endif
+        if(a_particle_flipUV.x > 0.5) v_uv.x = 1.0 - v_uv.x;
+        if(a_particle_flipUV.y > 0.5) v_uv.y = 1.0 - v_uv.y;
+        v_uv = v_uv * a_particle_tilingOffset.xy + a_particle_tilingOffset.zw;
         
         return position;
     }

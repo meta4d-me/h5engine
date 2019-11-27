@@ -29947,7 +29947,7 @@ var gd3d;
             };
             ParticleSystem.prototype.start = function () {
                 if (!this._mesh) {
-                    this._mesh = framework.sceneMgr.app.getAssetMgr().getDefaultMesh("quad_particle");
+                    this._mesh = framework.sceneMgr.app.getAssetMgr().getDefaultMesh(gd3d.framework.defMesh.quad);
                 }
                 if (!this.material) {
                     this.material = framework.sceneMgr.app.getAssetMgr().getDefParticleMat();
@@ -30029,7 +30029,7 @@ var gd3d;
                     this._isPlaying = this.main.playOnAwake;
                     this._awaked = true;
                 }
-                var isbillboard = !this.shape.alignToDirection && this.mesh == framework.sceneMgr.app.getAssetMgr().getDefaultMesh("quad_particle");
+                var isbillboard = !this.shape.alignToDirection && this.mesh == framework.sceneMgr.app.getAssetMgr().getDefaultMesh(gd3d.framework.defMesh.quad);
                 var billboardMatrix = new framework.Matrix4x4();
                 if (isbillboard) {
                     var cameraMatrix = new framework.Matrix4x4(camera.gameObject.transform.getWorldMatrix().rawData);
@@ -30057,6 +30057,8 @@ var gd3d;
                     this.material.setVector4("a_particle_scale", new gd3d.math.vector4(particle.size.x, particle.size.y, particle.size.z, 1));
                     this.material.setVector4("a_particle_rotation", new gd3d.math.vector4(particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1));
                     this.material.setVector4("a_particle_color", new gd3d.math.vector4(particle.color.r, particle.color.g, particle.color.b, particle.color.a));
+                    this.material.setVector4("a_particle_tilingOffset", new gd3d.math.vector4(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w));
+                    this.material.setVector4("a_particle_flipUV", new gd3d.math.vector4(particle.flipUV.x, particle.flipUV.y, 0, 0));
                     this.material.setMatrix("u_particle_billboardMatrix", new gd3d.math.matrix(billboardMatrix.rawData.concat()));
                     this.material.draw(context, mesh, subMeshs[0]);
                 }
