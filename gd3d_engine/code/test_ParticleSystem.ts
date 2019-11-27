@@ -31,7 +31,7 @@ class test_ParticleSystem implements IState
         this.camera.far = 120;
         this.camera.fov = Math.PI * 0.3;
         this.camera.backgroundColor = new gd3d.math.color(0.3, 0.3, 0.3, 1);
-        objCam.localTranslate = new gd3d.math.vector3(0, 15, -15);
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, -5);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         let hoverc = this.camera.gameObject.addComponent("HoverCameraScript") as gd3d.framework.HoverCameraScript;
         hoverc.panAngle = 180;
@@ -70,10 +70,10 @@ class test_ParticleSystem implements IState
         gd3d.framework.serialization.setValue(ps, pd);
 
         //
-        ps.colorOverLifetime.enabled = true;
-        ps.colorOverLifetime.color.mode = gd3d.framework.MinMaxGradientMode.Gradient;
-        ps.colorOverLifetime.color.gradient.colorKeys[0].color.setTo(1, 0, 0);
-        ps.colorOverLifetime.color.gradient.colorKeys[1].color.setTo(0, 1, 0);
+        // ps.colorOverLifetime.enabled = true;
+        // ps.colorOverLifetime.color.mode = gd3d.framework.MinMaxGradientMode.Gradient;
+        // ps.colorOverLifetime.color.gradient.colorKeys[0].color.setTo(1, 0, 0);
+        // ps.colorOverLifetime.color.gradient.colorKeys[1].color.setTo(0, 1, 0);
 
         //
         ps.play();
