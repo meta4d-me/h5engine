@@ -12,19 +12,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -38,19 +38,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -64,19 +64,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -92,19 +92,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 2.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -118,19 +118,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 2.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -144,19 +144,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -170,19 +170,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -196,19 +196,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -271,19 +271,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -297,19 +297,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 90.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -323,19 +323,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -349,19 +349,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -372,7 +372,6 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
     },
     "emission": {
         "__class__": "gd3d.framework.ParticleEmissionModule",
-        "burstCount": 0,
         "enabled": true,
         "rateOverDistance": {
             "__class__": "gd3d.framework.MinMaxCurve",
@@ -380,19 +379,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -406,19 +405,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -440,19 +439,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -477,19 +476,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 2.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -512,19 +511,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 5.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -538,19 +537,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": -5.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -564,19 +563,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -595,19 +594,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -621,19 +620,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -647,19 +646,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -673,19 +672,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -706,7 +705,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -725,7 +724,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -744,7 +743,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -758,7 +757,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -777,7 +776,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -796,7 +795,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -810,7 +809,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -829,7 +828,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -848,7 +847,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -968,7 +967,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -987,7 +986,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -1006,7 +1005,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -1020,7 +1019,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -1039,7 +1038,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -1058,7 +1057,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -1072,7 +1071,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -1091,7 +1090,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -1110,7 +1109,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -1124,7 +1123,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -1143,7 +1142,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -1162,7 +1161,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -1180,7 +1179,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -1199,7 +1198,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -1218,7 +1217,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -1232,7 +1231,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -1257,7 +1256,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -1282,7 +1281,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -1296,7 +1295,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -1315,7 +1314,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -1334,7 +1333,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -1355,7 +1354,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -1374,7 +1373,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -1393,7 +1392,7 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -1410,19 +1409,19 @@ var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem> =
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []

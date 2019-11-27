@@ -65,7 +65,9 @@ class test_ParticleSystem implements IState
         ps.material = mat;
         // ps.mesh = this.astMgr.getDefaultMesh("cube");
 
-        // gd3d.framework.serialization.setValue(ps, pd);
+        gd3d.framework.classUtils.addClassNameSpace("gd3d.framework");
+
+        gd3d.framework.serialization.setValue(ps, pd);
 
         //
         ps.colorOverLifetime.enabled = true;

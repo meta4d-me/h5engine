@@ -3947,6 +3947,8 @@ var test_ParticleSystem = (function () {
         if (!ps)
             ps = tran.gameObject.addComponent("ParticleSystem");
         ps.material = mat;
+        gd3d.framework.classUtils.addClassNameSpace("gd3d.framework");
+        gd3d.framework.serialization.setValue(ps, pd);
         ps.colorOverLifetime.enabled = true;
         ps.colorOverLifetime.color.mode = gd3d.framework.MinMaxGradientMode.Gradient;
         ps.colorOverLifetime.color.gradient.colorKeys[0].color.setTo(1, 0, 0);
@@ -3991,19 +3993,19 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4017,19 +4019,19 @@ var pd = {
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4043,19 +4045,19 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4071,19 +4073,19 @@ var pd = {
             "constantMax": 2.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4097,19 +4099,19 @@ var pd = {
             "constantMax": 2.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4123,19 +4125,19 @@ var pd = {
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4149,19 +4151,19 @@ var pd = {
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4175,19 +4177,19 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4250,19 +4252,19 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4276,19 +4278,19 @@ var pd = {
             "constantMax": 90.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4302,19 +4304,19 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4328,19 +4330,19 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4351,7 +4353,6 @@ var pd = {
     },
     "emission": {
         "__class__": "gd3d.framework.ParticleEmissionModule",
-        "burstCount": 0,
         "enabled": true,
         "rateOverDistance": {
             "__class__": "gd3d.framework.MinMaxCurve",
@@ -4359,19 +4360,19 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4385,19 +4386,19 @@ var pd = {
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4419,19 +4420,19 @@ var pd = {
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4456,19 +4457,19 @@ var pd = {
             "constantMax": 2.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4491,19 +4492,19 @@ var pd = {
             "constantMax": 5.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4517,19 +4518,19 @@ var pd = {
             "constantMax": -5.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4543,19 +4544,19 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4574,19 +4575,19 @@ var pd = {
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4600,19 +4601,19 @@ var pd = {
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4626,19 +4627,19 @@ var pd = {
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4652,19 +4653,19 @@ var pd = {
             "constantMax": 1.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4685,7 +4686,7 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -4704,7 +4705,7 @@ var pd = {
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -4723,7 +4724,7 @@ var pd = {
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4737,7 +4738,7 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -4756,7 +4757,7 @@ var pd = {
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -4775,7 +4776,7 @@ var pd = {
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4789,7 +4790,7 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -4808,7 +4809,7 @@ var pd = {
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -4827,7 +4828,7 @@ var pd = {
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4947,7 +4948,7 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -4966,7 +4967,7 @@ var pd = {
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -4985,7 +4986,7 @@ var pd = {
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -4999,7 +5000,7 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -5018,7 +5019,7 @@ var pd = {
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -5037,7 +5038,7 @@ var pd = {
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -5051,7 +5052,7 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -5070,7 +5071,7 @@ var pd = {
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -5089,7 +5090,7 @@ var pd = {
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -5103,7 +5104,7 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -5122,7 +5123,7 @@ var pd = {
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -5141,7 +5142,7 @@ var pd = {
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -5159,7 +5160,7 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -5178,7 +5179,7 @@ var pd = {
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -5197,7 +5198,7 @@ var pd = {
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -5211,7 +5212,7 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -5236,7 +5237,7 @@ var pd = {
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -5261,7 +5262,7 @@ var pd = {
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -5275,7 +5276,7 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -5294,7 +5295,7 @@ var pd = {
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -5313,7 +5314,7 @@ var pd = {
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -5334,7 +5335,7 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -5353,7 +5354,7 @@ var pd = {
                 ]
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 8,
                 "preWrapMode": 8,
                 "keys": [
@@ -5372,7 +5373,7 @@ var pd = {
                 ]
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
@@ -5389,19 +5390,19 @@ var pd = {
             "constantMax": 0.0,
             "constantMin": 0.0,
             "curve": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMax": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []
             },
             "curveMin": {
-                "__class__": "gd3d.framework.AnimationCurve",
+                "__class__": "gd3d.framework.AnimationCurve1",
                 "postWrapMode": 0,
                 "preWrapMode": 0,
                 "keys": []

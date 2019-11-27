@@ -14,13 +14,13 @@ namespace gd3d.framework
         /**
          * 粒子系统的持续时间(秒)。
          */
-        
+
         duration = 5;
 
         /**
          * 粒子系统在循环吗?
          */
-        
+
         loop = true;
 
         /**
@@ -28,7 +28,7 @@ namespace gd3d.framework
          * 
          * 当循环被激活时，它控制这个粒子系统在第一次出现时是否看起来像已经模拟了一个循环。
          */
-        
+
         prewarm = false;
 
         /**
@@ -36,7 +36,7 @@ namespace gd3d.framework
          * 
          * 启动延迟(以秒为单位)。
          */
-        
+
         startDelay = new MinMaxCurve();
 
         /**
@@ -54,7 +54,7 @@ namespace gd3d.framework
          * 
          * 每个新粒子的总寿命(以秒计)。
          */
-        
+
         startLifetime = serialization.setValue(new MinMaxCurve(), { between0And1: true, constant: 5, constantMin: 5, constantMax: 5 });
 
         /**
@@ -79,7 +79,7 @@ namespace gd3d.framework
          * 
          * 粒子发射时的初始速度。
          */
-        
+
         startSpeed = serialization.setValue(new MinMaxCurve(), { constant: 5, constantMin: 5, constantMax: 5 });
 
         /**
@@ -104,7 +104,7 @@ namespace gd3d.framework
          * 
          * 允许为每个轴分别指定粒度大小的标志。
          */
-        
+
         useStartSize3D = false;
 
         /**
@@ -112,7 +112,7 @@ namespace gd3d.framework
          * 
          * 粒子发射时的初始大小。
          */
-        
+
         get startSize()
         {
             return this.startSize3D.xCurve;
@@ -145,7 +145,7 @@ namespace gd3d.framework
          * 
          * 发射时粒子的初始大小。
          */
-        
+
         startSize3D = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 } });
 
         /**
@@ -156,6 +156,11 @@ namespace gd3d.framework
         get startSizeX()
         {
             return this.startSize3D.xCurve;
+        }
+
+        set startSizeX(v)
+        {
+            this.startSize3D.xCurve = v;
         }
 
         /**
@@ -185,6 +190,11 @@ namespace gd3d.framework
             return this.startSize3D.yCurve;
         }
 
+        set startSizeY(v)
+        {
+            this.startSize3D.yCurve = v;
+        }
+
         /**
          * Start rotation multiplier along the Y axis.
          * This method is more efficient than accessing the whole curve, if you only want to change the overall size multiplier.
@@ -212,6 +222,11 @@ namespace gd3d.framework
             return this.startSize3D.zCurve;
         }
 
+        set startSizeZ(v)
+        {
+            this.startSize3D.zCurve = v;
+        }
+
         /**
          * Start rotation multiplier along the Z axis.
          * This method is more efficient than accessing the whole curve, if you only want to change the overall size multiplier.
@@ -233,7 +248,7 @@ namespace gd3d.framework
          * A flag to enable 3D particle rotation.
          * 一个启用粒子3D旋转的标记。
          */
-        
+
         useStartRotation3D = false;
 
         /**
@@ -272,7 +287,7 @@ namespace gd3d.framework
          * 
          * 粒子发射时的初始旋转。
          */
-        
+
         startRotation3D = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { curveMultiplier: 180 }, yCurve: { curveMultiplier: 180 }, zCurve: { curveMultiplier: 180 } });
 
         /**
@@ -283,6 +298,11 @@ namespace gd3d.framework
         get startRotationX()
         {
             return this.startRotation3D.xCurve;
+        }
+
+        set startRotationX(v)
+        {
+            this.startRotation3D.xCurve = v;
         }
 
         /**
@@ -312,6 +332,11 @@ namespace gd3d.framework
             return this.startRotation3D.yCurve;
         }
 
+        set startRotationY(v)
+        {
+            this.startRotation3D.yCurve = v;
+        }
+
         /**
          * Start rotation multiplier around the Y axis.
          * This method is more efficient than accessing the whole curve, if you only want to change the overall rotation multiplier.
@@ -339,6 +364,11 @@ namespace gd3d.framework
             return this.startRotation3D.zCurve;
         }
 
+        set startRotationZ(v)
+        {
+            this.startRotation3D.zCurve = v;
+        }
+
         /**
          * Start rotation multiplier around the Z axis.
          * This method is more efficient than accessing the whole curve, if you only want to change the overall rotation multiplier.
@@ -361,7 +391,7 @@ namespace gd3d.framework
          * 
          * 导致一些粒子向相反的方向旋转。设置在0和1之间，数值越大，粒子朝相反方向旋转的比例越大。
          */
-        
+
         randomizeRotationDirection = 0;
 
         /**
@@ -369,7 +399,7 @@ namespace gd3d.framework
          * 
          * 粒子发射时的初始颜色。
          */
-        
+
         startColor = new MinMaxGradient();
 
         /**
@@ -377,7 +407,7 @@ namespace gd3d.framework
          * 
          * 应用于重力加速度的缩放。
          */
-        
+
         gravityModifier = new MinMaxCurve();
 
         /**
@@ -387,7 +417,7 @@ namespace gd3d.framework
          * 
          * @todo
          */
-        
+
         simulationSpace = ParticleSystemSimulationSpace.Local;
 
         /**
@@ -397,7 +427,7 @@ namespace gd3d.framework
          * 
          * @todo
          */
-        
+
         customSimulationSpace: transform;
 
         /**
@@ -405,7 +435,7 @@ namespace gd3d.framework
          * 
          * 重写粒子系统的默认播放速度。
          */
-        
+
         simulationSpeed = 1;
 
         /**
@@ -413,7 +443,7 @@ namespace gd3d.framework
          * 
          * 控制粒子系统的变换组件如何应用于粒子系统。
          */
-        
+
         scalingMode = ParticleSystemScalingMode.Local;
 
         /**
@@ -421,7 +451,7 @@ namespace gd3d.framework
          * 
          * 如果设置为真，粒子系统将自动开始播放启动。
          */
-        
+
         playOnAwake = true;
 
         /**
@@ -429,7 +459,7 @@ namespace gd3d.framework
          * 
          * 发射粒子的最大数量。
          */
-        
+
         maxParticles = 1000;
 
         /**

@@ -6114,7 +6114,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AnimationCurve1 {
-        __class__: "gd3d.framework.AnimationCurve";
+        __class__: "gd3d.framework.AnimationCurve1";
         maxtan: number;
         preWrapMode: AnimationCurveWrapMode;
         postWrapMode: AnimationCurveWrapMode;
@@ -6603,21 +6603,21 @@ declare namespace gd3d.framework {
         startSize: MinMaxCurve;
         startSizeMultiplier: number;
         startSize3D: MinMaxCurveVector3;
-        readonly startSizeX: MinMaxCurve;
+        startSizeX: MinMaxCurve;
         startSizeXMultiplier: number;
-        readonly startSizeY: MinMaxCurve;
+        startSizeY: MinMaxCurve;
         startSizeYMultiplier: number;
-        readonly startSizeZ: MinMaxCurve;
+        startSizeZ: MinMaxCurve;
         startSizeZMultiplier: number;
         useStartRotation3D: boolean;
         startRotation: MinMaxCurve;
         startRotationMultiplier: number;
         startRotation3D: MinMaxCurveVector3;
-        readonly startRotationX: MinMaxCurve;
+        startRotationX: MinMaxCurve;
         startRotationXMultiplier: number;
-        readonly startRotationY: MinMaxCurve;
+        startRotationY: MinMaxCurve;
         startRotationYMultiplier: number;
-        readonly startRotationZ: MinMaxCurve;
+        startRotationZ: MinMaxCurve;
         startRotationZMultiplier: number;
         randomizeRotationDirection: number;
         startColor: MinMaxGradient;

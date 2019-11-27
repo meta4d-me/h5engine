@@ -30975,7 +30975,7 @@ var gd3d;
     (function (framework) {
         var AnimationCurve1 = (function () {
             function AnimationCurve1() {
-                this.__class__ = "gd3d.framework.AnimationCurve";
+                this.__class__ = "gd3d.framework.AnimationCurve1";
                 this.maxtan = 1000;
                 this.preWrapMode = framework.AnimationCurveWrapMode.Clamp;
                 this.postWrapMode = framework.AnimationCurveWrapMode.Clamp;
@@ -33861,6 +33861,9 @@ var gd3d;
                 get: function () {
                     return this.startSize3D.xCurve;
                 },
+                set: function (v) {
+                    this.startSize3D.xCurve = v;
+                },
                 enumerable: true,
                 configurable: true
             });
@@ -33878,6 +33881,9 @@ var gd3d;
                 get: function () {
                     return this.startSize3D.yCurve;
                 },
+                set: function (v) {
+                    this.startSize3D.yCurve = v;
+                },
                 enumerable: true,
                 configurable: true
             });
@@ -33894,6 +33900,9 @@ var gd3d;
             Object.defineProperty(ParticleMainModule.prototype, "startSizeZ", {
                 get: function () {
                     return this.startSize3D.zCurve;
+                },
+                set: function (v) {
+                    this.startSize3D.zCurve = v;
                 },
                 enumerable: true,
                 configurable: true
@@ -33932,6 +33941,9 @@ var gd3d;
                 get: function () {
                     return this.startRotation3D.xCurve;
                 },
+                set: function (v) {
+                    this.startRotation3D.xCurve = v;
+                },
                 enumerable: true,
                 configurable: true
             });
@@ -33949,6 +33961,9 @@ var gd3d;
                 get: function () {
                     return this.startRotation3D.yCurve;
                 },
+                set: function (v) {
+                    this.startRotation3D.yCurve = v;
+                },
                 enumerable: true,
                 configurable: true
             });
@@ -33965,6 +33980,9 @@ var gd3d;
             Object.defineProperty(ParticleMainModule.prototype, "startRotationZ", {
                 get: function () {
                     return this.startRotation3D.zCurve;
+                },
+                set: function (v) {
+                    this.startRotation3D.zCurve = v;
                 },
                 enumerable: true,
                 configurable: true
