@@ -7,9 +7,12 @@ namespace gd3d.framework
      */
     export class Gradient
     {
+        __class__: "feng3d.Gradient" = "feng3d.Gradient";
+
         /**
          * 渐变模式
          */
+        @serialize
         mode = GradientMode.Blend;
 
         /**
@@ -17,6 +20,7 @@ namespace gd3d.framework
          * 
          * 注： 该值已对时间排序，否则赋值前请使用 sort((a, b) => a.time - b.time) 进行排序
          */
+        @serialize
         alphaKeys: GradientAlphaKey[] = [{ alpha: 1, time: 0 }, { alpha: 1, time: 1 }];
 
         /**
@@ -24,6 +28,7 @@ namespace gd3d.framework
          * 
          * 注： 该值已对时间排序，否则赋值前请使用 sort((a, b) => a.time - b.time) 进行排序
          */
+        @serialize
         colorKeys: GradientColorKey[] = [{ color: new Color3(1, 1, 1), time: 0 }, { color: new Color3(1, 1, 1), time: 1 }];
 
         /**

@@ -6452,6 +6452,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class Gradient {
+        __class__: "feng3d.Gradient";
         mode: GradientMode;
         alphaKeys: GradientAlphaKey[];
         colorKeys: GradientColorKey[];
@@ -6481,11 +6482,14 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class MinMaxGradient {
+        __class__: "feng3d.MinMaxGradient";
         mode: MinMaxGradientMode;
         color: Color4;
-        color1: Color4;
+        colorMin: Color4;
+        colorMax: Color4;
         gradient: Gradient;
-        gradient1: Gradient;
+        gradientMin: Gradient;
+        gradientMax: Gradient;
         getValue(time: number, randomBetween?: number): Color4;
     }
 }
@@ -6493,8 +6497,8 @@ declare namespace gd3d.framework {
     enum MinMaxGradientMode {
         Color = 0,
         Gradient = 1,
-        RandomBetweenTwoColors = 2,
-        RandomBetweenTwoGradients = 3,
+        TwoColors = 2,
+        TwoGradients = 3,
         RandomColor = 4
     }
 }

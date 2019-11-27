@@ -33331,6 +33331,7 @@ var gd3d;
     (function (framework) {
         var Gradient = (function () {
             function Gradient() {
+                this.__class__ = "feng3d.Gradient";
                 this.mode = framework.GradientMode.Blend;
                 this.alphaKeys = [{ alpha: 1, time: 0 }, { alpha: 1, time: 1 }];
                 this.colorKeys = [{ color: new framework.Color3(1, 1, 1), time: 0 }, { color: new framework.Color3(1, 1, 1), time: 1 }];
@@ -33397,6 +33398,18 @@ var gd3d;
                 }
                 return new framework.Color3();
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], Gradient.prototype, "mode", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Array)
+            ], Gradient.prototype, "alphaKeys", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Array)
+            ], Gradient.prototype, "colorKeys", void 0);
             return Gradient;
         }());
         framework.Gradient = Gradient;
@@ -33419,11 +33432,14 @@ var gd3d;
     (function (framework) {
         var MinMaxGradient = (function () {
             function MinMaxGradient() {
+                this.__class__ = "feng3d.MinMaxGradient";
                 this.mode = framework.MinMaxGradientMode.Color;
                 this.color = new framework.Color4();
-                this.color1 = new framework.Color4();
+                this.colorMin = new framework.Color4();
+                this.colorMax = new framework.Color4();
                 this.gradient = new framework.Gradient();
-                this.gradient1 = new framework.Gradient();
+                this.gradientMin = new framework.Gradient();
+                this.gradientMax = new framework.Gradient();
             }
             MinMaxGradient.prototype.getValue = function (time, randomBetween) {
                 if (randomBetween === void 0) { randomBetween = Math.random(); }
@@ -33432,11 +33448,11 @@ var gd3d;
                         return this.color;
                     case framework.MinMaxGradientMode.Gradient:
                         return this.gradient.getValue(time);
-                    case framework.MinMaxGradientMode.RandomBetweenTwoColors:
-                        return this.color.mixTo(this.color1, randomBetween);
-                    case framework.MinMaxGradientMode.RandomBetweenTwoGradients:
-                        var min = this.gradient.getValue(time);
-                        var max = this.gradient1.getValue(time);
+                    case framework.MinMaxGradientMode.TwoColors:
+                        return this.colorMin.mixTo(this.colorMax, randomBetween);
+                    case framework.MinMaxGradientMode.TwoGradients:
+                        var min = this.gradientMin.getValue(time);
+                        var max = this.gradientMax.getValue(time);
                         var v = min.mixTo(max, randomBetween);
                         return v;
                     case framework.MinMaxGradientMode.RandomColor:
@@ -33445,6 +33461,34 @@ var gd3d;
                 }
                 return this.color;
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxGradient.prototype, "mode", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxGradient.prototype, "color", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxGradient.prototype, "colorMin", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxGradient.prototype, "colorMax", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxGradient.prototype, "gradient", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxGradient.prototype, "gradientMin", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxGradient.prototype, "gradientMax", void 0);
             return MinMaxGradient;
         }());
         framework.MinMaxGradient = MinMaxGradient;
@@ -33458,8 +33502,8 @@ var gd3d;
         (function (MinMaxGradientMode) {
             MinMaxGradientMode[MinMaxGradientMode["Color"] = 0] = "Color";
             MinMaxGradientMode[MinMaxGradientMode["Gradient"] = 1] = "Gradient";
-            MinMaxGradientMode[MinMaxGradientMode["RandomBetweenTwoColors"] = 2] = "RandomBetweenTwoColors";
-            MinMaxGradientMode[MinMaxGradientMode["RandomBetweenTwoGradients"] = 3] = "RandomBetweenTwoGradients";
+            MinMaxGradientMode[MinMaxGradientMode["TwoColors"] = 2] = "TwoColors";
+            MinMaxGradientMode[MinMaxGradientMode["TwoGradients"] = 3] = "TwoGradients";
             MinMaxGradientMode[MinMaxGradientMode["RandomColor"] = 4] = "RandomColor";
         })(MinMaxGradientMode = framework.MinMaxGradientMode || (framework.MinMaxGradientMode = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));

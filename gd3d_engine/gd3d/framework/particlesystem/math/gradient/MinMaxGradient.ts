@@ -7,24 +7,63 @@ namespace gd3d.framework
      */
     export class MinMaxGradient
     {
+        __class__: "feng3d.MinMaxGradient" = "feng3d.MinMaxGradient";
+
         /**
-         * 模式
+         * Set the mode that the min-max gradient will use to evaluate colors.
+         * 
+         * 设置最小-最大梯度将用于评估颜色的模式。
          */
+        @serialize
         mode = MinMaxGradientMode.Color;
 
         /**
+         * Set a constant color.
+         * 
          * 常量颜色值
          */
+        @serialize
         color = new Color4();
 
         /**
-         * 常量颜色值，作用于 MinMaxGradientMode.RandomBetweenTwoColors
+         * Set a constant color for the lower bound.
+         * 
+         * 为下界设置一个常量颜色。
          */
-        color1 = new Color4();
+        @serialize
+        colorMin = new Color4();
 
+        /**
+         * Set a constant color for the upper bound.
+         * 
+         * 为上界设置一个常量颜色。
+         */
+        @serialize
+        colorMax = new Color4();
+
+        /**
+         * Set the gradient.
+         * 
+         * 设置渐变。
+         */
+        @serialize
         gradient = new Gradient();
 
-        gradient1 = new Gradient();
+        /**
+         * Set a gradient for the lower bound.
+         * 
+         * 为下界设置一个渐变。
+         */
+        @serialize
+        gradientMin = new Gradient();
+
+        /**
+         * Set a gradient for the upper bound.
+         * 
+         * 为上界设置一个渐变。
+         */
+        @serialize
+        gradientMax = new Gradient();
 
         /**
          * 获取值
@@ -38,11 +77,11 @@ namespace gd3d.framework
                     return this.color;
                 case MinMaxGradientMode.Gradient:
                     return this.gradient.getValue(time);
-                case MinMaxGradientMode.RandomBetweenTwoColors:
-                    return this.color.mixTo(this.color1, randomBetween);
-                case MinMaxGradientMode.RandomBetweenTwoGradients:
-                    var min = this.gradient.getValue(time);
-                    var max = this.gradient1.getValue(time);
+                case MinMaxGradientMode.TwoColors:
+                    return this.colorMin.mixTo(this.colorMax, randomBetween);
+                case MinMaxGradientMode.TwoGradients:
+                    var min = this.gradientMin.getValue(time);
+                    var max = this.gradientMax.getValue(time);
                     var v = min.mixTo(max, randomBetween);
                     return v;
                 case MinMaxGradientMode.RandomColor:
