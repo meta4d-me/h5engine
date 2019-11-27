@@ -13,15 +13,17 @@ namespace gd3d.framework
         /**
          * 作用在粒子上的力
          */
+        @serialize
         force = new MinMaxCurveVector3();
-
+        
         /**
          * Are the forces being applied in local or world space?
          * 
          * 这些力是作用于局部空间还是世界空间
          */
+        @serialize
         space = ParticleSystemSimulationSpace1.Local;
-
+        
         /**
          * When randomly selecting values between two curves or constants, this flag will cause a new random force to be chosen on each frame.
          * 
@@ -29,6 +31,7 @@ namespace gd3d.framework
          * 
          * @todo
          */
+        @serialize
         randomized = false;
 
         /**

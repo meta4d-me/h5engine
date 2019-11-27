@@ -13,6 +13,7 @@ namespace gd3d.framework
          * The gradient controlling the particle colors.
          * 控制粒子颜色的梯度。
          */
+        @serialize
         color = new MinMaxGradient();
 
         /**

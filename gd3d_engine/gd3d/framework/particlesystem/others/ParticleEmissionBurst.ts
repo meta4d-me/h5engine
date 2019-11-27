@@ -5,16 +5,20 @@ namespace gd3d.framework
      */
     export class ParticleEmissionBurst
     {
+        __class__: "feng3d.ParticleEmissionBurst" = "feng3d.ParticleEmissionBurst";
+
         /**
          * The time that each burst occurs.
          * 每次爆炸发生的时间。
          */
+        @serialize
         time = 0;
 
         /**
          * 要发射的粒子数。
          */
-        count = serialization.setValue(new MinMaxCurve(), { constant: 30, constant1: 30 });
+        @serialize
+        count = serialization.setValue(new MinMaxCurve(), { constant: 30, constantMin: 30, constantMax: 30 });
 
         /**
          * Minimum number of bursts to be emitted.
@@ -22,12 +26,12 @@ namespace gd3d.framework
          */
         get minCount()
         {
-            return this.count.constant;
+            return this.count.constantMin;
         }
 
         set minCount(v)
         {
-            this.count.constant = v;
+            this.count.constantMin = v;
         }
 
         /**
@@ -37,12 +41,12 @@ namespace gd3d.framework
          */
         get maxCount()
         {
-            return this.count.constant1;
+            return this.count.constantMax;
         }
 
         set maxCount(v)
         {
-            this.count.constant1 = v;
+            this.count.constantMax = v;
         }
 
         /**
@@ -51,6 +55,7 @@ namespace gd3d.framework
          * 
          * @todo
          */
+        @serialize
         cycleCount = 1;
 
         /**
@@ -60,11 +65,13 @@ namespace gd3d.framework
          * 
          * @todo
          */
+        @serialize
         repeatInterval = 0.01;
 
         /**
          * 喷发被触发的几率。
          */
+        @serialize
         probability = 1.0;
 
         /**

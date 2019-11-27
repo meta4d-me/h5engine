@@ -7,10 +7,13 @@ namespace gd3d.framework
      */
     export class ParticleEmissionModule extends ParticleModule
     {
+        __class__: "feng3d.ParticleEmissionModule" = "feng3d.ParticleEmissionModule";
+
         /**
          * 随着时间的推移，新粒子产生的速度。
          */
-        rateOverTime = serialization.setValue(new MinMaxCurve(), { between0And1: true, constant: 10, constant1: 10 });
+        @serialize
+        rateOverTime = serialization.setValue(new MinMaxCurve(), { between0And1: true, constant: 10, constantMin: 10, constantMax: 10, curveMultiplier: 10 });
 
         /**
          * Change the rate over time multiplier.
@@ -39,7 +42,7 @@ namespace gd3d.framework
          * 
          * @todo
          */
-        rateOverDistance = serialization.setValue(new MinMaxCurve(), { between0And1: true, constant: 0, constant1: 1 });
+        rateOverDistance = serialization.setValue(new MinMaxCurve(), { between0And1: true, constant: 0, constantMin: 0, constantMax: 1 });
 
         /**
          * Change the rate over distance multiplier.
@@ -61,6 +64,7 @@ namespace gd3d.framework
         /**
          * 爆发数组
          */
+        @serialize
         bursts: ParticleEmissionBurst[] = [];
 
         /**
