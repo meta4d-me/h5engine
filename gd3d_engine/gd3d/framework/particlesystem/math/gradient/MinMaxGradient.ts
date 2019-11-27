@@ -14,7 +14,7 @@ namespace gd3d.framework
          * 
          * 设置最小-最大梯度将用于评估颜色的模式。
          */
-        @serialize
+        
         mode = MinMaxGradientMode.Color;
 
         /**
@@ -22,7 +22,7 @@ namespace gd3d.framework
          * 
          * 常量颜色值
          */
-        @serialize
+        
         color = new Color4();
 
         /**
@@ -30,7 +30,7 @@ namespace gd3d.framework
          * 
          * 为下界设置一个常量颜色。
          */
-        @serialize
+        
         colorMin = new Color4();
 
         /**
@@ -38,7 +38,7 @@ namespace gd3d.framework
          * 
          * 为上界设置一个常量颜色。
          */
-        @serialize
+        
         colorMax = new Color4();
 
         /**
@@ -46,7 +46,7 @@ namespace gd3d.framework
          * 
          * 设置渐变。
          */
-        @serialize
+        
         gradient = new Gradient();
 
         /**
@@ -54,7 +54,7 @@ namespace gd3d.framework
          * 
          * 为下界设置一个渐变。
          */
-        @serialize
+        
         gradientMin = new Gradient();
 
         /**
@@ -62,7 +62,7 @@ namespace gd3d.framework
          * 
          * 为上界设置一个渐变。
          */
-        @serialize
+        
         gradientMax = new Gradient();
 
         /**

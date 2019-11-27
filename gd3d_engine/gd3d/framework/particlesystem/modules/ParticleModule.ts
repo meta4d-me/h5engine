@@ -10,7 +10,7 @@ namespace gd3d.framework
         /**
          * 是否开启
          */
-        @serialize
+        
         enabled = false;
 
         /**

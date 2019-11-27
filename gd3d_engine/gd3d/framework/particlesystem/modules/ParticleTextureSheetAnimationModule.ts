@@ -13,7 +13,7 @@ namespace gd3d.framework
          * 
          * 定义纹理的平铺。
          */
-        @serialize
+        
         tiles = new Vector2(1, 1);
 
         /**
@@ -21,7 +21,7 @@ namespace gd3d.framework
          * 
          * 指定动画类型。
          */
-        @serialize
+        
         animation = ParticleSystemAnimationType.WholeSheet;
 
         /**
@@ -29,7 +29,7 @@ namespace gd3d.framework
          * 
          * 曲线控制哪个帧的纹理表动画播放。
          */
-        @serialize
+        
         frameOverTime = serialization.setValue(new MinMaxCurve(), { mode: MinMaxCurveMode.Curve, curveMin: { keys: [{ time: 0, value: 0, inTangent: 1, outTangent: 1 }, { time: 1, value: 1, inTangent: 1, outTangent: 1 }] } });
 
         /**
@@ -37,7 +37,7 @@ namespace gd3d.framework
          * 
          * 对每个发射的粒子使用纹理表的随机行。
          */
-        @serialize
+        
         useRandomRow = true;
 
         /**
@@ -45,7 +45,7 @@ namespace gd3d.framework
          * 
          * 当useRandomRow设置为false时，显式选择使用纹理表的哪一行。
          */
-        @serialize
+        
         get rowIndex() { return this._rowIndex; }
         set rowIndex(v)
         {
@@ -58,7 +58,7 @@ namespace gd3d.framework
          * 
          * 为纹理表动画定义一个随机的起始帧。
          */
-        @serialize
+        
         startFrame = new MinMaxCurve();
 
         /**
@@ -66,7 +66,7 @@ namespace gd3d.framework
          * 
          * 指定在粒子的生命周期内动画将循环多少次。
          */
-        @serialize
+        
         cycleCount = 1;
 
         /**
@@ -74,7 +74,7 @@ namespace gd3d.framework
          * 
          * 在粒子上翻转UV坐标，使它们呈现镜像翻转。
          */
-        @serialize
+        
         flipUV = new Vector2();
 
         /**
@@ -84,7 +84,7 @@ namespace gd3d.framework
          * 
          * todo 目前引擎中只有一套UV
          */
-        @serialize
+        
         uvChannelMask = UVChannelFlags.Everything;
 
         /**

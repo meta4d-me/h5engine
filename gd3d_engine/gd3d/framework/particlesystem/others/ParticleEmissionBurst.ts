@@ -11,13 +11,13 @@ namespace gd3d.framework
          * The time that each burst occurs.
          * 每次爆炸发生的时间。
          */
-        @serialize
+        
         time = 0;
 
         /**
          * 要发射的粒子数。
          */
-        @serialize
+        
         count = serialization.setValue(new MinMaxCurve(), { constant: 30, constantMin: 30, constantMax: 30 });
 
         /**
@@ -55,7 +55,7 @@ namespace gd3d.framework
          * 
          * @todo
          */
-        @serialize
+        
         cycleCount = 1;
 
         /**
@@ -65,13 +65,13 @@ namespace gd3d.framework
          * 
          * @todo
          */
-        @serialize
+        
         repeatInterval = 0.01;
 
         /**
          * 喷发被触发的几率。
          */
-        @serialize
+        
         probability = 1.0;
 
         /**

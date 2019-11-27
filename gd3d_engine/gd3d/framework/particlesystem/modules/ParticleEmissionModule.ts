@@ -12,7 +12,7 @@ namespace gd3d.framework
         /**
          * 随着时间的推移，新粒子产生的速度。
          */
-        @serialize
+        
         rateOverTime = serialization.setValue(new MinMaxCurve(), { between0And1: true, constant: 10, constantMin: 10, constantMax: 10, curveMultiplier: 10 });
 
         /**
@@ -64,7 +64,7 @@ namespace gd3d.framework
         /**
          * 爆发数组
          */
-        @serialize
+        
         bursts: ParticleEmissionBurst[] = [];
 
         /**

@@ -17,7 +17,7 @@ namespace gd3d.framework
          * 
          * 基于寿命的粒子速度控制曲线。
          */
-        @serialize
+        
         velocity = new MinMaxCurveVector3();
 
         /**
@@ -25,7 +25,7 @@ namespace gd3d.framework
          * 
          * 指定速度是在局部空间(与变换一起旋转)还是在世界空间。
          */
-        @serialize
+        
         space = ParticleSystemSimulationSpace1.Local;
 
         /**

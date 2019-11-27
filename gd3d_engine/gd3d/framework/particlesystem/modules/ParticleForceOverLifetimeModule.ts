@@ -13,7 +13,7 @@ namespace gd3d.framework
         /**
          * 作用在粒子上的力
          */
-        @serialize
+        
         force = new MinMaxCurveVector3();
         
         /**
@@ -21,7 +21,7 @@ namespace gd3d.framework
          * 
          * 这些力是作用于局部空间还是世界空间
          */
-        @serialize
+        
         space = ParticleSystemSimulationSpace1.Local;
         
         /**
@@ -31,7 +31,7 @@ namespace gd3d.framework
          * 
          * @todo
          */
-        @serialize
+        
         randomized = false;
 
         /**

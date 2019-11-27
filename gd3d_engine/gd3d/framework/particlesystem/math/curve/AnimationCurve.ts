@@ -22,7 +22,7 @@ namespace gd3d.framework
          * 
          * 在第一个关键帧之前的动画行为。
          */
-        @serialize
+        
         preWrapMode = AnimationCurveWrapMode.Clamp;
 
         /**
@@ -30,7 +30,7 @@ namespace gd3d.framework
          * 
          * 动画在最后一个关键帧之后的行为。
          */
-        @serialize
+        
         postWrapMode = AnimationCurveWrapMode.Clamp;
 
         /**
@@ -40,7 +40,7 @@ namespace gd3d.framework
          * 
          * 注： 该值已对时间排序，否则赋值前请使用 sort((a, b) => a.time - b.time) 进行排序
          */
-        @serialize
+        
         keys: AnimationCurveKeyframe[] = [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }];
 
         /**

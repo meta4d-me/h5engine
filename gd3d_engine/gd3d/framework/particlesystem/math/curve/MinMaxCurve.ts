@@ -12,7 +12,7 @@ namespace gd3d.framework
         /**
          * 模式
          */
-        @serialize
+        
         mode = MinMaxCurveMode.Constant;
 
         /**
@@ -20,7 +20,7 @@ namespace gd3d.framework
          * 
          * 设置常数值。
          */
-        @serialize
+        
         constant = 0;
 
         /**
@@ -28,7 +28,7 @@ namespace gd3d.framework
          * 
          * 为下界设置一个常数。
          */
-        @serialize
+        
         constantMin = 0;
 
         /**
@@ -36,7 +36,7 @@ namespace gd3d.framework
          * 
          * 为上界设置一个常数。
          */
-        @serialize
+        
         constantMax = 0;
 
         /**
@@ -44,7 +44,7 @@ namespace gd3d.framework
          * 
          * 设置曲线。
          */
-        @serialize
+        
         curve = new AnimationCurve1();
 
         /**
@@ -52,7 +52,7 @@ namespace gd3d.framework
          * 
          * 为下界设置一条曲线。
          */
-        @serialize
+        
         curveMin = new AnimationCurve1();
 
         /**
@@ -60,7 +60,7 @@ namespace gd3d.framework
          * 
          * 为上界设置一条曲线。
          */
-        @serialize
+        
         curveMax = new AnimationCurve1();
 
         /**
@@ -68,13 +68,13 @@ namespace gd3d.framework
          * 
          * 设置一个乘数应用于曲线。
          */
-        @serialize
+        
         curveMultiplier = 1;
 
         /**
          * 是否在编辑器中只显示Y轴 0-1 区域，例如 lifetime 为非负，需要设置为true
          */
-        @serialize
+        
         between0And1 = false;
 
         /**

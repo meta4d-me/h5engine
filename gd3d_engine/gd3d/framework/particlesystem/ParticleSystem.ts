@@ -67,7 +67,7 @@ namespace gd3d.framework
          */
         time = 0;
 
-        @serialize
+        
         get main() { return this._main; }
         set main(v)
         {
@@ -77,7 +77,7 @@ namespace gd3d.framework
         }
         private _main: ParticleMainModule;
 
-        @serialize
+        
         get emission() { return this._emission; }
         set emission(v)
         {
@@ -87,7 +87,7 @@ namespace gd3d.framework
         }
         private _emission: ParticleEmissionModule;
 
-        @serialize
+        
         get shape() { return this._shape; }
         set shape(v)
         {
@@ -97,7 +97,7 @@ namespace gd3d.framework
         }
         private _shape: ParticleShapeModule;
 
-        @serialize
+        
         get velocityOverLifetime() { return this._velocityOverLifetime; }
         set velocityOverLifetime(v)
         {
@@ -107,7 +107,7 @@ namespace gd3d.framework
         }
         private _velocityOverLifetime: ParticleVelocityOverLifetimeModule;
 
-        @serialize
+        
         // @oav({ tooltip: "limit velocity over lifetime module.", block: "limitVelocityOverLifetime", component: "OAVObjectView" })
         get limitVelocityOverLifetime() { return this._limitVelocityOverLifetime; }
         set limitVelocityOverLifetime(v)
@@ -118,7 +118,7 @@ namespace gd3d.framework
         }
         private _limitVelocityOverLifetime: ParticleLimitVelocityOverLifetimeModule;
 
-        @serialize
+        
         get forceOverLifetime() { return this._forceOverLifetime; }
         set forceOverLifetime(v)
         {
@@ -128,7 +128,7 @@ namespace gd3d.framework
         }
         private _forceOverLifetime: ParticleForceOverLifetimeModule;
 
-        @serialize
+        
         get colorOverLifetime() { return this._colorOverLifetime; }
         set colorOverLifetime(v)
         {
@@ -138,7 +138,7 @@ namespace gd3d.framework
         }
         private _colorOverLifetime: ParticleColorOverLifetimeModule;
 
-        @serialize
+        
         get sizeOverLifetime() { return this._sizeOverLifetime; }
         set sizeOverLifetime(v)
         {
@@ -148,7 +148,7 @@ namespace gd3d.framework
         }
         private _sizeOverLifetime: ParticleSizeOverLifetimeModule;
 
-        @serialize
+        
         get rotationOverLifetime() { return this._rotationOverLifetime; }
         set rotationOverLifetime(v)
         {
@@ -161,7 +161,7 @@ namespace gd3d.framework
         /**
          * 粒子系统纹理表动画模块。
          */
-        @serialize
+        
         get textureSheetAnimation() { return this._textureSheetAnimation; }
         set textureSheetAnimation(v)
         {

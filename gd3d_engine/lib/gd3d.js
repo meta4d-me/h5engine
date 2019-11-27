@@ -30101,56 +30101,6 @@ var gd3d;
             };
             ParticleSystem.ClassName = "ParticleSystem";
             __decorate([
-                framework.serialize,
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Object])
-            ], ParticleSystem.prototype, "main", null);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Object])
-            ], ParticleSystem.prototype, "emission", null);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Object])
-            ], ParticleSystem.prototype, "shape", null);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Object])
-            ], ParticleSystem.prototype, "velocityOverLifetime", null);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Object])
-            ], ParticleSystem.prototype, "limitVelocityOverLifetime", null);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Object])
-            ], ParticleSystem.prototype, "forceOverLifetime", null);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Object])
-            ], ParticleSystem.prototype, "colorOverLifetime", null);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Object])
-            ], ParticleSystem.prototype, "sizeOverLifetime", null);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Object])
-            ], ParticleSystem.prototype, "rotationOverLifetime", null);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Object])
-            ], ParticleSystem.prototype, "textureSheetAnimation", null);
-            __decorate([
                 gd3d.reflect.Field("mesh"),
                 gd3d.reflect.UIStyle("WidgetDragSelect"),
                 __metadata("design:type", framework.mesh),
@@ -31095,18 +31045,6 @@ var gd3d;
                 }
                 return results;
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], AnimationCurve1.prototype, "preWrapMode", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], AnimationCurve1.prototype, "postWrapMode", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Array)
-            ], AnimationCurve1.prototype, "keys", void 0);
             return AnimationCurve1;
         }());
         framework.AnimationCurve1 = AnimationCurve1;
@@ -31417,42 +31355,6 @@ var gd3d;
                 }
                 return this.constant;
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxCurve.prototype, "mode", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxCurve.prototype, "constant", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxCurve.prototype, "constantMin", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxCurve.prototype, "constantMax", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxCurve.prototype, "curve", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxCurve.prototype, "curveMin", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxCurve.prototype, "curveMax", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxCurve.prototype, "curveMultiplier", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxCurve.prototype, "between0And1", void 0);
             return MinMaxCurve;
         }());
         framework.MinMaxCurve = MinMaxCurve;
@@ -31485,18 +31387,6 @@ var gd3d;
                 if (randomBetween === void 0) { randomBetween = Math.random(); }
                 return new framework.Vector3(this.xCurve.getValue(time, randomBetween), this.yCurve.getValue(time, randomBetween), this.zCurve.getValue(time, randomBetween));
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxCurveVector3.prototype, "xCurve", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxCurveVector3.prototype, "yCurve", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxCurveVector3.prototype, "zCurve", void 0);
             return MinMaxCurveVector3;
         }());
         framework.MinMaxCurveVector3 = MinMaxCurveVector3;
@@ -32588,10 +32478,6 @@ var gd3d;
                 0, 0, 1, 0,
                 0, 0, 0, 1
             ];
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Array)
-            ], Matrix4x4.prototype, "rawData", void 0);
             return Matrix4x4;
         }());
         framework.Matrix4x4 = Matrix4x4;
@@ -33398,18 +33284,6 @@ var gd3d;
                 }
                 return new framework.Color3();
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], Gradient.prototype, "mode", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Array)
-            ], Gradient.prototype, "alphaKeys", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Array)
-            ], Gradient.prototype, "colorKeys", void 0);
             return Gradient;
         }());
         framework.Gradient = Gradient;
@@ -33461,34 +33335,6 @@ var gd3d;
                 }
                 return this.color;
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxGradient.prototype, "mode", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxGradient.prototype, "color", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxGradient.prototype, "colorMin", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxGradient.prototype, "colorMax", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxGradient.prototype, "gradient", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxGradient.prototype, "gradientMin", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], MinMaxGradient.prototype, "gradientMax", void 0);
             return MinMaxGradient;
         }());
         framework.MinMaxGradient = MinMaxGradient;
@@ -33523,10 +33369,6 @@ var gd3d;
             };
             ParticleModule.prototype.updateParticleState = function (particle) {
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleModule.prototype, "enabled", void 0);
             return ParticleModule;
         }(framework.EventDispatcher));
         framework.ParticleModule = ParticleModule;
@@ -33551,10 +33393,6 @@ var gd3d;
                     return;
                 particle.color.multiply(this.color.getValue(particle.rateAtLifeTime, particle[_ColorOverLifetime_rate]));
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleColorOverLifetimeModule.prototype, "color", void 0);
             return ParticleColorOverLifetimeModule;
         }(framework.ParticleModule));
         framework.ParticleColorOverLifetimeModule = ParticleColorOverLifetimeModule;
@@ -33616,14 +33454,6 @@ var gd3d;
                     this.bursts[i] = bursts[i];
                 }
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleEmissionModule.prototype, "rateOverTime", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Array)
-            ], ParticleEmissionModule.prototype, "bursts", void 0);
             return ParticleEmissionModule;
         }(framework.ParticleModule));
         framework.ParticleEmissionModule = ParticleEmissionModule;
@@ -33721,18 +33551,6 @@ var gd3d;
                 particle.acceleration.add(force);
                 preForce.copy(force);
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleForceOverLifetimeModule.prototype, "force", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleForceOverLifetimeModule.prototype, "space", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleForceOverLifetimeModule.prototype, "randomized", void 0);
             return ParticleForceOverLifetimeModule;
         }(framework.ParticleModule));
         framework.ParticleForceOverLifetimeModule = ParticleForceOverLifetimeModule;
@@ -33896,26 +33714,6 @@ var gd3d;
                 }
                 particle.velocity.lerpNumber(pVelocity, this.dampen);
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleLimitVelocityOverLifetimeModule.prototype, "separateAxes", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleLimitVelocityOverLifetimeModule.prototype, "limit", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleLimitVelocityOverLifetimeModule.prototype, "limit3D", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleLimitVelocityOverLifetimeModule.prototype, "space", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleLimitVelocityOverLifetimeModule.prototype, "dampen", void 0);
             return ParticleLimitVelocityOverLifetimeModule;
         }(framework.ParticleModule));
         framework.ParticleLimitVelocityOverLifetimeModule = ParticleLimitVelocityOverLifetimeModule;
@@ -34155,87 +33953,6 @@ var gd3d;
                 particle.size.copy(particle.startSize);
                 particle.color.copy(particle.startColor);
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "duration", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "loop", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "prewarm", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "startDelay", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "startLifetime", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "startSpeed", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "useStartSize3D", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Object])
-            ], ParticleMainModule.prototype, "startSize", null);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "startSize3D", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "useStartRotation3D", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "startRotation3D", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "randomizeRotationDirection", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "startColor", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "gravityModifier", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "simulationSpace", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", framework.transform)
-            ], ParticleMainModule.prototype, "customSimulationSpace", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "simulationSpeed", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "scalingMode", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "playOnAwake", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleMainModule.prototype, "maxParticles", void 0);
             return ParticleMainModule;
         }(framework.ParticleModule));
         framework.ParticleMainModule = ParticleMainModule;
@@ -34331,14 +34048,6 @@ var gd3d;
                 particle.angularVelocity.add(v);
                 preAngularVelocity.copy(v);
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleRotationOverLifetimeModule.prototype, "separateAxes", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleRotationOverLifetimeModule.prototype, "angularVelocity", void 0);
             return ParticleRotationOverLifetimeModule;
         }(framework.ParticleModule));
         framework.ParticleRotationOverLifetimeModule = ParticleRotationOverLifetimeModule;
@@ -34607,67 +34316,6 @@ var gd3d;
                         break;
                 }
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Object])
-            ], ParticleShapeModule.prototype, "shapeType", null);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleShapeModule.prototype, "alignToDirection", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleShapeModule.prototype, "randomDirectionAmount", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleShapeModule.prototype, "sphericalDirectionAmount", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleShapeModule.prototype, "angle", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleShapeModule.prototype, "arc", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleShapeModule.prototype, "arcMode", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleShapeModule.prototype, "arcSpeed", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleShapeModule.prototype, "arcSpread", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleShapeModule.prototype, "box", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleShapeModule.prototype, "length", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleShapeModule.prototype, "radius", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleShapeModule.prototype, "radiusMode", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleShapeModule.prototype, "radiusSpeed", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleShapeModule.prototype, "radiusSpread", void 0);
             return ParticleShapeModule;
         }(framework.ParticleModule));
         framework.ParticleShapeModule = ParticleShapeModule;
@@ -34777,14 +34425,6 @@ var gd3d;
                 }
                 particle.size.multiply(size);
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleSizeOverLifetimeModule.prototype, "separateAxes", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleSizeOverLifetimeModule.prototype, "size3D", void 0);
             return ParticleSizeOverLifetimeModule;
         }(framework.ParticleModule));
         framework.ParticleSizeOverLifetimeModule = ParticleSizeOverLifetimeModule;
@@ -34910,43 +34550,6 @@ var gd3d;
                 particle.tilingOffset.init(step.x, step.y, uvPos.x, uvPos.y);
                 particle.flipUV = this.flipUV;
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleTextureSheetAnimationModule.prototype, "tiles", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleTextureSheetAnimationModule.prototype, "animation", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleTextureSheetAnimationModule.prototype, "frameOverTime", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleTextureSheetAnimationModule.prototype, "useRandomRow", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object),
-                __metadata("design:paramtypes", [Object])
-            ], ParticleTextureSheetAnimationModule.prototype, "rowIndex", null);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleTextureSheetAnimationModule.prototype, "startFrame", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleTextureSheetAnimationModule.prototype, "cycleCount", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleTextureSheetAnimationModule.prototype, "flipUV", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleTextureSheetAnimationModule.prototype, "uvChannelMask", void 0);
             return ParticleTextureSheetAnimationModule;
         }(framework.ParticleModule));
         framework.ParticleTextureSheetAnimationModule = ParticleTextureSheetAnimationModule;
@@ -35047,14 +34650,6 @@ var gd3d;
                 particle.velocity.add(velocity);
                 preVelocity.copy(velocity);
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleVelocityOverLifetimeModule.prototype, "velocity", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleVelocityOverLifetimeModule.prototype, "space", void 0);
             return ParticleVelocityOverLifetimeModule;
         }(framework.ParticleModule));
         framework.ParticleVelocityOverLifetimeModule = ParticleVelocityOverLifetimeModule;
@@ -35107,26 +34702,6 @@ var gd3d;
                 this._isProbability = this.probability >= Math.random();
                 return this._isProbability;
             };
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleEmissionBurst.prototype, "time", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleEmissionBurst.prototype, "count", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleEmissionBurst.prototype, "cycleCount", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleEmissionBurst.prototype, "repeatInterval", void 0);
-            __decorate([
-                framework.serialize,
-                __metadata("design:type", Object)
-            ], ParticleEmissionBurst.prototype, "probability", void 0);
             return ParticleEmissionBurst;
         }());
         framework.ParticleEmissionBurst = ParticleEmissionBurst;
