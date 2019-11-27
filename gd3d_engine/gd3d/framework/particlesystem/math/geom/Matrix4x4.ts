@@ -1,6 +1,5 @@
 namespace gd3d.framework
 {
-
     /**
      * Matrix4x4 类表示一个转换矩阵，该矩阵确定三维 (3D) 显示对象的位置和方向。
      * 该矩阵可以执行转换功能，包括平移（沿 x、y 和 z 轴重新定位）、旋转和缩放（调整大小）。
@@ -34,44 +33,125 @@ namespace gd3d.framework
             0, 0, 1, 0,//
             0, 0, 0, 1//
         ];
+
+        /**
+         * 通过位移旋转缩放重组矩阵
+         * 
+         * @param position 位移
+         * @param rotation 旋转，按照指定旋转顺序旋转。
+         * @param scale 缩放。
+         * @param order 旋转顺序。
+         */
+        static recompose(position: Vector3, rotation: Vector3, scale: Vector3, order = defaultRotationOrder)
+        {
+            return new Matrix4x4().recompose(position, rotation, scale, order);
+        }
+
         /**
          * 一个由 16 个数字组成的矢量，其中，每四个元素可以是 4x4 矩阵的一列。
          */
+        @serialize
         rawData: number[];
 
         /**
-         * 一个保存显示对象在转换参照帧中的 3D 坐标 (x,y,z) 位置的 Vector3 对象。
+         * 获取位移
+         * 
+         * @param value 用于存储位移信息的向量
          */
-        get position()
+        getPosition(value = new Vector3())
         {
-            return new Vector3(this.rawData[12], this.rawData[13], this.rawData[14]);
+            value.x = this.rawData[12];
+            value.y = this.rawData[13];
+            value.z = this.rawData[14];
+            return value;
         }
 
-        set position(value: Vector3)
+        /**
+         * 设置位移
+         * 
+         * @param value 位移
+         */
+        setPosition(value: Vector3)
         {
             this.rawData[12] = value.x;
             this.rawData[13] = value.y;
             this.rawData[14] = value.z;
+            return this;
         }
 
         /**
-         * 旋转角度
+         * 获取欧拉旋转角度。
+         * 
+         * @param rotation 欧拉旋转角度。
+         * @param order   绕轴旋转的顺序。
          */
-        get rotation()
+        getRotation(rotation = new Vector3(), order = defaultRotationOrder)
         {
-            var rotation = this.decompose()[1].scaleNumber(Math.RAD2DEG);
+            this.decompose(new Vector3(), rotation, new Vector3(), order);
             return rotation;
         }
 
-        set rotation(v)
+        /**
+         * 设置欧拉旋转角度。
+         * 
+         * @param rotation 欧拉旋转角度。
+         * @param order 绕轴旋转的顺序。
+         */
+        setRotation(rotation: Vector3, order = defaultRotationOrder)
         {
-            var comps = this.decompose();
-            comps[1].copy(v).scaleNumber(Math.DEG2RAD);
-            this.recompose(comps);
+            var p = new Vector3();
+            var r = new Vector3();
+            var s = new Vector3();
+            this.decompose(p, r, s, order);
+            r.copy(rotation);
+            this.recompose(p, r, s);
+            return this;
         }
 
         /**
-         * 一个用于确定矩阵是否可逆的数字。
+         * 获取缩放值。
+         * 
+         * @param scale 用于存储缩放值的向量。
+         */
+        getScale(scale = new Vector3)
+        {
+            var rawData = this.rawData;
+            var v = new Vector3();
+            scale.x = v.init(rawData[0], rawData[1], rawData[2]).length;
+            scale.y = v.init(rawData[4], rawData[5], rawData[6]).length;
+            scale.z = v.init(rawData[8], rawData[9], rawData[10]).length;
+            return scale;
+        }
+
+        /**
+         * 获取缩放值。
+         * 
+         * @param scale 缩放值。
+         */
+        setScale(scale: Vector3)
+        {
+            var oldS = this.getScale();
+
+            var te = this.rawData;
+            var sx = scale.x / oldS.x;
+            var sy = scale.y / oldS.y;
+            var sz = scale.z / oldS.z;
+
+            te[0] *= sx;
+            te[1] *= sx;
+            te[2] *= sx;
+            te[4] *= sy;
+            te[5] *= sy;
+            te[6] *= sy;
+            te[8] *= sz;
+            te[9] *= sz;
+            te[10] *= sz;
+
+            return this;
+        }
+
+        /**
+         * 一个用于确定矩阵是否可逆的数字。如果值为0则不可逆。
          */
         get determinant()
         {
@@ -139,12 +219,13 @@ namespace gd3d.framework
          */
         constructor(datas?: number[])
         {
-            this.rawData = datas || [//
-                1, 0, 0, 0,// 
-                0, 1, 0, 0,// 
-                0, 0, 1, 0,//
-                0, 0, 0, 1//
-            ];
+            if (datas)
+                this.rawData = datas;
+            else
+            {
+                this.rawData = [];
+                this.identity();
+            }
         }
 
         /**
@@ -172,25 +253,30 @@ namespace gd3d.framework
         }
 
         /**
-         * 创建旋转矩阵
+         * 从欧拉角旋转角度初始化矩阵。
+         * 
          * @param   rx      用于沿 x 轴旋转对象的角度。
          * @param   ry      用于沿 y 轴旋转对象的角度。
-         * @param   rz      用于沿 z 轴旋转对象的角度。      
+         * @param   rz      用于沿 z 轴旋转对象的角度。  
+         * @param   order   绕轴旋转的顺序。
          */
-        static fromRotation(rx: number, ry: number, rz: number): Matrix4x4
+        static fromRotation(rx: number, ry: number, rz: number, order = defaultRotationOrder): Matrix4x4
         {
-            rx = Math.degToRad(rx);
-            ry = Math.degToRad(ry);
-            rz = Math.degToRad(rz);
+            return new Matrix4x4().fromRotation(rx, ry, rz, order);
+        }
 
-            var sx = Math.sin(rx), cx = Math.cos(rx), sy = Math.sin(ry), cy = Math.cos(ry), sz = Math.sin(rz), cz = Math.cos(rz);
-
-            return new Matrix4x4([
-                cy * cz, cy * sz, -sy, 0,
-                sx * sy * cz - cx * sz, sx * sy * sz + cx * cz, sx * cy, 0,
-                cx * sy * cz + sx * sz, cx * sy * sz - sx * cz, cx * cy, 0,
-                0, 0, 0, 1,
-            ]);
+        /**
+         * 从欧拉角旋转角度初始化矩阵。
+         * 
+         * @param   rx      用于沿 x 轴旋转对象的角度。
+         * @param   ry      用于沿 y 轴旋转对象的角度。
+         * @param   rz      用于沿 z 轴旋转对象的角度。  
+         * @param   order   绕轴旋转的顺序。
+         */
+        fromRotation(rx: number, ry: number, rz: number, order = defaultRotationOrder)
+        {
+            this.recompose(new Vector3(), new Vector3(rx, ry, rz), new Vector3(1, 1, 1), order);
+            return this;
         }
 
         /**
@@ -470,111 +556,263 @@ namespace gd3d.framework
         }
 
         /**
-         * 将转换矩阵的平移、旋转和缩放设置作为由三个 Vector3 对象组成的矢量返回。
-         * @return      一个由三个 Vector3 对象组成的矢量，其中，每个对象分别容纳平移、旋转和缩放设置。
+         * 通过位移旋转缩放重组矩阵
+         * 
+         * @param position 位移
+         * @param rotation 旋转角度，按照指定旋转顺序旋转。
+         * @param scale 缩放。
+         * @param order 旋转顺序。
          */
-        decompose(orientationStyle: Orientation3D = Orientation3D.EULER_ANGLES, result?: Vector3[])
+        recompose(position: Vector3, rotation: Vector3, scale: Vector3, order = defaultRotationOrder)
         {
-            var raw = this.rawData;
+            this.identity();
+            var te = this.rawData;
+            //
+            rotation = rotation.scaleNumberTo(Math.DEG2RAD);
+            var px = position.x;
+            var py = position.y;
+            var pz = position.z;
+            var rx = rotation.x;
+            var ry = rotation.y;
+            var rz = rotation.z;
+            var sx = scale.x;
+            var sy = scale.y;
+            var sz = scale.z;
+            //
+            te[12] = px;
+            te[13] = py;
+            te[14] = pz;
+            //
+            var cosX = Math.cos(rx), sinX = Math.sin(rx);
+            var cosY = Math.cos(ry), sinY = Math.sin(ry);
+            var cosZ = Math.cos(rz), sinZ = Math.sin(rz);
 
-            var a = raw[0];
-            var e = raw[1];
-            var i = raw[2];
-            var b = raw[4];
-            var f = raw[5];
-            var j = raw[6];
-            var c = raw[8];
-            var g = raw[9];
-            var k = raw[10];
-
-            var x = raw[12];
-            var y = raw[13];
-            var z = raw[14];
-
-            var tx = Math.sqrt(a * a + e * e + i * i);
-            var ty = Math.sqrt(b * b + f * f + j * j);
-            var tz = Math.sqrt(c * c + g * g + k * k);
-            var tw = 0;
-
-            var scaleX = tx;
-            var scaleY = ty;
-            var scaleZ = tz;
-
-            if (a * (f * k - j * g) - e * (b * k - j * c) + i * (b * g - f * c) < 0)
+            if (order === RotationOrder.XYZ)
             {
-                scaleZ = -scaleZ;
-            }
+                var ae = cosX * cosZ, af = cosX * sinZ, be = sinX * cosZ, bf = sinX * sinZ;
 
-            a = a / scaleX;
-            e = e / scaleX;
-            i = i / scaleX;
-            b = b / scaleY;
-            f = f / scaleY;
-            j = j / scaleY;
-            c = c / scaleZ;
-            g = g / scaleZ;
-            k = k / scaleZ;
+                te[0] = cosY * cosZ;
+                te[4] = - cosY * sinZ;
+                te[8] = sinY;
 
-            if (orientationStyle == Orientation3D.EULER_ANGLES)
+                te[1] = af + be * sinY;
+                te[5] = ae - bf * sinY;
+                te[9] = - sinX * cosY;
+
+                te[2] = bf - ae * sinY;
+                te[6] = be + af * sinY;
+                te[10] = cosX * cosY;
+
+            } else if (order === RotationOrder.YXZ)
             {
-                tx = Math.atan2(j, k);
-                ty = Math.atan2(-i, Math.sqrt(a * a + e * e));
-                var s1 = Math.sin(tx);
-                var c1 = Math.cos(tx);
-                tz = Math.atan2(s1 * c - c1 * b, c1 * f - s1 * g);
-            }
-            else if (orientationStyle == Orientation3D.AXIS_ANGLE)
-            {
-                tw = Math.acos((a + f + k - 1) / 2);
-                var len = Math.sqrt((j - g) * (j - g) + (c - i) * (c - i) + (e - b) * (e - b));
-                tx = (j - g) / len;
-                ty = (c - i) / len;
-                tz = (e - b) / len;
-            }
-            else
-            { //Orientation3D.QUATERNION
-                var tr = a + f + k;
-                if (tr > 0)
-                {
-                    tw = Math.sqrt(1 + tr) / 2;
-                    tx = (j - g) / (4 * tw);
-                    ty = (c - i) / (4 * tw);
-                    tz = (e - b) / (4 * tw);
-                }
-                else if ((a > f) && (a > k))
-                {
-                    tx = Math.sqrt(1 + a - f - k) / 2;
-                    tw = (j - g) / (4 * tx);
-                    ty = (e + b) / (4 * tx);
-                    tz = (c + i) / (4 * tx);
-                }
-                else if (f > k)
-                {
-                    ty = Math.sqrt(1 + f - a - k) / 2;
-                    tx = (e + b) / (4 * ty);
-                    tw = (c - i) / (4 * ty);
-                    tz = (j + g) / (4 * ty);
-                }
-                else
-                {
-                    tz = Math.sqrt(1 + k - a - f) / 2;
-                    tx = (c + i) / (4 * tz);
-                    ty = (j + g) / (4 * tz);
-                    tw = (e - b) / (4 * tz);
-                }
-            }
+                var ce = cosY * cosZ, cf = cosY * sinZ, de = sinY * cosZ, df = sinY * sinZ;
 
-            result = result || [new Vector3(), new Vector3(), new Vector3()];
-            result[0].x = x;
-            result[0].y = y;
-            result[0].z = z;
-            result[1].x = tx;
-            result[1].y = ty;
-            result[1].z = tz;
-            result[2].x = scaleX;
-            result[2].y = scaleY;
-            result[2].z = scaleZ;
-            return result;
+                te[0] = ce + df * sinX;
+                te[4] = de * sinX - cf;
+                te[8] = cosX * sinY;
+
+                te[1] = cosX * sinZ;
+                te[5] = cosX * cosZ;
+                te[9] = - sinX;
+
+                te[2] = cf * sinX - de;
+                te[6] = df + ce * sinX;
+                te[10] = cosX * cosY;
+
+            } else if (order === RotationOrder.ZXY)
+            {
+                var ce = cosY * cosZ, cf = cosY * sinZ, de = sinY * cosZ, df = sinY * sinZ;
+
+                te[0] = ce - df * sinX;
+                te[4] = - cosX * sinZ;
+                te[8] = de + cf * sinX;
+
+                te[1] = cf + de * sinX;
+                te[5] = cosX * cosZ;
+                te[9] = df - ce * sinX;
+
+                te[2] = - cosX * sinY;
+                te[6] = sinX;
+                te[10] = cosX * cosY;
+
+            } else if (order === RotationOrder.ZYX)
+            {
+                var ae = cosX * cosZ, af = cosX * sinZ, be = sinX * cosZ, bf = sinX * sinZ;
+
+                te[0] = cosY * cosZ;
+                te[4] = be * sinY - af;
+                te[8] = ae * sinY + bf;
+
+                te[1] = cosY * sinZ;
+                te[5] = bf * sinY + ae;
+                te[9] = af * sinY - be;
+
+                te[2] = - sinY;
+                te[6] = sinX * cosY;
+                te[10] = cosX * cosY;
+
+            } else if (order === RotationOrder.YZX)
+            {
+                var ac = cosX * cosY, ad = cosX * sinY, bc = sinX * cosY, bd = sinX * sinY;
+
+                te[0] = cosY * cosZ;
+                te[4] = bd - ac * sinZ;
+                te[8] = bc * sinZ + ad;
+
+                te[1] = sinZ;
+                te[5] = cosX * cosZ;
+                te[9] = - sinX * cosZ;
+
+                te[2] = - sinY * cosZ;
+                te[6] = ad * sinZ + bc;
+                te[10] = ac - bd * sinZ;
+
+            } else if (order === RotationOrder.XZY)
+            {
+                var ac = cosX * cosY, ad = cosX * sinY, bc = sinX * cosY, bd = sinX * sinY;
+
+                te[0] = cosY * cosZ;
+                te[4] = - sinZ;
+                te[8] = sinY * cosZ;
+
+                te[1] = ac * sinZ + bd;
+                te[5] = cosX * cosZ;
+                te[9] = ad * sinZ - bc;
+
+                te[2] = bc * sinZ - ad;
+                te[6] = sinX * cosZ;
+                te[10] = bd * sinZ + ac;
+
+            } else
+            {
+                console.error(`初始化矩阵时错误旋转顺序 ${order}`);
+            }
+            //
+            te[0] *= sx;
+            te[1] *= sx;
+            te[2] *= sx;
+            te[4] *= sy;
+            te[5] *= sy;
+            te[6] *= sy;
+            te[8] *= sz;
+            te[9] *= sz;
+            te[10] *= sz;
+
+            return this;
+        }
+
+        /**
+         * 把矩阵分解为位移旋转缩放。
+         * 
+         * @param position 位移
+         * @param rotation 旋转角度，按照指定旋转顺序旋转。
+         * @param scale 缩放。
+         * @param order 旋转顺序。
+         */
+        decompose(position = new Vector3(), rotation = new Vector3(), scale = new Vector3(), order = defaultRotationOrder)
+        {
+            var clamp = Math.clamp;
+            //
+            var rawData = this.rawData;
+            var m11 = rawData[0], m12 = rawData[4], m13 = rawData[8];
+            var m21 = rawData[1], m22 = rawData[5], m23 = rawData[9];
+            var m31 = rawData[2], m32 = rawData[6], m33 = rawData[10];
+            //
+            position.x = rawData[12];
+            position.y = rawData[13];
+            position.z = rawData[14];
+            //
+            scale.x = Math.sqrt(m11 * m11 + m21 * m21 + m31 * m31);
+            m11 /= scale.x;
+            m21 /= scale.x;
+            m31 /= scale.x;
+            scale.y = Math.sqrt(m12 * m12 + m22 * m22 + m32 * m32);
+            m12 /= scale.y;
+            m22 /= scale.y;
+            m32 /= scale.y;
+            scale.z = Math.sqrt(m13 * m13 + m23 * m23 + m33 * m33);
+            m13 /= scale.z;
+            m23 /= scale.z;
+            m33 /= scale.z;
+            //
+            if (order === RotationOrder.XYZ)
+            {
+                rotation.y = Math.asin(clamp(m13, - 1, 1));
+                if (Math.abs(m13) < 0.9999999)
+                {
+                    rotation.x = Math.atan2(- m23, m33);
+                    rotation.z = Math.atan2(- m12, m11);
+                } else
+                {
+                    rotation.x = Math.atan2(m32, m22);
+                    rotation.z = 0;
+                }
+            } else if (order === RotationOrder.YXZ)
+            {
+                rotation.x = Math.asin(- clamp(m23, - 1, 1));
+                if (Math.abs(m23) < 0.9999999)
+                {
+                    rotation.y = Math.atan2(m13, m33);
+                    rotation.z = Math.atan2(m21, m22);
+                } else
+                {
+                    rotation.y = Math.atan2(- m31, m11);
+                    rotation.z = 0;
+                }
+            } else if (order === RotationOrder.ZXY)
+            {
+                rotation.x = Math.asin(clamp(m32, - 1, 1));
+                if (Math.abs(m32) < 0.9999999)
+                {
+                    rotation.y = Math.atan2(- m31, m33);
+                    rotation.z = Math.atan2(- m12, m22);
+                } else
+                {
+                    rotation.y = 0;
+                    rotation.z = Math.atan2(m21, m11);
+                }
+            } else if (order === RotationOrder.ZYX)
+            {
+                rotation.y = Math.asin(- clamp(m31, - 1, 1));
+                if (Math.abs(m31) < 0.9999999)
+                {
+                    rotation.x = Math.atan2(m32, m33);
+                    rotation.z = Math.atan2(m21, m11);
+                } else
+                {
+                    rotation.x = 0;
+                    rotation.z = Math.atan2(- m12, m22);
+                }
+            } else if (order === RotationOrder.YZX)
+            {
+                rotation.z = Math.asin(clamp(m21, - 1, 1));
+                if (Math.abs(m21) < 0.9999999)
+                {
+                    rotation.x = Math.atan2(- m23, m22);
+                    rotation.y = Math.atan2(- m31, m11);
+                } else
+                {
+                    rotation.x = 0;
+                    rotation.y = Math.atan2(m13, m33);
+                }
+            } else if (order === RotationOrder.XZY)
+            {
+                rotation.z = Math.asin(- clamp(m12, - 1, 1));
+                if (Math.abs(m12) < 0.9999999)
+                {
+                    rotation.x = Math.atan2(m32, m22);
+                    rotation.y = Math.atan2(m13, m11);
+                } else
+                {
+                    rotation.x = Math.atan2(- m23, m33);
+                    rotation.y = 0;
+                }
+            } else
+            {
+                console.error(`初始化矩阵时错误旋转顺序 ${order}`);
+            }
+            rotation.scaleNumber(Math.RAD2DEG);
+            return [position, rotation, scale];
         }
 
         /**
@@ -685,6 +923,22 @@ namespace gd3d.framework
             return this;
         }
 
+        prependScale1(xScale: number, yScale: number, zScale: number)
+        {
+            var rawData = this.rawData;
+            rawData[0] *= xScale;
+            rawData[1] *= xScale;
+            rawData[2] *= xScale;
+            rawData[4] *= yScale;
+            rawData[5] *= yScale;
+            rawData[6] *= yScale;
+            rawData[8] *= zScale;
+            rawData[9] *= zScale;
+            rawData[10] *= zScale;
+
+            return this;
+        }
+
         /**
          * 在 Matrix4x4 对象上前置一个增量平移，沿 x、y 和 z 轴重新定位。在将 Matrix4x4 对象应用于显示对象时，矩阵会在 Matrix4x4 对象中先执行平移更改，然后再执行其他转换。
          * @param   x   沿 x 轴的增量平移。
@@ -706,7 +960,7 @@ namespace gd3d.framework
         {
             var direction = this.right;
             direction.scaleNumber(distance);
-            this.position = this.position.addTo(direction);
+            this.setPosition(this.getPosition().addTo(direction));
             return this;
         }
 
@@ -718,7 +972,7 @@ namespace gd3d.framework
         {
             var direction = this.up;
             direction.scaleNumber(distance);
-            this.position = this.position.addTo(direction);
+            this.setPosition(this.getPosition().addTo(direction));
             return this;
         }
 
@@ -730,29 +984,7 @@ namespace gd3d.framework
         {
             var direction = this.forward;
             direction.scaleNumber(distance);
-            this.position = this.position.addTo(direction);
-            return this;
-        }
-
-        /**
-         * 设置转换矩阵的平移、旋转和缩放设置。
-         * @param   components      一个由三个 Vector3 对象组成的矢量，这些对象将替代 Matrix4x4 对象的平移、旋转和缩放元素。
-         */
-        recompose(components: Vector3[])
-        {
-            var rx = components[1].x;
-            var ry = components[1].y;
-            var rz = components[1].z;
-
-            var sx = Math.sin(rx), cx = Math.cos(rx), sy = Math.sin(ry), cy = Math.cos(ry), sz = Math.sin(rz), cz = Math.cos(rz);
-            var xS = components[2].x, yS = components[2].y, zS = components[2].z;
-
-            this.rawData = [
-                cy * cz * xS, cy * sz * xS, -sy * xS, 0,
-                (sx * sy * cz - cx * sz) * yS, (sx * sy * sz + cx * cz) * yS, sx * cy * yS, 0,
-                (cx * sy * cz + sx * sz) * zS, (cx * sy * sz - sx * cz) * zS, cx * cy * zS, 0,
-                components[0].x, components[0].y, components[0].z, 1,
-            ];
+            this.setPosition(this.getPosition().addTo(direction));
             return this;
         }
 
@@ -811,7 +1043,6 @@ namespace gd3d.framework
             var rotationMatrix3d = Matrix4x4.fromRotation(vin.x, vin.y, vin.z);
             rotationMatrix3d.append(this);
             var newrotation = rotationMatrix3d.decompose()[1];
-            newrotation.scaleNumber(180 / Math.PI);
             var v = Math.round((newrotation.x - vin.x) / 180);
             if (v % 2 != 0)
             {
@@ -840,17 +1071,14 @@ namespace gd3d.framework
          */
         transpose()
         {
-            var swap;
+            var swap: number;
             for (var i = 0; i < 4; i++)
             {
-                for (var j = 0; j < 4; j++)
+                for (var j = 0; j < i; j++)
                 {
-                    if (i > j)
-                    {
-                        swap = this.rawData[i * 4 + j];
-                        this.rawData[i * 4 + j] = this.rawData[j * 4 + i];
-                        this.rawData[j * 4 + i] = swap;
-                    }
+                    swap = this.rawData[i * 4 + j];
+                    this.rawData[i * 4 + j] = this.rawData[j * 4 + i];
+                    this.rawData[j * 4 + i] = swap;
                 }
             }
             return this;
@@ -876,7 +1104,7 @@ namespace gd3d.framework
          * @param target    目标位置
          * @param upAxis    向上朝向
          */
-        lookAt(target: Vector3, upAxis?: Vector3): void
+        lookAt(target: Vector3, upAxis?: Vector3)
         {
             //获取位移，缩放，在变换过程位移与缩放不变
             var vec = this.decompose();
@@ -890,9 +1118,11 @@ namespace gd3d.framework
 
             upAxis = upAxis || Vector3.Y_AXIS;
 
-            zAxis.x = target.x - this.position.x;
-            zAxis.y = target.y - this.position.y;
-            zAxis.z = target.z - this.position.z;
+            var p = this.getPosition();
+
+            zAxis.x = target.x - p.x;
+            zAxis.y = target.y - p.y;
+            zAxis.z = target.z - p.z;
             zAxis.normalize();
 
             xAxis.x = upAxis.y * zAxis.z - upAxis.z * zAxis.y;
@@ -931,6 +1161,7 @@ namespace gd3d.framework
             this.rawData[13] = position.y;
             this.rawData[14] = position.z;
             this.rawData[15] = 1;
+            return this;
         }
 
         /**

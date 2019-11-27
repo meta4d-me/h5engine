@@ -5760,24 +5760,40 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    enum ParticleSystemShapeConeEmitFrom {
+        Base = 0,
+        BaseShell = 1,
+        Volume = 2,
+        VolumeShell = 3
+    }
+}
+declare namespace gd3d.framework {
+    enum ParticleSystemShapeMultiModeValue {
+        Random = 0,
+        Loop = 1,
+        PingPong = 2,
+        BurstSpread = 3
+    }
+}
+declare namespace gd3d.framework {
     enum ParticleSystemShapeType {
         Sphere = 0,
         SphereShell = 1,
         Hemisphere = 2,
         HemisphereShell = 3,
         Cone = 4,
-        ConeShell = 5,
-        ConeVolume = 6,
-        ConeVolumeShell = 7,
-        Box = 8,
-        BoxShell = 9,
-        BoxEdge = 10,
-        Mesh = 11,
-        MeshRenderer = 12,
-        SkinnedMeshRenderer = 13,
-        Circle = 14,
-        CircleEdge = 15,
-        SingleSidedEdge = 16
+        ConeShell = 7,
+        ConeVolume = 8,
+        ConeVolumeShell = 9,
+        Box = 5,
+        BoxShell = 15,
+        BoxEdge = 16,
+        Mesh = 6,
+        MeshRenderer = 13,
+        SkinnedMeshRenderer = 14,
+        Circle = 10,
+        CircleEdge = 11,
+        SingleSidedEdge = 12
     }
 }
 declare namespace gd3d.framework {
@@ -6084,9 +6100,11 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AnimationCurve1 {
+        __class__: "feng3d.AnimationCurve";
         maxtan: number;
+        preWrapMode: AnimationCurveWrapMode;
+        postWrapMode: AnimationCurveWrapMode;
         keys: AnimationCurveKeyframe[];
-        wrapMode: AnimationCurveWrapMode;
         readonly numKeys: number;
         addKey(key: AnimationCurveKeyframe): void;
         sort(): void;
@@ -6101,19 +6119,18 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class AnimationCurveKeyframe {
+    interface AnimationCurveKeyframe {
         time: number;
         value: number;
-        tangent: number;
-        constructor(param: Partial<AnimationCurveKeyframe>);
-        init(param: Partial<AnimationCurveKeyframe>): void;
+        inTangent: number;
+        outTangent: number;
     }
 }
 declare namespace gd3d.framework {
     enum AnimationCurveWrapMode {
-        Loop = 0,
-        PingPong = 1,
-        Clamp = 2
+        Clamp = 1,
+        Loop = 2,
+        PingPong = 4
     }
 }
 declare namespace gd3d.framework {
@@ -6154,11 +6171,14 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class MinMaxCurve {
+        __class__: "feng3d.MinMaxCurve";
         mode: MinMaxCurveMode;
         constant: number;
-        constant1: number;
+        constantMin: number;
+        constantMax: number;
         curve: AnimationCurve1;
-        curve1: AnimationCurve1;
+        curveMin: AnimationCurve1;
+        curveMax: AnimationCurve1;
         curveMultiplier: number;
         between0And1: boolean;
         getValue(time: number, randomBetween?: number): number;
@@ -6168,8 +6188,8 @@ declare namespace gd3d.framework {
     enum MinMaxCurveMode {
         Constant = 0,
         Curve = 1,
-        RandomBetweenTwoConstants = 2,
-        RandomBetweenTwoCurves = 3
+        TwoConstants = 3,
+        TwoCurves = 2
     }
 }
 declare namespace gd3d.framework {
@@ -6207,9 +6227,14 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class Matrix4x4 {
         static RAW_DATA_CONTAINER: number[];
+        static recompose(position: Vector3, rotation: Vector3, scale: Vector3, order?: RotationOrder): Matrix4x4;
         rawData: number[];
-        position: Vector3;
-        rotation: Vector3;
+        getPosition(value?: Vector3): Vector3;
+        setPosition(value: Vector3): this;
+        getRotation(rotation?: Vector3, order?: RotationOrder): Vector3;
+        setRotation(rotation: Vector3, order?: RotationOrder): this;
+        getScale(scale?: Vector3): Vector3;
+        setScale(scale: Vector3): this;
         readonly determinant: number;
         readonly forward: Vector3;
         readonly up: Vector3;
@@ -6219,7 +6244,8 @@ declare namespace gd3d.framework {
         readonly left: Vector3;
         constructor(datas?: number[]);
         static fromAxisRotate(axis: Vector3, degrees: number): Matrix4x4;
-        static fromRotation(rx: number, ry: number, rz: number): Matrix4x4;
+        static fromRotation(rx: number, ry: number, rz: number, order?: RotationOrder): Matrix4x4;
+        fromRotation(rx: number, ry: number, rz: number, order?: RotationOrder): this;
         static fromScale(xScale: number, yScale: number, zScale: number): Matrix4x4;
         static fromPosition(x: number, y: number, z: number): Matrix4x4;
         append(lhs: Matrix4x4): this;
@@ -6236,25 +6262,26 @@ declare namespace gd3d.framework {
         copyRowFrom(row: number, vector3D: Vector4): this;
         copyRowTo(row: number, vector3D: Vector4): this;
         copyToMatrix3D(dest: Matrix4x4): this;
-        decompose(orientationStyle?: Orientation3D, result?: Vector3[]): Vector3[];
+        recompose(position: Vector3, rotation: Vector3, scale: Vector3, order?: RotationOrder): this;
+        decompose(position?: Vector3, rotation?: Vector3, scale?: Vector3, order?: RotationOrder): Vector3[];
         deltaTransformVector(v: Vector3, vout?: Vector3): Vector3;
         identity(): this;
         invert(): this;
         prepend(rhs: Matrix4x4): this;
         prependRotation(axis: Vector3, degrees: number, pivotPoint?: Vector3): this;
         prependScale(xScale: number, yScale: number, zScale: number): this;
+        prependScale1(xScale: number, yScale: number, zScale: number): this;
         prependTranslation(x: number, y: number, z: number): this;
         moveRight(distance: number): this;
         moveUp(distance: number): this;
         moveForward(distance: number): this;
-        recompose(components: Vector3[]): this;
         transformVector(vin: Vector3, vout?: Vector3): Vector3;
         transformVector4(vin: Vector4, vout?: Vector4): Vector4;
         transformVectors(vin: number[], vout: number[]): void;
         transformRotation(vin: Vector3, vout?: Vector3): Vector3;
         transpose(): this;
         equals(matrix3D: Matrix4x4, precision?: number): boolean;
-        lookAt(target: Vector3, upAxis?: Vector3): void;
+        lookAt(target: Vector3, upAxis?: Vector3): this;
         getMaxScaleOnAxis(): number;
         setOrtho(left: number, right: number, top: number, bottom: number, near: number, far: number): this;
         setPerspectiveFromFOV(fov: number, aspect: number, near: number, far: number): this;
@@ -6263,11 +6290,15 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    enum Orientation3D {
-        AXIS_ANGLE = "axisAngle",
-        EULER_ANGLES = "eulerAngles",
-        QUATERNION = "quaternion"
+    enum RotationOrder {
+        XYZ = 0,
+        ZXY = 1,
+        ZYX = 2,
+        YXZ = 3,
+        YZX = 4,
+        XZY = 5
     }
+    var defaultRotationOrder: RotationOrder;
 }
 declare namespace gd3d.framework {
     class Vector2 {
@@ -6484,6 +6515,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class ParticleEmissionModule extends ParticleModule {
+        __class__: "feng3d.ParticleEmissionModule";
         rateOverTime: MinMaxCurve;
         rateOverTimeMultiplier: number;
         rateOverDistance: MinMaxCurve;
@@ -6519,6 +6551,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class ParticleLimitVelocityOverLifetimeModule extends ParticleModule {
+        __class__: "feng3d.ParticleLimitVelocityOverLifetimeModule";
         separateAxes: boolean;
         limit: MinMaxCurve;
         limit3D: MinMaxCurveVector3;
@@ -6537,6 +6570,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class ParticleMainModule extends ParticleModule {
+        __class__: "feng3d.ParticleMainModule";
         enabled: boolean;
         duration: number;
         loop: boolean;
@@ -6596,6 +6630,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class ParticleShapeModule extends ParticleModule {
+        __class__: "feng3d.ParticleShapeModule";
         shapeType: ParticleSystemShapeType;
         private _shapeType;
         shape: ParticleSystemShapeType1;
@@ -6678,6 +6713,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class ParticleVelocityOverLifetimeModule extends ParticleModule {
+        __class__: "feng3d.ParticleVelocityOverLifetimeModule";
         velocity: MinMaxCurveVector3;
         space: ParticleSystemSimulationSpace1;
         x: MinMaxCurve;
@@ -6692,6 +6728,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class ParticleEmissionBurst {
+        __class__: "feng3d.ParticleEmissionBurst";
         time: number;
         count: MinMaxCurve;
         minCount: number;
@@ -6800,18 +6837,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    enum ParticleSystemShapeMultiModeValue {
-        Random = 0,
-        Loop = 1,
-        PingPong = 2,
-        BurstSpread = 3
-    }
-    enum ParticleSystemShapeConeEmitFrom {
-        Base = 0,
-        BaseShell = 1,
-        Volume = 2,
-        VolumeShell = 3
-    }
     class ParticleSystemShapeCone extends ParticleSystemShapeBase {
         angle: number;
         radius: number;

@@ -29969,14 +29969,15 @@ var gd3d;
                     this._isPlaying = this.main.playOnAwake;
                     this._awaked = true;
                 }
-                var cameraMatrix = new framework.Matrix4x4(camera.gameObject.transform.getWorldMatrix().rawData);
-                var localToWorldMatrix = new framework.Matrix4x4(this.transform.getWorldMatrix().rawData.concat());
-                var worldToLocalMatrix = localToWorldMatrix.clone().invert();
-                var localCameraPos = worldToLocalMatrix.transformVector(cameraMatrix.position);
-                var localCameraUp = worldToLocalMatrix.deltaTransformVector(cameraMatrix.up);
-                var u_particle_billboardMatrix = new framework.Matrix4x4();
-                if (!this.shape.alignToDirection && this.mesh == framework.sceneMgr.app.getAssetMgr().getDefaultMesh("quad_particle")) {
-                    u_particle_billboardMatrix.lookAt(localCameraPos, localCameraUp);
+                var isbillboard = !this.shape.alignToDirection && this.mesh == framework.sceneMgr.app.getAssetMgr().getDefaultMesh("quad_particle");
+                var billboardMatrix = new framework.Matrix4x4();
+                if (isbillboard) {
+                    var cameraMatrix = new framework.Matrix4x4(camera.gameObject.transform.getWorldMatrix().rawData);
+                    var localToWorldMatrix = new framework.Matrix4x4(this.transform.getWorldMatrix().rawData.concat());
+                    var worldToLocalMatrix = localToWorldMatrix.clone().invert();
+                    var localCameraForward = worldToLocalMatrix.deltaTransformVector(cameraMatrix.forward);
+                    var localCameraUp = worldToLocalMatrix.deltaTransformVector(cameraMatrix.up);
+                    billboardMatrix.lookAt(localCameraForward, localCameraUp);
                 }
                 var positions = [];
                 var scales = [];
@@ -29984,9 +29985,8 @@ var gd3d;
                 var colors = [];
                 var tilingOffsets = [];
                 var flipUVs = [];
-                var matrixModelViewProject = new framework.Matrix4x4(context.matrixModelViewProject.rawData.concat());
-                for (var i = 0, n = this._activeParticles.length; i < n; i++) {
-                    var particle = this._activeParticles[i];
+                for (var i_7 = 0, n_1 = this._activeParticles.length; i_7 < n_1; i_7++) {
+                    var particle = this._activeParticles[i_7];
                     positions.push(particle.position.x, particle.position.y, particle.position.z);
                     scales.push(particle.size.x, particle.size.y, particle.size.z);
                     rotations.push(particle.rotation.x, particle.rotation.y, particle.rotation.z);
@@ -29995,10 +29995,15 @@ var gd3d;
                     flipUVs.push(particle.flipUV.x, particle.flipUV.y);
                     this.material.setVector4("a_particle_position", new gd3d.math.vector4(particle.position.x, particle.position.y, particle.position.z, 1));
                     this.material.setVector4("a_particle_scale", new gd3d.math.vector4(particle.size.x, particle.size.y, particle.size.z, 1));
-                    this.material.setVector4("a_particle_rotation", new gd3d.math.vector4(particle.rotation.x, particle.rotation.y, particle.rotation.z, 1));
+                    this.material.setVector4("a_particle_rotation", new gd3d.math.vector4(particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1));
                     this.material.setVector4("a_particle_color", new gd3d.math.vector4(particle.color.r, particle.color.g, particle.color.b, particle.color.a));
-                    this.material.setMatrix("u_particle_billboardMatrix", new gd3d.math.matrix(u_particle_billboardMatrix.rawData.concat()));
+                    this.material.setMatrix("u_particle_billboardMatrix", new gd3d.math.matrix(billboardMatrix.rawData.concat()));
                     this.material.draw(context, mesh, subMeshs[0]);
+                }
+                if (isbillboard) {
+                    for (var i = 0, n = rotations.length; i < n; i += 3) {
+                        rotations[i + 2] = -rotations[i + 2];
+                    }
                 }
             };
             Object.defineProperty(ParticleSystem.prototype, "rateAtDuration", {
@@ -30041,8 +30046,8 @@ var gd3d;
                     }
                     var inCycleStart = startTime - cycleStartTime;
                     var inCycleEnd = endTime - cycleStartTime;
-                    for (var i_7 = 0; i_7 < bursts.length; i_7++) {
-                        var burst = bursts[i_7];
+                    for (var i_8 = 0; i_8 < bursts.length; i_8++) {
+                        var burst = bursts[i_8];
                         if (burst.isProbability && inCycleStart <= burst.time && burst.time < inCycleEnd) {
                             emits.push({ time: cycleStartTime + burst.time, num: burst.count.getValue(rateAtDuration) });
                         }
@@ -30066,7 +30071,7 @@ var gd3d;
                         particle.birthTime = birthTime;
                         particle.lifetime = lifetime;
                         particle.rateAtLifeTime = rateAtLifeTime;
-                        particle.birthRateAtDuration = birthRateAtDuration;
+                        particle.birthRateAtDuration = birthRateAtDuration - Math.floor(birthRateAtDuration);
                         this._activeParticles.push(particle);
                         this._initParticleState(particle);
                         this._updateParticleState(particle);
@@ -30095,6 +30100,56 @@ var gd3d;
                 particle.updateState(preTime, this._realTime);
             };
             ParticleSystem.ClassName = "ParticleSystem";
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleSystem.prototype, "main", null);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleSystem.prototype, "emission", null);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleSystem.prototype, "shape", null);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleSystem.prototype, "velocityOverLifetime", null);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleSystem.prototype, "limitVelocityOverLifetime", null);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleSystem.prototype, "forceOverLifetime", null);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleSystem.prototype, "colorOverLifetime", null);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleSystem.prototype, "sizeOverLifetime", null);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleSystem.prototype, "rotationOverLifetime", null);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleSystem.prototype, "textureSheetAnimation", null);
             __decorate([
                 gd3d.reflect.Field("mesh"),
                 gd3d.reflect.UIStyle("WidgetDragSelect"),
@@ -30165,6 +30220,32 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var ParticleSystemShapeConeEmitFrom;
+        (function (ParticleSystemShapeConeEmitFrom) {
+            ParticleSystemShapeConeEmitFrom[ParticleSystemShapeConeEmitFrom["Base"] = 0] = "Base";
+            ParticleSystemShapeConeEmitFrom[ParticleSystemShapeConeEmitFrom["BaseShell"] = 1] = "BaseShell";
+            ParticleSystemShapeConeEmitFrom[ParticleSystemShapeConeEmitFrom["Volume"] = 2] = "Volume";
+            ParticleSystemShapeConeEmitFrom[ParticleSystemShapeConeEmitFrom["VolumeShell"] = 3] = "VolumeShell";
+        })(ParticleSystemShapeConeEmitFrom = framework.ParticleSystemShapeConeEmitFrom || (framework.ParticleSystemShapeConeEmitFrom = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemShapeMultiModeValue;
+        (function (ParticleSystemShapeMultiModeValue) {
+            ParticleSystemShapeMultiModeValue[ParticleSystemShapeMultiModeValue["Random"] = 0] = "Random";
+            ParticleSystemShapeMultiModeValue[ParticleSystemShapeMultiModeValue["Loop"] = 1] = "Loop";
+            ParticleSystemShapeMultiModeValue[ParticleSystemShapeMultiModeValue["PingPong"] = 2] = "PingPong";
+            ParticleSystemShapeMultiModeValue[ParticleSystemShapeMultiModeValue["BurstSpread"] = 3] = "BurstSpread";
+        })(ParticleSystemShapeMultiModeValue = framework.ParticleSystemShapeMultiModeValue || (framework.ParticleSystemShapeMultiModeValue = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var ParticleSystemShapeType;
         (function (ParticleSystemShapeType) {
             ParticleSystemShapeType[ParticleSystemShapeType["Sphere"] = 0] = "Sphere";
@@ -30172,18 +30253,18 @@ var gd3d;
             ParticleSystemShapeType[ParticleSystemShapeType["Hemisphere"] = 2] = "Hemisphere";
             ParticleSystemShapeType[ParticleSystemShapeType["HemisphereShell"] = 3] = "HemisphereShell";
             ParticleSystemShapeType[ParticleSystemShapeType["Cone"] = 4] = "Cone";
-            ParticleSystemShapeType[ParticleSystemShapeType["ConeShell"] = 5] = "ConeShell";
-            ParticleSystemShapeType[ParticleSystemShapeType["ConeVolume"] = 6] = "ConeVolume";
-            ParticleSystemShapeType[ParticleSystemShapeType["ConeVolumeShell"] = 7] = "ConeVolumeShell";
-            ParticleSystemShapeType[ParticleSystemShapeType["Box"] = 8] = "Box";
-            ParticleSystemShapeType[ParticleSystemShapeType["BoxShell"] = 9] = "BoxShell";
-            ParticleSystemShapeType[ParticleSystemShapeType["BoxEdge"] = 10] = "BoxEdge";
-            ParticleSystemShapeType[ParticleSystemShapeType["Mesh"] = 11] = "Mesh";
-            ParticleSystemShapeType[ParticleSystemShapeType["MeshRenderer"] = 12] = "MeshRenderer";
-            ParticleSystemShapeType[ParticleSystemShapeType["SkinnedMeshRenderer"] = 13] = "SkinnedMeshRenderer";
-            ParticleSystemShapeType[ParticleSystemShapeType["Circle"] = 14] = "Circle";
-            ParticleSystemShapeType[ParticleSystemShapeType["CircleEdge"] = 15] = "CircleEdge";
-            ParticleSystemShapeType[ParticleSystemShapeType["SingleSidedEdge"] = 16] = "SingleSidedEdge";
+            ParticleSystemShapeType[ParticleSystemShapeType["ConeShell"] = 7] = "ConeShell";
+            ParticleSystemShapeType[ParticleSystemShapeType["ConeVolume"] = 8] = "ConeVolume";
+            ParticleSystemShapeType[ParticleSystemShapeType["ConeVolumeShell"] = 9] = "ConeVolumeShell";
+            ParticleSystemShapeType[ParticleSystemShapeType["Box"] = 5] = "Box";
+            ParticleSystemShapeType[ParticleSystemShapeType["BoxShell"] = 15] = "BoxShell";
+            ParticleSystemShapeType[ParticleSystemShapeType["BoxEdge"] = 16] = "BoxEdge";
+            ParticleSystemShapeType[ParticleSystemShapeType["Mesh"] = 6] = "Mesh";
+            ParticleSystemShapeType[ParticleSystemShapeType["MeshRenderer"] = 13] = "MeshRenderer";
+            ParticleSystemShapeType[ParticleSystemShapeType["SkinnedMeshRenderer"] = 14] = "SkinnedMeshRenderer";
+            ParticleSystemShapeType[ParticleSystemShapeType["Circle"] = 10] = "Circle";
+            ParticleSystemShapeType[ParticleSystemShapeType["CircleEdge"] = 11] = "CircleEdge";
+            ParticleSystemShapeType[ParticleSystemShapeType["SingleSidedEdge"] = 12] = "SingleSidedEdge";
         })(ParticleSystemShapeType = framework.ParticleSystemShapeType || (framework.ParticleSystemShapeType = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -30884,9 +30965,11 @@ var gd3d;
     (function (framework) {
         var AnimationCurve1 = (function () {
             function AnimationCurve1() {
+                this.__class__ = "feng3d.AnimationCurve";
                 this.maxtan = 1000;
-                this.keys = [new framework.AnimationCurveKeyframe({ time: 0, value: 1, tangent: 0 }), new framework.AnimationCurveKeyframe({ time: 1, value: 1, tangent: 0 })];
-                this.wrapMode = framework.AnimationCurveWrapMode.Clamp;
+                this.preWrapMode = framework.AnimationCurveWrapMode.Clamp;
+                this.postWrapMode = framework.AnimationCurveWrapMode.Clamp;
+                this.keys = [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }];
             }
             Object.defineProperty(AnimationCurve1.prototype, "numKeys", {
                 get: function () {
@@ -30914,7 +30997,12 @@ var gd3d;
                 return this.keys.indexOf(key);
             };
             AnimationCurve1.prototype.getPoint = function (t) {
-                switch (this.wrapMode) {
+                var wrapMode = framework.AnimationCurveWrapMode.Clamp;
+                if (t < 0)
+                    wrapMode = this.preWrapMode;
+                else if (t > 1)
+                    wrapMode = this.postWrapMode;
+                switch (wrapMode) {
                     case framework.AnimationCurveWrapMode.Clamp:
                         t = Math.clamp(t, 0, 1);
                         break;
@@ -30937,10 +31025,10 @@ var gd3d;
                     if (i > 0 && prekey.time <= t && t <= key.time) {
                         var xstart = prekey.time;
                         var ystart = prekey.value;
-                        var tanstart = prekey.tangent;
+                        var tanstart = prekey.outTangent;
                         var xend = key.time;
                         var yend = key.value;
-                        var tanend = key.tangent;
+                        var tanend = key.inTangent;
                         if (maxtan > Math.abs(tanstart) && maxtan > Math.abs(tanend)) {
                             var ct = (t - prekey.time) / (key.time - prekey.time);
                             var sys = [ystart, ystart + tanstart * (xend - xstart) / 3, yend - tanend * (xend - xstart) / 3, yend];
@@ -30971,8 +31059,8 @@ var gd3d;
                     }
                 }
                 if (keys.length == 0)
-                    return new framework.AnimationCurveKeyframe({ time: t, value: 0, tangent: 0 });
-                return new framework.AnimationCurveKeyframe({ time: t, value: value, tangent: tangent });
+                    return { time: t, value: 0, inTangent: 0, outTangent: 0 };
+                return { time: t, value: value, inTangent: tangent, outTangent: tangent };
             };
             AnimationCurve1.prototype.getValue = function (t) {
                 var point = this.getPoint(t);
@@ -31007,6 +31095,18 @@ var gd3d;
                 }
                 return results;
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], AnimationCurve1.prototype, "preWrapMode", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], AnimationCurve1.prototype, "postWrapMode", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Array)
+            ], AnimationCurve1.prototype, "keys", void 0);
             return AnimationCurve1;
         }());
         framework.AnimationCurve1 = AnimationCurve1;
@@ -31016,29 +31116,11 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var AnimationCurveKeyframe = (function () {
-            function AnimationCurveKeyframe(param) {
-                this.init(param);
-            }
-            AnimationCurveKeyframe.prototype.init = function (param) {
-                param.time && (this.time = param.time);
-                param.value && (this.value = param.value);
-                param.tangent && (this.tangent = param.tangent);
-            };
-            return AnimationCurveKeyframe;
-        }());
-        framework.AnimationCurveKeyframe = AnimationCurveKeyframe;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var AnimationCurveWrapMode;
         (function (AnimationCurveWrapMode) {
-            AnimationCurveWrapMode[AnimationCurveWrapMode["Loop"] = 0] = "Loop";
-            AnimationCurveWrapMode[AnimationCurveWrapMode["PingPong"] = 1] = "PingPong";
-            AnimationCurveWrapMode[AnimationCurveWrapMode["Clamp"] = 2] = "Clamp";
+            AnimationCurveWrapMode[AnimationCurveWrapMode["Clamp"] = 1] = "Clamp";
+            AnimationCurveWrapMode[AnimationCurveWrapMode["Loop"] = 2] = "Loop";
+            AnimationCurveWrapMode[AnimationCurveWrapMode["PingPong"] = 4] = "PingPong";
         })(AnimationCurveWrapMode = framework.AnimationCurveWrapMode || (framework.AnimationCurveWrapMode = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -31255,7 +31337,7 @@ var gd3d;
                         var nsp = sps.shift();
                         var ps0 = [];
                         ps0[0] = nfp;
-                        for (var j = 0, n_1 = pps.length; j < n_1; j++) {
+                        for (var j = 0, n_2 = pps.length; j < n_2; j++) {
                             ps0[j + 1] = ps0[j] + (pps[j] - ps0[j]) / t;
                         }
                         var ps1 = [];
@@ -31264,16 +31346,16 @@ var gd3d;
                             ps1[j] = ps1[j + 1] - (ps1[j + 1] - pps[j]) / (1 - t);
                         }
                         if (mergeType == 1) {
-                            for (var j = 0, n_2 = ps0.length - 1; j <= n_2; j++) {
-                                ps[j] = (ps0[j] * (n_2 - j) + ps1[j] * j) / n_2;
+                            for (var j = 0, n_3 = ps0.length - 1; j <= n_3; j++) {
+                                ps[j] = (ps0[j] * (n_3 - j) + ps1[j] * j) / n_3;
                             }
                         }
                         else if (mergeType == 0) {
-                            for (var j = 0, n_3 = ps0.length - 1; j <= n_3; j++) {
-                                if (j < n_3 / 2) {
+                            for (var j = 0, n_4 = ps0.length - 1; j <= n_4; j++) {
+                                if (j < n_4 / 2) {
                                     ps[j] = ps0[j];
                                 }
-                                else if (j > n_3 / 2) {
+                                else if (j > n_4 / 2) {
                                     ps[j] = ps1[j];
                                 }
                                 else {
@@ -31310,11 +31392,14 @@ var gd3d;
     (function (framework) {
         var MinMaxCurve = (function () {
             function MinMaxCurve() {
+                this.__class__ = "feng3d.MinMaxCurve";
                 this.mode = framework.MinMaxCurveMode.Constant;
                 this.constant = 0;
-                this.constant1 = 0;
+                this.constantMin = 0;
+                this.constantMax = 0;
                 this.curve = new framework.AnimationCurve1();
-                this.curve1 = framework.serialization.setValue(new framework.AnimationCurve1(), { keys: [{ time: 0, value: 0, tangent: 0 }, { time: 1, value: 1, tangent: 0 }] });
+                this.curveMin = new framework.AnimationCurve1();
+                this.curveMax = new framework.AnimationCurve1();
                 this.curveMultiplier = 1;
                 this.between0And1 = false;
             }
@@ -31325,13 +31410,49 @@ var gd3d;
                         return this.constant;
                     case framework.MinMaxCurveMode.Curve:
                         return this.curve.getValue(time) * this.curveMultiplier;
-                    case framework.MinMaxCurveMode.RandomBetweenTwoConstants:
-                        return Math.lerp(this.constant, this.constant1, randomBetween);
-                    case framework.MinMaxCurveMode.RandomBetweenTwoCurves:
-                        return Math.lerp(this.curve.getValue(time), this.curve1.getValue(time), randomBetween) * this.curveMultiplier;
+                    case framework.MinMaxCurveMode.TwoConstants:
+                        return Math.lerp(this.constantMin, this.constantMax, randomBetween);
+                    case framework.MinMaxCurveMode.TwoCurves:
+                        return Math.lerp(this.curveMin.getValue(time), this.curveMax.getValue(time), randomBetween) * this.curveMultiplier;
                 }
                 return this.constant;
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxCurve.prototype, "mode", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxCurve.prototype, "constant", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxCurve.prototype, "constantMin", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxCurve.prototype, "constantMax", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxCurve.prototype, "curve", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxCurve.prototype, "curveMin", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxCurve.prototype, "curveMax", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxCurve.prototype, "curveMultiplier", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxCurve.prototype, "between0And1", void 0);
             return MinMaxCurve;
         }());
         framework.MinMaxCurve = MinMaxCurve;
@@ -31345,8 +31466,8 @@ var gd3d;
         (function (MinMaxCurveMode) {
             MinMaxCurveMode[MinMaxCurveMode["Constant"] = 0] = "Constant";
             MinMaxCurveMode[MinMaxCurveMode["Curve"] = 1] = "Curve";
-            MinMaxCurveMode[MinMaxCurveMode["RandomBetweenTwoConstants"] = 2] = "RandomBetweenTwoConstants";
-            MinMaxCurveMode[MinMaxCurveMode["RandomBetweenTwoCurves"] = 3] = "RandomBetweenTwoCurves";
+            MinMaxCurveMode[MinMaxCurveMode["TwoConstants"] = 3] = "TwoConstants";
+            MinMaxCurveMode[MinMaxCurveMode["TwoCurves"] = 2] = "TwoCurves";
         })(MinMaxCurveMode = framework.MinMaxCurveMode || (framework.MinMaxCurveMode = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -31364,6 +31485,18 @@ var gd3d;
                 if (randomBetween === void 0) { randomBetween = Math.random(); }
                 return new framework.Vector3(this.xCurve.getValue(time, randomBetween), this.yCurve.getValue(time, randomBetween), this.zCurve.getValue(time, randomBetween));
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxCurveVector3.prototype, "xCurve", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxCurveVector3.prototype, "yCurve", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], MinMaxCurveVector3.prototype, "zCurve", void 0);
             return MinMaxCurveVector3;
         }());
         framework.MinMaxCurveVector3 = MinMaxCurveVector3;
@@ -31654,38 +31787,72 @@ var gd3d;
     (function (framework) {
         var Matrix4x4 = (function () {
             function Matrix4x4(datas) {
-                this.rawData = datas || [
-                    1, 0, 0, 0,
-                    0, 1, 0, 0,
-                    0, 0, 1, 0,
-                    0, 0, 0, 1
-                ];
+                if (datas)
+                    this.rawData = datas;
+                else {
+                    this.rawData = [];
+                    this.identity();
+                }
             }
-            Object.defineProperty(Matrix4x4.prototype, "position", {
-                get: function () {
-                    return new framework.Vector3(this.rawData[12], this.rawData[13], this.rawData[14]);
-                },
-                set: function (value) {
-                    this.rawData[12] = value.x;
-                    this.rawData[13] = value.y;
-                    this.rawData[14] = value.z;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(Matrix4x4.prototype, "rotation", {
-                get: function () {
-                    var rotation = this.decompose()[1].scaleNumber(Math.RAD2DEG);
-                    return rotation;
-                },
-                set: function (v) {
-                    var comps = this.decompose();
-                    comps[1].copy(v).scaleNumber(Math.DEG2RAD);
-                    this.recompose(comps);
-                },
-                enumerable: true,
-                configurable: true
-            });
+            Matrix4x4.recompose = function (position, rotation, scale, order) {
+                if (order === void 0) { order = framework.defaultRotationOrder; }
+                return new Matrix4x4().recompose(position, rotation, scale, order);
+            };
+            Matrix4x4.prototype.getPosition = function (value) {
+                if (value === void 0) { value = new framework.Vector3(); }
+                value.x = this.rawData[12];
+                value.y = this.rawData[13];
+                value.z = this.rawData[14];
+                return value;
+            };
+            Matrix4x4.prototype.setPosition = function (value) {
+                this.rawData[12] = value.x;
+                this.rawData[13] = value.y;
+                this.rawData[14] = value.z;
+                return this;
+            };
+            Matrix4x4.prototype.getRotation = function (rotation, order) {
+                if (rotation === void 0) { rotation = new framework.Vector3(); }
+                if (order === void 0) { order = framework.defaultRotationOrder; }
+                this.decompose(new framework.Vector3(), rotation, new framework.Vector3(), order);
+                return rotation;
+            };
+            Matrix4x4.prototype.setRotation = function (rotation, order) {
+                if (order === void 0) { order = framework.defaultRotationOrder; }
+                var p = new framework.Vector3();
+                var r = new framework.Vector3();
+                var s = new framework.Vector3();
+                this.decompose(p, r, s, order);
+                r.copy(rotation);
+                this.recompose(p, r, s);
+                return this;
+            };
+            Matrix4x4.prototype.getScale = function (scale) {
+                if (scale === void 0) { scale = new framework.Vector3; }
+                var rawData = this.rawData;
+                var v = new framework.Vector3();
+                scale.x = v.init(rawData[0], rawData[1], rawData[2]).length;
+                scale.y = v.init(rawData[4], rawData[5], rawData[6]).length;
+                scale.z = v.init(rawData[8], rawData[9], rawData[10]).length;
+                return scale;
+            };
+            Matrix4x4.prototype.setScale = function (scale) {
+                var oldS = this.getScale();
+                var te = this.rawData;
+                var sx = scale.x / oldS.x;
+                var sy = scale.y / oldS.y;
+                var sz = scale.z / oldS.z;
+                te[0] *= sx;
+                te[1] *= sx;
+                te[2] *= sx;
+                te[4] *= sy;
+                te[5] *= sy;
+                te[6] *= sy;
+                te[8] *= sz;
+                te[9] *= sz;
+                te[10] *= sz;
+                return this;
+            };
             Object.defineProperty(Matrix4x4.prototype, "determinant", {
                 get: function () {
                     return ((this.rawData[0] * this.rawData[5] - this.rawData[4] * this.rawData[1]) * (this.rawData[10] * this.rawData[15] - this.rawData[14] * this.rawData[11])
@@ -31755,17 +31922,14 @@ var gd3d;
                 ]);
                 return rotationMat;
             };
-            Matrix4x4.fromRotation = function (rx, ry, rz) {
-                rx = Math.degToRad(rx);
-                ry = Math.degToRad(ry);
-                rz = Math.degToRad(rz);
-                var sx = Math.sin(rx), cx = Math.cos(rx), sy = Math.sin(ry), cy = Math.cos(ry), sz = Math.sin(rz), cz = Math.cos(rz);
-                return new Matrix4x4([
-                    cy * cz, cy * sz, -sy, 0,
-                    sx * sy * cz - cx * sz, sx * sy * sz + cx * cz, sx * cy, 0,
-                    cx * sy * cz + sx * sz, cx * sy * sz - sx * cz, cx * cy, 0,
-                    0, 0, 0, 1,
-                ]);
+            Matrix4x4.fromRotation = function (rx, ry, rz, order) {
+                if (order === void 0) { order = framework.defaultRotationOrder; }
+                return new Matrix4x4().fromRotation(rx, ry, rz, order);
+            };
+            Matrix4x4.prototype.fromRotation = function (rx, ry, rz, order) {
+                if (order === void 0) { order = framework.defaultRotationOrder; }
+                this.recompose(new framework.Vector3(), new framework.Vector3(rx, ry, rz), new framework.Vector3(1, 1, 1), order);
+                return this;
             };
             Matrix4x4.fromScale = function (xScale, yScale, zScale) {
                 var rotationMat = new Matrix4x4([
@@ -31908,92 +32072,208 @@ var gd3d;
                 dest.rawData = this.rawData.concat();
                 return this;
             };
-            Matrix4x4.prototype.decompose = function (orientationStyle, result) {
-                if (orientationStyle === void 0) { orientationStyle = framework.Orientation3D.EULER_ANGLES; }
-                var raw = this.rawData;
-                var a = raw[0];
-                var e = raw[1];
-                var i = raw[2];
-                var b = raw[4];
-                var f = raw[5];
-                var j = raw[6];
-                var c = raw[8];
-                var g = raw[9];
-                var k = raw[10];
-                var x = raw[12];
-                var y = raw[13];
-                var z = raw[14];
-                var tx = Math.sqrt(a * a + e * e + i * i);
-                var ty = Math.sqrt(b * b + f * f + j * j);
-                var tz = Math.sqrt(c * c + g * g + k * k);
-                var tw = 0;
-                var scaleX = tx;
-                var scaleY = ty;
-                var scaleZ = tz;
-                if (a * (f * k - j * g) - e * (b * k - j * c) + i * (b * g - f * c) < 0) {
-                    scaleZ = -scaleZ;
+            Matrix4x4.prototype.recompose = function (position, rotation, scale, order) {
+                if (order === void 0) { order = framework.defaultRotationOrder; }
+                this.identity();
+                var te = this.rawData;
+                rotation = rotation.scaleNumberTo(Math.DEG2RAD);
+                var px = position.x;
+                var py = position.y;
+                var pz = position.z;
+                var rx = rotation.x;
+                var ry = rotation.y;
+                var rz = rotation.z;
+                var sx = scale.x;
+                var sy = scale.y;
+                var sz = scale.z;
+                te[12] = px;
+                te[13] = py;
+                te[14] = pz;
+                var cosX = Math.cos(rx), sinX = Math.sin(rx);
+                var cosY = Math.cos(ry), sinY = Math.sin(ry);
+                var cosZ = Math.cos(rz), sinZ = Math.sin(rz);
+                if (order === framework.RotationOrder.XYZ) {
+                    var ae = cosX * cosZ, af = cosX * sinZ, be = sinX * cosZ, bf = sinX * sinZ;
+                    te[0] = cosY * cosZ;
+                    te[4] = -cosY * sinZ;
+                    te[8] = sinY;
+                    te[1] = af + be * sinY;
+                    te[5] = ae - bf * sinY;
+                    te[9] = -sinX * cosY;
+                    te[2] = bf - ae * sinY;
+                    te[6] = be + af * sinY;
+                    te[10] = cosX * cosY;
                 }
-                a = a / scaleX;
-                e = e / scaleX;
-                i = i / scaleX;
-                b = b / scaleY;
-                f = f / scaleY;
-                j = j / scaleY;
-                c = c / scaleZ;
-                g = g / scaleZ;
-                k = k / scaleZ;
-                if (orientationStyle == framework.Orientation3D.EULER_ANGLES) {
-                    tx = Math.atan2(j, k);
-                    ty = Math.atan2(-i, Math.sqrt(a * a + e * e));
-                    var s1 = Math.sin(tx);
-                    var c1 = Math.cos(tx);
-                    tz = Math.atan2(s1 * c - c1 * b, c1 * f - s1 * g);
+                else if (order === framework.RotationOrder.YXZ) {
+                    var ce = cosY * cosZ, cf = cosY * sinZ, de = sinY * cosZ, df = sinY * sinZ;
+                    te[0] = ce + df * sinX;
+                    te[4] = de * sinX - cf;
+                    te[8] = cosX * sinY;
+                    te[1] = cosX * sinZ;
+                    te[5] = cosX * cosZ;
+                    te[9] = -sinX;
+                    te[2] = cf * sinX - de;
+                    te[6] = df + ce * sinX;
+                    te[10] = cosX * cosY;
                 }
-                else if (orientationStyle == framework.Orientation3D.AXIS_ANGLE) {
-                    tw = Math.acos((a + f + k - 1) / 2);
-                    var len = Math.sqrt((j - g) * (j - g) + (c - i) * (c - i) + (e - b) * (e - b));
-                    tx = (j - g) / len;
-                    ty = (c - i) / len;
-                    tz = (e - b) / len;
+                else if (order === framework.RotationOrder.ZXY) {
+                    var ce = cosY * cosZ, cf = cosY * sinZ, de = sinY * cosZ, df = sinY * sinZ;
+                    te[0] = ce - df * sinX;
+                    te[4] = -cosX * sinZ;
+                    te[8] = de + cf * sinX;
+                    te[1] = cf + de * sinX;
+                    te[5] = cosX * cosZ;
+                    te[9] = df - ce * sinX;
+                    te[2] = -cosX * sinY;
+                    te[6] = sinX;
+                    te[10] = cosX * cosY;
+                }
+                else if (order === framework.RotationOrder.ZYX) {
+                    var ae = cosX * cosZ, af = cosX * sinZ, be = sinX * cosZ, bf = sinX * sinZ;
+                    te[0] = cosY * cosZ;
+                    te[4] = be * sinY - af;
+                    te[8] = ae * sinY + bf;
+                    te[1] = cosY * sinZ;
+                    te[5] = bf * sinY + ae;
+                    te[9] = af * sinY - be;
+                    te[2] = -sinY;
+                    te[6] = sinX * cosY;
+                    te[10] = cosX * cosY;
+                }
+                else if (order === framework.RotationOrder.YZX) {
+                    var ac = cosX * cosY, ad = cosX * sinY, bc = sinX * cosY, bd = sinX * sinY;
+                    te[0] = cosY * cosZ;
+                    te[4] = bd - ac * sinZ;
+                    te[8] = bc * sinZ + ad;
+                    te[1] = sinZ;
+                    te[5] = cosX * cosZ;
+                    te[9] = -sinX * cosZ;
+                    te[2] = -sinY * cosZ;
+                    te[6] = ad * sinZ + bc;
+                    te[10] = ac - bd * sinZ;
+                }
+                else if (order === framework.RotationOrder.XZY) {
+                    var ac = cosX * cosY, ad = cosX * sinY, bc = sinX * cosY, bd = sinX * sinY;
+                    te[0] = cosY * cosZ;
+                    te[4] = -sinZ;
+                    te[8] = sinY * cosZ;
+                    te[1] = ac * sinZ + bd;
+                    te[5] = cosX * cosZ;
+                    te[9] = ad * sinZ - bc;
+                    te[2] = bc * sinZ - ad;
+                    te[6] = sinX * cosZ;
+                    te[10] = bd * sinZ + ac;
                 }
                 else {
-                    var tr = a + f + k;
-                    if (tr > 0) {
-                        tw = Math.sqrt(1 + tr) / 2;
-                        tx = (j - g) / (4 * tw);
-                        ty = (c - i) / (4 * tw);
-                        tz = (e - b) / (4 * tw);
-                    }
-                    else if ((a > f) && (a > k)) {
-                        tx = Math.sqrt(1 + a - f - k) / 2;
-                        tw = (j - g) / (4 * tx);
-                        ty = (e + b) / (4 * tx);
-                        tz = (c + i) / (4 * tx);
-                    }
-                    else if (f > k) {
-                        ty = Math.sqrt(1 + f - a - k) / 2;
-                        tx = (e + b) / (4 * ty);
-                        tw = (c - i) / (4 * ty);
-                        tz = (j + g) / (4 * ty);
+                    console.error("\u521D\u59CB\u5316\u77E9\u9635\u65F6\u9519\u8BEF\u65CB\u8F6C\u987A\u5E8F " + order);
+                }
+                te[0] *= sx;
+                te[1] *= sx;
+                te[2] *= sx;
+                te[4] *= sy;
+                te[5] *= sy;
+                te[6] *= sy;
+                te[8] *= sz;
+                te[9] *= sz;
+                te[10] *= sz;
+                return this;
+            };
+            Matrix4x4.prototype.decompose = function (position, rotation, scale, order) {
+                if (position === void 0) { position = new framework.Vector3(); }
+                if (rotation === void 0) { rotation = new framework.Vector3(); }
+                if (scale === void 0) { scale = new framework.Vector3(); }
+                if (order === void 0) { order = framework.defaultRotationOrder; }
+                var clamp = Math.clamp;
+                var rawData = this.rawData;
+                var m11 = rawData[0], m12 = rawData[4], m13 = rawData[8];
+                var m21 = rawData[1], m22 = rawData[5], m23 = rawData[9];
+                var m31 = rawData[2], m32 = rawData[6], m33 = rawData[10];
+                position.x = rawData[12];
+                position.y = rawData[13];
+                position.z = rawData[14];
+                scale.x = Math.sqrt(m11 * m11 + m21 * m21 + m31 * m31);
+                m11 /= scale.x;
+                m21 /= scale.x;
+                m31 /= scale.x;
+                scale.y = Math.sqrt(m12 * m12 + m22 * m22 + m32 * m32);
+                m12 /= scale.y;
+                m22 /= scale.y;
+                m32 /= scale.y;
+                scale.z = Math.sqrt(m13 * m13 + m23 * m23 + m33 * m33);
+                m13 /= scale.z;
+                m23 /= scale.z;
+                m33 /= scale.z;
+                if (order === framework.RotationOrder.XYZ) {
+                    rotation.y = Math.asin(clamp(m13, -1, 1));
+                    if (Math.abs(m13) < 0.9999999) {
+                        rotation.x = Math.atan2(-m23, m33);
+                        rotation.z = Math.atan2(-m12, m11);
                     }
                     else {
-                        tz = Math.sqrt(1 + k - a - f) / 2;
-                        tx = (c + i) / (4 * tz);
-                        ty = (j + g) / (4 * tz);
-                        tw = (e - b) / (4 * tz);
+                        rotation.x = Math.atan2(m32, m22);
+                        rotation.z = 0;
                     }
                 }
-                result = result || [new framework.Vector3(), new framework.Vector3(), new framework.Vector3()];
-                result[0].x = x;
-                result[0].y = y;
-                result[0].z = z;
-                result[1].x = tx;
-                result[1].y = ty;
-                result[1].z = tz;
-                result[2].x = scaleX;
-                result[2].y = scaleY;
-                result[2].z = scaleZ;
-                return result;
+                else if (order === framework.RotationOrder.YXZ) {
+                    rotation.x = Math.asin(-clamp(m23, -1, 1));
+                    if (Math.abs(m23) < 0.9999999) {
+                        rotation.y = Math.atan2(m13, m33);
+                        rotation.z = Math.atan2(m21, m22);
+                    }
+                    else {
+                        rotation.y = Math.atan2(-m31, m11);
+                        rotation.z = 0;
+                    }
+                }
+                else if (order === framework.RotationOrder.ZXY) {
+                    rotation.x = Math.asin(clamp(m32, -1, 1));
+                    if (Math.abs(m32) < 0.9999999) {
+                        rotation.y = Math.atan2(-m31, m33);
+                        rotation.z = Math.atan2(-m12, m22);
+                    }
+                    else {
+                        rotation.y = 0;
+                        rotation.z = Math.atan2(m21, m11);
+                    }
+                }
+                else if (order === framework.RotationOrder.ZYX) {
+                    rotation.y = Math.asin(-clamp(m31, -1, 1));
+                    if (Math.abs(m31) < 0.9999999) {
+                        rotation.x = Math.atan2(m32, m33);
+                        rotation.z = Math.atan2(m21, m11);
+                    }
+                    else {
+                        rotation.x = 0;
+                        rotation.z = Math.atan2(-m12, m22);
+                    }
+                }
+                else if (order === framework.RotationOrder.YZX) {
+                    rotation.z = Math.asin(clamp(m21, -1, 1));
+                    if (Math.abs(m21) < 0.9999999) {
+                        rotation.x = Math.atan2(-m23, m22);
+                        rotation.y = Math.atan2(-m31, m11);
+                    }
+                    else {
+                        rotation.x = 0;
+                        rotation.y = Math.atan2(m13, m33);
+                    }
+                }
+                else if (order === framework.RotationOrder.XZY) {
+                    rotation.z = Math.asin(-clamp(m12, -1, 1));
+                    if (Math.abs(m12) < 0.9999999) {
+                        rotation.x = Math.atan2(m32, m22);
+                        rotation.y = Math.atan2(m13, m11);
+                    }
+                    else {
+                        rotation.x = Math.atan2(-m23, m33);
+                        rotation.y = 0;
+                    }
+                }
+                else {
+                    console.error("\u521D\u59CB\u5316\u77E9\u9635\u65F6\u9519\u8BEF\u65CB\u8F6C\u987A\u5E8F " + order);
+                }
+                rotation.scaleNumber(Math.RAD2DEG);
+                return [position, rotation, scale];
             };
             Matrix4x4.prototype.deltaTransformVector = function (v, vout) {
                 if (vout === void 0) { vout = new framework.Vector3(); }
@@ -32081,6 +32361,19 @@ var gd3d;
                 this.prepend(scaleMat);
                 return this;
             };
+            Matrix4x4.prototype.prependScale1 = function (xScale, yScale, zScale) {
+                var rawData = this.rawData;
+                rawData[0] *= xScale;
+                rawData[1] *= xScale;
+                rawData[2] *= xScale;
+                rawData[4] *= yScale;
+                rawData[5] *= yScale;
+                rawData[6] *= yScale;
+                rawData[8] *= zScale;
+                rawData[9] *= zScale;
+                rawData[10] *= zScale;
+                return this;
+            };
             Matrix4x4.prototype.prependTranslation = function (x, y, z) {
                 var translationMat = Matrix4x4.fromPosition(x, y, z);
                 this.prepend(translationMat);
@@ -32089,33 +32382,19 @@ var gd3d;
             Matrix4x4.prototype.moveRight = function (distance) {
                 var direction = this.right;
                 direction.scaleNumber(distance);
-                this.position = this.position.addTo(direction);
+                this.setPosition(this.getPosition().addTo(direction));
                 return this;
             };
             Matrix4x4.prototype.moveUp = function (distance) {
                 var direction = this.up;
                 direction.scaleNumber(distance);
-                this.position = this.position.addTo(direction);
+                this.setPosition(this.getPosition().addTo(direction));
                 return this;
             };
             Matrix4x4.prototype.moveForward = function (distance) {
                 var direction = this.forward;
                 direction.scaleNumber(distance);
-                this.position = this.position.addTo(direction);
-                return this;
-            };
-            Matrix4x4.prototype.recompose = function (components) {
-                var rx = components[1].x;
-                var ry = components[1].y;
-                var rz = components[1].z;
-                var sx = Math.sin(rx), cx = Math.cos(rx), sy = Math.sin(ry), cy = Math.cos(ry), sz = Math.sin(rz), cz = Math.cos(rz);
-                var xS = components[2].x, yS = components[2].y, zS = components[2].z;
-                this.rawData = [
-                    cy * cz * xS, cy * sz * xS, -sy * xS, 0,
-                    (sx * sy * cz - cx * sz) * yS, (sx * sy * sz + cx * cz) * yS, sx * cy * yS, 0,
-                    (cx * sy * cz + sx * sz) * zS, (cx * sy * sz - sx * cz) * zS, cx * cy * zS, 0,
-                    components[0].x, components[0].y, components[0].z, 1,
-                ];
+                this.setPosition(this.getPosition().addTo(direction));
                 return this;
             };
             Matrix4x4.prototype.transformVector = function (vin, vout) {
@@ -32149,7 +32428,6 @@ var gd3d;
                 var rotationMatrix3d = Matrix4x4.fromRotation(vin.x, vin.y, vin.z);
                 rotationMatrix3d.append(this);
                 var newrotation = rotationMatrix3d.decompose()[1];
-                newrotation.scaleNumber(180 / Math.PI);
                 var v = Math.round((newrotation.x - vin.x) / 180);
                 if (v % 2 != 0) {
                     newrotation.x += 180;
@@ -32172,12 +32450,10 @@ var gd3d;
             Matrix4x4.prototype.transpose = function () {
                 var swap;
                 for (var i = 0; i < 4; i++) {
-                    for (var j = 0; j < 4; j++) {
-                        if (i > j) {
-                            swap = this.rawData[i * 4 + j];
-                            this.rawData[i * 4 + j] = this.rawData[j * 4 + i];
-                            this.rawData[j * 4 + i] = swap;
-                        }
+                    for (var j = 0; j < i; j++) {
+                        swap = this.rawData[i * 4 + j];
+                        this.rawData[i * 4 + j] = this.rawData[j * 4 + i];
+                        this.rawData[j * 4 + i] = swap;
                     }
                 }
                 return this;
@@ -32199,9 +32475,10 @@ var gd3d;
                 var yAxis = new framework.Vector3();
                 var zAxis = new framework.Vector3();
                 upAxis = upAxis || framework.Vector3.Y_AXIS;
-                zAxis.x = target.x - this.position.x;
-                zAxis.y = target.y - this.position.y;
-                zAxis.z = target.z - this.position.z;
+                var p = this.getPosition();
+                zAxis.x = target.x - p.x;
+                zAxis.y = target.y - p.y;
+                zAxis.z = target.z - p.z;
                 zAxis.normalize();
                 xAxis.x = upAxis.y * zAxis.z - upAxis.z * zAxis.y;
                 xAxis.y = upAxis.z * zAxis.x - upAxis.x * zAxis.z;
@@ -32232,6 +32509,7 @@ var gd3d;
                 this.rawData[13] = position.y;
                 this.rawData[14] = position.z;
                 this.rawData[15] = 1;
+                return this;
             };
             Matrix4x4.prototype.getMaxScaleOnAxis = function () {
                 var te = this.rawData;
@@ -32310,6 +32588,10 @@ var gd3d;
                 0, 0, 1, 0,
                 0, 0, 0, 1
             ];
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Array)
+            ], Matrix4x4.prototype, "rawData", void 0);
             return Matrix4x4;
         }());
         framework.Matrix4x4 = Matrix4x4;
@@ -32319,12 +32601,16 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var Orientation3D;
-        (function (Orientation3D) {
-            Orientation3D["AXIS_ANGLE"] = "axisAngle";
-            Orientation3D["EULER_ANGLES"] = "eulerAngles";
-            Orientation3D["QUATERNION"] = "quaternion";
-        })(Orientation3D = framework.Orientation3D || (framework.Orientation3D = {}));
+        var RotationOrder;
+        (function (RotationOrder) {
+            RotationOrder[RotationOrder["XYZ"] = 0] = "XYZ";
+            RotationOrder[RotationOrder["ZXY"] = 1] = "ZXY";
+            RotationOrder[RotationOrder["ZYX"] = 2] = "ZYX";
+            RotationOrder[RotationOrder["YXZ"] = 3] = "YXZ";
+            RotationOrder[RotationOrder["YZX"] = 4] = "YZX";
+            RotationOrder[RotationOrder["XZY"] = 5] = "XZY";
+        })(RotationOrder = framework.RotationOrder || (framework.RotationOrder = {}));
+        framework.defaultRotationOrder = RotationOrder.YXZ;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -33193,6 +33479,10 @@ var gd3d;
             };
             ParticleModule.prototype.updateParticleState = function (particle) {
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleModule.prototype, "enabled", void 0);
             return ParticleModule;
         }(framework.EventDispatcher));
         framework.ParticleModule = ParticleModule;
@@ -33217,6 +33507,10 @@ var gd3d;
                     return;
                 particle.color.multiply(this.color.getValue(particle.rateAtLifeTime, particle[_ColorOverLifetime_rate]));
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleColorOverLifetimeModule.prototype, "color", void 0);
             return ParticleColorOverLifetimeModule;
         }(framework.ParticleModule));
         framework.ParticleColorOverLifetimeModule = ParticleColorOverLifetimeModule;
@@ -33231,8 +33525,9 @@ var gd3d;
             __extends(ParticleEmissionModule, _super);
             function ParticleEmissionModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.rateOverTime = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 10, constant1: 10 });
-                _this.rateOverDistance = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 0, constant1: 1 });
+                _this.__class__ = "feng3d.ParticleEmissionModule";
+                _this.rateOverTime = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 10, constantMin: 10, constantMax: 10, curveMultiplier: 10 });
+                _this.rateOverDistance = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 0, constantMin: 0, constantMax: 1 });
                 _this.bursts = [];
                 return _this;
             }
@@ -33277,6 +33572,14 @@ var gd3d;
                     this.bursts[i] = bursts[i];
                 }
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleEmissionModule.prototype, "rateOverTime", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Array)
+            ], ParticleEmissionModule.prototype, "bursts", void 0);
             return ParticleEmissionModule;
         }(framework.ParticleModule));
         framework.ParticleEmissionModule = ParticleEmissionModule;
@@ -33374,6 +33677,18 @@ var gd3d;
                 particle.acceleration.add(force);
                 preForce.copy(force);
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleForceOverLifetimeModule.prototype, "force", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleForceOverLifetimeModule.prototype, "space", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleForceOverLifetimeModule.prototype, "randomized", void 0);
             return ParticleForceOverLifetimeModule;
         }(framework.ParticleModule));
         framework.ParticleForceOverLifetimeModule = ParticleForceOverLifetimeModule;
@@ -33390,7 +33705,7 @@ var gd3d;
             function InheritVelocityModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.mode = framework.ParticleSystemInheritVelocityMode.Initial;
-                _this.multiplier = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 1, constant1: 1 });
+                _this.multiplier = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 1, constantMin: 1, constantMax: 1 });
                 return _this;
             }
             Object.defineProperty(InheritVelocityModule.prototype, "curve", {
@@ -33426,9 +33741,10 @@ var gd3d;
             __extends(ParticleLimitVelocityOverLifetimeModule, _super);
             function ParticleLimitVelocityOverLifetimeModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.__class__ = "feng3d.ParticleLimitVelocityOverLifetimeModule";
                 _this.separateAxes = false;
-                _this.limit = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 1, constant1: 1 });
-                _this.limit3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constant1: 1 }, yCurve: { between0And1: true, constant: 1, constant1: 1 }, zCurve: { between0And1: true, constant: 1, constant1: 1 } });
+                _this.limit = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 });
+                _this.limit3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 } });
                 _this.space = framework.ParticleSystemSimulationSpace1.Local;
                 _this.dampen = 1;
                 return _this;
@@ -33536,6 +33852,26 @@ var gd3d;
                 }
                 particle.velocity.lerpNumber(pVelocity, this.dampen);
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleLimitVelocityOverLifetimeModule.prototype, "separateAxes", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleLimitVelocityOverLifetimeModule.prototype, "limit", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleLimitVelocityOverLifetimeModule.prototype, "limit3D", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleLimitVelocityOverLifetimeModule.prototype, "space", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleLimitVelocityOverLifetimeModule.prototype, "dampen", void 0);
             return ParticleLimitVelocityOverLifetimeModule;
         }(framework.ParticleModule));
         framework.ParticleLimitVelocityOverLifetimeModule = ParticleLimitVelocityOverLifetimeModule;
@@ -33550,15 +33886,16 @@ var gd3d;
             __extends(ParticleMainModule, _super);
             function ParticleMainModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.__class__ = "feng3d.ParticleMainModule";
                 _this.enabled = true;
                 _this.duration = 5;
                 _this.loop = true;
                 _this.prewarm = false;
                 _this.startDelay = new framework.MinMaxCurve();
-                _this.startLifetime = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 5, constant1: 5 });
-                _this.startSpeed = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 5, constant1: 5 });
+                _this.startLifetime = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 5, constantMin: 5, constantMax: 5 });
+                _this.startSpeed = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 5, constantMin: 5, constantMax: 5 });
                 _this.useStartSize3D = false;
-                _this.startSize3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constant1: 1 }, yCurve: { between0And1: true, constant: 1, constant1: 1 }, zCurve: { between0And1: true, constant: 1, constant1: 1 } });
+                _this.startSize3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 } });
                 _this.useStartRotation3D = false;
                 _this.startRotation3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { curveMultiplier: 180 }, yCurve: { curveMultiplier: 180 }, zCurve: { curveMultiplier: 180 } });
                 _this.randomizeRotationDirection = 0;
@@ -33774,6 +34111,87 @@ var gd3d;
                 particle.size.copy(particle.startSize);
                 particle.color.copy(particle.startColor);
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "duration", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "loop", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "prewarm", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "startDelay", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "startLifetime", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "startSpeed", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "useStartSize3D", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleMainModule.prototype, "startSize", null);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "startSize3D", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "useStartRotation3D", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "startRotation3D", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "randomizeRotationDirection", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "startColor", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "gravityModifier", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "simulationSpace", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", framework.transform)
+            ], ParticleMainModule.prototype, "customSimulationSpace", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "simulationSpeed", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "scalingMode", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "playOnAwake", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleMainModule.prototype, "maxParticles", void 0);
             return ParticleMainModule;
         }(framework.ParticleModule));
         framework.ParticleMainModule = ParticleMainModule;
@@ -33789,7 +34207,7 @@ var gd3d;
             function ParticleRotationOverLifetimeModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.separateAxes = false;
-                _this.angularVelocity = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { constant: 45, constant1: 45, curveMultiplier: 45 }, yCurve: { constant: 45, constant1: 45, curveMultiplier: 45 }, zCurve: { constant: 45, constant1: 45, curveMultiplier: 45 } });
+                _this.angularVelocity = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 }, yCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 }, zCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 } });
                 return _this;
             }
             Object.defineProperty(ParticleRotationOverLifetimeModule.prototype, "x", {
@@ -33869,6 +34287,14 @@ var gd3d;
                 particle.angularVelocity.add(v);
                 preAngularVelocity.copy(v);
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleRotationOverLifetimeModule.prototype, "separateAxes", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleRotationOverLifetimeModule.prototype, "angularVelocity", void 0);
             return ParticleRotationOverLifetimeModule;
         }(framework.ParticleModule));
         framework.ParticleRotationOverLifetimeModule = ParticleRotationOverLifetimeModule;
@@ -33884,13 +34310,14 @@ var gd3d;
             __extends(ParticleShapeModule, _super);
             function ParticleShapeModule() {
                 var _this = _super.call(this) || this;
+                _this.__class__ = "feng3d.ParticleShapeModule";
                 _this.alignToDirection = false;
                 _this.randomDirectionAmount = 0;
                 _this.sphericalDirectionAmount = 0;
                 _this.angle = 25;
                 _this.arc = 360;
                 _this.arcMode = framework.ParticleSystemShapeMultiModeValue.Random;
-                _this.arcSpeed = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 1, constant1: 1 });
+                _this.arcSpeed = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 1, constantMin: 1, constantMax: 1 });
                 _this.arcSpread = 0;
                 _this.box = new framework.Vector3(1, 1, 1);
                 _this.length = 5;
@@ -33900,7 +34327,7 @@ var gd3d;
                 _this.normalOffset = 0;
                 _this.radius = 1;
                 _this.radiusMode = framework.ParticleSystemShapeMultiModeValue.Random;
-                _this.radiusSpeed = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 1, constant1: 1 });
+                _this.radiusSpeed = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 1, constantMin: 1, constantMax: 1 });
                 _this.radiusSpread = 0;
                 _this._shapeSphere = new framework.ParticleSystemShapeSphere(_this);
                 _this._shapeHemisphere = new framework.ParticleSystemShapeHemisphere(_this);
@@ -33967,7 +34394,7 @@ var gd3d;
                     mat.lookAt(dir, framework.Vector3.Y_AXIS);
                     var mat0 = framework.Matrix4x4.fromRotation(particle.rotation.x, particle.rotation.y, particle.rotation.z);
                     mat0.append(mat);
-                    particle.rotation = mat0.rotation;
+                    particle.rotation = mat0.getRotation();
                 }
                 var length = particle.velocity.length;
                 if (this.randomDirectionAmount > 0) {
@@ -34136,6 +34563,67 @@ var gd3d;
                         break;
                 }
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleShapeModule.prototype, "shapeType", null);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleShapeModule.prototype, "alignToDirection", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleShapeModule.prototype, "randomDirectionAmount", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleShapeModule.prototype, "sphericalDirectionAmount", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleShapeModule.prototype, "angle", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleShapeModule.prototype, "arc", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleShapeModule.prototype, "arcMode", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleShapeModule.prototype, "arcSpeed", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleShapeModule.prototype, "arcSpread", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleShapeModule.prototype, "box", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleShapeModule.prototype, "length", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleShapeModule.prototype, "radius", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleShapeModule.prototype, "radiusMode", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleShapeModule.prototype, "radiusSpeed", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleShapeModule.prototype, "radiusSpread", void 0);
             return ParticleShapeModule;
         }(framework.ParticleModule));
         framework.ParticleShapeModule = ParticleShapeModule;
@@ -34150,7 +34638,7 @@ var gd3d;
             function ParticleSizeOverLifetimeModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.separateAxes = false;
-                _this.size3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constant1: 1, curveMultiplier: 1 }, yCurve: { between0And1: true, constant: 1, constant1: 1, curveMultiplier: 1 }, zCurve: { between0And1: true, constant: 1, constant1: 1, curveMultiplier: 1 } });
+                _this.size3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 } });
                 return _this;
             }
             Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "size", {
@@ -34245,6 +34733,14 @@ var gd3d;
                 }
                 particle.size.multiply(size);
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleSizeOverLifetimeModule.prototype, "separateAxes", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleSizeOverLifetimeModule.prototype, "size3D", void 0);
             return ParticleSizeOverLifetimeModule;
         }(framework.ParticleModule));
         framework.ParticleSizeOverLifetimeModule = ParticleSizeOverLifetimeModule;
@@ -34261,7 +34757,7 @@ var gd3d;
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.tiles = new framework.Vector2(1, 1);
                 _this.animation = framework.ParticleSystemAnimationType.WholeSheet;
-                _this.frameOverTime = framework.serialization.setValue(new framework.MinMaxCurve(), { mode: framework.MinMaxCurveMode.Curve, curve: { keys: [{ time: 0, value: 0, tangent: 1 }, { time: 1, value: 1, tangent: 1 }] } });
+                _this.frameOverTime = framework.serialization.setValue(new framework.MinMaxCurve(), { mode: framework.MinMaxCurveMode.Curve, curveMin: { keys: [{ time: 0, value: 0, inTangent: 1, outTangent: 1 }, { time: 1, value: 1, inTangent: 1, outTangent: 1 }] } });
                 _this.useRandomRow = true;
                 _this._rowIndex = 0;
                 _this.startFrame = new framework.MinMaxCurve();
@@ -34341,38 +34837,78 @@ var gd3d;
             ParticleTextureSheetAnimationModule.prototype.initParticleState = function (particle) {
                 particle[_TextureSheetAnimation_frameOverTime] = Math.random();
                 particle[_TextureSheetAnimation_startFrame] = Math.random();
+                particle[_TextureSheetAnimation_randomRow] = Math.random();
             };
             ParticleTextureSheetAnimationModule.prototype.updateParticleState = function (particle) {
+                particle.tilingOffset.init(1, 1, 0, 0);
+                particle.flipUV.init(0, 0);
                 if (!this.enabled)
                     return;
                 var segmentsX = this.tiles.x;
                 var segmentsY = this.tiles.y;
                 var step = this.tiles.clone().reciprocal();
-                var total = segmentsX * segmentsY;
                 var uvPos = new framework.Vector2();
                 var frameOverTime = this.frameOverTime.getValue(particle.rateAtLifeTime, particle[_TextureSheetAnimation_frameOverTime]);
                 var frameIndex = this.startFrame.getValue(particle.rateAtLifeTime, particle[_TextureSheetAnimation_startFrame]);
                 var rowIndex = this.rowIndex;
                 var cycleCount = this.cycleCount;
                 if (this.animation == framework.ParticleSystemAnimationType.WholeSheet) {
-                    frameIndex += Math.floor(frameOverTime * total * cycleCount);
+                    frameIndex = Math.round(frameIndex + frameOverTime * segmentsX * segmentsY * cycleCount);
                     uvPos.init(frameIndex % segmentsX, Math.floor(frameIndex / segmentsX) % segmentsY).scale(step);
                 }
                 else if (this.animation == framework.ParticleSystemAnimationType.SingleRow) {
-                    frameIndex += Math.floor(frameOverTime * segmentsX * cycleCount);
+                    frameIndex = Math.round(frameIndex + frameOverTime * segmentsX * cycleCount);
                     if (this.useRandomRow) {
-                        rowIndex = Math.floor(segmentsY * Math.random());
+                        rowIndex = Math.round(segmentsY * particle[_TextureSheetAnimation_randomRow]);
                     }
                     uvPos.init(frameIndex % segmentsX, rowIndex).scale(step);
                 }
                 particle.tilingOffset.init(step.x, step.y, uvPos.x, uvPos.y);
                 particle.flipUV = this.flipUV;
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleTextureSheetAnimationModule.prototype, "tiles", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleTextureSheetAnimationModule.prototype, "animation", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleTextureSheetAnimationModule.prototype, "frameOverTime", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleTextureSheetAnimationModule.prototype, "useRandomRow", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleTextureSheetAnimationModule.prototype, "rowIndex", null);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleTextureSheetAnimationModule.prototype, "startFrame", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleTextureSheetAnimationModule.prototype, "cycleCount", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleTextureSheetAnimationModule.prototype, "flipUV", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleTextureSheetAnimationModule.prototype, "uvChannelMask", void 0);
             return ParticleTextureSheetAnimationModule;
         }(framework.ParticleModule));
         framework.ParticleTextureSheetAnimationModule = ParticleTextureSheetAnimationModule;
         var _TextureSheetAnimation_frameOverTime = "_TextureSheetAnimation_rateAtLifeTime";
         var _TextureSheetAnimation_startFrame = "_TextureSheetAnimation_startFrame";
+        var _TextureSheetAnimation_randomRow = "_TextureSheetAnimation_randomRow";
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -34383,6 +34919,7 @@ var gd3d;
             __extends(ParticleVelocityOverLifetimeModule, _super);
             function ParticleVelocityOverLifetimeModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.__class__ = "feng3d.ParticleVelocityOverLifetimeModule";
                 _this.velocity = new framework.MinMaxCurveVector3();
                 _this.space = framework.ParticleSystemSimulationSpace1.Local;
                 return _this;
@@ -34466,6 +35003,14 @@ var gd3d;
                 particle.velocity.add(velocity);
                 preVelocity.copy(velocity);
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleVelocityOverLifetimeModule.prototype, "velocity", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleVelocityOverLifetimeModule.prototype, "space", void 0);
             return ParticleVelocityOverLifetimeModule;
         }(framework.ParticleModule));
         framework.ParticleVelocityOverLifetimeModule = ParticleVelocityOverLifetimeModule;
@@ -34479,8 +35024,9 @@ var gd3d;
     (function (framework) {
         var ParticleEmissionBurst = (function () {
             function ParticleEmissionBurst() {
+                this.__class__ = "feng3d.ParticleEmissionBurst";
                 this.time = 0;
-                this.count = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 30, constant1: 30 });
+                this.count = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 30, constantMin: 30, constantMax: 30 });
                 this.cycleCount = 1;
                 this.repeatInterval = 0.01;
                 this.probability = 1.0;
@@ -34488,20 +35034,20 @@ var gd3d;
             }
             Object.defineProperty(ParticleEmissionBurst.prototype, "minCount", {
                 get: function () {
-                    return this.count.constant;
+                    return this.count.constantMin;
                 },
                 set: function (v) {
-                    this.count.constant = v;
+                    this.count.constantMin = v;
                 },
                 enumerable: true,
                 configurable: true
             });
             Object.defineProperty(ParticleEmissionBurst.prototype, "maxCount", {
                 get: function () {
-                    return this.count.constant1;
+                    return this.count.constantMax;
                 },
                 set: function (v) {
-                    this.count.constant1 = v;
+                    this.count.constantMax = v;
                 },
                 enumerable: true,
                 configurable: true
@@ -34517,6 +35063,26 @@ var gd3d;
                 this._isProbability = this.probability >= Math.random();
                 return this._isProbability;
             };
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleEmissionBurst.prototype, "time", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleEmissionBurst.prototype, "count", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleEmissionBurst.prototype, "cycleCount", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleEmissionBurst.prototype, "repeatInterval", void 0);
+            __decorate([
+                framework.serialize,
+                __metadata("design:type", Object)
+            ], ParticleEmissionBurst.prototype, "probability", void 0);
             return ParticleEmissionBurst;
         }());
         framework.ParticleEmissionBurst = ParticleEmissionBurst;
@@ -35057,25 +35623,11 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var ParticleSystemShapeMultiModeValue;
-        (function (ParticleSystemShapeMultiModeValue) {
-            ParticleSystemShapeMultiModeValue[ParticleSystemShapeMultiModeValue["Random"] = 0] = "Random";
-            ParticleSystemShapeMultiModeValue[ParticleSystemShapeMultiModeValue["Loop"] = 1] = "Loop";
-            ParticleSystemShapeMultiModeValue[ParticleSystemShapeMultiModeValue["PingPong"] = 2] = "PingPong";
-            ParticleSystemShapeMultiModeValue[ParticleSystemShapeMultiModeValue["BurstSpread"] = 3] = "BurstSpread";
-        })(ParticleSystemShapeMultiModeValue = framework.ParticleSystemShapeMultiModeValue || (framework.ParticleSystemShapeMultiModeValue = {}));
-        var ParticleSystemShapeConeEmitFrom;
-        (function (ParticleSystemShapeConeEmitFrom) {
-            ParticleSystemShapeConeEmitFrom[ParticleSystemShapeConeEmitFrom["Base"] = 0] = "Base";
-            ParticleSystemShapeConeEmitFrom[ParticleSystemShapeConeEmitFrom["BaseShell"] = 1] = "BaseShell";
-            ParticleSystemShapeConeEmitFrom[ParticleSystemShapeConeEmitFrom["Volume"] = 2] = "Volume";
-            ParticleSystemShapeConeEmitFrom[ParticleSystemShapeConeEmitFrom["VolumeShell"] = 3] = "VolumeShell";
-        })(ParticleSystemShapeConeEmitFrom = framework.ParticleSystemShapeConeEmitFrom || (framework.ParticleSystemShapeConeEmitFrom = {}));
         var ParticleSystemShapeCone = (function (_super) {
             __extends(ParticleSystemShapeCone, _super);
             function ParticleSystemShapeCone() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.emitFrom = ParticleSystemShapeConeEmitFrom.Base;
+                _this.emitFrom = framework.ParticleSystemShapeConeEmitFrom.Base;
                 return _this;
             }
             Object.defineProperty(ParticleSystemShapeCone.prototype, "angle", {
@@ -35155,14 +35707,14 @@ var gd3d;
                 var arc = this.arc;
                 angle = Math.clamp(angle, 0, 87);
                 var radiusAngle = 0;
-                if (this.arcMode == ParticleSystemShapeMultiModeValue.Random) {
+                if (this.arcMode == framework.ParticleSystemShapeMultiModeValue.Random) {
                     radiusAngle = Math.random() * arc;
                 }
-                else if (this.arcMode == ParticleSystemShapeMultiModeValue.Loop) {
+                else if (this.arcMode == framework.ParticleSystemShapeMultiModeValue.Loop) {
                     var totalAngle = particle.birthTime * this.arcSpeed.getValue(particle.birthRateAtDuration) * 360;
                     radiusAngle = totalAngle % arc;
                 }
-                else if (this.arcMode == ParticleSystemShapeMultiModeValue.PingPong) {
+                else if (this.arcMode == framework.ParticleSystemShapeMultiModeValue.PingPong) {
                     var totalAngle = particle.birthTime * this.arcSpeed.getValue(particle.birthRateAtDuration) * 360;
                     radiusAngle = totalAngle % arc;
                     if (Math.floor(totalAngle / arc) % 2 == 1) {
@@ -35174,7 +35726,7 @@ var gd3d;
                 }
                 radiusAngle = Math.degToRad(radiusAngle);
                 var radiusRate = 1;
-                if (this.emitFrom == ParticleSystemShapeConeEmitFrom.Base || this.emitFrom == ParticleSystemShapeConeEmitFrom.Volume) {
+                if (this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.Base || this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.Volume) {
                     radiusRate = Math.random();
                 }
                 var basePos = new framework.Vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
@@ -35183,7 +35735,7 @@ var gd3d;
                 topPos.z = this.length;
                 particle.velocity.copy(topPos.subTo(bottomPos).normalize(speed));
                 var position = bottomPos.clone();
-                if (this.emitFrom == ParticleSystemShapeConeEmitFrom.Volume || this.emitFrom == ParticleSystemShapeConeEmitFrom.VolumeShell) {
+                if (this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.Volume || this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.VolumeShell) {
                     position.lerpNumber(topPos, Math.random());
                 }
                 particle.position.copy(position);

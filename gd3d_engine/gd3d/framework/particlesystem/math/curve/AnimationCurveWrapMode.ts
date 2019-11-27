@@ -8,16 +8,16 @@ namespace gd3d.framework
     export enum AnimationCurveWrapMode
     {
         /**
+         * 夹紧; 0>-<1
+         */
+        Clamp = 1,
+        /**
          * 循环; 0->1,0->1
          */
-        Loop,
+        Loop = 2,
         /**
          * 来回循环; 0->1,1->0
          */
-        PingPong,
-        /**
-         * 夹紧; 0>-<1
-         */
-        Clamp,
+        PingPong = 4,
     }
 }

@@ -5,33 +5,32 @@ namespace gd3d.framework
      * 
      * @author feng3d
      */
-    export class AnimationCurveKeyframe
+    export interface AnimationCurveKeyframe
     {
         /**
-         * 时间轴的位置 [0,1]
+         * The time of the keyframe.
+         * 
+         * 关键帧的时间。
          */
         time: number
 
         /**
-         * 值 [0,1]
+         * 曲线在关键帧处的值。
          */
         value: number
 
         /**
-         * 斜率
+         * Describes the tangent when approaching this point from the previous point in the curve.
+         * 
+         * 描述从曲线上的前一点接近该点时的切线。
          */
-        tangent: number
+        inTangent: number;
 
-        constructor(param: Partial<AnimationCurveKeyframe>)
-        {
-            this.init(param);
-        }
-
-        init(param: Partial<AnimationCurveKeyframe>)
-        {
-            param.time && (this.time = param.time);
-            param.value && (this.value = param.value);
-            param.tangent && (this.tangent = param.tangent);
-        }
+        /**
+         * Describes the tangent when leaving this point towards the next point in the curve.
+         * 
+         * 描述从这个点到曲线上下一个点的切线。
+         */
+        outTangent: number;
     }
 }

@@ -9,16 +9,19 @@ namespace gd3d.framework
         /**
          * x 曲线
          */
+        @serialize
         xCurve = new MinMaxCurve();
 
         /**
          * y 曲线
          */
+        @serialize
         yCurve = new MinMaxCurve();
 
         /**
          * z 曲线
          */
+        @serialize
         zCurve = new MinMaxCurve();
 
         /**

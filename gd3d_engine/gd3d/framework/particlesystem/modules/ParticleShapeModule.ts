@@ -45,7 +45,7 @@ namespace gd3d.framework
         /**
          * 当前使用的发射形状
          */
-        activeShape: ParticleSystemShape;
+        activeShape: ParticleSystemShapeBase;
 
         /**
          * Align particles based on their initial direction of travel.
