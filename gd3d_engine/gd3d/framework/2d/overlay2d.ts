@@ -59,6 +59,7 @@ namespace gd3d.framework
             if (camera == this.camera) return;
             this.camera = camera;
             this.app = camera.gameObject.getScene().app;
+            camera.calcViewPortPixel(this.app);
             this.canvas.scene = camera.gameObject.getScene();
             this.inputmgr = camera.gameObject.getScene().app.getInputMgr();
         }
