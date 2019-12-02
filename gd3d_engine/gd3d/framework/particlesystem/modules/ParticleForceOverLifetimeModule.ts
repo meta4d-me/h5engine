@@ -142,7 +142,7 @@ namespace gd3d.framework
         {
             var preForce: Vector3 = particle[_ForceOverLifetime_preForce];
             particle.acceleration.sub(preForce);
-            preForce.init(0, 0, 0);
+            preForce.set(0, 0, 0);
             if (!this.enabled) return;
 
             var force = this.force.getValue(particle.rateAtLifeTime, particle[_ForceOverLifetime_rate]);

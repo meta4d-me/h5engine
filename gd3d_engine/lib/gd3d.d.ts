@@ -5649,6 +5649,7 @@ declare namespace gd3d.framework {
         flipUV: Vector2;
         birthRateAtDuration: number;
         rateAtLifeTime: number;
+        cache: {};
         updateState(preTime: number, time: number): void;
     }
 }
@@ -5692,6 +5693,9 @@ declare namespace gd3d.framework {
         readonly transform: transform;
         readonly isPlaying: boolean;
         private _isPlaying;
+        readonly isStopped: boolean;
+        readonly isPaused: boolean;
+        readonly particleCount: number;
         time: number;
         main: ParticleMainModule;
         private _main;
@@ -5703,20 +5707,27 @@ declare namespace gd3d.framework {
         private _velocityOverLifetime;
         limitVelocityOverLifetime: ParticleLimitVelocityOverLifetimeModule;
         private _limitVelocityOverLifetime;
+        inheritVelocity: ParticleInheritVelocityModule;
+        private _inheritVelocity;
         forceOverLifetime: ParticleForceOverLifetimeModule;
         private _forceOverLifetime;
         colorOverLifetime: ParticleColorOverLifetimeModule;
         private _colorOverLifetime;
+        colorBySpeed: ParticleColorBySpeedModule;
+        private _colorBySpeed;
         sizeOverLifetime: ParticleSizeOverLifetimeModule;
         private _sizeOverLifetime;
+        sizeBySpeed: ParticleSizeBySpeedModule;
+        private _sizeBySpeed;
         rotationOverLifetime: ParticleRotationOverLifetimeModule;
         private _rotationOverLifetime;
+        rotationBySpeed: ParticleRotationBySpeedModule;
+        private _rotationBySpeed;
         textureSheetAnimation: ParticleTextureSheetAnimationModule;
         private _textureSheetAnimation;
         private _mesh;
         mesh: mesh;
         material: material;
-        readonly numActiveParticles: number;
         readonly single: boolean;
         startDelay: number;
         onPlay(): void;
@@ -5745,6 +5756,19 @@ declare namespace gd3d.framework {
         private _updateActiveParticlesState;
         private _initParticleState;
         private _updateParticleState;
+        private _simulationSpaceChanged;
+        addParticleVelocity(particle: Particle1, velocity: Vector3, space: ParticleSystemSimulationSpace, name?: string): void;
+        removeParticleVelocity(particle: Particle1, name: string): void;
+        addParticleAcceleration(particle: Particle1, acceleration: Vector3, space: ParticleSystemSimulationSpace, name?: string): void;
+        removeParticleAcceleration(particle: Particle1, name: string): void;
+        private _preworldPos;
+        private _isRateOverDistance;
+        private _leftRateOverDistance;
+        worldPos: Vector3;
+        moveVec: Vector3;
+        speed: Vector3;
+        localToWorldMatrix: Matrix4x4;
+        worldToLocalMatrix: Matrix4x4;
     }
 }
 declare namespace gd3d.framework {
@@ -6369,11 +6393,12 @@ declare namespace gd3d.framework {
         readonly length: number;
         readonly lengthSquared: number;
         constructor(x?: number, y?: number, z?: number);
-        init(x: number, y: number, z: number): this;
+        set(x: number, y: number, z: number): this;
         setZero(): void;
         fromArray(array: ArrayLike<number>, offset?: number): this;
         add(a: Vector3): this;
         addTo(a: Vector3, vout?: Vector3): Vector3;
+        addScaledVector(scalar: number, vector: Vector3): this;
         multiply(a: Vector3): this;
         multiplyTo(a: Vector3, vout?: Vector3): Vector3;
         divide(a: Vector3): this;
@@ -6525,6 +6550,14 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class ParticleColorBySpeedModule extends ParticleModule {
+        color: MinMaxGradient;
+        range: Vector2;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
     class ParticleColorOverLifetimeModule extends ParticleModule {
         color: MinMaxGradient;
         initParticleState(particle: Particle1): void;
@@ -6560,11 +6593,14 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class InheritVelocityModule extends ParticleModule {
+    class ParticleInheritVelocityModule extends ParticleModule {
+        "__class__": "feng3d.ParticleInheritVelocityModule";
         mode: ParticleSystemInheritVelocityMode;
         multiplier: MinMaxCurve;
         curve: MinMaxCurve;
         curveMultiplier: number;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6633,6 +6669,21 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class ParticleRotationBySpeedModule extends ParticleModule {
+        separateAxes: boolean;
+        angularVelocity: MinMaxCurveVector3;
+        range: Vector2;
+        x: MinMaxCurve;
+        xMultiplier: number;
+        y: MinMaxCurve;
+        yMultiplier: number;
+        z: MinMaxCurve;
+        zMultiplier: number;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
     class ParticleRotationOverLifetimeModule extends ParticleModule {
         separateAxes: boolean;
         angularVelocity: MinMaxCurveVector3;
@@ -6689,6 +6740,23 @@ declare namespace gd3d.framework {
         initParticleState(particle: Particle1): void;
         private _onShapeTypeChanged;
         private _onShapeChanged;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleSizeBySpeedModule extends ParticleModule {
+        separateAxes: boolean;
+        size: MinMaxCurve;
+        size3D: MinMaxCurveVector3;
+        range: Vector2;
+        sizeMultiplier: number;
+        x: MinMaxCurve;
+        xMultiplier: number;
+        y: MinMaxCurve;
+        yMultiplier: number;
+        z: MinMaxCurve;
+        zMultiplier: number;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6759,12 +6827,12 @@ declare namespace gd3d.framework {
         calculateProbability(): boolean;
     }
 }
-interface Array<T> {
-    unique(compare?: (a: T, b: T) => boolean): this;
-    delete(item: T): number;
-    concatToSelf(...items: (T | ConcatArray<T>)[]): this;
-    equal(arr: ArrayLike<T>): boolean;
-    replace(a: T, b: T, isAdd?: boolean): this;
+interface ArrayConstructor {
+    unique<T>(array: T[], compare?: (a: T, b: T) => boolean): T[];
+    delete<T>(array: T[], item: T): number;
+    concatToSelf<T>(array: T[], ...items: (T | ConcatArray<T>)[]): T[];
+    equal<T>(array: T[], arr: ArrayLike<T>): boolean;
+    replace<T>(array: T[], a: T, b: T, isAdd?: boolean): T[];
 }
 interface Math {
     DEG2RAD: number;
@@ -6821,6 +6889,20 @@ declare namespace gd3d.framework {
         readonly disposed: boolean;
         dispose(): void;
     }
+}
+declare namespace gd3d.framework {
+    function watch(onChange: string): (target: any, property: string) => void;
+    var watcher: Watcher;
+    class Watcher {
+        watch<T, K extends (keyof T & string), V extends T[K]>(object: T, property: K, handler: (object: T, property: string, oldvalue: V) => void, thisObject?: any): void;
+        unwatch<T, K extends (keyof T & string), V extends T[K]>(object: T, property: K, handler?: (object: T, property: string, oldvalue: V) => void, thisObject?: any): void;
+        watchchain(object: any, property: string, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
+        unwatchchain(object: any, property: string, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
+        watchobject<T>(object: T, property: gPartial<T>, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
+        unwatchobject<T>(object: T, property: gPartial<T>, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
+    }
+    const __watchs__ = "__watchs__";
+    const __watchchains__ = "__watchchains__";
 }
 declare namespace gd3d.framework {
     class ParticleSystemShapeBase {

@@ -97,7 +97,7 @@ namespace gd3d.framework
         /**
          * 将 Vector3 的成员设置为指定值
          */
-        init(x: number, y: number, z: number)
+        set(x: number, y: number, z: number)
         {
             this.x = x;
             this.y = y;
@@ -143,6 +143,20 @@ namespace gd3d.framework
         {
             if (a == vout) a = a.clone();
             return vout.copy(this).add(a);
+        }
+
+        /**
+         * Scale a vector and add it to this vector. Save the result in "this". (this = this + vector * scalar)
+         * @param scalar
+         * @param vector
+         * @param  target The vector to save the result in.
+         */
+        addScaledVector(scalar: number, vector: Vector3)
+        {
+            this.x = this.x + scalar * vector.x;
+            this.y = this.y + scalar * vector.y;
+            this.z = this.z + scalar * vector.z;
+            return this;
         }
 
         /**
@@ -197,7 +211,7 @@ namespace gd3d.framework
          */
         cross(a: Vector3): Vector3
         {
-            return this.init(this.y * a.z - this.z * a.y, this.z * a.x - this.x * a.z, this.x * a.y - this.y * a.x);
+            return this.set(this.y * a.z - this.z * a.y, this.z * a.x - this.x * a.z, this.x * a.y - this.y * a.x);
         }
 
         /**
@@ -234,23 +248,23 @@ namespace gd3d.framework
             {
                 var n = new Vector3();
                 var inorm = 1 / norm;
-                n.init(this.x * inorm, this.y * inorm, this.z * inorm);
+                n.set(this.x * inorm, this.y * inorm, this.z * inorm);
                 var randVec = new Vector3();
                 if (Math.abs(n.x) < 0.9)
                 {
-                    randVec.init(1, 0, 0);
+                    randVec.set(1, 0, 0);
                     n.crossTo(randVec, t1);
                 } else
                 {
-                    randVec.init(0, 1, 0);
+                    randVec.set(0, 1, 0);
                     n.crossTo(randVec, t1);
                 }
                 n.crossTo(t1, t2);
             } else
             {
                 // The normal length is zero, make something up
-                t1.init(1, 0, 0);
-                t2.init(0, 1, 0);
+                t1.set(1, 0, 0);
+                t2.set(0, 1, 0);
             }
         }
 

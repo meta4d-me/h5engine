@@ -473,16 +473,16 @@ namespace gd3d.framework
             //
             var birthRateAtDuration = particle.birthRateAtDuration;
 
-            particle.position.init(0, 0, 0);
-            particle.velocity.init(0, 0, this.startSpeed.getValue(birthRateAtDuration));
-            particle.acceleration.init(0, 0, 0);
+            particle.position.set(0, 0, 0);
+            particle.velocity.set(0, 0, this.startSpeed.getValue(birthRateAtDuration));
+            particle.acceleration.set(0, 0, 0);
             if (this.useStartSize3D)
             {
                 particle.startSize.copy(this.startSize3D.getValue(birthRateAtDuration));
             } else
             {
                 var startSize = this.startSize.getValue(birthRateAtDuration);
-                particle.startSize.init(startSize, startSize, startSize);
+                particle.startSize.set(startSize, startSize, startSize);
             }
 
             //
@@ -492,9 +492,9 @@ namespace gd3d.framework
             } else
             {
                 var startRotation = this.startRotation.getValue(birthRateAtDuration);
-                particle.rotation.init(0, 0, startRotation);
+                particle.rotation.set(0, 0, startRotation);
             }
-            particle.angularVelocity.init(0, 0, 0);
+            particle.angularVelocity.set(0, 0, 0);
             //
             particle.startColor.copy(this.startColor.getValue(birthRateAtDuration));
         }

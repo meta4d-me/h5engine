@@ -1,29 +1,34 @@
+/// <reference path="ParticleModule.ts" />
+
 namespace gd3d.framework
 {
     /**
-     * 粒子系统 旋转角度随时间变化模块
-     * 
-     * @author feng3d
+     * 粒子系统 旋转角度随速度变化模块
      */
-    export class ParticleRotationOverLifetimeModule extends ParticleModule
+    export class ParticleRotationBySpeedModule extends ParticleModule
     {
         /**
-         * Set the rotation over lifetime on each axis separately.
-         * 在每个轴上分别设置基于生命周期的旋转。
+         * Set the rotation by speed on each axis separately.
+         * 在每个轴上分别设置随速度变化的旋转。
          */
-        
         separateAxes = false;
 
         /**
-         * 角速度，基于生命周期的旋转。
+         * 角速度，随速度变化的旋转。
          */
-        
         angularVelocity = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 }, yCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 }, zCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 } });
 
         /**
-         * Rotation over lifetime curve for the X axis.
+         * Apply the rotation curve between these minimum and maximum speeds.
          * 
-         * X轴的旋转寿命曲线。
+         * 在这些最小和最大速度之间应用旋转曲线。
+         */
+        range = new Vector2(0, 1);
+
+        /**
+         * Rotation by speed curve for the X axis.
+         * 
+         * X轴的旋转随速度变化曲线。
          */
         get x()
         {
@@ -51,9 +56,9 @@ namespace gd3d.framework
         }
 
         /**
-         * Rotation over lifetime curve for the Y axis.
+         * Rotation by speed curve for the Y axis.
          * 
-         * Y轴的旋转寿命曲线。
+         * Y轴的旋转随速度变化曲线。
          */
         get y()
         {
@@ -81,9 +86,9 @@ namespace gd3d.framework
         }
 
         /**
-         * Rotation over lifetime curve for the Z axis.
+         * Rotation by speed curve for the Z axis.
          * 
-         * Z轴的旋转寿命曲线。
+         * Z轴的旋转随速度变化曲线。
          */
         get z()
         {
@@ -116,8 +121,8 @@ namespace gd3d.framework
          */
         initParticleState(particle: Particle1)
         {
-            particle[_RotationOverLifetime_rate] = Math.random();
-            particle[_RotationOverLifetime_preAngularVelocity] = new Vector3();
+            particle[_RotationBySpeed_rate] = Math.random();
+            particle[_RotationBySpeed_preAngularVelocity] = new Vector3();
         }
 
         /**
@@ -126,12 +131,15 @@ namespace gd3d.framework
          */
         updateParticleState(particle: Particle1)
         {
-            var preAngularVelocity: Vector3 = particle[_RotationOverLifetime_preAngularVelocity];
+            var preAngularVelocity: Vector3 = particle[_RotationBySpeed_preAngularVelocity];
             particle.angularVelocity.sub(preAngularVelocity);
             preAngularVelocity.set(0, 0, 0);
             if (!this.enabled) return;
 
-            var v = this.angularVelocity.getValue(particle.rateAtLifeTime, particle[_RotationOverLifetime_rate]);
+            var velocity = particle.velocity.length;
+            var rate = Math.clamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
+
+            var v = this.angularVelocity.getValue(rate, particle[_RotationBySpeed_rate]);
             if (!this.separateAxes)
             {
                 v.x = v.y = 0;
@@ -140,6 +148,6 @@ namespace gd3d.framework
             preAngularVelocity.copy(v);
         }
     }
-    var _RotationOverLifetime_rate = "_RotationOverLifetime_rate";
-    var _RotationOverLifetime_preAngularVelocity = "_RotationOverLifetime_preAngularVelocity";
+    var _RotationBySpeed_rate = "_RotationBySpeed_rate";
+    var _RotationBySpeed_preAngularVelocity = "_RotationBySpeed_preAngularVelocity";
 }

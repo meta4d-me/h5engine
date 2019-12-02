@@ -3,12 +3,12 @@ namespace gd3d.framework
     /**
      * The Inherit Velocity Module controls how the velocity of the emitter is transferred to the particles as they are emitted.
      * 
-     * 遗传速度模块控制发射体的速度在粒子发射时如何传递到粒子上。
-     * 
-     * @author feng3d
+     * 遗传速度模块控制发射体的速度在粒子发射时如何传递到粒子上。（只有粒子系统在世界空间中模拟时生效）
      */
-    export class InheritVelocityModule extends ParticleModule
+    export class ParticleInheritVelocityModule extends ParticleModule
     {
+        "__class__": "feng3d.ParticleInheritVelocityModule" = "feng3d.ParticleInheritVelocityModule";
+
         /**
          * How to apply emitter velocity to particles.
          * 
@@ -53,5 +53,35 @@ namespace gd3d.framework
             this.multiplier.curveMultiplier = v;
         }
 
+        /**
+         * 初始化粒子状态
+         * @param particle 粒子
+         */
+        initParticleState(particle: Particle1)
+        {
+            particle[_InheritVelocity_rate] = Math.random();
+
+            if (!this.enabled) return;
+            if (this.particleSystem.main.simulationSpace == ParticleSystemSimulationSpace.Local) return;
+            if (this.mode != ParticleSystemInheritVelocityMode.Initial) return;
+
+            var multiplier = this.multiplier.getValue(particle.rateAtLifeTime, particle[_InheritVelocity_rate]);
+            particle.velocity.addScaledVector(multiplier, this.particleSystem.speed);
+        }
+
+        /**
+         * 更新粒子状态
+         * @param particle 粒子
+         */
+        updateParticleState(particle: Particle1)
+        {
+            if (!this.enabled) return;
+            if (this.particleSystem.main.simulationSpace == ParticleSystemSimulationSpace.Local) return;
+            if (this.mode != ParticleSystemInheritVelocityMode.Current) return;
+
+            var multiplier = this.multiplier.getValue(particle.rateAtLifeTime, particle[_InheritVelocity_rate]);
+            particle.position.addScaledVector(multiplier, this.particleSystem.moveVec);
+        }
     }
+    var _InheritVelocity_rate = "_InheritVelocity_rate";
 }

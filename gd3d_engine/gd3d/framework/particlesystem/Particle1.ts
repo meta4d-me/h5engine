@@ -84,6 +84,11 @@ namespace gd3d.framework
 		rateAtLifeTime: number;
 
 		/**
+		 * 缓存，用于存储计算时临时数据
+		 */
+		cache = {};
+
+		/**
 		 * 更新状态
 		 */
 		updateState(preTime: number, time: number)

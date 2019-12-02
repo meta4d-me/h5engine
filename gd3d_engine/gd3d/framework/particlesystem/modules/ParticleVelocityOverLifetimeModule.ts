@@ -136,7 +136,7 @@ namespace gd3d.framework
         {
             var preVelocity: Vector3 = particle[_VelocityOverLifetime_preVelocity];
             particle.velocity.sub(preVelocity);
-            preVelocity.init(0, 0, 0);
+            preVelocity.set(0, 0, 0);
             if (!this.enabled) return;
 
             var velocity = this.velocity.getValue(particle.rateAtLifeTime, particle[_VelocityOverLifetime_rate]);
