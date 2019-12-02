@@ -10,6 +10,8 @@ namespace gd3d.framework
      */
     export class Vector2
     {
+        "__class__": "gd3d.framework.Vector2" = "gd3d.framework.Vector2";
+
         /**
          * 原点
          */

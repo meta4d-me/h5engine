@@ -7,7 +7,7 @@ namespace gd3d.framework
      */
     export class ParticleInheritVelocityModule extends ParticleModule
     {
-        "__class__": "feng3d.ParticleInheritVelocityModule" = "feng3d.ParticleInheritVelocityModule";
+        "__class__": "gd3d.framework.ParticleInheritVelocityModule" = "gd3d.framework.ParticleInheritVelocityModule";
 
         /**
          * How to apply emitter velocity to particles.

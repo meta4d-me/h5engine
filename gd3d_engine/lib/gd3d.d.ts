@@ -6340,6 +6340,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class Vector2 {
+        "__class__": "gd3d.framework.Vector2";
         static ZERO: Vector2;
         static polar(len: number, angle: number): Vector2;
         constructor(x?: number, y?: number);
@@ -6594,7 +6595,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class ParticleInheritVelocityModule extends ParticleModule {
-        "__class__": "feng3d.ParticleInheritVelocityModule";
+        "__class__": "gd3d.framework.ParticleInheritVelocityModule";
         mode: ParticleSystemInheritVelocityMode;
         multiplier: MinMaxCurve;
         curve: MinMaxCurve;
