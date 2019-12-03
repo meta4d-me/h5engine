@@ -481,6 +481,9 @@ namespace gd3d.framework
 
             mesh.glMesh.bindVboBuffer(context.webgl);
 
+            // 获取批量渲染扩展
+            var isSupportDrawInstancedArrays = !!context.webgl.getExtension("ANGLE_instanced_arrays");
+
             if (!this._awaked)
             {
                 this._isPlaying = this.main.playOnAwake;
@@ -524,15 +527,18 @@ namespace gd3d.framework
                 tilingOffsets.push(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w);
                 flipUVs.push(particle.flipUV.x, particle.flipUV.y);
 
-                this.material.setVector4("a_particle_position", new math.vector4(particle.position.x, particle.position.y, particle.position.z, 1));
-                this.material.setVector4("a_particle_scale", new math.vector4(particle.size.x, particle.size.y, particle.size.z, 1));
-                this.material.setVector4("a_particle_rotation", new math.vector4(particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1));
-                this.material.setVector4("a_particle_color", new math.vector4(particle.color.r, particle.color.g, particle.color.b, particle.color.a));
-                this.material.setVector4("a_particle_tilingOffset", new math.vector4(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w));
-                this.material.setVector4("a_particle_flipUV", new math.vector4(particle.flipUV.x, particle.flipUV.y, 0, 0));
-                this.material.setMatrix("u_particle_billboardMatrix", new math.matrix(billboardMatrix.rawData.concat()))
+                if (!isSupportDrawInstancedArrays)
+                {
+                    this.material.setVector4("a_particle_position", new math.vector4(particle.position.x, particle.position.y, particle.position.z, 1));
+                    this.material.setVector4("a_particle_scale", new math.vector4(particle.size.x, particle.size.y, particle.size.z, 1));
+                    this.material.setVector4("a_particle_rotation", new math.vector4(particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1));
+                    this.material.setVector4("a_particle_color", new math.vector4(particle.color.r, particle.color.g, particle.color.b, particle.color.a));
+                    this.material.setVector4("a_particle_tilingOffset", new math.vector4(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w));
+                    this.material.setVector4("a_particle_flipUV", new math.vector4(particle.flipUV.x, particle.flipUV.y, 0, 0));
+                    this.material.setMatrix("u_particle_billboardMatrix", new math.matrix(billboardMatrix.rawData.concat()))
 
-                this.material.draw(context, mesh, subMeshs[0]);
+                    this.material.draw(context, mesh, subMeshs[0]);
+                }
             }
 
             if (isbillboard)
@@ -541,6 +547,15 @@ namespace gd3d.framework
                 {
                     rotations[i + 2] = -rotations[i + 2];
                 }
+            }
+
+            if (isSupportDrawInstancedArrays)
+            {
+                this.material.getShader()
+                
+                context.webgl.getAttribLocation()
+
+                this.material.draw(context, mesh, subMeshs[0], "base", this.particleCount);
             }
         }
 

@@ -2374,7 +2374,7 @@ declare namespace gd3d.framework {
         private uniformDirtyMap;
         private static lastDrawMatID;
         private static lastDrawMeshID;
-        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string): void;
+        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, instanceCount?: number): void;
         Parse(assetmgr: assetMgr, json: any, bundleName?: string): this;
         clone(): material;
         save(): string;
@@ -8447,10 +8447,10 @@ declare namespace gd3d.render {
         uploadVertexData(webgl: WebGLRenderingContext, varray: Float32Array): void;
         uploadIndexSubData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array, offset?: number): void;
         uploadIndexData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array): void;
-        drawArrayTris(webgl: WebGLRenderingContext, start?: number, count?: number): void;
-        drawArrayLines(webgl: WebGLRenderingContext, start?: number, count?: number): void;
-        drawElementTris(webgl: WebGLRenderingContext, start?: number, count?: number): void;
-        drawElementLines(webgl: WebGLRenderingContext, start?: number, count?: number): void;
+        drawArrayTris(webgl: WebGLRenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        drawArrayLines(webgl: WebGLRenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        drawElementTris(webgl: WebGLRenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        drawElementLines(webgl: WebGLRenderingContext, start?: number, count?: number, instanceCount?: number): void;
     }
 }
 declare namespace gd3d.render {

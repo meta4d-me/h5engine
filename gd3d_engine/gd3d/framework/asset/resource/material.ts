@@ -495,9 +495,11 @@ namespace gd3d.framework
          * @param context 渲染上下文
          * @param mesh 渲染的mesh
          * @param sm 渲染的submesh信息
+         * 
+         * @param instanceCount 批量渲染时绘制数量
          * @version gd3d 1.0
          */
-        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base")
+        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base", instanceCount = 1)
         {
             let matGUID= this.getGUID();
             let meshGUID= mesh.getGUID();
@@ -532,22 +534,22 @@ namespace gd3d.framework
                 {
                     if (sm.line)
                     {
-                        mesh.glMesh.drawArrayLines(context.webgl, sm.start, sm.size);
+                        mesh.glMesh.drawArrayLines(context.webgl, sm.start, sm.size, instanceCount);
                     }
                     else
                     {
-                        mesh.glMesh.drawArrayTris(context.webgl, sm.start, sm.size);
+                        mesh.glMesh.drawArrayTris(context.webgl, sm.start, sm.size, instanceCount);
                     }
                 }
                 else
                 {
                     if (sm.line)
                     {
-                        mesh.glMesh.drawElementLines(context.webgl, sm.start, sm.size);
+                        mesh.glMesh.drawElementLines(context.webgl, sm.start, sm.size, instanceCount);
                     }
                     else
                     {
-                        mesh.glMesh.drawElementTris(context.webgl, sm.start, sm.size);
+                        mesh.glMesh.drawElementTris(context.webgl, sm.start, sm.size, instanceCount);
                     }
                 }
             }

@@ -143,6 +143,9 @@ namespace gd3d.render
             this.posBlendIndex4 = webgl.getAttribLocation(this.program, "_glesBlendIndex4");//未测试
             this.posBlendWeight4 = webgl.getAttribLocation(this.program, "_glesBlendWeight4");//未测试
             this.posColorEx = webgl.getAttribLocation(this.program, "_glesColorEx");
+
+
+            this["xxx"] = webgl.getAttribLocation(this.program, "xxx");
         }
         vs: glShader;
         fs: glShader;

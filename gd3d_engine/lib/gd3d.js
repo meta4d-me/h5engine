@@ -12314,8 +12314,9 @@ var gd3d;
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
                 }
             };
-            material.prototype.draw = function (context, mesh, sm, basetype) {
+            material.prototype.draw = function (context, mesh, sm, basetype, instanceCount) {
                 if (basetype === void 0) { basetype = "base"; }
+                if (instanceCount === void 0) { instanceCount = 1; }
                 var matGUID = this.getGUID();
                 var meshGUID = mesh.getGUID();
                 var LastMatSame = matGUID == material_2.lastDrawMatID;
@@ -12339,18 +12340,18 @@ var gd3d;
                     framework.DrawCallInfo.inc.add();
                     if (sm.useVertexIndex < 0) {
                         if (sm.line) {
-                            mesh.glMesh.drawArrayLines(context.webgl, sm.start, sm.size);
+                            mesh.glMesh.drawArrayLines(context.webgl, sm.start, sm.size, instanceCount);
                         }
                         else {
-                            mesh.glMesh.drawArrayTris(context.webgl, sm.start, sm.size);
+                            mesh.glMesh.drawArrayTris(context.webgl, sm.start, sm.size, instanceCount);
                         }
                     }
                     else {
                         if (sm.line) {
-                            mesh.glMesh.drawElementLines(context.webgl, sm.start, sm.size);
+                            mesh.glMesh.drawElementLines(context.webgl, sm.start, sm.size, instanceCount);
                         }
                         else {
-                            mesh.glMesh.drawElementTris(context.webgl, sm.start, sm.size);
+                            mesh.glMesh.drawElementTris(context.webgl, sm.start, sm.size, instanceCount);
                         }
                     }
                 }
@@ -30104,6 +30105,7 @@ var gd3d;
                 if (subMeshs == null)
                     return;
                 mesh.glMesh.bindVboBuffer(context.webgl);
+                var isSupportDrawInstancedArrays = !!context.webgl.getExtension("ANGLE_instanced_arrays");
                 if (!this._awaked) {
                     this._isPlaying = this.main.playOnAwake;
                     this._awaked = true;
@@ -30130,19 +30132,26 @@ var gd3d;
                     colors.push(particle.color.r, particle.color.g, particle.color.b, particle.color.a);
                     tilingOffsets.push(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w);
                     flipUVs.push(particle.flipUV.x, particle.flipUV.y);
-                    this.material.setVector4("a_particle_position", new gd3d.math.vector4(particle.position.x, particle.position.y, particle.position.z, 1));
-                    this.material.setVector4("a_particle_scale", new gd3d.math.vector4(particle.size.x, particle.size.y, particle.size.z, 1));
-                    this.material.setVector4("a_particle_rotation", new gd3d.math.vector4(particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1));
-                    this.material.setVector4("a_particle_color", new gd3d.math.vector4(particle.color.r, particle.color.g, particle.color.b, particle.color.a));
-                    this.material.setVector4("a_particle_tilingOffset", new gd3d.math.vector4(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w));
-                    this.material.setVector4("a_particle_flipUV", new gd3d.math.vector4(particle.flipUV.x, particle.flipUV.y, 0, 0));
-                    this.material.setMatrix("u_particle_billboardMatrix", new gd3d.math.matrix(billboardMatrix.rawData.concat()));
-                    this.material.draw(context, mesh, subMeshs[0]);
+                    if (!isSupportDrawInstancedArrays) {
+                        this.material.setVector4("a_particle_position", new gd3d.math.vector4(particle.position.x, particle.position.y, particle.position.z, 1));
+                        this.material.setVector4("a_particle_scale", new gd3d.math.vector4(particle.size.x, particle.size.y, particle.size.z, 1));
+                        this.material.setVector4("a_particle_rotation", new gd3d.math.vector4(particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1));
+                        this.material.setVector4("a_particle_color", new gd3d.math.vector4(particle.color.r, particle.color.g, particle.color.b, particle.color.a));
+                        this.material.setVector4("a_particle_tilingOffset", new gd3d.math.vector4(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w));
+                        this.material.setVector4("a_particle_flipUV", new gd3d.math.vector4(particle.flipUV.x, particle.flipUV.y, 0, 0));
+                        this.material.setMatrix("u_particle_billboardMatrix", new gd3d.math.matrix(billboardMatrix.rawData.concat()));
+                        this.material.draw(context, mesh, subMeshs[0]);
+                    }
                 }
                 if (isbillboard) {
                     for (var i = 0, n = rotations.length; i < n; i += 3) {
                         rotations[i + 2] = -rotations[i + 2];
                     }
+                }
+                if (isSupportDrawInstancedArrays) {
+                    this.material.getShader();
+                    context.webgl.getAttribLocation();
+                    this.material.draw(context, mesh, subMeshs[0], "base", this.particleCount);
                 }
             };
             Object.defineProperty(ParticleSystem.prototype, "rateAtDuration", {
@@ -43123,39 +43132,63 @@ var gd3d;
                 webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
                 webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, data, this.mode);
             };
-            glMesh.prototype.drawArrayTris = function (webgl, start, count) {
+            glMesh.prototype.drawArrayTris = function (webgl, start, count, instanceCount) {
                 if (start === void 0) { start = 0; }
                 if (count === void 0) { count = -1; }
+                if (instanceCount === void 0) { instanceCount = 1; }
                 if (count < 0)
                     count = ((this.vertexCount / 3) | 0) * 3;
                 drawInfo.ins.triCount += count / 3;
                 drawInfo.ins.renderCount++;
-                webgl.drawArrays(webgl.TRIANGLES, start, count);
+                if (instanceCount > 1 && webgl.getExtension("ANGLE_instanced_arrays") != null) {
+                    webgl.getExtension("ANGLE_instanced_arrays").drawArraysInstancedANGLE(webgl.TRIANGLES, start, count, instanceCount);
+                }
+                else {
+                    webgl.drawArrays(webgl.TRIANGLES, start, count);
+                }
             };
-            glMesh.prototype.drawArrayLines = function (webgl, start, count) {
+            glMesh.prototype.drawArrayLines = function (webgl, start, count, instanceCount) {
                 if (start === void 0) { start = 0; }
                 if (count === void 0) { count = -1; }
+                if (instanceCount === void 0) { instanceCount = 1; }
                 if (count < 0)
                     count = ((this.vertexCount / 2) | 0) * 2;
                 drawInfo.ins.renderCount++;
-                webgl.drawArrays(webgl.LINES, start, count);
+                if (instanceCount > 1 && webgl.getExtension("ANGLE_instanced_arrays") != null) {
+                    webgl.getExtension("ANGLE_instanced_arrays").drawArraysInstancedANGLE(webgl.LINES, start, count, instanceCount);
+                }
+                else {
+                    webgl.drawArrays(webgl.LINES, start, count);
+                }
             };
-            glMesh.prototype.drawElementTris = function (webgl, start, count) {
+            glMesh.prototype.drawElementTris = function (webgl, start, count, instanceCount) {
                 if (start === void 0) { start = 0; }
                 if (count === void 0) { count = -1; }
+                if (instanceCount === void 0) { instanceCount = 1; }
                 if (count < 0)
                     count = ((this.indexCounts[this.bindIndex] / 3) | 0) * 3;
                 drawInfo.ins.triCount += count / 3;
                 drawInfo.ins.renderCount++;
-                webgl.drawElements(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2);
+                if (instanceCount > 1 && webgl.getExtension("ANGLE_instanced_arrays") != null) {
+                    webgl.getExtension("ANGLE_instanced_arrays").drawElementsInstancedANGLE(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
+                }
+                else {
+                    webgl.drawElements(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2);
+                }
             };
-            glMesh.prototype.drawElementLines = function (webgl, start, count) {
+            glMesh.prototype.drawElementLines = function (webgl, start, count, instanceCount) {
                 if (start === void 0) { start = 0; }
                 if (count === void 0) { count = -1; }
+                if (instanceCount === void 0) { instanceCount = 1; }
                 if (count < 0)
                     count = ((this.indexCounts[this.bindIndex] / 2) | 0) * 2;
                 drawInfo.ins.renderCount++;
-                webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);
+                if (instanceCount > 1 && webgl.getExtension("ANGLE_instanced_arrays") != null) {
+                    webgl.getExtension("ANGLE_instanced_arrays").drawElementsInstancedANGLE(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
+                }
+                else {
+                    webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);
+                }
             };
             return glMesh;
         }());

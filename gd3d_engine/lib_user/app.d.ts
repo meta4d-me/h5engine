@@ -626,6 +626,11 @@ declare class test_ParticleSystem_particles_additive {
     static vscode: string;
     static fscode: string;
 }
+declare class test_ParticleSystem_particles_additive_drawInstanced {
+    static initShader(assetmgr: gd3d.framework.assetMgr, pool: gd3d.render.shaderPool): gd3d.framework.shader;
+    static vscode: string;
+    static fscode: string;
+}
 declare class test_RangeScreen implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
