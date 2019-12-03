@@ -12314,9 +12314,9 @@ var gd3d;
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
                 }
             };
-            material.prototype.draw = function (context, mesh, sm, basetype, instanceCount) {
+            material.prototype.draw = function (context, mesh, sm, basetype, drawInstanceInfo) {
                 if (basetype === void 0) { basetype = "base"; }
-                if (instanceCount === void 0) { instanceCount = 1; }
+                if (drawInstanceInfo === void 0) { drawInstanceInfo = undefined; }
                 var matGUID = this.getGUID();
                 var meshGUID = mesh.getGUID();
                 var LastMatSame = matGUID == material_2.lastDrawMatID;
@@ -12331,12 +12331,14 @@ var gd3d;
                             return;
                     }
                 }
+                var instanceCount = (drawInstanceInfo && drawInstanceInfo.instanceCount) || 1;
                 for (var i = 0, l = drawPasses.length; i < l; i++) {
                     var pass = drawPasses[i];
                     pass.use(context.webgl);
                     this.uploadUnifoms(pass, context, LastMatSame);
                     if (!LastMatSame || !LastMeshSame)
                         mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
+                    drawInstanceInfo && drawInstanceInfo.activeAttributes(pass.program.program);
                     framework.DrawCallInfo.inc.add();
                     if (sm.useVertexIndex < 0) {
                         if (sm.line) {
@@ -12354,6 +12356,7 @@ var gd3d;
                             mesh.glMesh.drawElementTris(context.webgl, sm.start, sm.size, instanceCount);
                         }
                     }
+                    drawInstanceInfo && drawInstanceInfo.disableAttributes(pass.program.program);
                 }
                 material_2.lastDrawMatID = matGUID;
                 material_2.lastDrawMeshID = meshGUID;
@@ -29774,6 +29777,15 @@ var gd3d;
                 _this.time = 0;
                 _this.startDelay = 0;
                 _this._startDelay_rate = Math.random();
+                _this._vbos = [];
+                _this._attributes = [
+                    ["a_particle_position", 4],
+                    ["a_particle_scale", 4],
+                    ["a_particle_rotation", 4],
+                    ["a_particle_color", 4],
+                    ["a_particle_tilingOffset", 4],
+                    ["a_particle_flipUV", 4],
+                ];
                 _this._awaked = false;
                 _this._realTime = 0;
                 _this._preRealTime = 0;
@@ -30089,6 +30101,7 @@ var gd3d;
                 }
             };
             ParticleSystem.prototype.render = function (context, assetmgr, camera) {
+                var _this = this;
                 var localToWorldMatrix = this.localToWorldMatrix = new framework.Matrix4x4(this.transform.getWorldMatrix().rawData.concat());
                 var worldToLocalMatrix = this.worldToLocalMatrix = localToWorldMatrix.clone().invert();
                 framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.EffectSystem;
@@ -30118,20 +30131,23 @@ var gd3d;
                     var localCameraUp = worldToLocalMatrix.deltaTransformVector(cameraMatrix.up);
                     billboardMatrix.lookAt(localCameraForward, localCameraUp);
                 }
+                this.material.setMatrix("u_particle_billboardMatrix", new gd3d.math.matrix(billboardMatrix.rawData.concat()));
                 var positions = [];
                 var scales = [];
                 var rotations = [];
                 var colors = [];
                 var tilingOffsets = [];
                 var flipUVs = [];
-                for (var i_7 = 0, n_1 = this._activeParticles.length; i_7 < n_1; i_7++) {
-                    var particle = this._activeParticles[i_7];
+                var data = [];
+                for (var i = 0, n = this._activeParticles.length; i < n; i++) {
+                    var particle = this._activeParticles[i];
                     positions.push(particle.position.x, particle.position.y, particle.position.z);
                     scales.push(particle.size.x, particle.size.y, particle.size.z);
                     rotations.push(particle.rotation.x, particle.rotation.y, particle.rotation.z);
                     colors.push(particle.color.r, particle.color.g, particle.color.b, particle.color.a);
                     tilingOffsets.push(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w);
                     flipUVs.push(particle.flipUV.x, particle.flipUV.y);
+                    data.push(particle.position.x, particle.position.y, particle.position.z, 1, particle.size.x, particle.size.y, particle.size.z, 1, particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1, particle.color.r, particle.color.g, particle.color.b, particle.color.a, particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w, particle.flipUV.x, particle.flipUV.y, 0, 0);
                     if (!isSupportDrawInstancedArrays) {
                         this.material.setVector4("a_particle_position", new gd3d.math.vector4(particle.position.x, particle.position.y, particle.position.z, 1));
                         this.material.setVector4("a_particle_scale", new gd3d.math.vector4(particle.size.x, particle.size.y, particle.size.z, 1));
@@ -30139,20 +30155,46 @@ var gd3d;
                         this.material.setVector4("a_particle_color", new gd3d.math.vector4(particle.color.r, particle.color.g, particle.color.b, particle.color.a));
                         this.material.setVector4("a_particle_tilingOffset", new gd3d.math.vector4(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w));
                         this.material.setVector4("a_particle_flipUV", new gd3d.math.vector4(particle.flipUV.x, particle.flipUV.y, 0, 0));
-                        this.material.setMatrix("u_particle_billboardMatrix", new gd3d.math.matrix(billboardMatrix.rawData.concat()));
                         this.material.draw(context, mesh, subMeshs[0]);
                     }
                 }
-                if (isbillboard) {
-                    for (var i = 0, n = rotations.length; i < n; i += 3) {
-                        rotations[i + 2] = -rotations[i + 2];
-                    }
-                }
+                console.assert(data.length == 24 * this._activeParticles.length);
                 if (isSupportDrawInstancedArrays) {
-                    this.material.getShader();
-                    context.webgl.getAttribLocation();
-                    this.material.draw(context, mesh, subMeshs[0], "base", this.particleCount);
+                    var gl = context.webgl;
+                    var vbo = this._getVBO(gl);
+                    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.DYNAMIC_DRAW);
+                    var drawInstanceInfo = {
+                        instanceCount: this.particleCount,
+                        activeAttributes: function (program) {
+                            var offset = 0;
+                            var stride = _this._attributes.reduce(function (pv, cv) { return pv += cv[1]; }, 0) * 4;
+                            _this._attributes.forEach(function (element) {
+                                var location = gl.getAttribLocation(program, element[0]);
+                                gl.enableVertexAttribArray(location);
+                                gl.vertexAttribPointer(location, element[1], gl.FLOAT, false, stride, offset);
+                                gl.getExtension("ANGLE_instanced_arrays").vertexAttribDivisorANGLE(location, 1);
+                                offset += element[1] * 4;
+                            });
+                        },
+                        disableAttributes: function (program) {
+                            _this._attributes.forEach(function (element) {
+                                var location = gl.getAttribLocation(program, element[0]);
+                                gl.disableVertexAttribArray(location);
+                            });
+                        }
+                    };
+                    this.material.draw(context, mesh, subMeshs[0], "base", drawInstanceInfo);
                 }
+            };
+            ParticleSystem.prototype._getVBO = function (gl) {
+                for (var i = 0, n = this._vbos.length; i < n; i++) {
+                    if (this._vbos[i][0] == gl)
+                        return this._vbos[i][1];
+                }
+                var vbo = gl.createBuffer();
+                this._vbos.push([gl, vbo]);
+                return vbo;
             };
             Object.defineProperty(ParticleSystem.prototype, "rateAtDuration", {
                 get: function () {
@@ -30222,8 +30264,8 @@ var gd3d;
                     }
                     var inCycleStart = startTime - cycleStartTime;
                     var inCycleEnd = endTime - cycleStartTime;
-                    for (var i_8 = 0; i_8 < bursts.length; i_8++) {
-                        var burst = bursts[i_8];
+                    for (var i_7 = 0; i_7 < bursts.length; i_7++) {
+                        var burst = bursts[i_7];
                         if (burst.isProbability && inCycleStart <= burst.time && burst.time < inCycleEnd) {
                             emits.push({ time: cycleStartTime + burst.time, num: burst.count.getValue(rateAtDuration) });
                         }
@@ -31543,7 +31585,7 @@ var gd3d;
                         var nsp = sps.shift();
                         var ps0 = [];
                         ps0[0] = nfp;
-                        for (var j = 0, n_2 = pps.length; j < n_2; j++) {
+                        for (var j = 0, n_1 = pps.length; j < n_1; j++) {
                             ps0[j + 1] = ps0[j] + (pps[j] - ps0[j]) / t;
                         }
                         var ps1 = [];
@@ -31552,16 +31594,16 @@ var gd3d;
                             ps1[j] = ps1[j + 1] - (ps1[j + 1] - pps[j]) / (1 - t);
                         }
                         if (mergeType == 1) {
-                            for (var j = 0, n_3 = ps0.length - 1; j <= n_3; j++) {
-                                ps[j] = (ps0[j] * (n_3 - j) + ps1[j] * j) / n_3;
+                            for (var j = 0, n_2 = ps0.length - 1; j <= n_2; j++) {
+                                ps[j] = (ps0[j] * (n_2 - j) + ps1[j] * j) / n_2;
                             }
                         }
                         else if (mergeType == 0) {
-                            for (var j = 0, n_4 = ps0.length - 1; j <= n_4; j++) {
-                                if (j < n_4 / 2) {
+                            for (var j = 0, n_3 = ps0.length - 1; j <= n_3; j++) {
+                                if (j < n_3 / 2) {
                                     ps[j] = ps0[j];
                                 }
-                                else if (j > n_4 / 2) {
+                                else if (j > n_3 / 2) {
                                     ps[j] = ps1[j];
                                 }
                                 else {
@@ -44206,6 +44248,7 @@ var gd3d;
                 this.posBlendIndex4 = webgl.getAttribLocation(this.program, "_glesBlendIndex4");
                 this.posBlendWeight4 = webgl.getAttribLocation(this.program, "_glesBlendWeight4");
                 this.posColorEx = webgl.getAttribLocation(this.program, "_glesColorEx");
+                this["xxx"] = webgl.getAttribLocation(this.program, "xxx");
             };
             glProgram.prototype.use = function (webgl) {
                 webgl.useProgram(this.program);

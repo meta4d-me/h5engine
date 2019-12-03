@@ -26,6 +26,25 @@ namespace gd3d.framework
     }
 
     /**
+     * 批量渲染相关接口
+     */
+    export interface DrawInstanceInfo
+    {
+        /**
+         * 渲染数量
+         */
+        instanceCount: number;
+        /**
+         * 启用批量渲染相关顶点属性
+         */
+        activeAttributes: (program: WebGLProgram) => void;
+        /**
+         * 禁用批量渲染相关顶点属性
+         */
+        disableAttributes: (program: WebGLProgram) => void;
+    }
+
+    /**
      * @public
      * @language zh_CN
      * @classdesc
@@ -189,12 +208,12 @@ namespace gd3d.framework
         }
 
         private static sameMatPassMap = {   glstate_matrix_model:true,
-                                            glstate_matrix_world2object:true,
-                                            glstate_matrix_modelview:true,
-                                            glstate_matrix_mvp:true,
-                                            glstate_vec4_bones:true,
-                                            glstate_matrix_bones:true
-                                        }
+            glstate_matrix_world2object:true,
+            glstate_matrix_modelview:true,
+            glstate_matrix_mvp:true,
+            glstate_vec4_bones:true,
+            glstate_matrix_bones:true
+        }
 
         uploadUnifoms(pass: render.glDrawPass, context: renderContext , lastMatSame = false)
         {
@@ -499,7 +518,7 @@ namespace gd3d.framework
          * @param instanceCount 批量渲染时绘制数量
          * @version gd3d 1.0
          */
-        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base", instanceCount = 1)
+        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base", drawInstanceInfo: DrawInstanceInfo = undefined)
         {
             let matGUID= this.getGUID();
             let meshGUID= mesh.getGUID();
@@ -518,12 +537,14 @@ namespace gd3d.framework
                         return;
                 }
             }
+            var instanceCount = (drawInstanceInfo && drawInstanceInfo.instanceCount) || 1;
             for (var i = 0, l = drawPasses.length; i < l; i++)
             {
                 var pass = drawPasses[i];
-                pass.use(context.webgl );
-                this.uploadUnifoms(pass, context , LastMatSame);
-                if(!LastMatSame || !LastMeshSame) mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
+                pass.use(context.webgl);
+                this.uploadUnifoms(pass, context, LastMatSame);
+                if (!LastMatSame || !LastMeshSame) mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
+                drawInstanceInfo && drawInstanceInfo.activeAttributes(pass.program.program);
                 //test code
                 // if(LastMatSame && LastMatSame){
                 //     console.log(`matGUID :${matGUID} , matName : ${this.name.getText()}`);
@@ -552,6 +573,7 @@ namespace gd3d.framework
                         mesh.glMesh.drawElementTris(context.webgl, sm.start, sm.size, instanceCount);
                     }
                 }
+                drawInstanceInfo && drawInstanceInfo.disableAttributes(pass.program.program);
             }
 
             material.lastDrawMatID = matGUID;

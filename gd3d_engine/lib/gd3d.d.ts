@@ -2330,6 +2330,11 @@ declare namespace gd3d.framework {
         resname: string;
         constructor(type: render.UniformTypeEnum, value: any, defaultValue?: any);
     }
+    interface DrawInstanceInfo {
+        instanceCount: number;
+        activeAttributes: (program: WebGLProgram) => void;
+        disableAttributes: (program: WebGLProgram) => void;
+    }
     class material implements IAsset {
         static readonly ClassName: string;
         private name;
@@ -2374,7 +2379,7 @@ declare namespace gd3d.framework {
         private uniformDirtyMap;
         private static lastDrawMatID;
         private static lastDrawMeshID;
-        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, instanceCount?: number): void;
+        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, drawInstanceInfo?: DrawInstanceInfo): void;
         Parse(assetmgr: assetMgr, json: any, bundleName?: string): this;
         clone(): material;
         save(): string;
@@ -5744,6 +5749,9 @@ declare namespace gd3d.framework {
         pause(): void;
         continue(): void;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        private _vbos;
+        private _getVBO;
+        private _attributes;
         private _awaked;
         private _realTime;
         private _preRealTime;

@@ -510,12 +510,15 @@ namespace gd3d.framework
                 billboardMatrix.lookAt(localCameraForward, localCameraUp);
             }
 
+            this.material.setMatrix("u_particle_billboardMatrix", new math.matrix(billboardMatrix.rawData.concat()))
+
             var positions: number[] = [];
             var scales: number[] = [];
             var rotations: number[] = [];
             var colors: number[] = [];
             var tilingOffsets: number[] = [];
             var flipUVs: number[] = [];
+            var data: number[] = [];
             for (let i = 0, n = this._activeParticles.length; i < n; i++)
             {
                 var particle = this._activeParticles[i];
@@ -527,6 +530,15 @@ namespace gd3d.framework
                 tilingOffsets.push(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w);
                 flipUVs.push(particle.flipUV.x, particle.flipUV.y);
 
+                data.push(
+                    particle.position.x, particle.position.y, particle.position.z, 1,
+                    particle.size.x, particle.size.y, particle.size.z, 1,
+                    particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1,
+                    particle.color.r, particle.color.g, particle.color.b, particle.color.a,
+                    particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w,
+                    particle.flipUV.x, particle.flipUV.y, 0, 0,
+                );
+
                 if (!isSupportDrawInstancedArrays)
                 {
                     this.material.setVector4("a_particle_position", new math.vector4(particle.position.x, particle.position.y, particle.position.z, 1));
@@ -535,29 +547,71 @@ namespace gd3d.framework
                     this.material.setVector4("a_particle_color", new math.vector4(particle.color.r, particle.color.g, particle.color.b, particle.color.a));
                     this.material.setVector4("a_particle_tilingOffset", new math.vector4(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w));
                     this.material.setVector4("a_particle_flipUV", new math.vector4(particle.flipUV.x, particle.flipUV.y, 0, 0));
-                    this.material.setMatrix("u_particle_billboardMatrix", new math.matrix(billboardMatrix.rawData.concat()))
 
                     this.material.draw(context, mesh, subMeshs[0]);
                 }
             }
 
-            if (isbillboard)
-            {
-                for (var i = 0, n = rotations.length; i < n; i += 3)
-                {
-                    rotations[i + 2] = -rotations[i + 2];
-                }
-            }
+            console.assert(data.length == 24 * this._activeParticles.length);
 
             if (isSupportDrawInstancedArrays)
             {
-                this.material.getShader()
-                
-                context.webgl.getAttribLocation()
+                var gl = context.webgl;
 
-                this.material.draw(context, mesh, subMeshs[0], "base", this.particleCount);
+                var vbo = this._getVBO(gl);
+                gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.DYNAMIC_DRAW);
+
+                var drawInstanceInfo: DrawInstanceInfo = {
+                    instanceCount: this.particleCount,
+                    activeAttributes: (program: WebGLProgram) => 
+                    {
+                        var offset = 0;
+                        var stride = this._attributes.reduce((pv, cv) => pv += cv[1], 0) * 4;
+                        this._attributes.forEach(element =>
+                        {
+                            var location = gl.getAttribLocation(program, element[0]);
+                            gl.enableVertexAttribArray(location);
+                            gl.vertexAttribPointer(location, element[1], gl.FLOAT, false, stride, offset);
+                            gl.getExtension("ANGLE_instanced_arrays").vertexAttribDivisorANGLE(location, 1);
+                            offset += element[1] * 4;
+                        });
+                    },
+                    disableAttributes: (program: WebGLProgram) =>
+                    {
+                        this._attributes.forEach(element =>
+                        {
+                            var location = gl.getAttribLocation(program, element[0]);
+                            gl.disableVertexAttribArray(location);
+                        });
+                    }
+                };
+
+                this.material.draw(context, mesh, subMeshs[0], "base", drawInstanceInfo);
             }
         }
+
+        private _vbos: [WebGLRenderingContext, WebGLBuffer][] = [];
+        private _getVBO(gl: WebGLRenderingContext)
+        {
+            for (let i = 0, n = this._vbos.length; i < n; i++)
+            {
+                if (this._vbos[i][0] == gl)
+                    return this._vbos[i][1];
+            }
+            var vbo = gl.createBuffer();
+            this._vbos.push([gl, vbo]);
+            return vbo;
+        }
+
+        private _attributes: [string, number][] = [
+            ["a_particle_position", 4],
+            ["a_particle_scale", 4],
+            ["a_particle_rotation", 4],
+            ["a_particle_color", 4],
+            ["a_particle_tilingOffset", 4],
+            ["a_particle_flipUV", 4],
+        ];
 
         private _awaked = false;
 
