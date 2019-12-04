@@ -1,31 +1,25 @@
-namespace gd3d.framework
-{
+namespace gd3d.framework {
     type loadCallback = (state?: stateLoad) => void;
     type downloadBindType = (guid: number, url: string, type: AssetTypeEnum, finish: () => void) => void;
 
     export const assetParseMap: { [key: number]: IAssetFactory } = {};
     //资源处理装饰器
-    export function assetF(type: AssetTypeEnum)
-    {
-        return function (ctor)
-        {
+    export function assetF(type: AssetTypeEnum) {
+        return function (ctor) {
             assetParseMap[type] = new ctor();
         }
     }
 
     //#region 资源类型
-    export function calcType(url: string | any): AssetTypeEnum
-    {
+    export function calcType(url: string | any): AssetTypeEnum {
         var filei = url.lastIndexOf("/");
         var file = url.substr(filei + 1);
         var i = file.indexOf(".", 0);
         var extname = null;
-        while (i >= 0)
-        {
+        while (i >= 0) {
             extname = file.substr(i);
 
-            switch (extname)
-            {
+            switch (extname) {
                 case ".vs.glsl":
                     return AssetTypeEnum.GLVertexShader;
                 case ".fs.glsl":
@@ -88,11 +82,9 @@ namespace gd3d.framework
         }
     }
 
-    export function calcReqType(type: AssetTypeEnum): "text" | "arraybuffer"
-    {
+    export function calcReqType(type: AssetTypeEnum): "text" | "arraybuffer" {
         var e = AssetTypeEnum;
-        switch (type)
-        {
+        switch (type) {
             case e.PackTxt:
             case e.Bundle:
             case e.Atlas:
@@ -124,8 +116,7 @@ namespace gd3d.framework
 
 
     //资源管理器
-    export class assetMgr
-    {
+    export class assetMgr {
         static urlmapGuid: { [key: string]: number } = {};//全局资源记录
         static cdnRoot: string;//资源根目录
         static guidlistURL: string;//资源根目录
@@ -151,10 +142,8 @@ namespace gd3d.framework
 
 
         //外部才能确定在哪用,初始化全局资源记录
-        static initGuidList()
-        {
-            io.loadJSON(assetMgr.guidlistURL, (json) =>
-            {
+        static initGuidList() {
+            io.loadJSON(assetMgr.guidlistURL, (json) => {
                 assetMgr.urlmapGuid = json.res;
                 // console.log(`initGuidList  资源GUID从[${json.__useid}]开始计数`);
                 resID.idAll = json.__useid;
@@ -163,16 +152,13 @@ namespace gd3d.framework
             });
         }
 
-
         //加载资源
         load(url: string, type: AssetTypeEnum = AssetTypeEnum.Auto,
             /** 这是解析完成的回调 */
-            onstate: loadCallback = null,downloadFinish:()=>void=null)
-        {
+            onstate: loadCallback = null, downloadFinish: () => void = null) {
             let keyUrl = url.replace(assetMgr.cdnRoot, "");
             let guid = assetMgr.urlmapGuid[keyUrl];
-            if (!guid)
-            {
+            if (!guid) {
                 if (url.endsWith(".assetbundle.json"))
                     guid = assetBundle.buildGuid();
                 else
@@ -189,15 +175,12 @@ namespace gd3d.framework
             }
 
             //只下载一次 其他入队
-            this.download(guid, url, type, () =>
-            {//下载完毕
+            this.download(guid, url, type, () => {//下载完毕
                 let loading = assetMgr.mapLoading[guid];
-                if (type == AssetTypeEnum.Bundle)
-                {
+                if (type == AssetTypeEnum.Bundle) {
                     let bundle = new assetBundle(url, this, guid);
                     this.name_bundles[bundle.name] = this.kurl_bundles[keyUrl] = this.guid_bundles[bundle.guid] = bundle;
-                    bundle.onReady = () =>
-                    {
+                    bundle.onReady = () => {
                         if (this.name_bundles[keyUrl])
                             console.warn(`assetbundle命名冲突:${keyUrl},${bundle.url}`);
                         let state = new stateLoad();
@@ -207,18 +190,14 @@ namespace gd3d.framework
                     };
                     bundle.onDownloadFinish = downloadFinish;
                     bundle.parseBundle(loading.data);
-                } else
-                {
+                } else {
                     let filename = getFileName(url);
-                    const next = (name, guid, type, dwguid?: number) =>
-                    {
-                        this.parseRes({ name, guid, type, dwguid }).then((asset: IAsset) =>
-                        {
+                    const next = (name, guid, type, dwguid?: number) => {
+                        this.parseRes({ name, guid, type, dwguid }).then((asset: IAsset) => {
                             //解析完毕
                             let state = new stateLoad();
                             state.isfinish = true;
-                            if (asset)
-                            {
+                            if (asset) {
                                 state.resstateFirst = {
                                     res: asset,
                                     state: 0,
@@ -230,8 +209,7 @@ namespace gd3d.framework
                     }
 
                     let factory = assetParseMap[type];
-                    if (factory.needDownload)
-                    {
+                    if (factory.needDownload) {
                         let nname = factory.needDownload(assetMgr.mapLoading[guid].data);
                         let nurl = url.replace(filename, nname);
                         let nguid = resID.next();
@@ -240,15 +218,16 @@ namespace gd3d.framework
                             this.loadImg(nguid, nurl, next.bind(this, filename, guid, type, nguid));//不一样的是这里带了一个需要下载的GUID
                         else
                             this.download(nguid, nurl, ntype, next.bind(this, filename, guid, type, nguid));//不一样的是这里带了一个需要下载的GUID
-                    } else
-                        next.call(this, filename, guid, type);
+                    } else{
+                        let dwguid = type ==  AssetTypeEnum.Texture ? guid : null;
+                        next.call(this, filename, guid, type , dwguid);
+                    }
 
                 }
             });
         }
 
-        download(guid: number, url: string, type: AssetTypeEnum, finish: () => void)
-        {
+        download(guid: number, url: string, type: AssetTypeEnum, finish: () => void) {
             let loading = assetMgr.mapLoading[guid];
             //下载完成的不再下载
             if (loading && loading.readyok && finish)
@@ -256,14 +235,20 @@ namespace gd3d.framework
             else if (!loading)
                 assetMgr.mapLoading[guid] = loading = { readyok: false, url: url };
 
-            let repType: "text" | "arraybuffer" = calcReqType(type);
-
-            io.xhrLoad(url, (data, err) =>
+            if(type == AssetTypeEnum.Texture)
             {
+                loading.cbQueue = [];
+                this.loadImg(guid,url,(img)=>{
+                    finish();
+                });
+                return;
+            }
+
+            let repType: "text" | "arraybuffer" = calcReqType(type);
+            io.xhrLoad(url, (data, err) => {
                 console.error(err.stack);
 
-            }, () => { }, repType, (xhr) =>
-            {
+            }, () => { }, repType, (xhr) => {
                 let loading = assetMgr.mapLoading[guid];
                 loading.readyok = true;
                 loading.data = xhr.response;
@@ -272,16 +257,14 @@ namespace gd3d.framework
         }
 
         //加载图片
-        loadImg(guid: number, url: string, cb: (img) => void)
-        {
+        loadImg(guid: number, url: string, cb: (img) => void) {
             if (assetMgr.mapImage[guid])
                 return cb(assetMgr.mapImage[guid]);
             let loading = assetMgr.mapLoading[guid];
             if (!loading)
                 loading = assetMgr.mapLoading[guid] = { readyok: false, cbQueue: [] }
             loading.cbQueue.push(cb);
-            this._loadImg(url, (img) =>
-            {
+            this._loadImg(url, (img) => {
                 assetMgr.mapImage[guid] = img;
                 loading.readyok = true;
                 loading.data = img;
@@ -291,8 +274,7 @@ namespace gd3d.framework
         }
 
         //微信可复写
-        protected _loadImg(url: string, cb: (img) => void)
-        {
+        protected _loadImg(url: string, cb: (img) => void) {
             let img = new Image();
             //webgl跨域渲染要这样玩 [crossOrigin = ""]否则服务器允许跨域也没用
             img.crossOrigin = "";
@@ -300,31 +282,25 @@ namespace gd3d.framework
             img.onload = cb.bind(this, img);
         }
 
-        use(asset: IAsset)
-        {
+        use(asset: IAsset) {
             let guid = asset.getGUID();
             let ref = assetMgr.mapGuid[guid];
-            if (!ref)
-            {
+            if (!ref) {
                 ref = new assetRef();
                 ref.asset = asset;
                 ref.refcount = 1;
                 assetMgr.mapGuid[guid] = ref;
-                if (asset.bundle)
-                {
-                    if (!assetMgr.mapBundleNamed[asset.bundle.guid])
-                    {
+                if (asset.bundle) {
+                    if (!assetMgr.mapBundleNamed[asset.bundle.guid]) {
                         assetMgr.mapBundleNamed[asset.bundle.guid] = {};
                         assetMgr.mapBundleNamed[asset.bundle.guid][asset.getName()] = ref;
-                    } else
-                    {
+                    } else {
                         if (!assetMgr.mapBundleNamed[asset.bundle.guid][asset.getName()])
                             assetMgr.mapBundleNamed[asset.bundle.guid][asset.getName()] = ref;
                         else
                             console.warn(`资源命名冲突:${asset.getName()}`);
                     }
-                } else
-                {
+                } else {
                     if (assetMgr.mapNamed[asset.getName()])
                         console.warn(`资源命名冲突:${asset.getName()}`);
                     assetMgr.mapNamed[asset.getName()] = asset;
@@ -333,32 +309,27 @@ namespace gd3d.framework
                 ++ref.refcount;
         }
 
-        unuse(asset: IAsset, disposeNow: boolean = true)
-        {
+        unuse(asset: IAsset, disposeNow: boolean = true) {
             let guid = asset.getGUID();
             let assetref = assetMgr.mapGuid[guid];
-            if (disposeNow && assetref && --assetref.refcount < 1)
-            {
+            if (disposeNow && assetref && --assetref.refcount < 1) {
                 delete assetMgr.mapGuid[guid];
                 delete assetMgr.mapLoading[asset.getGUID()];
                 delete assetMgr.mapNamed[assetref.asset.getName()];
             }
         }
 
-        async parseRes(asset: { guid: number, type: number, name: string, dwguid?: number }, bundle?: assetBundle)
-        {
-            if(assetMgr.mapGuid[asset.guid])
+        async parseRes(asset: { guid: number, type: number, name: string, dwguid?: number }, bundle?: assetBundle) {
+            if (assetMgr.mapGuid[asset.guid])
                 return assetMgr.mapGuid[asset.guid].asset;
             // let ctime = Date.now();
             let data = assetMgr.mapLoading[asset.guid].data;
             let factory = assetParseMap[asset.type];
-            if (!factory)
-            {
+            if (!factory) {
                 console.warn(`无法找到[${AssetTypeEnum[asset.type]}]的解析器`);
                 return;
             }
-            if (!factory.parse)
-            {
+            if (!factory.parse) {
                 console.warn(`解析器 ${factory.constructor.name} 没有实现parse方法`);
                 return;
             }
@@ -366,8 +337,7 @@ namespace gd3d.framework
             let __asset = factory.parse(this, bundle, asset.name, data, asset.dwguid);
             if (__asset instanceof gd3d.threading.gdPromise)
                 __asset = (await __asset);
-            if (__asset)
-            {
+            if (__asset) {
                 if (bundle)
                     __asset["id"].id = asset.guid;
                 __asset.bundle = bundle;
@@ -378,15 +348,12 @@ namespace gd3d.framework
         }
 
 
-        getAssetByName<T extends IAsset>(name: string, bundlename?: string): T
-        {
-            if (bundlename)
-            {
+        getAssetByName<T extends IAsset>(name: string, bundlename?: string): T {
+            if (bundlename) {
                 let bundle = this.kurl_bundles[bundlename] || this.name_bundles[bundlename];
-                if (bundle)
-                {
+                if (bundle) {
                     let guid = bundle.files[name.replace(".prefab", ".cprefab")];
-                    if (guid!=undefined && assetMgr.mapGuid[guid])
+                    if (guid != undefined && assetMgr.mapGuid[guid])
                         return assetMgr.mapGuid[guid].asset as T;
                 }
             }
@@ -412,54 +379,43 @@ namespace gd3d.framework
         shaderPool: gd3d.render.shaderPool;
         webgl: WebGLRenderingContext;
         mapRes: { [id: number]: any } = {};
-        constructor(app: application)
-        {
+        constructor(app: application) {
             this.app = app;
             this.webgl = app.webgl;
             this.shaderPool = new gd3d.render.shaderPool();
             // this.initAssetFactorys();
         }
-        static correctFileName(name: string): string
-        {
-            if (name.indexOf(this.bin) < 0)
-            {
+        static correctFileName(name: string): string {
+            if (name.indexOf(this.bin) < 0) {
                 return name;
             }
             let binlen = this.bin.length;
             let substr = name.substring(name.length - binlen);
-            if (substr == this.bin)
-            {
+            if (substr == this.bin) {
                 return name + ".js";
             }
             return name;
         }
-        static correctTxtFileName(name: string): string
-        {
-            if (name.indexOf(this.txt) < 0)
-            {
+        static correctTxtFileName(name: string): string {
+            if (name.indexOf(this.txt) < 0) {
                 return name;
             }
             let len = this.txt.length;
             let substr = name.substring(name.length - len);
-            if (substr == this.txt)
-            {
+            if (substr == this.txt) {
                 return name + ".js";
             }
             return name;
         }
-        getShader(name: string): gd3d.framework.shader
-        {
+        getShader(name: string): gd3d.framework.shader {
             return this.mapShader[name];
         }
         private particlemat: material;
-        getDefParticleMat(): material
-        {
-            if (this.particlemat == null)
-            {
+        getDefParticleMat(): material {
+            if (this.particlemat == null) {
                 var mat = new material("defparticle");
                 var shader = this.getShader("particles_additive.shader.json");
-                if (shader == null)
-                {
+                if (shader == null) {
                     shader = this.getShader("shader/def");
                 }
                 mat.setShader(shader);
@@ -470,51 +426,40 @@ namespace gd3d.framework
             return this.particlemat;
         }
         private assetUrlDic: { [id: number]: string };// = {};
-        setAssetUrl(asset: IAsset, url: string)
-        {
+        setAssetUrl(asset: IAsset, url: string) {
             // this.assetUrlDic[asset.getGUID()] = url;
         }
-        getAssetUrl(asset: IAsset): string
-        {
+        getAssetUrl(asset: IAsset): string {
             return this.assetUrlDic[asset.getGUID()];
         }
         maploaded: { [url: string]: IAsset };// = {};
 
-        savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[], contents?: any[]) => void)
-        {
+        savePrefab(trans: transform, prefabName: string, fun: (data: SaveInfo, resourses?: string[], contents?: any[]) => void) {
         }
-        loadCompressBundle(url: string, a?)
-        {
+        loadCompressBundle(url: string, a?) {
         }
-        loadImmediate(url: string)
-        {
+        loadImmediate(url: string) {
             return null;
         }
-        getAssetBundle(url: string): assetBundle
-        {
+        getAssetBundle(url: string): assetBundle {
             return this.name_bundles[url];
         }
-        releaseUnuseAsset()
-        {
+        releaseUnuseAsset() {
         }
-        initDefAsset()
-        {
+        initDefAsset() {
             defMesh.initDefaultMesh(this);
             defTexture.initDefaultTexture(this);
             defsprite.initDefaultSprite(this);
             defShader.initDefaultShader(this);
             defmaterial.initDefaultMaterial(this);
         }
-        loadScene(sceneName: string, onComplete: (firstChilds: Array<transform>) => void)
-        {
+        loadScene(sceneName: string, onComplete: (firstChilds: Array<transform>) => void) {
             let firstChilds = new Array<transform>();
             let scene = this.app.getScene();
-            if (sceneName.length > 0)
-            {
+            if (sceneName.length > 0) {
                 var _rawscene: rawscene = this.getAssetByName(sceneName, sceneName.replace(".scene.json", ".assetbundle.json")) as rawscene;
                 let willLoadRoot = _rawscene.getSceneRoot();
-                while (willLoadRoot.children.length > 0)
-                {
+                while (willLoadRoot.children.length > 0) {
                     let trans = willLoadRoot.children.shift();
                     firstChilds.push(trans);
                     scene.addChild(trans);
@@ -528,8 +473,7 @@ namespace gd3d.framework
                 //nav
                 _rawscene.useNavMesh(scene);
             }
-            else
-            {
+            else {
                 var _camera: transform = new transform();
                 _camera.gameObject.addComponent("camera");
                 _camera.name = "camera";
@@ -541,11 +485,9 @@ namespace gd3d.framework
             onComplete(firstChilds);
         }
 
-        unload(url: string): void
-        {
+        unload(url: string): void {
             let guid = assetMgr.urlmapGuid[url];
-            if (guid)
-            {
+            if (guid) {
                 let name = getFileName(url);
                 delete assetMgr.mapNamed[name];
                 delete assetMgr.mapLoading[guid];
@@ -555,8 +497,7 @@ namespace gd3d.framework
         //#endregion
     }
     //#region api保留
-    export class SaveInfo
-    {
+    export class SaveInfo {
         files: { [key: string]: string } = {};
     }
     //#endregion api保留
