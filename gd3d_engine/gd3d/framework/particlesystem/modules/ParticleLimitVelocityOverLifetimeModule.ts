@@ -16,7 +16,7 @@ namespace gd3d.framework
          * 
          * 在每个轴上分别设置生命周期内的大小。
          */
-        
+
         separateAxes = false;
 
         /**
@@ -24,7 +24,7 @@ namespace gd3d.framework
          * 
          * 最大速度曲线，当不使用每轴一个曲线时。
          */
-        
+
         limit = serialization.setValue(new MinMaxCurve(), { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 });
 
         /**
@@ -32,7 +32,7 @@ namespace gd3d.framework
          * 
          * 最高速度。
          */
-        
+
         limit3D = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 } });
 
         /**
@@ -40,15 +40,15 @@ namespace gd3d.framework
          * 
          * 指定速度是在局部空间(与变换一起旋转)还是在世界空间。
          */
-        
-        space = ParticleSystemSimulationSpace1.Local;
+
+        space = ParticleSystemSimulationSpace.Local;
 
         /**
          * Controls how much the velocity that exceeds the velocity limit should be dampened.
          * 
          * 控制多少速度，超过速度限制应该被抑制。
          */
-        
+
         dampen = 1;
 
         /**
@@ -178,12 +178,12 @@ namespace gd3d.framework
             var limit3D = this.limit3D.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
             var limit = this.limit.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
             var pVelocity = particle.velocity.clone();
-            if (this.space == ParticleSystemSimulationSpace1.World)
+            if (this.space == ParticleSystemSimulationSpace.World)
             {
-                var localToWorldMatrix = new Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
-                var worldToLocalMatrix = localToWorldMatrix.clone().invert();
+                var localToWorldMatrix = this.particleSystem.localToWorldMatrix;
+                var worldToLocalMatrix = this.particleSystem.worldToLocalMatrix;
                 //
-                localToWorldMatrix.deltaTransformVector(pVelocity, pVelocity)
+                math.matrixTransformNormal(pVelocity, localToWorldMatrix, pVelocity);
                 if (this.separateAxes)
                 {
                     pVelocity.clamp(limit3D.negateTo(), limit3D);
@@ -192,7 +192,7 @@ namespace gd3d.framework
                     if (pVelocity.lengthSquared > limit * limit)
                         pVelocity.normalize(limit);
                 }
-                worldToLocalMatrix.deltaTransformVector(pVelocity, pVelocity);
+                math.matrixTransformNormal(pVelocity, worldToLocalMatrix, pVelocity);
             } else
             {
                 if (this.separateAxes)

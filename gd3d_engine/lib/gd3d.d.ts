@@ -5776,8 +5776,8 @@ declare namespace gd3d.framework {
         worldPos: Vector3;
         moveVec: Vector3;
         speed: Vector3;
-        localToWorldMatrix: Matrix4x4;
-        worldToLocalMatrix: Matrix4x4;
+        localToWorldMatrix: math.matrix;
+        worldToLocalMatrix: math.matrix;
     }
 }
 declare namespace gd3d.framework {
@@ -5858,13 +5858,6 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     enum ParticleSystemSimulationSpace {
-        Local = 0,
-        World = 1,
-        Custom = 2
-    }
-}
-declare namespace gd3d.framework {
-    enum ParticleSystemSimulationSpace1 {
         Local = 0,
         World = 1
     }
@@ -6248,30 +6241,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class Matrix3x3 {
-        elements: [number, number, number, number, number, number, number, number, number];
-        constructor(elements?: [number, number, number, number, number, number, number, number, number]);
-        identity(): this;
-        setZero(): this;
-        setTrace(vec3: Vector3): this;
-        getTrace(target?: Vector3): Vector3;
-        vmult(v: Vector3, target?: Vector3): Vector3;
-        smult(s: number): void;
-        mmult(m: Matrix3x3, target?: Matrix3x3): Matrix3x3;
-        scale(v: Vector3, target?: Matrix3x3): Matrix3x3;
-        solve(b: Vector3, target?: Vector3): Vector3;
-        getElement(row: number, column: number): number;
-        setElement(row: number, column: number, value: number): void;
-        copy(source: Matrix3x3): this;
-        toString(): string;
-        reverse(): this;
-        reverseTo(target?: Matrix3x3): Matrix3x3;
-        transpose(): this;
-        transposeTo(target?: Matrix3x3): Matrix3x3;
-        formMatrix4x4(matrix4x4: Matrix4x4): this;
-    }
-}
-declare namespace gd3d.framework {
     class Matrix4x4 {
         static RAW_DATA_CONTAINER: number[];
         static recompose(position: Vector3, rotation: Vector3, scale: Vector3, order?: RotationOrder): Matrix4x4;
@@ -6590,7 +6559,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class ParticleForceOverLifetimeModule extends ParticleModule {
         force: MinMaxCurveVector3;
-        space: ParticleSystemSimulationSpace1;
+        space: ParticleSystemSimulationSpace;
         randomized: boolean;
         x: MinMaxCurve;
         xMultiplier: number;
@@ -6619,7 +6588,7 @@ declare namespace gd3d.framework {
         separateAxes: boolean;
         limit: MinMaxCurve;
         limit3D: MinMaxCurveVector3;
-        space: ParticleSystemSimulationSpace1;
+        space: ParticleSystemSimulationSpace;
         dampen: number;
         limitMultiplier: number;
         limitX: MinMaxCurve;
@@ -6811,7 +6780,7 @@ declare namespace gd3d.framework {
     class ParticleVelocityOverLifetimeModule extends ParticleModule {
         __class__: "gd3d.framework.ParticleVelocityOverLifetimeModule";
         velocity: MinMaxCurveVector3;
-        space: ParticleSystemSimulationSpace1;
+        space: ParticleSystemSimulationSpace;
         x: MinMaxCurve;
         xMultiplier: number;
         y: MinMaxCurve;

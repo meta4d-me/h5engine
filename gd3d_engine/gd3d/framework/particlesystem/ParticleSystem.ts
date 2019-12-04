@@ -359,13 +359,13 @@ namespace gd3d.framework
         {
             if (!this.isPlaying) return;
 
-            this.localToWorldMatrix.copyRawDataFrom(this.transform.getWorldMatrix().rawData);
-            this.worldToLocalMatrix.copyFrom(this.localToWorldMatrix).invert();
+            math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
+            math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
 
             this.time = this.time + this.main.simulationSpeed * interval;
             this._realTime = this.time - this.startDelay;
             // 粒子系统位置
-            this.worldPos.copy(this.localToWorldMatrix.getPosition());
+            math.matrixGetTranslation(this.localToWorldMatrix, this.worldPos);
             // 粒子系统位移
             this.moveVec.copy(this.worldPos).sub(this._preworldPos);
             // 粒子系统速度
@@ -464,8 +464,8 @@ namespace gd3d.framework
 
         render(context: renderContext, assetmgr: assetMgr, camera: camera)
         {
-            var localToWorldMatrix = this.localToWorldMatrix = new Matrix4x4(this.transform.getWorldMatrix().rawData.concat());
-            var worldToLocalMatrix = this.worldToLocalMatrix = localToWorldMatrix.clone().invert();
+            math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
+            math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
 
             DrawCallInfo.inc.currentState = DrawCallEnum.EffectSystem;
             let go = this.gameObject;
@@ -493,19 +493,20 @@ namespace gd3d.framework
 
             // 计算公告牌矩阵
             var isbillboard = !this.shape.alignToDirection && this.mesh == sceneMgr.app.getAssetMgr().getDefaultMesh(gd3d.framework.defMesh.quad);
-            var billboardMatrix = new Matrix4x4();
+            var billboardMatrix = new math.matrix();
             if (isbillboard)
             {
-                var cameraMatrix = new Matrix4x4(camera.gameObject.transform.getWorldMatrix().rawData);
-
                 //
-                var localCameraForward = worldToLocalMatrix.deltaTransformVector(cameraMatrix.forward);
-                var localCameraUp = worldToLocalMatrix.deltaTransformVector(cameraMatrix.up);
-
-                billboardMatrix.lookAt(localCameraForward, localCameraUp);
+                var cameraForward = new math.vector3();
+                var cameraUp = new math.vector3();
+                camera.gameObject.transform.getForwardInWorld(cameraForward);
+                camera.gameObject.transform.getUpInWorld(cameraUp);
+                math.matrixTransformNormal(cameraForward, this.worldToLocalMatrix, cameraForward);
+                math.matrixTransformNormal(cameraUp, this.worldToLocalMatrix, cameraUp);
+                math.matrixLookatLH(cameraForward, cameraUp, billboardMatrix);
             }
 
-            this.material.setMatrix("u_particle_billboardMatrix", new math.matrix(billboardMatrix.rawData.concat()))
+            this.material.setMatrix("u_particle_billboardMatrix", billboardMatrix);
 
             var positions: number[] = [];
             var scales: number[] = [];
@@ -849,18 +850,18 @@ namespace gd3d.framework
                 var worldToLocalMatrix = this.worldToLocalMatrix;
                 this._activeParticles.forEach(p =>
                 {
-                    worldToLocalMatrix.transformVector(p.position, p.position);
-                    worldToLocalMatrix.deltaTransformVector(p.velocity, p.velocity);
-                    worldToLocalMatrix.deltaTransformVector(p.acceleration, p.acceleration);
+                    math.matrixTransformVector3(p.position, worldToLocalMatrix, p.position);
+                    math.matrixTransformNormal(p.velocity, worldToLocalMatrix, p.velocity);
+                    math.matrixTransformNormal(p.acceleration, worldToLocalMatrix, p.acceleration);
                 });
             } else
             {
                 var localToWorldMatrix = this.localToWorldMatrix;
                 this._activeParticles.forEach(p =>
                 {
-                    localToWorldMatrix.transformVector(p.position, p.position);
-                    localToWorldMatrix.deltaTransformVector(p.velocity, p.velocity);
-                    localToWorldMatrix.deltaTransformVector(p.acceleration, p.acceleration);
+                    math.matrixTransformVector3(p.position, localToWorldMatrix, p.position);
+                    math.matrixTransformNormal(p.velocity, localToWorldMatrix, p.velocity);
+                    math.matrixTransformNormal(p.acceleration, localToWorldMatrix, p.acceleration);
                 });
             }
         }
@@ -885,10 +886,10 @@ namespace gd3d.framework
             {
                 if (space == ParticleSystemSimulationSpace.World)
                 {
-                    this.worldToLocalMatrix.deltaTransformVector(velocity, velocity);
+                    math.matrixTransformNormal(velocity, this.worldToLocalMatrix, velocity);
                 } else
                 {
-                    this.localToWorldMatrix.deltaTransformVector(velocity, velocity);
+                    math.matrixTransformNormal(velocity, this.localToWorldMatrix, velocity);
                 }
             }
             //
@@ -914,10 +915,10 @@ namespace gd3d.framework
                 {
                     if (space == ParticleSystemSimulationSpace.World)
                     {
-                        this.worldToLocalMatrix.deltaTransformVector(value, value);
+                        math.matrixTransformNormal(value, this.worldToLocalMatrix, value);
                     } else
                     {
-                        this.localToWorldMatrix.deltaTransformVector(value, value);
+                        math.matrixTransformNormal(value, this.localToWorldMatrix, value);
                     }
                 }
                 //
@@ -945,10 +946,10 @@ namespace gd3d.framework
             {
                 if (space == ParticleSystemSimulationSpace.World)
                 {
-                    this.worldToLocalMatrix.deltaTransformVector(acceleration, acceleration);
+                    math.matrixTransformNormal(acceleration, this.worldToLocalMatrix, acceleration);
                 } else
                 {
-                    this.localToWorldMatrix.deltaTransformVector(acceleration, acceleration);
+                    math.matrixTransformNormal(acceleration, this.localToWorldMatrix, acceleration);
                 }
             }
             //
@@ -974,10 +975,10 @@ namespace gd3d.framework
                 {
                     if (space == ParticleSystemSimulationSpace.World)
                     {
-                        this.worldToLocalMatrix.deltaTransformVector(value, value);
+                        math.matrixTransformNormal(value, this.worldToLocalMatrix, value);
                     } else
                     {
-                        this.localToWorldMatrix.deltaTransformVector(value, value);
+                        math.matrixTransformNormal(value, this.localToWorldMatrix, value);
                     }
                 }
                 //
@@ -997,7 +998,7 @@ namespace gd3d.framework
         speed = new Vector3;
 
         //
-        localToWorldMatrix = new Matrix4x4();
-        worldToLocalMatrix = new Matrix4x4();
+        localToWorldMatrix = new math.matrix();
+        worldToLocalMatrix = new math.matrix();
     }
 }

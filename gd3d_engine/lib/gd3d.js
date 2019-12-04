@@ -12338,7 +12338,7 @@ var gd3d;
                     this.uploadUnifoms(pass, context, LastMatSame);
                     if (!LastMatSame || !LastMeshSame)
                         mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
-                    drawInstanceInfo.initBuffer(context.webgl);
+                    drawInstanceInfo && drawInstanceInfo.initBuffer(context.webgl);
                     drawInstanceInfo && drawInstanceInfo.activeAttributes(context.webgl, pass.program.program);
                     framework.DrawCallInfo.inc.add();
                     if (sm.useVertexIndex < 0) {
@@ -29799,8 +29799,8 @@ var gd3d;
                 _this.worldPos = new framework.Vector3();
                 _this.moveVec = new framework.Vector3();
                 _this.speed = new framework.Vector3;
-                _this.localToWorldMatrix = new framework.Matrix4x4();
-                _this.worldToLocalMatrix = new framework.Matrix4x4();
+                _this.localToWorldMatrix = new gd3d.math.matrix();
+                _this.worldToLocalMatrix = new gd3d.math.matrix();
                 _this.main = new framework.ParticleMainModule();
                 _this.emission = new framework.ParticleEmissionModule();
                 _this.shape = new framework.ParticleShapeModule();
@@ -30047,11 +30047,11 @@ var gd3d;
             ParticleSystem.prototype.update = function (interval) {
                 if (!this.isPlaying)
                     return;
-                this.localToWorldMatrix.copyRawDataFrom(this.transform.getWorldMatrix().rawData);
-                this.worldToLocalMatrix.copyFrom(this.localToWorldMatrix).invert();
+                gd3d.math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
+                gd3d.math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
                 this.time = this.time + this.main.simulationSpeed * interval;
                 this._realTime = this.time - this.startDelay;
-                this.worldPos.copy(this.localToWorldMatrix.getPosition());
+                gd3d.math.matrixGetTranslation(this.localToWorldMatrix, this.worldPos);
                 this.moveVec.copy(this.worldPos).sub(this._preworldPos);
                 this.speed.copy(this.moveVec).divideNumber(this.main.simulationSpeed * interval / 1000);
                 this._updateActiveParticlesState();
@@ -30103,8 +30103,8 @@ var gd3d;
             };
             ParticleSystem.prototype.render = function (context, assetmgr, camera) {
                 var _this = this;
-                var localToWorldMatrix = this.localToWorldMatrix = new framework.Matrix4x4(this.transform.getWorldMatrix().rawData.concat());
-                var worldToLocalMatrix = this.worldToLocalMatrix = localToWorldMatrix.clone().invert();
+                gd3d.math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
+                gd3d.math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
                 framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.EffectSystem;
                 var go = this.gameObject;
                 var tran = go.transform;
@@ -30125,14 +30125,17 @@ var gd3d;
                     this._awaked = true;
                 }
                 var isbillboard = !this.shape.alignToDirection && this.mesh == framework.sceneMgr.app.getAssetMgr().getDefaultMesh(gd3d.framework.defMesh.quad);
-                var billboardMatrix = new framework.Matrix4x4();
+                var billboardMatrix = new gd3d.math.matrix();
                 if (isbillboard) {
-                    var cameraMatrix = new framework.Matrix4x4(camera.gameObject.transform.getWorldMatrix().rawData);
-                    var localCameraForward = worldToLocalMatrix.deltaTransformVector(cameraMatrix.forward);
-                    var localCameraUp = worldToLocalMatrix.deltaTransformVector(cameraMatrix.up);
-                    billboardMatrix.lookAt(localCameraForward, localCameraUp);
+                    var cameraForward = new gd3d.math.vector3();
+                    var cameraUp = new gd3d.math.vector3();
+                    camera.gameObject.transform.getForwardInWorld(cameraForward);
+                    camera.gameObject.transform.getUpInWorld(cameraUp);
+                    gd3d.math.matrixTransformNormal(cameraForward, this.worldToLocalMatrix, cameraForward);
+                    gd3d.math.matrixTransformNormal(cameraUp, this.worldToLocalMatrix, cameraUp);
+                    gd3d.math.matrixLookatLH(cameraForward, cameraUp, billboardMatrix);
                 }
-                this.material.setMatrix("u_particle_billboardMatrix", new gd3d.math.matrix(billboardMatrix.rawData.concat()));
+                this.material.setMatrix("u_particle_billboardMatrix", billboardMatrix);
                 var positions = [];
                 var scales = [];
                 var rotations = [];
@@ -30341,17 +30344,17 @@ var gd3d;
                 if (this._main.simulationSpace == framework.ParticleSystemSimulationSpace.Local) {
                     var worldToLocalMatrix = this.worldToLocalMatrix;
                     this._activeParticles.forEach(function (p) {
-                        worldToLocalMatrix.transformVector(p.position, p.position);
-                        worldToLocalMatrix.deltaTransformVector(p.velocity, p.velocity);
-                        worldToLocalMatrix.deltaTransformVector(p.acceleration, p.acceleration);
+                        gd3d.math.matrixTransformVector3(p.position, worldToLocalMatrix, p.position);
+                        gd3d.math.matrixTransformNormal(p.velocity, worldToLocalMatrix, p.velocity);
+                        gd3d.math.matrixTransformNormal(p.acceleration, worldToLocalMatrix, p.acceleration);
                     });
                 }
                 else {
                     var localToWorldMatrix = this.localToWorldMatrix;
                     this._activeParticles.forEach(function (p) {
-                        localToWorldMatrix.transformVector(p.position, p.position);
-                        localToWorldMatrix.deltaTransformVector(p.velocity, p.velocity);
-                        localToWorldMatrix.deltaTransformVector(p.acceleration, p.acceleration);
+                        gd3d.math.matrixTransformVector3(p.position, localToWorldMatrix, p.position);
+                        gd3d.math.matrixTransformNormal(p.velocity, localToWorldMatrix, p.velocity);
+                        gd3d.math.matrixTransformNormal(p.acceleration, localToWorldMatrix, p.acceleration);
                     });
                 }
             };
@@ -30362,10 +30365,10 @@ var gd3d;
                 }
                 if (space != this.main.simulationSpace) {
                     if (space == framework.ParticleSystemSimulationSpace.World) {
-                        this.worldToLocalMatrix.deltaTransformVector(velocity, velocity);
+                        gd3d.math.matrixTransformNormal(velocity, this.worldToLocalMatrix, velocity);
                     }
                     else {
-                        this.localToWorldMatrix.deltaTransformVector(velocity, velocity);
+                        gd3d.math.matrixTransformNormal(velocity, this.localToWorldMatrix, velocity);
                     }
                 }
                 particle.velocity.add(velocity);
@@ -30378,10 +30381,10 @@ var gd3d;
                     var value = obj.value;
                     if (space != this.main.simulationSpace) {
                         if (space == framework.ParticleSystemSimulationSpace.World) {
-                            this.worldToLocalMatrix.deltaTransformVector(value, value);
+                            gd3d.math.matrixTransformNormal(value, this.worldToLocalMatrix, value);
                         }
                         else {
-                            this.localToWorldMatrix.deltaTransformVector(value, value);
+                            gd3d.math.matrixTransformNormal(value, this.localToWorldMatrix, value);
                         }
                     }
                     particle.velocity.sub(value);
@@ -30394,10 +30397,10 @@ var gd3d;
                 }
                 if (space != this.main.simulationSpace) {
                     if (space == framework.ParticleSystemSimulationSpace.World) {
-                        this.worldToLocalMatrix.deltaTransformVector(acceleration, acceleration);
+                        gd3d.math.matrixTransformNormal(acceleration, this.worldToLocalMatrix, acceleration);
                     }
                     else {
-                        this.localToWorldMatrix.deltaTransformVector(acceleration, acceleration);
+                        gd3d.math.matrixTransformNormal(acceleration, this.localToWorldMatrix, acceleration);
                     }
                 }
                 particle.acceleration.add(acceleration);
@@ -30410,10 +30413,10 @@ var gd3d;
                     var value = obj.value;
                     if (space != this.main.simulationSpace) {
                         if (space == framework.ParticleSystemSimulationSpace.World) {
-                            this.worldToLocalMatrix.deltaTransformVector(value, value);
+                            gd3d.math.matrixTransformNormal(value, this.worldToLocalMatrix, value);
                         }
                         else {
-                            this.localToWorldMatrix.deltaTransformVector(value, value);
+                            gd3d.math.matrixTransformNormal(value, this.localToWorldMatrix, value);
                         }
                     }
                     particle.acceleration.sub(value);
@@ -30564,19 +30567,7 @@ var gd3d;
         (function (ParticleSystemSimulationSpace) {
             ParticleSystemSimulationSpace[ParticleSystemSimulationSpace["Local"] = 0] = "Local";
             ParticleSystemSimulationSpace[ParticleSystemSimulationSpace["World"] = 1] = "World";
-            ParticleSystemSimulationSpace[ParticleSystemSimulationSpace["Custom"] = 2] = "Custom";
         })(ParticleSystemSimulationSpace = framework.ParticleSystemSimulationSpace || (framework.ParticleSystemSimulationSpace = {}));
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var ParticleSystemSimulationSpace1;
-        (function (ParticleSystemSimulationSpace1) {
-            ParticleSystemSimulationSpace1[ParticleSystemSimulationSpace1["Local"] = 0] = "Local";
-            ParticleSystemSimulationSpace1[ParticleSystemSimulationSpace1["World"] = 1] = "World";
-        })(ParticleSystemSimulationSpace1 = framework.ParticleSystemSimulationSpace1 || (framework.ParticleSystemSimulationSpace1 = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -31706,285 +31697,6 @@ var gd3d;
             return MinMaxCurveVector3;
         }());
         framework.MinMaxCurveVector3 = MinMaxCurveVector3;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var Matrix3x3 = (function () {
-            function Matrix3x3(elements) {
-                if (elements === void 0) { elements = [1, 0, 0, 0, 1, 0, 0, 0, 1]; }
-                this.elements = elements;
-            }
-            Matrix3x3.prototype.identity = function () {
-                var e = this.elements;
-                e[0] = 1;
-                e[1] = 0;
-                e[2] = 0;
-                e[3] = 0;
-                e[4] = 1;
-                e[5] = 0;
-                e[6] = 0;
-                e[7] = 0;
-                e[8] = 1;
-                return this;
-            };
-            Matrix3x3.prototype.setZero = function () {
-                var e = this.elements;
-                e[0] = 0;
-                e[1] = 0;
-                e[2] = 0;
-                e[3] = 0;
-                e[4] = 0;
-                e[5] = 0;
-                e[6] = 0;
-                e[7] = 0;
-                e[8] = 0;
-                return this;
-            };
-            Matrix3x3.prototype.setTrace = function (vec3) {
-                var e = this.elements;
-                e[0] = vec3.x;
-                e[4] = vec3.y;
-                e[8] = vec3.z;
-                return this;
-            };
-            Matrix3x3.prototype.getTrace = function (target) {
-                if (target === void 0) { target = new framework.Vector3(); }
-                var e = this.elements;
-                target.x = e[0];
-                target.y = e[4];
-                target.z = e[8];
-                return target;
-            };
-            Matrix3x3.prototype.vmult = function (v, target) {
-                if (target === void 0) { target = new framework.Vector3(); }
-                var e = this.elements, x = v.x, y = v.y, z = v.z;
-                target.x = e[0] * x + e[1] * y + e[2] * z;
-                target.y = e[3] * x + e[4] * y + e[5] * z;
-                target.z = e[6] * x + e[7] * y + e[8] * z;
-                return target;
-            };
-            Matrix3x3.prototype.smult = function (s) {
-                for (var i = 0; i < this.elements.length; i++) {
-                    this.elements[i] *= s;
-                }
-            };
-            Matrix3x3.prototype.mmult = function (m, target) {
-                if (target === void 0) { target = new Matrix3x3(); }
-                for (var i = 0; i < 3; i++) {
-                    for (var j = 0; j < 3; j++) {
-                        var sum = 0.0;
-                        for (var k = 0; k < 3; k++) {
-                            sum += m.elements[i + k * 3] * this.elements[k + j * 3];
-                        }
-                        target.elements[i + j * 3] = sum;
-                    }
-                }
-                return target;
-            };
-            Matrix3x3.prototype.scale = function (v, target) {
-                if (target === void 0) { target = new Matrix3x3(); }
-                var e = this.elements, t = target.elements;
-                for (var i = 0; i !== 3; i++) {
-                    t[3 * i + 0] = v.x * e[3 * i + 0];
-                    t[3 * i + 1] = v.y * e[3 * i + 1];
-                    t[3 * i + 2] = v.z * e[3 * i + 2];
-                }
-                return target;
-            };
-            Matrix3x3.prototype.solve = function (b, target) {
-                if (target === void 0) { target = new framework.Vector3(); }
-                var nr = 3;
-                var nc = 4;
-                var eqns = [];
-                for (var i = 0; i < nr * nc; i++) {
-                    eqns.push(0);
-                }
-                var i, j;
-                for (i = 0; i < 3; i++) {
-                    for (j = 0; j < 3; j++) {
-                        eqns[i + nc * j] = this.elements[i + 3 * j];
-                    }
-                }
-                eqns[3 + 4 * 0] = b.x;
-                eqns[3 + 4 * 1] = b.y;
-                eqns[3 + 4 * 2] = b.z;
-                var n = 3, k = n, np;
-                var kp = 4;
-                var p;
-                do {
-                    i = k - n;
-                    if (eqns[i + nc * i] === 0) {
-                        for (j = i + 1; j < k; j++) {
-                            if (eqns[i + nc * j] !== 0) {
-                                np = kp;
-                                do {
-                                    p = kp - np;
-                                    eqns[p + nc * i] += eqns[p + nc * j];
-                                } while (--np);
-                                break;
-                            }
-                        }
-                    }
-                    if (eqns[i + nc * i] !== 0) {
-                        for (j = i + 1; j < k; j++) {
-                            var multiplier = eqns[i + nc * j] / eqns[i + nc * i];
-                            np = kp;
-                            do {
-                                p = kp - np;
-                                eqns[p + nc * j] = p <= i ? 0 : eqns[p + nc * j] - eqns[p + nc * i] * multiplier;
-                            } while (--np);
-                        }
-                    }
-                } while (--n);
-                target.z = eqns[2 * nc + 3] / eqns[2 * nc + 2];
-                target.y = (eqns[1 * nc + 3] - eqns[1 * nc + 2] * target.z) / eqns[1 * nc + 1];
-                target.x = (eqns[0 * nc + 3] - eqns[0 * nc + 2] * target.z - eqns[0 * nc + 1] * target.y) / eqns[0 * nc + 0];
-                if (isNaN(target.x) || isNaN(target.y) || isNaN(target.z) || target.x === Infinity || target.y === Infinity || target.z === Infinity) {
-                    throw "Could not solve equation! Got x=[" + target.toString() + "], b=[" + b.toString() + "], A=[" + this.toString() + "]";
-                }
-                return target;
-            };
-            Matrix3x3.prototype.getElement = function (row, column) {
-                return this.elements[column + 3 * row];
-            };
-            Matrix3x3.prototype.setElement = function (row, column, value) {
-                this.elements[column + 3 * row] = value;
-            };
-            Matrix3x3.prototype.copy = function (source) {
-                for (var i = 0; i < source.elements.length; i++) {
-                    this.elements[i] = source.elements[i];
-                }
-                return this;
-            };
-            Matrix3x3.prototype.toString = function () {
-                var r = "";
-                var sep = ",";
-                for (var i = 0; i < 9; i++) {
-                    r += this.elements[i] + sep;
-                }
-                return r;
-            };
-            Matrix3x3.prototype.reverse = function () {
-                var nr = 3;
-                var nc = 6;
-                var eqns = [];
-                for (var i = 0; i < nr * nc; i++) {
-                    eqns.push(0);
-                }
-                var i, j;
-                for (i = 0; i < 3; i++) {
-                    for (j = 0; j < 3; j++) {
-                        eqns[i + nc * j] = this.elements[i + 3 * j];
-                    }
-                }
-                eqns[3 + 6 * 0] = 1;
-                eqns[3 + 6 * 1] = 0;
-                eqns[3 + 6 * 2] = 0;
-                eqns[4 + 6 * 0] = 0;
-                eqns[4 + 6 * 1] = 1;
-                eqns[4 + 6 * 2] = 0;
-                eqns[5 + 6 * 0] = 0;
-                eqns[5 + 6 * 1] = 0;
-                eqns[5 + 6 * 2] = 1;
-                var n = 3, k = n, np;
-                var kp = nc;
-                var p;
-                do {
-                    i = k - n;
-                    if (eqns[i + nc * i] === 0) {
-                        for (j = i + 1; j < k; j++) {
-                            if (eqns[i + nc * j] !== 0) {
-                                np = kp;
-                                do {
-                                    p = kp - np;
-                                    eqns[p + nc * i] += eqns[p + nc * j];
-                                } while (--np);
-                                break;
-                            }
-                        }
-                    }
-                    if (eqns[i + nc * i] !== 0) {
-                        for (j = i + 1; j < k; j++) {
-                            var multiplier = eqns[i + nc * j] / eqns[i + nc * i];
-                            np = kp;
-                            do {
-                                p = kp - np;
-                                eqns[p + nc * j] = p <= i ? 0 : eqns[p + nc * j] - eqns[p + nc * i] * multiplier;
-                            } while (--np);
-                        }
-                    }
-                } while (--n);
-                i = 2;
-                do {
-                    j = i - 1;
-                    do {
-                        var multiplier = eqns[i + nc * j] / eqns[i + nc * i];
-                        np = nc;
-                        do {
-                            p = nc - np;
-                            eqns[p + nc * j] = eqns[p + nc * j] - eqns[p + nc * i] * multiplier;
-                        } while (--np);
-                    } while (j--);
-                } while (--i);
-                i = 2;
-                do {
-                    var multiplier = 1 / eqns[i + nc * i];
-                    np = nc;
-                    do {
-                        p = nc - np;
-                        eqns[p + nc * i] = eqns[p + nc * i] * multiplier;
-                    } while (--np);
-                } while (i--);
-                i = 2;
-                do {
-                    j = 2;
-                    do {
-                        p = eqns[nr + j + nc * i];
-                        if (isNaN(p) || p === Infinity) {
-                            throw "Could not reverse! A=[" + this.toString() + "]";
-                        }
-                        this.setElement(i, j, p);
-                    } while (j--);
-                } while (i--);
-                return this;
-            };
-            Matrix3x3.prototype.reverseTo = function (target) {
-                if (target === void 0) { target = new Matrix3x3(); }
-                return target.copy(this).reverse();
-            };
-            Matrix3x3.prototype.transpose = function () {
-                var Mt = this.elements, M = this.elements.concat();
-                for (var i = 0; i !== 3; i++) {
-                    for (var j = 0; j !== 3; j++) {
-                        Mt[3 * i + j] = M[3 * j + i];
-                    }
-                }
-                return this;
-            };
-            Matrix3x3.prototype.transposeTo = function (target) {
-                if (target === void 0) { target = new Matrix3x3(); }
-                return target.copy(this).transpose();
-            };
-            Matrix3x3.prototype.formMatrix4x4 = function (matrix4x4) {
-                var arr4 = matrix4x4.rawData;
-                var arr3 = this.elements;
-                arr3[0] = arr4[0];
-                arr3[1] = arr4[1];
-                arr3[2] = arr4[2];
-                arr3[3] = arr4[4];
-                arr3[4] = arr4[5];
-                arr3[5] = arr4[6];
-                arr3[6] = arr4[8];
-                arr3[7] = arr4[9];
-                arr3[8] = arr4[10];
-                return this;
-            };
-            return Matrix3x3;
-        }());
-        framework.Matrix3x3 = Matrix3x3;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -33816,7 +33528,7 @@ var gd3d;
             function ParticleForceOverLifetimeModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.force = new framework.MinMaxCurveVector3();
-                _this.space = framework.ParticleSystemSimulationSpace1.Local;
+                _this.space = framework.ParticleSystemSimulationSpace.Local;
                 _this.randomized = false;
                 return _this;
             }
@@ -33882,28 +33594,19 @@ var gd3d;
             });
             ParticleForceOverLifetimeModule.prototype.initParticleState = function (particle) {
                 particle[_ForceOverLifetime_rate] = Math.random();
-                particle[_ForceOverLifetime_preForce] = new framework.Vector3();
             };
             ParticleForceOverLifetimeModule.prototype.updateParticleState = function (particle) {
-                var preForce = particle[_ForceOverLifetime_preForce];
-                particle.acceleration.sub(preForce);
-                preForce.set(0, 0, 0);
+                this.particleSystem.removeParticleAcceleration(particle, _ForceOverLifetime_preForce);
                 if (!this.enabled)
                     return;
                 var force = this.force.getValue(particle.rateAtLifeTime, particle[_ForceOverLifetime_rate]);
-                if (this.space == framework.ParticleSystemSimulationSpace1.World) {
-                    var localToWorldMatrix = new framework.Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
-                    var worldToLocalMatrix = localToWorldMatrix.clone().invert();
-                    worldToLocalMatrix.deltaTransformVector(force, force);
-                }
-                particle.acceleration.add(force);
-                preForce.copy(force);
+                this.particleSystem.addParticleAcceleration(particle, force, this.space, _ForceOverLifetime_preForce);
             };
             return ParticleForceOverLifetimeModule;
         }(framework.ParticleModule));
         framework.ParticleForceOverLifetimeModule = ParticleForceOverLifetimeModule;
         var _ForceOverLifetime_rate = "_ForceOverLifetime_rate";
-        var _ForceOverLifetime_preForce = "_ForceOverLifetime_preVelocity";
+        var _ForceOverLifetime_preForce = "_ForceOverLifetime_preForce";
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -33977,7 +33680,7 @@ var gd3d;
                 _this.separateAxes = false;
                 _this.limit = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 });
                 _this.limit3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 } });
-                _this.space = framework.ParticleSystemSimulationSpace1.Local;
+                _this.space = framework.ParticleSystemSimulationSpace.Local;
                 _this.dampen = 1;
                 return _this;
             }
@@ -34060,10 +33763,10 @@ var gd3d;
                 var limit3D = this.limit3D.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
                 var limit = this.limit.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
                 var pVelocity = particle.velocity.clone();
-                if (this.space == framework.ParticleSystemSimulationSpace1.World) {
-                    var localToWorldMatrix = new framework.Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
-                    var worldToLocalMatrix = localToWorldMatrix.clone().invert();
-                    localToWorldMatrix.deltaTransformVector(pVelocity, pVelocity);
+                if (this.space == framework.ParticleSystemSimulationSpace.World) {
+                    var localToWorldMatrix = this.particleSystem.localToWorldMatrix;
+                    var worldToLocalMatrix = this.particleSystem.worldToLocalMatrix;
+                    gd3d.math.matrixTransformNormal(pVelocity, localToWorldMatrix, pVelocity);
                     if (this.separateAxes) {
                         pVelocity.clamp(limit3D.negateTo(), limit3D);
                     }
@@ -34071,7 +33774,7 @@ var gd3d;
                         if (pVelocity.lengthSquared > limit * limit)
                             pVelocity.normalize(limit);
                     }
-                    worldToLocalMatrix.deltaTransformVector(pVelocity, pVelocity);
+                    gd3d.math.matrixTransformNormal(pVelocity, worldToLocalMatrix, pVelocity);
                 }
                 else {
                     if (this.separateAxes) {
@@ -34307,7 +34010,6 @@ var gd3d;
                 configurable: true
             });
             ParticleMainModule.prototype.initParticleState = function (particle) {
-                particle[_Main_preGravity] = new framework.Vector3();
                 var birthRateAtDuration = particle.birthRateAtDuration;
                 particle.position.set(0, 0, 0);
                 particle.velocity.set(0, 0, this.startSpeed.getValue(birthRateAtDuration));
@@ -34330,19 +34032,15 @@ var gd3d;
                 particle.startColor.copy(this.startColor.getValue(birthRateAtDuration));
             };
             ParticleMainModule.prototype.updateParticleState = function (particle) {
-                var preGravity = particle[_Main_preGravity];
-                var gravity = new framework.Vector3(0, -this.gravityModifier.getValue(this.particleSystem.rateAtDuration) * 9.8, 0);
-                var worldToLocalMatrix = new framework.Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
-                worldToLocalMatrix.invert();
-                worldToLocalMatrix.deltaTransformVector(gravity, gravity);
-                particle.acceleration.sub(preGravity).add(gravity);
-                preGravity.copy(gravity);
+                var gravity = world_gravity.scaleNumberTo(this.gravityModifier.getValue(this.particleSystem.rateAtDuration));
+                this.particleSystem.addParticleAcceleration(particle, gravity, framework.ParticleSystemSimulationSpace.World, _Main_preGravity);
                 particle.size.copy(particle.startSize);
                 particle.color.copy(particle.startColor);
             };
             return ParticleMainModule;
         }(framework.ParticleModule));
         framework.ParticleMainModule = ParticleMainModule;
+        var world_gravity = new framework.Vector3(0, -9.8, 0);
         var _Main_preGravity = "_Main_preGravity";
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -35165,7 +34863,7 @@ var gd3d;
             function ParticleVelocityOverLifetimeModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.velocity = new framework.MinMaxCurveVector3();
-                _this.space = framework.ParticleSystemSimulationSpace1.Local;
+                _this.space = framework.ParticleSystemSimulationSpace.Local;
                 return _this;
             }
             Object.defineProperty(ParticleVelocityOverLifetimeModule.prototype, "x", {
@@ -35230,22 +34928,13 @@ var gd3d;
             });
             ParticleVelocityOverLifetimeModule.prototype.initParticleState = function (particle) {
                 particle[_VelocityOverLifetime_rate] = Math.random();
-                particle[_VelocityOverLifetime_preVelocity] = new framework.Vector3();
             };
             ParticleVelocityOverLifetimeModule.prototype.updateParticleState = function (particle) {
-                var preVelocity = particle[_VelocityOverLifetime_preVelocity];
-                particle.velocity.sub(preVelocity);
-                preVelocity.set(0, 0, 0);
+                this.particleSystem.removeParticleVelocity(particle, _VelocityOverLifetime_preVelocity);
                 if (!this.enabled)
                     return;
                 var velocity = this.velocity.getValue(particle.rateAtLifeTime, particle[_VelocityOverLifetime_rate]);
-                if (this.space == framework.ParticleSystemSimulationSpace1.World) {
-                    var worldToLocalMatrix = new framework.Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
-                    worldToLocalMatrix.invert();
-                    worldToLocalMatrix.deltaTransformVector(velocity, velocity);
-                }
-                particle.velocity.add(velocity);
-                preVelocity.copy(velocity);
+                this.particleSystem.addParticleVelocity(particle, velocity, this.space, _VelocityOverLifetime_preVelocity);
             };
             return ParticleVelocityOverLifetimeModule;
         }(framework.ParticleModule));

@@ -468,8 +468,6 @@ namespace gd3d.framework
          */
         initParticleState(particle: Particle1)
         {
-            particle[_Main_preGravity] = new Vector3();
-
             //
             var birthRateAtDuration = particle.birthRateAtDuration;
 
@@ -505,22 +503,15 @@ namespace gd3d.framework
          */
         updateParticleState(particle: Particle1)
         {
-            var preGravity: Vector3 = particle[_Main_preGravity];
-            // 计算重力加速度影响速度
-            var gravity = new Vector3(0, -this.gravityModifier.getValue(this.particleSystem.rateAtDuration) * 9.8, 0);
-            // 本地加速度
-            var worldToLocalMatrix = new Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
-            worldToLocalMatrix.invert();
-            worldToLocalMatrix.deltaTransformVector(gravity, gravity);
-            //
-            particle.acceleration.sub(preGravity).add(gravity);
-            preGravity.copy(gravity);
-
+            // 加速度
+            var gravity = world_gravity.scaleNumberTo(this.gravityModifier.getValue(this.particleSystem.rateAtDuration));
+            this.particleSystem.addParticleAcceleration(particle, gravity, ParticleSystemSimulationSpace.World, _Main_preGravity);
             //
             particle.size.copy(particle.startSize);
             particle.color.copy(particle.startColor);
         }
     }
 
+    var world_gravity = new Vector3(0, -9.8, 0);
     var _Main_preGravity = "_Main_preGravity";
 }

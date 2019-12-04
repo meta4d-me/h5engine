@@ -13,17 +13,16 @@ namespace gd3d.framework
         /**
          * 作用在粒子上的力
          */
-        
+
         force = new MinMaxCurveVector3();
-        
+
         /**
          * Are the forces being applied in local or world space?
          * 
          * 这些力是作用于局部空间还是世界空间
          */
-        
-        space = ParticleSystemSimulationSpace1.Local;
-        
+        space = ParticleSystemSimulationSpace.Local;
+
         /**
          * When randomly selecting values between two curves or constants, this flag will cause a new random force to be chosen on each frame.
          * 
@@ -31,7 +30,7 @@ namespace gd3d.framework
          * 
          * @todo
          */
-        
+
         randomized = false;
 
         /**
@@ -131,7 +130,6 @@ namespace gd3d.framework
         initParticleState(particle: Particle1)
         {
             particle[_ForceOverLifetime_rate] = Math.random();
-            particle[_ForceOverLifetime_preForce] = new Vector3();
         }
 
         /**
@@ -140,22 +138,13 @@ namespace gd3d.framework
          */
         updateParticleState(particle: Particle1)
         {
-            var preForce: Vector3 = particle[_ForceOverLifetime_preForce];
-            particle.acceleration.sub(preForce);
-            preForce.set(0, 0, 0);
+            this.particleSystem.removeParticleAcceleration(particle, _ForceOverLifetime_preForce);
             if (!this.enabled) return;
 
             var force = this.force.getValue(particle.rateAtLifeTime, particle[_ForceOverLifetime_rate]);
-            if (this.space == ParticleSystemSimulationSpace1.World)
-            {
-                var localToWorldMatrix = new Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
-                var worldToLocalMatrix = localToWorldMatrix.clone().invert();
-                worldToLocalMatrix.deltaTransformVector(force, force);
-            }
-            particle.acceleration.add(force);
-            preForce.copy(force);
+            this.particleSystem.addParticleAcceleration(particle, force, this.space, _ForceOverLifetime_preForce);
         }
     }
     var _ForceOverLifetime_rate = "_ForceOverLifetime_rate";
-    var _ForceOverLifetime_preForce = "_ForceOverLifetime_preVelocity";
+    var _ForceOverLifetime_preForce = "_ForceOverLifetime_preForce";
 }

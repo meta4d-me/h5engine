@@ -554,7 +554,7 @@ namespace gd3d.framework
                 this.uploadUnifoms(pass, context, LastMatSame);
                 if (!LastMatSame || !LastMeshSame) mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
 
-                drawInstanceInfo.initBuffer(context.webgl);
+                drawInstanceInfo && drawInstanceInfo.initBuffer(context.webgl);
                 drawInstanceInfo && drawInstanceInfo.activeAttributes(context.webgl, pass.program.program);
                 //test code
                 // if(LastMatSame && LastMatSame){

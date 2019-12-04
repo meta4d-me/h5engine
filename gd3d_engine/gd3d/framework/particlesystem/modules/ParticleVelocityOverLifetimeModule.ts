@@ -17,7 +17,7 @@ namespace gd3d.framework
          * 
          * 基于寿命的粒子速度控制曲线。
          */
-        
+
         velocity = new MinMaxCurveVector3();
 
         /**
@@ -25,8 +25,8 @@ namespace gd3d.framework
          * 
          * 指定速度是在局部空间(与变换一起旋转)还是在世界空间。
          */
-        
-        space = ParticleSystemSimulationSpace1.Local;
+
+        space = ParticleSystemSimulationSpace.Local;
 
         /**
          * Curve to control particle speed based on lifetime, on the X axis.
@@ -125,7 +125,6 @@ namespace gd3d.framework
         initParticleState(particle: Particle1)
         {
             particle[_VelocityOverLifetime_rate] = Math.random();
-            particle[_VelocityOverLifetime_preVelocity] = new Vector3();
         }
 
         /**
@@ -134,22 +133,11 @@ namespace gd3d.framework
          */
         updateParticleState(particle: Particle1)
         {
-            var preVelocity: Vector3 = particle[_VelocityOverLifetime_preVelocity];
-            particle.velocity.sub(preVelocity);
-            preVelocity.set(0, 0, 0);
+            this.particleSystem.removeParticleVelocity(particle, _VelocityOverLifetime_preVelocity);
             if (!this.enabled) return;
 
             var velocity = this.velocity.getValue(particle.rateAtLifeTime, particle[_VelocityOverLifetime_rate]);
-            if (this.space == ParticleSystemSimulationSpace1.World)
-            {
-                var worldToLocalMatrix = new Matrix4x4(this.particleSystem.transform.getWorldMatrix().rawData.concat());
-                worldToLocalMatrix.invert();
-                worldToLocalMatrix.deltaTransformVector(velocity, velocity);
-            }
-
-            //
-            particle.velocity.add(velocity);
-            preVelocity.copy(velocity);
+            this.particleSystem.addParticleVelocity(particle, velocity, this.space, _VelocityOverLifetime_preVelocity);
         }
     }
 
