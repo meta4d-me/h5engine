@@ -30119,7 +30119,8 @@ var gd3d;
                 if (subMeshs == null)
                     return;
                 mesh.glMesh.bindVboBuffer(context.webgl);
-                var isSupportDrawInstancedArrays = !!context.webgl.getExtension("ANGLE_instanced_arrays");
+                context.webgl.ANGLE_instanced_arrays = context.webgl.ANGLE_instanced_arrays || context.webgl.getExtension("ANGLE_instanced_arrays");
+                var isSupportDrawInstancedArrays = !!context.webgl.ANGLE_instanced_arrays;
                 if (!this._awaked) {
                     this._isPlaying = this.main.playOnAwake;
                     this._awaked = true;
@@ -30163,31 +30164,30 @@ var gd3d;
                     }
                 }
                 console.assert(data.length == 24 * this._activeParticles.length);
-                if (isSupportDrawInstancedArrays) {
+                var stride = this._attributes.reduce(function (pv, cv) { return pv += cv[1]; }, 0) * 4;
+                if (isSupportDrawInstancedArrays && this.particleCount > 0) {
+                    data = data.concat(data);
+                    var vbo = this._getVBO(context.webgl);
                     var drawInstanceInfo = {
                         instanceCount: this.particleCount,
                         initBuffer: function (gl) {
-                            var vbo = _this._getVBO(gl);
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.DYNAMIC_DRAW);
                         },
                         activeAttributes: function (gl, program) {
-                            var vbo = _this._getVBO(gl);
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                             var offset = 0;
-                            var stride = _this._attributes.reduce(function (pv, cv) { return pv += cv[1]; }, 0) * 4;
                             _this._attributes.forEach(function (element) {
                                 var location = gl.getAttribLocation(program, element[0]);
                                 if (location == -1)
                                     return;
                                 gl.enableVertexAttribArray(location);
                                 gl.vertexAttribPointer(location, element[1], gl.FLOAT, false, stride, offset);
-                                gl.getExtension("ANGLE_instanced_arrays").vertexAttribDivisorANGLE(location, 1);
+                                gl.ANGLE_instanced_arrays.vertexAttribDivisorANGLE(location, 1);
                                 offset += element[1] * 4;
                             });
                         },
                         disableAttributes: function (gl, program) {
-                            var vbo = _this._getVBO(gl);
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                             _this._attributes.forEach(function (element) {
                                 var location = gl.getAttribLocation(program, element[0]);
@@ -30201,12 +30201,7 @@ var gd3d;
                 }
             };
             ParticleSystem.prototype._getVBO = function (gl) {
-                for (var i = 0, n = this._vbos.length; i < n; i++) {
-                    if (this._vbos[i][0] == gl)
-                        return this._vbos[i][1];
-                }
                 var vbo = gl.createBuffer();
-                this._vbos.push([gl, vbo]);
                 return vbo;
             };
             Object.defineProperty(ParticleSystem.prototype, "rateAtDuration", {
@@ -42868,8 +42863,8 @@ var gd3d;
                     count = ((this.vertexCount / 3) | 0) * 3;
                 drawInfo.ins.triCount += count / 3;
                 drawInfo.ins.renderCount++;
-                if (instanceCount > 1 && webgl.getExtension("ANGLE_instanced_arrays") != null) {
-                    webgl.getExtension("ANGLE_instanced_arrays").drawArraysInstancedANGLE(webgl.TRIANGLES, start, count, instanceCount);
+                if (instanceCount > 1 && webgl.ANGLE_instanced_arrays != null) {
+                    webgl.ANGLE_instanced_arrays.drawArraysInstancedANGLE(webgl.TRIANGLES, start, count, instanceCount);
                 }
                 else {
                     webgl.drawArrays(webgl.TRIANGLES, start, count);
@@ -42882,8 +42877,8 @@ var gd3d;
                 if (count < 0)
                     count = ((this.vertexCount / 2) | 0) * 2;
                 drawInfo.ins.renderCount++;
-                if (instanceCount > 1 && webgl.getExtension("ANGLE_instanced_arrays") != null) {
-                    webgl.getExtension("ANGLE_instanced_arrays").drawArraysInstancedANGLE(webgl.LINES, start, count, instanceCount);
+                if (instanceCount > 1 && webgl.ANGLE_instanced_arrays != null) {
+                    webgl.ANGLE_instanced_arrays.drawArraysInstancedANGLE(webgl.LINES, start, count, instanceCount);
                 }
                 else {
                     webgl.drawArrays(webgl.LINES, start, count);
@@ -42897,8 +42892,8 @@ var gd3d;
                     count = ((this.indexCounts[this.bindIndex] / 3) | 0) * 3;
                 drawInfo.ins.triCount += count / 3;
                 drawInfo.ins.renderCount++;
-                if (instanceCount > 1 && webgl.getExtension("ANGLE_instanced_arrays") != null) {
-                    webgl.getExtension("ANGLE_instanced_arrays").drawElementsInstancedANGLE(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
+                if (instanceCount > 1 && webgl.ANGLE_instanced_arrays != null) {
+                    webgl.ANGLE_instanced_arrays.drawElementsInstancedANGLE(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
                 }
                 else {
                     webgl.drawElements(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2);
@@ -42911,8 +42906,8 @@ var gd3d;
                 if (count < 0)
                     count = ((this.indexCounts[this.bindIndex] / 2) | 0) * 2;
                 drawInfo.ins.renderCount++;
-                if (instanceCount > 1 && webgl.getExtension("ANGLE_instanced_arrays") != null) {
-                    webgl.getExtension("ANGLE_instanced_arrays").drawElementsInstancedANGLE(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
+                if (instanceCount > 1 && webgl.ANGLE_instanced_arrays != null) {
+                    webgl.ANGLE_instanced_arrays.drawElementsInstancedANGLE(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
                 }
                 else {
                     webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);

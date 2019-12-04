@@ -1,5 +1,10 @@
 /// <reference path="event/EventDispatcher.ts" />
 
+interface WebGLRenderingContext
+{
+    ANGLE_instanced_arrays: ANGLE_instanced_arrays;
+}
+
 namespace gd3d.framework
 {
     export interface ComponentMap { ParticleSystem: ParticleSystem }
@@ -482,7 +487,8 @@ namespace gd3d.framework
             mesh.glMesh.bindVboBuffer(context.webgl);
 
             // 获取批量渲染扩展
-            var isSupportDrawInstancedArrays = !!context.webgl.getExtension("ANGLE_instanced_arrays");
+            context.webgl.ANGLE_instanced_arrays = context.webgl.ANGLE_instanced_arrays || context.webgl.getExtension("ANGLE_instanced_arrays");
+            var isSupportDrawInstancedArrays = !!context.webgl.ANGLE_instanced_arrays;
             // isSupportDrawInstancedArrays = false;
 
             if (!this._awaked)
@@ -550,23 +556,26 @@ namespace gd3d.framework
 
             console.assert(data.length == 24 * this._activeParticles.length);
 
-            if (isSupportDrawInstancedArrays)
+            var stride = this._attributes.reduce((pv, cv) => pv += cv[1], 0) * 4;
+            if (isSupportDrawInstancedArrays && this.particleCount > 0)
             {
+                data = data.concat(data);
+                var vbo = this._getVBO(context.webgl);
+
                 var drawInstanceInfo: DrawInstanceInfo = {
                     instanceCount: this.particleCount,
                     initBuffer: (gl) =>
                     {
-                        var vbo = this._getVBO(gl);
                         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                        // gl.bufferData(gl.ARRAY_BUFFER, data.length * 4, gl.DYNAMIC_DRAW);
                         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.DYNAMIC_DRAW);
                     },
                     activeAttributes: (gl, program) =>
                     {
-                        var vbo = this._getVBO(gl);
                         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
 
                         var offset = 0;
-                        var stride = this._attributes.reduce((pv, cv) => pv += cv[1], 0) * 4;
+                        // console.log("1_0");
                         this._attributes.forEach(element =>
                         {
                             var location = gl.getAttribLocation(program, element[0]);
@@ -574,15 +583,17 @@ namespace gd3d.framework
 
                             gl.enableVertexAttribArray(location);
                             gl.vertexAttribPointer(location, element[1], gl.FLOAT, false, stride, offset);
-                            gl.getExtension("ANGLE_instanced_arrays").vertexAttribDivisorANGLE(location, 1);
+                            gl.ANGLE_instanced_arrays.vertexAttribDivisorANGLE(location, 1);
                             offset += element[1] * 4;
+
                         });
+                        // console.log(1);
                     },
                     disableAttributes: (gl, program) =>
                     {
-                        var vbo = this._getVBO(gl);
                         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
 
+                        // console.log("2_0");
                         this._attributes.forEach(element =>
                         {
                             var location = gl.getAttribLocation(program, element[0]);
@@ -590,6 +601,7 @@ namespace gd3d.framework
 
                             gl.disableVertexAttribArray(location);
                         });
+                        // console.log(2);
                     },
                 };
 
@@ -600,13 +612,13 @@ namespace gd3d.framework
         private _vbos: [WebGLRenderingContext, WebGLBuffer][] = [];
         private _getVBO(gl: WebGLRenderingContext)
         {
-            for (let i = 0, n = this._vbos.length; i < n; i++)
-            {
-                if (this._vbos[i][0] == gl)
-                    return this._vbos[i][1];
-            }
+            // for (let i = 0, n = this._vbos.length; i < n; i++)
+            // {
+            //     if (this._vbos[i][0] == gl)
+            //         return this._vbos[i][1];
+            // }
             var vbo = gl.createBuffer();
-            this._vbos.push([gl, vbo]);
+            // this._vbos.push([gl, vbo]);
             return vbo;
         }
 

@@ -315,9 +315,9 @@
             drawInfo.ins.triCount += count / 3;
             drawInfo.ins.renderCount ++;
             //model
-            if(instanceCount > 1 && webgl.getExtension("ANGLE_instanced_arrays") != null)
+            if(instanceCount > 1 && webgl.ANGLE_instanced_arrays != null)
             {
-                webgl.getExtension("ANGLE_instanced_arrays").drawArraysInstancedANGLE(webgl.TRIANGLES, start, count, instanceCount);
+                webgl.ANGLE_instanced_arrays.drawArraysInstancedANGLE(webgl.TRIANGLES, start, count, instanceCount);
             }else
             {
                 webgl.drawArrays(webgl.TRIANGLES, start, count);
@@ -330,9 +330,9 @@
                 count = ((this.vertexCount / 2) | 0) * 2;
             drawInfo.ins.renderCount ++;
             //model
-            if(instanceCount > 1 && webgl.getExtension("ANGLE_instanced_arrays") != null)
+            if(instanceCount > 1 && webgl.ANGLE_instanced_arrays != null)
             {
-                webgl.getExtension("ANGLE_instanced_arrays").drawArraysInstancedANGLE(webgl.LINES, start, count, instanceCount);
+                webgl.ANGLE_instanced_arrays.drawArraysInstancedANGLE(webgl.LINES, start, count, instanceCount);
             }else
             {
                 webgl.drawArrays(webgl.LINES, start, count);
@@ -344,9 +344,9 @@
                 count = ((this.indexCounts[this.bindIndex] / 3) | 0) * 3;
             drawInfo.ins.triCount += count / 3;
             drawInfo.ins.renderCount ++;
-            if(instanceCount > 1 && webgl.getExtension("ANGLE_instanced_arrays") != null)
+            if(instanceCount > 1 && webgl.ANGLE_instanced_arrays != null)
             {
-                webgl.getExtension("ANGLE_instanced_arrays").drawElementsInstancedANGLE(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
+                webgl.ANGLE_instanced_arrays.drawElementsInstancedANGLE(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
             }else
             {
                 webgl.drawElements(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2);
@@ -357,9 +357,9 @@
             if (count < 0)
                 count = ((this.indexCounts[this.bindIndex] / 2) | 0) * 2;
             drawInfo.ins.renderCount ++;
-            if(instanceCount > 1 && webgl.getExtension("ANGLE_instanced_arrays") != null)
+            if(instanceCount > 1 && webgl.ANGLE_instanced_arrays != null)
             {
-                webgl.getExtension("ANGLE_instanced_arrays").drawElementsInstancedANGLE(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
+                webgl.ANGLE_instanced_arrays.drawElementsInstancedANGLE(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
             }else
             {
                 webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);

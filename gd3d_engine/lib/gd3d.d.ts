@@ -5683,6 +5683,9 @@ declare namespace gd3d.framework {
         protected handelEventBubbles(e: Event<any>): void;
     }
 }
+interface WebGLRenderingContext {
+    ANGLE_instanced_arrays: ANGLE_instanced_arrays;
+}
 declare namespace gd3d.framework {
     interface ComponentMap {
         ParticleSystem: ParticleSystem;
