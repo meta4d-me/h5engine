@@ -35,7 +35,7 @@ class test_ParticleSystem_particles_additive_drawInstanced
     
     varying vec2 v_uv;
     
-    //
+    
     attribute vec4 a_particle_position;
     attribute vec4 a_particle_scale;
     attribute vec4 a_particle_rotation;
@@ -118,8 +118,8 @@ class test_ParticleSystem_particles_additive_drawInstanced
         //输出uv
         v_uv = _glesMultiTexCoord0.xy;
     
-        particleAnimation(position);
-        // position = particleAnimation(position);
+        // particleAnimation(position);
+        position = particleAnimation(position);
     
         //计算投影坐标
         gl_Position = glstate_matrix_mvp * position;

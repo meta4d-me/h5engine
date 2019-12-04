@@ -35,13 +35,19 @@ namespace gd3d.framework
          */
         instanceCount: number;
         /**
+         * 初始化Buffer
+         * 
+         * @param gl 
+         */
+        initBuffer(gl: WebGLRenderingContext): void;
+        /**
          * 启用批量渲染相关顶点属性
          */
-        activeAttributes: (program: WebGLProgram) => void;
+        activeAttributes(gl: WebGLRenderingContext, program: WebGLProgram): void;
         /**
          * 禁用批量渲染相关顶点属性
          */
-        disableAttributes: (program: WebGLProgram) => void;
+        disableAttributes(gl: WebGLRenderingContext, program: WebGLProgram): void;
     }
 
     /**
@@ -207,22 +213,24 @@ namespace gd3d.framework
             return total;
         }
 
-        private static sameMatPassMap = {   glstate_matrix_model:true,
-            glstate_matrix_world2object:true,
-            glstate_matrix_modelview:true,
-            glstate_matrix_mvp:true,
-            glstate_vec4_bones:true,
-            glstate_matrix_bones:true
+        private static sameMatPassMap = {
+            glstate_matrix_model: true,
+            glstate_matrix_world2object: true,
+            glstate_matrix_modelview: true,
+            glstate_matrix_mvp: true,
+            glstate_vec4_bones: true,
+            glstate_matrix_bones: true
         }
 
-        uploadUnifoms(pass: render.glDrawPass, context: renderContext , lastMatSame = false)
+        uploadUnifoms(pass: render.glDrawPass, context: renderContext, lastMatSame = false)
         {
             render.shaderUniform.texindex = 0;
             let udMap = this.uniformDirtyMap;
             for (let key in pass.mapuniforms)
             {
                 let unifom = pass.mapuniforms[key];
-                if(lastMatSame && !material.sameMatPassMap[unifom.name] && !udMap[unifom.name]){
+                if (lastMatSame && !material.sameMatPassMap[unifom.name] && !udMap[unifom.name])
+                {
                     continue;
                 }
                 udMap[unifom.name] = false;  //标记为 没有 变化
@@ -351,7 +359,8 @@ namespace gd3d.framework
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float)
             {
                 this.statedMapUniforms[_id] = _number;
-                if(this.statedMapUniforms[_id] != _number){
+                if (this.statedMapUniforms[_id] != _number)
+                {
                     this.uniformDirtyMap[_id] = true;
                 }
             } else
@@ -501,7 +510,7 @@ namespace gd3d.framework
             }
         }
 
-        private uniformDirtyMap : {[id:string]:boolean} = {};//值变化标记map
+        private uniformDirtyMap: { [id: string]: boolean } = {};//值变化标记map
 
         private static lastDrawMatID = -1;
         private static lastDrawMeshID = -1;
@@ -520,8 +529,8 @@ namespace gd3d.framework
          */
         draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base", drawInstanceInfo: DrawInstanceInfo = undefined)
         {
-            let matGUID= this.getGUID();
-            let meshGUID= mesh.getGUID();
+            let matGUID = this.getGUID();
+            let meshGUID = mesh.getGUID();
             let LastMatSame = matGUID == material.lastDrawMatID;
             let LastMeshSame = meshGUID == material.lastDrawMeshID;
 
@@ -544,7 +553,9 @@ namespace gd3d.framework
                 pass.use(context.webgl);
                 this.uploadUnifoms(pass, context, LastMatSame);
                 if (!LastMatSame || !LastMeshSame) mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
-                drawInstanceInfo && drawInstanceInfo.activeAttributes(pass.program.program);
+
+                drawInstanceInfo.initBuffer(context.webgl);
+                drawInstanceInfo && drawInstanceInfo.activeAttributes(context.webgl, pass.program.program);
                 //test code
                 // if(LastMatSame && LastMatSame){
                 //     console.log(`matGUID :${matGUID} , matName : ${this.name.getText()}`);
@@ -573,7 +584,7 @@ namespace gd3d.framework
                         mesh.glMesh.drawElementTris(context.webgl, sm.start, sm.size, instanceCount);
                     }
                 }
-                drawInstanceInfo && drawInstanceInfo.disableAttributes(pass.program.program);
+                drawInstanceInfo && drawInstanceInfo.disableAttributes(context.webgl, pass.program.program);
             }
 
             material.lastDrawMatID = matGUID;

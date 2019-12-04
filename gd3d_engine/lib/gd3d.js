@@ -12338,7 +12338,8 @@ var gd3d;
                     this.uploadUnifoms(pass, context, LastMatSame);
                     if (!LastMatSame || !LastMeshSame)
                         mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
-                    drawInstanceInfo && drawInstanceInfo.activeAttributes(pass.program.program);
+                    drawInstanceInfo.initBuffer(context.webgl);
+                    drawInstanceInfo && drawInstanceInfo.activeAttributes(context.webgl, pass.program.program);
                     framework.DrawCallInfo.inc.add();
                     if (sm.useVertexIndex < 0) {
                         if (sm.line) {
@@ -12356,7 +12357,7 @@ var gd3d;
                             mesh.glMesh.drawElementTris(context.webgl, sm.start, sm.size, instanceCount);
                         }
                     }
-                    drawInstanceInfo && drawInstanceInfo.disableAttributes(pass.program.program);
+                    drawInstanceInfo && drawInstanceInfo.disableAttributes(context.webgl, pass.program.program);
                 }
                 material_2.lastDrawMatID = matGUID;
                 material_2.lastDrawMeshID = meshGUID;
@@ -12471,7 +12472,8 @@ var gd3d;
             };
             var material_2;
             material.ClassName = "material";
-            material.sameMatPassMap = { glstate_matrix_model: true,
+            material.sameMatPassMap = {
+                glstate_matrix_model: true,
                 glstate_matrix_world2object: true,
                 glstate_matrix_modelview: true,
                 glstate_matrix_mvp: true,
@@ -29770,7 +29772,6 @@ var gd3d;
             __extends(ParticleSystem, _super);
             function ParticleSystem() {
                 var _this = _super.call(this) || this;
-                _this.__class__ = "gd3d.framework.ParticleSystem";
                 _this.layer = framework.RenderLayerEnum.Transparent;
                 _this.queue = 0;
                 _this._isPlaying = false;
@@ -30160,29 +30161,38 @@ var gd3d;
                 }
                 console.assert(data.length == 24 * this._activeParticles.length);
                 if (isSupportDrawInstancedArrays) {
-                    var gl = context.webgl;
-                    var vbo = this._getVBO(gl);
-                    gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.DYNAMIC_DRAW);
                     var drawInstanceInfo = {
                         instanceCount: this.particleCount,
-                        activeAttributes: function (program) {
+                        initBuffer: function (gl) {
+                            var vbo = _this._getVBO(gl);
+                            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.DYNAMIC_DRAW);
+                        },
+                        activeAttributes: function (gl, program) {
+                            var vbo = _this._getVBO(gl);
+                            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                             var offset = 0;
                             var stride = _this._attributes.reduce(function (pv, cv) { return pv += cv[1]; }, 0) * 4;
                             _this._attributes.forEach(function (element) {
                                 var location = gl.getAttribLocation(program, element[0]);
+                                if (location == -1)
+                                    return;
                                 gl.enableVertexAttribArray(location);
                                 gl.vertexAttribPointer(location, element[1], gl.FLOAT, false, stride, offset);
                                 gl.getExtension("ANGLE_instanced_arrays").vertexAttribDivisorANGLE(location, 1);
                                 offset += element[1] * 4;
                             });
                         },
-                        disableAttributes: function (program) {
+                        disableAttributes: function (gl, program) {
+                            var vbo = _this._getVBO(gl);
+                            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                             _this._attributes.forEach(function (element) {
                                 var location = gl.getAttribLocation(program, element[0]);
+                                if (location == -1)
+                                    return;
                                 gl.disableVertexAttribArray(location);
                             });
-                        }
+                        },
                     };
                     this.material.draw(context, mesh, subMeshs[0], "base", drawInstanceInfo);
                 }
@@ -30763,7 +30773,6 @@ var gd3d;
                 if (r === void 0) { r = 1; }
                 if (g === void 0) { g = 1; }
                 if (b === void 0) { b = 1; }
-                this.__class__ = "gd3d.framework.Color3";
                 this.r = 1;
                 this.g = 1;
                 this.b = 1;
@@ -30888,7 +30897,6 @@ var gd3d;
                 if (g === void 0) { g = 1; }
                 if (b === void 0) { b = 1; }
                 if (a === void 0) { a = 1; }
-                this.__class__ = "gd3d.framework.Color4";
                 this.r = 1;
                 this.g = 1;
                 this.b = 1;
@@ -31225,7 +31233,6 @@ var gd3d;
     (function (framework) {
         var AnimationCurve1 = (function () {
             function AnimationCurve1() {
-                this.__class__ = "gd3d.framework.AnimationCurve1";
                 this.maxtan = 1000;
                 this.preWrapMode = framework.AnimationCurveWrapMode.Clamp;
                 this.postWrapMode = framework.AnimationCurveWrapMode.Clamp;
@@ -31640,7 +31647,6 @@ var gd3d;
     (function (framework) {
         var MinMaxCurve = (function () {
             function MinMaxCurve() {
-                this.__class__ = "gd3d.framework.MinMaxCurve";
                 this.mode = framework.MinMaxCurveMode.Constant;
                 this.constant = 0;
                 this.constantMin = 0;
@@ -32985,7 +32991,6 @@ var gd3d;
                 if (x === void 0) { x = 0; }
                 if (y === void 0) { y = 0; }
                 if (z === void 0) { z = 0; }
-                this.__class__ = "gd3d.framework.Vector3";
                 this.x = 0;
                 this.y = 0;
                 this.z = 0;
@@ -33534,7 +33539,6 @@ var gd3d;
     (function (framework) {
         var Gradient = (function () {
             function Gradient() {
-                this.__class__ = "gd3d.framework.Gradient";
                 this.mode = framework.GradientMode.Blend;
                 this.alphaKeys = [{ alpha: 1, time: 0 }, { alpha: 1, time: 1 }];
                 this.colorKeys = [{ color: new framework.Color3(1, 1, 1), time: 0 }, { color: new framework.Color3(1, 1, 1), time: 1 }];
@@ -33623,7 +33627,6 @@ var gd3d;
     (function (framework) {
         var MinMaxGradient = (function () {
             function MinMaxGradient() {
-                this.__class__ = "gd3d.framework.MinMaxGradient";
                 this.mode = framework.MinMaxGradientMode.Color;
                 this.color = new framework.Color4();
                 this.colorMin = new framework.Color4();
@@ -33753,7 +33756,6 @@ var gd3d;
             __extends(ParticleEmissionModule, _super);
             function ParticleEmissionModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.__class__ = "gd3d.framework.ParticleEmissionModule";
                 _this.rateOverTime = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 10, constantMin: 10, constantMax: 10, curveMultiplier: 10 });
                 _this.rateOverDistance = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 0, constantMin: 0, constantMax: 1 });
                 _this.bursts = [];
@@ -33972,7 +33974,6 @@ var gd3d;
             __extends(ParticleLimitVelocityOverLifetimeModule, _super);
             function ParticleLimitVelocityOverLifetimeModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.__class__ = "gd3d.framework.ParticleLimitVelocityOverLifetimeModule";
                 _this.separateAxes = false;
                 _this.limit = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 });
                 _this.limit3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 } });
@@ -34097,7 +34098,6 @@ var gd3d;
             __extends(ParticleMainModule, _super);
             function ParticleMainModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.__class__ = "gd3d.framework.ParticleMainModule";
                 _this.enabled = true;
                 _this.duration = 5;
                 _this.loop = true;
@@ -34549,7 +34549,6 @@ var gd3d;
             __extends(ParticleShapeModule, _super);
             function ParticleShapeModule() {
                 var _this = _super.call(this) || this;
-                _this.__class__ = "gd3d.framework.ParticleShapeModule";
                 _this.alignToDirection = false;
                 _this.randomDirectionAmount = 0;
                 _this.sphericalDirectionAmount = 0;
@@ -35165,7 +35164,6 @@ var gd3d;
             __extends(ParticleVelocityOverLifetimeModule, _super);
             function ParticleVelocityOverLifetimeModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.__class__ = "gd3d.framework.ParticleVelocityOverLifetimeModule";
                 _this.velocity = new framework.MinMaxCurveVector3();
                 _this.space = framework.ParticleSystemSimulationSpace1.Local;
                 return _this;
@@ -35262,7 +35260,6 @@ var gd3d;
     (function (framework) {
         var ParticleEmissionBurst = (function () {
             function ParticleEmissionBurst() {
-                this.__class__ = "gd3d.framework.ParticleEmissionBurst";
                 this.time = 0;
                 this.count = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 30, constantMin: 30, constantMax: 30 });
                 this.cycleCount = 1;

@@ -483,18 +483,13 @@ namespace gd3d.framework
 
             // 获取批量渲染扩展
             var isSupportDrawInstancedArrays = !!context.webgl.getExtension("ANGLE_instanced_arrays");
+            // isSupportDrawInstancedArrays = false;
 
             if (!this._awaked)
             {
                 this._isPlaying = this.main.playOnAwake;
                 this._awaked = true;
             }
-
-            // renderAtomic.instanceCount = this._activeParticles.length;
-            //
-            // renderAtomic.shaderMacro.HAS_PARTICLE_ANIMATOR = true;
-
-            // renderAtomic.shaderMacro.ENABLED_PARTICLE_SYSTEM_textureSheetAnimation = this.textureSheetAnimation.enabled;
 
             // 计算公告牌矩阵
             var isbillboard = !this.shape.alignToDirection && this.mesh == sceneMgr.app.getAssetMgr().getDefaultMesh(gd3d.framework.defMesh.quad);
@@ -556,35 +551,45 @@ namespace gd3d.framework
 
             if (isSupportDrawInstancedArrays)
             {
-                var gl = context.webgl;
-
-                var vbo = this._getVBO(gl);
-                gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.DYNAMIC_DRAW);
-
                 var drawInstanceInfo: DrawInstanceInfo = {
                     instanceCount: this.particleCount,
-                    activeAttributes: (program: WebGLProgram) => 
+                    initBuffer: (gl) =>
                     {
+                        var vbo = this._getVBO(gl);
+                        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.DYNAMIC_DRAW);
+                    },
+                    activeAttributes: (gl, program) =>
+                    {
+                        var vbo = this._getVBO(gl);
+                        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+
                         var offset = 0;
                         var stride = this._attributes.reduce((pv, cv) => pv += cv[1], 0) * 4;
                         this._attributes.forEach(element =>
                         {
                             var location = gl.getAttribLocation(program, element[0]);
+                            if (location == -1) return;
+
                             gl.enableVertexAttribArray(location);
                             gl.vertexAttribPointer(location, element[1], gl.FLOAT, false, stride, offset);
                             gl.getExtension("ANGLE_instanced_arrays").vertexAttribDivisorANGLE(location, 1);
                             offset += element[1] * 4;
                         });
                     },
-                    disableAttributes: (program: WebGLProgram) =>
+                    disableAttributes: (gl, program) =>
                     {
+                        var vbo = this._getVBO(gl);
+                        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+
                         this._attributes.forEach(element =>
                         {
                             var location = gl.getAttribLocation(program, element[0]);
+                            if (location == -1) return;
+
                             gl.disableVertexAttribArray(location);
                         });
-                    }
+                    },
                 };
 
                 this.material.draw(context, mesh, subMeshs[0], "base", drawInstanceInfo);

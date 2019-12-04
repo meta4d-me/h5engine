@@ -2332,8 +2332,9 @@ declare namespace gd3d.framework {
     }
     interface DrawInstanceInfo {
         instanceCount: number;
-        activeAttributes: (program: WebGLProgram) => void;
-        disableAttributes: (program: WebGLProgram) => void;
+        initBuffer(gl: WebGLRenderingContext): void;
+        activeAttributes(gl: WebGLRenderingContext, program: WebGLProgram): void;
+        disableAttributes(gl: WebGLRenderingContext, program: WebGLProgram): void;
     }
     class material implements IAsset {
         static readonly ClassName: string;
