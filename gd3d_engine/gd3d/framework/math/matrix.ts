@@ -542,6 +542,8 @@ namespace gd3d.math
         out.rawData[15] = 1;
 
     }
+
+    
     export function matrix3x2MakeRotate(angle: number, out: matrix3x2)
     {
         var x = 0,

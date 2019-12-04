@@ -292,6 +292,16 @@ namespace gd3d.framework
             this.activeShape.initParticleState(particle);
             if (this.alignToDirection)
             {
+                // var dir = particle.velocity;
+                // var mat = new math.matrix();
+                // math.matrixLookatLH(dir, new math.vector3(0, 1, 0), mat);
+
+                // var mat0 = new math.matrix();
+                // math.matrix
+
+                // var mat0 = Matrix4x4.fromRotation(particle.rotation.x, particle.rotation.y, particle.rotation.z);
+                // mat0.append(mat);
+                
                 var dir = particle.velocity;
                 var mat = new Matrix4x4();
                 mat.lookAt(dir, Vector3.Y_AXIS);
