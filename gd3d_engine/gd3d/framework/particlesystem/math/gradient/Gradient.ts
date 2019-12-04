@@ -7,7 +7,7 @@ namespace gd3d.framework
      */
     export class Gradient
     {
-        __class__: "gd3d.framework.Gradient" = "gd3d.framework.Gradient";
+        __class__: "gd3d.framework.Gradient";
 
         /**
          * 渐变模式

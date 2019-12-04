@@ -5,7 +5,7 @@ namespace gd3d.framework
      */
     export class ParticleEmissionBurst
     {
-        __class__: "gd3d.framework.ParticleEmissionBurst" = "gd3d.framework.ParticleEmissionBurst";
+        __class__: "gd3d.framework.ParticleEmissionBurst";
 
         /**
          * The time that each burst occurs.

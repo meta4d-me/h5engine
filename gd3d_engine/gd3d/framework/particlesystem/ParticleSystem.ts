@@ -23,7 +23,7 @@ namespace gd3d.framework
     {
         static readonly ClassName: string = "ParticleSystem";
 
-        __class__: "gd3d.framework.ParticleSystem" = "gd3d.framework.ParticleSystem";
+        __class__: "gd3d.framework.ParticleSystem";
 
         layer: RenderLayerEnum = RenderLayerEnum.Transparent;
         /**

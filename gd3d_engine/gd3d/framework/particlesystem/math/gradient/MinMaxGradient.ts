@@ -7,7 +7,7 @@ namespace gd3d.framework
      */
     export class MinMaxGradient
     {
-        __class__: "gd3d.framework.MinMaxGradient" = "gd3d.framework.MinMaxGradient";
+        __class__: "gd3d.framework.MinMaxGradient";
 
         /**
          * Set the mode that the min-max gradient will use to evaluate colors.

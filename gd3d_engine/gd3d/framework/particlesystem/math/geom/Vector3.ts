@@ -8,7 +8,7 @@ namespace gd3d.framework
     export class Vector3
     {
 
-        __class__: "gd3d.framework.Vector3" = "gd3d.framework.Vector3";
+        __class__: "gd3d.framework.Vector3";
 
         /**
         * 定义为 Vector3 对象的 x 轴，坐标为 (1,0,0)。

@@ -7,7 +7,7 @@ namespace gd3d.framework
      */
     export class ParticleEmissionModule extends ParticleModule
     {
-        __class__: "gd3d.framework.ParticleEmissionModule" = "gd3d.framework.ParticleEmissionModule";
+        __class__: "gd3d.framework.ParticleEmissionModule";
 
         /**
          * 随着时间的推移，新粒子产生的速度。

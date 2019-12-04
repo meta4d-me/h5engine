@@ -118,7 +118,8 @@ class test_ParticleSystem_particles_additive_drawInstanced
         //输出uv
         v_uv = _glesMultiTexCoord0.xy;
     
-        position = particleAnimation(position);
+        particleAnimation(position);
+        // position = particleAnimation(position);
     
         //计算投影坐标
         gl_Position = glstate_matrix_mvp * position;
