@@ -5750,12 +5750,14 @@ declare namespace gd3d.framework {
         pause(): void;
         continue(): void;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        private _vbos;
+        private _getVBO;
+        private _attributes;
         private _awaked;
         private _realTime;
         private _preRealTime;
         private _particlePool;
         private _activeParticles;
-        private _attributes;
         private readonly _modules;
         readonly rateAtDuration: number;
         private _emit;
@@ -5917,42 +5919,6 @@ declare namespace gd3d.framework {
         thisObject: any;
         priority: number;
         once: boolean;
-    }
-}
-declare namespace gd3d.framework {
-    class Attribute {
-        name: string;
-        data: number[];
-        private _data;
-        size: number;
-        type: GLArrayType;
-        normalized: boolean;
-        stride: number;
-        offset: number;
-        divisor: number;
-        private _invalid;
-        private _indexBufferMap;
-        constructor(name: string, data: number[], size?: number, divisor?: number);
-        invalidate(): void;
-        active(gl: WebGLRenderingContext, location: number): void;
-        private getBuffer;
-        private clear;
-    }
-}
-declare namespace gd3d.framework {
-    enum AttributeUsage {
-        STATIC_DRAW = "STATIC_DRAW",
-        DYNAMIC_DRAW = "DYNAMIC_DRAW",
-        STREAM_DRAW = "STREAM_DRAW"
-    }
-}
-declare namespace gd3d.framework {
-    enum GLArrayType {
-        BYTE = "BYTE",
-        SHORT = "SHORT",
-        UNSIGNED_BYTE = "UNSIGNED_BYTE",
-        UNSIGNED_SHORT = "UNSIGNED_SHORT",
-        FLOAT = "FLOAT"
     }
 }
 declare namespace gd3d.framework {

@@ -29779,19 +29779,20 @@ var gd3d;
                 _this.time = 0;
                 _this.startDelay = 0;
                 _this._startDelay_rate = Math.random();
+                _this._vbos = [];
+                _this._attributes = [
+                    ["a_particle_position", 4],
+                    ["a_particle_scale", 4],
+                    ["a_particle_rotation", 4],
+                    ["a_particle_color", 4],
+                    ["a_particle_tilingOffset", 4],
+                    ["a_particle_flipUV", 4],
+                ];
                 _this._awaked = false;
                 _this._realTime = 0;
                 _this._preRealTime = 0;
                 _this._particlePool = [];
                 _this._activeParticles = [];
-                _this._attributes = {
-                    a_particle_position: new framework.Attribute("a_particle_position", [], 3, 1),
-                    a_particle_scale: new framework.Attribute("a_particle_scale", [], 3, 1),
-                    a_particle_rotation: new framework.Attribute("a_particle_rotation", [], 3, 1),
-                    a_particle_color: new framework.Attribute("a_particle_color", [], 4, 1),
-                    a_particle_tilingOffset: new framework.Attribute("a_particle_tilingOffset", [], 4, 1),
-                    a_particle_flipUV: new framework.Attribute("a_particle_flipUV", [], 2, 1),
-                };
                 _this._modules = [];
                 _this._preworldPos = new framework.Vector3();
                 _this._isRateOverDistance = false;
@@ -30139,8 +30140,8 @@ var gd3d;
                 }
                 this.material.setMatrix("u_particle_billboardMatrix", billboardMatrix);
                 if (!isSupportDrawInstancedArrays) {
-                    for (var i_7 = 0, n_1 = this._activeParticles.length; i_7 < n_1; i_7++) {
-                        var particle = this._activeParticles[i_7];
+                    for (var i = 0, n = this._activeParticles.length; i < n; i++) {
+                        var particle = this._activeParticles[i];
                         this.material.setVector4("a_particle_position", new gd3d.math.vector4(particle.position.x, particle.position.y, particle.position.z, 1));
                         this.material.setVector4("a_particle_scale", new gd3d.math.vector4(particle.size.x, particle.size.y, particle.size.z, 1));
                         this.material.setVector4("a_particle_rotation", new gd3d.math.vector4(particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1));
@@ -30151,63 +30152,52 @@ var gd3d;
                     }
                 }
                 else {
-                    var positions = [];
-                    var scales = [];
-                    var rotations = [];
-                    var colors = [];
-                    var tilingOffsets = [];
-                    var flipUVs = [];
-                    for (var i_8 = 0, n_2 = this._activeParticles.length; i_8 < n_2; i_8++) {
-                        var particle = this._activeParticles[i_8];
-                        positions.push(particle.position.x, particle.position.y, particle.position.z);
-                        scales.push(particle.size.x, particle.size.y, particle.size.z);
-                        rotations.push(particle.rotation.x, particle.rotation.y, particle.rotation.z);
-                        colors.push(particle.color.r, particle.color.g, particle.color.b, particle.color.a);
-                        tilingOffsets.push(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w);
-                        flipUVs.push(particle.flipUV.x, particle.flipUV.y);
+                    var data = [];
+                    for (var i = 0, n = this._activeParticles.length; i < n; i++) {
+                        var particle = this._activeParticles[i];
+                        data.push(particle.position.x, particle.position.y, particle.position.z, 1, particle.size.x, particle.size.y, particle.size.z, 1, particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1, particle.color.r, particle.color.g, particle.color.b, particle.color.a, particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w, particle.flipUV.x, particle.flipUV.y, 0, 0);
                     }
-                    if (isbillboard) {
-                        for (var i = 0, n = rotations.length; i < n; i += 3) {
-                            rotations[i + 2] = -rotations[i + 2];
-                        }
-                    }
-                    this._attributes.a_particle_position.data = positions;
-                    this._attributes.a_particle_scale.data = scales;
-                    this._attributes.a_particle_rotation.data = rotations;
-                    this._attributes.a_particle_color.data = colors;
-                    this._attributes.a_particle_tilingOffset.data = tilingOffsets;
-                    this._attributes.a_particle_flipUV.data = flipUVs;
-                    var drawInstanceInfo = {
-                        instanceCount: this.particleCount,
-                        initBuffer: function (gl) {
-                        },
-                        activeAttributes: function (gl, program) {
-                            for (var key in _this._attributes) {
-                                var element = _this._attributes[key];
-                                if (element instanceof framework.Attribute) {
-                                    var location = gl.getAttribLocation(program, key);
+                    console.assert(data.length == 24 * this._activeParticles.length);
+                    var stride = this._attributes.reduce(function (pv, cv) { return pv += cv[1]; }, 0) * 4;
+                    if (isSupportDrawInstancedArrays && this.particleCount > 0) {
+                        data = data.concat(data);
+                        var vbo = this._getVBO(context.webgl);
+                        var drawInstanceInfo = {
+                            instanceCount: this.particleCount,
+                            initBuffer: function (gl) {
+                                gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+                            },
+                            activeAttributes: function (gl, program) {
+                                gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                                var offset = 0;
+                                _this._attributes.forEach(function (element) {
+                                    var location = gl.getAttribLocation(program, element[0]);
                                     if (location == -1)
                                         return;
-                                    element.active(gl, location);
-                                }
-                            }
-                            mesh.glMesh.bindVboBuffer(context.webgl);
-                        },
-                        disableAttributes: function (gl, program) {
-                            for (var key in _this._attributes) {
-                                var element = _this._attributes[key];
-                                if (element instanceof framework.Attribute) {
-                                    var location = gl.getAttribLocation(program, key);
+                                    gl.enableVertexAttribArray(location);
+                                    gl.vertexAttribPointer(location, element[1], gl.FLOAT, false, stride, offset);
+                                    gl.vertexAttribDivisor(location, 1);
+                                    offset += element[1] * 4;
+                                });
+                            },
+                            disableAttributes: function (gl, program) {
+                                gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                                _this._attributes.forEach(function (element) {
+                                    var location = gl.getAttribLocation(program, element[0]);
                                     if (location == -1)
                                         return;
                                     gl.disableVertexAttribArray(location);
-                                }
-                            }
-                            mesh.glMesh.bindVboBuffer(context.webgl);
-                        },
-                    };
-                    this.material.draw(context, mesh, subMeshs[0], "base", drawInstanceInfo);
+                                });
+                            },
+                        };
+                        this.material.draw(context, mesh, subMeshs[0], "base", drawInstanceInfo);
+                    }
                 }
+            };
+            ParticleSystem.prototype._getVBO = function (gl) {
+                var vbo = gl.createBuffer();
+                return vbo;
             };
             Object.defineProperty(ParticleSystem.prototype, "rateAtDuration", {
                 get: function () {
@@ -30277,8 +30267,8 @@ var gd3d;
                     }
                     var inCycleStart = startTime - cycleStartTime;
                     var inCycleEnd = endTime - cycleStartTime;
-                    for (var i_9 = 0; i_9 < bursts.length; i_9++) {
-                        var burst = bursts[i_9];
+                    for (var i_7 = 0; i_7 < bursts.length; i_7++) {
+                        var burst = bursts[i_7];
                         if (burst.isProbability && inCycleStart <= burst.time && burst.time < inCycleEnd) {
                             emits.push({ time: cycleStartTime + burst.time, num: burst.count.getValue(rateAtDuration) });
                         }
@@ -30753,106 +30743,6 @@ var gd3d;
         }());
         framework.FEvent = FEvent;
         framework.objectevent = framework.event1 = new FEvent();
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var Attribute = (function () {
-            function Attribute(name, data, size, divisor) {
-                if (size === void 0) { size = 3; }
-                if (divisor === void 0) { divisor = 0; }
-                this.size = 3;
-                this.type = framework.GLArrayType.FLOAT;
-                this.normalized = false;
-                this.stride = 0;
-                this.offset = 0;
-                this.divisor = 0;
-                this._invalid = true;
-                this._indexBufferMap = new Map();
-                this.name = name;
-                this.data = data;
-                this.size = size;
-                this.divisor = divisor;
-            }
-            Object.defineProperty(Attribute.prototype, "data", {
-                get: function () {
-                    return this._data;
-                },
-                set: function (v) {
-                    this._data = v;
-                    this.invalidate();
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Attribute.prototype.invalidate = function () {
-                this._invalid = true;
-            };
-            Attribute.prototype.active = function (gl, location) {
-                if (this._invalid) {
-                    this.clear();
-                    this._invalid = false;
-                }
-                gl.enableVertexAttribArray(location);
-                var buffer = this.getBuffer(gl);
-                gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-                gl.vertexAttribPointer(location, this.size, gl[this.type], this.normalized, this.stride, this.offset);
-                if (this.divisor > 0) {
-                    gl.vertexAttribDivisor(location, this.divisor);
-                }
-            };
-            Attribute.prototype.getBuffer = function (gl) {
-                var buffer = this._indexBufferMap.get(gl);
-                if (!buffer) {
-                    var newbuffer = gl.createBuffer();
-                    if (!newbuffer) {
-                        console.error("createBuffer 失败！");
-                        throw "";
-                    }
-                    buffer = newbuffer;
-                    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.data), gl.STATIC_DRAW);
-                    this._indexBufferMap.set(gl, buffer);
-                }
-                return buffer;
-            };
-            Attribute.prototype.clear = function () {
-                this._indexBufferMap.forEach(function (value, key, map) {
-                    key.deleteBuffer(value);
-                });
-                this._indexBufferMap.clear();
-            };
-            return Attribute;
-        }());
-        framework.Attribute = Attribute;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var AttributeUsage;
-        (function (AttributeUsage) {
-            AttributeUsage["STATIC_DRAW"] = "STATIC_DRAW";
-            AttributeUsage["DYNAMIC_DRAW"] = "DYNAMIC_DRAW";
-            AttributeUsage["STREAM_DRAW"] = "STREAM_DRAW";
-        })(AttributeUsage = framework.AttributeUsage || (framework.AttributeUsage = {}));
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var GLArrayType;
-        (function (GLArrayType) {
-            GLArrayType["BYTE"] = "BYTE";
-            GLArrayType["SHORT"] = "SHORT";
-            GLArrayType["UNSIGNED_BYTE"] = "UNSIGNED_BYTE";
-            GLArrayType["UNSIGNED_SHORT"] = "UNSIGNED_SHORT";
-            GLArrayType["FLOAT"] = "FLOAT";
-        })(GLArrayType = framework.GLArrayType || (framework.GLArrayType = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -31683,7 +31573,7 @@ var gd3d;
                         var nsp = sps.shift();
                         var ps0 = [];
                         ps0[0] = nfp;
-                        for (var j = 0, n_3 = pps.length; j < n_3; j++) {
+                        for (var j = 0, n_1 = pps.length; j < n_1; j++) {
                             ps0[j + 1] = ps0[j] + (pps[j] - ps0[j]) / t;
                         }
                         var ps1 = [];
@@ -31692,16 +31582,16 @@ var gd3d;
                             ps1[j] = ps1[j + 1] - (ps1[j + 1] - pps[j]) / (1 - t);
                         }
                         if (mergeType == 1) {
-                            for (var j = 0, n_4 = ps0.length - 1; j <= n_4; j++) {
-                                ps[j] = (ps0[j] * (n_4 - j) + ps1[j] * j) / n_4;
+                            for (var j = 0, n_2 = ps0.length - 1; j <= n_2; j++) {
+                                ps[j] = (ps0[j] * (n_2 - j) + ps1[j] * j) / n_2;
                             }
                         }
                         else if (mergeType == 0) {
-                            for (var j = 0, n_5 = ps0.length - 1; j <= n_5; j++) {
-                                if (j < n_5 / 2) {
+                            for (var j = 0, n_3 = ps0.length - 1; j <= n_3; j++) {
+                                if (j < n_3 / 2) {
                                     ps[j] = ps0[j];
                                 }
-                                else if (j > n_5 / 2) {
+                                else if (j > n_3 / 2) {
                                     ps[j] = ps1[j];
                                 }
                                 else {

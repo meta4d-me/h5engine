@@ -527,78 +527,94 @@ namespace gd3d.framework
                 }
             } else
             {
-                var positions: number[] = [];
-                var scales: number[] = [];
-                var rotations: number[] = [];
-                var colors: number[] = [];
-                var tilingOffsets: number[] = [];
-                var flipUVs: number[] = [];
+                var data: number[] = [];
                 for (let i = 0, n = this._activeParticles.length; i < n; i++)
                 {
                     var particle = this._activeParticles[i];
-                    positions.push(particle.position.x, particle.position.y, particle.position.z);
-                    scales.push(particle.size.x, particle.size.y, particle.size.z);
 
-                    rotations.push(particle.rotation.x, particle.rotation.y, particle.rotation.z);
-                    colors.push(particle.color.r, particle.color.g, particle.color.b, particle.color.a);
-                    tilingOffsets.push(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w);
-                    flipUVs.push(particle.flipUV.x, particle.flipUV.y);
+                    data.push(
+                        particle.position.x, particle.position.y, particle.position.z, 1,
+                        particle.size.x, particle.size.y, particle.size.z, 1,
+                        particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1,
+                        particle.color.r, particle.color.g, particle.color.b, particle.color.a,
+                        particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w,
+                        particle.flipUV.x, particle.flipUV.y, 0, 0,
+                    );
+
                 }
 
-                if (isbillboard)
+                console.assert(data.length == 24 * this._activeParticles.length);
+
+                var stride = this._attributes.reduce((pv, cv) => pv += cv[1], 0) * 4;
+                if (isSupportDrawInstancedArrays && this.particleCount > 0)
                 {
-                    for (var i = 0, n = rotations.length; i < n; i += 3)
-                    {
-                        rotations[i + 2] = -rotations[i + 2];
-                    }
-                }
+                    data = data.concat(data);
+                    var vbo = this._getVBO(context.webgl);
 
-                //
-                this._attributes.a_particle_position.data = positions;
-                this._attributes.a_particle_scale.data = scales;
-                this._attributes.a_particle_rotation.data = rotations;
-                this._attributes.a_particle_color.data = colors;
-                this._attributes.a_particle_tilingOffset.data = tilingOffsets;
-                this._attributes.a_particle_flipUV.data = flipUVs;
+                    var drawInstanceInfo: DrawInstanceInfo = {
+                        instanceCount: this.particleCount,
+                        initBuffer: (gl) =>
+                        {
+                            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+                        },
+                        activeAttributes: (gl, program) =>
+                        {
+                            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
 
-                var drawInstanceInfo: DrawInstanceInfo = {
-                    instanceCount: this.particleCount,
-                    initBuffer: (gl) =>
-                    {
-                    },
-                    activeAttributes: (gl, program) =>
-                    {
-                        for (const key in this._attributes)
-                        {
-                            const element = this._attributes[key];
-                            if (element instanceof Attribute)
+                            var offset = 0;
+                            this._attributes.forEach(element =>
                             {
-                                var location = gl.getAttribLocation(program, key);
+                                var location = gl.getAttribLocation(program, element[0]);
                                 if (location == -1) return;
-                                element.active(gl, location);
-                            }
-                        }
-                        mesh.glMesh.bindVboBuffer(context.webgl);
-                    },
-                    disableAttributes: (gl, program) =>
-                    {
-                        for (const key in this._attributes)
+
+                                gl.enableVertexAttribArray(location);
+                                gl.vertexAttribPointer(location, element[1], gl.FLOAT, false, stride, offset);
+                                gl.vertexAttribDivisor(location, 1);
+                                offset += element[1] * 4;
+
+                            });
+                        },
+                        disableAttributes: (gl, program) =>
                         {
-                            const element = this._attributes[key];
-                            if (element instanceof Attribute)
+                            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+
+                            this._attributes.forEach(element =>
                             {
-                                var location = gl.getAttribLocation(program, key);
+                                var location = gl.getAttribLocation(program, element[0]);
                                 if (location == -1) return;
+
                                 gl.disableVertexAttribArray(location);
-                            }
-                        }
-                        mesh.glMesh.bindVboBuffer(context.webgl);
-                    },
-                };
+                            });
+                        },
+                    };
 
-                this.material.draw(context, mesh, subMeshs[0], "base", drawInstanceInfo);
+                    this.material.draw(context, mesh, subMeshs[0], "base", drawInstanceInfo);
+                }
             }
         }
+
+        private _vbos: [WebGLRenderingContext, WebGLBuffer][] = [];
+        private _getVBO(gl: WebGLRenderingContext)
+        {
+            // for (let i = 0, n = this._vbos.length; i < n; i++)
+            // {
+            //     if (this._vbos[i][0] == gl)
+            //         return this._vbos[i][1];
+            // }
+            var vbo = gl.createBuffer();
+            // this._vbos.push([gl, vbo]);
+            return vbo;
+        }
+
+        private _attributes: [string, number][] = [
+            ["a_particle_position", 4],
+            ["a_particle_scale", 4],
+            ["a_particle_rotation", 4],
+            ["a_particle_color", 4],
+            ["a_particle_tilingOffset", 4],
+            ["a_particle_flipUV", 4],
+        ];
 
         private _awaked = false;
 
@@ -619,18 +635,6 @@ namespace gd3d.framework
          * 活跃的粒子列表
          */
         private _activeParticles: Particle1[] = [];
-
-        /**
-         * 属性数据列表
-         */
-        private _attributes = {
-            a_particle_position: new Attribute("a_particle_position", [], 3, 1),
-            a_particle_scale: new Attribute("a_particle_scale", [], 3, 1),
-            a_particle_rotation: new Attribute("a_particle_rotation", [], 3, 1),
-            a_particle_color: new Attribute("a_particle_color", [], 4, 1),
-            a_particle_tilingOffset: new Attribute("a_particle_tilingOffset", [], 4, 1),
-            a_particle_flipUV: new Attribute("a_particle_flipUV", [], 2, 1),
-        };
 
         private readonly _modules: ParticleModule[] = [];
 
