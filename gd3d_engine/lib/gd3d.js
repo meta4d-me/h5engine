@@ -30769,7 +30769,6 @@ var gd3d;
                 this.stride = 0;
                 this.offset = 0;
                 this.divisor = 0;
-                this.usage = framework.AttributeUsage.STATIC_DRAW;
                 this._invalid = true;
                 this._indexBufferMap = new Map();
                 this.name = name;
@@ -30814,7 +30813,7 @@ var gd3d;
                     }
                     buffer = newbuffer;
                     gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.data), this.divisor > 0 ? gl.DYNAMIC_DRAW : gl[this.usage]);
+                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.data), gl.STATIC_DRAW);
                     this._indexBufferMap.set(gl, buffer);
                 }
                 return buffer;

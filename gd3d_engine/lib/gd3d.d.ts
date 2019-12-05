@@ -5930,7 +5930,6 @@ declare namespace gd3d.framework {
         stride: number;
         offset: number;
         divisor: number;
-        usage: AttributeUsage;
         private _invalid;
         private _indexBufferMap;
         constructor(name: string, data: number[], size?: number, divisor?: number);
