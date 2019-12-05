@@ -5924,7 +5924,7 @@ declare namespace gd3d.framework {
         once: boolean;
     }
 }
-declare namespace feng3d {
+declare namespace gd3d.framework {
     class Attribute {
         name: string;
         data: number[];
@@ -5945,14 +5945,14 @@ declare namespace feng3d {
         private clear;
     }
 }
-declare namespace feng3d {
+declare namespace gd3d.framework {
     enum AttributeUsage {
         STATIC_DRAW = "STATIC_DRAW",
         DYNAMIC_DRAW = "DYNAMIC_DRAW",
         STREAM_DRAW = "STREAM_DRAW"
     }
 }
-declare namespace feng3d {
+declare namespace gd3d.framework {
     enum GLArrayType {
         BYTE = "BYTE",
         SHORT = "SHORT",
@@ -7771,6 +7771,44 @@ declare namespace gd3d.framework {
         intersectBoxMinMax(minimum: gd3d.math.vector3, maximum: gd3d.math.vector3): boolean;
         intersectsSphere(center: gd3d.math.vector3, radius: number): boolean;
         intersectsTriangle(vertex0: gd3d.math.vector3, vertex1: gd3d.math.vector3, vertex2: gd3d.math.vector3, outInfo: pickinfo): boolean;
+    }
+}
+interface WebGLRenderingContext {
+    extensions: gd3d.framework.GLExtension;
+    vertexAttribDivisor(index: GLuint, divisor: GLuint): void;
+    drawElementsInstanced(mode: GLenum, count: GLsizei, type: GLenum, offset: GLintptr, instanceCount: GLsizei): void;
+    drawArraysInstanced(mode: GLenum, first: GLint, count: GLsizei, instanceCount: GLsizei): void;
+}
+declare namespace gd3d.framework {
+    class GLExtension {
+        ANGLE_instanced_arrays: ANGLE_instanced_arrays;
+        EXT_blend_minmax: EXT_blend_minmax;
+        EXT_color_buffer_half_float: any;
+        EXT_frag_depth: EXT_frag_depth;
+        EXT_sRGB: EXT_sRGB;
+        EXT_shader_texture_lod: EXT_shader_texture_lod;
+        EXT_texture_filter_anisotropic: EXT_texture_filter_anisotropic;
+        OES_element_index_uint: OES_element_index_uint;
+        OES_standard_derivatives: OES_standard_derivatives;
+        OES_texture_float: OES_texture_float;
+        OES_texture_float_linear: OES_texture_float_linear;
+        OES_texture_half_float: OES_texture_half_float;
+        OES_texture_half_float_linear: OES_texture_half_float_linear;
+        OES_vertex_array_object: OES_vertex_array_object;
+        WEBGL_color_buffer_float: WEBGL_color_buffer_float;
+        WEBGL_compressed_texture_atc: any;
+        WEBGL_compressed_texture_etc1: any;
+        WEBGL_compressed_texture_pvrtc: any;
+        WEBGL_compressed_texture_s3tc: WEBGL_compressed_texture_s3tc;
+        WEBGL_debug_renderer_info: WEBGL_debug_renderer_info;
+        WEBGL_debug_shaders: WEBGL_debug_shaders;
+        WEBGL_depth_texture: WEBGL_depth_texture;
+        WEBGL_draw_buffers: WEBGL_draw_buffers;
+        WEBGL_lose_context: any;
+        constructor(gl: WebGLRenderingContext);
+        private initExtensions;
+        private cacheGLQuery;
+        private wrap;
     }
 }
 declare namespace gd3d.framework {

@@ -1,9 +1,10 @@
-namespace feng3d
+namespace gd3d.framework
 {
     /**
      * GL 数组数据类型
      * 
      * @see https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/vertexAttribPointer
+     * @author feng3d
      */
     export enum GLArrayType
     {

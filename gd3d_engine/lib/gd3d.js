@@ -224,6 +224,7 @@ var gd3d;
                     console.error("Failed to get webgl at the application.start()");
                     throw Error("Failed to get webgl at the application.start()");
                 }
+                new framework.GLExtension(this.webgl);
                 switch (type) {
                     case CanvasFixedType.FixedWidthType:
                         this.canvasFixWidth = val;
@@ -30753,98 +30754,107 @@ var gd3d;
         framework.objectevent = framework.event1 = new FEvent();
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
-var feng3d;
-(function (feng3d) {
-    var Attribute = (function () {
-        function Attribute(name, data, size, divisor) {
-            if (size === void 0) { size = 3; }
-            if (divisor === void 0) { divisor = 0; }
-            this.size = 3;
-            this.type = feng3d.GLArrayType.FLOAT;
-            this.normalized = false;
-            this.stride = 0;
-            this.offset = 0;
-            this.divisor = 0;
-            this.usage = feng3d.AttributeUsage.STATIC_DRAW;
-            this._invalid = true;
-            this._indexBufferMap = new Map();
-            this.name = name;
-            this.data = data;
-            this.size = size;
-            this.divisor = divisor;
-        }
-        Object.defineProperty(Attribute.prototype, "data", {
-            get: function () {
-                return this._data;
-            },
-            set: function (v) {
-                this._data = v;
-                this.invalidate();
-            },
-            enumerable: true,
-            configurable: true
-        });
-        Attribute.prototype.active = function (gl, location) {
-            if (this._invalid) {
-                this.clear();
-                this._invalid = false;
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var Attribute = (function () {
+            function Attribute(name, data, size, divisor) {
+                if (size === void 0) { size = 3; }
+                if (divisor === void 0) { divisor = 0; }
+                this.size = 3;
+                this.type = framework.GLArrayType.FLOAT;
+                this.normalized = false;
+                this.stride = 0;
+                this.offset = 0;
+                this.divisor = 0;
+                this.usage = framework.AttributeUsage.STATIC_DRAW;
+                this._invalid = true;
+                this._indexBufferMap = new Map();
+                this.name = name;
+                this.data = data;
+                this.size = size;
+                this.divisor = divisor;
             }
-            gl.enableVertexAttribArray(location);
-            var buffer = this.getBuffer(gl);
-            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-            gl.vertexAttribPointer(location, this.size, gl[this.type], this.normalized, this.stride, this.offset);
-            if (this.divisor > 0) {
-                gl.vertexAttribDivisor(location, this.divisor);
-            }
-        };
-        Attribute.prototype.invalidate = function () {
-            this._invalid = true;
-        };
-        Attribute.prototype.getBuffer = function (gl) {
-            var buffer = this._indexBufferMap.get(gl);
-            if (!buffer) {
-                var newbuffer = gl.createBuffer();
-                if (!newbuffer) {
-                    console.error("createBuffer 失败！");
-                    throw "";
-                }
-                buffer = newbuffer;
-                gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.data), gl[this.usage]);
-                this._indexBufferMap.set(gl, buffer);
-            }
-            return buffer;
-        };
-        Attribute.prototype.clear = function () {
-            this._indexBufferMap.forEach(function (value, key, map) {
-                key.deleteBuffer(value);
+            Object.defineProperty(Attribute.prototype, "data", {
+                get: function () {
+                    return this._data;
+                },
+                set: function (v) {
+                    this._data = v;
+                    this.invalidate();
+                },
+                enumerable: true,
+                configurable: true
             });
-            this._indexBufferMap.clear();
-        };
-        return Attribute;
-    }());
-    feng3d.Attribute = Attribute;
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    var AttributeUsage;
-    (function (AttributeUsage) {
-        AttributeUsage["STATIC_DRAW"] = "STATIC_DRAW";
-        AttributeUsage["DYNAMIC_DRAW"] = "DYNAMIC_DRAW";
-        AttributeUsage["STREAM_DRAW"] = "STREAM_DRAW";
-    })(AttributeUsage = feng3d.AttributeUsage || (feng3d.AttributeUsage = {}));
-})(feng3d || (feng3d = {}));
-var feng3d;
-(function (feng3d) {
-    var GLArrayType;
-    (function (GLArrayType) {
-        GLArrayType["BYTE"] = "BYTE";
-        GLArrayType["SHORT"] = "SHORT";
-        GLArrayType["UNSIGNED_BYTE"] = "UNSIGNED_BYTE";
-        GLArrayType["UNSIGNED_SHORT"] = "UNSIGNED_SHORT";
-        GLArrayType["FLOAT"] = "FLOAT";
-    })(GLArrayType = feng3d.GLArrayType || (feng3d.GLArrayType = {}));
-})(feng3d || (feng3d = {}));
+            Attribute.prototype.active = function (gl, location) {
+                if (this._invalid) {
+                    this.clear();
+                    this._invalid = false;
+                }
+                gl.enableVertexAttribArray(location);
+                var buffer = this.getBuffer(gl);
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+                gl.vertexAttribPointer(location, this.size, gl[this.type], this.normalized, this.stride, this.offset);
+                if (this.divisor > 0) {
+                    gl.vertexAttribDivisor(location, this.divisor);
+                }
+            };
+            Attribute.prototype.invalidate = function () {
+                this._invalid = true;
+            };
+            Attribute.prototype.getBuffer = function (gl) {
+                var buffer = this._indexBufferMap.get(gl);
+                if (!buffer) {
+                    var newbuffer = gl.createBuffer();
+                    if (!newbuffer) {
+                        console.error("createBuffer 失败！");
+                        throw "";
+                    }
+                    buffer = newbuffer;
+                    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+                    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.data), gl[this.usage]);
+                    this._indexBufferMap.set(gl, buffer);
+                }
+                return buffer;
+            };
+            Attribute.prototype.clear = function () {
+                this._indexBufferMap.forEach(function (value, key, map) {
+                    key.deleteBuffer(value);
+                });
+                this._indexBufferMap.clear();
+            };
+            return Attribute;
+        }());
+        framework.Attribute = Attribute;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AttributeUsage;
+        (function (AttributeUsage) {
+            AttributeUsage["STATIC_DRAW"] = "STATIC_DRAW";
+            AttributeUsage["DYNAMIC_DRAW"] = "DYNAMIC_DRAW";
+            AttributeUsage["STREAM_DRAW"] = "STREAM_DRAW";
+        })(AttributeUsage = framework.AttributeUsage || (framework.AttributeUsage = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var GLArrayType;
+        (function (GLArrayType) {
+            GLArrayType["BYTE"] = "BYTE";
+            GLArrayType["SHORT"] = "SHORT";
+            GLArrayType["UNSIGNED_BYTE"] = "UNSIGNED_BYTE";
+            GLArrayType["UNSIGNED_SHORT"] = "UNSIGNED_SHORT";
+            GLArrayType["FLOAT"] = "FLOAT";
+        })(GLArrayType = framework.GLArrayType || (framework.GLArrayType = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
     var framework;
@@ -40418,6 +40428,87 @@ var gd3d;
             return ray;
         }());
         framework.ray = ray;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var GLExtension = (function () {
+            function GLExtension(gl) {
+                gl.extensions = this;
+                this.initExtensions(gl);
+                this.cacheGLQuery(gl);
+                this.wrap(gl);
+            }
+            GLExtension.prototype.initExtensions = function (gl) {
+                this.ANGLE_instanced_arrays = gl.getExtension("ANGLE_instanced_arrays");
+                this.EXT_blend_minmax = gl.getExtension("EXT_blend_minmax");
+                this.EXT_color_buffer_half_float = gl.getExtension("EXT_color_buffer_half_float");
+                this.EXT_frag_depth = gl.getExtension("EXT_frag_depth");
+                this.EXT_sRGB = gl.getExtension("EXT_sRGB");
+                this.EXT_shader_texture_lod = gl.getExtension("EXT_shader_texture_lod");
+                this.EXT_texture_filter_anisotropic = gl.getExtension('EXT_texture_filter_anisotropic') || gl.getExtension('MOZ_EXT_texture_filter_anisotropic') || gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');
+                this.OES_element_index_uint = gl.getExtension("OES_element_index_uint");
+                this.OES_standard_derivatives = gl.getExtension("OES_standard_derivatives");
+                this.OES_texture_float = gl.getExtension("OES_texture_float");
+                this.OES_texture_float_linear = gl.getExtension("OES_texture_float_linear");
+                this.OES_texture_half_float = gl.getExtension("OES_texture_half_float");
+                this.OES_texture_half_float_linear = gl.getExtension("OES_texture_half_float_linear");
+                this.OES_vertex_array_object = gl.getExtension("OES_vertex_array_object");
+                this.WEBGL_color_buffer_float = gl.getExtension("WEBGL_color_buffer_float");
+                this.WEBGL_compressed_texture_atc = gl.getExtension("WEBGL_compressed_texture_atc") || gl.getExtension("WEBKIT_WEBGL_compressed_texture_atc");
+                this.WEBGL_compressed_texture_etc1 = gl.getExtension("WEBGL_compressed_texture_etc1");
+                this.WEBGL_compressed_texture_pvrtc = gl.getExtension('WEBGL_compressed_texture_pvrtc') || gl.getExtension('WEBKIT_WEBGL_compressed_texture_pvrtc');
+                this.WEBGL_compressed_texture_s3tc = gl.getExtension('WEBGL_compressed_texture_s3tc') || gl.getExtension('MOZ_WEBGL_compressed_texture_s3tc') || gl.getExtension('WEBKIT_WEBGL_compressed_texture_s3tc');
+                this.WEBGL_debug_renderer_info = gl.getExtension("WEBGL_debug_renderer_info");
+                this.WEBGL_debug_shaders = gl.getExtension("WEBGL_debug_shaders");
+                this.WEBGL_depth_texture = gl.getExtension('WEBGL_depth_texture') || gl.getExtension('MOZ_WEBGL_depth_texture') || gl.getExtension('WEBKIT_WEBGL_depth_texture');
+                this.WEBGL_draw_buffers = gl.getExtension("WEBGL_draw_buffers");
+                this.WEBGL_lose_context = gl.getExtension("WEBGL_lose_context") || gl.getExtension("WEBKIT_WEBGL_lose_context") || gl.getExtension("MOZ_WEBGL_lose_context");
+            };
+            GLExtension.prototype.cacheGLQuery = function (gl) {
+                var oldGetExtension = gl.getExtension;
+                gl.getExtension = function (name) {
+                    gl.extensions[name] = gl.extensions[name] || oldGetExtension.apply(gl, arguments);
+                    return gl.extensions[name];
+                };
+            };
+            GLExtension.prototype.wrap = function (gl) {
+                if (!gl.vertexAttribDivisor) {
+                    gl.vertexAttribDivisor = function (index, divisor) {
+                        if (gl.extensions.ANGLE_instanced_arrays) {
+                            gl.extensions.ANGLE_instanced_arrays.vertexAttribDivisorANGLE(index, divisor);
+                        }
+                        else {
+                            console.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawElementsInstanced \uFF01");
+                        }
+                    };
+                }
+                if (!gl.drawElementsInstanced) {
+                    gl.drawElementsInstanced = function (mode, count, type, offset, instanceCount) {
+                        if (gl.extensions.ANGLE_instanced_arrays) {
+                            gl.extensions.ANGLE_instanced_arrays.drawElementsInstancedANGLE(mode, count, type, offset, instanceCount);
+                        }
+                        else {
+                            console.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawElementsInstanced \uFF01");
+                        }
+                    };
+                }
+                if (!gl.drawArraysInstanced) {
+                    gl.drawArraysInstanced = function (mode, first, count, instanceCount) {
+                        if (gl.extensions.ANGLE_instanced_arrays) {
+                            gl.extensions.ANGLE_instanced_arrays.drawArraysInstancedANGLE(mode, first, count, instanceCount);
+                        }
+                        else {
+                            console.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawArraysInstanced \uFF01");
+                        }
+                    };
+                }
+            };
+            return GLExtension;
+        }());
+        framework.GLExtension = GLExtension;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

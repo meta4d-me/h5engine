@@ -1,4 +1,4 @@
-namespace feng3d
+namespace gd3d.framework
 {
     /**
      * A GLenum specifying the intended usage pattern of the data store for optimization purposes. 
@@ -6,6 +6,7 @@ namespace feng3d
      * 指定数据存储区的使用方法。
      * 
      * @see https://developer.mozilla.org/zh-CN/docs/Web/API/WebGLRenderingContext/bufferData
+     * @author feng3d
      */
     export enum AttributeUsage
     {

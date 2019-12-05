@@ -269,6 +269,9 @@ namespace gd3d.framework
                 throw Error("Failed to get webgl at the application.start()");
             }
 
+            // 扩展
+            new GLExtension(this.webgl);
+
             switch (type)
             {
                 case CanvasFixedType.FixedWidthType: this.canvasFixWidth = val; break;
