@@ -556,23 +556,23 @@ namespace gd3d.framework
 
             console.assert(data.length == 24 * this._activeParticles.length);
 
-            var stride = this._attributes.reduce((pv, cv) => pv += cv[1], 0) * 4;
+            var stride = this._attributes.reduce((pv, cv) => pv += cv[1], 0) * 2;
             if (isSupportDrawInstancedArrays && this.particleCount > 0)
             {
                 data = data.concat(data);
-                var vbo = this._getVBO(context.webgl);
 
                 var drawInstanceInfo: DrawInstanceInfo = {
                     instanceCount: this.particleCount,
                     initBuffer: (gl) =>
                     {
+                        var vbo = this._getVBO(context.webgl);
                         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                         // gl.bufferData(gl.ARRAY_BUFFER, data.length * 4, gl.DYNAMIC_DRAW);
                         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.DYNAMIC_DRAW);
                     },
                     activeAttributes: (gl, program) =>
                     {
-                        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                        // gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
 
                         var offset = 0;
                         // console.log("1_0");
@@ -591,7 +591,7 @@ namespace gd3d.framework
                     },
                     disableAttributes: (gl, program) =>
                     {
-                        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                        // gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
 
                         // console.log("2_0");
                         this._attributes.forEach(element =>
@@ -612,13 +612,13 @@ namespace gd3d.framework
         private _vbos: [WebGLRenderingContext, WebGLBuffer][] = [];
         private _getVBO(gl: WebGLRenderingContext)
         {
-            // for (let i = 0, n = this._vbos.length; i < n; i++)
-            // {
-            //     if (this._vbos[i][0] == gl)
-            //         return this._vbos[i][1];
-            // }
+            for (let i = 0, n = this._vbos.length; i < n; i++)
+            {
+                if (this._vbos[i][0] == gl)
+                    return this._vbos[i][1];
+            }
             var vbo = gl.createBuffer();
-            // this._vbos.push([gl, vbo]);
+            this._vbos.push([gl, vbo]);
             return vbo;
         }
 

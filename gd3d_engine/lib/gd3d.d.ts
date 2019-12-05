@@ -5924,6 +5924,43 @@ declare namespace gd3d.framework {
         once: boolean;
     }
 }
+declare namespace feng3d {
+    class Attribute {
+        name: string;
+        data: number[];
+        private _data;
+        size: number;
+        type: GLArrayType;
+        normalized: boolean;
+        stride: number;
+        offset: number;
+        divisor: number;
+        usage: AttributeUsage;
+        private _invalid;
+        private _indexBufferMap;
+        constructor(name: string, data: number[], size?: number, divisor?: number);
+        active(gl: WebGLRenderingContext, location: number): void;
+        private invalidate;
+        private getBuffer;
+        private clear;
+    }
+}
+declare namespace feng3d {
+    enum AttributeUsage {
+        STATIC_DRAW = "STATIC_DRAW",
+        DYNAMIC_DRAW = "DYNAMIC_DRAW",
+        STREAM_DRAW = "STREAM_DRAW"
+    }
+}
+declare namespace feng3d {
+    enum GLArrayType {
+        BYTE = "BYTE",
+        SHORT = "SHORT",
+        UNSIGNED_BYTE = "UNSIGNED_BYTE",
+        UNSIGNED_SHORT = "UNSIGNED_SHORT",
+        FLOAT = "FLOAT"
+    }
+}
 declare namespace gd3d.framework {
     class Color3 {
         __class__: "gd3d.framework.Color3";

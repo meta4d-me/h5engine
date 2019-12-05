@@ -30164,18 +30164,17 @@ var gd3d;
                     }
                 }
                 console.assert(data.length == 24 * this._activeParticles.length);
-                var stride = this._attributes.reduce(function (pv, cv) { return pv += cv[1]; }, 0) * 4;
+                var stride = this._attributes.reduce(function (pv, cv) { return pv += cv[1]; }, 0) * 2;
                 if (isSupportDrawInstancedArrays && this.particleCount > 0) {
                     data = data.concat(data);
-                    var vbo = this._getVBO(context.webgl);
                     var drawInstanceInfo = {
                         instanceCount: this.particleCount,
                         initBuffer: function (gl) {
+                            var vbo = _this._getVBO(context.webgl);
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.DYNAMIC_DRAW);
                         },
                         activeAttributes: function (gl, program) {
-                            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                             var offset = 0;
                             _this._attributes.forEach(function (element) {
                                 var location = gl.getAttribLocation(program, element[0]);
@@ -30188,7 +30187,6 @@ var gd3d;
                             });
                         },
                         disableAttributes: function (gl, program) {
-                            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                             _this._attributes.forEach(function (element) {
                                 var location = gl.getAttribLocation(program, element[0]);
                                 if (location == -1)
@@ -30201,7 +30199,12 @@ var gd3d;
                 }
             };
             ParticleSystem.prototype._getVBO = function (gl) {
+                for (var i = 0, n = this._vbos.length; i < n; i++) {
+                    if (this._vbos[i][0] == gl)
+                        return this._vbos[i][1];
+                }
                 var vbo = gl.createBuffer();
+                this._vbos.push([gl, vbo]);
                 return vbo;
             };
             Object.defineProperty(ParticleSystem.prototype, "rateAtDuration", {
@@ -30750,6 +30753,98 @@ var gd3d;
         framework.objectevent = framework.event1 = new FEvent();
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
+var feng3d;
+(function (feng3d) {
+    var Attribute = (function () {
+        function Attribute(name, data, size, divisor) {
+            if (size === void 0) { size = 3; }
+            if (divisor === void 0) { divisor = 0; }
+            this.size = 3;
+            this.type = feng3d.GLArrayType.FLOAT;
+            this.normalized = false;
+            this.stride = 0;
+            this.offset = 0;
+            this.divisor = 0;
+            this.usage = feng3d.AttributeUsage.STATIC_DRAW;
+            this._invalid = true;
+            this._indexBufferMap = new Map();
+            this.name = name;
+            this.data = data;
+            this.size = size;
+            this.divisor = divisor;
+        }
+        Object.defineProperty(Attribute.prototype, "data", {
+            get: function () {
+                return this._data;
+            },
+            set: function (v) {
+                this._data = v;
+                this.invalidate();
+            },
+            enumerable: true,
+            configurable: true
+        });
+        Attribute.prototype.active = function (gl, location) {
+            if (this._invalid) {
+                this.clear();
+                this._invalid = false;
+            }
+            gl.enableVertexAttribArray(location);
+            var buffer = this.getBuffer(gl);
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+            gl.vertexAttribPointer(location, this.size, gl[this.type], this.normalized, this.stride, this.offset);
+            if (this.divisor > 0) {
+                gl.vertexAttribDivisor(location, this.divisor);
+            }
+        };
+        Attribute.prototype.invalidate = function () {
+            this._invalid = true;
+        };
+        Attribute.prototype.getBuffer = function (gl) {
+            var buffer = this._indexBufferMap.get(gl);
+            if (!buffer) {
+                var newbuffer = gl.createBuffer();
+                if (!newbuffer) {
+                    console.error("createBuffer 失败！");
+                    throw "";
+                }
+                buffer = newbuffer;
+                gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.data), gl[this.usage]);
+                this._indexBufferMap.set(gl, buffer);
+            }
+            return buffer;
+        };
+        Attribute.prototype.clear = function () {
+            this._indexBufferMap.forEach(function (value, key, map) {
+                key.deleteBuffer(value);
+            });
+            this._indexBufferMap.clear();
+        };
+        return Attribute;
+    }());
+    feng3d.Attribute = Attribute;
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var AttributeUsage;
+    (function (AttributeUsage) {
+        AttributeUsage["STATIC_DRAW"] = "STATIC_DRAW";
+        AttributeUsage["DYNAMIC_DRAW"] = "DYNAMIC_DRAW";
+        AttributeUsage["STREAM_DRAW"] = "STREAM_DRAW";
+    })(AttributeUsage = feng3d.AttributeUsage || (feng3d.AttributeUsage = {}));
+})(feng3d || (feng3d = {}));
+var feng3d;
+(function (feng3d) {
+    var GLArrayType;
+    (function (GLArrayType) {
+        GLArrayType["BYTE"] = "BYTE";
+        GLArrayType["SHORT"] = "SHORT";
+        GLArrayType["UNSIGNED_BYTE"] = "UNSIGNED_BYTE";
+        GLArrayType["UNSIGNED_SHORT"] = "UNSIGNED_SHORT";
+        GLArrayType["FLOAT"] = "FLOAT";
+    })(GLArrayType = feng3d.GLArrayType || (feng3d.GLArrayType = {}));
+})(feng3d || (feng3d = {}));
 var gd3d;
 (function (gd3d) {
     var framework;
