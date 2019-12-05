@@ -1,10 +1,5 @@
 /// <reference path="event/EventDispatcher.ts" />
 
-interface WebGLRenderingContext
-{
-    ANGLE_instanced_arrays: ANGLE_instanced_arrays;
-}
-
 namespace gd3d.framework
 {
     export interface ComponentMap { ParticleSystem: ParticleSystem }
@@ -472,6 +467,8 @@ namespace gd3d.framework
             math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
             math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
 
+            if (this.particleCount < 1) return;
+
             DrawCallInfo.inc.currentState = DrawCallEnum.EffectSystem;
             let go = this.gameObject;
             let tran = go.transform;
@@ -487,8 +484,7 @@ namespace gd3d.framework
             mesh.glMesh.bindVboBuffer(context.webgl);
 
             // 获取批量渲染扩展
-            context.webgl.ANGLE_instanced_arrays = context.webgl.ANGLE_instanced_arrays || context.webgl.getExtension("ANGLE_instanced_arrays");
-            var isSupportDrawInstancedArrays = !!context.webgl.ANGLE_instanced_arrays;
+            var isSupportDrawInstancedArrays = !!context.webgl.drawArraysInstanced;
             // isSupportDrawInstancedArrays = false;
 
             if (!this._awaked)
@@ -514,12 +510,12 @@ namespace gd3d.framework
 
             this.material.setMatrix("u_particle_billboardMatrix", billboardMatrix);
 
-            for (let i = 0, n = this._activeParticles.length; i < n; i++)
+            if (!isSupportDrawInstancedArrays)
             {
-                var particle = this._activeParticles[i];
-
-                if (!isSupportDrawInstancedArrays)
+                for (let i = 0, n = this._activeParticles.length; i < n; i++)
                 {
+                    var particle = this._activeParticles[i];
+
                     this.material.setVector4("a_particle_position", new math.vector4(particle.position.x, particle.position.y, particle.position.z, 1));
                     this.material.setVector4("a_particle_scale", new math.vector4(particle.size.x, particle.size.y, particle.size.z, 1));
                     this.material.setVector4("a_particle_rotation", new math.vector4(particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1));
@@ -529,9 +525,7 @@ namespace gd3d.framework
 
                     this.material.draw(context, mesh, subMeshs[0]);
                 }
-            }
-
-            if (isSupportDrawInstancedArrays && this.particleCount > 0)
+            } else
             {
                 var positions: number[] = [];
                 var scales: number[] = [];
@@ -544,7 +538,7 @@ namespace gd3d.framework
                     var particle = this._activeParticles[i];
                     positions.push(particle.position.x, particle.position.y, particle.position.z);
                     scales.push(particle.size.x, particle.size.y, particle.size.z);
-    
+
                     rotations.push(particle.rotation.x, particle.rotation.y, particle.rotation.z);
                     colors.push(particle.color.r, particle.color.g, particle.color.b, particle.color.a);
                     tilingOffsets.push(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w);
@@ -602,19 +596,6 @@ namespace gd3d.framework
 
                 this.material.draw(context, mesh, subMeshs[0], "base", drawInstanceInfo);
             }
-        }
-
-        private _vbos: [WebGLRenderingContext, WebGLBuffer][] = [];
-        private _getVBO(gl: WebGLRenderingContext)
-        {
-            for (let i = 0, n = this._vbos.length; i < n; i++)
-            {
-                if (this._vbos[i][0] == gl)
-                    return this._vbos[i][1];
-            }
-            var vbo = gl.createBuffer();
-            this._vbos.push([gl, vbo]);
-            return vbo;
         }
 
         private _awaked = false;

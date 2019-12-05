@@ -5683,9 +5683,6 @@ declare namespace gd3d.framework {
         protected handelEventBubbles(e: Event<any>): void;
     }
 }
-interface WebGLRenderingContext {
-    ANGLE_instanced_arrays: ANGLE_instanced_arrays;
-}
 declare namespace gd3d.framework {
     interface ComponentMap {
         ParticleSystem: ParticleSystem;
@@ -5753,8 +5750,6 @@ declare namespace gd3d.framework {
         pause(): void;
         continue(): void;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
-        private _vbos;
-        private _getVBO;
         private _awaked;
         private _realTime;
         private _preRealTime;
