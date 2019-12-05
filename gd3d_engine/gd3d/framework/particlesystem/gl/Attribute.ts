@@ -95,6 +95,14 @@ namespace gd3d.framework
         }
 
         /**
+         * 使数据失效
+         */
+        invalidate()
+        {
+            this._invalid = true;
+        }
+
+        /**
          * 
          * @param gl 
          * @param location A GLuint specifying the index of the vertex attribute that is to be modified.
@@ -119,11 +127,6 @@ namespace gd3d.framework
 
         }
 
-        private invalidate()
-        {
-            this._invalid = true;
-        }
-
         /**
          * 获取缓冲
          */
@@ -140,7 +143,7 @@ namespace gd3d.framework
                 }
                 buffer = newbuffer;
                 gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.data), gl[this.usage]);
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(this.data), this.divisor > 0 ? gl.DYNAMIC_DRAW : gl[this.usage]);
                 this._indexBufferMap.set(gl, buffer);
             }
             return buffer;

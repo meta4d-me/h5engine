@@ -5755,12 +5755,12 @@ declare namespace gd3d.framework {
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         private _vbos;
         private _getVBO;
-        private _attributes;
         private _awaked;
         private _realTime;
         private _preRealTime;
         private _particlePool;
         private _activeParticles;
+        private _attributes;
         private readonly _modules;
         readonly rateAtDuration: number;
         private _emit;
@@ -5939,8 +5939,8 @@ declare namespace gd3d.framework {
         private _invalid;
         private _indexBufferMap;
         constructor(name: string, data: number[], size?: number, divisor?: number);
+        invalidate(): void;
         active(gl: WebGLRenderingContext, location: number): void;
-        private invalidate;
         private getBuffer;
         private clear;
     }
