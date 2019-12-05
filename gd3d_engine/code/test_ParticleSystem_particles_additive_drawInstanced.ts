@@ -36,12 +36,12 @@ class test_ParticleSystem_particles_additive_drawInstanced
     varying vec2 v_uv;
     
     
-    attribute vec4 a_particle_position;
-    attribute vec4 a_particle_scale;
-    attribute vec4 a_particle_rotation;
+    attribute vec3 a_particle_position;
+    attribute vec3 a_particle_scale;
+    attribute vec3 a_particle_rotation;
     attribute vec4 a_particle_color;
     attribute vec4 a_particle_tilingOffset;
-    attribute vec4 a_particle_flipUV;
+    attribute vec2 a_particle_flipUV;
     
     uniform mat4 u_particle_billboardMatrix;
     
@@ -118,7 +118,6 @@ class test_ParticleSystem_particles_additive_drawInstanced
         //输出uv
         v_uv = _glesMultiTexCoord0.xy;
     
-        // particleAnimation(position);
         position = particleAnimation(position);
     
         //计算投影坐标

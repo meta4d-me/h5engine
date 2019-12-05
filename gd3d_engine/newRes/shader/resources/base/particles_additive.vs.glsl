@@ -9,13 +9,13 @@ uniform mat4 glstate_matrix_mvp;
 
 varying vec2 v_uv;
 
-//
-attribute vec4 a_particle_position;
-attribute vec4 a_particle_scale;
-attribute vec4 a_particle_rotation;
+
+attribute vec3 a_particle_position;
+attribute vec3 a_particle_scale;
+attribute vec3 a_particle_rotation;
 attribute vec4 a_particle_color;
 attribute vec4 a_particle_tilingOffset;
-attribute vec4 a_particle_flipUV;
+attribute vec2 a_particle_flipUV;
 
 uniform mat4 u_particle_billboardMatrix;
 

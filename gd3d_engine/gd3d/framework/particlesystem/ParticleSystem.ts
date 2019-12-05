@@ -578,6 +578,7 @@ namespace gd3d.framework
                                 element.active(gl, location);
                             }
                         }
+                        mesh.glMesh.bindVboBuffer(context.webgl);
                     },
                     disableAttributes: (gl, program) =>
                     {
@@ -591,6 +592,7 @@ namespace gd3d.framework
                                 gl.disableVertexAttribArray(location);
                             }
                         }
+                        mesh.glMesh.bindVboBuffer(context.webgl);
                     },
                 };
 

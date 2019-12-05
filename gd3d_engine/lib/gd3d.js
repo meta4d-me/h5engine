@@ -30191,6 +30191,7 @@ var gd3d;
                                     element.active(gl, location);
                                 }
                             }
+                            mesh.glMesh.bindVboBuffer(context.webgl);
                         },
                         disableAttributes: function (gl, program) {
                             for (var key in _this._attributes) {
@@ -30202,6 +30203,7 @@ var gd3d;
                                     gl.disableVertexAttribArray(location);
                                 }
                             }
+                            mesh.glMesh.bindVboBuffer(context.webgl);
                         },
                     };
                     this.material.draw(context, mesh, subMeshs[0], "base", drawInstanceInfo);
