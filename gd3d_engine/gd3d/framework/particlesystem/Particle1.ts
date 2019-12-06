@@ -66,7 +66,7 @@ namespace gd3d.framework
 		/**
 		 * 纹理UV缩放和偏移。
 		 */
-		tilingOffset = new Vector4(1, 1, 0, 0);
+		tilingOffset =  new math.vector4(1, 1, 0, 0);
 
 		/**
 		 * 在粒子上翻转UV坐标，使它们呈现水平镜像。

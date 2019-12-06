@@ -5653,7 +5653,7 @@ declare namespace gd3d.framework {
         startSize: Vector3;
         color: Color4;
         startColor: Color4;
-        tilingOffset: Vector4;
+        tilingOffset: math.vector4;
         flipUV: Vector2;
         birthRateAtDuration: number;
         rateAtLifeTime: number;
@@ -6366,42 +6366,6 @@ declare namespace gd3d.framework {
         roundToZero(): this;
         toString(): string;
         toArray(array?: number[], offset?: number): number[];
-    }
-}
-declare namespace gd3d.framework {
-    class Vector4 {
-        static fromArray(array: ArrayLike<number>, offset?: number): Vector4;
-        static fromVector3(vector3: Vector3, w?: number): Vector4;
-        static random(): Vector4;
-        x: number;
-        y: number;
-        z: number;
-        w: number;
-        constructor(x?: number, y?: number, z?: number, w?: number);
-        init(x: number, y: number, z: number, w: number): this;
-        fromArray(array: ArrayLike<number>, offset?: number): this;
-        fromVector3(vector3: Vector3, w?: number): this;
-        toVector3(v3?: Vector3): Vector3;
-        toArray(array?: number[], offset?: number): number[];
-        add(v: Vector4): this;
-        addTo(v: Vector4, vout?: Vector4): Vector4;
-        clone(): Vector4;
-        copy(v: Vector4): this;
-        sub(v: Vector4): this;
-        subTo(v: Vector4, vout?: Vector4): Vector4;
-        multiply(v: Vector4): this;
-        multiplyTo(v: Vector4, vout?: Vector4): Vector4;
-        div(v: Vector4): this;
-        divTo(v: Vector4, vout?: Vector4): Vector4;
-        equals(v: Vector4, precision?: number): boolean;
-        negate(): this;
-        negateTo(vout?: Vector4): Vector4;
-        scale(s: number): this;
-        scaleTo(s: number): Vector4;
-        dot(a: Vector4): number;
-        lerp(v: Vector4, alpha: number): this;
-        lerpTo(v: Vector4, alpha: number, vout?: Vector4): Vector4;
-        toString(): string;
     }
 }
 declare namespace gd3d.framework {

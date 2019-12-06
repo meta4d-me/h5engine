@@ -29871,7 +29871,7 @@ var gd3d;
                 this.startSize = new framework.Vector3(1, 1, 1);
                 this.color = new framework.Color4();
                 this.startColor = new framework.Color4();
-                this.tilingOffset = new framework.Vector4(1, 1, 0, 0);
+                this.tilingOffset = new gd3d.math.vector4(1, 1, 0, 0);
                 this.flipUV = new framework.Vector2();
                 this.cache = {};
             }
@@ -32424,179 +32424,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var Vector4 = (function () {
-            function Vector4(x, y, z, w) {
-                if (x === void 0) { x = 0; }
-                if (y === void 0) { y = 0; }
-                if (z === void 0) { z = 0; }
-                if (w === void 0) { w = 0; }
-                this.x = 0;
-                this.y = 0;
-                this.z = 0;
-                this.w = 0;
-                this.init(x, y, z, w);
-            }
-            Vector4.fromArray = function (array, offset) {
-                if (offset === void 0) { offset = 0; }
-                return new Vector4().fromArray(array, offset);
-            };
-            Vector4.fromVector3 = function (vector3, w) {
-                if (w === void 0) { w = 0; }
-                return new Vector4().fromVector3(vector3, w);
-            };
-            Vector4.random = function () {
-                return new Vector4(Math.random(), Math.random(), Math.random(), Math.random());
-            };
-            Vector4.prototype.init = function (x, y, z, w) {
-                this.x = x;
-                this.y = y;
-                this.z = z;
-                this.w = w;
-                return this;
-            };
-            Vector4.prototype.fromArray = function (array, offset) {
-                if (offset === void 0) { offset = 0; }
-                this.x = array[offset];
-                this.y = array[offset + 1];
-                this.z = array[offset + 2];
-                this.w = array[offset + 3];
-                return this;
-            };
-            Vector4.prototype.fromVector3 = function (vector3, w) {
-                if (w === void 0) { w = 0; }
-                this.x = vector3.x;
-                this.y = vector3.y;
-                this.z = vector3.z;
-                this.w = w;
-                return this;
-            };
-            Vector4.prototype.toVector3 = function (v3) {
-                if (v3 === void 0) { v3 = new framework.Vector3(); }
-                v3.set(this.x, this.y, this.z);
-                return v3;
-            };
-            Vector4.prototype.toArray = function (array, offset) {
-                if (array === void 0) { array = []; }
-                if (offset === void 0) { offset = 0; }
-                array[offset] = this.x;
-                array[offset + 1] = this.y;
-                array[offset + 2] = this.z;
-                array[offset + 3] = this.w;
-                return array;
-            };
-            Vector4.prototype.add = function (v) {
-                this.x += v.x;
-                this.y += v.y;
-                this.z += v.z;
-                this.w += v.w;
-                return this;
-            };
-            Vector4.prototype.addTo = function (v, vout) {
-                if (vout === void 0) { vout = new Vector4(); }
-                return vout.copy(this).add(v);
-            };
-            Vector4.prototype.clone = function () {
-                return new Vector4(this.x, this.y, this.z, this.w);
-            };
-            Vector4.prototype.copy = function (v) {
-                this.x = v.x;
-                this.y = v.y;
-                this.z = v.z;
-                this.w = v.w;
-                return this;
-            };
-            Vector4.prototype.sub = function (v) {
-                this.x -= v.x;
-                this.y -= v.y;
-                this.z -= v.z;
-                this.w -= v.w;
-                return this;
-            };
-            Vector4.prototype.subTo = function (v, vout) {
-                if (vout === void 0) { vout = new Vector4(); }
-                return vout.copy(this).sub(v);
-            };
-            Vector4.prototype.multiply = function (v) {
-                this.x *= v.x;
-                this.y *= v.y;
-                this.z *= v.z;
-                this.w *= v.w;
-                return this;
-            };
-            Vector4.prototype.multiplyTo = function (v, vout) {
-                if (vout === void 0) { vout = new Vector4(); }
-                return vout.copy(this).multiply(v);
-            };
-            Vector4.prototype.div = function (v) {
-                this.x /= v.x;
-                this.y /= v.y;
-                this.z /= v.z;
-                this.w /= v.w;
-                return this;
-            };
-            Vector4.prototype.divTo = function (v, vout) {
-                if (vout === void 0) { vout = new Vector4(); }
-                return vout.copy(this).div(v);
-            };
-            Vector4.prototype.equals = function (v, precision) {
-                if (precision === void 0) { precision = Math.PRECISION; }
-                if (!Math.equals(this.x - v.x, 0, precision))
-                    return false;
-                if (!Math.equals(this.y - v.y, 0, precision))
-                    return false;
-                if (!Math.equals(this.z - v.z, 0, precision))
-                    return false;
-                if (!Math.equals(this.w - v.w, 0, precision))
-                    return false;
-                return true;
-            };
-            Vector4.prototype.negate = function () {
-                this.x = -this.x;
-                this.y = -this.y;
-                this.z = -this.z;
-                this.w = -this.w;
-                return this;
-            };
-            Vector4.prototype.negateTo = function (vout) {
-                if (vout === void 0) { vout = new Vector4(); }
-                return vout.copy(this).negate();
-            };
-            Vector4.prototype.scale = function (s) {
-                this.x *= s;
-                this.y *= s;
-                this.z *= s;
-                this.w *= s;
-                return this;
-            };
-            Vector4.prototype.scaleTo = function (s) {
-                return this.clone().scale(s);
-            };
-            Vector4.prototype.dot = function (a) {
-                return this.x * a.x + this.y * a.y + this.z * a.z + this.w * a.w;
-            };
-            Vector4.prototype.lerp = function (v, alpha) {
-                this.x += (v.x - this.x) * alpha;
-                this.y += (v.y - this.y) * alpha;
-                this.z += (v.z - this.z) * alpha;
-                this.w += (v.w - this.w) * alpha;
-                return this;
-            };
-            Vector4.prototype.lerpTo = function (v, alpha, vout) {
-                if (vout === void 0) { vout = new Vector4(); }
-                return vout.copy(this).lerp(v, alpha);
-            };
-            Vector4.prototype.toString = function () {
-                return "<" + this.x + ", " + this.y + ", " + this.z + ", " + this.w + ">";
-            };
-            return Vector4;
-        }());
-        framework.Vector4 = Vector4;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var Gradient = (function () {
             function Gradient() {
                 this.mode = framework.GradientMode.Blend;
@@ -34173,7 +34000,7 @@ var gd3d;
                 particle[_TextureSheetAnimation_randomRow] = Math.random();
             };
             ParticleTextureSheetAnimationModule.prototype.updateParticleState = function (particle) {
-                particle.tilingOffset.init(1, 1, 0, 0);
+                gd3d.math.vec4Set(particle.tilingOffset, 1, 1, 0, 0);
                 particle.flipUV.init(0, 0);
                 if (!this.enabled)
                     return;
@@ -34196,7 +34023,7 @@ var gd3d;
                     }
                     uvPos.init(frameIndex % segmentsX, rowIndex).scale(step);
                 }
-                particle.tilingOffset.init(step.x, step.y, uvPos.x, uvPos.y);
+                gd3d.math.vec4Set(particle.tilingOffset, step.x, step.y, uvPos.x, uvPos.y);
                 particle.flipUV = this.flipUV;
             };
             return ParticleTextureSheetAnimationModule;
