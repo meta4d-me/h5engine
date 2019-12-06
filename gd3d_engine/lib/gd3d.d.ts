@@ -6254,47 +6254,6 @@ declare namespace gd3d.framework {
     var defaultRotationOrder: RotationOrder;
 }
 declare namespace gd3d.framework {
-    class Vector2 {
-        "__class__": "gd3d.framework.Vector2";
-        static ZERO: Vector2;
-        static polar(len: number, angle: number): Vector2;
-        constructor(x?: number, y?: number);
-        x: number;
-        y: number;
-        readonly length: number;
-        init(x: number, y: number): Vector2;
-        clone(): Vector2;
-        equals(toCompare: Vector2): boolean;
-        static distance(p1: Vector2, p2: Vector2): number;
-        copy(sourcePoint: Vector2): this;
-        addTo(v: Vector2, vout?: Vector2): Vector2;
-        normalize(thickness?: number): this;
-        negate(): this;
-        reciprocal(): this;
-        reciprocalTo(out?: Vector2): Vector2;
-        scaleNumber(s: number): Vector2;
-        scaleNumberTo(s: number, vout?: Vector2): Vector2;
-        scale(s: Vector2): this;
-        scaleTo(s: Vector2, vout?: Vector2): Vector2;
-        offset(dx: number, dy: number): Vector2;
-        sub(v: Vector2): this;
-        subTo(v: Vector2, vout?: Vector2): Vector2;
-        multiply(a: Vector2): this;
-        multiplyTo(a: Vector2, vout?: Vector2): Vector2;
-        lerp(p: Vector2, alpha: Vector2): Vector2;
-        lerpTo(v: Vector2, alpha: Vector2, vout?: Vector2): Vector2;
-        lerpNumber(v: Vector2, alpha: number): this;
-        lerpNumberTo(v: Vector2, alpha: number, vout?: Vector2): Vector2;
-        clamp(min: Vector2, max: Vector2): this;
-        clampTo(min: Vector2, max: Vector2, vout?: Vector2): Vector2;
-        min(v: Vector2): this;
-        max(v: Vector2): this;
-        round(): this;
-        toString(): string;
-        toArray(): number[];
-    }
-}
-declare namespace gd3d.framework {
     class Vector3 {
         __class__: "gd3d.framework.Vector3";
         static X_AXIS: Vector3;
