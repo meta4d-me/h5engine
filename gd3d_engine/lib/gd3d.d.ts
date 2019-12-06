@@ -1069,6 +1069,7 @@ declare namespace gd3d.math {
         v: number;
     }
     function matrix3x2Decompose(src: matrix3x2, scale: vector2, rotation: angelref, translation: vector2): boolean;
+    function matrixGetEuler(src: matrix, order: framework.RotationOrder, rotation: vector3): void;
     function matrixGetRotation(src: matrix, result: quaternion): void;
     function matrix2Quaternion(matrix: matrix, result: quaternion): void;
     function unitxyzToRotation(xAxis: vector3, yAxis: vector3, zAxis: vector3, out: quaternion): void;
@@ -1087,6 +1088,7 @@ declare namespace gd3d.math {
     function matrix3x2TransformVector2(mat: matrix, inp: vector2, out: vector2): void;
     function matrix3x2TransformNormal(mat: matrix, inp: vector2, out: vector2): void;
     function matrix3x2MakeScale(xScale: number, yScale: number, out: matrix3x2): void;
+    function matrixMakeEuler(rotation: vector3, order: framework.RotationOrder, out: matrix): void;
     function matrixMakeRotateAxisAngle(axis: vector3, angle: number, out: matrix): void;
     function matrix3x2MakeRotate(angle: number, out: matrix3x2): void;
     function matrixMultiply(lhs: matrix, rhs: matrix, out: matrix): void;
