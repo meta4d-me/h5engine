@@ -344,16 +344,6 @@ namespace gd3d.framework
         }
 
         /**
-         * 应用矩阵
-         * @param mat 矩阵
-         */
-        applyMatrix4x4(mat: Matrix4x4)
-        {
-            mat.transformVector4(this, this);
-            return this;
-        }
-
-        /**
          * 返回当前 Vector4 对象的字符串表示形式。
          */
         toString(): string

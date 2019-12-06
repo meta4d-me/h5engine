@@ -6243,71 +6243,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class Matrix4x4 {
-        static RAW_DATA_CONTAINER: number[];
-        static recompose(position: Vector3, rotation: Vector3, scale: Vector3, order?: RotationOrder): Matrix4x4;
-        rawData: number[];
-        getPosition(value?: Vector3): Vector3;
-        setPosition(value: Vector3): this;
-        getRotation(rotation?: Vector3, order?: RotationOrder): Vector3;
-        setRotation(rotation: Vector3, order?: RotationOrder): this;
-        getScale(scale?: Vector3): Vector3;
-        setScale(scale: Vector3): this;
-        readonly determinant: number;
-        readonly forward: Vector3;
-        readonly up: Vector3;
-        readonly right: Vector3;
-        readonly back: Vector3;
-        readonly down: Vector3;
-        readonly left: Vector3;
-        constructor(datas?: number[]);
-        static fromAxisRotate(axis: Vector3, degrees: number): Matrix4x4;
-        static fromRotation(rx: number, ry: number, rz: number, order?: RotationOrder): Matrix4x4;
-        fromRotation(rx: number, ry: number, rz: number, order?: RotationOrder): this;
-        static fromScale(xScale: number, yScale: number, zScale: number): Matrix4x4;
-        static fromPosition(x: number, y: number, z: number): Matrix4x4;
-        append(lhs: Matrix4x4): this;
-        appendRotation(axis: Vector3, degrees: number, pivotPoint?: Vector3): this;
-        appendScale(xScale: number, yScale: number, zScale: number): this;
-        appendTranslation(x: number, y: number, z: number): this;
-        clone(): Matrix4x4;
-        copyColumnFrom(column: number, vector3D: Vector4): this;
-        copyColumnToVector3(column: number, vector3D?: Vector3): Vector3;
-        copyColumnToVector4(column: number, vector3D?: Vector4): Vector4;
-        copyFrom(sourceMatrix3D: Matrix4x4): this;
-        copyRawDataFrom(vector: number[], index?: number, transpose?: boolean): this;
-        copyRawDataTo(vector: number[] | Float32Array, index?: number, transpose?: boolean): this;
-        copyRowFrom(row: number, vector3D: Vector4): this;
-        copyRowTo(row: number, vector3D: Vector4): this;
-        copyToMatrix3D(dest: Matrix4x4): this;
-        recompose(position: Vector3, rotation: Vector3, scale: Vector3, order?: RotationOrder): this;
-        decompose(position?: Vector3, rotation?: Vector3, scale?: Vector3, order?: RotationOrder): Vector3[];
-        deltaTransformVector(v: Vector3, vout?: Vector3): Vector3;
-        identity(): this;
-        invert(): this;
-        prepend(rhs: Matrix4x4): this;
-        prependRotation(axis: Vector3, degrees: number, pivotPoint?: Vector3): this;
-        prependScale(xScale: number, yScale: number, zScale: number): this;
-        prependScale1(xScale: number, yScale: number, zScale: number): this;
-        prependTranslation(x: number, y: number, z: number): this;
-        moveRight(distance: number): this;
-        moveUp(distance: number): this;
-        moveForward(distance: number): this;
-        transformVector(vin: Vector3, vout?: Vector3): Vector3;
-        transformVector4(vin: Vector4, vout?: Vector4): Vector4;
-        transformVectors(vin: number[], vout: number[]): void;
-        transformRotation(vin: Vector3, vout?: Vector3): Vector3;
-        transpose(): this;
-        equals(matrix3D: Matrix4x4, precision?: number): boolean;
-        lookAt(target: Vector3, upAxis?: Vector3): this;
-        getMaxScaleOnAxis(): number;
-        setOrtho(left: number, right: number, top: number, bottom: number, near: number, far: number): this;
-        setPerspectiveFromFOV(fov: number, aspect: number, near: number, far: number): this;
-        setPerspective(left: number, right: number, top: number, bottom: number, near: number, far: number): this;
-        toString(): string;
-    }
-}
-declare namespace gd3d.framework {
     enum RotationOrder {
         XYZ = 0,
         ZXY = 1,
@@ -6466,7 +6401,6 @@ declare namespace gd3d.framework {
         dot(a: Vector4): number;
         lerp(v: Vector4, alpha: number): this;
         lerpTo(v: Vector4, alpha: number, vout?: Vector4): Vector4;
-        applyMatrix4x4(mat: Matrix4x4): this;
         toString(): string;
     }
 }
