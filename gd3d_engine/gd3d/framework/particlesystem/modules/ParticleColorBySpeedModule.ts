@@ -21,7 +21,7 @@ namespace gd3d.framework
          * 
          * 在这些最小和最大速度之间应用颜色渐变。
          */
-        range = new Vector2(0, 1);
+        range = new math.vector2(0, 1);
 
         /**
          * 初始化粒子状态

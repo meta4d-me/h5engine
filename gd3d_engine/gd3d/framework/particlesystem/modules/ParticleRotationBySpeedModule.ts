@@ -23,7 +23,7 @@ namespace gd3d.framework
          * 
          * 在这些最小和最大速度之间应用旋转曲线。
          */
-        range = new Vector2(0, 1);
+        range = new math.vector2(0, 1);
 
         /**
          * Rotation by speed curve for the X axis.

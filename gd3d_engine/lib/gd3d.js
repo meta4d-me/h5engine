@@ -29872,7 +29872,7 @@ var gd3d;
                 this.color = new framework.Color4();
                 this.startColor = new framework.Color4();
                 this.tilingOffset = new gd3d.math.vector4(1, 1, 0, 0);
-                this.flipUV = new framework.Vector2();
+                this.flipUV = new gd3d.math.vector2();
                 this.cache = {};
             }
             Particle1.prototype.updateState = function (preTime, time) {
@@ -32590,7 +32590,7 @@ var gd3d;
             function ParticleColorBySpeedModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.color = new framework.MinMaxGradient();
-                _this.range = new framework.Vector2(0, 1);
+                _this.range = new gd3d.math.vector2(0, 1);
                 return _this;
             }
             ParticleColorBySpeedModule.prototype.initParticleState = function (particle) {
@@ -33229,7 +33229,7 @@ var gd3d;
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.separateAxes = false;
                 _this.angularVelocity = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 }, yCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 }, zCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 } });
-                _this.range = new framework.Vector2(0, 1);
+                _this.range = new gd3d.math.vector2(0, 1);
                 return _this;
             }
             Object.defineProperty(ParticleRotationBySpeedModule.prototype, "x", {
@@ -33694,7 +33694,7 @@ var gd3d;
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.separateAxes = false;
                 _this.size3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 } });
-                _this.range = new framework.Vector2(0, 1);
+                _this.range = new gd3d.math.vector2(0, 1);
                 return _this;
             }
             Object.defineProperty(ParticleSizeBySpeedModule.prototype, "size", {
@@ -33915,14 +33915,14 @@ var gd3d;
             __extends(ParticleTextureSheetAnimationModule, _super);
             function ParticleTextureSheetAnimationModule() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.tiles = new framework.Vector2(1, 1);
+                _this.tiles = new gd3d.math.vector2(1, 1);
                 _this.animation = framework.ParticleSystemAnimationType.WholeSheet;
                 _this.frameOverTime = framework.serialization.setValue(new framework.MinMaxCurve(), { mode: framework.MinMaxCurveMode.Curve, curveMin: { keys: [{ time: 0, value: 0, inTangent: 1, outTangent: 1 }, { time: 1, value: 1, inTangent: 1, outTangent: 1 }] } });
                 _this.useRandomRow = true;
                 _this._rowIndex = 0;
                 _this.startFrame = new framework.MinMaxCurve();
                 _this.cycleCount = 1;
-                _this.flipUV = new framework.Vector2();
+                _this.flipUV = new gd3d.math.vector2();
                 _this.uvChannelMask = framework.UVChannelFlags.Everything;
                 return _this;
             }
@@ -34001,27 +34001,30 @@ var gd3d;
             };
             ParticleTextureSheetAnimationModule.prototype.updateParticleState = function (particle) {
                 gd3d.math.vec4Set(particle.tilingOffset, 1, 1, 0, 0);
-                particle.flipUV.init(0, 0);
+                particle.flipUV.x = 0;
+                particle.flipUV.y = 0;
                 if (!this.enabled)
                     return;
                 var segmentsX = this.tiles.x;
                 var segmentsY = this.tiles.y;
-                var step = this.tiles.clone().reciprocal();
-                var uvPos = new framework.Vector2();
+                var step = new gd3d.math.vector2(1 / segmentsX, 1 / segmentsY);
+                var uvPos = new gd3d.math.vector2();
                 var frameOverTime = this.frameOverTime.getValue(particle.rateAtLifeTime, particle[_TextureSheetAnimation_frameOverTime]);
                 var frameIndex = this.startFrame.getValue(particle.rateAtLifeTime, particle[_TextureSheetAnimation_startFrame]);
                 var rowIndex = this.rowIndex;
                 var cycleCount = this.cycleCount;
                 if (this.animation == framework.ParticleSystemAnimationType.WholeSheet) {
                     frameIndex = Math.round(frameIndex + frameOverTime * segmentsX * segmentsY * cycleCount);
-                    uvPos.init(frameIndex % segmentsX, Math.floor(frameIndex / segmentsX) % segmentsY).scale(step);
+                    uvPos.x = (frameIndex % segmentsX) * step.x;
+                    uvPos.y = (Math.floor(frameIndex / segmentsX) % segmentsY) * step.y;
                 }
                 else if (this.animation == framework.ParticleSystemAnimationType.SingleRow) {
                     frameIndex = Math.round(frameIndex + frameOverTime * segmentsX * cycleCount);
                     if (this.useRandomRow) {
                         rowIndex = Math.round(segmentsY * particle[_TextureSheetAnimation_randomRow]);
                     }
-                    uvPos.init(frameIndex % segmentsX, rowIndex).scale(step);
+                    uvPos.x = (frameIndex % segmentsX) * step.x;
+                    uvPos.x = rowIndex * step.y;
                 }
                 gd3d.math.vec4Set(particle.tilingOffset, step.x, step.y, uvPos.x, uvPos.y);
                 particle.flipUV = this.flipUV;

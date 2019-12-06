@@ -71,7 +71,7 @@ namespace gd3d.framework
 		/**
 		 * 在粒子上翻转UV坐标，使它们呈现水平镜像。
 		 */
-		flipUV = new Vector2();
+		flipUV = new math.vector2();
 
 		/**
 		 * 出生时在周期的位置（在发射时被更新）

@@ -5654,7 +5654,7 @@ declare namespace gd3d.framework {
         color: Color4;
         startColor: Color4;
         tilingOffset: math.vector4;
-        flipUV: Vector2;
+        flipUV: math.vector2;
         birthRateAtDuration: number;
         rateAtLifeTime: number;
         cache: {};
@@ -6431,7 +6431,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class ParticleColorBySpeedModule extends ParticleModule {
         color: MinMaxGradient;
-        range: Vector2;
+        range: math.vector2;
         initParticleState(particle: Particle1): void;
         updateParticleState(particle: Particle1): void;
     }
@@ -6551,7 +6551,7 @@ declare namespace gd3d.framework {
     class ParticleRotationBySpeedModule extends ParticleModule {
         separateAxes: boolean;
         angularVelocity: MinMaxCurveVector3;
-        range: Vector2;
+        range: math.vector2;
         x: MinMaxCurve;
         xMultiplier: number;
         y: MinMaxCurve;
@@ -6626,7 +6626,7 @@ declare namespace gd3d.framework {
         separateAxes: boolean;
         size: MinMaxCurve;
         size3D: MinMaxCurveVector3;
-        range: Vector2;
+        range: math.vector2;
         sizeMultiplier: number;
         x: MinMaxCurve;
         xMultiplier: number;
@@ -6656,7 +6656,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class ParticleTextureSheetAnimationModule extends ParticleModule {
-        tiles: Vector2;
+        tiles: math.vector2;
         animation: ParticleSystemAnimationType;
         frameOverTime: MinMaxCurve;
         useRandomRow: boolean;
@@ -6664,7 +6664,7 @@ declare namespace gd3d.framework {
         private _rowIndex;
         startFrame: MinMaxCurve;
         cycleCount: number;
-        flipUV: Vector2;
+        flipUV: math.vector2;
         uvChannelMask: UVChannelFlags;
         flipU: number;
         flipV: number;

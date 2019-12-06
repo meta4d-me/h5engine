@@ -14,7 +14,7 @@ namespace gd3d.framework
          * 定义纹理的平铺。
          */
 
-        tiles = new Vector2(1, 1);
+        tiles = new math.vector2(1, 1);
 
         /**
          * Specifies the animation type.
@@ -75,7 +75,7 @@ namespace gd3d.framework
          * 在粒子上翻转UV坐标，使它们呈现镜像翻转。
          */
 
-        flipUV = new Vector2();
+        flipUV = new math.vector2();
 
         /**
          * Choose which UV channels will receive texture animation.
@@ -195,13 +195,14 @@ namespace gd3d.framework
         updateParticleState(particle: Particle1)
         {
             math.vec4Set(particle.tilingOffset, 1, 1, 0, 0);
-            particle.flipUV.init(0, 0);
+            particle.flipUV.x = 0;
+            particle.flipUV.y = 0;
             if (!this.enabled) return;
 
             var segmentsX = this.tiles.x;
             var segmentsY = this.tiles.y;
-            var step = this.tiles.clone().reciprocal();
-            var uvPos = new Vector2();
+            var step = new math.vector2(1 / segmentsX, 1 / segmentsY);
+            var uvPos = new math.vector2();
             var frameOverTime = this.frameOverTime.getValue(particle.rateAtLifeTime, particle[_TextureSheetAnimation_frameOverTime]);
             var frameIndex = this.startFrame.getValue(particle.rateAtLifeTime, particle[_TextureSheetAnimation_startFrame]);
             var rowIndex = this.rowIndex;
@@ -210,8 +211,8 @@ namespace gd3d.framework
             if (this.animation == ParticleSystemAnimationType.WholeSheet)
             {
                 frameIndex = Math.round(frameIndex + frameOverTime * segmentsX * segmentsY * cycleCount);
-                uvPos.init(frameIndex % segmentsX, Math.floor(frameIndex / segmentsX) % segmentsY).scale(step);
-
+                uvPos.x = (frameIndex % segmentsX) * step.x;
+                uvPos.y = (Math.floor(frameIndex / segmentsX) % segmentsY) * step.y;
             } else if (this.animation == ParticleSystemAnimationType.SingleRow)
             {
                 frameIndex = Math.round(frameIndex + frameOverTime * segmentsX * cycleCount);
@@ -219,7 +220,8 @@ namespace gd3d.framework
                 {
                     rowIndex = Math.round(segmentsY * particle[_TextureSheetAnimation_randomRow]);
                 }
-                uvPos.init(frameIndex % segmentsX, rowIndex).scale(step);
+                uvPos.x = (frameIndex % segmentsX) * step.x;
+                uvPos.x = rowIndex * step.y;
             }
 
             math.vec4Set(particle.tilingOffset, step.x, step.y, uvPos.x, uvPos.y);

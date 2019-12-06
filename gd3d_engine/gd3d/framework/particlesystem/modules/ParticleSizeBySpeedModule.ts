@@ -44,7 +44,7 @@ namespace gd3d.framework
          * 
          * 在这些最小和最大速度之间应用尺寸变化。
          */
-        range = new Vector2(0, 1);
+        range = new math.vector2(0, 1);
 
         /**
          * Size multiplier.
