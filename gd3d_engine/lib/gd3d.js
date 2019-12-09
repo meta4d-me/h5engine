@@ -31883,173 +31883,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var DEG_TO_RAD = Math.PI / 180;
-        var Vector2 = (function () {
-            function Vector2(x, y) {
-                if (x === void 0) { x = 0; }
-                if (y === void 0) { y = 0; }
-                this["__class__"] = "gd3d.framework.Vector2";
-                this.x = x;
-                this.y = y;
-            }
-            Vector2.polar = function (len, angle) {
-                return new Vector2(len * Math.cos(angle / DEG_TO_RAD), len * Math.sin(angle / DEG_TO_RAD));
-            };
-            Object.defineProperty(Vector2.prototype, "length", {
-                get: function () {
-                    return Math.sqrt(this.x * this.x + this.y * this.y);
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Vector2.prototype.init = function (x, y) {
-                this.x = x;
-                this.y = y;
-                return this;
-            };
-            Vector2.prototype.clone = function () {
-                return new Vector2(this.x, this.y);
-            };
-            Vector2.prototype.equals = function (toCompare) {
-                return this.x == toCompare.x && this.y == toCompare.y;
-            };
-            Vector2.distance = function (p1, p2) {
-                return Math.sqrt((p1.x - p2.x) * (p1.x - p2.x) + (p1.y - p2.y) * (p1.y - p2.y));
-            };
-            Vector2.prototype.copy = function (sourcePoint) {
-                this.x = sourcePoint.x;
-                this.y = sourcePoint.y;
-                return this;
-            };
-            Vector2.prototype.addTo = function (v, vout) {
-                if (vout === void 0) { vout = new Vector2(); }
-                return vout.init(this.x + v.x, this.y + v.y);
-            };
-            Vector2.prototype.normalize = function (thickness) {
-                if (thickness === void 0) { thickness = 1; }
-                if (this.x != 0 || this.y != 0) {
-                    var relativeThickness = thickness / this.length;
-                    this.x *= relativeThickness;
-                    this.y *= relativeThickness;
-                }
-                return this;
-            };
-            Vector2.prototype.negate = function () {
-                this.x *= -1;
-                this.y *= -1;
-                return this;
-            };
-            Vector2.prototype.reciprocal = function () {
-                this.x = 1 / this.x;
-                this.y = 1 / this.y;
-                return this;
-            };
-            Vector2.prototype.reciprocalTo = function (out) {
-                if (out === void 0) { out = new Vector2(); }
-                out.copy(this).reciprocal();
-                return out;
-            };
-            Vector2.prototype.scaleNumber = function (s) {
-                this.x *= s;
-                this.y *= s;
-                return this;
-            };
-            Vector2.prototype.scaleNumberTo = function (s, vout) {
-                if (vout === void 0) { vout = new Vector2(); }
-                return vout.copy(this).scaleNumber(s);
-            };
-            Vector2.prototype.scale = function (s) {
-                this.x *= s.x;
-                this.y *= s.y;
-                return this;
-            };
-            Vector2.prototype.scaleTo = function (s, vout) {
-                if (vout === void 0) { vout = new Vector2(); }
-                if (s == vout)
-                    s = s.clone();
-                return vout.copy(this).scale(s);
-            };
-            Vector2.prototype.offset = function (dx, dy) {
-                this.x += dx;
-                this.y += dy;
-                return this;
-            };
-            Vector2.prototype.sub = function (v) {
-                this.x -= v.x;
-                this.y -= v.y;
-                return this;
-            };
-            Vector2.prototype.subTo = function (v, vout) {
-                if (vout === void 0) { vout = new Vector2(); }
-                return vout.init(this.x - v.x, this.y - v.y);
-            };
-            Vector2.prototype.multiply = function (a) {
-                this.x *= a.x;
-                this.y *= a.y;
-                return this;
-            };
-            Vector2.prototype.multiplyTo = function (a, vout) {
-                if (vout === void 0) { vout = new Vector2(); }
-                return vout.copy(this).multiply(a);
-            };
-            Vector2.prototype.lerp = function (p, alpha) {
-                this.x += (p.x - this.x) * alpha.x;
-                this.y += (p.y - this.y) * alpha.y;
-                return this;
-            };
-            Vector2.prototype.lerpTo = function (v, alpha, vout) {
-                if (vout === void 0) { vout = new Vector2(); }
-                return vout.copy(this).lerp(v, alpha);
-            };
-            Vector2.prototype.lerpNumber = function (v, alpha) {
-                this.x += (v.x - this.x) * alpha;
-                this.y += (v.y - this.y) * alpha;
-                return this;
-            };
-            Vector2.prototype.lerpNumberTo = function (v, alpha, vout) {
-                if (vout === void 0) { vout = new Vector2(); }
-                return vout.copy(this).lerpNumber(v, alpha);
-            };
-            Vector2.prototype.clamp = function (min, max) {
-                this.x = Math.clamp(this.x, min.x, max.x);
-                this.y = Math.clamp(this.y, min.y, max.y);
-                return this;
-            };
-            Vector2.prototype.clampTo = function (min, max, vout) {
-                if (vout === void 0) { vout = new Vector2(); }
-                return vout.copy(this).clamp(min, max);
-            };
-            Vector2.prototype.min = function (v) {
-                this.x = Math.min(this.x, v.x);
-                this.y = Math.min(this.y, v.y);
-                return this;
-            };
-            Vector2.prototype.max = function (v) {
-                this.x = Math.max(this.x, v.x);
-                this.y = Math.max(this.y, v.y);
-                return this;
-            };
-            Vector2.prototype.round = function () {
-                this.x = Math.round(this.x);
-                this.y = Math.round(this.y);
-                return this;
-            };
-            Vector2.prototype.toString = function () {
-                return "(x=" + this.x + ", y=" + this.y + ")";
-            };
-            Vector2.prototype.toArray = function () {
-                return [this.x, this.y];
-            };
-            Vector2.ZERO = new Vector2();
-            return Vector2;
-        }());
-        framework.Vector2 = Vector2;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var Vector3 = (function () {
             function Vector3(x, y, z) {
                 if (x === void 0) { x = 0; }
@@ -34507,195 +34340,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        function watch(onChange) {
-            return function (target, property) {
-                var key = "_" + property;
-                var get = eval("(function (){return this." + key + "})");
-                var set = eval("(function (value){\n                if (this." + key + " == value)\n                    return;\n                var oldValue = this." + key + ";\n                this." + key + " = value;\n                this." + onChange + "(\"" + property + "\", oldValue, value);\n            })");
-                Object.defineProperty(target, property, {
-                    get: get,
-                    set: set,
-                    enumerable: true,
-                    configurable: true
-                });
-            };
-        }
-        framework.watch = watch;
-        var Watcher = (function () {
-            function Watcher() {
-            }
-            Watcher.prototype.watch = function (object, property, handler, thisObject) {
-                if (!Object.getOwnPropertyDescriptor(object, framework.__watchs__)) {
-                    Object.defineProperty(object, framework.__watchs__, {
-                        value: {},
-                        enumerable: false,
-                        configurable: true,
-                        writable: false,
-                    });
-                }
-                var watchs = object[framework.__watchs__];
-                if (!watchs[property]) {
-                    var oldPropertyDescriptor = Object.getOwnPropertyDescriptor(object, property);
-                    watchs[property] = { value: object[property], oldPropertyDescriptor: oldPropertyDescriptor, handlers: [] };
-                    var data = Object.getPropertyDescriptor(object, property);
-                    if (data && data.set && data.get) {
-                        data = { enumerable: data.enumerable, configurable: true, get: data.get, set: data.set };
-                        var orgSet = data.set;
-                        data.set = function (value) {
-                            var oldvalue = this[property];
-                            if (oldvalue != value) {
-                                orgSet && orgSet.call(this, value);
-                                notifyListener(this, property, oldvalue);
-                            }
-                        };
-                    }
-                    else if (!data || (!data.get && !data.set)) {
-                        data = { enumerable: true, configurable: true };
-                        data.get = function () {
-                            return this[framework.__watchs__][property].value;
-                        };
-                        data.set = function (value) {
-                            var oldvalue = this[framework.__watchs__][property].value;
-                            if (oldvalue != value) {
-                                this[framework.__watchs__][property].value = value;
-                                notifyListener(this, property, oldvalue);
-                            }
-                        };
-                    }
-                    else {
-                        console.warn("watch " + object + " . " + property + " \u5931\u8D25\uFF01");
-                        return;
-                    }
-                    Object.defineProperty(object, property, data);
-                }
-                var propertywatchs = watchs[property];
-                var has = propertywatchs.handlers.reduce(function (v, item) { return v || (item.handler == handler && item.thisObject == thisObject); }, false);
-                if (!has)
-                    propertywatchs.handlers.push({ handler: handler, thisObject: thisObject });
-            };
-            Watcher.prototype.unwatch = function (object, property, handler, thisObject) {
-                var watchs = object[framework.__watchs__];
-                if (!watchs)
-                    return;
-                if (watchs[property]) {
-                    var handlers = watchs[property].handlers;
-                    if (handler === undefined)
-                        handlers.length = 0;
-                    for (var i = handlers.length - 1; i >= 0; i--) {
-                        if (handlers[i].handler == handler && (handlers[i].thisObject == thisObject || thisObject === undefined))
-                            handlers.splice(i, 1);
-                    }
-                    if (handlers.length == 0) {
-                        var value = object[property];
-                        delete object[property];
-                        if (watchs[property].oldPropertyDescriptor)
-                            Object.defineProperty(object, property, watchs[property].oldPropertyDescriptor);
-                        object[property] = value;
-                        delete watchs[property];
-                    }
-                    if (Object.keys(watchs).length == 0) {
-                        delete object[framework.__watchs__];
-                    }
-                }
-            };
-            Watcher.prototype.watchchain = function (object, property, handler, thisObject) {
-                var _this = this;
-                var notIndex = property.indexOf(".");
-                if (notIndex == -1) {
-                    this.watch(object, property, handler, thisObject);
-                    return;
-                }
-                if (!Object.getOwnPropertyDescriptor(object, framework.__watchchains__))
-                    Object.defineProperty(object, framework.__watchchains__, { value: {}, enumerable: false, writable: false, configurable: true });
-                var watchchains = object[framework.__watchchains__];
-                if (!watchchains[property]) {
-                    watchchains[property] = [];
-                }
-                var propertywatchs = watchchains[property];
-                var has = propertywatchs.reduce(function (v, item) { return v || (item.handler == handler && item.thisObject == thisObject); }, false);
-                if (!has) {
-                    var currentp = property.substr(0, notIndex);
-                    var nextp = property.substr(notIndex + 1);
-                    if (object[currentp]) {
-                        this.watchchain(object[currentp], nextp, handler, thisObject);
-                    }
-                    var watchchainFun = function (h, p, oldvalue) {
-                        var newvalue = h[p];
-                        if (oldvalue)
-                            _this.unwatchchain(oldvalue, nextp, handler, thisObject);
-                        if (newvalue)
-                            _this.watchchain(newvalue, nextp, handler, thisObject);
-                        var ov = Object.getPropertyValue(oldvalue, nextp);
-                        var nv = Object.getPropertyValue(newvalue, nextp);
-                        if (ov != nv) {
-                            handler.call(thisObject, newvalue, nextp, ov);
-                        }
-                    };
-                    this.watch(object, currentp, watchchainFun);
-                    propertywatchs.push({ handler: handler, thisObject: thisObject, watchchainFun: watchchainFun });
-                }
-            };
-            Watcher.prototype.unwatchchain = function (object, property, handler, thisObject) {
-                var notIndex = property.indexOf(".");
-                if (notIndex == -1) {
-                    this.unwatch(object, property, handler, thisObject);
-                    return;
-                }
-                var currentp = property.substr(0, notIndex);
-                var nextp = property.substr(notIndex + 1);
-                var watchchains = object[framework.__watchchains__];
-                if (!watchchains || !watchchains[property])
-                    return;
-                var propertywatchs = watchchains[property];
-                for (var i = propertywatchs.length - 1; i >= 0; i--) {
-                    var element = propertywatchs[i];
-                    if (handler == null || (handler == element.handler && thisObject == element.thisObject)) {
-                        if (object[currentp]) {
-                            this.unwatchchain(object[currentp], nextp, element.handler, element.thisObject);
-                        }
-                        this.unwatch(object, currentp, element.watchchainFun);
-                        propertywatchs.splice(i, 1);
-                    }
-                }
-                if (propertywatchs.length == 0)
-                    delete watchchains[property];
-                if (Object.keys(watchchains).length == 0) {
-                    delete object[framework.__watchchains__];
-                }
-            };
-            Watcher.prototype.watchobject = function (object, property, handler, thisObject) {
-                var _this = this;
-                var chains = Object.getPropertyChains(object);
-                chains.forEach(function (v) {
-                    _this.watchchain(object, v, handler, thisObject);
-                });
-            };
-            Watcher.prototype.unwatchobject = function (object, property, handler, thisObject) {
-                var _this = this;
-                var chains = Object.getPropertyChains(property);
-                chains.forEach(function (v) {
-                    _this.unwatchchain(object, v, handler, thisObject);
-                });
-            };
-            return Watcher;
-        }());
-        framework.Watcher = Watcher;
-        framework.watcher = new Watcher();
-        framework.__watchs__ = "__watchs__";
-        framework.__watchchains__ = "__watchchains__";
-        function notifyListener(host, property, oldview) {
-            var watchs = host[framework.__watchs__];
-            var handlers = watchs[property].handlers;
-            handlers.forEach(function (element) {
-                element.handler.call(element.thisObject, host, property, oldview);
-            });
-        }
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var ParticleSystemShapeBase = (function () {
             function ParticleSystemShapeBase(module) {
                 this._module = module;
@@ -35711,6 +35355,195 @@ var gd3d;
                 }
             },
         ];
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        function watch(onChange) {
+            return function (target, property) {
+                var key = "_" + property;
+                var get = eval("(function (){return this." + key + "})");
+                var set = eval("(function (value){\n                if (this." + key + " == value)\n                    return;\n                var oldValue = this." + key + ";\n                this." + key + " = value;\n                this." + onChange + "(\"" + property + "\", oldValue, value);\n            })");
+                Object.defineProperty(target, property, {
+                    get: get,
+                    set: set,
+                    enumerable: true,
+                    configurable: true
+                });
+            };
+        }
+        framework.watch = watch;
+        var Watcher = (function () {
+            function Watcher() {
+            }
+            Watcher.prototype.watch = function (object, property, handler, thisObject) {
+                if (!Object.getOwnPropertyDescriptor(object, framework.__watchs__)) {
+                    Object.defineProperty(object, framework.__watchs__, {
+                        value: {},
+                        enumerable: false,
+                        configurable: true,
+                        writable: false,
+                    });
+                }
+                var watchs = object[framework.__watchs__];
+                if (!watchs[property]) {
+                    var oldPropertyDescriptor = Object.getOwnPropertyDescriptor(object, property);
+                    watchs[property] = { value: object[property], oldPropertyDescriptor: oldPropertyDescriptor, handlers: [] };
+                    var data = Object.getPropertyDescriptor(object, property);
+                    if (data && data.set && data.get) {
+                        data = { enumerable: data.enumerable, configurable: true, get: data.get, set: data.set };
+                        var orgSet = data.set;
+                        data.set = function (value) {
+                            var oldvalue = this[property];
+                            if (oldvalue != value) {
+                                orgSet && orgSet.call(this, value);
+                                notifyListener(this, property, oldvalue);
+                            }
+                        };
+                    }
+                    else if (!data || (!data.get && !data.set)) {
+                        data = { enumerable: true, configurable: true };
+                        data.get = function () {
+                            return this[framework.__watchs__][property].value;
+                        };
+                        data.set = function (value) {
+                            var oldvalue = this[framework.__watchs__][property].value;
+                            if (oldvalue != value) {
+                                this[framework.__watchs__][property].value = value;
+                                notifyListener(this, property, oldvalue);
+                            }
+                        };
+                    }
+                    else {
+                        console.warn("watch " + object + " . " + property + " \u5931\u8D25\uFF01");
+                        return;
+                    }
+                    Object.defineProperty(object, property, data);
+                }
+                var propertywatchs = watchs[property];
+                var has = propertywatchs.handlers.reduce(function (v, item) { return v || (item.handler == handler && item.thisObject == thisObject); }, false);
+                if (!has)
+                    propertywatchs.handlers.push({ handler: handler, thisObject: thisObject });
+            };
+            Watcher.prototype.unwatch = function (object, property, handler, thisObject) {
+                var watchs = object[framework.__watchs__];
+                if (!watchs)
+                    return;
+                if (watchs[property]) {
+                    var handlers = watchs[property].handlers;
+                    if (handler === undefined)
+                        handlers.length = 0;
+                    for (var i = handlers.length - 1; i >= 0; i--) {
+                        if (handlers[i].handler == handler && (handlers[i].thisObject == thisObject || thisObject === undefined))
+                            handlers.splice(i, 1);
+                    }
+                    if (handlers.length == 0) {
+                        var value = object[property];
+                        delete object[property];
+                        if (watchs[property].oldPropertyDescriptor)
+                            Object.defineProperty(object, property, watchs[property].oldPropertyDescriptor);
+                        object[property] = value;
+                        delete watchs[property];
+                    }
+                    if (Object.keys(watchs).length == 0) {
+                        delete object[framework.__watchs__];
+                    }
+                }
+            };
+            Watcher.prototype.watchchain = function (object, property, handler, thisObject) {
+                var _this = this;
+                var notIndex = property.indexOf(".");
+                if (notIndex == -1) {
+                    this.watch(object, property, handler, thisObject);
+                    return;
+                }
+                if (!Object.getOwnPropertyDescriptor(object, framework.__watchchains__))
+                    Object.defineProperty(object, framework.__watchchains__, { value: {}, enumerable: false, writable: false, configurable: true });
+                var watchchains = object[framework.__watchchains__];
+                if (!watchchains[property]) {
+                    watchchains[property] = [];
+                }
+                var propertywatchs = watchchains[property];
+                var has = propertywatchs.reduce(function (v, item) { return v || (item.handler == handler && item.thisObject == thisObject); }, false);
+                if (!has) {
+                    var currentp = property.substr(0, notIndex);
+                    var nextp = property.substr(notIndex + 1);
+                    if (object[currentp]) {
+                        this.watchchain(object[currentp], nextp, handler, thisObject);
+                    }
+                    var watchchainFun = function (h, p, oldvalue) {
+                        var newvalue = h[p];
+                        if (oldvalue)
+                            _this.unwatchchain(oldvalue, nextp, handler, thisObject);
+                        if (newvalue)
+                            _this.watchchain(newvalue, nextp, handler, thisObject);
+                        var ov = Object.getPropertyValue(oldvalue, nextp);
+                        var nv = Object.getPropertyValue(newvalue, nextp);
+                        if (ov != nv) {
+                            handler.call(thisObject, newvalue, nextp, ov);
+                        }
+                    };
+                    this.watch(object, currentp, watchchainFun);
+                    propertywatchs.push({ handler: handler, thisObject: thisObject, watchchainFun: watchchainFun });
+                }
+            };
+            Watcher.prototype.unwatchchain = function (object, property, handler, thisObject) {
+                var notIndex = property.indexOf(".");
+                if (notIndex == -1) {
+                    this.unwatch(object, property, handler, thisObject);
+                    return;
+                }
+                var currentp = property.substr(0, notIndex);
+                var nextp = property.substr(notIndex + 1);
+                var watchchains = object[framework.__watchchains__];
+                if (!watchchains || !watchchains[property])
+                    return;
+                var propertywatchs = watchchains[property];
+                for (var i = propertywatchs.length - 1; i >= 0; i--) {
+                    var element = propertywatchs[i];
+                    if (handler == null || (handler == element.handler && thisObject == element.thisObject)) {
+                        if (object[currentp]) {
+                            this.unwatchchain(object[currentp], nextp, element.handler, element.thisObject);
+                        }
+                        this.unwatch(object, currentp, element.watchchainFun);
+                        propertywatchs.splice(i, 1);
+                    }
+                }
+                if (propertywatchs.length == 0)
+                    delete watchchains[property];
+                if (Object.keys(watchchains).length == 0) {
+                    delete object[framework.__watchchains__];
+                }
+            };
+            Watcher.prototype.watchobject = function (object, property, handler, thisObject) {
+                var _this = this;
+                var chains = Object.getPropertyChains(object);
+                chains.forEach(function (v) {
+                    _this.watchchain(object, v, handler, thisObject);
+                });
+            };
+            Watcher.prototype.unwatchobject = function (object, property, handler, thisObject) {
+                var _this = this;
+                var chains = Object.getPropertyChains(property);
+                chains.forEach(function (v) {
+                    _this.unwatchchain(object, v, handler, thisObject);
+                });
+            };
+            return Watcher;
+        }());
+        framework.Watcher = Watcher;
+        framework.watcher = new Watcher();
+        framework.__watchs__ = "__watchs__";
+        framework.__watchchains__ = "__watchchains__";
+        function notifyListener(host, property, oldview) {
+            var watchs = host[framework.__watchs__];
+            var handlers = watchs[property].handlers;
+            handlers.forEach(function (element) {
+                element.handler.call(element.thisObject, host, property, oldview);
+            });
+        }
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

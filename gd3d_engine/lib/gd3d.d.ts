@@ -6254,47 +6254,6 @@ declare namespace gd3d.framework {
     var defaultRotationOrder: RotationOrder;
 }
 declare namespace gd3d.framework {
-    class Vector2 {
-        "__class__": "gd3d.framework.Vector2";
-        static ZERO: Vector2;
-        static polar(len: number, angle: number): Vector2;
-        constructor(x?: number, y?: number);
-        x: number;
-        y: number;
-        readonly length: number;
-        init(x: number, y: number): Vector2;
-        clone(): Vector2;
-        equals(toCompare: Vector2): boolean;
-        static distance(p1: Vector2, p2: Vector2): number;
-        copy(sourcePoint: Vector2): this;
-        addTo(v: Vector2, vout?: Vector2): Vector2;
-        normalize(thickness?: number): this;
-        negate(): this;
-        reciprocal(): this;
-        reciprocalTo(out?: Vector2): Vector2;
-        scaleNumber(s: number): Vector2;
-        scaleNumberTo(s: number, vout?: Vector2): Vector2;
-        scale(s: Vector2): this;
-        scaleTo(s: Vector2, vout?: Vector2): Vector2;
-        offset(dx: number, dy: number): Vector2;
-        sub(v: Vector2): this;
-        subTo(v: Vector2, vout?: Vector2): Vector2;
-        multiply(a: Vector2): this;
-        multiplyTo(a: Vector2, vout?: Vector2): Vector2;
-        lerp(p: Vector2, alpha: Vector2): Vector2;
-        lerpTo(v: Vector2, alpha: Vector2, vout?: Vector2): Vector2;
-        lerpNumber(v: Vector2, alpha: number): this;
-        lerpNumberTo(v: Vector2, alpha: number, vout?: Vector2): Vector2;
-        clamp(min: Vector2, max: Vector2): this;
-        clampTo(min: Vector2, max: Vector2, vout?: Vector2): Vector2;
-        min(v: Vector2): this;
-        max(v: Vector2): this;
-        round(): this;
-        toString(): string;
-        toArray(): number[];
-    }
-}
-declare namespace gd3d.framework {
     class Vector3 {
         __class__: "gd3d.framework.Vector3";
         static X_AXIS: Vector3;
@@ -6770,20 +6729,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    function watch(onChange: string): (target: any, property: string) => void;
-    var watcher: Watcher;
-    class Watcher {
-        watch<T, K extends (keyof T & string), V extends T[K]>(object: T, property: K, handler: (object: T, property: string, oldvalue: V) => void, thisObject?: any): void;
-        unwatch<T, K extends (keyof T & string), V extends T[K]>(object: T, property: K, handler?: (object: T, property: string, oldvalue: V) => void, thisObject?: any): void;
-        watchchain(object: any, property: string, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
-        unwatchchain(object: any, property: string, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
-        watchobject<T>(object: T, property: gPartial<T>, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
-        unwatchobject<T>(object: T, property: gPartial<T>, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
-    }
-    const __watchs__ = "__watchs__";
-    const __watchchains__ = "__watchchains__";
-}
-declare namespace gd3d.framework {
     class ParticleSystemShapeBase {
         protected _module: ParticleShapeModule;
         constructor(module: ParticleShapeModule);
@@ -6897,6 +6842,20 @@ declare namespace gd3d.framework {
         loadingNum?: number;
         onLoaded?: () => void;
     }
+}
+declare namespace gd3d.framework {
+    function watch(onChange: string): (target: any, property: string) => void;
+    var watcher: Watcher;
+    class Watcher {
+        watch<T, K extends (keyof T & string), V extends T[K]>(object: T, property: K, handler: (object: T, property: string, oldvalue: V) => void, thisObject?: any): void;
+        unwatch<T, K extends (keyof T & string), V extends T[K]>(object: T, property: K, handler?: (object: T, property: string, oldvalue: V) => void, thisObject?: any): void;
+        watchchain(object: any, property: string, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
+        unwatchchain(object: any, property: string, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
+        watchobject<T>(object: T, property: gPartial<T>, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
+        unwatchobject<T>(object: T, property: gPartial<T>, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
+    }
+    const __watchs__ = "__watchs__";
+    const __watchchains__ = "__watchchains__";
 }
 declare namespace gd3d.framework {
     class CannonJSPlugin implements IPhysicsEnginePlugin {
