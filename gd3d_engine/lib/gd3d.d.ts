@@ -6476,55 +6476,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    var classUtils: ClassUtils;
-    class ClassUtils {
-        getQualifiedClassName(value: any): string;
-        getDefinitionByName(name: string, readCache?: boolean): any;
-        private defaultInstMap;
-        getDefaultInstanceByName(name: string): any;
-        getInstanceByName(name: string): any;
-        addClassNameSpace(namespace: string): void;
-    }
-}
-declare namespace gd3d.framework {
-    var serialization: Serialization;
-    function serialize(target: any, propertyKey: string): void;
-    interface PropertyHandler {
-        (target: any, source: any, property: string, handlers: PropertyHandler[], serialization: Serialization): boolean;
-    }
-    interface DifferentPropertyHandler {
-        (target: any, source: any, property: string, different: Object, handlers: DifferentPropertyHandler[], serialization: Serialization): boolean;
-    }
-    class Serialization {
-        serializeHandlers: {
-            priority: number;
-            handler: PropertyHandler;
-        }[];
-        deserializeHandlers: {
-            priority: number;
-            handler: PropertyHandler;
-        }[];
-        differentHandlers: {
-            priority: number;
-            handler: DifferentPropertyHandler;
-        }[];
-        setValueHandlers: {
-            priority: number;
-            handler: PropertyHandler;
-        }[];
-        serialize<T>(target: T): gPartial<T>;
-        deserialize<T>(object: gPartial<T>): T;
-        different<T>(target: T, source: T): gPartial<T>;
-        setValue<T>(target: T, source: gPartial<T>): T;
-        clone<T>(target: T): T;
-    }
-    var CLASS_KEY: string;
-    interface SerializationTempInfo {
-        loadingNum?: number;
-        onLoaded?: () => void;
-    }
-}
-declare namespace gd3d.framework {
     class CannonJSPlugin implements IPhysicsEnginePlugin {
         private _useDeltaForWorldStep;
         BJSCANNON: any;
@@ -7259,6 +7210,16 @@ declare namespace gd3d.framework {
         intersectsTriangle(vertex0: gd3d.math.vector3, vertex1: gd3d.math.vector3, vertex2: gd3d.math.vector3, outInfo: pickinfo): boolean;
     }
 }
+declare namespace gd3d.framework {
+    class ClassUtils {
+        static getQualifiedClassName(value: any): string;
+        static getDefinitionByName(name: string, readCache?: boolean): any;
+        private static defaultInstMap;
+        static getDefaultInstanceByName(name: string): any;
+        static getInstanceByName(name: string): any;
+        static addClassNameSpace(namespace: string): void;
+    }
+}
 interface WebGLRenderingContext {
     extensions: gd3d.framework.GLExtension;
     vertexAttribDivisor(index: GLuint, divisor: GLuint): void;
@@ -7295,6 +7256,44 @@ declare namespace gd3d.framework {
         private initExtensions;
         private cacheGLQuery;
         private wrap;
+    }
+}
+declare namespace gd3d.framework {
+    var serialization: Serialization;
+    function serialize(target: any, propertyKey: string): void;
+    interface PropertyHandler {
+        (target: any, source: any, property: string, handlers: PropertyHandler[], serialization: Serialization): boolean;
+    }
+    interface DifferentPropertyHandler {
+        (target: any, source: any, property: string, different: Object, handlers: DifferentPropertyHandler[], serialization: Serialization): boolean;
+    }
+    class Serialization {
+        serializeHandlers: {
+            priority: number;
+            handler: PropertyHandler;
+        }[];
+        deserializeHandlers: {
+            priority: number;
+            handler: PropertyHandler;
+        }[];
+        differentHandlers: {
+            priority: number;
+            handler: DifferentPropertyHandler;
+        }[];
+        setValueHandlers: {
+            priority: number;
+            handler: PropertyHandler;
+        }[];
+        serialize<T>(target: T): gPartial<T>;
+        deserialize<T>(object: gPartial<T>): T;
+        different<T>(target: T, source: T): gPartial<T>;
+        setValue<T>(target: T, source: gPartial<T>): T;
+        clone<T>(target: T): T;
+    }
+    var CLASS_KEY: string;
+    interface SerializationTempInfo {
+        loadingNum?: number;
+        onLoaded?: () => void;
     }
 }
 declare namespace gd3d.framework {

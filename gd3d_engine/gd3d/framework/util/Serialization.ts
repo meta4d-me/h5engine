@@ -289,7 +289,7 @@ namespace gd3d.framework
                 if (spv && spv["serialize"])
                 {
                     let object = {};
-                    object[CLASS_KEY] = classUtils.getQualifiedClassName(spv);
+                    object[CLASS_KEY] = ClassUtils.getQualifiedClassName(spv);
                     spv["serialize"](object);
                     target[property] = object;
                     return true;
@@ -347,7 +347,7 @@ namespace gd3d.framework
 
                 if (tpv == null || tpv.constructor != spv.constructor)
                 {
-                    var className = classUtils.getQualifiedClassName(spv);
+                    var className = ClassUtils.getQualifiedClassName(spv);
                     // 获取或创建对象默认实例，把默认实例保存在构造函数上省去使用map保存。
                     var inst = spv.constructor.inst;
                     if (!inst)
@@ -463,7 +463,7 @@ namespace gd3d.framework
             {
                 var tpv = target[property];
                 var spv = source[property];
-                var inst = classUtils.getInstanceByName(spv[CLASS_KEY]);
+                var inst = ClassUtils.getInstanceByName(spv[CLASS_KEY]);
                 //处理自定义反序列化对象
                 if (inst && inst["deserialize"])
                 {
@@ -485,7 +485,7 @@ namespace gd3d.framework
             {
                 var tpv = target[property];
                 var spv = source[property];
-                var inst = classUtils.getInstanceByName(spv[CLASS_KEY]);
+                var inst = ClassUtils.getInstanceByName(spv[CLASS_KEY]);
                 if (inst)
                 {
                     if (tpv && tpv.constructor == inst.constructor)
@@ -720,7 +720,7 @@ namespace gd3d.framework
                 var tpv = target[property];
                 var spv = source[property];
 
-                var targetClassName = classUtils.getQualifiedClassName(target[property]);
+                var targetClassName = ClassUtils.getQualifiedClassName(target[property]);
                 // 相同对象类型
                 if (targetClassName == spv[CLASS_KEY])
                 {

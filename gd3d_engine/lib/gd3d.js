@@ -34027,564 +34027,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var CLASS_KEY = "__class__";
-        var ClassUtils = (function () {
-            function ClassUtils() {
-                this.defaultInstMap = {};
-            }
-            ClassUtils.prototype.getQualifiedClassName = function (value) {
-                if (value == null)
-                    return "null";
-                var prototype = value.prototype ? value.prototype : Object.getPrototypeOf(value);
-                if (prototype.hasOwnProperty(CLASS_KEY))
-                    return prototype[CLASS_KEY];
-                var className = prototype.constructor.name;
-                if (_global[className] == prototype.constructor)
-                    return className;
-                for (var i = 0; i < _classNameSpaces.length; i++) {
-                    var tryClassName = _classNameSpaces[i] + "." + className;
-                    if (this.getDefinitionByName(tryClassName) == prototype.constructor) {
-                        className = tryClassName;
-                        registerClass(prototype.constructor, className);
-                        return className;
-                    }
-                }
-                return className;
-            };
-            ClassUtils.prototype.getDefinitionByName = function (name, readCache) {
-                if (readCache === void 0) { readCache = true; }
-                if (name == "null")
-                    return null;
-                if (!name)
-                    return null;
-                if (_global[name])
-                    return _global[name];
-                if (readCache && _definitionCache[name])
-                    return _definitionCache[name];
-                var paths = name.split(".");
-                var length = paths.length;
-                var definition = _global;
-                for (var i = 0; i < length; i++) {
-                    var path = paths[i];
-                    definition = definition[path];
-                    if (!definition) {
-                        return null;
-                    }
-                }
-                _definitionCache[name] = definition;
-                return definition;
-            };
-            ClassUtils.prototype.getDefaultInstanceByName = function (name) {
-                var defaultInst = this.defaultInstMap[name];
-                if (defaultInst)
-                    return defaultInst;
-                var cls = this.getDefinitionByName(name);
-                if (!cls)
-                    return undefined;
-                defaultInst = this.defaultInstMap[name] = new cls();
-                Object.freeze(defaultInst);
-                return defaultInst;
-            };
-            ClassUtils.prototype.getInstanceByName = function (name) {
-                var cls = this.getDefinitionByName(name);
-                console.assert(cls);
-                if (!cls)
-                    return undefined;
-                return new cls();
-            };
-            ClassUtils.prototype.addClassNameSpace = function (namespace) {
-                if (_classNameSpaces.indexOf(namespace) == -1) {
-                    _classNameSpaces.push(namespace);
-                }
-            };
-            return ClassUtils;
-        }());
-        framework.ClassUtils = ClassUtils;
-        ;
-        framework.classUtils = new ClassUtils();
-        var _definitionCache = {};
-        var _global;
-        var global;
-        if (typeof window != "undefined") {
-            _global = window;
-        }
-        else if (typeof global != "undefined") {
-            _global = global;
-        }
-        var _classNameSpaces = ["feng3d"];
-        function registerClass(classDefinition, className) {
-            var prototype = classDefinition.prototype;
-            Object.defineProperty(prototype, CLASS_KEY, { value: className, writable: true });
-        }
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        function serialize(target, propertyKey) {
-            if (!Object.getOwnPropertyDescriptor(target, SERIALIZE_KEY)) {
-                Object.defineProperty(target, SERIALIZE_KEY, { value: [] });
-            }
-            var serializePropertys = target[SERIALIZE_KEY];
-            serializePropertys.push(propertyKey);
-        }
-        framework.serialize = serialize;
-        function propertyHandler(target, source, property, handlers, serialization) {
-            for (var i = 0; i < handlers.length; i++) {
-                if (handlers[i](target, source, property, handlers, serialization)) {
-                    return true;
-                }
-            }
-            return true;
-        }
-        function differentPropertyHandler(target, source, property, different, handlers, serialization) {
-            for (var i = 0; i < handlers.length; i++) {
-                if (handlers[i](target, source, property, different, handlers, serialization)) {
-                    return true;
-                }
-            }
-            return true;
-        }
-        var __root__ = "__root__";
-        var Serialization = (function () {
-            function Serialization() {
-                this.serializeHandlers = [];
-                this.deserializeHandlers = [];
-                this.differentHandlers = [];
-                this.setValueHandlers = [];
-            }
-            Serialization.prototype.serialize = function (target) {
-                var handlers = this.serializeHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
-                var result = {};
-                propertyHandler(result, { __root__: target }, __root__, handlers, this);
-                var v = result[__root__];
-                return v;
-            };
-            Serialization.prototype.deserialize = function (object) {
-                var handlers = this.deserializeHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
-                var result = {};
-                propertyHandler(result, { __root__: object }, __root__, handlers, this);
-                var v = result[__root__];
-                return v;
-            };
-            Serialization.prototype.different = function (target, source) {
-                var handlers = this.differentHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
-                var different = { __root__: {} };
-                differentPropertyHandler({ __root__: target }, { __root__: source }, __root__, different, handlers, this);
-                return different[__root__];
-            };
-            Serialization.prototype.setValue = function (target, source) {
-                var handlers = this.setValueHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
-                propertyHandler({ __root__: target }, { __root__: source }, __root__, handlers, this);
-                return target;
-            };
-            Serialization.prototype.clone = function (target) {
-                return this.deserialize(this.serialize(target));
-            };
-            return Serialization;
-        }());
-        framework.Serialization = Serialization;
-        framework.CLASS_KEY = "__class__";
-        var SERIALIZE_KEY = "_serialize__";
-        function getSerializableMembers(object, serializableMembers) {
-            serializableMembers = serializableMembers || [];
-            if (object["__proto__"]) {
-                getSerializableMembers(object["__proto__"], serializableMembers);
-            }
-            var serializePropertys = object[SERIALIZE_KEY];
-            if (serializePropertys)
-                framework.ArrayUtil.concatToSelf(serializableMembers, serializePropertys);
-            framework.ArrayUtil.unique(serializableMembers);
-            return serializableMembers;
-        }
-        framework.serialization = new Serialization();
-        framework.serialization.serializeHandlers.push({
-            priority: 0,
-            handler: function (target, source, property) {
-                var spv = source[property];
-                if (framework.ObjectUtil.isBaseType(spv)) {
-                    target[property] = spv;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property) {
-                var spv = source[property];
-                if (spv && typeof spv == "function") {
-                    var object = {};
-                    object[framework.CLASS_KEY] = "function";
-                    object.data = spv.toString();
-                    target[property] = object;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property) {
-                var spv = source[property];
-                if (spv && spv["serializable"] == false) {
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property) {
-                var spv = source[property];
-                if (spv && spv["serialize"]) {
-                    var object = {};
-                    object[framework.CLASS_KEY] = framework.classUtils.getQualifiedClassName(spv);
-                    spv["serialize"](object);
-                    target[property] = object;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property, handlers, serialization) {
-                var spv = source[property];
-                if (Array.isArray(spv)) {
-                    var arr_5 = target[property] || [];
-                    var keys = Object.keys(spv);
-                    keys.forEach(function (v) {
-                        propertyHandler(arr_5, spv, v, handlers, serialization);
-                    });
-                    target[property] = arr_5;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property, handlers, serialization) {
-                var spv = source[property];
-                if (framework.ObjectUtil.isObject(spv)) {
-                    var object_1 = {};
-                    var keys = Object.keys(spv);
-                    keys.forEach(function (key) {
-                        propertyHandler(object_1, spv, key, handlers, serialization);
-                    });
-                    target[property] = object_1;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: -10000,
-            handler: function (target, source, property, handlers, serialization) {
-                var tpv = target[property];
-                var spv = source[property];
-                if (tpv == null || tpv.constructor != spv.constructor) {
-                    var className = framework.classUtils.getQualifiedClassName(spv);
-                    var inst = spv.constructor.inst;
-                    if (!inst)
-                        inst = spv.constructor.inst = new spv.constructor();
-                    if (!(inst instanceof spv.constructor))
-                        inst = spv.constructor.inst = new spv.constructor();
-                    var diff = serialization.different(spv, inst);
-                    diff[framework.CLASS_KEY] = className;
-                    target[property] = diff;
-                }
-                else {
-                    debugger;
-                    var diff = serialization.different(spv, tpv);
-                    if (diff)
-                        target[property] = diff;
-                }
-                return true;
-            }
-        });
-        framework.serialization.deserializeHandlers.push({
-            priority: 0,
-            handler: function (target, source, property) {
-                var spv = source[property];
-                if (framework.ObjectUtil.isBaseType(spv)) {
-                    target[property] = spv;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property) {
-                var spv = source[property];
-                if (spv && spv[framework.CLASS_KEY] == "function") {
-                    target[property] = eval("(" + spv.data + ")");
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property) {
-                var spv = source[property];
-                if (!framework.ObjectUtil.isObject(spv) && !Array.isArray(spv)) {
-                    target[property] = spv;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property, handlers, serialization) {
-                var spv = source[property];
-                if (Array.isArray(spv)) {
-                    var arr = target[property] || [];
-                    var keys = Object.keys(spv);
-                    keys.forEach(function (key) {
-                        propertyHandler(arr, spv, key, handlers, serialization);
-                    });
-                    target[property] = arr;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property, handlers, serialization) {
-                var tpv = target[property];
-                var spv = source[property];
-                if (framework.ObjectUtil.isObject(spv) && spv[framework.CLASS_KEY] == null) {
-                    var obj = {};
-                    if (tpv)
-                        obj = tpv;
-                    var keys = Object.keys(spv);
-                    keys.forEach(function (key) {
-                        propertyHandler(obj, spv, key, handlers, serialization);
-                    });
-                    target[property] = obj;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property) {
-                var tpv = target[property];
-                var spv = source[property];
-                var inst = framework.classUtils.getInstanceByName(spv[framework.CLASS_KEY]);
-                if (inst && inst["deserialize"]) {
-                    if (tpv && tpv.constructor == inst.constructor) {
-                        inst = tpv;
-                    }
-                    inst["deserialize"](spv);
-                    target[property] = inst;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: -10000,
-            handler: function (target, source, property, handlers, serialization) {
-                var tpv = target[property];
-                var spv = source[property];
-                var inst = framework.classUtils.getInstanceByName(spv[framework.CLASS_KEY]);
-                if (inst) {
-                    if (tpv && tpv.constructor == inst.constructor) {
-                        inst = tpv;
-                    }
-                    var keys = Object.keys(spv);
-                    keys.forEach(function (key) {
-                        if (key != framework.CLASS_KEY)
-                            propertyHandler(inst, spv, key, handlers, serialization);
-                    });
-                    target[property] = inst;
-                    return true;
-                }
-                console.warn("\u672A\u5904\u7406");
-                return false;
-            }
-        });
-        framework.serialization.differentHandlers = [
-            {
-                priority: 0,
-                handler: function (target, source, property) {
-                    if (target[property] == source[property]) {
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, different, handlers, serialization) {
-                    if (null == source[property]) {
-                        different[property] = serialization.serialize(target[property]);
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, different, handlers, serialization) {
-                    var tpv = target[property];
-                    if (framework.ObjectUtil.isBaseType(tpv)) {
-                        different[property] = tpv;
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, different, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    if (Array.isArray(tpv)) {
-                        var keys = Object.keys(tpv);
-                        var diff = [];
-                        keys.forEach(function (key) {
-                            differentPropertyHandler(tpv, spv, key, diff, handlers, serialization);
-                        });
-                        if (Object.keys(diff).length > 0)
-                            different[property] = diff;
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, different, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    if (spv.constructor != tpv.constructor) {
-                        different[property] = serialization.serialize(tpv);
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: -10000,
-                handler: function (target, source, property, different, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    var keys = getSerializableMembers(tpv);
-                    if (tpv.constructor == Object)
-                        keys = Object.keys(tpv);
-                    var diff = {};
-                    keys.forEach(function (v) {
-                        differentPropertyHandler(tpv, spv, v, diff, handlers, serialization);
-                    });
-                    if (Object.keys(diff).length > 0)
-                        different[property] = diff;
-                    return true;
-                }
-            },
-        ];
-        framework.serialization.setValueHandlers = [
-            {
-                priority: 0,
-                handler: function (target, source, property, handlers) {
-                    if (target[property] == source[property]) {
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    if (tpv == null) {
-                        target[property] = serialization.deserialize(spv);
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, handlers) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    if (framework.ObjectUtil.isBaseType(spv)) {
-                        target[property] = spv;
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    if (Array.isArray(spv)) {
-                        console.assert(!!tpv);
-                        var keys = Object.keys(spv);
-                        keys.forEach(function (key) {
-                            propertyHandler(tpv, spv, key, handlers, serialization);
-                        });
-                        target[property] = tpv;
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    if (!framework.ObjectUtil.isObject(spv)) {
-                        target[property] = serialization.deserialize(spv);
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    if (framework.ObjectUtil.isObject(spv) && spv[framework.CLASS_KEY] == undefined) {
-                        console.assert(!!tpv);
-                        var keys = Object.keys(spv);
-                        keys.forEach(function (key) {
-                            propertyHandler(tpv, spv, key, handlers, serialization);
-                        });
-                        target[property] = tpv;
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: -10000,
-                handler: function (target, source, property, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    var targetClassName = framework.classUtils.getQualifiedClassName(target[property]);
-                    if (targetClassName == spv[framework.CLASS_KEY]) {
-                        var keys = Object.keys(spv);
-                        keys.forEach(function (key) {
-                            propertyHandler(tpv, spv, key, handlers, serialization);
-                        });
-                        target[property] = tpv;
-                    }
-                    else {
-                        target[property] = serialization.deserialize(spv);
-                    }
-                    return true;
-                }
-            },
-        ];
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var BJSCANNON;
         var CannonJSPlugin = (function () {
             function CannonJSPlugin(_useDeltaForWorldStep, iterations) {
@@ -38385,6 +37827,100 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var CLASS_KEY = "__class__";
+        var ClassUtils = (function () {
+            function ClassUtils() {
+            }
+            ClassUtils.getQualifiedClassName = function (value) {
+                if (value == null)
+                    return "null";
+                var prototype = value.prototype ? value.prototype : Object.getPrototypeOf(value);
+                if (prototype.hasOwnProperty(CLASS_KEY))
+                    return prototype[CLASS_KEY];
+                var className = prototype.constructor.name;
+                if (_global[className] == prototype.constructor)
+                    return className;
+                for (var i = 0; i < _classNameSpaces.length; i++) {
+                    var tryClassName = _classNameSpaces[i] + "." + className;
+                    if (this.getDefinitionByName(tryClassName) == prototype.constructor) {
+                        className = tryClassName;
+                        registerClass(prototype.constructor, className);
+                        return className;
+                    }
+                }
+                return className;
+            };
+            ClassUtils.getDefinitionByName = function (name, readCache) {
+                if (readCache === void 0) { readCache = true; }
+                if (name == "null")
+                    return null;
+                if (!name)
+                    return null;
+                if (_global[name])
+                    return _global[name];
+                if (readCache && _definitionCache[name])
+                    return _definitionCache[name];
+                var paths = name.split(".");
+                var length = paths.length;
+                var definition = _global;
+                for (var i = 0; i < length; i++) {
+                    var path = paths[i];
+                    definition = definition[path];
+                    if (!definition) {
+                        return null;
+                    }
+                }
+                _definitionCache[name] = definition;
+                return definition;
+            };
+            ClassUtils.getDefaultInstanceByName = function (name) {
+                var defaultInst = this.defaultInstMap[name];
+                if (defaultInst)
+                    return defaultInst;
+                var cls = this.getDefinitionByName(name);
+                if (!cls)
+                    return undefined;
+                defaultInst = this.defaultInstMap[name] = new cls();
+                Object.freeze(defaultInst);
+                return defaultInst;
+            };
+            ClassUtils.getInstanceByName = function (name) {
+                var cls = this.getDefinitionByName(name);
+                console.assert(cls);
+                if (!cls)
+                    return undefined;
+                return new cls();
+            };
+            ClassUtils.addClassNameSpace = function (namespace) {
+                if (_classNameSpaces.indexOf(namespace) == -1) {
+                    _classNameSpaces.push(namespace);
+                }
+            };
+            ClassUtils.defaultInstMap = {};
+            return ClassUtils;
+        }());
+        framework.ClassUtils = ClassUtils;
+        ;
+        var _definitionCache = {};
+        var _global;
+        var global;
+        if (typeof window != "undefined") {
+            _global = window;
+        }
+        else if (typeof global != "undefined") {
+            _global = global;
+        }
+        var _classNameSpaces = ["feng3d"];
+        function registerClass(classDefinition, className) {
+            var prototype = classDefinition.prototype;
+            Object.defineProperty(prototype, CLASS_KEY, { value: className, writable: true });
+        }
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var GLExtension = (function () {
             function GLExtension(gl) {
                 gl.extensions = this;
@@ -38460,6 +37996,469 @@ var gd3d;
             return GLExtension;
         }());
         framework.GLExtension = GLExtension;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        function serialize(target, propertyKey) {
+            if (!Object.getOwnPropertyDescriptor(target, SERIALIZE_KEY)) {
+                Object.defineProperty(target, SERIALIZE_KEY, { value: [] });
+            }
+            var serializePropertys = target[SERIALIZE_KEY];
+            serializePropertys.push(propertyKey);
+        }
+        framework.serialize = serialize;
+        function propertyHandler(target, source, property, handlers, serialization) {
+            for (var i = 0; i < handlers.length; i++) {
+                if (handlers[i](target, source, property, handlers, serialization)) {
+                    return true;
+                }
+            }
+            return true;
+        }
+        function differentPropertyHandler(target, source, property, different, handlers, serialization) {
+            for (var i = 0; i < handlers.length; i++) {
+                if (handlers[i](target, source, property, different, handlers, serialization)) {
+                    return true;
+                }
+            }
+            return true;
+        }
+        var __root__ = "__root__";
+        var Serialization = (function () {
+            function Serialization() {
+                this.serializeHandlers = [];
+                this.deserializeHandlers = [];
+                this.differentHandlers = [];
+                this.setValueHandlers = [];
+            }
+            Serialization.prototype.serialize = function (target) {
+                var handlers = this.serializeHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
+                var result = {};
+                propertyHandler(result, { __root__: target }, __root__, handlers, this);
+                var v = result[__root__];
+                return v;
+            };
+            Serialization.prototype.deserialize = function (object) {
+                var handlers = this.deserializeHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
+                var result = {};
+                propertyHandler(result, { __root__: object }, __root__, handlers, this);
+                var v = result[__root__];
+                return v;
+            };
+            Serialization.prototype.different = function (target, source) {
+                var handlers = this.differentHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
+                var different = { __root__: {} };
+                differentPropertyHandler({ __root__: target }, { __root__: source }, __root__, different, handlers, this);
+                return different[__root__];
+            };
+            Serialization.prototype.setValue = function (target, source) {
+                var handlers = this.setValueHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
+                propertyHandler({ __root__: target }, { __root__: source }, __root__, handlers, this);
+                return target;
+            };
+            Serialization.prototype.clone = function (target) {
+                return this.deserialize(this.serialize(target));
+            };
+            return Serialization;
+        }());
+        framework.Serialization = Serialization;
+        framework.CLASS_KEY = "__class__";
+        var SERIALIZE_KEY = "_serialize__";
+        function getSerializableMembers(object, serializableMembers) {
+            serializableMembers = serializableMembers || [];
+            if (object["__proto__"]) {
+                getSerializableMembers(object["__proto__"], serializableMembers);
+            }
+            var serializePropertys = object[SERIALIZE_KEY];
+            if (serializePropertys)
+                framework.ArrayUtil.concatToSelf(serializableMembers, serializePropertys);
+            framework.ArrayUtil.unique(serializableMembers);
+            return serializableMembers;
+        }
+        framework.serialization = new Serialization();
+        framework.serialization.serializeHandlers.push({
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (framework.ObjectUtil.isBaseType(spv)) {
+                    target[property] = spv;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (spv && typeof spv == "function") {
+                    var object = {};
+                    object[framework.CLASS_KEY] = "function";
+                    object.data = spv.toString();
+                    target[property] = object;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (spv && spv["serializable"] == false) {
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (spv && spv["serialize"]) {
+                    var object = {};
+                    object[framework.CLASS_KEY] = framework.ClassUtils.getQualifiedClassName(spv);
+                    spv["serialize"](object);
+                    target[property] = object;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property, handlers, serialization) {
+                var spv = source[property];
+                if (Array.isArray(spv)) {
+                    var arr_5 = target[property] || [];
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (v) {
+                        propertyHandler(arr_5, spv, v, handlers, serialization);
+                    });
+                    target[property] = arr_5;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property, handlers, serialization) {
+                var spv = source[property];
+                if (framework.ObjectUtil.isObject(spv)) {
+                    var object_1 = {};
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (key) {
+                        propertyHandler(object_1, spv, key, handlers, serialization);
+                    });
+                    target[property] = object_1;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: -10000,
+            handler: function (target, source, property, handlers, serialization) {
+                var tpv = target[property];
+                var spv = source[property];
+                if (tpv == null || tpv.constructor != spv.constructor) {
+                    var className = framework.ClassUtils.getQualifiedClassName(spv);
+                    var inst = spv.constructor.inst;
+                    if (!inst)
+                        inst = spv.constructor.inst = new spv.constructor();
+                    if (!(inst instanceof spv.constructor))
+                        inst = spv.constructor.inst = new spv.constructor();
+                    var diff = serialization.different(spv, inst);
+                    diff[framework.CLASS_KEY] = className;
+                    target[property] = diff;
+                }
+                else {
+                    debugger;
+                    var diff = serialization.different(spv, tpv);
+                    if (diff)
+                        target[property] = diff;
+                }
+                return true;
+            }
+        });
+        framework.serialization.deserializeHandlers.push({
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (framework.ObjectUtil.isBaseType(spv)) {
+                    target[property] = spv;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (spv && spv[framework.CLASS_KEY] == "function") {
+                    target[property] = eval("(" + spv.data + ")");
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (!framework.ObjectUtil.isObject(spv) && !Array.isArray(spv)) {
+                    target[property] = spv;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property, handlers, serialization) {
+                var spv = source[property];
+                if (Array.isArray(spv)) {
+                    var arr = target[property] || [];
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (key) {
+                        propertyHandler(arr, spv, key, handlers, serialization);
+                    });
+                    target[property] = arr;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property, handlers, serialization) {
+                var tpv = target[property];
+                var spv = source[property];
+                if (framework.ObjectUtil.isObject(spv) && spv[framework.CLASS_KEY] == null) {
+                    var obj = {};
+                    if (tpv)
+                        obj = tpv;
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (key) {
+                        propertyHandler(obj, spv, key, handlers, serialization);
+                    });
+                    target[property] = obj;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var tpv = target[property];
+                var spv = source[property];
+                var inst = framework.ClassUtils.getInstanceByName(spv[framework.CLASS_KEY]);
+                if (inst && inst["deserialize"]) {
+                    if (tpv && tpv.constructor == inst.constructor) {
+                        inst = tpv;
+                    }
+                    inst["deserialize"](spv);
+                    target[property] = inst;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: -10000,
+            handler: function (target, source, property, handlers, serialization) {
+                var tpv = target[property];
+                var spv = source[property];
+                var inst = framework.ClassUtils.getInstanceByName(spv[framework.CLASS_KEY]);
+                if (inst) {
+                    if (tpv && tpv.constructor == inst.constructor) {
+                        inst = tpv;
+                    }
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (key) {
+                        if (key != framework.CLASS_KEY)
+                            propertyHandler(inst, spv, key, handlers, serialization);
+                    });
+                    target[property] = inst;
+                    return true;
+                }
+                console.warn("\u672A\u5904\u7406");
+                return false;
+            }
+        });
+        framework.serialization.differentHandlers = [
+            {
+                priority: 0,
+                handler: function (target, source, property) {
+                    if (target[property] == source[property]) {
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, different, handlers, serialization) {
+                    if (null == source[property]) {
+                        different[property] = serialization.serialize(target[property]);
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, different, handlers, serialization) {
+                    var tpv = target[property];
+                    if (framework.ObjectUtil.isBaseType(tpv)) {
+                        different[property] = tpv;
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, different, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (Array.isArray(tpv)) {
+                        var keys = Object.keys(tpv);
+                        var diff = [];
+                        keys.forEach(function (key) {
+                            differentPropertyHandler(tpv, spv, key, diff, handlers, serialization);
+                        });
+                        if (Object.keys(diff).length > 0)
+                            different[property] = diff;
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, different, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (spv.constructor != tpv.constructor) {
+                        different[property] = serialization.serialize(tpv);
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: -10000,
+                handler: function (target, source, property, different, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    var keys = getSerializableMembers(tpv);
+                    if (tpv.constructor == Object)
+                        keys = Object.keys(tpv);
+                    var diff = {};
+                    keys.forEach(function (v) {
+                        differentPropertyHandler(tpv, spv, v, diff, handlers, serialization);
+                    });
+                    if (Object.keys(diff).length > 0)
+                        different[property] = diff;
+                    return true;
+                }
+            },
+        ];
+        framework.serialization.setValueHandlers = [
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers) {
+                    if (target[property] == source[property]) {
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (tpv == null) {
+                        target[property] = serialization.deserialize(spv);
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (framework.ObjectUtil.isBaseType(spv)) {
+                        target[property] = spv;
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (Array.isArray(spv)) {
+                        console.assert(!!tpv);
+                        var keys = Object.keys(spv);
+                        keys.forEach(function (key) {
+                            propertyHandler(tpv, spv, key, handlers, serialization);
+                        });
+                        target[property] = tpv;
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (!framework.ObjectUtil.isObject(spv)) {
+                        target[property] = serialization.deserialize(spv);
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (framework.ObjectUtil.isObject(spv) && spv[framework.CLASS_KEY] == undefined) {
+                        console.assert(!!tpv);
+                        var keys = Object.keys(spv);
+                        keys.forEach(function (key) {
+                            propertyHandler(tpv, spv, key, handlers, serialization);
+                        });
+                        target[property] = tpv;
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: -10000,
+                handler: function (target, source, property, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    var targetClassName = framework.ClassUtils.getQualifiedClassName(target[property]);
+                    if (targetClassName == spv[framework.CLASS_KEY]) {
+                        var keys = Object.keys(spv);
+                        keys.forEach(function (key) {
+                            propertyHandler(tpv, spv, key, handlers, serialization);
+                        });
+                        target[property] = tpv;
+                    }
+                    else {
+                        target[property] = serialization.deserialize(spv);
+                    }
+                    return true;
+                }
+            },
+        ];
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

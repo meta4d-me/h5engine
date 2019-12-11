@@ -4,11 +4,6 @@ namespace gd3d.framework
 
     /**
      * 类工具
-     */
-    export var classUtils: ClassUtils;
-
-    /**
-     * 类工具
      * 
      * @author feng3d
      */
@@ -20,7 +15,7 @@ namespace gd3d.framework
          * （如number)和类对象
          * @returns 包含完全限定类名称的字符串。
          */
-        getQualifiedClassName(value: any): string
+        static getQualifiedClassName(value: any): string
         {
             if (value == null)
                 return "null";
@@ -50,7 +45,7 @@ namespace gd3d.framework
          * 返回 name 参数指定的类的类对象引用。
          * @param name 类的名称。
          */
-        getDefinitionByName(name: string, readCache = true): any
+        static getDefinitionByName(name: string, readCache = true): any
         {
             if (name == "null")
                 return null;
@@ -77,14 +72,14 @@ namespace gd3d.framework
             return definition;
         }
 
-        private defaultInstMap: { [className: string]: any } = {};
+        private static defaultInstMap: { [className: string]: any } = {};
 
         /**
          * 获取默认实例
          * 
          * @param name 类名称
          */
-        getDefaultInstanceByName(name: string)
+        static getDefaultInstanceByName(name: string)
         {
             var defaultInst = this.defaultInstMap[name];
             if (defaultInst) return defaultInst;
@@ -105,7 +100,7 @@ namespace gd3d.framework
          * 
          * @param name 类名称
          */
-        getInstanceByName(name: string)
+        static getInstanceByName(name: string)
         {
             var cls = this.getDefinitionByName(name);
             console.assert(cls);
@@ -116,7 +111,7 @@ namespace gd3d.framework
         /**
          * 新增反射对象所在的命名空间，使得getQualifiedClassName能够得到正确的结果
          */
-        addClassNameSpace(namespace: string)
+        static addClassNameSpace(namespace: string)
         {
             if (_classNameSpaces.indexOf(namespace) == -1)
             {
@@ -124,8 +119,6 @@ namespace gd3d.framework
             }
         }
     };
-
-    classUtils = new ClassUtils();
 
     var _definitionCache = {};
     var _global: Window;

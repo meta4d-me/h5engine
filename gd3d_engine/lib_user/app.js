@@ -3939,7 +3939,7 @@ var test_ParticleSystem = (function () {
         if (!ps)
             ps = tran.gameObject.addComponent("ParticleSystem");
         ps.material = mat;
-        gd3d.framework.classUtils.addClassNameSpace("gd3d.framework");
+        gd3d.framework.ClassUtils.addClassNameSpace("gd3d.framework");
         gd3d.framework.serialization.setValue(ps, pd);
         ps.play();
     };
