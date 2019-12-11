@@ -154,7 +154,7 @@ namespace gd3d.framework
                 radiusRate = Math.random();
             }
             // 在圆的位置
-            var basePos = new Vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
+            var basePos = new math.vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
             // 底面位置
             var bottomPos = basePos.scaleNumberTo(radius).scaleNumber(radiusRate);
             // 顶面位置

@@ -512,6 +512,6 @@ namespace gd3d.framework
         }
     }
 
-    var world_gravity = new Vector3(0, -9.8, 0);
+    var world_gravity = new math.vector3(0, -9.8, 0);
     var _Main_preGravity = "_Main_preGravity";
 }

@@ -132,7 +132,7 @@ namespace gd3d.framework
          * 盒子的缩放。
          */
 
-        box = new Vector3(1, 1, 1);
+        box = new math.vector3(1, 1, 1);
 
         /**
          * Length of the cone.

@@ -101,8 +101,8 @@ namespace gd3d.framework
             radiusAngle = radiusAngle / arc;
 
             // 计算位置
-            var dir = new Vector3(0, 1, 0);
-            var p = new Vector3(this.radius * (radiusAngle * 2 - 1), 0, 0);
+            var dir = new math.vector3(0, 1, 0);
+            var p = new math.vector3(this.radius * (radiusAngle * 2 - 1), 0, 0);
 
             //
             particle.position.copy(p);

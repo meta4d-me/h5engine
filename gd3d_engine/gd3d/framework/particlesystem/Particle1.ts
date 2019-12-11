@@ -21,37 +21,37 @@ namespace gd3d.framework
 		/**
 		 * 位置
 		 */
-		position = new Vector3();
+		position = new math.vector3();
 
 		/**
 		 * 速度
 		 */
-		velocity = new Vector3();
+		velocity = new math.vector3();
 
 		/**
 		 * 加速度
 		 */
-		acceleration = new Vector3();
+		acceleration = new math.vector3();
 
 		/**
 		 * 旋转角度
 		 */
-		rotation = new Vector3();
+		rotation = new math.vector3();
 
 		/**
 		 * 角速度
 		 */
-		angularVelocity = new Vector3();
+		angularVelocity = new math.vector3();
 
 		/**
 		 * 尺寸
 		 */
-		size = new Vector3(1, 1, 1);
+		size = new math.vector3(1, 1, 1);
 
 		/**
 		 * 起始尺寸
 		 */
-		startSize = new Vector3(1, 1, 1);
+		startSize = new math.vector3(1, 1, 1);
 
 		/**
 		 * 颜色

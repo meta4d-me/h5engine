@@ -29876,13 +29876,13 @@ var gd3d;
             function Particle1() {
                 this.birthTime = 0;
                 this.lifetime = 5;
-                this.position = new framework.Vector3();
-                this.velocity = new framework.Vector3();
-                this.acceleration = new framework.Vector3();
-                this.rotation = new framework.Vector3();
-                this.angularVelocity = new framework.Vector3();
-                this.size = new framework.Vector3(1, 1, 1);
-                this.startSize = new framework.Vector3(1, 1, 1);
+                this.position = new gd3d.math.vector3();
+                this.velocity = new gd3d.math.vector3();
+                this.acceleration = new gd3d.math.vector3();
+                this.rotation = new gd3d.math.vector3();
+                this.angularVelocity = new gd3d.math.vector3();
+                this.size = new gd3d.math.vector3(1, 1, 1);
+                this.startSize = new gd3d.math.vector3(1, 1, 1);
                 this.color = new gd3d.math.color();
                 this.startColor = new gd3d.math.color();
                 this.tilingOffset = new gd3d.math.vector4(1, 1, 0, 0);
@@ -29982,12 +29982,12 @@ var gd3d;
                 _this._particlePool = [];
                 _this._activeParticles = [];
                 _this._modules = [];
-                _this._preworldPos = new framework.Vector3();
+                _this._preworldPos = new Vector3();
                 _this._isRateOverDistance = false;
                 _this._leftRateOverDistance = 0;
-                _this.worldPos = new framework.Vector3();
-                _this.moveVec = new framework.Vector3();
-                _this.speed = new framework.Vector3;
+                _this.worldPos = new Vector3();
+                _this.moveVec = new Vector3();
+                _this.speed = new Vector3;
                 _this.localToWorldMatrix = new gd3d.math.matrix();
                 _this.worldToLocalMatrix = new gd3d.math.matrix();
                 _this.main = new framework.ParticleMainModule();
@@ -30472,7 +30472,7 @@ var gd3d;
                 var rateAtDuration = this.rateAtDuration;
                 var num = v.num;
                 var birthTime = v.time;
-                var position = v.position || new framework.Vector3();
+                var position = v.position || new Vector3();
                 for (var i = 0; i < num; i++) {
                     if (this._activeParticles.length >= this.main.maxParticles)
                         return;
@@ -31641,7 +31641,7 @@ var gd3d;
             }
             MinMaxCurveVector3.prototype.getValue = function (time, randomBetween) {
                 if (randomBetween === void 0) { randomBetween = Math.random(); }
-                return new framework.Vector3(this.xCurve.getValue(time, randomBetween), this.yCurve.getValue(time, randomBetween), this.zCurve.getValue(time, randomBetween));
+                return new gd3d.math.vector3(this.xCurve.getValue(time, randomBetween), this.yCurve.getValue(time, randomBetween), this.zCurve.getValue(time, randomBetween));
             };
             return MinMaxCurveVector3;
         }());
@@ -31662,380 +31662,6 @@ var gd3d;
             RotationOrder[RotationOrder["XZY"] = 5] = "XZY";
         })(RotationOrder = framework.RotationOrder || (framework.RotationOrder = {}));
         framework.defaultRotationOrder = RotationOrder.YXZ;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var Vector3 = (function () {
-            function Vector3(x, y, z) {
-                if (x === void 0) { x = 0; }
-                if (y === void 0) { y = 0; }
-                if (z === void 0) { z = 0; }
-                this.x = 0;
-                this.y = 0;
-                this.z = 0;
-                this.x = x;
-                this.y = y;
-                this.z = z;
-            }
-            Vector3.fromArray = function (array, offset) {
-                if (offset === void 0) { offset = 0; }
-                return new Vector3().fromArray(array, offset);
-            };
-            Vector3.random = function (size) {
-                if (size === void 0) { size = 1; }
-                return new Vector3(Math.random() * size, Math.random() * size, Math.random() * size);
-            };
-            Object.defineProperty(Vector3.prototype, "length", {
-                get: function () {
-                    return Math.sqrt(this.lengthSquared);
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(Vector3.prototype, "lengthSquared", {
-                get: function () {
-                    return this.x * this.x + this.y * this.y + this.z * this.z;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Vector3.prototype.set = function (x, y, z) {
-                this.x = x;
-                this.y = y;
-                this.z = z;
-                return this;
-            };
-            Vector3.prototype.setZero = function () {
-                this.x = this.y = this.z = 0;
-            };
-            Vector3.prototype.fromArray = function (array, offset) {
-                if (offset === void 0) { offset = 0; }
-                this.x = array[offset];
-                this.y = array[offset + 1];
-                this.z = array[offset + 2];
-                return this;
-            };
-            Vector3.prototype.add = function (a) {
-                this.x += a.x;
-                this.y += a.y;
-                this.z += a.z;
-                return this;
-            };
-            Vector3.prototype.addTo = function (a, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (a == vout)
-                    a = a.clone();
-                return vout.copy(this).add(a);
-            };
-            Vector3.prototype.addScaledVector = function (scalar, vector) {
-                this.x = this.x + scalar * vector.x;
-                this.y = this.y + scalar * vector.y;
-                this.z = this.z + scalar * vector.z;
-                return this;
-            };
-            Vector3.prototype.multiply = function (a) {
-                this.x *= a.x;
-                this.y *= a.y;
-                this.z *= a.z;
-                return this;
-            };
-            Vector3.prototype.multiplyTo = function (a, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (a == vout)
-                    a = a.clone();
-                return vout.copy(this).multiply(a);
-            };
-            Vector3.prototype.divide = function (a) {
-                this.x /= a.x;
-                this.y /= a.y;
-                this.z /= a.z;
-                return this;
-            };
-            Vector3.prototype.divideTo = function (a, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (a == vout)
-                    a = a.clone();
-                return vout.copy(this).divide(a);
-            };
-            Vector3.prototype.cross = function (a) {
-                return this.set(this.y * a.z - this.z * a.y, this.z * a.x - this.x * a.z, this.x * a.y - this.y * a.x);
-            };
-            Vector3.prototype.crossTo = function (a, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (a == vout)
-                    a = a.clone();
-                return vout.copy(this).cross(a);
-            };
-            Vector3.prototype.dot = function (a) {
-                return this.x * a.x + this.y * a.y + this.z * a.z;
-            };
-            Vector3.prototype.isZero = function () {
-                return this.x === 0 && this.y === 0 && this.z === 0;
-            };
-            Vector3.prototype.tangents = function (t1, t2) {
-                var norm = this.length;
-                if (norm > 0.0) {
-                    var n = new Vector3();
-                    var inorm = 1 / norm;
-                    n.set(this.x * inorm, this.y * inorm, this.z * inorm);
-                    var randVec = new Vector3();
-                    if (Math.abs(n.x) < 0.9) {
-                        randVec.set(1, 0, 0);
-                        n.crossTo(randVec, t1);
-                    }
-                    else {
-                        randVec.set(0, 1, 0);
-                        n.crossTo(randVec, t1);
-                    }
-                    n.crossTo(t1, t2);
-                }
-                else {
-                    t1.set(1, 0, 0);
-                    t2.set(0, 1, 0);
-                }
-            };
-            Vector3.prototype.addNumber = function (n) {
-                this.x += n;
-                this.y += n;
-                this.z += n;
-                return this;
-            };
-            Vector3.prototype.addNumberTo = function (n, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                return vout.copy(this).addNumber(n);
-            };
-            Vector3.prototype.subNumber = function (n) {
-                this.x -= n;
-                this.y -= n;
-                this.z -= n;
-                return this;
-            };
-            Vector3.prototype.subNumberTo = function (n, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                return vout.copy(this).subNumber(n);
-            };
-            Vector3.prototype.multiplyNumber = function (n) {
-                this.x *= n;
-                this.y *= n;
-                this.z *= n;
-                return this;
-            };
-            Vector3.prototype.multiplyNumberTo = function (n, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                return vout.copy(this).multiplyNumber(n);
-            };
-            Vector3.prototype.divideNumber = function (n) {
-                this.x /= n;
-                this.y /= n;
-                this.z /= n;
-                return this;
-            };
-            Vector3.prototype.divideNumberTo = function (n, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                return vout.copy(this).divideNumber(n);
-            };
-            Vector3.prototype.clone = function () {
-                return new Vector3(this.x, this.y, this.z);
-            };
-            Vector3.prototype.copy = function (v) {
-                this.x = v.x;
-                this.y = v.y;
-                this.z = v.z;
-                return this;
-            };
-            Vector3.prototype.negate = function () {
-                this.x = -this.x;
-                this.y = -this.y;
-                this.z = -this.z;
-                return this;
-            };
-            Vector3.prototype.negateTo = function (vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                return vout.copy(this).negate();
-            };
-            Vector3.prototype.inverse = function () {
-                this.x = 1 / this.x;
-                this.y = 1 / this.y;
-                this.z = 1 / this.z;
-                return this;
-            };
-            Vector3.prototype.inverseTo = function (vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                return vout.copy(this).inverse();
-            };
-            Vector3.prototype.normalize = function (thickness) {
-                if (thickness === void 0) { thickness = 1; }
-                var length = this.lengthSquared;
-                if (length > 0) {
-                    length = Math.sqrt(length);
-                    var invLength = thickness / length;
-                    this.x *= invLength;
-                    this.y *= invLength;
-                    this.z *= invLength;
-                }
-                return this;
-            };
-            Vector3.prototype.unit = function (target) {
-                if (target === void 0) { target = new Vector3(); }
-                var x = this.x, y = this.y, z = this.z;
-                var ninv = x * x + y * y + z * z;
-                if (ninv > 0.0) {
-                    var ninv = Math.sqrt(ninv);
-                    ninv = 1.0 / ninv;
-                    target.x = x * ninv;
-                    target.y = y * ninv;
-                    target.z = z * ninv;
-                }
-                else {
-                    target.x = 1;
-                    target.y = 0;
-                    target.z = 0;
-                }
-                return target;
-            };
-            Vector3.prototype.scaleNumber = function (s) {
-                this.x *= s;
-                this.y *= s;
-                this.z *= s;
-                return this;
-            };
-            Vector3.prototype.scaleNumberTo = function (s, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                return vout.copy(this).scaleNumber(s);
-            };
-            Vector3.prototype.scale = function (s) {
-                this.x *= s.x;
-                this.y *= s.y;
-                this.z *= s.z;
-                return this;
-            };
-            Vector3.prototype.scaleTo = function (s, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (s == vout)
-                    s = s.clone();
-                return vout.copy(this).scale(s);
-            };
-            Vector3.prototype.sub = function (a) {
-                this.x -= a.x;
-                this.y -= a.y;
-                this.z -= a.z;
-                return this;
-            };
-            Vector3.prototype.subTo = function (a, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (a == vout)
-                    a = a.clone();
-                return vout.copy(this).sub(a);
-            };
-            Vector3.prototype.lerp = function (v, alpha) {
-                this.x += (v.x - this.x) * alpha.x;
-                this.y += (v.y - this.y) * alpha.y;
-                this.z += (v.z - this.z) * alpha.z;
-                return this;
-            };
-            Vector3.prototype.lerpTo = function (v, alpha, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (v == vout)
-                    v = v.clone();
-                return vout.copy(this).lerp(v, alpha);
-            };
-            Vector3.prototype.lerpNumber = function (v, alpha) {
-                this.x += (v.x - this.x) * alpha;
-                this.y += (v.y - this.y) * alpha;
-                this.z += (v.z - this.z) * alpha;
-                return this;
-            };
-            Vector3.prototype.lerpNumberTo = function (v, alpha, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (v == vout)
-                    v = v.clone();
-                return vout.copy(this).lerpNumber(v, alpha);
-            };
-            Vector3.prototype.less = function (p) {
-                return this.x < p.x && this.y < p.y && this.z < p.z;
-            };
-            Vector3.prototype.lessequal = function (p) {
-                return this.x <= p.x && this.y <= p.y && this.z <= p.z;
-            };
-            Vector3.prototype.greater = function (p) {
-                return this.x > p.x && this.y > p.y && this.z > p.z;
-            };
-            Vector3.prototype.greaterequal = function (p) {
-                return this.x >= p.x && this.y >= p.y && this.z >= p.z;
-            };
-            Vector3.prototype.clamp = function (min, max) {
-                this.x = gd3d.math.floatClamp(this.x, min.x, max.x);
-                this.y = gd3d.math.floatClamp(this.y, min.y, max.y);
-                this.z = gd3d.math.floatClamp(this.z, min.z, max.z);
-                return this;
-            };
-            Vector3.prototype.min = function (v) {
-                this.x = Math.min(this.x, v.x);
-                this.y = Math.min(this.y, v.y);
-                this.z = Math.min(this.z, v.z);
-                return this;
-            };
-            Vector3.prototype.max = function (v) {
-                this.x = Math.max(this.x, v.x);
-                this.y = Math.max(this.y, v.y);
-                this.z = Math.max(this.z, v.z);
-                return this;
-            };
-            Vector3.prototype.distanceSquared = function (v) {
-                var dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
-                return dx * dx + dy * dy + dz * dz;
-            };
-            Vector3.prototype.distance = function (v) {
-                return Math.sqrt(this.distanceSquared(v));
-            };
-            Vector3.prototype.reflect = function (normal) {
-                return this.sub(normal.multiplyNumberTo(2 * this.dot(normal)));
-            };
-            Vector3.prototype.floor = function () {
-                this.x = Math.floor(this.x);
-                this.y = Math.floor(this.y);
-                this.z = Math.floor(this.z);
-                return this;
-            };
-            Vector3.prototype.ceil = function () {
-                this.x = Math.ceil(this.x);
-                this.y = Math.ceil(this.y);
-                this.z = Math.ceil(this.z);
-                return this;
-            };
-            Vector3.prototype.round = function () {
-                this.x = Math.round(this.x);
-                this.y = Math.round(this.y);
-                this.z = Math.round(this.z);
-                return this;
-            };
-            Vector3.prototype.roundToZero = function () {
-                this.x = (this.x < 0) ? Math.ceil(this.x) : Math.floor(this.x);
-                this.y = (this.y < 0) ? Math.ceil(this.y) : Math.floor(this.y);
-                this.z = (this.z < 0) ? Math.ceil(this.z) : Math.floor(this.z);
-                return this;
-            };
-            Vector3.prototype.toString = function () {
-                return "<" + this.x + ", " + this.y + ", " + this.z + ">";
-            };
-            Vector3.prototype.toArray = function (array, offset) {
-                if (array === void 0) { array = []; }
-                if (offset === void 0) { offset = 0; }
-                array[offset] = this.x;
-                array[offset + 1] = this.y;
-                array[offset + 2] = this.z;
-                return array;
-            };
-            Vector3.X_AXIS = new Vector3(1, 0, 0);
-            Vector3.Y_AXIS = new Vector3(0, 1, 0);
-            Vector3.Z_AXIS = new Vector3(0, 0, 1);
-            Vector3.ZERO = new Vector3();
-            return Vector3;
-        }());
-        framework.Vector3 = Vector3;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -32210,7 +31836,7 @@ var gd3d;
             ParticleColorBySpeedModule.prototype.updateParticleState = function (particle) {
                 if (!this.enabled)
                     return;
-                var velocity = particle.velocity.length;
+                var velocity = gd3d.math.vec3Length(particle.velocity);
                 var rate = gd3d.math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
                 var color = this.color.getValue(rate, particle[_ColorBySpeed_rate]);
                 gd3d.math.colorMultiply(particle.color, color, particle.color);
@@ -32549,30 +32175,39 @@ var gd3d;
                     return;
                 var limit3D = this.limit3D.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
                 var limit = this.limit.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
-                var pVelocity = particle.velocity.clone();
+                var pVelocity = new gd3d.math.vector3();
+                gd3d.math.vec3Clone(particle.velocity, pVelocity);
                 if (this.space == framework.ParticleSystemSimulationSpace.World) {
                     var localToWorldMatrix = this.particleSystem.localToWorldMatrix;
                     var worldToLocalMatrix = this.particleSystem.worldToLocalMatrix;
                     gd3d.math.matrixTransformNormal(pVelocity, localToWorldMatrix, pVelocity);
                     if (this.separateAxes) {
-                        pVelocity.clamp(limit3D.negateTo(), limit3D);
+                        pVelocity.x = gd3d.math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
+                        pVelocity.y = gd3d.math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
+                        pVelocity.z = gd3d.math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
                     }
                     else {
-                        if (pVelocity.lengthSquared > limit * limit)
-                            pVelocity.normalize(limit);
+                        if (gd3d.math.vec3SqrLength(pVelocity) > limit * limit) {
+                            gd3d.math.vec3Normalize(pVelocity, pVelocity);
+                            gd3d.math.vec3ScaleByNum(pVelocity, limit, pVelocity);
+                        }
                     }
                     gd3d.math.matrixTransformNormal(pVelocity, worldToLocalMatrix, pVelocity);
                 }
                 else {
                     if (this.separateAxes) {
-                        pVelocity.clamp(limit3D.negateTo(), limit3D);
+                        pVelocity.x = gd3d.math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
+                        pVelocity.y = gd3d.math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
+                        pVelocity.z = gd3d.math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
                     }
                     else {
-                        if (pVelocity.lengthSquared > limit * limit)
-                            pVelocity.normalize(limit);
+                        if (gd3d.math.vec3SqrLength(pVelocity) > limit * limit) {
+                            gd3d.math.vec3Normalize(pVelocity, pVelocity);
+                            gd3d.math.vec3ScaleByNum(pVelocity, limit, pVelocity);
+                        }
                     }
                 }
-                particle.velocity.lerpNumber(pVelocity, this.dampen);
+                gd3d.math.vec3SLerp(particle.velocity, pVelocity, this.dampen, particle.velocity);
             };
             return ParticleLimitVelocityOverLifetimeModule;
         }(framework.ParticleModule));
@@ -32827,7 +32462,7 @@ var gd3d;
             return ParticleMainModule;
         }(framework.ParticleModule));
         framework.ParticleMainModule = ParticleMainModule;
-        var world_gravity = new framework.Vector3(0, -9.8, 0);
+        var world_gravity = new gd3d.math.vector3(0, -9.8, 0);
         var _Main_preGravity = "_Main_preGravity";
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -32906,7 +32541,7 @@ var gd3d;
             });
             ParticleRotationBySpeedModule.prototype.initParticleState = function (particle) {
                 particle[_RotationBySpeed_rate] = Math.random();
-                particle[_RotationBySpeed_preAngularVelocity] = new framework.Vector3();
+                particle[_RotationBySpeed_preAngularVelocity] = new gd3d.math.vector3();
             };
             ParticleRotationBySpeedModule.prototype.updateParticleState = function (particle) {
                 var preAngularVelocity = particle[_RotationBySpeed_preAngularVelocity];
@@ -33004,7 +32639,7 @@ var gd3d;
             });
             ParticleRotationOverLifetimeModule.prototype.initParticleState = function (particle) {
                 particle[_RotationOverLifetime_rate] = Math.random();
-                particle[_RotationOverLifetime_preAngularVelocity] = new framework.Vector3();
+                particle[_RotationOverLifetime_preAngularVelocity] = new gd3d.math.vector3();
             };
             ParticleRotationOverLifetimeModule.prototype.updateParticleState = function (particle) {
                 var preAngularVelocity = particle[_RotationOverLifetime_preAngularVelocity];
@@ -33042,7 +32677,7 @@ var gd3d;
                 _this.arcMode = framework.ParticleSystemShapeMultiModeValue.Random;
                 _this.arcSpeed = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 1, constantMin: 1, constantMax: 1 });
                 _this.arcSpread = 0;
-                _this.box = new framework.Vector3(1, 1, 1);
+                _this.box = new gd3d.math.vector3(1, 1, 1);
                 _this.length = 5;
                 _this.meshScale = 1;
                 _this.meshShapeType = framework.ParticleSystemMeshShapeType.Vertex;
@@ -33126,7 +32761,7 @@ var gd3d;
                 }
                 var length = particle.velocity.length;
                 if (this.randomDirectionAmount > 0) {
-                    var velocity = framework.Vector3.random().scaleNumber(2).subNumber(1).normalize(length);
+                    var velocity = Vector3.random().scaleNumber(2).subNumber(1).normalize(length);
                     particle.velocity.lerpNumber(velocity, this.randomDirectionAmount).normalize(length);
                 }
                 if (this.sphericalDirectionAmount > 0) {
@@ -34071,7 +33706,7 @@ var gd3d;
             });
             ParticleSystemShapeBox.prototype.initParticleState = function (particle) {
                 var speed = particle.velocity.length;
-                var p = new framework.Vector3(this.boxX, this.boxY, this.boxZ).multiply(framework.Vector3.random().scaleNumber(2).subNumber(1));
+                var p = new Vector3(this.boxX, this.boxY, this.boxZ).multiply(Vector3.random().scaleNumber(2).subNumber(1));
                 if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Shell) {
                     var max = Math.max(Math.abs(p.x), Math.abs(p.y), Math.abs(p.z));
                     if (Math.abs(p.x) == max) {
@@ -34100,7 +33735,7 @@ var gd3d;
                     }
                 }
                 particle.position.copy(p);
-                var dir = new framework.Vector3(0, 0, 1);
+                var dir = new Vector3(0, 0, 1);
                 particle.velocity.copy(dir).scaleNumber(speed);
             };
             return ParticleSystemShapeBox;
@@ -34192,7 +33827,7 @@ var gd3d;
                     radiusAngle = Math.floor(radiusAngle / arc / this.arcSpread) * arc * this.arcSpread;
                 }
                 radiusAngle = gd3d.math.degToRad(radiusAngle);
-                var dir = new framework.Vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
+                var dir = new Vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
                 var p = dir.scaleNumberTo(radius);
                 if (!this.emitFromEdge) {
                     p.scaleNumber(Math.random());
@@ -34315,7 +33950,7 @@ var gd3d;
                 if (this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.Base || this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.Volume) {
                     radiusRate = Math.random();
                 }
-                var basePos = new framework.Vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
+                var basePos = new gd3d.math.vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
                 var bottomPos = basePos.scaleNumberTo(radius).scaleNumber(radiusRate);
                 var topPos = basePos.scaleNumberTo(radius + this.length * Math.tan(gd3d.math.degToRad(angle))).scaleNumber(radiusRate);
                 topPos.z = this.length;
@@ -34402,8 +34037,8 @@ var gd3d;
                     radiusAngle = Math.floor(radiusAngle / arc / this.radiusSpread) * arc * this.radiusSpread;
                 }
                 radiusAngle = radiusAngle / arc;
-                var dir = new framework.Vector3(0, 1, 0);
-                var p = new framework.Vector3(this.radius * (radiusAngle * 2 - 1), 0, 0);
+                var dir = new gd3d.math.vector3(0, 1, 0);
+                var p = new gd3d.math.vector3(this.radius * (radiusAngle * 2 - 1), 0, 0);
                 particle.position.copy(p);
                 particle.velocity.copy(dir).scaleNumber(speed);
             };
@@ -34435,7 +34070,7 @@ var gd3d;
             });
             ParticleSystemShapeSphere.prototype.initParticleState = function (particle) {
                 var speed = particle.velocity.length;
-                var dir = framework.Vector3.random().scaleNumber(2).subNumber(1).normalize();
+                var dir = Vector3.random().scaleNumber(2).subNumber(1).normalize();
                 var p = dir.scaleNumberTo(this.radius);
                 if (!this.emitFromShell) {
                     p.scaleNumber(Math.random());
@@ -34456,7 +34091,7 @@ var gd3d;
             }
             ParticleSystemShapeHemisphere.prototype.initParticleState = function (particle) {
                 var speed = particle.velocity.length;
-                var dir = framework.Vector3.random().scaleNumber(2).subNumber(1).normalize();
+                var dir = Vector3.random().scaleNumber(2).subNumber(1).normalize();
                 dir.z = Math.abs(dir.z);
                 var p = dir.scaleNumberTo(this.radius);
                 if (!this.emitFromShell) {

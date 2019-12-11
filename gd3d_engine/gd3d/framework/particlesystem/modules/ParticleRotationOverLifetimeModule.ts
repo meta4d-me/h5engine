@@ -117,7 +117,7 @@ namespace gd3d.framework
         initParticleState(particle: Particle1)
         {
             particle[_RotationOverLifetime_rate] = Math.random();
-            particle[_RotationOverLifetime_preAngularVelocity] = new Vector3();
+            particle[_RotationOverLifetime_preAngularVelocity] = new math.vector3();
         }
 
         /**
@@ -126,7 +126,7 @@ namespace gd3d.framework
          */
         updateParticleState(particle: Particle1)
         {
-            var preAngularVelocity: Vector3 = particle[_RotationOverLifetime_preAngularVelocity];
+            var preAngularVelocity: math.vector3 = particle[_RotationOverLifetime_preAngularVelocity];
             particle.angularVelocity.sub(preAngularVelocity);
             preAngularVelocity.set(0, 0, 0);
             if (!this.enabled) return;
