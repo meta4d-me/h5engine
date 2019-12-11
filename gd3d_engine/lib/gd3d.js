@@ -33890,7 +33890,7 @@ var gd3d;
                 configurable: true
             });
             ParticleSystemShapeCircle.prototype.initParticleState = function (particle) {
-                var speed = particle.velocity.length;
+                var speed = gd3d.math.vec3Length(particle.velocity);
                 var radius = this.radius;
                 var arc = this.arc;
                 var radiusAngle = 0;
@@ -33912,13 +33912,20 @@ var gd3d;
                     radiusAngle = Math.floor(radiusAngle / arc / this.arcSpread) * arc * this.arcSpread;
                 }
                 radiusAngle = gd3d.math.degToRad(radiusAngle);
-                var dir = new Vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
-                var p = dir.scaleNumberTo(radius);
+                var dir = new gd3d.math.vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
+                var p = new gd3d.math.vector3(radius * dir.x, radius * dir.y, radius * dir.z);
                 if (!this.emitFromEdge) {
-                    p.scaleNumber(Math.random());
+                    var rand = Math.random();
+                    p.x *= rand;
+                    p.y *= rand;
+                    p.z *= rand;
                 }
-                particle.position.copy(p);
-                particle.velocity.copy(dir).scaleNumber(speed);
+                particle.position.x = p.x;
+                particle.position.y = p.y;
+                particle.position.z = p.z;
+                particle.velocity.x = dir.x * speed;
+                particle.velocity.y = dir.y * speed;
+                particle.velocity.z = dir.z * speed;
             };
             return ParticleSystemShapeCircle;
         }(framework.ParticleSystemShapeBase));
@@ -34105,7 +34112,7 @@ var gd3d;
                 configurable: true
             });
             ParticleSystemShapeEdge.prototype.initParticleState = function (particle) {
-                var speed = particle.velocity.length;
+                var speed = gd3d.math.vec3Length(particle.velocity);
                 var arc = 360 * this.radius;
                 var radiusAngle = 0;
                 if (this.radiusMode == framework.ParticleSystemShapeMultiModeValue.Random) {
@@ -34128,8 +34135,12 @@ var gd3d;
                 radiusAngle = radiusAngle / arc;
                 var dir = new gd3d.math.vector3(0, 1, 0);
                 var p = new gd3d.math.vector3(this.radius * (radiusAngle * 2 - 1), 0, 0);
-                particle.position.copy(p);
-                particle.velocity.copy(dir).scaleNumber(speed);
+                particle.position.x = p.x;
+                particle.position.y = p.y;
+                particle.position.z = p.z;
+                particle.velocity.x = dir.x * speed;
+                particle.velocity.y = dir.y * speed;
+                particle.velocity.z = dir.z * speed;
             };
             return ParticleSystemShapeEdge;
         }(framework.ParticleSystemShapeBase));
