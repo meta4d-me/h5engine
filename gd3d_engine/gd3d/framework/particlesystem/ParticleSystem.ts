@@ -104,14 +104,9 @@ namespace gd3d.framework
         get main() { return this._main; }
         set main(v)
         {
-            if (this._main)
-            {
-                watcher.unwatch(this._main, "simulationSpace", this._simulationSpaceChanged, this);
-            }
             Array.replace(this._modules, this._main, v);
             v.particleSystem = this;
             this._main = v;
-            watcher.watch(this._main, "simulationSpace", this._simulationSpaceChanged, this);
         }
         private _main: ParticleMainModule;
 
@@ -855,7 +850,7 @@ namespace gd3d.framework
             particle.updateState(preTime, this._realTime);
         }
 
-        private _simulationSpaceChanged()
+        _simulationSpaceChanged()
         {
             if (!this.transform) return;
             if (this._activeParticles.length == 0) return;

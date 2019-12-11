@@ -5772,7 +5772,7 @@ declare namespace gd3d.framework {
         private _updateActiveParticlesState;
         private _initParticleState;
         private _updateParticleState;
-        private _simulationSpaceChanged;
+        _simulationSpaceChanged(): void;
         addParticleVelocity(particle: Particle1, velocity: math.vector3, space: ParticleSystemSimulationSpace, name?: string): void;
         removeParticleVelocity(particle: Particle1, name: string): void;
         addParticleAcceleration(particle: Particle1, acceleration: math.vector3, space: ParticleSystemSimulationSpace, name?: string): void;
@@ -6224,6 +6224,7 @@ declare namespace gd3d.framework {
         startColor: MinMaxGradient;
         gravityModifier: MinMaxCurve;
         simulationSpace: ParticleSystemSimulationSpace;
+        private _simulationSpace;
         customSimulationSpace: transform;
         simulationSpeed: number;
         scalingMode: ParticleSystemScalingMode;
@@ -6545,20 +6546,6 @@ declare namespace gd3d.framework {
         loadingNum?: number;
         onLoaded?: () => void;
     }
-}
-declare namespace gd3d.framework {
-    function watch(onChange: string): (target: any, property: string) => void;
-    var watcher: Watcher;
-    class Watcher {
-        watch<T, K extends (keyof T & string), V extends T[K]>(object: T, property: K, handler: (object: T, property: string, oldvalue: V) => void, thisObject?: any): void;
-        unwatch<T, K extends (keyof T & string), V extends T[K]>(object: T, property: K, handler?: (object: T, property: string, oldvalue: V) => void, thisObject?: any): void;
-        watchchain(object: any, property: string, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
-        unwatchchain(object: any, property: string, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
-        watchobject<T>(object: T, property: gPartial<T>, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
-        unwatchobject<T>(object: T, property: gPartial<T>, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
-    }
-    const __watchs__ = "__watchs__";
-    const __watchchains__ = "__watchchains__";
 }
 declare namespace gd3d.framework {
     class CannonJSPlugin implements IPhysicsEnginePlugin {

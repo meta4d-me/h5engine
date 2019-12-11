@@ -417,8 +417,19 @@ namespace gd3d.framework
          * 
          * @todo
          */
-
-        simulationSpace = ParticleSystemSimulationSpace.Local;
+        get simulationSpace()
+        {
+            return this._simulationSpace;
+        }
+        set simulationSpace(v)
+        {
+            if (this._simulationSpace != v)
+            {
+                this._simulationSpace = v;
+                this.particleSystem._simulationSpaceChanged();
+            }
+        }
+        private _simulationSpace = ParticleSystemSimulationSpace.Local;
 
         /**
          * Simulate particles relative to a custom transform component.
