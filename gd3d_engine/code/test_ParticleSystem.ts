@@ -2,7 +2,12 @@ namespace gd3d.math
 {
     export interface color
     {
-        "__class__":"gd3d.math.color"
+        "__class__"?: "gd3d.math.color"
+    }
+
+    export interface vector3
+    {
+        "__class__"?: "gd3d.math.vector3"
     }
 }
 

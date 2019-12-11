@@ -612,7 +612,10 @@ declare class test_Decal implements IState {
 }
 declare namespace gd3d.math {
     interface color {
-        "__class__": "gd3d.math.color";
+        "__class__"?: "gd3d.math.color";
+    }
+    interface vector3 {
+        "__class__"?: "gd3d.math.vector3";
     }
 }
 declare class test_ParticleSystem implements IState {
