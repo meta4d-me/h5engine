@@ -11,13 +11,13 @@ namespace gd3d.framework
          * Set the rotation over lifetime on each axis separately.
          * 在每个轴上分别设置基于生命周期的旋转。
          */
-        
+
         separateAxes = false;
 
         /**
          * 角速度，基于生命周期的旋转。
          */
-        
+
         angularVelocity = serialization.setValue(new MinMaxCurveVector3(), { xCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 }, yCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 }, zCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 } });
 
         /**
@@ -127,8 +127,13 @@ namespace gd3d.framework
         updateParticleState(particle: Particle1)
         {
             var preAngularVelocity: math.vector3 = particle[_RotationOverLifetime_preAngularVelocity];
-            particle.angularVelocity.sub(preAngularVelocity);
-            preAngularVelocity.set(0, 0, 0);
+            particle.angularVelocity.x -= preAngularVelocity.x;
+            particle.angularVelocity.y -= preAngularVelocity.y;
+            particle.angularVelocity.z -= preAngularVelocity.z;
+
+            preAngularVelocity.x = 0;
+            preAngularVelocity.y = 0;
+            preAngularVelocity.z = 0;
             if (!this.enabled) return;
 
             var v = this.angularVelocity.getValue(particle.rateAtLifeTime, particle[_RotationOverLifetime_rate]);
@@ -136,8 +141,13 @@ namespace gd3d.framework
             {
                 v.x = v.y = 0;
             }
-            particle.angularVelocity.add(v);
-            preAngularVelocity.copy(v);
+            particle.angularVelocity.x += v.x;
+            particle.angularVelocity.y += v.y;
+            particle.angularVelocity.z += v.z;
+
+            preAngularVelocity.x = v.x;
+            preAngularVelocity.y = v.y;
+            preAngularVelocity.z = v.z;
         }
     }
     var _RotationOverLifetime_rate = "_RotationOverLifetime_rate";
