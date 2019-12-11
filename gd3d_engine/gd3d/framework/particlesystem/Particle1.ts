@@ -66,7 +66,7 @@ namespace gd3d.framework
 		/**
 		 * 纹理UV缩放和偏移。
 		 */
-		tilingOffset =  new math.vector4(1, 1, 0, 0);
+		tilingOffset = new math.vector4(1, 1, 0, 0);
 
 		/**
 		 * 在粒子上翻转UV坐标，使它们呈现水平镜像。
@@ -99,7 +99,9 @@ namespace gd3d.framework
 			var pTime = time - preTime;
 
 			// 计算速度
-			this.velocity.add(this.acceleration.scaleNumberTo(pTime));
+			this.velocity.x += this.acceleration.x * pTime;
+			this.velocity.y += this.acceleration.y * pTime;
+			this.velocity.z += this.acceleration.z * pTime;
 
 			// 计算位置
 			this.position.x += this.velocity.x * pTime;
@@ -107,7 +109,9 @@ namespace gd3d.framework
 			this.position.z += this.velocity.z * pTime;
 
 			// 计算角度
-			this.rotation.add(this.angularVelocity.scaleNumberTo(pTime));
+			this.rotation.x += this.angularVelocity.x * pTime;
+			this.rotation.y += this.angularVelocity.y * pTime;
+			this.rotation.z += this.angularVelocity.z * pTime;
 		}
 	}
 }

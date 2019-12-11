@@ -5649,13 +5649,13 @@ declare namespace gd3d.framework {
     class Particle1 {
         birthTime: number;
         lifetime: number;
-        position: Vector3;
-        velocity: Vector3;
-        acceleration: Vector3;
-        rotation: Vector3;
-        angularVelocity: Vector3;
-        size: Vector3;
-        startSize: Vector3;
+        position: math.vector3;
+        velocity: math.vector3;
+        acceleration: math.vector3;
+        rotation: math.vector3;
+        angularVelocity: math.vector3;
+        size: math.vector3;
+        startSize: math.vector3;
         color: math.color;
         startColor: math.color;
         tilingOffset: math.vector4;
@@ -5773,16 +5773,16 @@ declare namespace gd3d.framework {
         private _initParticleState;
         private _updateParticleState;
         private _simulationSpaceChanged;
-        addParticleVelocity(particle: Particle1, velocity: Vector3, space: ParticleSystemSimulationSpace, name?: string): void;
+        addParticleVelocity(particle: Particle1, velocity: math.vector3, space: ParticleSystemSimulationSpace, name?: string): void;
         removeParticleVelocity(particle: Particle1, name: string): void;
-        addParticleAcceleration(particle: Particle1, acceleration: Vector3, space: ParticleSystemSimulationSpace, name?: string): void;
+        addParticleAcceleration(particle: Particle1, acceleration: math.vector3, space: ParticleSystemSimulationSpace, name?: string): void;
         removeParticleAcceleration(particle: Particle1, name: string): void;
         private _preworldPos;
         private _isRateOverDistance;
         private _leftRateOverDistance;
-        worldPos: Vector3;
-        moveVec: Vector3;
-        speed: Vector3;
+        worldPos: math.vector3;
+        moveVec: math.vector3;
+        speed: math.vector3;
         localToWorldMatrix: math.matrix;
         worldToLocalMatrix: math.matrix;
     }
@@ -6041,7 +6041,7 @@ declare namespace gd3d.framework {
         xCurve: MinMaxCurve;
         yCurve: MinMaxCurve;
         zCurve: MinMaxCurve;
-        getValue(time: number, randomBetween?: number): Vector3;
+        getValue(time: number, randomBetween?: number): math.vector3;
     }
 }
 declare namespace gd3d.framework {
@@ -6054,80 +6054,6 @@ declare namespace gd3d.framework {
         XZY = 5
     }
     var defaultRotationOrder: RotationOrder;
-}
-declare namespace gd3d.framework {
-    class Vector3 {
-        __class__: "gd3d.framework.Vector3";
-        static X_AXIS: Vector3;
-        static Y_AXIS: Vector3;
-        static Z_AXIS: Vector3;
-        static ZERO: Vector3;
-        static fromArray(array: ArrayLike<number>, offset?: number): Vector3;
-        static random(size?: number): Vector3;
-        x: number;
-        y: number;
-        z: number;
-        readonly length: number;
-        readonly lengthSquared: number;
-        constructor(x?: number, y?: number, z?: number);
-        set(x: number, y: number, z: number): this;
-        setZero(): void;
-        fromArray(array: ArrayLike<number>, offset?: number): this;
-        add(a: Vector3): this;
-        addTo(a: Vector3, vout?: Vector3): Vector3;
-        addScaledVector(scalar: number, vector: Vector3): this;
-        multiply(a: Vector3): this;
-        multiplyTo(a: Vector3, vout?: Vector3): Vector3;
-        divide(a: Vector3): this;
-        divideTo(a: Vector3, vout?: Vector3): Vector3;
-        cross(a: Vector3): Vector3;
-        crossTo(a: Vector3, vout?: Vector3): Vector3;
-        dot(a: Vector3): number;
-        isZero(): boolean;
-        tangents(t1: Vector3, t2: Vector3): void;
-        addNumber(n: number): this;
-        addNumberTo(n: number, vout?: Vector3): Vector3;
-        subNumber(n: number): this;
-        subNumberTo(n: number, vout?: Vector3): Vector3;
-        multiplyNumber(n: number): this;
-        multiplyNumberTo(n: number, vout?: Vector3): Vector3;
-        divideNumber(n: number): this;
-        divideNumberTo(n: number, vout?: Vector3): Vector3;
-        clone(): Vector3;
-        copy(v: Vector3): this;
-        negate(): this;
-        negateTo(vout?: Vector3): Vector3;
-        inverse(): this;
-        inverseTo(vout?: Vector3): Vector3;
-        normalize(thickness?: number): this;
-        unit(target?: Vector3): Vector3;
-        scaleNumber(s: number): this;
-        scaleNumberTo(s: number, vout?: Vector3): Vector3;
-        scale(s: Vector3): this;
-        scaleTo(s: Vector3, vout?: Vector3): Vector3;
-        sub(a: Vector3): this;
-        subTo(a: Vector3, vout?: Vector3): Vector3;
-        lerp(v: Vector3, alpha: Vector3): this;
-        lerpTo(v: Vector3, alpha: Vector3, vout?: Vector3): Vector3;
-        lerpNumber(v: Vector3, alpha: number): this;
-        lerpNumberTo(v: Vector3, alpha: number, vout?: Vector3): Vector3;
-        less(p: Vector3): boolean;
-        lessequal(p: Vector3): boolean;
-        greater(p: Vector3): boolean;
-        greaterequal(p: Vector3): boolean;
-        clamp(min: Vector3, max: Vector3): this;
-        min(v: Vector3): this;
-        max(v: Vector3): this;
-        distanceSquared(v: Vector3): number;
-        distance(v: Vector3): number;
-        reflect(normal: Vector3): this;
-        floor(): this;
-        ceil(): this;
-        round(): this;
-        roundToZero(): this;
-        toString(): string;
-        toArray(array?: number[], offset?: number): number[];
-    }
 }
 declare namespace gd3d.framework {
     class Gradient {
@@ -6353,7 +6279,7 @@ declare namespace gd3d.framework {
         arcSpeed: MinMaxCurve;
         arcSpeedMultiplier: number;
         arcSpread: number;
-        box: Vector3;
+        box: math.vector3;
         length: number;
         mesh: any;
         useMeshMaterialIndex: boolean;

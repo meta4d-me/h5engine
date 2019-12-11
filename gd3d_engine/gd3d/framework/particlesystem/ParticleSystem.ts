@@ -367,9 +367,13 @@ namespace gd3d.framework
             // 粒子系统位置
             math.matrixGetTranslation(this.localToWorldMatrix, this.worldPos);
             // 粒子系统位移
-            this.moveVec.copy(this.worldPos).sub(this._preworldPos);
+            this.moveVec.x = this.worldPos.x - this._preworldPos.x;
+            this.moveVec.y = this.worldPos.y - this._preworldPos.y;
+            this.moveVec.z = this.worldPos.z - this._preworldPos.z;
             // 粒子系统速度
-            this.speed.copy(this.moveVec).divideNumber(this.main.simulationSpeed * interval / 1000);
+            this.speed.x = this.moveVec.x / (this.main.simulationSpeed * interval / 1000);
+            this.speed.y = this.moveVec.y / (this.main.simulationSpeed * interval / 1000);
+            this.speed.z = this.moveVec.z / (this.main.simulationSpeed * interval / 1000);
 
             this._updateActiveParticlesState();
 
@@ -386,7 +390,9 @@ namespace gd3d.framework
             this._emit();
 
             this._preRealTime = this._realTime;
-            this._preworldPos.copy(this.worldPos);
+            this._preworldPos.x = this.worldPos.x;
+            this._preworldPos.y = this.worldPos.y;
+            this._preworldPos.z = this.worldPos.z;
 
             // 判断非循环的效果是否播放结束
             if (!this.main.loop && this._activeParticles.length == 0 && this._realTime > this.main.duration)
@@ -673,7 +679,7 @@ namespace gd3d.framework
             if (!loop) realEmitTime = Math.min(realEmitTime, duration);
 
             // 
-            var emits: { time: number, num: number, position?: Vector3 }[] = [];
+            var emits: { time: number, num: number, position?: math.vector3 }[] = [];
             // 单粒子发射周期
             var step = 1 / this.emission.rateOverTime.getValue(rateAtDuration);
             var bursts = this.emission.bursts;
@@ -685,31 +691,41 @@ namespace gd3d.framework
                     var moveVec = this.moveVec;
                     var worldPos = this.worldPos;
                     // 本次移动距离
-                    if (moveVec.lengthSquared > 0)
+                    if (math.vec3SqrLength(moveVec) > 0)
                     {
                         // 移动方向
-                        var moveDir = moveVec.clone().normalize();
+                        var moveDir = new math.vector3(moveVec.x, moveVec.y, moveVec.z);
+                        math.vec3Normalize(moveDir, moveDir);
                         // 剩余移动量
-                        var leftRateOverDistance = this._leftRateOverDistance + moveVec.length;
+                        var leftRateOverDistance = this._leftRateOverDistance + math.vec3Length(moveVec);
                         // 发射频率
                         var rateOverDistance = this.emission.rateOverDistance.getValue(rateAtDuration);
                         // 发射间隔距离
                         var invRateOverDistance = 1 / rateOverDistance;
                         // 发射间隔位移
-                        var invRateOverDistanceVec = moveDir.scaleNumberTo(1 / rateOverDistance);
+                        var invRateOverDistanceVec = new math.vector3(moveDir.x / rateOverDistance, moveDir.y / rateOverDistance, moveDir.z / rateOverDistance);
                         // 上次发射位置
-                        var lastRateOverDistance = this._preworldPos.addTo(moveDir.negateTo().scaleNumber(this._leftRateOverDistance));
+                        var lastRateOverDistance = new math.vector3(
+                            this._preworldPos.x - moveDir.x * this._leftRateOverDistance,
+                            this._preworldPos.y - moveDir.y * this._leftRateOverDistance,
+                            this._preworldPos.z - moveDir.z * this._leftRateOverDistance,
+                        );
                         // 发射位置列表
-                        var emitPosArr: Vector3[] = [];
+                        var emitPosArr: math.vector3[] = [];
                         while (invRateOverDistance < leftRateOverDistance)
                         {
-                            emitPosArr.push(lastRateOverDistance.add(invRateOverDistanceVec).clone());
+                            emitPosArr.push(new math.vector3(
+                                lastRateOverDistance.x + invRateOverDistanceVec.x,
+                                lastRateOverDistance.y + invRateOverDistanceVec.y,
+                                lastRateOverDistance.z + invRateOverDistanceVec.z,
+                            ));
+
                             leftRateOverDistance -= invRateOverDistance;
                         }
                         this._leftRateOverDistance = leftRateOverDistance;
                         emitPosArr.forEach(p =>
                         {
-                            emits.push({ time: this.time, num: 1, position: p.sub(worldPos) });
+                            emits.push({ time: this.time, num: 1, position: new math.vector3(p.x - worldPos.x, p.y - worldPos.y, p.z - worldPos.z) });
                         });
                     }
                 }
@@ -765,12 +781,12 @@ namespace gd3d.framework
          * @param birthTime 发射时间
          * @param num 发射数量
          */
-        private _emitParticles(v: { time: number; num: number; position?: Vector3; })
+        private _emitParticles(v: { time: number; num: number; position?: math.vector3; })
         {
             var rateAtDuration = this.rateAtDuration;
             var num = v.num;
             var birthTime = v.time;
-            var position = v.position || new Vector3();
+            var position = v.position || new math.vector3();
             for (let i = 0; i < num; i++)
             {
                 if (this._activeParticles.length >= this.main.maxParticles) return;
@@ -782,7 +798,9 @@ namespace gd3d.framework
                 {
                     var particle = this._particlePool.pop() || new Particle1();
                     particle.cache = {};
-                    particle.position.copy(position);
+                    particle.position.x = position.x;
+                    particle.position.y = position.y;
+                    particle.position.z = position.z;
                     particle.birthTime = birthTime;
                     particle.lifetime = lifetime;
                     particle.rateAtLifeTime = rateAtLifeTime;
@@ -871,12 +889,12 @@ namespace gd3d.framework
          * @param space 速度所在空间。
          * @param name  速度名称。如果不为 undefined 时保存，调用 removeParticleVelocity 可以移除该部分速度。
          */
-        addParticleVelocity(particle: Particle1, velocity: Vector3, space: ParticleSystemSimulationSpace, name?: string)
+        addParticleVelocity(particle: Particle1, velocity: math.vector3, space: ParticleSystemSimulationSpace, name?: string)
         {
             if (name != undefined)
             {
                 this.removeParticleVelocity(particle, name);
-                particle.cache[name] = { value: velocity.clone(), space: space };
+                particle.cache[name] = { value: new math.vector3(velocity.x, velocity.y, velocity.z), space: space };
             }
 
             if (space != this.main.simulationSpace)
@@ -890,7 +908,9 @@ namespace gd3d.framework
                 }
             }
             //
-            particle.velocity.add(velocity);
+            particle.velocity.x += velocity.x;
+            particle.velocity.y += velocity.y;
+            particle.velocity.z += velocity.z;
         }
 
         /**
@@ -901,7 +921,7 @@ namespace gd3d.framework
          */
         removeParticleVelocity(particle: Particle1, name: string)
         {
-            var obj: { value: Vector3, space: ParticleSystemSimulationSpace } = particle.cache[name];
+            var obj: { value: math.vector3, space: ParticleSystemSimulationSpace } = particle.cache[name];
             if (obj)
             {
                 delete particle.cache[name];
@@ -919,7 +939,9 @@ namespace gd3d.framework
                     }
                 }
                 //
-                particle.velocity.sub(value);
+                particle.velocity.x -= value.x;
+                particle.velocity.y -= value.y;
+                particle.velocity.z -= value.z;
             }
         }
 
@@ -931,12 +953,12 @@ namespace gd3d.framework
          * @param space 加速度所在空间。
          * @param name  加速度名称。如果不为 undefined 时保存，调用 removeParticleVelocity 可以移除该部分速度。
          */
-        addParticleAcceleration(particle: Particle1, acceleration: Vector3, space: ParticleSystemSimulationSpace, name?: string)
+        addParticleAcceleration(particle: Particle1, acceleration: math.vector3, space: ParticleSystemSimulationSpace, name?: string)
         {
             if (name != undefined)
             {
                 this.removeParticleAcceleration(particle, name);
-                particle.cache[name] = { value: acceleration.clone(), space: space };
+                particle.cache[name] = { value: new math.vector3(acceleration.x, acceleration.y, acceleration.z), space: space };
             }
 
             if (space != this.main.simulationSpace)
@@ -950,7 +972,9 @@ namespace gd3d.framework
                 }
             }
             //
-            particle.acceleration.add(acceleration);
+            particle.acceleration.x += acceleration.x;
+            particle.acceleration.y += acceleration.y;
+            particle.acceleration.z += acceleration.z;
         }
 
         /**
@@ -961,7 +985,7 @@ namespace gd3d.framework
          */
         removeParticleAcceleration(particle: Particle1, name: string)
         {
-            var obj: { value: Vector3, space: ParticleSystemSimulationSpace } = particle.cache[name];
+            var obj: { value: math.vector3, space: ParticleSystemSimulationSpace } = particle.cache[name];
             if (obj)
             {
                 delete particle.cache[name];
@@ -979,20 +1003,22 @@ namespace gd3d.framework
                     }
                 }
                 //
-                particle.acceleration.sub(value);
+                particle.acceleration.x -= value.x;
+                particle.acceleration.y -= value.y;
+                particle.acceleration.z -= value.z;
             }
         }
 
         /**
          * 上次移动发射的位置
          */
-        private _preworldPos = new Vector3();
+        private _preworldPos = new math.vector3();
         private _isRateOverDistance = false;
         private _leftRateOverDistance = 0;
         //
-        worldPos = new Vector3();
-        moveVec = new Vector3();
-        speed = new Vector3;
+        worldPos = new math.vector3();
+        moveVec = new math.vector3();
+        speed = new math.vector3();
 
         //
         localToWorldMatrix = new math.matrix();

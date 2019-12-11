@@ -29893,11 +29893,15 @@ var gd3d;
                 preTime = Math.max(preTime, this.birthTime);
                 time = Math.max(this.birthTime, time);
                 var pTime = time - preTime;
-                this.velocity.add(this.acceleration.scaleNumberTo(pTime));
+                this.velocity.x += this.acceleration.x * pTime;
+                this.velocity.y += this.acceleration.y * pTime;
+                this.velocity.z += this.acceleration.z * pTime;
                 this.position.x += this.velocity.x * pTime;
                 this.position.y += this.velocity.y * pTime;
                 this.position.z += this.velocity.z * pTime;
-                this.rotation.add(this.angularVelocity.scaleNumberTo(pTime));
+                this.rotation.x += this.angularVelocity.x * pTime;
+                this.rotation.y += this.angularVelocity.y * pTime;
+                this.rotation.z += this.angularVelocity.z * pTime;
             };
             return Particle1;
         }());
@@ -29982,12 +29986,12 @@ var gd3d;
                 _this._particlePool = [];
                 _this._activeParticles = [];
                 _this._modules = [];
-                _this._preworldPos = new Vector3();
+                _this._preworldPos = new gd3d.math.vector3();
                 _this._isRateOverDistance = false;
                 _this._leftRateOverDistance = 0;
-                _this.worldPos = new Vector3();
-                _this.moveVec = new Vector3();
-                _this.speed = new Vector3;
+                _this.worldPos = new gd3d.math.vector3();
+                _this.moveVec = new gd3d.math.vector3();
+                _this.speed = new gd3d.math.vector3();
                 _this.localToWorldMatrix = new gd3d.math.matrix();
                 _this.worldToLocalMatrix = new gd3d.math.matrix();
                 _this.main = new framework.ParticleMainModule();
@@ -30241,8 +30245,12 @@ var gd3d;
                 this.time = this.time + this.main.simulationSpeed * interval;
                 this._realTime = this.time - this.startDelay;
                 gd3d.math.matrixGetTranslation(this.localToWorldMatrix, this.worldPos);
-                this.moveVec.copy(this.worldPos).sub(this._preworldPos);
-                this.speed.copy(this.moveVec).divideNumber(this.main.simulationSpeed * interval / 1000);
+                this.moveVec.x = this.worldPos.x - this._preworldPos.x;
+                this.moveVec.y = this.worldPos.y - this._preworldPos.y;
+                this.moveVec.z = this.worldPos.z - this._preworldPos.z;
+                this.speed.x = this.moveVec.x / (this.main.simulationSpeed * interval / 1000);
+                this.speed.y = this.moveVec.y / (this.main.simulationSpeed * interval / 1000);
+                this.speed.z = this.moveVec.z / (this.main.simulationSpeed * interval / 1000);
                 this._updateActiveParticlesState();
                 if (this.main.loop && Math.floor(this._preRealTime / this.main.duration) < Math.floor(this._realTime / this.main.duration)) {
                     this.emission.bursts.forEach(function (element) {
@@ -30251,7 +30259,9 @@ var gd3d;
                 }
                 this._emit();
                 this._preRealTime = this._realTime;
-                this._preworldPos.copy(this.worldPos);
+                this._preworldPos.x = this.worldPos.x;
+                this._preworldPos.y = this.worldPos.y;
+                this._preworldPos.z = this.worldPos.z;
                 if (!this.main.loop && this._activeParticles.length == 0 && this._realTime > this.main.duration) {
                     this.stop();
                     this.dispatch("particleCompleted", this);
@@ -30418,21 +30428,22 @@ var gd3d;
                     if (this._isRateOverDistance) {
                         var moveVec = this.moveVec;
                         var worldPos = this.worldPos;
-                        if (moveVec.lengthSquared > 0) {
-                            var moveDir = moveVec.clone().normalize();
-                            var leftRateOverDistance = this._leftRateOverDistance + moveVec.length;
+                        if (gd3d.math.vec3SqrLength(moveVec) > 0) {
+                            var moveDir = new gd3d.math.vector3(moveVec.x, moveVec.y, moveVec.z);
+                            gd3d.math.vec3Normalize(moveDir, moveDir);
+                            var leftRateOverDistance = this._leftRateOverDistance + gd3d.math.vec3Length(moveVec);
                             var rateOverDistance = this.emission.rateOverDistance.getValue(rateAtDuration);
                             var invRateOverDistance = 1 / rateOverDistance;
-                            var invRateOverDistanceVec = moveDir.scaleNumberTo(1 / rateOverDistance);
-                            var lastRateOverDistance = this._preworldPos.addTo(moveDir.negateTo().scaleNumber(this._leftRateOverDistance));
+                            var invRateOverDistanceVec = new gd3d.math.vector3(moveDir.x / rateOverDistance, moveDir.y / rateOverDistance, moveDir.z / rateOverDistance);
+                            var lastRateOverDistance = new gd3d.math.vector3(this._preworldPos.x - moveDir.x * this._leftRateOverDistance, this._preworldPos.y - moveDir.y * this._leftRateOverDistance, this._preworldPos.z - moveDir.z * this._leftRateOverDistance);
                             var emitPosArr = [];
                             while (invRateOverDistance < leftRateOverDistance) {
-                                emitPosArr.push(lastRateOverDistance.add(invRateOverDistanceVec).clone());
+                                emitPosArr.push(new gd3d.math.vector3(lastRateOverDistance.x + invRateOverDistanceVec.x, lastRateOverDistance.y + invRateOverDistanceVec.y, lastRateOverDistance.z + invRateOverDistanceVec.z));
                                 leftRateOverDistance -= invRateOverDistance;
                             }
                             this._leftRateOverDistance = leftRateOverDistance;
                             emitPosArr.forEach(function (p) {
-                                emits.push({ time: _this.time, num: 1, position: p.sub(worldPos) });
+                                emits.push({ time: _this.time, num: 1, position: new gd3d.math.vector3(p.x - worldPos.x, p.y - worldPos.y, p.z - worldPos.z) });
                             });
                         }
                     }
@@ -30472,7 +30483,7 @@ var gd3d;
                 var rateAtDuration = this.rateAtDuration;
                 var num = v.num;
                 var birthTime = v.time;
-                var position = v.position || new Vector3();
+                var position = v.position || new gd3d.math.vector3();
                 for (var i = 0; i < num; i++) {
                     if (this._activeParticles.length >= this.main.maxParticles)
                         return;
@@ -30482,7 +30493,9 @@ var gd3d;
                     if (rateAtLifeTime < 1) {
                         var particle = this._particlePool.pop() || new framework.Particle1();
                         particle.cache = {};
-                        particle.position.copy(position);
+                        particle.position.x = position.x;
+                        particle.position.y = position.y;
+                        particle.position.z = position.z;
                         particle.birthTime = birthTime;
                         particle.lifetime = lifetime;
                         particle.rateAtLifeTime = rateAtLifeTime;
@@ -30539,7 +30552,7 @@ var gd3d;
             ParticleSystem.prototype.addParticleVelocity = function (particle, velocity, space, name) {
                 if (name != undefined) {
                     this.removeParticleVelocity(particle, name);
-                    particle.cache[name] = { value: velocity.clone(), space: space };
+                    particle.cache[name] = { value: new gd3d.math.vector3(velocity.x, velocity.y, velocity.z), space: space };
                 }
                 if (space != this.main.simulationSpace) {
                     if (space == framework.ParticleSystemSimulationSpace.World) {
@@ -30549,7 +30562,9 @@ var gd3d;
                         gd3d.math.matrixTransformNormal(velocity, this.localToWorldMatrix, velocity);
                     }
                 }
-                particle.velocity.add(velocity);
+                particle.velocity.x += velocity.x;
+                particle.velocity.y += velocity.y;
+                particle.velocity.z += velocity.z;
             };
             ParticleSystem.prototype.removeParticleVelocity = function (particle, name) {
                 var obj = particle.cache[name];
@@ -30565,13 +30580,15 @@ var gd3d;
                             gd3d.math.matrixTransformNormal(value, this.localToWorldMatrix, value);
                         }
                     }
-                    particle.velocity.sub(value);
+                    particle.velocity.x -= value.x;
+                    particle.velocity.y -= value.y;
+                    particle.velocity.z -= value.z;
                 }
             };
             ParticleSystem.prototype.addParticleAcceleration = function (particle, acceleration, space, name) {
                 if (name != undefined) {
                     this.removeParticleAcceleration(particle, name);
-                    particle.cache[name] = { value: acceleration.clone(), space: space };
+                    particle.cache[name] = { value: new gd3d.math.vector3(acceleration.x, acceleration.y, acceleration.z), space: space };
                 }
                 if (space != this.main.simulationSpace) {
                     if (space == framework.ParticleSystemSimulationSpace.World) {
@@ -30581,7 +30598,9 @@ var gd3d;
                         gd3d.math.matrixTransformNormal(acceleration, this.localToWorldMatrix, acceleration);
                     }
                 }
-                particle.acceleration.add(acceleration);
+                particle.acceleration.x += acceleration.x;
+                particle.acceleration.y += acceleration.y;
+                particle.acceleration.z += acceleration.z;
             };
             ParticleSystem.prototype.removeParticleAcceleration = function (particle, name) {
                 var obj = particle.cache[name];
@@ -30597,7 +30616,9 @@ var gd3d;
                             gd3d.math.matrixTransformNormal(value, this.localToWorldMatrix, value);
                         }
                     }
-                    particle.acceleration.sub(value);
+                    particle.acceleration.x -= value.x;
+                    particle.acceleration.y -= value.y;
+                    particle.acceleration.z -= value.z;
                 }
             };
             ParticleSystem.ClassName = "ParticleSystem";
