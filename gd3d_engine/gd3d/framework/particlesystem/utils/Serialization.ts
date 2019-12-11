@@ -222,8 +222,8 @@ namespace gd3d.framework
             getSerializableMembers(object["__proto__"], serializableMembers);
         }
         var serializePropertys = object[SERIALIZE_KEY];
-        if (serializePropertys) Array.concatToSelf(serializableMembers, serializePropertys)
-        Array.unique(serializableMembers);
+        if (serializePropertys) ArrayUtil.concatToSelf(serializableMembers, serializePropertys)
+        ArrayUtil.unique(serializableMembers);
         return serializableMembers;
     }
 

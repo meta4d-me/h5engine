@@ -6393,13 +6393,6 @@ declare namespace gd3d.framework {
         calculateProbability(): boolean;
     }
 }
-interface ArrayConstructor {
-    unique<T>(array: T[], compare?: (a: T, b: T) => boolean): T[];
-    delete<T>(array: T[], item: T): number;
-    concatToSelf<T>(array: T[], ...items: (T | ConcatArray<T>)[]): T[];
-    equal<T>(array: T[], arr: ArrayLike<T>): boolean;
-    replace<T>(array: T[], a: T, b: T, isAdd?: boolean): T[];
-}
 interface AssignDeepHandler {
     (target: any, source: any, key: string, replacers: AssignDeepHandler[], deep: number): boolean;
 }
@@ -6412,7 +6405,6 @@ interface ObjectConstructor {
     getPropertyChains(object: Object): string[];
     assignShallow<T>(target: T, source: Partial<T>): T;
     assignDeep<T>(target: T, source: gd3d.framework.gPartial<T>, handlers?: AssignDeepHandler | AssignDeepHandler[], deep?: number): T;
-    equalDeep<T>(a: T, b: T): boolean;
     runFunc<T>(obj: T, func: (obj: T) => void): T;
     assignDeepDefaultHandlers: AssignDeepHandler[];
 }
@@ -7407,6 +7399,13 @@ declare namespace gd3d.framework {
         BackEaseIn = 38,
         BackEaseInOut = 39,
         BackEaseOutIn = 40
+    }
+}
+declare namespace gd3d.framework {
+    class ArrayUtil {
+        static replace<T>(arr: T[], a: T, b: T, isAdd?: boolean): T[];
+        static concatToSelf<T>(self: T[], ...items: (T | ConcatArray<T>)[]): T[];
+        static unique<T>(arr: T[], compare?: (a: T, b: T) => boolean): T[];
     }
 }
 declare namespace gd3d.framework {

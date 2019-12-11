@@ -104,7 +104,7 @@ namespace gd3d.framework
         get main() { return this._main; }
         set main(v)
         {
-            Array.replace(this._modules, this._main, v);
+            ArrayUtil.replace(this._modules, this._main, v);
             v.particleSystem = this;
             this._main = v;
         }
@@ -113,7 +113,7 @@ namespace gd3d.framework
         get emission() { return this._emission; }
         set emission(v)
         {
-            Array.replace(this._modules, this._emission, v);
+            ArrayUtil.replace(this._modules, this._emission, v);
             v.particleSystem = this;
             this._emission = v;
         }
@@ -122,7 +122,7 @@ namespace gd3d.framework
         get shape() { return this._shape; }
         set shape(v)
         {
-            Array.replace(this._modules, this._shape, v);
+            ArrayUtil.replace(this._modules, this._shape, v);
             v.particleSystem = this;
             this._shape = v;
         }
@@ -131,7 +131,7 @@ namespace gd3d.framework
         get velocityOverLifetime() { return this._velocityOverLifetime; }
         set velocityOverLifetime(v)
         {
-            Array.replace(this._modules, this._velocityOverLifetime, v);
+            ArrayUtil.replace(this._modules, this._velocityOverLifetime, v);
             v.particleSystem = this;
             this._velocityOverLifetime = v;
         }
@@ -140,7 +140,7 @@ namespace gd3d.framework
         get limitVelocityOverLifetime() { return this._limitVelocityOverLifetime; }
         set limitVelocityOverLifetime(v)
         {
-            Array.replace(this._modules, this._limitVelocityOverLifetime, v);
+            ArrayUtil.replace(this._modules, this._limitVelocityOverLifetime, v);
             v.particleSystem = this;
             this._limitVelocityOverLifetime = v;
         }
@@ -154,7 +154,7 @@ namespace gd3d.framework
         get inheritVelocity() { return this._inheritVelocity; }
         set inheritVelocity(v)
         {
-            Array.replace(this._modules, this._inheritVelocity, v);
+            ArrayUtil.replace(this._modules, this._inheritVelocity, v);
             v.particleSystem = this;
             this._inheritVelocity = v;
         }
@@ -163,7 +163,7 @@ namespace gd3d.framework
         get forceOverLifetime() { return this._forceOverLifetime; }
         set forceOverLifetime(v)
         {
-            Array.replace(this._modules, this._forceOverLifetime, v);
+            ArrayUtil.replace(this._modules, this._forceOverLifetime, v);
             v.particleSystem = this;
             this._forceOverLifetime = v;
         }
@@ -172,7 +172,7 @@ namespace gd3d.framework
         get colorOverLifetime() { return this._colorOverLifetime; }
         set colorOverLifetime(v)
         {
-            Array.replace(this._modules, this._colorOverLifetime, v);
+            ArrayUtil.replace(this._modules, this._colorOverLifetime, v);
             v.particleSystem = this;
             this._colorOverLifetime = v;
         }
@@ -184,7 +184,7 @@ namespace gd3d.framework
         get colorBySpeed() { return this._colorBySpeed; }
         set colorBySpeed(v)
         {
-            Array.replace(this._modules, this._colorBySpeed, v);
+            ArrayUtil.replace(this._modules, this._colorBySpeed, v);
             v.particleSystem = this;
             this._colorBySpeed = v;
         }
@@ -193,7 +193,7 @@ namespace gd3d.framework
         get sizeOverLifetime() { return this._sizeOverLifetime; }
         set sizeOverLifetime(v)
         {
-            Array.replace(this._modules, this._sizeOverLifetime, v);
+            ArrayUtil.replace(this._modules, this._sizeOverLifetime, v);
             v.particleSystem = this;
             this._sizeOverLifetime = v;
         }
@@ -205,7 +205,7 @@ namespace gd3d.framework
         get sizeBySpeed() { return this._sizeBySpeed; }
         set sizeBySpeed(v)
         {
-            Array.replace(this._modules, this._sizeBySpeed, v);
+            ArrayUtil.replace(this._modules, this._sizeBySpeed, v);
             v.particleSystem = this;
             this._sizeBySpeed = v;
         }
@@ -214,7 +214,7 @@ namespace gd3d.framework
         get rotationOverLifetime() { return this._rotationOverLifetime; }
         set rotationOverLifetime(v)
         {
-            Array.replace(this._modules, this._rotationOverLifetime, v);
+            ArrayUtil.replace(this._modules, this._rotationOverLifetime, v);
             v.particleSystem = this;
             this._rotationOverLifetime = v;
         }
@@ -226,7 +226,7 @@ namespace gd3d.framework
         get rotationBySpeed() { return this._rotationBySpeed; }
         set rotationBySpeed(v)
         {
-            Array.replace(this._modules, this._rotationBySpeed, v);
+            ArrayUtil.replace(this._modules, this._rotationBySpeed, v);
             v.particleSystem = this;
             this._rotationBySpeed = v;
         }
@@ -238,7 +238,7 @@ namespace gd3d.framework
         get textureSheetAnimation() { return this._textureSheetAnimation; }
         set textureSheetAnimation(v)
         {
-            Array.replace(this._modules, this._textureSheetAnimation, v);
+            ArrayUtil.replace(this._modules, this._textureSheetAnimation, v);
             v.particleSystem = this;
             this._textureSheetAnimation = v;
         }

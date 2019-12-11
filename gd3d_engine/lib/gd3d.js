@@ -30059,7 +30059,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "main", {
                 get: function () { return this._main; },
                 set: function (v) {
-                    Array.replace(this._modules, this._main, v);
+                    framework.ArrayUtil.replace(this._modules, this._main, v);
                     v.particleSystem = this;
                     this._main = v;
                 },
@@ -30069,7 +30069,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "emission", {
                 get: function () { return this._emission; },
                 set: function (v) {
-                    Array.replace(this._modules, this._emission, v);
+                    framework.ArrayUtil.replace(this._modules, this._emission, v);
                     v.particleSystem = this;
                     this._emission = v;
                 },
@@ -30079,7 +30079,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "shape", {
                 get: function () { return this._shape; },
                 set: function (v) {
-                    Array.replace(this._modules, this._shape, v);
+                    framework.ArrayUtil.replace(this._modules, this._shape, v);
                     v.particleSystem = this;
                     this._shape = v;
                 },
@@ -30089,7 +30089,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "velocityOverLifetime", {
                 get: function () { return this._velocityOverLifetime; },
                 set: function (v) {
-                    Array.replace(this._modules, this._velocityOverLifetime, v);
+                    framework.ArrayUtil.replace(this._modules, this._velocityOverLifetime, v);
                     v.particleSystem = this;
                     this._velocityOverLifetime = v;
                 },
@@ -30099,7 +30099,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "limitVelocityOverLifetime", {
                 get: function () { return this._limitVelocityOverLifetime; },
                 set: function (v) {
-                    Array.replace(this._modules, this._limitVelocityOverLifetime, v);
+                    framework.ArrayUtil.replace(this._modules, this._limitVelocityOverLifetime, v);
                     v.particleSystem = this;
                     this._limitVelocityOverLifetime = v;
                 },
@@ -30109,7 +30109,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "inheritVelocity", {
                 get: function () { return this._inheritVelocity; },
                 set: function (v) {
-                    Array.replace(this._modules, this._inheritVelocity, v);
+                    framework.ArrayUtil.replace(this._modules, this._inheritVelocity, v);
                     v.particleSystem = this;
                     this._inheritVelocity = v;
                 },
@@ -30119,7 +30119,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "forceOverLifetime", {
                 get: function () { return this._forceOverLifetime; },
                 set: function (v) {
-                    Array.replace(this._modules, this._forceOverLifetime, v);
+                    framework.ArrayUtil.replace(this._modules, this._forceOverLifetime, v);
                     v.particleSystem = this;
                     this._forceOverLifetime = v;
                 },
@@ -30129,7 +30129,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "colorOverLifetime", {
                 get: function () { return this._colorOverLifetime; },
                 set: function (v) {
-                    Array.replace(this._modules, this._colorOverLifetime, v);
+                    framework.ArrayUtil.replace(this._modules, this._colorOverLifetime, v);
                     v.particleSystem = this;
                     this._colorOverLifetime = v;
                 },
@@ -30139,7 +30139,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "colorBySpeed", {
                 get: function () { return this._colorBySpeed; },
                 set: function (v) {
-                    Array.replace(this._modules, this._colorBySpeed, v);
+                    framework.ArrayUtil.replace(this._modules, this._colorBySpeed, v);
                     v.particleSystem = this;
                     this._colorBySpeed = v;
                 },
@@ -30149,7 +30149,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "sizeOverLifetime", {
                 get: function () { return this._sizeOverLifetime; },
                 set: function (v) {
-                    Array.replace(this._modules, this._sizeOverLifetime, v);
+                    framework.ArrayUtil.replace(this._modules, this._sizeOverLifetime, v);
                     v.particleSystem = this;
                     this._sizeOverLifetime = v;
                 },
@@ -30159,7 +30159,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "sizeBySpeed", {
                 get: function () { return this._sizeBySpeed; },
                 set: function (v) {
-                    Array.replace(this._modules, this._sizeBySpeed, v);
+                    framework.ArrayUtil.replace(this._modules, this._sizeBySpeed, v);
                     v.particleSystem = this;
                     this._sizeBySpeed = v;
                 },
@@ -30169,7 +30169,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "rotationOverLifetime", {
                 get: function () { return this._rotationOverLifetime; },
                 set: function (v) {
-                    Array.replace(this._modules, this._rotationOverLifetime, v);
+                    framework.ArrayUtil.replace(this._modules, this._rotationOverLifetime, v);
                     v.particleSystem = this;
                     this._rotationOverLifetime = v;
                 },
@@ -30179,7 +30179,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "rotationBySpeed", {
                 get: function () { return this._rotationBySpeed; },
                 set: function (v) {
-                    Array.replace(this._modules, this._rotationBySpeed, v);
+                    framework.ArrayUtil.replace(this._modules, this._rotationBySpeed, v);
                     v.particleSystem = this;
                     this._rotationBySpeed = v;
                 },
@@ -30189,7 +30189,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "textureSheetAnimation", {
                 get: function () { return this._textureSheetAnimation; },
                 set: function (v) {
-                    Array.replace(this._modules, this._textureSheetAnimation, v);
+                    framework.ArrayUtil.replace(this._modules, this._textureSheetAnimation, v);
                     v.particleSystem = this;
                     this._textureSheetAnimation = v;
                 },
@@ -33512,69 +33512,6 @@ var gd3d;
         framework.ParticleEmissionBurst = ParticleEmissionBurst;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
-Array.equal = function (self, arr) {
-    if (self.length != arr.length)
-        return false;
-    var keys = Object.keys(arr);
-    for (var i = 0, n = keys.length; i < n; i++) {
-        var key = keys[i];
-        if (self[key] != arr[key])
-            return false;
-    }
-    return true;
-};
-Array.concatToSelf = function (self) {
-    var items = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        items[_i - 1] = arguments[_i];
-    }
-    var arr = [];
-    items.forEach(function (v) { return arr = arr.concat(v); });
-    arr.forEach(function (v) { return self.push(v); });
-    return self;
-};
-Array.unique = function (arr, compare) {
-    if (compare === void 0) { compare = function (a, b) { return a == b; }; }
-    var keys = Object.keys(arr);
-    var ids = keys.map(function (v) { return Number(v); }).filter(function (v) { return !isNaN(v); });
-    var deleteMap = {};
-    for (var i = 0, n = ids.length; i < n; i++) {
-        var ki = ids[i];
-        if (deleteMap[ki])
-            continue;
-        for (var j = i + 1; j < n; j++) {
-            var kj = ids[j];
-            if (compare(arr[ki], arr[kj]))
-                deleteMap[kj] = true;
-        }
-    }
-    for (var i = ids.length - 1; i >= 0; i--) {
-        var id = ids[i];
-        if (deleteMap[id])
-            arr.splice(id, 1);
-    }
-    return arr;
-};
-Array.delete = function (arr, item) {
-    var index = arr.indexOf(item);
-    if (index != -1)
-        arr.splice(index, 1);
-    return index;
-};
-Array.replace = function (arr, a, b, isAdd) {
-    if (isAdd === void 0) { isAdd = true; }
-    var isreplace = false;
-    for (var i = 0; i < arr.length; i++) {
-        if (arr[i] == a) {
-            arr[i] = b;
-            isreplace = true;
-            break;
-        }
-    }
-    if (!isreplace && isAdd)
-        arr.push(b);
-    return arr;
-};
 Object.isBaseType = function (object) {
     if (object == undefined
         || object == null
@@ -33651,27 +33588,6 @@ Object.getPropertyChains = function (object) {
         index++;
     }
     return result;
-};
-Object.equalDeep = function (a, b) {
-    if (a == b)
-        return true;
-    if (Object.isBaseType(a) || Object.isBaseType(b))
-        return a == b;
-    if (typeof a == "function" || typeof b == "function")
-        return a == b;
-    var akeys = Object.keys(a);
-    var bkeys = Object.keys(b);
-    if (!Array.equal(akeys, bkeys))
-        return false;
-    if (Array.isArray(a) && Array.isArray(b))
-        return a.length == b.length;
-    for (var i = 0; i < akeys.length; i++) {
-        var element = akeys[i];
-        if (!Object.equalDeep(a[element], b[element])) {
-            return false;
-        }
-    }
-    return true;
 };
 Object.assignShallow = function (target, source) {
     if (source == null)
@@ -34401,8 +34317,8 @@ var gd3d;
             }
             var serializePropertys = object[SERIALIZE_KEY];
             if (serializePropertys)
-                Array.concatToSelf(serializableMembers, serializePropertys);
-            Array.unique(serializableMembers);
+                framework.ArrayUtil.concatToSelf(serializableMembers, serializePropertys);
+            framework.ArrayUtil.unique(serializableMembers);
             return serializableMembers;
         }
         framework.serialization = new Serialization();
@@ -38999,6 +38915,63 @@ var gd3d;
             tweenMethod[tweenMethod["BackEaseInOut"] = 39] = "BackEaseInOut";
             tweenMethod[tweenMethod["BackEaseOutIn"] = 40] = "BackEaseOutIn";
         })(tweenMethod = framework.tweenMethod || (framework.tweenMethod = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ArrayUtil = (function () {
+            function ArrayUtil() {
+            }
+            ArrayUtil.replace = function (arr, a, b, isAdd) {
+                if (isAdd === void 0) { isAdd = true; }
+                var isreplace = false;
+                for (var i = 0; i < arr.length; i++) {
+                    if (arr[i] == a) {
+                        arr[i] = b;
+                        isreplace = true;
+                        break;
+                    }
+                }
+                if (!isreplace && isAdd)
+                    arr.push(b);
+                return arr;
+            };
+            ArrayUtil.concatToSelf = function (self) {
+                var items = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    items[_i - 1] = arguments[_i];
+                }
+                var arr = [];
+                items.forEach(function (v) { return arr = arr.concat(v); });
+                arr.forEach(function (v) { return self.push(v); });
+                return self;
+            };
+            ArrayUtil.unique = function (arr, compare) {
+                var keys = Object.keys(arr);
+                var ids = keys.map(function (v) { return Number(v); }).filter(function (v) { return !isNaN(v); });
+                var deleteMap = {};
+                for (var i = 0, n = ids.length; i < n; i++) {
+                    var ki = ids[i];
+                    if (deleteMap[ki])
+                        continue;
+                    for (var j = i + 1; j < n; j++) {
+                        var kj = ids[j];
+                        if (compare(arr[ki], arr[kj]))
+                            deleteMap[kj] = true;
+                    }
+                }
+                for (var i = ids.length - 1; i >= 0; i--) {
+                    var id = ids[i];
+                    if (deleteMap[id])
+                        arr.splice(id, 1);
+                }
+                return arr;
+            };
+            return ArrayUtil;
+        }());
+        framework.ArrayUtil = ArrayUtil;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
