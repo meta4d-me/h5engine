@@ -34169,14 +34169,22 @@ var gd3d;
                 configurable: true
             });
             ParticleSystemShapeSphere.prototype.initParticleState = function (particle) {
-                var speed = particle.velocity.length;
-                var dir = Vector3.random().scaleNumber(2).subNumber(1).normalize();
-                var p = dir.scaleNumberTo(this.radius);
+                var speed = gd3d.math.vec3Length(particle.velocity);
+                var dir = new gd3d.math.vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+                gd3d.math.vec3Normalize(dir, dir);
+                var p = new gd3d.math.vector3(this.radius * dir.x, this.radius * dir.y, this.radius * dir.z);
                 if (!this.emitFromShell) {
-                    p.scaleNumber(Math.random());
+                    var rand = Math.random();
+                    p.x *= rand;
+                    p.y *= rand;
+                    p.z *= rand;
                 }
-                particle.position.copy(p);
-                particle.velocity.copy(dir).scaleNumber(speed);
+                particle.position.x = p.x;
+                particle.position.y = p.y;
+                particle.position.z = p.z;
+                particle.velocity.x = dir.x * speed;
+                particle.velocity.y = dir.y * speed;
+                particle.velocity.z = dir.z * speed;
             };
             return ParticleSystemShapeSphere;
         }(framework.ParticleSystemShapeBase));
@@ -34190,15 +34198,23 @@ var gd3d;
                 return _this;
             }
             ParticleSystemShapeHemisphere.prototype.initParticleState = function (particle) {
-                var speed = particle.velocity.length;
-                var dir = Vector3.random().scaleNumber(2).subNumber(1).normalize();
+                var speed = gd3d.math.vec3Length(particle.velocity);
+                var dir = new gd3d.math.vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+                gd3d.math.vec3Normalize(dir, dir);
                 dir.z = Math.abs(dir.z);
-                var p = dir.scaleNumberTo(this.radius);
+                var p = new gd3d.math.vector3(this.radius * dir.x, this.radius * dir.y, this.radius * dir.z);
                 if (!this.emitFromShell) {
-                    p.scaleNumber(Math.random());
+                    var rand = Math.random();
+                    p.x *= rand;
+                    p.y *= rand;
+                    p.z *= rand;
                 }
-                particle.position.copy(p);
-                particle.velocity.copy(dir).scaleNumber(speed);
+                particle.position.x = p.x;
+                particle.position.y = p.y;
+                particle.position.z = p.z;
+                particle.velocity.x = dir.x * speed;
+                particle.velocity.y = dir.y * speed;
+                particle.velocity.z = dir.z * speed;
             };
             return ParticleSystemShapeHemisphere;
         }(framework.ParticleSystemShapeBase));
