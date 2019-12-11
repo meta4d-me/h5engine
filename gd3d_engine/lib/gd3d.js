@@ -32558,18 +32558,26 @@ var gd3d;
             };
             ParticleRotationBySpeedModule.prototype.updateParticleState = function (particle) {
                 var preAngularVelocity = particle[_RotationBySpeed_preAngularVelocity];
-                particle.angularVelocity.sub(preAngularVelocity);
-                preAngularVelocity.set(0, 0, 0);
+                particle.angularVelocity.x -= preAngularVelocity.x;
+                particle.angularVelocity.y -= preAngularVelocity.y;
+                particle.angularVelocity.z -= preAngularVelocity.z;
+                preAngularVelocity.x = 0;
+                preAngularVelocity.y = 0;
+                preAngularVelocity.z = 0;
                 if (!this.enabled)
                     return;
-                var velocity = particle.velocity.length;
+                var velocity = gd3d.math.vec3Length(particle.velocity);
                 var rate = gd3d.math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
                 var v = this.angularVelocity.getValue(rate, particle[_RotationBySpeed_rate]);
                 if (!this.separateAxes) {
                     v.x = v.y = 0;
                 }
-                particle.angularVelocity.add(v);
-                preAngularVelocity.copy(v);
+                particle.angularVelocity.x += v.x;
+                particle.angularVelocity.y += v.y;
+                particle.angularVelocity.z += v.z;
+                preAngularVelocity.x = v.x;
+                preAngularVelocity.y = v.x;
+                preAngularVelocity.z = v.x;
             };
             return ParticleRotationBySpeedModule;
         }(framework.ParticleModule));
