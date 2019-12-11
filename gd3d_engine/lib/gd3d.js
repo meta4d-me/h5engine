@@ -32085,7 +32085,9 @@ var gd3d;
                 if (this.mode != framework.ParticleSystemInheritVelocityMode.Initial)
                     return;
                 var multiplier = this.multiplier.getValue(particle.rateAtLifeTime, particle[_InheritVelocity_rate]);
-                particle.velocity.addScaledVector(multiplier, this.particleSystem.speed);
+                particle.velocity.x += multiplier * this.particleSystem.speed.x;
+                particle.velocity.y += multiplier * this.particleSystem.speed.y;
+                particle.velocity.z += multiplier * this.particleSystem.speed.z;
             };
             ParticleInheritVelocityModule.prototype.updateParticleState = function (particle) {
                 if (!this.enabled)
@@ -32095,7 +32097,9 @@ var gd3d;
                 if (this.mode != framework.ParticleSystemInheritVelocityMode.Current)
                     return;
                 var multiplier = this.multiplier.getValue(particle.rateAtLifeTime, particle[_InheritVelocity_rate]);
-                particle.position.addScaledVector(multiplier, this.particleSystem.moveVec);
+                particle.position.x += multiplier * this.particleSystem.moveVec.x;
+                particle.position.y += multiplier * this.particleSystem.moveVec.y;
+                particle.position.z += multiplier * this.particleSystem.moveVec.z;
             };
             return ParticleInheritVelocityModule;
         }(framework.ParticleModule));
@@ -33782,8 +33786,8 @@ var gd3d;
                 configurable: true
             });
             ParticleSystemShapeBox.prototype.initParticleState = function (particle) {
-                var speed = particle.velocity.length;
-                var p = new Vector3(this.boxX, this.boxY, this.boxZ).multiply(Vector3.random().scaleNumber(2).subNumber(1));
+                var speed = gd3d.math.vec3Length(particle.velocity);
+                var p = new gd3d.math.vector3(this.boxX * (Math.random() * 2 - 1), this.boxY * (Math.random() * 2 - 1), this.boxZ * (Math.random() * 2 - 1));
                 if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Shell) {
                     var max = Math.max(Math.abs(p.x), Math.abs(p.y), Math.abs(p.z));
                     if (Math.abs(p.x) == max) {
@@ -33811,9 +33815,13 @@ var gd3d;
                         p.y = p.y < 0 ? -1 : 1;
                     }
                 }
-                particle.position.copy(p);
-                var dir = new Vector3(0, 0, 1);
-                particle.velocity.copy(dir).scaleNumber(speed);
+                particle.position.x = p.x;
+                particle.position.y = p.y;
+                particle.position.z = p.z;
+                var dir = new gd3d.math.vector3(0, 0, 1);
+                particle.velocity.x = dir.x * speed;
+                particle.velocity.y = dir.y * speed;
+                particle.velocity.z = dir.z * speed;
             };
             return ParticleSystemShapeBox;
         }(framework.ParticleSystemShapeBase));
@@ -33999,7 +34007,7 @@ var gd3d;
                 configurable: true
             });
             ParticleSystemShapeCone.prototype.initParticleState = function (particle) {
-                var speed = particle.velocity.length;
+                var speed = gd3d.math.vec3Length(particle.velocity);
                 var radius = this.radius;
                 var angle = this.angle;
                 var arc = this.arc;
@@ -34028,15 +34036,19 @@ var gd3d;
                     radiusRate = Math.random();
                 }
                 var basePos = new gd3d.math.vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
-                var bottomPos = basePos.scaleNumberTo(radius).scaleNumber(radiusRate);
-                var topPos = basePos.scaleNumberTo(radius + this.length * Math.tan(gd3d.math.degToRad(angle))).scaleNumber(radiusRate);
-                topPos.z = this.length;
-                particle.velocity.copy(topPos.subTo(bottomPos).normalize(speed));
-                var position = bottomPos.clone();
+                var bottomPos = new gd3d.math.vector3(basePos.x * radius * radiusRate, basePos.y * radius * radiusRate, 0);
+                var scale = (radius + this.length * Math.tan(gd3d.math.degToRad(angle))) * radiusRate;
+                var topPos = new gd3d.math.vector3(basePos.x * scale, basePos.y * scale, this.length);
+                gd3d.math.vec3Subtract(topPos, bottomPos, particle.velocity);
+                gd3d.math.vec3Normalize(particle.velocity, particle.velocity);
+                gd3d.math.vec3ScaleByNum(particle.velocity, speed, particle.velocity);
+                var position = new gd3d.math.vector3(bottomPos.x, bottomPos.y, bottomPos.z);
                 if (this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.Volume || this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.VolumeShell) {
-                    position.lerpNumber(topPos, Math.random());
+                    gd3d.math.vec3SLerp(position, topPos, Math.random(), position);
                 }
-                particle.position.copy(position);
+                particle.position.x = position.x;
+                particle.position.y = position.y;
+                particle.position.z = position.z;
             };
             return ParticleSystemShapeCone;
         }(framework.ParticleSystemShapeBase));
