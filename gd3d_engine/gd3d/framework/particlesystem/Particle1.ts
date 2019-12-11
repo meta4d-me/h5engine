@@ -56,12 +56,12 @@ namespace gd3d.framework
 		/**
 		 * 颜色
 		 */
-		color = new Color4();
+		color = new math.color();
 
 		/**
 		 * 起始颜色
 		 */
-		startColor = new Color4();
+		startColor = new math.color();
 
 		/**
 		 * 纹理UV缩放和偏移。

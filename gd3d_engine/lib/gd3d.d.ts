@@ -5656,8 +5656,8 @@ declare namespace gd3d.framework {
         angularVelocity: Vector3;
         size: Vector3;
         startSize: Vector3;
-        color: Color4;
-        startColor: Color4;
+        color: math.color;
+        startColor: math.color;
         tilingOffset: math.vector4;
         flipUV: math.vector2;
         birthRateAtDuration: number;
@@ -5934,7 +5934,7 @@ declare namespace gd3d.framework {
         static WHITE: Color3;
         static BLACK: Color3;
         static fromUnit(color: number): Color3;
-        static fromColor4(color4: Color4): Color3;
+        static fromColor4(color4: math.color): Color3;
         r: number;
         g: number;
         b: number;
@@ -5949,7 +5949,6 @@ declare namespace gd3d.framework {
         scaleTo(s: number, vout?: Color3): Color3;
         copy(color: Color3): this;
         clone(): Color3;
-        toColor4(color4?: Color4): Color4;
         toString(): string;
         static ToHex(i: number): string;
     }
@@ -6103,33 +6102,6 @@ declare namespace gd3d.framework {
         'yellow': number;
         'yellowgreen': number;
     };
-}
-declare namespace gd3d.framework {
-    class Color4 {
-        __class__: "gd3d.framework.Color4";
-        static WHITE: Color4;
-        static BLACK: Color4;
-        static fromUnit(color: number): Color4;
-        static fromUnit24(color: number, a?: number): Color4;
-        static fromColor3(color3: Color3, a?: number): Color4;
-        r: number;
-        g: number;
-        b: number;
-        a: number;
-        constructor(r?: number, g?: number, b?: number, a?: number);
-        setTo(r: number, g: number, b: number, a?: number): this;
-        fromUnit(color: number): this;
-        toInt(): number;
-        toHexString(): string;
-        mix(color: Color4, rate?: number): this;
-        mixTo(color: Color4, rate: number, vout?: Color4): Color4;
-        multiply(c: Color4): this;
-        multiplyTo(v: Color4, vout?: Color4): Color4;
-        copy(color: Color4): this;
-        toString(): string;
-        toColor3(color?: Color3): Color3;
-        clone(): Color4;
-    }
 }
 declare namespace gd3d.framework {
     var equationSolving: EquationSolving;
@@ -6339,7 +6311,7 @@ declare namespace gd3d.framework {
         alphaKeys: GradientAlphaKey[];
         colorKeys: GradientColorKey[];
         fromColors(colors: number[], times?: number[]): this;
-        getValue(time: number): Color4;
+        getValue(time: number): math.color;
         getAlpha(time: number): number;
         getColor(time: number): Color3;
     }
@@ -6366,13 +6338,13 @@ declare namespace gd3d.framework {
     class MinMaxGradient {
         __class__: "gd3d.framework.MinMaxGradient";
         mode: MinMaxGradientMode;
-        color: Color4;
-        colorMin: Color4;
-        colorMax: Color4;
+        color: math.color;
+        colorMin: math.color;
+        colorMax: math.color;
         gradient: Gradient;
         gradientMin: Gradient;
         gradientMax: Gradient;
-        getValue(time: number, randomBetween?: number): Color4;
+        getValue(time: number, randomBetween?: number, out?: math.color): math.color;
     }
 }
 declare namespace gd3d.framework {

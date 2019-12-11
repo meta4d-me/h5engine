@@ -494,7 +494,7 @@ namespace gd3d.framework
             }
             particle.angularVelocity.set(0, 0, 0);
             //
-            particle.startColor.copy(this.startColor.getValue(birthRateAtDuration));
+            math.colorClone(this.startColor.getValue(birthRateAtDuration), particle.startColor);
         }
 
         /**
@@ -508,7 +508,7 @@ namespace gd3d.framework
             this.particleSystem.addParticleAcceleration(particle, gravity, ParticleSystemSimulationSpace.World, _Main_preGravity);
             //
             particle.size.copy(particle.startSize);
-            particle.color.copy(particle.startColor);
+            math.colorClone(particle.startColor, particle.color);
         }
     }
 

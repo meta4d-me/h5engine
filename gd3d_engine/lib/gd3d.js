@@ -29883,8 +29883,8 @@ var gd3d;
                 this.angularVelocity = new framework.Vector3();
                 this.size = new framework.Vector3(1, 1, 1);
                 this.startSize = new framework.Vector3(1, 1, 1);
-                this.color = new framework.Color4();
-                this.startColor = new framework.Color4();
+                this.color = new gd3d.math.color();
+                this.startColor = new gd3d.math.color();
                 this.tilingOffset = new gd3d.math.vector4(1, 1, 0, 0);
                 this.flipUV = new gd3d.math.vector2();
                 this.cache = {};
@@ -31006,13 +31006,6 @@ var gd3d;
             Color3.prototype.clone = function () {
                 return new Color3(this.r, this.g, this.b);
             };
-            Color3.prototype.toColor4 = function (color4) {
-                if (color4 === void 0) { color4 = new framework.Color4(); }
-                color4.r = this.r;
-                color4.g = this.g;
-                color4.b = this.b;
-                return color4;
-            };
             Color3.prototype.toString = function () {
                 return "{R: " + this.r + " G:" + this.g + " B:" + this.b + "}";
             };
@@ -31054,112 +31047,6 @@ var gd3d;
             'springgreen': 0x00FF7F, 'steelblue': 0x4682B4, 'tan': 0xD2B48C, 'teal': 0x008080, 'thistle': 0xD8BFD8, 'tomato': 0xFF6347, 'turquoise': 0x40E0D0,
             'violet': 0xEE82EE, 'wheat': 0xF5DEB3, 'white': 0xFFFFFF, 'whitesmoke': 0xF5F5F5, 'yellow': 0xFFFF00, 'yellowgreen': 0x9ACD32
         };
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var Color4 = (function () {
-            function Color4(r, g, b, a) {
-                if (r === void 0) { r = 1; }
-                if (g === void 0) { g = 1; }
-                if (b === void 0) { b = 1; }
-                if (a === void 0) { a = 1; }
-                this.r = 1;
-                this.g = 1;
-                this.b = 1;
-                this.a = 1;
-                this.r = r;
-                this.g = g;
-                this.b = b;
-                this.a = a;
-            }
-            Color4.fromUnit = function (color) {
-                return new Color4().fromUnit(color);
-            };
-            Color4.fromUnit24 = function (color, a) {
-                if (a === void 0) { a = 1; }
-                return Color4.fromColor3(framework.Color3.fromUnit(color), a);
-            };
-            Color4.fromColor3 = function (color3, a) {
-                if (a === void 0) { a = 1; }
-                return new Color4(color3.r, color3.g, color3.b, a);
-            };
-            Color4.prototype.setTo = function (r, g, b, a) {
-                if (a === void 0) { a = 1; }
-                this.r = r;
-                this.g = g;
-                this.b = b;
-                this.a = a;
-                return this;
-            };
-            Color4.prototype.fromUnit = function (color) {
-                this.a = ((color >> 24) & 0xff) / 0xff;
-                this.r = ((color >> 16) & 0xff) / 0xff;
-                this.g = ((color >> 8) & 0xff) / 0xff;
-                this.b = (color & 0xff) / 0xff;
-                return this;
-            };
-            Color4.prototype.toInt = function () {
-                var value = ((this.a * 0xff) << 24) + ((this.r * 0xff) << 16) + ((this.g * 0xff) << 8) + (this.b * 0xff);
-                return value;
-            };
-            Color4.prototype.toHexString = function () {
-                var intR = (this.r * 0xff) | 0;
-                var intG = (this.g * 0xff) | 0;
-                var intB = (this.b * 0xff) | 0;
-                var intA = (this.a * 0xff) | 0;
-                return "#" + framework.Color3.ToHex(intA) + framework.Color3.ToHex(intR) + framework.Color3.ToHex(intG) + framework.Color3.ToHex(intB);
-            };
-            Color4.prototype.mix = function (color, rate) {
-                if (rate === void 0) { rate = 0.5; }
-                this.r = this.r * (1 - rate) + color.r * rate;
-                this.g = this.g * (1 - rate) + color.g * rate;
-                this.b = this.b * (1 - rate) + color.b * rate;
-                this.a = this.a * (1 - rate) + color.a * rate;
-                return this;
-            };
-            Color4.prototype.mixTo = function (color, rate, vout) {
-                if (vout === void 0) { vout = new Color4(); }
-                return vout.copy(this).mix(color, rate);
-            };
-            Color4.prototype.multiply = function (c) {
-                this.r *= c.r;
-                this.g *= c.g;
-                this.b *= c.b;
-                this.a *= c.a;
-                return this;
-            };
-            Color4.prototype.multiplyTo = function (v, vout) {
-                if (vout === void 0) { vout = new Color4(); }
-                return vout.copy(this).multiply(v);
-            };
-            Color4.prototype.copy = function (color) {
-                this.r = color.r;
-                this.g = color.g;
-                this.b = color.b;
-                this.a = color.a;
-                return this;
-            };
-            Color4.prototype.toString = function () {
-                return "{R: " + this.r + " G:" + this.g + " B:" + this.b + " A:" + this.a + "}";
-            };
-            Color4.prototype.toColor3 = function (color) {
-                if (color === void 0) { color = new framework.Color3(); }
-                color.r = this.r;
-                color.g = this.g;
-                color.b = this.b;
-                return color;
-            };
-            Color4.prototype.clone = function () {
-                return new Color4(this.r, this.g, this.b, this.a);
-            };
-            Color4.WHITE = new Color4();
-            Color4.BLACK = new Color4(0, 0, 0);
-            return Color4;
-        }());
-        framework.Color4 = Color4;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -32293,7 +32180,7 @@ var gd3d;
             Gradient.prototype.getValue = function (time) {
                 var alpha = this.getAlpha(time);
                 var color = this.getColor(time);
-                return new framework.Color4(color.r, color.g, color.b, alpha);
+                return new gd3d.math.color(color.r, color.g, color.b, alpha);
             };
             Gradient.prototype.getAlpha = function (time) {
                 var alphaKeys = this.alphaKeys;
@@ -32362,32 +32249,37 @@ var gd3d;
         var MinMaxGradient = (function () {
             function MinMaxGradient() {
                 this.mode = framework.MinMaxGradientMode.Color;
-                this.color = new framework.Color4();
-                this.colorMin = new framework.Color4();
-                this.colorMax = new framework.Color4();
+                this.color = new gd3d.math.color();
+                this.colorMin = new gd3d.math.color();
+                this.colorMax = new gd3d.math.color();
                 this.gradient = new framework.Gradient();
                 this.gradientMin = new framework.Gradient();
                 this.gradientMax = new framework.Gradient();
             }
-            MinMaxGradient.prototype.getValue = function (time, randomBetween) {
+            MinMaxGradient.prototype.getValue = function (time, randomBetween, out) {
                 if (randomBetween === void 0) { randomBetween = Math.random(); }
+                if (out === void 0) { out = new gd3d.math.color(); }
                 switch (this.mode) {
                     case framework.MinMaxGradientMode.Color:
-                        return this.color;
+                        gd3d.math.colorClone(this.color, out);
+                        break;
                     case framework.MinMaxGradientMode.Gradient:
-                        return this.gradient.getValue(time);
+                        gd3d.math.colorClone(this.gradient.getValue(time), out);
+                        break;
                     case framework.MinMaxGradientMode.TwoColors:
-                        return this.colorMin.mixTo(this.colorMax, randomBetween);
+                        gd3d.math.colorLerp(this.colorMin, this.colorMax, randomBetween, out);
+                        break;
                     case framework.MinMaxGradientMode.TwoGradients:
                         var min = this.gradientMin.getValue(time);
                         var max = this.gradientMax.getValue(time);
-                        var v = min.mixTo(max, randomBetween);
-                        return v;
+                        gd3d.math.colorLerp(min, max, randomBetween, out);
+                        break;
                     case framework.MinMaxGradientMode.RandomColor:
                         var v = this.gradient.getValue(randomBetween);
-                        return v;
+                        gd3d.math.colorClone(v, out);
+                        break;
                 }
-                return this.color;
+                return out;
             };
             return MinMaxGradient;
         }());
@@ -32449,7 +32341,7 @@ var gd3d;
                 var velocity = particle.velocity.length;
                 var rate = gd3d.math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
                 var color = this.color.getValue(rate, particle[_ColorBySpeed_rate]);
-                particle.color.multiply(color);
+                gd3d.math.colorMultiply(particle.color, color, particle.color);
             };
             return ParticleColorBySpeedModule;
         }(framework.ParticleModule));
@@ -32474,7 +32366,8 @@ var gd3d;
             ParticleColorOverLifetimeModule.prototype.updateParticleState = function (particle) {
                 if (!this.enabled)
                     return;
-                particle.color.multiply(this.color.getValue(particle.rateAtLifeTime, particle[_ColorOverLifetime_rate]));
+                var color = this.color.getValue(particle.rateAtLifeTime, particle[_ColorOverLifetime_rate]);
+                gd3d.math.colorMultiply(particle.color, color, particle.color);
             };
             return ParticleColorOverLifetimeModule;
         }(framework.ParticleModule));
@@ -33051,13 +32944,13 @@ var gd3d;
                     particle.rotation.set(0, 0, startRotation);
                 }
                 particle.angularVelocity.set(0, 0, 0);
-                particle.startColor.copy(this.startColor.getValue(birthRateAtDuration));
+                gd3d.math.colorClone(this.startColor.getValue(birthRateAtDuration), particle.startColor);
             };
             ParticleMainModule.prototype.updateParticleState = function (particle) {
                 var gravity = world_gravity.scaleNumberTo(this.gravityModifier.getValue(this.particleSystem.rateAtDuration));
                 this.particleSystem.addParticleAcceleration(particle, gravity, framework.ParticleSystemSimulationSpace.World, _Main_preGravity);
                 particle.size.copy(particle.startSize);
-                particle.color.copy(particle.startColor);
+                gd3d.math.colorClone(particle.startColor, particle.color);
             };
             return ParticleMainModule;
         }(framework.ParticleModule));

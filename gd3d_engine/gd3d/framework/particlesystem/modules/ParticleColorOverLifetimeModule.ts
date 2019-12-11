@@ -13,7 +13,7 @@ namespace gd3d.framework
          * The gradient controlling the particle colors.
          * 控制粒子颜色的梯度。
          */
-        
+
         color = new MinMaxGradient();
 
         /**
@@ -33,7 +33,8 @@ namespace gd3d.framework
         {
             if (!this.enabled) return;
 
-            particle.color.multiply(this.color.getValue(particle.rateAtLifeTime, particle[_ColorOverLifetime_rate]));
+            var color = this.color.getValue(particle.rateAtLifeTime, particle[_ColorOverLifetime_rate]);
+            math.colorMultiply(particle.color, color, particle.color);
         }
     }
 

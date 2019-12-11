@@ -17,7 +17,7 @@ namespace gd3d.framework
             return new Color3().fromUnit(color);
         }
 
-        static fromColor4(color4: Color4)
+        static fromColor4(color4: math.color)
         {
             return new Color3(color4.r, color4.g, color4.b);
         }
@@ -144,14 +144,6 @@ namespace gd3d.framework
         clone()
         {
             return new Color3(this.r, this.g, this.b);
-        }
-
-        toColor4(color4 = new Color4())
-        {
-            color4.r = this.r;
-            color4.g = this.g;
-            color4.b = this.b;
-            return color4;
         }
 
         /**

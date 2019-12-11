@@ -43,7 +43,7 @@ namespace gd3d.framework
             var velocity = particle.velocity.length;
             var rate = math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
             var color = this.color.getValue(rate, particle[_ColorBySpeed_rate]);
-            particle.color.multiply(color);
+            math.colorMultiply(particle.color, color, particle.color);
         }
 
     }

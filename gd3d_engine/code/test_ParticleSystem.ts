@@ -1,3 +1,11 @@
+namespace gd3d.math
+{
+    export interface color
+    {
+        "__class__":"gd3d.math.color"
+    }
+}
+
 /** 
  * 粒子系統示例
  */

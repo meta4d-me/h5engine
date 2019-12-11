@@ -610,6 +610,11 @@ declare class test_Decal implements IState {
     private Y_ag;
     update(delta: number): void;
 }
+declare namespace gd3d.math {
+    interface color {
+        "__class__": "gd3d.math.color";
+    }
+}
 declare class test_ParticleSystem implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
