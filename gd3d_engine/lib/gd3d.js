@@ -33512,129 +33512,6 @@ var gd3d;
         framework.ParticleEmissionBurst = ParticleEmissionBurst;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
-Object.isBaseType = function (object) {
-    if (object == undefined
-        || object == null
-        || typeof object == "boolean"
-        || typeof object == "string"
-        || typeof object == "number")
-        return true;
-};
-Object.getPropertyDescriptor = function (host, property) {
-    var data = Object.getOwnPropertyDescriptor(host, property);
-    if (data) {
-        return data;
-    }
-    var prototype = Object.getPrototypeOf(host);
-    if (prototype) {
-        return Object.getPropertyDescriptor(prototype, property);
-    }
-    return null;
-};
-Object.propertyIsWritable = function (host, property) {
-    var data = Object.getPropertyDescriptor(host, property);
-    if (!data)
-        return false;
-    if (data.get && !data.set)
-        return false;
-    return true;
-};
-Object.runFunc = function (obj, func) {
-    func(obj);
-    return obj;
-};
-Object.isObject = function (obj) {
-    return obj != null && (obj.constructor == Object || (obj.constructor.name == "Object"));
-};
-Object.getPropertyValue = function (object, property) {
-    if (typeof property == "string")
-        property = property.split(".");
-    var value = object;
-    var len = property.length;
-    for (var i = 0; i < property.length; i++) {
-        if (value == null)
-            return undefined;
-        value = value[property[i]];
-    }
-    return value;
-};
-Object.getPropertyChains = function (object) {
-    var result = [];
-    var propertys = Object.keys(object);
-    var hosts = new Array(propertys.length).fill(object);
-    var parentPropertyIndices = new Array(propertys.length).fill(-1);
-    var index = 0;
-    while (index < propertys.length) {
-        var host = hosts[index];
-        var cp = propertys[index];
-        var cv = host[cp];
-        var vks;
-        if (cv == null || Object.isBaseType(cv) || (vks = Object.keys(cv)).length == 0) {
-            var ps = [cp];
-            var ci = index;
-            while ((ci = parentPropertyIndices[ci]) != -1) {
-                ps.push(propertys[ci]);
-            }
-            ps.reverse();
-            result.push(ps.join("."));
-        }
-        else {
-            vks.forEach(function (k) {
-                propertys.push(k);
-                hosts.push(cv);
-                parentPropertyIndices.push(index);
-            });
-        }
-        index++;
-    }
-    return result;
-};
-Object.assignShallow = function (target, source) {
-    if (source == null)
-        return target;
-    var keys = Object.keys(source);
-    keys.forEach(function (k) {
-        target[k] = source[k];
-    });
-    return target;
-};
-Object.assignDeep = function (target, source, replacers, deep) {
-    if (replacers === void 0) { replacers = []; }
-    if (deep === void 0) { deep = Number.MAX_SAFE_INTEGER; }
-    if (source == null)
-        return target;
-    if (deep < 1)
-        return target;
-    var keys = Object.keys(source);
-    keys.forEach(function (k) {
-        var handles = [].concat(replacers).concat(Object.assignDeepDefaultHandlers);
-        for (var i = 0; i < handles.length; i++) {
-            if (handles[i](target, source, k, replacers, deep)) {
-                return;
-            }
-        }
-        target[k] = source[k];
-    });
-    return target;
-};
-Object.assignDeepDefaultHandlers = [
-    function (target, source, key) {
-        if (target[key] == source[key])
-            return true;
-    },
-    function (target, source, key) {
-        if (Object.isBaseType(target[key]) || Object.isBaseType(source[key])) {
-            target[key] = source[key];
-            return true;
-        }
-    },
-    function (target, source, key, handlers, deep) {
-        if (Array.isArray(source[key]) || Object.isObject(source[key])) {
-            Object.assignDeep(target[key], source[key], handlers, deep - 1);
-            return true;
-        }
-    },
-];
 var gd3d;
 (function (gd3d) {
     var framework;
@@ -34326,7 +34203,7 @@ var gd3d;
             priority: 0,
             handler: function (target, source, property) {
                 var spv = source[property];
-                if (Object.isBaseType(spv)) {
+                if (framework.ObjectUtil.isBaseType(spv)) {
                     target[property] = spv;
                     return true;
                 }
@@ -34386,7 +34263,7 @@ var gd3d;
             priority: 0,
             handler: function (target, source, property, handlers, serialization) {
                 var spv = source[property];
-                if (Object.isObject(spv)) {
+                if (framework.ObjectUtil.isObject(spv)) {
                     var object_1 = {};
                     var keys = Object.keys(spv);
                     keys.forEach(function (key) {
@@ -34426,7 +34303,7 @@ var gd3d;
             priority: 0,
             handler: function (target, source, property) {
                 var spv = source[property];
-                if (Object.isBaseType(spv)) {
+                if (framework.ObjectUtil.isBaseType(spv)) {
                     target[property] = spv;
                     return true;
                 }
@@ -34446,7 +34323,7 @@ var gd3d;
             priority: 0,
             handler: function (target, source, property) {
                 var spv = source[property];
-                if (!Object.isObject(spv) && !Array.isArray(spv)) {
+                if (!framework.ObjectUtil.isObject(spv) && !Array.isArray(spv)) {
                     target[property] = spv;
                     return true;
                 }
@@ -34472,7 +34349,7 @@ var gd3d;
             handler: function (target, source, property, handlers, serialization) {
                 var tpv = target[property];
                 var spv = source[property];
-                if (Object.isObject(spv) && spv[framework.CLASS_KEY] == null) {
+                if (framework.ObjectUtil.isObject(spv) && spv[framework.CLASS_KEY] == null) {
                     var obj = {};
                     if (tpv)
                         obj = tpv;
@@ -34547,7 +34424,7 @@ var gd3d;
                 priority: 0,
                 handler: function (target, source, property, different, handlers, serialization) {
                     var tpv = target[property];
-                    if (Object.isBaseType(tpv)) {
+                    if (framework.ObjectUtil.isBaseType(tpv)) {
                         different[property] = tpv;
                         return true;
                     }
@@ -34629,7 +34506,7 @@ var gd3d;
                 handler: function (target, source, property, handlers) {
                     var tpv = target[property];
                     var spv = source[property];
-                    if (Object.isBaseType(spv)) {
+                    if (framework.ObjectUtil.isBaseType(spv)) {
                         target[property] = spv;
                         return true;
                     }
@@ -34658,7 +34535,7 @@ var gd3d;
                 handler: function (target, source, property, handlers, serialization) {
                     var tpv = target[property];
                     var spv = source[property];
-                    if (!Object.isObject(spv)) {
+                    if (!framework.ObjectUtil.isObject(spv)) {
                         target[property] = serialization.deserialize(spv);
                         return true;
                     }
@@ -34670,7 +34547,7 @@ var gd3d;
                 handler: function (target, source, property, handlers, serialization) {
                     var tpv = target[property];
                     var spv = source[property];
-                    if (Object.isObject(spv) && spv[framework.CLASS_KEY] == undefined) {
+                    if (framework.ObjectUtil.isObject(spv) && spv[framework.CLASS_KEY] == undefined) {
                         console.assert(!!tpv);
                         var keys = Object.keys(spv);
                         keys.forEach(function (key) {
@@ -39079,6 +38956,29 @@ var gd3d;
             return NumberUtil;
         }());
         framework.NumberUtil = NumberUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ObjectUtil = (function () {
+            function ObjectUtil() {
+            }
+            ObjectUtil.isBaseType = function (object) {
+                if (object == undefined
+                    || object == null
+                    || typeof object == "boolean"
+                    || typeof object == "string"
+                    || typeof object == "number")
+                    return true;
+            };
+            ObjectUtil.isObject = function (obj) {
+                return obj != null && (obj.constructor == Object || (obj.constructor.name == "Object"));
+            };
+            return ObjectUtil;
+        }());
+        framework.ObjectUtil = ObjectUtil;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

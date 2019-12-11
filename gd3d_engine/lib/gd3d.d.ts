@@ -6393,21 +6393,6 @@ declare namespace gd3d.framework {
         calculateProbability(): boolean;
     }
 }
-interface AssignDeepHandler {
-    (target: any, source: any, key: string, replacers: AssignDeepHandler[], deep: number): boolean;
-}
-interface ObjectConstructor {
-    getPropertyDescriptor(object: Object, property: string): PropertyDescriptor;
-    propertyIsWritable(obj: Object, property: string): boolean;
-    isBaseType(object: any): boolean;
-    isObject(object: any): boolean;
-    getPropertyValue(object: Object, property: string | string[]): any;
-    getPropertyChains(object: Object): string[];
-    assignShallow<T>(target: T, source: Partial<T>): T;
-    assignDeep<T>(target: T, source: gd3d.framework.gPartial<T>, handlers?: AssignDeepHandler | AssignDeepHandler[], deep?: number): T;
-    runFunc<T>(obj: T, func: (obj: T) => void): T;
-    assignDeepDefaultHandlers: AssignDeepHandler[];
-}
 declare namespace gd3d.framework {
     type gPartial<T> = {
         [P in keyof T]?: gPartial<T[P]>;
@@ -7479,6 +7464,12 @@ declare namespace gd3d.framework {
         static KEY_r: number;
         static KEY_s: number;
         static KEY_w: number;
+    }
+}
+declare namespace gd3d.framework {
+    class ObjectUtil {
+        static isBaseType(object: any): boolean;
+        static isObject(obj: any): boolean;
     }
 }
 declare namespace gd3d.framework {

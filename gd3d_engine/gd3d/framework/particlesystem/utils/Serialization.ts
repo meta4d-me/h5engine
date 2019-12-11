@@ -242,7 +242,7 @@ namespace gd3d.framework
             handler: function (target, source, property)
             {
                 var spv = source[property];
-                if (Object.isBaseType(spv))
+                if (ObjectUtil.isBaseType(spv))
                 {
                     target[property] = spv;
                     return true;
@@ -323,7 +323,7 @@ namespace gd3d.framework
             handler: function (target, source, property, handlers, serialization)
             {
                 var spv = source[property];
-                if (Object.isObject(spv))
+                if (ObjectUtil.isObject(spv))
                 {
                     let object = <any>{};
                     let keys = Object.keys(spv);
@@ -377,7 +377,7 @@ namespace gd3d.framework
             handler: function (target, source, property)
             {
                 var spv = source[property];
-                if (Object.isBaseType(spv))
+                if (ObjectUtil.isBaseType(spv))
                 {
                     target[property] = spv;
                     return true;
@@ -405,7 +405,7 @@ namespace gd3d.framework
             handler: function (target, source, property)
             {
                 var spv = source[property];
-                if (!Object.isObject(spv) && !Array.isArray(spv))
+                if (!ObjectUtil.isObject(spv) && !Array.isArray(spv))
                 {
                     target[property] = spv;
                     return true;
@@ -440,7 +440,7 @@ namespace gd3d.framework
             {
                 var tpv = target[property];
                 var spv = source[property];
-                if (Object.isObject(spv) && spv[CLASS_KEY] == null)
+                if (ObjectUtil.isObject(spv) && spv[CLASS_KEY] == null)
                 {
                     var obj = {};
                     if (tpv) obj = tpv;
@@ -540,7 +540,7 @@ namespace gd3d.framework
             handler: function (target, source, property, different, handlers, serialization)
             {
                 let tpv = target[property];
-                if (Object.isBaseType(tpv))
+                if (ObjectUtil.isBaseType(tpv))
                 {
                     different[property] = tpv;
                     return true;
@@ -647,7 +647,7 @@ namespace gd3d.framework
             {
                 var tpv = target[property];
                 var spv = source[property];
-                if (Object.isBaseType(spv))
+                if (ObjectUtil.isBaseType(spv))
                 {
                     target[property] = spv;
                     return true;
@@ -683,7 +683,7 @@ namespace gd3d.framework
             {
                 var tpv = target[property];
                 var spv = source[property];
-                if (!Object.isObject(spv))
+                if (!ObjectUtil.isObject(spv))
                 {
                     target[property] = serialization.deserialize(spv);
                     return true;
@@ -698,7 +698,7 @@ namespace gd3d.framework
             {
                 var tpv = target[property];
                 var spv = source[property];
-                if (Object.isObject(spv) && spv[CLASS_KEY] == undefined)
+                if (ObjectUtil.isObject(spv) && spv[CLASS_KEY] == undefined)
                 {
                     console.assert(!!tpv);
                     var keys = Object.keys(spv);
