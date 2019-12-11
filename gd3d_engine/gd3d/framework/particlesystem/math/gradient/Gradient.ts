@@ -29,31 +29,7 @@ namespace gd3d.framework
          * 注： 该值已对时间排序，否则赋值前请使用 sort((a, b) => a.time - b.time) 进行排序
          */
 
-        colorKeys: GradientColorKey[] = [{ color: new Color3(1, 1, 1), time: 0 }, { color: new Color3(1, 1, 1), time: 1 }];
-
-        /**
-         * 从颜色列表初始化
-         * @param colors 颜色列表
-         * @param times  
-         */
-        fromColors(colors: number[], times?: number[])
-        {
-            if (!times)
-            {
-                times = [];
-                for (let i = 0; i < colors.length; i++)
-                {
-                    times[i] = i / (colors.length - 1);
-                }
-            }
-
-            var colors1 = colors.map(v => new Color3().fromUnit(v));
-            for (let i = 0; i < colors1.length; i++)
-            {
-                this.colorKeys[i] = { color: colors1[i], time: times[i] };
-            }
-            return this;
-        }
+        colorKeys: GradientColorKey[] = [{ color: new math.color(1, 1, 1), time: 0 }, { color: new math.color(1, 1, 1), time: 1 }];
 
         /**
          * 获取值
@@ -110,10 +86,11 @@ namespace gd3d.framework
                 if (t < time && time < nt)
                 {
                     if (this.mode == GradientMode.Fixed) return nv;
-                    return v.mixTo(nv, (time - t) / (nt - t));
+                    math.colorLerp(v, nv, (time - t) / (nt - t), v);
+                    return v;
                 }
             }
-            return new Color3();
+            return new math.color();
         }
     }
 }
