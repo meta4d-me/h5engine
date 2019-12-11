@@ -311,18 +311,45 @@ namespace gd3d.framework
                 math.vec3ScaleByNum(rotation, 180 / Math.PI, rotation);
 
                 //
-                particle.rotation.set(rotation.x, rotation.y, rotation.z);
+                particle.rotation.x = rotation.x;
+                particle.rotation.y = rotation.y;
+                particle.rotation.z = rotation.z;
             }
-            var length = particle.velocity.length;
+            var length = math.vec3Length(particle.velocity);
+            var velocity = new math.vector3();
             if (this.randomDirectionAmount > 0)
             {
-                var velocity = Vector3.random().scaleNumber(2).subNumber(1).normalize(length);
-                particle.velocity.lerpNumber(velocity, this.randomDirectionAmount).normalize(length);
+                velocity.x = Math.random() * 2 - 1;
+                velocity.y = Math.random() * 2 - 1;
+                velocity.z = Math.random() * 2 - 1;
+                var len = math.vec3Length(velocity);
+                velocity.x = velocity.x / len * length;
+                velocity.y = velocity.y / len * length;
+                velocity.z = velocity.z / len * length;
+                //
+                math.vec3SLerp(particle.velocity, velocity, this.randomDirectionAmount, particle.velocity);
+                //
+                var len = math.vec3Length(particle.velocity);
+                particle.velocity.x = particle.velocity.x / len * length;
+                particle.velocity.y = particle.velocity.y / len * length;
+                particle.velocity.z = particle.velocity.z / len * length;
             }
             if (this.sphericalDirectionAmount > 0)
             {
-                var velocity = particle.position.clone().normalize(length);
-                particle.velocity.lerpNumber(velocity, this.sphericalDirectionAmount).normalize(length);
+                velocity.x = particle.position.x;
+                velocity.y = particle.position.y;
+                velocity.z = particle.position.z;
+                var len = math.vec3Length(velocity);
+                velocity.x = velocity.x / len * length;
+                velocity.y = velocity.y / len * length;
+                velocity.z = velocity.z / len * length;
+                //
+                math.vec3SLerp(particle.velocity, velocity, this.sphericalDirectionAmount, particle.velocity);
+                //
+                var len = math.vec3Length(particle.velocity);
+                particle.velocity.x = particle.velocity.x / len * length;
+                particle.velocity.y = particle.velocity.y / len * length;
+                particle.velocity.z = particle.velocity.z / len * length;
             }
         }
 

@@ -32786,16 +32786,39 @@ var gd3d;
                     gd3d.math.matrixMultiply(mat0, mat, mat0);
                     gd3d.math.matrixGetEuler(mat0, framework.defaultRotationOrder, rotation);
                     gd3d.math.vec3ScaleByNum(rotation, 180 / Math.PI, rotation);
-                    particle.rotation.set(rotation.x, rotation.y, rotation.z);
+                    particle.rotation.x = rotation.x;
+                    particle.rotation.y = rotation.y;
+                    particle.rotation.z = rotation.z;
                 }
-                var length = particle.velocity.length;
+                var length = gd3d.math.vec3Length(particle.velocity);
+                var velocity = new gd3d.math.vector3();
                 if (this.randomDirectionAmount > 0) {
-                    var velocity = Vector3.random().scaleNumber(2).subNumber(1).normalize(length);
-                    particle.velocity.lerpNumber(velocity, this.randomDirectionAmount).normalize(length);
+                    velocity.x = Math.random() * 2 - 1;
+                    velocity.y = Math.random() * 2 - 1;
+                    velocity.z = Math.random() * 2 - 1;
+                    var len = gd3d.math.vec3Length(velocity);
+                    velocity.x = velocity.x / len * length;
+                    velocity.y = velocity.y / len * length;
+                    velocity.z = velocity.z / len * length;
+                    gd3d.math.vec3SLerp(particle.velocity, velocity, this.randomDirectionAmount, particle.velocity);
+                    var len = gd3d.math.vec3Length(particle.velocity);
+                    particle.velocity.x = particle.velocity.x / len * length;
+                    particle.velocity.y = particle.velocity.y / len * length;
+                    particle.velocity.z = particle.velocity.z / len * length;
                 }
                 if (this.sphericalDirectionAmount > 0) {
-                    var velocity = particle.position.clone().normalize(length);
-                    particle.velocity.lerpNumber(velocity, this.sphericalDirectionAmount).normalize(length);
+                    velocity.x = particle.position.x;
+                    velocity.y = particle.position.y;
+                    velocity.z = particle.position.z;
+                    var len = gd3d.math.vec3Length(velocity);
+                    velocity.x = velocity.x / len * length;
+                    velocity.y = velocity.y / len * length;
+                    velocity.z = velocity.z / len * length;
+                    gd3d.math.vec3SLerp(particle.velocity, velocity, this.sphericalDirectionAmount, particle.velocity);
+                    var len = gd3d.math.vec3Length(particle.velocity);
+                    particle.velocity.x = particle.velocity.x / len * length;
+                    particle.velocity.y = particle.velocity.y / len * length;
+                    particle.velocity.z = particle.velocity.z / len * length;
                 }
             };
             ParticleShapeModule.prototype._onShapeTypeChanged = function () {
@@ -33059,13 +33082,15 @@ var gd3d;
             ParticleSizeBySpeedModule.prototype.updateParticleState = function (particle) {
                 if (!this.enabled)
                     return;
-                var velocity = particle.velocity.length;
+                var velocity = gd3d.math.vec3Length(particle.velocity);
                 var rate = gd3d.math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
                 var size = this.size3D.getValue(rate, particle[_SizeBySpeed_rate]);
                 if (!this.separateAxes) {
                     size.y = size.z = size.x;
                 }
-                particle.size.multiply(size);
+                particle.size.x *= size.x;
+                particle.size.y *= size.y;
+                particle.size.z *= size.z;
             };
             return ParticleSizeBySpeedModule;
         }(framework.ParticleModule));
@@ -33175,7 +33200,9 @@ var gd3d;
                 if (!this.separateAxes) {
                     size.y = size.z = size.x;
                 }
-                particle.size.multiply(size);
+                particle.size.x *= size.x;
+                particle.size.y *= size.y;
+                particle.size.z *= size.z;
             };
             return ParticleSizeOverLifetimeModule;
         }(framework.ParticleModule));
