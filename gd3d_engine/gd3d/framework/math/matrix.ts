@@ -135,7 +135,7 @@ namespace gd3d.math
 
     export function matrixGetEuler(src: matrix, order: framework.RotationOrder, rotation: vector3): void
     {
-        var clamp = Math.clamp;
+        var clamp = math.floatClamp;
         //
         var rawData = src.rawData;
         var m11 = rawData[0], m12 = rawData[4], m13 = rawData[8];

@@ -617,9 +617,9 @@ namespace gd3d.framework
          */
         clamp(min: Vector3, max: Vector3)
         {
-            this.x = Math.clamp(this.x, min.x, max.x);
-            this.y = Math.clamp(this.y, min.y, max.y);
-            this.z = Math.clamp(this.z, min.z, max.z);
+            this.x = math.floatClamp(this.x, min.x, max.x);
+            this.y = math.floatClamp(this.y, min.y, max.y);
+            this.z = math.floatClamp(this.z, min.z, max.z);
             return this;
         }
 

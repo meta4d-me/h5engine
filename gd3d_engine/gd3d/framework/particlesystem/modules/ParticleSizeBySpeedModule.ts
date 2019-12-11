@@ -169,7 +169,7 @@ namespace gd3d.framework
             if (!this.enabled) return;
 
             var velocity = particle.velocity.length;
-            var rate = Math.clamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
+            var rate = math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
             var size = this.size3D.getValue(rate, particle[_SizeBySpeed_rate]);
             if (!this.separateAxes)
             {

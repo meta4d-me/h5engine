@@ -119,13 +119,13 @@ namespace gd3d.framework
             switch (wrapMode)
             {
                 case AnimationCurveWrapMode.Clamp:
-                    t = Math.clamp(t, 0, 1);
+                    t = math.floatClamp(t, 0, 1);
                     break;
                 case AnimationCurveWrapMode.Loop:
-                    t = Math.clamp(t - Math.floor(t), 0, 1);
+                    t = math.floatClamp(t - Math.floor(t), 0, 1);
                     break;
                 case AnimationCurveWrapMode.PingPong:
-                    t = Math.clamp(t - Math.floor(t), 0, 1);
+                    t = math.floatClamp(t - Math.floor(t), 0, 1);
                     if (Math.floor(t) % 2 == 1) t = 1 - t;
                     break;
             }

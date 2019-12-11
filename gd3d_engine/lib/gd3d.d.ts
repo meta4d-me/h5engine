@@ -4413,6 +4413,11 @@ declare namespace gd3d.math {
     function floatClamp(v: number, min?: number, max?: number): number;
     function sign(value: number): number;
     function getKeyCodeByAscii(ev: KeyboardEvent): number;
+    var DEG2RAD: number;
+    var RAD2DEG: number;
+    function degToRad(degrees: number): number;
+    function radToDeg(radians: number): number;
+    function mapLinear(x: number, a1: number, a2: number, b1: number, b2: number): number;
     function numberLerp(fromV: number, toV: number, v: number): number;
     function x_AXIS(): vector3;
     function y_AXIS(): vector3;
@@ -6671,30 +6676,6 @@ interface ArrayConstructor {
     concatToSelf<T>(array: T[], ...items: (T | ConcatArray<T>)[]): T[];
     equal<T>(array: T[], arr: ArrayLike<T>): boolean;
     replace<T>(array: T[], a: T, b: T, isAdd?: boolean): T[];
-}
-interface Math {
-    DEG2RAD: number;
-    RAD2DEG: number;
-    PRECISION: number;
-    uuid: () => string;
-    clamp(value: number, lowerlimit: number, upperlimit: number): number;
-    euclideanModulo(n: number, m: number): number;
-    mapLinear: (x: number, a1: number, a2: number, b1: number, b2: number) => number;
-    lerp(start: number, end: number, t: number): number;
-    smoothstep(x: number, min: number, max: number): number;
-    smootherstep(x: number, min: number, max: number): number;
-    randInt(low: number, high: number): number;
-    randFloat(low: number, high: number): number;
-    randFloatSpread(range: number): number;
-    degToRad(degrees: number): number;
-    radToDeg(radians: number): number;
-    isPowerOfTwo(value: number): boolean;
-    nearestPowerOfTwo(value: number): number;
-    nextPowerOfTwo(value: number): number;
-    toRound(source: number, target: number, precision?: number): number;
-    equals(a: number, b: number, precision?: number): boolean;
-    gcd(a: number, b: number): number;
-    lcm(a: number, b: number): number;
 }
 interface AssignDeepHandler {
     (target: any, source: any, key: string, replacers: AssignDeepHandler[], deep: number): boolean;

@@ -120,7 +120,7 @@ namespace gd3d.framework
             var radius = this.radius;
             var angle = this.angle;
             var arc = this.arc;
-            angle = Math.clamp(angle, 0, 87);
+            angle = math.floatClamp(angle, 0, 87);
             // 在圆心的方向
             var radiusAngle = 0;
             if (this.arcMode == ParticleSystemShapeMultiModeValue.Random)
@@ -146,7 +146,7 @@ namespace gd3d.framework
             {
                 radiusAngle = Math.floor(radiusAngle / arc / this.arcSpread) * arc * this.arcSpread;
             }
-            radiusAngle = Math.degToRad(radiusAngle);
+            radiusAngle = math.degToRad(radiusAngle);
             // 在圆的位置
             var radiusRate = 1;
             if (this.emitFrom == ParticleSystemShapeConeEmitFrom.Base || this.emitFrom == ParticleSystemShapeConeEmitFrom.Volume)
@@ -158,7 +158,7 @@ namespace gd3d.framework
             // 底面位置
             var bottomPos = basePos.scaleNumberTo(radius).scaleNumber(radiusRate);
             // 顶面位置
-            var topPos = basePos.scaleNumberTo(radius + this.length * Math.tan(Math.degToRad(angle))).scaleNumber(radiusRate);
+            var topPos = basePos.scaleNumberTo(radius + this.length * Math.tan(math.degToRad(angle))).scaleNumber(radiusRate);
             topPos.z = this.length;
             // 计算速度
             particle.velocity.copy(topPos.subTo(bottomPos).normalize(speed));

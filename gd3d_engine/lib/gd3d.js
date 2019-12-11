@@ -6411,7 +6411,7 @@ var gd3d;
         }
         math.matrix3x2Decompose = matrix3x2Decompose;
         function matrixGetEuler(src, order, rotation) {
-            var clamp = Math.clamp;
+            var clamp = math.floatClamp;
             var rawData = src.rawData;
             var m11 = rawData[0], m12 = rawData[4], m13 = rawData[8];
             var m21 = rawData[1], m22 = rawData[5], m23 = rawData[9];
@@ -23308,6 +23308,20 @@ var gd3d;
             }
         }
         math.getKeyCodeByAscii = getKeyCodeByAscii;
+        math.DEG2RAD = Math.PI / 180;
+        math.RAD2DEG = 180 / Math.PI;
+        function degToRad(degrees) {
+            return degrees * math.DEG2RAD;
+        }
+        math.degToRad = degToRad;
+        function radToDeg(radians) {
+            return radians * math.RAD2DEG;
+        }
+        math.radToDeg = radToDeg;
+        function mapLinear(x, a1, a2, b1, b2) {
+            return b1 + (x - a1) * (b2 - b1) / (a2 - a1);
+        }
+        math.mapLinear = mapLinear;
         function numberLerp(fromV, toV, v) {
             return fromV * (1 - v) + toV * v;
         }
@@ -31426,13 +31440,13 @@ var gd3d;
                     wrapMode = this.postWrapMode;
                 switch (wrapMode) {
                     case framework.AnimationCurveWrapMode.Clamp:
-                        t = Math.clamp(t, 0, 1);
+                        t = gd3d.math.floatClamp(t, 0, 1);
                         break;
                     case framework.AnimationCurveWrapMode.Loop:
-                        t = Math.clamp(t - Math.floor(t), 0, 1);
+                        t = gd3d.math.floatClamp(t - Math.floor(t), 0, 1);
                         break;
                     case framework.AnimationCurveWrapMode.PingPong:
-                        t = Math.clamp(t - Math.floor(t), 0, 1);
+                        t = gd3d.math.floatClamp(t - Math.floor(t), 0, 1);
                         if (Math.floor(t) % 2 == 1)
                             t = 1 - t;
                         break;
@@ -31820,9 +31834,9 @@ var gd3d;
                     case framework.MinMaxCurveMode.Curve:
                         return this.curve.getValue(time) * this.curveMultiplier;
                     case framework.MinMaxCurveMode.TwoConstants:
-                        return Math.lerp(this.constantMin, this.constantMax, randomBetween);
+                        return gd3d.math.numberLerp(this.constantMin, this.constantMax, randomBetween);
                     case framework.MinMaxCurveMode.TwoCurves:
-                        return Math.lerp(this.curveMin.getValue(time), this.curveMax.getValue(time), randomBetween) * this.curveMultiplier;
+                        return gd3d.math.numberLerp(this.curveMin.getValue(time), this.curveMax.getValue(time), randomBetween) * this.curveMultiplier;
                 }
                 return this.constant;
             };
@@ -32182,9 +32196,9 @@ var gd3d;
                 return this.x >= p.x && this.y >= p.y && this.z >= p.z;
             };
             Vector3.prototype.clamp = function (min, max) {
-                this.x = Math.clamp(this.x, min.x, max.x);
-                this.y = Math.clamp(this.y, min.y, max.y);
-                this.z = Math.clamp(this.z, min.z, max.z);
+                this.x = gd3d.math.floatClamp(this.x, min.x, max.x);
+                this.y = gd3d.math.floatClamp(this.y, min.y, max.y);
+                this.z = gd3d.math.floatClamp(this.z, min.z, max.z);
                 return this;
             };
             Vector3.prototype.min = function (v) {
@@ -32298,7 +32312,7 @@ var gd3d;
                     if (t < time && time < nt) {
                         if (this.mode == framework.GradientMode.Fixed)
                             return nv;
-                        return Math.mapLinear(time, t, nt, v, nv);
+                        return gd3d.math.mapLinear(time, t, nt, v, nv);
                     }
                 }
                 return 1;
@@ -32433,7 +32447,7 @@ var gd3d;
                 if (!this.enabled)
                     return;
                 var velocity = particle.velocity.length;
-                var rate = Math.clamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
+                var rate = gd3d.math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
                 var color = this.color.getValue(rate, particle[_ColorBySpeed_rate]);
                 particle.color.multiply(color);
             };
@@ -33136,7 +33150,7 @@ var gd3d;
                 if (!this.enabled)
                     return;
                 var velocity = particle.velocity.length;
-                var rate = Math.clamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
+                var rate = gd3d.math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
                 var v = this.angularVelocity.getValue(rate, particle[_RotationBySpeed_rate]);
                 if (!this.separateAxes) {
                     v.x = v.y = 0;
@@ -33617,7 +33631,7 @@ var gd3d;
                 if (!this.enabled)
                     return;
                 var velocity = particle.velocity.length;
-                var rate = Math.clamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
+                var rate = gd3d.math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
                 var size = this.size3D.getValue(rate, particle[_SizeBySpeed_rate]);
                 if (!this.separateAxes) {
                     size.y = size.z = size.x;
@@ -33762,7 +33776,7 @@ var gd3d;
             Object.defineProperty(ParticleTextureSheetAnimationModule.prototype, "rowIndex", {
                 get: function () { return this._rowIndex; },
                 set: function (v) {
-                    this._rowIndex = Math.clamp(v, 0, this.tiles.y - 1);
+                    this._rowIndex = gd3d.math.floatClamp(v, 0, this.tiles.y - 1);
                 },
                 enumerable: true,
                 configurable: true
@@ -34070,114 +34084,6 @@ Array.replace = function (arr, a, b, isAdd) {
     if (!isreplace && isAdd)
         arr.push(b);
     return arr;
-};
-Math.DEG2RAD = Math.PI / 180;
-Math.RAD2DEG = 180 / Math.PI;
-Math.PRECISION = 0.000001;
-Math.uuid = Math.uuid || function (length) {
-    if (length === void 0) { length = 36; }
-    var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
-    var id = new Array(length);
-    var rnd = 0, r = 0;
-    return function generateUUID() {
-        for (var i = 0; i < length; i++) {
-            if (i === 8 || i === 13 || i === 18 || i === 23) {
-                id[i] = '-';
-            }
-            else if (i === 14) {
-                id[i] = '4';
-            }
-            else {
-                if (rnd <= 0x02)
-                    rnd = 0x2000000 + (Math.random() * 0x1000000) | 0;
-                r = rnd & 0xf;
-                rnd = rnd >> 4;
-                id[i] = chars[(i === 19) ? (r & 0x3) | 0x8 : r];
-            }
-        }
-        return id.join('');
-    };
-}();
-Math.clamp = Math.clamp || function (value, lowerlimit, upperlimit) {
-    if ((value - lowerlimit) * (value - upperlimit) <= 0)
-        return value;
-    if (value < lowerlimit)
-        return lowerlimit < upperlimit ? lowerlimit : upperlimit;
-    return lowerlimit > upperlimit ? lowerlimit : upperlimit;
-};
-Math.euclideanModulo = Math.euclideanModulo || function (n, m) {
-    return ((n % m) + m) % m;
-};
-Math.mapLinear = Math.mapLinear || function (x, a1, a2, b1, b2) {
-    return b1 + (x - a1) * (b2 - b1) / (a2 - a1);
-};
-Math.lerp = Math.lerp || function (start, end, t) {
-    return (1 - t) * start + t * end;
-};
-Math.smoothstep = Math.smoothstep || function (x, min, max) {
-    if (x <= min)
-        return 0;
-    if (x >= max)
-        return 1;
-    x = (x - min) / (max - min);
-    return x * x * (3 - 2 * x);
-};
-Math.smootherstep = Math.smootherstep || function (x, min, max) {
-    if (x <= min)
-        return 0;
-    if (x >= max)
-        return 1;
-    x = (x - min) / (max - min);
-    return x * x * x * (x * (x * 6 - 15) + 10);
-};
-Math.randInt = Math.randInt || function (low, high) {
-    return low + Math.floor(Math.random() * (high - low + 1));
-};
-Math.randFloat = Math.randFloat || function (low, high) {
-    return low + Math.random() * (high - low);
-};
-Math.randFloatSpread = Math.randFloatSpread || function (range) {
-    return range * (0.5 - Math.random());
-};
-Math.degToRad = Math.degToRad || function (degrees) {
-    return degrees * this.DEG2RAD;
-};
-Math.radToDeg = Math.radToDeg || function (radians) {
-    return radians * this.RAD2DEG;
-};
-Math.isPowerOfTwo = Math.isPowerOfTwo || function (value) {
-    return (value & (value - 1)) === 0 && value !== 0;
-};
-Math.nearestPowerOfTwo = Math.nearestPowerOfTwo || function (value) {
-    return Math.pow(2, Math.round(Math.log(value) / Math.LN2));
-};
-Math.nextPowerOfTwo = Math.nextPowerOfTwo || function (value) {
-    value--;
-    value |= value >> 1;
-    value |= value >> 2;
-    value |= value >> 4;
-    value |= value >> 8;
-    value |= value >> 16;
-    value++;
-    return value;
-};
-Math.toRound = Math.toRound || function (source, target, precision) {
-    if (precision === void 0) { precision = 360; }
-    return source + Math.round((target - source) / precision) * precision;
-};
-Math.equals = Math.equals || function (a, b, precision) {
-    if (precision == undefined)
-        precision = this.PRECISION;
-    return Math.abs(a - b) < precision;
-};
-Math.gcd = Math.gcd || function (a, b) {
-    if (b)
-        while ((a %= b) && (b %= a))
-            ;
-    return a + b;
-};
-Math.lcm = Math.lcm || function (a, b) {
-    return a * b / Math.gcd(a, b);
 };
 Object.isBaseType = function (object) {
     if (object == undefined
@@ -34520,7 +34426,7 @@ var gd3d;
                 if (this.arcSpread > 0) {
                     radiusAngle = Math.floor(radiusAngle / arc / this.arcSpread) * arc * this.arcSpread;
                 }
-                radiusAngle = Math.degToRad(radiusAngle);
+                radiusAngle = gd3d.math.degToRad(radiusAngle);
                 var dir = new framework.Vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
                 var p = dir.scaleNumberTo(radius);
                 if (!this.emitFromEdge) {
@@ -34620,7 +34526,7 @@ var gd3d;
                 var radius = this.radius;
                 var angle = this.angle;
                 var arc = this.arc;
-                angle = Math.clamp(angle, 0, 87);
+                angle = gd3d.math.floatClamp(angle, 0, 87);
                 var radiusAngle = 0;
                 if (this.arcMode == framework.ParticleSystemShapeMultiModeValue.Random) {
                     radiusAngle = Math.random() * arc;
@@ -34639,14 +34545,14 @@ var gd3d;
                 if (this.arcSpread > 0) {
                     radiusAngle = Math.floor(radiusAngle / arc / this.arcSpread) * arc * this.arcSpread;
                 }
-                radiusAngle = Math.degToRad(radiusAngle);
+                radiusAngle = gd3d.math.degToRad(radiusAngle);
                 var radiusRate = 1;
                 if (this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.Base || this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.Volume) {
                     radiusRate = Math.random();
                 }
                 var basePos = new framework.Vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
                 var bottomPos = basePos.scaleNumberTo(radius).scaleNumber(radiusRate);
-                var topPos = basePos.scaleNumberTo(radius + this.length * Math.tan(Math.degToRad(angle))).scaleNumber(radiusRate);
+                var topPos = basePos.scaleNumberTo(radius + this.length * Math.tan(gd3d.math.degToRad(angle))).scaleNumber(radiusRate);
                 topPos.z = this.length;
                 particle.velocity.copy(topPos.subTo(bottomPos).normalize(speed));
                 var position = bottomPos.clone();
@@ -43644,7 +43550,7 @@ var gd3d;
                 var half = size / 2;
                 for (var i = 0; i < size; i++) {
                     for (var j = 0; j < size; j++) {
-                        var l = Math.clamp(gd3d.math.vec2Length(new gd3d.math.vector2(i - half, j - half)), 0, half) / half;
+                        var l = gd3d.math.floatClamp(gd3d.math.vec2Length(new gd3d.math.vector2(i - half, j - half)), 0, half) / half;
                         var f = 1 - l;
                         f = f * f;
                         var pos = (i + j * size) * 4;

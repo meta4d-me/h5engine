@@ -34,6 +34,42 @@ namespace gd3d.math
         }
     }
 
+    export var DEG2RAD = Math.PI / 180;
+    export var RAD2DEG = 180 / Math.PI;
+
+    /**
+     * 角度转换为弧度
+     * 
+     * @param degrees 角度
+     */
+    export function degToRad(degrees: number)
+    {
+        return degrees * DEG2RAD;
+    }
+
+    /**
+     * 弧度转换为角度
+     * 
+     * @param radians 弧度
+     */
+    export function radToDeg(radians: number)
+    {
+        return radians * RAD2DEG;
+    }
+
+    /**
+     * 使 x 值从区间 <a1, a2> 线性映射到区间 <b1, b2>
+     * 
+     * @param x 第一个区间中值
+     * @param a1 第一个区间起始值
+     * @param a2 第一个区间终止值
+     * @param b1 第二个区间起始值
+     * @param b2 第二个区间起始值
+     */
+    export function mapLinear(x: number, a1: number, a2: number, b1: number, b2: number)
+    {
+        return b1 + (x - a1) * (b2 - b1) / (a2 - a1);
+    }
 
     export function numberLerp(fromV: number, toV: number, v: number)
     {

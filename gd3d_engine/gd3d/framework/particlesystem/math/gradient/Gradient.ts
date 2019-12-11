@@ -85,7 +85,7 @@ namespace gd3d.framework
                 if (t < time && time < nt)
                 {
                     if (this.mode == GradientMode.Fixed) return nv;
-                    return Math.mapLinear(time, t, nt, v, nv);
+                    return math.mapLinear(time, t, nt, v, nv);
                 }
             }
             return 1;

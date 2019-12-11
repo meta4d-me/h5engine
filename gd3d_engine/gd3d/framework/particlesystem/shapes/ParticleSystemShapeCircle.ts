@@ -112,7 +112,7 @@ namespace gd3d.framework
             {
                 radiusAngle = Math.floor(radiusAngle / arc / this.arcSpread) * arc * this.arcSpread;
             }
-            radiusAngle = Math.degToRad(radiusAngle);
+            radiusAngle = math.degToRad(radiusAngle);
             // 计算位置
             var dir = new Vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
             var p = dir.scaleNumberTo(radius);

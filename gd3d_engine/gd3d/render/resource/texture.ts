@@ -606,7 +606,7 @@
             {
                 for (let j = 0; j < size; j++)
                 {
-                    var l = Math.clamp(math.vec2Length(new math.vector2(i - half, j - half)), 0, half) / half;
+                    var l = math.floatClamp(math.vec2Length(new math.vector2(i - half, j - half)), 0, half) / half;
                     // l = l * l;
                     var f = 1 - l;
                     f = f * f;
