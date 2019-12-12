@@ -150,10 +150,10 @@ namespace gd3d.framework
                     {
                         var ct = (t - prekey.time) / (key.time - prekey.time);
                         var sys = [ystart, ystart + tanstart * (xend - xstart) / 3, yend - tanend * (xend - xstart) / 3, yend];
-                        var fy = bezierCurve.getValue(ct, sys);
+                        var fy = BezierCurve.getValue(ct, sys);
                         isfind = true;
                         value = fy;
-                        tangent = bezierCurve.getDerivative(ct, sys) / (xend - xstart);
+                        tangent = BezierCurve.getDerivative(ct, sys) / (xend - xstart);
                         break;
                     } else
                     {

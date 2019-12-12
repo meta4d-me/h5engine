@@ -24447,10 +24447,10 @@ var gd3d;
                         if (maxtan > Math.abs(tanstart) && maxtan > Math.abs(tanend)) {
                             var ct = (t - prekey.time) / (key.time - prekey.time);
                             var sys = [ystart, ystart + tanstart * (xend - xstart) / 3, yend - tanend * (xend - xstart) / 3, yend];
-                            var fy = framework.bezierCurve.getValue(ct, sys);
+                            var fy = framework.BezierCurve.getValue(ct, sys);
                             isfind = true;
                             value = fy;
-                            tangent = framework.bezierCurve.getDerivative(ct, sys) / (xend - xstart);
+                            tangent = framework.BezierCurve.getDerivative(ct, sys) / (xend - xstart);
                             break;
                         }
                         else {
@@ -24534,34 +24534,34 @@ var gd3d;
         var BezierCurve = (function () {
             function BezierCurve() {
             }
-            BezierCurve.prototype.linear = function (t, p0, p1) {
+            BezierCurve.linear = function (t, p0, p1) {
                 return p0 + t * (p1 - p0);
             };
-            BezierCurve.prototype.linearDerivative = function (t, p0, p1) {
+            BezierCurve.linearDerivative = function (t, p0, p1) {
                 return p1 - p0;
             };
-            BezierCurve.prototype.linearSecondDerivative = function (t, p0, p1) {
+            BezierCurve.linearSecondDerivative = function (t, p0, p1) {
                 return 0;
             };
-            BezierCurve.prototype.quadratic = function (t, p0, p1, p2) {
+            BezierCurve.quadratic = function (t, p0, p1, p2) {
                 return (1 - t) * (1 - t) * p0 + 2 * (1 - t) * t * p1 + t * t * p2;
             };
-            BezierCurve.prototype.quadraticDerivative = function (t, p0, p1, p2) {
+            BezierCurve.quadraticDerivative = function (t, p0, p1, p2) {
                 return 2 * (1 - t) * (p1 - p0) + 2 * t * (p2 - p1);
             };
-            BezierCurve.prototype.quadraticSecondDerivative = function (t, p0, p1, p2) {
+            BezierCurve.quadraticSecondDerivative = function (t, p0, p1, p2) {
                 return 2 * (p2 - 2 * p1 + p0);
             };
-            BezierCurve.prototype.cubic = function (t, p0, p1, p2, p3) {
+            BezierCurve.cubic = function (t, p0, p1, p2, p3) {
                 return (1 - t) * (1 - t) * (1 - t) * p0 + 3 * (1 - t) * (1 - t) * t * p1 + 3 * (1 - t) * t * t * p2 + t * t * t * p3;
             };
-            BezierCurve.prototype.cubicDerivative = function (t, p0, p1, p2, p3) {
+            BezierCurve.cubicDerivative = function (t, p0, p1, p2, p3) {
                 return 3 * (1 - t) * (1 - t) * (p1 - p0) + 6 * (1 - t) * t * (p2 - p1) + 3 * t * t * (p3 - p2);
             };
-            BezierCurve.prototype.cubicSecondDerivative = function (t, p0, p1, p2, p3) {
+            BezierCurve.cubicSecondDerivative = function (t, p0, p1, p2, p3) {
                 return 6 * (1 - t) * (p2 - 2 * p1 + p0) + 6 * t * (p3 - 2 * p2 + p1);
             };
-            BezierCurve.prototype.bn = function (t, ps, processs) {
+            BezierCurve.bn = function (t, ps, processs) {
                 if (processs === void 0) { processs = null; }
                 ps = ps.concat();
                 if (processs)
@@ -24577,7 +24577,7 @@ var gd3d;
                 }
                 return ps[0];
             };
-            BezierCurve.prototype.bnDerivative = function (t, ps) {
+            BezierCurve.bnDerivative = function (t, ps) {
                 if (ps.length < 2)
                     return 0;
                 ps = ps.concat();
@@ -24588,7 +24588,7 @@ var gd3d;
                 var v = ps.length * this.bn(t, ps);
                 return v;
             };
-            BezierCurve.prototype.bnSecondDerivative = function (t, ps) {
+            BezierCurve.bnSecondDerivative = function (t, ps) {
                 if (ps.length < 3)
                     return 0;
                 ps = ps.concat();
@@ -24599,7 +24599,7 @@ var gd3d;
                 var v = ps.length * this.bnDerivative(t, ps);
                 return v;
             };
-            BezierCurve.prototype.bnND = function (t, dn, ps) {
+            BezierCurve.bnND = function (t, dn, ps) {
                 if (ps.length < dn + 1)
                     return 0;
                 var factorial = 1;
@@ -24614,7 +24614,7 @@ var gd3d;
                 var v = factorial * this.bn(t, ps);
                 return v;
             };
-            BezierCurve.prototype.getValue = function (t, ps) {
+            BezierCurve.getValue = function (t, ps) {
                 if (ps.length == 2) {
                     return this.linear(t, ps[0], ps[1]);
                 }
@@ -24626,7 +24626,7 @@ var gd3d;
                 }
                 return this.bn(t, ps);
             };
-            BezierCurve.prototype.getDerivative = function (t, ps) {
+            BezierCurve.getDerivative = function (t, ps) {
                 if (ps.length == 2) {
                     return this.linearDerivative(t, ps[0], ps[1]);
                 }
@@ -24638,7 +24638,7 @@ var gd3d;
                 }
                 return this.bnDerivative(t, ps);
             };
-            BezierCurve.prototype.getSecondDerivative = function (t, ps) {
+            BezierCurve.getSecondDerivative = function (t, ps) {
                 if (ps.length == 2) {
                     return this.linearSecondDerivative(t, ps[0], ps[1]);
                 }
@@ -24650,7 +24650,7 @@ var gd3d;
                 }
                 return this.bnSecondDerivative(t, ps);
             };
-            BezierCurve.prototype.getExtremums = function (ps, numSamples, precision) {
+            BezierCurve.getExtremums = function (ps, numSamples, precision) {
                 var _this = this;
                 if (numSamples === void 0) { numSamples = 10; }
                 if (precision === void 0) { precision = 0.0000001; }
@@ -24669,7 +24669,7 @@ var gd3d;
                 }
                 return { ts: resultTs, vs: resultVs };
             };
-            BezierCurve.prototype.getMonotoneIntervals = function (ps, numSamples, precision) {
+            BezierCurve.getMonotoneIntervals = function (ps, numSamples, precision) {
                 if (numSamples === void 0) { numSamples = 10; }
                 if (precision === void 0) { precision = 0.0000001; }
                 var monotoneIntervalTs = [0, 1];
@@ -24681,7 +24681,7 @@ var gd3d;
                 }
                 return { ts: monotoneIntervalTs, vs: monotoneIntervalVs };
             };
-            BezierCurve.prototype.getTFromValue = function (targetV, ps, numSamples, precision) {
+            BezierCurve.getTFromValue = function (targetV, ps, numSamples, precision) {
                 var _this = this;
                 if (numSamples === void 0) { numSamples = 10; }
                 if (precision === void 0) { precision = 0.0000001; }
@@ -24698,9 +24698,9 @@ var gd3d;
                 }
                 return results;
             };
-            BezierCurve.prototype.split = function (t, ps) {
+            BezierCurve.split = function (t, ps) {
                 var processs = [];
-                framework.bezierCurve.bn(t, ps, processs);
+                BezierCurve.bn(t, ps, processs);
                 var fps = [];
                 var sps = [];
                 for (var i = processs.length - 1; i >= 0; i--) {
@@ -24715,7 +24715,7 @@ var gd3d;
                 }
                 return [fps, sps];
             };
-            BezierCurve.prototype.merge = function (fps, sps, mergeType) {
+            BezierCurve.merge = function (fps, sps, mergeType) {
                 if (mergeType === void 0) { mergeType = 0; }
                 fps = fps.concat();
                 sps = sps.concat();
@@ -24773,7 +24773,7 @@ var gd3d;
                 }
                 return processs.pop();
             };
-            BezierCurve.prototype.getSamples = function (ps, num) {
+            BezierCurve.getSamples = function (ps, num) {
                 if (num === void 0) { num = 100; }
                 var results = [];
                 for (var i = 0; i <= num; i++) {
@@ -24786,7 +24786,6 @@ var gd3d;
             return BezierCurve;
         }());
         framework.BezierCurve = BezierCurve;
-        framework.bezierCurve = new BezierCurve();
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

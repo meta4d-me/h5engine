@@ -3,11 +3,6 @@ namespace gd3d.framework
 
     /**
      * Bézier曲线
-     */
-    export var bezierCurve: BezierCurve;
-
-    /**
-     * Bézier曲线
      * @see https://en.wikipedia.org/wiki/B%C3%A9zier_curve
      * 
      * @author feng3d
@@ -26,7 +21,7 @@ namespace gd3d.framework
          * @param p0 点0
          * @param p1 点1
          */
-        linear(t: number, p0: number, p1: number)
+        static linear(t: number, p0: number, p1: number)
         {
             return p0 + t * (p1 - p0);
             // return (1 - t) * p0 + t * p1;
@@ -38,7 +33,7 @@ namespace gd3d.framework
          * @param p0 点0
          * @param p1 点1
          */
-        linearDerivative(t: number, p0: number, p1: number)
+        static linearDerivative(t: number, p0: number, p1: number)
         {
             return p1 - p0;
         }
@@ -49,7 +44,7 @@ namespace gd3d.framework
          * @param p0 点0
          * @param p1 点1
          */
-        linearSecondDerivative(t: number, p0: number, p1: number)
+        static linearSecondDerivative(t: number, p0: number, p1: number)
         {
             return 0;
         }
@@ -81,7 +76,7 @@ namespace gd3d.framework
          * @param p1 点1
          * @param p2 点2
          */
-        quadratic(t: number, p0: number, p1: number, p2: number)
+        static quadratic(t: number, p0: number, p1: number, p2: number)
         {
             // return this.linear(t, this.linear(t, p0, p1), this.linear(t, p1, p2));
             // return (1 - t) * ((1 - t) * p0 + t * p1) + t * ((1 - t) * p1 + t * p2);
@@ -95,7 +90,7 @@ namespace gd3d.framework
          * @param p1 点1
          * @param p2 点2
          */
-        quadraticDerivative(t: number, p0: number, p1: number, p2: number)
+        static quadraticDerivative(t: number, p0: number, p1: number, p2: number)
         {
             // return 2 * this.linear(t, this.linearDerivative(t, p0, p1), this.linearDerivative(t, p1, p2));
             return 2 * (1 - t) * (p1 - p0) + 2 * t * (p2 - p1);
@@ -108,7 +103,7 @@ namespace gd3d.framework
          * @param p1 点1
          * @param p2 点2
          */
-        quadraticSecondDerivative(t: number, p0: number, p1: number, p2: number)
+        static quadraticSecondDerivative(t: number, p0: number, p1: number, p2: number)
         {
             // return 1 * 2 * this.linearDerivative(t, p1 - p0, p2 - p1)
             // return 1 * 2 * ((p2 - p1) - (p1 - p0));
@@ -147,7 +142,7 @@ namespace gd3d.framework
          * @param p2 点2
          * @param p3 点3
          */
-        cubic(t: number, p0: number, p1: number, p2: number, p3: number)
+        static cubic(t: number, p0: number, p1: number, p2: number, p3: number)
         {
             // return this.linear(t, this.quadratic(t, p0, p1, p2), this.quadratic(t, p1, p2, p3));
             return (1 - t) * (1 - t) * (1 - t) * p0 + 3 * (1 - t) * (1 - t) * t * p1 + 3 * (1 - t) * t * t * p2 + t * t * t * p3;
@@ -161,7 +156,7 @@ namespace gd3d.framework
          * @param p2 点2
          * @param p3 点3
          */
-        cubicDerivative(t: number, p0: number, p1: number, p2: number, p3: number)
+        static cubicDerivative(t: number, p0: number, p1: number, p2: number, p3: number)
         {
             // return 3 * this.linear(t, this.quadraticDerivative(t, p0, p1, p2), this.quadraticDerivative(t, p1, p2, p3));
             return 3 * (1 - t) * (1 - t) * (p1 - p0) + 6 * (1 - t) * t * (p2 - p1) + 3 * t * t * (p3 - p2);
@@ -174,7 +169,7 @@ namespace gd3d.framework
          * @param p1 点1
          * @param p2 点2
          */
-        cubicSecondDerivative(t: number, p0: number, p1: number, p2: number, p3: number)
+        static cubicSecondDerivative(t: number, p0: number, p1: number, p2: number, p3: number)
         {
             // return 3 * this.linear(t, this.quadraticSecondDerivative(t, p0, p1, p2), this.quadraticSecondDerivative(t, p1, p2, p3));
             return 6 * (1 - t) * (p2 - 2 * p1 + p0) + 6 * t * (p3 - 2 * p2 + p1);
@@ -191,7 +186,7 @@ namespace gd3d.framework
          * @param ps 点列表 ps.length == n+1
          * @param processs 收集中间过程数据，可用作Bézier曲线动画数据
          */
-        bn(t: number, ps: number[], processs: number[][] = null)
+        static bn(t: number, ps: number[], processs: number[][] = null)
         {
             ps = ps.concat();
             if (processs)
@@ -222,7 +217,7 @@ namespace gd3d.framework
          * @param t 插值度
          * @param ps 点列表 ps.length == n+1
          */
-        bnDerivative(t: number, ps: number[])
+        static bnDerivative(t: number, ps: number[])
         {
             if (ps.length < 2)
                 return 0;
@@ -248,7 +243,7 @@ namespace gd3d.framework
          * @param t 插值度
          * @param ps 点列表 ps.length == n+1
          */
-        bnSecondDerivative(t: number, ps: number[])
+        static bnSecondDerivative(t: number, ps: number[])
         {
             if (ps.length < 3)
                 return 0;
@@ -273,7 +268,7 @@ namespace gd3d.framework
          * @param dn 求导次数
          * @param ps 点列表     ps.length == n+1
          */
-        bnND(t: number, dn: number, ps: number[])
+        static bnND(t: number, dn: number, ps: number[])
         {
             if (ps.length < dn + 1)
                 return 0;
@@ -299,7 +294,7 @@ namespace gd3d.framework
          * @param t 插值度
          * @param ps 点列表
          */
-        getValue(t: number, ps: number[]): number
+        static getValue(t: number, ps: number[]): number
         {
             if (ps.length == 2)
             {
@@ -323,7 +318,7 @@ namespace gd3d.framework
          * @param t 插值度
          * @param ps 点列表
          */
-        getDerivative(t: number, ps: number[]): number
+        static getDerivative(t: number, ps: number[]): number
         {
             if (ps.length == 2)
             {
@@ -346,7 +341,7 @@ namespace gd3d.framework
          * @param t 插值度
          * @param ps 点列表
          */
-        getSecondDerivative(t: number, ps: number[]): number
+        static getSecondDerivative(t: number, ps: number[]): number
         {
             if (ps.length == 2)
             {
@@ -373,7 +368,7 @@ namespace gd3d.framework
          * 
          * @returns 极值列表 {} {ts: 极值插值度列表,vs: 极值值列表}
          */
-        getExtremums(ps: number[], numSamples = 10, precision = 0.0000001)
+        static getExtremums(ps: number[], numSamples = 10, precision = 0.0000001)
         {
             var samples: number[] = [];
             for (let i = 0; i <= numSamples; i++)
@@ -400,7 +395,7 @@ namespace gd3d.framework
          * 获取单调区间列表
          * @returns {} {ts: 区间结点插值度列表,vs: 区间结点值列表}
          */
-        getMonotoneIntervals(ps: number[], numSamples = 10, precision = 0.0000001)
+        static getMonotoneIntervals(ps: number[], numSamples = 10, precision = 0.0000001)
         {
             // 区间内的单调区间
             var monotoneIntervalTs = [0, 1];
@@ -426,7 +421,7 @@ namespace gd3d.framework
          * 
          * @returns 返回解数组
          */
-        getTFromValue(targetV: number, ps: number[], numSamples = 10, precision = 0.0000001)
+        static getTFromValue(targetV: number, ps: number[], numSamples = 10, precision = 0.0000001)
         {
             // 获取单调区间
             var monotoneIntervals = this.getMonotoneIntervals(ps, numSamples, precision);
@@ -459,11 +454,11 @@ namespace gd3d.framework
          * @param ps 被分割曲线点列表
          * @returns 返回两条曲线组成的数组
          */
-        split(t: number, ps: number[])
+        static split(t: number, ps: number[])
         {
             // 获取曲线的动画过程
             var processs: number[][] = [];
-            bezierCurve.bn(t, ps, processs);
+            BezierCurve.bn(t, ps, processs);
 
             // 第一条曲线
             var fps: number[] = [];
@@ -496,7 +491,7 @@ namespace gd3d.framework
          * @param sps 第二条曲线点列表
          * @param mergeType 合并方式。mergeType = 0时进行还原合并，还原拆分之前的曲线；mergeType = 1时进行拟合合并，合并后的曲线会经过两条曲线的连接点；
          */
-        merge(fps: number[], sps: number[], mergeType = 0)
+        static merge(fps: number[], sps: number[], mergeType = 0)
         {
             fps = fps.concat();
             sps = sps.concat();
@@ -580,7 +575,7 @@ namespace gd3d.framework
          * @param ps 点列表
          * @param num 采样次数 ，采样点分别为[0,1/num,2/num,....,(num-1)/num,1]
          */
-        getSamples(ps: number[], num = 100)
+        static getSamples(ps: number[], num = 100)
         {
             var results: { t: number, v: number }[] = [];
             for (let i = 0; i <= num; i++)
@@ -592,6 +587,4 @@ namespace gd3d.framework
             return results;
         }
     }
-
-    bezierCurve = new BezierCurve();
 }

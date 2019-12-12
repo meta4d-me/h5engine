@@ -4585,36 +4585,35 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    var bezierCurve: BezierCurve;
     class BezierCurve {
-        linear(t: number, p0: number, p1: number): number;
-        linearDerivative(t: number, p0: number, p1: number): number;
-        linearSecondDerivative(t: number, p0: number, p1: number): number;
-        quadratic(t: number, p0: number, p1: number, p2: number): number;
-        quadraticDerivative(t: number, p0: number, p1: number, p2: number): number;
-        quadraticSecondDerivative(t: number, p0: number, p1: number, p2: number): number;
-        cubic(t: number, p0: number, p1: number, p2: number, p3: number): number;
-        cubicDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
-        cubicSecondDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
-        bn(t: number, ps: number[], processs?: number[][]): number;
-        bnDerivative(t: number, ps: number[]): number;
-        bnSecondDerivative(t: number, ps: number[]): number;
-        bnND(t: number, dn: number, ps: number[]): number;
-        getValue(t: number, ps: number[]): number;
-        getDerivative(t: number, ps: number[]): number;
-        getSecondDerivative(t: number, ps: number[]): number;
-        getExtremums(ps: number[], numSamples?: number, precision?: number): {
+        static linear(t: number, p0: number, p1: number): number;
+        static linearDerivative(t: number, p0: number, p1: number): number;
+        static linearSecondDerivative(t: number, p0: number, p1: number): number;
+        static quadratic(t: number, p0: number, p1: number, p2: number): number;
+        static quadraticDerivative(t: number, p0: number, p1: number, p2: number): number;
+        static quadraticSecondDerivative(t: number, p0: number, p1: number, p2: number): number;
+        static cubic(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        static cubicDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        static cubicSecondDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        static bn(t: number, ps: number[], processs?: number[][]): number;
+        static bnDerivative(t: number, ps: number[]): number;
+        static bnSecondDerivative(t: number, ps: number[]): number;
+        static bnND(t: number, dn: number, ps: number[]): number;
+        static getValue(t: number, ps: number[]): number;
+        static getDerivative(t: number, ps: number[]): number;
+        static getSecondDerivative(t: number, ps: number[]): number;
+        static getExtremums(ps: number[], numSamples?: number, precision?: number): {
             ts: number[];
             vs: number[];
         };
-        getMonotoneIntervals(ps: number[], numSamples?: number, precision?: number): {
+        static getMonotoneIntervals(ps: number[], numSamples?: number, precision?: number): {
             ts: number[];
             vs: number[];
         };
-        getTFromValue(targetV: number, ps: number[], numSamples?: number, precision?: number): number[];
-        split(t: number, ps: number[]): number[][];
-        merge(fps: number[], sps: number[], mergeType?: number): number[];
-        getSamples(ps: number[], num?: number): {
+        static getTFromValue(targetV: number, ps: number[], numSamples?: number, precision?: number): number[];
+        static split(t: number, ps: number[]): number[][];
+        static merge(fps: number[], sps: number[], mergeType?: number): number[];
+        static getSamples(ps: number[], num?: number): {
             t: number;
             v: number;
         }[];
