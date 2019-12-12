@@ -388,7 +388,7 @@ namespace gd3d.framework
             {
                 if (samples[i] * samples[i + 1] < 0)
                 {
-                    var guessT = equationSolving.line((x) => { return this.getDerivative(x, ps); }, i / numSamples, (i + 1) / numSamples, precision);
+                    var guessT = EquationSolving.line((x) => { return this.getDerivative(x, ps); }, i / numSamples, (i + 1) / numSamples, precision);
                     resultTs.push(guessT);
                     resultVs.push(this.getValue(guessT, ps));
                 }
@@ -443,7 +443,7 @@ namespace gd3d.framework
                     var fx = (x) => { return this.getValue(x, ps) - targetV; };
 
                     // 连线法
-                    var result = equationSolving.line(fx, monotoneIntervalTs[i], monotoneIntervalTs[i + 1], precision)
+                    var result = EquationSolving.line(fx, monotoneIntervalTs[i], monotoneIntervalTs[i + 1], precision)
                     results.push(result);
                 }
             }

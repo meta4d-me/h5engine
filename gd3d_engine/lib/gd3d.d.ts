@@ -4395,6 +4395,16 @@ declare namespace gd3d.io {
         writeInt(num: number): void;
     }
 }
+declare namespace gd3d.framework {
+    class EquationSolving {
+        private static getSign;
+        private static equalNumber;
+        static getDerivative(f: (x: number) => number, delta?: number): (x: number) => number;
+        private static isContinuous;
+        private static hasSolution;
+        static line(f: (x: number) => number, a: number, b: number, precision?: number, errorcallback?: (err: Error) => void): number;
+    }
+}
 declare namespace gd3d.math {
     function colorSet_White(out: color): void;
     function colorSet_Black(out: color): void;
@@ -4538,6 +4548,170 @@ declare namespace gd3d.math {
     function vec4ScaleByNum(from: gd3d.math.vector4, scale: number, out: gd3d.math.vector4): void;
     function vec4SetAll(vector: vector4, value: number): void;
     function vec4Set(vector: vector4, x: number, y: number, z: number, w: number): void;
+}
+declare namespace gd3d.framework {
+    class AnimationCurve1 {
+        __class__: "gd3d.framework.AnimationCurve1";
+        maxtan: number;
+        preWrapMode: AnimationCurveWrapMode;
+        postWrapMode: AnimationCurveWrapMode;
+        keys: AnimationCurveKeyframe[];
+        readonly numKeys: number;
+        addKey(key: AnimationCurveKeyframe): void;
+        sort(): void;
+        deleteKey(key: AnimationCurveKeyframe): void;
+        getKey(index: number): AnimationCurveKeyframe;
+        indexOfKeys(key: AnimationCurveKeyframe): number;
+        getPoint(t: number): AnimationCurveKeyframe;
+        getValue(t: number): number;
+        findKey(t: number, y: number, precision: number): AnimationCurveKeyframe;
+        addKeyAtCurve(time: number, value: number, precision: number): AnimationCurveKeyframe;
+        getSamples(num?: number): AnimationCurveKeyframe[];
+    }
+}
+declare namespace gd3d.framework {
+    interface AnimationCurveKeyframe {
+        time: number;
+        value: number;
+        inTangent: number;
+        outTangent: number;
+    }
+}
+declare namespace gd3d.framework {
+    enum AnimationCurveWrapMode {
+        Clamp = 1,
+        Loop = 2,
+        PingPong = 4
+    }
+}
+declare namespace gd3d.framework {
+    var bezierCurve: BezierCurve;
+    class BezierCurve {
+        linear(t: number, p0: number, p1: number): number;
+        linearDerivative(t: number, p0: number, p1: number): number;
+        linearSecondDerivative(t: number, p0: number, p1: number): number;
+        quadratic(t: number, p0: number, p1: number, p2: number): number;
+        quadraticDerivative(t: number, p0: number, p1: number, p2: number): number;
+        quadraticSecondDerivative(t: number, p0: number, p1: number, p2: number): number;
+        cubic(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        cubicDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        cubicSecondDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        bn(t: number, ps: number[], processs?: number[][]): number;
+        bnDerivative(t: number, ps: number[]): number;
+        bnSecondDerivative(t: number, ps: number[]): number;
+        bnND(t: number, dn: number, ps: number[]): number;
+        getValue(t: number, ps: number[]): number;
+        getDerivative(t: number, ps: number[]): number;
+        getSecondDerivative(t: number, ps: number[]): number;
+        getExtremums(ps: number[], numSamples?: number, precision?: number): {
+            ts: number[];
+            vs: number[];
+        };
+        getMonotoneIntervals(ps: number[], numSamples?: number, precision?: number): {
+            ts: number[];
+            vs: number[];
+        };
+        getTFromValue(targetV: number, ps: number[], numSamples?: number, precision?: number): number[];
+        split(t: number, ps: number[]): number[][];
+        merge(fps: number[], sps: number[], mergeType?: number): number[];
+        getSamples(ps: number[], num?: number): {
+            t: number;
+            v: number;
+        }[];
+    }
+}
+declare namespace gd3d.framework {
+    class MinMaxCurve {
+        __class__: "gd3d.framework.MinMaxCurve";
+        mode: MinMaxCurveMode;
+        constant: number;
+        constantMin: number;
+        constantMax: number;
+        curve: AnimationCurve1;
+        curveMin: AnimationCurve1;
+        curveMax: AnimationCurve1;
+        curveMultiplier: number;
+        between0And1: boolean;
+        getValue(time: number, randomBetween?: number): number;
+    }
+}
+declare namespace gd3d.framework {
+    enum MinMaxCurveMode {
+        Constant = 0,
+        Curve = 1,
+        TwoConstants = 3,
+        TwoCurves = 2
+    }
+}
+declare namespace gd3d.framework {
+    class MinMaxCurveVector3 {
+        xCurve: MinMaxCurve;
+        yCurve: MinMaxCurve;
+        zCurve: MinMaxCurve;
+        getValue(time: number, randomBetween?: number): math.vector3;
+    }
+}
+declare namespace gd3d.framework {
+    enum RotationOrder {
+        XYZ = 0,
+        ZXY = 1,
+        ZYX = 2,
+        YXZ = 3,
+        YZX = 4,
+        XZY = 5
+    }
+    var defaultRotationOrder: RotationOrder;
+}
+declare namespace gd3d.framework {
+    class Gradient {
+        __class__: "gd3d.framework.Gradient";
+        mode: GradientMode;
+        alphaKeys: GradientAlphaKey[];
+        colorKeys: GradientColorKey[];
+        getValue(time: number): math.color;
+        getAlpha(time: number): number;
+        getColor(time: number): math.color;
+    }
+}
+declare namespace gd3d.framework {
+    interface GradientAlphaKey {
+        alpha: number;
+        time: number;
+    }
+}
+declare namespace gd3d.framework {
+    interface GradientColorKey {
+        color: math.color;
+        time: number;
+    }
+}
+declare namespace gd3d.framework {
+    enum GradientMode {
+        Blend = 0,
+        Fixed = 1
+    }
+}
+declare namespace gd3d.framework {
+    class MinMaxGradient {
+        __class__: "gd3d.framework.MinMaxGradient";
+        mode: MinMaxGradientMode;
+        color: math.color;
+        colorMin: math.color;
+        colorMax: math.color;
+        gradient: Gradient;
+        gradientMin: Gradient;
+        gradientMax: Gradient;
+        getValue(time: number, randomBetween?: number, out?: math.color): math.color;
+    }
+}
+declare namespace gd3d.framework {
+    enum MinMaxGradientMode {
+        Color = 0,
+        Gradient = 1,
+        TwoColors = 2,
+        TwoGradients = 3,
+        RandomColor = 4
+    }
 }
 declare namespace gd3d.framework {
     class navVec3 {
@@ -5853,184 +6027,6 @@ declare namespace gd3d.framework {
         UV2 = 4,
         UV3 = 8,
         Everything = 15
-    }
-}
-declare namespace gd3d.framework {
-    var equationSolving: EquationSolving;
-    class EquationSolving {
-        private getSign;
-        private equalNumber;
-        getDerivative(f: (x: number) => number, delta?: number): (x: number) => number;
-        isContinuous(f: (x: number) => number): boolean;
-        hasSolution(f: (x: number) => number, a: number, b: number, errorcallback?: (err: Error) => void): boolean;
-        binary(f: (x: number) => number, a: number, b: number, precision?: number, errorcallback?: (err: Error) => void): number;
-        line(f: (x: number) => number, a: number, b: number, precision?: number, errorcallback?: (err: Error) => void): number;
-        tangent(f: (x: number) => number, f1: (x: number) => number, f2: (x: number) => number, a: number, b: number, precision?: number, errorcallback?: (err: Error) => void): number;
-        secant(f: (x: number) => number, a: number, b: number, precision?: number, errorcallback?: (err: Error) => void): number;
-    }
-}
-declare namespace gd3d.framework {
-    class AnimationCurve1 {
-        __class__: "gd3d.framework.AnimationCurve1";
-        maxtan: number;
-        preWrapMode: AnimationCurveWrapMode;
-        postWrapMode: AnimationCurveWrapMode;
-        keys: AnimationCurveKeyframe[];
-        readonly numKeys: number;
-        addKey(key: AnimationCurveKeyframe): void;
-        sort(): void;
-        deleteKey(key: AnimationCurveKeyframe): void;
-        getKey(index: number): AnimationCurveKeyframe;
-        indexOfKeys(key: AnimationCurveKeyframe): number;
-        getPoint(t: number): AnimationCurveKeyframe;
-        getValue(t: number): number;
-        findKey(t: number, y: number, precision: number): AnimationCurveKeyframe;
-        addKeyAtCurve(time: number, value: number, precision: number): AnimationCurveKeyframe;
-        getSamples(num?: number): AnimationCurveKeyframe[];
-    }
-}
-declare namespace gd3d.framework {
-    interface AnimationCurveKeyframe {
-        time: number;
-        value: number;
-        inTangent: number;
-        outTangent: number;
-    }
-}
-declare namespace gd3d.framework {
-    enum AnimationCurveWrapMode {
-        Clamp = 1,
-        Loop = 2,
-        PingPong = 4
-    }
-}
-declare namespace gd3d.framework {
-    var bezierCurve: BezierCurve;
-    class BezierCurve {
-        linear(t: number, p0: number, p1: number): number;
-        linearDerivative(t: number, p0: number, p1: number): number;
-        linearSecondDerivative(t: number, p0: number, p1: number): number;
-        quadratic(t: number, p0: number, p1: number, p2: number): number;
-        quadraticDerivative(t: number, p0: number, p1: number, p2: number): number;
-        quadraticSecondDerivative(t: number, p0: number, p1: number, p2: number): number;
-        cubic(t: number, p0: number, p1: number, p2: number, p3: number): number;
-        cubicDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
-        cubicSecondDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
-        bn(t: number, ps: number[], processs?: number[][]): number;
-        bnDerivative(t: number, ps: number[]): number;
-        bnSecondDerivative(t: number, ps: number[]): number;
-        bnND(t: number, dn: number, ps: number[]): number;
-        getValue(t: number, ps: number[]): number;
-        getDerivative(t: number, ps: number[]): number;
-        getSecondDerivative(t: number, ps: number[]): number;
-        getExtremums(ps: number[], numSamples?: number, precision?: number): {
-            ts: number[];
-            vs: number[];
-        };
-        getMonotoneIntervals(ps: number[], numSamples?: number, precision?: number): {
-            ts: number[];
-            vs: number[];
-        };
-        getTFromValue(targetV: number, ps: number[], numSamples?: number, precision?: number): number[];
-        split(t: number, ps: number[]): number[][];
-        merge(fps: number[], sps: number[], mergeType?: number): number[];
-        getSamples(ps: number[], num?: number): {
-            t: number;
-            v: number;
-        }[];
-    }
-}
-declare namespace gd3d.framework {
-    class MinMaxCurve {
-        __class__: "gd3d.framework.MinMaxCurve";
-        mode: MinMaxCurveMode;
-        constant: number;
-        constantMin: number;
-        constantMax: number;
-        curve: AnimationCurve1;
-        curveMin: AnimationCurve1;
-        curveMax: AnimationCurve1;
-        curveMultiplier: number;
-        between0And1: boolean;
-        getValue(time: number, randomBetween?: number): number;
-    }
-}
-declare namespace gd3d.framework {
-    enum MinMaxCurveMode {
-        Constant = 0,
-        Curve = 1,
-        TwoConstants = 3,
-        TwoCurves = 2
-    }
-}
-declare namespace gd3d.framework {
-    class MinMaxCurveVector3 {
-        xCurve: MinMaxCurve;
-        yCurve: MinMaxCurve;
-        zCurve: MinMaxCurve;
-        getValue(time: number, randomBetween?: number): math.vector3;
-    }
-}
-declare namespace gd3d.framework {
-    enum RotationOrder {
-        XYZ = 0,
-        ZXY = 1,
-        ZYX = 2,
-        YXZ = 3,
-        YZX = 4,
-        XZY = 5
-    }
-    var defaultRotationOrder: RotationOrder;
-}
-declare namespace gd3d.framework {
-    class Gradient {
-        __class__: "gd3d.framework.Gradient";
-        mode: GradientMode;
-        alphaKeys: GradientAlphaKey[];
-        colorKeys: GradientColorKey[];
-        getValue(time: number): math.color;
-        getAlpha(time: number): number;
-        getColor(time: number): math.color;
-    }
-}
-declare namespace gd3d.framework {
-    interface GradientAlphaKey {
-        alpha: number;
-        time: number;
-    }
-}
-declare namespace gd3d.framework {
-    interface GradientColorKey {
-        color: math.color;
-        time: number;
-    }
-}
-declare namespace gd3d.framework {
-    enum GradientMode {
-        Blend = 0,
-        Fixed = 1
-    }
-}
-declare namespace gd3d.framework {
-    class MinMaxGradient {
-        __class__: "gd3d.framework.MinMaxGradient";
-        mode: MinMaxGradientMode;
-        color: math.color;
-        colorMin: math.color;
-        colorMax: math.color;
-        gradient: Gradient;
-        gradientMin: Gradient;
-        gradientMax: Gradient;
-        getValue(time: number, randomBetween?: number, out?: math.color): math.color;
-    }
-}
-declare namespace gd3d.framework {
-    enum MinMaxGradientMode {
-        Color = 0,
-        Gradient = 1,
-        TwoColors = 2,
-        TwoGradients = 3,
-        RandomColor = 4
     }
 }
 declare namespace gd3d.framework {
