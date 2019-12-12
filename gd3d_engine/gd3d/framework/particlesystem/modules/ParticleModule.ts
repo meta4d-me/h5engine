@@ -5,7 +5,7 @@ namespace gd3d.framework
      * 
      * @author feng3d
      */
-    export class ParticleModule extends EventDispatcher
+    export class ParticleModule
     {
         /**
          * 是否开启

@@ -447,7 +447,6 @@ namespace gd3d.framework
                     break;
             }
             serialization.setValue(this.activeShape, preValue);
-            this.dispatch("refreshView");
         }
 
         private _onShapeChanged()

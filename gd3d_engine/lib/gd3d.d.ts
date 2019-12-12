@@ -5667,37 +5667,13 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    var dispatcher: IEventDispatcher<GlobalEvents>;
-    interface GlobalEvents {
-    }
-    interface IEventDispatcher<T> {
-        once<K extends keyof T>(type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof T>(type: K, data?: T[K], bubbles?: boolean): Event<T[K]>;
-        has<K extends keyof T>(type: K): boolean;
-        on<K extends keyof T>(type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof T>(type?: K, listener?: (event: Event<T[K]>) => void, thisObject?: any): void;
-    }
-    class EventDispatcher {
-        once(type: string, listener: (event: any) => void, thisObject?: any, priority?: number): void;
-        dispatchEvent(e: Event<any>): boolean;
-        dispatch(type: string, data?: any, bubbles?: boolean): Event<any>;
-        has(type: string): boolean;
-        on(type: string, listener: (event: any) => void, thisObject?: any, priority?: number, once?: boolean): void;
-        off(type?: string, listener?: (event: any) => void, thisObject?: any): void;
-        onAll(listener: (event: any) => void, thisObject?: any, priority?: number): void;
-        offAll(listener?: (event: any) => void, thisObject?: any): void;
-        protected handleEvent(e: Event<any>): void;
-        protected handelEventBubbles(e: Event<any>): void;
-    }
-}
-declare namespace gd3d.framework {
     interface ComponentMap {
         ParticleSystem: ParticleSystem;
     }
     interface GameObjectEventMap {
         particleCompleted: ParticleSystem;
     }
-    class ParticleSystem extends EventDispatcher implements IRenderer {
+    class ParticleSystem implements IRenderer {
         static readonly ClassName: string;
         __class__: "gd3d.framework.ParticleSystem";
         layer: RenderLayerEnum;
@@ -5880,55 +5856,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    var event1: FEvent;
-    var objectevent: ObjectEventDispatcher<Object, ObjectEventType>;
-    interface ObjectEventType {
-        propertyValueChanged: {
-            property: string;
-            oldValue: any;
-            newValue: any;
-        };
-    }
-    interface ObjectEventDispatcher<O, T> {
-        once<K extends keyof T>(target: O, type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof T>(target: O, type: K, data?: T[K], bubbles?: boolean): Event<T[K]>;
-        has<K extends keyof T>(target: O, type: K): boolean;
-        on<K extends keyof T>(target: O, type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof T>(target: O, type?: K, listener?: (event: Event<T[K]>) => void, thisObject?: any): void;
-    }
-    class FEvent {
-        private feventMap;
-        private getBubbleTargets;
-        once(obj: Object, type: string, listener: (event: any) => void, thisObject?: any, priority?: number): void;
-        dispatchEvent(obj: Object, e: Event<any>): boolean;
-        dispatch(obj: Object, type: string, data?: any, bubbles?: boolean): Event<any>;
-        has(obj: Object, type: string): boolean;
-        on(obj: Object, type: string, listener: (event: any) => any, thisObject?: any, priority?: number, once?: boolean): void;
-        off(obj: Object, type?: string, listener?: (event: any) => any, thisObject?: any): void;
-        onAll(obj: Object, listener: (event: any) => void, thisObject?: any, priority?: number): void;
-        offAll(obj: Object, listener?: (event: any) => void, thisObject?: any): void;
-        protected handleEvent(obj: Object, e: Event<any>): void;
-        protected handelEventBubbles(obj: Object, e: Event<any>): void;
-    }
-    interface Event<T> {
-        type: string;
-        data: T;
-        bubbles: boolean;
-        target: any;
-        currentTarget: any;
-        isStop: boolean;
-        isStopBubbles: boolean;
-        targets: any[];
-        handles: ListenerVO[];
-    }
-    interface ListenerVO {
-        listener: (event: Event<any>) => void;
-        thisObject: any;
-        priority: number;
-        once: boolean;
-    }
-}
-declare namespace gd3d.framework {
     var equationSolving: EquationSolving;
     class EquationSolving {
         private getSign;
@@ -6107,7 +6034,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class ParticleModule extends EventDispatcher {
+    class ParticleModule {
         enabled: boolean;
         particleSystem: ParticleSystem;
         initParticleState(particle: Particle1): void;
@@ -6391,22 +6318,6 @@ declare namespace gd3d.framework {
         readonly isProbability: boolean;
         private _isProbability;
         calculateProbability(): boolean;
-    }
-}
-declare namespace gd3d.framework {
-    type gPartial<T> = {
-        [P in keyof T]?: gPartial<T[P]>;
-    };
-    type Lazy<T> = T | (() => T);
-    type LazyObject<T> = {
-        [P in keyof T]: Lazy<T[P]>;
-    };
-    var lazy: {
-        getvalue: <T>(lazyItem: Lazy<T>) => T;
-    };
-    interface IDisposable {
-        readonly disposed: boolean;
-        dispose(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -7211,92 +7122,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class ClassUtils {
-        static getQualifiedClassName(value: any): string;
-        static getDefinitionByName(name: string, readCache?: boolean): any;
-        private static defaultInstMap;
-        static getDefaultInstanceByName(name: string): any;
-        static getInstanceByName(name: string): any;
-        static addClassNameSpace(namespace: string): void;
-    }
-}
-interface WebGLRenderingContext {
-    extensions: gd3d.framework.GLExtension;
-    vertexAttribDivisor(index: GLuint, divisor: GLuint): void;
-    drawElementsInstanced(mode: GLenum, count: GLsizei, type: GLenum, offset: GLintptr, instanceCount: GLsizei): void;
-    drawArraysInstanced(mode: GLenum, first: GLint, count: GLsizei, instanceCount: GLsizei): void;
-}
-declare namespace gd3d.framework {
-    class GLExtension {
-        ANGLE_instanced_arrays: ANGLE_instanced_arrays;
-        EXT_blend_minmax: EXT_blend_minmax;
-        EXT_color_buffer_half_float: any;
-        EXT_frag_depth: EXT_frag_depth;
-        EXT_sRGB: EXT_sRGB;
-        EXT_shader_texture_lod: EXT_shader_texture_lod;
-        EXT_texture_filter_anisotropic: EXT_texture_filter_anisotropic;
-        OES_element_index_uint: OES_element_index_uint;
-        OES_standard_derivatives: OES_standard_derivatives;
-        OES_texture_float: OES_texture_float;
-        OES_texture_float_linear: OES_texture_float_linear;
-        OES_texture_half_float: OES_texture_half_float;
-        OES_texture_half_float_linear: OES_texture_half_float_linear;
-        OES_vertex_array_object: OES_vertex_array_object;
-        WEBGL_color_buffer_float: WEBGL_color_buffer_float;
-        WEBGL_compressed_texture_atc: any;
-        WEBGL_compressed_texture_etc1: any;
-        WEBGL_compressed_texture_pvrtc: any;
-        WEBGL_compressed_texture_s3tc: WEBGL_compressed_texture_s3tc;
-        WEBGL_debug_renderer_info: WEBGL_debug_renderer_info;
-        WEBGL_debug_shaders: WEBGL_debug_shaders;
-        WEBGL_depth_texture: WEBGL_depth_texture;
-        WEBGL_draw_buffers: WEBGL_draw_buffers;
-        WEBGL_lose_context: any;
-        constructor(gl: WebGLRenderingContext);
-        private initExtensions;
-        private cacheGLQuery;
-        private wrap;
-    }
-}
-declare namespace gd3d.framework {
-    var serialization: Serialization;
-    function serialize(target: any, propertyKey: string): void;
-    interface PropertyHandler {
-        (target: any, source: any, property: string, handlers: PropertyHandler[], serialization: Serialization): boolean;
-    }
-    interface DifferentPropertyHandler {
-        (target: any, source: any, property: string, different: Object, handlers: DifferentPropertyHandler[], serialization: Serialization): boolean;
-    }
-    class Serialization {
-        serializeHandlers: {
-            priority: number;
-            handler: PropertyHandler;
-        }[];
-        deserializeHandlers: {
-            priority: number;
-            handler: PropertyHandler;
-        }[];
-        differentHandlers: {
-            priority: number;
-            handler: DifferentPropertyHandler;
-        }[];
-        setValueHandlers: {
-            priority: number;
-            handler: PropertyHandler;
-        }[];
-        serialize<T>(target: T): gPartial<T>;
-        deserialize<T>(object: gPartial<T>): T;
-        different<T>(target: T, source: T): gPartial<T>;
-        setValue<T>(target: T, source: gPartial<T>): T;
-        clone<T>(target: T): T;
-    }
-    var CLASS_KEY: string;
-    interface SerializationTempInfo {
-        loadingNum?: number;
-        onLoaded?: () => void;
-    }
-}
-declare namespace gd3d.framework {
     class tweenUtil {
         static GetEaseProgress(ease_type: tweenMethod, linear_progress: number): number;
         static Linear(t: number, b: number, c: number, d: number): number;
@@ -7393,6 +7218,16 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class ClassUtils {
+        static getQualifiedClassName(value: any): string;
+        static getDefinitionByName(name: string, readCache?: boolean): any;
+        private static defaultInstMap;
+        static getDefaultInstanceByName(name: string): any;
+        static getInstanceByName(name: string): any;
+        static addClassNameSpace(namespace: string): void;
+    }
+}
+declare namespace gd3d.framework {
     enum CullingMask {
         nothing = 0,
         default = 1,
@@ -7447,6 +7282,44 @@ declare namespace gd3d.framework {
         static getEnumObjByType(enumType: string): any;
     }
 }
+interface WebGLRenderingContext {
+    extensions: gd3d.framework.GLExtension;
+    vertexAttribDivisor(index: GLuint, divisor: GLuint): void;
+    drawElementsInstanced(mode: GLenum, count: GLsizei, type: GLenum, offset: GLintptr, instanceCount: GLsizei): void;
+    drawArraysInstanced(mode: GLenum, first: GLint, count: GLsizei, instanceCount: GLsizei): void;
+}
+declare namespace gd3d.framework {
+    class GLExtension {
+        ANGLE_instanced_arrays: ANGLE_instanced_arrays;
+        EXT_blend_minmax: EXT_blend_minmax;
+        EXT_color_buffer_half_float: any;
+        EXT_frag_depth: EXT_frag_depth;
+        EXT_sRGB: EXT_sRGB;
+        EXT_shader_texture_lod: EXT_shader_texture_lod;
+        EXT_texture_filter_anisotropic: EXT_texture_filter_anisotropic;
+        OES_element_index_uint: OES_element_index_uint;
+        OES_standard_derivatives: OES_standard_derivatives;
+        OES_texture_float: OES_texture_float;
+        OES_texture_float_linear: OES_texture_float_linear;
+        OES_texture_half_float: OES_texture_half_float;
+        OES_texture_half_float_linear: OES_texture_half_float_linear;
+        OES_vertex_array_object: OES_vertex_array_object;
+        WEBGL_color_buffer_float: WEBGL_color_buffer_float;
+        WEBGL_compressed_texture_atc: any;
+        WEBGL_compressed_texture_etc1: any;
+        WEBGL_compressed_texture_pvrtc: any;
+        WEBGL_compressed_texture_s3tc: WEBGL_compressed_texture_s3tc;
+        WEBGL_debug_renderer_info: WEBGL_debug_renderer_info;
+        WEBGL_debug_shaders: WEBGL_debug_shaders;
+        WEBGL_depth_texture: WEBGL_depth_texture;
+        WEBGL_draw_buffers: WEBGL_draw_buffers;
+        WEBGL_lose_context: any;
+        constructor(gl: WebGLRenderingContext);
+        private initExtensions;
+        private cacheGLQuery;
+        private wrap;
+    }
+}
 declare namespace gd3d.framework {
     class NumberUtil {
         static KEY_A: number;
@@ -7479,6 +7352,44 @@ declare namespace gd3d.framework {
         static rangeRegexp: RegExp;
         static vector4Regexp: RegExp;
         static vector3FloatOrRangeRegexp: RegExp;
+    }
+}
+declare namespace gd3d.framework {
+    var serialization: Serialization;
+    function serialize(target: any, propertyKey: string): void;
+    interface PropertyHandler {
+        (target: any, source: any, property: string, handlers: PropertyHandler[], serialization: Serialization): boolean;
+    }
+    interface DifferentPropertyHandler {
+        (target: any, source: any, property: string, different: Object, handlers: DifferentPropertyHandler[], serialization: Serialization): boolean;
+    }
+    class Serialization {
+        serializeHandlers: {
+            priority: number;
+            handler: PropertyHandler;
+        }[];
+        deserializeHandlers: {
+            priority: number;
+            handler: PropertyHandler;
+        }[];
+        differentHandlers: {
+            priority: number;
+            handler: DifferentPropertyHandler;
+        }[];
+        setValueHandlers: {
+            priority: number;
+            handler: PropertyHandler;
+        }[];
+        serialize<T>(target: T): gPartial<T>;
+        deserialize<T>(object: gPartial<T>): T;
+        different<T>(target: T, source: T): gPartial<T>;
+        setValue<T>(target: T, source: gPartial<T>): T;
+        clone<T>(target: T): T;
+    }
+    var CLASS_KEY: string;
+    interface SerializationTempInfo {
+        loadingNum?: number;
+        onLoaded?: () => void;
     }
 }
 declare namespace gd3d.framework {
@@ -7542,6 +7453,22 @@ declare namespace gd3d.framework {
         private static create2D_image2D;
         private static create2D_label;
         private static create2D_button;
+    }
+}
+declare namespace gd3d.framework {
+    type gPartial<T> = {
+        [P in keyof T]?: gPartial<T[P]>;
+    };
+    type Lazy<T> = T | (() => T);
+    type LazyObject<T> = {
+        [P in keyof T]: Lazy<T[P]>;
+    };
+    var lazy: {
+        getvalue: <T>(lazyItem: Lazy<T>) => T;
+    };
+    interface IDisposable {
+        readonly disposed: boolean;
+        dispose(): void;
     }
 }
 declare namespace gd3d.framework {

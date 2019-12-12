@@ -1,5 +1,3 @@
-/// <reference path="event/EventDispatcher.ts" />
-
 namespace gd3d.framework
 {
     export interface ComponentMap { ParticleSystem: ParticleSystem }
@@ -19,7 +17,7 @@ namespace gd3d.framework
      */
     @reflect.nodeRender
     @reflect.nodeComponent
-    export class ParticleSystem extends EventDispatcher implements IRenderer
+    export class ParticleSystem implements IRenderer
     {
         static readonly ClassName: string = "ParticleSystem";
 
@@ -328,8 +326,6 @@ namespace gd3d.framework
 
         constructor()
         {
-            super();
-
             this.main = new ParticleMainModule();
             this.emission = new ParticleEmissionModule();
             this.shape = new ParticleShapeModule();
@@ -393,7 +389,7 @@ namespace gd3d.framework
             if (!this.main.loop && this._activeParticles.length == 0 && this._realTime > this.main.duration)
             {
                 this.stop();
-                this.dispatch("particleCompleted", this);
+                // this.dispatch("particleCompleted", this);
             }
         }
 

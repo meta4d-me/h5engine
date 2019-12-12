@@ -29912,67 +29912,16 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var EventDispatcher = (function () {
-            function EventDispatcher() {
-            }
-            EventDispatcher.prototype.once = function (type, listener, thisObject, priority) {
-                if (thisObject === void 0) { thisObject = null; }
-                if (priority === void 0) { priority = 0; }
-                framework.event1.on(this, type, listener, thisObject, priority, true);
-            };
-            EventDispatcher.prototype.dispatchEvent = function (e) {
-                return framework.event1.dispatchEvent(this, e);
-            };
-            EventDispatcher.prototype.dispatch = function (type, data, bubbles) {
-                if (bubbles === void 0) { bubbles = false; }
-                return framework.event1.dispatch(this, type, data, bubbles);
-            };
-            EventDispatcher.prototype.has = function (type) {
-                return framework.event1.has(this, type);
-            };
-            EventDispatcher.prototype.on = function (type, listener, thisObject, priority, once) {
-                if (priority === void 0) { priority = 0; }
-                if (once === void 0) { once = false; }
-                framework.event1.on(this, type, listener, thisObject, priority, once);
-            };
-            EventDispatcher.prototype.off = function (type, listener, thisObject) {
-                framework.event1.off(this, type, listener, thisObject);
-            };
-            EventDispatcher.prototype.onAll = function (listener, thisObject, priority) {
-                if (priority === void 0) { priority = 0; }
-                framework.event1.onAll(this, listener, thisObject, priority);
-            };
-            EventDispatcher.prototype.offAll = function (listener, thisObject) {
-                framework.event1.offAll(this, listener, thisObject);
-            };
-            EventDispatcher.prototype.handleEvent = function (e) {
-                framework.event1["handleEvent"](this, e);
-            };
-            EventDispatcher.prototype.handelEventBubbles = function (e) {
-                framework.event1["handelEventBubbles"](this, e);
-            };
-            return EventDispatcher;
-        }());
-        framework.EventDispatcher = EventDispatcher;
-        framework.dispatcher = new EventDispatcher();
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var ParticleSystem = (function (_super) {
-            __extends(ParticleSystem, _super);
+        var ParticleSystem = (function () {
             function ParticleSystem() {
-                var _this = _super.call(this) || this;
-                _this.layer = framework.RenderLayerEnum.Transparent;
-                _this.queue = 0;
-                _this._isPlaying = false;
-                _this.time = 0;
-                _this.startDelay = 0;
-                _this._startDelay_rate = Math.random();
-                _this._vbos = [];
-                _this._attributes = [
+                this.layer = framework.RenderLayerEnum.Transparent;
+                this.queue = 0;
+                this._isPlaying = false;
+                this.time = 0;
+                this.startDelay = 0;
+                this._startDelay_rate = Math.random();
+                this._vbos = [];
+                this._attributes = [
                     ["a_particle_position", 4],
                     ["a_particle_scale", 4],
                     ["a_particle_rotation", 4],
@@ -29980,38 +29929,37 @@ var gd3d;
                     ["a_particle_tilingOffset", 4],
                     ["a_particle_flipUV", 4],
                 ];
-                _this._awaked = false;
-                _this._realTime = 0;
-                _this._preRealTime = 0;
-                _this._particlePool = [];
-                _this._activeParticles = [];
-                _this._modules = [];
-                _this._preworldPos = new gd3d.math.vector3();
-                _this._isRateOverDistance = false;
-                _this._leftRateOverDistance = 0;
-                _this.worldPos = new gd3d.math.vector3();
-                _this.moveVec = new gd3d.math.vector3();
-                _this.speed = new gd3d.math.vector3();
-                _this.localToWorldMatrix = new gd3d.math.matrix();
-                _this.worldToLocalMatrix = new gd3d.math.matrix();
-                _this.main = new framework.ParticleMainModule();
-                _this.emission = new framework.ParticleEmissionModule();
-                _this.shape = new framework.ParticleShapeModule();
-                _this.velocityOverLifetime = new framework.ParticleVelocityOverLifetimeModule();
-                _this.inheritVelocity = new framework.ParticleInheritVelocityModule();
-                _this.forceOverLifetime = new framework.ParticleForceOverLifetimeModule();
-                _this.limitVelocityOverLifetime = new framework.ParticleLimitVelocityOverLifetimeModule();
-                _this.colorOverLifetime = new framework.ParticleColorOverLifetimeModule();
-                _this.colorBySpeed = new framework.ParticleColorBySpeedModule();
-                _this.sizeOverLifetime = new framework.ParticleSizeOverLifetimeModule();
-                _this.sizeBySpeed = new framework.ParticleSizeBySpeedModule();
-                _this.rotationOverLifetime = new framework.ParticleRotationOverLifetimeModule();
-                _this.rotationBySpeed = new framework.ParticleRotationBySpeedModule();
-                _this.textureSheetAnimation = new framework.ParticleTextureSheetAnimationModule();
-                _this.main.enabled = true;
-                _this.emission.enabled = true;
-                _this.shape.enabled = true;
-                return _this;
+                this._awaked = false;
+                this._realTime = 0;
+                this._preRealTime = 0;
+                this._particlePool = [];
+                this._activeParticles = [];
+                this._modules = [];
+                this._preworldPos = new gd3d.math.vector3();
+                this._isRateOverDistance = false;
+                this._leftRateOverDistance = 0;
+                this.worldPos = new gd3d.math.vector3();
+                this.moveVec = new gd3d.math.vector3();
+                this.speed = new gd3d.math.vector3();
+                this.localToWorldMatrix = new gd3d.math.matrix();
+                this.worldToLocalMatrix = new gd3d.math.matrix();
+                this.main = new framework.ParticleMainModule();
+                this.emission = new framework.ParticleEmissionModule();
+                this.shape = new framework.ParticleShapeModule();
+                this.velocityOverLifetime = new framework.ParticleVelocityOverLifetimeModule();
+                this.inheritVelocity = new framework.ParticleInheritVelocityModule();
+                this.forceOverLifetime = new framework.ParticleForceOverLifetimeModule();
+                this.limitVelocityOverLifetime = new framework.ParticleLimitVelocityOverLifetimeModule();
+                this.colorOverLifetime = new framework.ParticleColorOverLifetimeModule();
+                this.colorBySpeed = new framework.ParticleColorBySpeedModule();
+                this.sizeOverLifetime = new framework.ParticleSizeOverLifetimeModule();
+                this.sizeBySpeed = new framework.ParticleSizeBySpeedModule();
+                this.rotationOverLifetime = new framework.ParticleRotationOverLifetimeModule();
+                this.rotationBySpeed = new framework.ParticleRotationBySpeedModule();
+                this.textureSheetAnimation = new framework.ParticleTextureSheetAnimationModule();
+                this.main.enabled = true;
+                this.emission.enabled = true;
+                this.shape.enabled = true;
             }
             Object.defineProperty(ParticleSystem.prototype, "renderLayer", {
                 get: function () { return this.gameObject.layer; },
@@ -30260,7 +30208,6 @@ var gd3d;
                 this._preworldPos.z = this.worldPos.z;
                 if (!this.main.loop && this._activeParticles.length == 0 && this._realTime > this.main.duration) {
                     this.stop();
-                    this.dispatch("particleCompleted", this);
                 }
             };
             ParticleSystem.prototype.stop = function () {
@@ -30634,7 +30581,7 @@ var gd3d;
                 __metadata("design:paramtypes", [])
             ], ParticleSystem);
             return ParticleSystem;
-        }(framework.EventDispatcher));
+        }());
         framework.ParticleSystem = ParticleSystem;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -30778,176 +30725,6 @@ var gd3d;
             UVChannelFlags[UVChannelFlags["UV3"] = 8] = "UV3";
             UVChannelFlags[UVChannelFlags["Everything"] = 15] = "Everything";
         })(UVChannelFlags = framework.UVChannelFlags || (framework.UVChannelFlags = {}));
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var FEvent = (function () {
-            function FEvent() {
-                this.feventMap = new Map();
-            }
-            FEvent.prototype.getBubbleTargets = function (target) {
-                return [target["parent"]];
-            };
-            FEvent.prototype.once = function (obj, type, listener, thisObject, priority) {
-                if (thisObject === void 0) { thisObject = null; }
-                if (priority === void 0) { priority = 0; }
-                this.on(obj, type, listener, thisObject, priority, true);
-            };
-            FEvent.prototype.dispatchEvent = function (obj, e) {
-                var targets = e.targets = e.targets || [];
-                if (targets.indexOf(obj) != -1)
-                    return false;
-                targets.push(obj);
-                e.handles = [];
-                this.handleEvent(obj, e);
-                this.handelEventBubbles(obj, e);
-                return true;
-            };
-            FEvent.prototype.dispatch = function (obj, type, data, bubbles) {
-                if (bubbles === void 0) { bubbles = false; }
-                var e = { type: type, data: data, bubbles: bubbles, target: null, currentTarget: null, isStop: false, isStopBubbles: false, targets: [], handles: [] };
-                this.dispatchEvent(obj, e);
-                return e;
-            };
-            FEvent.prototype.has = function (obj, type) {
-                return !!(this.feventMap.get(obj) && this.feventMap.get(obj)[type] && this.feventMap.get(obj)[type].length);
-            };
-            FEvent.prototype.on = function (obj, type, listener, thisObject, priority, once) {
-                if (priority === void 0) { priority = 0; }
-                if (once === void 0) { once = false; }
-                var objectListener = this.feventMap.get(obj);
-                if (!objectListener)
-                    (this.feventMap.set(obj, objectListener = {}));
-                var listeners = objectListener[type] = objectListener[type] || [];
-                for (var i = 0; i < listeners.length; i++) {
-                    var element = listeners[i];
-                    if (element.listener == listener && element.thisObject == thisObject) {
-                        listeners.splice(i, 1);
-                        break;
-                    }
-                }
-                for (var i = 0; i < listeners.length; i++) {
-                    var element = listeners[i];
-                    if (priority > element.priority) {
-                        break;
-                    }
-                }
-                listeners.splice(i, 0, { listener: listener, thisObject: thisObject, priority: priority, once: once });
-            };
-            FEvent.prototype.off = function (obj, type, listener, thisObject) {
-                if (!type) {
-                    this.feventMap.delete(obj);
-                    return;
-                }
-                if (!listener) {
-                    if (this.feventMap.get(obj))
-                        delete this.feventMap.get(obj)[type];
-                    return;
-                }
-                var listeners = this.feventMap.get(obj) && this.feventMap.get(obj)[type];
-                if (listeners) {
-                    for (var i = listeners.length - 1; i >= 0; i--) {
-                        var element = listeners[i];
-                        if (element.listener == listener && element.thisObject == thisObject) {
-                            listeners.splice(i, 1);
-                        }
-                    }
-                    if (listeners.length == 0) {
-                        delete this.feventMap.get(obj)[type];
-                    }
-                }
-            };
-            FEvent.prototype.onAll = function (obj, listener, thisObject, priority) {
-                if (priority === void 0) { priority = 0; }
-                var objectListener = this.feventMap.get(obj);
-                if (!objectListener)
-                    (this.feventMap.set(obj, objectListener = {}));
-                var listeners = objectListener.__allEventType__ = objectListener.__allEventType__ || [];
-                for (var i = 0; i < listeners.length; i++) {
-                    var element = listeners[i];
-                    if (element.listener == listener && element.thisObject == thisObject) {
-                        listeners.splice(i, 1);
-                        break;
-                    }
-                }
-                for (var i = 0; i < listeners.length; i++) {
-                    var element = listeners[i];
-                    if (priority > element.priority) {
-                        break;
-                    }
-                }
-                listeners.splice(i, 0, { listener: listener, thisObject: thisObject, priority: priority, once: false });
-            };
-            FEvent.prototype.offAll = function (obj, listener, thisObject) {
-                if (!listener) {
-                    if (this.feventMap.get(obj))
-                        delete this.feventMap.get(obj).__allEventType__;
-                    return;
-                }
-                var listeners = this.feventMap.get(obj) && this.feventMap.get(obj).__allEventType__;
-                if (listeners) {
-                    for (var i = listeners.length - 1; i >= 0; i--) {
-                        var element = listeners[i];
-                        if (element.listener == listener && element.thisObject == thisObject) {
-                            listeners.splice(i, 1);
-                        }
-                    }
-                    if (listeners.length == 0) {
-                        delete this.feventMap.get(obj).__allEventType__;
-                    }
-                }
-            };
-            FEvent.prototype.handleEvent = function (obj, e) {
-                e.target || (e.target = obj);
-                try {
-                    e.currentTarget = obj;
-                }
-                catch (error) { }
-                var listeners = this.feventMap.get(obj) && this.feventMap.get(obj)[e.type];
-                if (listeners) {
-                    var listeners0 = listeners.concat();
-                    for (var i = 0; i < listeners0.length && !e.isStop; i++) {
-                        listeners0[i].listener.call(listeners0[i].thisObject, e);
-                        e.handles.push(listeners0[i]);
-                    }
-                    for (var i = listeners.length - 1; i >= 0; i--) {
-                        if (listeners[i].once)
-                            listeners.splice(i, 1);
-                    }
-                    if (listeners.length == 0)
-                        delete this.feventMap.get(obj)[e.type];
-                }
-                listeners = this.feventMap.get(obj) && this.feventMap.get(obj).__allEventType__;
-                if (listeners) {
-                    var listeners0 = listeners.concat();
-                    for (var i = 0; i < listeners0.length && !e.isStop; i++) {
-                        listeners0[i].listener.call(listeners0[i].thisObject, e);
-                    }
-                    for (var i = listeners.length - 1; i >= 0; i--) {
-                        if (listeners[i].once)
-                            listeners.splice(i, 1);
-                    }
-                    if (listeners.length == 0)
-                        delete this.feventMap.get(obj).__allEventType__;
-                }
-            };
-            FEvent.prototype.handelEventBubbles = function (obj, e) {
-                if (e.bubbles && !e.isStopBubbles) {
-                    var bubbleTargets = this.getBubbleTargets(obj);
-                    for (var i = 0, n = bubbleTargets.length; i < n; i++) {
-                        var bubbleTarget = bubbleTargets[i];
-                        if (!e.isStop && bubbleTarget && bubbleTarget.dispatchEvent)
-                            bubbleTarget.dispatchEvent(e);
-                    }
-                }
-            };
-            return FEvent;
-        }());
-        framework.FEvent = FEvent;
-        framework.objectevent = framework.event1 = new FEvent();
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -31819,19 +31596,16 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var ParticleModule = (function (_super) {
-            __extends(ParticleModule, _super);
+        var ParticleModule = (function () {
             function ParticleModule() {
-                var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.enabled = false;
-                return _this;
+                this.enabled = false;
             }
             ParticleModule.prototype.initParticleState = function (particle) {
             };
             ParticleModule.prototype.updateParticleState = function (particle) {
             };
             return ParticleModule;
-        }(framework.EventDispatcher));
+        }());
         framework.ParticleModule = ParticleModule;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -32947,7 +32721,6 @@ var gd3d;
                         break;
                 }
                 framework.serialization.setValue(this.activeShape, preValue);
-                this.dispatch("refreshView");
             };
             ParticleShapeModule.prototype._onShapeChanged = function () {
                 switch (this.shape) {
@@ -33510,19 +33283,6 @@ var gd3d;
             return ParticleEmissionBurst;
         }());
         framework.ParticleEmissionBurst = ParticleEmissionBurst;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        framework.lazy = {
-            getvalue: function (lazyItem) {
-                if (typeof lazyItem == "function")
-                    return lazyItem();
-                return lazyItem;
-            }
-        };
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -37827,6 +37587,395 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var tweenUtil = (function () {
+            function tweenUtil() {
+            }
+            tweenUtil.GetEaseProgress = function (ease_type, linear_progress) {
+                switch (ease_type) {
+                    case tweenMethod.Linear:
+                        return linear_progress;
+                    case tweenMethod.ExpoEaseOut:
+                        return tweenUtil.ExpoEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.ExpoEaseIn:
+                        return tweenUtil.ExpoEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ExpoEaseOutIn:
+                        return tweenUtil.ExpoEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ExpoEaseInOut:
+                        return tweenUtil.ExpoEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseOut:
+                        return tweenUtil.CircEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseIn:
+                        return tweenUtil.CircEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseOutIn:
+                        return tweenUtil.CircEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CircEaseInOut:
+                        return tweenUtil.CircEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseOut:
+                        return tweenUtil.QuadEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseIn:
+                        return tweenUtil.QuadEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseOutIn:
+                        return tweenUtil.QuadEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuadEaseInOut:
+                        return tweenUtil.QuadEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseOut:
+                        return tweenUtil.SineEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseIn:
+                        return tweenUtil.SineEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseOutIn:
+                        return tweenUtil.SineEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.SineEaseInOut:
+                        return tweenUtil.SineEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseOut:
+                        return tweenUtil.CubicEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseIn:
+                        return tweenUtil.CubicEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseOutIn:
+                        return tweenUtil.CubicEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.CubicEaseInOut:
+                        return tweenUtil.CubicEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseOut:
+                        return tweenUtil.QuartEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseIn:
+                        return tweenUtil.QuartEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseOutIn:
+                        return tweenUtil.QuartEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuartEaseInOut:
+                        return tweenUtil.QuartEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseOut:
+                        return tweenUtil.QuintEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseIn:
+                        return tweenUtil.QuintEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseOutIn:
+                        return tweenUtil.QuintEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.QuintEaseInOut:
+                        return tweenUtil.QuintEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseOut:
+                        return tweenUtil.ElasticEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseIn:
+                        return tweenUtil.ElasticEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseOutIn:
+                        return tweenUtil.ElasticEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.ElasticEaseInOut:
+                        return tweenUtil.ElasticEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseOut:
+                        return tweenUtil.BounceEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseIn:
+                        return tweenUtil.BounceEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseOutIn:
+                        return tweenUtil.BounceEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BounceEaseInOut:
+                        return tweenUtil.BounceEaseInOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseOut:
+                        return tweenUtil.BackEaseOut(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseIn:
+                        return tweenUtil.BackEaseIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseOutIn:
+                        return tweenUtil.BackEaseOutIn(linear_progress, 0, 1, 1);
+                    case tweenMethod.BackEaseInOut:
+                        return tweenUtil.BackEaseInOut(linear_progress, 0, 1, 1);
+                    default:
+                        return linear_progress;
+                }
+            };
+            tweenUtil.Linear = function (t, b, c, d) {
+                return c * t / d + b;
+            };
+            tweenUtil.ExpoEaseOut = function (t, b, c, d) {
+                return (t == d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
+            };
+            tweenUtil.ExpoEaseIn = function (t, b, c, d) {
+                return (t == 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
+            };
+            tweenUtil.ExpoEaseInOut = function (t, b, c, d) {
+                if (t == 0)
+                    return b;
+                if (t == d)
+                    return b + c;
+                if ((t /= d / 2) < 1)
+                    return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
+                return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
+            };
+            tweenUtil.ExpoEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.ExpoEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.ExpoEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.CircEaseOut = function (t, b, c, d) {
+                return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
+            };
+            tweenUtil.CircEaseIn = function (t, b, c, d) {
+                return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
+            };
+            tweenUtil.CircEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
+                return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
+            };
+            tweenUtil.CircEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.CircEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.CircEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.QuadEaseOut = function (t, b, c, d) {
+                return -c * (t /= d) * (t - 2) + b;
+            };
+            tweenUtil.QuadEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t + b;
+            };
+            tweenUtil.QuadEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t + b;
+                return -c / 2 * ((--t) * (t - 2) - 1) + b;
+            };
+            tweenUtil.QuadEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.QuadEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.QuadEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.SineEaseOut = function (t, b, c, d) {
+                return c * Math.sin(t / d * (Math.PI / 2)) + b;
+            };
+            tweenUtil.SineEaseIn = function (t, b, c, d) {
+                return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
+            };
+            tweenUtil.SineEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * (Math.sin(Math.PI * t / 2)) + b;
+                return -c / 2 * (Math.cos(Math.PI * --t / 2) - 2) + b;
+            };
+            tweenUtil.SineEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.SineEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.SineEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.CubicEaseOut = function (t, b, c, d) {
+                return c * ((t = t / d - 1) * t * t + 1) + b;
+            };
+            tweenUtil.CubicEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * t + b;
+            };
+            tweenUtil.CubicEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t * t + b;
+                return c / 2 * ((t -= 2) * t * t + 2) + b;
+            };
+            tweenUtil.CubicEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.CubicEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.CubicEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.QuartEaseOut = function (t, b, c, d) {
+                return -c * ((t = t / d - 1) * t * t * t - 1) + b;
+            };
+            tweenUtil.QuartEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * t * t + b;
+            };
+            tweenUtil.QuartEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t * t * t + b;
+                return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
+            };
+            tweenUtil.QuartEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.QuartEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.QuartEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.QuintEaseOut = function (t, b, c, d) {
+                return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
+            };
+            tweenUtil.QuintEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * t * t * t + b;
+            };
+            tweenUtil.QuintEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) < 1)
+                    return c / 2 * t * t * t * t * t + b;
+                return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
+            };
+            tweenUtil.QuintEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.QuintEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.QuintEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.ElasticEaseOut = function (t, b, c, d) {
+                if ((t /= d) == 1)
+                    return b + c;
+                var p = d * 0.3;
+                var s = p / 4;
+                return (c * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b);
+            };
+            tweenUtil.ElasticEaseIn = function (t, b, c, d) {
+                if ((t /= d) == 1)
+                    return b + c;
+                var p = d * 0.3;
+                var s = p / 4;
+                return -(c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+            };
+            tweenUtil.ElasticEaseInOut = function (t, b, c, d) {
+                if ((t /= d / 2) == 2)
+                    return b + c;
+                var p = d * (0.3 * 1.5);
+                var s = p / 4;
+                if (t < 1)
+                    return -0.5 * (c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
+                return c * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * 0.5 + c + b;
+            };
+            tweenUtil.ElasticEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.ElasticEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.ElasticEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.BounceEaseOut = function (t, b, c, d) {
+                if ((t /= d) < (1 / 2.75))
+                    return c * (7.5625 * t * t) + b;
+                else if (t < (2 / 2.75))
+                    return c * (7.5625 * (t -= (1.5 / 2.75)) * t + 0.75) + b;
+                else if (t < (2.5 / 2.75))
+                    return c * (7.5625 * (t -= (2.25 / 2.75)) * t + 0.9375) + b;
+                else
+                    return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
+            };
+            tweenUtil.BounceEaseIn = function (t, b, c, d) {
+                return c - tweenUtil.BounceEaseOut(d - t, 0, c, d) + b;
+            };
+            tweenUtil.BounceEaseInOut = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.BounceEaseIn(t * 2, 0, c, d) * 0.5 + b;
+                else
+                    return tweenUtil.BounceEaseOut(t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
+            };
+            tweenUtil.BounceEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.BounceEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.BounceEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            tweenUtil.BackEaseOut = function (t, b, c, d) {
+                return c * ((t = t / d - 1) * t * ((1.70158 + 1) * t + 1.70158) + 1) + b;
+            };
+            tweenUtil.BackEaseIn = function (t, b, c, d) {
+                return c * (t /= d) * t * ((1.70158 + 1) * t - 1.70158) + b;
+            };
+            tweenUtil.BackEaseInOut = function (t, b, c, d) {
+                var s = 1.70158;
+                if ((t /= d / 2) < 1)
+                    return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
+                return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + b;
+            };
+            tweenUtil.BackEaseOutIn = function (t, b, c, d) {
+                if (t < d / 2)
+                    return tweenUtil.BackEaseOut(t * 2, b, c / 2, d);
+                return tweenUtil.BackEaseIn((t * 2) - d, b + c / 2, c / 2, d);
+            };
+            return tweenUtil;
+        }());
+        framework.tweenUtil = tweenUtil;
+        var tweenMethod;
+        (function (tweenMethod) {
+            tweenMethod[tweenMethod["Linear"] = 0] = "Linear";
+            tweenMethod[tweenMethod["ExpoEaseOut"] = 1] = "ExpoEaseOut";
+            tweenMethod[tweenMethod["ExpoEaseIn"] = 2] = "ExpoEaseIn";
+            tweenMethod[tweenMethod["ExpoEaseInOut"] = 3] = "ExpoEaseInOut";
+            tweenMethod[tweenMethod["ExpoEaseOutIn"] = 4] = "ExpoEaseOutIn";
+            tweenMethod[tweenMethod["CircEaseOut"] = 5] = "CircEaseOut";
+            tweenMethod[tweenMethod["CircEaseIn"] = 6] = "CircEaseIn";
+            tweenMethod[tweenMethod["CircEaseInOut"] = 7] = "CircEaseInOut";
+            tweenMethod[tweenMethod["CircEaseOutIn"] = 8] = "CircEaseOutIn";
+            tweenMethod[tweenMethod["QuadEaseOut"] = 9] = "QuadEaseOut";
+            tweenMethod[tweenMethod["QuadEaseIn"] = 10] = "QuadEaseIn";
+            tweenMethod[tweenMethod["QuadEaseInOut"] = 11] = "QuadEaseInOut";
+            tweenMethod[tweenMethod["QuadEaseOutIn"] = 12] = "QuadEaseOutIn";
+            tweenMethod[tweenMethod["SineEaseOut"] = 13] = "SineEaseOut";
+            tweenMethod[tweenMethod["SineEaseIn"] = 14] = "SineEaseIn";
+            tweenMethod[tweenMethod["SineEaseInOut"] = 15] = "SineEaseInOut";
+            tweenMethod[tweenMethod["SineEaseOutIn"] = 16] = "SineEaseOutIn";
+            tweenMethod[tweenMethod["CubicEaseOut"] = 17] = "CubicEaseOut";
+            tweenMethod[tweenMethod["CubicEaseIn"] = 18] = "CubicEaseIn";
+            tweenMethod[tweenMethod["CubicEaseInOut"] = 19] = "CubicEaseInOut";
+            tweenMethod[tweenMethod["CubicEaseOutIn"] = 20] = "CubicEaseOutIn";
+            tweenMethod[tweenMethod["QuartEaseOut"] = 21] = "QuartEaseOut";
+            tweenMethod[tweenMethod["QuartEaseIn"] = 22] = "QuartEaseIn";
+            tweenMethod[tweenMethod["QuartEaseInOut"] = 23] = "QuartEaseInOut";
+            tweenMethod[tweenMethod["QuartEaseOutIn"] = 24] = "QuartEaseOutIn";
+            tweenMethod[tweenMethod["QuintEaseOut"] = 25] = "QuintEaseOut";
+            tweenMethod[tweenMethod["QuintEaseIn"] = 26] = "QuintEaseIn";
+            tweenMethod[tweenMethod["QuintEaseInOut"] = 27] = "QuintEaseInOut";
+            tweenMethod[tweenMethod["QuintEaseOutIn"] = 28] = "QuintEaseOutIn";
+            tweenMethod[tweenMethod["ElasticEaseOut"] = 29] = "ElasticEaseOut";
+            tweenMethod[tweenMethod["ElasticEaseIn"] = 30] = "ElasticEaseIn";
+            tweenMethod[tweenMethod["ElasticEaseInOut"] = 31] = "ElasticEaseInOut";
+            tweenMethod[tweenMethod["ElasticEaseOutIn"] = 32] = "ElasticEaseOutIn";
+            tweenMethod[tweenMethod["BounceEaseOut"] = 33] = "BounceEaseOut";
+            tweenMethod[tweenMethod["BounceEaseIn"] = 34] = "BounceEaseIn";
+            tweenMethod[tweenMethod["BounceEaseInOut"] = 35] = "BounceEaseInOut";
+            tweenMethod[tweenMethod["BounceEaseOutIn"] = 36] = "BounceEaseOutIn";
+            tweenMethod[tweenMethod["BackEaseOut"] = 37] = "BackEaseOut";
+            tweenMethod[tweenMethod["BackEaseIn"] = 38] = "BackEaseIn";
+            tweenMethod[tweenMethod["BackEaseInOut"] = 39] = "BackEaseInOut";
+            tweenMethod[tweenMethod["BackEaseOutIn"] = 40] = "BackEaseOutIn";
+        })(tweenMethod = framework.tweenMethod || (framework.tweenMethod = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ArrayUtil = (function () {
+            function ArrayUtil() {
+            }
+            ArrayUtil.replace = function (arr, a, b, isAdd) {
+                if (isAdd === void 0) { isAdd = true; }
+                var isreplace = false;
+                for (var i = 0; i < arr.length; i++) {
+                    if (arr[i] == a) {
+                        arr[i] = b;
+                        isreplace = true;
+                        break;
+                    }
+                }
+                if (!isreplace && isAdd)
+                    arr.push(b);
+                return arr;
+            };
+            ArrayUtil.concatToSelf = function (self) {
+                var items = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    items[_i - 1] = arguments[_i];
+                }
+                var arr = [];
+                items.forEach(function (v) { return arr = arr.concat(v); });
+                arr.forEach(function (v) { return self.push(v); });
+                return self;
+            };
+            ArrayUtil.unique = function (arr, compare) {
+                var keys = Object.keys(arr);
+                var ids = keys.map(function (v) { return Number(v); }).filter(function (v) { return !isNaN(v); });
+                var deleteMap = {};
+                for (var i = 0, n = ids.length; i < n; i++) {
+                    var ki = ids[i];
+                    if (deleteMap[ki])
+                        continue;
+                    for (var j = i + 1; j < n; j++) {
+                        var kj = ids[j];
+                        if (compare(arr[ki], arr[kj]))
+                            deleteMap[kj] = true;
+                    }
+                }
+                for (var i = ids.length - 1; i >= 0; i--) {
+                    var id = ids[i];
+                    if (deleteMap[id])
+                        arr.splice(id, 1);
+                }
+                return arr;
+            };
+            return ArrayUtil;
+        }());
+        framework.ArrayUtil = ArrayUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var CLASS_KEY = "__class__";
         var ClassUtils = (function () {
             function ClassUtils() {
@@ -37921,6 +38070,87 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var CullingMask;
+        (function (CullingMask) {
+            CullingMask[CullingMask["nothing"] = 0] = "nothing";
+            CullingMask[CullingMask["default"] = 1] = "default";
+            CullingMask[CullingMask["transparentFx"] = 2] = "transparentFx";
+            CullingMask[CullingMask["IgnoreRaycast"] = 4] = "IgnoreRaycast";
+            CullingMask[CullingMask["editor"] = 8] = "editor";
+            CullingMask[CullingMask["water"] = 16] = "water";
+            CullingMask[CullingMask["ui"] = 32] = "ui";
+            CullingMask[CullingMask["preview"] = 64] = "preview";
+            CullingMask[CullingMask["builtin_0"] = 1] = "builtin_0";
+            CullingMask[CullingMask["builtin_1"] = 2] = "builtin_1";
+            CullingMask[CullingMask["builtin_2"] = 4] = "builtin_2";
+            CullingMask[CullingMask["builtin_3"] = 8] = "builtin_3";
+            CullingMask[CullingMask["builtin_4"] = 16] = "builtin_4";
+            CullingMask[CullingMask["builtin_5"] = 32] = "builtin_5";
+            CullingMask[CullingMask["builtin_6"] = 64] = "builtin_6";
+            CullingMask[CullingMask["builtin_7"] = 128] = "builtin_7";
+            CullingMask[CullingMask["modelbeforeui"] = 256] = "modelbeforeui";
+            CullingMask[CullingMask["user_8"] = 256] = "user_8";
+            CullingMask[CullingMask["user_9"] = 512] = "user_9";
+            CullingMask[CullingMask["user_10"] = 1024] = "user_10";
+            CullingMask[CullingMask["user_11"] = 2048] = "user_11";
+            CullingMask[CullingMask["user_12"] = 4096] = "user_12";
+            CullingMask[CullingMask["user_13"] = 8192] = "user_13";
+            CullingMask[CullingMask["user_14"] = 16384] = "user_14";
+            CullingMask[CullingMask["user_15"] = 32768] = "user_15";
+            CullingMask[CullingMask["user_16"] = 65536] = "user_16";
+            CullingMask[CullingMask["user_17"] = 131072] = "user_17";
+            CullingMask[CullingMask["user_18"] = 262144] = "user_18";
+            CullingMask[CullingMask["user_19"] = 524288] = "user_19";
+            CullingMask[CullingMask["user_20"] = 1048576] = "user_20";
+            CullingMask[CullingMask["user_21"] = 2097152] = "user_21";
+            CullingMask[CullingMask["user_22"] = 4194304] = "user_22";
+            CullingMask[CullingMask["user_23"] = 8388608] = "user_23";
+            CullingMask[CullingMask["user_24"] = 16777216] = "user_24";
+            CullingMask[CullingMask["user_25"] = 33554432] = "user_25";
+            CullingMask[CullingMask["user_26"] = 67108864] = "user_26";
+            CullingMask[CullingMask["user_27"] = 134217728] = "user_27";
+            CullingMask[CullingMask["user_28"] = 268435456] = "user_28";
+            CullingMask[CullingMask["user_29"] = 536870912] = "user_29";
+            CullingMask[CullingMask["user_30"] = 1073741824] = "user_30";
+            CullingMask[CullingMask["user_31"] = 2147483648] = "user_31";
+            CullingMask[CullingMask["everything"] = 4294967295] = "everything";
+        })(CullingMask = framework.CullingMask || (framework.CullingMask = {}));
+        var cullingmaskutil = (function () {
+            function cullingmaskutil() {
+            }
+            cullingmaskutil.maskTolayer = function (mask) {
+                return Math.log(mask) / Math.log(2);
+            };
+            cullingmaskutil.layerToMask = function (layer) {
+                return 1 << layer;
+            };
+            return cullingmaskutil;
+        }());
+        framework.cullingmaskutil = cullingmaskutil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var EnumUtil = (function () {
+            function EnumUtil() {
+            }
+            EnumUtil.getEnumObjByType = function (enumType) {
+                var index = enumType.indexOf("gd3d.framework.");
+                if (index == 0)
+                    enumType = enumType.substr(15);
+                return eval("{result:" + enumType + "}");
+            };
+            return EnumUtil;
+        }());
+        framework.EnumUtil = EnumUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var GLExtension = (function () {
             function GLExtension(gl) {
                 gl.extensions = this;
@@ -37996,6 +38226,73 @@ var gd3d;
             return GLExtension;
         }());
         framework.GLExtension = GLExtension;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var NumberUtil = (function () {
+            function NumberUtil() {
+            }
+            NumberUtil.KEY_A = 65;
+            NumberUtil.KEY_D = 68;
+            NumberUtil.KEY_E = 69;
+            NumberUtil.KEY_Q = 81;
+            NumberUtil.KEY_R = 82;
+            NumberUtil.KEY_S = 83;
+            NumberUtil.KEY_W = 87;
+            NumberUtil.KEY_a = 97;
+            NumberUtil.KEY_d = 100;
+            NumberUtil.KEY_e = 101;
+            NumberUtil.KEY_q = 113;
+            NumberUtil.KEY_r = 114;
+            NumberUtil.KEY_s = 115;
+            NumberUtil.KEY_w = 119;
+            return NumberUtil;
+        }());
+        framework.NumberUtil = NumberUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ObjectUtil = (function () {
+            function ObjectUtil() {
+            }
+            ObjectUtil.isBaseType = function (object) {
+                if (object == undefined
+                    || object == null
+                    || typeof object == "boolean"
+                    || typeof object == "string"
+                    || typeof object == "number")
+                    return true;
+            };
+            ObjectUtil.isObject = function (obj) {
+                return obj != null && (obj.constructor == Object || (obj.constructor.name == "Object"));
+            };
+            return ObjectUtil;
+        }());
+        framework.ObjectUtil = ObjectUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var RegexpUtil = (function () {
+            function RegexpUtil() {
+            }
+            RegexpUtil.textureRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*'(.+)'[ ]*\{[ ]*([a-zA-Z]*)[ ]*([a-zA-Z]*)[ ]*\}/;
+            RegexpUtil.vectorRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)/;
+            RegexpUtil.floatRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*([0-9.-]+)/;
+            RegexpUtil.rangeRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)[ ]*\)[ ]*=[ ]*([0-9.-]+)/;
+            RegexpUtil.vector4Regexp = /\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)/;
+            RegexpUtil.vector3FloatOrRangeRegexp = /([0-9.-]+|\[[0-9.-]+,[0-9.-]+\]),([0-9.-]+|\[[0-9.-]+,[0-9.-]+\]),([0-9.-]+|\[[0-9.-]+,[0-9.-]+\])/;
+            return RegexpUtil;
+        }());
+        framework.RegexpUtil = RegexpUtil;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -38465,543 +38762,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var tweenUtil = (function () {
-            function tweenUtil() {
-            }
-            tweenUtil.GetEaseProgress = function (ease_type, linear_progress) {
-                switch (ease_type) {
-                    case tweenMethod.Linear:
-                        return linear_progress;
-                    case tweenMethod.ExpoEaseOut:
-                        return tweenUtil.ExpoEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.ExpoEaseIn:
-                        return tweenUtil.ExpoEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.ExpoEaseOutIn:
-                        return tweenUtil.ExpoEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.ExpoEaseInOut:
-                        return tweenUtil.ExpoEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.CircEaseOut:
-                        return tweenUtil.CircEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.CircEaseIn:
-                        return tweenUtil.CircEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.CircEaseOutIn:
-                        return tweenUtil.CircEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.CircEaseInOut:
-                        return tweenUtil.CircEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuadEaseOut:
-                        return tweenUtil.QuadEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuadEaseIn:
-                        return tweenUtil.QuadEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuadEaseOutIn:
-                        return tweenUtil.QuadEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuadEaseInOut:
-                        return tweenUtil.QuadEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.SineEaseOut:
-                        return tweenUtil.SineEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.SineEaseIn:
-                        return tweenUtil.SineEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.SineEaseOutIn:
-                        return tweenUtil.SineEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.SineEaseInOut:
-                        return tweenUtil.SineEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.CubicEaseOut:
-                        return tweenUtil.CubicEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.CubicEaseIn:
-                        return tweenUtil.CubicEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.CubicEaseOutIn:
-                        return tweenUtil.CubicEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.CubicEaseInOut:
-                        return tweenUtil.CubicEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuartEaseOut:
-                        return tweenUtil.QuartEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuartEaseIn:
-                        return tweenUtil.QuartEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuartEaseOutIn:
-                        return tweenUtil.QuartEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuartEaseInOut:
-                        return tweenUtil.QuartEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuintEaseOut:
-                        return tweenUtil.QuintEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuintEaseIn:
-                        return tweenUtil.QuintEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuintEaseOutIn:
-                        return tweenUtil.QuintEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.QuintEaseInOut:
-                        return tweenUtil.QuintEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.ElasticEaseOut:
-                        return tweenUtil.ElasticEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.ElasticEaseIn:
-                        return tweenUtil.ElasticEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.ElasticEaseOutIn:
-                        return tweenUtil.ElasticEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.ElasticEaseInOut:
-                        return tweenUtil.ElasticEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.BounceEaseOut:
-                        return tweenUtil.BounceEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.BounceEaseIn:
-                        return tweenUtil.BounceEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.BounceEaseOutIn:
-                        return tweenUtil.BounceEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.BounceEaseInOut:
-                        return tweenUtil.BounceEaseInOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.BackEaseOut:
-                        return tweenUtil.BackEaseOut(linear_progress, 0, 1, 1);
-                    case tweenMethod.BackEaseIn:
-                        return tweenUtil.BackEaseIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.BackEaseOutIn:
-                        return tweenUtil.BackEaseOutIn(linear_progress, 0, 1, 1);
-                    case tweenMethod.BackEaseInOut:
-                        return tweenUtil.BackEaseInOut(linear_progress, 0, 1, 1);
-                    default:
-                        return linear_progress;
-                }
-            };
-            tweenUtil.Linear = function (t, b, c, d) {
-                return c * t / d + b;
-            };
-            tweenUtil.ExpoEaseOut = function (t, b, c, d) {
-                return (t == d) ? b + c : c * (-Math.pow(2, -10 * t / d) + 1) + b;
-            };
-            tweenUtil.ExpoEaseIn = function (t, b, c, d) {
-                return (t == 0) ? b : c * Math.pow(2, 10 * (t / d - 1)) + b;
-            };
-            tweenUtil.ExpoEaseInOut = function (t, b, c, d) {
-                if (t == 0)
-                    return b;
-                if (t == d)
-                    return b + c;
-                if ((t /= d / 2) < 1)
-                    return c / 2 * Math.pow(2, 10 * (t - 1)) + b;
-                return c / 2 * (-Math.pow(2, -10 * --t) + 2) + b;
-            };
-            tweenUtil.ExpoEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.ExpoEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.ExpoEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.CircEaseOut = function (t, b, c, d) {
-                return c * Math.sqrt(1 - (t = t / d - 1) * t) + b;
-            };
-            tweenUtil.CircEaseIn = function (t, b, c, d) {
-                return -c * (Math.sqrt(1 - (t /= d) * t) - 1) + b;
-            };
-            tweenUtil.CircEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return -c / 2 * (Math.sqrt(1 - t * t) - 1) + b;
-                return c / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + b;
-            };
-            tweenUtil.CircEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.CircEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.CircEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.QuadEaseOut = function (t, b, c, d) {
-                return -c * (t /= d) * (t - 2) + b;
-            };
-            tweenUtil.QuadEaseIn = function (t, b, c, d) {
-                return c * (t /= d) * t + b;
-            };
-            tweenUtil.QuadEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return c / 2 * t * t + b;
-                return -c / 2 * ((--t) * (t - 2) - 1) + b;
-            };
-            tweenUtil.QuadEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.QuadEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.QuadEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.SineEaseOut = function (t, b, c, d) {
-                return c * Math.sin(t / d * (Math.PI / 2)) + b;
-            };
-            tweenUtil.SineEaseIn = function (t, b, c, d) {
-                return -c * Math.cos(t / d * (Math.PI / 2)) + c + b;
-            };
-            tweenUtil.SineEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return c / 2 * (Math.sin(Math.PI * t / 2)) + b;
-                return -c / 2 * (Math.cos(Math.PI * --t / 2) - 2) + b;
-            };
-            tweenUtil.SineEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.SineEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.SineEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.CubicEaseOut = function (t, b, c, d) {
-                return c * ((t = t / d - 1) * t * t + 1) + b;
-            };
-            tweenUtil.CubicEaseIn = function (t, b, c, d) {
-                return c * (t /= d) * t * t + b;
-            };
-            tweenUtil.CubicEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return c / 2 * t * t * t + b;
-                return c / 2 * ((t -= 2) * t * t + 2) + b;
-            };
-            tweenUtil.CubicEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.CubicEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.CubicEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.QuartEaseOut = function (t, b, c, d) {
-                return -c * ((t = t / d - 1) * t * t * t - 1) + b;
-            };
-            tweenUtil.QuartEaseIn = function (t, b, c, d) {
-                return c * (t /= d) * t * t * t + b;
-            };
-            tweenUtil.QuartEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return c / 2 * t * t * t * t + b;
-                return -c / 2 * ((t -= 2) * t * t * t - 2) + b;
-            };
-            tweenUtil.QuartEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.QuartEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.QuartEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.QuintEaseOut = function (t, b, c, d) {
-                return c * ((t = t / d - 1) * t * t * t * t + 1) + b;
-            };
-            tweenUtil.QuintEaseIn = function (t, b, c, d) {
-                return c * (t /= d) * t * t * t * t + b;
-            };
-            tweenUtil.QuintEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) < 1)
-                    return c / 2 * t * t * t * t * t + b;
-                return c / 2 * ((t -= 2) * t * t * t * t + 2) + b;
-            };
-            tweenUtil.QuintEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.QuintEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.QuintEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.ElasticEaseOut = function (t, b, c, d) {
-                if ((t /= d) == 1)
-                    return b + c;
-                var p = d * 0.3;
-                var s = p / 4;
-                return (c * Math.pow(2, -10 * t) * Math.sin((t * d - s) * (2 * Math.PI) / p) + c + b);
-            };
-            tweenUtil.ElasticEaseIn = function (t, b, c, d) {
-                if ((t /= d) == 1)
-                    return b + c;
-                var p = d * 0.3;
-                var s = p / 4;
-                return -(c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
-            };
-            tweenUtil.ElasticEaseInOut = function (t, b, c, d) {
-                if ((t /= d / 2) == 2)
-                    return b + c;
-                var p = d * (0.3 * 1.5);
-                var s = p / 4;
-                if (t < 1)
-                    return -0.5 * (c * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p)) + b;
-                return c * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * d - s) * (2 * Math.PI) / p) * 0.5 + c + b;
-            };
-            tweenUtil.ElasticEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.ElasticEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.ElasticEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.BounceEaseOut = function (t, b, c, d) {
-                if ((t /= d) < (1 / 2.75))
-                    return c * (7.5625 * t * t) + b;
-                else if (t < (2 / 2.75))
-                    return c * (7.5625 * (t -= (1.5 / 2.75)) * t + 0.75) + b;
-                else if (t < (2.5 / 2.75))
-                    return c * (7.5625 * (t -= (2.25 / 2.75)) * t + 0.9375) + b;
-                else
-                    return c * (7.5625 * (t -= (2.625 / 2.75)) * t + .984375) + b;
-            };
-            tweenUtil.BounceEaseIn = function (t, b, c, d) {
-                return c - tweenUtil.BounceEaseOut(d - t, 0, c, d) + b;
-            };
-            tweenUtil.BounceEaseInOut = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.BounceEaseIn(t * 2, 0, c, d) * 0.5 + b;
-                else
-                    return tweenUtil.BounceEaseOut(t * 2 - d, 0, c, d) * 0.5 + c * 0.5 + b;
-            };
-            tweenUtil.BounceEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.BounceEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.BounceEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            tweenUtil.BackEaseOut = function (t, b, c, d) {
-                return c * ((t = t / d - 1) * t * ((1.70158 + 1) * t + 1.70158) + 1) + b;
-            };
-            tweenUtil.BackEaseIn = function (t, b, c, d) {
-                return c * (t /= d) * t * ((1.70158 + 1) * t - 1.70158) + b;
-            };
-            tweenUtil.BackEaseInOut = function (t, b, c, d) {
-                var s = 1.70158;
-                if ((t /= d / 2) < 1)
-                    return c / 2 * (t * t * (((s *= (1.525)) + 1) * t - s)) + b;
-                return c / 2 * ((t -= 2) * t * (((s *= (1.525)) + 1) * t + s) + 2) + b;
-            };
-            tweenUtil.BackEaseOutIn = function (t, b, c, d) {
-                if (t < d / 2)
-                    return tweenUtil.BackEaseOut(t * 2, b, c / 2, d);
-                return tweenUtil.BackEaseIn((t * 2) - d, b + c / 2, c / 2, d);
-            };
-            return tweenUtil;
-        }());
-        framework.tweenUtil = tweenUtil;
-        var tweenMethod;
-        (function (tweenMethod) {
-            tweenMethod[tweenMethod["Linear"] = 0] = "Linear";
-            tweenMethod[tweenMethod["ExpoEaseOut"] = 1] = "ExpoEaseOut";
-            tweenMethod[tweenMethod["ExpoEaseIn"] = 2] = "ExpoEaseIn";
-            tweenMethod[tweenMethod["ExpoEaseInOut"] = 3] = "ExpoEaseInOut";
-            tweenMethod[tweenMethod["ExpoEaseOutIn"] = 4] = "ExpoEaseOutIn";
-            tweenMethod[tweenMethod["CircEaseOut"] = 5] = "CircEaseOut";
-            tweenMethod[tweenMethod["CircEaseIn"] = 6] = "CircEaseIn";
-            tweenMethod[tweenMethod["CircEaseInOut"] = 7] = "CircEaseInOut";
-            tweenMethod[tweenMethod["CircEaseOutIn"] = 8] = "CircEaseOutIn";
-            tweenMethod[tweenMethod["QuadEaseOut"] = 9] = "QuadEaseOut";
-            tweenMethod[tweenMethod["QuadEaseIn"] = 10] = "QuadEaseIn";
-            tweenMethod[tweenMethod["QuadEaseInOut"] = 11] = "QuadEaseInOut";
-            tweenMethod[tweenMethod["QuadEaseOutIn"] = 12] = "QuadEaseOutIn";
-            tweenMethod[tweenMethod["SineEaseOut"] = 13] = "SineEaseOut";
-            tweenMethod[tweenMethod["SineEaseIn"] = 14] = "SineEaseIn";
-            tweenMethod[tweenMethod["SineEaseInOut"] = 15] = "SineEaseInOut";
-            tweenMethod[tweenMethod["SineEaseOutIn"] = 16] = "SineEaseOutIn";
-            tweenMethod[tweenMethod["CubicEaseOut"] = 17] = "CubicEaseOut";
-            tweenMethod[tweenMethod["CubicEaseIn"] = 18] = "CubicEaseIn";
-            tweenMethod[tweenMethod["CubicEaseInOut"] = 19] = "CubicEaseInOut";
-            tweenMethod[tweenMethod["CubicEaseOutIn"] = 20] = "CubicEaseOutIn";
-            tweenMethod[tweenMethod["QuartEaseOut"] = 21] = "QuartEaseOut";
-            tweenMethod[tweenMethod["QuartEaseIn"] = 22] = "QuartEaseIn";
-            tweenMethod[tweenMethod["QuartEaseInOut"] = 23] = "QuartEaseInOut";
-            tweenMethod[tweenMethod["QuartEaseOutIn"] = 24] = "QuartEaseOutIn";
-            tweenMethod[tweenMethod["QuintEaseOut"] = 25] = "QuintEaseOut";
-            tweenMethod[tweenMethod["QuintEaseIn"] = 26] = "QuintEaseIn";
-            tweenMethod[tweenMethod["QuintEaseInOut"] = 27] = "QuintEaseInOut";
-            tweenMethod[tweenMethod["QuintEaseOutIn"] = 28] = "QuintEaseOutIn";
-            tweenMethod[tweenMethod["ElasticEaseOut"] = 29] = "ElasticEaseOut";
-            tweenMethod[tweenMethod["ElasticEaseIn"] = 30] = "ElasticEaseIn";
-            tweenMethod[tweenMethod["ElasticEaseInOut"] = 31] = "ElasticEaseInOut";
-            tweenMethod[tweenMethod["ElasticEaseOutIn"] = 32] = "ElasticEaseOutIn";
-            tweenMethod[tweenMethod["BounceEaseOut"] = 33] = "BounceEaseOut";
-            tweenMethod[tweenMethod["BounceEaseIn"] = 34] = "BounceEaseIn";
-            tweenMethod[tweenMethod["BounceEaseInOut"] = 35] = "BounceEaseInOut";
-            tweenMethod[tweenMethod["BounceEaseOutIn"] = 36] = "BounceEaseOutIn";
-            tweenMethod[tweenMethod["BackEaseOut"] = 37] = "BackEaseOut";
-            tweenMethod[tweenMethod["BackEaseIn"] = 38] = "BackEaseIn";
-            tweenMethod[tweenMethod["BackEaseInOut"] = 39] = "BackEaseInOut";
-            tweenMethod[tweenMethod["BackEaseOutIn"] = 40] = "BackEaseOutIn";
-        })(tweenMethod = framework.tweenMethod || (framework.tweenMethod = {}));
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var ArrayUtil = (function () {
-            function ArrayUtil() {
-            }
-            ArrayUtil.replace = function (arr, a, b, isAdd) {
-                if (isAdd === void 0) { isAdd = true; }
-                var isreplace = false;
-                for (var i = 0; i < arr.length; i++) {
-                    if (arr[i] == a) {
-                        arr[i] = b;
-                        isreplace = true;
-                        break;
-                    }
-                }
-                if (!isreplace && isAdd)
-                    arr.push(b);
-                return arr;
-            };
-            ArrayUtil.concatToSelf = function (self) {
-                var items = [];
-                for (var _i = 1; _i < arguments.length; _i++) {
-                    items[_i - 1] = arguments[_i];
-                }
-                var arr = [];
-                items.forEach(function (v) { return arr = arr.concat(v); });
-                arr.forEach(function (v) { return self.push(v); });
-                return self;
-            };
-            ArrayUtil.unique = function (arr, compare) {
-                var keys = Object.keys(arr);
-                var ids = keys.map(function (v) { return Number(v); }).filter(function (v) { return !isNaN(v); });
-                var deleteMap = {};
-                for (var i = 0, n = ids.length; i < n; i++) {
-                    var ki = ids[i];
-                    if (deleteMap[ki])
-                        continue;
-                    for (var j = i + 1; j < n; j++) {
-                        var kj = ids[j];
-                        if (compare(arr[ki], arr[kj]))
-                            deleteMap[kj] = true;
-                    }
-                }
-                for (var i = ids.length - 1; i >= 0; i--) {
-                    var id = ids[i];
-                    if (deleteMap[id])
-                        arr.splice(id, 1);
-                }
-                return arr;
-            };
-            return ArrayUtil;
-        }());
-        framework.ArrayUtil = ArrayUtil;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var CullingMask;
-        (function (CullingMask) {
-            CullingMask[CullingMask["nothing"] = 0] = "nothing";
-            CullingMask[CullingMask["default"] = 1] = "default";
-            CullingMask[CullingMask["transparentFx"] = 2] = "transparentFx";
-            CullingMask[CullingMask["IgnoreRaycast"] = 4] = "IgnoreRaycast";
-            CullingMask[CullingMask["editor"] = 8] = "editor";
-            CullingMask[CullingMask["water"] = 16] = "water";
-            CullingMask[CullingMask["ui"] = 32] = "ui";
-            CullingMask[CullingMask["preview"] = 64] = "preview";
-            CullingMask[CullingMask["builtin_0"] = 1] = "builtin_0";
-            CullingMask[CullingMask["builtin_1"] = 2] = "builtin_1";
-            CullingMask[CullingMask["builtin_2"] = 4] = "builtin_2";
-            CullingMask[CullingMask["builtin_3"] = 8] = "builtin_3";
-            CullingMask[CullingMask["builtin_4"] = 16] = "builtin_4";
-            CullingMask[CullingMask["builtin_5"] = 32] = "builtin_5";
-            CullingMask[CullingMask["builtin_6"] = 64] = "builtin_6";
-            CullingMask[CullingMask["builtin_7"] = 128] = "builtin_7";
-            CullingMask[CullingMask["modelbeforeui"] = 256] = "modelbeforeui";
-            CullingMask[CullingMask["user_8"] = 256] = "user_8";
-            CullingMask[CullingMask["user_9"] = 512] = "user_9";
-            CullingMask[CullingMask["user_10"] = 1024] = "user_10";
-            CullingMask[CullingMask["user_11"] = 2048] = "user_11";
-            CullingMask[CullingMask["user_12"] = 4096] = "user_12";
-            CullingMask[CullingMask["user_13"] = 8192] = "user_13";
-            CullingMask[CullingMask["user_14"] = 16384] = "user_14";
-            CullingMask[CullingMask["user_15"] = 32768] = "user_15";
-            CullingMask[CullingMask["user_16"] = 65536] = "user_16";
-            CullingMask[CullingMask["user_17"] = 131072] = "user_17";
-            CullingMask[CullingMask["user_18"] = 262144] = "user_18";
-            CullingMask[CullingMask["user_19"] = 524288] = "user_19";
-            CullingMask[CullingMask["user_20"] = 1048576] = "user_20";
-            CullingMask[CullingMask["user_21"] = 2097152] = "user_21";
-            CullingMask[CullingMask["user_22"] = 4194304] = "user_22";
-            CullingMask[CullingMask["user_23"] = 8388608] = "user_23";
-            CullingMask[CullingMask["user_24"] = 16777216] = "user_24";
-            CullingMask[CullingMask["user_25"] = 33554432] = "user_25";
-            CullingMask[CullingMask["user_26"] = 67108864] = "user_26";
-            CullingMask[CullingMask["user_27"] = 134217728] = "user_27";
-            CullingMask[CullingMask["user_28"] = 268435456] = "user_28";
-            CullingMask[CullingMask["user_29"] = 536870912] = "user_29";
-            CullingMask[CullingMask["user_30"] = 1073741824] = "user_30";
-            CullingMask[CullingMask["user_31"] = 2147483648] = "user_31";
-            CullingMask[CullingMask["everything"] = 4294967295] = "everything";
-        })(CullingMask = framework.CullingMask || (framework.CullingMask = {}));
-        var cullingmaskutil = (function () {
-            function cullingmaskutil() {
-            }
-            cullingmaskutil.maskTolayer = function (mask) {
-                return Math.log(mask) / Math.log(2);
-            };
-            cullingmaskutil.layerToMask = function (layer) {
-                return 1 << layer;
-            };
-            return cullingmaskutil;
-        }());
-        framework.cullingmaskutil = cullingmaskutil;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var EnumUtil = (function () {
-            function EnumUtil() {
-            }
-            EnumUtil.getEnumObjByType = function (enumType) {
-                var index = enumType.indexOf("gd3d.framework.");
-                if (index == 0)
-                    enumType = enumType.substr(15);
-                return eval("{result:" + enumType + "}");
-            };
-            return EnumUtil;
-        }());
-        framework.EnumUtil = EnumUtil;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var NumberUtil = (function () {
-            function NumberUtil() {
-            }
-            NumberUtil.KEY_A = 65;
-            NumberUtil.KEY_D = 68;
-            NumberUtil.KEY_E = 69;
-            NumberUtil.KEY_Q = 81;
-            NumberUtil.KEY_R = 82;
-            NumberUtil.KEY_S = 83;
-            NumberUtil.KEY_W = 87;
-            NumberUtil.KEY_a = 97;
-            NumberUtil.KEY_d = 100;
-            NumberUtil.KEY_e = 101;
-            NumberUtil.KEY_q = 113;
-            NumberUtil.KEY_r = 114;
-            NumberUtil.KEY_s = 115;
-            NumberUtil.KEY_w = 119;
-            return NumberUtil;
-        }());
-        framework.NumberUtil = NumberUtil;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var ObjectUtil = (function () {
-            function ObjectUtil() {
-            }
-            ObjectUtil.isBaseType = function (object) {
-                if (object == undefined
-                    || object == null
-                    || typeof object == "boolean"
-                    || typeof object == "string"
-                    || typeof object == "number")
-                    return true;
-            };
-            ObjectUtil.isObject = function (obj) {
-                return obj != null && (obj.constructor == Object || (obj.constructor.name == "Object"));
-            };
-            return ObjectUtil;
-        }());
-        framework.ObjectUtil = ObjectUtil;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var RegexpUtil = (function () {
-            function RegexpUtil() {
-            }
-            RegexpUtil.textureRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*'(.+)'[ ]*\{[ ]*([a-zA-Z]*)[ ]*([a-zA-Z]*)[ ]*\}/;
-            RegexpUtil.vectorRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)/;
-            RegexpUtil.floatRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\)[ ]*=[ ]*([0-9.-]+)/;
-            RegexpUtil.rangeRegexp = /([_0-9a-zA-Z]+)[ ]*\([ ]*'(.+)'[ ]*,[ ]*([0-9a-zA-Z]+)[ ]*\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)[ ]*\)[ ]*=[ ]*([0-9.-]+)/;
-            RegexpUtil.vector4Regexp = /\([ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*,[ ]*([0-9.-]+)[ ]*\)/;
-            RegexpUtil.vector3FloatOrRangeRegexp = /([0-9.-]+|\[[0-9.-]+,[0-9.-]+\]),([0-9.-]+|\[[0-9.-]+,[0-9.-]+\]),([0-9.-]+|\[[0-9.-]+,[0-9.-]+\])/;
-            return RegexpUtil;
-        }());
-        framework.RegexpUtil = RegexpUtil;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var StringUtil = (function () {
             function StringUtil() {
             }
@@ -39229,6 +38989,19 @@ var gd3d;
             return TransformUtil;
         }());
         framework.TransformUtil = TransformUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        framework.lazy = {
+            getvalue: function (lazyItem) {
+                if (typeof lazyItem == "function")
+                    return lazyItem();
+                return lazyItem;
+            }
+        };
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
