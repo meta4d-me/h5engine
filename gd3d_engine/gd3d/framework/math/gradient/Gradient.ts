@@ -86,8 +86,9 @@ namespace gd3d.framework
                 if (t < time && time < nt)
                 {
                     if (this.mode == GradientMode.Fixed) return nv;
-                    math.colorLerp(v, nv, (time - t) / (nt - t), v);
-                    return v;
+                    var color = new math.color();
+                    math.colorLerp(v, nv, (time - t) / (nt - t), color);
+                    return color;
                 }
             }
             return new math.color();

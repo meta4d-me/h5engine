@@ -46,12 +46,13 @@ class test_ParticleSystem implements IState
         this.camera.backgroundColor = new gd3d.math.color(0.2784, 0.2784, 0.2784, 1);
         objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-        // let hoverc = this.camera.gameObject.addComponent("HoverCameraScript") as gd3d.framework.HoverCameraScript;
-        // hoverc.panAngle = 180;
-        // hoverc.tiltAngle = 45;
-        // hoverc.distance = 30;
-        // hoverc.scaleSpeed = 0.1;
-        // hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0)
+        //
+        let hoverc = this.camera.gameObject.addComponent("HoverCameraScript") as gd3d.framework.HoverCameraScript;
+        hoverc.panAngle = 180;
+        hoverc.tiltAngle = 45;
+        hoverc.distance = 30;
+        hoverc.scaleSpeed = 0.1;
+        hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0)
 
         this.initParticleSystem();
     }

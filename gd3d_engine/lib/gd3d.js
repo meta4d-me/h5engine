@@ -7053,6 +7053,46 @@ var gd3d;
             out.rawData[15] = 1;
         }
         math.matrixProject_OrthoLH = matrixProject_OrthoLH;
+        function matrixLookat(position, target, upAxis, out) {
+            var xAxis = new math.vector3();
+            var yAxis = new math.vector3();
+            var zAxis = new math.vector3();
+            upAxis = upAxis || new math.vector3(0, 1, 0);
+            zAxis.x = target.x - position.x;
+            zAxis.y = target.y - position.y;
+            zAxis.z = target.z - position.z;
+            math.vec3Normalize(zAxis, zAxis);
+            xAxis.x = upAxis.y * zAxis.z - upAxis.z * zAxis.y;
+            xAxis.y = upAxis.z * zAxis.x - upAxis.x * zAxis.z;
+            xAxis.z = upAxis.x * zAxis.y - upAxis.y * zAxis.x;
+            math.vec3Normalize(xAxis, xAxis);
+            if (math.vec3SqrLength(xAxis) < .005) {
+                xAxis.x = upAxis.y;
+                xAxis.y = upAxis.x;
+                xAxis.z = 0;
+                math.vec3Normalize(xAxis, xAxis);
+            }
+            yAxis.x = zAxis.y * xAxis.z - zAxis.z * xAxis.y;
+            yAxis.y = zAxis.z * xAxis.x - zAxis.x * xAxis.z;
+            yAxis.z = zAxis.x * xAxis.y - zAxis.y * xAxis.x;
+            out.rawData[0] = xAxis.x;
+            out.rawData[1] = xAxis.y;
+            out.rawData[2] = xAxis.z;
+            out.rawData[3] = 0;
+            out.rawData[4] = yAxis.x;
+            out.rawData[5] = yAxis.y;
+            out.rawData[6] = yAxis.z;
+            out.rawData[7] = 0;
+            out.rawData[8] = zAxis.x;
+            out.rawData[9] = zAxis.y;
+            out.rawData[10] = zAxis.z;
+            out.rawData[11] = 0;
+            out.rawData[12] = position.x;
+            out.rawData[13] = position.y;
+            out.rawData[14] = position.z;
+            out.rawData[15] = 1;
+        }
+        math.matrixLookat = matrixLookat;
         function matrixLookatLH(forward, up, out) {
             var z = math.pool.new_vector3(-forward.x, -forward.y, -forward.z);
             math.vec3Normalize(z, z);
@@ -24925,8 +24965,9 @@ var gd3d;
                     if (t < time && time < nt) {
                         if (this.mode == framework.GradientMode.Fixed)
                             return nv;
-                        gd3d.math.colorLerp(v, nv, (time - t) / (nt - t), v);
-                        return v;
+                        var color = new gd3d.math.color();
+                        gd3d.math.colorLerp(v, nv, (time - t) / (nt - t), color);
+                        return color;
                     }
                 }
                 return new gd3d.math.color();
@@ -30975,7 +31016,7 @@ var gd3d;
                     camera.gameObject.transform.getUpInWorld(cameraUp);
                     gd3d.math.matrixTransformNormal(cameraForward, this.worldToLocalMatrix, cameraForward);
                     gd3d.math.matrixTransformNormal(cameraUp, this.worldToLocalMatrix, cameraUp);
-                    gd3d.math.matrixLookatLH(cameraForward, cameraUp, billboardMatrix);
+                    gd3d.math.matrixLookat(new gd3d.math.vector3(), cameraForward, cameraUp, billboardMatrix);
                 }
                 this.material.setMatrix("u_particle_billboardMatrix", billboardMatrix);
                 if (!isSupportDrawInstancedArrays) {
@@ -30999,7 +31040,6 @@ var gd3d;
                     console.assert(data.length == 24 * this._activeParticles.length);
                     var stride = this._attributes.reduce(function (pv, cv) { return pv += cv[1]; }, 0) * 4;
                     if (isSupportDrawInstancedArrays && this.particleCount > 0) {
-                        data = data.concat(data);
                         var vbo = this._getVBO(context.webgl);
                         var drawInstanceInfo = {
                             instanceCount: this.particleCount,

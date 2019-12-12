@@ -959,6 +959,66 @@ namespace gd3d.math
         out.rawData[14] = nid;
         out.rawData[15] = 1;
     }
+
+    /**
+     * 看向目标位置
+     * 
+     * @param position  所在位置
+     * @param target    目标位置
+     * @param upAxis    向上朝向
+     */
+    export function matrixLookat(position:vector3, target: vector3, upAxis: vector3, out: matrix)
+    {
+        //
+        var xAxis = new vector3();
+        var yAxis = new vector3();
+        var zAxis = new vector3();
+
+        upAxis = upAxis || new vector3(0,1,0);
+
+        zAxis.x = target.x - position.x;
+        zAxis.y = target.y - position.y;
+        zAxis.z = target.z - position.z;
+        math.vec3Normalize(zAxis,zAxis);
+
+        xAxis.x = upAxis.y * zAxis.z - upAxis.z * zAxis.y;
+        xAxis.y = upAxis.z * zAxis.x - upAxis.x * zAxis.z;
+        xAxis.z = upAxis.x * zAxis.y - upAxis.y * zAxis.x;
+        math.vec3Normalize(xAxis,xAxis);
+
+        if (math.vec3SqrLength(xAxis) < .005)
+        {
+            xAxis.x = upAxis.y;
+            xAxis.y = upAxis.x;
+            xAxis.z = 0;
+            math.vec3Normalize(xAxis,xAxis);
+        }
+
+        yAxis.x = zAxis.y * xAxis.z - zAxis.z * xAxis.y;
+        yAxis.y = zAxis.z * xAxis.x - zAxis.x * xAxis.z;
+        yAxis.z = zAxis.x * xAxis.y - zAxis.y * xAxis.x;
+
+        out.rawData[0] = xAxis.x;
+        out.rawData[1] = xAxis.y;
+        out.rawData[2] = xAxis.z;
+        out.rawData[3] = 0;
+
+        out.rawData[4] = yAxis.x;
+        out.rawData[5] = yAxis.y;
+        out.rawData[6] = yAxis.z;
+        out.rawData[7] = 0;
+
+        out.rawData[8] = zAxis.x;
+        out.rawData[9] = zAxis.y;
+        out.rawData[10] = zAxis.z;
+        out.rawData[11] = 0;
+
+        out.rawData[12] = position.x;
+        out.rawData[13] = position.y;
+        out.rawData[14] = position.z;
+        out.rawData[15] = 1;
+    }
+
     //lights fix
     export function matrixLookatLH(forward: vector3, up: vector3, out: matrix)
     {

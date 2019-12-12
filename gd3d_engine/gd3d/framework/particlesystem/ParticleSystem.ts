@@ -502,7 +502,7 @@ namespace gd3d.framework
                 camera.gameObject.transform.getUpInWorld(cameraUp);
                 math.matrixTransformNormal(cameraForward, this.worldToLocalMatrix, cameraForward);
                 math.matrixTransformNormal(cameraUp, this.worldToLocalMatrix, cameraUp);
-                math.matrixLookatLH(cameraForward, cameraUp, billboardMatrix);
+                math.matrixLookat(new math.vector3(), cameraForward, cameraUp, billboardMatrix);
             }
 
             this.material.setMatrix("u_particle_billboardMatrix", billboardMatrix);
@@ -545,7 +545,6 @@ namespace gd3d.framework
                 var stride = this._attributes.reduce((pv, cv) => pv += cv[1], 0) * 4;
                 if (isSupportDrawInstancedArrays && this.particleCount > 0)
                 {
-                    data = data.concat(data);
                     var vbo = this._getVBO(context.webgl);
 
                     var drawInstanceInfo: DrawInstanceInfo = {

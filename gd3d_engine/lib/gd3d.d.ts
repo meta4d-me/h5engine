@@ -1096,6 +1096,7 @@ declare namespace gd3d.math {
     function matrix3x2Equal(mtx1: matrix3x2, mtx2: matrix3x2, threshold?: number): boolean;
     function matrixProject_PerspectiveLH(fov: number, aspect: number, znear: number, zfar: number, out: matrix): void;
     function matrixProject_OrthoLH(width: number, height: number, znear: number, zfar: number, out: matrix): void;
+    function matrixLookat(position: vector3, target: vector3, upAxis: vector3, out: matrix): void;
     function matrixLookatLH(forward: vector3, up: vector3, out: matrix): void;
     function matrixViewLookatLH(eye: vector3, forward: vector3, up: vector3, out: matrix): void;
     function matrixLerp(left: matrix, right: matrix, v: number, out: matrix): void;
