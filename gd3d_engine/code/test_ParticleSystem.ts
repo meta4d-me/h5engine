@@ -1,3 +1,16 @@
+namespace gd3d.math
+{
+    export interface color
+    {
+        "__class__"?: "gd3d.math.color"
+    }
+
+    export interface vector3
+    {
+        "__class__"?: "gd3d.math.vector3"
+    }
+}
+
 /** 
  * 粒子系統示例
  */
@@ -66,7 +79,7 @@ class test_ParticleSystem implements IState
         ps.material = mat;
         // ps.mesh = this.astMgr.getDefaultMesh("cube");
 
-        gd3d.framework.classUtils.addClassNameSpace("gd3d.framework");
+        gd3d.framework.ClassUtils.addClassNameSpace("gd3d.framework");
 
         gd3d.framework.serialization.setValue(ps, pd);
 

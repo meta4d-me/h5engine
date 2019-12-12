@@ -177,7 +177,8 @@ namespace gd3d.framework
 
             var limit3D = this.limit3D.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
             var limit = this.limit.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
-            var pVelocity = particle.velocity.clone();
+            var pVelocity = new math.vector3();
+            math.vec3Clone(particle.velocity, pVelocity);
             if (this.space == ParticleSystemSimulationSpace.World)
             {
                 var localToWorldMatrix = this.particleSystem.localToWorldMatrix;
@@ -186,25 +187,35 @@ namespace gd3d.framework
                 math.matrixTransformNormal(pVelocity, localToWorldMatrix, pVelocity);
                 if (this.separateAxes)
                 {
-                    pVelocity.clamp(limit3D.negateTo(), limit3D);
+                    pVelocity.x = math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
+                    pVelocity.y = math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
+                    pVelocity.z = math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
                 } else
                 {
-                    if (pVelocity.lengthSquared > limit * limit)
-                        pVelocity.normalize(limit);
+                    if (math.vec3SqrLength(pVelocity) > limit * limit)
+                    {
+                        math.vec3Normalize(pVelocity, pVelocity);
+                        math.vec3ScaleByNum(pVelocity, limit, pVelocity);
+                    }
                 }
                 math.matrixTransformNormal(pVelocity, worldToLocalMatrix, pVelocity);
             } else
             {
                 if (this.separateAxes)
                 {
-                    pVelocity.clamp(limit3D.negateTo(), limit3D);
+                    pVelocity.x = math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
+                    pVelocity.y = math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
+                    pVelocity.z = math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
                 } else
                 {
-                    if (pVelocity.lengthSquared > limit * limit)
-                        pVelocity.normalize(limit);
+                    if (math.vec3SqrLength(pVelocity) > limit * limit)
+                    {
+                        math.vec3Normalize(pVelocity, pVelocity);
+                        math.vec3ScaleByNum(pVelocity, limit, pVelocity);
+                    }
                 }
             }
-            particle.velocity.lerpNumber(pVelocity, this.dampen);
+            math.vec3SLerp(particle.velocity, pVelocity, this.dampen, particle.velocity);
         }
     }
 

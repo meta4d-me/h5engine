@@ -14,7 +14,7 @@ namespace gd3d.framework
          * 
          * 设置最小-最大梯度将用于评估颜色的模式。
          */
-        
+
         mode = MinMaxGradientMode.Color;
 
         /**
@@ -22,31 +22,31 @@ namespace gd3d.framework
          * 
          * 常量颜色值
          */
-        
-        color = new Color4();
+
+        color = new math.color();
 
         /**
          * Set a constant color for the lower bound.
          * 
          * 为下界设置一个常量颜色。
          */
-        
-        colorMin = new Color4();
+
+        colorMin = new math.color();
 
         /**
          * Set a constant color for the upper bound.
          * 
          * 为上界设置一个常量颜色。
          */
-        
-        colorMax = new Color4();
+
+        colorMax = new math.color();
 
         /**
          * Set the gradient.
          * 
          * 设置渐变。
          */
-        
+
         gradient = new Gradient();
 
         /**
@@ -54,7 +54,7 @@ namespace gd3d.framework
          * 
          * 为下界设置一个渐变。
          */
-        
+
         gradientMin = new Gradient();
 
         /**
@@ -62,33 +62,37 @@ namespace gd3d.framework
          * 
          * 为上界设置一个渐变。
          */
-        
+
         gradientMax = new Gradient();
 
         /**
          * 获取值
          * @param time 时间
          */
-        getValue(time: number, randomBetween: number = Math.random())
+        getValue(time: number, randomBetween: number = Math.random(), out = new math.color())
         {
             switch (this.mode)
             {
                 case MinMaxGradientMode.Color:
-                    return this.color;
+                    math.colorClone(this.color, out);
+                    break;
                 case MinMaxGradientMode.Gradient:
-                    return this.gradient.getValue(time);
+                    math.colorClone(this.gradient.getValue(time), out);
+                    break;
                 case MinMaxGradientMode.TwoColors:
-                    return this.colorMin.mixTo(this.colorMax, randomBetween);
+                    math.colorLerp(this.colorMin, this.colorMax, randomBetween, out);
+                    break;
                 case MinMaxGradientMode.TwoGradients:
                     var min = this.gradientMin.getValue(time);
                     var max = this.gradientMax.getValue(time);
-                    var v = min.mixTo(max, randomBetween);
-                    return v;
+                    math.colorLerp(min, max, randomBetween, out);
+                    break;
                 case MinMaxGradientMode.RandomColor:
                     var v = this.gradient.getValue(randomBetween);
-                    return v;
+                    math.colorClone(v, out);
+                    break;
             }
-            return this.color;
+            return out;
         }
     }
 }

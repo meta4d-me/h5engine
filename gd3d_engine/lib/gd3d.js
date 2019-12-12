@@ -6411,7 +6411,7 @@ var gd3d;
         }
         math.matrix3x2Decompose = matrix3x2Decompose;
         function matrixGetEuler(src, order, rotation) {
-            var clamp = Math.clamp;
+            var clamp = math.floatClamp;
             var rawData = src.rawData;
             var m11 = rawData[0], m12 = rawData[4], m13 = rawData[8];
             var m21 = rawData[1], m22 = rawData[5], m23 = rawData[9];
@@ -23308,6 +23308,20 @@ var gd3d;
             }
         }
         math.getKeyCodeByAscii = getKeyCodeByAscii;
+        math.DEG2RAD = Math.PI / 180;
+        math.RAD2DEG = 180 / Math.PI;
+        function degToRad(degrees) {
+            return degrees * math.DEG2RAD;
+        }
+        math.degToRad = degToRad;
+        function radToDeg(radians) {
+            return radians * math.RAD2DEG;
+        }
+        math.radToDeg = radToDeg;
+        function mapLinear(x, a1, a2, b1, b2) {
+            return b1 + (x - a1) * (b2 - b1) / (a2 - a1);
+        }
+        math.mapLinear = mapLinear;
         function numberLerp(fromV, toV, v) {
             return fromV * (1 - v) + toV * v;
         }
@@ -29862,15 +29876,15 @@ var gd3d;
             function Particle1() {
                 this.birthTime = 0;
                 this.lifetime = 5;
-                this.position = new framework.Vector3();
-                this.velocity = new framework.Vector3();
-                this.acceleration = new framework.Vector3();
-                this.rotation = new framework.Vector3();
-                this.angularVelocity = new framework.Vector3();
-                this.size = new framework.Vector3(1, 1, 1);
-                this.startSize = new framework.Vector3(1, 1, 1);
-                this.color = new framework.Color4();
-                this.startColor = new framework.Color4();
+                this.position = new gd3d.math.vector3();
+                this.velocity = new gd3d.math.vector3();
+                this.acceleration = new gd3d.math.vector3();
+                this.rotation = new gd3d.math.vector3();
+                this.angularVelocity = new gd3d.math.vector3();
+                this.size = new gd3d.math.vector3(1, 1, 1);
+                this.startSize = new gd3d.math.vector3(1, 1, 1);
+                this.color = new gd3d.math.color();
+                this.startColor = new gd3d.math.color();
                 this.tilingOffset = new gd3d.math.vector4(1, 1, 0, 0);
                 this.flipUV = new gd3d.math.vector2();
                 this.cache = {};
@@ -29879,11 +29893,15 @@ var gd3d;
                 preTime = Math.max(preTime, this.birthTime);
                 time = Math.max(this.birthTime, time);
                 var pTime = time - preTime;
-                this.velocity.add(this.acceleration.scaleNumberTo(pTime));
+                this.velocity.x += this.acceleration.x * pTime;
+                this.velocity.y += this.acceleration.y * pTime;
+                this.velocity.z += this.acceleration.z * pTime;
                 this.position.x += this.velocity.x * pTime;
                 this.position.y += this.velocity.y * pTime;
                 this.position.z += this.velocity.z * pTime;
-                this.rotation.add(this.angularVelocity.scaleNumberTo(pTime));
+                this.rotation.x += this.angularVelocity.x * pTime;
+                this.rotation.y += this.angularVelocity.y * pTime;
+                this.rotation.z += this.angularVelocity.z * pTime;
             };
             return Particle1;
         }());
@@ -29894,67 +29912,16 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var EventDispatcher = (function () {
-            function EventDispatcher() {
-            }
-            EventDispatcher.prototype.once = function (type, listener, thisObject, priority) {
-                if (thisObject === void 0) { thisObject = null; }
-                if (priority === void 0) { priority = 0; }
-                framework.event1.on(this, type, listener, thisObject, priority, true);
-            };
-            EventDispatcher.prototype.dispatchEvent = function (e) {
-                return framework.event1.dispatchEvent(this, e);
-            };
-            EventDispatcher.prototype.dispatch = function (type, data, bubbles) {
-                if (bubbles === void 0) { bubbles = false; }
-                return framework.event1.dispatch(this, type, data, bubbles);
-            };
-            EventDispatcher.prototype.has = function (type) {
-                return framework.event1.has(this, type);
-            };
-            EventDispatcher.prototype.on = function (type, listener, thisObject, priority, once) {
-                if (priority === void 0) { priority = 0; }
-                if (once === void 0) { once = false; }
-                framework.event1.on(this, type, listener, thisObject, priority, once);
-            };
-            EventDispatcher.prototype.off = function (type, listener, thisObject) {
-                framework.event1.off(this, type, listener, thisObject);
-            };
-            EventDispatcher.prototype.onAll = function (listener, thisObject, priority) {
-                if (priority === void 0) { priority = 0; }
-                framework.event1.onAll(this, listener, thisObject, priority);
-            };
-            EventDispatcher.prototype.offAll = function (listener, thisObject) {
-                framework.event1.offAll(this, listener, thisObject);
-            };
-            EventDispatcher.prototype.handleEvent = function (e) {
-                framework.event1["handleEvent"](this, e);
-            };
-            EventDispatcher.prototype.handelEventBubbles = function (e) {
-                framework.event1["handelEventBubbles"](this, e);
-            };
-            return EventDispatcher;
-        }());
-        framework.EventDispatcher = EventDispatcher;
-        framework.dispatcher = new EventDispatcher();
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var ParticleSystem = (function (_super) {
-            __extends(ParticleSystem, _super);
+        var ParticleSystem = (function () {
             function ParticleSystem() {
-                var _this = _super.call(this) || this;
-                _this.layer = framework.RenderLayerEnum.Transparent;
-                _this.queue = 0;
-                _this._isPlaying = false;
-                _this.time = 0;
-                _this.startDelay = 0;
-                _this._startDelay_rate = Math.random();
-                _this._vbos = [];
-                _this._attributes = [
+                this.layer = framework.RenderLayerEnum.Transparent;
+                this.queue = 0;
+                this._isPlaying = false;
+                this.time = 0;
+                this.startDelay = 0;
+                this._startDelay_rate = Math.random();
+                this._vbos = [];
+                this._attributes = [
                     ["a_particle_position", 4],
                     ["a_particle_scale", 4],
                     ["a_particle_rotation", 4],
@@ -29962,38 +29929,37 @@ var gd3d;
                     ["a_particle_tilingOffset", 4],
                     ["a_particle_flipUV", 4],
                 ];
-                _this._awaked = false;
-                _this._realTime = 0;
-                _this._preRealTime = 0;
-                _this._particlePool = [];
-                _this._activeParticles = [];
-                _this._modules = [];
-                _this._preworldPos = new framework.Vector3();
-                _this._isRateOverDistance = false;
-                _this._leftRateOverDistance = 0;
-                _this.worldPos = new framework.Vector3();
-                _this.moveVec = new framework.Vector3();
-                _this.speed = new framework.Vector3;
-                _this.localToWorldMatrix = new gd3d.math.matrix();
-                _this.worldToLocalMatrix = new gd3d.math.matrix();
-                _this.main = new framework.ParticleMainModule();
-                _this.emission = new framework.ParticleEmissionModule();
-                _this.shape = new framework.ParticleShapeModule();
-                _this.velocityOverLifetime = new framework.ParticleVelocityOverLifetimeModule();
-                _this.inheritVelocity = new framework.ParticleInheritVelocityModule();
-                _this.forceOverLifetime = new framework.ParticleForceOverLifetimeModule();
-                _this.limitVelocityOverLifetime = new framework.ParticleLimitVelocityOverLifetimeModule();
-                _this.colorOverLifetime = new framework.ParticleColorOverLifetimeModule();
-                _this.colorBySpeed = new framework.ParticleColorBySpeedModule();
-                _this.sizeOverLifetime = new framework.ParticleSizeOverLifetimeModule();
-                _this.sizeBySpeed = new framework.ParticleSizeBySpeedModule();
-                _this.rotationOverLifetime = new framework.ParticleRotationOverLifetimeModule();
-                _this.rotationBySpeed = new framework.ParticleRotationBySpeedModule();
-                _this.textureSheetAnimation = new framework.ParticleTextureSheetAnimationModule();
-                _this.main.enabled = true;
-                _this.emission.enabled = true;
-                _this.shape.enabled = true;
-                return _this;
+                this._awaked = false;
+                this._realTime = 0;
+                this._preRealTime = 0;
+                this._particlePool = [];
+                this._activeParticles = [];
+                this._modules = [];
+                this._preworldPos = new gd3d.math.vector3();
+                this._isRateOverDistance = false;
+                this._leftRateOverDistance = 0;
+                this.worldPos = new gd3d.math.vector3();
+                this.moveVec = new gd3d.math.vector3();
+                this.speed = new gd3d.math.vector3();
+                this.localToWorldMatrix = new gd3d.math.matrix();
+                this.worldToLocalMatrix = new gd3d.math.matrix();
+                this.main = new framework.ParticleMainModule();
+                this.emission = new framework.ParticleEmissionModule();
+                this.shape = new framework.ParticleShapeModule();
+                this.velocityOverLifetime = new framework.ParticleVelocityOverLifetimeModule();
+                this.inheritVelocity = new framework.ParticleInheritVelocityModule();
+                this.forceOverLifetime = new framework.ParticleForceOverLifetimeModule();
+                this.limitVelocityOverLifetime = new framework.ParticleLimitVelocityOverLifetimeModule();
+                this.colorOverLifetime = new framework.ParticleColorOverLifetimeModule();
+                this.colorBySpeed = new framework.ParticleColorBySpeedModule();
+                this.sizeOverLifetime = new framework.ParticleSizeOverLifetimeModule();
+                this.sizeBySpeed = new framework.ParticleSizeBySpeedModule();
+                this.rotationOverLifetime = new framework.ParticleRotationOverLifetimeModule();
+                this.rotationBySpeed = new framework.ParticleRotationBySpeedModule();
+                this.textureSheetAnimation = new framework.ParticleTextureSheetAnimationModule();
+                this.main.enabled = true;
+                this.emission.enabled = true;
+                this.shape.enabled = true;
             }
             Object.defineProperty(ParticleSystem.prototype, "renderLayer", {
                 get: function () { return this.gameObject.layer; },
@@ -30041,13 +30007,9 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "main", {
                 get: function () { return this._main; },
                 set: function (v) {
-                    if (this._main) {
-                        framework.watcher.unwatch(this._main, "simulationSpace", this._simulationSpaceChanged, this);
-                    }
-                    Array.replace(this._modules, this._main, v);
+                    framework.ArrayUtil.replace(this._modules, this._main, v);
                     v.particleSystem = this;
                     this._main = v;
-                    framework.watcher.watch(this._main, "simulationSpace", this._simulationSpaceChanged, this);
                 },
                 enumerable: true,
                 configurable: true
@@ -30055,7 +30017,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "emission", {
                 get: function () { return this._emission; },
                 set: function (v) {
-                    Array.replace(this._modules, this._emission, v);
+                    framework.ArrayUtil.replace(this._modules, this._emission, v);
                     v.particleSystem = this;
                     this._emission = v;
                 },
@@ -30065,7 +30027,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "shape", {
                 get: function () { return this._shape; },
                 set: function (v) {
-                    Array.replace(this._modules, this._shape, v);
+                    framework.ArrayUtil.replace(this._modules, this._shape, v);
                     v.particleSystem = this;
                     this._shape = v;
                 },
@@ -30075,7 +30037,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "velocityOverLifetime", {
                 get: function () { return this._velocityOverLifetime; },
                 set: function (v) {
-                    Array.replace(this._modules, this._velocityOverLifetime, v);
+                    framework.ArrayUtil.replace(this._modules, this._velocityOverLifetime, v);
                     v.particleSystem = this;
                     this._velocityOverLifetime = v;
                 },
@@ -30085,7 +30047,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "limitVelocityOverLifetime", {
                 get: function () { return this._limitVelocityOverLifetime; },
                 set: function (v) {
-                    Array.replace(this._modules, this._limitVelocityOverLifetime, v);
+                    framework.ArrayUtil.replace(this._modules, this._limitVelocityOverLifetime, v);
                     v.particleSystem = this;
                     this._limitVelocityOverLifetime = v;
                 },
@@ -30095,7 +30057,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "inheritVelocity", {
                 get: function () { return this._inheritVelocity; },
                 set: function (v) {
-                    Array.replace(this._modules, this._inheritVelocity, v);
+                    framework.ArrayUtil.replace(this._modules, this._inheritVelocity, v);
                     v.particleSystem = this;
                     this._inheritVelocity = v;
                 },
@@ -30105,7 +30067,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "forceOverLifetime", {
                 get: function () { return this._forceOverLifetime; },
                 set: function (v) {
-                    Array.replace(this._modules, this._forceOverLifetime, v);
+                    framework.ArrayUtil.replace(this._modules, this._forceOverLifetime, v);
                     v.particleSystem = this;
                     this._forceOverLifetime = v;
                 },
@@ -30115,7 +30077,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "colorOverLifetime", {
                 get: function () { return this._colorOverLifetime; },
                 set: function (v) {
-                    Array.replace(this._modules, this._colorOverLifetime, v);
+                    framework.ArrayUtil.replace(this._modules, this._colorOverLifetime, v);
                     v.particleSystem = this;
                     this._colorOverLifetime = v;
                 },
@@ -30125,7 +30087,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "colorBySpeed", {
                 get: function () { return this._colorBySpeed; },
                 set: function (v) {
-                    Array.replace(this._modules, this._colorBySpeed, v);
+                    framework.ArrayUtil.replace(this._modules, this._colorBySpeed, v);
                     v.particleSystem = this;
                     this._colorBySpeed = v;
                 },
@@ -30135,7 +30097,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "sizeOverLifetime", {
                 get: function () { return this._sizeOverLifetime; },
                 set: function (v) {
-                    Array.replace(this._modules, this._sizeOverLifetime, v);
+                    framework.ArrayUtil.replace(this._modules, this._sizeOverLifetime, v);
                     v.particleSystem = this;
                     this._sizeOverLifetime = v;
                 },
@@ -30145,7 +30107,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "sizeBySpeed", {
                 get: function () { return this._sizeBySpeed; },
                 set: function (v) {
-                    Array.replace(this._modules, this._sizeBySpeed, v);
+                    framework.ArrayUtil.replace(this._modules, this._sizeBySpeed, v);
                     v.particleSystem = this;
                     this._sizeBySpeed = v;
                 },
@@ -30155,7 +30117,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "rotationOverLifetime", {
                 get: function () { return this._rotationOverLifetime; },
                 set: function (v) {
-                    Array.replace(this._modules, this._rotationOverLifetime, v);
+                    framework.ArrayUtil.replace(this._modules, this._rotationOverLifetime, v);
                     v.particleSystem = this;
                     this._rotationOverLifetime = v;
                 },
@@ -30165,7 +30127,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "rotationBySpeed", {
                 get: function () { return this._rotationBySpeed; },
                 set: function (v) {
-                    Array.replace(this._modules, this._rotationBySpeed, v);
+                    framework.ArrayUtil.replace(this._modules, this._rotationBySpeed, v);
                     v.particleSystem = this;
                     this._rotationBySpeed = v;
                 },
@@ -30175,7 +30137,7 @@ var gd3d;
             Object.defineProperty(ParticleSystem.prototype, "textureSheetAnimation", {
                 get: function () { return this._textureSheetAnimation; },
                 set: function (v) {
-                    Array.replace(this._modules, this._textureSheetAnimation, v);
+                    framework.ArrayUtil.replace(this._modules, this._textureSheetAnimation, v);
                     v.particleSystem = this;
                     this._textureSheetAnimation = v;
                 },
@@ -30227,8 +30189,12 @@ var gd3d;
                 this.time = this.time + this.main.simulationSpeed * interval;
                 this._realTime = this.time - this.startDelay;
                 gd3d.math.matrixGetTranslation(this.localToWorldMatrix, this.worldPos);
-                this.moveVec.copy(this.worldPos).sub(this._preworldPos);
-                this.speed.copy(this.moveVec).divideNumber(this.main.simulationSpeed * interval / 1000);
+                this.moveVec.x = this.worldPos.x - this._preworldPos.x;
+                this.moveVec.y = this.worldPos.y - this._preworldPos.y;
+                this.moveVec.z = this.worldPos.z - this._preworldPos.z;
+                this.speed.x = this.moveVec.x / (this.main.simulationSpeed * interval / 1000);
+                this.speed.y = this.moveVec.y / (this.main.simulationSpeed * interval / 1000);
+                this.speed.z = this.moveVec.z / (this.main.simulationSpeed * interval / 1000);
                 this._updateActiveParticlesState();
                 if (this.main.loop && Math.floor(this._preRealTime / this.main.duration) < Math.floor(this._realTime / this.main.duration)) {
                     this.emission.bursts.forEach(function (element) {
@@ -30237,10 +30203,11 @@ var gd3d;
                 }
                 this._emit();
                 this._preRealTime = this._realTime;
-                this._preworldPos.copy(this.worldPos);
+                this._preworldPos.x = this.worldPos.x;
+                this._preworldPos.y = this.worldPos.y;
+                this._preworldPos.z = this.worldPos.z;
                 if (!this.main.loop && this._activeParticles.length == 0 && this._realTime > this.main.duration) {
                     this.stop();
-                    this.dispatch("particleCompleted", this);
                 }
             };
             ParticleSystem.prototype.stop = function () {
@@ -30404,21 +30371,22 @@ var gd3d;
                     if (this._isRateOverDistance) {
                         var moveVec = this.moveVec;
                         var worldPos = this.worldPos;
-                        if (moveVec.lengthSquared > 0) {
-                            var moveDir = moveVec.clone().normalize();
-                            var leftRateOverDistance = this._leftRateOverDistance + moveVec.length;
+                        if (gd3d.math.vec3SqrLength(moveVec) > 0) {
+                            var moveDir = new gd3d.math.vector3(moveVec.x, moveVec.y, moveVec.z);
+                            gd3d.math.vec3Normalize(moveDir, moveDir);
+                            var leftRateOverDistance = this._leftRateOverDistance + gd3d.math.vec3Length(moveVec);
                             var rateOverDistance = this.emission.rateOverDistance.getValue(rateAtDuration);
                             var invRateOverDistance = 1 / rateOverDistance;
-                            var invRateOverDistanceVec = moveDir.scaleNumberTo(1 / rateOverDistance);
-                            var lastRateOverDistance = this._preworldPos.addTo(moveDir.negateTo().scaleNumber(this._leftRateOverDistance));
+                            var invRateOverDistanceVec = new gd3d.math.vector3(moveDir.x / rateOverDistance, moveDir.y / rateOverDistance, moveDir.z / rateOverDistance);
+                            var lastRateOverDistance = new gd3d.math.vector3(this._preworldPos.x - moveDir.x * this._leftRateOverDistance, this._preworldPos.y - moveDir.y * this._leftRateOverDistance, this._preworldPos.z - moveDir.z * this._leftRateOverDistance);
                             var emitPosArr = [];
                             while (invRateOverDistance < leftRateOverDistance) {
-                                emitPosArr.push(lastRateOverDistance.add(invRateOverDistanceVec).clone());
+                                emitPosArr.push(new gd3d.math.vector3(lastRateOverDistance.x + invRateOverDistanceVec.x, lastRateOverDistance.y + invRateOverDistanceVec.y, lastRateOverDistance.z + invRateOverDistanceVec.z));
                                 leftRateOverDistance -= invRateOverDistance;
                             }
                             this._leftRateOverDistance = leftRateOverDistance;
                             emitPosArr.forEach(function (p) {
-                                emits.push({ time: _this.time, num: 1, position: p.sub(worldPos) });
+                                emits.push({ time: _this.time, num: 1, position: new gd3d.math.vector3(p.x - worldPos.x, p.y - worldPos.y, p.z - worldPos.z) });
                             });
                         }
                     }
@@ -30458,7 +30426,7 @@ var gd3d;
                 var rateAtDuration = this.rateAtDuration;
                 var num = v.num;
                 var birthTime = v.time;
-                var position = v.position || new framework.Vector3();
+                var position = v.position || new gd3d.math.vector3();
                 for (var i = 0; i < num; i++) {
                     if (this._activeParticles.length >= this.main.maxParticles)
                         return;
@@ -30468,7 +30436,9 @@ var gd3d;
                     if (rateAtLifeTime < 1) {
                         var particle = this._particlePool.pop() || new framework.Particle1();
                         particle.cache = {};
-                        particle.position.copy(position);
+                        particle.position.x = position.x;
+                        particle.position.y = position.y;
+                        particle.position.z = position.z;
                         particle.birthTime = birthTime;
                         particle.lifetime = lifetime;
                         particle.rateAtLifeTime = rateAtLifeTime;
@@ -30525,7 +30495,7 @@ var gd3d;
             ParticleSystem.prototype.addParticleVelocity = function (particle, velocity, space, name) {
                 if (name != undefined) {
                     this.removeParticleVelocity(particle, name);
-                    particle.cache[name] = { value: velocity.clone(), space: space };
+                    particle.cache[name] = { value: new gd3d.math.vector3(velocity.x, velocity.y, velocity.z), space: space };
                 }
                 if (space != this.main.simulationSpace) {
                     if (space == framework.ParticleSystemSimulationSpace.World) {
@@ -30535,7 +30505,9 @@ var gd3d;
                         gd3d.math.matrixTransformNormal(velocity, this.localToWorldMatrix, velocity);
                     }
                 }
-                particle.velocity.add(velocity);
+                particle.velocity.x += velocity.x;
+                particle.velocity.y += velocity.y;
+                particle.velocity.z += velocity.z;
             };
             ParticleSystem.prototype.removeParticleVelocity = function (particle, name) {
                 var obj = particle.cache[name];
@@ -30551,13 +30523,15 @@ var gd3d;
                             gd3d.math.matrixTransformNormal(value, this.localToWorldMatrix, value);
                         }
                     }
-                    particle.velocity.sub(value);
+                    particle.velocity.x -= value.x;
+                    particle.velocity.y -= value.y;
+                    particle.velocity.z -= value.z;
                 }
             };
             ParticleSystem.prototype.addParticleAcceleration = function (particle, acceleration, space, name) {
                 if (name != undefined) {
                     this.removeParticleAcceleration(particle, name);
-                    particle.cache[name] = { value: acceleration.clone(), space: space };
+                    particle.cache[name] = { value: new gd3d.math.vector3(acceleration.x, acceleration.y, acceleration.z), space: space };
                 }
                 if (space != this.main.simulationSpace) {
                     if (space == framework.ParticleSystemSimulationSpace.World) {
@@ -30567,7 +30541,9 @@ var gd3d;
                         gd3d.math.matrixTransformNormal(acceleration, this.localToWorldMatrix, acceleration);
                     }
                 }
-                particle.acceleration.add(acceleration);
+                particle.acceleration.x += acceleration.x;
+                particle.acceleration.y += acceleration.y;
+                particle.acceleration.z += acceleration.z;
             };
             ParticleSystem.prototype.removeParticleAcceleration = function (particle, name) {
                 var obj = particle.cache[name];
@@ -30583,7 +30559,9 @@ var gd3d;
                             gd3d.math.matrixTransformNormal(value, this.localToWorldMatrix, value);
                         }
                     }
-                    particle.acceleration.sub(value);
+                    particle.acceleration.x -= value.x;
+                    particle.acceleration.y -= value.y;
+                    particle.acceleration.z -= value.z;
                 }
             };
             ParticleSystem.ClassName = "ParticleSystem";
@@ -30603,7 +30581,7 @@ var gd3d;
                 __metadata("design:paramtypes", [])
             ], ParticleSystem);
             return ParticleSystem;
-        }(framework.EventDispatcher));
+        }());
         framework.ParticleSystem = ParticleSystem;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -30747,405 +30725,6 @@ var gd3d;
             UVChannelFlags[UVChannelFlags["UV3"] = 8] = "UV3";
             UVChannelFlags[UVChannelFlags["Everything"] = 15] = "Everything";
         })(UVChannelFlags = framework.UVChannelFlags || (framework.UVChannelFlags = {}));
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var FEvent = (function () {
-            function FEvent() {
-                this.feventMap = new Map();
-            }
-            FEvent.prototype.getBubbleTargets = function (target) {
-                return [target["parent"]];
-            };
-            FEvent.prototype.once = function (obj, type, listener, thisObject, priority) {
-                if (thisObject === void 0) { thisObject = null; }
-                if (priority === void 0) { priority = 0; }
-                this.on(obj, type, listener, thisObject, priority, true);
-            };
-            FEvent.prototype.dispatchEvent = function (obj, e) {
-                var targets = e.targets = e.targets || [];
-                if (targets.indexOf(obj) != -1)
-                    return false;
-                targets.push(obj);
-                e.handles = [];
-                this.handleEvent(obj, e);
-                this.handelEventBubbles(obj, e);
-                return true;
-            };
-            FEvent.prototype.dispatch = function (obj, type, data, bubbles) {
-                if (bubbles === void 0) { bubbles = false; }
-                var e = { type: type, data: data, bubbles: bubbles, target: null, currentTarget: null, isStop: false, isStopBubbles: false, targets: [], handles: [] };
-                this.dispatchEvent(obj, e);
-                return e;
-            };
-            FEvent.prototype.has = function (obj, type) {
-                return !!(this.feventMap.get(obj) && this.feventMap.get(obj)[type] && this.feventMap.get(obj)[type].length);
-            };
-            FEvent.prototype.on = function (obj, type, listener, thisObject, priority, once) {
-                if (priority === void 0) { priority = 0; }
-                if (once === void 0) { once = false; }
-                var objectListener = this.feventMap.get(obj);
-                if (!objectListener)
-                    (this.feventMap.set(obj, objectListener = {}));
-                var listeners = objectListener[type] = objectListener[type] || [];
-                for (var i = 0; i < listeners.length; i++) {
-                    var element = listeners[i];
-                    if (element.listener == listener && element.thisObject == thisObject) {
-                        listeners.splice(i, 1);
-                        break;
-                    }
-                }
-                for (var i = 0; i < listeners.length; i++) {
-                    var element = listeners[i];
-                    if (priority > element.priority) {
-                        break;
-                    }
-                }
-                listeners.splice(i, 0, { listener: listener, thisObject: thisObject, priority: priority, once: once });
-            };
-            FEvent.prototype.off = function (obj, type, listener, thisObject) {
-                if (!type) {
-                    this.feventMap.delete(obj);
-                    return;
-                }
-                if (!listener) {
-                    if (this.feventMap.get(obj))
-                        delete this.feventMap.get(obj)[type];
-                    return;
-                }
-                var listeners = this.feventMap.get(obj) && this.feventMap.get(obj)[type];
-                if (listeners) {
-                    for (var i = listeners.length - 1; i >= 0; i--) {
-                        var element = listeners[i];
-                        if (element.listener == listener && element.thisObject == thisObject) {
-                            listeners.splice(i, 1);
-                        }
-                    }
-                    if (listeners.length == 0) {
-                        delete this.feventMap.get(obj)[type];
-                    }
-                }
-            };
-            FEvent.prototype.onAll = function (obj, listener, thisObject, priority) {
-                if (priority === void 0) { priority = 0; }
-                var objectListener = this.feventMap.get(obj);
-                if (!objectListener)
-                    (this.feventMap.set(obj, objectListener = {}));
-                var listeners = objectListener.__allEventType__ = objectListener.__allEventType__ || [];
-                for (var i = 0; i < listeners.length; i++) {
-                    var element = listeners[i];
-                    if (element.listener == listener && element.thisObject == thisObject) {
-                        listeners.splice(i, 1);
-                        break;
-                    }
-                }
-                for (var i = 0; i < listeners.length; i++) {
-                    var element = listeners[i];
-                    if (priority > element.priority) {
-                        break;
-                    }
-                }
-                listeners.splice(i, 0, { listener: listener, thisObject: thisObject, priority: priority, once: false });
-            };
-            FEvent.prototype.offAll = function (obj, listener, thisObject) {
-                if (!listener) {
-                    if (this.feventMap.get(obj))
-                        delete this.feventMap.get(obj).__allEventType__;
-                    return;
-                }
-                var listeners = this.feventMap.get(obj) && this.feventMap.get(obj).__allEventType__;
-                if (listeners) {
-                    for (var i = listeners.length - 1; i >= 0; i--) {
-                        var element = listeners[i];
-                        if (element.listener == listener && element.thisObject == thisObject) {
-                            listeners.splice(i, 1);
-                        }
-                    }
-                    if (listeners.length == 0) {
-                        delete this.feventMap.get(obj).__allEventType__;
-                    }
-                }
-            };
-            FEvent.prototype.handleEvent = function (obj, e) {
-                e.target || (e.target = obj);
-                try {
-                    e.currentTarget = obj;
-                }
-                catch (error) { }
-                var listeners = this.feventMap.get(obj) && this.feventMap.get(obj)[e.type];
-                if (listeners) {
-                    var listeners0 = listeners.concat();
-                    for (var i = 0; i < listeners0.length && !e.isStop; i++) {
-                        listeners0[i].listener.call(listeners0[i].thisObject, e);
-                        e.handles.push(listeners0[i]);
-                    }
-                    for (var i = listeners.length - 1; i >= 0; i--) {
-                        if (listeners[i].once)
-                            listeners.splice(i, 1);
-                    }
-                    if (listeners.length == 0)
-                        delete this.feventMap.get(obj)[e.type];
-                }
-                listeners = this.feventMap.get(obj) && this.feventMap.get(obj).__allEventType__;
-                if (listeners) {
-                    var listeners0 = listeners.concat();
-                    for (var i = 0; i < listeners0.length && !e.isStop; i++) {
-                        listeners0[i].listener.call(listeners0[i].thisObject, e);
-                    }
-                    for (var i = listeners.length - 1; i >= 0; i--) {
-                        if (listeners[i].once)
-                            listeners.splice(i, 1);
-                    }
-                    if (listeners.length == 0)
-                        delete this.feventMap.get(obj).__allEventType__;
-                }
-            };
-            FEvent.prototype.handelEventBubbles = function (obj, e) {
-                if (e.bubbles && !e.isStopBubbles) {
-                    var bubbleTargets = this.getBubbleTargets(obj);
-                    for (var i = 0, n = bubbleTargets.length; i < n; i++) {
-                        var bubbleTarget = bubbleTargets[i];
-                        if (!e.isStop && bubbleTarget && bubbleTarget.dispatchEvent)
-                            bubbleTarget.dispatchEvent(e);
-                    }
-                }
-            };
-            return FEvent;
-        }());
-        framework.FEvent = FEvent;
-        framework.objectevent = framework.event1 = new FEvent();
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var Color3 = (function () {
-            function Color3(r, g, b) {
-                if (r === void 0) { r = 1; }
-                if (g === void 0) { g = 1; }
-                if (b === void 0) { b = 1; }
-                this.r = 1;
-                this.g = 1;
-                this.b = 1;
-                this.r = r;
-                this.g = g;
-                this.b = b;
-            }
-            Color3.fromUnit = function (color) {
-                return new Color3().fromUnit(color);
-            };
-            Color3.fromColor4 = function (color4) {
-                return new Color3(color4.r, color4.g, color4.b);
-            };
-            Color3.prototype.setTo = function (r, g, b) {
-                this.r = r;
-                this.g = g;
-                this.b = b;
-                return this;
-            };
-            Color3.prototype.fromUnit = function (color) {
-                this.r = ((color >> 16) & 0xff) / 0xff;
-                this.g = ((color >> 8) & 0xff) / 0xff;
-                this.b = (color & 0xff) / 0xff;
-                return this;
-            };
-            Color3.prototype.toInt = function () {
-                var value = ((this.r * 0xff) << 16) + ((this.g * 0xff) << 8) + (this.b * 0xff);
-                return value;
-            };
-            Color3.prototype.toHexString = function () {
-                var intR = (this.r * 0xff) | 0;
-                var intG = (this.g * 0xff) | 0;
-                var intB = (this.b * 0xff) | 0;
-                return "#" + Color3.ToHex(intR) + Color3.ToHex(intG) + Color3.ToHex(intB);
-            };
-            Color3.prototype.mix = function (color, rate) {
-                this.r = this.r * (1 - rate) + color.r * rate;
-                this.g = this.g * (1 - rate) + color.g * rate;
-                this.b = this.b * (1 - rate) + color.b * rate;
-                return this;
-            };
-            Color3.prototype.mixTo = function (color, rate, vout) {
-                if (vout === void 0) { vout = new Color3(); }
-                return vout.copy(this).mix(color, rate);
-            };
-            Color3.prototype.scale = function (s) {
-                this.r *= s;
-                this.g *= s;
-                this.b *= s;
-                return this;
-            };
-            Color3.prototype.scaleTo = function (s, vout) {
-                if (vout === void 0) { vout = new Color3(); }
-                return vout.copy(this).scale(s);
-            };
-            Color3.prototype.copy = function (color) {
-                this.r = color.r;
-                this.g = color.g;
-                this.b = color.b;
-                return this;
-            };
-            Color3.prototype.clone = function () {
-                return new Color3(this.r, this.g, this.b);
-            };
-            Color3.prototype.toColor4 = function (color4) {
-                if (color4 === void 0) { color4 = new framework.Color4(); }
-                color4.r = this.r;
-                color4.g = this.g;
-                color4.b = this.b;
-                return color4;
-            };
-            Color3.prototype.toString = function () {
-                return "{R: " + this.r + " G:" + this.g + " B:" + this.b + "}";
-            };
-            Color3.ToHex = function (i) {
-                var str = i.toString(16);
-                if (i <= 0xf) {
-                    return ("0" + str).toUpperCase();
-                }
-                return str.toUpperCase();
-            };
-            Color3.WHITE = new Color3();
-            Color3.BLACK = new Color3(0, 0, 0);
-            return Color3;
-        }());
-        framework.Color3 = Color3;
-        framework.ColorKeywords = {
-            'aliceblue': 0xF0F8FF, 'antiquewhite': 0xFAEBD7, 'aqua': 0x00FFFF, 'aquamarine': 0x7FFFD4, 'azure': 0xF0FFFF,
-            'beige': 0xF5F5DC, 'bisque': 0xFFE4C4, 'black': 0x000000, 'blanchedalmond': 0xFFEBCD, 'blue': 0x0000FF, 'blueviolet': 0x8A2BE2,
-            'brown': 0xA52A2A, 'burlywood': 0xDEB887, 'cadetblue': 0x5F9EA0, 'chartreuse': 0x7FFF00, 'chocolate': 0xD2691E, 'coral': 0xFF7F50,
-            'cornflowerblue': 0x6495ED, 'cornsilk': 0xFFF8DC, 'crimson': 0xDC143C, 'cyan': 0x00FFFF, 'darkblue': 0x00008B, 'darkcyan': 0x008B8B,
-            'darkgoldenrod': 0xB8860B, 'darkgray': 0xA9A9A9, 'darkgreen': 0x006400, 'darkgrey': 0xA9A9A9, 'darkkhaki': 0xBDB76B, 'darkmagenta': 0x8B008B,
-            'darkolivegreen': 0x556B2F, 'darkorange': 0xFF8C00, 'darkorchid': 0x9932CC, 'darkred': 0x8B0000, 'darksalmon': 0xE9967A, 'darkseagreen': 0x8FBC8F,
-            'darkslateblue': 0x483D8B, 'darkslategray': 0x2F4F4F, 'darkslategrey': 0x2F4F4F, 'darkturquoise': 0x00CED1, 'darkviolet': 0x9400D3,
-            'deeppink': 0xFF1493, 'deepskyblue': 0x00BFFF, 'dimgray': 0x696969, 'dimgrey': 0x696969, 'dodgerblue': 0x1E90FF, 'firebrick': 0xB22222,
-            'floralwhite': 0xFFFAF0, 'forestgreen': 0x228B22, 'fuchsia': 0xFF00FF, 'gainsboro': 0xDCDCDC, 'ghostwhite': 0xF8F8FF, 'gold': 0xFFD700,
-            'goldenrod': 0xDAA520, 'gray': 0x808080, 'green': 0x008000, 'greenyellow': 0xADFF2F, 'grey': 0x808080, 'honeydew': 0xF0FFF0, 'hotpink': 0xFF69B4,
-            'indianred': 0xCD5C5C, 'indigo': 0x4B0082, 'ivory': 0xFFFFF0, 'khaki': 0xF0E68C, 'lavender': 0xE6E6FA, 'lavenderblush': 0xFFF0F5, 'lawngreen': 0x7CFC00,
-            'lemonchiffon': 0xFFFACD, 'lightblue': 0xADD8E6, 'lightcoral': 0xF08080, 'lightcyan': 0xE0FFFF, 'lightgoldenrodyellow': 0xFAFAD2, 'lightgray': 0xD3D3D3,
-            'lightgreen': 0x90EE90, 'lightgrey': 0xD3D3D3, 'lightpink': 0xFFB6C1, 'lightsalmon': 0xFFA07A, 'lightseagreen': 0x20B2AA, 'lightskyblue': 0x87CEFA,
-            'lightslategray': 0x778899, 'lightslategrey': 0x778899, 'lightsteelblue': 0xB0C4DE, 'lightyellow': 0xFFFFE0, 'lime': 0x00FF00, 'limegreen': 0x32CD32,
-            'linen': 0xFAF0E6, 'magenta': 0xFF00FF, 'maroon': 0x800000, 'mediumaquamarine': 0x66CDAA, 'mediumblue': 0x0000CD, 'mediumorchid': 0xBA55D3,
-            'mediumpurple': 0x9370DB, 'mediumseagreen': 0x3CB371, 'mediumslateblue': 0x7B68EE, 'mediumspringgreen': 0x00FA9A, 'mediumturquoise': 0x48D1CC,
-            'mediumvioletred': 0xC71585, 'midnightblue': 0x191970, 'mintcream': 0xF5FFFA, 'mistyrose': 0xFFE4E1, 'moccasin': 0xFFE4B5, 'navajowhite': 0xFFDEAD,
-            'navy': 0x000080, 'oldlace': 0xFDF5E6, 'olive': 0x808000, 'olivedrab': 0x6B8E23, 'orange': 0xFFA500, 'orangered': 0xFF4500, 'orchid': 0xDA70D6,
-            'palegoldenrod': 0xEEE8AA, 'palegreen': 0x98FB98, 'paleturquoise': 0xAFEEEE, 'palevioletred': 0xDB7093, 'papayawhip': 0xFFEFD5, 'peachpuff': 0xFFDAB9,
-            'peru': 0xCD853F, 'pink': 0xFFC0CB, 'plum': 0xDDA0DD, 'powderblue': 0xB0E0E6, 'purple': 0x800080, 'rebeccapurple': 0x663399, 'red': 0xFF0000, 'rosybrown': 0xBC8F8F,
-            'royalblue': 0x4169E1, 'saddlebrown': 0x8B4513, 'salmon': 0xFA8072, 'sandybrown': 0xF4A460, 'seagreen': 0x2E8B57, 'seashell': 0xFFF5EE,
-            'sienna': 0xA0522D, 'silver': 0xC0C0C0, 'skyblue': 0x87CEEB, 'slateblue': 0x6A5ACD, 'slategray': 0x708090, 'slategrey': 0x708090, 'snow': 0xFFFAFA,
-            'springgreen': 0x00FF7F, 'steelblue': 0x4682B4, 'tan': 0xD2B48C, 'teal': 0x008080, 'thistle': 0xD8BFD8, 'tomato': 0xFF6347, 'turquoise': 0x40E0D0,
-            'violet': 0xEE82EE, 'wheat': 0xF5DEB3, 'white': 0xFFFFFF, 'whitesmoke': 0xF5F5F5, 'yellow': 0xFFFF00, 'yellowgreen': 0x9ACD32
-        };
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var Color4 = (function () {
-            function Color4(r, g, b, a) {
-                if (r === void 0) { r = 1; }
-                if (g === void 0) { g = 1; }
-                if (b === void 0) { b = 1; }
-                if (a === void 0) { a = 1; }
-                this.r = 1;
-                this.g = 1;
-                this.b = 1;
-                this.a = 1;
-                this.r = r;
-                this.g = g;
-                this.b = b;
-                this.a = a;
-            }
-            Color4.fromUnit = function (color) {
-                return new Color4().fromUnit(color);
-            };
-            Color4.fromUnit24 = function (color, a) {
-                if (a === void 0) { a = 1; }
-                return Color4.fromColor3(framework.Color3.fromUnit(color), a);
-            };
-            Color4.fromColor3 = function (color3, a) {
-                if (a === void 0) { a = 1; }
-                return new Color4(color3.r, color3.g, color3.b, a);
-            };
-            Color4.prototype.setTo = function (r, g, b, a) {
-                if (a === void 0) { a = 1; }
-                this.r = r;
-                this.g = g;
-                this.b = b;
-                this.a = a;
-                return this;
-            };
-            Color4.prototype.fromUnit = function (color) {
-                this.a = ((color >> 24) & 0xff) / 0xff;
-                this.r = ((color >> 16) & 0xff) / 0xff;
-                this.g = ((color >> 8) & 0xff) / 0xff;
-                this.b = (color & 0xff) / 0xff;
-                return this;
-            };
-            Color4.prototype.toInt = function () {
-                var value = ((this.a * 0xff) << 24) + ((this.r * 0xff) << 16) + ((this.g * 0xff) << 8) + (this.b * 0xff);
-                return value;
-            };
-            Color4.prototype.toHexString = function () {
-                var intR = (this.r * 0xff) | 0;
-                var intG = (this.g * 0xff) | 0;
-                var intB = (this.b * 0xff) | 0;
-                var intA = (this.a * 0xff) | 0;
-                return "#" + framework.Color3.ToHex(intA) + framework.Color3.ToHex(intR) + framework.Color3.ToHex(intG) + framework.Color3.ToHex(intB);
-            };
-            Color4.prototype.mix = function (color, rate) {
-                if (rate === void 0) { rate = 0.5; }
-                this.r = this.r * (1 - rate) + color.r * rate;
-                this.g = this.g * (1 - rate) + color.g * rate;
-                this.b = this.b * (1 - rate) + color.b * rate;
-                this.a = this.a * (1 - rate) + color.a * rate;
-                return this;
-            };
-            Color4.prototype.mixTo = function (color, rate, vout) {
-                if (vout === void 0) { vout = new Color4(); }
-                return vout.copy(this).mix(color, rate);
-            };
-            Color4.prototype.multiply = function (c) {
-                this.r *= c.r;
-                this.g *= c.g;
-                this.b *= c.b;
-                this.a *= c.a;
-                return this;
-            };
-            Color4.prototype.multiplyTo = function (v, vout) {
-                if (vout === void 0) { vout = new Color4(); }
-                return vout.copy(this).multiply(v);
-            };
-            Color4.prototype.copy = function (color) {
-                this.r = color.r;
-                this.g = color.g;
-                this.b = color.b;
-                this.a = color.a;
-                return this;
-            };
-            Color4.prototype.toString = function () {
-                return "{R: " + this.r + " G:" + this.g + " B:" + this.b + " A:" + this.a + "}";
-            };
-            Color4.prototype.toColor3 = function (color) {
-                if (color === void 0) { color = new framework.Color3(); }
-                color.r = this.r;
-                color.g = this.g;
-                color.b = this.b;
-                return color;
-            };
-            Color4.prototype.clone = function () {
-                return new Color4(this.r, this.g, this.b, this.a);
-            };
-            Color4.WHITE = new Color4();
-            Color4.BLACK = new Color4(0, 0, 0);
-            return Color4;
-        }());
-        framework.Color4 = Color4;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -31426,13 +31005,13 @@ var gd3d;
                     wrapMode = this.postWrapMode;
                 switch (wrapMode) {
                     case framework.AnimationCurveWrapMode.Clamp:
-                        t = Math.clamp(t, 0, 1);
+                        t = gd3d.math.floatClamp(t, 0, 1);
                         break;
                     case framework.AnimationCurveWrapMode.Loop:
-                        t = Math.clamp(t - Math.floor(t), 0, 1);
+                        t = gd3d.math.floatClamp(t - Math.floor(t), 0, 1);
                         break;
                     case framework.AnimationCurveWrapMode.PingPong:
-                        t = Math.clamp(t - Math.floor(t), 0, 1);
+                        t = gd3d.math.floatClamp(t - Math.floor(t), 0, 1);
                         if (Math.floor(t) % 2 == 1)
                             t = 1 - t;
                         break;
@@ -31820,9 +31399,9 @@ var gd3d;
                     case framework.MinMaxCurveMode.Curve:
                         return this.curve.getValue(time) * this.curveMultiplier;
                     case framework.MinMaxCurveMode.TwoConstants:
-                        return Math.lerp(this.constantMin, this.constantMax, randomBetween);
+                        return gd3d.math.numberLerp(this.constantMin, this.constantMax, randomBetween);
                     case framework.MinMaxCurveMode.TwoCurves:
-                        return Math.lerp(this.curveMin.getValue(time), this.curveMax.getValue(time), randomBetween) * this.curveMultiplier;
+                        return gd3d.math.numberLerp(this.curveMin.getValue(time), this.curveMax.getValue(time), randomBetween) * this.curveMultiplier;
                 }
                 return this.constant;
             };
@@ -31856,7 +31435,7 @@ var gd3d;
             }
             MinMaxCurveVector3.prototype.getValue = function (time, randomBetween) {
                 if (randomBetween === void 0) { randomBetween = Math.random(); }
-                return new framework.Vector3(this.xCurve.getValue(time, randomBetween), this.yCurve.getValue(time, randomBetween), this.zCurve.getValue(time, randomBetween));
+                return new gd3d.math.vector3(this.xCurve.getValue(time, randomBetween), this.yCurve.getValue(time, randomBetween), this.zCurve.getValue(time, randomBetween));
             };
             return MinMaxCurveVector3;
         }());
@@ -31883,403 +31462,16 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var Vector3 = (function () {
-            function Vector3(x, y, z) {
-                if (x === void 0) { x = 0; }
-                if (y === void 0) { y = 0; }
-                if (z === void 0) { z = 0; }
-                this.x = 0;
-                this.y = 0;
-                this.z = 0;
-                this.x = x;
-                this.y = y;
-                this.z = z;
-            }
-            Vector3.fromArray = function (array, offset) {
-                if (offset === void 0) { offset = 0; }
-                return new Vector3().fromArray(array, offset);
-            };
-            Vector3.random = function (size) {
-                if (size === void 0) { size = 1; }
-                return new Vector3(Math.random() * size, Math.random() * size, Math.random() * size);
-            };
-            Object.defineProperty(Vector3.prototype, "length", {
-                get: function () {
-                    return Math.sqrt(this.lengthSquared);
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Object.defineProperty(Vector3.prototype, "lengthSquared", {
-                get: function () {
-                    return this.x * this.x + this.y * this.y + this.z * this.z;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            Vector3.prototype.set = function (x, y, z) {
-                this.x = x;
-                this.y = y;
-                this.z = z;
-                return this;
-            };
-            Vector3.prototype.setZero = function () {
-                this.x = this.y = this.z = 0;
-            };
-            Vector3.prototype.fromArray = function (array, offset) {
-                if (offset === void 0) { offset = 0; }
-                this.x = array[offset];
-                this.y = array[offset + 1];
-                this.z = array[offset + 2];
-                return this;
-            };
-            Vector3.prototype.add = function (a) {
-                this.x += a.x;
-                this.y += a.y;
-                this.z += a.z;
-                return this;
-            };
-            Vector3.prototype.addTo = function (a, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (a == vout)
-                    a = a.clone();
-                return vout.copy(this).add(a);
-            };
-            Vector3.prototype.addScaledVector = function (scalar, vector) {
-                this.x = this.x + scalar * vector.x;
-                this.y = this.y + scalar * vector.y;
-                this.z = this.z + scalar * vector.z;
-                return this;
-            };
-            Vector3.prototype.multiply = function (a) {
-                this.x *= a.x;
-                this.y *= a.y;
-                this.z *= a.z;
-                return this;
-            };
-            Vector3.prototype.multiplyTo = function (a, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (a == vout)
-                    a = a.clone();
-                return vout.copy(this).multiply(a);
-            };
-            Vector3.prototype.divide = function (a) {
-                this.x /= a.x;
-                this.y /= a.y;
-                this.z /= a.z;
-                return this;
-            };
-            Vector3.prototype.divideTo = function (a, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (a == vout)
-                    a = a.clone();
-                return vout.copy(this).divide(a);
-            };
-            Vector3.prototype.cross = function (a) {
-                return this.set(this.y * a.z - this.z * a.y, this.z * a.x - this.x * a.z, this.x * a.y - this.y * a.x);
-            };
-            Vector3.prototype.crossTo = function (a, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (a == vout)
-                    a = a.clone();
-                return vout.copy(this).cross(a);
-            };
-            Vector3.prototype.dot = function (a) {
-                return this.x * a.x + this.y * a.y + this.z * a.z;
-            };
-            Vector3.prototype.isZero = function () {
-                return this.x === 0 && this.y === 0 && this.z === 0;
-            };
-            Vector3.prototype.tangents = function (t1, t2) {
-                var norm = this.length;
-                if (norm > 0.0) {
-                    var n = new Vector3();
-                    var inorm = 1 / norm;
-                    n.set(this.x * inorm, this.y * inorm, this.z * inorm);
-                    var randVec = new Vector3();
-                    if (Math.abs(n.x) < 0.9) {
-                        randVec.set(1, 0, 0);
-                        n.crossTo(randVec, t1);
-                    }
-                    else {
-                        randVec.set(0, 1, 0);
-                        n.crossTo(randVec, t1);
-                    }
-                    n.crossTo(t1, t2);
-                }
-                else {
-                    t1.set(1, 0, 0);
-                    t2.set(0, 1, 0);
-                }
-            };
-            Vector3.prototype.addNumber = function (n) {
-                this.x += n;
-                this.y += n;
-                this.z += n;
-                return this;
-            };
-            Vector3.prototype.addNumberTo = function (n, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                return vout.copy(this).addNumber(n);
-            };
-            Vector3.prototype.subNumber = function (n) {
-                this.x -= n;
-                this.y -= n;
-                this.z -= n;
-                return this;
-            };
-            Vector3.prototype.subNumberTo = function (n, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                return vout.copy(this).subNumber(n);
-            };
-            Vector3.prototype.multiplyNumber = function (n) {
-                this.x *= n;
-                this.y *= n;
-                this.z *= n;
-                return this;
-            };
-            Vector3.prototype.multiplyNumberTo = function (n, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                return vout.copy(this).multiplyNumber(n);
-            };
-            Vector3.prototype.divideNumber = function (n) {
-                this.x /= n;
-                this.y /= n;
-                this.z /= n;
-                return this;
-            };
-            Vector3.prototype.divideNumberTo = function (n, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                return vout.copy(this).divideNumber(n);
-            };
-            Vector3.prototype.clone = function () {
-                return new Vector3(this.x, this.y, this.z);
-            };
-            Vector3.prototype.copy = function (v) {
-                this.x = v.x;
-                this.y = v.y;
-                this.z = v.z;
-                return this;
-            };
-            Vector3.prototype.negate = function () {
-                this.x = -this.x;
-                this.y = -this.y;
-                this.z = -this.z;
-                return this;
-            };
-            Vector3.prototype.negateTo = function (vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                return vout.copy(this).negate();
-            };
-            Vector3.prototype.inverse = function () {
-                this.x = 1 / this.x;
-                this.y = 1 / this.y;
-                this.z = 1 / this.z;
-                return this;
-            };
-            Vector3.prototype.inverseTo = function (vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                return vout.copy(this).inverse();
-            };
-            Vector3.prototype.normalize = function (thickness) {
-                if (thickness === void 0) { thickness = 1; }
-                var length = this.lengthSquared;
-                if (length > 0) {
-                    length = Math.sqrt(length);
-                    var invLength = thickness / length;
-                    this.x *= invLength;
-                    this.y *= invLength;
-                    this.z *= invLength;
-                }
-                return this;
-            };
-            Vector3.prototype.unit = function (target) {
-                if (target === void 0) { target = new Vector3(); }
-                var x = this.x, y = this.y, z = this.z;
-                var ninv = x * x + y * y + z * z;
-                if (ninv > 0.0) {
-                    var ninv = Math.sqrt(ninv);
-                    ninv = 1.0 / ninv;
-                    target.x = x * ninv;
-                    target.y = y * ninv;
-                    target.z = z * ninv;
-                }
-                else {
-                    target.x = 1;
-                    target.y = 0;
-                    target.z = 0;
-                }
-                return target;
-            };
-            Vector3.prototype.scaleNumber = function (s) {
-                this.x *= s;
-                this.y *= s;
-                this.z *= s;
-                return this;
-            };
-            Vector3.prototype.scaleNumberTo = function (s, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                return vout.copy(this).scaleNumber(s);
-            };
-            Vector3.prototype.scale = function (s) {
-                this.x *= s.x;
-                this.y *= s.y;
-                this.z *= s.z;
-                return this;
-            };
-            Vector3.prototype.scaleTo = function (s, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (s == vout)
-                    s = s.clone();
-                return vout.copy(this).scale(s);
-            };
-            Vector3.prototype.sub = function (a) {
-                this.x -= a.x;
-                this.y -= a.y;
-                this.z -= a.z;
-                return this;
-            };
-            Vector3.prototype.subTo = function (a, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (a == vout)
-                    a = a.clone();
-                return vout.copy(this).sub(a);
-            };
-            Vector3.prototype.lerp = function (v, alpha) {
-                this.x += (v.x - this.x) * alpha.x;
-                this.y += (v.y - this.y) * alpha.y;
-                this.z += (v.z - this.z) * alpha.z;
-                return this;
-            };
-            Vector3.prototype.lerpTo = function (v, alpha, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (v == vout)
-                    v = v.clone();
-                return vout.copy(this).lerp(v, alpha);
-            };
-            Vector3.prototype.lerpNumber = function (v, alpha) {
-                this.x += (v.x - this.x) * alpha;
-                this.y += (v.y - this.y) * alpha;
-                this.z += (v.z - this.z) * alpha;
-                return this;
-            };
-            Vector3.prototype.lerpNumberTo = function (v, alpha, vout) {
-                if (vout === void 0) { vout = new Vector3(); }
-                if (v == vout)
-                    v = v.clone();
-                return vout.copy(this).lerpNumber(v, alpha);
-            };
-            Vector3.prototype.less = function (p) {
-                return this.x < p.x && this.y < p.y && this.z < p.z;
-            };
-            Vector3.prototype.lessequal = function (p) {
-                return this.x <= p.x && this.y <= p.y && this.z <= p.z;
-            };
-            Vector3.prototype.greater = function (p) {
-                return this.x > p.x && this.y > p.y && this.z > p.z;
-            };
-            Vector3.prototype.greaterequal = function (p) {
-                return this.x >= p.x && this.y >= p.y && this.z >= p.z;
-            };
-            Vector3.prototype.clamp = function (min, max) {
-                this.x = Math.clamp(this.x, min.x, max.x);
-                this.y = Math.clamp(this.y, min.y, max.y);
-                this.z = Math.clamp(this.z, min.z, max.z);
-                return this;
-            };
-            Vector3.prototype.min = function (v) {
-                this.x = Math.min(this.x, v.x);
-                this.y = Math.min(this.y, v.y);
-                this.z = Math.min(this.z, v.z);
-                return this;
-            };
-            Vector3.prototype.max = function (v) {
-                this.x = Math.max(this.x, v.x);
-                this.y = Math.max(this.y, v.y);
-                this.z = Math.max(this.z, v.z);
-                return this;
-            };
-            Vector3.prototype.distanceSquared = function (v) {
-                var dx = this.x - v.x, dy = this.y - v.y, dz = this.z - v.z;
-                return dx * dx + dy * dy + dz * dz;
-            };
-            Vector3.prototype.distance = function (v) {
-                return Math.sqrt(this.distanceSquared(v));
-            };
-            Vector3.prototype.reflect = function (normal) {
-                return this.sub(normal.multiplyNumberTo(2 * this.dot(normal)));
-            };
-            Vector3.prototype.floor = function () {
-                this.x = Math.floor(this.x);
-                this.y = Math.floor(this.y);
-                this.z = Math.floor(this.z);
-                return this;
-            };
-            Vector3.prototype.ceil = function () {
-                this.x = Math.ceil(this.x);
-                this.y = Math.ceil(this.y);
-                this.z = Math.ceil(this.z);
-                return this;
-            };
-            Vector3.prototype.round = function () {
-                this.x = Math.round(this.x);
-                this.y = Math.round(this.y);
-                this.z = Math.round(this.z);
-                return this;
-            };
-            Vector3.prototype.roundToZero = function () {
-                this.x = (this.x < 0) ? Math.ceil(this.x) : Math.floor(this.x);
-                this.y = (this.y < 0) ? Math.ceil(this.y) : Math.floor(this.y);
-                this.z = (this.z < 0) ? Math.ceil(this.z) : Math.floor(this.z);
-                return this;
-            };
-            Vector3.prototype.toString = function () {
-                return "<" + this.x + ", " + this.y + ", " + this.z + ">";
-            };
-            Vector3.prototype.toArray = function (array, offset) {
-                if (array === void 0) { array = []; }
-                if (offset === void 0) { offset = 0; }
-                array[offset] = this.x;
-                array[offset + 1] = this.y;
-                array[offset + 2] = this.z;
-                return array;
-            };
-            Vector3.X_AXIS = new Vector3(1, 0, 0);
-            Vector3.Y_AXIS = new Vector3(0, 1, 0);
-            Vector3.Z_AXIS = new Vector3(0, 0, 1);
-            Vector3.ZERO = new Vector3();
-            return Vector3;
-        }());
-        framework.Vector3 = Vector3;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var Gradient = (function () {
             function Gradient() {
                 this.mode = framework.GradientMode.Blend;
                 this.alphaKeys = [{ alpha: 1, time: 0 }, { alpha: 1, time: 1 }];
-                this.colorKeys = [{ color: new framework.Color3(1, 1, 1), time: 0 }, { color: new framework.Color3(1, 1, 1), time: 1 }];
+                this.colorKeys = [{ color: new gd3d.math.color(1, 1, 1), time: 0 }, { color: new gd3d.math.color(1, 1, 1), time: 1 }];
             }
-            Gradient.prototype.fromColors = function (colors, times) {
-                if (!times) {
-                    times = [];
-                    for (var i = 0; i < colors.length; i++) {
-                        times[i] = i / (colors.length - 1);
-                    }
-                }
-                var colors1 = colors.map(function (v) { return new framework.Color3().fromUnit(v); });
-                for (var i = 0; i < colors1.length; i++) {
-                    this.colorKeys[i] = { color: colors1[i], time: times[i] };
-                }
-                return this;
-            };
             Gradient.prototype.getValue = function (time) {
                 var alpha = this.getAlpha(time);
                 var color = this.getColor(time);
-                return new framework.Color4(color.r, color.g, color.b, alpha);
+                return new gd3d.math.color(color.r, color.g, color.b, alpha);
             };
             Gradient.prototype.getAlpha = function (time) {
                 var alphaKeys = this.alphaKeys;
@@ -32298,7 +31490,7 @@ var gd3d;
                     if (t < time && time < nt) {
                         if (this.mode == framework.GradientMode.Fixed)
                             return nv;
-                        return Math.mapLinear(time, t, nt, v, nv);
+                        return gd3d.math.mapLinear(time, t, nt, v, nv);
                     }
                 }
                 return 1;
@@ -32320,10 +31512,11 @@ var gd3d;
                     if (t < time && time < nt) {
                         if (this.mode == framework.GradientMode.Fixed)
                             return nv;
-                        return v.mixTo(nv, (time - t) / (nt - t));
+                        gd3d.math.colorLerp(v, nv, (time - t) / (nt - t), v);
+                        return v;
                     }
                 }
-                return new framework.Color3();
+                return new gd3d.math.color();
             };
             return Gradient;
         }());
@@ -32348,32 +31541,37 @@ var gd3d;
         var MinMaxGradient = (function () {
             function MinMaxGradient() {
                 this.mode = framework.MinMaxGradientMode.Color;
-                this.color = new framework.Color4();
-                this.colorMin = new framework.Color4();
-                this.colorMax = new framework.Color4();
+                this.color = new gd3d.math.color();
+                this.colorMin = new gd3d.math.color();
+                this.colorMax = new gd3d.math.color();
                 this.gradient = new framework.Gradient();
                 this.gradientMin = new framework.Gradient();
                 this.gradientMax = new framework.Gradient();
             }
-            MinMaxGradient.prototype.getValue = function (time, randomBetween) {
+            MinMaxGradient.prototype.getValue = function (time, randomBetween, out) {
                 if (randomBetween === void 0) { randomBetween = Math.random(); }
+                if (out === void 0) { out = new gd3d.math.color(); }
                 switch (this.mode) {
                     case framework.MinMaxGradientMode.Color:
-                        return this.color;
+                        gd3d.math.colorClone(this.color, out);
+                        break;
                     case framework.MinMaxGradientMode.Gradient:
-                        return this.gradient.getValue(time);
+                        gd3d.math.colorClone(this.gradient.getValue(time), out);
+                        break;
                     case framework.MinMaxGradientMode.TwoColors:
-                        return this.colorMin.mixTo(this.colorMax, randomBetween);
+                        gd3d.math.colorLerp(this.colorMin, this.colorMax, randomBetween, out);
+                        break;
                     case framework.MinMaxGradientMode.TwoGradients:
                         var min = this.gradientMin.getValue(time);
                         var max = this.gradientMax.getValue(time);
-                        var v = min.mixTo(max, randomBetween);
-                        return v;
+                        gd3d.math.colorLerp(min, max, randomBetween, out);
+                        break;
                     case framework.MinMaxGradientMode.RandomColor:
                         var v = this.gradient.getValue(randomBetween);
-                        return v;
+                        gd3d.math.colorClone(v, out);
+                        break;
                 }
-                return this.color;
+                return out;
             };
             return MinMaxGradient;
         }());
@@ -32398,19 +31596,16 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var ParticleModule = (function (_super) {
-            __extends(ParticleModule, _super);
+        var ParticleModule = (function () {
             function ParticleModule() {
-                var _this = _super !== null && _super.apply(this, arguments) || this;
-                _this.enabled = false;
-                return _this;
+                this.enabled = false;
             }
             ParticleModule.prototype.initParticleState = function (particle) {
             };
             ParticleModule.prototype.updateParticleState = function (particle) {
             };
             return ParticleModule;
-        }(framework.EventDispatcher));
+        }());
         framework.ParticleModule = ParticleModule;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -32432,10 +31627,10 @@ var gd3d;
             ParticleColorBySpeedModule.prototype.updateParticleState = function (particle) {
                 if (!this.enabled)
                     return;
-                var velocity = particle.velocity.length;
-                var rate = Math.clamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
+                var velocity = gd3d.math.vec3Length(particle.velocity);
+                var rate = gd3d.math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
                 var color = this.color.getValue(rate, particle[_ColorBySpeed_rate]);
-                particle.color.multiply(color);
+                gd3d.math.colorMultiply(particle.color, color, particle.color);
             };
             return ParticleColorBySpeedModule;
         }(framework.ParticleModule));
@@ -32460,7 +31655,8 @@ var gd3d;
             ParticleColorOverLifetimeModule.prototype.updateParticleState = function (particle) {
                 if (!this.enabled)
                     return;
-                particle.color.multiply(this.color.getValue(particle.rateAtLifeTime, particle[_ColorOverLifetime_rate]));
+                var color = this.color.getValue(particle.rateAtLifeTime, particle[_ColorOverLifetime_rate]);
+                gd3d.math.colorMultiply(particle.color, color, particle.color);
             };
             return ParticleColorOverLifetimeModule;
         }(framework.ParticleModule));
@@ -32659,7 +31855,9 @@ var gd3d;
                 if (this.mode != framework.ParticleSystemInheritVelocityMode.Initial)
                     return;
                 var multiplier = this.multiplier.getValue(particle.rateAtLifeTime, particle[_InheritVelocity_rate]);
-                particle.velocity.addScaledVector(multiplier, this.particleSystem.speed);
+                particle.velocity.x += multiplier * this.particleSystem.speed.x;
+                particle.velocity.y += multiplier * this.particleSystem.speed.y;
+                particle.velocity.z += multiplier * this.particleSystem.speed.z;
             };
             ParticleInheritVelocityModule.prototype.updateParticleState = function (particle) {
                 if (!this.enabled)
@@ -32669,7 +31867,9 @@ var gd3d;
                 if (this.mode != framework.ParticleSystemInheritVelocityMode.Current)
                     return;
                 var multiplier = this.multiplier.getValue(particle.rateAtLifeTime, particle[_InheritVelocity_rate]);
-                particle.position.addScaledVector(multiplier, this.particleSystem.moveVec);
+                particle.position.x += multiplier * this.particleSystem.moveVec.x;
+                particle.position.y += multiplier * this.particleSystem.moveVec.y;
+                particle.position.z += multiplier * this.particleSystem.moveVec.z;
             };
             return ParticleInheritVelocityModule;
         }(framework.ParticleModule));
@@ -32770,30 +31970,39 @@ var gd3d;
                     return;
                 var limit3D = this.limit3D.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
                 var limit = this.limit.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
-                var pVelocity = particle.velocity.clone();
+                var pVelocity = new gd3d.math.vector3();
+                gd3d.math.vec3Clone(particle.velocity, pVelocity);
                 if (this.space == framework.ParticleSystemSimulationSpace.World) {
                     var localToWorldMatrix = this.particleSystem.localToWorldMatrix;
                     var worldToLocalMatrix = this.particleSystem.worldToLocalMatrix;
                     gd3d.math.matrixTransformNormal(pVelocity, localToWorldMatrix, pVelocity);
                     if (this.separateAxes) {
-                        pVelocity.clamp(limit3D.negateTo(), limit3D);
+                        pVelocity.x = gd3d.math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
+                        pVelocity.y = gd3d.math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
+                        pVelocity.z = gd3d.math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
                     }
                     else {
-                        if (pVelocity.lengthSquared > limit * limit)
-                            pVelocity.normalize(limit);
+                        if (gd3d.math.vec3SqrLength(pVelocity) > limit * limit) {
+                            gd3d.math.vec3Normalize(pVelocity, pVelocity);
+                            gd3d.math.vec3ScaleByNum(pVelocity, limit, pVelocity);
+                        }
                     }
                     gd3d.math.matrixTransformNormal(pVelocity, worldToLocalMatrix, pVelocity);
                 }
                 else {
                     if (this.separateAxes) {
-                        pVelocity.clamp(limit3D.negateTo(), limit3D);
+                        pVelocity.x = gd3d.math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
+                        pVelocity.y = gd3d.math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
+                        pVelocity.z = gd3d.math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
                     }
                     else {
-                        if (pVelocity.lengthSquared > limit * limit)
-                            pVelocity.normalize(limit);
+                        if (gd3d.math.vec3SqrLength(pVelocity) > limit * limit) {
+                            gd3d.math.vec3Normalize(pVelocity, pVelocity);
+                            gd3d.math.vec3ScaleByNum(pVelocity, limit, pVelocity);
+                        }
                     }
                 }
-                particle.velocity.lerpNumber(pVelocity, this.dampen);
+                gd3d.math.vec3SLerp(particle.velocity, pVelocity, this.dampen, particle.velocity);
             };
             return ParticleLimitVelocityOverLifetimeModule;
         }(framework.ParticleModule));
@@ -32823,7 +32032,7 @@ var gd3d;
                 _this.randomizeRotationDirection = 0;
                 _this.startColor = new framework.MinMaxGradient();
                 _this.gravityModifier = new framework.MinMaxCurve();
-                _this.simulationSpace = framework.ParticleSystemSimulationSpace.Local;
+                _this._simulationSpace = framework.ParticleSystemSimulationSpace.Local;
                 _this.simulationSpeed = 1;
                 _this.scalingMode = framework.ParticleSystemScalingMode.Local;
                 _this.playOnAwake = true;
@@ -33017,38 +32226,64 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(ParticleMainModule.prototype, "simulationSpace", {
+                get: function () {
+                    return this._simulationSpace;
+                },
+                set: function (v) {
+                    if (this._simulationSpace != v) {
+                        this._simulationSpace = v;
+                        this.particleSystem._simulationSpaceChanged();
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
             ParticleMainModule.prototype.initParticleState = function (particle) {
                 var birthRateAtDuration = particle.birthRateAtDuration;
-                particle.position.set(0, 0, 0);
-                particle.velocity.set(0, 0, this.startSpeed.getValue(birthRateAtDuration));
-                particle.acceleration.set(0, 0, 0);
+                particle.position.x = 0;
+                particle.position.y = 0;
+                particle.position.z = 0;
+                particle.velocity.x = 0;
+                particle.velocity.y = 0;
+                particle.velocity.z = this.startSpeed.getValue(birthRateAtDuration);
+                particle.acceleration.x = 0;
+                particle.acceleration.y = 0;
+                particle.acceleration.z = 0;
                 if (this.useStartSize3D) {
-                    particle.startSize.copy(this.startSize3D.getValue(birthRateAtDuration));
+                    gd3d.math.vec3Clone(this.startSize3D.getValue(birthRateAtDuration), particle.startSize);
                 }
                 else {
                     var startSize = this.startSize.getValue(birthRateAtDuration);
-                    particle.startSize.set(startSize, startSize, startSize);
+                    particle.startSize.x = startSize;
+                    particle.startSize.y = startSize;
+                    particle.startSize.z = startSize;
                 }
                 if (this.useStartRotation3D) {
-                    particle.rotation.copy(this.startRotation3D.getValue(birthRateAtDuration));
+                    gd3d.math.vec3Clone(this.startRotation3D.getValue(birthRateAtDuration), particle.rotation);
                 }
                 else {
                     var startRotation = this.startRotation.getValue(birthRateAtDuration);
-                    particle.rotation.set(0, 0, startRotation);
+                    particle.rotation.x = 0;
+                    particle.rotation.y = 0;
+                    particle.rotation.z = startRotation;
                 }
-                particle.angularVelocity.set(0, 0, 0);
-                particle.startColor.copy(this.startColor.getValue(birthRateAtDuration));
+                particle.angularVelocity.x = 0;
+                particle.angularVelocity.y = 0;
+                particle.angularVelocity.z = 0;
+                gd3d.math.colorClone(this.startColor.getValue(birthRateAtDuration), particle.startColor);
             };
             ParticleMainModule.prototype.updateParticleState = function (particle) {
-                var gravity = world_gravity.scaleNumberTo(this.gravityModifier.getValue(this.particleSystem.rateAtDuration));
+                var gravity = new gd3d.math.vector3(world_gravity.x, world_gravity.y, world_gravity.z);
+                gd3d.math.vec3ScaleByNum(gravity, this.gravityModifier.getValue(this.particleSystem.rateAtDuration), gravity);
                 this.particleSystem.addParticleAcceleration(particle, gravity, framework.ParticleSystemSimulationSpace.World, _Main_preGravity);
-                particle.size.copy(particle.startSize);
-                particle.color.copy(particle.startColor);
+                gd3d.math.vec3Clone(particle.startSize, particle.size);
+                gd3d.math.colorClone(particle.startColor, particle.color);
             };
             return ParticleMainModule;
         }(framework.ParticleModule));
         framework.ParticleMainModule = ParticleMainModule;
-        var world_gravity = new framework.Vector3(0, -9.8, 0);
+        var world_gravity = new gd3d.math.vector3(0, -9.8, 0);
         var _Main_preGravity = "_Main_preGravity";
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
@@ -33127,22 +32362,30 @@ var gd3d;
             });
             ParticleRotationBySpeedModule.prototype.initParticleState = function (particle) {
                 particle[_RotationBySpeed_rate] = Math.random();
-                particle[_RotationBySpeed_preAngularVelocity] = new framework.Vector3();
+                particle[_RotationBySpeed_preAngularVelocity] = new gd3d.math.vector3();
             };
             ParticleRotationBySpeedModule.prototype.updateParticleState = function (particle) {
                 var preAngularVelocity = particle[_RotationBySpeed_preAngularVelocity];
-                particle.angularVelocity.sub(preAngularVelocity);
-                preAngularVelocity.set(0, 0, 0);
+                particle.angularVelocity.x -= preAngularVelocity.x;
+                particle.angularVelocity.y -= preAngularVelocity.y;
+                particle.angularVelocity.z -= preAngularVelocity.z;
+                preAngularVelocity.x = 0;
+                preAngularVelocity.y = 0;
+                preAngularVelocity.z = 0;
                 if (!this.enabled)
                     return;
-                var velocity = particle.velocity.length;
-                var rate = Math.clamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
+                var velocity = gd3d.math.vec3Length(particle.velocity);
+                var rate = gd3d.math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
                 var v = this.angularVelocity.getValue(rate, particle[_RotationBySpeed_rate]);
                 if (!this.separateAxes) {
                     v.x = v.y = 0;
                 }
-                particle.angularVelocity.add(v);
-                preAngularVelocity.copy(v);
+                particle.angularVelocity.x += v.x;
+                particle.angularVelocity.y += v.y;
+                particle.angularVelocity.z += v.z;
+                preAngularVelocity.x = v.x;
+                preAngularVelocity.y = v.x;
+                preAngularVelocity.z = v.x;
             };
             return ParticleRotationBySpeedModule;
         }(framework.ParticleModule));
@@ -33225,20 +32468,28 @@ var gd3d;
             });
             ParticleRotationOverLifetimeModule.prototype.initParticleState = function (particle) {
                 particle[_RotationOverLifetime_rate] = Math.random();
-                particle[_RotationOverLifetime_preAngularVelocity] = new framework.Vector3();
+                particle[_RotationOverLifetime_preAngularVelocity] = new gd3d.math.vector3();
             };
             ParticleRotationOverLifetimeModule.prototype.updateParticleState = function (particle) {
                 var preAngularVelocity = particle[_RotationOverLifetime_preAngularVelocity];
-                particle.angularVelocity.sub(preAngularVelocity);
-                preAngularVelocity.set(0, 0, 0);
+                particle.angularVelocity.x -= preAngularVelocity.x;
+                particle.angularVelocity.y -= preAngularVelocity.y;
+                particle.angularVelocity.z -= preAngularVelocity.z;
+                preAngularVelocity.x = 0;
+                preAngularVelocity.y = 0;
+                preAngularVelocity.z = 0;
                 if (!this.enabled)
                     return;
                 var v = this.angularVelocity.getValue(particle.rateAtLifeTime, particle[_RotationOverLifetime_rate]);
                 if (!this.separateAxes) {
                     v.x = v.y = 0;
                 }
-                particle.angularVelocity.add(v);
-                preAngularVelocity.copy(v);
+                particle.angularVelocity.x += v.x;
+                particle.angularVelocity.y += v.y;
+                particle.angularVelocity.z += v.z;
+                preAngularVelocity.x = v.x;
+                preAngularVelocity.y = v.y;
+                preAngularVelocity.z = v.z;
             };
             return ParticleRotationOverLifetimeModule;
         }(framework.ParticleModule));
@@ -33263,7 +32514,7 @@ var gd3d;
                 _this.arcMode = framework.ParticleSystemShapeMultiModeValue.Random;
                 _this.arcSpeed = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 1, constantMin: 1, constantMax: 1 });
                 _this.arcSpread = 0;
-                _this.box = new framework.Vector3(1, 1, 1);
+                _this.box = new gd3d.math.vector3(1, 1, 1);
                 _this.length = 5;
                 _this.meshScale = 1;
                 _this.meshShapeType = framework.ParticleSystemMeshShapeType.Vertex;
@@ -33343,16 +32594,39 @@ var gd3d;
                     gd3d.math.matrixMultiply(mat0, mat, mat0);
                     gd3d.math.matrixGetEuler(mat0, framework.defaultRotationOrder, rotation);
                     gd3d.math.vec3ScaleByNum(rotation, 180 / Math.PI, rotation);
-                    particle.rotation.set(rotation.x, rotation.y, rotation.z);
+                    particle.rotation.x = rotation.x;
+                    particle.rotation.y = rotation.y;
+                    particle.rotation.z = rotation.z;
                 }
-                var length = particle.velocity.length;
+                var length = gd3d.math.vec3Length(particle.velocity);
+                var velocity = new gd3d.math.vector3();
                 if (this.randomDirectionAmount > 0) {
-                    var velocity = framework.Vector3.random().scaleNumber(2).subNumber(1).normalize(length);
-                    particle.velocity.lerpNumber(velocity, this.randomDirectionAmount).normalize(length);
+                    velocity.x = Math.random() * 2 - 1;
+                    velocity.y = Math.random() * 2 - 1;
+                    velocity.z = Math.random() * 2 - 1;
+                    var len = gd3d.math.vec3Length(velocity);
+                    velocity.x = velocity.x / len * length;
+                    velocity.y = velocity.y / len * length;
+                    velocity.z = velocity.z / len * length;
+                    gd3d.math.vec3SLerp(particle.velocity, velocity, this.randomDirectionAmount, particle.velocity);
+                    var len = gd3d.math.vec3Length(particle.velocity);
+                    particle.velocity.x = particle.velocity.x / len * length;
+                    particle.velocity.y = particle.velocity.y / len * length;
+                    particle.velocity.z = particle.velocity.z / len * length;
                 }
                 if (this.sphericalDirectionAmount > 0) {
-                    var velocity = particle.position.clone().normalize(length);
-                    particle.velocity.lerpNumber(velocity, this.sphericalDirectionAmount).normalize(length);
+                    velocity.x = particle.position.x;
+                    velocity.y = particle.position.y;
+                    velocity.z = particle.position.z;
+                    var len = gd3d.math.vec3Length(velocity);
+                    velocity.x = velocity.x / len * length;
+                    velocity.y = velocity.y / len * length;
+                    velocity.z = velocity.z / len * length;
+                    gd3d.math.vec3SLerp(particle.velocity, velocity, this.sphericalDirectionAmount, particle.velocity);
+                    var len = gd3d.math.vec3Length(particle.velocity);
+                    particle.velocity.x = particle.velocity.x / len * length;
+                    particle.velocity.y = particle.velocity.y / len * length;
+                    particle.velocity.z = particle.velocity.z / len * length;
                 }
             };
             ParticleShapeModule.prototype._onShapeTypeChanged = function () {
@@ -33447,7 +32721,6 @@ var gd3d;
                         break;
                 }
                 framework.serialization.setValue(this.activeShape, preValue);
-                this.dispatch("refreshView");
             };
             ParticleShapeModule.prototype._onShapeChanged = function () {
                 switch (this.shape) {
@@ -33616,13 +32889,15 @@ var gd3d;
             ParticleSizeBySpeedModule.prototype.updateParticleState = function (particle) {
                 if (!this.enabled)
                     return;
-                var velocity = particle.velocity.length;
-                var rate = Math.clamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
+                var velocity = gd3d.math.vec3Length(particle.velocity);
+                var rate = gd3d.math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
                 var size = this.size3D.getValue(rate, particle[_SizeBySpeed_rate]);
                 if (!this.separateAxes) {
                     size.y = size.z = size.x;
                 }
-                particle.size.multiply(size);
+                particle.size.x *= size.x;
+                particle.size.y *= size.y;
+                particle.size.z *= size.z;
             };
             return ParticleSizeBySpeedModule;
         }(framework.ParticleModule));
@@ -33732,7 +33007,9 @@ var gd3d;
                 if (!this.separateAxes) {
                     size.y = size.z = size.x;
                 }
-                particle.size.multiply(size);
+                particle.size.x *= size.x;
+                particle.size.y *= size.y;
+                particle.size.z *= size.z;
             };
             return ParticleSizeOverLifetimeModule;
         }(framework.ParticleModule));
@@ -33762,7 +33039,7 @@ var gd3d;
             Object.defineProperty(ParticleTextureSheetAnimationModule.prototype, "rowIndex", {
                 get: function () { return this._rowIndex; },
                 set: function (v) {
-                    this._rowIndex = Math.clamp(v, 0, this.tiles.y - 1);
+                    this._rowIndex = gd3d.math.floatClamp(v, 0, this.tiles.y - 1);
                 },
                 enumerable: true,
                 configurable: true
@@ -34008,334 +33285,6 @@ var gd3d;
         framework.ParticleEmissionBurst = ParticleEmissionBurst;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
-Array.equal = function (self, arr) {
-    if (self.length != arr.length)
-        return false;
-    var keys = Object.keys(arr);
-    for (var i = 0, n = keys.length; i < n; i++) {
-        var key = keys[i];
-        if (self[key] != arr[key])
-            return false;
-    }
-    return true;
-};
-Array.concatToSelf = function (self) {
-    var items = [];
-    for (var _i = 1; _i < arguments.length; _i++) {
-        items[_i - 1] = arguments[_i];
-    }
-    var arr = [];
-    items.forEach(function (v) { return arr = arr.concat(v); });
-    arr.forEach(function (v) { return self.push(v); });
-    return self;
-};
-Array.unique = function (arr, compare) {
-    if (compare === void 0) { compare = function (a, b) { return a == b; }; }
-    var keys = Object.keys(arr);
-    var ids = keys.map(function (v) { return Number(v); }).filter(function (v) { return !isNaN(v); });
-    var deleteMap = {};
-    for (var i = 0, n = ids.length; i < n; i++) {
-        var ki = ids[i];
-        if (deleteMap[ki])
-            continue;
-        for (var j = i + 1; j < n; j++) {
-            var kj = ids[j];
-            if (compare(arr[ki], arr[kj]))
-                deleteMap[kj] = true;
-        }
-    }
-    for (var i = ids.length - 1; i >= 0; i--) {
-        var id = ids[i];
-        if (deleteMap[id])
-            arr.splice(id, 1);
-    }
-    return arr;
-};
-Array.delete = function (arr, item) {
-    var index = arr.indexOf(item);
-    if (index != -1)
-        arr.splice(index, 1);
-    return index;
-};
-Array.replace = function (arr, a, b, isAdd) {
-    if (isAdd === void 0) { isAdd = true; }
-    var isreplace = false;
-    for (var i = 0; i < arr.length; i++) {
-        if (arr[i] == a) {
-            arr[i] = b;
-            isreplace = true;
-            break;
-        }
-    }
-    if (!isreplace && isAdd)
-        arr.push(b);
-    return arr;
-};
-Math.DEG2RAD = Math.PI / 180;
-Math.RAD2DEG = 180 / Math.PI;
-Math.PRECISION = 0.000001;
-Math.uuid = Math.uuid || function (length) {
-    if (length === void 0) { length = 36; }
-    var chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'.split('');
-    var id = new Array(length);
-    var rnd = 0, r = 0;
-    return function generateUUID() {
-        for (var i = 0; i < length; i++) {
-            if (i === 8 || i === 13 || i === 18 || i === 23) {
-                id[i] = '-';
-            }
-            else if (i === 14) {
-                id[i] = '4';
-            }
-            else {
-                if (rnd <= 0x02)
-                    rnd = 0x2000000 + (Math.random() * 0x1000000) | 0;
-                r = rnd & 0xf;
-                rnd = rnd >> 4;
-                id[i] = chars[(i === 19) ? (r & 0x3) | 0x8 : r];
-            }
-        }
-        return id.join('');
-    };
-}();
-Math.clamp = Math.clamp || function (value, lowerlimit, upperlimit) {
-    if ((value - lowerlimit) * (value - upperlimit) <= 0)
-        return value;
-    if (value < lowerlimit)
-        return lowerlimit < upperlimit ? lowerlimit : upperlimit;
-    return lowerlimit > upperlimit ? lowerlimit : upperlimit;
-};
-Math.euclideanModulo = Math.euclideanModulo || function (n, m) {
-    return ((n % m) + m) % m;
-};
-Math.mapLinear = Math.mapLinear || function (x, a1, a2, b1, b2) {
-    return b1 + (x - a1) * (b2 - b1) / (a2 - a1);
-};
-Math.lerp = Math.lerp || function (start, end, t) {
-    return (1 - t) * start + t * end;
-};
-Math.smoothstep = Math.smoothstep || function (x, min, max) {
-    if (x <= min)
-        return 0;
-    if (x >= max)
-        return 1;
-    x = (x - min) / (max - min);
-    return x * x * (3 - 2 * x);
-};
-Math.smootherstep = Math.smootherstep || function (x, min, max) {
-    if (x <= min)
-        return 0;
-    if (x >= max)
-        return 1;
-    x = (x - min) / (max - min);
-    return x * x * x * (x * (x * 6 - 15) + 10);
-};
-Math.randInt = Math.randInt || function (low, high) {
-    return low + Math.floor(Math.random() * (high - low + 1));
-};
-Math.randFloat = Math.randFloat || function (low, high) {
-    return low + Math.random() * (high - low);
-};
-Math.randFloatSpread = Math.randFloatSpread || function (range) {
-    return range * (0.5 - Math.random());
-};
-Math.degToRad = Math.degToRad || function (degrees) {
-    return degrees * this.DEG2RAD;
-};
-Math.radToDeg = Math.radToDeg || function (radians) {
-    return radians * this.RAD2DEG;
-};
-Math.isPowerOfTwo = Math.isPowerOfTwo || function (value) {
-    return (value & (value - 1)) === 0 && value !== 0;
-};
-Math.nearestPowerOfTwo = Math.nearestPowerOfTwo || function (value) {
-    return Math.pow(2, Math.round(Math.log(value) / Math.LN2));
-};
-Math.nextPowerOfTwo = Math.nextPowerOfTwo || function (value) {
-    value--;
-    value |= value >> 1;
-    value |= value >> 2;
-    value |= value >> 4;
-    value |= value >> 8;
-    value |= value >> 16;
-    value++;
-    return value;
-};
-Math.toRound = Math.toRound || function (source, target, precision) {
-    if (precision === void 0) { precision = 360; }
-    return source + Math.round((target - source) / precision) * precision;
-};
-Math.equals = Math.equals || function (a, b, precision) {
-    if (precision == undefined)
-        precision = this.PRECISION;
-    return Math.abs(a - b) < precision;
-};
-Math.gcd = Math.gcd || function (a, b) {
-    if (b)
-        while ((a %= b) && (b %= a))
-            ;
-    return a + b;
-};
-Math.lcm = Math.lcm || function (a, b) {
-    return a * b / Math.gcd(a, b);
-};
-Object.isBaseType = function (object) {
-    if (object == undefined
-        || object == null
-        || typeof object == "boolean"
-        || typeof object == "string"
-        || typeof object == "number")
-        return true;
-};
-Object.getPropertyDescriptor = function (host, property) {
-    var data = Object.getOwnPropertyDescriptor(host, property);
-    if (data) {
-        return data;
-    }
-    var prototype = Object.getPrototypeOf(host);
-    if (prototype) {
-        return Object.getPropertyDescriptor(prototype, property);
-    }
-    return null;
-};
-Object.propertyIsWritable = function (host, property) {
-    var data = Object.getPropertyDescriptor(host, property);
-    if (!data)
-        return false;
-    if (data.get && !data.set)
-        return false;
-    return true;
-};
-Object.runFunc = function (obj, func) {
-    func(obj);
-    return obj;
-};
-Object.isObject = function (obj) {
-    return obj != null && (obj.constructor == Object || (obj.constructor.name == "Object"));
-};
-Object.getPropertyValue = function (object, property) {
-    if (typeof property == "string")
-        property = property.split(".");
-    var value = object;
-    var len = property.length;
-    for (var i = 0; i < property.length; i++) {
-        if (value == null)
-            return undefined;
-        value = value[property[i]];
-    }
-    return value;
-};
-Object.getPropertyChains = function (object) {
-    var result = [];
-    var propertys = Object.keys(object);
-    var hosts = new Array(propertys.length).fill(object);
-    var parentPropertyIndices = new Array(propertys.length).fill(-1);
-    var index = 0;
-    while (index < propertys.length) {
-        var host = hosts[index];
-        var cp = propertys[index];
-        var cv = host[cp];
-        var vks;
-        if (cv == null || Object.isBaseType(cv) || (vks = Object.keys(cv)).length == 0) {
-            var ps = [cp];
-            var ci = index;
-            while ((ci = parentPropertyIndices[ci]) != -1) {
-                ps.push(propertys[ci]);
-            }
-            ps.reverse();
-            result.push(ps.join("."));
-        }
-        else {
-            vks.forEach(function (k) {
-                propertys.push(k);
-                hosts.push(cv);
-                parentPropertyIndices.push(index);
-            });
-        }
-        index++;
-    }
-    return result;
-};
-Object.equalDeep = function (a, b) {
-    if (a == b)
-        return true;
-    if (Object.isBaseType(a) || Object.isBaseType(b))
-        return a == b;
-    if (typeof a == "function" || typeof b == "function")
-        return a == b;
-    var akeys = Object.keys(a);
-    var bkeys = Object.keys(b);
-    if (!Array.equal(akeys, bkeys))
-        return false;
-    if (Array.isArray(a) && Array.isArray(b))
-        return a.length == b.length;
-    for (var i = 0; i < akeys.length; i++) {
-        var element = akeys[i];
-        if (!Object.equalDeep(a[element], b[element])) {
-            return false;
-        }
-    }
-    return true;
-};
-Object.assignShallow = function (target, source) {
-    if (source == null)
-        return target;
-    var keys = Object.keys(source);
-    keys.forEach(function (k) {
-        target[k] = source[k];
-    });
-    return target;
-};
-Object.assignDeep = function (target, source, replacers, deep) {
-    if (replacers === void 0) { replacers = []; }
-    if (deep === void 0) { deep = Number.MAX_SAFE_INTEGER; }
-    if (source == null)
-        return target;
-    if (deep < 1)
-        return target;
-    var keys = Object.keys(source);
-    keys.forEach(function (k) {
-        var handles = [].concat(replacers).concat(Object.assignDeepDefaultHandlers);
-        for (var i = 0; i < handles.length; i++) {
-            if (handles[i](target, source, k, replacers, deep)) {
-                return;
-            }
-        }
-        target[k] = source[k];
-    });
-    return target;
-};
-Object.assignDeepDefaultHandlers = [
-    function (target, source, key) {
-        if (target[key] == source[key])
-            return true;
-    },
-    function (target, source, key) {
-        if (Object.isBaseType(target[key]) || Object.isBaseType(source[key])) {
-            target[key] = source[key];
-            return true;
-        }
-    },
-    function (target, source, key, handlers, deep) {
-        if (Array.isArray(source[key]) || Object.isObject(source[key])) {
-            Object.assignDeep(target[key], source[key], handlers, deep - 1);
-            return true;
-        }
-    },
-];
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        framework.lazy = {
-            getvalue: function (lazyItem) {
-                if (typeof lazyItem == "function")
-                    return lazyItem();
-                return lazyItem;
-            }
-        };
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
     var framework;
@@ -34399,8 +33348,8 @@ var gd3d;
                 configurable: true
             });
             ParticleSystemShapeBox.prototype.initParticleState = function (particle) {
-                var speed = particle.velocity.length;
-                var p = new framework.Vector3(this.boxX, this.boxY, this.boxZ).multiply(framework.Vector3.random().scaleNumber(2).subNumber(1));
+                var speed = gd3d.math.vec3Length(particle.velocity);
+                var p = new gd3d.math.vector3(this.boxX * (Math.random() * 2 - 1), this.boxY * (Math.random() * 2 - 1), this.boxZ * (Math.random() * 2 - 1));
                 if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Shell) {
                     var max = Math.max(Math.abs(p.x), Math.abs(p.y), Math.abs(p.z));
                     if (Math.abs(p.x) == max) {
@@ -34428,9 +33377,13 @@ var gd3d;
                         p.y = p.y < 0 ? -1 : 1;
                     }
                 }
-                particle.position.copy(p);
-                var dir = new framework.Vector3(0, 0, 1);
-                particle.velocity.copy(dir).scaleNumber(speed);
+                particle.position.x = p.x;
+                particle.position.y = p.y;
+                particle.position.z = p.z;
+                var dir = new gd3d.math.vector3(0, 0, 1);
+                particle.velocity.x = dir.x * speed;
+                particle.velocity.y = dir.y * speed;
+                particle.velocity.z = dir.z * speed;
             };
             return ParticleSystemShapeBox;
         }(framework.ParticleSystemShapeBase));
@@ -34499,7 +33452,7 @@ var gd3d;
                 configurable: true
             });
             ParticleSystemShapeCircle.prototype.initParticleState = function (particle) {
-                var speed = particle.velocity.length;
+                var speed = gd3d.math.vec3Length(particle.velocity);
                 var radius = this.radius;
                 var arc = this.arc;
                 var radiusAngle = 0;
@@ -34520,14 +33473,21 @@ var gd3d;
                 if (this.arcSpread > 0) {
                     radiusAngle = Math.floor(radiusAngle / arc / this.arcSpread) * arc * this.arcSpread;
                 }
-                radiusAngle = Math.degToRad(radiusAngle);
-                var dir = new framework.Vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
-                var p = dir.scaleNumberTo(radius);
+                radiusAngle = gd3d.math.degToRad(radiusAngle);
+                var dir = new gd3d.math.vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
+                var p = new gd3d.math.vector3(radius * dir.x, radius * dir.y, radius * dir.z);
                 if (!this.emitFromEdge) {
-                    p.scaleNumber(Math.random());
+                    var rand = Math.random();
+                    p.x *= rand;
+                    p.y *= rand;
+                    p.z *= rand;
                 }
-                particle.position.copy(p);
-                particle.velocity.copy(dir).scaleNumber(speed);
+                particle.position.x = p.x;
+                particle.position.y = p.y;
+                particle.position.z = p.z;
+                particle.velocity.x = dir.x * speed;
+                particle.velocity.y = dir.y * speed;
+                particle.velocity.z = dir.z * speed;
             };
             return ParticleSystemShapeCircle;
         }(framework.ParticleSystemShapeBase));
@@ -34616,11 +33576,11 @@ var gd3d;
                 configurable: true
             });
             ParticleSystemShapeCone.prototype.initParticleState = function (particle) {
-                var speed = particle.velocity.length;
+                var speed = gd3d.math.vec3Length(particle.velocity);
                 var radius = this.radius;
                 var angle = this.angle;
                 var arc = this.arc;
-                angle = Math.clamp(angle, 0, 87);
+                angle = gd3d.math.floatClamp(angle, 0, 87);
                 var radiusAngle = 0;
                 if (this.arcMode == framework.ParticleSystemShapeMultiModeValue.Random) {
                     radiusAngle = Math.random() * arc;
@@ -34639,21 +33599,25 @@ var gd3d;
                 if (this.arcSpread > 0) {
                     radiusAngle = Math.floor(radiusAngle / arc / this.arcSpread) * arc * this.arcSpread;
                 }
-                radiusAngle = Math.degToRad(radiusAngle);
+                radiusAngle = gd3d.math.degToRad(radiusAngle);
                 var radiusRate = 1;
                 if (this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.Base || this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.Volume) {
                     radiusRate = Math.random();
                 }
-                var basePos = new framework.Vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
-                var bottomPos = basePos.scaleNumberTo(radius).scaleNumber(radiusRate);
-                var topPos = basePos.scaleNumberTo(radius + this.length * Math.tan(Math.degToRad(angle))).scaleNumber(radiusRate);
-                topPos.z = this.length;
-                particle.velocity.copy(topPos.subTo(bottomPos).normalize(speed));
-                var position = bottomPos.clone();
+                var basePos = new gd3d.math.vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
+                var bottomPos = new gd3d.math.vector3(basePos.x * radius * radiusRate, basePos.y * radius * radiusRate, 0);
+                var scale = (radius + this.length * Math.tan(gd3d.math.degToRad(angle))) * radiusRate;
+                var topPos = new gd3d.math.vector3(basePos.x * scale, basePos.y * scale, this.length);
+                gd3d.math.vec3Subtract(topPos, bottomPos, particle.velocity);
+                gd3d.math.vec3Normalize(particle.velocity, particle.velocity);
+                gd3d.math.vec3ScaleByNum(particle.velocity, speed, particle.velocity);
+                var position = new gd3d.math.vector3(bottomPos.x, bottomPos.y, bottomPos.z);
                 if (this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.Volume || this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.VolumeShell) {
-                    position.lerpNumber(topPos, Math.random());
+                    gd3d.math.vec3SLerp(position, topPos, Math.random(), position);
                 }
-                particle.position.copy(position);
+                particle.position.x = position.x;
+                particle.position.y = position.y;
+                particle.position.z = position.z;
             };
             return ParticleSystemShapeCone;
         }(framework.ParticleSystemShapeBase));
@@ -34710,7 +33674,7 @@ var gd3d;
                 configurable: true
             });
             ParticleSystemShapeEdge.prototype.initParticleState = function (particle) {
-                var speed = particle.velocity.length;
+                var speed = gd3d.math.vec3Length(particle.velocity);
                 var arc = 360 * this.radius;
                 var radiusAngle = 0;
                 if (this.radiusMode == framework.ParticleSystemShapeMultiModeValue.Random) {
@@ -34731,10 +33695,14 @@ var gd3d;
                     radiusAngle = Math.floor(radiusAngle / arc / this.radiusSpread) * arc * this.radiusSpread;
                 }
                 radiusAngle = radiusAngle / arc;
-                var dir = new framework.Vector3(0, 1, 0);
-                var p = new framework.Vector3(this.radius * (radiusAngle * 2 - 1), 0, 0);
-                particle.position.copy(p);
-                particle.velocity.copy(dir).scaleNumber(speed);
+                var dir = new gd3d.math.vector3(0, 1, 0);
+                var p = new gd3d.math.vector3(this.radius * (radiusAngle * 2 - 1), 0, 0);
+                particle.position.x = p.x;
+                particle.position.y = p.y;
+                particle.position.z = p.z;
+                particle.velocity.x = dir.x * speed;
+                particle.velocity.y = dir.y * speed;
+                particle.velocity.z = dir.z * speed;
             };
             return ParticleSystemShapeEdge;
         }(framework.ParticleSystemShapeBase));
@@ -34763,14 +33731,22 @@ var gd3d;
                 configurable: true
             });
             ParticleSystemShapeSphere.prototype.initParticleState = function (particle) {
-                var speed = particle.velocity.length;
-                var dir = framework.Vector3.random().scaleNumber(2).subNumber(1).normalize();
-                var p = dir.scaleNumberTo(this.radius);
+                var speed = gd3d.math.vec3Length(particle.velocity);
+                var dir = new gd3d.math.vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+                gd3d.math.vec3Normalize(dir, dir);
+                var p = new gd3d.math.vector3(this.radius * dir.x, this.radius * dir.y, this.radius * dir.z);
                 if (!this.emitFromShell) {
-                    p.scaleNumber(Math.random());
+                    var rand = Math.random();
+                    p.x *= rand;
+                    p.y *= rand;
+                    p.z *= rand;
                 }
-                particle.position.copy(p);
-                particle.velocity.copy(dir).scaleNumber(speed);
+                particle.position.x = p.x;
+                particle.position.y = p.y;
+                particle.position.z = p.z;
+                particle.velocity.x = dir.x * speed;
+                particle.velocity.y = dir.y * speed;
+                particle.velocity.z = dir.z * speed;
             };
             return ParticleSystemShapeSphere;
         }(framework.ParticleSystemShapeBase));
@@ -34784,766 +33760,27 @@ var gd3d;
                 return _this;
             }
             ParticleSystemShapeHemisphere.prototype.initParticleState = function (particle) {
-                var speed = particle.velocity.length;
-                var dir = framework.Vector3.random().scaleNumber(2).subNumber(1).normalize();
+                var speed = gd3d.math.vec3Length(particle.velocity);
+                var dir = new gd3d.math.vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+                gd3d.math.vec3Normalize(dir, dir);
                 dir.z = Math.abs(dir.z);
-                var p = dir.scaleNumberTo(this.radius);
+                var p = new gd3d.math.vector3(this.radius * dir.x, this.radius * dir.y, this.radius * dir.z);
                 if (!this.emitFromShell) {
-                    p.scaleNumber(Math.random());
+                    var rand = Math.random();
+                    p.x *= rand;
+                    p.y *= rand;
+                    p.z *= rand;
                 }
-                particle.position.copy(p);
-                particle.velocity.copy(dir).scaleNumber(speed);
+                particle.position.x = p.x;
+                particle.position.y = p.y;
+                particle.position.z = p.z;
+                particle.velocity.x = dir.x * speed;
+                particle.velocity.y = dir.y * speed;
+                particle.velocity.z = dir.z * speed;
             };
             return ParticleSystemShapeHemisphere;
         }(framework.ParticleSystemShapeBase));
         framework.ParticleSystemShapeHemisphere = ParticleSystemShapeHemisphere;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var CLASS_KEY = "__class__";
-        var ClassUtils = (function () {
-            function ClassUtils() {
-                this.defaultInstMap = {};
-            }
-            ClassUtils.prototype.getQualifiedClassName = function (value) {
-                if (value == null)
-                    return "null";
-                var prototype = value.prototype ? value.prototype : Object.getPrototypeOf(value);
-                if (prototype.hasOwnProperty(CLASS_KEY))
-                    return prototype[CLASS_KEY];
-                var className = prototype.constructor.name;
-                if (_global[className] == prototype.constructor)
-                    return className;
-                for (var i = 0; i < _classNameSpaces.length; i++) {
-                    var tryClassName = _classNameSpaces[i] + "." + className;
-                    if (this.getDefinitionByName(tryClassName) == prototype.constructor) {
-                        className = tryClassName;
-                        registerClass(prototype.constructor, className);
-                        return className;
-                    }
-                }
-                return className;
-            };
-            ClassUtils.prototype.getDefinitionByName = function (name, readCache) {
-                if (readCache === void 0) { readCache = true; }
-                if (name == "null")
-                    return null;
-                if (!name)
-                    return null;
-                if (_global[name])
-                    return _global[name];
-                if (readCache && _definitionCache[name])
-                    return _definitionCache[name];
-                var paths = name.split(".");
-                var length = paths.length;
-                var definition = _global;
-                for (var i = 0; i < length; i++) {
-                    var path = paths[i];
-                    definition = definition[path];
-                    if (!definition) {
-                        return null;
-                    }
-                }
-                _definitionCache[name] = definition;
-                return definition;
-            };
-            ClassUtils.prototype.getDefaultInstanceByName = function (name) {
-                var defaultInst = this.defaultInstMap[name];
-                if (defaultInst)
-                    return defaultInst;
-                var cls = this.getDefinitionByName(name);
-                if (!cls)
-                    return undefined;
-                defaultInst = this.defaultInstMap[name] = new cls();
-                Object.freeze(defaultInst);
-                return defaultInst;
-            };
-            ClassUtils.prototype.getInstanceByName = function (name) {
-                var cls = this.getDefinitionByName(name);
-                console.assert(cls);
-                if (!cls)
-                    return undefined;
-                return new cls();
-            };
-            ClassUtils.prototype.addClassNameSpace = function (namespace) {
-                if (_classNameSpaces.indexOf(namespace) == -1) {
-                    _classNameSpaces.push(namespace);
-                }
-            };
-            return ClassUtils;
-        }());
-        framework.ClassUtils = ClassUtils;
-        ;
-        framework.classUtils = new ClassUtils();
-        var _definitionCache = {};
-        var _global;
-        var global;
-        if (typeof window != "undefined") {
-            _global = window;
-        }
-        else if (typeof global != "undefined") {
-            _global = global;
-        }
-        var _classNameSpaces = ["feng3d"];
-        function registerClass(classDefinition, className) {
-            var prototype = classDefinition.prototype;
-            Object.defineProperty(prototype, CLASS_KEY, { value: className, writable: true });
-        }
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        function serialize(target, propertyKey) {
-            if (!Object.getOwnPropertyDescriptor(target, SERIALIZE_KEY)) {
-                Object.defineProperty(target, SERIALIZE_KEY, { value: [] });
-            }
-            var serializePropertys = target[SERIALIZE_KEY];
-            serializePropertys.push(propertyKey);
-        }
-        framework.serialize = serialize;
-        function propertyHandler(target, source, property, handlers, serialization) {
-            for (var i = 0; i < handlers.length; i++) {
-                if (handlers[i](target, source, property, handlers, serialization)) {
-                    return true;
-                }
-            }
-            return true;
-        }
-        function differentPropertyHandler(target, source, property, different, handlers, serialization) {
-            for (var i = 0; i < handlers.length; i++) {
-                if (handlers[i](target, source, property, different, handlers, serialization)) {
-                    return true;
-                }
-            }
-            return true;
-        }
-        var __root__ = "__root__";
-        var Serialization = (function () {
-            function Serialization() {
-                this.serializeHandlers = [];
-                this.deserializeHandlers = [];
-                this.differentHandlers = [];
-                this.setValueHandlers = [];
-            }
-            Serialization.prototype.serialize = function (target) {
-                var handlers = this.serializeHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
-                var result = {};
-                propertyHandler(result, { __root__: target }, __root__, handlers, this);
-                var v = result[__root__];
-                return v;
-            };
-            Serialization.prototype.deserialize = function (object) {
-                var handlers = this.deserializeHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
-                var result = {};
-                propertyHandler(result, { __root__: object }, __root__, handlers, this);
-                var v = result[__root__];
-                return v;
-            };
-            Serialization.prototype.different = function (target, source) {
-                var handlers = this.differentHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
-                var different = { __root__: {} };
-                differentPropertyHandler({ __root__: target }, { __root__: source }, __root__, different, handlers, this);
-                return different[__root__];
-            };
-            Serialization.prototype.setValue = function (target, source) {
-                var handlers = this.setValueHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
-                propertyHandler({ __root__: target }, { __root__: source }, __root__, handlers, this);
-                return target;
-            };
-            Serialization.prototype.clone = function (target) {
-                return this.deserialize(this.serialize(target));
-            };
-            return Serialization;
-        }());
-        framework.Serialization = Serialization;
-        framework.CLASS_KEY = "__class__";
-        var SERIALIZE_KEY = "_serialize__";
-        function getSerializableMembers(object, serializableMembers) {
-            serializableMembers = serializableMembers || [];
-            if (object["__proto__"]) {
-                getSerializableMembers(object["__proto__"], serializableMembers);
-            }
-            var serializePropertys = object[SERIALIZE_KEY];
-            if (serializePropertys)
-                Array.concatToSelf(serializableMembers, serializePropertys);
-            Array.unique(serializableMembers);
-            return serializableMembers;
-        }
-        framework.serialization = new Serialization();
-        framework.serialization.serializeHandlers.push({
-            priority: 0,
-            handler: function (target, source, property) {
-                var spv = source[property];
-                if (Object.isBaseType(spv)) {
-                    target[property] = spv;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property) {
-                var spv = source[property];
-                if (spv && typeof spv == "function") {
-                    var object = {};
-                    object[framework.CLASS_KEY] = "function";
-                    object.data = spv.toString();
-                    target[property] = object;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property) {
-                var spv = source[property];
-                if (spv && spv["serializable"] == false) {
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property) {
-                var spv = source[property];
-                if (spv && spv["serialize"]) {
-                    var object = {};
-                    object[framework.CLASS_KEY] = framework.classUtils.getQualifiedClassName(spv);
-                    spv["serialize"](object);
-                    target[property] = object;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property, handlers, serialization) {
-                var spv = source[property];
-                if (Array.isArray(spv)) {
-                    var arr_5 = target[property] || [];
-                    var keys = Object.keys(spv);
-                    keys.forEach(function (v) {
-                        propertyHandler(arr_5, spv, v, handlers, serialization);
-                    });
-                    target[property] = arr_5;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property, handlers, serialization) {
-                var spv = source[property];
-                if (Object.isObject(spv)) {
-                    var object_1 = {};
-                    var keys = Object.keys(spv);
-                    keys.forEach(function (key) {
-                        propertyHandler(object_1, spv, key, handlers, serialization);
-                    });
-                    target[property] = object_1;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: -10000,
-            handler: function (target, source, property, handlers, serialization) {
-                var tpv = target[property];
-                var spv = source[property];
-                if (tpv == null || tpv.constructor != spv.constructor) {
-                    var className = framework.classUtils.getQualifiedClassName(spv);
-                    var inst = spv.constructor.inst;
-                    if (!inst)
-                        inst = spv.constructor.inst = new spv.constructor();
-                    if (!(inst instanceof spv.constructor))
-                        inst = spv.constructor.inst = new spv.constructor();
-                    var diff = serialization.different(spv, inst);
-                    diff[framework.CLASS_KEY] = className;
-                    target[property] = diff;
-                }
-                else {
-                    debugger;
-                    var diff = serialization.different(spv, tpv);
-                    if (diff)
-                        target[property] = diff;
-                }
-                return true;
-            }
-        });
-        framework.serialization.deserializeHandlers.push({
-            priority: 0,
-            handler: function (target, source, property) {
-                var spv = source[property];
-                if (Object.isBaseType(spv)) {
-                    target[property] = spv;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property) {
-                var spv = source[property];
-                if (spv && spv[framework.CLASS_KEY] == "function") {
-                    target[property] = eval("(" + spv.data + ")");
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property) {
-                var spv = source[property];
-                if (!Object.isObject(spv) && !Array.isArray(spv)) {
-                    target[property] = spv;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property, handlers, serialization) {
-                var spv = source[property];
-                if (Array.isArray(spv)) {
-                    var arr = target[property] || [];
-                    var keys = Object.keys(spv);
-                    keys.forEach(function (key) {
-                        propertyHandler(arr, spv, key, handlers, serialization);
-                    });
-                    target[property] = arr;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property, handlers, serialization) {
-                var tpv = target[property];
-                var spv = source[property];
-                if (Object.isObject(spv) && spv[framework.CLASS_KEY] == null) {
-                    var obj = {};
-                    if (tpv)
-                        obj = tpv;
-                    var keys = Object.keys(spv);
-                    keys.forEach(function (key) {
-                        propertyHandler(obj, spv, key, handlers, serialization);
-                    });
-                    target[property] = obj;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: 0,
-            handler: function (target, source, property) {
-                var tpv = target[property];
-                var spv = source[property];
-                var inst = framework.classUtils.getInstanceByName(spv[framework.CLASS_KEY]);
-                if (inst && inst["deserialize"]) {
-                    if (tpv && tpv.constructor == inst.constructor) {
-                        inst = tpv;
-                    }
-                    inst["deserialize"](spv);
-                    target[property] = inst;
-                    return true;
-                }
-                return false;
-            }
-        }, {
-            priority: -10000,
-            handler: function (target, source, property, handlers, serialization) {
-                var tpv = target[property];
-                var spv = source[property];
-                var inst = framework.classUtils.getInstanceByName(spv[framework.CLASS_KEY]);
-                if (inst) {
-                    if (tpv && tpv.constructor == inst.constructor) {
-                        inst = tpv;
-                    }
-                    var keys = Object.keys(spv);
-                    keys.forEach(function (key) {
-                        if (key != framework.CLASS_KEY)
-                            propertyHandler(inst, spv, key, handlers, serialization);
-                    });
-                    target[property] = inst;
-                    return true;
-                }
-                console.warn("\u672A\u5904\u7406");
-                return false;
-            }
-        });
-        framework.serialization.differentHandlers = [
-            {
-                priority: 0,
-                handler: function (target, source, property) {
-                    if (target[property] == source[property]) {
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, different, handlers, serialization) {
-                    if (null == source[property]) {
-                        different[property] = serialization.serialize(target[property]);
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, different, handlers, serialization) {
-                    var tpv = target[property];
-                    if (Object.isBaseType(tpv)) {
-                        different[property] = tpv;
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, different, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    if (Array.isArray(tpv)) {
-                        var keys = Object.keys(tpv);
-                        var diff = [];
-                        keys.forEach(function (key) {
-                            differentPropertyHandler(tpv, spv, key, diff, handlers, serialization);
-                        });
-                        if (Object.keys(diff).length > 0)
-                            different[property] = diff;
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, different, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    if (spv.constructor != tpv.constructor) {
-                        different[property] = serialization.serialize(tpv);
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: -10000,
-                handler: function (target, source, property, different, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    var keys = getSerializableMembers(tpv);
-                    if (tpv.constructor == Object)
-                        keys = Object.keys(tpv);
-                    var diff = {};
-                    keys.forEach(function (v) {
-                        differentPropertyHandler(tpv, spv, v, diff, handlers, serialization);
-                    });
-                    if (Object.keys(diff).length > 0)
-                        different[property] = diff;
-                    return true;
-                }
-            },
-        ];
-        framework.serialization.setValueHandlers = [
-            {
-                priority: 0,
-                handler: function (target, source, property, handlers) {
-                    if (target[property] == source[property]) {
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    if (tpv == null) {
-                        target[property] = serialization.deserialize(spv);
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, handlers) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    if (Object.isBaseType(spv)) {
-                        target[property] = spv;
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    if (Array.isArray(spv)) {
-                        console.assert(!!tpv);
-                        var keys = Object.keys(spv);
-                        keys.forEach(function (key) {
-                            propertyHandler(tpv, spv, key, handlers, serialization);
-                        });
-                        target[property] = tpv;
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    if (!Object.isObject(spv)) {
-                        target[property] = serialization.deserialize(spv);
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: 0,
-                handler: function (target, source, property, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    if (Object.isObject(spv) && spv[framework.CLASS_KEY] == undefined) {
-                        console.assert(!!tpv);
-                        var keys = Object.keys(spv);
-                        keys.forEach(function (key) {
-                            propertyHandler(tpv, spv, key, handlers, serialization);
-                        });
-                        target[property] = tpv;
-                        return true;
-                    }
-                    return false;
-                }
-            },
-            {
-                priority: -10000,
-                handler: function (target, source, property, handlers, serialization) {
-                    var tpv = target[property];
-                    var spv = source[property];
-                    var targetClassName = framework.classUtils.getQualifiedClassName(target[property]);
-                    if (targetClassName == spv[framework.CLASS_KEY]) {
-                        var keys = Object.keys(spv);
-                        keys.forEach(function (key) {
-                            propertyHandler(tpv, spv, key, handlers, serialization);
-                        });
-                        target[property] = tpv;
-                    }
-                    else {
-                        target[property] = serialization.deserialize(spv);
-                    }
-                    return true;
-                }
-            },
-        ];
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        function watch(onChange) {
-            return function (target, property) {
-                var key = "_" + property;
-                var get = eval("(function (){return this." + key + "})");
-                var set = eval("(function (value){\n                if (this." + key + " == value)\n                    return;\n                var oldValue = this." + key + ";\n                this." + key + " = value;\n                this." + onChange + "(\"" + property + "\", oldValue, value);\n            })");
-                Object.defineProperty(target, property, {
-                    get: get,
-                    set: set,
-                    enumerable: true,
-                    configurable: true
-                });
-            };
-        }
-        framework.watch = watch;
-        var Watcher = (function () {
-            function Watcher() {
-            }
-            Watcher.prototype.watch = function (object, property, handler, thisObject) {
-                if (!Object.getOwnPropertyDescriptor(object, framework.__watchs__)) {
-                    Object.defineProperty(object, framework.__watchs__, {
-                        value: {},
-                        enumerable: false,
-                        configurable: true,
-                        writable: false,
-                    });
-                }
-                var watchs = object[framework.__watchs__];
-                if (!watchs[property]) {
-                    var oldPropertyDescriptor = Object.getOwnPropertyDescriptor(object, property);
-                    watchs[property] = { value: object[property], oldPropertyDescriptor: oldPropertyDescriptor, handlers: [] };
-                    var data = Object.getPropertyDescriptor(object, property);
-                    if (data && data.set && data.get) {
-                        data = { enumerable: data.enumerable, configurable: true, get: data.get, set: data.set };
-                        var orgSet = data.set;
-                        data.set = function (value) {
-                            var oldvalue = this[property];
-                            if (oldvalue != value) {
-                                orgSet && orgSet.call(this, value);
-                                notifyListener(this, property, oldvalue);
-                            }
-                        };
-                    }
-                    else if (!data || (!data.get && !data.set)) {
-                        data = { enumerable: true, configurable: true };
-                        data.get = function () {
-                            return this[framework.__watchs__][property].value;
-                        };
-                        data.set = function (value) {
-                            var oldvalue = this[framework.__watchs__][property].value;
-                            if (oldvalue != value) {
-                                this[framework.__watchs__][property].value = value;
-                                notifyListener(this, property, oldvalue);
-                            }
-                        };
-                    }
-                    else {
-                        console.warn("watch " + object + " . " + property + " \u5931\u8D25\uFF01");
-                        return;
-                    }
-                    Object.defineProperty(object, property, data);
-                }
-                var propertywatchs = watchs[property];
-                var has = propertywatchs.handlers.reduce(function (v, item) { return v || (item.handler == handler && item.thisObject == thisObject); }, false);
-                if (!has)
-                    propertywatchs.handlers.push({ handler: handler, thisObject: thisObject });
-            };
-            Watcher.prototype.unwatch = function (object, property, handler, thisObject) {
-                var watchs = object[framework.__watchs__];
-                if (!watchs)
-                    return;
-                if (watchs[property]) {
-                    var handlers = watchs[property].handlers;
-                    if (handler === undefined)
-                        handlers.length = 0;
-                    for (var i = handlers.length - 1; i >= 0; i--) {
-                        if (handlers[i].handler == handler && (handlers[i].thisObject == thisObject || thisObject === undefined))
-                            handlers.splice(i, 1);
-                    }
-                    if (handlers.length == 0) {
-                        var value = object[property];
-                        delete object[property];
-                        if (watchs[property].oldPropertyDescriptor)
-                            Object.defineProperty(object, property, watchs[property].oldPropertyDescriptor);
-                        object[property] = value;
-                        delete watchs[property];
-                    }
-                    if (Object.keys(watchs).length == 0) {
-                        delete object[framework.__watchs__];
-                    }
-                }
-            };
-            Watcher.prototype.watchchain = function (object, property, handler, thisObject) {
-                var _this = this;
-                var notIndex = property.indexOf(".");
-                if (notIndex == -1) {
-                    this.watch(object, property, handler, thisObject);
-                    return;
-                }
-                if (!Object.getOwnPropertyDescriptor(object, framework.__watchchains__))
-                    Object.defineProperty(object, framework.__watchchains__, { value: {}, enumerable: false, writable: false, configurable: true });
-                var watchchains = object[framework.__watchchains__];
-                if (!watchchains[property]) {
-                    watchchains[property] = [];
-                }
-                var propertywatchs = watchchains[property];
-                var has = propertywatchs.reduce(function (v, item) { return v || (item.handler == handler && item.thisObject == thisObject); }, false);
-                if (!has) {
-                    var currentp = property.substr(0, notIndex);
-                    var nextp = property.substr(notIndex + 1);
-                    if (object[currentp]) {
-                        this.watchchain(object[currentp], nextp, handler, thisObject);
-                    }
-                    var watchchainFun = function (h, p, oldvalue) {
-                        var newvalue = h[p];
-                        if (oldvalue)
-                            _this.unwatchchain(oldvalue, nextp, handler, thisObject);
-                        if (newvalue)
-                            _this.watchchain(newvalue, nextp, handler, thisObject);
-                        var ov = Object.getPropertyValue(oldvalue, nextp);
-                        var nv = Object.getPropertyValue(newvalue, nextp);
-                        if (ov != nv) {
-                            handler.call(thisObject, newvalue, nextp, ov);
-                        }
-                    };
-                    this.watch(object, currentp, watchchainFun);
-                    propertywatchs.push({ handler: handler, thisObject: thisObject, watchchainFun: watchchainFun });
-                }
-            };
-            Watcher.prototype.unwatchchain = function (object, property, handler, thisObject) {
-                var notIndex = property.indexOf(".");
-                if (notIndex == -1) {
-                    this.unwatch(object, property, handler, thisObject);
-                    return;
-                }
-                var currentp = property.substr(0, notIndex);
-                var nextp = property.substr(notIndex + 1);
-                var watchchains = object[framework.__watchchains__];
-                if (!watchchains || !watchchains[property])
-                    return;
-                var propertywatchs = watchchains[property];
-                for (var i = propertywatchs.length - 1; i >= 0; i--) {
-                    var element = propertywatchs[i];
-                    if (handler == null || (handler == element.handler && thisObject == element.thisObject)) {
-                        if (object[currentp]) {
-                            this.unwatchchain(object[currentp], nextp, element.handler, element.thisObject);
-                        }
-                        this.unwatch(object, currentp, element.watchchainFun);
-                        propertywatchs.splice(i, 1);
-                    }
-                }
-                if (propertywatchs.length == 0)
-                    delete watchchains[property];
-                if (Object.keys(watchchains).length == 0) {
-                    delete object[framework.__watchchains__];
-                }
-            };
-            Watcher.prototype.watchobject = function (object, property, handler, thisObject) {
-                var _this = this;
-                var chains = Object.getPropertyChains(object);
-                chains.forEach(function (v) {
-                    _this.watchchain(object, v, handler, thisObject);
-                });
-            };
-            Watcher.prototype.unwatchobject = function (object, property, handler, thisObject) {
-                var _this = this;
-                var chains = Object.getPropertyChains(property);
-                chains.forEach(function (v) {
-                    _this.unwatchchain(object, v, handler, thisObject);
-                });
-            };
-            return Watcher;
-        }());
-        framework.Watcher = Watcher;
-        framework.watcher = new Watcher();
-        framework.__watchs__ = "__watchs__";
-        framework.__watchchains__ = "__watchchains__";
-        function notifyListener(host, property, oldview) {
-            var watchs = host[framework.__watchs__];
-            var handlers = watchs[property].handlers;
-            handlers.forEach(function (element) {
-                element.handler.call(element.thisObject, host, property, oldview);
-            });
-        }
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -39350,87 +37587,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        var GLExtension = (function () {
-            function GLExtension(gl) {
-                gl.extensions = this;
-                this.initExtensions(gl);
-                this.cacheGLQuery(gl);
-                this.wrap(gl);
-            }
-            GLExtension.prototype.initExtensions = function (gl) {
-                this.ANGLE_instanced_arrays = gl.getExtension("ANGLE_instanced_arrays");
-                this.EXT_blend_minmax = gl.getExtension("EXT_blend_minmax");
-                this.EXT_color_buffer_half_float = gl.getExtension("EXT_color_buffer_half_float");
-                this.EXT_frag_depth = gl.getExtension("EXT_frag_depth");
-                this.EXT_sRGB = gl.getExtension("EXT_sRGB");
-                this.EXT_shader_texture_lod = gl.getExtension("EXT_shader_texture_lod");
-                this.EXT_texture_filter_anisotropic = gl.getExtension('EXT_texture_filter_anisotropic') || gl.getExtension('MOZ_EXT_texture_filter_anisotropic') || gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');
-                this.OES_element_index_uint = gl.getExtension("OES_element_index_uint");
-                this.OES_standard_derivatives = gl.getExtension("OES_standard_derivatives");
-                this.OES_texture_float = gl.getExtension("OES_texture_float");
-                this.OES_texture_float_linear = gl.getExtension("OES_texture_float_linear");
-                this.OES_texture_half_float = gl.getExtension("OES_texture_half_float");
-                this.OES_texture_half_float_linear = gl.getExtension("OES_texture_half_float_linear");
-                this.OES_vertex_array_object = gl.getExtension("OES_vertex_array_object");
-                this.WEBGL_color_buffer_float = gl.getExtension("WEBGL_color_buffer_float");
-                this.WEBGL_compressed_texture_atc = gl.getExtension("WEBGL_compressed_texture_atc") || gl.getExtension("WEBKIT_WEBGL_compressed_texture_atc");
-                this.WEBGL_compressed_texture_etc1 = gl.getExtension("WEBGL_compressed_texture_etc1");
-                this.WEBGL_compressed_texture_pvrtc = gl.getExtension('WEBGL_compressed_texture_pvrtc') || gl.getExtension('WEBKIT_WEBGL_compressed_texture_pvrtc');
-                this.WEBGL_compressed_texture_s3tc = gl.getExtension('WEBGL_compressed_texture_s3tc') || gl.getExtension('MOZ_WEBGL_compressed_texture_s3tc') || gl.getExtension('WEBKIT_WEBGL_compressed_texture_s3tc');
-                this.WEBGL_debug_renderer_info = gl.getExtension("WEBGL_debug_renderer_info");
-                this.WEBGL_debug_shaders = gl.getExtension("WEBGL_debug_shaders");
-                this.WEBGL_depth_texture = gl.getExtension('WEBGL_depth_texture') || gl.getExtension('MOZ_WEBGL_depth_texture') || gl.getExtension('WEBKIT_WEBGL_depth_texture');
-                this.WEBGL_draw_buffers = gl.getExtension("WEBGL_draw_buffers");
-                this.WEBGL_lose_context = gl.getExtension("WEBGL_lose_context") || gl.getExtension("WEBKIT_WEBGL_lose_context") || gl.getExtension("MOZ_WEBGL_lose_context");
-            };
-            GLExtension.prototype.cacheGLQuery = function (gl) {
-                var oldGetExtension = gl.getExtension;
-                gl.getExtension = function (name) {
-                    gl.extensions[name] = gl.extensions[name] || oldGetExtension.apply(gl, arguments);
-                    return gl.extensions[name];
-                };
-            };
-            GLExtension.prototype.wrap = function (gl) {
-                if (!gl.vertexAttribDivisor) {
-                    gl.vertexAttribDivisor = function (index, divisor) {
-                        if (gl.extensions.ANGLE_instanced_arrays) {
-                            gl.extensions.ANGLE_instanced_arrays.vertexAttribDivisorANGLE(index, divisor);
-                        }
-                        else {
-                            console.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawElementsInstanced \uFF01");
-                        }
-                    };
-                }
-                if (!gl.drawElementsInstanced) {
-                    gl.drawElementsInstanced = function (mode, count, type, offset, instanceCount) {
-                        if (gl.extensions.ANGLE_instanced_arrays) {
-                            gl.extensions.ANGLE_instanced_arrays.drawElementsInstancedANGLE(mode, count, type, offset, instanceCount);
-                        }
-                        else {
-                            console.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawElementsInstanced \uFF01");
-                        }
-                    };
-                }
-                if (!gl.drawArraysInstanced) {
-                    gl.drawArraysInstanced = function (mode, first, count, instanceCount) {
-                        if (gl.extensions.ANGLE_instanced_arrays) {
-                            gl.extensions.ANGLE_instanced_arrays.drawArraysInstancedANGLE(mode, first, count, instanceCount);
-                        }
-                        else {
-                            console.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawArraysInstanced \uFF01");
-                        }
-                    };
-                }
-            };
-            return GLExtension;
-        }());
-        framework.GLExtension = GLExtension;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
         var tweenUtil = (function () {
             function tweenUtil() {
             }
@@ -39763,6 +37919,157 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var ArrayUtil = (function () {
+            function ArrayUtil() {
+            }
+            ArrayUtil.replace = function (arr, a, b, isAdd) {
+                if (isAdd === void 0) { isAdd = true; }
+                var isreplace = false;
+                for (var i = 0; i < arr.length; i++) {
+                    if (arr[i] == a) {
+                        arr[i] = b;
+                        isreplace = true;
+                        break;
+                    }
+                }
+                if (!isreplace && isAdd)
+                    arr.push(b);
+                return arr;
+            };
+            ArrayUtil.concatToSelf = function (self) {
+                var items = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    items[_i - 1] = arguments[_i];
+                }
+                var arr = [];
+                items.forEach(function (v) { return arr = arr.concat(v); });
+                arr.forEach(function (v) { return self.push(v); });
+                return self;
+            };
+            ArrayUtil.unique = function (arr, compare) {
+                var keys = Object.keys(arr);
+                var ids = keys.map(function (v) { return Number(v); }).filter(function (v) { return !isNaN(v); });
+                var deleteMap = {};
+                for (var i = 0, n = ids.length; i < n; i++) {
+                    var ki = ids[i];
+                    if (deleteMap[ki])
+                        continue;
+                    for (var j = i + 1; j < n; j++) {
+                        var kj = ids[j];
+                        if (compare(arr[ki], arr[kj]))
+                            deleteMap[kj] = true;
+                    }
+                }
+                for (var i = ids.length - 1; i >= 0; i--) {
+                    var id = ids[i];
+                    if (deleteMap[id])
+                        arr.splice(id, 1);
+                }
+                return arr;
+            };
+            return ArrayUtil;
+        }());
+        framework.ArrayUtil = ArrayUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var CLASS_KEY = "__class__";
+        var ClassUtils = (function () {
+            function ClassUtils() {
+            }
+            ClassUtils.getQualifiedClassName = function (value) {
+                if (value == null)
+                    return "null";
+                var prototype = value.prototype ? value.prototype : Object.getPrototypeOf(value);
+                if (prototype.hasOwnProperty(CLASS_KEY))
+                    return prototype[CLASS_KEY];
+                var className = prototype.constructor.name;
+                if (_global[className] == prototype.constructor)
+                    return className;
+                for (var i = 0; i < _classNameSpaces.length; i++) {
+                    var tryClassName = _classNameSpaces[i] + "." + className;
+                    if (this.getDefinitionByName(tryClassName) == prototype.constructor) {
+                        className = tryClassName;
+                        registerClass(prototype.constructor, className);
+                        return className;
+                    }
+                }
+                return className;
+            };
+            ClassUtils.getDefinitionByName = function (name, readCache) {
+                if (readCache === void 0) { readCache = true; }
+                if (name == "null")
+                    return null;
+                if (!name)
+                    return null;
+                if (_global[name])
+                    return _global[name];
+                if (readCache && _definitionCache[name])
+                    return _definitionCache[name];
+                var paths = name.split(".");
+                var length = paths.length;
+                var definition = _global;
+                for (var i = 0; i < length; i++) {
+                    var path = paths[i];
+                    definition = definition[path];
+                    if (!definition) {
+                        return null;
+                    }
+                }
+                _definitionCache[name] = definition;
+                return definition;
+            };
+            ClassUtils.getDefaultInstanceByName = function (name) {
+                var defaultInst = this.defaultInstMap[name];
+                if (defaultInst)
+                    return defaultInst;
+                var cls = this.getDefinitionByName(name);
+                if (!cls)
+                    return undefined;
+                defaultInst = this.defaultInstMap[name] = new cls();
+                Object.freeze(defaultInst);
+                return defaultInst;
+            };
+            ClassUtils.getInstanceByName = function (name) {
+                var cls = this.getDefinitionByName(name);
+                console.assert(cls);
+                if (!cls)
+                    return undefined;
+                return new cls();
+            };
+            ClassUtils.addClassNameSpace = function (namespace) {
+                if (_classNameSpaces.indexOf(namespace) == -1) {
+                    _classNameSpaces.push(namespace);
+                }
+            };
+            ClassUtils.defaultInstMap = {};
+            return ClassUtils;
+        }());
+        framework.ClassUtils = ClassUtils;
+        ;
+        var _definitionCache = {};
+        var _global;
+        var global;
+        if (typeof window != "undefined") {
+            _global = window;
+        }
+        else if (typeof global != "undefined") {
+            _global = global;
+        }
+        var _classNameSpaces = ["feng3d"];
+        function registerClass(classDefinition, className) {
+            var prototype = classDefinition.prototype;
+            Object.defineProperty(prototype, CLASS_KEY, { value: className, writable: true });
+        }
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var CullingMask;
         (function (CullingMask) {
             CullingMask[CullingMask["nothing"] = 0] = "nothing";
@@ -39844,6 +38151,87 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var GLExtension = (function () {
+            function GLExtension(gl) {
+                gl.extensions = this;
+                this.initExtensions(gl);
+                this.cacheGLQuery(gl);
+                this.wrap(gl);
+            }
+            GLExtension.prototype.initExtensions = function (gl) {
+                this.ANGLE_instanced_arrays = gl.getExtension("ANGLE_instanced_arrays");
+                this.EXT_blend_minmax = gl.getExtension("EXT_blend_minmax");
+                this.EXT_color_buffer_half_float = gl.getExtension("EXT_color_buffer_half_float");
+                this.EXT_frag_depth = gl.getExtension("EXT_frag_depth");
+                this.EXT_sRGB = gl.getExtension("EXT_sRGB");
+                this.EXT_shader_texture_lod = gl.getExtension("EXT_shader_texture_lod");
+                this.EXT_texture_filter_anisotropic = gl.getExtension('EXT_texture_filter_anisotropic') || gl.getExtension('MOZ_EXT_texture_filter_anisotropic') || gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');
+                this.OES_element_index_uint = gl.getExtension("OES_element_index_uint");
+                this.OES_standard_derivatives = gl.getExtension("OES_standard_derivatives");
+                this.OES_texture_float = gl.getExtension("OES_texture_float");
+                this.OES_texture_float_linear = gl.getExtension("OES_texture_float_linear");
+                this.OES_texture_half_float = gl.getExtension("OES_texture_half_float");
+                this.OES_texture_half_float_linear = gl.getExtension("OES_texture_half_float_linear");
+                this.OES_vertex_array_object = gl.getExtension("OES_vertex_array_object");
+                this.WEBGL_color_buffer_float = gl.getExtension("WEBGL_color_buffer_float");
+                this.WEBGL_compressed_texture_atc = gl.getExtension("WEBGL_compressed_texture_atc") || gl.getExtension("WEBKIT_WEBGL_compressed_texture_atc");
+                this.WEBGL_compressed_texture_etc1 = gl.getExtension("WEBGL_compressed_texture_etc1");
+                this.WEBGL_compressed_texture_pvrtc = gl.getExtension('WEBGL_compressed_texture_pvrtc') || gl.getExtension('WEBKIT_WEBGL_compressed_texture_pvrtc');
+                this.WEBGL_compressed_texture_s3tc = gl.getExtension('WEBGL_compressed_texture_s3tc') || gl.getExtension('MOZ_WEBGL_compressed_texture_s3tc') || gl.getExtension('WEBKIT_WEBGL_compressed_texture_s3tc');
+                this.WEBGL_debug_renderer_info = gl.getExtension("WEBGL_debug_renderer_info");
+                this.WEBGL_debug_shaders = gl.getExtension("WEBGL_debug_shaders");
+                this.WEBGL_depth_texture = gl.getExtension('WEBGL_depth_texture') || gl.getExtension('MOZ_WEBGL_depth_texture') || gl.getExtension('WEBKIT_WEBGL_depth_texture');
+                this.WEBGL_draw_buffers = gl.getExtension("WEBGL_draw_buffers");
+                this.WEBGL_lose_context = gl.getExtension("WEBGL_lose_context") || gl.getExtension("WEBKIT_WEBGL_lose_context") || gl.getExtension("MOZ_WEBGL_lose_context");
+            };
+            GLExtension.prototype.cacheGLQuery = function (gl) {
+                var oldGetExtension = gl.getExtension;
+                gl.getExtension = function (name) {
+                    gl.extensions[name] = gl.extensions[name] || oldGetExtension.apply(gl, arguments);
+                    return gl.extensions[name];
+                };
+            };
+            GLExtension.prototype.wrap = function (gl) {
+                if (!gl.vertexAttribDivisor) {
+                    gl.vertexAttribDivisor = function (index, divisor) {
+                        if (gl.extensions.ANGLE_instanced_arrays) {
+                            gl.extensions.ANGLE_instanced_arrays.vertexAttribDivisorANGLE(index, divisor);
+                        }
+                        else {
+                            console.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawElementsInstanced \uFF01");
+                        }
+                    };
+                }
+                if (!gl.drawElementsInstanced) {
+                    gl.drawElementsInstanced = function (mode, count, type, offset, instanceCount) {
+                        if (gl.extensions.ANGLE_instanced_arrays) {
+                            gl.extensions.ANGLE_instanced_arrays.drawElementsInstancedANGLE(mode, count, type, offset, instanceCount);
+                        }
+                        else {
+                            console.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawElementsInstanced \uFF01");
+                        }
+                    };
+                }
+                if (!gl.drawArraysInstanced) {
+                    gl.drawArraysInstanced = function (mode, first, count, instanceCount) {
+                        if (gl.extensions.ANGLE_instanced_arrays) {
+                            gl.extensions.ANGLE_instanced_arrays.drawArraysInstancedANGLE(mode, first, count, instanceCount);
+                        }
+                        else {
+                            console.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawArraysInstanced \uFF01");
+                        }
+                    };
+                }
+            };
+            return GLExtension;
+        }());
+        framework.GLExtension = GLExtension;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var NumberUtil = (function () {
             function NumberUtil() {
             }
@@ -39870,6 +38258,29 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var ObjectUtil = (function () {
+            function ObjectUtil() {
+            }
+            ObjectUtil.isBaseType = function (object) {
+                if (object == undefined
+                    || object == null
+                    || typeof object == "boolean"
+                    || typeof object == "string"
+                    || typeof object == "number")
+                    return true;
+            };
+            ObjectUtil.isObject = function (obj) {
+                return obj != null && (obj.constructor == Object || (obj.constructor.name == "Object"));
+            };
+            return ObjectUtil;
+        }());
+        framework.ObjectUtil = ObjectUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var RegexpUtil = (function () {
             function RegexpUtil() {
             }
@@ -39882,6 +38293,469 @@ var gd3d;
             return RegexpUtil;
         }());
         framework.RegexpUtil = RegexpUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        function serialize(target, propertyKey) {
+            if (!Object.getOwnPropertyDescriptor(target, SERIALIZE_KEY)) {
+                Object.defineProperty(target, SERIALIZE_KEY, { value: [] });
+            }
+            var serializePropertys = target[SERIALIZE_KEY];
+            serializePropertys.push(propertyKey);
+        }
+        framework.serialize = serialize;
+        function propertyHandler(target, source, property, handlers, serialization) {
+            for (var i = 0; i < handlers.length; i++) {
+                if (handlers[i](target, source, property, handlers, serialization)) {
+                    return true;
+                }
+            }
+            return true;
+        }
+        function differentPropertyHandler(target, source, property, different, handlers, serialization) {
+            for (var i = 0; i < handlers.length; i++) {
+                if (handlers[i](target, source, property, different, handlers, serialization)) {
+                    return true;
+                }
+            }
+            return true;
+        }
+        var __root__ = "__root__";
+        var Serialization = (function () {
+            function Serialization() {
+                this.serializeHandlers = [];
+                this.deserializeHandlers = [];
+                this.differentHandlers = [];
+                this.setValueHandlers = [];
+            }
+            Serialization.prototype.serialize = function (target) {
+                var handlers = this.serializeHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
+                var result = {};
+                propertyHandler(result, { __root__: target }, __root__, handlers, this);
+                var v = result[__root__];
+                return v;
+            };
+            Serialization.prototype.deserialize = function (object) {
+                var handlers = this.deserializeHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
+                var result = {};
+                propertyHandler(result, { __root__: object }, __root__, handlers, this);
+                var v = result[__root__];
+                return v;
+            };
+            Serialization.prototype.different = function (target, source) {
+                var handlers = this.differentHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
+                var different = { __root__: {} };
+                differentPropertyHandler({ __root__: target }, { __root__: source }, __root__, different, handlers, this);
+                return different[__root__];
+            };
+            Serialization.prototype.setValue = function (target, source) {
+                var handlers = this.setValueHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
+                propertyHandler({ __root__: target }, { __root__: source }, __root__, handlers, this);
+                return target;
+            };
+            Serialization.prototype.clone = function (target) {
+                return this.deserialize(this.serialize(target));
+            };
+            return Serialization;
+        }());
+        framework.Serialization = Serialization;
+        framework.CLASS_KEY = "__class__";
+        var SERIALIZE_KEY = "_serialize__";
+        function getSerializableMembers(object, serializableMembers) {
+            serializableMembers = serializableMembers || [];
+            if (object["__proto__"]) {
+                getSerializableMembers(object["__proto__"], serializableMembers);
+            }
+            var serializePropertys = object[SERIALIZE_KEY];
+            if (serializePropertys)
+                framework.ArrayUtil.concatToSelf(serializableMembers, serializePropertys);
+            framework.ArrayUtil.unique(serializableMembers);
+            return serializableMembers;
+        }
+        framework.serialization = new Serialization();
+        framework.serialization.serializeHandlers.push({
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (framework.ObjectUtil.isBaseType(spv)) {
+                    target[property] = spv;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (spv && typeof spv == "function") {
+                    var object = {};
+                    object[framework.CLASS_KEY] = "function";
+                    object.data = spv.toString();
+                    target[property] = object;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (spv && spv["serializable"] == false) {
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (spv && spv["serialize"]) {
+                    var object = {};
+                    object[framework.CLASS_KEY] = framework.ClassUtils.getQualifiedClassName(spv);
+                    spv["serialize"](object);
+                    target[property] = object;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property, handlers, serialization) {
+                var spv = source[property];
+                if (Array.isArray(spv)) {
+                    var arr_5 = target[property] || [];
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (v) {
+                        propertyHandler(arr_5, spv, v, handlers, serialization);
+                    });
+                    target[property] = arr_5;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property, handlers, serialization) {
+                var spv = source[property];
+                if (framework.ObjectUtil.isObject(spv)) {
+                    var object_1 = {};
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (key) {
+                        propertyHandler(object_1, spv, key, handlers, serialization);
+                    });
+                    target[property] = object_1;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: -10000,
+            handler: function (target, source, property, handlers, serialization) {
+                var tpv = target[property];
+                var spv = source[property];
+                if (tpv == null || tpv.constructor != spv.constructor) {
+                    var className = framework.ClassUtils.getQualifiedClassName(spv);
+                    var inst = spv.constructor.inst;
+                    if (!inst)
+                        inst = spv.constructor.inst = new spv.constructor();
+                    if (!(inst instanceof spv.constructor))
+                        inst = spv.constructor.inst = new spv.constructor();
+                    var diff = serialization.different(spv, inst);
+                    diff[framework.CLASS_KEY] = className;
+                    target[property] = diff;
+                }
+                else {
+                    debugger;
+                    var diff = serialization.different(spv, tpv);
+                    if (diff)
+                        target[property] = diff;
+                }
+                return true;
+            }
+        });
+        framework.serialization.deserializeHandlers.push({
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (framework.ObjectUtil.isBaseType(spv)) {
+                    target[property] = spv;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (spv && spv[framework.CLASS_KEY] == "function") {
+                    target[property] = eval("(" + spv.data + ")");
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (!framework.ObjectUtil.isObject(spv) && !Array.isArray(spv)) {
+                    target[property] = spv;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property, handlers, serialization) {
+                var spv = source[property];
+                if (Array.isArray(spv)) {
+                    var arr = target[property] || [];
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (key) {
+                        propertyHandler(arr, spv, key, handlers, serialization);
+                    });
+                    target[property] = arr;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property, handlers, serialization) {
+                var tpv = target[property];
+                var spv = source[property];
+                if (framework.ObjectUtil.isObject(spv) && spv[framework.CLASS_KEY] == null) {
+                    var obj = {};
+                    if (tpv)
+                        obj = tpv;
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (key) {
+                        propertyHandler(obj, spv, key, handlers, serialization);
+                    });
+                    target[property] = obj;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var tpv = target[property];
+                var spv = source[property];
+                var inst = framework.ClassUtils.getInstanceByName(spv[framework.CLASS_KEY]);
+                if (inst && inst["deserialize"]) {
+                    if (tpv && tpv.constructor == inst.constructor) {
+                        inst = tpv;
+                    }
+                    inst["deserialize"](spv);
+                    target[property] = inst;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: -10000,
+            handler: function (target, source, property, handlers, serialization) {
+                var tpv = target[property];
+                var spv = source[property];
+                var inst = framework.ClassUtils.getInstanceByName(spv[framework.CLASS_KEY]);
+                if (inst) {
+                    if (tpv && tpv.constructor == inst.constructor) {
+                        inst = tpv;
+                    }
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (key) {
+                        if (key != framework.CLASS_KEY)
+                            propertyHandler(inst, spv, key, handlers, serialization);
+                    });
+                    target[property] = inst;
+                    return true;
+                }
+                console.warn("\u672A\u5904\u7406");
+                return false;
+            }
+        });
+        framework.serialization.differentHandlers = [
+            {
+                priority: 0,
+                handler: function (target, source, property) {
+                    if (target[property] == source[property]) {
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, different, handlers, serialization) {
+                    if (null == source[property]) {
+                        different[property] = serialization.serialize(target[property]);
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, different, handlers, serialization) {
+                    var tpv = target[property];
+                    if (framework.ObjectUtil.isBaseType(tpv)) {
+                        different[property] = tpv;
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, different, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (Array.isArray(tpv)) {
+                        var keys = Object.keys(tpv);
+                        var diff = [];
+                        keys.forEach(function (key) {
+                            differentPropertyHandler(tpv, spv, key, diff, handlers, serialization);
+                        });
+                        if (Object.keys(diff).length > 0)
+                            different[property] = diff;
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, different, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (spv.constructor != tpv.constructor) {
+                        different[property] = serialization.serialize(tpv);
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: -10000,
+                handler: function (target, source, property, different, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    var keys = getSerializableMembers(tpv);
+                    if (tpv.constructor == Object)
+                        keys = Object.keys(tpv);
+                    var diff = {};
+                    keys.forEach(function (v) {
+                        differentPropertyHandler(tpv, spv, v, diff, handlers, serialization);
+                    });
+                    if (Object.keys(diff).length > 0)
+                        different[property] = diff;
+                    return true;
+                }
+            },
+        ];
+        framework.serialization.setValueHandlers = [
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers) {
+                    if (target[property] == source[property]) {
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (tpv == null) {
+                        target[property] = serialization.deserialize(spv);
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (framework.ObjectUtil.isBaseType(spv)) {
+                        target[property] = spv;
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (Array.isArray(spv)) {
+                        console.assert(!!tpv);
+                        var keys = Object.keys(spv);
+                        keys.forEach(function (key) {
+                            propertyHandler(tpv, spv, key, handlers, serialization);
+                        });
+                        target[property] = tpv;
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (!framework.ObjectUtil.isObject(spv)) {
+                        target[property] = serialization.deserialize(spv);
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (framework.ObjectUtil.isObject(spv) && spv[framework.CLASS_KEY] == undefined) {
+                        console.assert(!!tpv);
+                        var keys = Object.keys(spv);
+                        keys.forEach(function (key) {
+                            propertyHandler(tpv, spv, key, handlers, serialization);
+                        });
+                        target[property] = tpv;
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: -10000,
+                handler: function (target, source, property, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    var targetClassName = framework.ClassUtils.getQualifiedClassName(target[property]);
+                    if (targetClassName == spv[framework.CLASS_KEY]) {
+                        var keys = Object.keys(spv);
+                        keys.forEach(function (key) {
+                            propertyHandler(tpv, spv, key, handlers, serialization);
+                        });
+                        target[property] = tpv;
+                    }
+                    else {
+                        target[property] = serialization.deserialize(spv);
+                    }
+                    return true;
+                }
+            },
+        ];
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -40115,6 +38989,19 @@ var gd3d;
             return TransformUtil;
         }());
         framework.TransformUtil = TransformUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        framework.lazy = {
+            getvalue: function (lazyItem) {
+                if (typeof lazyItem == "function")
+                    return lazyItem();
+                return lazyItem;
+            }
+        };
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -43644,7 +42531,7 @@ var gd3d;
                 var half = size / 2;
                 for (var i = 0; i < size; i++) {
                     for (var j = 0; j < size; j++) {
-                        var l = Math.clamp(gd3d.math.vec2Length(new gd3d.math.vector2(i - half, j - half)), 0, half) / half;
+                        var l = gd3d.math.floatClamp(gd3d.math.vec2Length(new gd3d.math.vector2(i - half, j - half)), 0, half) / half;
                         var f = 1 - l;
                         f = f * f;
                         var pos = (i + j * size) * 4;

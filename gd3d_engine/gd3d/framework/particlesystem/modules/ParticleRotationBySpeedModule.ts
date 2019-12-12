@@ -122,7 +122,7 @@ namespace gd3d.framework
         initParticleState(particle: Particle1)
         {
             particle[_RotationBySpeed_rate] = Math.random();
-            particle[_RotationBySpeed_preAngularVelocity] = new Vector3();
+            particle[_RotationBySpeed_preAngularVelocity] = new math.vector3();
         }
 
         /**
@@ -131,21 +131,31 @@ namespace gd3d.framework
          */
         updateParticleState(particle: Particle1)
         {
-            var preAngularVelocity: Vector3 = particle[_RotationBySpeed_preAngularVelocity];
-            particle.angularVelocity.sub(preAngularVelocity);
-            preAngularVelocity.set(0, 0, 0);
+            var preAngularVelocity: math.vector3 = particle[_RotationBySpeed_preAngularVelocity];
+            particle.angularVelocity.x -= preAngularVelocity.x;
+            particle.angularVelocity.y -= preAngularVelocity.y;
+            particle.angularVelocity.z -= preAngularVelocity.z;
+
+            preAngularVelocity.x = 0;
+            preAngularVelocity.y = 0;
+            preAngularVelocity.z = 0;
             if (!this.enabled) return;
 
-            var velocity = particle.velocity.length;
-            var rate = Math.clamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
+            var velocity = math.vec3Length(particle.velocity);
+            var rate = math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
 
             var v = this.angularVelocity.getValue(rate, particle[_RotationBySpeed_rate]);
             if (!this.separateAxes)
             {
                 v.x = v.y = 0;
             }
-            particle.angularVelocity.add(v);
-            preAngularVelocity.copy(v);
+            particle.angularVelocity.x += v.x;
+            particle.angularVelocity.y += v.y;
+            particle.angularVelocity.z += v.z;
+
+            preAngularVelocity.x = v.x;
+            preAngularVelocity.y = v.x;
+            preAngularVelocity.z = v.x;
         }
     }
     var _RotationBySpeed_rate = "_RotationBySpeed_rate";

@@ -116,11 +116,11 @@ namespace gd3d.framework
          */
         initParticleState(particle: Particle1)
         {
-            var speed = particle.velocity.length;
+            var speed = math.vec3Length(particle.velocity);
             var radius = this.radius;
             var angle = this.angle;
             var arc = this.arc;
-            angle = Math.clamp(angle, 0, 87);
+            angle = math.floatClamp(angle, 0, 87);
             // 在圆心的方向
             var radiusAngle = 0;
             if (this.arcMode == ParticleSystemShapeMultiModeValue.Random)
@@ -146,7 +146,7 @@ namespace gd3d.framework
             {
                 radiusAngle = Math.floor(radiusAngle / arc / this.arcSpread) * arc * this.arcSpread;
             }
-            radiusAngle = Math.degToRad(radiusAngle);
+            radiusAngle = math.degToRad(radiusAngle);
             // 在圆的位置
             var radiusRate = 1;
             if (this.emitFrom == ParticleSystemShapeConeEmitFrom.Base || this.emitFrom == ParticleSystemShapeConeEmitFrom.Volume)
@@ -154,22 +154,26 @@ namespace gd3d.framework
                 radiusRate = Math.random();
             }
             // 在圆的位置
-            var basePos = new Vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
+            var basePos = new math.vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
             // 底面位置
-            var bottomPos = basePos.scaleNumberTo(radius).scaleNumber(radiusRate);
+            var bottomPos = new math.vector3(basePos.x * radius * radiusRate, basePos.y * radius * radiusRate, 0);
             // 顶面位置
-            var topPos = basePos.scaleNumberTo(radius + this.length * Math.tan(Math.degToRad(angle))).scaleNumber(radiusRate);
-            topPos.z = this.length;
+            var scale = (radius + this.length * Math.tan(math.degToRad(angle))) * radiusRate;
+            var topPos = new math.vector3(basePos.x * scale, basePos.y * scale, this.length);
             // 计算速度
-            particle.velocity.copy(topPos.subTo(bottomPos).normalize(speed));
+            math.vec3Subtract(topPos, bottomPos, particle.velocity);
+            math.vec3Normalize(particle.velocity, particle.velocity);
+            math.vec3ScaleByNum(particle.velocity, speed, particle.velocity);
             // 计算位置
-            var position = bottomPos.clone();
+            var position = new math.vector3(bottomPos.x, bottomPos.y, bottomPos.z);
             if (this.emitFrom == ParticleSystemShapeConeEmitFrom.Volume || this.emitFrom == ParticleSystemShapeConeEmitFrom.VolumeShell)
             {
                 // 上下点进行插值
-                position.lerpNumber(topPos, Math.random());
+                math.vec3SLerp(position, topPos, Math.random(), position);
             }
-            particle.position.copy(position);
+            particle.position.x = position.x;
+            particle.position.y = position.y;
+            particle.position.z = position.z;
         }
     }
 }

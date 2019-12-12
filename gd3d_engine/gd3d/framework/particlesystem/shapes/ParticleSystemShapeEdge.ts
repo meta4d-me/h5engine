@@ -71,7 +71,7 @@ namespace gd3d.framework
          */
         initParticleState(particle: Particle1)
         {
-            var speed = particle.velocity.length;
+            var speed = math.vec3Length(particle.velocity);
             var arc = 360 * this.radius;
             // 在圆心的方向
             var radiusAngle = 0;
@@ -101,14 +101,18 @@ namespace gd3d.framework
             radiusAngle = radiusAngle / arc;
 
             // 计算位置
-            var dir = new Vector3(0, 1, 0);
-            var p = new Vector3(this.radius * (radiusAngle * 2 - 1), 0, 0);
+            var dir = new math.vector3(0, 1, 0);
+            var p = new math.vector3(this.radius * (radiusAngle * 2 - 1), 0, 0);
 
             //
-            particle.position.copy(p);
+            particle.position.x = p.x;
+            particle.position.y = p.y;
+            particle.position.z = p.z;
 
             // 计算速度
-            particle.velocity.copy(dir).scaleNumber(speed);
+            particle.velocity.x = dir.x * speed;
+            particle.velocity.y = dir.y * speed;
+            particle.velocity.z = dir.z * speed;
         }
     }
 }

@@ -30,7 +30,7 @@ namespace gd3d.framework
          */
         getValue(time: number, randomBetween: number = Math.random())
         {
-            return new Vector3(this.xCurve.getValue(time, randomBetween), this.yCurve.getValue(time, randomBetween), this.zCurve.getValue(time, randomBetween));
+            return new math.vector3(this.xCurve.getValue(time, randomBetween), this.yCurve.getValue(time, randomBetween), this.zCurve.getValue(time, randomBetween));
         }
     }
 }

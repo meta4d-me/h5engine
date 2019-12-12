@@ -66,7 +66,9 @@ namespace gd3d.framework
             if (this.mode != ParticleSystemInheritVelocityMode.Initial) return;
 
             var multiplier = this.multiplier.getValue(particle.rateAtLifeTime, particle[_InheritVelocity_rate]);
-            particle.velocity.addScaledVector(multiplier, this.particleSystem.speed);
+            particle.velocity.x += multiplier * this.particleSystem.speed.x;
+            particle.velocity.y += multiplier * this.particleSystem.speed.y;
+            particle.velocity.z += multiplier * this.particleSystem.speed.z;
         }
 
         /**
@@ -80,7 +82,9 @@ namespace gd3d.framework
             if (this.mode != ParticleSystemInheritVelocityMode.Current) return;
 
             var multiplier = this.multiplier.getValue(particle.rateAtLifeTime, particle[_InheritVelocity_rate]);
-            particle.position.addScaledVector(multiplier, this.particleSystem.moveVec);
+            particle.position.x += multiplier * this.particleSystem.moveVec.x;
+            particle.position.y += multiplier * this.particleSystem.moveVec.y;
+            particle.position.z += multiplier * this.particleSystem.moveVec.z;
         }
     }
     var _InheritVelocity_rate = "_InheritVelocity_rate";

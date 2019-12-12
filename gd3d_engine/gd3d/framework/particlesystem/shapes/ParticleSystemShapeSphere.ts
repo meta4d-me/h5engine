@@ -31,21 +31,32 @@ namespace gd3d.framework
          */
         initParticleState(particle: Particle1)
         {
-            var speed = particle.velocity.length;
+            var speed = math.vec3Length(particle.velocity);
 
             // 计算位置
-            var dir = Vector3.random().scaleNumber(2).subNumber(1).normalize();
+            var dir = new math.vector3(
+                Math.random() * 2 - 1,
+                Math.random() * 2 - 1,
+                Math.random() * 2 - 1,
+            );
+            math.vec3Normalize(dir, dir);
 
-            var p = dir.scaleNumberTo(this.radius);
+            var p = new math.vector3(this.radius * dir.x, this.radius * dir.y, this.radius * dir.z);
             if (!this.emitFromShell)
             {
-                p.scaleNumber(Math.random());
+                var rand = Math.random();
+                p.x *= rand;
+                p.y *= rand;
+                p.z *= rand;
             }
-
-            particle.position.copy(p);
+            particle.position.x = p.x;
+            particle.position.y = p.y;
+            particle.position.z = p.z;
 
             // 计算速度
-            particle.velocity.copy(dir).scaleNumber(speed);
+            particle.velocity.x = dir.x * speed;
+            particle.velocity.y = dir.y * speed;
+            particle.velocity.z = dir.z * speed;
         }
     }
 
@@ -67,21 +78,33 @@ namespace gd3d.framework
          */
         initParticleState(particle: Particle1)
         {
-            var speed = particle.velocity.length;
+            var speed = math.vec3Length(particle.velocity);
 
             // 计算位置
-            var dir = Vector3.random().scaleNumber(2).subNumber(1).normalize();
+            var dir = new math.vector3(
+                Math.random() * 2 - 1,
+                Math.random() * 2 - 1,
+                Math.random() * 2 - 1,
+            );
+            math.vec3Normalize(dir, dir);
             dir.z = Math.abs(dir.z);
 
-            var p = dir.scaleNumberTo(this.radius);
+            var p = new math.vector3(this.radius * dir.x, this.radius * dir.y, this.radius * dir.z);
             if (!this.emitFromShell)
             {
-                p.scaleNumber(Math.random());
+                var rand = Math.random();
+                p.x *= rand;
+                p.y *= rand;
+                p.z *= rand;
             }
-            particle.position.copy(p);
+            particle.position.x = p.x;
+            particle.position.y = p.y;
+            particle.position.z = p.z;
 
             // 计算速度
-            particle.velocity.copy(dir).scaleNumber(speed);
+            particle.velocity.x = dir.x * speed;
+            particle.velocity.y = dir.y * speed;
+            particle.velocity.z = dir.z * speed;
         }
     }
 }

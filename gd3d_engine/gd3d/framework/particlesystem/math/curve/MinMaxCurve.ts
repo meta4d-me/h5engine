@@ -12,7 +12,7 @@ namespace gd3d.framework
         /**
          * 模式
          */
-        
+
         mode = MinMaxCurveMode.Constant;
 
         /**
@@ -20,7 +20,7 @@ namespace gd3d.framework
          * 
          * 设置常数值。
          */
-        
+
         constant = 0;
 
         /**
@@ -28,7 +28,7 @@ namespace gd3d.framework
          * 
          * 为下界设置一个常数。
          */
-        
+
         constantMin = 0;
 
         /**
@@ -36,7 +36,7 @@ namespace gd3d.framework
          * 
          * 为上界设置一个常数。
          */
-        
+
         constantMax = 0;
 
         /**
@@ -44,7 +44,7 @@ namespace gd3d.framework
          * 
          * 设置曲线。
          */
-        
+
         curve = new AnimationCurve1();
 
         /**
@@ -52,7 +52,7 @@ namespace gd3d.framework
          * 
          * 为下界设置一条曲线。
          */
-        
+
         curveMin = new AnimationCurve1();
 
         /**
@@ -60,7 +60,7 @@ namespace gd3d.framework
          * 
          * 为上界设置一条曲线。
          */
-        
+
         curveMax = new AnimationCurve1();
 
         /**
@@ -68,13 +68,12 @@ namespace gd3d.framework
          * 
          * 设置一个乘数应用于曲线。
          */
-        
+
         curveMultiplier = 1;
 
         /**
          * 是否在编辑器中只显示Y轴 0-1 区域，例如 lifetime 为非负，需要设置为true
          */
-        
         between0And1 = false;
 
         /**
@@ -90,9 +89,9 @@ namespace gd3d.framework
                 case MinMaxCurveMode.Curve:
                     return this.curve.getValue(time) * this.curveMultiplier;
                 case MinMaxCurveMode.TwoConstants:
-                    return Math.lerp(this.constantMin, this.constantMax, randomBetween);
+                    return math.numberLerp(this.constantMin, this.constantMax, randomBetween);
                 case MinMaxCurveMode.TwoCurves:
-                    return Math.lerp(this.curveMin.getValue(time), this.curveMax.getValue(time), randomBetween) * this.curveMultiplier;
+                    return math.numberLerp(this.curveMin.getValue(time), this.curveMax.getValue(time), randomBetween) * this.curveMultiplier;
             }
 
             return this.constant;

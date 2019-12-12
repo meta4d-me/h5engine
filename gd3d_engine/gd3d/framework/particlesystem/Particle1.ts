@@ -21,52 +21,52 @@ namespace gd3d.framework
 		/**
 		 * 位置
 		 */
-		position = new Vector3();
+		position = new math.vector3();
 
 		/**
 		 * 速度
 		 */
-		velocity = new Vector3();
+		velocity = new math.vector3();
 
 		/**
 		 * 加速度
 		 */
-		acceleration = new Vector3();
+		acceleration = new math.vector3();
 
 		/**
 		 * 旋转角度
 		 */
-		rotation = new Vector3();
+		rotation = new math.vector3();
 
 		/**
 		 * 角速度
 		 */
-		angularVelocity = new Vector3();
+		angularVelocity = new math.vector3();
 
 		/**
 		 * 尺寸
 		 */
-		size = new Vector3(1, 1, 1);
+		size = new math.vector3(1, 1, 1);
 
 		/**
 		 * 起始尺寸
 		 */
-		startSize = new Vector3(1, 1, 1);
+		startSize = new math.vector3(1, 1, 1);
 
 		/**
 		 * 颜色
 		 */
-		color = new Color4();
+		color = new math.color();
 
 		/**
 		 * 起始颜色
 		 */
-		startColor = new Color4();
+		startColor = new math.color();
 
 		/**
 		 * 纹理UV缩放和偏移。
 		 */
-		tilingOffset =  new math.vector4(1, 1, 0, 0);
+		tilingOffset = new math.vector4(1, 1, 0, 0);
 
 		/**
 		 * 在粒子上翻转UV坐标，使它们呈现水平镜像。
@@ -99,7 +99,9 @@ namespace gd3d.framework
 			var pTime = time - preTime;
 
 			// 计算速度
-			this.velocity.add(this.acceleration.scaleNumberTo(pTime));
+			this.velocity.x += this.acceleration.x * pTime;
+			this.velocity.y += this.acceleration.y * pTime;
+			this.velocity.z += this.acceleration.z * pTime;
 
 			// 计算位置
 			this.position.x += this.velocity.x * pTime;
@@ -107,7 +109,9 @@ namespace gd3d.framework
 			this.position.z += this.velocity.z * pTime;
 
 			// 计算角度
-			this.rotation.add(this.angularVelocity.scaleNumberTo(pTime));
+			this.rotation.x += this.angularVelocity.x * pTime;
+			this.rotation.y += this.angularVelocity.y * pTime;
+			this.rotation.z += this.angularVelocity.z * pTime;
 		}
 	}
 }

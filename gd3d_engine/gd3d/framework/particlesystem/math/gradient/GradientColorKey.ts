@@ -10,7 +10,7 @@ namespace gd3d.framework
         /**
          * 颜色值
          */
-        color: Color3;
+        color: math.color;
 
         /**
          * 时间

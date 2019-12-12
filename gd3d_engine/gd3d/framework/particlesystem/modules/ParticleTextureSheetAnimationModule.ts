@@ -49,7 +49,7 @@ namespace gd3d.framework
         get rowIndex() { return this._rowIndex; }
         set rowIndex(v)
         {
-            this._rowIndex = Math.clamp(v, 0, this.tiles.y - 1);
+            this._rowIndex = math.floatClamp(v, 0, this.tiles.y - 1);
         }
         private _rowIndex = 0;
 

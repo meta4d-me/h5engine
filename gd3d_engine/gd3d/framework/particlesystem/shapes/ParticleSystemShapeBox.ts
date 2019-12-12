@@ -78,10 +78,10 @@ namespace gd3d.framework
          */
         initParticleState(particle: Particle1)
         {
-            var speed = particle.velocity.length;
+            var speed = math.vec3Length(particle.velocity);
 
             // 计算位置
-            var p = new Vector3(this.boxX, this.boxY, this.boxZ).multiply(Vector3.random().scaleNumber(2).subNumber(1));
+            var p = new math.vector3(this.boxX * (Math.random() * 2 - 1), this.boxY * (Math.random() * 2 - 1), this.boxZ * (Math.random() * 2 - 1));
 
             if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Shell)
             {
@@ -114,11 +114,15 @@ namespace gd3d.framework
                 }
             }
 
-            particle.position.copy(p);
+            particle.position.x = p.x;
+            particle.position.y = p.y;
+            particle.position.z = p.z;
 
             // 计算速度
-            var dir = new Vector3(0, 0, 1);
-            particle.velocity.copy(dir).scaleNumber(speed);
+            var dir = new math.vector3(0, 0, 1);
+            particle.velocity.x = dir.x * speed;
+            particle.velocity.y = dir.y * speed;
+            particle.velocity.z = dir.z * speed;
         }
     }
 }

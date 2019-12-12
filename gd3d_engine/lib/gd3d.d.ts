@@ -4413,6 +4413,11 @@ declare namespace gd3d.math {
     function floatClamp(v: number, min?: number, max?: number): number;
     function sign(value: number): number;
     function getKeyCodeByAscii(ev: KeyboardEvent): number;
+    var DEG2RAD: number;
+    var RAD2DEG: number;
+    function degToRad(degrees: number): number;
+    function radToDeg(radians: number): number;
+    function mapLinear(x: number, a1: number, a2: number, b1: number, b2: number): number;
     function numberLerp(fromV: number, toV: number, v: number): number;
     function x_AXIS(): vector3;
     function y_AXIS(): vector3;
@@ -5644,15 +5649,15 @@ declare namespace gd3d.framework {
     class Particle1 {
         birthTime: number;
         lifetime: number;
-        position: Vector3;
-        velocity: Vector3;
-        acceleration: Vector3;
-        rotation: Vector3;
-        angularVelocity: Vector3;
-        size: Vector3;
-        startSize: Vector3;
-        color: Color4;
-        startColor: Color4;
+        position: math.vector3;
+        velocity: math.vector3;
+        acceleration: math.vector3;
+        rotation: math.vector3;
+        angularVelocity: math.vector3;
+        size: math.vector3;
+        startSize: math.vector3;
+        color: math.color;
+        startColor: math.color;
         tilingOffset: math.vector4;
         flipUV: math.vector2;
         birthRateAtDuration: number;
@@ -5662,37 +5667,13 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    var dispatcher: IEventDispatcher<GlobalEvents>;
-    interface GlobalEvents {
-    }
-    interface IEventDispatcher<T> {
-        once<K extends keyof T>(type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof T>(type: K, data?: T[K], bubbles?: boolean): Event<T[K]>;
-        has<K extends keyof T>(type: K): boolean;
-        on<K extends keyof T>(type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof T>(type?: K, listener?: (event: Event<T[K]>) => void, thisObject?: any): void;
-    }
-    class EventDispatcher {
-        once(type: string, listener: (event: any) => void, thisObject?: any, priority?: number): void;
-        dispatchEvent(e: Event<any>): boolean;
-        dispatch(type: string, data?: any, bubbles?: boolean): Event<any>;
-        has(type: string): boolean;
-        on(type: string, listener: (event: any) => void, thisObject?: any, priority?: number, once?: boolean): void;
-        off(type?: string, listener?: (event: any) => void, thisObject?: any): void;
-        onAll(listener: (event: any) => void, thisObject?: any, priority?: number): void;
-        offAll(listener?: (event: any) => void, thisObject?: any): void;
-        protected handleEvent(e: Event<any>): void;
-        protected handelEventBubbles(e: Event<any>): void;
-    }
-}
-declare namespace gd3d.framework {
     interface ComponentMap {
         ParticleSystem: ParticleSystem;
     }
     interface GameObjectEventMap {
         particleCompleted: ParticleSystem;
     }
-    class ParticleSystem extends EventDispatcher implements IRenderer {
+    class ParticleSystem implements IRenderer {
         static readonly ClassName: string;
         __class__: "gd3d.framework.ParticleSystem";
         layer: RenderLayerEnum;
@@ -5767,17 +5748,17 @@ declare namespace gd3d.framework {
         private _updateActiveParticlesState;
         private _initParticleState;
         private _updateParticleState;
-        private _simulationSpaceChanged;
-        addParticleVelocity(particle: Particle1, velocity: Vector3, space: ParticleSystemSimulationSpace, name?: string): void;
+        _simulationSpaceChanged(): void;
+        addParticleVelocity(particle: Particle1, velocity: math.vector3, space: ParticleSystemSimulationSpace, name?: string): void;
         removeParticleVelocity(particle: Particle1, name: string): void;
-        addParticleAcceleration(particle: Particle1, acceleration: Vector3, space: ParticleSystemSimulationSpace, name?: string): void;
+        addParticleAcceleration(particle: Particle1, acceleration: math.vector3, space: ParticleSystemSimulationSpace, name?: string): void;
         removeParticleAcceleration(particle: Particle1, name: string): void;
         private _preworldPos;
         private _isRateOverDistance;
         private _leftRateOverDistance;
-        worldPos: Vector3;
-        moveVec: Vector3;
-        speed: Vector3;
+        worldPos: math.vector3;
+        moveVec: math.vector3;
+        speed: math.vector3;
         localToWorldMatrix: math.matrix;
         worldToLocalMatrix: math.matrix;
     }
@@ -5872,258 +5853,6 @@ declare namespace gd3d.framework {
         UV2 = 4,
         UV3 = 8,
         Everything = 15
-    }
-}
-declare namespace gd3d.framework {
-    var event1: FEvent;
-    var objectevent: ObjectEventDispatcher<Object, ObjectEventType>;
-    interface ObjectEventType {
-        propertyValueChanged: {
-            property: string;
-            oldValue: any;
-            newValue: any;
-        };
-    }
-    interface ObjectEventDispatcher<O, T> {
-        once<K extends keyof T>(target: O, type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number): void;
-        dispatch<K extends keyof T>(target: O, type: K, data?: T[K], bubbles?: boolean): Event<T[K]>;
-        has<K extends keyof T>(target: O, type: K): boolean;
-        on<K extends keyof T>(target: O, type: K, listener: (event: Event<T[K]>) => void, thisObject?: any, priority?: number, once?: boolean): void;
-        off<K extends keyof T>(target: O, type?: K, listener?: (event: Event<T[K]>) => void, thisObject?: any): void;
-    }
-    class FEvent {
-        private feventMap;
-        private getBubbleTargets;
-        once(obj: Object, type: string, listener: (event: any) => void, thisObject?: any, priority?: number): void;
-        dispatchEvent(obj: Object, e: Event<any>): boolean;
-        dispatch(obj: Object, type: string, data?: any, bubbles?: boolean): Event<any>;
-        has(obj: Object, type: string): boolean;
-        on(obj: Object, type: string, listener: (event: any) => any, thisObject?: any, priority?: number, once?: boolean): void;
-        off(obj: Object, type?: string, listener?: (event: any) => any, thisObject?: any): void;
-        onAll(obj: Object, listener: (event: any) => void, thisObject?: any, priority?: number): void;
-        offAll(obj: Object, listener?: (event: any) => void, thisObject?: any): void;
-        protected handleEvent(obj: Object, e: Event<any>): void;
-        protected handelEventBubbles(obj: Object, e: Event<any>): void;
-    }
-    interface Event<T> {
-        type: string;
-        data: T;
-        bubbles: boolean;
-        target: any;
-        currentTarget: any;
-        isStop: boolean;
-        isStopBubbles: boolean;
-        targets: any[];
-        handles: ListenerVO[];
-    }
-    interface ListenerVO {
-        listener: (event: Event<any>) => void;
-        thisObject: any;
-        priority: number;
-        once: boolean;
-    }
-}
-declare namespace gd3d.framework {
-    class Color3 {
-        __class__: "gd3d.framework.Color3";
-        static WHITE: Color3;
-        static BLACK: Color3;
-        static fromUnit(color: number): Color3;
-        static fromColor4(color4: Color4): Color3;
-        r: number;
-        g: number;
-        b: number;
-        constructor(r?: number, g?: number, b?: number);
-        setTo(r: number, g: number, b: number): this;
-        fromUnit(color: number): this;
-        toInt(): number;
-        toHexString(): string;
-        mix(color: Color3, rate: number): this;
-        mixTo(color: Color3, rate: number, vout?: Color3): Color3;
-        scale(s: number): this;
-        scaleTo(s: number, vout?: Color3): Color3;
-        copy(color: Color3): this;
-        clone(): Color3;
-        toColor4(color4?: Color4): Color4;
-        toString(): string;
-        static ToHex(i: number): string;
-    }
-    var ColorKeywords: {
-        'aliceblue': number;
-        'antiquewhite': number;
-        'aqua': number;
-        'aquamarine': number;
-        'azure': number;
-        'beige': number;
-        'bisque': number;
-        'black': number;
-        'blanchedalmond': number;
-        'blue': number;
-        'blueviolet': number;
-        'brown': number;
-        'burlywood': number;
-        'cadetblue': number;
-        'chartreuse': number;
-        'chocolate': number;
-        'coral': number;
-        'cornflowerblue': number;
-        'cornsilk': number;
-        'crimson': number;
-        'cyan': number;
-        'darkblue': number;
-        'darkcyan': number;
-        'darkgoldenrod': number;
-        'darkgray': number;
-        'darkgreen': number;
-        'darkgrey': number;
-        'darkkhaki': number;
-        'darkmagenta': number;
-        'darkolivegreen': number;
-        'darkorange': number;
-        'darkorchid': number;
-        'darkred': number;
-        'darksalmon': number;
-        'darkseagreen': number;
-        'darkslateblue': number;
-        'darkslategray': number;
-        'darkslategrey': number;
-        'darkturquoise': number;
-        'darkviolet': number;
-        'deeppink': number;
-        'deepskyblue': number;
-        'dimgray': number;
-        'dimgrey': number;
-        'dodgerblue': number;
-        'firebrick': number;
-        'floralwhite': number;
-        'forestgreen': number;
-        'fuchsia': number;
-        'gainsboro': number;
-        'ghostwhite': number;
-        'gold': number;
-        'goldenrod': number;
-        'gray': number;
-        'green': number;
-        'greenyellow': number;
-        'grey': number;
-        'honeydew': number;
-        'hotpink': number;
-        'indianred': number;
-        'indigo': number;
-        'ivory': number;
-        'khaki': number;
-        'lavender': number;
-        'lavenderblush': number;
-        'lawngreen': number;
-        'lemonchiffon': number;
-        'lightblue': number;
-        'lightcoral': number;
-        'lightcyan': number;
-        'lightgoldenrodyellow': number;
-        'lightgray': number;
-        'lightgreen': number;
-        'lightgrey': number;
-        'lightpink': number;
-        'lightsalmon': number;
-        'lightseagreen': number;
-        'lightskyblue': number;
-        'lightslategray': number;
-        'lightslategrey': number;
-        'lightsteelblue': number;
-        'lightyellow': number;
-        'lime': number;
-        'limegreen': number;
-        'linen': number;
-        'magenta': number;
-        'maroon': number;
-        'mediumaquamarine': number;
-        'mediumblue': number;
-        'mediumorchid': number;
-        'mediumpurple': number;
-        'mediumseagreen': number;
-        'mediumslateblue': number;
-        'mediumspringgreen': number;
-        'mediumturquoise': number;
-        'mediumvioletred': number;
-        'midnightblue': number;
-        'mintcream': number;
-        'mistyrose': number;
-        'moccasin': number;
-        'navajowhite': number;
-        'navy': number;
-        'oldlace': number;
-        'olive': number;
-        'olivedrab': number;
-        'orange': number;
-        'orangered': number;
-        'orchid': number;
-        'palegoldenrod': number;
-        'palegreen': number;
-        'paleturquoise': number;
-        'palevioletred': number;
-        'papayawhip': number;
-        'peachpuff': number;
-        'peru': number;
-        'pink': number;
-        'plum': number;
-        'powderblue': number;
-        'purple': number;
-        'rebeccapurple': number;
-        'red': number;
-        'rosybrown': number;
-        'royalblue': number;
-        'saddlebrown': number;
-        'salmon': number;
-        'sandybrown': number;
-        'seagreen': number;
-        'seashell': number;
-        'sienna': number;
-        'silver': number;
-        'skyblue': number;
-        'slateblue': number;
-        'slategray': number;
-        'slategrey': number;
-        'snow': number;
-        'springgreen': number;
-        'steelblue': number;
-        'tan': number;
-        'teal': number;
-        'thistle': number;
-        'tomato': number;
-        'turquoise': number;
-        'violet': number;
-        'wheat': number;
-        'white': number;
-        'whitesmoke': number;
-        'yellow': number;
-        'yellowgreen': number;
-    };
-}
-declare namespace gd3d.framework {
-    class Color4 {
-        __class__: "gd3d.framework.Color4";
-        static WHITE: Color4;
-        static BLACK: Color4;
-        static fromUnit(color: number): Color4;
-        static fromUnit24(color: number, a?: number): Color4;
-        static fromColor3(color3: Color3, a?: number): Color4;
-        r: number;
-        g: number;
-        b: number;
-        a: number;
-        constructor(r?: number, g?: number, b?: number, a?: number);
-        setTo(r: number, g: number, b: number, a?: number): this;
-        fromUnit(color: number): this;
-        toInt(): number;
-        toHexString(): string;
-        mix(color: Color4, rate?: number): this;
-        mixTo(color: Color4, rate: number, vout?: Color4): Color4;
-        multiply(c: Color4): this;
-        multiplyTo(v: Color4, vout?: Color4): Color4;
-        copy(color: Color4): this;
-        toString(): string;
-        toColor3(color?: Color3): Color3;
-        clone(): Color4;
     }
 }
 declare namespace gd3d.framework {
@@ -6239,7 +5968,7 @@ declare namespace gd3d.framework {
         xCurve: MinMaxCurve;
         yCurve: MinMaxCurve;
         zCurve: MinMaxCurve;
-        getValue(time: number, randomBetween?: number): Vector3;
+        getValue(time: number, randomBetween?: number): math.vector3;
     }
 }
 declare namespace gd3d.framework {
@@ -6254,89 +5983,14 @@ declare namespace gd3d.framework {
     var defaultRotationOrder: RotationOrder;
 }
 declare namespace gd3d.framework {
-    class Vector3 {
-        __class__: "gd3d.framework.Vector3";
-        static X_AXIS: Vector3;
-        static Y_AXIS: Vector3;
-        static Z_AXIS: Vector3;
-        static ZERO: Vector3;
-        static fromArray(array: ArrayLike<number>, offset?: number): Vector3;
-        static random(size?: number): Vector3;
-        x: number;
-        y: number;
-        z: number;
-        readonly length: number;
-        readonly lengthSquared: number;
-        constructor(x?: number, y?: number, z?: number);
-        set(x: number, y: number, z: number): this;
-        setZero(): void;
-        fromArray(array: ArrayLike<number>, offset?: number): this;
-        add(a: Vector3): this;
-        addTo(a: Vector3, vout?: Vector3): Vector3;
-        addScaledVector(scalar: number, vector: Vector3): this;
-        multiply(a: Vector3): this;
-        multiplyTo(a: Vector3, vout?: Vector3): Vector3;
-        divide(a: Vector3): this;
-        divideTo(a: Vector3, vout?: Vector3): Vector3;
-        cross(a: Vector3): Vector3;
-        crossTo(a: Vector3, vout?: Vector3): Vector3;
-        dot(a: Vector3): number;
-        isZero(): boolean;
-        tangents(t1: Vector3, t2: Vector3): void;
-        addNumber(n: number): this;
-        addNumberTo(n: number, vout?: Vector3): Vector3;
-        subNumber(n: number): this;
-        subNumberTo(n: number, vout?: Vector3): Vector3;
-        multiplyNumber(n: number): this;
-        multiplyNumberTo(n: number, vout?: Vector3): Vector3;
-        divideNumber(n: number): this;
-        divideNumberTo(n: number, vout?: Vector3): Vector3;
-        clone(): Vector3;
-        copy(v: Vector3): this;
-        negate(): this;
-        negateTo(vout?: Vector3): Vector3;
-        inverse(): this;
-        inverseTo(vout?: Vector3): Vector3;
-        normalize(thickness?: number): this;
-        unit(target?: Vector3): Vector3;
-        scaleNumber(s: number): this;
-        scaleNumberTo(s: number, vout?: Vector3): Vector3;
-        scale(s: Vector3): this;
-        scaleTo(s: Vector3, vout?: Vector3): Vector3;
-        sub(a: Vector3): this;
-        subTo(a: Vector3, vout?: Vector3): Vector3;
-        lerp(v: Vector3, alpha: Vector3): this;
-        lerpTo(v: Vector3, alpha: Vector3, vout?: Vector3): Vector3;
-        lerpNumber(v: Vector3, alpha: number): this;
-        lerpNumberTo(v: Vector3, alpha: number, vout?: Vector3): Vector3;
-        less(p: Vector3): boolean;
-        lessequal(p: Vector3): boolean;
-        greater(p: Vector3): boolean;
-        greaterequal(p: Vector3): boolean;
-        clamp(min: Vector3, max: Vector3): this;
-        min(v: Vector3): this;
-        max(v: Vector3): this;
-        distanceSquared(v: Vector3): number;
-        distance(v: Vector3): number;
-        reflect(normal: Vector3): this;
-        floor(): this;
-        ceil(): this;
-        round(): this;
-        roundToZero(): this;
-        toString(): string;
-        toArray(array?: number[], offset?: number): number[];
-    }
-}
-declare namespace gd3d.framework {
     class Gradient {
         __class__: "gd3d.framework.Gradient";
         mode: GradientMode;
         alphaKeys: GradientAlphaKey[];
         colorKeys: GradientColorKey[];
-        fromColors(colors: number[], times?: number[]): this;
-        getValue(time: number): Color4;
+        getValue(time: number): math.color;
         getAlpha(time: number): number;
-        getColor(time: number): Color3;
+        getColor(time: number): math.color;
     }
 }
 declare namespace gd3d.framework {
@@ -6347,7 +6001,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     interface GradientColorKey {
-        color: Color3;
+        color: math.color;
         time: number;
     }
 }
@@ -6361,13 +6015,13 @@ declare namespace gd3d.framework {
     class MinMaxGradient {
         __class__: "gd3d.framework.MinMaxGradient";
         mode: MinMaxGradientMode;
-        color: Color4;
-        colorMin: Color4;
-        colorMax: Color4;
+        color: math.color;
+        colorMin: math.color;
+        colorMax: math.color;
         gradient: Gradient;
         gradientMin: Gradient;
         gradientMax: Gradient;
-        getValue(time: number, randomBetween?: number): Color4;
+        getValue(time: number, randomBetween?: number, out?: math.color): math.color;
     }
 }
 declare namespace gd3d.framework {
@@ -6380,7 +6034,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class ParticleModule extends EventDispatcher {
+    class ParticleModule {
         enabled: boolean;
         particleSystem: ParticleSystem;
         initParticleState(particle: Particle1): void;
@@ -6497,6 +6151,7 @@ declare namespace gd3d.framework {
         startColor: MinMaxGradient;
         gravityModifier: MinMaxCurve;
         simulationSpace: ParticleSystemSimulationSpace;
+        private _simulationSpace;
         customSimulationSpace: transform;
         simulationSpeed: number;
         scalingMode: ParticleSystemScalingMode;
@@ -6552,7 +6207,7 @@ declare namespace gd3d.framework {
         arcSpeed: MinMaxCurve;
         arcSpeedMultiplier: number;
         arcSpread: number;
-        box: Vector3;
+        box: math.vector3;
         length: number;
         mesh: any;
         useMeshMaterialIndex: boolean;
@@ -6665,69 +6320,6 @@ declare namespace gd3d.framework {
         calculateProbability(): boolean;
     }
 }
-interface ArrayConstructor {
-    unique<T>(array: T[], compare?: (a: T, b: T) => boolean): T[];
-    delete<T>(array: T[], item: T): number;
-    concatToSelf<T>(array: T[], ...items: (T | ConcatArray<T>)[]): T[];
-    equal<T>(array: T[], arr: ArrayLike<T>): boolean;
-    replace<T>(array: T[], a: T, b: T, isAdd?: boolean): T[];
-}
-interface Math {
-    DEG2RAD: number;
-    RAD2DEG: number;
-    PRECISION: number;
-    uuid: () => string;
-    clamp(value: number, lowerlimit: number, upperlimit: number): number;
-    euclideanModulo(n: number, m: number): number;
-    mapLinear: (x: number, a1: number, a2: number, b1: number, b2: number) => number;
-    lerp(start: number, end: number, t: number): number;
-    smoothstep(x: number, min: number, max: number): number;
-    smootherstep(x: number, min: number, max: number): number;
-    randInt(low: number, high: number): number;
-    randFloat(low: number, high: number): number;
-    randFloatSpread(range: number): number;
-    degToRad(degrees: number): number;
-    radToDeg(radians: number): number;
-    isPowerOfTwo(value: number): boolean;
-    nearestPowerOfTwo(value: number): number;
-    nextPowerOfTwo(value: number): number;
-    toRound(source: number, target: number, precision?: number): number;
-    equals(a: number, b: number, precision?: number): boolean;
-    gcd(a: number, b: number): number;
-    lcm(a: number, b: number): number;
-}
-interface AssignDeepHandler {
-    (target: any, source: any, key: string, replacers: AssignDeepHandler[], deep: number): boolean;
-}
-interface ObjectConstructor {
-    getPropertyDescriptor(object: Object, property: string): PropertyDescriptor;
-    propertyIsWritable(obj: Object, property: string): boolean;
-    isBaseType(object: any): boolean;
-    isObject(object: any): boolean;
-    getPropertyValue(object: Object, property: string | string[]): any;
-    getPropertyChains(object: Object): string[];
-    assignShallow<T>(target: T, source: Partial<T>): T;
-    assignDeep<T>(target: T, source: gd3d.framework.gPartial<T>, handlers?: AssignDeepHandler | AssignDeepHandler[], deep?: number): T;
-    equalDeep<T>(a: T, b: T): boolean;
-    runFunc<T>(obj: T, func: (obj: T) => void): T;
-    assignDeepDefaultHandlers: AssignDeepHandler[];
-}
-declare namespace gd3d.framework {
-    type gPartial<T> = {
-        [P in keyof T]?: gPartial<T[P]>;
-    };
-    type Lazy<T> = T | (() => T);
-    type LazyObject<T> = {
-        [P in keyof T]: Lazy<T[P]>;
-    };
-    var lazy: {
-        getvalue: <T>(lazyItem: Lazy<T>) => T;
-    };
-    interface IDisposable {
-        readonly disposed: boolean;
-        dispose(): void;
-    }
-}
 declare namespace gd3d.framework {
     class ParticleSystemShapeBase {
         protected _module: ParticleShapeModule;
@@ -6793,69 +6385,6 @@ declare namespace gd3d.framework {
         emitFromShell: boolean;
         initParticleState(particle: Particle1): void;
     }
-}
-declare namespace gd3d.framework {
-    var classUtils: ClassUtils;
-    class ClassUtils {
-        getQualifiedClassName(value: any): string;
-        getDefinitionByName(name: string, readCache?: boolean): any;
-        private defaultInstMap;
-        getDefaultInstanceByName(name: string): any;
-        getInstanceByName(name: string): any;
-        addClassNameSpace(namespace: string): void;
-    }
-}
-declare namespace gd3d.framework {
-    var serialization: Serialization;
-    function serialize(target: any, propertyKey: string): void;
-    interface PropertyHandler {
-        (target: any, source: any, property: string, handlers: PropertyHandler[], serialization: Serialization): boolean;
-    }
-    interface DifferentPropertyHandler {
-        (target: any, source: any, property: string, different: Object, handlers: DifferentPropertyHandler[], serialization: Serialization): boolean;
-    }
-    class Serialization {
-        serializeHandlers: {
-            priority: number;
-            handler: PropertyHandler;
-        }[];
-        deserializeHandlers: {
-            priority: number;
-            handler: PropertyHandler;
-        }[];
-        differentHandlers: {
-            priority: number;
-            handler: DifferentPropertyHandler;
-        }[];
-        setValueHandlers: {
-            priority: number;
-            handler: PropertyHandler;
-        }[];
-        serialize<T>(target: T): gPartial<T>;
-        deserialize<T>(object: gPartial<T>): T;
-        different<T>(target: T, source: T): gPartial<T>;
-        setValue<T>(target: T, source: gPartial<T>): T;
-        clone<T>(target: T): T;
-    }
-    var CLASS_KEY: string;
-    interface SerializationTempInfo {
-        loadingNum?: number;
-        onLoaded?: () => void;
-    }
-}
-declare namespace gd3d.framework {
-    function watch(onChange: string): (target: any, property: string) => void;
-    var watcher: Watcher;
-    class Watcher {
-        watch<T, K extends (keyof T & string), V extends T[K]>(object: T, property: K, handler: (object: T, property: string, oldvalue: V) => void, thisObject?: any): void;
-        unwatch<T, K extends (keyof T & string), V extends T[K]>(object: T, property: K, handler?: (object: T, property: string, oldvalue: V) => void, thisObject?: any): void;
-        watchchain(object: any, property: string, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
-        unwatchchain(object: any, property: string, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
-        watchobject<T>(object: T, property: gPartial<T>, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
-        unwatchobject<T>(object: T, property: gPartial<T>, handler?: (object: any, property: string, oldvalue: any) => void, thisObject?: any): void;
-    }
-    const __watchs__ = "__watchs__";
-    const __watchchains__ = "__watchchains__";
 }
 declare namespace gd3d.framework {
     class CannonJSPlugin implements IPhysicsEnginePlugin {
@@ -7592,44 +7121,6 @@ declare namespace gd3d.framework {
         intersectsTriangle(vertex0: gd3d.math.vector3, vertex1: gd3d.math.vector3, vertex2: gd3d.math.vector3, outInfo: pickinfo): boolean;
     }
 }
-interface WebGLRenderingContext {
-    extensions: gd3d.framework.GLExtension;
-    vertexAttribDivisor(index: GLuint, divisor: GLuint): void;
-    drawElementsInstanced(mode: GLenum, count: GLsizei, type: GLenum, offset: GLintptr, instanceCount: GLsizei): void;
-    drawArraysInstanced(mode: GLenum, first: GLint, count: GLsizei, instanceCount: GLsizei): void;
-}
-declare namespace gd3d.framework {
-    class GLExtension {
-        ANGLE_instanced_arrays: ANGLE_instanced_arrays;
-        EXT_blend_minmax: EXT_blend_minmax;
-        EXT_color_buffer_half_float: any;
-        EXT_frag_depth: EXT_frag_depth;
-        EXT_sRGB: EXT_sRGB;
-        EXT_shader_texture_lod: EXT_shader_texture_lod;
-        EXT_texture_filter_anisotropic: EXT_texture_filter_anisotropic;
-        OES_element_index_uint: OES_element_index_uint;
-        OES_standard_derivatives: OES_standard_derivatives;
-        OES_texture_float: OES_texture_float;
-        OES_texture_float_linear: OES_texture_float_linear;
-        OES_texture_half_float: OES_texture_half_float;
-        OES_texture_half_float_linear: OES_texture_half_float_linear;
-        OES_vertex_array_object: OES_vertex_array_object;
-        WEBGL_color_buffer_float: WEBGL_color_buffer_float;
-        WEBGL_compressed_texture_atc: any;
-        WEBGL_compressed_texture_etc1: any;
-        WEBGL_compressed_texture_pvrtc: any;
-        WEBGL_compressed_texture_s3tc: WEBGL_compressed_texture_s3tc;
-        WEBGL_debug_renderer_info: WEBGL_debug_renderer_info;
-        WEBGL_debug_shaders: WEBGL_debug_shaders;
-        WEBGL_depth_texture: WEBGL_depth_texture;
-        WEBGL_draw_buffers: WEBGL_draw_buffers;
-        WEBGL_lose_context: any;
-        constructor(gl: WebGLRenderingContext);
-        private initExtensions;
-        private cacheGLQuery;
-        private wrap;
-    }
-}
 declare namespace gd3d.framework {
     class tweenUtil {
         static GetEaseProgress(ease_type: tweenMethod, linear_progress: number): number;
@@ -7720,6 +7211,23 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class ArrayUtil {
+        static replace<T>(arr: T[], a: T, b: T, isAdd?: boolean): T[];
+        static concatToSelf<T>(self: T[], ...items: (T | ConcatArray<T>)[]): T[];
+        static unique<T>(arr: T[], compare?: (a: T, b: T) => boolean): T[];
+    }
+}
+declare namespace gd3d.framework {
+    class ClassUtils {
+        static getQualifiedClassName(value: any): string;
+        static getDefinitionByName(name: string, readCache?: boolean): any;
+        private static defaultInstMap;
+        static getDefaultInstanceByName(name: string): any;
+        static getInstanceByName(name: string): any;
+        static addClassNameSpace(namespace: string): void;
+    }
+}
+declare namespace gd3d.framework {
     enum CullingMask {
         nothing = 0,
         default = 1,
@@ -7774,6 +7282,44 @@ declare namespace gd3d.framework {
         static getEnumObjByType(enumType: string): any;
     }
 }
+interface WebGLRenderingContext {
+    extensions: gd3d.framework.GLExtension;
+    vertexAttribDivisor(index: GLuint, divisor: GLuint): void;
+    drawElementsInstanced(mode: GLenum, count: GLsizei, type: GLenum, offset: GLintptr, instanceCount: GLsizei): void;
+    drawArraysInstanced(mode: GLenum, first: GLint, count: GLsizei, instanceCount: GLsizei): void;
+}
+declare namespace gd3d.framework {
+    class GLExtension {
+        ANGLE_instanced_arrays: ANGLE_instanced_arrays;
+        EXT_blend_minmax: EXT_blend_minmax;
+        EXT_color_buffer_half_float: any;
+        EXT_frag_depth: EXT_frag_depth;
+        EXT_sRGB: EXT_sRGB;
+        EXT_shader_texture_lod: EXT_shader_texture_lod;
+        EXT_texture_filter_anisotropic: EXT_texture_filter_anisotropic;
+        OES_element_index_uint: OES_element_index_uint;
+        OES_standard_derivatives: OES_standard_derivatives;
+        OES_texture_float: OES_texture_float;
+        OES_texture_float_linear: OES_texture_float_linear;
+        OES_texture_half_float: OES_texture_half_float;
+        OES_texture_half_float_linear: OES_texture_half_float_linear;
+        OES_vertex_array_object: OES_vertex_array_object;
+        WEBGL_color_buffer_float: WEBGL_color_buffer_float;
+        WEBGL_compressed_texture_atc: any;
+        WEBGL_compressed_texture_etc1: any;
+        WEBGL_compressed_texture_pvrtc: any;
+        WEBGL_compressed_texture_s3tc: WEBGL_compressed_texture_s3tc;
+        WEBGL_debug_renderer_info: WEBGL_debug_renderer_info;
+        WEBGL_debug_shaders: WEBGL_debug_shaders;
+        WEBGL_depth_texture: WEBGL_depth_texture;
+        WEBGL_draw_buffers: WEBGL_draw_buffers;
+        WEBGL_lose_context: any;
+        constructor(gl: WebGLRenderingContext);
+        private initExtensions;
+        private cacheGLQuery;
+        private wrap;
+    }
+}
 declare namespace gd3d.framework {
     class NumberUtil {
         static KEY_A: number;
@@ -7793,6 +7339,12 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class ObjectUtil {
+        static isBaseType(object: any): boolean;
+        static isObject(obj: any): boolean;
+    }
+}
+declare namespace gd3d.framework {
     class RegexpUtil {
         static textureRegexp: RegExp;
         static vectorRegexp: RegExp;
@@ -7800,6 +7352,44 @@ declare namespace gd3d.framework {
         static rangeRegexp: RegExp;
         static vector4Regexp: RegExp;
         static vector3FloatOrRangeRegexp: RegExp;
+    }
+}
+declare namespace gd3d.framework {
+    var serialization: Serialization;
+    function serialize(target: any, propertyKey: string): void;
+    interface PropertyHandler {
+        (target: any, source: any, property: string, handlers: PropertyHandler[], serialization: Serialization): boolean;
+    }
+    interface DifferentPropertyHandler {
+        (target: any, source: any, property: string, different: Object, handlers: DifferentPropertyHandler[], serialization: Serialization): boolean;
+    }
+    class Serialization {
+        serializeHandlers: {
+            priority: number;
+            handler: PropertyHandler;
+        }[];
+        deserializeHandlers: {
+            priority: number;
+            handler: PropertyHandler;
+        }[];
+        differentHandlers: {
+            priority: number;
+            handler: DifferentPropertyHandler;
+        }[];
+        setValueHandlers: {
+            priority: number;
+            handler: PropertyHandler;
+        }[];
+        serialize<T>(target: T): gPartial<T>;
+        deserialize<T>(object: gPartial<T>): T;
+        different<T>(target: T, source: T): gPartial<T>;
+        setValue<T>(target: T, source: gPartial<T>): T;
+        clone<T>(target: T): T;
+    }
+    var CLASS_KEY: string;
+    interface SerializationTempInfo {
+        loadingNum?: number;
+        onLoaded?: () => void;
     }
 }
 declare namespace gd3d.framework {
@@ -7863,6 +7453,22 @@ declare namespace gd3d.framework {
         private static create2D_image2D;
         private static create2D_label;
         private static create2D_button;
+    }
+}
+declare namespace gd3d.framework {
+    type gPartial<T> = {
+        [P in keyof T]?: gPartial<T[P]>;
+    };
+    type Lazy<T> = T | (() => T);
+    type LazyObject<T> = {
+        [P in keyof T]: Lazy<T[P]>;
+    };
+    var lazy: {
+        getvalue: <T>(lazyItem: Lazy<T>) => T;
+    };
+    interface IDisposable {
+        readonly disposed: boolean;
+        dispose(): void;
     }
 }
 declare namespace gd3d.framework {

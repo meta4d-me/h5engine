@@ -417,8 +417,19 @@ namespace gd3d.framework
          * 
          * @todo
          */
-
-        simulationSpace = ParticleSystemSimulationSpace.Local;
+        get simulationSpace()
+        {
+            return this._simulationSpace;
+        }
+        set simulationSpace(v)
+        {
+            if (this._simulationSpace != v)
+            {
+                this._simulationSpace = v;
+                this.particleSystem._simulationSpaceChanged();
+            }
+        }
+        private _simulationSpace = ParticleSystemSimulationSpace.Local;
 
         /**
          * Simulate particles relative to a custom transform component.
@@ -471,30 +482,44 @@ namespace gd3d.framework
             //
             var birthRateAtDuration = particle.birthRateAtDuration;
 
-            particle.position.set(0, 0, 0);
-            particle.velocity.set(0, 0, this.startSpeed.getValue(birthRateAtDuration));
-            particle.acceleration.set(0, 0, 0);
+            particle.position.x = 0;
+            particle.position.y = 0;
+            particle.position.z = 0;
+            particle.velocity.x = 0;
+            particle.velocity.y = 0;
+            particle.velocity.z = this.startSpeed.getValue(birthRateAtDuration);
+
+            particle.acceleration.x = 0;
+            particle.acceleration.y = 0;
+            particle.acceleration.z = 0;
+
             if (this.useStartSize3D)
             {
-                particle.startSize.copy(this.startSize3D.getValue(birthRateAtDuration));
+                math.vec3Clone(this.startSize3D.getValue(birthRateAtDuration), particle.startSize);
             } else
             {
                 var startSize = this.startSize.getValue(birthRateAtDuration);
-                particle.startSize.set(startSize, startSize, startSize);
+                particle.startSize.x = startSize;
+                particle.startSize.y = startSize;
+                particle.startSize.z = startSize;
             }
 
             //
             if (this.useStartRotation3D)
             {
-                particle.rotation.copy(this.startRotation3D.getValue(birthRateAtDuration));
+                math.vec3Clone(this.startRotation3D.getValue(birthRateAtDuration), particle.rotation);
             } else
             {
                 var startRotation = this.startRotation.getValue(birthRateAtDuration);
-                particle.rotation.set(0, 0, startRotation);
+                particle.rotation.x = 0;
+                particle.rotation.y = 0;
+                particle.rotation.z = startRotation;
             }
-            particle.angularVelocity.set(0, 0, 0);
+            particle.angularVelocity.x = 0;
+            particle.angularVelocity.y = 0;
+            particle.angularVelocity.z = 0;
             //
-            particle.startColor.copy(this.startColor.getValue(birthRateAtDuration));
+            math.colorClone(this.startColor.getValue(birthRateAtDuration), particle.startColor);
         }
 
         /**
@@ -504,14 +529,16 @@ namespace gd3d.framework
         updateParticleState(particle: Particle1)
         {
             // 加速度
-            var gravity = world_gravity.scaleNumberTo(this.gravityModifier.getValue(this.particleSystem.rateAtDuration));
+            var gravity = new math.vector3(world_gravity.x, world_gravity.y, world_gravity.z);
+            math.vec3ScaleByNum(gravity, this.gravityModifier.getValue(this.particleSystem.rateAtDuration), gravity)
+
             this.particleSystem.addParticleAcceleration(particle, gravity, ParticleSystemSimulationSpace.World, _Main_preGravity);
             //
-            particle.size.copy(particle.startSize);
-            particle.color.copy(particle.startColor);
+            math.vec3Clone(particle.startSize, particle.size);
+            math.colorClone(particle.startColor, particle.color);
         }
     }
 
-    var world_gravity = new Vector3(0, -9.8, 0);
+    var world_gravity = new math.vector3(0, -9.8, 0);
     var _Main_preGravity = "_Main_preGravity";
 }
