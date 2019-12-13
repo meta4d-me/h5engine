@@ -301,13 +301,13 @@ namespace gd3d.framework
                 var mat0 = new math.matrix();
                 var rotation = new gd3d.math.vector3(particle.rotation.x, particle.rotation.y, particle.rotation.z);
                 math.vec3ScaleByNum(rotation, Math.PI / 180, rotation);
-                math.matrixMakeEuler(rotation, defaultRotationOrder, mat0);
+                math.matrixMakeEuler(rotation, math.defaultRotationOrder, mat0);
 
                 //
                 math.matrixMultiply(mat0, mat, mat0);
 
                 // 获取被变换后的旋转
-                math.matrixGetEuler(mat0, defaultRotationOrder, rotation);
+                math.matrixGetEuler(mat0, math.defaultRotationOrder, rotation);
                 math.vec3ScaleByNum(rotation, 180 / Math.PI, rotation);
 
                 //

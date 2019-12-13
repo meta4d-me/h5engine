@@ -1,4 +1,4 @@
-namespace gd3d.framework
+namespace gd3d.math
 {
 
     /**
