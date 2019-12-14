@@ -78,7 +78,9 @@ class test_ParticleSystem implements IState
         // 新建粒子材质
         var mat = new gd3d.framework.material("defparticle1");
         // var shader = test_ParticleSystem_particles_additive.initShader(this.astMgr, this.astMgr.shaderPool);
-        var shader = test_ParticleSystem_particles_additive_drawInstanced.initShader(this.astMgr, this.astMgr.shaderPool);
+        // var shader0 = test_ParticleSystem_particles_additive_drawInstanced.initShader(this.astMgr, this.astMgr.shaderPool);
+        
+        var shader = this.astMgr.getShader("particlesystem_additive.shader.json")
         mat.setShader(shader);
 
         var tex = this.astMgr.getDefaultTexture(gd3d.framework.defTexture.particle);

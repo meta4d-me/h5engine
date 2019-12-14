@@ -3949,7 +3949,7 @@ var test_ParticleSystem = (function () {
     };
     test_ParticleSystem.prototype.initParticleSystem = function (ps) {
         var mat = new gd3d.framework.material("defparticle1");
-        var shader = test_ParticleSystem_particles_additive_drawInstanced.initShader(this.astMgr, this.astMgr.shaderPool);
+        var shader = this.astMgr.getShader("particlesystem_additive.shader.json");
         mat.setShader(shader);
         var tex = this.astMgr.getDefaultTexture(gd3d.framework.defTexture.particle);
         mat.setTexture("_MainTex", tex);
@@ -3990,10 +3990,10 @@ var test_ParticleSystem_particles_additive_drawInstanced = (function () {
     function test_ParticleSystem_particles_additive_drawInstanced() {
     }
     test_ParticleSystem_particles_additive_drawInstanced.initShader = function (assetmgr, pool) {
-        pool.compileVS(assetmgr.webgl, "particles_additive1", this.vscode);
-        pool.compileFS(assetmgr.webgl, "particles_additive1", this.fscode);
-        var program = pool.linkProgram(assetmgr.webgl, "particles_additive1", "particles_additive1");
-        var sh = new gd3d.framework.shader("shader/particles_additive1");
+        pool.compileVS(assetmgr.webgl, "particlesystem_additive", this.vscode);
+        pool.compileFS(assetmgr.webgl, "particlesystem_additive", this.fscode);
+        var program = pool.linkProgram(assetmgr.webgl, "particlesystem_additive", "particlesystem_additive");
+        var sh = new gd3d.framework.shader("shader/particlesystem_additive");
         sh.defaultAsset = true;
         sh.passes["base"] = [];
         var p = new gd3d.render.glDrawPass();
