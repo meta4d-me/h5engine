@@ -20,8 +20,9 @@ class test_ParticleSystem implements IState
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
-    // res : string = "Cube";
-    res: string = "ParticleSystem";
+    // res: string = "ParticleSystem";
+    // res: string = "Fire";
+    res: string = "Flames";
     async start(app: gd3d.framework.application)
     {
         this.app = app;
@@ -45,7 +46,7 @@ class test_ParticleSystem implements IState
         this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
         this.camera.near = 0.01;
         this.camera.far = 1000;
-        this.camera.fov = Math.PI / 3;
+        this.camera.fov = Math.PI * 2 / 3;
         this.camera.backgroundColor = new gd3d.math.color(0.2784, 0.2784, 0.2784, 1);
         objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
@@ -68,7 +69,7 @@ class test_ParticleSystem implements IState
         let ps = cubeTran.gameObject.getComponent("ParticleSystem") as gd3d.framework.ParticleSystem;
         if (ps)
         {
-            this.initParticleSystem(ps);
+            // this.initParticleSystem(ps);
             ps.play();
         }
     }
@@ -79,7 +80,7 @@ class test_ParticleSystem implements IState
         var mat = new gd3d.framework.material("defparticle1");
         // var shader = test_ParticleSystem_particles_additive.initShader(this.astMgr, this.astMgr.shaderPool);
         // var shader0 = test_ParticleSystem_particles_additive_drawInstanced.initShader(this.astMgr, this.astMgr.shaderPool);
-        
+
         var shader = this.astMgr.getShader("particlesystem_additive.shader.json")
         mat.setShader(shader);
 

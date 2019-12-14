@@ -3899,7 +3899,7 @@ var test_Decal = (function () {
 }());
 var test_ParticleSystem = (function () {
     function test_ParticleSystem() {
-        this.res = "ParticleSystem";
+        this.res = "Flames";
     }
     test_ParticleSystem.prototype.start = function (app) {
         return __awaiter(this, void 0, void 0, function () {
@@ -3928,7 +3928,7 @@ var test_ParticleSystem = (function () {
         this.camera = objCam.gameObject.addComponent("camera");
         this.camera.near = 0.01;
         this.camera.far = 1000;
-        this.camera.fov = Math.PI / 3;
+        this.camera.fov = Math.PI * 2 / 3;
         this.camera.backgroundColor = new gd3d.math.color(0.2784, 0.2784, 0.2784, 1);
         objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
@@ -3943,7 +3943,6 @@ var test_ParticleSystem = (function () {
         this.scene.addChild(cubeTran);
         var ps = cubeTran.gameObject.getComponent("ParticleSystem");
         if (ps) {
-            this.initParticleSystem(ps);
             ps.play();
         }
     };
