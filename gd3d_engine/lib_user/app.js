@@ -3964,10 +3964,10 @@ var test_ParticleSystem_particles_additive = (function () {
     function test_ParticleSystem_particles_additive() {
     }
     test_ParticleSystem_particles_additive.initShader = function (assetmgr, pool) {
-        pool.compileVS(assetmgr.webgl, "particles_additive1", this.vscode);
-        pool.compileFS(assetmgr.webgl, "particles_additive1", this.fscode);
-        var program = pool.linkProgram(assetmgr.webgl, "particles_additive1", "particles_additive1");
-        var sh = new gd3d.framework.shader("shader/particles_additive1");
+        pool.compileVS(assetmgr.webgl, "particlesystem_additive", this.vscode);
+        pool.compileFS(assetmgr.webgl, "particlesystem_additive", this.fscode);
+        var program = pool.linkProgram(assetmgr.webgl, "particlesystem_additive", "particlesystem_additive");
+        var sh = new gd3d.framework.shader("shader/particlesystem_additive");
         sh.defaultAsset = true;
         sh.passes["base"] = [];
         var p = new gd3d.render.glDrawPass();

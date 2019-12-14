@@ -241,6 +241,18 @@
           "length":0
           },
       {
+          "name":"resources/particlesystem_additive.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/particlesystem_additive.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/particlesystem_additive.vs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/particles_add.shader.json",
           "length":0
           },
