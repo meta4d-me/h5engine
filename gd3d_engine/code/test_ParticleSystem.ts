@@ -27,7 +27,8 @@ class test_ParticleSystem implements IState
         this.app = app;
         this.scene = this.app.getScene();
         this.astMgr = this.app.getAssetMgr();
-        await demoTool.loadbySync(`res/f14effprefab/customShader/customShader.assetbundle.json`, this.astMgr);
+        await demoTool.loadbySync(`newRes/shader/MainShader.assetbundle.json`, this.astMgr);
+        // await demoTool.loadbySync(`res/f14effprefab/customShader/customShader.assetbundle.json`, this.astMgr);
 
         await demoTool.loadbySync(`res/prefabs/${this.res}/${this.res}.assetbundle.json`, this.astMgr);
         //res/f14effprefab/customShader/customShader.assetbundle.json

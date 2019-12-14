@@ -3909,7 +3909,7 @@ var test_ParticleSystem = (function () {
                         this.app = app;
                         this.scene = this.app.getScene();
                         this.astMgr = this.app.getAssetMgr();
-                        return [4, demoTool.loadbySync("res/f14effprefab/customShader/customShader.assetbundle.json", this.astMgr)];
+                        return [4, demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", this.astMgr)];
                     case 1:
                         _a.sent();
                         return [4, demoTool.loadbySync("res/prefabs/" + this.res + "/" + this.res + ".assetbundle.json", this.astMgr)];
