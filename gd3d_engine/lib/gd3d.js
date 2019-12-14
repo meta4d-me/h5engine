@@ -8268,7 +8268,7 @@ var gd3d;
                 for (var i = this.pkgsGuid.length - 1; i >= 0; --i) {
                     var pkgGuid = this.pkgsGuid[i];
                     var pkgld = framework.assetMgr.mapLoading[pkgGuid];
-                    if (pkgld.data == 0)
+                    if (!pkgld || !pkgld.data || pkgld.data == 0)
                         continue;
                     var isbin = this.pkgs[i].endsWith(".bpkg.json");
                     pkgld.subRes = [];
@@ -8606,7 +8606,12 @@ var gd3d;
                     console.error(err.stack);
                 }, function () { }, repType, function (xhr) {
                     var loading = assetMgr.mapLoading[guid];
-                    loading.readyok = true;
+                    if (!loading) {
+                        loading = assetMgr.mapLoading[guid] = { readyok: true };
+                    }
+                    else {
+                        loading.readyok = true;
+                    }
                     loading.data = xhr.response;
                     finish();
                 });

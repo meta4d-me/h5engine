@@ -130,7 +130,7 @@ namespace gd3d.framework
 
                 var pkgGuid = this.pkgsGuid[i];
                 var pkgld = assetMgr.mapLoading[pkgGuid];
-                if (pkgld.data == 0)//被解析过了不再解析 项目中标记的 
+                if (!pkgld || !pkgld.data || pkgld.data == 0)//被解析过了不再解析 项目中标记的 
                     continue;
                 var isbin = this.pkgs[i].endsWith(".bpkg.json");
                 pkgld.subRes = [];

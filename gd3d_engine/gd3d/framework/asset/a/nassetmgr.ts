@@ -250,7 +250,11 @@ namespace gd3d.framework {
 
             }, () => { }, repType, (xhr) => {
                 let loading = assetMgr.mapLoading[guid];
-                loading.readyok = true;
+                if(!loading) {
+                    loading = assetMgr.mapLoading[guid] = { readyok : true };
+                }else{
+                    loading.readyok = true;
+                }
                 loading.data = xhr.response;
                 finish();
             });
