@@ -5812,6 +5812,7 @@ declare namespace gd3d.framework {
         unuse(disposeNow?: boolean): void;
         caclByteLength(): number;
         setData(v: string): void;
+        objectData: any;
     }
 }
 declare namespace gd3d.framework {

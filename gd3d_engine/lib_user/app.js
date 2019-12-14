@@ -3941,25 +3941,19 @@ var test_ParticleSystem = (function () {
         var cubeP = this.astMgr.getAssetByName(this.res + ".prefab.json", this.res + ".assetbundle.json");
         var cubeTran = cubeP.getCloneTrans();
         this.scene.addChild(cubeTran);
+        var ps = cubeTran.gameObject.getComponent("ParticleSystem");
+        if (ps) {
+            this.initParticleSystem(ps);
+            ps.play();
+        }
     };
-    test_ParticleSystem.prototype.initParticleSystem = function () {
-        var tran = new gd3d.framework.transform();
-        tran.name = "ParticleSystem";
-        gd3d.math.quatFromAxisAngle(new gd3d.math.vector3(1, 0, 0), -90, tran.localRotate);
-        tran.localRotate = tran.localRotate;
-        this.scene.addChild(tran);
+    test_ParticleSystem.prototype.initParticleSystem = function (ps) {
         var mat = new gd3d.framework.material("defparticle1");
         var shader = test_ParticleSystem_particles_additive_drawInstanced.initShader(this.astMgr, this.astMgr.shaderPool);
         mat.setShader(shader);
         var tex = this.astMgr.getDefaultTexture(gd3d.framework.defTexture.particle);
         mat.setTexture("_MainTex", tex);
-        var ps = tran.gameObject.getComponent("ParticleSystem");
-        if (!ps)
-            ps = tran.gameObject.addComponent("ParticleSystem");
         ps.material = mat;
-        gd3d.framework.ClassUtils.addClassNameSpace("gd3d.framework");
-        gd3d.framework.serialization.setValue(ps, pd);
-        ps.play();
     };
     test_ParticleSystem.prototype.update = function (delta) {
     };

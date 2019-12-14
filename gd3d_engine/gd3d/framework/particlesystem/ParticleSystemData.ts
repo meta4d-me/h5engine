@@ -43,13 +43,13 @@ namespace gd3d.framework
         }
         set value(v)
         {
+            this._value = v;
+
             if (ParticleSystemData._datas[v])
             {
-                debugger;
                 console.log(`重复创建粒子系统资源 ${v}`);
+                return;
             }
-
-            this._value = v;
             ParticleSystemData._datas[v] = this;
         }
         private _value: string;
@@ -139,8 +139,13 @@ namespace gd3d.framework
 
         setData(v: string)
         {
-            var obj = JSON.parse(v);
-            serialization.setValue(this.particleSystem, obj);
+            this.objectData = JSON.parse(v);
+            if (this.particleSystem)
+            {
+                serialization.setValue(this.particleSystem, this.objectData);
+            }
         }
+
+        objectData: any;
     }
 }

@@ -302,8 +302,15 @@ namespace gd3d.framework
 
         set particleSystemData(v)
         {
-            this._particleSystemData = v;
-            v.particleSystem = this;
+            var data = ParticleSystemData.get(v.value);
+            if (data.objectData)
+            {
+                serialization.setValue(this, data.objectData);
+            }else
+            {
+                data.particleSystem = this;
+            }
+            this._particleSystemData = data;
         }
         private _particleSystemData: ParticleSystemData;
 

@@ -30317,8 +30317,14 @@ var gd3d;
                     return this._particleSystemData;
                 },
                 set: function (v) {
-                    this._particleSystemData = v;
-                    v.particleSystem = this;
+                    var data = framework.ParticleSystemData.get(v.value);
+                    if (data.objectData) {
+                        framework.serialization.setValue(this, data.objectData);
+                    }
+                    else {
+                        data.particleSystem = this;
+                    }
+                    this._particleSystemData = data;
                 },
                 enumerable: true,
                 configurable: true
@@ -30771,11 +30777,11 @@ var gd3d;
                     return this._value;
                 },
                 set: function (v) {
-                    if (ParticleSystemData_1._datas[v]) {
-                        debugger;
-                        console.log("\u91CD\u590D\u521B\u5EFA\u7C92\u5B50\u7CFB\u7EDF\u8D44\u6E90 " + v);
-                    }
                     this._value = v;
+                    if (ParticleSystemData_1._datas[v]) {
+                        console.log("\u91CD\u590D\u521B\u5EFA\u7C92\u5B50\u7CFB\u7EDF\u8D44\u6E90 " + v);
+                        return;
+                    }
                     ParticleSystemData_1._datas[v] = this;
                 },
                 enumerable: true,
@@ -30804,8 +30810,10 @@ var gd3d;
                 return total;
             };
             ParticleSystemData.prototype.setData = function (v) {
-                var obj = JSON.parse(v);
-                framework.serialization.setValue(this.particleSystem, obj);
+                this.objectData = JSON.parse(v);
+                if (this.particleSystem) {
+                    framework.serialization.setValue(this.particleSystem, this.objectData);
+                }
             };
             var ParticleSystemData_1;
             ParticleSystemData.ClassName = "ParticleSystemData";
@@ -38047,7 +38055,7 @@ var gd3d;
         else if (typeof global != "undefined") {
             _global = global;
         }
-        var _classNameSpaces = ["feng3d"];
+        var _classNameSpaces = ["gd3d.framework"];
         function registerClass(classDefinition, className) {
             var prototype = classDefinition.prototype;
             Object.defineProperty(prototype, CLASS_KEY, { value: className, writable: true });
