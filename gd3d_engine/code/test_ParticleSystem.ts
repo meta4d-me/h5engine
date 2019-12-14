@@ -20,14 +20,16 @@ class test_ParticleSystem implements IState
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
-
+    // res : string = "Cube";
+    res : string = "ParticleSystem";
     async start(app: gd3d.framework.application)
     {
         this.app = app;
         this.scene = this.app.getScene();
         this.astMgr = this.app.getAssetMgr();
-        // await demoTool.loadbySync(`newRes/shader/shader.assetbundle.json`,this.astMgr);
-        // await demoTool.loadbySync(`res/f14effprefab/customShader/customShader.assetbundle.json`,this.astMgr);
+        await demoTool.loadbySync(`res/f14effprefab/customShader/customShader.assetbundle.json`,this.astMgr);
+
+        await demoTool.loadbySync(`res/prefabs/${this.res}/${this.res}.assetbundle.json`,this.astMgr);
         //res/f14effprefab/customShader/customShader.assetbundle.json
         //
         this.init();
@@ -41,7 +43,7 @@ class test_ParticleSystem implements IState
         this.scene.addChild(objCam);
         this.camera = objCam.gameObject.addComponent("camera") as gd3d.framework.camera;
         this.camera.near = 0.01;
-        this.camera.far = 120;
+        this.camera.far = 1000;
         this.camera.fov = Math.PI / 3;
         this.camera.backgroundColor = new gd3d.math.color(0.2784, 0.2784, 0.2784, 1);
         objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
@@ -54,7 +56,13 @@ class test_ParticleSystem implements IState
         hoverc.scaleSpeed = 0.1;
         hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0)
 
-        this.initParticleSystem();
+        // this.initParticleSystem();
+
+        //load res to secnen
+        let cubeP = this.astMgr.getAssetByName( `${this.res}.prefab.json` , `${this.res}.assetbundle.json`) as gd3d.framework.prefab;
+        let cubeTran = cubeP.getCloneTrans();
+
+        this.scene.addChild(cubeTran);
     }
 
     private initParticleSystem()

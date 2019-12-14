@@ -1510,7 +1510,8 @@ declare namespace gd3d.framework {
         DDS = 21,
         Scene = 22,
         Prefab = 23,
-        cPrefab = 24
+        cPrefab = 24,
+        ParticleSystem = 25
     }
     class ResourceState {
         res: IAsset;
@@ -1835,6 +1836,11 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class AssetFactory_Mesh implements IAssetFactory {
         parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: ArrayBuffer): threading.gdPromise<mesh>;
+    }
+}
+declare namespace gd3d.framework {
+    class AssetFactory_ParticleSystem implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, txt: string): ParticleSystemData;
     }
 }
 declare namespace gd3d.framework {
@@ -5741,6 +5747,8 @@ declare namespace gd3d.framework {
         material: material;
         readonly single: boolean;
         startDelay: number;
+        particleSystemData: ParticleSystemData;
+        private _particleSystemData;
         onPlay(): void;
         start(): void;
         remove(): void;
@@ -5783,6 +5791,27 @@ declare namespace gd3d.framework {
         speed: math.vector3;
         localToWorldMatrix: math.matrix;
         worldToLocalMatrix: math.matrix;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleSystemData implements IAsset {
+        static readonly ClassName: string;
+        private static _datas;
+        particleSystem: ParticleSystem;
+        static get(valueName: string): ParticleSystemData;
+        private name;
+        private id;
+        defaultAsset: boolean;
+        value: string;
+        private _value;
+        constructor(assetName?: string);
+        getName(): string;
+        getGUID(): number;
+        dispose(): void;
+        use(): void;
+        unuse(disposeNow?: boolean): void;
+        caclByteLength(): number;
+        setData(v: string): void;
     }
 }
 declare namespace gd3d.framework {

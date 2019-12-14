@@ -19,7 +19,7 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class ParticleSystem implements IRenderer
     {
-        static readonly ClassName: string = "ParticleSystem";
+        static readonly ClassName: string = "particlesystem";
 
         __class__: "gd3d.framework.ParticleSystem";
 
@@ -293,6 +293,19 @@ namespace gd3d.framework
          * 启动延迟(以秒为单位)。在调用.play()时初始化值。
          */
         startDelay = 0;
+
+        @gd3d.reflect.Field("ParticleSystemData")
+        get particleSystemData()
+        {
+            return this._particleSystemData;
+        }
+
+        set particleSystemData(v)
+        {
+            this._particleSystemData = v;
+            v.particleSystem = this;
+        }
+        private _particleSystemData: ParticleSystemData;
 
         onPlay()
         {

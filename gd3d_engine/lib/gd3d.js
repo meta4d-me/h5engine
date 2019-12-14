@@ -8333,6 +8333,7 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["Scene"] = 22] = "Scene";
             AssetTypeEnum[AssetTypeEnum["Prefab"] = 23] = "Prefab";
             AssetTypeEnum[AssetTypeEnum["cPrefab"] = 24] = "cPrefab";
+            AssetTypeEnum[AssetTypeEnum["ParticleSystem"] = 25] = "ParticleSystem";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
         var ResourceState = (function () {
             function ResourceState() {
@@ -8671,6 +8672,8 @@ var gd3d;
                         return framework.AssetTypeEnum.DDS;
                     case ".keyframeAniclip.json":
                         return framework.AssetTypeEnum.KeyFrameAniclip;
+                    case ".particlesystem.json":
+                        return framework.AssetTypeEnum.ParticleSystem;
                 }
                 i = file.indexOf(".", i + 1);
             }
@@ -9767,6 +9770,26 @@ var gd3d;
             return AssetFactory_Mesh;
         }());
         framework.AssetFactory_Mesh = AssetFactory_Mesh;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_ParticleSystem = (function () {
+            function AssetFactory_ParticleSystem() {
+            }
+            AssetFactory_ParticleSystem.prototype.parse = function (assetmgr, bundle, name, txt) {
+                var data = framework.ParticleSystemData.get(name);
+                data.setData(txt);
+                return data;
+            };
+            AssetFactory_ParticleSystem = __decorate([
+                framework.assetF(framework.AssetTypeEnum.ParticleSystem)
+            ], AssetFactory_ParticleSystem);
+            return AssetFactory_ParticleSystem;
+        }());
+        framework.AssetFactory_ParticleSystem = AssetFactory_ParticleSystem;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -30289,6 +30312,17 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(ParticleSystem.prototype, "particleSystemData", {
+                get: function () {
+                    return this._particleSystemData;
+                },
+                set: function (v) {
+                    this._particleSystemData = v;
+                    v.particleSystem = this;
+                },
+                enumerable: true,
+                configurable: true
+            });
             ParticleSystem.prototype.onPlay = function () {
             };
             ParticleSystem.prototype.start = function () {
@@ -30687,7 +30721,7 @@ var gd3d;
                     particle.acceleration.z -= value.z;
                 }
             };
-            ParticleSystem.ClassName = "ParticleSystem";
+            ParticleSystem.ClassName = "particlesystem";
             __decorate([
                 gd3d.reflect.Field("mesh"),
                 gd3d.reflect.UIStyle("WidgetDragSelect"),
@@ -30698,6 +30732,11 @@ var gd3d;
                 gd3d.reflect.Field("material"),
                 __metadata("design:type", framework.material)
             ], ParticleSystem.prototype, "material", void 0);
+            __decorate([
+                gd3d.reflect.Field("ParticleSystemData"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleSystem.prototype, "particleSystemData", null);
             ParticleSystem = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
@@ -30706,6 +30745,82 @@ var gd3d;
             return ParticleSystem;
         }());
         framework.ParticleSystem = ParticleSystem;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemData = (function () {
+            function ParticleSystemData(assetName) {
+                if (assetName === void 0) { assetName = null; }
+                this.name = null;
+                this.id = new framework.resID();
+                this.defaultAsset = false;
+                if (!assetName) {
+                    assetName = "ParticleSystem_" + this.getGUID();
+                }
+                this.name = new framework.constText(assetName);
+            }
+            ParticleSystemData_1 = ParticleSystemData;
+            ParticleSystemData.get = function (valueName) {
+                return this._datas[valueName];
+            };
+            Object.defineProperty(ParticleSystemData.prototype, "value", {
+                get: function () {
+                    return this._value;
+                },
+                set: function (v) {
+                    if (ParticleSystemData_1._datas[v]) {
+                        debugger;
+                        console.log("\u91CD\u590D\u521B\u5EFA\u7C92\u5B50\u7CFB\u7EDF\u8D44\u6E90 " + v);
+                    }
+                    this._value = v;
+                    ParticleSystemData_1._datas[v] = this;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleSystemData.prototype.getName = function () {
+                if (this.name == undefined) {
+                    return null;
+                }
+                return this.name.getText();
+            };
+            ParticleSystemData.prototype.getGUID = function () {
+                return this.id.getID();
+            };
+            ParticleSystemData.prototype.dispose = function () {
+            };
+            ParticleSystemData.prototype.use = function () {
+                framework.sceneMgr.app.getAssetMgr().use(this);
+            };
+            ParticleSystemData.prototype.unuse = function (disposeNow) {
+                if (disposeNow === void 0) { disposeNow = false; }
+                framework.sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
+            };
+            ParticleSystemData.prototype.caclByteLength = function () {
+                var total = 0;
+                return total;
+            };
+            ParticleSystemData.prototype.setData = function (v) {
+                var obj = JSON.parse(v);
+                framework.serialization.setValue(this.particleSystem, obj);
+            };
+            var ParticleSystemData_1;
+            ParticleSystemData.ClassName = "ParticleSystemData";
+            ParticleSystemData._datas = {};
+            __decorate([
+                gd3d.reflect.Field("constText"),
+                __metadata("design:type", framework.constText)
+            ], ParticleSystemData.prototype, "name", void 0);
+            ParticleSystemData = ParticleSystemData_1 = __decorate([
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [String])
+            ], ParticleSystemData);
+            return ParticleSystemData;
+        }());
+        framework.ParticleSystemData = ParticleSystemData;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
