@@ -30505,7 +30505,12 @@ var gd3d;
                 }
             };
             ParticleSystem.prototype._getVBO = function (gl) {
+                for (var i = 0, n = this._vbos.length; i < n; i++) {
+                    if (this._vbos[i][0] == gl)
+                        return this._vbos[i][1];
+                }
                 var vbo = gl.createBuffer();
+                this._vbos.push([gl, vbo]);
                 return vbo;
             };
             Object.defineProperty(ParticleSystem.prototype, "rateAtDuration", {

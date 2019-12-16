@@ -1,3 +1,5 @@
+/// <reference path="../lib/dat.gui.d.ts" />
+
 namespace gd3d.math
 {
     export interface color
@@ -20,22 +22,42 @@ class test_ParticleSystem implements IState
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
-    // res: string = "ParticleSystem";
-    // res: string = "Fire";
-    res: string = "Flames";
+
+    private _particles = ["ParticleSystem", "Fire", "Flames"];
+    private _particle: gd3d.framework.transform;
+
     async start(app: gd3d.framework.application)
     {
         this.app = app;
         this.scene = this.app.getScene();
         this.astMgr = this.app.getAssetMgr();
-        await demoTool.loadbySync(`newRes/shader/MainShader.assetbundle.json`, this.astMgr);
-        // await demoTool.loadbySync(`res/f14effprefab/customShader/customShader.assetbundle.json`, this.astMgr);
 
-        await demoTool.loadbySync(`res/prefabs/${this.res}/${this.res}.assetbundle.json`, this.astMgr);
-        //res/f14effprefab/customShader/customShader.assetbundle.json
+        await demoTool.loadbySync(`newRes/shader/MainShader.assetbundle.json`, this.astMgr);
+        await datGui.init();
+
+        //
+        this.setGUI();
         //
         this.init();
     }
+
+    setGUI()
+    {
+        if (!dat) return;
+        let gui = new dat.GUI();
+        gui.add(this, 'particleName', this._particles);
+    }
+
+    private get particleName()
+    {
+        return this._particleName;
+    }
+    private set particleName(v)
+    {
+        this._showParticle(v);
+        this._particleName = v;
+    }
+    private _particleName = "ParticleSystem";
 
     private init()
     {
@@ -54,19 +76,26 @@ class test_ParticleSystem implements IState
         let hoverc = this.camera.gameObject.addComponent("HoverCameraScript") as gd3d.framework.HoverCameraScript;
         hoverc.panAngle = 180;
         hoverc.tiltAngle = 45;
-        hoverc.distance = 30;
+        hoverc.distance = 10;
         hoverc.scaleSpeed = 0.1;
-        hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0)
+        hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0)
 
-        this.initParticleSystem0();
+        this._showParticle(this._particles[0]);
         // this.initParticleSystem();
     }
 
-    private initParticleSystem0()
+    private async _showParticle(res: string)
     {
-        //load res to secnen
-        let cubeP = this.astMgr.getAssetByName(`${this.res}.prefab.json`, `${this.res}.assetbundle.json`) as gd3d.framework.prefab;
-        let cubeTran = cubeP.getCloneTrans();
+        if (this._particle)
+        {
+            this.scene.removeChild(this._particle);
+            this._particle = null;
+        }
+
+        await demoTool.loadbySync(`res/prefabs/${res}/${res}.assetbundle.json`, this.astMgr);
+
+        let cubeP = this.astMgr.getAssetByName(`${res}.prefab.json`, `${res}.assetbundle.json`) as gd3d.framework.prefab;
+        let cubeTran = this._particle = cubeP.getCloneTrans();
 
         this.scene.addChild(cubeTran);
 
@@ -75,6 +104,7 @@ class test_ParticleSystem implements IState
         {
             ps.play();
         }
+
     }
 
     private initParticleSystem()

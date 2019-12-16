@@ -622,13 +622,13 @@ namespace gd3d.framework
         private _vbos: [WebGLRenderingContext, WebGLBuffer][] = [];
         private _getVBO(gl: WebGLRenderingContext)
         {
-            // for (let i = 0, n = this._vbos.length; i < n; i++)
-            // {
-            //     if (this._vbos[i][0] == gl)
-            //         return this._vbos[i][1];
-            // }
+            for (let i = 0, n = this._vbos.length; i < n; i++)
+            {
+                if (this._vbos[i][0] == gl)
+                    return this._vbos[i][1];
+            }
             var vbo = gl.createBuffer();
-            // this._vbos.push([gl, vbo]);
+            this._vbos.push([gl, vbo]);
             return vbo;
         }
 

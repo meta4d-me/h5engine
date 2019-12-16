@@ -3899,7 +3899,8 @@ var test_Decal = (function () {
 }());
 var test_ParticleSystem = (function () {
     function test_ParticleSystem() {
-        this.res = "Flames";
+        this._particles = ["ParticleSystem", "Fire", "Flames"];
+        this._particleName = "ParticleSystem";
     }
     test_ParticleSystem.prototype.start = function (app) {
         return __awaiter(this, void 0, void 0, function () {
@@ -3912,15 +3913,33 @@ var test_ParticleSystem = (function () {
                         return [4, demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", this.astMgr)];
                     case 1:
                         _a.sent();
-                        return [4, demoTool.loadbySync("res/prefabs/" + this.res + "/" + this.res + ".assetbundle.json", this.astMgr)];
+                        return [4, datGui.init()];
                     case 2:
                         _a.sent();
+                        this.setGUI();
                         this.init();
                         return [2];
                 }
             });
         });
     };
+    test_ParticleSystem.prototype.setGUI = function () {
+        if (!dat)
+            return;
+        var gui = new dat.GUI();
+        gui.add(this, 'particleName', this._particles);
+    };
+    Object.defineProperty(test_ParticleSystem.prototype, "particleName", {
+        get: function () {
+            return this._particleName;
+        },
+        set: function (v) {
+            this._showParticle(v);
+            this._particleName = v;
+        },
+        enumerable: true,
+        configurable: true
+    });
     test_ParticleSystem.prototype.init = function () {
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
@@ -3935,19 +3954,35 @@ var test_ParticleSystem = (function () {
         var hoverc = this.camera.gameObject.addComponent("HoverCameraScript");
         hoverc.panAngle = 180;
         hoverc.tiltAngle = 45;
-        hoverc.distance = 30;
+        hoverc.distance = 10;
         hoverc.scaleSpeed = 0.1;
-        hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0);
-        this.initParticleSystem0();
+        hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0);
+        this._showParticle(this._particles[0]);
     };
-    test_ParticleSystem.prototype.initParticleSystem0 = function () {
-        var cubeP = this.astMgr.getAssetByName(this.res + ".prefab.json", this.res + ".assetbundle.json");
-        var cubeTran = cubeP.getCloneTrans();
-        this.scene.addChild(cubeTran);
-        var ps = cubeTran.gameObject.getComponent("ParticleSystem");
-        if (ps) {
-            ps.play();
-        }
+    test_ParticleSystem.prototype._showParticle = function (res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var cubeP, cubeTran, ps;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (this._particle) {
+                            this.scene.removeChild(this._particle);
+                            this._particle = null;
+                        }
+                        return [4, demoTool.loadbySync("res/prefabs/" + res + "/" + res + ".assetbundle.json", this.astMgr)];
+                    case 1:
+                        _a.sent();
+                        cubeP = this.astMgr.getAssetByName(res + ".prefab.json", res + ".assetbundle.json");
+                        cubeTran = this._particle = cubeP.getCloneTrans();
+                        this.scene.addChild(cubeTran);
+                        ps = cubeTran.gameObject.getComponent("ParticleSystem");
+                        if (ps) {
+                            ps.play();
+                        }
+                        return [2];
+                }
+            });
+        });
     };
     test_ParticleSystem.prototype.initParticleSystem = function () {
         var tran = new gd3d.framework.transform();
