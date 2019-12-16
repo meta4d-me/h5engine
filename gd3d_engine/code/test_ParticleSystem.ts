@@ -58,8 +58,12 @@ class test_ParticleSystem implements IState
         hoverc.scaleSpeed = 0.1;
         hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0)
 
+        this.initParticleSystem0();
         // this.initParticleSystem();
+    }
 
+    private initParticleSystem0()
+    {
         //load res to secnen
         let cubeP = this.astMgr.getAssetByName(`${this.res}.prefab.json`, `${this.res}.assetbundle.json`) as gd3d.framework.prefab;
         let cubeTran = cubeP.getCloneTrans();
@@ -69,34 +73,37 @@ class test_ParticleSystem implements IState
         let ps = cubeTran.gameObject.getComponent("ParticleSystem") as gd3d.framework.ParticleSystem;
         if (ps)
         {
-            // this.initParticleSystem(ps);
             ps.play();
         }
     }
 
-    private initParticleSystem(ps: gd3d.framework.ParticleSystem)
+    private initParticleSystem()
     {
+        let tran = new gd3d.framework.transform();
+        tran.name = "ParticleSystem";
+        gd3d.math.quatFromAxisAngle(new gd3d.math.vector3(1, 0, 0), -90, tran.localRotate);
+        tran.localRotate = tran.localRotate;
+        // tran.localPosition = new gd3d.math.vector3(-7.2, 0.29, 2.826);
+        this.scene.addChild(tran);
+
         // 新建粒子材质
         var mat = new gd3d.framework.material("defparticle1");
+        var shader = test_ParticleSystem_particles_additive_drawInstanced.initShader(this.astMgr, this.astMgr.shaderPool);
         // var shader = test_ParticleSystem_particles_additive.initShader(this.astMgr, this.astMgr.shaderPool);
-        // var shader0 = test_ParticleSystem_particles_additive_drawInstanced.initShader(this.astMgr, this.astMgr.shaderPool);
-
-        var shader = this.astMgr.getShader("particlesystem_additive.shader.json")
         mat.setShader(shader);
 
         var tex = this.astMgr.getDefaultTexture(gd3d.framework.defTexture.particle);
         mat.setTexture("_MainTex", tex);
         //
+        let ps = tran.gameObject.getComponent("particlesystem") as gd3d.framework.ParticleSystem;
+        if (!ps) ps = tran.gameObject.addComponent("particlesystem") as any;
         //
         ps.material = mat;
-        // ps.mesh = this.astMgr.getDefaultMesh("cube");
 
-        // gd3d.framework.ClassUtils.addClassNameSpace("gd3d.framework");
-
-        // gd3d.framework.serialization.setValue(ps, pd);
+        gd3d.framework.serialization.setValue(ps, pd);
 
         //
-        // ps.play();
+        ps.play();
     }
 
     update(delta: number)

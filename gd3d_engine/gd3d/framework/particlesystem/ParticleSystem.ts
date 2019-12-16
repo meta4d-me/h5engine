@@ -306,7 +306,7 @@ namespace gd3d.framework
             if (data.objectData)
             {
                 serialization.setValue(this, data.objectData);
-            }else
+            } else
             {
                 data.particleSystem = this;
             }
@@ -520,12 +520,21 @@ namespace gd3d.framework
                 var cameraUp = new math.vector3();
                 camera.gameObject.transform.getForwardInWorld(cameraForward);
                 camera.gameObject.transform.getUpInWorld(cameraUp);
-                math.matrixTransformNormal(cameraForward, this.worldToLocalMatrix, cameraForward);
-                math.matrixTransformNormal(cameraUp, this.worldToLocalMatrix, cameraUp);
+                if (this.main.simulationSpace == ParticleSystemSimulationSpace.Local)
+                {
+                    math.matrixTransformNormal(cameraForward, this.worldToLocalMatrix, cameraForward);
+                    math.matrixTransformNormal(cameraUp, this.worldToLocalMatrix, cameraUp);
+                }
+
                 math.matrixLookat(new math.vector3(), cameraForward, cameraUp, billboardMatrix);
             }
 
             this.material.setMatrix("u_particle_billboardMatrix", billboardMatrix);
+
+            if (this.main.simulationSpace == ParticleSystemSimulationSpace.World)
+            {
+                gd3d.math.matrixClone(context.matrixViewProject, context.matrixModelViewProject);
+            }
 
             if (!isSupportDrawInstancedArrays)
             {

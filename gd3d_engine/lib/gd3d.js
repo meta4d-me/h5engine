@@ -30439,11 +30439,16 @@ var gd3d;
                     var cameraUp = new gd3d.math.vector3();
                     camera.gameObject.transform.getForwardInWorld(cameraForward);
                     camera.gameObject.transform.getUpInWorld(cameraUp);
-                    gd3d.math.matrixTransformNormal(cameraForward, this.worldToLocalMatrix, cameraForward);
-                    gd3d.math.matrixTransformNormal(cameraUp, this.worldToLocalMatrix, cameraUp);
+                    if (this.main.simulationSpace == framework.ParticleSystemSimulationSpace.Local) {
+                        gd3d.math.matrixTransformNormal(cameraForward, this.worldToLocalMatrix, cameraForward);
+                        gd3d.math.matrixTransformNormal(cameraUp, this.worldToLocalMatrix, cameraUp);
+                    }
                     gd3d.math.matrixLookat(new gd3d.math.vector3(), cameraForward, cameraUp, billboardMatrix);
                 }
                 this.material.setMatrix("u_particle_billboardMatrix", billboardMatrix);
+                if (this.main.simulationSpace == framework.ParticleSystemSimulationSpace.World) {
+                    gd3d.math.matrixClone(context.matrixViewProject, context.matrixModelViewProject);
+                }
                 if (!isSupportDrawInstancedArrays) {
                     for (var i = 0, n = this._activeParticles.length; i < n; i++) {
                         var particle = this._activeParticles[i];

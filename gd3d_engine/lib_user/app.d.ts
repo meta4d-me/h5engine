@@ -626,6 +626,7 @@ declare class test_ParticleSystem implements IState {
     res: string;
     start(app: gd3d.framework.application): Promise<void>;
     private init;
+    private initParticleSystem0;
     private initParticleSystem;
     update(delta: number): void;
 }
