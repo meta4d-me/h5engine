@@ -133,7 +133,7 @@ namespace gd3d.math
         return true;
     }
 
-    export function matrixGetEuler(src: matrix, order: framework.RotationOrder, rotation: vector3): void
+    export function matrixGetEuler(src: matrix, order: RotationOrder, rotation: vector3): void
     {
         var clamp = math.floatClamp;
         //
@@ -155,7 +155,7 @@ namespace gd3d.math
         m23 /= scaleZ;
         m33 /= scaleZ;
         //
-        if (order === framework.RotationOrder.XYZ)
+        if (order === RotationOrder.XYZ)
         {
             rotation.y = Math.asin(clamp(m13, - 1, 1));
             if (Math.abs(m13) < 0.9999999)
@@ -167,7 +167,7 @@ namespace gd3d.math
                 rotation.x = Math.atan2(m32, m22);
                 rotation.z = 0;
             }
-        } else if (order === framework.RotationOrder.YXZ)
+        } else if (order === RotationOrder.YXZ)
         {
             rotation.x = Math.asin(- clamp(m23, - 1, 1));
             if (Math.abs(m23) < 0.9999999)
@@ -179,7 +179,7 @@ namespace gd3d.math
                 rotation.y = Math.atan2(- m31, m11);
                 rotation.z = 0;
             }
-        } else if (order === framework.RotationOrder.ZXY)
+        } else if (order === RotationOrder.ZXY)
         {
             rotation.x = Math.asin(clamp(m32, - 1, 1));
             if (Math.abs(m32) < 0.9999999)
@@ -191,7 +191,7 @@ namespace gd3d.math
                 rotation.y = 0;
                 rotation.z = Math.atan2(m21, m11);
             }
-        } else if (order === framework.RotationOrder.ZYX)
+        } else if (order === RotationOrder.ZYX)
         {
             rotation.y = Math.asin(- clamp(m31, - 1, 1));
             if (Math.abs(m31) < 0.9999999)
@@ -203,7 +203,7 @@ namespace gd3d.math
                 rotation.x = 0;
                 rotation.z = Math.atan2(- m12, m22);
             }
-        } else if (order === framework.RotationOrder.YZX)
+        } else if (order === RotationOrder.YZX)
         {
             rotation.z = Math.asin(clamp(m21, - 1, 1));
             if (Math.abs(m21) < 0.9999999)
@@ -215,7 +215,7 @@ namespace gd3d.math
                 rotation.x = 0;
                 rotation.y = Math.atan2(m13, m33);
             }
-        } else if (order === framework.RotationOrder.XZY)
+        } else if (order === RotationOrder.XZY)
         {
             rotation.z = Math.asin(- clamp(m12, - 1, 1));
             if (Math.abs(m12) < 0.9999999)
@@ -601,7 +601,7 @@ namespace gd3d.math
      * @param order 旋转顺序
      * @param out 输出矩阵
      */
-    export function matrixMakeEuler(rotation: vector3, order: framework.RotationOrder, out: matrix)
+    export function matrixMakeEuler(rotation: vector3, order: RotationOrder, out: matrix)
     {
         var te = out.rawData;
         //
@@ -613,7 +613,7 @@ namespace gd3d.math
         var cosY = Math.cos(ry), sinY = Math.sin(ry);
         var cosZ = Math.cos(rz), sinZ = Math.sin(rz);
 
-        if (order === framework.RotationOrder.XYZ)
+        if (order === RotationOrder.XYZ)
         {
             var ae = cosX * cosZ, af = cosX * sinZ, be = sinX * cosZ, bf = sinX * sinZ;
 
@@ -629,7 +629,7 @@ namespace gd3d.math
             te[6] = be + af * sinY;
             te[10] = cosX * cosY;
 
-        } else if (order === framework.RotationOrder.YXZ)
+        } else if (order === RotationOrder.YXZ)
         {
             var ce = cosY * cosZ, cf = cosY * sinZ, de = sinY * cosZ, df = sinY * sinZ;
 
@@ -645,7 +645,7 @@ namespace gd3d.math
             te[6] = df + ce * sinX;
             te[10] = cosX * cosY;
 
-        } else if (order === framework.RotationOrder.ZXY)
+        } else if (order === RotationOrder.ZXY)
         {
             var ce = cosY * cosZ, cf = cosY * sinZ, de = sinY * cosZ, df = sinY * sinZ;
 
@@ -661,7 +661,7 @@ namespace gd3d.math
             te[6] = sinX;
             te[10] = cosX * cosY;
 
-        } else if (order === framework.RotationOrder.ZYX)
+        } else if (order === RotationOrder.ZYX)
         {
             var ae = cosX * cosZ, af = cosX * sinZ, be = sinX * cosZ, bf = sinX * sinZ;
 
@@ -677,7 +677,7 @@ namespace gd3d.math
             te[6] = sinX * cosY;
             te[10] = cosX * cosY;
 
-        } else if (order === framework.RotationOrder.YZX)
+        } else if (order === RotationOrder.YZX)
         {
             var ac = cosX * cosY, ad = cosX * sinY, bc = sinX * cosY, bd = sinX * sinY;
 
@@ -693,7 +693,7 @@ namespace gd3d.math
             te[6] = ad * sinZ + bc;
             te[10] = ac - bd * sinZ;
 
-        } else if (order === framework.RotationOrder.XZY)
+        } else if (order === RotationOrder.XZY)
         {
             var ac = cosX * cosY, ad = cosX * sinY, bc = sinX * cosY, bd = sinX * sinY;
 
@@ -959,6 +959,66 @@ namespace gd3d.math
         out.rawData[14] = nid;
         out.rawData[15] = 1;
     }
+
+    /**
+     * 看向目标位置
+     * 
+     * @param position  所在位置
+     * @param target    目标位置
+     * @param upAxis    向上朝向
+     */
+    export function matrixLookat(position:vector3, target: vector3, upAxis: vector3, out: matrix)
+    {
+        //
+        var xAxis = new vector3();
+        var yAxis = new vector3();
+        var zAxis = new vector3();
+
+        upAxis = upAxis || new vector3(0,1,0);
+
+        zAxis.x = target.x - position.x;
+        zAxis.y = target.y - position.y;
+        zAxis.z = target.z - position.z;
+        math.vec3Normalize(zAxis,zAxis);
+
+        xAxis.x = upAxis.y * zAxis.z - upAxis.z * zAxis.y;
+        xAxis.y = upAxis.z * zAxis.x - upAxis.x * zAxis.z;
+        xAxis.z = upAxis.x * zAxis.y - upAxis.y * zAxis.x;
+        math.vec3Normalize(xAxis,xAxis);
+
+        if (math.vec3SqrLength(xAxis) < .005)
+        {
+            xAxis.x = upAxis.y;
+            xAxis.y = upAxis.x;
+            xAxis.z = 0;
+            math.vec3Normalize(xAxis,xAxis);
+        }
+
+        yAxis.x = zAxis.y * xAxis.z - zAxis.z * xAxis.y;
+        yAxis.y = zAxis.z * xAxis.x - zAxis.x * xAxis.z;
+        yAxis.z = zAxis.x * xAxis.y - zAxis.y * xAxis.x;
+
+        out.rawData[0] = xAxis.x;
+        out.rawData[1] = xAxis.y;
+        out.rawData[2] = xAxis.z;
+        out.rawData[3] = 0;
+
+        out.rawData[4] = yAxis.x;
+        out.rawData[5] = yAxis.y;
+        out.rawData[6] = yAxis.z;
+        out.rawData[7] = 0;
+
+        out.rawData[8] = zAxis.x;
+        out.rawData[9] = zAxis.y;
+        out.rawData[10] = zAxis.z;
+        out.rawData[11] = 0;
+
+        out.rawData[12] = position.x;
+        out.rawData[13] = position.y;
+        out.rawData[14] = position.z;
+        out.rawData[15] = 1;
+    }
+
     //lights fix
     export function matrixLookatLH(forward: vector3, up: vector3, out: matrix)
     {

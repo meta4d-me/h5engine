@@ -6428,7 +6428,7 @@ var gd3d;
             m13 /= scaleZ;
             m23 /= scaleZ;
             m33 /= scaleZ;
-            if (order === gd3d.framework.RotationOrder.XYZ) {
+            if (order === math.RotationOrder.XYZ) {
                 rotation.y = Math.asin(clamp(m13, -1, 1));
                 if (Math.abs(m13) < 0.9999999) {
                     rotation.x = Math.atan2(-m23, m33);
@@ -6439,7 +6439,7 @@ var gd3d;
                     rotation.z = 0;
                 }
             }
-            else if (order === gd3d.framework.RotationOrder.YXZ) {
+            else if (order === math.RotationOrder.YXZ) {
                 rotation.x = Math.asin(-clamp(m23, -1, 1));
                 if (Math.abs(m23) < 0.9999999) {
                     rotation.y = Math.atan2(m13, m33);
@@ -6450,7 +6450,7 @@ var gd3d;
                     rotation.z = 0;
                 }
             }
-            else if (order === gd3d.framework.RotationOrder.ZXY) {
+            else if (order === math.RotationOrder.ZXY) {
                 rotation.x = Math.asin(clamp(m32, -1, 1));
                 if (Math.abs(m32) < 0.9999999) {
                     rotation.y = Math.atan2(-m31, m33);
@@ -6461,7 +6461,7 @@ var gd3d;
                     rotation.z = Math.atan2(m21, m11);
                 }
             }
-            else if (order === gd3d.framework.RotationOrder.ZYX) {
+            else if (order === math.RotationOrder.ZYX) {
                 rotation.y = Math.asin(-clamp(m31, -1, 1));
                 if (Math.abs(m31) < 0.9999999) {
                     rotation.x = Math.atan2(m32, m33);
@@ -6472,7 +6472,7 @@ var gd3d;
                     rotation.z = Math.atan2(-m12, m22);
                 }
             }
-            else if (order === gd3d.framework.RotationOrder.YZX) {
+            else if (order === math.RotationOrder.YZX) {
                 rotation.z = Math.asin(clamp(m21, -1, 1));
                 if (Math.abs(m21) < 0.9999999) {
                     rotation.x = Math.atan2(-m23, m22);
@@ -6483,7 +6483,7 @@ var gd3d;
                     rotation.y = Math.atan2(m13, m33);
                 }
             }
-            else if (order === gd3d.framework.RotationOrder.XZY) {
+            else if (order === math.RotationOrder.XZY) {
                 rotation.z = Math.asin(-clamp(m12, -1, 1));
                 if (Math.abs(m12) < 0.9999999) {
                     rotation.x = Math.atan2(m32, m22);
@@ -6824,7 +6824,7 @@ var gd3d;
             var cosX = Math.cos(rx), sinX = Math.sin(rx);
             var cosY = Math.cos(ry), sinY = Math.sin(ry);
             var cosZ = Math.cos(rz), sinZ = Math.sin(rz);
-            if (order === gd3d.framework.RotationOrder.XYZ) {
+            if (order === math.RotationOrder.XYZ) {
                 var ae = cosX * cosZ, af = cosX * sinZ, be = sinX * cosZ, bf = sinX * sinZ;
                 te[0] = cosY * cosZ;
                 te[4] = -cosY * sinZ;
@@ -6836,7 +6836,7 @@ var gd3d;
                 te[6] = be + af * sinY;
                 te[10] = cosX * cosY;
             }
-            else if (order === gd3d.framework.RotationOrder.YXZ) {
+            else if (order === math.RotationOrder.YXZ) {
                 var ce = cosY * cosZ, cf = cosY * sinZ, de = sinY * cosZ, df = sinY * sinZ;
                 te[0] = ce + df * sinX;
                 te[4] = de * sinX - cf;
@@ -6848,7 +6848,7 @@ var gd3d;
                 te[6] = df + ce * sinX;
                 te[10] = cosX * cosY;
             }
-            else if (order === gd3d.framework.RotationOrder.ZXY) {
+            else if (order === math.RotationOrder.ZXY) {
                 var ce = cosY * cosZ, cf = cosY * sinZ, de = sinY * cosZ, df = sinY * sinZ;
                 te[0] = ce - df * sinX;
                 te[4] = -cosX * sinZ;
@@ -6860,7 +6860,7 @@ var gd3d;
                 te[6] = sinX;
                 te[10] = cosX * cosY;
             }
-            else if (order === gd3d.framework.RotationOrder.ZYX) {
+            else if (order === math.RotationOrder.ZYX) {
                 var ae = cosX * cosZ, af = cosX * sinZ, be = sinX * cosZ, bf = sinX * sinZ;
                 te[0] = cosY * cosZ;
                 te[4] = be * sinY - af;
@@ -6872,7 +6872,7 @@ var gd3d;
                 te[6] = sinX * cosY;
                 te[10] = cosX * cosY;
             }
-            else if (order === gd3d.framework.RotationOrder.YZX) {
+            else if (order === math.RotationOrder.YZX) {
                 var ac = cosX * cosY, ad = cosX * sinY, bc = sinX * cosY, bd = sinX * sinY;
                 te[0] = cosY * cosZ;
                 te[4] = bd - ac * sinZ;
@@ -6884,7 +6884,7 @@ var gd3d;
                 te[6] = ad * sinZ + bc;
                 te[10] = ac - bd * sinZ;
             }
-            else if (order === gd3d.framework.RotationOrder.XZY) {
+            else if (order === math.RotationOrder.XZY) {
                 var ac = cosX * cosY, ad = cosX * sinY, bc = sinX * cosY, bd = sinX * sinY;
                 te[0] = cosY * cosZ;
                 te[4] = -sinZ;
@@ -7053,6 +7053,46 @@ var gd3d;
             out.rawData[15] = 1;
         }
         math.matrixProject_OrthoLH = matrixProject_OrthoLH;
+        function matrixLookat(position, target, upAxis, out) {
+            var xAxis = new math.vector3();
+            var yAxis = new math.vector3();
+            var zAxis = new math.vector3();
+            upAxis = upAxis || new math.vector3(0, 1, 0);
+            zAxis.x = target.x - position.x;
+            zAxis.y = target.y - position.y;
+            zAxis.z = target.z - position.z;
+            math.vec3Normalize(zAxis, zAxis);
+            xAxis.x = upAxis.y * zAxis.z - upAxis.z * zAxis.y;
+            xAxis.y = upAxis.z * zAxis.x - upAxis.x * zAxis.z;
+            xAxis.z = upAxis.x * zAxis.y - upAxis.y * zAxis.x;
+            math.vec3Normalize(xAxis, xAxis);
+            if (math.vec3SqrLength(xAxis) < .005) {
+                xAxis.x = upAxis.y;
+                xAxis.y = upAxis.x;
+                xAxis.z = 0;
+                math.vec3Normalize(xAxis, xAxis);
+            }
+            yAxis.x = zAxis.y * xAxis.z - zAxis.z * xAxis.y;
+            yAxis.y = zAxis.z * xAxis.x - zAxis.x * xAxis.z;
+            yAxis.z = zAxis.x * xAxis.y - zAxis.y * xAxis.x;
+            out.rawData[0] = xAxis.x;
+            out.rawData[1] = xAxis.y;
+            out.rawData[2] = xAxis.z;
+            out.rawData[3] = 0;
+            out.rawData[4] = yAxis.x;
+            out.rawData[5] = yAxis.y;
+            out.rawData[6] = yAxis.z;
+            out.rawData[7] = 0;
+            out.rawData[8] = zAxis.x;
+            out.rawData[9] = zAxis.y;
+            out.rawData[10] = zAxis.z;
+            out.rawData[11] = 0;
+            out.rawData[12] = position.x;
+            out.rawData[13] = position.y;
+            out.rawData[14] = position.z;
+            out.rawData[15] = 1;
+        }
+        math.matrixLookat = matrixLookat;
         function matrixLookatLH(forward, up, out) {
             var z = math.pool.new_vector3(-forward.x, -forward.y, -forward.z);
             math.vec3Normalize(z, z);
@@ -8293,6 +8333,7 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["Scene"] = 22] = "Scene";
             AssetTypeEnum[AssetTypeEnum["Prefab"] = 23] = "Prefab";
             AssetTypeEnum[AssetTypeEnum["cPrefab"] = 24] = "cPrefab";
+            AssetTypeEnum[AssetTypeEnum["ParticleSystem"] = 25] = "ParticleSystem";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
         var ResourceState = (function () {
             function ResourceState() {
@@ -8631,6 +8672,8 @@ var gd3d;
                         return framework.AssetTypeEnum.DDS;
                     case ".keyframeAniclip.json":
                         return framework.AssetTypeEnum.KeyFrameAniclip;
+                    case ".particlesystem.json":
+                        return framework.AssetTypeEnum.ParticleSystem;
                 }
                 i = file.indexOf(".", i + 1);
             }
@@ -9727,6 +9770,26 @@ var gd3d;
             return AssetFactory_Mesh;
         }());
         framework.AssetFactory_Mesh = AssetFactory_Mesh;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_ParticleSystem = (function () {
+            function AssetFactory_ParticleSystem() {
+            }
+            AssetFactory_ParticleSystem.prototype.parse = function (assetmgr, bundle, name, txt) {
+                var data = framework.ParticleSystemData.get(name);
+                data.setData(txt);
+                return data;
+            };
+            AssetFactory_ParticleSystem = __decorate([
+                framework.assetF(framework.AssetTypeEnum.ParticleSystem)
+            ], AssetFactory_ParticleSystem);
+            return AssetFactory_ParticleSystem;
+        }());
+        framework.AssetFactory_ParticleSystem = AssetFactory_ParticleSystem;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -23145,6 +23208,90 @@ var gd3d;
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
+    var framework;
+    (function (framework) {
+        var EquationSolving = (function () {
+            function EquationSolving() {
+            }
+            EquationSolving.getSign = function (n) {
+                return n > 0 ? "+" : "-";
+            };
+            EquationSolving.equalNumber = function (a, b, precision) {
+                if (precision === void 0) { precision = 0.0000001; }
+                return Math.abs(a - b) < precision;
+            };
+            EquationSolving.getDerivative = function (f, delta) {
+                if (delta === void 0) { delta = 0.000000001; }
+                return function (x) {
+                    var d = (f(x + delta) - f(x)) / delta;
+                    return d;
+                };
+            };
+            EquationSolving.isContinuous = function (f) {
+                return true;
+            };
+            EquationSolving.hasSolution = function (f, a, b, errorcallback) {
+                if (!this.isContinuous(f)) {
+                    errorcallback && errorcallback(new Error("\u51FD\u6570 " + f + " \u5728 [" + a + " ," + b + "] \u533A\u95F4\u5185\u4E0D\u8FDE\u7EED\uFF0C\u65E0\u6CD5\u4E3A\u5176\u6C42\u89E3\uFF01"));
+                    return false;
+                }
+                var fa = f(a);
+                var fb = f(b);
+                if (fa * fb > 0) {
+                    errorcallback && errorcallback(new Error("f(a) * f(b) \u503C\u4E3A " + fa * fb + "\uFF0C\u4E0D\u6EE1\u8DB3 f(a) * f(b) <= 0\uFF0C\u65E0\u6CD5\u4E3A\u5176\u6C42\u89E3\uFF01"));
+                    return false;
+                }
+                return true;
+            };
+            EquationSolving.line = function (f, a, b, precision, errorcallback) {
+                if (precision === void 0) { precision = 0.0000001; }
+                if (!this.hasSolution(f, a, b, errorcallback))
+                    return undefined;
+                var fa = f(a);
+                var fb = f(b);
+                if (this.equalNumber(fa, 0, precision)) {
+                    return a;
+                }
+                if (this.equalNumber(fb, 0, precision)) {
+                    return b;
+                }
+                do {
+                    var x = a - fa * (b - a) / (fb - fa);
+                    var fr = f(x);
+                    if (fa * fr < 0) {
+                        b = x;
+                        fb = fr;
+                    }
+                    else {
+                        a = x;
+                        fa = fr;
+                    }
+                } while (!this.equalNumber(fr, 0, precision));
+                return x;
+            };
+            return EquationSolving;
+        }());
+        framework.EquationSolving = EquationSolving;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var math;
+    (function (math) {
+        var RotationOrder;
+        (function (RotationOrder) {
+            RotationOrder[RotationOrder["XYZ"] = 0] = "XYZ";
+            RotationOrder[RotationOrder["ZXY"] = 1] = "ZXY";
+            RotationOrder[RotationOrder["ZYX"] = 2] = "ZYX";
+            RotationOrder[RotationOrder["YXZ"] = 3] = "YXZ";
+            RotationOrder[RotationOrder["YZX"] = 4] = "YZX";
+            RotationOrder[RotationOrder["XZY"] = 5] = "XZY";
+        })(RotationOrder = math.RotationOrder || (math.RotationOrder = {}));
+        math.defaultRotationOrder = RotationOrder.YXZ;
+    })(math = gd3d.math || (gd3d.math = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
     var math;
     (function (math) {
         function colorSet_White(out) {
@@ -30165,6 +30312,23 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(ParticleSystem.prototype, "particleSystemData", {
+                get: function () {
+                    return this._particleSystemData;
+                },
+                set: function (v) {
+                    var data = framework.ParticleSystemData.get(v.value);
+                    if (data.objectData) {
+                        framework.serialization.setValue(this, data.objectData);
+                    }
+                    else {
+                        data.particleSystem = this;
+                    }
+                    this._particleSystemData = data;
+                },
+                enumerable: true,
+                configurable: true
+            });
             ParticleSystem.prototype.onPlay = function () {
             };
             ParticleSystem.prototype.start = function () {
@@ -30275,11 +30439,16 @@ var gd3d;
                     var cameraUp = new gd3d.math.vector3();
                     camera.gameObject.transform.getForwardInWorld(cameraForward);
                     camera.gameObject.transform.getUpInWorld(cameraUp);
-                    gd3d.math.matrixTransformNormal(cameraForward, this.worldToLocalMatrix, cameraForward);
-                    gd3d.math.matrixTransformNormal(cameraUp, this.worldToLocalMatrix, cameraUp);
-                    gd3d.math.matrixLookatLH(cameraForward, cameraUp, billboardMatrix);
+                    if (this.main.simulationSpace == framework.ParticleSystemSimulationSpace.Local) {
+                        gd3d.math.matrixTransformNormal(cameraForward, this.worldToLocalMatrix, cameraForward);
+                        gd3d.math.matrixTransformNormal(cameraUp, this.worldToLocalMatrix, cameraUp);
+                    }
+                    gd3d.math.matrixLookat(new gd3d.math.vector3(), cameraForward, cameraUp, billboardMatrix);
                 }
                 this.material.setMatrix("u_particle_billboardMatrix", billboardMatrix);
+                if (this.main.simulationSpace == framework.ParticleSystemSimulationSpace.World) {
+                    gd3d.math.matrixClone(context.matrixViewProject, context.matrixModelViewProject);
+                }
                 if (!isSupportDrawInstancedArrays) {
                     for (var i = 0, n = this._activeParticles.length; i < n; i++) {
                         var particle = this._activeParticles[i];
@@ -30301,7 +30470,6 @@ var gd3d;
                     console.assert(data.length == 24 * this._activeParticles.length);
                     var stride = this._attributes.reduce(function (pv, cv) { return pv += cv[1]; }, 0) * 4;
                     if (isSupportDrawInstancedArrays && this.particleCount > 0) {
-                        data = data.concat(data);
                         var vbo = this._getVBO(context.webgl);
                         var drawInstanceInfo = {
                             instanceCount: this.particleCount,
@@ -30337,7 +30505,12 @@ var gd3d;
                 }
             };
             ParticleSystem.prototype._getVBO = function (gl) {
+                for (var i = 0, n = this._vbos.length; i < n; i++) {
+                    if (this._vbos[i][0] == gl)
+                        return this._vbos[i][1];
+                }
                 var vbo = gl.createBuffer();
+                this._vbos.push([gl, vbo]);
                 return vbo;
             };
             Object.defineProperty(ParticleSystem.prototype, "rateAtDuration", {
@@ -30564,7 +30737,7 @@ var gd3d;
                     particle.acceleration.z -= value.z;
                 }
             };
-            ParticleSystem.ClassName = "ParticleSystem";
+            ParticleSystem.ClassName = "particlesystem";
             __decorate([
                 gd3d.reflect.Field("mesh"),
                 gd3d.reflect.UIStyle("WidgetDragSelect"),
@@ -30575,6 +30748,11 @@ var gd3d;
                 gd3d.reflect.Field("material"),
                 __metadata("design:type", framework.material)
             ], ParticleSystem.prototype, "material", void 0);
+            __decorate([
+                gd3d.reflect.Field("ParticleSystemData"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleSystem.prototype, "particleSystemData", null);
             ParticleSystem = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
@@ -30583,6 +30761,84 @@ var gd3d;
             return ParticleSystem;
         }());
         framework.ParticleSystem = ParticleSystem;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemData = (function () {
+            function ParticleSystemData(assetName) {
+                if (assetName === void 0) { assetName = null; }
+                this.name = null;
+                this.id = new framework.resID();
+                this.defaultAsset = false;
+                if (!assetName) {
+                    assetName = "ParticleSystem_" + this.getGUID();
+                }
+                this.name = new framework.constText(assetName);
+            }
+            ParticleSystemData_1 = ParticleSystemData;
+            ParticleSystemData.get = function (valueName) {
+                return this._datas[valueName];
+            };
+            Object.defineProperty(ParticleSystemData.prototype, "value", {
+                get: function () {
+                    return this._value;
+                },
+                set: function (v) {
+                    this._value = v;
+                    if (ParticleSystemData_1._datas[v]) {
+                        console.log("\u91CD\u590D\u521B\u5EFA\u7C92\u5B50\u7CFB\u7EDF\u8D44\u6E90 " + v);
+                        return;
+                    }
+                    ParticleSystemData_1._datas[v] = this;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleSystemData.prototype.getName = function () {
+                if (this.name == undefined) {
+                    return null;
+                }
+                return this.name.getText();
+            };
+            ParticleSystemData.prototype.getGUID = function () {
+                return this.id.getID();
+            };
+            ParticleSystemData.prototype.dispose = function () {
+            };
+            ParticleSystemData.prototype.use = function () {
+                framework.sceneMgr.app.getAssetMgr().use(this);
+            };
+            ParticleSystemData.prototype.unuse = function (disposeNow) {
+                if (disposeNow === void 0) { disposeNow = false; }
+                framework.sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
+            };
+            ParticleSystemData.prototype.caclByteLength = function () {
+                var total = 0;
+                return total;
+            };
+            ParticleSystemData.prototype.setData = function (v) {
+                this.objectData = JSON.parse(v);
+                if (this.particleSystem) {
+                    framework.serialization.setValue(this.particleSystem, this.objectData);
+                }
+            };
+            var ParticleSystemData_1;
+            ParticleSystemData.ClassName = "ParticleSystemData";
+            ParticleSystemData._datas = {};
+            __decorate([
+                gd3d.reflect.Field("constText"),
+                __metadata("design:type", framework.constText)
+            ], ParticleSystemData.prototype, "name", void 0);
+            ParticleSystemData = ParticleSystemData_1 = __decorate([
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [String])
+            ], ParticleSystemData);
+            return ParticleSystemData;
+        }());
+        framework.ParticleSystemData = ParticleSystemData;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -30725,871 +30981,6 @@ var gd3d;
             UVChannelFlags[UVChannelFlags["UV3"] = 8] = "UV3";
             UVChannelFlags[UVChannelFlags["Everything"] = 15] = "Everything";
         })(UVChannelFlags = framework.UVChannelFlags || (framework.UVChannelFlags = {}));
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var EquationSolving = (function () {
-            function EquationSolving() {
-            }
-            EquationSolving.prototype.getSign = function (n) {
-                return n > 0 ? "+" : "-";
-            };
-            EquationSolving.prototype.equalNumber = function (a, b, precision) {
-                if (precision === void 0) { precision = 0.0000001; }
-                return Math.abs(a - b) < precision;
-            };
-            EquationSolving.prototype.getDerivative = function (f, delta) {
-                if (delta === void 0) { delta = 0.000000001; }
-                return function (x) {
-                    var d = (f(x + delta) - f(x)) / delta;
-                    return d;
-                };
-            };
-            EquationSolving.prototype.isContinuous = function (f) {
-                return true;
-            };
-            EquationSolving.prototype.hasSolution = function (f, a, b, errorcallback) {
-                if (!this.isContinuous(f)) {
-                    errorcallback && errorcallback(new Error("\u51FD\u6570 " + f + " \u5728 [" + a + " ," + b + "] \u533A\u95F4\u5185\u4E0D\u8FDE\u7EED\uFF0C\u65E0\u6CD5\u4E3A\u5176\u6C42\u89E3\uFF01"));
-                    return false;
-                }
-                var fa = f(a);
-                var fb = f(b);
-                if (fa * fb > 0) {
-                    errorcallback && errorcallback(new Error("f(a) * f(b) \u503C\u4E3A " + fa * fb + "\uFF0C\u4E0D\u6EE1\u8DB3 f(a) * f(b) <= 0\uFF0C\u65E0\u6CD5\u4E3A\u5176\u6C42\u89E3\uFF01"));
-                    return false;
-                }
-                return true;
-            };
-            EquationSolving.prototype.binary = function (f, a, b, precision, errorcallback) {
-                if (precision === void 0) { precision = 0.0000001; }
-                if (!this.hasSolution(f, a, b, errorcallback))
-                    return undefined;
-                var fa = f(a);
-                var fb = f(b);
-                if (this.equalNumber(fa, 0, precision)) {
-                    return a;
-                }
-                if (this.equalNumber(fb, 0, precision)) {
-                    return b;
-                }
-                do {
-                    var x = (a + b) / 2;
-                    var fr = f(x);
-                    if (fa * fr < 0) {
-                        b = x;
-                        fb = fr;
-                    }
-                    else {
-                        a = x;
-                        fa = fr;
-                    }
-                } while (!this.equalNumber(fr, 0, precision));
-                return x;
-            };
-            EquationSolving.prototype.line = function (f, a, b, precision, errorcallback) {
-                if (precision === void 0) { precision = 0.0000001; }
-                if (!this.hasSolution(f, a, b, errorcallback))
-                    return undefined;
-                var fa = f(a);
-                var fb = f(b);
-                if (this.equalNumber(fa, 0, precision)) {
-                    return a;
-                }
-                if (this.equalNumber(fb, 0, precision)) {
-                    return b;
-                }
-                do {
-                    var x = a - fa * (b - a) / (fb - fa);
-                    var fr = f(x);
-                    if (fa * fr < 0) {
-                        b = x;
-                        fb = fr;
-                    }
-                    else {
-                        a = x;
-                        fa = fr;
-                    }
-                } while (!this.equalNumber(fr, 0, precision));
-                return x;
-            };
-            EquationSolving.prototype.tangent = function (f, f1, f2, a, b, precision, errorcallback) {
-                if (precision === void 0) { precision = 0.0000001; }
-                if (!this.hasSolution(f, a, b, errorcallback))
-                    return undefined;
-                var fa = f(a);
-                var fb = f(b);
-                if (this.equalNumber(fa, 0, precision)) {
-                    return a;
-                }
-                if (this.equalNumber(fb, 0, precision)) {
-                    return b;
-                }
-                var f1Sign = fb - fa;
-                var f1a = f1(a);
-                var f1b = f1(b);
-                if (f1a * f1Sign <= 0) {
-                    errorcallback && errorcallback(new Error("[" + a + ", " + b + "] \u4E0A\u5B58\u5728\u89E3\uFF0C\u7531\u4E8Ef'(" + a + ") = " + f1a + " \u5728[a, b]\u4E0A\u6CA1\u6709\u4FDD\u6301\u5B9A\u53F7 " + this.getSign(f1Sign) + " \uFF0C\u65E0\u6CD5\u4F7F\u7528\u5207\u7EBF\u6CD5\u6C42\u89E3"));
-                    return undefined;
-                }
-                if (f1b * f1Sign <= 0) {
-                    errorcallback && errorcallback(new Error("[" + a + ", " + b + "] \u4E0A\u5B58\u5728\u89E3\uFF0C\u7531\u4E8Ef'(" + b + ") = " + f1b + " \u5728[a, b]\u4E0A\u6CA1\u6709\u4FDD\u6301\u5B9A\u53F7 " + this.getSign(f1Sign) + " \uFF0C\u65E0\u6CD5\u4F7F\u7528\u5207\u7EBF\u6CD5\u6C42\u89E3"));
-                    return undefined;
-                }
-                var f2Sign = fb - fa;
-                var f2a = f2(a);
-                var f2b = f2(b);
-                if (f2a * f2Sign <= 0) {
-                    errorcallback && errorcallback(new Error("[" + a + ", " + b + "] \u4E0A\u5B58\u5728\u89E3\uFF0C\u7531\u4E8Ef''(" + a + ") = " + f2a + " \u5728[a, b]\u4E0A\u6CA1\u6709\u4FDD\u6301\u5B9A\u53F7 " + this.getSign(f2Sign) + " \uFF0C\u65E0\u6CD5\u4F7F\u7528\u5207\u7EBF\u6CD5\u6C42\u89E3"));
-                    return undefined;
-                }
-                if (f2b * f2Sign <= 0) {
-                    errorcallback && errorcallback(new Error("[" + a + ", " + b + "] \u4E0A\u5B58\u5728\u89E3\uFF0C\u7531\u4E8Ef''(" + b + ") = " + f2b + " \u5728[a, b]\u4E0A\u6CA1\u6709\u4FDD\u6301\u5B9A\u53F7 " + this.getSign(f2Sign) + " \uFF0C\u65E0\u6CD5\u4F7F\u7528\u5207\u7EBF\u6CD5\u6C42\u89E3"));
-                    return undefined;
-                }
-                var x;
-                if (f1Sign > 0) {
-                    if (f2Sign > 0)
-                        x = b;
-                    else
-                        x = a;
-                }
-                else {
-                    if (f2Sign > 0)
-                        x = a;
-                    else
-                        x = b;
-                }
-                do {
-                    var fx = f(x);
-                    var f1x = f1(x);
-                    var f2x = f2(x);
-                    if (f1x * f1Sign <= 0) {
-                        errorcallback && errorcallback(new Error("[" + a + ", " + b + "] \u4E0A\u5B58\u5728\u89E3\uFF0C\u7531\u4E8Ef'(" + x + ") = " + f1x + " \u5728[a, b]\u4E0A\u6CA1\u6709\u4FDD\u6301\u5B9A\u53F7 " + this.getSign(f1Sign) + " \uFF0C\u65E0\u6CD5\u4F7F\u7528\u5207\u7EBF\u6CD5\u6C42\u89E3"));
-                        return undefined;
-                    }
-                    if (f2x * f2Sign <= 0) {
-                        errorcallback && errorcallback(new Error("[" + a + ", " + b + "] \u4E0A\u5B58\u5728\u89E3\uFF0C\u7531\u4E8Ef''(" + x + ") = " + f2x + " \u5728[a, b]\u4E0A\u6CA1\u6709\u4FDD\u6301\u5B9A\u53F7 " + this.getSign(f2Sign) + " \uFF0C\u65E0\u6CD5\u4F7F\u7528\u5207\u7EBF\u6CD5\u6C42\u89E3"));
-                        return undefined;
-                    }
-                    x = x - fx / f1x;
-                } while (!this.equalNumber(fx, 0, precision));
-                return x;
-            };
-            EquationSolving.prototype.secant = function (f, a, b, precision, errorcallback) {
-                if (precision === void 0) { precision = 0.0000001; }
-                if (!this.hasSolution(f, a, b, errorcallback))
-                    return undefined;
-                var fa = f(a);
-                var fb = f(b);
-                if (this.equalNumber(fa, 0, precision)) {
-                    return a;
-                }
-                if (this.equalNumber(fb, 0, precision)) {
-                    return b;
-                }
-                var f1 = this.getDerivative(f, precision);
-                var f2 = this.getDerivative(f1, precision);
-                var f1Sign = fb - fa;
-                var f1a = f1(a);
-                var f1b = f1(b);
-                if (f1a * f1Sign <= 0) {
-                    errorcallback && errorcallback(new Error("[" + a + ", " + b + "] \u4E0A\u5B58\u5728\u89E3\uFF0C\u7531\u4E8Ef'(" + a + ") = " + f1a + " \u5728[a, b]\u4E0A\u6CA1\u6709\u4FDD\u6301\u5B9A\u53F7 " + this.getSign(f1Sign) + " \uFF0C\u65E0\u6CD5\u4F7F\u7528\u5207\u7EBF\u6CD5\u6C42\u89E3"));
-                    return undefined;
-                }
-                if (f1b * f1Sign <= 0) {
-                    errorcallback && errorcallback(new Error("[" + a + ", " + b + "] \u4E0A\u5B58\u5728\u89E3\uFF0C\u7531\u4E8Ef'(" + b + ") = " + f1b + " \u5728[a, b]\u4E0A\u6CA1\u6709\u4FDD\u6301\u5B9A\u53F7 " + this.getSign(f1Sign) + " \uFF0C\u65E0\u6CD5\u4F7F\u7528\u5207\u7EBF\u6CD5\u6C42\u89E3"));
-                    return undefined;
-                }
-                var f2Sign = fb - fa;
-                var f2a = f2(a);
-                var f2b = f2(b);
-                if (f2a * f2Sign <= 0) {
-                    errorcallback && errorcallback(new Error("[" + a + ", " + b + "] \u4E0A\u5B58\u5728\u89E3\uFF0C\u7531\u4E8Ef''(" + a + ") = " + f2a + " \u5728[a, b]\u4E0A\u6CA1\u6709\u4FDD\u6301\u5B9A\u53F7 " + this.getSign(f2Sign) + " \uFF0C\u65E0\u6CD5\u4F7F\u7528\u5207\u7EBF\u6CD5\u6C42\u89E3"));
-                    return undefined;
-                }
-                if (f2b * f2Sign <= 0) {
-                    errorcallback && errorcallback(new Error("[" + a + ", " + b + "] \u4E0A\u5B58\u5728\u89E3\uFF0C\u7531\u4E8Ef''(" + b + ") = " + f2b + " \u5728[a, b]\u4E0A\u6CA1\u6709\u4FDD\u6301\u5B9A\u53F7 " + this.getSign(f2Sign) + " \uFF0C\u65E0\u6CD5\u4F7F\u7528\u5207\u7EBF\u6CD5\u6C42\u89E3"));
-                    return undefined;
-                }
-                var x;
-                if (f1Sign > 0) {
-                    if (f2Sign > 0)
-                        x = b;
-                    else
-                        x = a;
-                }
-                else {
-                    if (f2Sign > 0)
-                        x = a;
-                    else
-                        x = b;
-                }
-                var xn_1 = x;
-                var fxn_1 = f(xn_1);
-                var xn = xn_1 - precision * f2Sign / Math.abs(f2Sign);
-                var fxn = f(xn);
-                if (fxn * fxn_1 < 0) {
-                    return xn;
-                }
-                var xn$1;
-                do {
-                    var f1xn = f1(xn);
-                    if (f1xn * f1Sign <= 0) {
-                        errorcallback && errorcallback(new Error("[" + a + ", " + b + "] \u4E0A\u5B58\u5728\u89E3\uFF0C\u7531\u4E8Ef'(" + xn + ") = " + f1xn + " \u5728[a, b]\u4E0A\u6CA1\u6709\u4FDD\u6301\u5B9A\u53F7 " + this.getSign(f1Sign) + " \uFF0C\u65E0\u6CD5\u4F7F\u7528\u5207\u7EBF\u6CD5\u6C42\u89E3"));
-                        return undefined;
-                    }
-                    var f2xn = f2(xn);
-                    if (f2xn * f2Sign <= 0) {
-                        errorcallback && errorcallback(new Error("[" + a + ", " + b + "] \u4E0A\u5B58\u5728\u89E3\uFF0C\u7531\u4E8Ef''(" + xn + ") = " + f2xn + " \u5728[a, b]\u4E0A\u6CA1\u6709\u4FDD\u6301\u5B9A\u53F7 " + this.getSign(f2Sign) + " \uFF0C\u65E0\u6CD5\u4F7F\u7528\u5207\u7EBF\u6CD5\u6C42\u89E3"));
-                        return undefined;
-                    }
-                    xn$1 = xn - fxn * (xn - xn_1) / (fxn - fxn_1);
-                    xn_1 = xn;
-                    fxn_1 = fxn;
-                    xn = xn$1;
-                    fxn = f(xn);
-                } while (!this.equalNumber(fxn, 0, precision));
-                return xn;
-            };
-            return EquationSolving;
-        }());
-        framework.EquationSolving = EquationSolving;
-        framework.equationSolving = new EquationSolving();
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var AnimationCurve1 = (function () {
-            function AnimationCurve1() {
-                this.maxtan = 1000;
-                this.preWrapMode = framework.AnimationCurveWrapMode.Clamp;
-                this.postWrapMode = framework.AnimationCurveWrapMode.Clamp;
-                this.keys = [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }];
-            }
-            Object.defineProperty(AnimationCurve1.prototype, "numKeys", {
-                get: function () {
-                    return this.keys.length;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            AnimationCurve1.prototype.addKey = function (key) {
-                this.keys.push(key);
-                this.sort();
-            };
-            AnimationCurve1.prototype.sort = function () {
-                this.keys.sort(function (a, b) { return a.time - b.time; });
-            };
-            AnimationCurve1.prototype.deleteKey = function (key) {
-                var index = this.keys.indexOf(key);
-                if (index != -1)
-                    this.keys.splice(index, 1);
-            };
-            AnimationCurve1.prototype.getKey = function (index) {
-                return this.keys[index];
-            };
-            AnimationCurve1.prototype.indexOfKeys = function (key) {
-                return this.keys.indexOf(key);
-            };
-            AnimationCurve1.prototype.getPoint = function (t) {
-                var wrapMode = framework.AnimationCurveWrapMode.Clamp;
-                if (t < 0)
-                    wrapMode = this.preWrapMode;
-                else if (t > 1)
-                    wrapMode = this.postWrapMode;
-                switch (wrapMode) {
-                    case framework.AnimationCurveWrapMode.Clamp:
-                        t = gd3d.math.floatClamp(t, 0, 1);
-                        break;
-                    case framework.AnimationCurveWrapMode.Loop:
-                        t = gd3d.math.floatClamp(t - Math.floor(t), 0, 1);
-                        break;
-                    case framework.AnimationCurveWrapMode.PingPong:
-                        t = gd3d.math.floatClamp(t - Math.floor(t), 0, 1);
-                        if (Math.floor(t) % 2 == 1)
-                            t = 1 - t;
-                        break;
-                }
-                var keys = this.keys;
-                var maxtan = this.maxtan;
-                var value = 0, tangent = 0, isfind = false;
-                ;
-                for (var i = 0, n = keys.length; i < n; i++) {
-                    var key = keys[i];
-                    var prekey = keys[i - 1];
-                    if (i > 0 && prekey.time <= t && t <= key.time) {
-                        var xstart = prekey.time;
-                        var ystart = prekey.value;
-                        var tanstart = prekey.outTangent;
-                        var xend = key.time;
-                        var yend = key.value;
-                        var tanend = key.inTangent;
-                        if (maxtan > Math.abs(tanstart) && maxtan > Math.abs(tanend)) {
-                            var ct = (t - prekey.time) / (key.time - prekey.time);
-                            var sys = [ystart, ystart + tanstart * (xend - xstart) / 3, yend - tanend * (xend - xstart) / 3, yend];
-                            var fy = framework.bezierCurve.getValue(ct, sys);
-                            isfind = true;
-                            value = fy;
-                            tangent = framework.bezierCurve.getDerivative(ct, sys) / (xend - xstart);
-                            break;
-                        }
-                        else {
-                            isfind = true;
-                            value = prekey.value;
-                            tangent = 0;
-                            break;
-                        }
-                    }
-                    if (i == 0 && t <= key.time) {
-                        isfind = true;
-                        value = key.value;
-                        tangent = 0;
-                        break;
-                    }
-                    if (i == n - 1 && t >= key.time) {
-                        isfind = true;
-                        value = key.value;
-                        tangent = 0;
-                        break;
-                    }
-                }
-                if (keys.length == 0)
-                    return { time: t, value: 0, inTangent: 0, outTangent: 0 };
-                return { time: t, value: value, inTangent: tangent, outTangent: tangent };
-            };
-            AnimationCurve1.prototype.getValue = function (t) {
-                var point = this.getPoint(t);
-                if (!point)
-                    return 0;
-                return point.value;
-            };
-            AnimationCurve1.prototype.findKey = function (t, y, precision) {
-                var keys = this.keys;
-                for (var i = 0; i < keys.length; i++) {
-                    if (Math.abs(keys[i].time - t) < precision && Math.abs(keys[i].value - y) < precision) {
-                        return keys[i];
-                    }
-                }
-                return null;
-            };
-            AnimationCurve1.prototype.addKeyAtCurve = function (time, value, precision) {
-                var point = this.getPoint(time);
-                if (Math.abs(value - point.value) < precision) {
-                    this.keys.push(point);
-                    this.keys.sort(function (a, b) { return a.time - b.time; });
-                    return point;
-                }
-                return null;
-            };
-            AnimationCurve1.prototype.getSamples = function (num) {
-                if (num === void 0) { num = 100; }
-                var results = [];
-                for (var i = 0; i <= num; i++) {
-                    var p = this.getPoint(i / num);
-                    results.push(p);
-                }
-                return results;
-            };
-            return AnimationCurve1;
-        }());
-        framework.AnimationCurve1 = AnimationCurve1;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var AnimationCurveWrapMode;
-        (function (AnimationCurveWrapMode) {
-            AnimationCurveWrapMode[AnimationCurveWrapMode["Clamp"] = 1] = "Clamp";
-            AnimationCurveWrapMode[AnimationCurveWrapMode["Loop"] = 2] = "Loop";
-            AnimationCurveWrapMode[AnimationCurveWrapMode["PingPong"] = 4] = "PingPong";
-        })(AnimationCurveWrapMode = framework.AnimationCurveWrapMode || (framework.AnimationCurveWrapMode = {}));
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var BezierCurve = (function () {
-            function BezierCurve() {
-            }
-            BezierCurve.prototype.linear = function (t, p0, p1) {
-                return p0 + t * (p1 - p0);
-            };
-            BezierCurve.prototype.linearDerivative = function (t, p0, p1) {
-                return p1 - p0;
-            };
-            BezierCurve.prototype.linearSecondDerivative = function (t, p0, p1) {
-                return 0;
-            };
-            BezierCurve.prototype.quadratic = function (t, p0, p1, p2) {
-                return (1 - t) * (1 - t) * p0 + 2 * (1 - t) * t * p1 + t * t * p2;
-            };
-            BezierCurve.prototype.quadraticDerivative = function (t, p0, p1, p2) {
-                return 2 * (1 - t) * (p1 - p0) + 2 * t * (p2 - p1);
-            };
-            BezierCurve.prototype.quadraticSecondDerivative = function (t, p0, p1, p2) {
-                return 2 * (p2 - 2 * p1 + p0);
-            };
-            BezierCurve.prototype.cubic = function (t, p0, p1, p2, p3) {
-                return (1 - t) * (1 - t) * (1 - t) * p0 + 3 * (1 - t) * (1 - t) * t * p1 + 3 * (1 - t) * t * t * p2 + t * t * t * p3;
-            };
-            BezierCurve.prototype.cubicDerivative = function (t, p0, p1, p2, p3) {
-                return 3 * (1 - t) * (1 - t) * (p1 - p0) + 6 * (1 - t) * t * (p2 - p1) + 3 * t * t * (p3 - p2);
-            };
-            BezierCurve.prototype.cubicSecondDerivative = function (t, p0, p1, p2, p3) {
-                return 6 * (1 - t) * (p2 - 2 * p1 + p0) + 6 * t * (p3 - 2 * p2 + p1);
-            };
-            BezierCurve.prototype.bn = function (t, ps, processs) {
-                if (processs === void 0) { processs = null; }
-                ps = ps.concat();
-                if (processs)
-                    processs.push(ps.concat());
-                for (var i = ps.length - 1; i > 0; i--) {
-                    for (var j = 0; j < i; j++) {
-                        ps[j] = (1 - t) * ps[j] + t * ps[j + 1];
-                    }
-                    if (processs) {
-                        ps.length = ps.length - 1;
-                        processs.push(ps.concat());
-                    }
-                }
-                return ps[0];
-            };
-            BezierCurve.prototype.bnDerivative = function (t, ps) {
-                if (ps.length < 2)
-                    return 0;
-                ps = ps.concat();
-                for (var i = 0, n = ps.length - 1; i < n; i++) {
-                    ps[i] = ps[i + 1] - ps[i];
-                }
-                ps.length = ps.length - 1;
-                var v = ps.length * this.bn(t, ps);
-                return v;
-            };
-            BezierCurve.prototype.bnSecondDerivative = function (t, ps) {
-                if (ps.length < 3)
-                    return 0;
-                ps = ps.concat();
-                for (var i = 0, n = ps.length - 1; i < n; i++) {
-                    ps[i] = ps[i + 1] - ps[i];
-                }
-                ps.length = ps.length - 1;
-                var v = ps.length * this.bnDerivative(t, ps);
-                return v;
-            };
-            BezierCurve.prototype.bnND = function (t, dn, ps) {
-                if (ps.length < dn + 1)
-                    return 0;
-                var factorial = 1;
-                ps = ps.concat();
-                for (var j = 0; j < dn; j++) {
-                    for (var i = 0, n = ps.length - 1; i < n; i++) {
-                        ps[i] = ps[i + 1] - ps[i];
-                    }
-                    ps.length = ps.length - 1;
-                    factorial *= ps.length;
-                }
-                var v = factorial * this.bn(t, ps);
-                return v;
-            };
-            BezierCurve.prototype.getValue = function (t, ps) {
-                if (ps.length == 2) {
-                    return this.linear(t, ps[0], ps[1]);
-                }
-                if (ps.length == 3) {
-                    return this.quadratic(t, ps[0], ps[1], ps[2]);
-                }
-                if (ps.length == 4) {
-                    return this.cubic(t, ps[0], ps[1], ps[2], ps[3]);
-                }
-                return this.bn(t, ps);
-            };
-            BezierCurve.prototype.getDerivative = function (t, ps) {
-                if (ps.length == 2) {
-                    return this.linearDerivative(t, ps[0], ps[1]);
-                }
-                if (ps.length == 3) {
-                    return this.quadraticDerivative(t, ps[0], ps[1], ps[2]);
-                }
-                if (ps.length == 4) {
-                    return this.cubicDerivative(t, ps[0], ps[1], ps[2], ps[3]);
-                }
-                return this.bnDerivative(t, ps);
-            };
-            BezierCurve.prototype.getSecondDerivative = function (t, ps) {
-                if (ps.length == 2) {
-                    return this.linearSecondDerivative(t, ps[0], ps[1]);
-                }
-                if (ps.length == 3) {
-                    return this.quadraticSecondDerivative(t, ps[0], ps[1], ps[2]);
-                }
-                if (ps.length == 4) {
-                    return this.cubicSecondDerivative(t, ps[0], ps[1], ps[2], ps[3]);
-                }
-                return this.bnSecondDerivative(t, ps);
-            };
-            BezierCurve.prototype.getExtremums = function (ps, numSamples, precision) {
-                var _this = this;
-                if (numSamples === void 0) { numSamples = 10; }
-                if (precision === void 0) { precision = 0.0000001; }
-                var samples = [];
-                for (var i = 0; i <= numSamples; i++) {
-                    samples.push(this.getDerivative(i / numSamples, ps));
-                }
-                var resultTs = [];
-                var resultVs = [];
-                for (var i = 0, n = numSamples; i < n; i++) {
-                    if (samples[i] * samples[i + 1] < 0) {
-                        var guessT = framework.equationSolving.line(function (x) { return _this.getDerivative(x, ps); }, i / numSamples, (i + 1) / numSamples, precision);
-                        resultTs.push(guessT);
-                        resultVs.push(this.getValue(guessT, ps));
-                    }
-                }
-                return { ts: resultTs, vs: resultVs };
-            };
-            BezierCurve.prototype.getMonotoneIntervals = function (ps, numSamples, precision) {
-                if (numSamples === void 0) { numSamples = 10; }
-                if (precision === void 0) { precision = 0.0000001; }
-                var monotoneIntervalTs = [0, 1];
-                var monotoneIntervalVs = [ps[0], ps[ps.length - 1]];
-                var extremums = this.getExtremums(ps, numSamples, precision);
-                for (var i = 0; i < extremums.ts.length; i++) {
-                    monotoneIntervalTs.splice(i + 1, 0, extremums.ts[i]);
-                    monotoneIntervalVs.splice(i + 1, 0, extremums.vs[i]);
-                }
-                return { ts: monotoneIntervalTs, vs: monotoneIntervalVs };
-            };
-            BezierCurve.prototype.getTFromValue = function (targetV, ps, numSamples, precision) {
-                var _this = this;
-                if (numSamples === void 0) { numSamples = 10; }
-                if (precision === void 0) { precision = 0.0000001; }
-                var monotoneIntervals = this.getMonotoneIntervals(ps, numSamples, precision);
-                var monotoneIntervalTs = monotoneIntervals.ts;
-                var monotoneIntervalVs = monotoneIntervals.vs;
-                var results = [];
-                for (var i = 0, n = monotoneIntervalVs.length - 1; i < n; i++) {
-                    if ((monotoneIntervalVs[i] - targetV) * (monotoneIntervalVs[i + 1] - targetV) <= 0) {
-                        var fx = function (x) { return _this.getValue(x, ps) - targetV; };
-                        var result = framework.equationSolving.line(fx, monotoneIntervalTs[i], monotoneIntervalTs[i + 1], precision);
-                        results.push(result);
-                    }
-                }
-                return results;
-            };
-            BezierCurve.prototype.split = function (t, ps) {
-                var processs = [];
-                framework.bezierCurve.bn(t, ps, processs);
-                var fps = [];
-                var sps = [];
-                for (var i = processs.length - 1; i >= 0; i--) {
-                    if (i == processs.length - 1) {
-                        fps.push(processs[i][0]);
-                        fps.push(processs[i][0]);
-                    }
-                    else {
-                        fps.unshift(processs[i][0]);
-                        sps.push(processs[i].pop());
-                    }
-                }
-                return [fps, sps];
-            };
-            BezierCurve.prototype.merge = function (fps, sps, mergeType) {
-                if (mergeType === void 0) { mergeType = 0; }
-                fps = fps.concat();
-                sps = sps.concat();
-                var processs = [];
-                var t;
-                var pps;
-                var ps;
-                for (var i = 0, n = fps.length; i < n; i++) {
-                    ps = processs[i] = [];
-                    if (i == 0) {
-                        processs[i][0] = fps.pop();
-                        sps.shift();
-                    }
-                    else if (i == 1) {
-                        processs[i][0] = fps.pop();
-                        processs[i][1] = sps.shift();
-                        t = (processs[i - 1][0] - processs[i][0]) / (processs[i][1] - processs[i][0]);
-                    }
-                    else {
-                        pps = processs[i - 1];
-                        var nfp = fps.pop();
-                        var nsp = sps.shift();
-                        var ps0 = [];
-                        ps0[0] = nfp;
-                        for (var j = 0, n_1 = pps.length; j < n_1; j++) {
-                            ps0[j + 1] = ps0[j] + (pps[j] - ps0[j]) / t;
-                        }
-                        var ps1 = [];
-                        ps1[pps.length] = nsp;
-                        for (var j = pps.length - 1; j >= 0; j--) {
-                            ps1[j] = ps1[j + 1] - (ps1[j + 1] - pps[j]) / (1 - t);
-                        }
-                        if (mergeType == 1) {
-                            for (var j = 0, n_2 = ps0.length - 1; j <= n_2; j++) {
-                                ps[j] = (ps0[j] * (n_2 - j) + ps1[j] * j) / n_2;
-                            }
-                        }
-                        else if (mergeType == 0) {
-                            for (var j = 0, n_3 = ps0.length - 1; j <= n_3; j++) {
-                                if (j < n_3 / 2) {
-                                    ps[j] = ps0[j];
-                                }
-                                else if (j > n_3 / 2) {
-                                    ps[j] = ps1[j];
-                                }
-                                else {
-                                    ps[j] = (ps0[j] + ps1[j]) / 2;
-                                }
-                            }
-                        }
-                        else {
-                            console.error("\u5408\u5E76\u7C7B\u578B mergeType " + mergeType + " \u9519\u8BEF!");
-                        }
-                    }
-                }
-                return processs.pop();
-            };
-            BezierCurve.prototype.getSamples = function (ps, num) {
-                if (num === void 0) { num = 100; }
-                var results = [];
-                for (var i = 0; i <= num; i++) {
-                    var t = i / num;
-                    var p = this.getValue(t, ps);
-                    results.push({ t: t, v: p });
-                }
-                return results;
-            };
-            return BezierCurve;
-        }());
-        framework.BezierCurve = BezierCurve;
-        framework.bezierCurve = new BezierCurve();
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var MinMaxCurve = (function () {
-            function MinMaxCurve() {
-                this.mode = framework.MinMaxCurveMode.Constant;
-                this.constant = 0;
-                this.constantMin = 0;
-                this.constantMax = 0;
-                this.curve = new framework.AnimationCurve1();
-                this.curveMin = new framework.AnimationCurve1();
-                this.curveMax = new framework.AnimationCurve1();
-                this.curveMultiplier = 1;
-                this.between0And1 = false;
-            }
-            MinMaxCurve.prototype.getValue = function (time, randomBetween) {
-                if (randomBetween === void 0) { randomBetween = Math.random(); }
-                switch (this.mode) {
-                    case framework.MinMaxCurveMode.Constant:
-                        return this.constant;
-                    case framework.MinMaxCurveMode.Curve:
-                        return this.curve.getValue(time) * this.curveMultiplier;
-                    case framework.MinMaxCurveMode.TwoConstants:
-                        return gd3d.math.numberLerp(this.constantMin, this.constantMax, randomBetween);
-                    case framework.MinMaxCurveMode.TwoCurves:
-                        return gd3d.math.numberLerp(this.curveMin.getValue(time), this.curveMax.getValue(time), randomBetween) * this.curveMultiplier;
-                }
-                return this.constant;
-            };
-            return MinMaxCurve;
-        }());
-        framework.MinMaxCurve = MinMaxCurve;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var MinMaxCurveMode;
-        (function (MinMaxCurveMode) {
-            MinMaxCurveMode[MinMaxCurveMode["Constant"] = 0] = "Constant";
-            MinMaxCurveMode[MinMaxCurveMode["Curve"] = 1] = "Curve";
-            MinMaxCurveMode[MinMaxCurveMode["TwoConstants"] = 3] = "TwoConstants";
-            MinMaxCurveMode[MinMaxCurveMode["TwoCurves"] = 2] = "TwoCurves";
-        })(MinMaxCurveMode = framework.MinMaxCurveMode || (framework.MinMaxCurveMode = {}));
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var MinMaxCurveVector3 = (function () {
-            function MinMaxCurveVector3() {
-                this.xCurve = new framework.MinMaxCurve();
-                this.yCurve = new framework.MinMaxCurve();
-                this.zCurve = new framework.MinMaxCurve();
-            }
-            MinMaxCurveVector3.prototype.getValue = function (time, randomBetween) {
-                if (randomBetween === void 0) { randomBetween = Math.random(); }
-                return new gd3d.math.vector3(this.xCurve.getValue(time, randomBetween), this.yCurve.getValue(time, randomBetween), this.zCurve.getValue(time, randomBetween));
-            };
-            return MinMaxCurveVector3;
-        }());
-        framework.MinMaxCurveVector3 = MinMaxCurveVector3;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var RotationOrder;
-        (function (RotationOrder) {
-            RotationOrder[RotationOrder["XYZ"] = 0] = "XYZ";
-            RotationOrder[RotationOrder["ZXY"] = 1] = "ZXY";
-            RotationOrder[RotationOrder["ZYX"] = 2] = "ZYX";
-            RotationOrder[RotationOrder["YXZ"] = 3] = "YXZ";
-            RotationOrder[RotationOrder["YZX"] = 4] = "YZX";
-            RotationOrder[RotationOrder["XZY"] = 5] = "XZY";
-        })(RotationOrder = framework.RotationOrder || (framework.RotationOrder = {}));
-        framework.defaultRotationOrder = RotationOrder.YXZ;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var Gradient = (function () {
-            function Gradient() {
-                this.mode = framework.GradientMode.Blend;
-                this.alphaKeys = [{ alpha: 1, time: 0 }, { alpha: 1, time: 1 }];
-                this.colorKeys = [{ color: new gd3d.math.color(1, 1, 1), time: 0 }, { color: new gd3d.math.color(1, 1, 1), time: 1 }];
-            }
-            Gradient.prototype.getValue = function (time) {
-                var alpha = this.getAlpha(time);
-                var color = this.getColor(time);
-                return new gd3d.math.color(color.r, color.g, color.b, alpha);
-            };
-            Gradient.prototype.getAlpha = function (time) {
-                var alphaKeys = this.alphaKeys;
-                if (alphaKeys.length == 1)
-                    return alphaKeys[0].alpha;
-                if (time <= alphaKeys[0].time)
-                    return alphaKeys[0].alpha;
-                if (time >= alphaKeys[alphaKeys.length - 1].time)
-                    return alphaKeys[alphaKeys.length - 1].alpha;
-                for (var i = 0, n = alphaKeys.length - 1; i < n; i++) {
-                    var t = alphaKeys[i].time, v = alphaKeys[i].alpha, nt = alphaKeys[i + 1].time, nv = alphaKeys[i + 1].alpha;
-                    if (time == t)
-                        return v;
-                    if (time == nt)
-                        return nv;
-                    if (t < time && time < nt) {
-                        if (this.mode == framework.GradientMode.Fixed)
-                            return nv;
-                        return gd3d.math.mapLinear(time, t, nt, v, nv);
-                    }
-                }
-                return 1;
-            };
-            Gradient.prototype.getColor = function (time) {
-                var colorKeys = this.colorKeys;
-                if (colorKeys.length == 1)
-                    return colorKeys[0].color;
-                if (time <= colorKeys[0].time)
-                    return colorKeys[0].color;
-                if (time >= colorKeys[colorKeys.length - 1].time)
-                    return colorKeys[colorKeys.length - 1].color;
-                for (var i = 0, n = colorKeys.length - 1; i < n; i++) {
-                    var t = colorKeys[i].time, v = colorKeys[i].color, nt = colorKeys[i + 1].time, nv = colorKeys[i + 1].color;
-                    if (time == t)
-                        return v;
-                    if (time == nt)
-                        return nv;
-                    if (t < time && time < nt) {
-                        if (this.mode == framework.GradientMode.Fixed)
-                            return nv;
-                        gd3d.math.colorLerp(v, nv, (time - t) / (nt - t), v);
-                        return v;
-                    }
-                }
-                return new gd3d.math.color();
-            };
-            return Gradient;
-        }());
-        framework.Gradient = Gradient;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var GradientMode;
-        (function (GradientMode) {
-            GradientMode[GradientMode["Blend"] = 0] = "Blend";
-            GradientMode[GradientMode["Fixed"] = 1] = "Fixed";
-        })(GradientMode = framework.GradientMode || (framework.GradientMode = {}));
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var MinMaxGradient = (function () {
-            function MinMaxGradient() {
-                this.mode = framework.MinMaxGradientMode.Color;
-                this.color = new gd3d.math.color();
-                this.colorMin = new gd3d.math.color();
-                this.colorMax = new gd3d.math.color();
-                this.gradient = new framework.Gradient();
-                this.gradientMin = new framework.Gradient();
-                this.gradientMax = new framework.Gradient();
-            }
-            MinMaxGradient.prototype.getValue = function (time, randomBetween, out) {
-                if (randomBetween === void 0) { randomBetween = Math.random(); }
-                if (out === void 0) { out = new gd3d.math.color(); }
-                switch (this.mode) {
-                    case framework.MinMaxGradientMode.Color:
-                        gd3d.math.colorClone(this.color, out);
-                        break;
-                    case framework.MinMaxGradientMode.Gradient:
-                        gd3d.math.colorClone(this.gradient.getValue(time), out);
-                        break;
-                    case framework.MinMaxGradientMode.TwoColors:
-                        gd3d.math.colorLerp(this.colorMin, this.colorMax, randomBetween, out);
-                        break;
-                    case framework.MinMaxGradientMode.TwoGradients:
-                        var min = this.gradientMin.getValue(time);
-                        var max = this.gradientMax.getValue(time);
-                        gd3d.math.colorLerp(min, max, randomBetween, out);
-                        break;
-                    case framework.MinMaxGradientMode.RandomColor:
-                        var v = this.gradient.getValue(randomBetween);
-                        gd3d.math.colorClone(v, out);
-                        break;
-                }
-                return out;
-            };
-            return MinMaxGradient;
-        }());
-        framework.MinMaxGradient = MinMaxGradient;
-    })(framework = gd3d.framework || (gd3d.framework = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var framework;
-    (function (framework) {
-        var MinMaxGradientMode;
-        (function (MinMaxGradientMode) {
-            MinMaxGradientMode[MinMaxGradientMode["Color"] = 0] = "Color";
-            MinMaxGradientMode[MinMaxGradientMode["Gradient"] = 1] = "Gradient";
-            MinMaxGradientMode[MinMaxGradientMode["TwoColors"] = 2] = "TwoColors";
-            MinMaxGradientMode[MinMaxGradientMode["TwoGradients"] = 3] = "TwoGradients";
-            MinMaxGradientMode[MinMaxGradientMode["RandomColor"] = 4] = "RandomColor";
-        })(MinMaxGradientMode = framework.MinMaxGradientMode || (framework.MinMaxGradientMode = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -32590,9 +31981,9 @@ var gd3d;
                     var mat0 = new gd3d.math.matrix();
                     var rotation = new gd3d.math.vector3(particle.rotation.x, particle.rotation.y, particle.rotation.z);
                     gd3d.math.vec3ScaleByNum(rotation, Math.PI / 180, rotation);
-                    gd3d.math.matrixMakeEuler(rotation, framework.defaultRotationOrder, mat0);
+                    gd3d.math.matrixMakeEuler(rotation, gd3d.math.defaultRotationOrder, mat0);
                     gd3d.math.matrixMultiply(mat0, mat, mat0);
-                    gd3d.math.matrixGetEuler(mat0, framework.defaultRotationOrder, rotation);
+                    gd3d.math.matrixGetEuler(mat0, gd3d.math.defaultRotationOrder, rotation);
                     gd3d.math.vec3ScaleByNum(rotation, 180 / Math.PI, rotation);
                     particle.rotation.x = rotation.x;
                     particle.rotation.y = rotation.y;
@@ -33283,6 +32674,621 @@ var gd3d;
             return ParticleEmissionBurst;
         }());
         framework.ParticleEmissionBurst = ParticleEmissionBurst;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimationCurve1 = (function () {
+            function AnimationCurve1() {
+                this.maxtan = 1000;
+                this.preWrapMode = framework.AnimationCurveWrapMode.Clamp;
+                this.postWrapMode = framework.AnimationCurveWrapMode.Clamp;
+                this.keys = [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }];
+            }
+            Object.defineProperty(AnimationCurve1.prototype, "numKeys", {
+                get: function () {
+                    return this.keys.length;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            AnimationCurve1.prototype.addKey = function (key) {
+                this.keys.push(key);
+                this.sort();
+            };
+            AnimationCurve1.prototype.sort = function () {
+                this.keys.sort(function (a, b) { return a.time - b.time; });
+            };
+            AnimationCurve1.prototype.deleteKey = function (key) {
+                var index = this.keys.indexOf(key);
+                if (index != -1)
+                    this.keys.splice(index, 1);
+            };
+            AnimationCurve1.prototype.getKey = function (index) {
+                return this.keys[index];
+            };
+            AnimationCurve1.prototype.indexOfKeys = function (key) {
+                return this.keys.indexOf(key);
+            };
+            AnimationCurve1.prototype.getPoint = function (t) {
+                var wrapMode = framework.AnimationCurveWrapMode.Clamp;
+                if (t < 0)
+                    wrapMode = this.preWrapMode;
+                else if (t > 1)
+                    wrapMode = this.postWrapMode;
+                switch (wrapMode) {
+                    case framework.AnimationCurveWrapMode.Clamp:
+                        t = gd3d.math.floatClamp(t, 0, 1);
+                        break;
+                    case framework.AnimationCurveWrapMode.Loop:
+                        t = gd3d.math.floatClamp(t - Math.floor(t), 0, 1);
+                        break;
+                    case framework.AnimationCurveWrapMode.PingPong:
+                        t = gd3d.math.floatClamp(t - Math.floor(t), 0, 1);
+                        if (Math.floor(t) % 2 == 1)
+                            t = 1 - t;
+                        break;
+                }
+                var keys = this.keys;
+                var maxtan = this.maxtan;
+                var value = 0, tangent = 0, isfind = false;
+                ;
+                for (var i = 0, n = keys.length; i < n; i++) {
+                    var key = keys[i];
+                    var prekey = keys[i - 1];
+                    if (i > 0 && prekey.time <= t && t <= key.time) {
+                        var xstart = prekey.time;
+                        var ystart = prekey.value;
+                        var tanstart = prekey.outTangent;
+                        var xend = key.time;
+                        var yend = key.value;
+                        var tanend = key.inTangent;
+                        if (maxtan > Math.abs(tanstart) && maxtan > Math.abs(tanend)) {
+                            var ct = (t - prekey.time) / (key.time - prekey.time);
+                            var sys = [ystart, ystart + tanstart * (xend - xstart) / 3, yend - tanend * (xend - xstart) / 3, yend];
+                            var fy = framework.BezierCurve.getValue(ct, sys);
+                            isfind = true;
+                            value = fy;
+                            tangent = framework.BezierCurve.getDerivative(ct, sys) / (xend - xstart);
+                            break;
+                        }
+                        else {
+                            isfind = true;
+                            value = prekey.value;
+                            tangent = 0;
+                            break;
+                        }
+                    }
+                    if (i == 0 && t <= key.time) {
+                        isfind = true;
+                        value = key.value;
+                        tangent = 0;
+                        break;
+                    }
+                    if (i == n - 1 && t >= key.time) {
+                        isfind = true;
+                        value = key.value;
+                        tangent = 0;
+                        break;
+                    }
+                }
+                if (keys.length == 0)
+                    return { time: t, value: 0, inTangent: 0, outTangent: 0 };
+                return { time: t, value: value, inTangent: tangent, outTangent: tangent };
+            };
+            AnimationCurve1.prototype.getValue = function (t) {
+                var point = this.getPoint(t);
+                if (!point)
+                    return 0;
+                return point.value;
+            };
+            AnimationCurve1.prototype.findKey = function (t, y, precision) {
+                var keys = this.keys;
+                for (var i = 0; i < keys.length; i++) {
+                    if (Math.abs(keys[i].time - t) < precision && Math.abs(keys[i].value - y) < precision) {
+                        return keys[i];
+                    }
+                }
+                return null;
+            };
+            AnimationCurve1.prototype.addKeyAtCurve = function (time, value, precision) {
+                var point = this.getPoint(time);
+                if (Math.abs(value - point.value) < precision) {
+                    this.keys.push(point);
+                    this.keys.sort(function (a, b) { return a.time - b.time; });
+                    return point;
+                }
+                return null;
+            };
+            AnimationCurve1.prototype.getSamples = function (num) {
+                if (num === void 0) { num = 100; }
+                var results = [];
+                for (var i = 0; i <= num; i++) {
+                    var p = this.getPoint(i / num);
+                    results.push(p);
+                }
+                return results;
+            };
+            return AnimationCurve1;
+        }());
+        framework.AnimationCurve1 = AnimationCurve1;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimationCurveWrapMode;
+        (function (AnimationCurveWrapMode) {
+            AnimationCurveWrapMode[AnimationCurveWrapMode["Clamp"] = 1] = "Clamp";
+            AnimationCurveWrapMode[AnimationCurveWrapMode["Loop"] = 2] = "Loop";
+            AnimationCurveWrapMode[AnimationCurveWrapMode["PingPong"] = 4] = "PingPong";
+        })(AnimationCurveWrapMode = framework.AnimationCurveWrapMode || (framework.AnimationCurveWrapMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var BezierCurve = (function () {
+            function BezierCurve() {
+            }
+            BezierCurve.linear = function (t, p0, p1) {
+                return p0 + t * (p1 - p0);
+            };
+            BezierCurve.linearDerivative = function (t, p0, p1) {
+                return p1 - p0;
+            };
+            BezierCurve.linearSecondDerivative = function (t, p0, p1) {
+                return 0;
+            };
+            BezierCurve.quadratic = function (t, p0, p1, p2) {
+                return (1 - t) * (1 - t) * p0 + 2 * (1 - t) * t * p1 + t * t * p2;
+            };
+            BezierCurve.quadraticDerivative = function (t, p0, p1, p2) {
+                return 2 * (1 - t) * (p1 - p0) + 2 * t * (p2 - p1);
+            };
+            BezierCurve.quadraticSecondDerivative = function (t, p0, p1, p2) {
+                return 2 * (p2 - 2 * p1 + p0);
+            };
+            BezierCurve.cubic = function (t, p0, p1, p2, p3) {
+                return (1 - t) * (1 - t) * (1 - t) * p0 + 3 * (1 - t) * (1 - t) * t * p1 + 3 * (1 - t) * t * t * p2 + t * t * t * p3;
+            };
+            BezierCurve.cubicDerivative = function (t, p0, p1, p2, p3) {
+                return 3 * (1 - t) * (1 - t) * (p1 - p0) + 6 * (1 - t) * t * (p2 - p1) + 3 * t * t * (p3 - p2);
+            };
+            BezierCurve.cubicSecondDerivative = function (t, p0, p1, p2, p3) {
+                return 6 * (1 - t) * (p2 - 2 * p1 + p0) + 6 * t * (p3 - 2 * p2 + p1);
+            };
+            BezierCurve.bn = function (t, ps, processs) {
+                if (processs === void 0) { processs = null; }
+                ps = ps.concat();
+                if (processs)
+                    processs.push(ps.concat());
+                for (var i = ps.length - 1; i > 0; i--) {
+                    for (var j = 0; j < i; j++) {
+                        ps[j] = (1 - t) * ps[j] + t * ps[j + 1];
+                    }
+                    if (processs) {
+                        ps.length = ps.length - 1;
+                        processs.push(ps.concat());
+                    }
+                }
+                return ps[0];
+            };
+            BezierCurve.bnDerivative = function (t, ps) {
+                if (ps.length < 2)
+                    return 0;
+                ps = ps.concat();
+                for (var i = 0, n = ps.length - 1; i < n; i++) {
+                    ps[i] = ps[i + 1] - ps[i];
+                }
+                ps.length = ps.length - 1;
+                var v = ps.length * this.bn(t, ps);
+                return v;
+            };
+            BezierCurve.bnSecondDerivative = function (t, ps) {
+                if (ps.length < 3)
+                    return 0;
+                ps = ps.concat();
+                for (var i = 0, n = ps.length - 1; i < n; i++) {
+                    ps[i] = ps[i + 1] - ps[i];
+                }
+                ps.length = ps.length - 1;
+                var v = ps.length * this.bnDerivative(t, ps);
+                return v;
+            };
+            BezierCurve.bnND = function (t, dn, ps) {
+                if (ps.length < dn + 1)
+                    return 0;
+                var factorial = 1;
+                ps = ps.concat();
+                for (var j = 0; j < dn; j++) {
+                    for (var i = 0, n = ps.length - 1; i < n; i++) {
+                        ps[i] = ps[i + 1] - ps[i];
+                    }
+                    ps.length = ps.length - 1;
+                    factorial *= ps.length;
+                }
+                var v = factorial * this.bn(t, ps);
+                return v;
+            };
+            BezierCurve.getValue = function (t, ps) {
+                if (ps.length == 2) {
+                    return this.linear(t, ps[0], ps[1]);
+                }
+                if (ps.length == 3) {
+                    return this.quadratic(t, ps[0], ps[1], ps[2]);
+                }
+                if (ps.length == 4) {
+                    return this.cubic(t, ps[0], ps[1], ps[2], ps[3]);
+                }
+                return this.bn(t, ps);
+            };
+            BezierCurve.getDerivative = function (t, ps) {
+                if (ps.length == 2) {
+                    return this.linearDerivative(t, ps[0], ps[1]);
+                }
+                if (ps.length == 3) {
+                    return this.quadraticDerivative(t, ps[0], ps[1], ps[2]);
+                }
+                if (ps.length == 4) {
+                    return this.cubicDerivative(t, ps[0], ps[1], ps[2], ps[3]);
+                }
+                return this.bnDerivative(t, ps);
+            };
+            BezierCurve.getSecondDerivative = function (t, ps) {
+                if (ps.length == 2) {
+                    return this.linearSecondDerivative(t, ps[0], ps[1]);
+                }
+                if (ps.length == 3) {
+                    return this.quadraticSecondDerivative(t, ps[0], ps[1], ps[2]);
+                }
+                if (ps.length == 4) {
+                    return this.cubicSecondDerivative(t, ps[0], ps[1], ps[2], ps[3]);
+                }
+                return this.bnSecondDerivative(t, ps);
+            };
+            BezierCurve.getExtremums = function (ps, numSamples, precision) {
+                var _this = this;
+                if (numSamples === void 0) { numSamples = 10; }
+                if (precision === void 0) { precision = 0.0000001; }
+                var samples = [];
+                for (var i = 0; i <= numSamples; i++) {
+                    samples.push(this.getDerivative(i / numSamples, ps));
+                }
+                var resultTs = [];
+                var resultVs = [];
+                for (var i = 0, n = numSamples; i < n; i++) {
+                    if (samples[i] * samples[i + 1] < 0) {
+                        var guessT = framework.EquationSolving.line(function (x) { return _this.getDerivative(x, ps); }, i / numSamples, (i + 1) / numSamples, precision);
+                        resultTs.push(guessT);
+                        resultVs.push(this.getValue(guessT, ps));
+                    }
+                }
+                return { ts: resultTs, vs: resultVs };
+            };
+            BezierCurve.getMonotoneIntervals = function (ps, numSamples, precision) {
+                if (numSamples === void 0) { numSamples = 10; }
+                if (precision === void 0) { precision = 0.0000001; }
+                var monotoneIntervalTs = [0, 1];
+                var monotoneIntervalVs = [ps[0], ps[ps.length - 1]];
+                var extremums = this.getExtremums(ps, numSamples, precision);
+                for (var i = 0; i < extremums.ts.length; i++) {
+                    monotoneIntervalTs.splice(i + 1, 0, extremums.ts[i]);
+                    monotoneIntervalVs.splice(i + 1, 0, extremums.vs[i]);
+                }
+                return { ts: monotoneIntervalTs, vs: monotoneIntervalVs };
+            };
+            BezierCurve.getTFromValue = function (targetV, ps, numSamples, precision) {
+                var _this = this;
+                if (numSamples === void 0) { numSamples = 10; }
+                if (precision === void 0) { precision = 0.0000001; }
+                var monotoneIntervals = this.getMonotoneIntervals(ps, numSamples, precision);
+                var monotoneIntervalTs = monotoneIntervals.ts;
+                var monotoneIntervalVs = monotoneIntervals.vs;
+                var results = [];
+                for (var i = 0, n = monotoneIntervalVs.length - 1; i < n; i++) {
+                    if ((monotoneIntervalVs[i] - targetV) * (monotoneIntervalVs[i + 1] - targetV) <= 0) {
+                        var fx = function (x) { return _this.getValue(x, ps) - targetV; };
+                        var result = framework.EquationSolving.line(fx, monotoneIntervalTs[i], monotoneIntervalTs[i + 1], precision);
+                        results.push(result);
+                    }
+                }
+                return results;
+            };
+            BezierCurve.split = function (t, ps) {
+                var processs = [];
+                BezierCurve.bn(t, ps, processs);
+                var fps = [];
+                var sps = [];
+                for (var i = processs.length - 1; i >= 0; i--) {
+                    if (i == processs.length - 1) {
+                        fps.push(processs[i][0]);
+                        fps.push(processs[i][0]);
+                    }
+                    else {
+                        fps.unshift(processs[i][0]);
+                        sps.push(processs[i].pop());
+                    }
+                }
+                return [fps, sps];
+            };
+            BezierCurve.merge = function (fps, sps, mergeType) {
+                if (mergeType === void 0) { mergeType = 0; }
+                fps = fps.concat();
+                sps = sps.concat();
+                var processs = [];
+                var t;
+                var pps;
+                var ps;
+                for (var i = 0, n = fps.length; i < n; i++) {
+                    ps = processs[i] = [];
+                    if (i == 0) {
+                        processs[i][0] = fps.pop();
+                        sps.shift();
+                    }
+                    else if (i == 1) {
+                        processs[i][0] = fps.pop();
+                        processs[i][1] = sps.shift();
+                        t = (processs[i - 1][0] - processs[i][0]) / (processs[i][1] - processs[i][0]);
+                    }
+                    else {
+                        pps = processs[i - 1];
+                        var nfp = fps.pop();
+                        var nsp = sps.shift();
+                        var ps0 = [];
+                        ps0[0] = nfp;
+                        for (var j = 0, n_1 = pps.length; j < n_1; j++) {
+                            ps0[j + 1] = ps0[j] + (pps[j] - ps0[j]) / t;
+                        }
+                        var ps1 = [];
+                        ps1[pps.length] = nsp;
+                        for (var j = pps.length - 1; j >= 0; j--) {
+                            ps1[j] = ps1[j + 1] - (ps1[j + 1] - pps[j]) / (1 - t);
+                        }
+                        if (mergeType == 1) {
+                            for (var j = 0, n_2 = ps0.length - 1; j <= n_2; j++) {
+                                ps[j] = (ps0[j] * (n_2 - j) + ps1[j] * j) / n_2;
+                            }
+                        }
+                        else if (mergeType == 0) {
+                            for (var j = 0, n_3 = ps0.length - 1; j <= n_3; j++) {
+                                if (j < n_3 / 2) {
+                                    ps[j] = ps0[j];
+                                }
+                                else if (j > n_3 / 2) {
+                                    ps[j] = ps1[j];
+                                }
+                                else {
+                                    ps[j] = (ps0[j] + ps1[j]) / 2;
+                                }
+                            }
+                        }
+                        else {
+                            console.error("\u5408\u5E76\u7C7B\u578B mergeType " + mergeType + " \u9519\u8BEF!");
+                        }
+                    }
+                }
+                return processs.pop();
+            };
+            BezierCurve.getSamples = function (ps, num) {
+                if (num === void 0) { num = 100; }
+                var results = [];
+                for (var i = 0; i <= num; i++) {
+                    var t = i / num;
+                    var p = this.getValue(t, ps);
+                    results.push({ t: t, v: p });
+                }
+                return results;
+            };
+            return BezierCurve;
+        }());
+        framework.BezierCurve = BezierCurve;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var MinMaxCurve = (function () {
+            function MinMaxCurve() {
+                this.mode = framework.MinMaxCurveMode.Constant;
+                this.constant = 0;
+                this.constantMin = 0;
+                this.constantMax = 0;
+                this.curve = new framework.AnimationCurve1();
+                this.curveMin = new framework.AnimationCurve1();
+                this.curveMax = new framework.AnimationCurve1();
+                this.curveMultiplier = 1;
+                this.between0And1 = false;
+            }
+            MinMaxCurve.prototype.getValue = function (time, randomBetween) {
+                if (randomBetween === void 0) { randomBetween = Math.random(); }
+                switch (this.mode) {
+                    case framework.MinMaxCurveMode.Constant:
+                        return this.constant;
+                    case framework.MinMaxCurveMode.Curve:
+                        return this.curve.getValue(time) * this.curveMultiplier;
+                    case framework.MinMaxCurveMode.TwoConstants:
+                        return gd3d.math.numberLerp(this.constantMin, this.constantMax, randomBetween);
+                    case framework.MinMaxCurveMode.TwoCurves:
+                        return gd3d.math.numberLerp(this.curveMin.getValue(time), this.curveMax.getValue(time), randomBetween) * this.curveMultiplier;
+                }
+                return this.constant;
+            };
+            return MinMaxCurve;
+        }());
+        framework.MinMaxCurve = MinMaxCurve;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var MinMaxCurveMode;
+        (function (MinMaxCurveMode) {
+            MinMaxCurveMode[MinMaxCurveMode["Constant"] = 0] = "Constant";
+            MinMaxCurveMode[MinMaxCurveMode["Curve"] = 1] = "Curve";
+            MinMaxCurveMode[MinMaxCurveMode["TwoConstants"] = 3] = "TwoConstants";
+            MinMaxCurveMode[MinMaxCurveMode["TwoCurves"] = 2] = "TwoCurves";
+        })(MinMaxCurveMode = framework.MinMaxCurveMode || (framework.MinMaxCurveMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var MinMaxCurveVector3 = (function () {
+            function MinMaxCurveVector3() {
+                this.xCurve = new framework.MinMaxCurve();
+                this.yCurve = new framework.MinMaxCurve();
+                this.zCurve = new framework.MinMaxCurve();
+            }
+            MinMaxCurveVector3.prototype.getValue = function (time, randomBetween) {
+                if (randomBetween === void 0) { randomBetween = Math.random(); }
+                return new gd3d.math.vector3(this.xCurve.getValue(time, randomBetween), this.yCurve.getValue(time, randomBetween), this.zCurve.getValue(time, randomBetween));
+            };
+            return MinMaxCurveVector3;
+        }());
+        framework.MinMaxCurveVector3 = MinMaxCurveVector3;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var Gradient = (function () {
+            function Gradient() {
+                this.mode = framework.GradientMode.Blend;
+                this.alphaKeys = [{ alpha: 1, time: 0 }, { alpha: 1, time: 1 }];
+                this.colorKeys = [{ color: new gd3d.math.color(1, 1, 1), time: 0 }, { color: new gd3d.math.color(1, 1, 1), time: 1 }];
+            }
+            Gradient.prototype.getValue = function (time) {
+                var alpha = this.getAlpha(time);
+                var color = this.getColor(time);
+                return new gd3d.math.color(color.r, color.g, color.b, alpha);
+            };
+            Gradient.prototype.getAlpha = function (time) {
+                var alphaKeys = this.alphaKeys;
+                if (alphaKeys.length == 1)
+                    return alphaKeys[0].alpha;
+                if (time <= alphaKeys[0].time)
+                    return alphaKeys[0].alpha;
+                if (time >= alphaKeys[alphaKeys.length - 1].time)
+                    return alphaKeys[alphaKeys.length - 1].alpha;
+                for (var i = 0, n = alphaKeys.length - 1; i < n; i++) {
+                    var t = alphaKeys[i].time, v = alphaKeys[i].alpha, nt = alphaKeys[i + 1].time, nv = alphaKeys[i + 1].alpha;
+                    if (time == t)
+                        return v;
+                    if (time == nt)
+                        return nv;
+                    if (t < time && time < nt) {
+                        if (this.mode == framework.GradientMode.Fixed)
+                            return nv;
+                        return gd3d.math.mapLinear(time, t, nt, v, nv);
+                    }
+                }
+                return 1;
+            };
+            Gradient.prototype.getColor = function (time) {
+                var colorKeys = this.colorKeys;
+                if (colorKeys.length == 1)
+                    return colorKeys[0].color;
+                if (time <= colorKeys[0].time)
+                    return colorKeys[0].color;
+                if (time >= colorKeys[colorKeys.length - 1].time)
+                    return colorKeys[colorKeys.length - 1].color;
+                for (var i = 0, n = colorKeys.length - 1; i < n; i++) {
+                    var t = colorKeys[i].time, v = colorKeys[i].color, nt = colorKeys[i + 1].time, nv = colorKeys[i + 1].color;
+                    if (time == t)
+                        return v;
+                    if (time == nt)
+                        return nv;
+                    if (t < time && time < nt) {
+                        if (this.mode == framework.GradientMode.Fixed)
+                            return nv;
+                        var color = new gd3d.math.color();
+                        gd3d.math.colorLerp(v, nv, (time - t) / (nt - t), color);
+                        return color;
+                    }
+                }
+                return new gd3d.math.color();
+            };
+            return Gradient;
+        }());
+        framework.Gradient = Gradient;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var GradientMode;
+        (function (GradientMode) {
+            GradientMode[GradientMode["Blend"] = 0] = "Blend";
+            GradientMode[GradientMode["Fixed"] = 1] = "Fixed";
+        })(GradientMode = framework.GradientMode || (framework.GradientMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var MinMaxGradient = (function () {
+            function MinMaxGradient() {
+                this.mode = framework.MinMaxGradientMode.Color;
+                this.color = new gd3d.math.color();
+                this.colorMin = new gd3d.math.color();
+                this.colorMax = new gd3d.math.color();
+                this.gradient = new framework.Gradient();
+                this.gradientMin = new framework.Gradient();
+                this.gradientMax = new framework.Gradient();
+            }
+            MinMaxGradient.prototype.getValue = function (time, randomBetween, out) {
+                if (randomBetween === void 0) { randomBetween = Math.random(); }
+                if (out === void 0) { out = new gd3d.math.color(); }
+                switch (this.mode) {
+                    case framework.MinMaxGradientMode.Color:
+                        gd3d.math.colorClone(this.color, out);
+                        break;
+                    case framework.MinMaxGradientMode.Gradient:
+                        gd3d.math.colorClone(this.gradient.getValue(time), out);
+                        break;
+                    case framework.MinMaxGradientMode.TwoColors:
+                        gd3d.math.colorLerp(this.colorMin, this.colorMax, randomBetween, out);
+                        break;
+                    case framework.MinMaxGradientMode.TwoGradients:
+                        var min = this.gradientMin.getValue(time);
+                        var max = this.gradientMax.getValue(time);
+                        gd3d.math.colorLerp(min, max, randomBetween, out);
+                        break;
+                    case framework.MinMaxGradientMode.RandomColor:
+                        var v = this.gradient.getValue(randomBetween);
+                        gd3d.math.colorClone(v, out);
+                        break;
+                }
+                return out;
+            };
+            return MinMaxGradient;
+        }());
+        framework.MinMaxGradient = MinMaxGradient;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var MinMaxGradientMode;
+        (function (MinMaxGradientMode) {
+            MinMaxGradientMode[MinMaxGradientMode["Color"] = 0] = "Color";
+            MinMaxGradientMode[MinMaxGradientMode["Gradient"] = 1] = "Gradient";
+            MinMaxGradientMode[MinMaxGradientMode["TwoColors"] = 2] = "TwoColors";
+            MinMaxGradientMode[MinMaxGradientMode["TwoGradients"] = 3] = "TwoGradients";
+            MinMaxGradientMode[MinMaxGradientMode["RandomColor"] = 4] = "RandomColor";
+        })(MinMaxGradientMode = framework.MinMaxGradientMode || (framework.MinMaxGradientMode = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -38059,7 +38065,7 @@ var gd3d;
         else if (typeof global != "undefined") {
             _global = global;
         }
-        var _classNameSpaces = ["feng3d"];
+        var _classNameSpaces = ["gd3d.framework"];
         function registerClass(classDefinition, className) {
             var prototype = classDefinition.prototype;
             Object.defineProperty(prototype, CLASS_KEY, { value: className, writable: true });

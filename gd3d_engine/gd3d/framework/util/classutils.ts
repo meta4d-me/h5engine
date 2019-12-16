@@ -131,7 +131,7 @@ namespace gd3d.framework
         _global = <any>global;
     }
 
-    var _classNameSpaces = ["feng3d"];
+    var _classNameSpaces = ["gd3d.framework"];
 
 
     /**

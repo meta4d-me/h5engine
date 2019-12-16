@@ -19,7 +19,7 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class ParticleSystem implements IRenderer
     {
-        static readonly ClassName: string = "ParticleSystem";
+        static readonly ClassName: string = "particlesystem";
 
         __class__: "gd3d.framework.ParticleSystem";
 
@@ -294,6 +294,26 @@ namespace gd3d.framework
          */
         startDelay = 0;
 
+        @gd3d.reflect.Field("ParticleSystemData")
+        get particleSystemData()
+        {
+            return this._particleSystemData;
+        }
+
+        set particleSystemData(v)
+        {
+            var data = ParticleSystemData.get(v.value);
+            if (data.objectData)
+            {
+                serialization.setValue(this, data.objectData);
+            } else
+            {
+                data.particleSystem = this;
+            }
+            this._particleSystemData = data;
+        }
+        private _particleSystemData: ParticleSystemData;
+
         onPlay()
         {
 
@@ -500,12 +520,21 @@ namespace gd3d.framework
                 var cameraUp = new math.vector3();
                 camera.gameObject.transform.getForwardInWorld(cameraForward);
                 camera.gameObject.transform.getUpInWorld(cameraUp);
-                math.matrixTransformNormal(cameraForward, this.worldToLocalMatrix, cameraForward);
-                math.matrixTransformNormal(cameraUp, this.worldToLocalMatrix, cameraUp);
-                math.matrixLookatLH(cameraForward, cameraUp, billboardMatrix);
+                if (this.main.simulationSpace == ParticleSystemSimulationSpace.Local)
+                {
+                    math.matrixTransformNormal(cameraForward, this.worldToLocalMatrix, cameraForward);
+                    math.matrixTransformNormal(cameraUp, this.worldToLocalMatrix, cameraUp);
+                }
+
+                math.matrixLookat(new math.vector3(), cameraForward, cameraUp, billboardMatrix);
             }
 
             this.material.setMatrix("u_particle_billboardMatrix", billboardMatrix);
+
+            if (this.main.simulationSpace == ParticleSystemSimulationSpace.World)
+            {
+                gd3d.math.matrixClone(context.matrixViewProject, context.matrixModelViewProject);
+            }
 
             if (!isSupportDrawInstancedArrays)
             {
@@ -545,7 +574,6 @@ namespace gd3d.framework
                 var stride = this._attributes.reduce((pv, cv) => pv += cv[1], 0) * 4;
                 if (isSupportDrawInstancedArrays && this.particleCount > 0)
                 {
-                    data = data.concat(data);
                     var vbo = this._getVBO(context.webgl);
 
                     var drawInstanceInfo: DrawInstanceInfo = {
@@ -594,13 +622,13 @@ namespace gd3d.framework
         private _vbos: [WebGLRenderingContext, WebGLBuffer][] = [];
         private _getVBO(gl: WebGLRenderingContext)
         {
-            // for (let i = 0, n = this._vbos.length; i < n; i++)
-            // {
-            //     if (this._vbos[i][0] == gl)
-            //         return this._vbos[i][1];
-            // }
+            for (let i = 0, n = this._vbos.length; i < n; i++)
+            {
+                if (this._vbos[i][0] == gl)
+                    return this._vbos[i][1];
+            }
             var vbo = gl.createBuffer();
-            // this._vbos.push([gl, vbo]);
+            this._vbos.push([gl, vbo]);
             return vbo;
         }
 

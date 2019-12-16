@@ -82,6 +82,8 @@ namespace gd3d.framework
                     return AssetTypeEnum.DDS;
                 case ".keyframeAniclip.json":
                     return AssetTypeEnum.KeyFrameAniclip;
+                case ".particlesystem.json":
+                    return AssetTypeEnum.ParticleSystem;
             }
 
             i = file.indexOf(".", i + 1);
