@@ -394,35 +394,51 @@ namespace gd3d.framework
          */
         setTexture(_id: string, _texture: gd3d.framework.texture, resname: string = "")
         {
-            if ((this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) || _id == "_LightmapTex")
-            {
-                if (this.statedMapUniforms[_id] != null && (!this.statedMapUniforms[_id].defaultAsset))
-                {
-                    this.statedMapUniforms[_id].unuse();
-                }
-                this.statedMapUniforms[_id] = _texture;
-                if (_texture != null)
-                {
-                    if (_texture.getName() == "_color")
-                    {
-                        _texture;
-                    }
-                    if (!_texture.defaultAsset)
-                    {
-                        _texture.use();
-                    }
-                    //图片的尺寸信息(1/width,1/height,width,height)
-                    let _texelsizeName = _id + "_TexelSize";
-                    let _gltexture = _texture.glTexture;
-                    if (_gltexture != null && this.defaultMapUniform[_texelsizeName] != null)
-                    {
-                        this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
-                    }
-                }
-            } else
-            {
+            // if((this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) || _id == "_LightmapTex"){
+            if(!(this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) && _id != "_LightmapTex"){
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                return;
             }
+
+            let oldTex = this.statedMapUniforms[_id] as gd3d.framework.texture;
+            if(oldTex != null ){
+                if(oldTex == _texture) return;
+                if (this.statedMapUniforms[_id].defaultAsset)
+                {
+                    oldTex = null;
+                    // this.statedMapUniforms[_id].unuse();
+                }
+
+            }
+            // let old;
+            this.statedMapUniforms[_id] = _texture;
+            if (_texture != null)
+            {
+                if (_texture.getName() == "_color")
+                {
+                    _texture;
+                }
+                if (!_texture.defaultAsset)
+                {
+                    _texture.use();
+                }
+                //图片的尺寸信息(1/width,1/height,width,height)
+                let _texelsizeName = _id + "_TexelSize";
+                let _gltexture = _texture.glTexture;
+                if (_gltexture != null && this.defaultMapUniform[_texelsizeName] != null)
+                {
+                    this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
+                }
+            }
+
+            if(oldTex) oldTex.unuse();
+
+            // if ((this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) || _id == "_LightmapTex")
+            // {
+            // } else
+            // {
+            //     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+            // }
 
         }
 
