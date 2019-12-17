@@ -23,7 +23,7 @@ class test_ParticleSystem implements IState
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
 
-    private _particles = ["ps_inheritVelocity", "aaaaa", "ParticleSystem", "Fire", "Flames"];
+    private _particles = ["ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames"];
     private _particle: gd3d.framework.transform;
 
     private _isMove = false;
@@ -67,7 +67,7 @@ class test_ParticleSystem implements IState
         this._showParticle(v);
         this._particleName = v;
     }
-    private _particleName: string = "ParticleSystem";
+    private _particleName: string = "ps_inheritVelocity";
 
     private init()
     {
@@ -117,35 +117,6 @@ class test_ParticleSystem implements IState
 
         this._particleStartPosition = new gd3d.math.vector3();
         gd3d.math.vec3Clone(this._particle.localPosition, this._particleStartPosition);
-    }
-
-    private initParticleSystem()
-    {
-        let tran = new gd3d.framework.transform();
-        tran.name = "ParticleSystem";
-        gd3d.math.quatFromAxisAngle(new gd3d.math.vector3(1, 0, 0), -90, tran.localRotate);
-        tran.localRotate = tran.localRotate;
-        // tran.localPosition = new gd3d.math.vector3(-7.2, 0.29, 2.826);
-        this.scene.addChild(tran);
-
-        // 新建粒子材质
-        var mat = new gd3d.framework.material("defparticle1");
-        var shader = test_ParticleSystem_particles_additive_drawInstanced.initShader(this.astMgr, this.astMgr.shaderPool);
-        // var shader = test_ParticleSystem_particles_additive.initShader(this.astMgr, this.astMgr.shaderPool);
-        mat.setShader(shader);
-
-        var tex = this.astMgr.getDefaultTexture(gd3d.framework.defTexture.particle);
-        mat.setTexture("_MainTex", tex);
-        //
-        let ps = tran.gameObject.getComponent("particlesystem") as gd3d.framework.ParticleSystem;
-        if (!ps) ps = tran.gameObject.addComponent("particlesystem") as any;
-        //
-        ps.material = mat;
-
-        gd3d.framework.serialization.setValue(ps, pd);
-
-        //
-        ps.play();
     }
 
     update(delta: number)

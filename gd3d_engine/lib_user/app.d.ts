@@ -638,19 +638,7 @@ declare class test_ParticleSystem implements IState {
     private _particleName;
     private init;
     private _showParticle;
-    private initParticleSystem;
     update(delta: number): void;
-}
-declare var pd: gd3d.framework.gPartial<gd3d.framework.ParticleSystem>;
-declare class test_ParticleSystem_particles_additive {
-    static initShader(assetmgr: gd3d.framework.assetMgr, pool: gd3d.render.shaderPool): gd3d.framework.shader;
-    static vscode: string;
-    static fscode: string;
-}
-declare class test_ParticleSystem_particles_additive_drawInstanced {
-    static initShader(assetmgr: gd3d.framework.assetMgr, pool: gd3d.render.shaderPool): gd3d.framework.shader;
-    static vscode: string;
-    static fscode: string;
 }
 declare class test_RangeScreen implements IState {
     app: gd3d.framework.application;
