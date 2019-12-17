@@ -1,1 +1,14 @@
-{"files":{"-1344.particlesystem.json":10,"particle.imgdesc.json":16,"particle.mat.json":17,"ps_inheritVelocity.cprefab.json":14},"texs":{"particle.png":13},"pkg":["ps_inheritVelocity.jpkg.json"]}
+{
+    "files": {
+        "-1344.particlesystem.json": 100,
+        "particle.imgdesc.json": 160,
+        "particle.mat.json": 170,
+        "ps_inheritVelocity.cprefab.json": 140
+    },
+    "texs": {
+        "particle.png": 130
+    },
+    "pkg": [
+        "ps_inheritVelocity.jpkg.json"
+    ]
+}
