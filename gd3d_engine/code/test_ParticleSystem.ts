@@ -23,11 +23,19 @@ class test_ParticleSystem implements IState
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
 
-    private _particles = ["ParticleSystem", "Fire", "Flames"];
+    private _particles = ["aaaaa", "ParticleSystem", "Fire", "Flames"];
     private _particle: gd3d.framework.transform;
+
+    private _isMove = false;
+    private _particleStartPosition = new gd3d.math.vector3();
+    private _particleCurrentPosition = new gd3d.math.vector3();
+    private _moveRadius = 5;
+    private _moveAngle = 0;
+    private _moveAngleSpeed = 1;
 
     async start(app: gd3d.framework.application)
     {
+        debugger;
         this.app = app;
         this.scene = this.app.getScene();
         this.astMgr = this.app.getAssetMgr();
@@ -46,6 +54,9 @@ class test_ParticleSystem implements IState
         if (!dat) return;
         let gui = new dat.GUI();
         gui.add(this, 'particleName', this._particles);
+        gui.add(this, '_isMove');
+        gui.add(this, '_moveRadius');
+        gui.add(this, '_moveAngleSpeed');
     }
 
     private get particleName()
@@ -57,7 +68,7 @@ class test_ParticleSystem implements IState
         this._showParticle(v);
         this._particleName = v;
     }
-    private _particleName = "ParticleSystem";
+    private _particleName: string;
 
     private init()
     {
@@ -105,6 +116,8 @@ class test_ParticleSystem implements IState
             ps.play();
         }
 
+        this._particleStartPosition = new gd3d.math.vector3();
+        gd3d.math.vec3Clone(this._particle.localPosition, this._particleStartPosition);
     }
 
     private initParticleSystem()
@@ -138,6 +151,23 @@ class test_ParticleSystem implements IState
 
     update(delta: number)
     {
+        if (!this._particle) return;
 
+        if (this._isMove)
+        {
+            var offsetX = Math.cos(this._moveAngle / 180 * Math.PI) * this._moveRadius;
+            var offsetZ = Math.sin(this._moveAngle / 180 * Math.PI) * this._moveRadius;
+
+            this._particleCurrentPosition.x = this._particleStartPosition.x + offsetX;
+            this._particleCurrentPosition.y = this._particleStartPosition.y;
+            this._particleCurrentPosition.z = this._particleStartPosition.z + offsetZ;
+
+            this._particle.localPosition = this._particleCurrentPosition;
+
+            this._moveAngle += this._moveAngleSpeed;
+        } else
+        {
+            this._particle.localPosition = this._particleStartPosition;
+        }
     }
 }

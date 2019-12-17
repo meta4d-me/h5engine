@@ -6195,158 +6195,6 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class AnimationCurve1 {
-        __class__: "gd3d.framework.AnimationCurve1";
-        maxtan: number;
-        preWrapMode: AnimationCurveWrapMode;
-        postWrapMode: AnimationCurveWrapMode;
-        keys: AnimationCurveKeyframe[];
-        readonly numKeys: number;
-        addKey(key: AnimationCurveKeyframe): void;
-        sort(): void;
-        deleteKey(key: AnimationCurveKeyframe): void;
-        getKey(index: number): AnimationCurveKeyframe;
-        indexOfKeys(key: AnimationCurveKeyframe): number;
-        getPoint(t: number): AnimationCurveKeyframe;
-        getValue(t: number): number;
-        findKey(t: number, y: number, precision: number): AnimationCurveKeyframe;
-        addKeyAtCurve(time: number, value: number, precision: number): AnimationCurveKeyframe;
-        getSamples(num?: number): AnimationCurveKeyframe[];
-    }
-}
-declare namespace gd3d.framework {
-    interface AnimationCurveKeyframe {
-        time: number;
-        value: number;
-        inTangent: number;
-        outTangent: number;
-    }
-}
-declare namespace gd3d.framework {
-    enum AnimationCurveWrapMode {
-        Clamp = 1,
-        Loop = 2,
-        PingPong = 4
-    }
-}
-declare namespace gd3d.framework {
-    class BezierCurve {
-        static linear(t: number, p0: number, p1: number): number;
-        static linearDerivative(t: number, p0: number, p1: number): number;
-        static linearSecondDerivative(t: number, p0: number, p1: number): number;
-        static quadratic(t: number, p0: number, p1: number, p2: number): number;
-        static quadraticDerivative(t: number, p0: number, p1: number, p2: number): number;
-        static quadraticSecondDerivative(t: number, p0: number, p1: number, p2: number): number;
-        static cubic(t: number, p0: number, p1: number, p2: number, p3: number): number;
-        static cubicDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
-        static cubicSecondDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
-        static bn(t: number, ps: number[], processs?: number[][]): number;
-        static bnDerivative(t: number, ps: number[]): number;
-        static bnSecondDerivative(t: number, ps: number[]): number;
-        static bnND(t: number, dn: number, ps: number[]): number;
-        static getValue(t: number, ps: number[]): number;
-        static getDerivative(t: number, ps: number[]): number;
-        static getSecondDerivative(t: number, ps: number[]): number;
-        static getExtremums(ps: number[], numSamples?: number, precision?: number): {
-            ts: number[];
-            vs: number[];
-        };
-        static getMonotoneIntervals(ps: number[], numSamples?: number, precision?: number): {
-            ts: number[];
-            vs: number[];
-        };
-        static getTFromValue(targetV: number, ps: number[], numSamples?: number, precision?: number): number[];
-        static split(t: number, ps: number[]): number[][];
-        static merge(fps: number[], sps: number[], mergeType?: number): number[];
-        static getSamples(ps: number[], num?: number): {
-            t: number;
-            v: number;
-        }[];
-    }
-}
-declare namespace gd3d.framework {
-    class MinMaxCurve {
-        __class__: "gd3d.framework.MinMaxCurve";
-        mode: MinMaxCurveMode;
-        constant: number;
-        constantMin: number;
-        constantMax: number;
-        curve: AnimationCurve1;
-        curveMin: AnimationCurve1;
-        curveMax: AnimationCurve1;
-        curveMultiplier: number;
-        between0And1: boolean;
-        getValue(time: number, randomBetween?: number): number;
-    }
-}
-declare namespace gd3d.framework {
-    enum MinMaxCurveMode {
-        Constant = 0,
-        Curve = 1,
-        TwoConstants = 3,
-        TwoCurves = 2
-    }
-}
-declare namespace gd3d.framework {
-    class MinMaxCurveVector3 {
-        xCurve: MinMaxCurve;
-        yCurve: MinMaxCurve;
-        zCurve: MinMaxCurve;
-        getValue(time: number, randomBetween?: number): math.vector3;
-    }
-}
-declare namespace gd3d.framework {
-    class Gradient {
-        __class__: "gd3d.framework.Gradient";
-        mode: GradientMode;
-        alphaKeys: GradientAlphaKey[];
-        colorKeys: GradientColorKey[];
-        getValue(time: number): math.color;
-        getAlpha(time: number): number;
-        getColor(time: number): math.color;
-    }
-}
-declare namespace gd3d.framework {
-    interface GradientAlphaKey {
-        alpha: number;
-        time: number;
-    }
-}
-declare namespace gd3d.framework {
-    interface GradientColorKey {
-        color: math.color;
-        time: number;
-    }
-}
-declare namespace gd3d.framework {
-    enum GradientMode {
-        Blend = 0,
-        Fixed = 1
-    }
-}
-declare namespace gd3d.framework {
-    class MinMaxGradient {
-        __class__: "gd3d.framework.MinMaxGradient";
-        mode: MinMaxGradientMode;
-        color: math.color;
-        colorMin: math.color;
-        colorMax: math.color;
-        gradient: Gradient;
-        gradientMin: Gradient;
-        gradientMax: Gradient;
-        getValue(time: number, randomBetween?: number, out?: math.color): math.color;
-    }
-}
-declare namespace gd3d.framework {
-    enum MinMaxGradientMode {
-        Color = 0,
-        Gradient = 1,
-        TwoColors = 2,
-        TwoGradients = 3,
-        RandomColor = 4
-    }
-}
-declare namespace gd3d.framework {
     class ParticleSystemShapeBase {
         protected _module: ParticleShapeModule;
         constructor(module: ParticleShapeModule);
@@ -7696,6 +7544,158 @@ declare namespace gd3d.framework {
         setupWebGL(canvas: Element, opt_attribs?: WebGLContextAttributes, opt_onError?: (msg: string) => void): any;
         create3DContext(canvas: any, opt_attribs: any): any;
         constructor();
+    }
+}
+declare namespace gd3d.framework {
+    class AnimationCurve1 {
+        __class__: "gd3d.framework.AnimationCurve1";
+        maxtan: number;
+        preWrapMode: AnimationCurveWrapMode;
+        postWrapMode: AnimationCurveWrapMode;
+        keys: AnimationCurveKeyframe[];
+        readonly numKeys: number;
+        addKey(key: AnimationCurveKeyframe): void;
+        sort(): void;
+        deleteKey(key: AnimationCurveKeyframe): void;
+        getKey(index: number): AnimationCurveKeyframe;
+        indexOfKeys(key: AnimationCurveKeyframe): number;
+        getPoint(t: number): AnimationCurveKeyframe;
+        getValue(t: number): number;
+        findKey(t: number, y: number, precision: number): AnimationCurveKeyframe;
+        addKeyAtCurve(time: number, value: number, precision: number): AnimationCurveKeyframe;
+        getSamples(num?: number): AnimationCurveKeyframe[];
+    }
+}
+declare namespace gd3d.framework {
+    interface AnimationCurveKeyframe {
+        time: number;
+        value: number;
+        inTangent: number;
+        outTangent: number;
+    }
+}
+declare namespace gd3d.framework {
+    enum AnimationCurveWrapMode {
+        Clamp = 1,
+        Loop = 2,
+        PingPong = 4
+    }
+}
+declare namespace gd3d.framework {
+    class BezierCurve {
+        static linear(t: number, p0: number, p1: number): number;
+        static linearDerivative(t: number, p0: number, p1: number): number;
+        static linearSecondDerivative(t: number, p0: number, p1: number): number;
+        static quadratic(t: number, p0: number, p1: number, p2: number): number;
+        static quadraticDerivative(t: number, p0: number, p1: number, p2: number): number;
+        static quadraticSecondDerivative(t: number, p0: number, p1: number, p2: number): number;
+        static cubic(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        static cubicDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        static cubicSecondDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        static bn(t: number, ps: number[], processs?: number[][]): number;
+        static bnDerivative(t: number, ps: number[]): number;
+        static bnSecondDerivative(t: number, ps: number[]): number;
+        static bnND(t: number, dn: number, ps: number[]): number;
+        static getValue(t: number, ps: number[]): number;
+        static getDerivative(t: number, ps: number[]): number;
+        static getSecondDerivative(t: number, ps: number[]): number;
+        static getExtremums(ps: number[], numSamples?: number, precision?: number): {
+            ts: number[];
+            vs: number[];
+        };
+        static getMonotoneIntervals(ps: number[], numSamples?: number, precision?: number): {
+            ts: number[];
+            vs: number[];
+        };
+        static getTFromValue(targetV: number, ps: number[], numSamples?: number, precision?: number): number[];
+        static split(t: number, ps: number[]): number[][];
+        static merge(fps: number[], sps: number[], mergeType?: number): number[];
+        static getSamples(ps: number[], num?: number): {
+            t: number;
+            v: number;
+        }[];
+    }
+}
+declare namespace gd3d.framework {
+    class MinMaxCurve {
+        __class__: "gd3d.framework.MinMaxCurve";
+        mode: MinMaxCurveMode;
+        constant: number;
+        constantMin: number;
+        constantMax: number;
+        curve: AnimationCurve1;
+        curveMin: AnimationCurve1;
+        curveMax: AnimationCurve1;
+        curveMultiplier: number;
+        between0And1: boolean;
+        getValue(time: number, randomBetween?: number): number;
+    }
+}
+declare namespace gd3d.framework {
+    enum MinMaxCurveMode {
+        Constant = 0,
+        Curve = 1,
+        TwoConstants = 3,
+        TwoCurves = 2
+    }
+}
+declare namespace gd3d.framework {
+    class MinMaxCurveVector3 {
+        xCurve: MinMaxCurve;
+        yCurve: MinMaxCurve;
+        zCurve: MinMaxCurve;
+        getValue(time: number, randomBetween?: number): math.vector3;
+    }
+}
+declare namespace gd3d.framework {
+    class Gradient {
+        __class__: "gd3d.framework.Gradient";
+        mode: GradientMode;
+        alphaKeys: GradientAlphaKey[];
+        colorKeys: GradientColorKey[];
+        getValue(time: number): math.color;
+        getAlpha(time: number): number;
+        getColor(time: number): math.color;
+    }
+}
+declare namespace gd3d.framework {
+    interface GradientAlphaKey {
+        alpha: number;
+        time: number;
+    }
+}
+declare namespace gd3d.framework {
+    interface GradientColorKey {
+        color: math.color;
+        time: number;
+    }
+}
+declare namespace gd3d.framework {
+    enum GradientMode {
+        Blend = 0,
+        Fixed = 1
+    }
+}
+declare namespace gd3d.framework {
+    class MinMaxGradient {
+        __class__: "gd3d.framework.MinMaxGradient";
+        mode: MinMaxGradientMode;
+        color: math.color;
+        colorMin: math.color;
+        colorMax: math.color;
+        gradient: Gradient;
+        gradientMin: Gradient;
+        gradientMax: Gradient;
+        getValue(time: number, randomBetween?: number, out?: math.color): math.color;
+    }
+}
+declare namespace gd3d.framework {
+    enum MinMaxGradientMode {
+        Color = 0,
+        Gradient = 1,
+        TwoColors = 2,
+        TwoGradients = 3,
+        RandomColor = 4
     }
 }
 declare namespace gd3d.io {

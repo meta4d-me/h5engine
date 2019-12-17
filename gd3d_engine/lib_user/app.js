@@ -3899,14 +3899,20 @@ var test_Decal = (function () {
 }());
 var test_ParticleSystem = (function () {
     function test_ParticleSystem() {
-        this._particles = ["ParticleSystem", "Fire", "Flames"];
-        this._particleName = "ParticleSystem";
+        this._particles = ["aaaaa", "ParticleSystem", "Fire", "Flames"];
+        this._isMove = false;
+        this._particleStartPosition = new gd3d.math.vector3();
+        this._particleCurrentPosition = new gd3d.math.vector3();
+        this._moveRadius = 5;
+        this._moveAngle = 0;
+        this._moveAngleSpeed = 1;
     }
     test_ParticleSystem.prototype.start = function (app) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        debugger;
                         this.app = app;
                         this.scene = this.app.getScene();
                         this.astMgr = this.app.getAssetMgr();
@@ -3928,6 +3934,9 @@ var test_ParticleSystem = (function () {
             return;
         var gui = new dat.GUI();
         gui.add(this, 'particleName', this._particles);
+        gui.add(this, '_isMove');
+        gui.add(this, '_moveRadius');
+        gui.add(this, '_moveAngleSpeed');
     };
     Object.defineProperty(test_ParticleSystem.prototype, "particleName", {
         get: function () {
@@ -3979,6 +3988,8 @@ var test_ParticleSystem = (function () {
                         if (ps) {
                             ps.play();
                         }
+                        this._particleStartPosition = new gd3d.math.vector3();
+                        gd3d.math.vec3Clone(this._particle.localPosition, this._particleStartPosition);
                         return [2];
                 }
             });
@@ -4003,6 +4014,20 @@ var test_ParticleSystem = (function () {
         ps.play();
     };
     test_ParticleSystem.prototype.update = function (delta) {
+        if (!this._particle)
+            return;
+        if (this._isMove) {
+            var offsetX = Math.cos(this._moveAngle / 180 * Math.PI) * this._moveRadius;
+            var offsetZ = Math.sin(this._moveAngle / 180 * Math.PI) * this._moveRadius;
+            this._particleCurrentPosition.x = this._particleStartPosition.x + offsetX;
+            this._particleCurrentPosition.y = this._particleStartPosition.y;
+            this._particleCurrentPosition.z = this._particleStartPosition.z + offsetZ;
+            this._particle.localPosition = this._particleCurrentPosition;
+            this._moveAngle += this._moveAngleSpeed;
+        }
+        else {
+            this._particle.localPosition = this._particleStartPosition;
+        }
     };
     return test_ParticleSystem;
 }());

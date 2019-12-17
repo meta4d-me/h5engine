@@ -626,6 +626,12 @@ declare class test_ParticleSystem implements IState {
     astMgr: gd3d.framework.assetMgr;
     private _particles;
     private _particle;
+    private _isMove;
+    private _particleStartPosition;
+    private _particleCurrentPosition;
+    private _moveRadius;
+    private _moveAngle;
+    private _moveAngleSpeed;
     start(app: gd3d.framework.application): Promise<void>;
     setGUI(): void;
     private particleName;
