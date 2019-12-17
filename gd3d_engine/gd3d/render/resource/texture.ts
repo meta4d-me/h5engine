@@ -213,7 +213,7 @@
             //if (url == null)//不给定url 则 texture 不加载
             //    return;
             this.texture = webgl.createTexture();
-            let extname = "WEBGL_compressed_texture_pvrtc";
+            // let extname = "WEBGL_compressed_texture_pvrtc";
             // this.ext = this.webgl.getExtension(extname) || this.webgl.getExtension('WEBKIT_' + extname);
             this.ext = this.getExt("WEBGL_compressed_texture_pvrtc");
         }

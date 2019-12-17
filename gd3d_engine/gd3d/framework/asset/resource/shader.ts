@@ -202,7 +202,7 @@ namespace gd3d.framework
                     words = property.match(RegexpUtil.textureRegexp);
                 if (words == null)
                 {
-                    alert(this.getName() + " property error! info:\n" + property);
+                    console.error(this.getName() + " property error! info:\n" + property);
                     return;
                 }
 
@@ -233,7 +233,7 @@ namespace gd3d.framework
                             this.defaultMapUniform[key] = { type: render.UniformTypeEnum.Texture, value: assetmgr.getDefaultTexture(words[4]) };
                             break;
                         default:
-                            alert(this.getName() + " property error! unknown type : " + type);
+                            console.error(this.getName() + " property error! unknown type : " + type);
                             break;
                     }
                 }
@@ -319,7 +319,7 @@ namespace gd3d.framework
             pass.setAlphaBlend(blendmode);
 
             //var program = assetmgr.shaderPool.linkProgram(assetmgr.webgl, vs, fs);
-            var program = assetmgr.shaderPool.linkProgrambyPassType(assetmgr.webgl,type,vs, fs);
+            var program = assetmgr.shaderPool.linkProgrambyPassType(assetmgr.webgl,type,vs, fs, assetmgr.app.globalMacros);
             pass.setProgram(program);
 
             if (this.layer == RenderLayerEnum.Overlay)

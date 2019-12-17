@@ -7,10 +7,12 @@ class test_anim implements IState
     player: gd3d.framework.transform;
     cubes: { [id: string]: gd3d.framework.transform } = {};
     _assetMgr : gd3d.framework.assetMgr;
+    list = [];
     start(app: gd3d.framework.application)
     {
         console.log("i am here.");
         this.app = app;
+        window['app'] = app
         this.scene = this.app.getScene();
         this._assetMgr = this.app.getAssetMgr();
         // this.app.targetFrame = 10;
@@ -29,103 +31,6 @@ class test_anim implements IState
             lighttran.markDirty();
 
         }
-        //let resName = "taidao@qirenzhan"; //elong
-        let resName = "elong"; //
-        this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) =>
-        {
-            if (state.isfinish)
-            {
-                // let _shader = this.app.getAssetMgr().getShader("light1.shader.json");
-
-                this.app.getAssetMgr().load(`res/prefabs/${resName}/${resName}.assetbundle.json`, gd3d.framework.AssetTypeEnum.Auto, (s) =>
-                {
-                    if (s.isfinish)
-                    {
-                        var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(`${resName}.prefab.json`) as gd3d.framework.prefab;
-                        prefabObj = _prefab.getCloneTrans();
-                        this.player = prefabObj;
-                        this.scene.addChild(prefabObj);
-                        prefabObj.localScale = new gd3d.math.vector3(0.2, 0.2, 0.2);
-                        prefabObj.localTranslate = new gd3d.math.vector3(0, 0, 0);
-
-
-                        objCam.lookat(prefabObj);
-                        objCam.markDirty();
-                        // var _skinMeshRenders = baihu.gameObject.getComponentsInChildren("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer[];
-                        // _skinMeshRenders[0].materials[0].setShader(_shader);
-
-                        var ap = prefabObj.gameObject.getComponent("aniplayer") as gd3d.framework.aniplayer;
-                        // ap.autoplay = false;
-                        let list = ap.awaitLoadClipNames();
-                        let resPath = `res/prefabs/${resName}/resources/`;
-                        if(list.length >0 ){
-                            let cname = list[1];
-                            ap.addClipByNameLoad(this._assetMgr,resPath,cname,(sta,clipName)=>{
-                                if(sta.isfinish){
-                                    let clip = ap.getClip(cname);
-                                    ap.play(cname);
-                                }
-                            });
-                        }
-
-                        document.onkeydown = (ev) =>
-                        {
-                            // if (ev.code == "KeyM")
-                            // {
-                            //     ap.playCrossByIndex(0, 0.2);
-                            // }
-                            // else if (ev.code == "KeyN")
-                            // {
-                            //     ap.playCrossByIndex(1, 0.2);
-                            // }
-                            // else if(ev.code == "KeyS"){
-                            //     ap.stop();
-                            // }
-                        }
-
-                        //let wingroot = prefabObj.find("Bip001 Xtra17Nub");
-                        let wingroot = prefabObj.find("Bip001 R Toe0");
-
-                        if(wingroot){
-                            wingroot.gameObject.addComponent("asbone") as gd3d.framework.asbone;
-                            let trans = new gd3d.framework.transform();
-                            trans.name = "cube11";
-                            var mesh = trans.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-                            var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
-                            mesh.mesh = smesh;
-                            var renderer = trans.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-                            wingroot.addChild(trans);
-                            trans.localTranslate = new gd3d.math.vector3(0, 0, 0);
-                            trans.localScale = new gd3d.math.vector3(0.3,0.3,0.3);
-                            renderer.materials = [];
-                            renderer.materials.push(new gd3d.framework.material());
-                            renderer.materials[0].setShader(this.app.getAssetMgr().getShader("shader/def"));
-                        }
-
-                        
-
-                        // for (var i = 0; i < ap.bones.length; i++)
-                        // {
-                        //     var cube = new gd3d.framework.transform();
-                        //     cube.name = "cube";
-                        //     var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-                        //     var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
-                        //     mesh.mesh = smesh;
-                        //     var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-                        //     gd3d.math.vec3Clone(ap.bones[i].tposep, cube.localTranslate);
-
-                        //     gd3d.math.quatClone(ap.bones[i].tposeq, cube.localRotate);
-                        //     cube.localScale.x=0.2;
-                        //     baihu.addChild(cube);
-                        //     cube.markDirty();
-                        //     this.cubes[ap.bones[i].name] = cube;
-                        // }
-                    }
-                });
-            }
-        });
-        this.cube = prefabObj;
-
         //添加一个摄像机
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
@@ -137,6 +42,127 @@ class test_anim implements IState
         objCam.lookat(prefabObj);
         objCam.markDirty();//标记为需要刷新
 
+        gd3d.framework.assetMgr.cdnRoot = "res/";
+        gd3d.framework.assetMgr.guidlistURL = "res/guidlist.json";
+        gd3d.framework.assetMgr.onGuidInit = ()=>{
+
+            // let resName = "PF_Angler"; //
+            // let resName = "PF_PufferFish3"; //
+            let resName = "PF_Puffer"; //
+            this.app.getAssetMgr().load("res/shader/MainShader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, (state) => {
+                if (state.isfinish) {
+                    // let _shader = this.app.getAssetMgr().getShader("light1.shader.json");
+
+                    this.app.getAssetMgr().load(`res/${resName}/${resName}.assetbundle.json`, gd3d.framework.AssetTypeEnum.Auto, (s) => {
+                        if (s.isfinish) {
+                            var _prefab: gd3d.framework.prefab = this.app.getAssetMgr().getAssetByName(`${resName}.prefab.json`) as gd3d.framework.prefab;
+                            prefabObj = _prefab.getCloneTrans();
+                            this.player = prefabObj;
+                            this.scene.addChild(prefabObj);
+                            prefabObj.localScale = new gd3d.math.vector3(50.2, 50.2, 50.2);
+                            prefabObj.localTranslate = new gd3d.math.vector3(0, 0, 0);
+
+
+                            objCam.lookat(prefabObj);
+                            objCam.markDirty();
+                            // var _skinMeshRenders = baihu.gameObject.getComponentsInChildren("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer[];
+                            // _skinMeshRenders[0].materials[0].setShader(_shader);
+
+                            var aps = prefabObj.gameObject.getComponentsInChildren("aniplayer") as gd3d.framework.aniplayer[];
+                            var ap = aps[0];
+                            // ap.autoplay = false;
+                            // debugger
+                            let list = ap.awaitLoadClipNames();
+                            let resPath = `res/prefabs/${resName}/resources`;
+                            let isloadedAllclip = false;
+                            if (list.length > 0) {
+                                let len = list.length;
+
+                                // let cname = list[0];
+                                // ap.addClipByNameLoad(this._assetMgr, resPath, cname, (sta, cname) => {
+                                //     if (sta.isfinish) {
+                                //         let clip = ap.getClip(cname);
+                                //         ap.play(cname);
+                                //     }
+                                // });
+
+                                list.forEach((str)=>{
+                                    ap.addClipByNameLoad(this._assetMgr, resPath, str,()=>{
+                                        len--;
+                                        isloadedAllclip = len <= 0;
+                                    });
+                                });
+                            }
+
+                            document.onkeydown = (ev) => {
+                                if(!isloadedAllclip)return;
+                                console.log(`${ev.code}`);
+                                let cname = list[ev.code.substr(5, 1)];
+                                ap.play(cname);
+
+                                // if (ev.code == "KeyM")
+                                // {
+                                //     ap.playCrossByIndex(0, 0.2);
+                                // }
+                                // else if (ev.code == "KeyN")
+                                // {
+                                //     ap.playCrossByIndex(1, 0.2);
+                                // }
+                                // else if(ev.code == "KeyS"){
+                                //     ap.stop();
+                                // }
+                            }
+
+                            //let wingroot = prefabObj.find("Bip001 Xtra17Nub");
+                            let wingroot = prefabObj.find("Bip001 R Toe0");
+
+                            if (wingroot) {
+                                wingroot.gameObject.addComponent("asbone") as gd3d.framework.asbone;
+                                let trans = new gd3d.framework.transform();
+                                trans.name = "cube11";
+                                var mesh = trans.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+                                var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+                                mesh.mesh = smesh;
+                                var renderer = trans.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+                                wingroot.addChild(trans);
+                                trans.localTranslate = new gd3d.math.vector3(0, 0, 0);
+                                trans.localScale = new gd3d.math.vector3(0.3, 0.3, 0.3);
+                                renderer.materials = [];
+                                renderer.materials.push(new gd3d.framework.material());
+                                renderer.materials[0].setShader(this.app.getAssetMgr().getShader("shader/def"));
+                            }
+
+
+
+                            // for (var i = 0; i < ap.bones.length; i++)
+                            // {
+                            //     var cube = new gd3d.framework.transform();
+                            //     cube.name = "cube";
+                            //     var mesh = cube.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+                            //     var smesh = this.app.getAssetMgr().getDefaultMesh("cube");
+                            //     mesh.mesh = smesh;
+                            //     var renderer = cube.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+                            //     gd3d.math.vec3Clone(ap.bones[i].tposep, cube.localTranslate);
+
+                            //     gd3d.math.quatClone(ap.bones[i].tposeq, cube.localRotate);
+                            //     cube.localScale.x=0.2;
+                            //     baihu.addChild(cube);
+                            //     cube.markDirty();
+                            //     this.cubes[ap.bones[i].name] = cube;
+                            // }
+                        }
+                    });
+                }
+            });
+            this.cube = prefabObj;
+
+
+        };
+        gd3d.framework.assetMgr.initGuidList();
+        //let resName = "taidao@qirenzhan"; //elong
+        // let resName = "elong"; //PF_Angler
+
+
 
     }
 
@@ -147,13 +173,15 @@ class test_anim implements IState
     timer: number = 0;
     update(delta: number)
     {
+
         this.timer += delta;
         var x = Math.sin(this.timer);
         var z = Math.cos(this.timer);
         var x2 = Math.sin(this.timer * 1.1);
         var z2 = Math.cos(this.timer * 1.1);
         var objCam = this.camera.gameObject.transform;
-        objCam.localTranslate = new gd3d.math.vector3(x2 * 5, 2.25, -z2 * 5);
+        objCam.localTranslate = new gd3d.math.vector3(x2 * 1, 0.25, -z2 * 1);
+        if (!this.cube) return;
         objCam.lookat(this.cube);
         objCam.markDirty();//标记为需要刷新
         objCam.updateWorldTran();

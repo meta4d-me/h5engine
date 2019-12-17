@@ -382,88 +382,352 @@ namespace gd3d.framework
          */
         Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext)
         {
-            return new threading.gdPromise((reslove) =>
+            return new threading.gdPromise<mesh>((reslove) =>
             {
 
-                if (inData instanceof ArrayBuffer)
-                {
-                    let buf = inData;
-                    if (mesh.useThead)
-                    {
+                // if (inData instanceof ArrayBuffer)
+                // {
 
-                        threading.thread.Instance.Call("meshDataHandle", buf, (result) =>
-                        {
+                // if (this.getName().lastIndexOf(".cmesh") == -1)
+                // {
+                //     if (mesh.useThead)
+                //         this.parseTMesh(inData, webgl, reslove);
+                //     else
+                //         this.parseMesh(inData, webgl, reslove);
+                // } else
+                // {
+                    this.parseCMesh(inData, webgl);
+                    reslove(this);
+                // }
 
-                            let objVF = result.objVF;
-                            let data = result.meshData;
-                            data.originVF = objVF.vf;
-                            // this.data = new gd3d.render.meshData();
-                            this.data = render.meshData.cloneByObj(data);
-                            // for (let k in data)
-                            //     this.data[k] = data[k];
-                            this.submesh = result.subMesh;
-
-                            this.glMesh = new gd3d.render.glMesh();
-                            var vertexs = this.data.genVertexDataArray(objVF.vf);
-                            var indices = this.data.genIndexDataArray();
-
-                            // let __webgl = sceneMgr.app.getAssetMgr().webgl;
-                            this.glMesh.initBuffer(webgl, objVF.vf, this.data.pos.length);
-                            this.glMesh.uploadVertexData(webgl, vertexs);
-                            this.glMesh.addIndex(webgl, indices.length);
-                            this.glMesh.uploadIndexData(webgl, 0, indices);
-                            reslove();
-                        });
-                    } else
-                    {
-
-                        var objVF = { vf: 0 };//顶点属性
-                        var data: gd3d.render.meshData = new gd3d.render.meshData();
-                        var read: gd3d.io.binReader = new gd3d.io.binReader(buf);
-                        // var meshName = read.readStringAnsi();
-                        read.readStringAnsi();
-
-                        read.position = read.position + 24;
-
-                        var vcount = read.readUInt32();
-
-                        var vec10tpose: number[] = [];
-
-                        //分片加载 
-                        this.readProcess(read, data, objVF, vcount, vec10tpose, () =>
-                        {
-                            this.readFinish(read, data, buf, objVF, webgl);
-                            reslove();
-                        });
-                    }
-                } else
-                {
-                    this.data = new gd3d.render.meshData();
-                    this.data.originVF = inData.meshData.originVF;
-                    this.data.pos = inData.meshData.pos;
-                    this.data.color = inData.meshData.color;
-                    this.data.colorex = inData.meshData.colorex;
-                    this.data.uv = inData.meshData.uv;
-                    this.data.uv2 = inData.meshData.uv2;
-                    this.data.normal = inData.meshData.normal;
-                    this.data.tangent = inData.meshData.tangent;
-                    this.data.blendIndex = inData.meshData.blendIndex;
-                    this.data.blendWeight = inData.meshData.blendWeight;
-                    this.data.trisindex = inData.meshData.trisindex;
-                    this.submesh = inData.submesh;
-        
-                    this.glMesh = new gd3d.render.glMesh();
-                    var vertexs = this.data.genVertexDataArray(this.data.originVF);
-                    var indices = this.data.genIndexDataArray();
-                    this.glMesh.initBuffer(webgl, this.data.originVF, this.data.pos.length);
-                    this.glMesh.uploadVertexData(webgl, vertexs);
-                    this.glMesh.addIndex(webgl, indices.length);
-                    this.glMesh.uploadIndexData(webgl, 0, indices);
-                    reslove();
-                }
+                // } else
+                // {
+                //     this.parseJSON(inData, webgl);
+                //     reslove();
+                // }
             });
         }
-      
+
+        parseCMesh(inData, webgl)
+        {
+            // console.log(`parseCMesh:${this.name.getText()}`);
+            var data: gd3d.render.meshData = new gd3d.render.meshData();
+            var read: gd3d.io.binReader = new gd3d.io.binReader(inData);
+            data.originVF = read.readUInt16();
+            let vertexCount = read.readUInt32();
+            let fmt = gd3d.render.VertexFormatMask;
+            data.pos = [];
+            for (let i = 0; i < vertexCount; ++i)
+            {
+                data.pos.push({
+                    x: read.readSingle(),
+                    y: read.readSingle(),
+                    z: read.readSingle()
+                });
+                if (data.originVF & fmt.Normal)
+                {
+                    data.normal = data.normal || [];
+                    data.normal.push({
+                        x: read.readSingle(),
+                        y: read.readSingle(),
+                        z: read.readSingle()
+                    });
+                }
+                if (data.originVF & fmt.Tangent)
+                {
+                    data.tangent = data.tangent || [];
+                    data.tangent.push({
+                        x: read.readSingle(),
+                        y: read.readSingle(),
+                        z: read.readSingle()
+                    });
+                }
+
+                if (data.originVF & fmt.Color)
+                {
+                    data.color = data.color || [];
+                    data.color.push({
+                        r: read.readSingle(),
+                        g: read.readSingle(),
+                        b: read.readSingle(),
+                        a: read.readSingle()
+                    });
+                }
+                if (data.originVF & fmt.UV0)
+                {
+                    data.uv = data.uv || [];
+                    data.uv.push({
+                        x: read.readSingle(),
+                        y: read.readSingle()
+                    });
+                }
+                if (data.originVF & fmt.UV1)
+                {
+                    data.uv2 = data.uv2 || [];
+                    data.uv2.push({
+                        x: read.readSingle(),
+                        y: read.readSingle()
+                    });
+                }
+                if (data.originVF & fmt.BlendIndex4)
+                {
+                    data.blendIndex = data.blendIndex || [];
+                    data.blendIndex.push({
+                        v0: read.readUInt32(),
+                        v1: read.readUInt32(),
+                        v2: read.readUInt32(),
+                        v3: read.readUInt32()
+                    });
+                }
+                if (data.originVF & fmt.BlendWeight4)
+                {
+                    data.blendWeight = data.blendWeight || [];
+                    data.blendWeight.push({
+                        v0: read.readSingle(),
+                        v1: read.readSingle(),
+                        v2: read.readSingle(),
+                        v3: read.readSingle()
+                    });
+                }
+                if (data.originVF & fmt.ColorEX)
+                {
+                    data.colorex = data.colorex || [];
+                    data.colorex.push({
+                        r: read.readSingle(),
+                        g: read.readSingle(),
+                        b: read.readSingle(),
+                        a: read.readSingle()
+                    })
+                }
+            }
+
+            var len = read.readUInt8();
+            data.trisindex = [];
+            this.submesh = [];
+            for (var i = 0; i < len; ++i)
+            {
+                var _submeshinfo: subMeshInfo = new subMeshInfo();
+                _submeshinfo.start = read.readUInt16();
+                _submeshinfo.size = read.readUInt32();
+                _submeshinfo.matIndex = i;//read.readUInt8();
+                this.submesh.push(_submeshinfo);
+                for (var j = 0; j < _submeshinfo.size; j++)
+                {
+                    data.trisindex.push(read.readUInt32());
+                }
+
+            }
+
+            this.data = data;
+            this.glMesh = new gd3d.render.glMesh();
+            var vertexs = this.data.genVertexDataArray(this.data.originVF);
+            var indices = this.data.genIndexDataArray();
+
+            this.glMesh.initBuffer(webgl, this.data.originVF, this.data.pos.length);
+            this.glMesh.uploadVertexData(webgl, vertexs);
+            this.glMesh.addIndex(webgl, indices.length);
+            this.glMesh.uploadIndexData(webgl, 0, indices);
+        }
+        
+        // parseTMesh(inData, webgl, reslove)
+        // {
+        //     threading.thread.Instance.Call("meshDataHandle", inData, (result) =>
+        //     {
+        //         let objVF = result.objVF;
+        //         let data = result.meshData;
+        //         data.originVF = objVF.vf;
+        //         // this.data = new gd3d.render.meshData();
+        //         this.data = render.meshData.cloneByObj(data);
+        //         // for (let k in data)
+        //         //     this.data[k] = data[k];
+        //         this.submesh = result.subMesh;
+
+        //         this.glMesh = new gd3d.render.glMesh();
+        //         var vertexs = this.data.genVertexDataArray(objVF.vf);
+        //         var indices = this.data.genIndexDataArray();
+
+        //         // let __webgl = sceneMgr.app.getAssetMgr().webgl;
+        //         this.glMesh.initBuffer(webgl, objVF.vf, this.data.pos.length);
+        //         this.glMesh.uploadVertexData(webgl, vertexs);
+        //         this.glMesh.addIndex(webgl, indices.length);
+        //         this.glMesh.uploadIndexData(webgl, 0, indices);
+        //         reslove();
+        //     });
+        // }
+        // parseMesh(inData, webgl, reslove)
+        // {
+        //     var objVF = { vf: 0 };//顶点属性
+        //     var data: gd3d.render.meshData = new gd3d.render.meshData();
+        //     var read: gd3d.io.binReader = new gd3d.io.binReader(inData);
+        //     // var meshName = read.readStringAnsi();
+        //     read.readStringAnsi();
+
+        //     read.position = read.position + 24;
+
+        //     var vcount = read.readUInt32();
+
+        //     var vec10tpose: number[] = [];
+
+        //     //分片加载 
+        //     this.readProcess(read, data, objVF, vcount, vec10tpose, () =>
+        //     {
+        //         this.readFinish(read, data, inData, objVF, webgl);
+        //         reslove();
+        //     });
+        // }
+        // parseCMesh(inData, webgl)
+        // {
+        //     var data: gd3d.render.meshData = new gd3d.render.meshData();
+        //     var read: gd3d.io.binReader = new gd3d.io.binReader(inData);
+        //     data.originVF = read.readUInt16();
+        //     data.pos = [];
+
+        //     let vector3 = math.vector3, color = math.color, vector2 = math.vector2, number4 = render.number4;
+        //     var len;
+
+        //     len = read.readUInt32();
+        //     for (var i = 0; i < len; ++i)
+        //     {
+        //         var v3 = new vector3(read.readSingle(), read.readSingle(), read.readSingle());
+        //         data.pos.push(v3);
+        //     }
+
+
+        //     len = read.readUInt32();
+        //     if (len > 0)
+        //     {
+        //         data.color = [];
+        //         for (var i = 0; i < len; ++i)
+        //         {
+        //             var c = new color(read.readSingle(), read.readSingle(), read.readSingle(), read.readSingle());
+        //             data.color.push(c);
+        //         }
+        //     }
+        //     len = read.readUInt32();
+        //     if (len > 0)
+        //     {
+        //         data.uv = [];
+        //         for (var i = 0; i < len; ++i)
+        //         {
+        //             var uv = new vector2(read.readSingle(), read.readSingle());
+        //             data.uv.push(uv);
+        //         }
+        //     }
+
+        //     len = read.readUInt32();
+        //     if (len > 0)
+        //     {
+        //         data.uv2 = [];
+        //         for (var i = 0; i < len; ++i)
+        //         {
+        //             var uv2 = new vector2(read.readSingle(), read.readSingle());
+        //             data.uv2.push(uv2);
+        //         }
+        //     }
+
+        //     len = read.readUInt32();
+        //     if (len > 0)
+        //     {
+        //         data.normal = [];
+        //         for (var i = 0; i < len; ++i)
+        //         {
+        //             var normal = new vector3(read.readSingle(), read.readSingle(), read.readSingle());
+        //             data.normal.push(normal);
+        //         }
+        //     }
+
+        //     len = read.readUInt32();
+        //     if (len > 0)
+        //     {
+        //         data.tangent = [];
+        //         for (var i = 0; i < len; ++i)
+        //         {
+        //             var tangent = new vector3(read.readSingle(), read.readSingle(), read.readSingle());
+        //             data.tangent.push(tangent);
+        //         }
+        //     }
+        //     len = read.readUInt32();
+        //     if (len > 0)
+        //     {
+        //         data.blendIndex = [];
+        //         for (var i = 0; i < len; ++i)
+        //         {
+        //             var bi = new number4();
+        //             bi.v0 = read.readUInt32();
+        //             bi.v1 = read.readUInt32();
+        //             bi.v2 = read.readUInt32();
+        //             bi.v3 = read.readUInt32();
+        //             data.blendIndex.push(bi);
+        //         }
+        //     }
+        //     len = read.readUInt32();
+        //     if (len > 0)
+        //     {
+        //         data.blendWeight = [];
+        //         for (var i = 0; i < len; ++i)
+        //         {
+        //             var bi = new number4();
+        //             bi.v0 = read.readSingle();
+        //             bi.v1 = read.readSingle();
+        //             bi.v2 = read.readSingle();
+        //             bi.v3 = read.readSingle();
+        //             data.blendWeight.push(bi);
+        //         }
+        //     }
+
+        //     data.trisindex = [];
+        //     this.submesh = [];
+        //     len = read.readUInt8();
+        //     for (var i = 0; i < len; ++i)
+        //     {
+        //         var _submeshinfo: subMeshInfo = new subMeshInfo();
+        //         _submeshinfo.start = read.readUInt16();
+        //         _submeshinfo.size = read.readUInt32();
+        //         _submeshinfo.matIndex = i;//read.readUInt8();
+        //         this.submesh.push(_submeshinfo);
+        //         for (var j = 0; j < _submeshinfo.size; j++)
+        //         {
+        //             data.trisindex.push(read.readUInt32());
+        //         }
+
+        //     }
+
+        //     this.data = data;
+        //     this.glMesh = new gd3d.render.glMesh();
+        //     var vertexs = this.data.genVertexDataArray(this.data.originVF);
+        //     var indices = this.data.genIndexDataArray();
+
+        //     this.glMesh.initBuffer(webgl, this.data.originVF, this.data.pos.length);
+        //     this.glMesh.uploadVertexData(webgl, vertexs);
+        //     this.glMesh.addIndex(webgl, indices.length);
+        //     this.glMesh.uploadIndexData(webgl, 0, indices);
+
+        // }
+        /*
+        parseJSON(inData, webgl)
+        {
+            this.data = new gd3d.render.meshData();
+            this.data.originVF = inData.meshData.originVF;
+            this.data.pos = inData.meshData.pos;
+            this.data.color = inData.meshData.color;
+            this.data.colorex = inData.meshData.colorex;
+            this.data.uv = inData.meshData.uv;
+            this.data.uv2 = inData.meshData.uv2;
+            this.data.normal = inData.meshData.normal;
+            this.data.tangent = inData.meshData.tangent;
+            this.data.blendIndex = inData.meshData.blendIndex;
+            this.data.blendWeight = inData.meshData.blendWeight;
+            this.data.trisindex = inData.meshData.trisindex;
+            this.submesh = inData.submesh;
+
+            this.glMesh = new gd3d.render.glMesh();
+            var vertexs = this.data.genVertexDataArray(this.data.originVF);
+            var indices = this.data.genIndexDataArray();
+            this.glMesh.initBuffer(webgl, this.data.originVF, this.data.pos.length);
+            this.glMesh.uploadVertexData(webgl, vertexs);
+            this.glMesh.addIndex(webgl, indices.length);
+            this.glMesh.uploadIndexData(webgl, 0, indices);
+        }*/
         /**
          * @public
          * @language zh_CN
@@ -547,131 +811,7 @@ namespace gd3d.framework
             let _result = new mesh(this.getName());
             var vf = this.glMesh.vertexFormat;//顶点属性
             // var data: gd3d.render.meshData = new gd3d.render.meshData();
-            var data: gd3d.render.meshData = render.meshData.cloneByObj(this.data);
-
-            // if (this.data.pos != undefined)
-            // {
-            //     data.pos = [];
-            //     // for (let i = 0,len = this.data.pos.length; i < len; ++i)
-            //     for (let item of this.data.pos)
-            //     {
-            //         var _position = new gd3d.math.vector3();
-            //         _position.rawData.set(item.rawData);
-            //         // _position.x = this.data.pos[i].x;
-            //         // _position.y = this.data.pos[i].y;
-            //         // _position.z = this.data.pos[i].z;
-            //         data.pos.push(_position);
-            //     }
-            // }
-            // if (this.data.color != undefined)
-            // {
-            //     data.color = [];
-            //     // for (let i = 0, len = this.data.color.length; i < len; i++)
-            //     for (let item of this.data.color)
-            //     {
-            //         let _color = new gd3d.math.color();
-            //         // _color.a = this.data.color[i].a;
-            //         // _color.r = this.data.color[i].r;
-            //         // _color.g = this.data.color[i].g;
-            //         // _color.b = this.data.color[i].b;
-            //         _color.rawData.set(item.rawData);
-            //         data.color.push(_color);
-            //     }
-            // }
-            // if (this.data.normal != undefined)
-            // {
-            //     data.normal = [];
-            //     // for (let i = 0; i < this.data.normal.length; i++)
-            //     for (let item of this.data.normal)
-            //     {
-            //         var _normal = new gd3d.math.vector3();
-            //         _normal.rawData.set(item.rawData);
-            //         // _normal.x = this.data.normal[i].x;
-            //         // _normal.y = this.data.normal[i].y;
-            //         // _normal.z = this.data.normal[i].z;
-            //         data.normal.push(_normal);
-            //     }
-            // }
-            // if (this.data.uv != undefined)
-            // {
-            //     data.uv = [];
-            //     // for (var i = 0; i < this.data.uv.length; i++)
-            //     for (let item of this.data.uv)
-            //     {
-            //         var uv = new gd3d.math.vector2();
-            //         uv.rawData.set(item.rawData);
-            //         // uv.x = this.data.uv[i].x;
-            //         // uv.y = this.data.uv[i].y;
-            //         data.uv.push(uv);
-            //     }
-            // }
-            // if (this.data.uv2 != undefined)
-            // {
-            //     data.uv2 = [];
-            //     // for (var i = 0; i < this.data.uv2.length; i++)
-            //     for (let item of this.data.uv2)
-            //     {
-            //         var uv = new gd3d.math.vector2();
-            //         // uv.x = this.data.uv2[i].x;
-            //         // uv.y = this.data.uv2[i].y;
-            //         uv.rawData.set(uv.rawData);
-            //         data.uv2.push(uv);
-            //     }
-            // }
-            // if (this.data.tangent != undefined)
-            // {
-            //     data.tangent = [];
-            //     // for (var i = 0; i < this.data.tangent.length; i++)
-            //     for (let item of this.data.tangent)
-            //     {
-            //         var tangent = new gd3d.math.vector3();
-            //         // tangent.x = this.data.tangent[i].x;
-            //         // tangent.y = this.data.tangent[i].y;
-            //         // tangent.z = this.data.tangent[i].z;
-            //         tangent.rawData.set(item.rawData);
-            //         data.tangent.push(tangent);
-            //     }
-            // }
-            // if (this.data.blendIndex != undefined)
-            // {
-            //     data.blendIndex = [];
-            //     for (let i = 0, len = this.data.blendIndex.length; i < len; ++i)
-            //     {
-            //         let item = this.data.blendIndex[i];
-            //         let _boneIndex = new render.number4();
-            //         _boneIndex.v0 = item.v0;
-            //         _boneIndex.v1 = item.v1;
-            //         _boneIndex.v2 = item.v2;
-            //         _boneIndex.v3 = item.v3;
-            //         data.blendIndex.push(_boneIndex);
-            //     }
-            // }
-            // if (this.data.blendWeight != undefined)
-            // {
-            //     data.blendWeight = [];
-            //     for (let i = 0, len = this.data.blendWeight.length; i < len; ++i)
-            //     {
-            //         let item = this.data.blendWeight[i];
-            //         let _boneWeight = new render.number4();
-            //         _boneWeight.v0 = item.v0;
-            //         _boneWeight.v1 = item.v1;
-            //         _boneWeight.v2 = item.v2;
-            //         _boneWeight.v3 = item.v3;
-            //         data.blendWeight.push(_boneWeight);
-            //     }
-            // }
-
-            // _result.submesh = [];
-            // for (var i = 0; i < this.submesh.length; i++)
-            // {
-            //     var _submeshinfo: subMeshInfo = new subMeshInfo();
-
-            //     _submeshinfo.start = this.submesh[i].start;
-            //     _submeshinfo.size = this.submesh[i].size;
-            //     _submeshinfo.matIndex = i;
-            //     _result.submesh.push(_submeshinfo);
-            // }
-            // data.trisindex = this.data.trisindex.slice();
+            var data: gd3d.render.meshData = render.meshData.cloneByObj(this.data);           
 
             _result.data = data;
             _result.glMesh = new gd3d.render.glMesh();

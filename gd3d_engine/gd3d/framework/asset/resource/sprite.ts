@@ -14,6 +14,7 @@
 
         private name: constText;
         private id: resID = new resID();
+        bundle:assetBundle;
         /**
          * @public
          * @language zh_CN

@@ -13,7 +13,7 @@ namespace gd3d.framework
     @reflect.nodeRender
     export class label implements IRectRenderer
     {
-        static readonly ClassName:string="label";
+        static readonly ClassName: string = "label";
 
         private _text: string;
         /**
@@ -30,14 +30,15 @@ namespace gd3d.framework
         }
         set text(text: string)
         {
-            text = text == null? "": text;
+            text = text == null ? "" : text;
             this._text = text;
             //设置缓存长度
             this.initdater();
             this.dirtyData = true;
         }
 
-        private initdater(){
+        private initdater()
+        {
             var cachelen = 6 * 13 * this._text.length;
             this.datar.splice(0, this.datar.length);
             while (this.datar.length < cachelen)
@@ -71,18 +72,20 @@ namespace gd3d.framework
         }
         set font(font: font)
         {
-            if(font == this._font) return;
+            if (font == this._font) return;
 
             this.needRefreshFont = true;
-            if(this._font)
+            if (this._font)
             {
                 this._font.unuse();
             }
             this._font = font;
-            if(font){
+            if (font)
+            {
                 this._font.use();
                 this._fontName = this._font.getName();
-            }else{
+            } else
+            {
                 this._fontName = "";
             }
         }
@@ -146,7 +149,7 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
-        horizontalOverflow :boolean = false;
+        horizontalOverflow: boolean = false;
 
         /**
          * @public
@@ -156,12 +159,12 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("boolean")
-        verticalOverflow :boolean = false;
+        verticalOverflow: boolean = false;
 
         //计算数组
         private indexarr = [];
         private remainarrx = [];
-        
+
         /**
          * @private
          */
@@ -176,8 +179,8 @@ namespace gd3d.framework
             var m21 = m.rawData[1];
             var m22 = m.rawData[3];
 
-            var bx = this.data_begin.x ;
-            var by = this.data_begin.y ;
+            var bx = this.data_begin.x;
+            var by = this.data_begin.y;
 
             //计算出排列数据
             var txadd = 0;
@@ -186,8 +189,8 @@ namespace gd3d.framework
             this.remainarrx = [];
             var remainy = 0;
             tyadd += this._fontsize * this.linespace;
-            let contrast_w = this.horizontalOverflow ? Number.MAX_VALUE: this.transform.width; 
-            let contrast_h = this.verticalOverflow ? Number.MAX_VALUE: this.transform.height; 
+            let contrast_w = this.horizontalOverflow ? Number.MAX_VALUE : this.transform.width;
+            let contrast_h = this.verticalOverflow ? Number.MAX_VALUE : this.transform.height;
             for (var i = 0; i < this._text.length; i++)
             {
                 let c = this._text.charAt(i);
@@ -197,7 +200,7 @@ namespace gd3d.framework
                 {
                     continue;
                 }
-                if ( isNewline || txadd + cinfo.xAddvance * rate > contrast_w )
+                if (isNewline || txadd + cinfo.xAddvance * rate > contrast_w)
                 {
                     if (tyadd + this._fontsize * this.linespace > contrast_h)
                     {
@@ -211,7 +214,7 @@ namespace gd3d.framework
                         tyadd += this._fontsize * this.linespace;
                     }
                 }
-                if(cinfo)  txadd += cinfo.xAddvance * rate;
+                if (cinfo) txadd += cinfo.xAddvance * rate;
             }
             this.indexarr.push(i);
             this.remainarrx.push(this.transform.width - txadd);
@@ -272,10 +275,10 @@ namespace gd3d.framework
                     let _y1 = this.datar[i * 6 * 13 + 13 * 1 + 1] = by + x1 * m21 + y1 * m22;//y
                     let _x2 = this.datar[i * 6 * 13 + 13 * 2 + 0] = bx + x2 * m11 + y2 * m12;//x
                     let _y2 = this.datar[i * 6 * 13 + 13 * 2 + 1] = by + x2 * m21 + y2 * m22;//y
-                              this.datar[i * 6 * 13 + 13 * 3 + 0] = bx + x2 * m11 + y2 * m12;//x
-                              this.datar[i * 6 * 13 + 13 * 3 + 1] = by + x2 * m21 + y2 * m22;//y
-                              this.datar[i * 6 * 13 + 13 * 4 + 0] = bx + x1 * m11 + y1 * m12;//x
-                              this.datar[i * 6 * 13 + 13 * 4 + 1] = by + x1 * m21 + y1 * m22;//y
+                    this.datar[i * 6 * 13 + 13 * 3 + 0] = bx + x2 * m11 + y2 * m12;//x
+                    this.datar[i * 6 * 13 + 13 * 3 + 1] = by + x2 * m21 + y2 * m22;//y
+                    this.datar[i * 6 * 13 + 13 * 4 + 0] = bx + x1 * m11 + y1 * m12;//x
+                    this.datar[i * 6 * 13 + 13 * 4 + 1] = by + x1 * m21 + y1 * m22;//y
                     let _x3 = this.datar[i * 6 * 13 + 13 * 5 + 0] = bx + x3 * m11 + y3 * m12;//x
                     let _y3 = this.datar[i * 6 * 13 + 13 * 5 + 1] = by + x3 * m21 + y3 * m22;//y
 
@@ -318,10 +321,10 @@ namespace gd3d.framework
                     }
 
                     //drawRect 
-                    this.min_x = Math.min(_x0,_x1,_x2,_x3,this.min_x);
-                    this.min_y = Math.min(_y0,_y1,_y2,_y3,this.min_y);
-                    this.max_x = Math.max(_x0,_x1,_x2,_x3,this.max_x);
-                    this.max_y = Math.max(_y0,_y1,_y2,_y3,this.max_y);
+                    this.min_x = Math.min(_x0, _x1, _x2, _x3, this.min_x);
+                    this.min_y = Math.min(_y0, _y1, _y2, _y3, this.min_y);
+                    this.max_x = Math.max(_x0, _x1, _x2, _x3, this.max_x);
+                    this.max_y = Math.max(_y0, _y1, _y2, _y3, this.max_y);
                 }
                 yadd += this._fontsize * this.linespace;
             }
@@ -442,7 +445,7 @@ namespace gd3d.framework
         @reflect.Field("color")
         @reflect.UIStyle("color")
         color2: math.color = new math.color(0, 0, 0.5, 0.5);
-        
+
         private static readonly defUIShader = `shader/defuifont`;
         private static readonly defMaskUIShader = `shader/defmaskfont`;
 
@@ -454,7 +457,8 @@ namespace gd3d.framework
          * 设置rander Shader名字
          * @version gd3d 1.0
          */
-        setShaderByName(shaderName:string){
+        setShaderByName(shaderName: string)
+        {
             this._CustomShaderName = shaderName;
         }
 
@@ -465,14 +469,16 @@ namespace gd3d.framework
          * 获取rander 的材质
          * @version gd3d 1.0
          */
-        getMaterial(){
-            if(!this._uimat){
+        getMaterial()
+        {
+            if (!this._uimat)
+            {
                 return this.uimat;
             }
             return this._uimat;
         }
 
-        private _darwRect : gd3d.math.rect;
+        private _darwRect: gd3d.math.rect;
 
         /**
          * @public
@@ -481,45 +487,52 @@ namespace gd3d.framework
          * 获取渲染绘制矩形边界
          * @version gd3d 1.0
          */
-        getDrawBounds(){
-            if(!this._darwRect){
+        getDrawBounds()
+        {
+            if (!this._darwRect)
+            {
                 this._darwRect = new math.rect();
                 this.calcDrawRect();
             }
             return this._darwRect;
         }
 
-       /**
-         * @private
-         * ui默认材质
-         */
+        /**
+          * @private
+          * ui默认材质
+          */
         private _uimat: material;
-        private get uimat(){
+        private get uimat()
+        {
             let assetmgr = this.transform.canvas.assetmgr;
-            if(!assetmgr) return this._uimat;
+            if (!assetmgr) return this._uimat;
 
             this.searchTexture();
-            
-            if (this.font  && this.font.texture ){
+
+            if (this.font && this.font.texture)
+            {
                 let pMask = this.transform.parentIsMask;
                 let mat = this._uimat;
                 let rectTag = "";
                 let uiTag = "_ui";
-                if(pMask){
+                if (pMask)
+                {
                     //when parentIsMask,can't multiplexing material , can be multiplexing when parent equal
                     let rId = this.transform.maskRectId;
                     rectTag = `mask(${rId})`;
                 }
-                let matName =this.font.texture.getName() + uiTag + rectTag;
-                if(!mat || mat.getName() != matName){
-                    if(mat) mat.unuse(); 
+                let matName = this.font.texture.getName() + uiTag + rectTag;
+                if (!mat || mat.getName() != matName)
+                {
+                    if (mat) mat.unuse();
                     mat = assetmgr.getAssetByName(matName) as gd3d.framework.material;
-                    if(mat) mat.use();
+                    if (mat) mat.use();
                 }
-                if(!mat){
+                if (!mat)
+                {
                     mat = new material(matName);
                     let sh = assetmgr.getShader(this._CustomShaderName);
-                    sh = sh? sh : assetmgr.getShader(pMask ? label.defMaskUIShader : label.defUIShader);
+                    sh = sh ? sh : assetmgr.getShader(pMask ? label.defMaskUIShader : label.defUIShader);
                     mat.setShader(sh);
                     mat.use();
                     this.needRefreshFont = true;
@@ -538,9 +551,9 @@ namespace gd3d.framework
         render(canvas: canvas)
         {
             let mat = this.uimat;
-            if(!mat) return;
+            if (!mat) return;
 
-            if(!this._font) return;
+            if (!this._font) return;
             if (this.dirtyData == true)
             {
                 this.updateData(this._font);
@@ -556,18 +569,21 @@ namespace gd3d.framework
             if (img)
             {
                 let needRMask = false;
-                if(this.needRefreshFont){
+                if (this.needRefreshFont)
+                {
                     mat.setTexture("_MainTex", img);
                     this.needRefreshFont = false;
                     needRMask = true;
                 }
 
-                if(this.transform.parentIsMask){
-                    if(this._cacheMaskV4 == null) this._cacheMaskV4 = new math.vector4();
+                if (this.transform.parentIsMask)
+                {
+                    if (this._cacheMaskV4 == null) this._cacheMaskV4 = new math.vector4();
                     let rect = this.transform.maskRect;
-                    if(this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h || needRMask){
-                        this._cacheMaskV4.x = rect.x; this._cacheMaskV4.y = rect.y;this._cacheMaskV4.z = rect.w;this._cacheMaskV4.w = rect.h;
-                        mat.setVector4("_maskRect",this._cacheMaskV4);
+                    if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h || needRMask)
+                    {
+                        this._cacheMaskV4.x = rect.x; this._cacheMaskV4.y = rect.y; this._cacheMaskV4.z = rect.w; this._cacheMaskV4.w = rect.h;
+                        mat.setVector4("_maskRect", this._cacheMaskV4);
                     }
                 }
 
@@ -577,25 +593,30 @@ namespace gd3d.framework
         }
 
         //资源管理器中寻找 指定的贴图资源
-        private searchTexture(){
-            if(this._font) return;
-            let assetmgr = this.transform.canvas.assetmgr; 
+        private searchTexture()
+        {
+            if (this._font) return;
+            let assetmgr: framework.assetMgr = this.transform.canvas.assetmgr;
             let resName = this._fontName;
-            let temp = assetmgr.mapNamed[resName];
-            if(temp == undefined){
+            let abname = resName.replace(".font.json", ".assetbundle.json");
+            let temp = assetmgr.getAssetByName(resName, abname);            
+            if (!temp)
+            {
                 resName = `${this._fontName}.font.json`
-                temp = assetmgr.mapNamed[resName];
+                temp = assetmgr.getAssetByName(resName, abname);
             }
-            if(temp != null){
-                let tfont = assetmgr.getAssetByName(resName) as gd3d.framework.font;
-                if(tfont){
+            if (temp != null)
+            {
+                let tfont = assetmgr.getAssetByName(resName, abname) as gd3d.framework.font;
+                if (tfont)
+                {
                     this.font = tfont;
                     this.needRefreshFont = true;
                 }
             }
         }
 
-        private _cacheMaskV4:math.vector4;
+        private _cacheMaskV4: math.vector4;
 
         /**
          * @private
@@ -612,26 +633,27 @@ namespace gd3d.framework
             this.dirtyData = true;
         }
 
-        private min_x : number = Number.MAX_VALUE;
-        private max_x : number = Number.MAX_VALUE * -1;
-        private min_y : number = Number.MAX_VALUE;
-        private max_y : number = Number.MAX_VALUE * -1;
+        private min_x: number = Number.MAX_VALUE;
+        private max_x: number = Number.MAX_VALUE * -1;
+        private min_y: number = Number.MAX_VALUE;
+        private max_y: number = Number.MAX_VALUE * -1;
         /** 计算drawRect */
-        private calcDrawRect(){
-            if(!this._darwRect)    return;
+        private calcDrawRect()
+        {
+            if (!this._darwRect) return;
             //drawBounds (y 轴反向)
             let canvas = this.transform.canvas;
-            if(!canvas)return;
+            if (!canvas) return;
 
             let minPos = poolv2();
             minPos.x = this.min_x;
             minPos.y = this.max_y;
-            canvas.ModelPosToCanvasPos(minPos,minPos);
+            canvas.clipPosToCanvasPos(minPos, minPos);
 
             let maxPos = poolv2();
             maxPos.x = this.max_x;
             maxPos.y = this.min_y;
-            canvas.ModelPosToCanvasPos(maxPos,maxPos);
+            canvas.clipPosToCanvasPos(maxPos, maxPos);
 
             this._darwRect.x = minPos.x;
             this._darwRect.y = minPos.y;
@@ -653,7 +675,8 @@ namespace gd3d.framework
 
         }
 
-        onPlay(){
+        onPlay()
+        {
 
         }
 
@@ -679,15 +702,15 @@ namespace gd3d.framework
          */
         remove()
         {
-            if(this._font)  this._font.unuse();
-            if(this._uimat) this._uimat.unuse();
+            if (this._font) this._font.unuse();
+            if (this._uimat) this._uimat.unuse();
             this.indexarr.length = 0;
             this.remainarrx.length = 0;
             this.datar.length = 0;
             this.transform = null;
             this._cacheMaskV4 = null;
         }
-        
+
     }
 
     /**

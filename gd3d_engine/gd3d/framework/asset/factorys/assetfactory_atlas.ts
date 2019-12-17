@@ -1,7 +1,10 @@
 namespace gd3d.framework
 {
+    @assetF(AssetTypeEnum.Atlas)
     export class AssetFactory_Atlas implements IAssetFactory
     {
+        //#region 废弃de参考代码
+        /*
         newAsset(): atlas
         {
             return null;
@@ -52,6 +55,11 @@ namespace gd3d.framework
 
                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
             });
+        }*/
+        //#endregion
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string)
+        {
+            return new atlas(filename).Parse(txt, assetmgr, bundle.name);
         }
     }
 }

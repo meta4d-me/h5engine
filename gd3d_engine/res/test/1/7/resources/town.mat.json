@@ -1,0 +1,1 @@
+{"shader":"actionlinecaustics.shader.json","srcshader":"Gd3d/ActionLineCaustics","queue":0,"mapUniform":{"_MainTex":{"type":0,"value":"town.imgdesc.json"},"_CausticsTex":{"type":0,"value":"caustics.imgdesc.json"},"_LightingIntensity":{"type":1,"value":1},"_CausticsIntensity":{"type":1,"value":1},"_UnitTime":{"type":1,"value":0}}}

@@ -254,7 +254,7 @@ namespace gd3d.framework
             {
                 this._sprite.unuse();
             }
-            if(!this._sprite || this._sprite.texture != sprite.texture ){
+            if(!this._sprite || !sprite || this._sprite.texture != sprite.texture ){
                 this.needRefreshImg = true;
             }
             
@@ -339,7 +339,7 @@ namespace gd3d.framework
         private searchTexture(){
             if(this._sprite) return;
             let assetmgr = this.transform.canvas.assetmgr;
-            let temp = assetmgr.mapNamed[this._spriteName];
+            let temp = assetMgr.mapNamed[this._spriteName];
             let tspr:sprite;
             if(temp != null){
                 tspr = assetmgr.getAssetByName(this._spriteName) as gd3d.framework.sprite;
@@ -629,12 +629,12 @@ namespace gd3d.framework
             let minPos = poolv2();
             minPos.x = this.min_x;
             minPos.y = this.max_y;
-            canvas.ModelPosToCanvasPos(minPos,minPos);
+            canvas.clipPosToCanvasPos(minPos,minPos);
 
             let maxPos = poolv2();
             maxPos.x = this.max_x;
             maxPos.y = this.min_y;
-            canvas.ModelPosToCanvasPos(maxPos,maxPos);
+            canvas.clipPosToCanvasPos(maxPos,maxPos);
 
             this._darwRect.x = minPos.x;
             this._darwRect.y = minPos.y;

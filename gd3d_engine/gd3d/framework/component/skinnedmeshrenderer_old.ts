@@ -7,7 +7,7 @@
 //     * @language zh_CN
 //     * @classdesc
 //     * 蒙皮网格渲染组件
-//     * @version egret-gd3d 1.0
+//     * @version gd3d 1.0
 //     */
 //     @reflect.nodeRender
 //     @reflect.nodeComponent
@@ -21,7 +21,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 挂载的gameobject
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         gameObject: gameObject;
 //         /**
@@ -29,7 +29,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 场景渲染层级（common、transparent、overlay）
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         layer: RenderLayerEnum = RenderLayerEnum.Common;
 //         /**
@@ -37,7 +37,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 渲染mask层级（和相机相对应）
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         //renderLayer: CullingMask = CullingMask.default;
 //         get renderLayer() { return this.gameObject.layer; }
@@ -55,7 +55,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 返回此组件的场景渲染层级排序依据queue大小
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         get queue(): number
 //         {
@@ -66,7 +66,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 设置此组件的场景渲染层级排序number大小
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         set queue(value: number)
 //         {
@@ -78,7 +78,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 材质数组
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         @gd3d.reflect.Field("material[]")
 //         materials: material[];
@@ -91,7 +91,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 返回动画播放组件
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         get player(): aniplayer
 //         {
@@ -108,7 +108,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 返回mesh数据
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         @gd3d.reflect.Field("mesh")
 //         get mesh()
@@ -120,7 +120,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 设置mesh数据
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         set mesh(mesh: mesh)
 //         {
@@ -159,7 +159,7 @@
 //          * @language zh_CN
 //          * @classdesc
 //          * 最大骨骼数量
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         maxBoneCount: number = 0;
 
@@ -310,7 +310,7 @@
 //          * @param ray 射线
 //          * @classdesc
 //          * 射线检测
-//          * @version egret-gd3d 1.0
+//          * @version gd3d 1.0
 //          */
 //         intersects(ray: ray, outInfo: pickinfo): boolean
 //         {

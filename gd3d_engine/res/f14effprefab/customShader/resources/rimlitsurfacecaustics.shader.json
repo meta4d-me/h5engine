@@ -1,0 +1,39 @@
+{
+    "layer": "geometry",
+    "properties": [
+        "_MainTex('MainTex',Texture)='white'{}",
+        "_CausticsTex('Caustics',Texture) = 'white' {}",
+        "_CausticsIntensity('Caustics Strength',Range(0.0,2.0)) = 1.0",
+        "_LightingIntensity('Lighting Intensity',Range(0.0,1.0)) = 1.0"
+    ],
+    "passes": {
+        "base": [
+            {
+                "showface": "ccw",
+                "vs": "rimlitsurfacecaustics",
+                "fs": "rimlitsurfacecaustics"
+            }
+        ],
+        "base_fog": [
+            {
+                "showface": "ccw",
+                "vs": "rimlitsurfacecaustics",
+                "fs": "rimlitsurfacecaustics"
+            }
+        ],
+        "skin": [
+            {
+                "showface": "ccw",
+                "vs": "rimlitsurfacecaustics",
+                "fs": "rimlitsurfacecaustics"
+            }
+        ],
+        "skin_fog": [
+            {
+                "showface": "ccw",
+                "vs": "rimlitsurfacecaustics",
+                "fs": "rimlitsurfacecaustics"
+            }
+        ]
+    }
+}

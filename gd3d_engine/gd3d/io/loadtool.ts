@@ -1,10 +1,13 @@
 ﻿namespace gd3d.io
 {
-    class loadRetryMgr
-    {
-        public static urlCaseDic: { [url: string]: number };
+    // class loadRetryMgr
+    // {
+    //     public static urlCaseDic: { [url: string]: number };
 
-    }
+    // }
+    const urlCaseDic: { [url: string]: number } = {};
+    const retryTime: number = 500;
+    const retryCount: number = 9999;
     /**
      * 
      * @param url 加载路径
@@ -24,15 +27,19 @@
             {
                 if (req.status == 200)
                 {
-                    loadedFun(req);
+                    if (urlCaseDic[url])
+                        delete urlCaseDic[url];
                     isLoaded = true;
+                    loadedFun(req);
                 } else
                 {
                     switch (req.status)
                     {
                         case 404:
-                            fun(null, new Error("got a 404:" + url));
-                            //return;
+                            if (fun)
+                                fun(null, new Error("got a 404:" + url));
+                            console.error("got a 404:" + url);
+                            urlCaseDic[url] = retryCount;//无法找到资源 不需要重试
                             break;
                     }
                 }
@@ -44,40 +51,47 @@
         }
         req.onerror = (ev) =>
         {
-            fun(null, new Error(`URL : ${url} \n onerr on req: `));
+            if (fun)
+                fun(null, new Error(`URL : ${url} \n onerr on req: `));
+            loadFail(req, url, fun, onprocess, responseType, loadedFun);
         };
         req.onloadend = () =>
         {
             //console.error(" is onload");
             if (!isLoaded)
             {
-                //retry some times
-                if (!loadRetryMgr.urlCaseDic) loadRetryMgr.urlCaseDic = {};
-                let dic = loadRetryMgr.urlCaseDic;
-                dic[url] = isNaN(dic[url]) || dic[url] < 0 ? 0 : dic[url];
-                if (dic[url] >= 2)
-                {
-                    dic[url] = 0;
-                    fun(null, new Error("load this url fail  ：" + url), true);  //throw error after retry some times
-                    //console.error(`------ load this url fail URL:${url}  `);
-                } else
-                {
-                    gd3d.io.xhrLoad(url, fun, onprocess, responseType, loadedFun);
-                    dic[url]++;
-                    //console.warn(` retryLoad URL:${url} \n times ${dic[url]} `);
-                }
+                loadFail(req, url, fun, onprocess, responseType, loadedFun);
             }
         };
 
-        try
-        {
-            req.send();
-        } catch (err)
-        {
-            fun(null, err);
-        }
+        // try
+        // {
+        req.send();
+        // } catch (err)
+        // {
+        //     fun(null, err);
+        // }
     }
 
+    function loadFail(xhr: XMLHttpRequest, url, fun, onprocess, responseType, loadedFun)
+    {
+        console.error(`下载失败: ${url}  status:${xhr.status}, ${retryTime}/ms 后重试`);
+        urlCaseDic[url] = urlCaseDic[url] || 0;
+        if (urlCaseDic[url] >= retryCount)
+        {
+            urlCaseDic[url] = 0;
+            if (fun)
+                fun(null, new Error("load this url fail  ：" + url), true);  //throw error after retry some times
+            console.error(`------ load this url fail URL:${url}  `);
+        } else
+        {
+            setTimeout(() =>
+            {
+                urlCaseDic[url]++;
+                gd3d.io.xhrLoad(url, fun, onprocess, responseType, loadedFun);
+            }, retryTime);
+        }
+    }
     /**
      * @public
      * @language zh_CN
@@ -90,10 +104,10 @@
      */
     export function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void 
     {
-        if (framework.assetMgr.useBinJs)
-        {
-            url = framework.assetMgr.correctTxtFileName(url);
-        }
+        // if (framework.assetMgr.useBinJs)
+        // {
+        //     url = framework.assetMgr.correctTxtFileName(url);
+        // }
         gd3d.io.xhrLoad(url, fun, onprocess, "text", (req) =>
         {
             fun(req.responseText, null);
@@ -107,18 +121,19 @@
         return new threading.gdPromise<any>((r) =>
         {
             let cached = cachedMap[url];
-            if (cached.ready)
-                return r(cachedMap[url].json);
+            cached.ready = true;
+            cached.useTime = Date.now();
 
-            JSONParse(text).then((json) =>
-            {
-                //cachedMap[url] = json;
-                cached.ready = true;
-                cached.json = json;
-                cached.useTime = Date.now();
-                r(json);
-            });
-
+            if(cached.json){
+                r(cached.json);
+            }else{
+                JSONParse(text || cached.text).then((json) =>
+                {
+                    //cachedMap[url] = json;
+                    // cached.json = json;                
+                    r(json);
+                });
+            }
         });
         // return JSONParse(text);
     }
@@ -138,13 +153,13 @@
             resolve(json);
         });
     }
-    export function loadJSON(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null) 
+    export function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null) 
     {
 
         return new threading.gdPromise((r) =>
         {
-            if (framework.assetMgr.useBinJs)
-                url = framework.assetMgr.correctTxtFileName(url);
+            // if (framework.assetMgr.useBinJs)
+            //     url = framework.assetMgr.correctTxtFileName(url);
             let now = Date.now();
             if (now - checkClsTime > 15000)//15秒检查缓存
             {
@@ -177,7 +192,10 @@
             if (cached.ready)
             {
                 fun(cached.json, null);
-                r();
+                GetJSON(url).then((json) =>
+                {
+                    r(json);
+                });
                 return;
             }
 
@@ -188,22 +206,27 @@
 
                 gd3d.io.xhrLoad(url, fun, onprocess, "text", (req) =>
                 {
-                    GetJSON(url, req.response).then(() =>
+                    GetJSON(url, req.response).then((json) =>
                     {
                         let cached = cachedMap[url];
+                        cached.text = req.responseText;
                         const slowOut = function ()
                         {
                             if (cached.queue.length > 0)
-                                cached.queue.shift()(cached.json, null);
+                                cached.queue.shift()(json, null);
 
                             if (cached.queue.length > 0)
                                 setTimeout(slowOut, 10);
                         }
                         // while (cached.queue.length > 0)
                         if (cached.queue.length == 1)
-                            cached.queue.shift()(cached.json, null);
+                            cached.queue.shift()(json, null);
                         else
                             slowOut();
+
+                        //缓存成josn
+                        cached.json = json;
+                        cached.text = "";
                     });
                 });
             }
@@ -223,10 +246,10 @@
      */
     export function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {
-        if (framework.assetMgr.useBinJs)
-        {
-            url = framework.assetMgr.correctFileName(url);
-        }
+        // if (framework.assetMgr.useBinJs)
+        // {
+        //     url = framework.assetMgr.correctFileName(url);
+        // }
         //req.responseType = "arraybuffer";//ie 一定要在open之后修改responseType
         gd3d.io.xhrLoad(url, fun, onprocess, "arraybuffer", (req) =>
         {
@@ -262,29 +285,34 @@
      * @param progress 加载进度
      * @version gd3d 1.0
      */
-    export function loadImg(url: string, fun: (_tex: HTMLImageElement, _err: Error, loadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
+    export function loadImg(url: string, fun: (_tex: HTMLImageElement, _err?: Error, loadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {
-        gd3d.io.xhrLoad(url, fun, onprocess, "blob", (req) =>
+        let guid = framework.resID.next();
+        framework.assetMgr.Instance.loadImg(guid, url, (img) =>
         {
-            var blob = req.response;
-            var img = document.createElement("img");
-            //img.crossOrigin = "anonymous";
-            img.onload = function (e)
-            {
-                window.URL.revokeObjectURL(img.src);
-                fun(img, null);
-            };
-            img.onerror = function (e)
-            {
-                fun(null, new Error("error when blob to img:" + url));
-            }
-            try
-            {
-                img.src = window.URL.createObjectURL(blob);
-            } catch (e)
-            {
-                fun(null, e);
-            }
+            fun(img);
         });
+        // gd3d.io.xhrLoad(url, fun, onprocess, "blob", (req) =>
+        // {
+        //     var blob = req.response;
+        //     var img = document.createElement("img");
+        //     //img.crossOrigin = "anonymous";
+        //     img.onload = function (e)
+        //     {
+        //         window.URL.revokeObjectURL(img.src);
+        //         fun(img, null);
+        //     };
+        //     img.onerror = function (e)
+        //     {
+        //         fun(null, new Error("error when blob to img:" + url));
+        //     }
+        //     try
+        //     {
+        //         img.src = window.URL.createObjectURL(blob);
+        //     } catch (e)
+        //     {
+        //         fun(null, e);
+        //     }
+        // });
     }
 }

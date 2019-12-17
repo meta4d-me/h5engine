@@ -10,7 +10,7 @@ namespace gd3d.framework
     @gd3d.reflect.SerializeType
     export class rawscene implements IAsset
     {
-        static readonly ClassName:string="rawscene";
+        static readonly ClassName: string = "rawscene";
 
         private name: constText;
         private id: resID = new resID();
@@ -103,7 +103,7 @@ namespace gd3d.framework
             let total = 0;
             return total;
         }
-        resetLightMap(assetmgr: assetMgr)
+        resetLightMap(assetmgr: assetMgr, bundleName: string = null)
         {
             this.lightmaps.length = 0;
             let lightmapCount = this.lightmapData.length;
@@ -116,7 +116,7 @@ namespace gd3d.framework
                 else
                 {
                     let lightmapName = this.lightmapData[i].name;
-                    let lightmap = assetmgr.getAssetByName(lightmapName) as texture;
+                    let lightmap = assetmgr.getAssetByName(lightmapName, bundleName) as texture;
                     if (lightmap)
                         lightmap.use();
                     this.lightmaps.push(lightmap);
@@ -133,63 +133,63 @@ namespace gd3d.framework
          * @param assetmgr 资源管理实例
          * @version gd3d 1.0
          */
-        async Parse(txt: string, assetmgr: assetMgr)
+        Parse(txt: string, assetmgr: assetMgr)
         {
-            // return new threading.gdPromise((resolve) =>
-            // {
-
-                // let _json = JSON.parse(txt);
-                let _json = await io.JSONParse(txt);
-                this.rootNode = new transform();
-                this.rootNode.name = this.getName();
-                io.deSerialize(_json["rootNode"], this.rootNode, assetmgr, this.assetbundle);
-
-                this.lightmaps = [];
-                this.lightmapData = _json["lightmap"];
-                let lightmapCount = this.lightmapData.length;
-                for (let i = 0; i < lightmapCount; i++)
+            return new threading.gdPromise<rawscene>((resolve) =>
+            {
+                io.JSONParse(txt).then((_json) =>
                 {
-                    if (this.lightmapData[i] == null)
+                    this.rootNode = new transform();
+                    this.rootNode.name = this.getName();
+                    io.deSerialize(_json["rootNode"], this.rootNode, assetmgr, this.assetbundle);
+
+                    this.lightmaps = [];
+                    this.lightmapData = _json["lightmap"];
+                    let lightmapCount = this.lightmapData.length;
+                    for (let i = 0; i < lightmapCount; i++)
                     {
-                        this.lightmaps.push(null);
-                    }
-                    else
-                    {
-                        let lightmapName = this.lightmapData[i].name;
-                        let lightmap = assetmgr.getAssetByName(lightmapName, this.assetbundle) as texture;
-                        if (lightmap)
+                        if (this.lightmapData[i] == null)
                         {
-                            lightmap.use();
-                            this.lightmaps.push(lightmap);
+                            this.lightmaps.push(null);
+                        }
+                        else
+                        {
+                            let lightmapName = this.lightmapData[i].name;
+                            let lightmap = assetmgr.getAssetByName(lightmapName, this.assetbundle) as texture;
+                            if (lightmap)
+                            {
+                                lightmap.use();
+                                this.lightmaps.push(lightmap);
+                            }
                         }
                     }
-                }
 
-                let fogData = _json["fog"];
-                if (fogData != undefined)
-                {
-                    this.fog = new Fog();
-                    this.fog._Start = <number>fogData["_Start"];
-                    this.fog._End = <number>fogData["_End"];
-
-                    let cor: string = fogData["_Color"];
-                    if (typeof (cor) == "string")
+                    let fogData = _json["fog"];
+                    if (fogData != undefined)
                     {
-                        let array: string[] = cor.split(",");
-                        this.fog._Color = new gd3d.math.vector4(parseFloat(array[0]), parseFloat(array[1]), parseFloat(array[2]), parseFloat(array[3]));
-                    } else
-                        this.fog._Color = cor;
-                    this.fog._Density = <number>fogData["_Density"];
-                }
+                        this.fog = new Fog();
+                        this.fog._Start = <number>fogData["_Start"];
+                        this.fog._End = <number>fogData["_End"];
 
-                //navMesh
-                let nav = _json["navmesh"];
-                if (nav != undefined && nav.data != null)
-                {
-                    this.navMeshJson = nav.data;
-                }
-            //     resolve();
-            // });
+                        let cor: string = fogData["_Color"];
+                        if (typeof (cor) == "string")
+                        {
+                            let array: string[] = cor.split(",");
+                            this.fog._Color = new gd3d.math.vector4(parseFloat(array[0]), parseFloat(array[1]), parseFloat(array[2]), parseFloat(array[3]));
+                        } else
+                            this.fog._Color = cor;
+                        this.fog._Density = <number>fogData["_Density"];
+                    }
+
+                    //navMesh
+                    let nav = _json["navmesh"];
+                    if (nav != undefined && nav.data != null)
+                    {
+                        this.navMeshJson = nav.data;
+                    }
+                    resolve(this);
+                });
+            });
         }
 
         /**

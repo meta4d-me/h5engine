@@ -12,19 +12,19 @@ namespace gd3d.framework
         public endFrame: number;
 
         public effect: f14EffectSystem;
-        public constructor(effect: f14EffectSystem, layer: F14Layer)
+        public constructor(effect: f14EffectSystem, layer: F14Layer, bundleName: string )
         {
 
             this.type = F14TypeEnum.RefType;
             this.effect = effect;
             this.baseddata = layer.data.elementdata as F14RefBaseData;
             this.layer = layer;
-            let f14Dat: f14eff = (sceneMgr.app.getAssetMgr().getAssetByName(this.baseddata.refdataName) as f14eff);
+            let f14Dat: f14eff = (sceneMgr.app.getAssetMgr().getAssetByName(this.baseddata.refdataName, bundleName) as f14eff);
             if (!f14Dat)
                 return;
             this.refreshStartEndFrame();
 
-            this.RefEffect = new f14EffectSystem();
+            this.RefEffect = new f14EffectSystem(bundleName);
             this.RefEffect._root = new transform();
             this.RefEffect.enableDraw = true;
             this.RefEffect.gameObject = this.RefEffect._root.gameObject;
@@ -37,7 +37,7 @@ namespace gd3d.framework
 
             this.RefEffect.beref = true;
             this.baseddata.refData = f14Dat.data;
-            this.RefEffect.setData(this.baseddata.refData);
+            this.RefEffect.setData(this.baseddata.refData,bundleName);
             //this.RefEffect.batchRoot = effect.player.transform;
         }
         public RefEffect: f14EffectSystem;
@@ -109,7 +109,7 @@ namespace gd3d.framework
         {
             this.RefEffect.changeColor(value);
         }
-        changeAlpha(value:number)
+        changeAlpha(value: number)
         {
             this.RefEffect.changeAlpha(value);
         }

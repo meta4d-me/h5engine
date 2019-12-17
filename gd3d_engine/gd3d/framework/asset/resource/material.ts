@@ -188,12 +188,25 @@ namespace gd3d.framework
             return total;
         }
 
-        uploadUnifoms(pass: render.glDrawPass, context: renderContext)
+        private static sameMatPassMap = {   glstate_matrix_model:true,
+                                            glstate_matrix_world2object:true,
+                                            glstate_matrix_modelview:true,
+                                            glstate_matrix_mvp:true,
+                                            glstate_vec4_bones:true,
+                                            glstate_matrix_bones:true
+                                        }
+
+        uploadUnifoms(pass: render.glDrawPass, context: renderContext , lastMatSame = false)
         {
             render.shaderUniform.texindex = 0;
+            let udMap = this.uniformDirtyMap;
             for (let key in pass.mapuniforms)
             {
                 let unifom = pass.mapuniforms[key];
+                if(lastMatSame && !material.sameMatPassMap[unifom.name] && !udMap[unifom.name]){
+                    continue;
+                }
+                udMap[unifom.name] = false;  //标记为 没有 变化
 
                 let func = render.shaderUniform.applyuniformFunc[unifom.type];
                 let unifomValue: any;
@@ -319,6 +332,9 @@ namespace gd3d.framework
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float)
             {
                 this.statedMapUniforms[_id] = _number;
+                if(this.statedMapUniforms[_id] != _number){
+                    this.uniformDirtyMap[_id] = true;
+                }
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -332,6 +348,7 @@ namespace gd3d.framework
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Floatv)
             {
                 this.statedMapUniforms[_id] = _numbers;
+                this.uniformDirtyMap[_id] = true;
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -345,6 +362,7 @@ namespace gd3d.framework
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4)
             {
                 this.statedMapUniforms[_id] = _vector4;
+                this.uniformDirtyMap[_id] = true;
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -358,6 +376,8 @@ namespace gd3d.framework
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4v)
             {
                 this.statedMapUniforms[_id] = _vector4v;
+                this.uniformDirtyMap[_id] = true;
+
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -371,6 +391,8 @@ namespace gd3d.framework
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4)
             {
                 this.statedMapUniforms[_id] = _matrix;
+                this.uniformDirtyMap[_id] = true;
+
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -384,6 +406,8 @@ namespace gd3d.framework
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4v)
             {
                 this.statedMapUniforms[_id] = _matrixv;
+                this.uniformDirtyMap[_id] = true;
+
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -429,6 +453,11 @@ namespace gd3d.framework
                 {
                     this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                 }
+                this.uniformDirtyMap[_id] = true;
+
+            } else
+            {
+                console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
 
             if(oldTex) oldTex.unuse();
@@ -465,11 +494,17 @@ namespace gd3d.framework
                         this.setVector4(_texelsizeName, new math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
                 }
+                this.uniformDirtyMap[_id] = true;
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
         }
+
+        private uniformDirtyMap : {[id:string]:boolean} = {};//值变化标记map
+
+        private static lastDrawMatID = -1;
+        private static lastDrawMeshID = -1;
 
         /**
          * @public
@@ -481,8 +516,12 @@ namespace gd3d.framework
          * @param sm 渲染的submesh信息
          * @version gd3d 1.0
          */
-        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base", useGLobalLightMap: boolean = true)
+        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype: string = "base")
         {
+            let matGUID= this.getGUID();
+            let meshGUID= mesh.getGUID();
+            let LastMatSame = matGUID == material.lastDrawMatID;
+            let LastMeshSame = meshGUID == material.lastDrawMeshID;
 
             let drawPasses = this.shader.passes[basetype + context.drawtype];
             if (drawPasses == undefined)
@@ -499,10 +538,13 @@ namespace gd3d.framework
             for (var i = 0, l = drawPasses.length; i < l; i++)
             {
                 var pass = drawPasses[i];
-                pass.use(context.webgl);
-                this.uploadUnifoms(pass, context);
-
-                mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
+                pass.use(context.webgl );
+                this.uploadUnifoms(pass, context , LastMatSame);
+                if(!LastMatSame || !LastMeshSame) mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
+                //test code
+                // if(LastMatSame && LastMatSame){
+                //     console.log(`matGUID :${matGUID} , matName : ${this.name.getText()}`);
+                // }
 
                 DrawCallInfo.inc.add();
                 if (sm.useVertexIndex < 0)
@@ -528,6 +570,10 @@ namespace gd3d.framework
                     }
                 }
             }
+
+            material.lastDrawMatID = matGUID;
+            material.lastDrawMeshID = meshGUID;
+
         }
 
         /**
@@ -601,6 +647,7 @@ namespace gd3d.framework
                         break;
                 }
             }
+            return this;
         }
 
         /**

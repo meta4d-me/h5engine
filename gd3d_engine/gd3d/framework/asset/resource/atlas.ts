@@ -10,8 +10,8 @@
     @gd3d.reflect.SerializeType
     export class atlas implements IAsset
     {
-        static readonly ClassName:string="atlas";
-        
+        static readonly ClassName: string = "atlas";
+
         @gd3d.reflect.Field("constText")
         private name: constText;
         private id: resID = new resID();
@@ -126,7 +126,7 @@
         textureheight: number;
 
         private _texture: texture;
-        
+
         /**
          * @public
          * @language zh_CN
@@ -173,7 +173,7 @@
          * @param assetmgr 资源管理实例
          * @version gd3d 1.0
          */
-        Parse(jsonStr: string, assetmgr: assetMgr)
+        Parse(jsonStr: string, assetmgr: assetMgr, bundleName: string = null)
         {
 
             var json = JSON.parse(jsonStr);
@@ -182,7 +182,8 @@
             this.textureheight = json["h"];
             var s = <any[]>json["s"];
 
-            this.texture = assetmgr.getAssetByName(name) as gd3d.framework.texture;
+            this.texture = assetmgr.getAssetByName(name, bundleName) as gd3d.framework.texture;
+            
             if (this.texture == null)
             {
                 console.log("atlas的图片名字不对");
@@ -192,6 +193,7 @@
                 var ss = <any[]>s[i];
                 var spriteName = ss[0];
                 var r: sprite = new sprite(this.getName() + "_" + spriteName);//用Atlas的名字的Sprite的名字拼接
+                // r.bundle = assetmgr.name_bundles[bundleName];
                 assetmgr.use(r);
                 if (this.texture)
                 {
@@ -202,6 +204,7 @@
                 r.atlas = this.getName();
                 this.sprites[spriteName] = r;
             }
+            return this;
         }
     }
 }

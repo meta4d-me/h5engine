@@ -62,7 +62,7 @@ namespace gd3d.framework
          */
         renderList: renderList;
         private assetmgr: assetMgr;
-        private _overlay2d: Array<overlay2D>;
+        private _overlay2ds: Array<overlay2D>;
         /**
          * @public
          * @language zh_CN
@@ -73,10 +73,11 @@ namespace gd3d.framework
         addScreenSpaceOverlay(overlay: overlay2D)
         {
             if (!overlay) return;
-            if (!this._overlay2d) this._overlay2d = [];
-            if (this._overlay2d.indexOf(overlay) != -1) return;
-            this._overlay2d.push(overlay);
-            this.sortOverLays(this._overlay2d);
+            if (!this._overlay2ds) this._overlay2ds = [];
+            let ol2ds = this._overlay2ds;
+            if (ol2ds.indexOf(overlay) != -1) return;
+            ol2ds.push(overlay);
+            this.sortOverLays(ol2ds);
         }
 
         /**
@@ -88,10 +89,11 @@ namespace gd3d.framework
          */
         removeScreenSpaceOverlay(overlay)
         {
-            if (!overlay || !this._overlay2d) return;
-            let idx = this._overlay2d.indexOf(overlay);
-            if (idx != -1) this._overlay2d.splice(idx, 1);
-            this.sortOverLays(this._overlay2d);
+            let  ol2ds = this._overlay2ds;
+            if (!overlay || !ol2ds) return;
+            let idx = ol2ds.indexOf(overlay);
+            if (idx != -1) ol2ds.splice(idx, 1);
+            this.sortOverLays(ol2ds);
         }
         /**
          * @public
@@ -171,6 +173,7 @@ namespace gd3d.framework
             //更新矩阵
             //this.rootNode.updateTran(false);
             //this.rootNode.updateAABBChild();//更新完tarn再更新子物体aabb 确保每个transform的aabb正确
+            material["lastDrawMatID"] = material["lastDrawMeshID"] = render.glDrawPass["lastPassID"] = -1;  //每帧 清理 material 的记录 ， 避免 显示bug
 
             //更新跑一遍，刷出渲染列表
             if(this.autoCollectlightCamera){
@@ -180,6 +183,7 @@ namespace gd3d.framework
             this.renderList.clear();
 
             // aniplayer.playerCaches = [];
+            this.updateSceneOverLay(delta); 
 
             //递归的更新与填充渲染列表
             this.updateScene(this.rootNode, delta);
@@ -227,7 +231,8 @@ namespace gd3d.framework
                 this.renderCameras[i].isLastCamera = false;
             }
 
-            this.updateSceneOverLay(delta);
+            // this.updateSceneOverLay(delta);
+            this.rendererSceneOverLay();
 
             if (this.RealCameraNumber == 0 && this.app && this.app.beRendering)
             {
@@ -244,21 +249,22 @@ namespace gd3d.framework
             }
         }
 
-        //更新和渲染 scene overlayers
-        private updateSceneOverLay(delta: number)
-        {
-            if (!this._overlay2d || this._overlay2d.length < 1) return;
+        //渲染场景 2dUI overlay
+        private rendererSceneOverLay(){
+            let ol2ds = this._overlay2ds;
+            if (!ol2ds || ol2ds.length < 1) return;
 
             let targetcamera = this.mainCamera;
-            if (!this._overlay2d || !targetcamera) return;
-            let mainCamIdx = this.renderCameras.indexOf(targetcamera);
+            if ( !targetcamera) return;
+            let rCams = this.renderCameras;
+            let mainCamIdx = rCams.indexOf(targetcamera);
             if (mainCamIdx == -1)
             {
                 let cname = targetcamera.gameObject.getName();
                 let oktag = false;
-                for (var i = 0, l = this.renderCameras.length; i < l; i++)
+                for (var i = 0, l = rCams.length; i < l; i++)
                 {
-                    let cam = this.renderCameras[i];
+                    let cam = rCams[i];
                     if (cam && cam.gameObject.getName() == cname)
                     {
                         targetcamera = this.mainCamera = cam;
@@ -272,52 +278,36 @@ namespace gd3d.framework
                     targetcamera = this.mainCamera;
                 }
             }
-            mainCamIdx = this.renderCameras.indexOf(targetcamera);
+            mainCamIdx = rCams.indexOf(targetcamera);
             if (!targetcamera) return;
-            if (this._overlay2d)
+            let len = ol2ds.length;
+            for (var i = 0, l = len; i < l; ++i)
             {
-                for (var i = 0, l = this._overlay2d.length; i < l; ++i)
+                var overlay = ol2ds[i];
+                if (overlay && this.app && this.app.beRendering)
                 {
-                    var overlay = this._overlay2d[i];
-                    if (overlay)
-                    {
-                        overlay.start(targetcamera);
-                        overlay.update(delta);
-                        if (this.app && this.app.beRendering)
-                        {
-                            overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
-                        }
-                    }
+                    overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
                 }
-                // this._overlay2d.forEach(overlay =>
-                // {
-                //     if (overlay)
-                //     {
-                //         overlay.start(targetcamera);
-                //         overlay.update(delta);
-                //         if (this.app && this.app.beRendering)
-                //         {
-                //             overlay.render(this.renderContext[mainCamIdx], this.assetmgr, targetcamera);
-                //         }
-                //     }
-                // });
             }
+        }
 
-            //test----
-            // for(var i=0;i< this.renderCameras.length;i++){
-            //     let cam = this.renderCameras[i];
-            //     let contx = this.renderContext[i];
-            //     if(!cam || !contx) return;
-            //     if(this._overlay2d){
-            //         this._overlay2d.forEach(overlay=>{
-            //             if(overlay){
-            //                 overlay.start( cam);
-            //                 overlay.update(delta);
-            //                 overlay.render(contx, this.assetmgr, cam);
-            //             }
-            //         });
-            //     }
-            // }
+        //更新 scene overlayers
+        private updateSceneOverLay(delta: number)
+        {
+            let ol2ds = this._overlay2ds;
+            if (!ol2ds || ol2ds.length < 1) return;
+            let targetcamera = this.mainCamera;
+            if (!targetcamera) return;
+            if(this.renderCameras.indexOf(targetcamera) == -1) return;
+            for (var i = 0, l = ol2ds.length; i < l; ++i)
+            {
+                var overlay = ol2ds[i];
+                if (overlay)
+                {
+                    overlay.start(targetcamera);
+                    overlay.update(delta);
+                }
+            }
         }
 
         private RealCameraNumber: number = 0;

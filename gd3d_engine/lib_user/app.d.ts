@@ -153,6 +153,9 @@ declare class test_01 implements IState {
     cube3: gd3d.framework.transform;
     timer: number;
     update(delta: number): void;
+    private testPrefab;
+    private testNRes;
+    private testEffect;
 }
 declare class test_loadScene implements IState {
     app: gd3d.framework.application;
@@ -1137,6 +1140,7 @@ declare class test_anim implements IState {
         [id: string]: gd3d.framework.transform;
     };
     _assetMgr: gd3d.framework.assetMgr;
+    list: any[];
     start(app: gd3d.framework.application): void;
     camera: gd3d.framework.camera;
     cube: gd3d.framework.transform;

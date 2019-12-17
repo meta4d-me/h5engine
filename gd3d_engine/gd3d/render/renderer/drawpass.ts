@@ -36,7 +36,7 @@
      */
     export class glDrawPass
     {
-
+        id: framework.resID = new framework.resID();
         static lastShowFace: number=-1;
         static lastZWrite: boolean=null;
         static lastZTest: boolean=null;
@@ -205,8 +205,20 @@
             this.lastBlend=null;
             this.lastBlendMode=null;
         }
-        use(webgl: WebGLRenderingContext, applyUniForm: boolean = true)
+
+        private static useStateMap = {
+
+        } 
+
+        private static lastPassID = -1;
+
+        use(webgl: WebGLRenderingContext)
         {
+            let ID = this.id.getID(); 
+            let lastSame = glDrawPass.lastPassID == ID;
+            glDrawPass.lastPassID = ID;
+            if(lastSame) return;
+
             // if (this.state_showface == ShowFaceStateEnum.ALL)
             // {
             //     webgl.disable(webgl.CULL_FACE);

@@ -59,6 +59,7 @@ namespace gd3d.framework
             if (camera == this.camera) return;
             this.camera = camera;
             this.app = camera.gameObject.getScene().app;
+            camera.calcViewPortPixel(this.app);
             this.canvas.scene = camera.gameObject.getScene();
             this.inputmgr = camera.gameObject.getScene().app.getInputMgr();
         }
@@ -222,9 +223,9 @@ namespace gd3d.framework
             this.canvas.render(context, assetmgr);
         }
 
-        private viewPixelrect = new math.rect();
-        private helpv2 = new gd3d.math.vector2();
-        private helpv2_1 = new gd3d.math.vector2();
+        // private readonly viewPixelrect = new math.rect();
+        private readonly helpv2 = new gd3d.math.vector2();
+        private readonly helpv2_1 = new gd3d.math.vector2();
         /**
          * @private
          */
@@ -244,7 +245,7 @@ namespace gd3d.framework
             this.helpv2.y = this.inputmgr.point.y;
             let sPos = this.helpv2;
             let mPos = this.helpv2_1;
-            this.calScreenPosToModelPos(sPos,mPos);
+            this.calScreenPosToClipPos(sPos,mPos);
 
             //canvas de update 直接集成pointevent处理
             this.canvas.update(delta, this.inputmgr.point.touch, mPos.x, mPos.y);
@@ -257,9 +258,11 @@ namespace gd3d.framework
         //检查缩放模式 改变
         private ckScaleMode(){
             if(!this.canvas.getRoot().visible || !this.camera) return;
-            this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+            // this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+            // gd3d.math.rectClone(this.camera.currViewPixelRect ,this.viewPixelrect);
+            let currVPR = this.camera.currViewPixelRect;
             let dirty = false;
-            if(math.rectEqul(this.lastVPRect,this.viewPixelrect)){
+            if(math.rectEqul(this.lastVPRect,currVPR)){
                 switch(this.scaleMode){
                     case UIScaleMode.CONSTANT_PIXEL_SIZE:
                     break;
@@ -277,7 +280,7 @@ namespace gd3d.framework
             if(!dirty) return;
             
             let _w = 0; let _h = 0;
-            math.rectClone(this.viewPixelrect,this.lastVPRect);
+            math.rectClone(currVPR,this.lastVPRect);
             this.lastScreenMR = this.screenMatchRate;
             this.lastMR_width = this.matchReference_width;
             this.lastMR_height = this.matchReference_height;
@@ -285,13 +288,13 @@ namespace gd3d.framework
             //计算w h
             switch(this.scaleMode){
                 case UIScaleMode.CONSTANT_PIXEL_SIZE:
-                    _w = this.viewPixelrect.w;
-                    _h = this.viewPixelrect.h;
+                    _w = currVPR.w;
+                    _h = currVPR.h;
                 break;
                 case UIScaleMode.SCALE_WITH_SCREEN_SIZE:
                     let match = this.screenMatchRate < 0 ? 0: this.screenMatchRate;
                     match = match>1? 1:match;
-                    let asp = this.viewPixelrect.w / this.viewPixelrect.h;
+                    let asp = currVPR.w / currVPR.h;
                     _w = math.numberLerp(this.matchReference_width,this.matchReference_height * asp,match);
                     _h = math.numberLerp(this.matchReference_height,this.matchReference_width / asp, 1 - match );
                 break;
@@ -320,7 +323,7 @@ namespace gd3d.framework
             this.helpv2.y = my;
             let sPos = this.helpv2;
             let mPos = this.helpv2_1;
-            this.calScreenPosToModelPos(sPos,mPos);
+            this.calScreenPosToClipPos(sPos,mPos);
             let trans = this.dopick2d(mPos, root, tolerance);
             return trans;
         }
@@ -328,7 +331,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        private dopick2d(ModelPos: math.vector2, tran: transform2D, tolerance: number = 0): transform2D
+        private dopick2d(clipPos: math.vector2, tran: transform2D, tolerance: number = 0): transform2D
         {
             if (tran.components != null)
             {
@@ -337,7 +340,7 @@ namespace gd3d.framework
                     var comp = tran.components[i];
                     if (comp != null)
                         //if (comp.init && comp.comp.transform.ContainsCanvasPoint(outv,tolerance))
-                        if (comp.comp.transform.ContainsCanvasPoint(ModelPos, tolerance))
+                        if (comp.comp.transform.ContainsCanvasPoint(clipPos, tolerance))
                         {
                             return comp.comp.transform;
                         }
@@ -348,7 +351,7 @@ namespace gd3d.framework
             {
                 for (var i = tran.children.length - 1; i >= 0; i--)
                 {
-                    var tran2 = this.dopick2d(ModelPos, tran.children[i], tolerance);
+                    var tran2 = this.dopick2d(clipPos, tran.children[i], tolerance);
                     if (tran2 != null) return tran2;
                 }
             }
@@ -366,7 +369,7 @@ namespace gd3d.framework
         {
             if(!this.camera || !this.canvas)    return;
             let mPos = this.helpv2;
-            this.calScreenPosToModelPos(screenPos,mPos);
+            this.calScreenPosToClipPos(screenPos,mPos);
             
             // var mat: gd3d.math.matrix3x2 = gd3d.math.pool.new_matrix3x2();
             // gd3d.math.matrix3x2Clone(this.canvas.getRoot().getWorldMatrix(), mat);
@@ -375,7 +378,7 @@ namespace gd3d.framework
 
             // gd3d.math.pool.delete_matrix3x2(mat);
 
-            this.canvas.ModelPosToCanvasPos(mPos,outCanvasPos);
+            this.canvas.clipPosToCanvasPos(mPos,outCanvasPos);
         }
 
         /**
@@ -389,27 +392,46 @@ namespace gd3d.framework
          */
         calCanvasPosToScreenPos(canvasPos: gd3d.math.vector2, outScreenPos: gd3d.math.vector2){
             if(!this.camera || !this.canvas)    return;
-            let mPos = this.helpv2;
-            this.canvas.CanvasPosToModelPos(canvasPos,mPos);
-            this.calModelPosToScreenPos(mPos,outScreenPos);
+            let clipPos = this.helpv2;
+            this.canvas.canvasPosToClipPos(canvasPos,clipPos);
+            this.calClipPosToScreenPos(clipPos,outScreenPos);
+        }
+
+        /**
+         * [过时接口,完全弃用]
+         * @version gd3d 1.0
+         */
+        calScreenPosToModelPos(screenPos: gd3d.math.vector2 , outClipPos : gd3d.math.vector2){
+            this.calScreenPosToClipPos(screenPos,outClipPos);
         }
 
         /**
          * @public
          * @language zh_CN
          * @classdesc
-         * 屏幕空间坐标 转到 Model坐标
+         * 屏幕空间坐标 转到 裁剪空间坐标
          * @version gd3d 1.0
+         * @param screenPos 
+         * @param outClipPos 
          */
-        calScreenPosToModelPos(screenPos: gd3d.math.vector2 , outModelPos : gd3d.math.vector2){
-            if(!screenPos || !outModelPos || !this.camera)    return;
-            this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+        calScreenPosToClipPos(screenPos: gd3d.math.vector2 , outClipPos : gd3d.math.vector2){
+            if(!screenPos || !outClipPos || !this.camera)    return;
+            // this.camera.calcViewPortPixel(this.app, currVPR);
+            let currVPR = this.camera.currViewPixelRect;
             let rect = this.camera.viewport;
 
             let real_x = screenPos.x - rect.x * this.app.width;
             let real_y = screenPos.y - rect.y * this.app.height;
-            outModelPos.x = (real_x / this.viewPixelrect.w) * 2 - 1;
-            outModelPos.y = (real_y / this.viewPixelrect.h) * -2 + 1;
+            outClipPos.x = (real_x / currVPR.w) * 2 - 1;
+            outClipPos.y = (real_y / currVPR.h) * -2 + 1;
+        }
+
+        /**
+         * [过时接口,完全弃用]
+         * @version gd3d 1.0
+         */
+        calModelPosToScreenPos(clipPos: gd3d.math.vector2 , outScreenPos : gd3d.math.vector2){
+            this.calClipPosToScreenPos(clipPos,outScreenPos);
         }
 
         /**
@@ -417,17 +439,18 @@ namespace gd3d.framework
          * @language zh_CN
          * @classdesc
          * Model坐标 转到 屏幕空间坐标
-         * @param modelPos Model坐标
+         * @param clipPos 裁剪空间坐标
          * @param outScreenPos 输出的屏幕空间坐标
          * @version gd3d 1.0
          */
-        calModelPosToScreenPos(modelPos: gd3d.math.vector2 , outScreenPos : gd3d.math.vector2){
-            if(!modelPos || !outScreenPos || !this.camera)    return;
-            this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
+        calClipPosToScreenPos(clipPos: gd3d.math.vector2 , outScreenPos : gd3d.math.vector2){
+            if(!clipPos || !outScreenPos || !this.camera)    return;
+            let currVPR = this.camera.currViewPixelRect;
+            // this.camera.calcViewPortPixel(this.app, currVPR);
             let rect = this.camera.viewport;
 
-            let real_x = this.viewPixelrect.w * (modelPos.x + 1)/2; 
-            let real_y = this.viewPixelrect.h * (modelPos.y - 1)/-2; 
+            let real_x = currVPR.w * (clipPos.x + 1) * 0.5; 
+            let real_y = currVPR.h * (clipPos.y - 1) * -0.5; 
 
             outScreenPos.x = real_x + rect.x * this.app.width;
             outScreenPos.y = real_y + rect.y * this.app.height;

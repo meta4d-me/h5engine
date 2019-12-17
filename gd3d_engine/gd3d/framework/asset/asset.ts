@@ -15,8 +15,8 @@ namespace gd3d.framework
         {
             this.id = resID.next();
         }
-        private static idAll: number = 1;
-        private static next(): number
+        public static idAll: number = 1;
+        public static next(): number
         {
             var next = resID.idAll;
             resID.idAll++;
@@ -57,6 +57,8 @@ namespace gd3d.framework
      */
     export interface IAsset //
     {
+        bundle?:assetBundle;
+
         defaultAsset:boolean;//是否为系统默认资源
         //setName(name: string);//名字只能设置一次
         getName(): string;//资源自己解决命名问题，比如构造函数，不能改资源的名字
@@ -66,6 +68,6 @@ namespace gd3d.framework
         unuse(disposeNow?: boolean):void;
         dispose();
         caclByteLength(): number;
-        
+        init?();
     }
 }

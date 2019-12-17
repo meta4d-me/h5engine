@@ -2,6 +2,7 @@ namespace gd3d.io
 {
     var assetMgr: gd3d.framework.assetMgr;
     const filter = { cls: true, insid: true, gameObject: true, components: true, children: true };
+    const baseType = { string: true, number: true, boolean: true };
     export function ndeSerialize<T extends framework.transform | framework.transform2D>(json: any, assetbundle: string, useAsset?: boolean): T
     {
         if (!assetMgr)
@@ -16,6 +17,7 @@ namespace gd3d.io
         if (is2d)
             coms = [];
         fullTrasn(json, root, gos, instMap, bundlename);
+        //先收集transform 再赋值gameobject
         var god: { go: framework.gameObject, data: any };
         for (let i = 0, len = gos.length; i < len; ++i)
         {
@@ -28,10 +30,6 @@ namespace gd3d.io
             {
                 let com = coms[i];
                 com.src[com.key] = com.cls == "transform2D" ? instMap[com.refid] : instMap[com.refid].getComponent(com.cls);
-                // refid: prop.refid,
-                // cls: prop.cls,
-                // src: comp,
-                // key: k
             }
         }
         return root;
@@ -57,7 +55,8 @@ namespace gd3d.io
         for (let k in json)
         {
             if (!filter[k])
-                trans[k] = json[k];
+                fullValue(trans, k, json[k]);
+            // trans[k] = json[k];
         }
 
         if (json.components || (json.gameObject && json.gameObject.components))
@@ -95,13 +94,17 @@ namespace gd3d.io
                 let ele = prop[i];
                 let value;
                 if (ele.cls && isAsset(ele.cls))
-                    value = getAssetValue(ele.value, ele.cls, bundlename,useAsset);
+                    value = getAssetValue(ele.value, ele.cls, bundlename, useAsset);
                 else if (ele.refid)
                 {
                     value = instMap[ele.refid];
                 }
                 else
-                    value = ele;
+                {
+                    // value = ele;
+                    arrProp.push(null);//先填充空值再赋值
+                    fullValue(arrProp, i, prop[i]);
+                }
                 if (value)
                     arrProp.push(value);
             }
@@ -119,20 +122,38 @@ namespace gd3d.io
                     key: k
                 });
             }
-            else{
+            else
+            {
 
                 if (prop.cls && gd3d.reflect.isComp(prop.cls))
                 {
                     //引用组件
                     let trans = instMap[prop.refid] as framework.transform;
-                    let comp = trans.gameObject.getComponent(prop.cls);
-                    comp[k] = comp;
-                }else
+                    comp[k] = trans.gameObject.getComponent(prop.cls);
+                } else
                     comp[k] = instMap[prop.refid];
             }
         }
         else
-            comp[k] = prop;
+            fullValue(comp, k, prop);
+        // comp[k] = prop;
+    }
+    function fullValue(obj: any, key: string | number, json)
+    {
+        if (!json.cls || baseType[json.cls])
+            obj[key] = json;
+        else
+        {
+            let ctor = gd3d.math[json.cls] || gd3d.framework[json.cls];
+            let inst = new ctor();
+            for (let k in json)
+            {
+                if (k == "cls")
+                    continue;
+                fullValue(inst, k, json[k]);
+            }
+            obj[key] = inst;
+        }
     }
     function getAssetValue(assetName: string, type: string, bundlename: string, useAsset?: boolean)
     {
@@ -141,23 +162,24 @@ namespace gd3d.io
         {
             assetName = assetName.replace("SystemDefaultAsset-", "");
             if (type == "mesh")
-                asset = assetMgr.getDefaultMesh(assetName.replace(".mesh.bin", "").replace(".mesh.json", ""));
+                asset = assetMgr.getDefaultMesh(assetName.replace(".mesh.bin", "").replace(".cmesh.bin", ""));
             else if (type == "texture")
                 asset = assetMgr.getDefaultTexture(assetName);
         }
         else
             asset = assetMgr.getAssetByName(assetName, bundlename) ||
-                assetMgr.getAssetByName(assetName.replace(".mesh.bin", ".mesh.json"), bundlename);
+                assetMgr.getAssetByName(assetName.replace(".mesh.bin", ".cmesh.bin"), bundlename);
 
-        if(!asset && type == "animationClip"){
+        if (!asset && type == "animationClip")
+        {
             let clip = new framework.animationClip(assetName);
             clip.bones = [];
             clip.subclips = [];
             asset = clip;
         }
-
         if (useAsset && asset)
             asset.use();
         return asset;
     }
+
 }

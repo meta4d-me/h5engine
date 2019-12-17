@@ -83,7 +83,14 @@ namespace gd3d.framework
             this.flyingSlidr(delta);
         }
         transform: transform2D;
+        //暂停滑动
+        pauseSlide:boolean=false;
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean) {
+            if(this.pauseSlide)
+            {
+                this.isPointDown = false;
+                return;
+            }
             //oncap==true 是捕获阶段，一般的行为，只在pop阶段处理
             if (oncap == false)
             {
@@ -101,7 +108,7 @@ namespace gd3d.framework
                     let temps = scrollRect.helpv2;
                     gd3d.math.vec2Set(temps,ev.x,ev.y);
                     let tempc = scrollRect.helpv2_1;
-                    this.transform.canvas.ModelPosToCanvasPos(temps,tempc);
+                    this.transform.canvas.clipPosToCanvasPos(temps,tempc);
 
                     let sp = this.strPoint;
                     if(ev.type == event.PointEventEnum.PointDown ) {

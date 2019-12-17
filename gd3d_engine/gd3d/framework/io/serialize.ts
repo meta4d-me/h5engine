@@ -1062,7 +1062,7 @@ namespace gd3d.io
                 assetName = assetName.replace("SystemDefaultAsset-", "");
                 if (type == "mesh")
                 {
-                    assetName = assetName.replace(".mesh.bin", "").replace(".mesh.json","");
+                    assetName = assetName.replace(".mesh.bin", "").replace(".cmesh.bin","");
                     _asset = assetMgr.getDefaultMesh(assetName);
                 }
                 else if (type == "texture")
@@ -1072,7 +1072,7 @@ namespace gd3d.io
             }
             else
             {
-                _asset = assetMgr.getAssetByName(assetName, bundlename) || assetMgr.getAssetByName(assetName.replace(".mesh.bin",".mesh.json"), bundlename);
+                _asset = assetMgr.getAssetByName(assetName, bundlename) || assetMgr.getAssetByName(assetName.replace(".mesh.bin",".cmesh.bin"), bundlename);
             }
 
             // if (type == "mesh" && _parentType == "meshFilter")
