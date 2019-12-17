@@ -23,7 +23,7 @@ class test_ParticleSystem implements IState
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
 
-    private _particles = ["aaaaa", "ParticleSystem", "Fire", "Flames"];
+    private _particles = ["ps_inheritVelocity", "aaaaa", "ParticleSystem", "Fire", "Flames"];
     private _particle: gd3d.framework.transform;
 
     private _isMove = false;
@@ -35,7 +35,6 @@ class test_ParticleSystem implements IState
 
     async start(app: gd3d.framework.application)
     {
-        debugger;
         this.app = app;
         this.scene = this.app.getScene();
         this.astMgr = this.app.getAssetMgr();
@@ -55,8 +54,8 @@ class test_ParticleSystem implements IState
         let gui = new dat.GUI();
         gui.add(this, 'particleName', this._particles);
         gui.add(this, '_isMove');
-        gui.add(this, '_moveRadius');
-        gui.add(this, '_moveAngleSpeed');
+        gui.add(this, '_moveRadius', 1, 50, 1);
+        gui.add(this, '_moveAngleSpeed', -10, 10, 0.2);
     }
 
     private get particleName()
@@ -68,7 +67,7 @@ class test_ParticleSystem implements IState
         this._showParticle(v);
         this._particleName = v;
     }
-    private _particleName: string;
+    private _particleName: string = "ParticleSystem";
 
     private init()
     {

@@ -3899,20 +3899,20 @@ var test_Decal = (function () {
 }());
 var test_ParticleSystem = (function () {
     function test_ParticleSystem() {
-        this._particles = ["aaaaa", "ParticleSystem", "Fire", "Flames"];
+        this._particles = ["ps_inheritVelocity", "aaaaa", "ParticleSystem", "Fire", "Flames"];
         this._isMove = false;
         this._particleStartPosition = new gd3d.math.vector3();
         this._particleCurrentPosition = new gd3d.math.vector3();
         this._moveRadius = 5;
         this._moveAngle = 0;
         this._moveAngleSpeed = 1;
+        this._particleName = "ParticleSystem";
     }
     test_ParticleSystem.prototype.start = function (app) {
         return __awaiter(this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        debugger;
                         this.app = app;
                         this.scene = this.app.getScene();
                         this.astMgr = this.app.getAssetMgr();
@@ -3935,8 +3935,8 @@ var test_ParticleSystem = (function () {
         var gui = new dat.GUI();
         gui.add(this, 'particleName', this._particles);
         gui.add(this, '_isMove');
-        gui.add(this, '_moveRadius');
-        gui.add(this, '_moveAngleSpeed');
+        gui.add(this, '_moveRadius', 1, 50, 1);
+        gui.add(this, '_moveAngleSpeed', -10, 10, 0.2);
     };
     Object.defineProperty(test_ParticleSystem.prototype, "particleName", {
         get: function () {
