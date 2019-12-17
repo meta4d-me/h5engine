@@ -382,9 +382,9 @@ namespace gd3d.framework
             this.moveVec.y = this.worldPos.y - this._preworldPos.y;
             this.moveVec.z = this.worldPos.z - this._preworldPos.z;
             // 粒子系统速度
-            this.speed.x = this.moveVec.x / (this.main.simulationSpeed * interval / 1000);
-            this.speed.y = this.moveVec.y / (this.main.simulationSpeed * interval / 1000);
-            this.speed.z = this.moveVec.z / (this.main.simulationSpeed * interval / 1000);
+            this.speed.x = this.moveVec.x / (this.main.simulationSpeed * interval);
+            this.speed.y = this.moveVec.y / (this.main.simulationSpeed * interval);
+            this.speed.z = this.moveVec.z / (this.main.simulationSpeed * interval);
 
             this._updateActiveParticlesState();
 

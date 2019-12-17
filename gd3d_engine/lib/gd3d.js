@@ -30356,9 +30356,9 @@ var gd3d;
                 this.moveVec.x = this.worldPos.x - this._preworldPos.x;
                 this.moveVec.y = this.worldPos.y - this._preworldPos.y;
                 this.moveVec.z = this.worldPos.z - this._preworldPos.z;
-                this.speed.x = this.moveVec.x / (this.main.simulationSpeed * interval / 1000);
-                this.speed.y = this.moveVec.y / (this.main.simulationSpeed * interval / 1000);
-                this.speed.z = this.moveVec.z / (this.main.simulationSpeed * interval / 1000);
+                this.speed.x = this.moveVec.x / (this.main.simulationSpeed * interval);
+                this.speed.y = this.moveVec.y / (this.main.simulationSpeed * interval);
+                this.speed.z = this.moveVec.z / (this.main.simulationSpeed * interval);
                 this._updateActiveParticlesState();
                 if (this.main.loop && Math.floor(this._preRealTime / this.main.duration) < Math.floor(this._realTime / this.main.duration)) {
                     this.emission.bursts.forEach(function (element) {

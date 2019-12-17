@@ -128,7 +128,7 @@ class test_ParticleSystem implements IState
             var offsetX = Math.cos(this._moveAngle / 180 * Math.PI) * this._moveRadius;
             var offsetZ = Math.sin(this._moveAngle / 180 * Math.PI) * this._moveRadius;
 
-            this._particleCurrentPosition.x = this._particleStartPosition.x + offsetX;
+            // this._particleCurrentPosition.x = this._particleStartPosition.x + offsetX;
             this._particleCurrentPosition.y = this._particleStartPosition.y;
             this._particleCurrentPosition.z = this._particleStartPosition.z + offsetZ;
 
