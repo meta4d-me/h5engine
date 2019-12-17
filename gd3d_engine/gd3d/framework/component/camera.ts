@@ -235,7 +235,7 @@ namespace gd3d.framework
 
         start()
         {
-            this.isEditorCam = this.gameObject.transform.name.toLowerCase().indexOf("editor") >= 0
+            this.isEditorCam = this.gameObject.transform.name.toLowerCase().indexOf("editor") >= 0;
         }
 
         onPlay()

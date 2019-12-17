@@ -10,10 +10,10 @@ namespace gd3d.framework
      */
     export class pointinfo
     {
-        id: number;
+        id: number = -1;
         touch: boolean = false;
-        x: number;
-        y: number;
+        x: number = 0;
+        y: number = 0;
     }
     /**
      * @public

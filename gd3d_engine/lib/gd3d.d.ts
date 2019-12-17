@@ -1872,7 +1872,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AssetFactory_Texture implements IAssetFactory {
-        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): texture;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string, dwguid: number): texture;
     }
 }
 declare namespace gd3d.framework {

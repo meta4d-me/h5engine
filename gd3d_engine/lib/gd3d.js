@@ -2392,6 +2392,7 @@ var gd3d;
                     return;
                 this.camera = camera;
                 this.app = camera.gameObject.getScene().app;
+                camera.calcViewPortPixel(this.app);
                 this.canvas.scene = camera.gameObject.getScene();
                 this.inputmgr = camera.gameObject.getScene().app.getInputMgr();
             };
@@ -3971,7 +3972,7 @@ var gd3d;
                     if (this._sprite) {
                         this._sprite.unuse();
                     }
-                    if (!this._sprite || this._sprite.texture != sprite.texture) {
+                    if (!this._sprite || !sprite || this._sprite.texture != sprite.texture) {
                         this.needRefreshImg = true;
                     }
                     this._sprite = sprite;
@@ -8483,7 +8484,7 @@ var gd3d;
                 for (var i = this.pkgsGuid.length - 1; i >= 0; --i) {
                     var pkgGuid = this.pkgsGuid[i];
                     var pkgld = framework.assetMgr.mapLoading[pkgGuid];
-                    if (pkgld.data == 0)
+                    if (!pkgld || !pkgld.data || pkgld.data == 0)
                         continue;
                     var isbin = this.pkgs[i].endsWith(".bpkg.json");
                     pkgld.subRes = [];
@@ -8798,8 +8799,10 @@ var gd3d;
                             else
                                 _this.download(nguid, nurl, ntype, next.bind(_this, filename, guid, type, nguid));
                         }
-                        else
-                            next.call(_this, filename, guid, type);
+                        else {
+                            var dwguid = type == framework.AssetTypeEnum.Texture ? guid : null;
+                            next.call(_this, filename, guid, type, dwguid);
+                        }
                     }
                 });
             };
@@ -8809,12 +8812,24 @@ var gd3d;
                     return finish();
                 else if (!loading)
                     assetMgr.mapLoading[guid] = loading = { readyok: false, url: url };
+                if (type == framework.AssetTypeEnum.Texture) {
+                    loading.cbQueue = [];
+                    this.loadImg(guid, url, function (img) {
+                        finish();
+                    });
+                    return;
+                }
                 var repType = calcReqType(type);
                 gd3d.io.xhrLoad(url, function (data, err) {
                     console.error(err.stack);
                 }, function () { }, repType, function (xhr) {
                     var loading = assetMgr.mapLoading[guid];
-                    loading.readyok = true;
+                    if (!loading) {
+                        loading = assetMgr.mapLoading[guid] = { readyok: true };
+                    }
+                    else {
+                        loading.readyok = true;
+                    }
                     loading.data = xhr.response;
                     finish();
                 });
@@ -9916,8 +9931,8 @@ var gd3d;
         var AssetFactory_Texture = (function () {
             function AssetFactory_Texture() {
             }
-            AssetFactory_Texture.prototype.parse = function (assetmgr, bundle, filename, txt) {
-                var imgGuid = bundle.texs[filename];
+            AssetFactory_Texture.prototype.parse = function (assetmgr, bundle, filename, txt, dwguid) {
+                var imgGuid = bundle && bundle.texs ? bundle.texs[filename] : dwguid;
                 var _tex = framework.assetMgr.mapImage[imgGuid] || framework.assetMgr.mapLoading[imgGuid].data;
                 var _texture = new framework.texture(filename);
                 var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
@@ -20571,7 +20586,10 @@ var gd3d;
     (function (framework) {
         var pointinfo = (function () {
             function pointinfo() {
+                this.id = -1;
                 this.touch = false;
+                this.x = 0;
+                this.y = 0;
             }
             return pointinfo;
         }());
