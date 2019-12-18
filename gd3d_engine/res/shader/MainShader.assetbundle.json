@@ -77,15 +77,15 @@
           "length":0
           },
       {
-          "name":"resources/base/f4skin.fs.glsl",
+          "name":"resources/base/particles_additive.fs.glsl",
           "length":0
           },
       {
-          "name":"resources/base/f4skin.shader.json",
+          "name":"resources/base/particles_additive.vs.glsl",
           "length":0
           },
       {
-          "name":"resources/base/f4skin.vs.glsl",
+          "name":"resources/base/particles_additive1.shader.json",
           "length":0
           },
       {

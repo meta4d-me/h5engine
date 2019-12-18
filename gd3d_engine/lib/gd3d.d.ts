@@ -1069,6 +1069,7 @@ declare namespace gd3d.math {
         v: number;
     }
     function matrix3x2Decompose(src: matrix3x2, scale: vector2, rotation: angelref, translation: vector2): boolean;
+    function matrixGetEuler(src: matrix, order: RotationOrder, rotation: vector3): void;
     function matrixGetRotation(src: matrix, result: quaternion): void;
     function matrix2Quaternion(matrix: matrix, result: quaternion): void;
     function unitxyzToRotation(xAxis: vector3, yAxis: vector3, zAxis: vector3, out: quaternion): void;
@@ -1087,6 +1088,7 @@ declare namespace gd3d.math {
     function matrix3x2TransformVector2(mat: matrix, inp: vector2, out: vector2): void;
     function matrix3x2TransformNormal(mat: matrix, inp: vector2, out: vector2): void;
     function matrix3x2MakeScale(xScale: number, yScale: number, out: matrix3x2): void;
+    function matrixMakeEuler(rotation: vector3, order: RotationOrder, out: matrix): void;
     function matrixMakeRotateAxisAngle(axis: vector3, angle: number, out: matrix): void;
     function matrix3x2MakeRotate(angle: number, out: matrix3x2): void;
     function matrixMultiply(lhs: matrix, rhs: matrix, out: matrix): void;
@@ -1094,6 +1096,7 @@ declare namespace gd3d.math {
     function matrix3x2Equal(mtx1: matrix3x2, mtx2: matrix3x2, threshold?: number): boolean;
     function matrixProject_PerspectiveLH(fov: number, aspect: number, znear: number, zfar: number, out: matrix): void;
     function matrixProject_OrthoLH(width: number, height: number, znear: number, zfar: number, out: matrix): void;
+    function matrixLookat(position: vector3, target: vector3, upAxis: vector3, out: matrix): void;
     function matrixLookatLH(forward: vector3, up: vector3, out: matrix): void;
     function matrixViewLookatLH(eye: vector3, forward: vector3, up: vector3, out: matrix): void;
     function matrixLerp(left: matrix, right: matrix, v: number, out: matrix): void;
@@ -1507,7 +1510,8 @@ declare namespace gd3d.framework {
         DDS = 21,
         Scene = 22,
         Prefab = 23,
-        cPrefab = 24
+        cPrefab = 24,
+        ParticleSystem = 25
     }
     class ResourceState {
         res: IAsset;
@@ -1615,6 +1619,7 @@ declare namespace gd3d.framework {
         };
         static noparseBundle: Array<assetBundle>;
         static atonceParse: boolean;
+        static openGuid: boolean;
         name_bundles: {
             [key: string]: assetBundle;
         };
@@ -1757,6 +1762,7 @@ declare namespace gd3d.framework {
         static readonly gray = "gray";
         static readonly normal = "normal";
         static readonly grid = "grid";
+        static readonly particle = "particle";
         static initDefaultTexture(assetmgr: assetMgr): void;
         private static initDefaultCubeTexture;
     }
@@ -1831,6 +1837,11 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class AssetFactory_Mesh implements IAssetFactory {
         parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: ArrayBuffer): threading.gdPromise<mesh>;
+    }
+}
+declare namespace gd3d.framework {
+    class AssetFactory_ParticleSystem implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, txt: string): ParticleSystemData;
     }
 }
 declare namespace gd3d.framework {
@@ -2336,6 +2347,12 @@ declare namespace gd3d.framework {
         resname: string;
         constructor(type: render.UniformTypeEnum, value: any, defaultValue?: any);
     }
+    interface DrawInstanceInfo {
+        instanceCount: number;
+        initBuffer(gl: WebGLRenderingContext): void;
+        activeAttributes(gl: WebGLRenderingContext, program: WebGLProgram): void;
+        disableAttributes(gl: WebGLRenderingContext, program: WebGLProgram): void;
+    }
     class material implements IAsset {
         static readonly ClassName: string;
         private name;
@@ -2380,7 +2397,7 @@ declare namespace gd3d.framework {
         private uniformDirtyMap;
         private static lastDrawMatID;
         private static lastDrawMeshID;
-        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string): void;
+        draw(context: renderContext, mesh: mesh, sm: subMeshInfo, basetype?: string, drawInstanceInfo?: DrawInstanceInfo): void;
         Parse(assetmgr: assetMgr, json: any, bundleName?: string): this;
         clone(): material;
         save(): string;
@@ -4444,6 +4461,27 @@ declare namespace gd3d.io {
         writeInt(num: number): void;
     }
 }
+declare namespace gd3d.framework {
+    class EquationSolving {
+        private static getSign;
+        private static equalNumber;
+        static getDerivative(f: (x: number) => number, delta?: number): (x: number) => number;
+        private static isContinuous;
+        private static hasSolution;
+        static line(f: (x: number) => number, a: number, b: number, precision?: number, errorcallback?: (err: Error) => void): number;
+    }
+}
+declare namespace gd3d.math {
+    enum RotationOrder {
+        XYZ = 0,
+        ZXY = 1,
+        ZYX = 2,
+        YXZ = 3,
+        YZX = 4,
+        XZY = 5
+    }
+    var defaultRotationOrder: RotationOrder;
+}
 declare namespace gd3d.math {
     function colorSet_White(out: color): void;
     function colorSet_Black(out: color): void;
@@ -4462,6 +4500,11 @@ declare namespace gd3d.math {
     function floatClamp(v: number, min?: number, max?: number): number;
     function sign(value: number): number;
     function getKeyCodeByAscii(ev: KeyboardEvent): number;
+    var DEG2RAD: number;
+    var RAD2DEG: number;
+    function degToRad(degrees: number): number;
+    function radToDeg(radians: number): number;
+    function mapLinear(x: number, a1: number, a2: number, b1: number, b2: number): number;
     function numberLerp(fromV: number, toV: number, v: number): number;
     function x_AXIS(): vector3;
     function y_AXIS(): vector3;
@@ -5690,6 +5733,593 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class Particle1 {
+        birthTime: number;
+        lifetime: number;
+        position: math.vector3;
+        velocity: math.vector3;
+        acceleration: math.vector3;
+        rotation: math.vector3;
+        angularVelocity: math.vector3;
+        size: math.vector3;
+        startSize: math.vector3;
+        color: math.color;
+        startColor: math.color;
+        tilingOffset: math.vector4;
+        flipUV: math.vector2;
+        birthRateAtDuration: number;
+        rateAtLifeTime: number;
+        cache: {};
+        updateState(preTime: number, time: number): void;
+    }
+}
+declare namespace gd3d.framework {
+    interface ComponentMap {
+        ParticleSystem: ParticleSystem;
+    }
+    interface GameObjectEventMap {
+        particleCompleted: ParticleSystem;
+    }
+    class ParticleSystem implements IRenderer {
+        static readonly ClassName: string;
+        __class__: "gd3d.framework.ParticleSystem";
+        layer: RenderLayerEnum;
+        renderLayer: number;
+        queue: number;
+        readonly transform: transform;
+        readonly isPlaying: boolean;
+        private _isPlaying;
+        readonly isStopped: boolean;
+        readonly isPaused: boolean;
+        readonly particleCount: number;
+        time: number;
+        main: ParticleMainModule;
+        private _main;
+        emission: ParticleEmissionModule;
+        private _emission;
+        shape: ParticleShapeModule;
+        private _shape;
+        velocityOverLifetime: ParticleVelocityOverLifetimeModule;
+        private _velocityOverLifetime;
+        limitVelocityOverLifetime: ParticleLimitVelocityOverLifetimeModule;
+        private _limitVelocityOverLifetime;
+        inheritVelocity: ParticleInheritVelocityModule;
+        private _inheritVelocity;
+        forceOverLifetime: ParticleForceOverLifetimeModule;
+        private _forceOverLifetime;
+        colorOverLifetime: ParticleColorOverLifetimeModule;
+        private _colorOverLifetime;
+        colorBySpeed: ParticleColorBySpeedModule;
+        private _colorBySpeed;
+        sizeOverLifetime: ParticleSizeOverLifetimeModule;
+        private _sizeOverLifetime;
+        sizeBySpeed: ParticleSizeBySpeedModule;
+        private _sizeBySpeed;
+        rotationOverLifetime: ParticleRotationOverLifetimeModule;
+        private _rotationOverLifetime;
+        rotationBySpeed: ParticleRotationBySpeedModule;
+        private _rotationBySpeed;
+        textureSheetAnimation: ParticleTextureSheetAnimationModule;
+        private _textureSheetAnimation;
+        private _mesh;
+        mesh: mesh;
+        material: material;
+        readonly single: boolean;
+        startDelay: number;
+        particleSystemData: ParticleSystemData;
+        private _particleSystemData;
+        onPlay(): void;
+        start(): void;
+        remove(): void;
+        clone(): void;
+        gameObject: gameObject;
+        constructor();
+        update(interval: number): void;
+        stop(): void;
+        play(): void;
+        private _startDelay_rate;
+        updateStartDelay(): void;
+        pause(): void;
+        continue(): void;
+        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        private _vbos;
+        private _getVBO;
+        private _attributes;
+        private _awaked;
+        private _realTime;
+        private _preRealTime;
+        private _particlePool;
+        private _activeParticles;
+        private readonly _modules;
+        readonly rateAtDuration: number;
+        private _emit;
+        private _emitParticles;
+        private _updateActiveParticlesState;
+        private _initParticleState;
+        private _updateParticleState;
+        _simulationSpaceChanged(): void;
+        addParticleVelocity(particle: Particle1, velocity: math.vector3, space: ParticleSystemSimulationSpace, name?: string): void;
+        removeParticleVelocity(particle: Particle1, name: string): void;
+        addParticleAcceleration(particle: Particle1, acceleration: math.vector3, space: ParticleSystemSimulationSpace, name?: string): void;
+        removeParticleAcceleration(particle: Particle1, name: string): void;
+        private _preworldPos;
+        private _isRateOverDistance;
+        private _leftRateOverDistance;
+        worldPos: math.vector3;
+        moveVec: math.vector3;
+        speed: math.vector3;
+        localToWorldMatrix: math.matrix;
+        worldToLocalMatrix: math.matrix;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleSystemData implements IAsset {
+        static readonly ClassName: string;
+        private static _datas;
+        particleSystem: ParticleSystem;
+        static get(valueName: string): ParticleSystemData;
+        private name;
+        private id;
+        defaultAsset: boolean;
+        value: string;
+        private _value;
+        constructor(assetName?: string);
+        getName(): string;
+        getGUID(): number;
+        dispose(): void;
+        use(): void;
+        unuse(disposeNow?: boolean): void;
+        caclByteLength(): number;
+        setData(v: string): void;
+        objectData: any;
+    }
+}
+declare namespace gd3d.framework {
+    enum ParticleSystemAnimationType {
+        WholeSheet = 0,
+        SingleRow = 1
+    }
+}
+declare namespace gd3d.framework {
+    enum ParticleSystemInheritVelocityMode {
+        Initial = 0,
+        Current = 1
+    }
+}
+declare namespace gd3d.framework {
+    enum ParticleSystemMeshShapeType {
+        Vertex = 0,
+        Edge = 1,
+        Triangle = 2
+    }
+}
+declare namespace gd3d.framework {
+    enum ParticleSystemScalingMode {
+        Hierarchy = 0,
+        Local = 1,
+        Shape = 2
+    }
+}
+declare namespace gd3d.framework {
+    enum ParticleSystemShapeConeEmitFrom {
+        Base = 0,
+        BaseShell = 1,
+        Volume = 2,
+        VolumeShell = 3
+    }
+}
+declare namespace gd3d.framework {
+    enum ParticleSystemShapeMultiModeValue {
+        Random = 0,
+        Loop = 1,
+        PingPong = 2,
+        BurstSpread = 3
+    }
+}
+declare namespace gd3d.framework {
+    enum ParticleSystemShapeType {
+        Sphere = 0,
+        SphereShell = 1,
+        Hemisphere = 2,
+        HemisphereShell = 3,
+        Cone = 4,
+        ConeShell = 7,
+        ConeVolume = 8,
+        ConeVolumeShell = 9,
+        Box = 5,
+        BoxShell = 15,
+        BoxEdge = 16,
+        Mesh = 6,
+        MeshRenderer = 13,
+        SkinnedMeshRenderer = 14,
+        Circle = 10,
+        CircleEdge = 11,
+        SingleSidedEdge = 12
+    }
+}
+declare namespace gd3d.framework {
+    enum ParticleSystemShapeType1 {
+        Sphere = 0,
+        Hemisphere = 1,
+        Cone = 2,
+        Box = 3,
+        Mesh = 4,
+        MeshRenderer = 5,
+        SkinnedMeshRenderer = 6,
+        Circle = 7,
+        Edge = 8
+    }
+}
+declare namespace gd3d.framework {
+    enum ParticleSystemSimulationSpace {
+        Local = 0,
+        World = 1
+    }
+}
+declare namespace gd3d.framework {
+    enum UVChannelFlags {
+        Nothing = 0,
+        UV0 = 1,
+        UV1 = 2,
+        UV2 = 4,
+        UV3 = 8,
+        Everything = 15
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleModule {
+        enabled: boolean;
+        particleSystem: ParticleSystem;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleColorBySpeedModule extends ParticleModule {
+        color: MinMaxGradient;
+        range: math.vector2;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleColorOverLifetimeModule extends ParticleModule {
+        color: MinMaxGradient;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleEmissionModule extends ParticleModule {
+        __class__: "gd3d.framework.ParticleEmissionModule";
+        rateOverTime: MinMaxCurve;
+        rateOverTimeMultiplier: number;
+        rateOverDistance: MinMaxCurve;
+        rateOverDistanceMultiplier: number;
+        bursts: ParticleEmissionBurst[];
+        readonly burstCount: number;
+        getBursts(bursts: ParticleEmissionBurst[]): number;
+        setBursts(bursts: ParticleEmissionBurst[], size?: number): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleForceOverLifetimeModule extends ParticleModule {
+        force: MinMaxCurveVector3;
+        space: ParticleSystemSimulationSpace;
+        randomized: boolean;
+        x: MinMaxCurve;
+        xMultiplier: number;
+        y: MinMaxCurve;
+        yMultiplier: number;
+        z: MinMaxCurve;
+        zMultiplier: number;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleInheritVelocityModule extends ParticleModule {
+        "__class__": "gd3d.framework.ParticleInheritVelocityModule";
+        mode: ParticleSystemInheritVelocityMode;
+        multiplier: MinMaxCurve;
+        curve: MinMaxCurve;
+        curveMultiplier: number;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleLimitVelocityOverLifetimeModule extends ParticleModule {
+        __class__: "gd3d.framework.ParticleLimitVelocityOverLifetimeModule";
+        separateAxes: boolean;
+        limit: MinMaxCurve;
+        limit3D: MinMaxCurveVector3;
+        space: ParticleSystemSimulationSpace;
+        dampen: number;
+        limitMultiplier: number;
+        limitX: MinMaxCurve;
+        limitXMultiplier: number;
+        limitY: MinMaxCurve;
+        limitYMultiplier: number;
+        limitZ: MinMaxCurve;
+        limitZMultiplier: number;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleMainModule extends ParticleModule {
+        __class__: "gd3d.framework.ParticleMainModule";
+        enabled: boolean;
+        duration: number;
+        loop: boolean;
+        prewarm: boolean;
+        startDelay: MinMaxCurve;
+        readonly startDelayMultiplier: number;
+        startLifetime: MinMaxCurve;
+        startLifetimeMultiplier: number;
+        startSpeed: MinMaxCurve;
+        startSpeedMultiplier: number;
+        useStartSize3D: boolean;
+        startSize: MinMaxCurve;
+        startSizeMultiplier: number;
+        startSize3D: MinMaxCurveVector3;
+        startSizeX: MinMaxCurve;
+        startSizeXMultiplier: number;
+        startSizeY: MinMaxCurve;
+        startSizeYMultiplier: number;
+        startSizeZ: MinMaxCurve;
+        startSizeZMultiplier: number;
+        useStartRotation3D: boolean;
+        startRotation: MinMaxCurve;
+        startRotationMultiplier: number;
+        startRotation3D: MinMaxCurveVector3;
+        startRotationX: MinMaxCurve;
+        startRotationXMultiplier: number;
+        startRotationY: MinMaxCurve;
+        startRotationYMultiplier: number;
+        startRotationZ: MinMaxCurve;
+        startRotationZMultiplier: number;
+        randomizeRotationDirection: number;
+        startColor: MinMaxGradient;
+        gravityModifier: MinMaxCurve;
+        simulationSpace: ParticleSystemSimulationSpace;
+        private _simulationSpace;
+        customSimulationSpace: transform;
+        simulationSpeed: number;
+        scalingMode: ParticleSystemScalingMode;
+        playOnAwake: boolean;
+        maxParticles: number;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleRotationBySpeedModule extends ParticleModule {
+        separateAxes: boolean;
+        angularVelocity: MinMaxCurveVector3;
+        range: math.vector2;
+        x: MinMaxCurve;
+        xMultiplier: number;
+        y: MinMaxCurve;
+        yMultiplier: number;
+        z: MinMaxCurve;
+        zMultiplier: number;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleRotationOverLifetimeModule extends ParticleModule {
+        separateAxes: boolean;
+        angularVelocity: MinMaxCurveVector3;
+        x: MinMaxCurve;
+        xMultiplier: number;
+        y: MinMaxCurve;
+        yMultiplier: number;
+        z: MinMaxCurve;
+        zMultiplier: number;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleShapeModule extends ParticleModule {
+        __class__: "gd3d.framework.ParticleShapeModule";
+        shapeType: ParticleSystemShapeType;
+        private _shapeType;
+        shape: ParticleSystemShapeType1;
+        private _shape;
+        activeShape: ParticleSystemShapeBase;
+        alignToDirection: boolean;
+        randomDirectionAmount: number;
+        sphericalDirectionAmount: number;
+        angle: number;
+        arc: number;
+        arcMode: ParticleSystemShapeMultiModeValue;
+        arcSpeed: MinMaxCurve;
+        arcSpeedMultiplier: number;
+        arcSpread: number;
+        box: math.vector3;
+        length: number;
+        mesh: any;
+        useMeshMaterialIndex: boolean;
+        meshMaterialIndex: number;
+        meshRenderer: any;
+        skinnedMeshRenderer: any;
+        meshScale: number;
+        meshShapeType: ParticleSystemMeshShapeType;
+        useMeshColors: boolean;
+        normalOffset: number;
+        radius: number;
+        radiusMode: ParticleSystemShapeMultiModeValue;
+        radiusSpeed: MinMaxCurve;
+        radiusSpeedMultiplier: number;
+        radiusSpread: number;
+        private _shapeSphere;
+        private _shapeHemisphere;
+        private _shapeCone;
+        private _shapeBox;
+        private _shapeCircle;
+        private _shapeEdge;
+        constructor();
+        initParticleState(particle: Particle1): void;
+        private _onShapeTypeChanged;
+        private _onShapeChanged;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleSizeBySpeedModule extends ParticleModule {
+        separateAxes: boolean;
+        size: MinMaxCurve;
+        size3D: MinMaxCurveVector3;
+        range: math.vector2;
+        sizeMultiplier: number;
+        x: MinMaxCurve;
+        xMultiplier: number;
+        y: MinMaxCurve;
+        yMultiplier: number;
+        z: MinMaxCurve;
+        zMultiplier: number;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleSizeOverLifetimeModule extends ParticleModule {
+        separateAxes: boolean;
+        size: MinMaxCurve;
+        sizeMultiplier: number;
+        size3D: MinMaxCurveVector3;
+        x: MinMaxCurve;
+        xMultiplier: number;
+        y: MinMaxCurve;
+        yMultiplier: number;
+        z: MinMaxCurve;
+        zMultiplier: number;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleTextureSheetAnimationModule extends ParticleModule {
+        tiles: math.vector2;
+        animation: ParticleSystemAnimationType;
+        frameOverTime: MinMaxCurve;
+        useRandomRow: boolean;
+        rowIndex: number;
+        private _rowIndex;
+        startFrame: MinMaxCurve;
+        cycleCount: number;
+        flipUV: math.vector2;
+        uvChannelMask: UVChannelFlags;
+        flipU: number;
+        flipV: number;
+        frameOverTimeMultiplier: number;
+        numTilesX: number;
+        numTilesY: number;
+        startFrameMultiplier: number;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleVelocityOverLifetimeModule extends ParticleModule {
+        __class__: "gd3d.framework.ParticleVelocityOverLifetimeModule";
+        velocity: MinMaxCurveVector3;
+        space: ParticleSystemSimulationSpace;
+        x: MinMaxCurve;
+        xMultiplier: number;
+        y: MinMaxCurve;
+        yMultiplier: number;
+        z: MinMaxCurve;
+        zMultiplier: number;
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleEmissionBurst {
+        __class__: "gd3d.framework.ParticleEmissionBurst";
+        time: number;
+        count: MinMaxCurve;
+        minCount: number;
+        maxCount: number;
+        cycleCount: number;
+        repeatInterval: number;
+        probability: number;
+        readonly isProbability: boolean;
+        private _isProbability;
+        calculateProbability(): boolean;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleSystemShapeBase {
+        protected _module: ParticleShapeModule;
+        constructor(module: ParticleShapeModule);
+        initParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    enum ParticleSystemShapeBoxEmitFrom {
+        Volume = 0,
+        Shell = 1,
+        Edge = 2
+    }
+    class ParticleSystemShapeBox extends ParticleSystemShapeBase {
+        boxX: number;
+        boxY: number;
+        boxZ: number;
+        emitFrom: ParticleSystemShapeBoxEmitFrom;
+        initParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleSystemShapeCircle extends ParticleSystemShapeBase {
+        radius: number;
+        arc: number;
+        arcMode: ParticleSystemShapeMultiModeValue;
+        arcSpread: number;
+        arcSpeed: MinMaxCurve;
+        emitFromEdge: boolean;
+        initParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleSystemShapeCone extends ParticleSystemShapeBase {
+        angle: number;
+        radius: number;
+        length: number;
+        arc: number;
+        arcMode: ParticleSystemShapeMultiModeValue;
+        arcSpread: number;
+        arcSpeed: MinMaxCurve;
+        emitFrom: ParticleSystemShapeConeEmitFrom;
+        initParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleSystemShapeEdge extends ParticleSystemShapeBase {
+        radius: number;
+        radiusMode: ParticleSystemShapeMultiModeValue;
+        radiusSpread: number;
+        radiusSpeed: MinMaxCurve;
+        initParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleSystemShapeSphere extends ParticleSystemShapeBase {
+        radius: number;
+        emitFromShell: boolean;
+        initParticleState(particle: Particle1): void;
+    }
+    class ParticleSystemShapeHemisphere extends ParticleSystemShapeBase {
+        radius: number;
+        emitFromShell: boolean;
+        initParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
     class CannonJSPlugin implements IPhysicsEnginePlugin {
         private _useDeltaForWorldStep;
         BJSCANNON: any;
@@ -6514,6 +7144,23 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class ArrayUtil {
+        static replace<T>(arr: T[], a: T, b: T, isAdd?: boolean): T[];
+        static concatToSelf<T>(self: T[], ...items: (T | ConcatArray<T>)[]): T[];
+        static unique<T>(arr: T[], compare?: (a: T, b: T) => boolean): T[];
+    }
+}
+declare namespace gd3d.framework {
+    class ClassUtils {
+        static getQualifiedClassName(value: any): string;
+        static getDefinitionByName(name: string, readCache?: boolean): any;
+        private static defaultInstMap;
+        static getDefaultInstanceByName(name: string): any;
+        static getInstanceByName(name: string): any;
+        static addClassNameSpace(namespace: string): void;
+    }
+}
+declare namespace gd3d.framework {
     enum CullingMask {
         nothing = 0,
         default = 1,
@@ -6568,6 +7215,44 @@ declare namespace gd3d.framework {
         static getEnumObjByType(enumType: string): any;
     }
 }
+interface WebGLRenderingContext {
+    extensions: gd3d.framework.GLExtension;
+    vertexAttribDivisor(index: GLuint, divisor: GLuint): void;
+    drawElementsInstanced(mode: GLenum, count: GLsizei, type: GLenum, offset: GLintptr, instanceCount: GLsizei): void;
+    drawArraysInstanced(mode: GLenum, first: GLint, count: GLsizei, instanceCount: GLsizei): void;
+}
+declare namespace gd3d.framework {
+    class GLExtension {
+        ANGLE_instanced_arrays: ANGLE_instanced_arrays;
+        EXT_blend_minmax: EXT_blend_minmax;
+        EXT_color_buffer_half_float: any;
+        EXT_frag_depth: EXT_frag_depth;
+        EXT_sRGB: EXT_sRGB;
+        EXT_shader_texture_lod: EXT_shader_texture_lod;
+        EXT_texture_filter_anisotropic: EXT_texture_filter_anisotropic;
+        OES_element_index_uint: OES_element_index_uint;
+        OES_standard_derivatives: OES_standard_derivatives;
+        OES_texture_float: OES_texture_float;
+        OES_texture_float_linear: OES_texture_float_linear;
+        OES_texture_half_float: OES_texture_half_float;
+        OES_texture_half_float_linear: OES_texture_half_float_linear;
+        OES_vertex_array_object: OES_vertex_array_object;
+        WEBGL_color_buffer_float: WEBGL_color_buffer_float;
+        WEBGL_compressed_texture_atc: any;
+        WEBGL_compressed_texture_etc1: any;
+        WEBGL_compressed_texture_pvrtc: any;
+        WEBGL_compressed_texture_s3tc: WEBGL_compressed_texture_s3tc;
+        WEBGL_debug_renderer_info: WEBGL_debug_renderer_info;
+        WEBGL_debug_shaders: WEBGL_debug_shaders;
+        WEBGL_depth_texture: WEBGL_depth_texture;
+        WEBGL_draw_buffers: WEBGL_draw_buffers;
+        WEBGL_lose_context: any;
+        constructor(gl: WebGLRenderingContext);
+        private initExtensions;
+        private cacheGLQuery;
+        private wrap;
+    }
+}
 declare namespace gd3d.framework {
     class NumberUtil {
         static KEY_A: number;
@@ -6587,6 +7272,12 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class ObjectUtil {
+        static isBaseType(object: any): boolean;
+        static isObject(obj: any): boolean;
+    }
+}
+declare namespace gd3d.framework {
     class RegexpUtil {
         static textureRegexp: RegExp;
         static vectorRegexp: RegExp;
@@ -6594,6 +7285,44 @@ declare namespace gd3d.framework {
         static rangeRegexp: RegExp;
         static vector4Regexp: RegExp;
         static vector3FloatOrRangeRegexp: RegExp;
+    }
+}
+declare namespace gd3d.framework {
+    var serialization: Serialization;
+    function serialize(target: any, propertyKey: string): void;
+    interface PropertyHandler {
+        (target: any, source: any, property: string, handlers: PropertyHandler[], serialization: Serialization): boolean;
+    }
+    interface DifferentPropertyHandler {
+        (target: any, source: any, property: string, different: Object, handlers: DifferentPropertyHandler[], serialization: Serialization): boolean;
+    }
+    class Serialization {
+        serializeHandlers: {
+            priority: number;
+            handler: PropertyHandler;
+        }[];
+        deserializeHandlers: {
+            priority: number;
+            handler: PropertyHandler;
+        }[];
+        differentHandlers: {
+            priority: number;
+            handler: DifferentPropertyHandler;
+        }[];
+        setValueHandlers: {
+            priority: number;
+            handler: PropertyHandler;
+        }[];
+        serialize<T>(target: T): gPartial<T>;
+        deserialize<T>(object: gPartial<T>): T;
+        different<T>(target: T, source: T): gPartial<T>;
+        setValue<T>(target: T, source: gPartial<T>): T;
+        clone<T>(target: T): T;
+    }
+    var CLASS_KEY: string;
+    interface SerializationTempInfo {
+        loadingNum?: number;
+        onLoaded?: () => void;
     }
 }
 declare namespace gd3d.framework {
@@ -6657,6 +7386,22 @@ declare namespace gd3d.framework {
         private static create2D_image2D;
         private static create2D_label;
         private static create2D_button;
+    }
+}
+declare namespace gd3d.framework {
+    type gPartial<T> = {
+        [P in keyof T]?: gPartial<T[P]>;
+    };
+    type Lazy<T> = T | (() => T);
+    type LazyObject<T> = {
+        [P in keyof T]: Lazy<T[P]>;
+    };
+    var lazy: {
+        getvalue: <T>(lazyItem: Lazy<T>) => T;
+    };
+    interface IDisposable {
+        readonly disposed: boolean;
+        dispose(): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6858,6 +7603,158 @@ declare namespace gd3d.framework {
         setupWebGL(canvas: Element, opt_attribs?: WebGLContextAttributes, opt_onError?: (msg: string) => void): any;
         create3DContext(canvas: any, opt_attribs: any): any;
         constructor();
+    }
+}
+declare namespace gd3d.framework {
+    class AnimationCurve1 {
+        __class__: "gd3d.framework.AnimationCurve1";
+        maxtan: number;
+        preWrapMode: AnimationCurveWrapMode;
+        postWrapMode: AnimationCurveWrapMode;
+        keys: AnimationCurveKeyframe[];
+        readonly numKeys: number;
+        addKey(key: AnimationCurveKeyframe): void;
+        sort(): void;
+        deleteKey(key: AnimationCurveKeyframe): void;
+        getKey(index: number): AnimationCurveKeyframe;
+        indexOfKeys(key: AnimationCurveKeyframe): number;
+        getPoint(t: number): AnimationCurveKeyframe;
+        getValue(t: number): number;
+        findKey(t: number, y: number, precision: number): AnimationCurveKeyframe;
+        addKeyAtCurve(time: number, value: number, precision: number): AnimationCurveKeyframe;
+        getSamples(num?: number): AnimationCurveKeyframe[];
+    }
+}
+declare namespace gd3d.framework {
+    interface AnimationCurveKeyframe {
+        time: number;
+        value: number;
+        inTangent: number;
+        outTangent: number;
+    }
+}
+declare namespace gd3d.framework {
+    enum AnimationCurveWrapMode {
+        Clamp = 1,
+        Loop = 2,
+        PingPong = 4
+    }
+}
+declare namespace gd3d.framework {
+    class BezierCurve {
+        static linear(t: number, p0: number, p1: number): number;
+        static linearDerivative(t: number, p0: number, p1: number): number;
+        static linearSecondDerivative(t: number, p0: number, p1: number): number;
+        static quadratic(t: number, p0: number, p1: number, p2: number): number;
+        static quadraticDerivative(t: number, p0: number, p1: number, p2: number): number;
+        static quadraticSecondDerivative(t: number, p0: number, p1: number, p2: number): number;
+        static cubic(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        static cubicDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        static cubicSecondDerivative(t: number, p0: number, p1: number, p2: number, p3: number): number;
+        static bn(t: number, ps: number[], processs?: number[][]): number;
+        static bnDerivative(t: number, ps: number[]): number;
+        static bnSecondDerivative(t: number, ps: number[]): number;
+        static bnND(t: number, dn: number, ps: number[]): number;
+        static getValue(t: number, ps: number[]): number;
+        static getDerivative(t: number, ps: number[]): number;
+        static getSecondDerivative(t: number, ps: number[]): number;
+        static getExtremums(ps: number[], numSamples?: number, precision?: number): {
+            ts: number[];
+            vs: number[];
+        };
+        static getMonotoneIntervals(ps: number[], numSamples?: number, precision?: number): {
+            ts: number[];
+            vs: number[];
+        };
+        static getTFromValue(targetV: number, ps: number[], numSamples?: number, precision?: number): number[];
+        static split(t: number, ps: number[]): number[][];
+        static merge(fps: number[], sps: number[], mergeType?: number): number[];
+        static getSamples(ps: number[], num?: number): {
+            t: number;
+            v: number;
+        }[];
+    }
+}
+declare namespace gd3d.framework {
+    class MinMaxCurve {
+        __class__: "gd3d.framework.MinMaxCurve";
+        mode: MinMaxCurveMode;
+        constant: number;
+        constantMin: number;
+        constantMax: number;
+        curve: AnimationCurve1;
+        curveMin: AnimationCurve1;
+        curveMax: AnimationCurve1;
+        curveMultiplier: number;
+        between0And1: boolean;
+        getValue(time: number, randomBetween?: number): number;
+    }
+}
+declare namespace gd3d.framework {
+    enum MinMaxCurveMode {
+        Constant = 0,
+        Curve = 1,
+        TwoConstants = 3,
+        TwoCurves = 2
+    }
+}
+declare namespace gd3d.framework {
+    class MinMaxCurveVector3 {
+        xCurve: MinMaxCurve;
+        yCurve: MinMaxCurve;
+        zCurve: MinMaxCurve;
+        getValue(time: number, randomBetween?: number): math.vector3;
+    }
+}
+declare namespace gd3d.framework {
+    class Gradient {
+        __class__: "gd3d.framework.Gradient";
+        mode: GradientMode;
+        alphaKeys: GradientAlphaKey[];
+        colorKeys: GradientColorKey[];
+        getValue(time: number): math.color;
+        getAlpha(time: number): number;
+        getColor(time: number): math.color;
+    }
+}
+declare namespace gd3d.framework {
+    interface GradientAlphaKey {
+        alpha: number;
+        time: number;
+    }
+}
+declare namespace gd3d.framework {
+    interface GradientColorKey {
+        color: math.color;
+        time: number;
+    }
+}
+declare namespace gd3d.framework {
+    enum GradientMode {
+        Blend = 0,
+        Fixed = 1
+    }
+}
+declare namespace gd3d.framework {
+    class MinMaxGradient {
+        __class__: "gd3d.framework.MinMaxGradient";
+        mode: MinMaxGradientMode;
+        color: math.color;
+        colorMin: math.color;
+        colorMax: math.color;
+        gradient: Gradient;
+        gradientMin: Gradient;
+        gradientMax: Gradient;
+        getValue(time: number, randomBetween?: number, out?: math.color): math.color;
+    }
+}
+declare namespace gd3d.framework {
+    enum MinMaxGradientMode {
+        Color = 0,
+        Gradient = 1,
+        TwoColors = 2,
+        TwoGradients = 3,
+        RandomColor = 4
     }
 }
 declare namespace gd3d.io {
@@ -7116,10 +8013,10 @@ declare namespace gd3d.render {
         uploadVertexData(webgl: WebGLRenderingContext, varray: Float32Array): void;
         uploadIndexSubData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array, offset?: number): void;
         uploadIndexData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array): void;
-        drawArrayTris(webgl: WebGLRenderingContext, start?: number, count?: number): void;
-        drawArrayLines(webgl: WebGLRenderingContext, start?: number, count?: number): void;
-        drawElementTris(webgl: WebGLRenderingContext, start?: number, count?: number): void;
-        drawElementLines(webgl: WebGLRenderingContext, start?: number, count?: number): void;
+        drawArrayTris(webgl: WebGLRenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        drawArrayLines(webgl: WebGLRenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        drawElementTris(webgl: WebGLRenderingContext, start?: number, count?: number, instanceCount?: number): void;
+        drawElementLines(webgl: WebGLRenderingContext, start?: number, count?: number, instanceCount?: number): void;
     }
 }
 declare namespace gd3d.render {
@@ -7316,6 +8213,7 @@ declare namespace gd3d.render {
         private static mapTexture;
         static formGrayArray(webgl: WebGLRenderingContext, array: number[] | Float32Array | Float64Array, width: number, height: number): glTexture2D;
         static staticTexture(webgl: WebGLRenderingContext, name: string): glTexture2D;
+        static particleTexture(webgl: WebGLRenderingContext, name?: string): glTexture2D;
     }
     class glTextureCube implements ITexture {
         constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
@@ -7353,3 +8251,4 @@ declare namespace gd3d.render {
         caclByteLength(): number;
     }
 }
+//# sourceMappingURL=gd3d.d.ts.map

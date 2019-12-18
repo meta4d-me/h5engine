@@ -308,38 +308,62 @@
             webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, data,this.mode);
         }
         //三角形应用vbo
-        drawArrayTris(webgl: WebGLRenderingContext, start: number = 0, count: number = -1)
+        drawArrayTris(webgl: WebGLRenderingContext, start: number = 0, count: number = -1, instanceCount = 1)
         {
             if (count < 0)
                 count = ((this.vertexCount / 3) | 0) * 3;
             drawInfo.ins.triCount += count / 3;
             drawInfo.ins.renderCount ++;
             //model
-            webgl.drawArrays(webgl.TRIANGLES, start, count);
+            if(instanceCount > 1 && webgl.drawArraysInstanced != null)
+            {
+                webgl.drawArraysInstanced(webgl.TRIANGLES, start, count, instanceCount);
+            }else
+            {
+                webgl.drawArrays(webgl.TRIANGLES, start, count);
+            }
         }
         //直线应用vbo
-        drawArrayLines(webgl: WebGLRenderingContext, start: number = 0, count: number = -1)
+        drawArrayLines(webgl: WebGLRenderingContext, start: number = 0, count: number = -1, instanceCount = 1)
         {
             if (count < 0)
                 count = ((this.vertexCount / 2) | 0) * 2;
             drawInfo.ins.renderCount ++;
             //model
-            webgl.drawArrays(webgl.LINES, start, count);
+            if(instanceCount > 1 && webgl.drawArraysInstanced != null)
+            {
+                webgl.drawArraysInstanced(webgl.LINES, start, count, instanceCount);
+            }else
+            {
+                webgl.drawArrays(webgl.LINES, start, count);
+            }
         }
-        drawElementTris(webgl: WebGLRenderingContext, start: number = 0, count: number = -1)
+        drawElementTris(webgl: WebGLRenderingContext, start: number = 0, count: number = -1, instanceCount = 1)
         {
             if (count < 0)
                 count = ((this.indexCounts[this.bindIndex] / 3) | 0) * 3;
             drawInfo.ins.triCount += count / 3;
             drawInfo.ins.renderCount ++;
-            webgl.drawElements(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2);
+            if(instanceCount > 1 && webgl.drawElementsInstanced != null)
+            {
+                webgl.drawElementsInstanced(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
+            }else
+            {
+                webgl.drawElements(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2);
+            }
         }
-        drawElementLines(webgl: WebGLRenderingContext, start: number = 0, count: number = -1)
+        drawElementLines(webgl: WebGLRenderingContext, start: number = 0, count: number = -1, instanceCount = 1)
         {
             if (count < 0)
                 count = ((this.indexCounts[this.bindIndex] / 2) | 0) * 2;
             drawInfo.ins.renderCount ++;
-            webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);
+            if(instanceCount > 1 && webgl.drawElementsInstanced != null)
+            {
+                webgl.drawElementsInstanced(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
+            }else
+            {
+                webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);
+            }
         }
 
 

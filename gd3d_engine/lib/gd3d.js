@@ -224,6 +224,7 @@ var gd3d;
                     console.error("Failed to get webgl at the application.start()");
                     throw Error("Failed to get webgl at the application.start()");
                 }
+                new framework.GLExtension(this.webgl);
                 switch (type) {
                     case CanvasFixedType.FixedWidthType:
                         this.canvasFixWidth = val;
@@ -6410,6 +6411,95 @@ var gd3d;
             return true;
         }
         math.matrix3x2Decompose = matrix3x2Decompose;
+        function matrixGetEuler(src, order, rotation) {
+            var clamp = math.floatClamp;
+            var rawData = src.rawData;
+            var m11 = rawData[0], m12 = rawData[4], m13 = rawData[8];
+            var m21 = rawData[1], m22 = rawData[5], m23 = rawData[9];
+            var m31 = rawData[2], m32 = rawData[6], m33 = rawData[10];
+            var scaleX = Math.sqrt(m11 * m11 + m21 * m21 + m31 * m31);
+            m11 /= scaleX;
+            m21 /= scaleX;
+            m31 /= scaleX;
+            var scaleY = Math.sqrt(m12 * m12 + m22 * m22 + m32 * m32);
+            m12 /= scaleY;
+            m22 /= scaleY;
+            m32 /= scaleY;
+            var scaleZ = Math.sqrt(m13 * m13 + m23 * m23 + m33 * m33);
+            m13 /= scaleZ;
+            m23 /= scaleZ;
+            m33 /= scaleZ;
+            if (order === math.RotationOrder.XYZ) {
+                rotation.y = Math.asin(clamp(m13, -1, 1));
+                if (Math.abs(m13) < 0.9999999) {
+                    rotation.x = Math.atan2(-m23, m33);
+                    rotation.z = Math.atan2(-m12, m11);
+                }
+                else {
+                    rotation.x = Math.atan2(m32, m22);
+                    rotation.z = 0;
+                }
+            }
+            else if (order === math.RotationOrder.YXZ) {
+                rotation.x = Math.asin(-clamp(m23, -1, 1));
+                if (Math.abs(m23) < 0.9999999) {
+                    rotation.y = Math.atan2(m13, m33);
+                    rotation.z = Math.atan2(m21, m22);
+                }
+                else {
+                    rotation.y = Math.atan2(-m31, m11);
+                    rotation.z = 0;
+                }
+            }
+            else if (order === math.RotationOrder.ZXY) {
+                rotation.x = Math.asin(clamp(m32, -1, 1));
+                if (Math.abs(m32) < 0.9999999) {
+                    rotation.y = Math.atan2(-m31, m33);
+                    rotation.z = Math.atan2(-m12, m22);
+                }
+                else {
+                    rotation.y = 0;
+                    rotation.z = Math.atan2(m21, m11);
+                }
+            }
+            else if (order === math.RotationOrder.ZYX) {
+                rotation.y = Math.asin(-clamp(m31, -1, 1));
+                if (Math.abs(m31) < 0.9999999) {
+                    rotation.x = Math.atan2(m32, m33);
+                    rotation.z = Math.atan2(m21, m11);
+                }
+                else {
+                    rotation.x = 0;
+                    rotation.z = Math.atan2(-m12, m22);
+                }
+            }
+            else if (order === math.RotationOrder.YZX) {
+                rotation.z = Math.asin(clamp(m21, -1, 1));
+                if (Math.abs(m21) < 0.9999999) {
+                    rotation.x = Math.atan2(-m23, m22);
+                    rotation.y = Math.atan2(-m31, m11);
+                }
+                else {
+                    rotation.x = 0;
+                    rotation.y = Math.atan2(m13, m33);
+                }
+            }
+            else if (order === math.RotationOrder.XZY) {
+                rotation.z = Math.asin(-clamp(m12, -1, 1));
+                if (Math.abs(m12) < 0.9999999) {
+                    rotation.x = Math.atan2(m32, m22);
+                    rotation.y = Math.atan2(m13, m11);
+                }
+                else {
+                    rotation.x = Math.atan2(-m23, m33);
+                    rotation.y = 0;
+                }
+            }
+            else {
+                console.error("\u521D\u59CB\u5316\u77E9\u9635\u65F6\u9519\u8BEF\u65CB\u8F6C\u987A\u5E8F " + order);
+            }
+        }
+        math.matrixGetEuler = matrixGetEuler;
         function matrixGetRotation(src, result) {
             var xs = math.sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
             var ys = math.sign(src.rawData[4] * src.rawData[5] * src.rawData[6] * src.rawData[7]) < 0 ? -1 : 1;
@@ -6727,6 +6817,91 @@ var gd3d;
             out.rawData[5] = 0.0;
         }
         math.matrix3x2MakeScale = matrix3x2MakeScale;
+        function matrixMakeEuler(rotation, order, out) {
+            var te = out.rawData;
+            var rx = rotation.x;
+            var ry = rotation.y;
+            var rz = rotation.z;
+            var cosX = Math.cos(rx), sinX = Math.sin(rx);
+            var cosY = Math.cos(ry), sinY = Math.sin(ry);
+            var cosZ = Math.cos(rz), sinZ = Math.sin(rz);
+            if (order === math.RotationOrder.XYZ) {
+                var ae = cosX * cosZ, af = cosX * sinZ, be = sinX * cosZ, bf = sinX * sinZ;
+                te[0] = cosY * cosZ;
+                te[4] = -cosY * sinZ;
+                te[8] = sinY;
+                te[1] = af + be * sinY;
+                te[5] = ae - bf * sinY;
+                te[9] = -sinX * cosY;
+                te[2] = bf - ae * sinY;
+                te[6] = be + af * sinY;
+                te[10] = cosX * cosY;
+            }
+            else if (order === math.RotationOrder.YXZ) {
+                var ce = cosY * cosZ, cf = cosY * sinZ, de = sinY * cosZ, df = sinY * sinZ;
+                te[0] = ce + df * sinX;
+                te[4] = de * sinX - cf;
+                te[8] = cosX * sinY;
+                te[1] = cosX * sinZ;
+                te[5] = cosX * cosZ;
+                te[9] = -sinX;
+                te[2] = cf * sinX - de;
+                te[6] = df + ce * sinX;
+                te[10] = cosX * cosY;
+            }
+            else if (order === math.RotationOrder.ZXY) {
+                var ce = cosY * cosZ, cf = cosY * sinZ, de = sinY * cosZ, df = sinY * sinZ;
+                te[0] = ce - df * sinX;
+                te[4] = -cosX * sinZ;
+                te[8] = de + cf * sinX;
+                te[1] = cf + de * sinX;
+                te[5] = cosX * cosZ;
+                te[9] = df - ce * sinX;
+                te[2] = -cosX * sinY;
+                te[6] = sinX;
+                te[10] = cosX * cosY;
+            }
+            else if (order === math.RotationOrder.ZYX) {
+                var ae = cosX * cosZ, af = cosX * sinZ, be = sinX * cosZ, bf = sinX * sinZ;
+                te[0] = cosY * cosZ;
+                te[4] = be * sinY - af;
+                te[8] = ae * sinY + bf;
+                te[1] = cosY * sinZ;
+                te[5] = bf * sinY + ae;
+                te[9] = af * sinY - be;
+                te[2] = -sinY;
+                te[6] = sinX * cosY;
+                te[10] = cosX * cosY;
+            }
+            else if (order === math.RotationOrder.YZX) {
+                var ac = cosX * cosY, ad = cosX * sinY, bc = sinX * cosY, bd = sinX * sinY;
+                te[0] = cosY * cosZ;
+                te[4] = bd - ac * sinZ;
+                te[8] = bc * sinZ + ad;
+                te[1] = sinZ;
+                te[5] = cosX * cosZ;
+                te[9] = -sinX * cosZ;
+                te[2] = -sinY * cosZ;
+                te[6] = ad * sinZ + bc;
+                te[10] = ac - bd * sinZ;
+            }
+            else if (order === math.RotationOrder.XZY) {
+                var ac = cosX * cosY, ad = cosX * sinY, bc = sinX * cosY, bd = sinX * sinY;
+                te[0] = cosY * cosZ;
+                te[4] = -sinZ;
+                te[8] = sinY * cosZ;
+                te[1] = ac * sinZ + bd;
+                te[5] = cosX * cosZ;
+                te[9] = ad * sinZ - bc;
+                te[2] = bc * sinZ - ad;
+                te[6] = sinX * cosZ;
+                te[10] = bd * sinZ + ac;
+            }
+            else {
+                console.error("\u521D\u59CB\u5316\u77E9\u9635\u65F6\u9519\u8BEF\u65CB\u8F6C\u987A\u5E8F " + order);
+            }
+        }
+        math.matrixMakeEuler = matrixMakeEuler;
         function matrixMakeRotateAxisAngle(axis, angle, out) {
             var x = axis.x, y = axis.y, z = axis.z;
             var length = Math.sqrt(x * x + y * y + z * z);
@@ -6879,6 +7054,46 @@ var gd3d;
             out.rawData[15] = 1;
         }
         math.matrixProject_OrthoLH = matrixProject_OrthoLH;
+        function matrixLookat(position, target, upAxis, out) {
+            var xAxis = new math.vector3();
+            var yAxis = new math.vector3();
+            var zAxis = new math.vector3();
+            upAxis = upAxis || new math.vector3(0, 1, 0);
+            zAxis.x = target.x - position.x;
+            zAxis.y = target.y - position.y;
+            zAxis.z = target.z - position.z;
+            math.vec3Normalize(zAxis, zAxis);
+            xAxis.x = upAxis.y * zAxis.z - upAxis.z * zAxis.y;
+            xAxis.y = upAxis.z * zAxis.x - upAxis.x * zAxis.z;
+            xAxis.z = upAxis.x * zAxis.y - upAxis.y * zAxis.x;
+            math.vec3Normalize(xAxis, xAxis);
+            if (math.vec3SqrLength(xAxis) < .005) {
+                xAxis.x = upAxis.y;
+                xAxis.y = upAxis.x;
+                xAxis.z = 0;
+                math.vec3Normalize(xAxis, xAxis);
+            }
+            yAxis.x = zAxis.y * xAxis.z - zAxis.z * xAxis.y;
+            yAxis.y = zAxis.z * xAxis.x - zAxis.x * xAxis.z;
+            yAxis.z = zAxis.x * xAxis.y - zAxis.y * xAxis.x;
+            out.rawData[0] = xAxis.x;
+            out.rawData[1] = xAxis.y;
+            out.rawData[2] = xAxis.z;
+            out.rawData[3] = 0;
+            out.rawData[4] = yAxis.x;
+            out.rawData[5] = yAxis.y;
+            out.rawData[6] = yAxis.z;
+            out.rawData[7] = 0;
+            out.rawData[8] = zAxis.x;
+            out.rawData[9] = zAxis.y;
+            out.rawData[10] = zAxis.z;
+            out.rawData[11] = 0;
+            out.rawData[12] = position.x;
+            out.rawData[13] = position.y;
+            out.rawData[14] = position.z;
+            out.rawData[15] = 1;
+        }
+        math.matrixLookat = matrixLookat;
         function matrixLookatLH(forward, up, out) {
             var z = math.pool.new_vector3(-forward.x, -forward.y, -forward.z);
             math.vec3Normalize(z, z);
@@ -8119,6 +8334,7 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["Scene"] = 22] = "Scene";
             AssetTypeEnum[AssetTypeEnum["Prefab"] = 23] = "Prefab";
             AssetTypeEnum[AssetTypeEnum["cPrefab"] = 24] = "cPrefab";
+            AssetTypeEnum[AssetTypeEnum["ParticleSystem"] = 25] = "ParticleSystem";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
         var ResourceState = (function () {
             function ResourceState() {
@@ -8218,6 +8434,12 @@ var gd3d;
                 this.files = json.files;
                 this.texs = json.texs;
                 this.pkgs = json.pkg;
+                if (!framework.assetMgr.openGuid) {
+                    for (var k in this.files)
+                        this.files[k] = assetBundle.buildGuid();
+                    for (var k in this.texs)
+                        this.texs[k] = assetBundle.buildGuid();
+                }
                 this.dw_imgCount = this.dw_fileCount = Object.keys(this.texs || {}).length;
                 var dwpkgCount = 0;
                 if (this.pkgs) {
@@ -8457,6 +8679,8 @@ var gd3d;
                         return framework.AssetTypeEnum.DDS;
                     case ".keyframeAniclip.json":
                         return framework.AssetTypeEnum.KeyFrameAniclip;
+                    case ".particlesystem.json":
+                        return framework.AssetTypeEnum.ParticleSystem;
                 }
                 i = file.indexOf(".", i + 1);
             }
@@ -8835,6 +9059,7 @@ var gd3d;
             assetMgr.mapBundleNamed = {};
             assetMgr.noparseBundle = [];
             assetMgr.atonceParse = true;
+            assetMgr.openGuid = true;
             assetMgr.useBinJs = false;
             assetMgr.txt = ".txt";
             assetMgr.bin = ".bin";
@@ -9294,6 +9519,10 @@ var gd3d;
                 t.glTexture = gd3d.render.glTexture2D.staticTexture(assetmgr.webgl, this.grid);
                 t.defaultAsset = true;
                 assetmgr.mapDefaultTexture[this.grid] = t;
+                var t = new framework.texture(this.particle);
+                t.glTexture = gd3d.render.glTexture2D.particleTexture(assetmgr.webgl);
+                t.defaultAsset = true;
+                assetmgr.mapDefaultTexture[this.particle] = t;
                 defTexture.initDefaultCubeTexture(assetmgr);
             };
             defTexture.initDefaultCubeTexture = function (assetmgr) {
@@ -9308,6 +9537,7 @@ var gd3d;
             defTexture.gray = "gray";
             defTexture.normal = "normal";
             defTexture.grid = "grid";
+            defTexture.particle = "particle";
             return defTexture;
         }());
         framework.defTexture = defTexture;
@@ -9562,6 +9792,26 @@ var gd3d;
             return AssetFactory_Mesh;
         }());
         framework.AssetFactory_Mesh = AssetFactory_Mesh;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_ParticleSystem = (function () {
+            function AssetFactory_ParticleSystem() {
+            }
+            AssetFactory_ParticleSystem.prototype.parse = function (assetmgr, bundle, name, txt) {
+                var data = framework.ParticleSystemData.get(name);
+                data.setData(txt);
+                return data;
+            };
+            AssetFactory_ParticleSystem = __decorate([
+                framework.assetF(framework.AssetTypeEnum.ParticleSystem)
+            ], AssetFactory_ParticleSystem);
+            return AssetFactory_ParticleSystem;
+        }());
+        framework.AssetFactory_ParticleSystem = AssetFactory_ParticleSystem;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -12348,8 +12598,9 @@ var gd3d;
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
                 }
             };
-            material.prototype.draw = function (context, mesh, sm, basetype) {
+            material.prototype.draw = function (context, mesh, sm, basetype, drawInstanceInfo) {
                 if (basetype === void 0) { basetype = "base"; }
+                if (drawInstanceInfo === void 0) { drawInstanceInfo = undefined; }
                 var matGUID = this.getGUID();
                 var meshGUID = mesh.getGUID();
                 var LastMatSame = matGUID == material_2.lastDrawMatID;
@@ -12364,29 +12615,33 @@ var gd3d;
                             return;
                     }
                 }
+                var instanceCount = (drawInstanceInfo && drawInstanceInfo.instanceCount) || 1;
                 for (var i = 0, l = drawPasses.length; i < l; i++) {
                     var pass = drawPasses[i];
                     pass.use(context.webgl);
                     this.uploadUnifoms(pass, context, LastMatSame);
                     if (!LastMatSame || !LastMeshSame)
                         mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
+                    drawInstanceInfo && drawInstanceInfo.initBuffer(context.webgl);
+                    drawInstanceInfo && drawInstanceInfo.activeAttributes(context.webgl, pass.program.program);
                     framework.DrawCallInfo.inc.add();
                     if (sm.useVertexIndex < 0) {
                         if (sm.line) {
-                            mesh.glMesh.drawArrayLines(context.webgl, sm.start, sm.size);
+                            mesh.glMesh.drawArrayLines(context.webgl, sm.start, sm.size, instanceCount);
                         }
                         else {
-                            mesh.glMesh.drawArrayTris(context.webgl, sm.start, sm.size);
+                            mesh.glMesh.drawArrayTris(context.webgl, sm.start, sm.size, instanceCount);
                         }
                     }
                     else {
                         if (sm.line) {
-                            mesh.glMesh.drawElementLines(context.webgl, sm.start, sm.size);
+                            mesh.glMesh.drawElementLines(context.webgl, sm.start, sm.size, instanceCount);
                         }
                         else {
-                            mesh.glMesh.drawElementTris(context.webgl, sm.start, sm.size);
+                            mesh.glMesh.drawElementTris(context.webgl, sm.start, sm.size, instanceCount);
                         }
                     }
+                    drawInstanceInfo && drawInstanceInfo.disableAttributes(context.webgl, pass.program.program);
                 }
                 material_2.lastDrawMatID = matGUID;
                 material_2.lastDrawMeshID = meshGUID;
@@ -23393,6 +23648,90 @@ var gd3d;
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
+    var framework;
+    (function (framework) {
+        var EquationSolving = (function () {
+            function EquationSolving() {
+            }
+            EquationSolving.getSign = function (n) {
+                return n > 0 ? "+" : "-";
+            };
+            EquationSolving.equalNumber = function (a, b, precision) {
+                if (precision === void 0) { precision = 0.0000001; }
+                return Math.abs(a - b) < precision;
+            };
+            EquationSolving.getDerivative = function (f, delta) {
+                if (delta === void 0) { delta = 0.000000001; }
+                return function (x) {
+                    var d = (f(x + delta) - f(x)) / delta;
+                    return d;
+                };
+            };
+            EquationSolving.isContinuous = function (f) {
+                return true;
+            };
+            EquationSolving.hasSolution = function (f, a, b, errorcallback) {
+                if (!this.isContinuous(f)) {
+                    errorcallback && errorcallback(new Error("\u51FD\u6570 " + f + " \u5728 [" + a + " ," + b + "] \u533A\u95F4\u5185\u4E0D\u8FDE\u7EED\uFF0C\u65E0\u6CD5\u4E3A\u5176\u6C42\u89E3\uFF01"));
+                    return false;
+                }
+                var fa = f(a);
+                var fb = f(b);
+                if (fa * fb > 0) {
+                    errorcallback && errorcallback(new Error("f(a) * f(b) \u503C\u4E3A " + fa * fb + "\uFF0C\u4E0D\u6EE1\u8DB3 f(a) * f(b) <= 0\uFF0C\u65E0\u6CD5\u4E3A\u5176\u6C42\u89E3\uFF01"));
+                    return false;
+                }
+                return true;
+            };
+            EquationSolving.line = function (f, a, b, precision, errorcallback) {
+                if (precision === void 0) { precision = 0.0000001; }
+                if (!this.hasSolution(f, a, b, errorcallback))
+                    return undefined;
+                var fa = f(a);
+                var fb = f(b);
+                if (this.equalNumber(fa, 0, precision)) {
+                    return a;
+                }
+                if (this.equalNumber(fb, 0, precision)) {
+                    return b;
+                }
+                do {
+                    var x = a - fa * (b - a) / (fb - fa);
+                    var fr = f(x);
+                    if (fa * fr < 0) {
+                        b = x;
+                        fb = fr;
+                    }
+                    else {
+                        a = x;
+                        fa = fr;
+                    }
+                } while (!this.equalNumber(fr, 0, precision));
+                return x;
+            };
+            return EquationSolving;
+        }());
+        framework.EquationSolving = EquationSolving;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var math;
+    (function (math) {
+        var RotationOrder;
+        (function (RotationOrder) {
+            RotationOrder[RotationOrder["XYZ"] = 0] = "XYZ";
+            RotationOrder[RotationOrder["ZXY"] = 1] = "ZXY";
+            RotationOrder[RotationOrder["ZYX"] = 2] = "ZYX";
+            RotationOrder[RotationOrder["YXZ"] = 3] = "YXZ";
+            RotationOrder[RotationOrder["YZX"] = 4] = "YZX";
+            RotationOrder[RotationOrder["XZY"] = 5] = "XZY";
+        })(RotationOrder = math.RotationOrder || (math.RotationOrder = {}));
+        math.defaultRotationOrder = RotationOrder.YXZ;
+    })(math = gd3d.math || (gd3d.math = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
     var math;
     (function (math) {
         function colorSet_White(out) {
@@ -23556,6 +23895,20 @@ var gd3d;
             }
         }
         math.getKeyCodeByAscii = getKeyCodeByAscii;
+        math.DEG2RAD = Math.PI / 180;
+        math.RAD2DEG = 180 / Math.PI;
+        function degToRad(degrees) {
+            return degrees * math.DEG2RAD;
+        }
+        math.degToRad = degToRad;
+        function radToDeg(radians) {
+            return radians * math.RAD2DEG;
+        }
+        math.radToDeg = radToDeg;
+        function mapLinear(x, a1, a2, b1, b2) {
+            return b1 + (x - a1) * (b2 - b1) / (a2 - a1);
+        }
+        math.mapLinear = mapLinear;
         function numberLerp(fromV, toV, v) {
             return fromV * (1 - v) + toV * v;
         }
@@ -30106,6 +30459,3165 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var Particle1 = (function () {
+            function Particle1() {
+                this.birthTime = 0;
+                this.lifetime = 5;
+                this.position = new gd3d.math.vector3();
+                this.velocity = new gd3d.math.vector3();
+                this.acceleration = new gd3d.math.vector3();
+                this.rotation = new gd3d.math.vector3();
+                this.angularVelocity = new gd3d.math.vector3();
+                this.size = new gd3d.math.vector3(1, 1, 1);
+                this.startSize = new gd3d.math.vector3(1, 1, 1);
+                this.color = new gd3d.math.color();
+                this.startColor = new gd3d.math.color();
+                this.tilingOffset = new gd3d.math.vector4(1, 1, 0, 0);
+                this.flipUV = new gd3d.math.vector2();
+                this.cache = {};
+            }
+            Particle1.prototype.updateState = function (preTime, time) {
+                preTime = Math.max(preTime, this.birthTime);
+                time = Math.max(this.birthTime, time);
+                var pTime = time - preTime;
+                this.velocity.x += this.acceleration.x * pTime;
+                this.velocity.y += this.acceleration.y * pTime;
+                this.velocity.z += this.acceleration.z * pTime;
+                this.position.x += this.velocity.x * pTime;
+                this.position.y += this.velocity.y * pTime;
+                this.position.z += this.velocity.z * pTime;
+                this.rotation.x += this.angularVelocity.x * pTime;
+                this.rotation.y += this.angularVelocity.y * pTime;
+                this.rotation.z += this.angularVelocity.z * pTime;
+            };
+            return Particle1;
+        }());
+        framework.Particle1 = Particle1;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystem = (function () {
+            function ParticleSystem() {
+                this.layer = framework.RenderLayerEnum.Transparent;
+                this.queue = 0;
+                this._isPlaying = false;
+                this.time = 0;
+                this.startDelay = 0;
+                this._startDelay_rate = Math.random();
+                this._vbos = [];
+                this._attributes = [
+                    ["a_particle_position", 4],
+                    ["a_particle_scale", 4],
+                    ["a_particle_rotation", 4],
+                    ["a_particle_color", 4],
+                    ["a_particle_tilingOffset", 4],
+                    ["a_particle_flipUV", 4],
+                ];
+                this._awaked = false;
+                this._realTime = 0;
+                this._preRealTime = 0;
+                this._particlePool = [];
+                this._activeParticles = [];
+                this._modules = [];
+                this._preworldPos = new gd3d.math.vector3();
+                this._isRateOverDistance = false;
+                this._leftRateOverDistance = 0;
+                this.worldPos = new gd3d.math.vector3();
+                this.moveVec = new gd3d.math.vector3();
+                this.speed = new gd3d.math.vector3();
+                this.localToWorldMatrix = new gd3d.math.matrix();
+                this.worldToLocalMatrix = new gd3d.math.matrix();
+                this.main = new framework.ParticleMainModule();
+                this.emission = new framework.ParticleEmissionModule();
+                this.shape = new framework.ParticleShapeModule();
+                this.velocityOverLifetime = new framework.ParticleVelocityOverLifetimeModule();
+                this.inheritVelocity = new framework.ParticleInheritVelocityModule();
+                this.forceOverLifetime = new framework.ParticleForceOverLifetimeModule();
+                this.limitVelocityOverLifetime = new framework.ParticleLimitVelocityOverLifetimeModule();
+                this.colorOverLifetime = new framework.ParticleColorOverLifetimeModule();
+                this.colorBySpeed = new framework.ParticleColorBySpeedModule();
+                this.sizeOverLifetime = new framework.ParticleSizeOverLifetimeModule();
+                this.sizeBySpeed = new framework.ParticleSizeBySpeedModule();
+                this.rotationOverLifetime = new framework.ParticleRotationOverLifetimeModule();
+                this.rotationBySpeed = new framework.ParticleRotationBySpeedModule();
+                this.textureSheetAnimation = new framework.ParticleTextureSheetAnimationModule();
+                this.main.enabled = true;
+                this.emission.enabled = true;
+                this.shape.enabled = true;
+            }
+            Object.defineProperty(ParticleSystem.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "transform", {
+                get: function () {
+                    return this.gameObject.transform;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "isPlaying", {
+                get: function () {
+                    return this._isPlaying;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "isStopped", {
+                get: function () {
+                    return !this._isPlaying && this.time == 0;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "isPaused", {
+                get: function () {
+                    return !this._isPlaying && this.time != 0;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "particleCount", {
+                get: function () {
+                    return this._activeParticles.length;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "main", {
+                get: function () { return this._main; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._main, v);
+                    v.particleSystem = this;
+                    this._main = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "emission", {
+                get: function () { return this._emission; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._emission, v);
+                    v.particleSystem = this;
+                    this._emission = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "shape", {
+                get: function () { return this._shape; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._shape, v);
+                    v.particleSystem = this;
+                    this._shape = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "velocityOverLifetime", {
+                get: function () { return this._velocityOverLifetime; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._velocityOverLifetime, v);
+                    v.particleSystem = this;
+                    this._velocityOverLifetime = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "limitVelocityOverLifetime", {
+                get: function () { return this._limitVelocityOverLifetime; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._limitVelocityOverLifetime, v);
+                    v.particleSystem = this;
+                    this._limitVelocityOverLifetime = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "inheritVelocity", {
+                get: function () { return this._inheritVelocity; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._inheritVelocity, v);
+                    v.particleSystem = this;
+                    this._inheritVelocity = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "forceOverLifetime", {
+                get: function () { return this._forceOverLifetime; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._forceOverLifetime, v);
+                    v.particleSystem = this;
+                    this._forceOverLifetime = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "colorOverLifetime", {
+                get: function () { return this._colorOverLifetime; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._colorOverLifetime, v);
+                    v.particleSystem = this;
+                    this._colorOverLifetime = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "colorBySpeed", {
+                get: function () { return this._colorBySpeed; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._colorBySpeed, v);
+                    v.particleSystem = this;
+                    this._colorBySpeed = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "sizeOverLifetime", {
+                get: function () { return this._sizeOverLifetime; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._sizeOverLifetime, v);
+                    v.particleSystem = this;
+                    this._sizeOverLifetime = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "sizeBySpeed", {
+                get: function () { return this._sizeBySpeed; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._sizeBySpeed, v);
+                    v.particleSystem = this;
+                    this._sizeBySpeed = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "rotationOverLifetime", {
+                get: function () { return this._rotationOverLifetime; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._rotationOverLifetime, v);
+                    v.particleSystem = this;
+                    this._rotationOverLifetime = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "rotationBySpeed", {
+                get: function () { return this._rotationBySpeed; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._rotationBySpeed, v);
+                    v.particleSystem = this;
+                    this._rotationBySpeed = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "textureSheetAnimation", {
+                get: function () { return this._textureSheetAnimation; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._textureSheetAnimation, v);
+                    v.particleSystem = this;
+                    this._textureSheetAnimation = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "mesh", {
+                get: function () {
+                    return this._mesh;
+                },
+                set: function (mesh) {
+                    if (this._mesh != null) {
+                        this._mesh.unuse();
+                    }
+                    this._mesh = mesh;
+                    if (this._mesh != null) {
+                        this._mesh.use();
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "single", {
+                get: function () { return true; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "particleSystemData", {
+                get: function () {
+                    return this._particleSystemData;
+                },
+                set: function (v) {
+                    var data = framework.ParticleSystemData.get(v.value);
+                    if (data.objectData) {
+                        framework.serialization.setValue(this, data.objectData);
+                    }
+                    else {
+                        data.particleSystem = this;
+                    }
+                    this._particleSystemData = data;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleSystem.prototype.onPlay = function () {
+            };
+            ParticleSystem.prototype.start = function () {
+                if (!this._mesh) {
+                    this._mesh = framework.sceneMgr.app.getAssetMgr().getDefaultMesh(gd3d.framework.defMesh.quad);
+                }
+                if (!this.material) {
+                    this.material = framework.sceneMgr.app.getAssetMgr().getDefParticleMat();
+                }
+            };
+            ParticleSystem.prototype.remove = function () {
+                throw "未实现";
+            };
+            ParticleSystem.prototype.clone = function () {
+                throw "未实现";
+            };
+            ParticleSystem.prototype.update = function (interval) {
+                if (!this.isPlaying)
+                    return;
+                gd3d.math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
+                gd3d.math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
+                this.time = this.time + this.main.simulationSpeed * interval;
+                this._realTime = this.time - this.startDelay;
+                gd3d.math.matrixGetTranslation(this.localToWorldMatrix, this.worldPos);
+                this.moveVec.x = this.worldPos.x - this._preworldPos.x;
+                this.moveVec.y = this.worldPos.y - this._preworldPos.y;
+                this.moveVec.z = this.worldPos.z - this._preworldPos.z;
+                this.speed.x = this.moveVec.x / (this.main.simulationSpeed * interval);
+                this.speed.y = this.moveVec.y / (this.main.simulationSpeed * interval);
+                this.speed.z = this.moveVec.z / (this.main.simulationSpeed * interval);
+                this._updateActiveParticlesState();
+                if (this.main.loop && Math.floor(this._preRealTime / this.main.duration) < Math.floor(this._realTime / this.main.duration)) {
+                    this.emission.bursts.forEach(function (element) {
+                        element.calculateProbability();
+                    });
+                }
+                this._emit();
+                this._preRealTime = this._realTime;
+                this._preworldPos.x = this.worldPos.x;
+                this._preworldPos.y = this.worldPos.y;
+                this._preworldPos.z = this.worldPos.z;
+                if (!this.main.loop && this._activeParticles.length == 0 && this._realTime > this.main.duration) {
+                    this.stop();
+                }
+            };
+            ParticleSystem.prototype.stop = function () {
+                this._isPlaying = false;
+                this.time = 0;
+                this._particlePool = this._particlePool.concat(this._activeParticles);
+                this._activeParticles.length = 0;
+            };
+            ParticleSystem.prototype.play = function () {
+                this._isPlaying = true;
+                this.time = 0;
+                this._startDelay_rate = Math.random();
+                this.updateStartDelay();
+                this._preRealTime = 0;
+                this._particlePool = this._particlePool.concat(this._activeParticles);
+                this._activeParticles.length = 0;
+                this.emission.bursts.forEach(function (element) {
+                    element.calculateProbability();
+                });
+            };
+            ParticleSystem.prototype.updateStartDelay = function () {
+                this.startDelay = this.main.startDelay.getValue(this._startDelay_rate);
+            };
+            ParticleSystem.prototype.pause = function () {
+                this._isPlaying = false;
+            };
+            ParticleSystem.prototype.continue = function () {
+                if (this.time == 0) {
+                    this.play();
+                }
+                else {
+                    this._isPlaying = true;
+                    this._preRealTime = Math.max(0, this._realTime);
+                }
+            };
+            ParticleSystem.prototype.render = function (context, assetmgr, camera) {
+                var _this = this;
+                gd3d.math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
+                gd3d.math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
+                if (this.particleCount < 1)
+                    return;
+                framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.EffectSystem;
+                var go = this.gameObject;
+                var tran = go.transform;
+                context.updateLightMask(go.layer);
+                context.updateModel(tran);
+                if (!this.material)
+                    return;
+                var mesh = this.mesh;
+                if (mesh == null || mesh.glMesh == null || mesh.submesh == null)
+                    return;
+                var subMeshs = mesh.submesh;
+                if (subMeshs == null)
+                    return;
+                mesh.glMesh.bindVboBuffer(context.webgl);
+                var isSupportDrawInstancedArrays = !!context.webgl.drawArraysInstanced;
+                if (!this._awaked) {
+                    this._isPlaying = this.main.playOnAwake;
+                    this._awaked = true;
+                }
+                var isbillboard = !this.shape.alignToDirection && this.mesh == framework.sceneMgr.app.getAssetMgr().getDefaultMesh(gd3d.framework.defMesh.quad);
+                var billboardMatrix = new gd3d.math.matrix();
+                if (isbillboard) {
+                    var cameraForward = new gd3d.math.vector3();
+                    var cameraUp = new gd3d.math.vector3();
+                    camera.gameObject.transform.getForwardInWorld(cameraForward);
+                    camera.gameObject.transform.getUpInWorld(cameraUp);
+                    if (this.main.simulationSpace == framework.ParticleSystemSimulationSpace.Local) {
+                        gd3d.math.matrixTransformNormal(cameraForward, this.worldToLocalMatrix, cameraForward);
+                        gd3d.math.matrixTransformNormal(cameraUp, this.worldToLocalMatrix, cameraUp);
+                    }
+                    gd3d.math.matrixLookat(new gd3d.math.vector3(), cameraForward, cameraUp, billboardMatrix);
+                }
+                this.material.setMatrix("u_particle_billboardMatrix", billboardMatrix);
+                if (this.main.simulationSpace == framework.ParticleSystemSimulationSpace.World) {
+                    gd3d.math.matrixClone(context.matrixViewProject, context.matrixModelViewProject);
+                }
+                if (!isSupportDrawInstancedArrays) {
+                    for (var i = 0, n = this._activeParticles.length; i < n; i++) {
+                        var particle = this._activeParticles[i];
+                        this.material.setVector4("a_particle_position", new gd3d.math.vector4(particle.position.x, particle.position.y, particle.position.z, 1));
+                        this.material.setVector4("a_particle_scale", new gd3d.math.vector4(particle.size.x, particle.size.y, particle.size.z, 1));
+                        this.material.setVector4("a_particle_rotation", new gd3d.math.vector4(particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1));
+                        this.material.setVector4("a_particle_color", new gd3d.math.vector4(particle.color.r, particle.color.g, particle.color.b, particle.color.a));
+                        this.material.setVector4("a_particle_tilingOffset", new gd3d.math.vector4(particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w));
+                        this.material.setVector4("a_particle_flipUV", new gd3d.math.vector4(particle.flipUV.x, particle.flipUV.y, 0, 0));
+                        this.material.draw(context, mesh, subMeshs[0]);
+                    }
+                }
+                else {
+                    var data = [];
+                    for (var i = 0, n = this._activeParticles.length; i < n; i++) {
+                        var particle = this._activeParticles[i];
+                        data.push(particle.position.x, particle.position.y, particle.position.z, 1, particle.size.x, particle.size.y, particle.size.z, 1, particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1, particle.color.r, particle.color.g, particle.color.b, particle.color.a, particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w, particle.flipUV.x, particle.flipUV.y, 0, 0);
+                    }
+                    console.assert(data.length == 24 * this._activeParticles.length);
+                    var stride = this._attributes.reduce(function (pv, cv) { return pv += cv[1]; }, 0) * 4;
+                    if (isSupportDrawInstancedArrays && this.particleCount > 0) {
+                        var vbo = this._getVBO(context.webgl);
+                        var drawInstanceInfo = {
+                            instanceCount: this.particleCount,
+                            initBuffer: function (gl) {
+                                gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+                            },
+                            activeAttributes: function (gl, program) {
+                                gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                                var offset = 0;
+                                _this._attributes.forEach(function (element) {
+                                    var location = gl.getAttribLocation(program, element[0]);
+                                    if (location == -1)
+                                        return;
+                                    gl.enableVertexAttribArray(location);
+                                    gl.vertexAttribPointer(location, element[1], gl.FLOAT, false, stride, offset);
+                                    gl.vertexAttribDivisor(location, 1);
+                                    offset += element[1] * 4;
+                                });
+                            },
+                            disableAttributes: function (gl, program) {
+                                gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                                _this._attributes.forEach(function (element) {
+                                    var location = gl.getAttribLocation(program, element[0]);
+                                    if (location == -1)
+                                        return;
+                                    gl.disableVertexAttribArray(location);
+                                });
+                            },
+                        };
+                        this.material.draw(context, mesh, subMeshs[0], "base", drawInstanceInfo);
+                    }
+                }
+            };
+            ParticleSystem.prototype._getVBO = function (gl) {
+                for (var i = 0, n = this._vbos.length; i < n; i++) {
+                    if (this._vbos[i][0] == gl)
+                        return this._vbos[i][1];
+                }
+                var vbo = gl.createBuffer();
+                this._vbos.push([gl, vbo]);
+                return vbo;
+            };
+            Object.defineProperty(ParticleSystem.prototype, "rateAtDuration", {
+                get: function () {
+                    return (this._realTime % this.main.duration) / this.main.duration;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleSystem.prototype._emit = function () {
+                var _this = this;
+                if (!this.emission.enabled)
+                    return;
+                if (this._activeParticles.length >= this.main.maxParticles)
+                    return;
+                if (this._realTime <= 0)
+                    return;
+                var loop = this.main.loop;
+                var duration = this.main.duration;
+                var rateAtDuration = this.rateAtDuration;
+                var preRealTime = this._preRealTime;
+                if (!loop && preRealTime >= duration)
+                    return;
+                var realEmitTime = this._realTime;
+                if (!loop)
+                    realEmitTime = Math.min(realEmitTime, duration);
+                var emits = [];
+                var step = 1 / this.emission.rateOverTime.getValue(rateAtDuration);
+                var bursts = this.emission.bursts;
+                if (this.main.simulationSpace == framework.ParticleSystemSimulationSpace.World) {
+                    if (this._isRateOverDistance) {
+                        var moveVec = this.moveVec;
+                        var worldPos = this.worldPos;
+                        if (gd3d.math.vec3SqrLength(moveVec) > 0) {
+                            var moveDir = new gd3d.math.vector3(moveVec.x, moveVec.y, moveVec.z);
+                            gd3d.math.vec3Normalize(moveDir, moveDir);
+                            var leftRateOverDistance = this._leftRateOverDistance + gd3d.math.vec3Length(moveVec);
+                            var rateOverDistance = this.emission.rateOverDistance.getValue(rateAtDuration);
+                            var invRateOverDistance = 1 / rateOverDistance;
+                            var invRateOverDistanceVec = new gd3d.math.vector3(moveDir.x / rateOverDistance, moveDir.y / rateOverDistance, moveDir.z / rateOverDistance);
+                            var lastRateOverDistance = new gd3d.math.vector3(this._preworldPos.x - moveDir.x * this._leftRateOverDistance, this._preworldPos.y - moveDir.y * this._leftRateOverDistance, this._preworldPos.z - moveDir.z * this._leftRateOverDistance);
+                            var emitPosArr = [];
+                            while (invRateOverDistance < leftRateOverDistance) {
+                                emitPosArr.push(new gd3d.math.vector3(lastRateOverDistance.x + invRateOverDistanceVec.x, lastRateOverDistance.y + invRateOverDistanceVec.y, lastRateOverDistance.z + invRateOverDistanceVec.z));
+                                leftRateOverDistance -= invRateOverDistance;
+                            }
+                            this._leftRateOverDistance = leftRateOverDistance;
+                            emitPosArr.forEach(function (p) {
+                                emits.push({ time: _this.time, num: 1, position: new gd3d.math.vector3(p.x - worldPos.x, p.y - worldPos.y, p.z - worldPos.z) });
+                            });
+                        }
+                    }
+                    this._isRateOverDistance = true;
+                }
+                else {
+                    this._isRateOverDistance = false;
+                    this._leftRateOverDistance = 0;
+                }
+                var cycleStartIndex = Math.floor(preRealTime / duration);
+                var cycleEndIndex = Math.ceil(realEmitTime / duration);
+                for (var k = cycleStartIndex; k < cycleEndIndex; k++) {
+                    var cycleStartTime = k * duration;
+                    var cycleEndTime = (k + 1) * duration;
+                    var startTime = Math.max(preRealTime, cycleStartTime);
+                    var endTime = Math.min(realEmitTime, cycleEndTime);
+                    var singleStart = Math.ceil(startTime / step) * step;
+                    for (var i = singleStart; i < endTime; i += step) {
+                        emits.push({ time: i, num: 1 });
+                    }
+                    var inCycleStart = startTime - cycleStartTime;
+                    var inCycleEnd = endTime - cycleStartTime;
+                    for (var i_7 = 0; i_7 < bursts.length; i_7++) {
+                        var burst = bursts[i_7];
+                        if (burst.isProbability && inCycleStart <= burst.time && burst.time < inCycleEnd) {
+                            emits.push({ time: cycleStartTime + burst.time, num: burst.count.getValue(rateAtDuration) });
+                        }
+                    }
+                }
+                emits.sort(function (a, b) { return a.time - b.time; });
+                ;
+                emits.forEach(function (v) {
+                    _this._emitParticles(v);
+                });
+            };
+            ParticleSystem.prototype._emitParticles = function (v) {
+                var rateAtDuration = this.rateAtDuration;
+                var num = v.num;
+                var birthTime = v.time;
+                var position = v.position || new gd3d.math.vector3();
+                for (var i = 0; i < num; i++) {
+                    if (this._activeParticles.length >= this.main.maxParticles)
+                        return;
+                    var lifetime = this.main.startLifetime.getValue(rateAtDuration);
+                    var birthRateAtDuration = (birthTime - this.startDelay) / this.main.duration;
+                    var rateAtLifeTime = (this._realTime - birthTime) / lifetime;
+                    if (rateAtLifeTime < 1) {
+                        var particle = this._particlePool.pop() || new framework.Particle1();
+                        particle.cache = {};
+                        particle.position.x = position.x;
+                        particle.position.y = position.y;
+                        particle.position.z = position.z;
+                        particle.birthTime = birthTime;
+                        particle.lifetime = lifetime;
+                        particle.rateAtLifeTime = rateAtLifeTime;
+                        particle.birthRateAtDuration = birthRateAtDuration - Math.floor(birthRateAtDuration);
+                        this._activeParticles.push(particle);
+                        this._initParticleState(particle);
+                        this._updateParticleState(particle);
+                    }
+                }
+            };
+            ParticleSystem.prototype._updateActiveParticlesState = function () {
+                for (var i = this._activeParticles.length - 1; i >= 0; i--) {
+                    var particle = this._activeParticles[i];
+                    particle.rateAtLifeTime = (this._realTime - particle.birthTime) / particle.lifetime;
+                    if (particle.rateAtLifeTime < 0 || particle.rateAtLifeTime > 1) {
+                        this._activeParticles.splice(i, 1);
+                        this._particlePool.push(particle);
+                    }
+                    else {
+                        this._updateParticleState(particle);
+                    }
+                }
+            };
+            ParticleSystem.prototype._initParticleState = function (particle) {
+                this._modules.forEach(function (v) { v.initParticleState(particle); });
+            };
+            ParticleSystem.prototype._updateParticleState = function (particle) {
+                var preTime = Math.max(this._preRealTime, particle.birthTime);
+                this._modules.forEach(function (v) { v.updateParticleState(particle); });
+                particle.updateState(preTime, this._realTime);
+            };
+            ParticleSystem.prototype._simulationSpaceChanged = function () {
+                if (!this.transform)
+                    return;
+                if (this._activeParticles.length == 0)
+                    return;
+                if (this._main.simulationSpace == framework.ParticleSystemSimulationSpace.Local) {
+                    var worldToLocalMatrix = this.worldToLocalMatrix;
+                    this._activeParticles.forEach(function (p) {
+                        gd3d.math.matrixTransformVector3(p.position, worldToLocalMatrix, p.position);
+                        gd3d.math.matrixTransformNormal(p.velocity, worldToLocalMatrix, p.velocity);
+                        gd3d.math.matrixTransformNormal(p.acceleration, worldToLocalMatrix, p.acceleration);
+                    });
+                }
+                else {
+                    var localToWorldMatrix = this.localToWorldMatrix;
+                    this._activeParticles.forEach(function (p) {
+                        gd3d.math.matrixTransformVector3(p.position, localToWorldMatrix, p.position);
+                        gd3d.math.matrixTransformNormal(p.velocity, localToWorldMatrix, p.velocity);
+                        gd3d.math.matrixTransformNormal(p.acceleration, localToWorldMatrix, p.acceleration);
+                    });
+                }
+            };
+            ParticleSystem.prototype.addParticleVelocity = function (particle, velocity, space, name) {
+                if (name != undefined) {
+                    this.removeParticleVelocity(particle, name);
+                    particle.cache[name] = { value: new gd3d.math.vector3(velocity.x, velocity.y, velocity.z), space: space };
+                }
+                if (space != this.main.simulationSpace) {
+                    if (space == framework.ParticleSystemSimulationSpace.World) {
+                        gd3d.math.matrixTransformNormal(velocity, this.worldToLocalMatrix, velocity);
+                    }
+                    else {
+                        gd3d.math.matrixTransformNormal(velocity, this.localToWorldMatrix, velocity);
+                    }
+                }
+                particle.velocity.x += velocity.x;
+                particle.velocity.y += velocity.y;
+                particle.velocity.z += velocity.z;
+            };
+            ParticleSystem.prototype.removeParticleVelocity = function (particle, name) {
+                var obj = particle.cache[name];
+                if (obj) {
+                    delete particle.cache[name];
+                    var space = obj.space;
+                    var value = obj.value;
+                    if (space != this.main.simulationSpace) {
+                        if (space == framework.ParticleSystemSimulationSpace.World) {
+                            gd3d.math.matrixTransformNormal(value, this.worldToLocalMatrix, value);
+                        }
+                        else {
+                            gd3d.math.matrixTransformNormal(value, this.localToWorldMatrix, value);
+                        }
+                    }
+                    particle.velocity.x -= value.x;
+                    particle.velocity.y -= value.y;
+                    particle.velocity.z -= value.z;
+                }
+            };
+            ParticleSystem.prototype.addParticleAcceleration = function (particle, acceleration, space, name) {
+                if (name != undefined) {
+                    this.removeParticleAcceleration(particle, name);
+                    particle.cache[name] = { value: new gd3d.math.vector3(acceleration.x, acceleration.y, acceleration.z), space: space };
+                }
+                if (space != this.main.simulationSpace) {
+                    if (space == framework.ParticleSystemSimulationSpace.World) {
+                        gd3d.math.matrixTransformNormal(acceleration, this.worldToLocalMatrix, acceleration);
+                    }
+                    else {
+                        gd3d.math.matrixTransformNormal(acceleration, this.localToWorldMatrix, acceleration);
+                    }
+                }
+                particle.acceleration.x += acceleration.x;
+                particle.acceleration.y += acceleration.y;
+                particle.acceleration.z += acceleration.z;
+            };
+            ParticleSystem.prototype.removeParticleAcceleration = function (particle, name) {
+                var obj = particle.cache[name];
+                if (obj) {
+                    delete particle.cache[name];
+                    var space = obj.space;
+                    var value = obj.value;
+                    if (space != this.main.simulationSpace) {
+                        if (space == framework.ParticleSystemSimulationSpace.World) {
+                            gd3d.math.matrixTransformNormal(value, this.worldToLocalMatrix, value);
+                        }
+                        else {
+                            gd3d.math.matrixTransformNormal(value, this.localToWorldMatrix, value);
+                        }
+                    }
+                    particle.acceleration.x -= value.x;
+                    particle.acceleration.y -= value.y;
+                    particle.acceleration.z -= value.z;
+                }
+            };
+            ParticleSystem.ClassName = "particlesystem";
+            __decorate([
+                gd3d.reflect.Field("mesh"),
+                gd3d.reflect.UIStyle("WidgetDragSelect"),
+                __metadata("design:type", framework.mesh),
+                __metadata("design:paramtypes", [framework.mesh])
+            ], ParticleSystem.prototype, "mesh", null);
+            __decorate([
+                gd3d.reflect.Field("material"),
+                __metadata("design:type", framework.material)
+            ], ParticleSystem.prototype, "material", void 0);
+            __decorate([
+                gd3d.reflect.Field("ParticleSystemData"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleSystem.prototype, "particleSystemData", null);
+            ParticleSystem = __decorate([
+                gd3d.reflect.nodeRender,
+                gd3d.reflect.nodeComponent,
+                __metadata("design:paramtypes", [])
+            ], ParticleSystem);
+            return ParticleSystem;
+        }());
+        framework.ParticleSystem = ParticleSystem;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemData = (function () {
+            function ParticleSystemData(assetName) {
+                if (assetName === void 0) { assetName = null; }
+                this.name = null;
+                this.id = new framework.resID();
+                this.defaultAsset = false;
+                if (!assetName) {
+                    assetName = "ParticleSystem_" + this.getGUID();
+                }
+                this.name = new framework.constText(assetName);
+            }
+            ParticleSystemData_1 = ParticleSystemData;
+            ParticleSystemData.get = function (valueName) {
+                return this._datas[valueName];
+            };
+            Object.defineProperty(ParticleSystemData.prototype, "value", {
+                get: function () {
+                    return this._value;
+                },
+                set: function (v) {
+                    this._value = v;
+                    if (ParticleSystemData_1._datas[v]) {
+                        console.log("\u91CD\u590D\u521B\u5EFA\u7C92\u5B50\u7CFB\u7EDF\u8D44\u6E90 " + v);
+                        return;
+                    }
+                    ParticleSystemData_1._datas[v] = this;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleSystemData.prototype.getName = function () {
+                if (this.name == undefined) {
+                    return null;
+                }
+                return this.name.getText();
+            };
+            ParticleSystemData.prototype.getGUID = function () {
+                return this.id.getID();
+            };
+            ParticleSystemData.prototype.dispose = function () {
+            };
+            ParticleSystemData.prototype.use = function () {
+                framework.sceneMgr.app.getAssetMgr().use(this);
+            };
+            ParticleSystemData.prototype.unuse = function (disposeNow) {
+                if (disposeNow === void 0) { disposeNow = false; }
+                framework.sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
+            };
+            ParticleSystemData.prototype.caclByteLength = function () {
+                var total = 0;
+                return total;
+            };
+            ParticleSystemData.prototype.setData = function (v) {
+                this.objectData = JSON.parse(v);
+                if (this.particleSystem) {
+                    framework.serialization.setValue(this.particleSystem, this.objectData);
+                }
+            };
+            var ParticleSystemData_1;
+            ParticleSystemData.ClassName = "ParticleSystemData";
+            ParticleSystemData._datas = {};
+            __decorate([
+                gd3d.reflect.Field("constText"),
+                __metadata("design:type", framework.constText)
+            ], ParticleSystemData.prototype, "name", void 0);
+            ParticleSystemData = ParticleSystemData_1 = __decorate([
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [String])
+            ], ParticleSystemData);
+            return ParticleSystemData;
+        }());
+        framework.ParticleSystemData = ParticleSystemData;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemAnimationType;
+        (function (ParticleSystemAnimationType) {
+            ParticleSystemAnimationType[ParticleSystemAnimationType["WholeSheet"] = 0] = "WholeSheet";
+            ParticleSystemAnimationType[ParticleSystemAnimationType["SingleRow"] = 1] = "SingleRow";
+        })(ParticleSystemAnimationType = framework.ParticleSystemAnimationType || (framework.ParticleSystemAnimationType = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemInheritVelocityMode;
+        (function (ParticleSystemInheritVelocityMode) {
+            ParticleSystemInheritVelocityMode[ParticleSystemInheritVelocityMode["Initial"] = 0] = "Initial";
+            ParticleSystemInheritVelocityMode[ParticleSystemInheritVelocityMode["Current"] = 1] = "Current";
+        })(ParticleSystemInheritVelocityMode = framework.ParticleSystemInheritVelocityMode || (framework.ParticleSystemInheritVelocityMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemMeshShapeType;
+        (function (ParticleSystemMeshShapeType) {
+            ParticleSystemMeshShapeType[ParticleSystemMeshShapeType["Vertex"] = 0] = "Vertex";
+            ParticleSystemMeshShapeType[ParticleSystemMeshShapeType["Edge"] = 1] = "Edge";
+            ParticleSystemMeshShapeType[ParticleSystemMeshShapeType["Triangle"] = 2] = "Triangle";
+        })(ParticleSystemMeshShapeType = framework.ParticleSystemMeshShapeType || (framework.ParticleSystemMeshShapeType = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemScalingMode;
+        (function (ParticleSystemScalingMode) {
+            ParticleSystemScalingMode[ParticleSystemScalingMode["Hierarchy"] = 0] = "Hierarchy";
+            ParticleSystemScalingMode[ParticleSystemScalingMode["Local"] = 1] = "Local";
+            ParticleSystemScalingMode[ParticleSystemScalingMode["Shape"] = 2] = "Shape";
+        })(ParticleSystemScalingMode = framework.ParticleSystemScalingMode || (framework.ParticleSystemScalingMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemShapeConeEmitFrom;
+        (function (ParticleSystemShapeConeEmitFrom) {
+            ParticleSystemShapeConeEmitFrom[ParticleSystemShapeConeEmitFrom["Base"] = 0] = "Base";
+            ParticleSystemShapeConeEmitFrom[ParticleSystemShapeConeEmitFrom["BaseShell"] = 1] = "BaseShell";
+            ParticleSystemShapeConeEmitFrom[ParticleSystemShapeConeEmitFrom["Volume"] = 2] = "Volume";
+            ParticleSystemShapeConeEmitFrom[ParticleSystemShapeConeEmitFrom["VolumeShell"] = 3] = "VolumeShell";
+        })(ParticleSystemShapeConeEmitFrom = framework.ParticleSystemShapeConeEmitFrom || (framework.ParticleSystemShapeConeEmitFrom = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemShapeMultiModeValue;
+        (function (ParticleSystemShapeMultiModeValue) {
+            ParticleSystemShapeMultiModeValue[ParticleSystemShapeMultiModeValue["Random"] = 0] = "Random";
+            ParticleSystemShapeMultiModeValue[ParticleSystemShapeMultiModeValue["Loop"] = 1] = "Loop";
+            ParticleSystemShapeMultiModeValue[ParticleSystemShapeMultiModeValue["PingPong"] = 2] = "PingPong";
+            ParticleSystemShapeMultiModeValue[ParticleSystemShapeMultiModeValue["BurstSpread"] = 3] = "BurstSpread";
+        })(ParticleSystemShapeMultiModeValue = framework.ParticleSystemShapeMultiModeValue || (framework.ParticleSystemShapeMultiModeValue = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemShapeType;
+        (function (ParticleSystemShapeType) {
+            ParticleSystemShapeType[ParticleSystemShapeType["Sphere"] = 0] = "Sphere";
+            ParticleSystemShapeType[ParticleSystemShapeType["SphereShell"] = 1] = "SphereShell";
+            ParticleSystemShapeType[ParticleSystemShapeType["Hemisphere"] = 2] = "Hemisphere";
+            ParticleSystemShapeType[ParticleSystemShapeType["HemisphereShell"] = 3] = "HemisphereShell";
+            ParticleSystemShapeType[ParticleSystemShapeType["Cone"] = 4] = "Cone";
+            ParticleSystemShapeType[ParticleSystemShapeType["ConeShell"] = 7] = "ConeShell";
+            ParticleSystemShapeType[ParticleSystemShapeType["ConeVolume"] = 8] = "ConeVolume";
+            ParticleSystemShapeType[ParticleSystemShapeType["ConeVolumeShell"] = 9] = "ConeVolumeShell";
+            ParticleSystemShapeType[ParticleSystemShapeType["Box"] = 5] = "Box";
+            ParticleSystemShapeType[ParticleSystemShapeType["BoxShell"] = 15] = "BoxShell";
+            ParticleSystemShapeType[ParticleSystemShapeType["BoxEdge"] = 16] = "BoxEdge";
+            ParticleSystemShapeType[ParticleSystemShapeType["Mesh"] = 6] = "Mesh";
+            ParticleSystemShapeType[ParticleSystemShapeType["MeshRenderer"] = 13] = "MeshRenderer";
+            ParticleSystemShapeType[ParticleSystemShapeType["SkinnedMeshRenderer"] = 14] = "SkinnedMeshRenderer";
+            ParticleSystemShapeType[ParticleSystemShapeType["Circle"] = 10] = "Circle";
+            ParticleSystemShapeType[ParticleSystemShapeType["CircleEdge"] = 11] = "CircleEdge";
+            ParticleSystemShapeType[ParticleSystemShapeType["SingleSidedEdge"] = 12] = "SingleSidedEdge";
+        })(ParticleSystemShapeType = framework.ParticleSystemShapeType || (framework.ParticleSystemShapeType = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemShapeType1;
+        (function (ParticleSystemShapeType1) {
+            ParticleSystemShapeType1[ParticleSystemShapeType1["Sphere"] = 0] = "Sphere";
+            ParticleSystemShapeType1[ParticleSystemShapeType1["Hemisphere"] = 1] = "Hemisphere";
+            ParticleSystemShapeType1[ParticleSystemShapeType1["Cone"] = 2] = "Cone";
+            ParticleSystemShapeType1[ParticleSystemShapeType1["Box"] = 3] = "Box";
+            ParticleSystemShapeType1[ParticleSystemShapeType1["Mesh"] = 4] = "Mesh";
+            ParticleSystemShapeType1[ParticleSystemShapeType1["MeshRenderer"] = 5] = "MeshRenderer";
+            ParticleSystemShapeType1[ParticleSystemShapeType1["SkinnedMeshRenderer"] = 6] = "SkinnedMeshRenderer";
+            ParticleSystemShapeType1[ParticleSystemShapeType1["Circle"] = 7] = "Circle";
+            ParticleSystemShapeType1[ParticleSystemShapeType1["Edge"] = 8] = "Edge";
+        })(ParticleSystemShapeType1 = framework.ParticleSystemShapeType1 || (framework.ParticleSystemShapeType1 = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemSimulationSpace;
+        (function (ParticleSystemSimulationSpace) {
+            ParticleSystemSimulationSpace[ParticleSystemSimulationSpace["Local"] = 0] = "Local";
+            ParticleSystemSimulationSpace[ParticleSystemSimulationSpace["World"] = 1] = "World";
+        })(ParticleSystemSimulationSpace = framework.ParticleSystemSimulationSpace || (framework.ParticleSystemSimulationSpace = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var UVChannelFlags;
+        (function (UVChannelFlags) {
+            UVChannelFlags[UVChannelFlags["Nothing"] = 0] = "Nothing";
+            UVChannelFlags[UVChannelFlags["UV0"] = 1] = "UV0";
+            UVChannelFlags[UVChannelFlags["UV1"] = 2] = "UV1";
+            UVChannelFlags[UVChannelFlags["UV2"] = 4] = "UV2";
+            UVChannelFlags[UVChannelFlags["UV3"] = 8] = "UV3";
+            UVChannelFlags[UVChannelFlags["Everything"] = 15] = "Everything";
+        })(UVChannelFlags = framework.UVChannelFlags || (framework.UVChannelFlags = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleModule = (function () {
+            function ParticleModule() {
+                this.enabled = false;
+            }
+            ParticleModule.prototype.initParticleState = function (particle) {
+            };
+            ParticleModule.prototype.updateParticleState = function (particle) {
+            };
+            return ParticleModule;
+        }());
+        framework.ParticleModule = ParticleModule;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleColorBySpeedModule = (function (_super) {
+            __extends(ParticleColorBySpeedModule, _super);
+            function ParticleColorBySpeedModule() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.color = new framework.MinMaxGradient();
+                _this.range = new gd3d.math.vector2(0, 1);
+                return _this;
+            }
+            ParticleColorBySpeedModule.prototype.initParticleState = function (particle) {
+                particle[_ColorBySpeed_rate] = Math.random();
+            };
+            ParticleColorBySpeedModule.prototype.updateParticleState = function (particle) {
+                if (!this.enabled)
+                    return;
+                var velocity = gd3d.math.vec3Length(particle.velocity);
+                var rate = gd3d.math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
+                var color = this.color.getValue(rate, particle[_ColorBySpeed_rate]);
+                gd3d.math.colorMultiply(particle.color, color, particle.color);
+            };
+            return ParticleColorBySpeedModule;
+        }(framework.ParticleModule));
+        framework.ParticleColorBySpeedModule = ParticleColorBySpeedModule;
+        var _ColorBySpeed_rate = "_ColorBySpeed_rate";
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleColorOverLifetimeModule = (function (_super) {
+            __extends(ParticleColorOverLifetimeModule, _super);
+            function ParticleColorOverLifetimeModule() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.color = new framework.MinMaxGradient();
+                return _this;
+            }
+            ParticleColorOverLifetimeModule.prototype.initParticleState = function (particle) {
+                particle[_ColorOverLifetime_rate] = Math.random();
+            };
+            ParticleColorOverLifetimeModule.prototype.updateParticleState = function (particle) {
+                if (!this.enabled)
+                    return;
+                var color = this.color.getValue(particle.rateAtLifeTime, particle[_ColorOverLifetime_rate]);
+                gd3d.math.colorMultiply(particle.color, color, particle.color);
+            };
+            return ParticleColorOverLifetimeModule;
+        }(framework.ParticleModule));
+        framework.ParticleColorOverLifetimeModule = ParticleColorOverLifetimeModule;
+        var _ColorOverLifetime_rate = "_ColorOverLifetime_rate";
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleEmissionModule = (function (_super) {
+            __extends(ParticleEmissionModule, _super);
+            function ParticleEmissionModule() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.rateOverTime = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 10, constantMin: 10, constantMax: 10, curveMultiplier: 10 });
+                _this.rateOverDistance = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 0, constantMin: 0, constantMax: 1 });
+                _this.bursts = [];
+                return _this;
+            }
+            Object.defineProperty(ParticleEmissionModule.prototype, "rateOverTimeMultiplier", {
+                get: function () {
+                    return this.rateOverTime.curveMultiplier;
+                },
+                set: function (v) {
+                    this.rateOverTime.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleEmissionModule.prototype, "rateOverDistanceMultiplier", {
+                get: function () {
+                    return this.rateOverDistance.curveMultiplier;
+                },
+                set: function (v) {
+                    this.rateOverDistance.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleEmissionModule.prototype, "burstCount", {
+                get: function () {
+                    return this.bursts.length;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleEmissionModule.prototype.getBursts = function (bursts) {
+                bursts.length = this.bursts.length;
+                for (var i = 0, n = bursts.length; i < n; i++) {
+                    bursts[i] = this.bursts[i];
+                }
+                return bursts.length;
+            };
+            ParticleEmissionModule.prototype.setBursts = function (bursts, size) {
+                if (size === void 0) { size = Number.MAX_SAFE_INTEGER; }
+                var size = Math.min(bursts.length, size);
+                for (var i = 0; i < size; i++) {
+                    this.bursts[i] = bursts[i];
+                }
+            };
+            return ParticleEmissionModule;
+        }(framework.ParticleModule));
+        framework.ParticleEmissionModule = ParticleEmissionModule;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleForceOverLifetimeModule = (function (_super) {
+            __extends(ParticleForceOverLifetimeModule, _super);
+            function ParticleForceOverLifetimeModule() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.force = new framework.MinMaxCurveVector3();
+                _this.space = framework.ParticleSystemSimulationSpace.Local;
+                _this.randomized = false;
+                return _this;
+            }
+            Object.defineProperty(ParticleForceOverLifetimeModule.prototype, "x", {
+                get: function () {
+                    return this.force.xCurve;
+                },
+                set: function (v) {
+                    this.force.xCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleForceOverLifetimeModule.prototype, "xMultiplier", {
+                get: function () {
+                    return this.x.curveMultiplier;
+                },
+                set: function (v) {
+                    this.x.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleForceOverLifetimeModule.prototype, "y", {
+                get: function () {
+                    return this.force.yCurve;
+                },
+                set: function (v) {
+                    this.force.yCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleForceOverLifetimeModule.prototype, "yMultiplier", {
+                get: function () {
+                    return this.y.curveMultiplier;
+                },
+                set: function (v) {
+                    this.y.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleForceOverLifetimeModule.prototype, "z", {
+                get: function () {
+                    return this.force.zCurve;
+                },
+                set: function (v) {
+                    this.force.zCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleForceOverLifetimeModule.prototype, "zMultiplier", {
+                get: function () {
+                    return this.z.curveMultiplier;
+                },
+                set: function (v) {
+                    this.z.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleForceOverLifetimeModule.prototype.initParticleState = function (particle) {
+                particle[_ForceOverLifetime_rate] = Math.random();
+            };
+            ParticleForceOverLifetimeModule.prototype.updateParticleState = function (particle) {
+                this.particleSystem.removeParticleAcceleration(particle, _ForceOverLifetime_preForce);
+                if (!this.enabled)
+                    return;
+                var force = this.force.getValue(particle.rateAtLifeTime, particle[_ForceOverLifetime_rate]);
+                this.particleSystem.addParticleAcceleration(particle, force, this.space, _ForceOverLifetime_preForce);
+            };
+            return ParticleForceOverLifetimeModule;
+        }(framework.ParticleModule));
+        framework.ParticleForceOverLifetimeModule = ParticleForceOverLifetimeModule;
+        var _ForceOverLifetime_rate = "_ForceOverLifetime_rate";
+        var _ForceOverLifetime_preForce = "_ForceOverLifetime_preForce";
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleInheritVelocityModule = (function (_super) {
+            __extends(ParticleInheritVelocityModule, _super);
+            function ParticleInheritVelocityModule() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this["__class__"] = "gd3d.framework.ParticleInheritVelocityModule";
+                _this.mode = framework.ParticleSystemInheritVelocityMode.Initial;
+                _this.multiplier = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 1, constantMin: 1, constantMax: 1 });
+                return _this;
+            }
+            Object.defineProperty(ParticleInheritVelocityModule.prototype, "curve", {
+                get: function () {
+                    return this.multiplier;
+                },
+                set: function (v) {
+                    this.multiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleInheritVelocityModule.prototype, "curveMultiplier", {
+                get: function () {
+                    return this.multiplier.curveMultiplier;
+                },
+                set: function (v) {
+                    this.multiplier.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleInheritVelocityModule.prototype.initParticleState = function (particle) {
+                particle[_InheritVelocity_rate] = Math.random();
+                if (!this.enabled)
+                    return;
+                if (this.particleSystem.main.simulationSpace == framework.ParticleSystemSimulationSpace.Local)
+                    return;
+                if (this.mode != framework.ParticleSystemInheritVelocityMode.Initial)
+                    return;
+                var multiplier = this.multiplier.getValue(particle.rateAtLifeTime, particle[_InheritVelocity_rate]);
+                particle.velocity.x += multiplier * this.particleSystem.speed.x;
+                particle.velocity.y += multiplier * this.particleSystem.speed.y;
+                particle.velocity.z += multiplier * this.particleSystem.speed.z;
+            };
+            ParticleInheritVelocityModule.prototype.updateParticleState = function (particle) {
+                if (!this.enabled)
+                    return;
+                if (this.particleSystem.main.simulationSpace == framework.ParticleSystemSimulationSpace.Local)
+                    return;
+                if (this.mode != framework.ParticleSystemInheritVelocityMode.Current)
+                    return;
+                var multiplier = this.multiplier.getValue(particle.rateAtLifeTime, particle[_InheritVelocity_rate]);
+                particle.position.x += multiplier * this.particleSystem.moveVec.x;
+                particle.position.y += multiplier * this.particleSystem.moveVec.y;
+                particle.position.z += multiplier * this.particleSystem.moveVec.z;
+            };
+            return ParticleInheritVelocityModule;
+        }(framework.ParticleModule));
+        framework.ParticleInheritVelocityModule = ParticleInheritVelocityModule;
+        var _InheritVelocity_rate = "_InheritVelocity_rate";
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleLimitVelocityOverLifetimeModule = (function (_super) {
+            __extends(ParticleLimitVelocityOverLifetimeModule, _super);
+            function ParticleLimitVelocityOverLifetimeModule() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.separateAxes = false;
+                _this.limit = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 });
+                _this.limit3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 } });
+                _this.space = framework.ParticleSystemSimulationSpace.Local;
+                _this.dampen = 1;
+                return _this;
+            }
+            Object.defineProperty(ParticleLimitVelocityOverLifetimeModule.prototype, "limitMultiplier", {
+                get: function () {
+                    return this.limit.curveMultiplier;
+                },
+                set: function (v) {
+                    this.limit.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleLimitVelocityOverLifetimeModule.prototype, "limitX", {
+                get: function () {
+                    return this.limit3D.xCurve;
+                },
+                set: function (v) {
+                    this.limit3D.xCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleLimitVelocityOverLifetimeModule.prototype, "limitXMultiplier", {
+                get: function () {
+                    return this.limit3D.xCurve.curveMultiplier;
+                },
+                set: function (v) {
+                    this.limit3D.xCurve.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleLimitVelocityOverLifetimeModule.prototype, "limitY", {
+                get: function () {
+                    return this.limit3D.yCurve;
+                },
+                set: function (v) {
+                    this.limit3D.yCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleLimitVelocityOverLifetimeModule.prototype, "limitYMultiplier", {
+                get: function () {
+                    return this.limit3D.yCurve.curveMultiplier;
+                },
+                set: function (v) {
+                    this.limit3D.yCurve.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleLimitVelocityOverLifetimeModule.prototype, "limitZ", {
+                get: function () {
+                    return this.limit3D.zCurve;
+                },
+                set: function (v) {
+                    this.limit3D.zCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleLimitVelocityOverLifetimeModule.prototype, "limitZMultiplier", {
+                get: function () {
+                    return this.limit3D.zCurve.curveMultiplier;
+                },
+                set: function (v) {
+                    this.limit3D.zCurve.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleLimitVelocityOverLifetimeModule.prototype.initParticleState = function (particle) {
+                particle[_LimitVelocityOverLifetime_rate] = Math.random();
+            };
+            ParticleLimitVelocityOverLifetimeModule.prototype.updateParticleState = function (particle) {
+                if (!this.enabled)
+                    return;
+                var limit3D = this.limit3D.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
+                var limit = this.limit.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
+                var pVelocity = new gd3d.math.vector3();
+                gd3d.math.vec3Clone(particle.velocity, pVelocity);
+                if (this.space == framework.ParticleSystemSimulationSpace.World) {
+                    var localToWorldMatrix = this.particleSystem.localToWorldMatrix;
+                    var worldToLocalMatrix = this.particleSystem.worldToLocalMatrix;
+                    gd3d.math.matrixTransformNormal(pVelocity, localToWorldMatrix, pVelocity);
+                    if (this.separateAxes) {
+                        pVelocity.x = gd3d.math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
+                        pVelocity.y = gd3d.math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
+                        pVelocity.z = gd3d.math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
+                    }
+                    else {
+                        if (gd3d.math.vec3SqrLength(pVelocity) > limit * limit) {
+                            gd3d.math.vec3Normalize(pVelocity, pVelocity);
+                            gd3d.math.vec3ScaleByNum(pVelocity, limit, pVelocity);
+                        }
+                    }
+                    gd3d.math.matrixTransformNormal(pVelocity, worldToLocalMatrix, pVelocity);
+                }
+                else {
+                    if (this.separateAxes) {
+                        pVelocity.x = gd3d.math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
+                        pVelocity.y = gd3d.math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
+                        pVelocity.z = gd3d.math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
+                    }
+                    else {
+                        if (gd3d.math.vec3SqrLength(pVelocity) > limit * limit) {
+                            gd3d.math.vec3Normalize(pVelocity, pVelocity);
+                            gd3d.math.vec3ScaleByNum(pVelocity, limit, pVelocity);
+                        }
+                    }
+                }
+                gd3d.math.vec3SLerp(particle.velocity, pVelocity, this.dampen, particle.velocity);
+            };
+            return ParticleLimitVelocityOverLifetimeModule;
+        }(framework.ParticleModule));
+        framework.ParticleLimitVelocityOverLifetimeModule = ParticleLimitVelocityOverLifetimeModule;
+        var _LimitVelocityOverLifetime_rate = "_LimitVelocityOverLifetime_rate";
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleMainModule = (function (_super) {
+            __extends(ParticleMainModule, _super);
+            function ParticleMainModule() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.enabled = true;
+                _this.duration = 5;
+                _this.loop = true;
+                _this.prewarm = false;
+                _this.startDelay = new framework.MinMaxCurve();
+                _this.startLifetime = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, constant: 5, constantMin: 5, constantMax: 5 });
+                _this.startSpeed = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 5, constantMin: 5, constantMax: 5 });
+                _this.useStartSize3D = false;
+                _this.startSize3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1 } });
+                _this.useStartRotation3D = false;
+                _this.startRotation3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { curveMultiplier: 180 }, yCurve: { curveMultiplier: 180 }, zCurve: { curveMultiplier: 180 } });
+                _this.randomizeRotationDirection = 0;
+                _this.startColor = new framework.MinMaxGradient();
+                _this.gravityModifier = new framework.MinMaxCurve();
+                _this._simulationSpace = framework.ParticleSystemSimulationSpace.Local;
+                _this.simulationSpeed = 1;
+                _this.scalingMode = framework.ParticleSystemScalingMode.Local;
+                _this.playOnAwake = true;
+                _this.maxParticles = 1000;
+                return _this;
+            }
+            Object.defineProperty(ParticleMainModule.prototype, "startDelayMultiplier", {
+                get: function () {
+                    return this.startDelay.curveMultiplier;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startLifetimeMultiplier", {
+                get: function () {
+                    return this.startLifetime.curveMultiplier;
+                },
+                set: function (v) {
+                    this.startLifetime.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startSpeedMultiplier", {
+                get: function () {
+                    return this.startSpeed.curveMultiplier;
+                },
+                set: function (v) {
+                    this.startSpeed.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startSize", {
+                get: function () {
+                    return this.startSize3D.xCurve;
+                },
+                set: function (v) {
+                    this.startSize3D.xCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startSizeMultiplier", {
+                get: function () {
+                    return this.startSize.curveMultiplier;
+                },
+                set: function (v) {
+                    this.startSize.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startSizeX", {
+                get: function () {
+                    return this.startSize3D.xCurve;
+                },
+                set: function (v) {
+                    this.startSize3D.xCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startSizeXMultiplier", {
+                get: function () {
+                    return this.startSizeX.curveMultiplier;
+                },
+                set: function (v) {
+                    this.startSizeX.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startSizeY", {
+                get: function () {
+                    return this.startSize3D.yCurve;
+                },
+                set: function (v) {
+                    this.startSize3D.yCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startSizeYMultiplier", {
+                get: function () {
+                    return this.startSizeY.curveMultiplier;
+                },
+                set: function (v) {
+                    this.startSizeY.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startSizeZ", {
+                get: function () {
+                    return this.startSize3D.zCurve;
+                },
+                set: function (v) {
+                    this.startSize3D.zCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startSizeZMultiplier", {
+                get: function () {
+                    return this.startSizeZ.curveMultiplier;
+                },
+                set: function (v) {
+                    this.startSizeZ.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startRotation", {
+                get: function () {
+                    return this.startRotation3D.zCurve;
+                },
+                set: function (v) {
+                    this.startRotation3D.zCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startRotationMultiplier", {
+                get: function () {
+                    return this.startRotation.curveMultiplier;
+                },
+                set: function (v) {
+                    this.startRotation.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startRotationX", {
+                get: function () {
+                    return this.startRotation3D.xCurve;
+                },
+                set: function (v) {
+                    this.startRotation3D.xCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startRotationXMultiplier", {
+                get: function () {
+                    return this.startRotationX.curveMultiplier;
+                },
+                set: function (v) {
+                    this.startRotationX.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startRotationY", {
+                get: function () {
+                    return this.startRotation3D.yCurve;
+                },
+                set: function (v) {
+                    this.startRotation3D.yCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startRotationYMultiplier", {
+                get: function () {
+                    return this.startRotationY.curveMultiplier;
+                },
+                set: function (v) {
+                    this.startRotationY.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startRotationZ", {
+                get: function () {
+                    return this.startRotation3D.zCurve;
+                },
+                set: function (v) {
+                    this.startRotation3D.zCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "startRotationZMultiplier", {
+                get: function () {
+                    return this.startRotationZ.curveMultiplier;
+                },
+                set: function (v) {
+                    this.startRotationZ.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleMainModule.prototype, "simulationSpace", {
+                get: function () {
+                    return this._simulationSpace;
+                },
+                set: function (v) {
+                    if (this._simulationSpace != v) {
+                        this._simulationSpace = v;
+                        this.particleSystem._simulationSpaceChanged();
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleMainModule.prototype.initParticleState = function (particle) {
+                var birthRateAtDuration = particle.birthRateAtDuration;
+                particle.position.x = 0;
+                particle.position.y = 0;
+                particle.position.z = 0;
+                particle.velocity.x = 0;
+                particle.velocity.y = 0;
+                particle.velocity.z = this.startSpeed.getValue(birthRateAtDuration);
+                particle.acceleration.x = 0;
+                particle.acceleration.y = 0;
+                particle.acceleration.z = 0;
+                if (this.useStartSize3D) {
+                    gd3d.math.vec3Clone(this.startSize3D.getValue(birthRateAtDuration), particle.startSize);
+                }
+                else {
+                    var startSize = this.startSize.getValue(birthRateAtDuration);
+                    particle.startSize.x = startSize;
+                    particle.startSize.y = startSize;
+                    particle.startSize.z = startSize;
+                }
+                if (this.useStartRotation3D) {
+                    gd3d.math.vec3Clone(this.startRotation3D.getValue(birthRateAtDuration), particle.rotation);
+                }
+                else {
+                    var startRotation = this.startRotation.getValue(birthRateAtDuration);
+                    particle.rotation.x = 0;
+                    particle.rotation.y = 0;
+                    particle.rotation.z = startRotation;
+                }
+                particle.angularVelocity.x = 0;
+                particle.angularVelocity.y = 0;
+                particle.angularVelocity.z = 0;
+                gd3d.math.colorClone(this.startColor.getValue(birthRateAtDuration), particle.startColor);
+            };
+            ParticleMainModule.prototype.updateParticleState = function (particle) {
+                var gravity = new gd3d.math.vector3(world_gravity.x, world_gravity.y, world_gravity.z);
+                gd3d.math.vec3ScaleByNum(gravity, this.gravityModifier.getValue(this.particleSystem.rateAtDuration), gravity);
+                this.particleSystem.addParticleAcceleration(particle, gravity, framework.ParticleSystemSimulationSpace.World, _Main_preGravity);
+                gd3d.math.vec3Clone(particle.startSize, particle.size);
+                gd3d.math.colorClone(particle.startColor, particle.color);
+            };
+            return ParticleMainModule;
+        }(framework.ParticleModule));
+        framework.ParticleMainModule = ParticleMainModule;
+        var world_gravity = new gd3d.math.vector3(0, -9.8, 0);
+        var _Main_preGravity = "_Main_preGravity";
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleRotationBySpeedModule = (function (_super) {
+            __extends(ParticleRotationBySpeedModule, _super);
+            function ParticleRotationBySpeedModule() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.separateAxes = false;
+                _this.angularVelocity = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 }, yCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 }, zCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 } });
+                _this.range = new gd3d.math.vector2(0, 1);
+                return _this;
+            }
+            Object.defineProperty(ParticleRotationBySpeedModule.prototype, "x", {
+                get: function () {
+                    return this.angularVelocity.xCurve;
+                },
+                set: function (v) {
+                    this.angularVelocity.xCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleRotationBySpeedModule.prototype, "xMultiplier", {
+                get: function () {
+                    return this.x.curveMultiplier;
+                },
+                set: function (v) {
+                    this.x.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleRotationBySpeedModule.prototype, "y", {
+                get: function () {
+                    return this.angularVelocity.yCurve;
+                },
+                set: function (v) {
+                    this.angularVelocity.yCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleRotationBySpeedModule.prototype, "yMultiplier", {
+                get: function () {
+                    return this.y.curveMultiplier;
+                },
+                set: function (v) {
+                    this.y.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleRotationBySpeedModule.prototype, "z", {
+                get: function () {
+                    return this.angularVelocity.zCurve;
+                },
+                set: function (v) {
+                    this.angularVelocity.zCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleRotationBySpeedModule.prototype, "zMultiplier", {
+                get: function () {
+                    return this.z.curveMultiplier;
+                },
+                set: function (v) {
+                    this.z.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleRotationBySpeedModule.prototype.initParticleState = function (particle) {
+                particle[_RotationBySpeed_rate] = Math.random();
+                particle[_RotationBySpeed_preAngularVelocity] = new gd3d.math.vector3();
+            };
+            ParticleRotationBySpeedModule.prototype.updateParticleState = function (particle) {
+                var preAngularVelocity = particle[_RotationBySpeed_preAngularVelocity];
+                particle.angularVelocity.x -= preAngularVelocity.x;
+                particle.angularVelocity.y -= preAngularVelocity.y;
+                particle.angularVelocity.z -= preAngularVelocity.z;
+                preAngularVelocity.x = 0;
+                preAngularVelocity.y = 0;
+                preAngularVelocity.z = 0;
+                if (!this.enabled)
+                    return;
+                var velocity = gd3d.math.vec3Length(particle.velocity);
+                var rate = gd3d.math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
+                var v = this.angularVelocity.getValue(rate, particle[_RotationBySpeed_rate]);
+                if (!this.separateAxes) {
+                    v.x = v.y = 0;
+                }
+                particle.angularVelocity.x += v.x;
+                particle.angularVelocity.y += v.y;
+                particle.angularVelocity.z += v.z;
+                preAngularVelocity.x = v.x;
+                preAngularVelocity.y = v.x;
+                preAngularVelocity.z = v.x;
+            };
+            return ParticleRotationBySpeedModule;
+        }(framework.ParticleModule));
+        framework.ParticleRotationBySpeedModule = ParticleRotationBySpeedModule;
+        var _RotationBySpeed_rate = "_RotationBySpeed_rate";
+        var _RotationBySpeed_preAngularVelocity = "_RotationBySpeed_preAngularVelocity";
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleRotationOverLifetimeModule = (function (_super) {
+            __extends(ParticleRotationOverLifetimeModule, _super);
+            function ParticleRotationOverLifetimeModule() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.separateAxes = false;
+                _this.angularVelocity = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 }, yCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 }, zCurve: { constant: 45, constantMin: 45, constantMax: 45, curveMultiplier: 45 } });
+                return _this;
+            }
+            Object.defineProperty(ParticleRotationOverLifetimeModule.prototype, "x", {
+                get: function () {
+                    return this.angularVelocity.xCurve;
+                },
+                set: function (v) {
+                    this.angularVelocity.xCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleRotationOverLifetimeModule.prototype, "xMultiplier", {
+                get: function () {
+                    return this.x.curveMultiplier;
+                },
+                set: function (v) {
+                    this.x.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleRotationOverLifetimeModule.prototype, "y", {
+                get: function () {
+                    return this.angularVelocity.yCurve;
+                },
+                set: function (v) {
+                    this.angularVelocity.yCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleRotationOverLifetimeModule.prototype, "yMultiplier", {
+                get: function () {
+                    return this.y.curveMultiplier;
+                },
+                set: function (v) {
+                    this.y.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleRotationOverLifetimeModule.prototype, "z", {
+                get: function () {
+                    return this.angularVelocity.zCurve;
+                },
+                set: function (v) {
+                    this.angularVelocity.zCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleRotationOverLifetimeModule.prototype, "zMultiplier", {
+                get: function () {
+                    return this.z.curveMultiplier;
+                },
+                set: function (v) {
+                    this.z.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleRotationOverLifetimeModule.prototype.initParticleState = function (particle) {
+                particle[_RotationOverLifetime_rate] = Math.random();
+                particle[_RotationOverLifetime_preAngularVelocity] = new gd3d.math.vector3();
+            };
+            ParticleRotationOverLifetimeModule.prototype.updateParticleState = function (particle) {
+                var preAngularVelocity = particle[_RotationOverLifetime_preAngularVelocity];
+                particle.angularVelocity.x -= preAngularVelocity.x;
+                particle.angularVelocity.y -= preAngularVelocity.y;
+                particle.angularVelocity.z -= preAngularVelocity.z;
+                preAngularVelocity.x = 0;
+                preAngularVelocity.y = 0;
+                preAngularVelocity.z = 0;
+                if (!this.enabled)
+                    return;
+                var v = this.angularVelocity.getValue(particle.rateAtLifeTime, particle[_RotationOverLifetime_rate]);
+                if (!this.separateAxes) {
+                    v.x = v.y = 0;
+                }
+                particle.angularVelocity.x += v.x;
+                particle.angularVelocity.y += v.y;
+                particle.angularVelocity.z += v.z;
+                preAngularVelocity.x = v.x;
+                preAngularVelocity.y = v.y;
+                preAngularVelocity.z = v.z;
+            };
+            return ParticleRotationOverLifetimeModule;
+        }(framework.ParticleModule));
+        framework.ParticleRotationOverLifetimeModule = ParticleRotationOverLifetimeModule;
+        var _RotationOverLifetime_rate = "_RotationOverLifetime_rate";
+        var _RotationOverLifetime_preAngularVelocity = "_RotationOverLifetime_preAngularVelocity";
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleShapeModule = (function (_super) {
+            __extends(ParticleShapeModule, _super);
+            function ParticleShapeModule() {
+                var _this = _super.call(this) || this;
+                _this.alignToDirection = false;
+                _this.randomDirectionAmount = 0;
+                _this.sphericalDirectionAmount = 0;
+                _this.angle = 25;
+                _this.arc = 360;
+                _this.arcMode = framework.ParticleSystemShapeMultiModeValue.Random;
+                _this.arcSpeed = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 1, constantMin: 1, constantMax: 1 });
+                _this.arcSpread = 0;
+                _this.box = new gd3d.math.vector3(1, 1, 1);
+                _this.length = 5;
+                _this.meshScale = 1;
+                _this.meshShapeType = framework.ParticleSystemMeshShapeType.Vertex;
+                _this.useMeshColors = true;
+                _this.normalOffset = 0;
+                _this.radius = 1;
+                _this.radiusMode = framework.ParticleSystemShapeMultiModeValue.Random;
+                _this.radiusSpeed = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 1, constantMin: 1, constantMax: 1 });
+                _this.radiusSpread = 0;
+                _this._shapeSphere = new framework.ParticleSystemShapeSphere(_this);
+                _this._shapeHemisphere = new framework.ParticleSystemShapeHemisphere(_this);
+                _this._shapeCone = new framework.ParticleSystemShapeCone(_this);
+                _this._shapeBox = new framework.ParticleSystemShapeBox(_this);
+                _this._shapeCircle = new framework.ParticleSystemShapeCircle(_this);
+                _this._shapeEdge = new framework.ParticleSystemShapeEdge(_this);
+                _this.shapeType = framework.ParticleSystemShapeType.Cone;
+                return _this;
+            }
+            Object.defineProperty(ParticleShapeModule.prototype, "shapeType", {
+                get: function () {
+                    return this._shapeType;
+                },
+                set: function (v) {
+                    if (this._shapeType == v)
+                        return;
+                    this._shapeType = v;
+                    this._onShapeTypeChanged();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleShapeModule.prototype, "shape", {
+                get: function () {
+                    return this._shape;
+                },
+                set: function (v) {
+                    if (this._shape == v)
+                        return;
+                    this._shape = v;
+                    this._onShapeChanged();
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleShapeModule.prototype, "arcSpeedMultiplier", {
+                get: function () {
+                    return this.arcSpeed.curveMultiplier;
+                },
+                set: function (v) {
+                    this.arcSpeed.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleShapeModule.prototype, "radiusSpeedMultiplier", {
+                get: function () {
+                    return this.radiusSpeed.curveMultiplier;
+                },
+                set: function (v) {
+                    this.radiusSpeed.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleShapeModule.prototype.initParticleState = function (particle) {
+                if (!this.enabled)
+                    return;
+                this.activeShape.initParticleState(particle);
+                if (this.alignToDirection) {
+                    var mat = new gd3d.math.matrix();
+                    var dir = particle.velocity;
+                    gd3d.math.matrixLookatLH(dir, new gd3d.math.vector3(0, 1, 0), mat);
+                    var mat0 = new gd3d.math.matrix();
+                    var rotation = new gd3d.math.vector3(particle.rotation.x, particle.rotation.y, particle.rotation.z);
+                    gd3d.math.vec3ScaleByNum(rotation, Math.PI / 180, rotation);
+                    gd3d.math.matrixMakeEuler(rotation, gd3d.math.defaultRotationOrder, mat0);
+                    gd3d.math.matrixMultiply(mat0, mat, mat0);
+                    gd3d.math.matrixGetEuler(mat0, gd3d.math.defaultRotationOrder, rotation);
+                    gd3d.math.vec3ScaleByNum(rotation, 180 / Math.PI, rotation);
+                    particle.rotation.x = rotation.x;
+                    particle.rotation.y = rotation.y;
+                    particle.rotation.z = rotation.z;
+                }
+                var length = gd3d.math.vec3Length(particle.velocity);
+                var velocity = new gd3d.math.vector3();
+                if (this.randomDirectionAmount > 0) {
+                    velocity.x = Math.random() * 2 - 1;
+                    velocity.y = Math.random() * 2 - 1;
+                    velocity.z = Math.random() * 2 - 1;
+                    var len = gd3d.math.vec3Length(velocity);
+                    velocity.x = velocity.x / len * length;
+                    velocity.y = velocity.y / len * length;
+                    velocity.z = velocity.z / len * length;
+                    gd3d.math.vec3SLerp(particle.velocity, velocity, this.randomDirectionAmount, particle.velocity);
+                    var len = gd3d.math.vec3Length(particle.velocity);
+                    particle.velocity.x = particle.velocity.x / len * length;
+                    particle.velocity.y = particle.velocity.y / len * length;
+                    particle.velocity.z = particle.velocity.z / len * length;
+                }
+                if (this.sphericalDirectionAmount > 0) {
+                    velocity.x = particle.position.x;
+                    velocity.y = particle.position.y;
+                    velocity.z = particle.position.z;
+                    var len = gd3d.math.vec3Length(velocity);
+                    velocity.x = velocity.x / len * length;
+                    velocity.y = velocity.y / len * length;
+                    velocity.z = velocity.z / len * length;
+                    gd3d.math.vec3SLerp(particle.velocity, velocity, this.sphericalDirectionAmount, particle.velocity);
+                    var len = gd3d.math.vec3Length(particle.velocity);
+                    particle.velocity.x = particle.velocity.x / len * length;
+                    particle.velocity.y = particle.velocity.y / len * length;
+                    particle.velocity.z = particle.velocity.z / len * length;
+                }
+            };
+            ParticleShapeModule.prototype._onShapeTypeChanged = function () {
+                var preValue = this.activeShape;
+                switch (this.shapeType) {
+                    case framework.ParticleSystemShapeType.Sphere:
+                        this._shape = framework.ParticleSystemShapeType1.Sphere;
+                        this._shapeSphere.emitFromShell = false;
+                        this.activeShape = this._shapeSphere;
+                        break;
+                    case framework.ParticleSystemShapeType.SphereShell:
+                        this._shape = framework.ParticleSystemShapeType1.Sphere;
+                        this._shapeSphere.emitFromShell = true;
+                        this.activeShape = this._shapeSphere;
+                        break;
+                    case framework.ParticleSystemShapeType.Hemisphere:
+                        this._shape = framework.ParticleSystemShapeType1.Hemisphere;
+                        this._shapeHemisphere.emitFromShell = false;
+                        this.activeShape = this._shapeHemisphere;
+                        break;
+                    case framework.ParticleSystemShapeType.HemisphereShell:
+                        this._shape = framework.ParticleSystemShapeType1.Hemisphere;
+                        this._shapeHemisphere.emitFromShell = true;
+                        this.activeShape = this._shapeHemisphere;
+                        break;
+                    case framework.ParticleSystemShapeType.Cone:
+                        this._shape = framework.ParticleSystemShapeType1.Cone;
+                        this._shapeCone.emitFrom = framework.ParticleSystemShapeConeEmitFrom.Base;
+                        this.activeShape = this._shapeCone;
+                        break;
+                    case framework.ParticleSystemShapeType.ConeShell:
+                        this._shape = framework.ParticleSystemShapeType1.Cone;
+                        this._shapeCone.emitFrom = framework.ParticleSystemShapeConeEmitFrom.BaseShell;
+                        this.activeShape = this._shapeCone;
+                        break;
+                    case framework.ParticleSystemShapeType.ConeVolume:
+                        this._shape = framework.ParticleSystemShapeType1.Cone;
+                        this._shapeCone.emitFrom = framework.ParticleSystemShapeConeEmitFrom.Volume;
+                        this.activeShape = this._shapeCone;
+                        break;
+                    case framework.ParticleSystemShapeType.ConeVolumeShell:
+                        this._shape = framework.ParticleSystemShapeType1.Cone;
+                        this._shapeCone.emitFrom = framework.ParticleSystemShapeConeEmitFrom.VolumeShell;
+                        this.activeShape = this._shapeCone;
+                        break;
+                    case framework.ParticleSystemShapeType.Box:
+                        this._shape = framework.ParticleSystemShapeType1.Box;
+                        this._shapeBox.emitFrom = framework.ParticleSystemShapeBoxEmitFrom.Volume;
+                        this.activeShape = this._shapeBox;
+                        break;
+                    case framework.ParticleSystemShapeType.BoxShell:
+                        this._shape = framework.ParticleSystemShapeType1.Box;
+                        this._shapeBox.emitFrom = framework.ParticleSystemShapeBoxEmitFrom.Shell;
+                        this.activeShape = this._shapeBox;
+                        break;
+                    case framework.ParticleSystemShapeType.BoxEdge:
+                        this._shape = framework.ParticleSystemShapeType1.Box;
+                        this._shapeBox.emitFrom = framework.ParticleSystemShapeBoxEmitFrom.Edge;
+                        this.activeShape = this._shapeBox;
+                        break;
+                    case framework.ParticleSystemShapeType.Mesh:
+                        this._shape = framework.ParticleSystemShapeType1.Mesh;
+                        console.warn("\u672A\u5B9E\u73B0 ParticleSystemShapeType.Mesh");
+                        this.activeShape = null;
+                        break;
+                    case framework.ParticleSystemShapeType.MeshRenderer:
+                        this._shape = framework.ParticleSystemShapeType1.MeshRenderer;
+                        console.warn("\u672A\u5B9E\u73B0 ParticleSystemShapeType.Mesh");
+                        this.activeShape = null;
+                        break;
+                    case framework.ParticleSystemShapeType.SkinnedMeshRenderer:
+                        this._shape = framework.ParticleSystemShapeType1.SkinnedMeshRenderer;
+                        console.warn("\u672A\u5B9E\u73B0 ParticleSystemShapeType.Mesh");
+                        this.activeShape = null;
+                        break;
+                    case framework.ParticleSystemShapeType.Circle:
+                        this._shape = framework.ParticleSystemShapeType1.Circle;
+                        this._shapeCircle.emitFromEdge = false;
+                        this.activeShape = this._shapeCircle;
+                        break;
+                    case framework.ParticleSystemShapeType.CircleEdge:
+                        this._shape = framework.ParticleSystemShapeType1.Circle;
+                        this._shapeCircle.emitFromEdge = true;
+                        this.activeShape = this._shapeCircle;
+                        break;
+                    case framework.ParticleSystemShapeType.SingleSidedEdge:
+                        this._shape = framework.ParticleSystemShapeType1.Edge;
+                        this.activeShape = this._shapeEdge;
+                        break;
+                    default:
+                        console.warn("\u9519\u8BEF ParticleShapeModule.shapeType \u503C " + this.shapeType);
+                        break;
+                }
+                framework.serialization.setValue(this.activeShape, preValue);
+            };
+            ParticleShapeModule.prototype._onShapeChanged = function () {
+                switch (this.shape) {
+                    case framework.ParticleSystemShapeType1.Sphere:
+                        this.shapeType = this._shapeSphere.emitFromShell ? framework.ParticleSystemShapeType.SphereShell : framework.ParticleSystemShapeType.Sphere;
+                        break;
+                    case framework.ParticleSystemShapeType1.Hemisphere:
+                        this.shapeType = this._shapeHemisphere.emitFromShell ? framework.ParticleSystemShapeType.HemisphereShell : framework.ParticleSystemShapeType.Hemisphere;
+                        break;
+                    case framework.ParticleSystemShapeType1.Cone:
+                        switch (this._shapeCone.emitFrom) {
+                            case framework.ParticleSystemShapeConeEmitFrom.Base:
+                                this.shapeType = framework.ParticleSystemShapeType.Cone;
+                                break;
+                            case framework.ParticleSystemShapeConeEmitFrom.BaseShell:
+                                this.shapeType = framework.ParticleSystemShapeType.ConeShell;
+                                break;
+                            case framework.ParticleSystemShapeConeEmitFrom.Volume:
+                                this.shapeType = framework.ParticleSystemShapeType.ConeVolume;
+                                break;
+                            case framework.ParticleSystemShapeConeEmitFrom.VolumeShell:
+                                this.shapeType = framework.ParticleSystemShapeType.ConeVolumeShell;
+                                break;
+                            default:
+                                console.warn("\u9519\u8BEFParticleSystemShapeCone.emitFrom\u503C " + this._shapeCone.emitFrom);
+                                break;
+                        }
+                        break;
+                    case framework.ParticleSystemShapeType1.Box:
+                        switch (this._shapeBox.emitFrom) {
+                            case framework.ParticleSystemShapeBoxEmitFrom.Volume:
+                                this.shapeType = framework.ParticleSystemShapeType.Box;
+                                break;
+                            case framework.ParticleSystemShapeBoxEmitFrom.Shell:
+                                this.shapeType = framework.ParticleSystemShapeType.BoxShell;
+                                break;
+                            case framework.ParticleSystemShapeBoxEmitFrom.Edge:
+                                this.shapeType = framework.ParticleSystemShapeType.BoxEdge;
+                                break;
+                            default:
+                                console.warn("\u9519\u8BEFParticleSystemShapeCone.emitFrom\u503C " + this._shapeCone.emitFrom);
+                                break;
+                        }
+                        break;
+                    case framework.ParticleSystemShapeType1.Mesh:
+                        this.shapeType = framework.ParticleSystemShapeType.Mesh;
+                        break;
+                    case framework.ParticleSystemShapeType1.MeshRenderer:
+                        this.shapeType = framework.ParticleSystemShapeType.MeshRenderer;
+                        break;
+                    case framework.ParticleSystemShapeType1.SkinnedMeshRenderer:
+                        this.shapeType = framework.ParticleSystemShapeType.SkinnedMeshRenderer;
+                        break;
+                    case framework.ParticleSystemShapeType1.Circle:
+                        this.shapeType = this._shapeCircle.emitFromEdge ? framework.ParticleSystemShapeType.CircleEdge : framework.ParticleSystemShapeType.Circle;
+                        break;
+                    case framework.ParticleSystemShapeType1.Edge:
+                        this.shapeType = framework.ParticleSystemShapeType.SingleSidedEdge;
+                        break;
+                    default:
+                        console.warn("\u9519\u8BEF ParticleShapeModule.shape \u503C " + this.shape);
+                        break;
+                }
+            };
+            return ParticleShapeModule;
+        }(framework.ParticleModule));
+        framework.ParticleShapeModule = ParticleShapeModule;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSizeBySpeedModule = (function (_super) {
+            __extends(ParticleSizeBySpeedModule, _super);
+            function ParticleSizeBySpeedModule() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.separateAxes = false;
+                _this.size3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 } });
+                _this.range = new gd3d.math.vector2(0, 1);
+                return _this;
+            }
+            Object.defineProperty(ParticleSizeBySpeedModule.prototype, "size", {
+                get: function () {
+                    return this.size3D.xCurve;
+                },
+                set: function (v) {
+                    this.size3D.xCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSizeBySpeedModule.prototype, "sizeMultiplier", {
+                get: function () {
+                    return this.size.curveMultiplier;
+                },
+                set: function (v) {
+                    this.size.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSizeBySpeedModule.prototype, "x", {
+                get: function () {
+                    return this.size3D.xCurve;
+                },
+                set: function (v) {
+                    this.size3D.xCurve;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSizeBySpeedModule.prototype, "xMultiplier", {
+                get: function () {
+                    return this.x.curveMultiplier;
+                },
+                set: function (v) {
+                    this.x.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSizeBySpeedModule.prototype, "y", {
+                get: function () {
+                    return this.size3D.yCurve;
+                },
+                set: function (v) {
+                    this.size3D.yCurve;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSizeBySpeedModule.prototype, "yMultiplier", {
+                get: function () {
+                    return this.y.curveMultiplier;
+                },
+                set: function (v) {
+                    this.y.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSizeBySpeedModule.prototype, "z", {
+                get: function () {
+                    return this.size3D.zCurve;
+                },
+                set: function (v) {
+                    this.size3D.zCurve;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSizeBySpeedModule.prototype, "zMultiplier", {
+                get: function () {
+                    return this.z.curveMultiplier;
+                },
+                set: function (v) {
+                    this.z.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleSizeBySpeedModule.prototype.initParticleState = function (particle) {
+                particle[_SizeBySpeed_rate] = Math.random();
+            };
+            ParticleSizeBySpeedModule.prototype.updateParticleState = function (particle) {
+                if (!this.enabled)
+                    return;
+                var velocity = gd3d.math.vec3Length(particle.velocity);
+                var rate = gd3d.math.floatClamp((velocity - this.range.x) / (this.range.y - this.range.x), 0, 1);
+                var size = this.size3D.getValue(rate, particle[_SizeBySpeed_rate]);
+                if (!this.separateAxes) {
+                    size.y = size.z = size.x;
+                }
+                particle.size.x *= size.x;
+                particle.size.y *= size.y;
+                particle.size.z *= size.z;
+            };
+            return ParticleSizeBySpeedModule;
+        }(framework.ParticleModule));
+        framework.ParticleSizeBySpeedModule = ParticleSizeBySpeedModule;
+        var _SizeBySpeed_rate = "_SizeBySpeed_rate";
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSizeOverLifetimeModule = (function (_super) {
+            __extends(ParticleSizeOverLifetimeModule, _super);
+            function ParticleSizeOverLifetimeModule() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.separateAxes = false;
+                _this.size3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 } });
+                return _this;
+            }
+            Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "size", {
+                get: function () {
+                    return this.size3D.xCurve;
+                },
+                set: function (v) {
+                    this.size3D.xCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "sizeMultiplier", {
+                get: function () {
+                    return this.size.curveMultiplier;
+                },
+                set: function (v) {
+                    this.size.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "x", {
+                get: function () {
+                    return this.size3D.xCurve;
+                },
+                set: function (v) {
+                    this.size3D.xCurve;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "xMultiplier", {
+                get: function () {
+                    return this.x.curveMultiplier;
+                },
+                set: function (v) {
+                    this.x.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "y", {
+                get: function () {
+                    return this.size3D.yCurve;
+                },
+                set: function (v) {
+                    this.size3D.yCurve;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "yMultiplier", {
+                get: function () {
+                    return this.y.curveMultiplier;
+                },
+                set: function (v) {
+                    this.y.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "z", {
+                get: function () {
+                    return this.size3D.zCurve;
+                },
+                set: function (v) {
+                    this.size3D.zCurve;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "zMultiplier", {
+                get: function () {
+                    return this.z.curveMultiplier;
+                },
+                set: function (v) {
+                    this.z.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleSizeOverLifetimeModule.prototype.initParticleState = function (particle) {
+                particle[_SizeOverLifetime_rate] = Math.random();
+            };
+            ParticleSizeOverLifetimeModule.prototype.updateParticleState = function (particle) {
+                if (!this.enabled)
+                    return;
+                var size = this.size3D.getValue(particle.rateAtLifeTime, particle[_SizeOverLifetime_rate]);
+                if (!this.separateAxes) {
+                    size.y = size.z = size.x;
+                }
+                particle.size.x *= size.x;
+                particle.size.y *= size.y;
+                particle.size.z *= size.z;
+            };
+            return ParticleSizeOverLifetimeModule;
+        }(framework.ParticleModule));
+        framework.ParticleSizeOverLifetimeModule = ParticleSizeOverLifetimeModule;
+        var _SizeOverLifetime_rate = "_SizeOverLifetime_rate";
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleTextureSheetAnimationModule = (function (_super) {
+            __extends(ParticleTextureSheetAnimationModule, _super);
+            function ParticleTextureSheetAnimationModule() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.tiles = new gd3d.math.vector2(1, 1);
+                _this.animation = framework.ParticleSystemAnimationType.WholeSheet;
+                _this.frameOverTime = framework.serialization.setValue(new framework.MinMaxCurve(), { mode: framework.MinMaxCurveMode.Curve, curveMin: { keys: [{ time: 0, value: 0, inTangent: 1, outTangent: 1 }, { time: 1, value: 1, inTangent: 1, outTangent: 1 }] } });
+                _this.useRandomRow = true;
+                _this._rowIndex = 0;
+                _this.startFrame = new framework.MinMaxCurve();
+                _this.cycleCount = 1;
+                _this.flipUV = new gd3d.math.vector2();
+                _this.uvChannelMask = framework.UVChannelFlags.Everything;
+                return _this;
+            }
+            Object.defineProperty(ParticleTextureSheetAnimationModule.prototype, "rowIndex", {
+                get: function () { return this._rowIndex; },
+                set: function (v) {
+                    this._rowIndex = gd3d.math.floatClamp(v, 0, this.tiles.y - 1);
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleTextureSheetAnimationModule.prototype, "flipU", {
+                get: function () {
+                    return this.flipUV.x;
+                },
+                set: function (v) {
+                    this.flipUV.x = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleTextureSheetAnimationModule.prototype, "flipV", {
+                get: function () {
+                    return this.flipUV.y;
+                },
+                set: function (v) {
+                    this.flipUV.y = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleTextureSheetAnimationModule.prototype, "frameOverTimeMultiplier", {
+                get: function () {
+                    return this.frameOverTime.curveMultiplier;
+                },
+                set: function (v) {
+                    this.frameOverTime.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleTextureSheetAnimationModule.prototype, "numTilesX", {
+                get: function () {
+                    return this.tiles.x;
+                },
+                set: function (v) {
+                    this.tiles.x = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleTextureSheetAnimationModule.prototype, "numTilesY", {
+                get: function () {
+                    return this.tiles.y;
+                },
+                set: function (v) {
+                    this.tiles.y = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleTextureSheetAnimationModule.prototype, "startFrameMultiplier", {
+                get: function () {
+                    return this.startFrame.curveMultiplier;
+                },
+                set: function (v) {
+                    this.startFrame.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleTextureSheetAnimationModule.prototype.initParticleState = function (particle) {
+                particle[_TextureSheetAnimation_frameOverTime] = Math.random();
+                particle[_TextureSheetAnimation_startFrame] = Math.random();
+                particle[_TextureSheetAnimation_randomRow] = Math.random();
+            };
+            ParticleTextureSheetAnimationModule.prototype.updateParticleState = function (particle) {
+                gd3d.math.vec4Set(particle.tilingOffset, 1, 1, 0, 0);
+                particle.flipUV.x = 0;
+                particle.flipUV.y = 0;
+                if (!this.enabled)
+                    return;
+                var segmentsX = this.tiles.x;
+                var segmentsY = this.tiles.y;
+                var step = new gd3d.math.vector2(1 / segmentsX, 1 / segmentsY);
+                var uvPos = new gd3d.math.vector2();
+                var frameOverTime = this.frameOverTime.getValue(particle.rateAtLifeTime, particle[_TextureSheetAnimation_frameOverTime]);
+                var frameIndex = this.startFrame.getValue(particle.rateAtLifeTime, particle[_TextureSheetAnimation_startFrame]);
+                var rowIndex = this.rowIndex;
+                var cycleCount = this.cycleCount;
+                if (this.animation == framework.ParticleSystemAnimationType.WholeSheet) {
+                    frameIndex = Math.round(frameIndex + frameOverTime * segmentsX * segmentsY * cycleCount);
+                    uvPos.x = (frameIndex % segmentsX) * step.x;
+                    uvPos.y = (Math.floor(frameIndex / segmentsX) % segmentsY) * step.y;
+                }
+                else if (this.animation == framework.ParticleSystemAnimationType.SingleRow) {
+                    frameIndex = Math.round(frameIndex + frameOverTime * segmentsX * cycleCount);
+                    if (this.useRandomRow) {
+                        rowIndex = Math.round(segmentsY * particle[_TextureSheetAnimation_randomRow]);
+                    }
+                    uvPos.x = (frameIndex % segmentsX) * step.x;
+                    uvPos.x = rowIndex * step.y;
+                }
+                gd3d.math.vec4Set(particle.tilingOffset, step.x, step.y, uvPos.x, uvPos.y);
+                particle.flipUV = this.flipUV;
+            };
+            return ParticleTextureSheetAnimationModule;
+        }(framework.ParticleModule));
+        framework.ParticleTextureSheetAnimationModule = ParticleTextureSheetAnimationModule;
+        var _TextureSheetAnimation_frameOverTime = "_TextureSheetAnimation_rateAtLifeTime";
+        var _TextureSheetAnimation_startFrame = "_TextureSheetAnimation_startFrame";
+        var _TextureSheetAnimation_randomRow = "_TextureSheetAnimation_randomRow";
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleVelocityOverLifetimeModule = (function (_super) {
+            __extends(ParticleVelocityOverLifetimeModule, _super);
+            function ParticleVelocityOverLifetimeModule() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.velocity = new framework.MinMaxCurveVector3();
+                _this.space = framework.ParticleSystemSimulationSpace.Local;
+                return _this;
+            }
+            Object.defineProperty(ParticleVelocityOverLifetimeModule.prototype, "x", {
+                get: function () {
+                    return this.velocity.xCurve;
+                },
+                set: function (v) {
+                    this.velocity.xCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleVelocityOverLifetimeModule.prototype, "xMultiplier", {
+                get: function () {
+                    return this.x.curveMultiplier;
+                },
+                set: function (v) {
+                    this.x.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleVelocityOverLifetimeModule.prototype, "y", {
+                get: function () {
+                    return this.velocity.yCurve;
+                },
+                set: function (v) {
+                    this.velocity.yCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleVelocityOverLifetimeModule.prototype, "yMultiplier", {
+                get: function () {
+                    return this.y.curveMultiplier;
+                },
+                set: function (v) {
+                    this.y.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleVelocityOverLifetimeModule.prototype, "z", {
+                get: function () {
+                    return this.velocity.zCurve;
+                },
+                set: function (v) {
+                    this.velocity.zCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleVelocityOverLifetimeModule.prototype, "zMultiplier", {
+                get: function () {
+                    return this.z.curveMultiplier;
+                },
+                set: function (v) {
+                    this.z.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleVelocityOverLifetimeModule.prototype.initParticleState = function (particle) {
+                particle[_VelocityOverLifetime_rate] = Math.random();
+            };
+            ParticleVelocityOverLifetimeModule.prototype.updateParticleState = function (particle) {
+                this.particleSystem.removeParticleVelocity(particle, _VelocityOverLifetime_preVelocity);
+                if (!this.enabled)
+                    return;
+                var velocity = this.velocity.getValue(particle.rateAtLifeTime, particle[_VelocityOverLifetime_rate]);
+                this.particleSystem.addParticleVelocity(particle, velocity, this.space, _VelocityOverLifetime_preVelocity);
+            };
+            return ParticleVelocityOverLifetimeModule;
+        }(framework.ParticleModule));
+        framework.ParticleVelocityOverLifetimeModule = ParticleVelocityOverLifetimeModule;
+        var _VelocityOverLifetime_rate = "_VelocityOverLifetime_rate";
+        var _VelocityOverLifetime_preVelocity = "_VelocityOverLifetime_preVelocity";
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleEmissionBurst = (function () {
+            function ParticleEmissionBurst() {
+                this.time = 0;
+                this.count = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 30, constantMin: 30, constantMax: 30 });
+                this.cycleCount = 1;
+                this.repeatInterval = 0.01;
+                this.probability = 1.0;
+                this._isProbability = true;
+            }
+            Object.defineProperty(ParticleEmissionBurst.prototype, "minCount", {
+                get: function () {
+                    return this.count.constantMin;
+                },
+                set: function (v) {
+                    this.count.constantMin = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleEmissionBurst.prototype, "maxCount", {
+                get: function () {
+                    return this.count.constantMax;
+                },
+                set: function (v) {
+                    this.count.constantMax = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleEmissionBurst.prototype, "isProbability", {
+                get: function () {
+                    return this._isProbability;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleEmissionBurst.prototype.calculateProbability = function () {
+                this._isProbability = this.probability >= Math.random();
+                return this._isProbability;
+            };
+            return ParticleEmissionBurst;
+        }());
+        framework.ParticleEmissionBurst = ParticleEmissionBurst;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemShapeBase = (function () {
+            function ParticleSystemShapeBase(module) {
+                this._module = module;
+            }
+            ParticleSystemShapeBase.prototype.initParticleState = function (particle) {
+            };
+            return ParticleSystemShapeBase;
+        }());
+        framework.ParticleSystemShapeBase = ParticleSystemShapeBase;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemShapeBoxEmitFrom;
+        (function (ParticleSystemShapeBoxEmitFrom) {
+            ParticleSystemShapeBoxEmitFrom[ParticleSystemShapeBoxEmitFrom["Volume"] = 0] = "Volume";
+            ParticleSystemShapeBoxEmitFrom[ParticleSystemShapeBoxEmitFrom["Shell"] = 1] = "Shell";
+            ParticleSystemShapeBoxEmitFrom[ParticleSystemShapeBoxEmitFrom["Edge"] = 2] = "Edge";
+        })(ParticleSystemShapeBoxEmitFrom = framework.ParticleSystemShapeBoxEmitFrom || (framework.ParticleSystemShapeBoxEmitFrom = {}));
+        var ParticleSystemShapeBox = (function (_super) {
+            __extends(ParticleSystemShapeBox, _super);
+            function ParticleSystemShapeBox() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.emitFrom = ParticleSystemShapeBoxEmitFrom.Volume;
+                return _this;
+            }
+            Object.defineProperty(ParticleSystemShapeBox.prototype, "boxX", {
+                get: function () {
+                    return this._module.box.x;
+                },
+                set: function (v) {
+                    this._module.box.x = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystemShapeBox.prototype, "boxY", {
+                get: function () {
+                    return this._module.box.y;
+                },
+                set: function (v) {
+                    this._module.box.y = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystemShapeBox.prototype, "boxZ", {
+                get: function () {
+                    return this._module.box.z;
+                },
+                set: function (v) {
+                    this._module.box.z = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleSystemShapeBox.prototype.initParticleState = function (particle) {
+                var speed = gd3d.math.vec3Length(particle.velocity);
+                var p = new gd3d.math.vector3(this.boxX * (Math.random() * 2 - 1), this.boxY * (Math.random() * 2 - 1), this.boxZ * (Math.random() * 2 - 1));
+                if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Shell) {
+                    var max = Math.max(Math.abs(p.x), Math.abs(p.y), Math.abs(p.z));
+                    if (Math.abs(p.x) == max) {
+                        p.x = p.x < 0 ? -1 : 1;
+                    }
+                    else if (Math.abs(p.y) == max) {
+                        p.y = p.y < 0 ? -1 : 1;
+                    }
+                    else if (Math.abs(p.z) == max) {
+                        p.z = p.z < 0 ? -1 : 1;
+                    }
+                }
+                else if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Edge) {
+                    var min = Math.min(Math.abs(p.x), Math.abs(p.y), Math.abs(p.z));
+                    if (Math.abs(p.x) == min) {
+                        p.y = p.y < 0 ? -1 : 1;
+                        p.z = p.z < 0 ? -1 : 1;
+                    }
+                    else if (Math.abs(p.y) == min) {
+                        p.x = p.x < 0 ? -1 : 1;
+                        p.z = p.z < 0 ? -1 : 1;
+                    }
+                    else if (Math.abs(p.z) == min) {
+                        p.x = p.x < 0 ? -1 : 1;
+                        p.y = p.y < 0 ? -1 : 1;
+                    }
+                }
+                particle.position.x = p.x;
+                particle.position.y = p.y;
+                particle.position.z = p.z;
+                var dir = new gd3d.math.vector3(0, 0, 1);
+                particle.velocity.x = dir.x * speed;
+                particle.velocity.y = dir.y * speed;
+                particle.velocity.z = dir.z * speed;
+            };
+            return ParticleSystemShapeBox;
+        }(framework.ParticleSystemShapeBase));
+        framework.ParticleSystemShapeBox = ParticleSystemShapeBox;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemShapeCircle = (function (_super) {
+            __extends(ParticleSystemShapeCircle, _super);
+            function ParticleSystemShapeCircle() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.emitFromEdge = false;
+                return _this;
+            }
+            Object.defineProperty(ParticleSystemShapeCircle.prototype, "radius", {
+                get: function () {
+                    return this._module.radius;
+                },
+                set: function (v) {
+                    this._module.radius = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystemShapeCircle.prototype, "arc", {
+                get: function () {
+                    return this._module.arc;
+                },
+                set: function (v) {
+                    this._module.arc = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystemShapeCircle.prototype, "arcMode", {
+                get: function () {
+                    return this._module.arcMode;
+                },
+                set: function (v) {
+                    this._module.arcMode = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystemShapeCircle.prototype, "arcSpread", {
+                get: function () {
+                    return this._module.arcSpread;
+                },
+                set: function (v) {
+                    this._module.arcSpread = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystemShapeCircle.prototype, "arcSpeed", {
+                get: function () {
+                    return this._module.arcSpeed;
+                },
+                set: function (v) {
+                    this._module.arcSpeed = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleSystemShapeCircle.prototype.initParticleState = function (particle) {
+                var speed = gd3d.math.vec3Length(particle.velocity);
+                var radius = this.radius;
+                var arc = this.arc;
+                var radiusAngle = 0;
+                if (this.arcMode == framework.ParticleSystemShapeMultiModeValue.Random) {
+                    radiusAngle = Math.random() * arc;
+                }
+                else if (this.arcMode == framework.ParticleSystemShapeMultiModeValue.Loop) {
+                    var totalAngle = particle.birthTime * this.arcSpeed.getValue(particle.birthRateAtDuration) * 360;
+                    radiusAngle = totalAngle % arc;
+                }
+                else if (this.arcMode == framework.ParticleSystemShapeMultiModeValue.PingPong) {
+                    var totalAngle = particle.birthTime * this.arcSpeed.getValue(particle.birthRateAtDuration) * 360;
+                    radiusAngle = totalAngle % arc;
+                    if (Math.floor(totalAngle / arc) % 2 == 1) {
+                        radiusAngle = arc - radiusAngle;
+                    }
+                }
+                if (this.arcSpread > 0) {
+                    radiusAngle = Math.floor(radiusAngle / arc / this.arcSpread) * arc * this.arcSpread;
+                }
+                radiusAngle = gd3d.math.degToRad(radiusAngle);
+                var dir = new gd3d.math.vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
+                var p = new gd3d.math.vector3(radius * dir.x, radius * dir.y, radius * dir.z);
+                if (!this.emitFromEdge) {
+                    var rand = Math.random();
+                    p.x *= rand;
+                    p.y *= rand;
+                    p.z *= rand;
+                }
+                particle.position.x = p.x;
+                particle.position.y = p.y;
+                particle.position.z = p.z;
+                particle.velocity.x = dir.x * speed;
+                particle.velocity.y = dir.y * speed;
+                particle.velocity.z = dir.z * speed;
+            };
+            return ParticleSystemShapeCircle;
+        }(framework.ParticleSystemShapeBase));
+        framework.ParticleSystemShapeCircle = ParticleSystemShapeCircle;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemShapeCone = (function (_super) {
+            __extends(ParticleSystemShapeCone, _super);
+            function ParticleSystemShapeCone() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.emitFrom = framework.ParticleSystemShapeConeEmitFrom.Base;
+                return _this;
+            }
+            Object.defineProperty(ParticleSystemShapeCone.prototype, "angle", {
+                get: function () {
+                    return this._module.angle;
+                },
+                set: function (v) {
+                    this._module.angle = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystemShapeCone.prototype, "radius", {
+                get: function () {
+                    return this._module.radius;
+                },
+                set: function (v) {
+                    this._module.radius = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystemShapeCone.prototype, "length", {
+                get: function () {
+                    return this._module.length;
+                },
+                set: function (v) {
+                    this._module.length = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystemShapeCone.prototype, "arc", {
+                get: function () {
+                    return this._module.arc;
+                },
+                set: function (v) {
+                    this._module.arc = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystemShapeCone.prototype, "arcMode", {
+                get: function () {
+                    return this._module.arcMode;
+                },
+                set: function (v) {
+                    this._module.arcMode = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystemShapeCone.prototype, "arcSpread", {
+                get: function () {
+                    return this._module.arcSpread;
+                },
+                set: function (v) {
+                    this._module.arcSpread = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystemShapeCone.prototype, "arcSpeed", {
+                get: function () {
+                    return this._module.arcSpeed;
+                },
+                set: function (v) {
+                    this._module.arcSpeed = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleSystemShapeCone.prototype.initParticleState = function (particle) {
+                var speed = gd3d.math.vec3Length(particle.velocity);
+                var radius = this.radius;
+                var angle = this.angle;
+                var arc = this.arc;
+                angle = gd3d.math.floatClamp(angle, 0, 87);
+                var radiusAngle = 0;
+                if (this.arcMode == framework.ParticleSystemShapeMultiModeValue.Random) {
+                    radiusAngle = Math.random() * arc;
+                }
+                else if (this.arcMode == framework.ParticleSystemShapeMultiModeValue.Loop) {
+                    var totalAngle = particle.birthTime * this.arcSpeed.getValue(particle.birthRateAtDuration) * 360;
+                    radiusAngle = totalAngle % arc;
+                }
+                else if (this.arcMode == framework.ParticleSystemShapeMultiModeValue.PingPong) {
+                    var totalAngle = particle.birthTime * this.arcSpeed.getValue(particle.birthRateAtDuration) * 360;
+                    radiusAngle = totalAngle % arc;
+                    if (Math.floor(totalAngle / arc) % 2 == 1) {
+                        radiusAngle = arc - radiusAngle;
+                    }
+                }
+                if (this.arcSpread > 0) {
+                    radiusAngle = Math.floor(radiusAngle / arc / this.arcSpread) * arc * this.arcSpread;
+                }
+                radiusAngle = gd3d.math.degToRad(radiusAngle);
+                var radiusRate = 1;
+                if (this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.Base || this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.Volume) {
+                    radiusRate = Math.random();
+                }
+                var basePos = new gd3d.math.vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
+                var bottomPos = new gd3d.math.vector3(basePos.x * radius * radiusRate, basePos.y * radius * radiusRate, 0);
+                var scale = (radius + this.length * Math.tan(gd3d.math.degToRad(angle))) * radiusRate;
+                var topPos = new gd3d.math.vector3(basePos.x * scale, basePos.y * scale, this.length);
+                gd3d.math.vec3Subtract(topPos, bottomPos, particle.velocity);
+                gd3d.math.vec3Normalize(particle.velocity, particle.velocity);
+                gd3d.math.vec3ScaleByNum(particle.velocity, speed, particle.velocity);
+                var position = new gd3d.math.vector3(bottomPos.x, bottomPos.y, bottomPos.z);
+                if (this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.Volume || this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.VolumeShell) {
+                    gd3d.math.vec3SLerp(position, topPos, Math.random(), position);
+                }
+                particle.position.x = position.x;
+                particle.position.y = position.y;
+                particle.position.z = position.z;
+            };
+            return ParticleSystemShapeCone;
+        }(framework.ParticleSystemShapeBase));
+        framework.ParticleSystemShapeCone = ParticleSystemShapeCone;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemShapeEdge = (function (_super) {
+            __extends(ParticleSystemShapeEdge, _super);
+            function ParticleSystemShapeEdge() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            Object.defineProperty(ParticleSystemShapeEdge.prototype, "radius", {
+                get: function () {
+                    return this._module.radius;
+                },
+                set: function (v) {
+                    this._module.radius = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystemShapeEdge.prototype, "radiusMode", {
+                get: function () {
+                    return this._module.radiusMode;
+                },
+                set: function (v) {
+                    this._module.radiusMode = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystemShapeEdge.prototype, "radiusSpread", {
+                get: function () {
+                    return this._module.radiusSpread;
+                },
+                set: function (v) {
+                    this._module.radiusSpread = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystemShapeEdge.prototype, "radiusSpeed", {
+                get: function () {
+                    return this._module.radiusSpeed;
+                },
+                set: function (v) {
+                    this._module.radiusSpeed = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleSystemShapeEdge.prototype.initParticleState = function (particle) {
+                var speed = gd3d.math.vec3Length(particle.velocity);
+                var arc = 360 * this.radius;
+                var radiusAngle = 0;
+                if (this.radiusMode == framework.ParticleSystemShapeMultiModeValue.Random) {
+                    radiusAngle = Math.random() * arc;
+                }
+                else if (this.radiusMode == framework.ParticleSystemShapeMultiModeValue.Loop) {
+                    var totalAngle = particle.birthTime * this.radiusSpeed.getValue(particle.birthRateAtDuration) * 360;
+                    radiusAngle = totalAngle % arc;
+                }
+                else if (this.radiusMode == framework.ParticleSystemShapeMultiModeValue.PingPong) {
+                    var totalAngle = particle.birthTime * this.radiusSpeed.getValue(particle.birthRateAtDuration) * 360;
+                    radiusAngle = totalAngle % arc;
+                    if (Math.floor(totalAngle / arc) % 2 == 1) {
+                        radiusAngle = arc - radiusAngle;
+                    }
+                }
+                if (this.radiusSpread > 0) {
+                    radiusAngle = Math.floor(radiusAngle / arc / this.radiusSpread) * arc * this.radiusSpread;
+                }
+                radiusAngle = radiusAngle / arc;
+                var dir = new gd3d.math.vector3(0, 1, 0);
+                var p = new gd3d.math.vector3(this.radius * (radiusAngle * 2 - 1), 0, 0);
+                particle.position.x = p.x;
+                particle.position.y = p.y;
+                particle.position.z = p.z;
+                particle.velocity.x = dir.x * speed;
+                particle.velocity.y = dir.y * speed;
+                particle.velocity.z = dir.z * speed;
+            };
+            return ParticleSystemShapeEdge;
+        }(framework.ParticleSystemShapeBase));
+        framework.ParticleSystemShapeEdge = ParticleSystemShapeEdge;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemShapeSphere = (function (_super) {
+            __extends(ParticleSystemShapeSphere, _super);
+            function ParticleSystemShapeSphere() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.emitFromShell = false;
+                return _this;
+            }
+            Object.defineProperty(ParticleSystemShapeSphere.prototype, "radius", {
+                get: function () {
+                    return this._module.radius;
+                },
+                set: function (v) {
+                    this._module.radius = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleSystemShapeSphere.prototype.initParticleState = function (particle) {
+                var speed = gd3d.math.vec3Length(particle.velocity);
+                var dir = new gd3d.math.vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+                gd3d.math.vec3Normalize(dir, dir);
+                var p = new gd3d.math.vector3(this.radius * dir.x, this.radius * dir.y, this.radius * dir.z);
+                if (!this.emitFromShell) {
+                    var rand = Math.random();
+                    p.x *= rand;
+                    p.y *= rand;
+                    p.z *= rand;
+                }
+                particle.position.x = p.x;
+                particle.position.y = p.y;
+                particle.position.z = p.z;
+                particle.velocity.x = dir.x * speed;
+                particle.velocity.y = dir.y * speed;
+                particle.velocity.z = dir.z * speed;
+            };
+            return ParticleSystemShapeSphere;
+        }(framework.ParticleSystemShapeBase));
+        framework.ParticleSystemShapeSphere = ParticleSystemShapeSphere;
+        var ParticleSystemShapeHemisphere = (function (_super) {
+            __extends(ParticleSystemShapeHemisphere, _super);
+            function ParticleSystemShapeHemisphere() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.radius = 1;
+                _this.emitFromShell = false;
+                return _this;
+            }
+            ParticleSystemShapeHemisphere.prototype.initParticleState = function (particle) {
+                var speed = gd3d.math.vec3Length(particle.velocity);
+                var dir = new gd3d.math.vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+                gd3d.math.vec3Normalize(dir, dir);
+                dir.z = Math.abs(dir.z);
+                var p = new gd3d.math.vector3(this.radius * dir.x, this.radius * dir.y, this.radius * dir.z);
+                if (!this.emitFromShell) {
+                    var rand = Math.random();
+                    p.x *= rand;
+                    p.y *= rand;
+                    p.z *= rand;
+                }
+                particle.position.x = p.x;
+                particle.position.y = p.y;
+                particle.position.z = p.z;
+                particle.velocity.x = dir.x * speed;
+                particle.velocity.y = dir.y * speed;
+                particle.velocity.z = dir.z * speed;
+            };
+            return ParticleSystemShapeHemisphere;
+        }(framework.ParticleSystemShapeBase));
+        framework.ParticleSystemShapeHemisphere = ParticleSystemShapeHemisphere;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var BJSCANNON;
         var CannonJSPlugin = (function () {
             function CannonJSPlugin(_useDeltaForWorldStep, iterations) {
@@ -34238,6 +37750,157 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var ArrayUtil = (function () {
+            function ArrayUtil() {
+            }
+            ArrayUtil.replace = function (arr, a, b, isAdd) {
+                if (isAdd === void 0) { isAdd = true; }
+                var isreplace = false;
+                for (var i = 0; i < arr.length; i++) {
+                    if (arr[i] == a) {
+                        arr[i] = b;
+                        isreplace = true;
+                        break;
+                    }
+                }
+                if (!isreplace && isAdd)
+                    arr.push(b);
+                return arr;
+            };
+            ArrayUtil.concatToSelf = function (self) {
+                var items = [];
+                for (var _i = 1; _i < arguments.length; _i++) {
+                    items[_i - 1] = arguments[_i];
+                }
+                var arr = [];
+                items.forEach(function (v) { return arr = arr.concat(v); });
+                arr.forEach(function (v) { return self.push(v); });
+                return self;
+            };
+            ArrayUtil.unique = function (arr, compare) {
+                var keys = Object.keys(arr);
+                var ids = keys.map(function (v) { return Number(v); }).filter(function (v) { return !isNaN(v); });
+                var deleteMap = {};
+                for (var i = 0, n = ids.length; i < n; i++) {
+                    var ki = ids[i];
+                    if (deleteMap[ki])
+                        continue;
+                    for (var j = i + 1; j < n; j++) {
+                        var kj = ids[j];
+                        if (compare(arr[ki], arr[kj]))
+                            deleteMap[kj] = true;
+                    }
+                }
+                for (var i = ids.length - 1; i >= 0; i--) {
+                    var id = ids[i];
+                    if (deleteMap[id])
+                        arr.splice(id, 1);
+                }
+                return arr;
+            };
+            return ArrayUtil;
+        }());
+        framework.ArrayUtil = ArrayUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var CLASS_KEY = "__class__";
+        var ClassUtils = (function () {
+            function ClassUtils() {
+            }
+            ClassUtils.getQualifiedClassName = function (value) {
+                if (value == null)
+                    return "null";
+                var prototype = value.prototype ? value.prototype : Object.getPrototypeOf(value);
+                if (prototype.hasOwnProperty(CLASS_KEY))
+                    return prototype[CLASS_KEY];
+                var className = prototype.constructor.name;
+                if (_global[className] == prototype.constructor)
+                    return className;
+                for (var i = 0; i < _classNameSpaces.length; i++) {
+                    var tryClassName = _classNameSpaces[i] + "." + className;
+                    if (this.getDefinitionByName(tryClassName) == prototype.constructor) {
+                        className = tryClassName;
+                        registerClass(prototype.constructor, className);
+                        return className;
+                    }
+                }
+                return className;
+            };
+            ClassUtils.getDefinitionByName = function (name, readCache) {
+                if (readCache === void 0) { readCache = true; }
+                if (name == "null")
+                    return null;
+                if (!name)
+                    return null;
+                if (_global[name])
+                    return _global[name];
+                if (readCache && _definitionCache[name])
+                    return _definitionCache[name];
+                var paths = name.split(".");
+                var length = paths.length;
+                var definition = _global;
+                for (var i = 0; i < length; i++) {
+                    var path = paths[i];
+                    definition = definition[path];
+                    if (!definition) {
+                        return null;
+                    }
+                }
+                _definitionCache[name] = definition;
+                return definition;
+            };
+            ClassUtils.getDefaultInstanceByName = function (name) {
+                var defaultInst = this.defaultInstMap[name];
+                if (defaultInst)
+                    return defaultInst;
+                var cls = this.getDefinitionByName(name);
+                if (!cls)
+                    return undefined;
+                defaultInst = this.defaultInstMap[name] = new cls();
+                Object.freeze(defaultInst);
+                return defaultInst;
+            };
+            ClassUtils.getInstanceByName = function (name) {
+                var cls = this.getDefinitionByName(name);
+                console.assert(cls);
+                if (!cls)
+                    return undefined;
+                return new cls();
+            };
+            ClassUtils.addClassNameSpace = function (namespace) {
+                if (_classNameSpaces.indexOf(namespace) == -1) {
+                    _classNameSpaces.push(namespace);
+                }
+            };
+            ClassUtils.defaultInstMap = {};
+            return ClassUtils;
+        }());
+        framework.ClassUtils = ClassUtils;
+        ;
+        var _definitionCache = {};
+        var _global;
+        var global;
+        if (typeof window != "undefined") {
+            _global = window;
+        }
+        else if (typeof global != "undefined") {
+            _global = global;
+        }
+        var _classNameSpaces = ["gd3d.framework"];
+        function registerClass(classDefinition, className) {
+            var prototype = classDefinition.prototype;
+            Object.defineProperty(prototype, CLASS_KEY, { value: className, writable: true });
+        }
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var CullingMask;
         (function (CullingMask) {
             CullingMask[CullingMask["nothing"] = 0] = "nothing";
@@ -34319,6 +37982,87 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var GLExtension = (function () {
+            function GLExtension(gl) {
+                gl.extensions = this;
+                this.initExtensions(gl);
+                this.cacheGLQuery(gl);
+                this.wrap(gl);
+            }
+            GLExtension.prototype.initExtensions = function (gl) {
+                this.ANGLE_instanced_arrays = gl.getExtension("ANGLE_instanced_arrays");
+                this.EXT_blend_minmax = gl.getExtension("EXT_blend_minmax");
+                this.EXT_color_buffer_half_float = gl.getExtension("EXT_color_buffer_half_float");
+                this.EXT_frag_depth = gl.getExtension("EXT_frag_depth");
+                this.EXT_sRGB = gl.getExtension("EXT_sRGB");
+                this.EXT_shader_texture_lod = gl.getExtension("EXT_shader_texture_lod");
+                this.EXT_texture_filter_anisotropic = gl.getExtension('EXT_texture_filter_anisotropic') || gl.getExtension('MOZ_EXT_texture_filter_anisotropic') || gl.getExtension('WEBKIT_EXT_texture_filter_anisotropic');
+                this.OES_element_index_uint = gl.getExtension("OES_element_index_uint");
+                this.OES_standard_derivatives = gl.getExtension("OES_standard_derivatives");
+                this.OES_texture_float = gl.getExtension("OES_texture_float");
+                this.OES_texture_float_linear = gl.getExtension("OES_texture_float_linear");
+                this.OES_texture_half_float = gl.getExtension("OES_texture_half_float");
+                this.OES_texture_half_float_linear = gl.getExtension("OES_texture_half_float_linear");
+                this.OES_vertex_array_object = gl.getExtension("OES_vertex_array_object");
+                this.WEBGL_color_buffer_float = gl.getExtension("WEBGL_color_buffer_float");
+                this.WEBGL_compressed_texture_atc = gl.getExtension("WEBGL_compressed_texture_atc") || gl.getExtension("WEBKIT_WEBGL_compressed_texture_atc");
+                this.WEBGL_compressed_texture_etc1 = gl.getExtension("WEBGL_compressed_texture_etc1");
+                this.WEBGL_compressed_texture_pvrtc = gl.getExtension('WEBGL_compressed_texture_pvrtc') || gl.getExtension('WEBKIT_WEBGL_compressed_texture_pvrtc');
+                this.WEBGL_compressed_texture_s3tc = gl.getExtension('WEBGL_compressed_texture_s3tc') || gl.getExtension('MOZ_WEBGL_compressed_texture_s3tc') || gl.getExtension('WEBKIT_WEBGL_compressed_texture_s3tc');
+                this.WEBGL_debug_renderer_info = gl.getExtension("WEBGL_debug_renderer_info");
+                this.WEBGL_debug_shaders = gl.getExtension("WEBGL_debug_shaders");
+                this.WEBGL_depth_texture = gl.getExtension('WEBGL_depth_texture') || gl.getExtension('MOZ_WEBGL_depth_texture') || gl.getExtension('WEBKIT_WEBGL_depth_texture');
+                this.WEBGL_draw_buffers = gl.getExtension("WEBGL_draw_buffers");
+                this.WEBGL_lose_context = gl.getExtension("WEBGL_lose_context") || gl.getExtension("WEBKIT_WEBGL_lose_context") || gl.getExtension("MOZ_WEBGL_lose_context");
+            };
+            GLExtension.prototype.cacheGLQuery = function (gl) {
+                var oldGetExtension = gl.getExtension;
+                gl.getExtension = function (name) {
+                    gl.extensions[name] = gl.extensions[name] || oldGetExtension.apply(gl, arguments);
+                    return gl.extensions[name];
+                };
+            };
+            GLExtension.prototype.wrap = function (gl) {
+                if (!gl.vertexAttribDivisor) {
+                    gl.vertexAttribDivisor = function (index, divisor) {
+                        if (gl.extensions.ANGLE_instanced_arrays) {
+                            gl.extensions.ANGLE_instanced_arrays.vertexAttribDivisorANGLE(index, divisor);
+                        }
+                        else {
+                            console.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawElementsInstanced \uFF01");
+                        }
+                    };
+                }
+                if (!gl.drawElementsInstanced) {
+                    gl.drawElementsInstanced = function (mode, count, type, offset, instanceCount) {
+                        if (gl.extensions.ANGLE_instanced_arrays) {
+                            gl.extensions.ANGLE_instanced_arrays.drawElementsInstancedANGLE(mode, count, type, offset, instanceCount);
+                        }
+                        else {
+                            console.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawElementsInstanced \uFF01");
+                        }
+                    };
+                }
+                if (!gl.drawArraysInstanced) {
+                    gl.drawArraysInstanced = function (mode, first, count, instanceCount) {
+                        if (gl.extensions.ANGLE_instanced_arrays) {
+                            gl.extensions.ANGLE_instanced_arrays.drawArraysInstancedANGLE(mode, first, count, instanceCount);
+                        }
+                        else {
+                            console.warn("\u6D4F\u89C8\u5668 \u4E0D\u652F\u6301 drawArraysInstanced \uFF01");
+                        }
+                    };
+                }
+            };
+            return GLExtension;
+        }());
+        framework.GLExtension = GLExtension;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var NumberUtil = (function () {
             function NumberUtil() {
             }
@@ -34345,6 +38089,29 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var ObjectUtil = (function () {
+            function ObjectUtil() {
+            }
+            ObjectUtil.isBaseType = function (object) {
+                if (object == undefined
+                    || object == null
+                    || typeof object == "boolean"
+                    || typeof object == "string"
+                    || typeof object == "number")
+                    return true;
+            };
+            ObjectUtil.isObject = function (obj) {
+                return obj != null && (obj.constructor == Object || (obj.constructor.name == "Object"));
+            };
+            return ObjectUtil;
+        }());
+        framework.ObjectUtil = ObjectUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var RegexpUtil = (function () {
             function RegexpUtil() {
             }
@@ -34357,6 +38124,469 @@ var gd3d;
             return RegexpUtil;
         }());
         framework.RegexpUtil = RegexpUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        function serialize(target, propertyKey) {
+            if (!Object.getOwnPropertyDescriptor(target, SERIALIZE_KEY)) {
+                Object.defineProperty(target, SERIALIZE_KEY, { value: [] });
+            }
+            var serializePropertys = target[SERIALIZE_KEY];
+            serializePropertys.push(propertyKey);
+        }
+        framework.serialize = serialize;
+        function propertyHandler(target, source, property, handlers, serialization) {
+            for (var i = 0; i < handlers.length; i++) {
+                if (handlers[i](target, source, property, handlers, serialization)) {
+                    return true;
+                }
+            }
+            return true;
+        }
+        function differentPropertyHandler(target, source, property, different, handlers, serialization) {
+            for (var i = 0; i < handlers.length; i++) {
+                if (handlers[i](target, source, property, different, handlers, serialization)) {
+                    return true;
+                }
+            }
+            return true;
+        }
+        var __root__ = "__root__";
+        var Serialization = (function () {
+            function Serialization() {
+                this.serializeHandlers = [];
+                this.deserializeHandlers = [];
+                this.differentHandlers = [];
+                this.setValueHandlers = [];
+            }
+            Serialization.prototype.serialize = function (target) {
+                var handlers = this.serializeHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
+                var result = {};
+                propertyHandler(result, { __root__: target }, __root__, handlers, this);
+                var v = result[__root__];
+                return v;
+            };
+            Serialization.prototype.deserialize = function (object) {
+                var handlers = this.deserializeHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
+                var result = {};
+                propertyHandler(result, { __root__: object }, __root__, handlers, this);
+                var v = result[__root__];
+                return v;
+            };
+            Serialization.prototype.different = function (target, source) {
+                var handlers = this.differentHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
+                var different = { __root__: {} };
+                differentPropertyHandler({ __root__: target }, { __root__: source }, __root__, different, handlers, this);
+                return different[__root__];
+            };
+            Serialization.prototype.setValue = function (target, source) {
+                var handlers = this.setValueHandlers.sort(function (a, b) { return b.priority - a.priority; }).map(function (v) { return v.handler; });
+                propertyHandler({ __root__: target }, { __root__: source }, __root__, handlers, this);
+                return target;
+            };
+            Serialization.prototype.clone = function (target) {
+                return this.deserialize(this.serialize(target));
+            };
+            return Serialization;
+        }());
+        framework.Serialization = Serialization;
+        framework.CLASS_KEY = "__class__";
+        var SERIALIZE_KEY = "_serialize__";
+        function getSerializableMembers(object, serializableMembers) {
+            serializableMembers = serializableMembers || [];
+            if (object["__proto__"]) {
+                getSerializableMembers(object["__proto__"], serializableMembers);
+            }
+            var serializePropertys = object[SERIALIZE_KEY];
+            if (serializePropertys)
+                framework.ArrayUtil.concatToSelf(serializableMembers, serializePropertys);
+            framework.ArrayUtil.unique(serializableMembers);
+            return serializableMembers;
+        }
+        framework.serialization = new Serialization();
+        framework.serialization.serializeHandlers.push({
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (framework.ObjectUtil.isBaseType(spv)) {
+                    target[property] = spv;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (spv && typeof spv == "function") {
+                    var object = {};
+                    object[framework.CLASS_KEY] = "function";
+                    object.data = spv.toString();
+                    target[property] = object;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (spv && spv["serializable"] == false) {
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (spv && spv["serialize"]) {
+                    var object = {};
+                    object[framework.CLASS_KEY] = framework.ClassUtils.getQualifiedClassName(spv);
+                    spv["serialize"](object);
+                    target[property] = object;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property, handlers, serialization) {
+                var spv = source[property];
+                if (Array.isArray(spv)) {
+                    var arr_5 = target[property] || [];
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (v) {
+                        propertyHandler(arr_5, spv, v, handlers, serialization);
+                    });
+                    target[property] = arr_5;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property, handlers, serialization) {
+                var spv = source[property];
+                if (framework.ObjectUtil.isObject(spv)) {
+                    var object_1 = {};
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (key) {
+                        propertyHandler(object_1, spv, key, handlers, serialization);
+                    });
+                    target[property] = object_1;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: -10000,
+            handler: function (target, source, property, handlers, serialization) {
+                var tpv = target[property];
+                var spv = source[property];
+                if (tpv == null || tpv.constructor != spv.constructor) {
+                    var className = framework.ClassUtils.getQualifiedClassName(spv);
+                    var inst = spv.constructor.inst;
+                    if (!inst)
+                        inst = spv.constructor.inst = new spv.constructor();
+                    if (!(inst instanceof spv.constructor))
+                        inst = spv.constructor.inst = new spv.constructor();
+                    var diff = serialization.different(spv, inst);
+                    diff[framework.CLASS_KEY] = className;
+                    target[property] = diff;
+                }
+                else {
+                    debugger;
+                    var diff = serialization.different(spv, tpv);
+                    if (diff)
+                        target[property] = diff;
+                }
+                return true;
+            }
+        });
+        framework.serialization.deserializeHandlers.push({
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (framework.ObjectUtil.isBaseType(spv)) {
+                    target[property] = spv;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (spv && spv[framework.CLASS_KEY] == "function") {
+                    target[property] = eval("(" + spv.data + ")");
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var spv = source[property];
+                if (!framework.ObjectUtil.isObject(spv) && !Array.isArray(spv)) {
+                    target[property] = spv;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property, handlers, serialization) {
+                var spv = source[property];
+                if (Array.isArray(spv)) {
+                    var arr = target[property] || [];
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (key) {
+                        propertyHandler(arr, spv, key, handlers, serialization);
+                    });
+                    target[property] = arr;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property, handlers, serialization) {
+                var tpv = target[property];
+                var spv = source[property];
+                if (framework.ObjectUtil.isObject(spv) && spv[framework.CLASS_KEY] == null) {
+                    var obj = {};
+                    if (tpv)
+                        obj = tpv;
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (key) {
+                        propertyHandler(obj, spv, key, handlers, serialization);
+                    });
+                    target[property] = obj;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: 0,
+            handler: function (target, source, property) {
+                var tpv = target[property];
+                var spv = source[property];
+                var inst = framework.ClassUtils.getInstanceByName(spv[framework.CLASS_KEY]);
+                if (inst && inst["deserialize"]) {
+                    if (tpv && tpv.constructor == inst.constructor) {
+                        inst = tpv;
+                    }
+                    inst["deserialize"](spv);
+                    target[property] = inst;
+                    return true;
+                }
+                return false;
+            }
+        }, {
+            priority: -10000,
+            handler: function (target, source, property, handlers, serialization) {
+                var tpv = target[property];
+                var spv = source[property];
+                var inst = framework.ClassUtils.getInstanceByName(spv[framework.CLASS_KEY]);
+                if (inst) {
+                    if (tpv && tpv.constructor == inst.constructor) {
+                        inst = tpv;
+                    }
+                    var keys = Object.keys(spv);
+                    keys.forEach(function (key) {
+                        if (key != framework.CLASS_KEY)
+                            propertyHandler(inst, spv, key, handlers, serialization);
+                    });
+                    target[property] = inst;
+                    return true;
+                }
+                console.warn("\u672A\u5904\u7406");
+                return false;
+            }
+        });
+        framework.serialization.differentHandlers = [
+            {
+                priority: 0,
+                handler: function (target, source, property) {
+                    if (target[property] == source[property]) {
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, different, handlers, serialization) {
+                    if (null == source[property]) {
+                        different[property] = serialization.serialize(target[property]);
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, different, handlers, serialization) {
+                    var tpv = target[property];
+                    if (framework.ObjectUtil.isBaseType(tpv)) {
+                        different[property] = tpv;
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, different, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (Array.isArray(tpv)) {
+                        var keys = Object.keys(tpv);
+                        var diff = [];
+                        keys.forEach(function (key) {
+                            differentPropertyHandler(tpv, spv, key, diff, handlers, serialization);
+                        });
+                        if (Object.keys(diff).length > 0)
+                            different[property] = diff;
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, different, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (spv.constructor != tpv.constructor) {
+                        different[property] = serialization.serialize(tpv);
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: -10000,
+                handler: function (target, source, property, different, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    var keys = getSerializableMembers(tpv);
+                    if (tpv.constructor == Object)
+                        keys = Object.keys(tpv);
+                    var diff = {};
+                    keys.forEach(function (v) {
+                        differentPropertyHandler(tpv, spv, v, diff, handlers, serialization);
+                    });
+                    if (Object.keys(diff).length > 0)
+                        different[property] = diff;
+                    return true;
+                }
+            },
+        ];
+        framework.serialization.setValueHandlers = [
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers) {
+                    if (target[property] == source[property]) {
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (tpv == null) {
+                        target[property] = serialization.deserialize(spv);
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (framework.ObjectUtil.isBaseType(spv)) {
+                        target[property] = spv;
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (Array.isArray(spv)) {
+                        console.assert(!!tpv);
+                        var keys = Object.keys(spv);
+                        keys.forEach(function (key) {
+                            propertyHandler(tpv, spv, key, handlers, serialization);
+                        });
+                        target[property] = tpv;
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (!framework.ObjectUtil.isObject(spv)) {
+                        target[property] = serialization.deserialize(spv);
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: 0,
+                handler: function (target, source, property, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    if (framework.ObjectUtil.isObject(spv) && spv[framework.CLASS_KEY] == undefined) {
+                        console.assert(!!tpv);
+                        var keys = Object.keys(spv);
+                        keys.forEach(function (key) {
+                            propertyHandler(tpv, spv, key, handlers, serialization);
+                        });
+                        target[property] = tpv;
+                        return true;
+                    }
+                    return false;
+                }
+            },
+            {
+                priority: -10000,
+                handler: function (target, source, property, handlers, serialization) {
+                    var tpv = target[property];
+                    var spv = source[property];
+                    var targetClassName = framework.ClassUtils.getQualifiedClassName(target[property]);
+                    if (targetClassName == spv[framework.CLASS_KEY]) {
+                        var keys = Object.keys(spv);
+                        keys.forEach(function (key) {
+                            propertyHandler(tpv, spv, key, handlers, serialization);
+                        });
+                        target[property] = tpv;
+                    }
+                    else {
+                        target[property] = serialization.deserialize(spv);
+                    }
+                    return true;
+                }
+            },
+        ];
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -34590,6 +38820,19 @@ var gd3d;
             return TransformUtil;
         }());
         framework.TransformUtil = TransformUtil;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        framework.lazy = {
+            getvalue: function (lazyItem) {
+                if (typeof lazyItem == "function")
+                    return lazyItem();
+                return lazyItem;
+            }
+        };
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -35125,6 +39368,621 @@ var gd3d;
             return WebGLUtils;
         }());
         framework.WebGLUtils = WebGLUtils;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimationCurve1 = (function () {
+            function AnimationCurve1() {
+                this.maxtan = 1000;
+                this.preWrapMode = framework.AnimationCurveWrapMode.Clamp;
+                this.postWrapMode = framework.AnimationCurveWrapMode.Clamp;
+                this.keys = [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }];
+            }
+            Object.defineProperty(AnimationCurve1.prototype, "numKeys", {
+                get: function () {
+                    return this.keys.length;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            AnimationCurve1.prototype.addKey = function (key) {
+                this.keys.push(key);
+                this.sort();
+            };
+            AnimationCurve1.prototype.sort = function () {
+                this.keys.sort(function (a, b) { return a.time - b.time; });
+            };
+            AnimationCurve1.prototype.deleteKey = function (key) {
+                var index = this.keys.indexOf(key);
+                if (index != -1)
+                    this.keys.splice(index, 1);
+            };
+            AnimationCurve1.prototype.getKey = function (index) {
+                return this.keys[index];
+            };
+            AnimationCurve1.prototype.indexOfKeys = function (key) {
+                return this.keys.indexOf(key);
+            };
+            AnimationCurve1.prototype.getPoint = function (t) {
+                var wrapMode = framework.AnimationCurveWrapMode.Clamp;
+                if (t < 0)
+                    wrapMode = this.preWrapMode;
+                else if (t > 1)
+                    wrapMode = this.postWrapMode;
+                switch (wrapMode) {
+                    case framework.AnimationCurveWrapMode.Clamp:
+                        t = gd3d.math.floatClamp(t, 0, 1);
+                        break;
+                    case framework.AnimationCurveWrapMode.Loop:
+                        t = gd3d.math.floatClamp(t - Math.floor(t), 0, 1);
+                        break;
+                    case framework.AnimationCurveWrapMode.PingPong:
+                        t = gd3d.math.floatClamp(t - Math.floor(t), 0, 1);
+                        if (Math.floor(t) % 2 == 1)
+                            t = 1 - t;
+                        break;
+                }
+                var keys = this.keys;
+                var maxtan = this.maxtan;
+                var value = 0, tangent = 0, isfind = false;
+                ;
+                for (var i = 0, n = keys.length; i < n; i++) {
+                    var key = keys[i];
+                    var prekey = keys[i - 1];
+                    if (i > 0 && prekey.time <= t && t <= key.time) {
+                        var xstart = prekey.time;
+                        var ystart = prekey.value;
+                        var tanstart = prekey.outTangent;
+                        var xend = key.time;
+                        var yend = key.value;
+                        var tanend = key.inTangent;
+                        if (maxtan > Math.abs(tanstart) && maxtan > Math.abs(tanend)) {
+                            var ct = (t - prekey.time) / (key.time - prekey.time);
+                            var sys = [ystart, ystart + tanstart * (xend - xstart) / 3, yend - tanend * (xend - xstart) / 3, yend];
+                            var fy = framework.BezierCurve.getValue(ct, sys);
+                            isfind = true;
+                            value = fy;
+                            tangent = framework.BezierCurve.getDerivative(ct, sys) / (xend - xstart);
+                            break;
+                        }
+                        else {
+                            isfind = true;
+                            value = prekey.value;
+                            tangent = 0;
+                            break;
+                        }
+                    }
+                    if (i == 0 && t <= key.time) {
+                        isfind = true;
+                        value = key.value;
+                        tangent = 0;
+                        break;
+                    }
+                    if (i == n - 1 && t >= key.time) {
+                        isfind = true;
+                        value = key.value;
+                        tangent = 0;
+                        break;
+                    }
+                }
+                if (keys.length == 0)
+                    return { time: t, value: 0, inTangent: 0, outTangent: 0 };
+                return { time: t, value: value, inTangent: tangent, outTangent: tangent };
+            };
+            AnimationCurve1.prototype.getValue = function (t) {
+                var point = this.getPoint(t);
+                if (!point)
+                    return 0;
+                return point.value;
+            };
+            AnimationCurve1.prototype.findKey = function (t, y, precision) {
+                var keys = this.keys;
+                for (var i = 0; i < keys.length; i++) {
+                    if (Math.abs(keys[i].time - t) < precision && Math.abs(keys[i].value - y) < precision) {
+                        return keys[i];
+                    }
+                }
+                return null;
+            };
+            AnimationCurve1.prototype.addKeyAtCurve = function (time, value, precision) {
+                var point = this.getPoint(time);
+                if (Math.abs(value - point.value) < precision) {
+                    this.keys.push(point);
+                    this.keys.sort(function (a, b) { return a.time - b.time; });
+                    return point;
+                }
+                return null;
+            };
+            AnimationCurve1.prototype.getSamples = function (num) {
+                if (num === void 0) { num = 100; }
+                var results = [];
+                for (var i = 0; i <= num; i++) {
+                    var p = this.getPoint(i / num);
+                    results.push(p);
+                }
+                return results;
+            };
+            return AnimationCurve1;
+        }());
+        framework.AnimationCurve1 = AnimationCurve1;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimationCurveWrapMode;
+        (function (AnimationCurveWrapMode) {
+            AnimationCurveWrapMode[AnimationCurveWrapMode["Clamp"] = 1] = "Clamp";
+            AnimationCurveWrapMode[AnimationCurveWrapMode["Loop"] = 2] = "Loop";
+            AnimationCurveWrapMode[AnimationCurveWrapMode["PingPong"] = 4] = "PingPong";
+        })(AnimationCurveWrapMode = framework.AnimationCurveWrapMode || (framework.AnimationCurveWrapMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var BezierCurve = (function () {
+            function BezierCurve() {
+            }
+            BezierCurve.linear = function (t, p0, p1) {
+                return p0 + t * (p1 - p0);
+            };
+            BezierCurve.linearDerivative = function (t, p0, p1) {
+                return p1 - p0;
+            };
+            BezierCurve.linearSecondDerivative = function (t, p0, p1) {
+                return 0;
+            };
+            BezierCurve.quadratic = function (t, p0, p1, p2) {
+                return (1 - t) * (1 - t) * p0 + 2 * (1 - t) * t * p1 + t * t * p2;
+            };
+            BezierCurve.quadraticDerivative = function (t, p0, p1, p2) {
+                return 2 * (1 - t) * (p1 - p0) + 2 * t * (p2 - p1);
+            };
+            BezierCurve.quadraticSecondDerivative = function (t, p0, p1, p2) {
+                return 2 * (p2 - 2 * p1 + p0);
+            };
+            BezierCurve.cubic = function (t, p0, p1, p2, p3) {
+                return (1 - t) * (1 - t) * (1 - t) * p0 + 3 * (1 - t) * (1 - t) * t * p1 + 3 * (1 - t) * t * t * p2 + t * t * t * p3;
+            };
+            BezierCurve.cubicDerivative = function (t, p0, p1, p2, p3) {
+                return 3 * (1 - t) * (1 - t) * (p1 - p0) + 6 * (1 - t) * t * (p2 - p1) + 3 * t * t * (p3 - p2);
+            };
+            BezierCurve.cubicSecondDerivative = function (t, p0, p1, p2, p3) {
+                return 6 * (1 - t) * (p2 - 2 * p1 + p0) + 6 * t * (p3 - 2 * p2 + p1);
+            };
+            BezierCurve.bn = function (t, ps, processs) {
+                if (processs === void 0) { processs = null; }
+                ps = ps.concat();
+                if (processs)
+                    processs.push(ps.concat());
+                for (var i = ps.length - 1; i > 0; i--) {
+                    for (var j = 0; j < i; j++) {
+                        ps[j] = (1 - t) * ps[j] + t * ps[j + 1];
+                    }
+                    if (processs) {
+                        ps.length = ps.length - 1;
+                        processs.push(ps.concat());
+                    }
+                }
+                return ps[0];
+            };
+            BezierCurve.bnDerivative = function (t, ps) {
+                if (ps.length < 2)
+                    return 0;
+                ps = ps.concat();
+                for (var i = 0, n = ps.length - 1; i < n; i++) {
+                    ps[i] = ps[i + 1] - ps[i];
+                }
+                ps.length = ps.length - 1;
+                var v = ps.length * this.bn(t, ps);
+                return v;
+            };
+            BezierCurve.bnSecondDerivative = function (t, ps) {
+                if (ps.length < 3)
+                    return 0;
+                ps = ps.concat();
+                for (var i = 0, n = ps.length - 1; i < n; i++) {
+                    ps[i] = ps[i + 1] - ps[i];
+                }
+                ps.length = ps.length - 1;
+                var v = ps.length * this.bnDerivative(t, ps);
+                return v;
+            };
+            BezierCurve.bnND = function (t, dn, ps) {
+                if (ps.length < dn + 1)
+                    return 0;
+                var factorial = 1;
+                ps = ps.concat();
+                for (var j = 0; j < dn; j++) {
+                    for (var i = 0, n = ps.length - 1; i < n; i++) {
+                        ps[i] = ps[i + 1] - ps[i];
+                    }
+                    ps.length = ps.length - 1;
+                    factorial *= ps.length;
+                }
+                var v = factorial * this.bn(t, ps);
+                return v;
+            };
+            BezierCurve.getValue = function (t, ps) {
+                if (ps.length == 2) {
+                    return this.linear(t, ps[0], ps[1]);
+                }
+                if (ps.length == 3) {
+                    return this.quadratic(t, ps[0], ps[1], ps[2]);
+                }
+                if (ps.length == 4) {
+                    return this.cubic(t, ps[0], ps[1], ps[2], ps[3]);
+                }
+                return this.bn(t, ps);
+            };
+            BezierCurve.getDerivative = function (t, ps) {
+                if (ps.length == 2) {
+                    return this.linearDerivative(t, ps[0], ps[1]);
+                }
+                if (ps.length == 3) {
+                    return this.quadraticDerivative(t, ps[0], ps[1], ps[2]);
+                }
+                if (ps.length == 4) {
+                    return this.cubicDerivative(t, ps[0], ps[1], ps[2], ps[3]);
+                }
+                return this.bnDerivative(t, ps);
+            };
+            BezierCurve.getSecondDerivative = function (t, ps) {
+                if (ps.length == 2) {
+                    return this.linearSecondDerivative(t, ps[0], ps[1]);
+                }
+                if (ps.length == 3) {
+                    return this.quadraticSecondDerivative(t, ps[0], ps[1], ps[2]);
+                }
+                if (ps.length == 4) {
+                    return this.cubicSecondDerivative(t, ps[0], ps[1], ps[2], ps[3]);
+                }
+                return this.bnSecondDerivative(t, ps);
+            };
+            BezierCurve.getExtremums = function (ps, numSamples, precision) {
+                var _this = this;
+                if (numSamples === void 0) { numSamples = 10; }
+                if (precision === void 0) { precision = 0.0000001; }
+                var samples = [];
+                for (var i = 0; i <= numSamples; i++) {
+                    samples.push(this.getDerivative(i / numSamples, ps));
+                }
+                var resultTs = [];
+                var resultVs = [];
+                for (var i = 0, n = numSamples; i < n; i++) {
+                    if (samples[i] * samples[i + 1] < 0) {
+                        var guessT = framework.EquationSolving.line(function (x) { return _this.getDerivative(x, ps); }, i / numSamples, (i + 1) / numSamples, precision);
+                        resultTs.push(guessT);
+                        resultVs.push(this.getValue(guessT, ps));
+                    }
+                }
+                return { ts: resultTs, vs: resultVs };
+            };
+            BezierCurve.getMonotoneIntervals = function (ps, numSamples, precision) {
+                if (numSamples === void 0) { numSamples = 10; }
+                if (precision === void 0) { precision = 0.0000001; }
+                var monotoneIntervalTs = [0, 1];
+                var monotoneIntervalVs = [ps[0], ps[ps.length - 1]];
+                var extremums = this.getExtremums(ps, numSamples, precision);
+                for (var i = 0; i < extremums.ts.length; i++) {
+                    monotoneIntervalTs.splice(i + 1, 0, extremums.ts[i]);
+                    monotoneIntervalVs.splice(i + 1, 0, extremums.vs[i]);
+                }
+                return { ts: monotoneIntervalTs, vs: monotoneIntervalVs };
+            };
+            BezierCurve.getTFromValue = function (targetV, ps, numSamples, precision) {
+                var _this = this;
+                if (numSamples === void 0) { numSamples = 10; }
+                if (precision === void 0) { precision = 0.0000001; }
+                var monotoneIntervals = this.getMonotoneIntervals(ps, numSamples, precision);
+                var monotoneIntervalTs = monotoneIntervals.ts;
+                var monotoneIntervalVs = monotoneIntervals.vs;
+                var results = [];
+                for (var i = 0, n = monotoneIntervalVs.length - 1; i < n; i++) {
+                    if ((monotoneIntervalVs[i] - targetV) * (monotoneIntervalVs[i + 1] - targetV) <= 0) {
+                        var fx = function (x) { return _this.getValue(x, ps) - targetV; };
+                        var result = framework.EquationSolving.line(fx, monotoneIntervalTs[i], monotoneIntervalTs[i + 1], precision);
+                        results.push(result);
+                    }
+                }
+                return results;
+            };
+            BezierCurve.split = function (t, ps) {
+                var processs = [];
+                BezierCurve.bn(t, ps, processs);
+                var fps = [];
+                var sps = [];
+                for (var i = processs.length - 1; i >= 0; i--) {
+                    if (i == processs.length - 1) {
+                        fps.push(processs[i][0]);
+                        fps.push(processs[i][0]);
+                    }
+                    else {
+                        fps.unshift(processs[i][0]);
+                        sps.push(processs[i].pop());
+                    }
+                }
+                return [fps, sps];
+            };
+            BezierCurve.merge = function (fps, sps, mergeType) {
+                if (mergeType === void 0) { mergeType = 0; }
+                fps = fps.concat();
+                sps = sps.concat();
+                var processs = [];
+                var t;
+                var pps;
+                var ps;
+                for (var i = 0, n = fps.length; i < n; i++) {
+                    ps = processs[i] = [];
+                    if (i == 0) {
+                        processs[i][0] = fps.pop();
+                        sps.shift();
+                    }
+                    else if (i == 1) {
+                        processs[i][0] = fps.pop();
+                        processs[i][1] = sps.shift();
+                        t = (processs[i - 1][0] - processs[i][0]) / (processs[i][1] - processs[i][0]);
+                    }
+                    else {
+                        pps = processs[i - 1];
+                        var nfp = fps.pop();
+                        var nsp = sps.shift();
+                        var ps0 = [];
+                        ps0[0] = nfp;
+                        for (var j = 0, n_1 = pps.length; j < n_1; j++) {
+                            ps0[j + 1] = ps0[j] + (pps[j] - ps0[j]) / t;
+                        }
+                        var ps1 = [];
+                        ps1[pps.length] = nsp;
+                        for (var j = pps.length - 1; j >= 0; j--) {
+                            ps1[j] = ps1[j + 1] - (ps1[j + 1] - pps[j]) / (1 - t);
+                        }
+                        if (mergeType == 1) {
+                            for (var j = 0, n_2 = ps0.length - 1; j <= n_2; j++) {
+                                ps[j] = (ps0[j] * (n_2 - j) + ps1[j] * j) / n_2;
+                            }
+                        }
+                        else if (mergeType == 0) {
+                            for (var j = 0, n_3 = ps0.length - 1; j <= n_3; j++) {
+                                if (j < n_3 / 2) {
+                                    ps[j] = ps0[j];
+                                }
+                                else if (j > n_3 / 2) {
+                                    ps[j] = ps1[j];
+                                }
+                                else {
+                                    ps[j] = (ps0[j] + ps1[j]) / 2;
+                                }
+                            }
+                        }
+                        else {
+                            console.error("\u5408\u5E76\u7C7B\u578B mergeType " + mergeType + " \u9519\u8BEF!");
+                        }
+                    }
+                }
+                return processs.pop();
+            };
+            BezierCurve.getSamples = function (ps, num) {
+                if (num === void 0) { num = 100; }
+                var results = [];
+                for (var i = 0; i <= num; i++) {
+                    var t = i / num;
+                    var p = this.getValue(t, ps);
+                    results.push({ t: t, v: p });
+                }
+                return results;
+            };
+            return BezierCurve;
+        }());
+        framework.BezierCurve = BezierCurve;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var MinMaxCurve = (function () {
+            function MinMaxCurve() {
+                this.mode = framework.MinMaxCurveMode.Constant;
+                this.constant = 0;
+                this.constantMin = 0;
+                this.constantMax = 0;
+                this.curve = new framework.AnimationCurve1();
+                this.curveMin = new framework.AnimationCurve1();
+                this.curveMax = new framework.AnimationCurve1();
+                this.curveMultiplier = 1;
+                this.between0And1 = false;
+            }
+            MinMaxCurve.prototype.getValue = function (time, randomBetween) {
+                if (randomBetween === void 0) { randomBetween = Math.random(); }
+                switch (this.mode) {
+                    case framework.MinMaxCurveMode.Constant:
+                        return this.constant;
+                    case framework.MinMaxCurveMode.Curve:
+                        return this.curve.getValue(time) * this.curveMultiplier;
+                    case framework.MinMaxCurveMode.TwoConstants:
+                        return gd3d.math.numberLerp(this.constantMin, this.constantMax, randomBetween);
+                    case framework.MinMaxCurveMode.TwoCurves:
+                        return gd3d.math.numberLerp(this.curveMin.getValue(time), this.curveMax.getValue(time), randomBetween) * this.curveMultiplier;
+                }
+                return this.constant;
+            };
+            return MinMaxCurve;
+        }());
+        framework.MinMaxCurve = MinMaxCurve;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var MinMaxCurveMode;
+        (function (MinMaxCurveMode) {
+            MinMaxCurveMode[MinMaxCurveMode["Constant"] = 0] = "Constant";
+            MinMaxCurveMode[MinMaxCurveMode["Curve"] = 1] = "Curve";
+            MinMaxCurveMode[MinMaxCurveMode["TwoConstants"] = 3] = "TwoConstants";
+            MinMaxCurveMode[MinMaxCurveMode["TwoCurves"] = 2] = "TwoCurves";
+        })(MinMaxCurveMode = framework.MinMaxCurveMode || (framework.MinMaxCurveMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var MinMaxCurveVector3 = (function () {
+            function MinMaxCurveVector3() {
+                this.xCurve = new framework.MinMaxCurve();
+                this.yCurve = new framework.MinMaxCurve();
+                this.zCurve = new framework.MinMaxCurve();
+            }
+            MinMaxCurveVector3.prototype.getValue = function (time, randomBetween) {
+                if (randomBetween === void 0) { randomBetween = Math.random(); }
+                return new gd3d.math.vector3(this.xCurve.getValue(time, randomBetween), this.yCurve.getValue(time, randomBetween), this.zCurve.getValue(time, randomBetween));
+            };
+            return MinMaxCurveVector3;
+        }());
+        framework.MinMaxCurveVector3 = MinMaxCurveVector3;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var Gradient = (function () {
+            function Gradient() {
+                this.mode = framework.GradientMode.Blend;
+                this.alphaKeys = [{ alpha: 1, time: 0 }, { alpha: 1, time: 1 }];
+                this.colorKeys = [{ color: new gd3d.math.color(1, 1, 1), time: 0 }, { color: new gd3d.math.color(1, 1, 1), time: 1 }];
+            }
+            Gradient.prototype.getValue = function (time) {
+                var alpha = this.getAlpha(time);
+                var color = this.getColor(time);
+                return new gd3d.math.color(color.r, color.g, color.b, alpha);
+            };
+            Gradient.prototype.getAlpha = function (time) {
+                var alphaKeys = this.alphaKeys;
+                if (alphaKeys.length == 1)
+                    return alphaKeys[0].alpha;
+                if (time <= alphaKeys[0].time)
+                    return alphaKeys[0].alpha;
+                if (time >= alphaKeys[alphaKeys.length - 1].time)
+                    return alphaKeys[alphaKeys.length - 1].alpha;
+                for (var i = 0, n = alphaKeys.length - 1; i < n; i++) {
+                    var t = alphaKeys[i].time, v = alphaKeys[i].alpha, nt = alphaKeys[i + 1].time, nv = alphaKeys[i + 1].alpha;
+                    if (time == t)
+                        return v;
+                    if (time == nt)
+                        return nv;
+                    if (t < time && time < nt) {
+                        if (this.mode == framework.GradientMode.Fixed)
+                            return nv;
+                        return gd3d.math.mapLinear(time, t, nt, v, nv);
+                    }
+                }
+                return 1;
+            };
+            Gradient.prototype.getColor = function (time) {
+                var colorKeys = this.colorKeys;
+                if (colorKeys.length == 1)
+                    return colorKeys[0].color;
+                if (time <= colorKeys[0].time)
+                    return colorKeys[0].color;
+                if (time >= colorKeys[colorKeys.length - 1].time)
+                    return colorKeys[colorKeys.length - 1].color;
+                for (var i = 0, n = colorKeys.length - 1; i < n; i++) {
+                    var t = colorKeys[i].time, v = colorKeys[i].color, nt = colorKeys[i + 1].time, nv = colorKeys[i + 1].color;
+                    if (time == t)
+                        return v;
+                    if (time == nt)
+                        return nv;
+                    if (t < time && time < nt) {
+                        if (this.mode == framework.GradientMode.Fixed)
+                            return nv;
+                        var color = new gd3d.math.color();
+                        gd3d.math.colorLerp(v, nv, (time - t) / (nt - t), color);
+                        return color;
+                    }
+                }
+                return new gd3d.math.color();
+            };
+            return Gradient;
+        }());
+        framework.Gradient = Gradient;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var GradientMode;
+        (function (GradientMode) {
+            GradientMode[GradientMode["Blend"] = 0] = "Blend";
+            GradientMode[GradientMode["Fixed"] = 1] = "Fixed";
+        })(GradientMode = framework.GradientMode || (framework.GradientMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var MinMaxGradient = (function () {
+            function MinMaxGradient() {
+                this.mode = framework.MinMaxGradientMode.Color;
+                this.color = new gd3d.math.color();
+                this.colorMin = new gd3d.math.color();
+                this.colorMax = new gd3d.math.color();
+                this.gradient = new framework.Gradient();
+                this.gradientMin = new framework.Gradient();
+                this.gradientMax = new framework.Gradient();
+            }
+            MinMaxGradient.prototype.getValue = function (time, randomBetween, out) {
+                if (randomBetween === void 0) { randomBetween = Math.random(); }
+                if (out === void 0) { out = new gd3d.math.color(); }
+                switch (this.mode) {
+                    case framework.MinMaxGradientMode.Color:
+                        gd3d.math.colorClone(this.color, out);
+                        break;
+                    case framework.MinMaxGradientMode.Gradient:
+                        gd3d.math.colorClone(this.gradient.getValue(time), out);
+                        break;
+                    case framework.MinMaxGradientMode.TwoColors:
+                        gd3d.math.colorLerp(this.colorMin, this.colorMax, randomBetween, out);
+                        break;
+                    case framework.MinMaxGradientMode.TwoGradients:
+                        var min = this.gradientMin.getValue(time);
+                        var max = this.gradientMax.getValue(time);
+                        gd3d.math.colorLerp(min, max, randomBetween, out);
+                        break;
+                    case framework.MinMaxGradientMode.RandomColor:
+                        var v = this.gradient.getValue(randomBetween);
+                        gd3d.math.colorClone(v, out);
+                        break;
+                }
+                return out;
+            };
+            return MinMaxGradient;
+        }());
+        framework.MinMaxGradient = MinMaxGradient;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var MinMaxGradientMode;
+        (function (MinMaxGradientMode) {
+            MinMaxGradientMode[MinMaxGradientMode["Color"] = 0] = "Color";
+            MinMaxGradientMode[MinMaxGradientMode["Gradient"] = 1] = "Gradient";
+            MinMaxGradientMode[MinMaxGradientMode["TwoColors"] = 2] = "TwoColors";
+            MinMaxGradientMode[MinMaxGradientMode["TwoGradients"] = 3] = "TwoGradients";
+            MinMaxGradientMode[MinMaxGradientMode["RandomColor"] = 4] = "RandomColor";
+        })(MinMaxGradientMode = framework.MinMaxGradientMode || (framework.MinMaxGradientMode = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -36433,39 +41291,63 @@ var gd3d;
                 webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
                 webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, data, this.mode);
             };
-            glMesh.prototype.drawArrayTris = function (webgl, start, count) {
+            glMesh.prototype.drawArrayTris = function (webgl, start, count, instanceCount) {
                 if (start === void 0) { start = 0; }
                 if (count === void 0) { count = -1; }
+                if (instanceCount === void 0) { instanceCount = 1; }
                 if (count < 0)
                     count = ((this.vertexCount / 3) | 0) * 3;
                 drawInfo.ins.triCount += count / 3;
                 drawInfo.ins.renderCount++;
-                webgl.drawArrays(webgl.TRIANGLES, start, count);
+                if (instanceCount > 1 && webgl.drawArraysInstanced != null) {
+                    webgl.drawArraysInstanced(webgl.TRIANGLES, start, count, instanceCount);
+                }
+                else {
+                    webgl.drawArrays(webgl.TRIANGLES, start, count);
+                }
             };
-            glMesh.prototype.drawArrayLines = function (webgl, start, count) {
+            glMesh.prototype.drawArrayLines = function (webgl, start, count, instanceCount) {
                 if (start === void 0) { start = 0; }
                 if (count === void 0) { count = -1; }
+                if (instanceCount === void 0) { instanceCount = 1; }
                 if (count < 0)
                     count = ((this.vertexCount / 2) | 0) * 2;
                 drawInfo.ins.renderCount++;
-                webgl.drawArrays(webgl.LINES, start, count);
+                if (instanceCount > 1 && webgl.drawArraysInstanced != null) {
+                    webgl.drawArraysInstanced(webgl.LINES, start, count, instanceCount);
+                }
+                else {
+                    webgl.drawArrays(webgl.LINES, start, count);
+                }
             };
-            glMesh.prototype.drawElementTris = function (webgl, start, count) {
+            glMesh.prototype.drawElementTris = function (webgl, start, count, instanceCount) {
                 if (start === void 0) { start = 0; }
                 if (count === void 0) { count = -1; }
+                if (instanceCount === void 0) { instanceCount = 1; }
                 if (count < 0)
                     count = ((this.indexCounts[this.bindIndex] / 3) | 0) * 3;
                 drawInfo.ins.triCount += count / 3;
                 drawInfo.ins.renderCount++;
-                webgl.drawElements(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2);
+                if (instanceCount > 1 && webgl.drawElementsInstanced != null) {
+                    webgl.drawElementsInstanced(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
+                }
+                else {
+                    webgl.drawElements(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2);
+                }
             };
-            glMesh.prototype.drawElementLines = function (webgl, start, count) {
+            glMesh.prototype.drawElementLines = function (webgl, start, count, instanceCount) {
                 if (start === void 0) { start = 0; }
                 if (count === void 0) { count = -1; }
+                if (instanceCount === void 0) { instanceCount = 1; }
                 if (count < 0)
                     count = ((this.indexCounts[this.bindIndex] / 2) | 0) * 2;
                 drawInfo.ins.renderCount++;
-                webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);
+                if (instanceCount > 1 && webgl.drawElementsInstanced != null) {
+                    webgl.drawElementsInstanced(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
+                }
+                else {
+                    webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);
+                }
             };
             return glMesh;
         }());
@@ -37483,6 +42365,7 @@ var gd3d;
                 this.posBlendIndex4 = webgl.getAttribLocation(this.program, "_glesBlendIndex4");
                 this.posBlendWeight4 = webgl.getAttribLocation(this.program, "_glesBlendWeight4");
                 this.posColorEx = webgl.getAttribLocation(this.program, "_glesColorEx");
+                this["xxx"] = webgl.getAttribLocation(this.program, "xxx");
             };
             glProgram.prototype.use = function (webgl) {
                 webgl.useProgram(this.program);
@@ -37573,8 +42456,9 @@ var gd3d;
                 webgl.compileShader(vs);
                 var r1 = webgl.getShaderParameter(vs, webgl.COMPILE_STATUS);
                 if (r1 == false) {
+                    var error = webgl.getShaderInfoLog(vs);
                     webgl.deleteShader(vs);
-                    console.error(code);
+                    console.error(code, 'Failed to compile shader: ' + error);
                     return null;
                 }
                 var s = new glShader(name, ShaderTypeEnum.VS, vs, code);
@@ -37587,8 +42471,9 @@ var gd3d;
                 webgl.compileShader(fs);
                 var r1 = webgl.getShaderParameter(fs, webgl.COMPILE_STATUS);
                 if (r1 == false) {
+                    var error = webgl.getShaderInfoLog(fs);
                     webgl.deleteShader(fs);
-                    console.error(code);
+                    console.error(code, 'Failed to compile shader: ' + error);
                     return null;
                 }
                 var s = new glShader(name, ShaderTypeEnum.FS, fs, code);
@@ -38086,6 +42971,33 @@ var gd3d;
                     }
                 }
                 t.uploadByteArray(mipmap, linear, width, height, data);
+                glTexture2D.mapTexture[name] = t;
+                return t;
+            };
+            glTexture2D.particleTexture = function (webgl, name) {
+                if (name === void 0) { name = gd3d.framework.defTexture.particle; }
+                var t = glTexture2D.mapTexture[name];
+                if (t != undefined)
+                    return t;
+                var mipmap = false;
+                var linear = true;
+                t = new glTexture2D(webgl, TextureFormatEnum.RGBA, mipmap, linear);
+                var size = 64;
+                var data = new Uint8Array(size * size * 4);
+                var half = size / 2;
+                for (var i = 0; i < size; i++) {
+                    for (var j = 0; j < size; j++) {
+                        var l = gd3d.math.floatClamp(gd3d.math.vec2Length(new gd3d.math.vector2(i - half, j - half)), 0, half) / half;
+                        var f = 1 - l;
+                        f = f * f;
+                        var pos = (i + j * size) * 4;
+                        data[pos] = f * 255;
+                        data[pos + 1] = f * 255;
+                        data[pos + 2] = f * 255;
+                        data[pos + 3] = 255;
+                    }
+                }
+                t.uploadByteArray(mipmap, linear, size, size, data);
                 glTexture2D.mapTexture[name] = t;
                 return t;
             };

@@ -3,6 +3,7 @@
     "module": "system",
     "target": "es5",
     "declaration": true,
+    "declarationMap": true,
     "sourceMap": true,
     "removeComments": true,
     "experimentalDecorators": true,
@@ -11,6 +12,7 @@
     // "outFile": "D:/heziwen_/weChatGames/hungryshark_ubi/editor/server/public/1/hungryshark/lib/gd3d.js",
     // "outFile": "C:/codes/CurDeveloper/jes/hungryshark_ubi/editor/server/public/1/hungryshark/lib/gd3d.js",
     "lib": [
+      "es2015",
       "es2015.promise",
       "dom",
       "es5",

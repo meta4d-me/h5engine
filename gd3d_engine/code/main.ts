@@ -29,6 +29,7 @@ class main implements gd3d.framework.IUserCode
             demoList.addBtn("test_sound", () => new t.test_sound());
             demoList.addBtn("射线检测", () => new test_pick_boxcollider());
             demoList.addBtn("关键帧动画",()=>new test_keyFrameAni());
+            demoList.addBtn("粒子系統",()=>new test_ParticleSystem());
             return new demoList();
         });
 

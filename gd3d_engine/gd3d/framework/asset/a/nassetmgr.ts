@@ -76,6 +76,8 @@ namespace gd3d.framework {
                     return AssetTypeEnum.DDS;
                 case ".keyframeAniclip.json":
                     return AssetTypeEnum.KeyFrameAniclip;
+                case ".particlesystem.json":
+                    return AssetTypeEnum.ParticleSystem;
             }
 
             i = file.indexOf(".", i + 1);
@@ -132,7 +134,7 @@ namespace gd3d.framework {
         static noparseBundle: Array<assetBundle> = [];//未解析的资源包
 
         static atonceParse: boolean = true;//是否立即解析        
-
+        static openGuid:boolean = true;//是否开启去重能力
         name_bundles: { [key: string]: assetBundle } = {};
         kurl_bundles: { [key: string]: assetBundle } = {};
         guid_bundles: { [key: string]: assetBundle } = {};

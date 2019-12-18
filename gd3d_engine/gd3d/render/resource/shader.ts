@@ -143,6 +143,9 @@ namespace gd3d.render
             this.posBlendIndex4 = webgl.getAttribLocation(this.program, "_glesBlendIndex4");//未测试
             this.posBlendWeight4 = webgl.getAttribLocation(this.program, "_glesBlendWeight4");//未测试
             this.posColorEx = webgl.getAttribLocation(this.program, "_glesColorEx");
+
+
+            this["xxx"] = webgl.getAttribLocation(this.program, "xxx");
         }
         vs: glShader;
         fs: glShader;
@@ -278,8 +281,9 @@ namespace gd3d.render
             var r1 = webgl.getShaderParameter(vs, webgl.COMPILE_STATUS);
             if (r1 == false)
             {
+                var error = webgl.getShaderInfoLog(vs);
                 webgl.deleteShader(vs);
-                console.error(code);
+                console.error(code,'Failed to compile shader: ' + error);
 
                 return null;
             }
@@ -296,9 +300,9 @@ namespace gd3d.render
             var r1 = webgl.getShaderParameter(fs, webgl.COMPILE_STATUS);
             if (r1 == false)
             {
-
+                var error = webgl.getShaderInfoLog(fs);
                 webgl.deleteShader(fs);
-                console.error(code);
+                console.error(code,'Failed to compile shader: ' + error);
                 return null;
             }
 

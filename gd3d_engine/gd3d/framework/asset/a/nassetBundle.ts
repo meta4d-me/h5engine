@@ -28,7 +28,7 @@ namespace gd3d.framework
         dw_fileCount: number;
 
         onReady: () => void;
-        onDownloadFinish:()=>void;
+        onDownloadFinish: () => void;
         ready: boolean;
 
         constructor(url: string, private assetmgr: assetMgr, guid?: number)
@@ -53,6 +53,13 @@ namespace gd3d.framework
             this.files = json.files;
             this.texs = json.texs;
             this.pkgs = json.pkg;
+            if (!assetMgr.openGuid)
+            {
+                for (let k in this.files)
+                    this.files[k] =assetBundle.buildGuid();
+                for(let k in this.texs)
+                    this.texs[k] = assetBundle.buildGuid();
+            }
             // console.log(`${this.name}正在解析描述文件...`);
             this.dw_imgCount = this.dw_fileCount = Object.keys(this.texs || {}).length;
             let dwpkgCount = 0;
@@ -71,7 +78,7 @@ namespace gd3d.framework
                     var url = nameURL + extName;
                     var kurl = url.replace(assetMgr.cdnRoot, "");
                     var guid = assetMgr.urlmapGuid[kurl];
-                    if(!guid)
+                    if (!guid)
                         guid = assetBundle.buildGuid();
                     this.pkgsGuid.push(guid);
                     // console.log(`${this.name} 开始下载分包 ,guid:${guid},${url}`);
@@ -180,7 +187,7 @@ namespace gd3d.framework
         //解析
         async parseFile()
         {
-            if(this.onDownloadFinish)
+            if (this.onDownloadFinish)
                 this.onDownloadFinish();
             if (!this.ready)
             {
@@ -244,15 +251,15 @@ namespace gd3d.framework
                 let ref = assetMgr.mapGuid[guid];
                 if (ref)
                     this.assetmgr.unuse(ref.asset, disposeNow);
-                else 
+                else
                     delete assetMgr.mapLoading[guid];
             }
             delete this.assetmgr.guid_bundles[this.guid];
             delete this.assetmgr.name_bundles[this.name];
             delete this.assetmgr.kurl_bundles[this.keyUrl];
             delete assetMgr.mapBundleNamed[this.guid];
-            
-            
+
+
         }
 
     }

@@ -169,6 +169,10 @@ namespace gd3d.framework
          */
         Prefab,
         cPrefab,
+        /**
+         * 粒子系统
+         */
+        ParticleSystem,
     }
 
     /**

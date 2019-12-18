@@ -1,4 +1,5 @@
 /// <reference path="../lib/gd3d.d.ts" />
+/// <reference path="../lib/dat.gui.d.ts" />
 /// <reference path="../lib/htmlui.d.ts" />
 declare class demoList implements IState {
     private static funArr;
@@ -622,6 +623,35 @@ declare class test_Decal implements IState {
     init(): void;
     private initCamera;
     private Y_ag;
+    update(delta: number): void;
+}
+declare namespace gd3d.math {
+    interface color {
+        "__class__"?: "gd3d.math.color";
+    }
+    interface vector3 {
+        "__class__"?: "gd3d.math.vector3";
+    }
+}
+declare class test_ParticleSystem implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    astMgr: gd3d.framework.assetMgr;
+    private _particles;
+    private _particle;
+    private _isMove;
+    private _particleStartPosition;
+    private _particleCurrentPosition;
+    private _moveRadius;
+    private _moveAngle;
+    private _moveAngleSpeed;
+    start(app: gd3d.framework.application): Promise<void>;
+    setGUI(): void;
+    private particleName;
+    private _particleName;
+    private init;
+    private _showParticle;
     update(delta: number): void;
 }
 declare class test_RangeScreen implements IState {
@@ -2380,7 +2410,6 @@ declare class guideMask extends gd3d.framework.behaviour2d {
     private right;
     private refreshMask;
 }
-declare let dat: any;
 declare let Promise: any;
 declare class datGui {
     private static _inited;

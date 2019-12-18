@@ -1,4 +1,3 @@
-declare let dat;  
 declare let Promise;
 /**
  * datGui 工具类

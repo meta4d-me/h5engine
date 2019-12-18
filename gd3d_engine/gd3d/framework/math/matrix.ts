@@ -133,6 +133,106 @@ namespace gd3d.math
         return true;
     }
 
+    export function matrixGetEuler(src: matrix, order: RotationOrder, rotation: vector3): void
+    {
+        var clamp = math.floatClamp;
+        //
+        var rawData = src.rawData;
+        var m11 = rawData[0], m12 = rawData[4], m13 = rawData[8];
+        var m21 = rawData[1], m22 = rawData[5], m23 = rawData[9];
+        var m31 = rawData[2], m32 = rawData[6], m33 = rawData[10];
+        //
+        var scaleX = Math.sqrt(m11 * m11 + m21 * m21 + m31 * m31);
+        m11 /= scaleX;
+        m21 /= scaleX;
+        m31 /= scaleX;
+        var scaleY = Math.sqrt(m12 * m12 + m22 * m22 + m32 * m32);
+        m12 /= scaleY;
+        m22 /= scaleY;
+        m32 /= scaleY;
+        var scaleZ = Math.sqrt(m13 * m13 + m23 * m23 + m33 * m33);
+        m13 /= scaleZ;
+        m23 /= scaleZ;
+        m33 /= scaleZ;
+        //
+        if (order === RotationOrder.XYZ)
+        {
+            rotation.y = Math.asin(clamp(m13, - 1, 1));
+            if (Math.abs(m13) < 0.9999999)
+            {
+                rotation.x = Math.atan2(- m23, m33);
+                rotation.z = Math.atan2(- m12, m11);
+            } else
+            {
+                rotation.x = Math.atan2(m32, m22);
+                rotation.z = 0;
+            }
+        } else if (order === RotationOrder.YXZ)
+        {
+            rotation.x = Math.asin(- clamp(m23, - 1, 1));
+            if (Math.abs(m23) < 0.9999999)
+            {
+                rotation.y = Math.atan2(m13, m33);
+                rotation.z = Math.atan2(m21, m22);
+            } else
+            {
+                rotation.y = Math.atan2(- m31, m11);
+                rotation.z = 0;
+            }
+        } else if (order === RotationOrder.ZXY)
+        {
+            rotation.x = Math.asin(clamp(m32, - 1, 1));
+            if (Math.abs(m32) < 0.9999999)
+            {
+                rotation.y = Math.atan2(- m31, m33);
+                rotation.z = Math.atan2(- m12, m22);
+            } else
+            {
+                rotation.y = 0;
+                rotation.z = Math.atan2(m21, m11);
+            }
+        } else if (order === RotationOrder.ZYX)
+        {
+            rotation.y = Math.asin(- clamp(m31, - 1, 1));
+            if (Math.abs(m31) < 0.9999999)
+            {
+                rotation.x = Math.atan2(m32, m33);
+                rotation.z = Math.atan2(m21, m11);
+            } else
+            {
+                rotation.x = 0;
+                rotation.z = Math.atan2(- m12, m22);
+            }
+        } else if (order === RotationOrder.YZX)
+        {
+            rotation.z = Math.asin(clamp(m21, - 1, 1));
+            if (Math.abs(m21) < 0.9999999)
+            {
+                rotation.x = Math.atan2(- m23, m22);
+                rotation.y = Math.atan2(- m31, m11);
+            } else
+            {
+                rotation.x = 0;
+                rotation.y = Math.atan2(m13, m33);
+            }
+        } else if (order === RotationOrder.XZY)
+        {
+            rotation.z = Math.asin(- clamp(m12, - 1, 1));
+            if (Math.abs(m12) < 0.9999999)
+            {
+                rotation.x = Math.atan2(m32, m22);
+                rotation.y = Math.atan2(m13, m11);
+            } else
+            {
+                rotation.x = Math.atan2(- m23, m33);
+                rotation.y = 0;
+            }
+        } else
+        {
+            console.error(`初始化矩阵时错误旋转顺序 ${order}`);
+        }
+    }
+
     export function matrixGetRotation(src: matrix, result: quaternion): void
     {
         let xs = sign(src.rawData[0] * src.rawData[1] * src.rawData[2] * src.rawData[3]) < 0 ? -1 : 1;
@@ -493,6 +593,127 @@ namespace gd3d.math
         out.rawData[2] = 0.0; out.rawData[3] = yScale;
         out.rawData[4] = 0.0; out.rawData[5] = 0.0;
     }
+
+    /**
+     * 从欧拉旋转初始化矩阵
+     * 
+     * @param rotation 旋转弧度值
+     * @param order 旋转顺序
+     * @param out 输出矩阵
+     */
+    export function matrixMakeEuler(rotation: vector3, order: RotationOrder, out: matrix)
+    {
+        var te = out.rawData;
+        //
+        var rx = rotation.x;
+        var ry = rotation.y;
+        var rz = rotation.z;
+        //
+        var cosX = Math.cos(rx), sinX = Math.sin(rx);
+        var cosY = Math.cos(ry), sinY = Math.sin(ry);
+        var cosZ = Math.cos(rz), sinZ = Math.sin(rz);
+
+        if (order === RotationOrder.XYZ)
+        {
+            var ae = cosX * cosZ, af = cosX * sinZ, be = sinX * cosZ, bf = sinX * sinZ;
+
+            te[0] = cosY * cosZ;
+            te[4] = - cosY * sinZ;
+            te[8] = sinY;
+
+            te[1] = af + be * sinY;
+            te[5] = ae - bf * sinY;
+            te[9] = - sinX * cosY;
+
+            te[2] = bf - ae * sinY;
+            te[6] = be + af * sinY;
+            te[10] = cosX * cosY;
+
+        } else if (order === RotationOrder.YXZ)
+        {
+            var ce = cosY * cosZ, cf = cosY * sinZ, de = sinY * cosZ, df = sinY * sinZ;
+
+            te[0] = ce + df * sinX;
+            te[4] = de * sinX - cf;
+            te[8] = cosX * sinY;
+
+            te[1] = cosX * sinZ;
+            te[5] = cosX * cosZ;
+            te[9] = - sinX;
+
+            te[2] = cf * sinX - de;
+            te[6] = df + ce * sinX;
+            te[10] = cosX * cosY;
+
+        } else if (order === RotationOrder.ZXY)
+        {
+            var ce = cosY * cosZ, cf = cosY * sinZ, de = sinY * cosZ, df = sinY * sinZ;
+
+            te[0] = ce - df * sinX;
+            te[4] = - cosX * sinZ;
+            te[8] = de + cf * sinX;
+
+            te[1] = cf + de * sinX;
+            te[5] = cosX * cosZ;
+            te[9] = df - ce * sinX;
+
+            te[2] = - cosX * sinY;
+            te[6] = sinX;
+            te[10] = cosX * cosY;
+
+        } else if (order === RotationOrder.ZYX)
+        {
+            var ae = cosX * cosZ, af = cosX * sinZ, be = sinX * cosZ, bf = sinX * sinZ;
+
+            te[0] = cosY * cosZ;
+            te[4] = be * sinY - af;
+            te[8] = ae * sinY + bf;
+
+            te[1] = cosY * sinZ;
+            te[5] = bf * sinY + ae;
+            te[9] = af * sinY - be;
+
+            te[2] = - sinY;
+            te[6] = sinX * cosY;
+            te[10] = cosX * cosY;
+
+        } else if (order === RotationOrder.YZX)
+        {
+            var ac = cosX * cosY, ad = cosX * sinY, bc = sinX * cosY, bd = sinX * sinY;
+
+            te[0] = cosY * cosZ;
+            te[4] = bd - ac * sinZ;
+            te[8] = bc * sinZ + ad;
+
+            te[1] = sinZ;
+            te[5] = cosX * cosZ;
+            te[9] = - sinX * cosZ;
+
+            te[2] = - sinY * cosZ;
+            te[6] = ad * sinZ + bc;
+            te[10] = ac - bd * sinZ;
+
+        } else if (order === RotationOrder.XZY)
+        {
+            var ac = cosX * cosY, ad = cosX * sinY, bc = sinX * cosY, bd = sinX * sinY;
+
+            te[0] = cosY * cosZ;
+            te[4] = - sinZ;
+            te[8] = sinY * cosZ;
+
+            te[1] = ac * sinZ + bd;
+            te[5] = cosX * cosZ;
+            te[9] = ad * sinZ - bc;
+
+            te[2] = bc * sinZ - ad;
+            te[6] = sinX * cosZ;
+            te[10] = bd * sinZ + ac;
+
+        } else
+        {
+            console.error(`初始化矩阵时错误旋转顺序 ${order}`);
+        }
+    }
     export function matrixMakeRotateAxisAngle(axis: vector3, angle: number, out: matrix)
     {
         var x = axis.x,
@@ -542,6 +763,8 @@ namespace gd3d.math
         out.rawData[15] = 1;
 
     }
+
+
     export function matrix3x2MakeRotate(angle: number, out: matrix3x2)
     {
         var x = 0,
@@ -736,6 +959,66 @@ namespace gd3d.math
         out.rawData[14] = nid;
         out.rawData[15] = 1;
     }
+
+    /**
+     * 看向目标位置
+     * 
+     * @param position  所在位置
+     * @param target    目标位置
+     * @param upAxis    向上朝向
+     */
+    export function matrixLookat(position:vector3, target: vector3, upAxis: vector3, out: matrix)
+    {
+        //
+        var xAxis = new vector3();
+        var yAxis = new vector3();
+        var zAxis = new vector3();
+
+        upAxis = upAxis || new vector3(0,1,0);
+
+        zAxis.x = target.x - position.x;
+        zAxis.y = target.y - position.y;
+        zAxis.z = target.z - position.z;
+        math.vec3Normalize(zAxis,zAxis);
+
+        xAxis.x = upAxis.y * zAxis.z - upAxis.z * zAxis.y;
+        xAxis.y = upAxis.z * zAxis.x - upAxis.x * zAxis.z;
+        xAxis.z = upAxis.x * zAxis.y - upAxis.y * zAxis.x;
+        math.vec3Normalize(xAxis,xAxis);
+
+        if (math.vec3SqrLength(xAxis) < .005)
+        {
+            xAxis.x = upAxis.y;
+            xAxis.y = upAxis.x;
+            xAxis.z = 0;
+            math.vec3Normalize(xAxis,xAxis);
+        }
+
+        yAxis.x = zAxis.y * xAxis.z - zAxis.z * xAxis.y;
+        yAxis.y = zAxis.z * xAxis.x - zAxis.x * xAxis.z;
+        yAxis.z = zAxis.x * xAxis.y - zAxis.y * xAxis.x;
+
+        out.rawData[0] = xAxis.x;
+        out.rawData[1] = xAxis.y;
+        out.rawData[2] = xAxis.z;
+        out.rawData[3] = 0;
+
+        out.rawData[4] = yAxis.x;
+        out.rawData[5] = yAxis.y;
+        out.rawData[6] = yAxis.z;
+        out.rawData[7] = 0;
+
+        out.rawData[8] = zAxis.x;
+        out.rawData[9] = zAxis.y;
+        out.rawData[10] = zAxis.z;
+        out.rawData[11] = 0;
+
+        out.rawData[12] = position.x;
+        out.rawData[13] = position.y;
+        out.rawData[14] = position.z;
+        out.rawData[15] = 1;
+    }
+
     //lights fix
     export function matrixLookatLH(forward: vector3, up: vector3, out: matrix)
     {

@@ -1179,6 +1179,7 @@ var main = (function () {
             demoList.addBtn("test_sound", function () { return new t.test_sound(); });
             demoList.addBtn("射线检测", function () { return new test_pick_boxcollider(); });
             demoList.addBtn("关键帧动画", function () { return new test_keyFrameAni(); });
+            demoList.addBtn("粒子系統", function () { return new test_ParticleSystem(); });
             return new demoList();
         });
         this.addBtn("渲染==>", function () {
@@ -4157,6 +4158,122 @@ var test_Decal = (function () {
         this.building.localRotate = this.building.localRotate;
     };
     return test_Decal;
+}());
+var test_ParticleSystem = (function () {
+    function test_ParticleSystem() {
+        this._particles = ["ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames"];
+        this._isMove = false;
+        this._particleStartPosition = new gd3d.math.vector3();
+        this._particleCurrentPosition = new gd3d.math.vector3();
+        this._moveRadius = 5;
+        this._moveAngle = 0;
+        this._moveAngleSpeed = 1;
+        this._particleName = "ps_inheritVelocity";
+    }
+    test_ParticleSystem.prototype.start = function (app) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.app = app;
+                        this.scene = this.app.getScene();
+                        this.astMgr = this.app.getAssetMgr();
+                        gd3d.framework.assetMgr.openGuid = false;
+                        return [4, demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", this.astMgr)];
+                    case 1:
+                        _a.sent();
+                        return [4, datGui.init()];
+                    case 2:
+                        _a.sent();
+                        this.setGUI();
+                        this.init();
+                        return [2];
+                }
+            });
+        });
+    };
+    test_ParticleSystem.prototype.setGUI = function () {
+        if (!dat)
+            return;
+        var gui = new dat.GUI();
+        gui.add(this, 'particleName', this._particles);
+        gui.add(this, '_isMove');
+        gui.add(this, '_moveRadius', 1, 50, 1);
+        gui.add(this, '_moveAngleSpeed', -10, 10, 0.2);
+    };
+    Object.defineProperty(test_ParticleSystem.prototype, "particleName", {
+        get: function () {
+            return this._particleName;
+        },
+        set: function (v) {
+            this._showParticle(v);
+            this._particleName = v;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    test_ParticleSystem.prototype.init = function () {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 1000;
+        this.camera.fov = Math.PI * 2 / 3;
+        this.camera.backgroundColor = new gd3d.math.color(0.2784, 0.2784, 0.2784, 1);
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        var hoverc = this.camera.gameObject.addComponent("HoverCameraScript");
+        hoverc.panAngle = 180;
+        hoverc.tiltAngle = 45;
+        hoverc.distance = 10;
+        hoverc.scaleSpeed = 0.1;
+        hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0);
+        this._showParticle(this._particles[0]);
+    };
+    test_ParticleSystem.prototype._showParticle = function (res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var cubeP, cubeTran, ps;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (this._particle) {
+                            this.scene.removeChild(this._particle);
+                            this._particle = null;
+                        }
+                        return [4, demoTool.loadbySync("res/prefabs/" + res + "/" + res + ".assetbundle.json", this.astMgr)];
+                    case 1:
+                        _a.sent();
+                        cubeP = this.astMgr.getAssetByName(res + ".prefab.json", res + ".assetbundle.json");
+                        cubeTran = this._particle = cubeP.getCloneTrans();
+                        this.scene.addChild(cubeTran);
+                        ps = cubeTran.gameObject.getComponent("ParticleSystem");
+                        if (ps) {
+                            ps.play();
+                        }
+                        this._particleStartPosition = new gd3d.math.vector3();
+                        gd3d.math.vec3Clone(this._particle.localPosition, this._particleStartPosition);
+                        return [2];
+                }
+            });
+        });
+    };
+    test_ParticleSystem.prototype.update = function (delta) {
+        if (!this._particle)
+            return;
+        if (this._isMove) {
+            var offsetX = Math.cos(this._moveAngle / 180 * Math.PI) * this._moveRadius;
+            var offsetZ = Math.sin(this._moveAngle / 180 * Math.PI) * this._moveRadius;
+            this._particleCurrentPosition.y = this._particleStartPosition.y;
+            this._particleCurrentPosition.z = this._particleStartPosition.z + offsetZ;
+            this._particle.localPosition = this._particleCurrentPosition;
+            this._moveAngle += this._moveAngleSpeed;
+        }
+        else {
+            this._particle.localPosition = this._particleStartPosition;
+        }
+    };
+    return test_ParticleSystem;
 }());
 var test_RangeScreen = (function () {
     function test_RangeScreen() {
