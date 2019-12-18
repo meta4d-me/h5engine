@@ -1193,6 +1193,7 @@ var main = (function () {
             demoList.addBtn("test_light1", function () { return new t.test_light1(); });
             demoList.addBtn("test_light_d1", function () { return new t.light_d1(); });
             demoList.addBtn("test_normalmap", function () { return new t.Test_NormalMap(); });
+            demoList.addBtn("test_f4skin", function () { return new test_f4skin(); });
             return new demoList();
         });
         this.addBtn("UI样例==>", function () {
@@ -2077,6 +2078,267 @@ var testReload = (function () {
         }
     };
     return testReload;
+}());
+var test_f4skin = (function () {
+    function test_f4skin() {
+        this.timer = 0;
+    }
+    test_f4skin.prototype.boneConfig = function (bone, yOffset, rotate) {
+        if (yOffset === void 0) { yOffset = 4; }
+        if (rotate === void 0) { rotate = 10; }
+        var mf = bone.gameObject.addComponent('meshFilter');
+        mf.mesh = this.app.getAssetMgr().getDefaultMesh("cube");
+        var mr = bone.gameObject.addComponent('meshRenderer');
+        bone.localTranslate.x = yOffset;
+        bone.markDirty();
+    };
+    test_f4skin.prototype.assembSkeleton = function (segment) {
+        var bones = [];
+        for (var i = 0; i < segment; i++) {
+            var bone = new gd3d.framework.transform();
+            bone.name = 'bone_' + i;
+            bones[i] = bone;
+            if (i) {
+                this.boneConfig(bone);
+                var parent_1 = bones[i - 1];
+                parent_1.addChild(bone);
+            }
+            else {
+                this.boneConfig(bone, 0);
+            }
+        }
+        return bones;
+    };
+    test_f4skin.prototype.createMesh = function (ctx) {
+        var mesh = new gd3d.framework.mesh();
+        var NumVertsPerRow = 5;
+        var NumVertsPerCol = 2;
+        var CellSpacing = 2;
+        var boneAmount = 3;
+        var _NumCellsPerRow;
+        var _NumCellsPerCol;
+        var _Width;
+        var _Depth;
+        var _NumVertices;
+        var _NumTriangles;
+        _NumCellsPerRow = NumVertsPerRow - 1;
+        _NumCellsPerCol = NumVertsPerCol - 1;
+        _Width = _NumCellsPerRow * CellSpacing;
+        _Depth = _NumCellsPerCol * CellSpacing;
+        _NumVertices = NumVertsPerRow * NumVertsPerCol;
+        _NumTriangles = _NumCellsPerRow * _NumCellsPerCol * 2;
+        var data = mesh.data = new gd3d.render.meshData();
+        var _Vertices = data.pos = [];
+        var _Colours = data.color = [];
+        var _BoneIndex = data.blendIndex = [];
+        var _BoneWeight = data.blendWeight = [];
+        var _Indices = data.trisindex = [];
+        var StartZ = -1;
+        var EndZ = _Depth;
+        var StartX = 0;
+        var EndX = _Width;
+        var fUI = _NumCellsPerRow * 0.5 / _NumCellsPerRow;
+        var fVI = _NumCellsPerCol * 0.5 / _NumCellsPerCol;
+        var i = 0;
+        var fWaterStep = 0.0;
+        var bw = [
+            [1, 0, 0, 0],
+            [0.7, 0.3, 0, 0],
+            [0.5, 0.5, 0, 0],
+            [0, 0.6, 0.4, 0],
+            [0, 0, 1, 0],
+        ];
+        var bi = [
+            [0, 1, 2, 3],
+            [0, 1, 2, 3],
+            [0, 1, 2, 3],
+            [0, 1, 2, 3],
+            [0, 1, 2, 3],
+        ];
+        for (var z = StartZ; z <= EndZ; z += CellSpacing) {
+            var j = 0;
+            for (var x = StartX; x <= EndX; x += CellSpacing) {
+                var iIndex = i * NumVertsPerRow + j;
+                _Vertices[iIndex] = new gd3d.math.vector3();
+                _Colours[iIndex] = new gd3d.math.vector4();
+                _BoneIndex[iIndex] = new gd3d.math.vector4();
+                _BoneWeight[iIndex] = new gd3d.math.vector4();
+                _Vertices[iIndex].x = x;
+                _Vertices[iIndex].y = 0;
+                _Vertices[iIndex].z = z;
+                console.log('j ' + j);
+                console.log('x ' + x);
+                _BoneWeight[iIndex].x = _Colours[iIndex].x = bw[j][0];
+                _BoneWeight[iIndex].y = _Colours[iIndex].y = bw[j][1];
+                _BoneWeight[iIndex].z = _Colours[iIndex].z = bw[j][2];
+                _BoneWeight[iIndex].w = bw[j][3];
+                _Colours[iIndex].w = 1;
+                _BoneIndex[iIndex].x = bi[j][0];
+                _BoneIndex[iIndex].y = bi[j][1];
+                _BoneIndex[iIndex].z = bi[j][2];
+                _BoneIndex[iIndex].w = bi[j][3] = 1;
+                ++j;
+            }
+            ++i;
+        }
+        var iBaseIndex = 0;
+        for (var i_4 = 0; i_4 < _NumCellsPerCol; ++i_4) {
+            for (var j = 0; j < _NumCellsPerRow; ++j) {
+                _Indices[iBaseIndex] = i_4 * NumVertsPerRow + j;
+                _Indices[iBaseIndex + 1] = i_4 * NumVertsPerRow + j + 1;
+                _Indices[iBaseIndex + 2] = (i_4 + 1) * NumVertsPerRow + j;
+                _Indices[iBaseIndex + 3] = (i_4 + 1) * NumVertsPerRow + j;
+                _Indices[iBaseIndex + 4] = i_4 * NumVertsPerRow + j + 1;
+                _Indices[iBaseIndex + 5] = (i_4 + 1) * NumVertsPerRow + j + 1;
+                iBaseIndex += 6;
+            }
+        }
+        mesh.glMesh = new gd3d.render.glMesh();
+        var vf = gd3d.render.VertexFormatMask.Position
+            | gd3d.render.VertexFormatMask.Color
+            | gd3d.render.VertexFormatMask.BlendIndex4
+            | gd3d.render.VertexFormatMask.BlendWeight4;
+        mesh.glMesh.initBuffer(ctx, vf, _Vertices.length, gd3d.render.MeshTypeEnum.Dynamic);
+        var bs = 3 + 4 + 4 + 4;
+        var vbo = new Float32Array(_Vertices.length * bs);
+        for (var v = 0; v < _Vertices.length; v++) {
+            var cur = vbo.subarray(v * bs);
+            var position = cur.subarray(0, 3);
+            var color = cur.subarray(3, 7);
+            var boneIndex = cur.subarray(7, 11);
+            var boneWeight = cur.subarray(11, 15);
+            position[0] = _Vertices[v].x;
+            position[1] = _Vertices[v].y;
+            position[2] = _Vertices[v].z;
+            boneIndex[0] = _BoneIndex[v].x;
+            boneIndex[1] = _BoneIndex[v].y;
+            boneIndex[2] = _BoneIndex[v].z;
+            boneIndex[3] = _BoneIndex[v].w;
+            boneWeight[0] = _BoneWeight[v].x;
+            boneWeight[1] = _BoneWeight[v].y;
+            boneWeight[2] = _BoneWeight[v].z;
+            boneWeight[3] = _BoneWeight[v].w;
+            color[0] = _Colours[v].x;
+            color[1] = _Colours[v].y;
+            color[2] = _Colours[v].z;
+            color[3] = _Colours[v].w;
+        }
+        var ebo = new Uint16Array(_Indices);
+        mesh.glMesh.uploadVertexData(ctx, vbo);
+        mesh.glMesh.addIndex(ctx, ebo.length);
+        mesh.glMesh.uploadIndexData(ctx, 0, ebo);
+        mesh.submesh = [];
+        var sm = new gd3d.framework.subMeshInfo();
+        sm.matIndex = 0;
+        sm.useVertexIndex = 0;
+        sm.start = 0;
+        sm.size = ebo.length;
+        sm.line = false;
+        mesh.submesh.push(sm);
+        mesh.glMesh.uploadIndexSubData(ctx, 0, ebo);
+        return mesh;
+    };
+    test_f4skin.prototype.start = function (app) {
+        return __awaiter(this, void 0, void 0, function () {
+            var objCam, sample, mr, joints, pf, orig, anip11, _a, f4, f5, anim, _b, anip, anip2, bite;
+            var _this = this;
+            return __generator(this, function (_c) {
+                switch (_c.label) {
+                    case 0:
+                        console.log("i am here.");
+                        this.app = app;
+                        this.scene = this.app.getScene();
+                        objCam = new gd3d.framework.transform();
+                        objCam.name = "sth.";
+                        this.scene.addChild(objCam);
+                        this.camera = objCam.gameObject.addComponent("camera");
+                        this.camera.near = 0.01;
+                        this.camera.far = 100;
+                        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
+                        objCam.markDirty();
+                        return [4, new Promise(function (res) {
+                                _this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
+                                    if (state.isfinish) {
+                                        res();
+                                    }
+                                });
+                            })];
+                    case 1:
+                        _c.sent();
+                        sample = new gd3d.framework.transform();
+                        mr = sample.gameObject.addComponent('f4skinnedMeshRenderer');
+                        mr.materials = [];
+                        mr.materials[0] = new gd3d.framework.material('mat');
+                        mr.materials[0].setShader(this.app.getAssetMgr().getShader("f4skin.shader.json"));
+                        mr.mesh = this.createMesh(this.app.webgl);
+                        joints = this.assembSkeleton(3);
+                        this.scene.addChild(sample);
+                        this.scene.addChild(joints[0]);
+                        this.bones = mr.bones = joints;
+                        mr.initStaticPoseMatrices();
+                        mr.initBoneMatrices();
+                        objCam.lookat(sample);
+                        return [4, new Promise(function (res) {
+                                _this.app.getAssetMgr().load("res/prefabs/PF_PlayerSharkAlien/PF_PlayerSharkAlien.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                    if (s.isfinish)
+                                        res();
+                                });
+                            })];
+                    case 2:
+                        _c.sent();
+                        pf = this.app.getAssetMgr().getAssetByName("PF_PlayerSharkAlien.prefab.json").getCloneTrans();
+                        orig = pf.clone();
+                        this.scene.addChild(orig);
+                        anip11 = orig.gameObject.getComponentsInChildren("keyFrameAniPlayer")[0];
+                        anip11.play();
+                        this.scene.addChild(pf);
+                        _a = pf.gameObject.getComponentsInChildren('f4skinnedMeshRenderer'), f4 = _a[0], f5 = _a[1];
+                        anim = f5.gameObject.transform.parent;
+                        anim.parent.removeChild(anim);
+                        f4.bones[3].addChild(anim);
+                        pf.localTranslate.x = 0;
+                        pf.localTranslate.z -= 2;
+                        pf.localTranslate.y = 4;
+                        console.log(f4);
+                        window['f4'] = f4;
+                        window['f5'] = f5;
+                        this.f4 = pf;
+                        _b = pf.gameObject.getComponentsInChildren("keyFrameAniPlayer"), anip = _b[0], anip2 = _b[1];
+                        console.log(anip);
+                        console.log(anip2);
+                        anip.play();
+                        window['anip'] = anip2;
+                        bite = function (value) {
+                            if (value === void 0) { value = 190; }
+                            anip.rewind();
+                            anip.playByName('bite.keyframeAniclip.json');
+                            setTimeout(function () {
+                                anip2.rewind();
+                                anip2.play();
+                            }, value);
+                        };
+                        window['bite'] = bite;
+                        app.showFps();
+                        return [2];
+                }
+            });
+        });
+    };
+    test_f4skin.prototype.rotate = function (bone, valuey, valuez) {
+        gd3d.math.quatFromEulerAngles(0, valuey, valuez, bone.localRotate);
+    };
+    test_f4skin.prototype.update = function (delta) {
+        this.timer += delta;
+        if (this.bones && this.bones.length) {
+            this.rotate(this.bones[0], Math.sin(this.timer * 2) * 50, Math.cos(this.timer * 4) * 40 * 0);
+            this.rotate(this.bones[1], Math.sin(this.timer * 2) * 80, Math.cos(this.timer * 4) * -80 * 0);
+            this.rotate(this.bones[2], Math.sin(this.timer * 2) * 60, Math.cos(this.timer * 4) * 80 * 0);
+        }
+        if (window['f4']) {
+            gd3d.math.quatFromEulerAngles(0, this.timer * 10, 0, this.f4.localRotate);
+        }
+    };
+    return test_f4skin;
 }());
 var test_3DPhysics_baseShape = (function () {
     function test_3DPhysics_baseShape() {

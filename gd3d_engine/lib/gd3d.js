@@ -11859,6 +11859,12 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var Interpolation;
+        (function (Interpolation) {
+            Interpolation[Interpolation["Linear"] = 0] = "Linear";
+            Interpolation[Interpolation["Step"] = 1] = "Step";
+            Interpolation[Interpolation["Curve"] = 2] = "Curve";
+        })(Interpolation = framework.Interpolation || (framework.Interpolation = {}));
         var WrapMode;
         (function (WrapMode) {
             WrapMode[WrapMode["Default"] = 0] = "Default";
@@ -11876,6 +11882,7 @@ var gd3d;
                 this.length = 0;
                 this.frameRate = 0;
                 this.curves = [];
+                this._interpolation = Interpolation.Linear;
                 if (!assetName) {
                     assetName = "keyFrameAniClip_" + this.getGUID();
                 }
@@ -11907,6 +11914,7 @@ var gd3d;
                 this.length = obj["length"];
                 this._wrapMode = obj["wrapMode"];
                 this.frameRate = obj["frameRate"];
+                this._interpolation = obj["interpolation"] || Interpolation.Linear;
                 var curves_o = obj["curves"];
                 for (var i = 0; i < curves_o.length; i++) {
                     var curve = new AnimationCurve();
@@ -11956,6 +11964,13 @@ var gd3d;
             });
             Object.defineProperty(keyFrameAniClip.prototype, "frameCount", {
                 get: function () { return Math.floor(this.frameRate * this.length); },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(keyFrameAniClip.prototype, "interpolation", {
+                get: function () {
+                    return this._interpolation;
+                },
                 enumerable: true,
                 configurable: true
             });
@@ -12222,10 +12237,10 @@ var gd3d;
             };
             material.prototype.setFloat = function (_id, _number) {
                 if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == gd3d.render.UniformTypeEnum.Float) {
-                    this.statedMapUniforms[_id] = _number;
                     if (this.statedMapUniforms[_id] != _number) {
                         this.uniformDirtyMap[_id] = true;
                     }
+                    this.statedMapUniforms[_id] = _number;
                 }
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -12278,29 +12293,38 @@ var gd3d;
             };
             material.prototype.setTexture = function (_id, _texture, resname) {
                 if (resname === void 0) { resname = ""; }
-                if ((this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == gd3d.render.UniformTypeEnum.Texture) || _id == "_LightmapTex") {
-                    if (this.statedMapUniforms[_id] != null && (!this.statedMapUniforms[_id].defaultAsset)) {
-                        this.statedMapUniforms[_id].unuse();
+                if (!(this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == gd3d.render.UniformTypeEnum.Texture) && _id != "_LightmapTex") {
+                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                    return;
+                }
+                var oldTex = this.statedMapUniforms[_id];
+                if (oldTex != null) {
+                    if (oldTex == _texture)
+                        return;
+                    if (this.statedMapUniforms[_id].defaultAsset) {
+                        oldTex = null;
                     }
-                    this.statedMapUniforms[_id] = _texture;
-                    if (_texture != null) {
-                        if (_texture.getName() == "_color") {
-                            _texture;
-                        }
-                        if (!_texture.defaultAsset) {
-                            _texture.use();
-                        }
-                        var _texelsizeName = _id + "_TexelSize";
-                        var _gltexture = _texture.glTexture;
-                        if (_gltexture != null && this.defaultMapUniform[_texelsizeName] != null) {
-                            this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
-                        }
+                }
+                this.statedMapUniforms[_id] = _texture;
+                if (_texture != null) {
+                    if (_texture.getName() == "_color") {
+                        _texture;
+                    }
+                    if (!_texture.defaultAsset) {
+                        _texture.use();
+                    }
+                    var _texelsizeName = _id + "_TexelSize";
+                    var _gltexture = _texture.glTexture;
+                    if (_gltexture != null && this.defaultMapUniform[_texelsizeName] != null) {
+                        this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
                     this.uniformDirtyMap[_id] = true;
                 }
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
                 }
+                if (oldTex)
+                    oldTex.unuse();
             };
             material.prototype.setCubeTexture = function (_id, _texture) {
                 if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == gd3d.render.UniformTypeEnum.CubeTexture) {
@@ -12482,7 +12506,8 @@ var gd3d;
                 glstate_matrix_modelview: true,
                 glstate_matrix_mvp: true,
                 glstate_vec4_bones: true,
-                glstate_matrix_bones: true
+                glstate_matrix_bones: true,
+                boneSampler: true
             };
             material.lastDrawMatID = -1;
             material.lastDrawMeshID = -1;
@@ -16449,6 +16474,299 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var f4skinnedMeshRenderer = (function () {
+            function f4skinnedMeshRenderer() {
+                this.layer = framework.RenderLayerEnum.Common;
+                this.issetq = false;
+                this._queue = 0;
+                this.useBoneTexture = true;
+                this.tempMatrix = new gd3d.math.matrix();
+                this.inverseRootBone = new gd3d.math.matrix();
+            }
+            f4skinnedMeshRenderer_1 = f4skinnedMeshRenderer;
+            Object.defineProperty(f4skinnedMeshRenderer.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(f4skinnedMeshRenderer.prototype, "queue", {
+                get: function () {
+                    return this._queue;
+                },
+                set: function (value) {
+                    this._queue = value;
+                    this.issetq = true;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(f4skinnedMeshRenderer.prototype, "mesh", {
+                get: function () {
+                    return this._mesh;
+                },
+                set: function (mesh) {
+                    if (this._mesh != null) {
+                        this._mesh.unuse();
+                    }
+                    this._mesh = mesh;
+                    if (this._mesh != null) {
+                        this._mesh.use();
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(f4skinnedMeshRenderer.prototype, "aabb", {
+                get: function () {
+                    if (!this._aabb) {
+                        var _a = this, size = _a.size, center = _a.center;
+                        var max = gd3d.math.pool.new_vector3();
+                        var min = gd3d.math.pool.new_vector3();
+                        var temp = gd3d.math.pool.new_vector3();
+                        gd3d.math.vec3ScaleByNum(size, 0.5, min);
+                        min.x = Math.abs(min.x);
+                        min.y = Math.abs(min.y);
+                        min.z = Math.abs(min.z);
+                        gd3d.math.vec3Add(center, min, max);
+                        gd3d.math.vec3Subtract(center, min, min);
+                        var rootboneMat = this.rootBone.getWorldMatrix();
+                        gd3d.math.matrixTransformVector3(max, rootboneMat, max);
+                        gd3d.math.matrixTransformVector3(min, rootboneMat, min);
+                        gd3d.math.vec3Max(max, min, temp);
+                        gd3d.math.vec3Min(max, min, min);
+                        gd3d.math.vec3Clone(temp, max);
+                        this._aabb = new framework.aabb(max, min);
+                        gd3d.math.pool.delete_vector3(max);
+                        gd3d.math.pool.delete_vector3(min);
+                        gd3d.math.pool.delete_vector3(temp);
+                    }
+                    return this._aabb;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            f4skinnedMeshRenderer.prototype.start = function () {
+                if (!this.ibmContainer)
+                    return;
+                this.ibm = [];
+                for (var i = 0; i < this.ibmContainer.length / 4; i++) {
+                    var data = [
+                        this.ibmContainer[i * 4 + 0].x,
+                        this.ibmContainer[i * 4 + 0].y,
+                        this.ibmContainer[i * 4 + 0].z,
+                        this.ibmContainer[i * 4 + 0].w,
+                        this.ibmContainer[i * 4 + 1].x,
+                        this.ibmContainer[i * 4 + 1].y,
+                        this.ibmContainer[i * 4 + 1].z,
+                        this.ibmContainer[i * 4 + 1].w,
+                        this.ibmContainer[i * 4 + 2].x,
+                        this.ibmContainer[i * 4 + 2].y,
+                        this.ibmContainer[i * 4 + 2].z,
+                        this.ibmContainer[i * 4 + 2].w,
+                        this.ibmContainer[i * 4 + 3].x,
+                        this.ibmContainer[i * 4 + 3].y,
+                        this.ibmContainer[i * 4 + 3].z,
+                        this.ibmContainer[i * 4 + 3].w,
+                    ];
+                    this.ibm[i] = new gd3d.math.matrix(data);
+                }
+                this.initBoneMatrices();
+            };
+            f4skinnedMeshRenderer.prototype.onPlay = function () {
+            };
+            f4skinnedMeshRenderer.prototype.update = function (delta) {
+                if (this.materials != null && this.materials.length > 0) {
+                    var _mat = this.materials[0];
+                    if (_mat) {
+                        this.layer = _mat.getLayer();
+                        if (!this.issetq)
+                            this._queue = _mat.getQueue();
+                    }
+                }
+            };
+            f4skinnedMeshRenderer.prototype.render = function (context, assetmgr, camera) {
+                if (!this.ibm)
+                    return;
+                framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.SKinrender;
+                context.updateModel(this.gameObject.transform);
+                this.updateBoneMatrix();
+                if (this.useBoneTexture) {
+                    this.updateBoneTexture(context);
+                }
+                else {
+                    context.matrix_bones = this.boneMatrices;
+                }
+                if (this._mesh && this.mesh.glMesh) {
+                    this._mesh.glMesh.bindVboBuffer(context.webgl);
+                    if (this._mesh.submesh != null) {
+                        for (var i = 0; i < this._mesh.submesh.length; i++) {
+                            var sm = this._mesh.submesh[i];
+                            var mid = this._mesh.submesh[i].matIndex;
+                            var usemat = this.materials[mid];
+                            if (usemat != null) {
+                                if (this.gameObject.transform.scene.fog) {
+                                    context.fog = this.gameObject.transform.scene.fog;
+                                    usemat.draw(context, this._mesh, sm, "skin_fog");
+                                }
+                                else {
+                                    usemat.draw(context, this._mesh, sm, "skin");
+                                }
+                            }
+                        }
+                    }
+                }
+            };
+            f4skinnedMeshRenderer.prototype.remove = function () {
+                this.materials.forEach(function (element) {
+                    if (element)
+                        element.unuse();
+                });
+                if (this.mesh)
+                    this.mesh.unuse();
+                this.bones.length = 0;
+                this.boneMatrices = null;
+                this.boneMatrixChunks = null;
+                this.boneMatricesTexture.unuse();
+            };
+            f4skinnedMeshRenderer.prototype.clone = function () {
+            };
+            f4skinnedMeshRenderer.prototype.initBoneMatrices = function () {
+                if (!this.boneMatrices) {
+                    this.boneMatrices = new Float32Array(16 * (this.bones.length + 0));
+                }
+                this.boneMatrixChunks = [];
+                for (var i = 0; i < this.bones.length; i++) {
+                    this.boneMatrixChunks[i] = this.boneMatrices.subarray(i * 16, (i + 1) * 16);
+                }
+            };
+            f4skinnedMeshRenderer.prototype.initStaticPoseMatrices = function () {
+                this.ibm = [];
+                if (this.bones && this.bones.length) {
+                    if (!this.rootBone) {
+                        this.rootBone = this.bones[0];
+                    }
+                    gd3d.math.matrixInverse(this.rootBone.getWorldMatrix(), this.tempMatrix);
+                    for (var i = 0; i < this.bones.length; i++) {
+                        var bone = this.bones[i];
+                        var mat = new gd3d.math.matrix();
+                        gd3d.math.matrixMultiply(this.tempMatrix, bone.getWorldMatrix(), mat);
+                        gd3d.math.matrixInverse(mat, mat);
+                        this.ibm[i] = mat;
+                    }
+                }
+            };
+            f4skinnedMeshRenderer.prototype.updateBoneTexture = function (context) {
+                var ctx = context.webgl;
+                if (!this.boneMatricesTexture) {
+                    this.boneMatricesTexture = new gd3d.framework.texture('bone_matrices' + Math.random());
+                    this.boneMatricesTexture.glTexture = new gd3d.render.glTexture2D(ctx, gd3d.render.TextureFormatEnum.RGBA, false, false);
+                    this.boneMatricesTexture.glTexture.width = this.boneMatrices.length / 4;
+                    this.boneMatricesTexture.glTexture.height = 1;
+                    this.boneMatricesTexture.use();
+                }
+                var mat = this.materials[0];
+                mat.setTexture(f4skinnedMeshRenderer_1.boneSampler, this.boneMatricesTexture);
+                mat.setFloat(f4skinnedMeshRenderer_1.boneSamplerTexelSize, 4 / this.boneMatrices.length);
+                var basetype = this.gameObject.transform.scene.fog ? "skin_fog" : "skin";
+                var drawType = context.drawtype;
+                var shader = mat.getShader();
+                var drawPasses = shader.passes[basetype + drawType][0];
+                var texindex = ctx.getUniform(drawPasses.program.program, drawPasses.mapuniforms[f4skinnedMeshRenderer_1.boneSampler].location);
+                ctx.activeTexture(gd3d.render.webglkit.GetTextureNumber(texindex));
+                this.boneMatricesTexture.glTexture.uploadByteArray(false, false, this.boneMatrices.length / 4, 1, this.boneMatrices, false, false, false, false, false, WebGLRenderingContext.FLOAT);
+            };
+            f4skinnedMeshRenderer.prototype.updateBoneMatrix = function () {
+                for (var i = 0; i < this.bones.length; i++) {
+                    var bone = this.bones[i];
+                    gd3d.math.matrixInverse(this.gameObject.transform.getWorldMatrix(), this.tempMatrix);
+                    gd3d.math.matrixMultiply(this.tempMatrix, bone.getWorldMatrix(), this.tempMatrix);
+                    this.matrixMultiplyToArray(this.tempMatrix, this.ibm[i], this.boneMatrixChunks[i]);
+                }
+            };
+            f4skinnedMeshRenderer.prototype.matrixMultiplyToArray = function (lhs, rhs, out) {
+                var a00 = lhs.rawData[0], a01 = lhs.rawData[1], a02 = lhs.rawData[2], a03 = lhs.rawData[3];
+                var a10 = lhs.rawData[4], a11 = lhs.rawData[5], a12 = lhs.rawData[6], a13 = lhs.rawData[7];
+                var a20 = lhs.rawData[8], a21 = lhs.rawData[9], a22 = lhs.rawData[10], a23 = lhs.rawData[11];
+                var a30 = lhs.rawData[12], a31 = lhs.rawData[13], a32 = lhs.rawData[14], a33 = lhs.rawData[15];
+                var b0 = rhs.rawData[0], b1 = rhs.rawData[1], b2 = rhs.rawData[2], b3 = rhs.rawData[3];
+                out[0] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+                out[1] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+                out[2] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+                out[3] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+                b0 = rhs.rawData[4];
+                b1 = rhs.rawData[5];
+                b2 = rhs.rawData[6];
+                b3 = rhs.rawData[7];
+                out[4] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+                out[5] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+                out[6] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+                out[7] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+                b0 = rhs.rawData[8];
+                b1 = rhs.rawData[9];
+                b2 = rhs.rawData[10];
+                b3 = rhs.rawData[11];
+                out[8] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+                out[9] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+                out[10] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+                out[11] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+                b0 = rhs.rawData[12];
+                b1 = rhs.rawData[13];
+                b2 = rhs.rawData[14];
+                b3 = rhs.rawData[15];
+                out[12] = b0 * a00 + b1 * a10 + b2 * a20 + b3 * a30;
+                out[13] = b0 * a01 + b1 * a11 + b2 * a21 + b3 * a31;
+                out[14] = b0 * a02 + b1 * a12 + b2 * a22 + b3 * a32;
+                out[15] = b0 * a03 + b1 * a13 + b2 * a23 + b3 * a33;
+            };
+            var f4skinnedMeshRenderer_1;
+            f4skinnedMeshRenderer.ClassName = "f4skinnedMeshRenderer";
+            f4skinnedMeshRenderer.boneSampler = "boneSampler";
+            f4skinnedMeshRenderer.boneSamplerTexelSize = "boneSamplerTexelSize";
+            __decorate([
+                gd3d.reflect.Field("material[]"),
+                __metadata("design:type", Array)
+            ], f4skinnedMeshRenderer.prototype, "materials", void 0);
+            __decorate([
+                gd3d.reflect.Field("mesh"),
+                __metadata("design:type", framework.mesh),
+                __metadata("design:paramtypes", [framework.mesh])
+            ], f4skinnedMeshRenderer.prototype, "mesh", null);
+            __decorate([
+                gd3d.reflect.Field("transform[]"),
+                __metadata("design:type", Array)
+            ], f4skinnedMeshRenderer.prototype, "bones", void 0);
+            __decorate([
+                gd3d.reflect.Field("transform"),
+                __metadata("design:type", framework.transform)
+            ], f4skinnedMeshRenderer.prototype, "rootBone", void 0);
+            __decorate([
+                gd3d.reflect.Field("vector3"),
+                __metadata("design:type", gd3d.math.vector3)
+            ], f4skinnedMeshRenderer.prototype, "center", void 0);
+            __decorate([
+                gd3d.reflect.Field("vector3"),
+                __metadata("design:type", gd3d.math.vector3)
+            ], f4skinnedMeshRenderer.prototype, "size", void 0);
+            __decorate([
+                gd3d.reflect.Field("vector4[]"),
+                __metadata("design:type", Array)
+            ], f4skinnedMeshRenderer.prototype, "ibmContainer", void 0);
+            f4skinnedMeshRenderer = f4skinnedMeshRenderer_1 = __decorate([
+                gd3d.reflect.nodeRender,
+                gd3d.reflect.nodeComponent
+            ], f4skinnedMeshRenderer);
+            return f4skinnedMeshRenderer;
+        }());
+        framework.f4skinnedMeshRenderer = f4skinnedMeshRenderer;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var frustumculling = (function () {
             function frustumculling() {
             }
@@ -16614,7 +16932,10 @@ var gd3d;
             function keyFrameAniPlayer() {
                 this.nowTime = 0;
                 this.pathPropertyMap = {};
+                this.eulerStatusMap = {};
+                this.eulerMap = {};
             }
+            keyFrameAniPlayer_1 = keyFrameAniPlayer;
             Object.defineProperty(keyFrameAniPlayer.prototype, "nowFrame", {
                 get: function () {
                     if (!this.nowClip)
@@ -16652,6 +16973,38 @@ var gd3d;
                     this.refrasCurveProperty(tempc, playTime);
                 }
             };
+            keyFrameAniPlayer.vec3lerp = function (a, b, t, out) {
+                out.x = a.x + t * (b.x - a.x);
+                out.y = a.y + t * (b.y - a.y);
+                out.z = a.z + t * (b.z - a.z);
+                return out;
+            };
+            keyFrameAniPlayer.quatSlerp = function (a, b, t, out) {
+                var omega, cosom, sinom, scale0, scale1;
+                cosom = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+                if (cosom < 0.0) {
+                    cosom = -cosom;
+                    b.x = -b.x;
+                    b.y = -b.y;
+                    b.z = -b.z;
+                    b.w = -b.w;
+                }
+                if ((1.0 - cosom) > 0.000001) {
+                    omega = Math.acos(cosom);
+                    sinom = Math.sin(omega);
+                    scale0 = Math.sin((1.0 - t) * omega) / sinom;
+                    scale1 = Math.sin(t * omega) / sinom;
+                }
+                else {
+                    scale0 = 1.0 - t;
+                    scale1 = t;
+                }
+                out.x = scale0 * a.x + scale1 * b.x;
+                out.y = scale0 * a.y + scale1 * b.y;
+                out.z = scale0 * a.z + scale1 * b.z;
+                out.w = scale0 * a.w + scale1 * b.w;
+                return out;
+            };
             keyFrameAniPlayer.prototype.calcValueByTime = function (curve, playTime) {
                 var kfs = curve.keyFrames;
                 if (!kfs || kfs.length < 1)
@@ -16668,28 +17021,84 @@ var gd3d;
                         break;
                     }
                 }
+                var progress = leftKf
+                    ? (playTime - leftKf.time) / (rightKf.time - leftKf.time)
+                    : 1;
+                switch (curve.propertyName) {
+                    case 'localScale':
+                    case 'localTranslate':
+                        keyFrameAniPlayer_1.rhvec.x = rightKf.value[0];
+                        keyFrameAniPlayer_1.rhvec.y = rightKf.value[1];
+                        keyFrameAniPlayer_1.rhvec.z = rightKf.value[2];
+                        if (!leftKf) {
+                            return keyFrameAniPlayer_1.rhvec;
+                        }
+                        keyFrameAniPlayer_1.lhvec.x = leftKf.value[0];
+                        keyFrameAniPlayer_1.lhvec.y = leftKf.value[1];
+                        keyFrameAniPlayer_1.lhvec.z = leftKf.value[2];
+                        return keyFrameAniPlayer_1.vec3lerp(keyFrameAniPlayer_1.lhvec, keyFrameAniPlayer_1.rhvec, progress, keyFrameAniPlayer_1.resvec);
+                        break;
+                    case 'localRotate':
+                        keyFrameAniPlayer_1.rhquat.x = rightKf.value[0];
+                        keyFrameAniPlayer_1.rhquat.y = rightKf.value[1];
+                        keyFrameAniPlayer_1.rhquat.z = rightKf.value[2];
+                        keyFrameAniPlayer_1.rhquat.w = rightKf.value[3];
+                        if (!leftKf) {
+                            return keyFrameAniPlayer_1.rhquat;
+                        }
+                        keyFrameAniPlayer_1.lhquat.x = leftKf.value[0];
+                        keyFrameAniPlayer_1.lhquat.y = leftKf.value[1];
+                        keyFrameAniPlayer_1.lhquat.z = leftKf.value[2];
+                        keyFrameAniPlayer_1.lhquat.w = leftKf.value[3];
+                        return keyFrameAniPlayer_1.quatSlerp(keyFrameAniPlayer_1.lhquat, keyFrameAniPlayer_1.rhquat, progress, keyFrameAniPlayer_1.resquat);
+                }
+                return null;
                 return bezierCurveTool.calcValue(leftKf, rightKf, playTime);
             };
             keyFrameAniPlayer.prototype.refrasCurveProperty = function (curve, playTime) {
                 if (playTime < 0 || !curve || curve.keyFrames.length < 2 || framework.StringUtil.isNullOrEmptyObject(curve.propertyName))
                     return;
-                var key = curve.path + "_" + curve.type;
+                var path = curve.path;
+                var key = path + "_" + curve.type;
                 var obj = this.pathPropertyMap[key];
                 if (!obj)
                     return;
                 var sub = obj;
                 var strs = curve.propertyName.split(".");
+                var prop_type = "";
                 while (strs.length > 0) {
                     if (strs.length == 1) {
-                        sub[strs[0]] = this.calcValueByTime(curve, playTime);
+                        var str_p = strs[0];
+                        var target = this.calcValueByTime(curve, playTime);
                         if (curve.type == framework.transform["name"]) {
                             if (obj instanceof framework.transform) {
-                                obj.markDirty();
+                                if (target) {
+                                    switch (curve.propertyName) {
+                                        case 'localScale':
+                                            obj.localScale.x = target['x'];
+                                            obj.localScale.y = target['y'];
+                                            obj.localScale.z = target['z'];
+                                            break;
+                                        case 'localTranslate':
+                                            obj.localTranslate.x = target['x'];
+                                            obj.localTranslate.y = target['y'];
+                                            obj.localTranslate.z = target['z'];
+                                            break;
+                                        case 'localRotate':
+                                            obj.localRotate.x = target['x'];
+                                            obj.localRotate.y = target['y'];
+                                            obj.localRotate.z = target['z'];
+                                            obj.localRotate.w = target['w'];
+                                            break;
+                                    }
+                                }
+                                obj["dirtify"](true);
                             }
                         }
                         return;
                     }
                     var str = strs.shift();
+                    prop_type = str;
                     sub = sub[str];
                     if (!sub)
                         return;
@@ -16778,7 +17187,7 @@ var gd3d;
                     if (!framework.StringUtil.isNullOrEmptyObject(curve.path)) {
                         var strs = curve.path.split("/");
                         for (var j = 0; j < strs.length; j++) {
-                            tran = this.serchChild(strs[i], tran);
+                            tran = this.serchChild(strs[j], tran);
                             if (!tran)
                                 break;
                         }
@@ -16811,12 +17220,19 @@ var gd3d;
                 this.clips.length = 0;
                 this.clips = null;
             };
+            var keyFrameAniPlayer_1;
             keyFrameAniPlayer.ClassName = "keyFrameAniPlayer";
+            keyFrameAniPlayer.lhvec = new gd3d.math.vector3();
+            keyFrameAniPlayer.rhvec = new gd3d.math.vector3();
+            keyFrameAniPlayer.lhquat = new gd3d.math.quaternion();
+            keyFrameAniPlayer.rhquat = new gd3d.math.quaternion();
+            keyFrameAniPlayer.resvec = new gd3d.math.vector3();
+            keyFrameAniPlayer.resquat = new gd3d.math.quaternion();
             __decorate([
                 gd3d.reflect.Field("keyFrameAniClip[]"),
                 __metadata("design:type", Array)
             ], keyFrameAniPlayer.prototype, "clips", void 0);
-            keyFrameAniPlayer = __decorate([
+            keyFrameAniPlayer = keyFrameAniPlayer_1 = __decorate([
                 gd3d.reflect.nodeComponent
             ], keyFrameAniPlayer);
             return keyFrameAniPlayer;
@@ -35546,6 +35962,7 @@ var gd3d;
                         webglkit.caps.standardDerivatives = (webgl.getExtension('OES_standard_derivatives') !== null);
                         webglkit.caps.pvrtcExtension = webgl.getExtension('WEBGL_compressed_texture_pvrtc');
                         webglkit.caps.atcExtension = webgl.getExtension('WEBGL_compressed_texture_atc');
+                        webglkit.caps.textureFloat = (webgl.getExtension('OES_texture_float') !== null);
                     }
                 }
             };
@@ -37478,10 +37895,13 @@ var gd3d;
                     this.webgl.texParameteri(this.webgl.TEXTURE_2D, this.webgl.TEXTURE_WRAP_T, this.webgl.CLAMP_TO_EDGE);
                 }
             };
-            glTexture2D.prototype.uploadByteArray = function (mipmap, linear, width, height, data, repeat, mirroredU, mirroredV) {
+            glTexture2D.prototype.uploadByteArray = function (mipmap, linear, width, height, data, repeat, mirroredU, mirroredV, premultiplyAlpha, flipY, dataType) {
                 if (repeat === void 0) { repeat = false; }
                 if (mirroredU === void 0) { mirroredU = false; }
                 if (mirroredV === void 0) { mirroredV = false; }
+                if (premultiplyAlpha === void 0) { premultiplyAlpha = true; }
+                if (flipY === void 0) { flipY = true; }
+                if (dataType === void 0) { dataType = this.webgl.UNSIGNED_BYTE; }
                 this.width = width;
                 this.height = height;
                 this.mipmap = mipmap;
@@ -37490,15 +37910,21 @@ var gd3d;
                 this.mirroredU = mirroredU;
                 this.mirroredV = mirroredV;
                 this.loaded = true;
-                this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-                this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+                if (premultiplyAlpha) {
+                    this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+                }
+                else {
+                    this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
+                }
+                if (flipY) {
+                }
                 this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
                 var formatGL = this.webgl.RGBA;
                 if (this.format == TextureFormatEnum.RGB)
                     formatGL = this.webgl.RGB;
                 else if (this.format == TextureFormatEnum.Gray)
                     formatGL = this.webgl.LUMINANCE;
-                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, width, height, 0, formatGL, this.webgl.UNSIGNED_BYTE, data);
+                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, width, height, 0, formatGL, dataType, data);
                 if (mipmap) {
                     this.webgl.generateMipmap(this.webgl.TEXTURE_2D);
                     if (linear) {

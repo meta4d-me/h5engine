@@ -193,7 +193,8 @@ namespace gd3d.framework
                                             glstate_matrix_modelview:true,
                                             glstate_matrix_mvp:true,
                                             glstate_vec4_bones:true,
-                                            glstate_matrix_bones:true
+                                            glstate_matrix_bones:true,
+                                            boneSampler : true
                                         }
 
         uploadUnifoms(pass: render.glDrawPass, context: renderContext , lastMatSame = false)
@@ -331,10 +332,10 @@ namespace gd3d.framework
         {
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float)
             {
-                this.statedMapUniforms[_id] = _number;
                 if(this.statedMapUniforms[_id] != _number){
                     this.uniformDirtyMap[_id] = true;
                 }
+                this.statedMapUniforms[_id] = _number;
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);

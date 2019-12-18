@@ -6,6 +6,8 @@ namespace gd3d.framework {
     @reflect.nodeComponent
     export class f4skinnedMeshRenderer implements IRenderer {
         static readonly ClassName: string = "f4skinnedMeshRenderer";
+        private static readonly boneSampler = "boneSampler";
+        private static readonly boneSamplerTexelSize = "boneSamplerTexelSize";
         /**
          * 挂载的gameobject
          */
@@ -201,7 +203,7 @@ namespace gd3d.framework {
             context.updateModel(this.gameObject.transform); // Update MVP
             this.updateBoneMatrix();
             if (this.useBoneTexture) {
-                this.updateBoneTexture(context.webgl);
+                this.updateBoneTexture(context);
             } else {
                 context.matrix_bones = this.boneMatrices;
             }
@@ -301,7 +303,8 @@ namespace gd3d.framework {
             }
         }
 
-        updateBoneTexture(ctx: WebGLRenderingContext) {
+        updateBoneTexture(context: renderContext) {
+            let ctx: WebGLRenderingContext = context.webgl;
             if (!this.boneMatricesTexture) {
                 this.boneMatricesTexture = new gd3d.framework.texture('bone_matrices'+Math.random());
                 this.boneMatricesTexture.glTexture = new gd3d.render.glTexture2D(ctx, render.TextureFormatEnum.RGBA, false, false) as gd3d.render.glTexture2D;
@@ -312,10 +315,21 @@ namespace gd3d.framework {
                 this.boneMatricesTexture.use();
 
             }
+
             // Ensure boneMatrices is correct, if multiple skinnedMeshRenderer sharing the same material
-            this.materials[0].setTexture("boneSampler", this.boneMatricesTexture);
-            this.materials[0].setTexture("boneSampler", this.boneMatricesTexture);
-            this.materials[0].setFloat("boneSamplerTexelSize", 4 / this.boneMatrices.length);
+            // this.materials[0].setTexture("boneSampler", this.boneMatricesTexture);
+            let mat = this.materials[0];
+            mat.setTexture(f4skinnedMeshRenderer.boneSampler, this.boneMatricesTexture);
+            mat.setFloat(f4skinnedMeshRenderer.boneSamplerTexelSize, 4 / this.boneMatrices.length);
+
+            //处理uniform 同材质去重优化,贴图通道被污染
+            let basetype = this.gameObject.transform.scene.fog ?  "skin_fog" : "skin" ;
+            let drawType = context.drawtype;
+            let shader = mat.getShader();
+            let drawPasses = shader.passes[basetype + drawType][0];
+            let texindex = ctx.getUniform(drawPasses.program.program , drawPasses.mapuniforms[f4skinnedMeshRenderer.boneSampler].location);
+            ctx.activeTexture(render.webglkit.GetTextureNumber( texindex ));
+
             // update data texture
             (this.boneMatricesTexture.glTexture as gd3d.render.glTexture2D).uploadByteArray(
                 false,
