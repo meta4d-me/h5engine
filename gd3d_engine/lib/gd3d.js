@@ -8434,6 +8434,12 @@ var gd3d;
                 this.files = json.files;
                 this.texs = json.texs;
                 this.pkgs = json.pkg;
+                if (!framework.assetMgr.openGuid) {
+                    for (var k in this.files)
+                        this.files[k] = assetBundle.buildGuid();
+                    for (var k in this.texs)
+                        this.texs[k] = assetBundle.buildGuid();
+                }
                 this.dw_imgCount = this.dw_fileCount = Object.keys(this.texs || {}).length;
                 var dwpkgCount = 0;
                 if (this.pkgs) {
@@ -9053,6 +9059,7 @@ var gd3d;
             assetMgr.mapBundleNamed = {};
             assetMgr.noparseBundle = [];
             assetMgr.atonceParse = true;
+            assetMgr.openGuid = true;
             assetMgr.useBinJs = false;
             assetMgr.txt = ".txt";
             assetMgr.bin = ".bin";

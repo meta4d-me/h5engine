@@ -1619,6 +1619,7 @@ declare namespace gd3d.framework {
         };
         static noparseBundle: Array<assetBundle>;
         static atonceParse: boolean;
+        static openGuid: boolean;
         name_bundles: {
             [key: string]: assetBundle;
         };

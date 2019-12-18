@@ -39,6 +39,8 @@ class test_ParticleSystem implements IState
         this.scene = this.app.getScene();
         this.astMgr = this.app.getAssetMgr();
 
+        gd3d.framework.assetMgr.openGuid = false;
+
         await demoTool.loadbySync(`newRes/shader/MainShader.assetbundle.json`, this.astMgr);
         await datGui.init();
 
