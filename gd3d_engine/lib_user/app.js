@@ -2249,6 +2249,7 @@ var test_f4skin = (function () {
                         console.log("i am here.");
                         this.app = app;
                         this.scene = this.app.getScene();
+                        gd3d.framework.assetMgr.openGuid = false;
                         objCam = new gd3d.framework.transform();
                         objCam.name = "sth.";
                         this.scene.addChild(objCam);
@@ -2257,13 +2258,7 @@ var test_f4skin = (function () {
                         this.camera.far = 100;
                         objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
                         objCam.markDirty();
-                        return [4, new Promise(function (res) {
-                                _this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
-                                    if (state.isfinish) {
-                                        res();
-                                    }
-                                });
-                            })];
+                        return [4, demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", this.app.getAssetMgr())];
                     case 1:
                         _c.sent();
                         sample = new gd3d.framework.transform();
@@ -2287,13 +2282,14 @@ var test_f4skin = (function () {
                             })];
                     case 2:
                         _c.sent();
-                        pf = this.app.getAssetMgr().getAssetByName("PF_PlayerSharkAlien.prefab.json").getCloneTrans();
+                        pf = this.app.getAssetMgr().getAssetByName("PF_PlayerSharkAlien.prefab.json", "PF_PlayerSharkAlien.assetbundle.json").getCloneTrans();
                         orig = pf.clone();
                         this.scene.addChild(orig);
                         anip11 = orig.gameObject.getComponentsInChildren("keyFrameAniPlayer")[0];
                         anip11.play();
                         this.scene.addChild(pf);
                         _a = pf.gameObject.getComponentsInChildren('f4skinnedMeshRenderer'), f4 = _a[0], f5 = _a[1];
+                        f4.materials[0].setShader(this.app.getAssetMgr().getShader("f4skin.shader.json"));
                         anim = f5.gameObject.transform.parent;
                         anim.parent.removeChild(anim);
                         f4.bones[3].addChild(anim);

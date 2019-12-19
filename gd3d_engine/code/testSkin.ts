@@ -242,6 +242,7 @@ class test_f4skin implements IState
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
+        gd3d.framework.assetMgr.openGuid = false;
 
         // let isSplitPcakge = true;
         // let mpath = "meshprefab/";
@@ -259,15 +260,15 @@ class test_f4skin implements IState
         objCam.markDirty();//标记为需要刷新
 
 
+        await demoTool.loadbySync(`newRes/shader/MainShader.assetbundle.json`, this.app.getAssetMgr());
 
-
-        await new Promise((res) => {
-            this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json" , gd3d.framework.AssetTypeEnum.Auto, (state) => {
-                if (state.isfinish) {
-                    res();
-                }
-            })
-        });
+        // await new Promise((res) => {
+        //     this.app.getAssetMgr().load("newRes/shader/shader.assetbundle.json" , gd3d.framework.AssetTypeEnum.Auto, (state) => {
+        //         if (state.isfinish) {
+        //             res();
+        //         }
+        //     })
+        // });
 
 
 
@@ -310,13 +311,15 @@ class test_f4skin implements IState
                 });
         });
 
-        let  pf = (this.app.getAssetMgr().getAssetByName("PF_PlayerSharkAlien.prefab.json") as gd3d.framework.prefab).getCloneTrans();
+        let  pf = (this.app.getAssetMgr().getAssetByName("PF_PlayerSharkAlien.prefab.json" , "PF_PlayerSharkAlien.assetbundle.json") as gd3d.framework.prefab).getCloneTrans();
         let orig = pf.clone();
         this.scene.addChild(orig);
         let [anip11] = orig.gameObject.getComponentsInChildren("keyFrameAniPlayer") as gd3d.framework.keyFrameAniPlayer[];
         anip11.play();
         this.scene.addChild(pf);
         let [f4, f5] = pf.gameObject.getComponentsInChildren('f4skinnedMeshRenderer') as gd3d.framework.f4skinnedMeshRenderer[];
+        f4.materials[0].setShader(this.app.getAssetMgr().getShader("f4skin.shader.json"));
+
         // f4.initStaticPoseMatrices();
         // f4.initBoneMatrices();
         // f5.initStaticPoseMatrices();
