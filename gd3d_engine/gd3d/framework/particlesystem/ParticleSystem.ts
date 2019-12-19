@@ -484,6 +484,12 @@ namespace gd3d.framework
             math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
             math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
 
+            if (!this._awaked)
+            {
+                this._isPlaying = this._isPlaying || this.main.playOnAwake;
+                this._awaked = true;
+            }
+
             if (this.particleCount < 1) return;
 
             DrawCallInfo.inc.currentState = DrawCallEnum.EffectSystem;
@@ -503,12 +509,6 @@ namespace gd3d.framework
             // 获取批量渲染扩展
             var isSupportDrawInstancedArrays = !!context.webgl.drawArraysInstanced;
             // isSupportDrawInstancedArrays = false;
-
-            if (!this._awaked)
-            {
-                this._isPlaying = this.main.playOnAwake;
-                this._awaked = true;
-            }
 
             // 计算公告牌矩阵
             var isbillboard = !this.shape.alignToDirection && this.mesh == sceneMgr.app.getAssetMgr().getDefaultMesh(gd3d.framework.defMesh.quad);

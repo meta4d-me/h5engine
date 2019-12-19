@@ -2498,7 +2498,7 @@ declare namespace gd3d.framework {
         getCloneTrans2D(): transform2D;
         apply(trans: transform): void;
         jsonstr: string;
-        Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<unknown>;
+        Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<{}>;
         cParse(data: any): void;
     }
 }
@@ -7761,7 +7761,7 @@ declare namespace gd3d.io {
     function xhrLoad(url: string, fun: (ContentData: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void, responseType: XMLHttpRequestResponseType, loadedFun: (req: XMLHttpRequest) => void): void;
     function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function JSONParse(text: string): threading.gdPromise<any>;
-    function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): threading.gdPromise<unknown>;
+    function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): threading.gdPromise<{}>;
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err?: Error, loadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
