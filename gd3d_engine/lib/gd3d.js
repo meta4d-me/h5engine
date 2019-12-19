@@ -30436,6 +30436,10 @@ var gd3d;
                 var _this = this;
                 gd3d.math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
                 gd3d.math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
+                if (!this._awaked) {
+                    this._isPlaying = this._isPlaying || this.main.playOnAwake;
+                    this._awaked = true;
+                }
                 if (this.particleCount < 1)
                     return;
                 framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.EffectSystem;
@@ -30453,10 +30457,6 @@ var gd3d;
                     return;
                 mesh.glMesh.bindVboBuffer(context.webgl);
                 var isSupportDrawInstancedArrays = !!context.webgl.drawArraysInstanced;
-                if (!this._awaked) {
-                    this._isPlaying = this.main.playOnAwake;
-                    this._awaked = true;
-                }
                 var isbillboard = !this.shape.alignToDirection && this.mesh == framework.sceneMgr.app.getAssetMgr().getDefaultMesh(gd3d.framework.defMesh.quad);
                 var billboardMatrix = new gd3d.math.matrix();
                 if (isbillboard) {

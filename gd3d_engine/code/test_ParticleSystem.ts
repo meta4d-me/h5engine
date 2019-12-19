@@ -23,7 +23,7 @@ class test_ParticleSystem implements IState
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
 
-    private _particles = ["ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames"];
+    private _particles = ["ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames", "shark-levelup"];
     private _particle: gd3d.framework.transform;
 
     private _isMove = false;
@@ -112,6 +112,7 @@ class test_ParticleSystem implements IState
         this.scene.addChild(cubeTran);
 
         let ps = cubeTran.gameObject.getComponent("ParticleSystem") as gd3d.framework.ParticleSystem;
+
         if (ps)
         {
             ps.play();
