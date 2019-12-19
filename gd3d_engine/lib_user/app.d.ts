@@ -242,6 +242,20 @@ declare class testReload implements IState {
     timer: number;
     update(delta: number): void;
 }
+declare class test_f4skin implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    boneConfig(bone: gd3d.framework.transform, yOffset?: number, rotate?: number): void;
+    assembSkeleton(segment: number): gd3d.framework.transform[];
+    createMesh(ctx: WebGLRenderingContext): gd3d.framework.mesh;
+    start(app: gd3d.framework.application): Promise<void>;
+    bones: gd3d.framework.transform[];
+    f4: gd3d.framework.transform;
+    rotate(bone: gd3d.framework.transform, valuey: number, valuez: number): void;
+    timer: number;
+    update(delta: number): void;
+}
 declare class test_3DPhysics_baseShape implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;

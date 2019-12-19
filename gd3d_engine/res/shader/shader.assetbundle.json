@@ -105,18 +105,6 @@
           "length":0
           },
       {
-          "name":"resources/base/particles_additive.vs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/base/particles_additive.fs.glsl",
-          "length":0
-          },
-      {
-          "name":"resources/base/particles_additive1.shader.json",
-          "length":0
-          },
-      {
           "name":"resources/using/terrain.vs.glsl",
           "length":0
           },
@@ -198,6 +186,18 @@
           },
       {
           "name":"resources/base/diffuse_nolight.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/base/f4skin.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/base/f4skin.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/base/f4skin.shader.json",
           "length":0
           }
       ]

@@ -2288,6 +2288,11 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    enum Interpolation {
+        Linear = 0,
+        Step = 1,
+        Curve = 2
+    }
     enum WrapMode {
         Default = 0,
         Once = 1,
@@ -2317,6 +2322,8 @@ declare namespace gd3d.framework {
         readonly time: number;
         readonly frameCount: number;
         curves: AnimationCurve[];
+        private _interpolation;
+        readonly interpolation: Interpolation;
     }
     class AnimationCurve {
         path: string;
@@ -2491,7 +2498,7 @@ declare namespace gd3d.framework {
         getCloneTrans2D(): transform2D;
         apply(trans: transform): void;
         jsonstr: string;
-        Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<{}>;
+        Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<unknown>;
         cParse(data: any): void;
     }
 }
@@ -3089,6 +3096,47 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class f4skinnedMeshRenderer implements IRenderer {
+        static readonly ClassName: string;
+        private static readonly boneSampler;
+        private static readonly boneSamplerTexelSize;
+        gameObject: gameObject;
+        layer: RenderLayerEnum;
+        renderLayer: number;
+        private issetq;
+        _queue: number;
+        queue: number;
+        materials: material[];
+        private _mesh;
+        mesh: mesh;
+        bones: transform[];
+        rootBone: transform;
+        center: math.vector3;
+        size: math.vector3;
+        _aabb: aabb;
+        readonly aabb: aabb;
+        start(): void;
+        onPlay(): void;
+        update(delta: number): void;
+        render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
+        remove(): void;
+        clone(): void;
+        useBoneTexture: boolean;
+        ibmContainer: gd3d.math.vector4[];
+        ibm: gd3d.math.matrix[];
+        private boneMatrices;
+        boneMatrixChunks: Float32Array[];
+        boneMatricesTexture: gd3d.framework.texture;
+        initBoneMatrices(): void;
+        initStaticPoseMatrices(): void;
+        updateBoneTexture(context: renderContext): void;
+        tempMatrix: math.matrix;
+        inverseRootBone: math.matrix;
+        updateBoneMatrix(): void;
+        matrixMultiplyToArray(lhs: gd3d.math.matrix, rhs: gd3d.math.matrix, out: Float32Array): void;
+    }
+}
+declare namespace gd3d.framework {
     class frustumculling implements INodeComponent {
         static readonly ClassName: string;
         constructor();
@@ -3143,7 +3191,17 @@ declare namespace gd3d.framework {
         onPlay(): void;
         update(delta: number): void;
         private displayByTime;
+        private static lhvec;
+        private static rhvec;
+        private static lhquat;
+        private static rhquat;
+        private static resvec;
+        private static resquat;
+        private static vec3lerp;
+        private static quatSlerp;
         private calcValueByTime;
+        private eulerStatusMap;
+        private eulerMap;
         private refrasCurveProperty;
         private timeFilterCurves;
         private checkPlayEnd;
@@ -7703,7 +7761,7 @@ declare namespace gd3d.io {
     function xhrLoad(url: string, fun: (ContentData: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void, responseType: XMLHttpRequestResponseType, loadedFun: (req: XMLHttpRequest) => void): void;
     function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function JSONParse(text: string): threading.gdPromise<any>;
-    function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): threading.gdPromise<{}>;
+    function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): threading.gdPromise<unknown>;
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err?: Error, loadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
@@ -8139,7 +8197,7 @@ declare namespace gd3d.render {
         constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
         private getExt;
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply?: boolean, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
-        uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean): void;
+        uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array | Float32Array, repeat?: boolean, mirroredU?: boolean, mirroredV?: boolean, premultiplyAlpha?: boolean, flipY?: boolean, dataType?: number): void;
         webgl: WebGLRenderingContext;
         loaded: boolean;
         texture: WebGLTexture;

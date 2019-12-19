@@ -7,6 +7,13 @@
 /// <reference path="../../component/skinnedmeshrenderer.ts" />
 
 namespace gd3d.framework {
+
+    export enum Interpolation {
+        Linear, // 线性插值(Default)
+        Step,   // 不插值
+        Curve   // 曲线插值
+    }
+
     export enum WrapMode {
         Default = 0,
         Once = 1,
@@ -135,6 +142,7 @@ namespace gd3d.framework {
             this.length = obj["length"];
             this._wrapMode = obj["wrapMode"];
             this.frameRate = obj["frameRate"];
+            this._interpolation = obj["interpolation"] || Interpolation.Linear;
             let curves_o: any[] = obj["curves"];
             for (var i = 0; i < curves_o.length; i++) {
                 let curve = new AnimationCurve();
@@ -157,7 +165,7 @@ namespace gd3d.framework {
                         kf.outTangent = Number(kf_o["outTangent"]);
                     else
                         kf.outTangent = kf_o["outTangent"];
-                        
+
                     kf.tangentMode = kf_o["tangentMode"];
                     kf.time = kf_o["time"];
                     kf.value = kf_o["value"];
@@ -218,6 +226,11 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         curves: AnimationCurve[] = [];
+
+        private _interpolation = Interpolation.Linear;
+        get interpolation() {
+            return this._interpolation;
+        }
     }
 
     export class AnimationCurve {

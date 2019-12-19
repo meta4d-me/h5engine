@@ -63,6 +63,46 @@ namespace gd3d.framework {
         }
 
         //通过时间计算curve 值
+        // 插值函数
+        private static lhvec = new gd3d.math.vector3();
+        private static rhvec = new gd3d.math.vector3();
+        private static lhquat = new gd3d.math.quaternion();
+        private static rhquat = new gd3d.math.quaternion();
+        private static resvec = new gd3d.math.vector3();
+        private static resquat = new gd3d.math.quaternion();
+        private static vec3lerp(a: gd3d.math.vector3, b: gd3d.math.vector3, t: number, out: gd3d.math.vector3) {
+            out.x = a.x + t * (b.x - a.x);
+            out.y = a.y + t * (b.y - a.y);
+            out.z = a.z + t * (b.z - a.z);
+            return out;
+        }
+        private static quatSlerp(a: gd3d.math.quaternion, b: gd3d.math.quaternion, t: number, out: gd3d.math.quaternion) {
+            let omega, cosom, sinom, scale0, scale1;
+
+            cosom = a.x * b.x + a.y * b.y + a.z * b.z + a.w * b.w;
+            if ( cosom < 0.0 ) {
+                cosom = -cosom;
+                b.x = - b.x;
+                b.y = - b.y;
+                b.z = - b.z;
+                b.w = - b.w;
+            }
+            if ( (1.0 - cosom) > 0.000001 ) {
+                omega  = Math.acos(cosom);
+                sinom  = Math.sin(omega);
+                scale0 = Math.sin((1.0 - t) * omega) / sinom;
+                scale1 = Math.sin(t * omega) / sinom;
+            } else {
+                scale0 = 1.0 - t;
+                scale1 = t;
+            }
+            out.x = scale0 * a.x + scale1 * b.x;
+            out.y = scale0 * a.y + scale1 * b.y;
+            out.z = scale0 * a.z + scale1 * b.z;
+            out.w = scale0 * a.w + scale1 * b.w;
+
+            return out;
+        }
         private calcValueByTime(curve: AnimationCurve, playTime: number) {
             let kfs = curve.keyFrames;
             if(!kfs || kfs.length < 1)return 0;
@@ -77,30 +117,122 @@ namespace gd3d.framework {
                     break;
                 }
             }
+            // NOTE: Using LINEAR instead of bezier
+            const progress = leftKf
+                ? (playTime-leftKf.time) /(rightKf.time - leftKf.time)
+                : 1;
+            switch(curve.propertyName) {
+                case 'localScale':
+                case 'localTranslate':
+                    keyFrameAniPlayer.rhvec.x = rightKf.value[0];
+                    keyFrameAniPlayer.rhvec.y = rightKf.value[1];
+                    keyFrameAniPlayer.rhvec.z = rightKf.value[2];
+                    if(!leftKf) {
+                        return keyFrameAniPlayer.rhvec;
+                    }
+                    keyFrameAniPlayer.lhvec.x = leftKf.value[0];
+                    keyFrameAniPlayer.lhvec.y = leftKf.value[1];
+                    keyFrameAniPlayer.lhvec.z = leftKf.value[2];
 
+                    return keyFrameAniPlayer.vec3lerp(keyFrameAniPlayer.lhvec, keyFrameAniPlayer.rhvec, progress, keyFrameAniPlayer.resvec);                    break;
+                case 'localRotate':
+                    keyFrameAniPlayer.rhquat.x = rightKf.value[0];
+                    keyFrameAniPlayer.rhquat.y = rightKf.value[1];
+                    keyFrameAniPlayer.rhquat.z = rightKf.value[2];
+                    keyFrameAniPlayer.rhquat.w = rightKf.value[3];
+                    if(!leftKf) {
+                        return keyFrameAniPlayer.rhquat;
+                    }
+                    keyFrameAniPlayer.lhquat.x = leftKf.value[0];
+                    keyFrameAniPlayer.lhquat.y = leftKf.value[1];
+                    keyFrameAniPlayer.lhquat.z = leftKf.value[2];
+                    keyFrameAniPlayer.lhquat.w = leftKf.value[3];
+
+                    return keyFrameAniPlayer.quatSlerp(keyFrameAniPlayer.lhquat, keyFrameAniPlayer.rhquat, progress, keyFrameAniPlayer.resquat);
+            }
+
+            return null;
             //贝塞尔算值
             return bezierCurveTool.calcValue(leftKf,rightKf,playTime);
         }
 
+        private eulerStatusMap = {};
+        private eulerMap = {};
         //刷新curve 属性
         private refrasCurveProperty(curve: AnimationCurve, playTime: number) {
             if (playTime < 0  || !curve || curve.keyFrames.length<2 || StringUtil.isNullOrEmptyObject(curve.propertyName)) return;
-            let key = `${curve.path}_${curve.type}`;
+            let path = curve.path;
+            let key = `${path}_${curve.type}`;
             let obj = this.pathPropertyMap[key];
             if (!obj) return;
             let sub = obj;
             let strs = curve.propertyName.split(".");
+            let prop_type = "";
             while (strs.length > 0) {
                 if (strs.length == 1) {
-                    sub[strs[0]] = this.calcValueByTime(curve, playTime);
+                    let str_p = strs[0];
+                    const target = this.calcValueByTime(curve, playTime);
+                    // const target = 0;
                     if (curve.type == transform["name"]){
                         if(obj instanceof transform){
-                            obj.markDirty();
+                            if(target) {
+                                switch(curve.propertyName) {
+                                    case 'localScale':
+                                        obj.localScale.x = target['x'];
+                                        obj.localScale.y = target['y'];
+                                        obj.localScale.z = target['z'];
+                                        break;
+                                    case 'localTranslate':
+                                        obj.localTranslate.x = target['x'];
+                                        obj.localTranslate.y = target['y'];
+                                        obj.localTranslate.z = target['z'];
+                                        break;
+                                    case 'localRotate':
+                                        obj.localRotate.x = target['x'];
+                                        obj.localRotate.y = target['y'];
+                                        obj.localRotate.z = target['z'];
+                                        obj.localRotate.w = target['w'];
+                                        break;
+                                }
+                            }
+
+                            // if(prop_type == "localEulerAngles"){
+                            //     if(!this.eulerStatusMap[path]) this.eulerStatusMap[path] = 0;
+                            //     let p_val = 0;
+                            //     switch(str_p){
+                            //         case "x" : p_val = 0;  break;
+                            //         case "y" : p_val = 1;  break;
+                            //         case "z" : p_val = 2;  break;
+                            //     }
+
+                            //     this.eulerStatusMap[path] |= 1 << p_val;
+                            //     this.eulerMap[path+str_p] = target;
+
+                            //     if(this.eulerStatusMap[path] == 7){
+                            //         this.eulerStatusMap[path] = 0;
+                            //         sub.x = this.eulerMap[path+'x'];
+                            //         sub.y = this.eulerMap[path+'y'];
+                            //         sub.z = this.eulerMap[path+'z'];
+                            //         obj.localEulerAngles = sub;
+                            //         // gd3d.math.quatNormalize(obj.localRotate,obj.localRotate);
+                            //         // obj.localRotate = obj.localRotate;
+                            //     }
+                            // } else {
+                            //     sub[str_p] = target;
+                            // }
+
+                            // obj.markDirty();
+                            // obj["dirtyLocal"] = true;
+                            obj["dirtify"](true);
+                            // dirtify
+
+
                         }
                     }
                     return;
                 }
                 let str = strs.shift();
+                prop_type = str;
                 sub = sub[str];
                 if (!sub)
                     return;
@@ -146,7 +278,7 @@ namespace gd3d.framework {
          * @public
          * @language zh_CN
          * @classdesc
-         * 播放指定动画 
+         * 播放指定动画
          * @version gd3d 1.0
          */
         playByName(ClipName: string) {
@@ -165,7 +297,7 @@ namespace gd3d.framework {
          * @public
          * @language zh_CN
          * @classdesc
-         * 播放默认动画 
+         * 播放默认动画
          * @version gd3d 1.0
          */
         play() {
@@ -179,7 +311,7 @@ namespace gd3d.framework {
          * @public
          * @language zh_CN
          * @classdesc
-         * 停止默认动画 
+         * 停止默认动画
          * @version gd3d 1.0
          */
         stop(){
@@ -226,7 +358,7 @@ namespace gd3d.framework {
                 if (!StringUtil.isNullOrEmptyObject(curve.path)) {
                     let strs = curve.path.split("/");
                     for (var j = 0; j < strs.length; j++) {
-                        tran = this.serchChild(strs[i], tran);
+                        tran = this.serchChild(strs[j], tran);
                         if (!tran) break;
                     }
                     if (!tran) continue;
@@ -254,7 +386,7 @@ namespace gd3d.framework {
         }
 
         remove() {
-            
+
 
             this.gameObject = null;
             this.pathPropertyMap = null;
@@ -280,7 +412,7 @@ namespace gd3d.framework {
             let p1 = math.pool.new_vector2();
             let p2 = math.pool.new_vector2();
             let p3 = math.pool.new_vector2(outTime,outV);
-            
+
             let dir1 = math.pool.new_vector2(inTangent<0? -1 : 1, Math.sqrt(1 + inTangent * inTangent));
             let dir2 = math.pool.new_vector2(outTangent<0? -1 : 1, Math.sqrt(1 + outTangent * outTangent));
             math.vec2Add(p0,dir1,p1);

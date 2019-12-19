@@ -224,7 +224,7 @@
             //     "MOZ_",
             //     "OP_",
             //     "WEBKIT_"
-            // ];            
+            // ];
             // for (var ii = 0; ii < browserPrefixes.length; ++ii)
             // {
             //     var prefixedName = browserPrefixes[ii] + name;
@@ -328,7 +328,7 @@
             //this.img = null;
 
         }
-        uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false): void
+        uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array | Float32Array, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false, premultiplyAlpha = true, flipY = true, dataType: number = this.webgl.UNSIGNED_BYTE): void
         {
             this.width = width;
             this.height = height;
@@ -338,9 +338,14 @@
             this.mirroredU = mirroredU;
             this.mirroredV = mirroredV;
             this.loaded = true;
-            this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-            this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
-
+            if (premultiplyAlpha) {
+                this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+            } else {
+                this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
+            }
+            if (flipY) {
+                // this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+            }
             this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
             var formatGL = this.webgl.RGBA;
             if (this.format == TextureFormatEnum.RGB)
@@ -355,7 +360,7 @@
                 0,
                 formatGL,
                 //最后这个type，可以管格式
-                this.webgl.UNSIGNED_BYTE
+                dataType
                 , data);
             if (mipmap)
             {

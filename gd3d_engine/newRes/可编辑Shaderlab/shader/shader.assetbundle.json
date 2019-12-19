@@ -199,6 +199,18 @@
       {
           "name":"resources/particlesystem_additive.shader.json",
           "length":0
+          },
+      {
+          "name":"resources/f4skin.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/f4skin.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/f4skin.shader.json",
+          "length":0
           }
       ]
   }
