@@ -323,8 +323,8 @@ class test_f4skin implements IState
         pf.gameObject.getComponentsInChildren("ParticleSystem").forEach(v=>{
 
 var ps =            (<gd3d.framework.ParticleSystem>v);
-// ps.main.loop = true;
-// ps.play();
+ps.main.loop = true;
+ps.play();
         });
 
         // f4.initStaticPoseMatrices();

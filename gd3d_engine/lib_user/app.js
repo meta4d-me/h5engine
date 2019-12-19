@@ -2290,6 +2290,11 @@ var test_f4skin = (function () {
                         this.scene.addChild(pf);
                         _a = pf.gameObject.getComponentsInChildren('f4skinnedMeshRenderer'), f4 = _a[0], f5 = _a[1];
                         f4.materials[0].setShader(this.app.getAssetMgr().getShader("f4skin.shader.json"));
+                        pf.gameObject.getComponentsInChildren("ParticleSystem").forEach(function (v) {
+                            var ps = v;
+                            ps.main.loop = true;
+                            ps.play();
+                        });
                         anim = f5.gameObject.transform.parent;
                         anim.parent.removeChild(anim);
                         f4.bones[3].addChild(anim);

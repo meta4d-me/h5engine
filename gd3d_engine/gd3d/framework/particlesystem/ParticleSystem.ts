@@ -609,6 +609,7 @@ namespace gd3d.framework
                                 var location = gl.getAttribLocation(program, element[0]);
                                 if (location == -1) return;
 
+                                gl.vertexAttribDivisor(location, 0);
                                 gl.disableVertexAttribArray(location);
                             });
                         },
