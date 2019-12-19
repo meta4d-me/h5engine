@@ -4001,6 +4001,7 @@ var test_ParticleSystem = (function () {
                         this.scene.addChild(cubeTran);
                         this._particleStartPosition = new gd3d.math.vector3();
                         gd3d.math.vec3Clone(this._particle.localPosition, this._particleStartPosition);
+                        this.play();
                         return [2];
                 }
             });

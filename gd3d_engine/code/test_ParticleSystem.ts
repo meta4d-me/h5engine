@@ -133,6 +133,8 @@ class test_ParticleSystem implements IState
 
         this._particleStartPosition = new gd3d.math.vector3();
         gd3d.math.vec3Clone(this._particle.localPosition, this._particleStartPosition);
+
+        this.play();
     }
 
     update(delta: number)
