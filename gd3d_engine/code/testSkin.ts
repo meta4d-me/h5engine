@@ -320,6 +320,13 @@ class test_f4skin implements IState
         let [f4, f5] = pf.gameObject.getComponentsInChildren('f4skinnedMeshRenderer') as gd3d.framework.f4skinnedMeshRenderer[];
         f4.materials[0].setShader(this.app.getAssetMgr().getShader("f4skin.shader.json"));
 
+        pf.gameObject.getComponentsInChildren("ParticleSystem").forEach(v=>{
+
+var ps =            (<gd3d.framework.ParticleSystem>v);
+ps.main.loop = true;
+ps.play();
+        });
+
         // f4.initStaticPoseMatrices();
         // f4.initBoneMatrices();
         // f5.initStaticPoseMatrices();

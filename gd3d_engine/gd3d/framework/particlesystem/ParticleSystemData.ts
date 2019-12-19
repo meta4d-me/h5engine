@@ -37,6 +37,7 @@ namespace gd3d.framework
         /**
          * 粒子系统资源名称
          */
+        @gd3d.reflect.Field("string")
         get value()
         {
             return this._value;

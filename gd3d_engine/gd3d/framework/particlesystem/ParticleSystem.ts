@@ -48,7 +48,7 @@ namespace gd3d.framework
 
         get transform()
         {
-            return this.gameObject.transform;
+            return this.gameObject && this.gameObject.transform;
         }
 
         /**

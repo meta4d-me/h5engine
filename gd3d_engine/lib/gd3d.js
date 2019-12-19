@@ -30558,7 +30558,7 @@ var gd3d;
             });
             Object.defineProperty(ParticleSystem.prototype, "transform", {
                 get: function () {
-                    return this.gameObject.transform;
+                    return this.gameObject && this.gameObject.transform;
                 },
                 enumerable: true,
                 configurable: true
@@ -31273,6 +31273,11 @@ var gd3d;
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
             ], ParticleSystemData.prototype, "name", void 0);
+            __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], ParticleSystemData.prototype, "value", null);
             ParticleSystemData = ParticleSystemData_1 = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
