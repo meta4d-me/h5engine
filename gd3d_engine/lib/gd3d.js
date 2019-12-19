@@ -39385,7 +39385,7 @@ var gd3d;
                 this.maxtan = 1000;
                 this.preWrapMode = framework.AnimationCurveWrapMode.Clamp;
                 this.postWrapMode = framework.AnimationCurveWrapMode.Clamp;
-                this.keys = [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }, { time: 1, value: 1, inTangent: 0, outTangent: 0 }];
+                this.keys = [{ time: 0, value: 1, inTangent: 0, outTangent: 0 }];
             }
             Object.defineProperty(AnimationCurve1.prototype, "numKeys", {
                 get: function () {
