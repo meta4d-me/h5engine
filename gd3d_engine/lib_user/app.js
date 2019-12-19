@@ -3938,6 +3938,20 @@ var test_ParticleSystem = (function () {
         gui.add(this, '_isMove');
         gui.add(this, '_moveRadius', 1, 50, 1);
         gui.add(this, '_moveAngleSpeed', -10, 10, 0.2);
+        gui.add(this, 'play');
+        gui.add(this, 'stop');
+    };
+    test_ParticleSystem.prototype.play = function () {
+        this._particle.gameObject.getComponentsInChildren("ParticleSystem").forEach(function (v) {
+            var ps = v;
+            ps.play();
+        });
+    };
+    test_ParticleSystem.prototype.stop = function () {
+        this._particle.gameObject.getComponentsInChildren("ParticleSystem").forEach(function (v) {
+            var ps = v;
+            ps.stop();
+        });
     };
     Object.defineProperty(test_ParticleSystem.prototype, "particleName", {
         get: function () {
@@ -3971,7 +3985,7 @@ var test_ParticleSystem = (function () {
     };
     test_ParticleSystem.prototype._showParticle = function (res) {
         return __awaiter(this, void 0, void 0, function () {
-            var cubeP, cubeTran, ps;
+            var cubeP, cubeTran;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -3985,10 +3999,6 @@ var test_ParticleSystem = (function () {
                         cubeP = this.astMgr.getAssetByName(res + ".prefab.json", res + ".assetbundle.json");
                         cubeTran = this._particle = cubeP.getCloneTrans();
                         this.scene.addChild(cubeTran);
-                        ps = cubeTran.gameObject.getComponent("ParticleSystem");
-                        if (ps) {
-                            ps.play();
-                        }
                         this._particleStartPosition = new gd3d.math.vector3();
                         gd3d.math.vec3Clone(this._particle.localPosition, this._particleStartPosition);
                         return [2];

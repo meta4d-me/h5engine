@@ -634,6 +634,8 @@ declare class test_ParticleSystem implements IState {
     private _moveAngleSpeed;
     start(app: gd3d.framework.application): Promise<void>;
     setGUI(): void;
+    play(): void;
+    stop(): void;
     private particleName;
     private _particleName;
     private init;

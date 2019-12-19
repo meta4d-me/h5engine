@@ -58,6 +58,26 @@ class test_ParticleSystem implements IState
         gui.add(this, '_isMove');
         gui.add(this, '_moveRadius', 1, 50, 1);
         gui.add(this, '_moveAngleSpeed', -10, 10, 0.2);
+        gui.add(this, 'play');
+        gui.add(this, 'stop');
+    }
+
+    play()
+    {
+        this._particle.gameObject.getComponentsInChildren("ParticleSystem").forEach(v =>
+        {
+            var ps: gd3d.framework.ParticleSystem = <any>v;
+            ps.play();
+        })
+    }
+
+    stop()
+    {
+        this._particle.gameObject.getComponentsInChildren("ParticleSystem").forEach(v =>
+        {
+            var ps: gd3d.framework.ParticleSystem = <any>v;
+            ps.stop();
+        })
     }
 
     private get particleName()
@@ -110,13 +130,6 @@ class test_ParticleSystem implements IState
         let cubeTran = this._particle = cubeP.getCloneTrans();
 
         this.scene.addChild(cubeTran);
-
-        let ps = cubeTran.gameObject.getComponent("ParticleSystem") as gd3d.framework.ParticleSystem;
-
-        if (ps)
-        {
-            ps.play();
-        }
 
         this._particleStartPosition = new gd3d.math.vector3();
         gd3d.math.vec3Clone(this._particle.localPosition, this._particleStartPosition);
