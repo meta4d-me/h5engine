@@ -11,6 +11,9 @@ namespace gd3d.io
         constructor(buf: ArrayBuffer, seek: number = 0)
         {
             this._seek = seek;
+            if (!(buf instanceof ArrayBuffer))
+                throw new Error(`[binReader]Error buf is not Arraybuffer instance`);
+
             this._data = new DataView(buf, seek);
         }
         public _seek: number;
@@ -264,7 +267,6 @@ namespace gd3d.io
                 var buf = new ArrayBuffer(1024);
                 this._length = 0;
             }
-
             this._buf = new Uint8Array(buf);
             this._data = new DataView(this._buf.buffer);
             this._seek = 0;
