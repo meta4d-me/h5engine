@@ -1,9 +1,9 @@
 namespace gd3d.framework
 {
+    //错误搜集类
     export class error
     {
         public static openQueue: boolean;
-
         public static onError: (err: Error) => void;
         public static push(err: Error)
         {
