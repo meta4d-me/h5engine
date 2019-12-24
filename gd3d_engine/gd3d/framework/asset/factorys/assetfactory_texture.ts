@@ -55,18 +55,32 @@ namespace gd3d.framework
             
             let imgGuid = bundle && bundle.texs ?  bundle.texs[filename] : dwguid;
             let _texture : texture;
-            let assRef = assetMgr.mapGuid[imgGuid]
-            if(assRef){
-                _texture = assRef.asset as texture;
-                if(_texture && _texture instanceof texture) return _texture;
+            let texName = filename.split(".")[0];
+            let texDescName = `${texName}.imgdesc.json`;
+            let hasImgdesc = bundle && bundle.files[texDescName] != null;
+            let guidList : number[] = [imgGuid];
+            if(hasImgdesc) {
+                guidList.push(bundle.files[texDescName]);
             }
 
-            let _tex = assetMgr.mapImage[imgGuid] || assetMgr.mapLoading[imgGuid].data;
-            _texture =  new texture(filename);
-            let texName = filename.split(".")[0];
-            let texDesc = `${texName}.imgdesc.json`;
-            if(!bundle || bundle.files[texDesc] == null){
-                //有描述文件不new texture ， 避免冗余增加内存开销
+            let len = guidList.length;
+            for(let i=0;i < len ;i++){
+                //如找到已近加载过的资源，不再重复构建
+                let _guid = guidList[i];
+                let assRef = assetMgr.mapGuid[_guid]
+                if(assRef){
+                    _texture = assRef.asset as texture;
+                    if(_texture && _texture instanceof texture) {
+                        delete assetMgr.mapImage[imgGuid];
+                        return _texture;
+                    }
+                }
+            }
+
+            //有描述文件不new texture ， 避免冗余增加内存开销
+            if(!hasImgdesc){
+                let _tex = assetMgr.mapImage[imgGuid] || assetMgr.mapLoading[imgGuid].data;
+                _texture =  new texture(filename);
                 var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
                 var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat)
                 t2d.uploadImage(_tex, false, true, true, false);

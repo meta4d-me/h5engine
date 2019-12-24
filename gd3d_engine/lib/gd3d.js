@@ -8844,13 +8844,23 @@ var gd3d;
                 });
             };
             assetMgr.prototype.loadImg = function (guid, url, cb) {
-                if (assetMgr.mapImage[guid])
-                    return cb(assetMgr.mapImage[guid]);
+                var _img = assetMgr.mapImage[guid];
+                if (_img) {
+                    _img.guid = guid;
+                    return cb(_img);
+                }
+                else {
+                    if (assetMgr.mapGuid[guid]) {
+                        cb(null);
+                        return;
+                    }
+                }
                 var loading = assetMgr.mapLoading[guid];
                 if (!loading)
                     loading = assetMgr.mapLoading[guid] = { readyok: false, cbQueue: [] };
                 loading.cbQueue.push(cb);
                 this._loadImg(url, function (img) {
+                    img.guid = guid;
                     assetMgr.mapImage[guid] = img;
                     loading.readyok = true;
                     loading.data = img;
@@ -9965,17 +9975,28 @@ var gd3d;
             AssetFactory_Texture.prototype.parse = function (assetmgr, bundle, filename, txt, dwguid) {
                 var imgGuid = bundle && bundle.texs ? bundle.texs[filename] : dwguid;
                 var _texture;
-                var assRef = framework.assetMgr.mapGuid[imgGuid];
-                if (assRef) {
-                    _texture = assRef.asset;
-                    if (_texture && _texture instanceof framework.texture)
-                        return _texture;
-                }
-                var _tex = framework.assetMgr.mapImage[imgGuid] || framework.assetMgr.mapLoading[imgGuid].data;
-                _texture = new framework.texture(filename);
                 var texName = filename.split(".")[0];
-                var texDesc = texName + ".imgdesc.json";
-                if (!bundle || bundle.files[texDesc] == null) {
+                var texDescName = texName + ".imgdesc.json";
+                var hasImgdesc = bundle && bundle.files[texDescName] != null;
+                var guidList = [imgGuid];
+                if (hasImgdesc) {
+                    guidList.push(bundle.files[texDescName]);
+                }
+                var len = guidList.length;
+                for (var i = 0; i < len; i++) {
+                    var _guid = guidList[i];
+                    var assRef = framework.assetMgr.mapGuid[_guid];
+                    if (assRef) {
+                        _texture = assRef.asset;
+                        if (_texture && _texture instanceof framework.texture) {
+                            delete framework.assetMgr.mapImage[imgGuid];
+                            return _texture;
+                        }
+                    }
+                }
+                if (!hasImgdesc) {
+                    var _tex = framework.assetMgr.mapImage[imgGuid] || framework.assetMgr.mapLoading[imgGuid].data;
+                    _texture = new framework.texture(filename);
                     var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
                     var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat);
                     t2d.uploadImage(_tex, false, true, true, false);

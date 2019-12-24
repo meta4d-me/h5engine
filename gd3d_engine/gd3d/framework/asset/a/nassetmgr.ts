@@ -267,13 +267,23 @@ namespace gd3d.framework {
 
         //加载图片
         loadImg(guid: number, url: string, cb: (img) => void) {
-            if (assetMgr.mapImage[guid])
-                return cb(assetMgr.mapImage[guid]);
+            let _img = assetMgr.mapImage[guid] ;
+            if (_img){
+                (_img as any).guid = guid;
+                return cb(_img);
+            }else{
+                if(assetMgr.mapGuid[guid]) {    //因为 资源解析完assetMgr.mapImage 缓存会被清理 ，此环节退出 避免loadimg 
+                    cb(null);
+                    return;
+                }
+            }
+
             let loading = assetMgr.mapLoading[guid];
             if (!loading)
                 loading = assetMgr.mapLoading[guid] = { readyok: false, cbQueue: [] }
             loading.cbQueue.push(cb);
             this._loadImg(url, (img) => {
+                img.guid = guid;
                 assetMgr.mapImage[guid] = img;
                 loading.readyok = true;
                 loading.data = img;
