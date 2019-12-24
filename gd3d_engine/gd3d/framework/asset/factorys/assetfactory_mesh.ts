@@ -107,8 +107,7 @@ namespace gd3d.framework
         {
             if (!(data instanceof ArrayBuffer))
             {
-                let stack = new Error().stack;
-                console.error(`data not ArrayBuffer instance ,mesh name:${name},bundle:${bundle ? bundle.url : null} stack:${stack}`);
+                error.push(new Error(`data not ArrayBuffer instance ,mesh name:${name},bundle:${bundle ? bundle.url : null} `));                
                 return new mesh(name);
             }
             return new mesh(name).Parse(data, assetMgr.webgl);

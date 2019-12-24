@@ -213,14 +213,15 @@ namespace gd3d.framework
             return total;
         }
 
-        private static sameMatPassMap = {   glstate_matrix_model:true,
-                                            glstate_matrix_world2object:true,
-                                            glstate_matrix_modelview:true,
-                                            glstate_matrix_mvp:true,
-                                            glstate_vec4_bones:true,
-                                            glstate_matrix_bones:true,
-                                            boneSampler : true
-                                        }
+        private static sameMatPassMap = {
+            glstate_matrix_model: true,
+            glstate_matrix_world2object: true,
+            glstate_matrix_modelview: true,
+            glstate_matrix_mvp: true,
+            glstate_vec4_bones: true,
+            glstate_matrix_bones: true,
+            boneSampler: true
+        }
 
         uploadUnifoms(pass: render.glDrawPass, context: renderContext, lastMatSame = false)
         {
@@ -253,6 +254,11 @@ namespace gd3d.framework
                     {
                         console.error("Uniform don't be setted or have def value. uniform:" + unifom.name + "mat:" + this.getName());
                     }
+                }
+                if (unifom.type == render.UniformTypeEnum.Texture && !unifomValue.glTexture)
+                {
+                    error.push(new Error(`material [${this.name}] uploadunifrom fail! glTexture is null!! `));
+                    continue;
                 }
                 func(unifom.location, unifomValue);
             }
@@ -358,7 +364,8 @@ namespace gd3d.framework
         {
             if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float)
             {
-                if(this.statedMapUniforms[_id] != _number){
+                if (this.statedMapUniforms[_id] != _number)
+                {
                     this.uniformDirtyMap[_id] = true;
                 }
                 this.statedMapUniforms[_id] = _number;
@@ -446,14 +453,16 @@ namespace gd3d.framework
         setTexture(_id: string, _texture: gd3d.framework.texture, resname: string = "")
         {
             // if((this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) || _id == "_LightmapTex"){
-            if(!(this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) && _id != "_LightmapTex"){
+            if (!(this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) && _id != "_LightmapTex")
+            {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
                 return;
             }
 
             let oldTex = this.statedMapUniforms[_id] as gd3d.framework.texture;
-            if(oldTex != null ){
-                if(oldTex == _texture) return;
+            if (oldTex != null)
+            {
+                if (oldTex == _texture) return;
                 if (this.statedMapUniforms[_id].defaultAsset)
                 {
                     oldTex = null;
@@ -487,7 +496,7 @@ namespace gd3d.framework
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
 
-            if(oldTex) oldTex.unuse();
+            if (oldTex) oldTex.unuse();
 
             // if ((this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) || _id == "_LightmapTex")
             // {

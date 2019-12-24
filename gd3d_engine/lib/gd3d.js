@@ -22,10 +22,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -799,6 +800,24 @@ var gd3d;
             return DrawCallInfo;
         }());
         framework.DrawCallInfo = DrawCallInfo;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var error = (function () {
+            function error() {
+            }
+            error.push = function (err) {
+                if (this.openQueue && this.onError)
+                    this.onError(err);
+                else
+                    console.error(err.stack);
+            };
+            return error;
+        }());
+        framework.error = error;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -9784,6 +9803,10 @@ var gd3d;
             function AssetFactory_Mesh() {
             }
             AssetFactory_Mesh.prototype.parse = function (assetMgr, bundle, name, data) {
+                if (!(data instanceof ArrayBuffer)) {
+                    framework.error.push(new Error("data not ArrayBuffer instance ,mesh name:" + name + ",bundle:" + (bundle ? bundle.url : null) + " "));
+                    return new framework.mesh(name);
+                }
                 return new framework.mesh(name).Parse(data, assetMgr.webgl);
             };
             AssetFactory_Mesh = __decorate([
@@ -12466,6 +12489,10 @@ var gd3d;
                             console.error("Uniform don't be setted or have def value. uniform:" + unifom.name + "mat:" + this.getName());
                         }
                     }
+                    if (unifom.type == gd3d.render.UniformTypeEnum.Texture && !unifomValue.glTexture) {
+                        framework.error.push(new Error("material [" + this.name + "] uploadunifrom fail! glTexture is null!! "));
+                        continue;
+                    }
                     func(unifom.location, unifomValue);
                 }
             };
@@ -12756,7 +12783,8 @@ var gd3d;
             };
             var material_2;
             material.ClassName = "material";
-            material.sameMatPassMap = { glstate_matrix_model: true,
+            material.sameMatPassMap = {
+                glstate_matrix_model: true,
                 glstate_matrix_world2object: true,
                 glstate_matrix_modelview: true,
                 glstate_matrix_mvp: true,
@@ -23289,6 +23317,8 @@ var gd3d;
             function binReader(buf, seek) {
                 if (seek === void 0) { seek = 0; }
                 this._seek = seek;
+                if (!(buf instanceof ArrayBuffer))
+                    throw new Error("[binReader]Error buf is not Arraybuffer instance");
                 this._data = new DataView(buf, seek);
             }
             binReader.prototype.seek = function (seek) {

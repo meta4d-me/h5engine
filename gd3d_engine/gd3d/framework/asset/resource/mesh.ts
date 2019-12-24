@@ -384,27 +384,8 @@ namespace gd3d.framework
         {
             return new threading.gdPromise<mesh>((reslove) =>
             {
-
-                // if (inData instanceof ArrayBuffer)
-                // {
-
-                // if (this.getName().lastIndexOf(".cmesh") == -1)
-                // {
-                //     if (mesh.useThead)
-                //         this.parseTMesh(inData, webgl, reslove);
-                //     else
-                //         this.parseMesh(inData, webgl, reslove);
-                // } else
-                // {
-                    this.parseCMesh(inData, webgl);
-                    reslove(this);
-                // }
-
-                // } else
-                // {
-                //     this.parseJSON(inData, webgl);
-                //     reslove();
-                // }
+                this.parseCMesh(inData, webgl);
+                reslove(this);
             });
         }
 
@@ -528,7 +509,7 @@ namespace gd3d.framework
             this.glMesh.addIndex(webgl, indices.length);
             this.glMesh.uploadIndexData(webgl, 0, indices);
         }
-        
+
         // parseTMesh(inData, webgl, reslove)
         // {
         //     threading.thread.Instance.Call("meshDataHandle", inData, (result) =>
@@ -811,7 +792,7 @@ namespace gd3d.framework
             let _result = new mesh(this.getName());
             var vf = this.glMesh.vertexFormat;//顶点属性
             // var data: gd3d.render.meshData = new gd3d.render.meshData();
-            var data: gd3d.render.meshData = render.meshData.cloneByObj(this.data);           
+            var data: gd3d.render.meshData = render.meshData.cloneByObj(this.data);
 
             _result.data = data;
             _result.glMesh = new gd3d.render.glMesh();

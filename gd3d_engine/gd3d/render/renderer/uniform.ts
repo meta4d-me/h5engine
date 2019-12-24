@@ -29,6 +29,7 @@ namespace gd3d.render
                 this.webgl.uniformMatrix4fv(location,false,value);
             };
             this.applyuniformFunc[UniformTypeEnum.Texture]=(location,value)=>{//texture
+                
                 var tex = value.glTexture.texture;
                 this.webgl.activeTexture(render.webglkit.GetTextureNumber( this.texindex));
                 this.webgl.bindTexture(this.webgl.TEXTURE_2D, tex);
