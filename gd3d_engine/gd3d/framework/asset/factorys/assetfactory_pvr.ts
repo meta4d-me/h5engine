@@ -46,11 +46,30 @@ namespace gd3d.framework
         //     { });
         // }
         //#endregion
-        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer)
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer , dwguid: number)
         {
             let _texture = new texture(name);
             let pvr: PvrParse = new PvrParse(assetmgr.webgl);
-            _texture.glTexture = pvr.parse(bytes);
+
+            let imgGuid = dwguid || bundle.texs[name];
+            let assRef = assetMgr.mapGuid[imgGuid];
+            if(assRef){
+                _texture = assRef.asset as texture;
+                if(_texture && _texture instanceof texture) return _texture;
+            }
+
+
+            let texName = name.split(".")[0];
+            let texDesc = `${texName}.imgdesc.json`;
+            if(!bundle || bundle.files[texDesc] == null){
+                _texture.glTexture = pvr.parse(bytes);
+                //清理 HTMLImageElement 的占用
+                let loading = assetMgr.mapLoading[imgGuid];
+                if(loading){
+                    delete loading.data;
+                }
+            }
+
             return _texture;
         }
     }

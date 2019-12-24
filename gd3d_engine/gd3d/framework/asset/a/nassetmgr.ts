@@ -230,6 +230,9 @@ namespace gd3d.framework {
         }
 
         download(guid: number, url: string, type: AssetTypeEnum, finish: () => void) {
+            if(assetMgr.mapGuid[guid]){
+                return finish();
+            }
             let loading = assetMgr.mapLoading[guid];
             //下载完成的不再下载
             if (loading && loading.readyok && finish)
@@ -348,6 +351,7 @@ namespace gd3d.framework {
                     __asset["id"].id = asset.guid;
                 __asset.bundle = bundle;
                 this.use(__asset);
+                delete assetMgr.mapLoading[asset.guid];
             }
             return __asset;
             // console.log(`解析完成[${AssetTypeEnum[asset.type]}]${Date.now() - ctime}ms,解析器:${factory.constructor.name},guid:${asset.guid},name:${asset.name}`);

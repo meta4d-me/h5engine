@@ -52,13 +52,28 @@ namespace gd3d.framework
         //#endregion
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string , dwguid: number)
         {            
+            
             let imgGuid = bundle && bundle.texs ?  bundle.texs[filename] : dwguid;
+            let _texture : texture;
+            let assRef = assetMgr.mapGuid[imgGuid]
+            if(assRef){
+                _texture = assRef.asset as texture;
+                if(_texture && _texture instanceof texture) return _texture;
+            }
+
             let _tex = assetMgr.mapImage[imgGuid] || assetMgr.mapLoading[imgGuid].data;
-            let _texture =  new texture(filename);
-            var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
-            var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat)
-            t2d.uploadImage(_tex, false, true, true, false);
-            _texture.glTexture = t2d;
+            _texture =  new texture(filename);
+            let texName = filename.split(".")[0];
+            let texDesc = `${texName}.imgdesc.json`;
+            if(!bundle || bundle.files[texDesc] == null){
+                //有描述文件不new texture ， 避免冗余增加内存开销
+                var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
+                var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat)
+                t2d.uploadImage(_tex, false, true, true, false);
+                _texture.glTexture = t2d;
+                //清理 HTMLImageElement 的占用
+                delete assetMgr.mapImage[imgGuid];
+            }
             return _texture;
         }
     }
