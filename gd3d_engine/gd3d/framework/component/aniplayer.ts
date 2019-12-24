@@ -194,6 +194,7 @@ namespace gd3d.framework
 
         }
         private temptMat: math.matrix = math.pool.new_matrix();
+        frameDirty : boolean = false;
         update(delta: number)
         {
             if (!this.bePlay) return;
@@ -208,7 +209,13 @@ namespace gd3d.framework
                     this.beCross = false;
                 }
             }
-            this.curFrame = this._playClip.frames[this._playFrameid];
+            let lastFdata = this.curFrame;
+            this.frameDirty = false;
+            let currFdata = this._playClip.frames[this._playFrameid];
+            if(currFdata == lastFdata) return;
+
+            this.frameDirty = true;
+            this.curFrame = currFdata;
 
             const bs = this._playClip.hasScaled
                 ? 8 // TODO: 8
