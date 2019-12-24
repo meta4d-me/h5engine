@@ -9862,15 +9862,29 @@ var gd3d;
                 var _texture = new framework.texture(name);
                 var pvr = new PvrParse(assetmgr.webgl);
                 var imgGuid = dwguid || bundle.texs[name];
-                var assRef = framework.assetMgr.mapGuid[imgGuid];
-                if (assRef) {
-                    _texture = assRef.asset;
-                    if (_texture && _texture instanceof framework.texture)
-                        return _texture;
-                }
                 var texName = name.split(".")[0];
-                var texDesc = texName + ".imgdesc.json";
-                if (!bundle || bundle.files[texDesc] == null) {
+                var texDescName = texName + ".imgdesc.json";
+                var hasImgdesc = bundle && bundle.files[texDescName] != null;
+                var guidList = [imgGuid];
+                if (hasImgdesc) {
+                    guidList.push(bundle.files[texDescName]);
+                }
+                var len = guidList.length;
+                for (var i = 0; i < len; i++) {
+                    var _guid = guidList[i];
+                    var assRef = framework.assetMgr.mapGuid[_guid];
+                    if (assRef) {
+                        _texture = assRef.asset;
+                        if (_texture && _texture instanceof framework.texture) {
+                            var loading = framework.assetMgr.mapLoading[imgGuid];
+                            if (loading) {
+                                delete loading.data;
+                            }
+                            return _texture;
+                        }
+                    }
+                }
+                if (!hasImgdesc) {
                     _texture.glTexture = pvr.parse(bytes);
                     var loading = framework.assetMgr.mapLoading[imgGuid];
                     if (loading) {
