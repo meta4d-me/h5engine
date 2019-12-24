@@ -105,6 +105,12 @@ namespace gd3d.framework
 
         parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: ArrayBuffer)
         {
+            if (!(data instanceof ArrayBuffer))
+            {
+                let stack = new Error().stack;
+                console.error(`data not ArrayBuffer instance ,mesh name:${name},bundle:${bundle ? bundle.url : null} stack:${stack}`);
+                return new mesh(name);
+            }
             return new mesh(name).Parse(data, assetMgr.webgl);
         }
     }
