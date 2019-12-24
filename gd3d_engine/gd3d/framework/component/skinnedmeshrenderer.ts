@@ -416,7 +416,7 @@ namespace gd3d.framework
                 }
             }
 
-            if (this.player != null && this.player.gameObject)
+            if (this.player != null && this.player.gameObject && this.player.frameDirty)
             {
                 this.player.fillPoseData(this._skeletonMatrixData, this.bones);
             }

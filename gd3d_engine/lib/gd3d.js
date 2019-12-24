@@ -9788,6 +9788,11 @@ var gd3d;
             function AssetFactory_Mesh() {
             }
             AssetFactory_Mesh.prototype.parse = function (assetMgr, bundle, name, data) {
+                if (!(data instanceof ArrayBuffer)) {
+                    var stack = new Error().stack;
+                    console.error("data not ArrayBuffer instance ,mesh name:" + name + ",bundle:" + (bundle ? bundle.url : null) + " stack:" + stack);
+                    return new framework.mesh(name);
+                }
                 return new framework.mesh(name).Parse(data, assetMgr.webgl);
             };
             AssetFactory_Mesh = __decorate([
@@ -12057,7 +12062,7 @@ var gd3d;
                             this._queue = _mat.getQueue();
                     }
                 }
-                if (this.player != null && this.player.gameObject) {
+                if (this.player != null && this.player.gameObject && this.player.frameDirty) {
                     this.player.fillPoseData(this._skeletonMatrixData, this.bones);
                 }
             };
@@ -14294,6 +14299,7 @@ var gd3d;
                 this._allClipNames = [];
                 this.collected = false;
                 this.temptMat = gd3d.math.pool.new_matrix();
+                this.frameDirty = false;
                 this.playEndDic = {};
                 this.beActivedEndFrame = false;
                 this.endFrame = 0;
@@ -14429,7 +14435,13 @@ var gd3d;
                         this.beCross = false;
                     }
                 }
-                this.curFrame = this._playClip.frames[this._playFrameid];
+                var lastFdata = this.curFrame;
+                this.frameDirty = false;
+                var currFdata = this._playClip.frames[this._playFrameid];
+                if (currFdata == lastFdata)
+                    return;
+                this.frameDirty = true;
+                this.curFrame = currFdata;
                 var bs = this._playClip.hasScaled
                     ? 8
                     : 7;
@@ -23341,6 +23353,8 @@ var gd3d;
             function binReader(buf, seek) {
                 if (seek === void 0) { seek = 0; }
                 this._seek = seek;
+                if (!(buf instanceof ArrayBuffer))
+                    throw new Error("[binReader]Error buf is not Arraybuffer instance");
                 this._data = new DataView(buf, seek);
             }
             binReader.prototype.seek = function (seek) {
