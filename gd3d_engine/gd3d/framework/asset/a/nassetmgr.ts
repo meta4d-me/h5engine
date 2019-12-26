@@ -111,7 +111,8 @@ namespace gd3d.framework {
             case e.PackBin:
                 return "arraybuffer";
             default:
-                throw Error(`无法识别类型 enum:${AssetTypeEnum[type]},type:${type}`);
+                // throw Error(`无法识别类型 enum:${AssetTypeEnum[type]},type:${type}`);
+                return null;
         }
     }
     //#endregion
@@ -250,6 +251,10 @@ namespace gd3d.framework {
             }
 
             let repType: "text" | "arraybuffer" = calcReqType(type);
+            if(repType == null){
+                error.push(new Error(`无法识别类型 url:${url} , guid:${guid} , enum:${AssetTypeEnum[type]},type:${type}`));
+                return;                
+            }
             io.xhrLoad(url, (data, err) => {
                 console.error(err.stack);
 
