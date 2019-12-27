@@ -8890,9 +8890,6 @@ var gd3d;
                 });
             };
             assetMgr.prototype.download = function (guid, url, type, finish) {
-                if (assetMgr.mapGuid[guid]) {
-                    return finish();
-                }
                 var loading = assetMgr.mapLoading[guid];
                 if (loading && loading.readyok && finish)
                     return finish();
@@ -8925,23 +8922,13 @@ var gd3d;
                 });
             };
             assetMgr.prototype.loadImg = function (guid, url, cb) {
-                var _img = assetMgr.mapImage[guid];
-                if (_img) {
-                    _img.guid = guid;
-                    return cb(_img);
-                }
-                else {
-                    if (assetMgr.mapGuid[guid]) {
-                        cb(null);
-                        return;
-                    }
-                }
+                if (assetMgr.mapImage[guid])
+                    return cb(assetMgr.mapImage[guid]);
                 var loading = assetMgr.mapLoading[guid];
                 if (!loading)
                     loading = assetMgr.mapLoading[guid] = { readyok: false, cbQueue: [] };
                 loading.cbQueue.push(cb);
                 this._loadImg(url, function (img) {
-                    img.guid = guid;
                     assetMgr.mapImage[guid] = img;
                     loading.readyok = true;
                     loading.data = img;
@@ -9029,7 +9016,6 @@ var gd3d;
                                         __asset["id"].id = asset.guid;
                                     __asset.bundle = bundle;
                                     this.use(__asset);
-                                    delete assetMgr.mapLoading[asset.guid];
                                 }
                                 return [2, __asset];
                         }
@@ -9943,42 +9929,7 @@ var gd3d;
         var AssetFactory_PVR = (function () {
             function AssetFactory_PVR() {
             }
-            AssetFactory_PVR.prototype.parse = function (assetmgr, bundle, name, bytes, dwguid) {
-                var _texture = new framework.texture(name);
-                var pvr = new PvrParse(assetmgr.webgl);
-                var imgGuid = dwguid || bundle.texs[name];
-                var texName = name.split(".")[0];
-                var texDescName = texName + ".imgdesc.json";
-                var hasImgdesc = bundle && bundle.files[texDescName] != null;
-                var guidList = [imgGuid];
-                if (hasImgdesc) {
-                    guidList.push(bundle.files[texDescName]);
-                }
-                var len = guidList.length;
-                for (var i = 0; i < len; i++) {
-                    var _guid = guidList[i];
-                    var assRef = framework.assetMgr.mapGuid[_guid];
-                    if (assRef) {
-                        _texture = assRef.asset;
-                        if (_texture && _texture instanceof framework.texture) {
-                            var loading = framework.assetMgr.mapLoading[imgGuid];
-                            if (loading) {
-                                delete loading.data;
-                            }
-                            return _texture;
-                        }
-                    }
-                }
-                if (!hasImgdesc) {
-                    _texture.glTexture = pvr.parse(bytes);
-                    var loading = framework.assetMgr.mapLoading[imgGuid];
-                    if (loading) {
-                        delete loading.data;
-                    }
-                }
-                return _texture;
-            };
-            AssetFactory_PVR.prototype._parse = function (assetmgr, bundle, name, bytes, dwguid) {
+            AssetFactory_PVR.prototype.parse = function (assetmgr, bundle, name, bytes) {
                 var _texture = new framework.texture(name);
                 var pvr = new PvrParse(assetmgr.webgl);
                 _texture.glTexture = pvr.parse(bytes);
@@ -10079,35 +10030,12 @@ var gd3d;
             }
             AssetFactory_Texture.prototype.parse = function (assetmgr, bundle, filename, txt, dwguid) {
                 var imgGuid = bundle && bundle.texs ? bundle.texs[filename] : dwguid;
-                var _texture;
-                var texName = filename.split(".")[0];
-                var texDescName = texName + ".imgdesc.json";
-                var hasImgdesc = bundle && bundle.files[texDescName] != null;
-                var guidList = [imgGuid];
-                if (hasImgdesc) {
-                    guidList.push(bundle.files[texDescName]);
-                }
-                var len = guidList.length;
-                for (var i = 0; i < len; i++) {
-                    var _guid = guidList[i];
-                    var assRef = framework.assetMgr.mapGuid[_guid];
-                    if (assRef) {
-                        _texture = assRef.asset;
-                        if (_texture && _texture instanceof framework.texture) {
-                            delete framework.assetMgr.mapImage[imgGuid];
-                            return _texture;
-                        }
-                    }
-                }
-                if (!hasImgdesc) {
-                    var _tex = framework.assetMgr.mapImage[imgGuid] || framework.assetMgr.mapLoading[imgGuid].data;
-                    _texture = new framework.texture(filename);
-                    var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
-                    var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat);
-                    t2d.uploadImage(_tex, false, true, true, false);
-                    _texture.glTexture = t2d;
-                    delete framework.assetMgr.mapImage[imgGuid];
-                }
+                var _tex = framework.assetMgr.mapImage[imgGuid] || framework.assetMgr.mapLoading[imgGuid].data;
+                var _texture = new framework.texture(filename);
+                var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
+                var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat);
+                t2d.uploadImage(_tex, false, true, true, false);
+                _texture.glTexture = t2d;
                 return _texture;
             };
             AssetFactory_Texture = __decorate([
@@ -10131,20 +10059,6 @@ var gd3d;
             AssetFactory_TextureDesc.prototype.parse = function (assetmgr, bundle, name, data, dwguid) {
                 var _texturedesc = JSON.parse(data);
                 var _name = _texturedesc["name"];
-                var imgGuid = dwguid || bundle.texs[_name];
-                var _texture;
-                if (!bundle) {
-                    _texture = framework.assetMgr.mapNamed[name];
-                }
-                else {
-                    var imgdescGuid = bundle.files[name];
-                    var assRef = framework.assetMgr.mapGuid[imgdescGuid];
-                    if (assRef)
-                        _texture = assRef.asset;
-                }
-                if (_texture && _texture instanceof framework.texture)
-                    return _texture;
-                _texture = new framework.texture(name);
                 var _filterMode = _texturedesc["filterMode"];
                 var _format = _texturedesc["format"];
                 var _mipmap = _texturedesc["mipmap"];
@@ -10164,6 +10078,7 @@ var gd3d;
                 var _repeat = false;
                 if (_wrap.indexOf("Repeat") >= 0)
                     _repeat = true;
+                var _texture = new framework.texture(name);
                 _texture.realName = _name;
                 var tType = this.t_Normal;
                 if (_name.indexOf(".pvr.bin") >= 0) {
@@ -10172,12 +10087,8 @@ var gd3d;
                 else if (_name.indexOf(".dds.bin") >= 0) {
                     tType = this.t_DDS;
                 }
-                var img = framework.assetMgr.mapImage[imgGuid];
-                var loadingObj = framework.assetMgr.mapLoading[imgGuid];
-                if (!img && loadingObj)
-                    img = loadingObj.data;
-                if (!img)
-                    return _texture;
+                var imgGuid = dwguid || bundle.texs[_name];
+                var img = framework.assetMgr.mapImage[imgGuid] || framework.assetMgr.mapLoading[imgGuid].data;
                 switch (tType) {
                     case this.t_Normal:
                         var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat);
@@ -10190,10 +10101,6 @@ var gd3d;
                         break;
                     case this.t_DDS:
                         throw new Error("暂不支持DDS");
-                }
-                delete framework.assetMgr.mapImage[imgGuid];
-                if (loadingObj) {
-                    delete loadingObj.data;
                 }
                 return _texture;
             };

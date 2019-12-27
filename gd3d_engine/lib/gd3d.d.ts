@@ -1864,8 +1864,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AssetFactory_PVR implements IAssetFactory {
-        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer, dwguid: number): texture;
-        private _parse;
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer): texture;
     }
 }
 declare namespace gd3d.framework {
