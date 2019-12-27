@@ -22,11 +22,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -8437,7 +8436,7 @@ var gd3d;
         var assetBundle = (function () {
             function assetBundle(url, assetmgr, guid) {
                 this.assetmgr = assetmgr;
-                this.outTime = 8000;
+                this.outTime = 1000 * 30;
                 this.stateQueue = [];
                 this.stateParse = {};
                 this.guid = guid || assetBundle.buildGuid();
@@ -9944,7 +9943,7 @@ var gd3d;
         var AssetFactory_PVR = (function () {
             function AssetFactory_PVR() {
             }
-            AssetFactory_PVR.prototype.parse = function (assetmgr, bundle, name, bytes, dwguid) {
+            AssetFactory_PVR.prototype.__parse = function (assetmgr, bundle, name, bytes, dwguid) {
                 var _texture = new framework.texture(name);
                 var pvr = new PvrParse(assetmgr.webgl);
                 var imgGuid = dwguid || bundle.texs[name];
@@ -9977,6 +9976,12 @@ var gd3d;
                         delete loading.data;
                     }
                 }
+                return _texture;
+            };
+            AssetFactory_PVR.prototype.parse = function (assetmgr, bundle, name, bytes, dwguid) {
+                var _texture = new framework.texture(name);
+                var pvr = new PvrParse(assetmgr.webgl);
+                _texture.glTexture = pvr.parse(bytes);
                 return _texture;
             };
             AssetFactory_PVR = __decorate([

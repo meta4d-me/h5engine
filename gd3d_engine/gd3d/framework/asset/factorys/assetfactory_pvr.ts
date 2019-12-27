@@ -46,7 +46,7 @@ namespace gd3d.framework
         //     { });
         // }
         //#endregion
-        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer , dwguid: number)
+        private __parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer , dwguid: number)
         {
             let _texture = new texture(name);
             let pvr: PvrParse = new PvrParse(assetmgr.webgl);
@@ -94,6 +94,14 @@ namespace gd3d.framework
                 }
             }
 
+            return _texture;
+        }
+
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer , dwguid: number)
+        {
+            let _texture = new texture(name);
+            let pvr: PvrParse = new PvrParse(assetmgr.webgl);
+            _texture.glTexture = pvr.parse(bytes);
             return _texture;
         }
     }
