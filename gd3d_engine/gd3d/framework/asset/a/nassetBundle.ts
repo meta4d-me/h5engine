@@ -30,7 +30,11 @@ namespace gd3d.framework
         onReady: () => void;
         onDownloadFinish: () => void;
         ready: boolean;
-
+        outTime: number = 8000;
+        stateQueue = [];
+        stateParse: any = {};
+        stateText: string;
+        thd: number;
         constructor(url: string, private assetmgr: assetMgr, guid?: number)
         {
             this.guid = guid || assetBundle.buildGuid();
@@ -45,22 +49,50 @@ namespace gd3d.framework
             return --assetBundle.idNext;
         }
 
-
+        timeOut()
+        {
+            let text = "\ndownload :\n";
+            let fcount = 0;
+            for (let item of this.stateQueue)
+            {
+                text += `${item.url} ,guid:${item.guid} ,wd:${item.wd}\n`;
+                if (item.wd)
+                    ++fcount;
+            }
+            text += `${fcount}/${this.stateQueue.length}`;
+            text += "\nparse:\n";
+            let temp = []
+            for (let k in this.stateParse)
+                if (k != "count")
+                    temp.push(this.stateParse[k]);
+            temp.sort((a, b) => { return a.i - b.i });
+            fcount = 0;
+            for (let item of this.stateQueue)
+            {
+                text += `name:${item.name},i:${item.i},type:${item.type} ,st:${item.st}\n`;
+                if (item.wd)
+                    ++fcount;
+            }
+            text += `${fcount}/${this.stateParse.count}`;
+            error.push(new Error(`[资源包超时] ${this.url} , state:${this.stateText},${text}`));
+        }
         //解析资源包描述文件 和下载
         parseBundle(data: string)
         {
+            this.thd = setTimeout(this.timeOut.bind(this), this.outTime);
             let json = JSON.parse(data);
             this.files = json.files;
             this.texs = json.texs;
             this.pkgs = json.pkg;
+            this.stateText = "下载资源";
             if (!assetMgr.openGuid)
             {
                 for (let k in this.files)
-                    this.files[k] =assetBundle.buildGuid();
-                for(let k in this.texs)
+                    this.files[k] = assetBundle.buildGuid();
+                for (let k in this.texs)
                     this.texs[k] = assetBundle.buildGuid();
             }
-            // console.log(`${this.name}正在解析描述文件...`);
+
             this.dw_imgCount = this.dw_fileCount = Object.keys(this.texs || {}).length;
             let dwpkgCount = 0;
             if (this.pkgs)
@@ -74,18 +106,20 @@ namespace gd3d.framework
 
                 for (let i = 0, len = this.pkgs.length; i < len; ++i)
                 {
-                    var extName = this.pkgs[i].substring(this.pkgs[i].indexOf("."));
-                    var url = nameURL + extName;
-                    var kurl = url.replace(assetMgr.cdnRoot, "");
-                    var guid = assetMgr.urlmapGuid[kurl];
+                    let extName = this.pkgs[i].substring(this.pkgs[i].indexOf("."));
+                    let url = nameURL + extName;
+                    let kurl = url.replace(assetMgr.cdnRoot, "");
+                    let guid = assetMgr.urlmapGuid[kurl];
                     if (!guid)
                         guid = assetBundle.buildGuid();
                     this.pkgsGuid.push(guid);
-                    // console.log(`${this.name} 开始下载分包 ,guid:${guid},${url}`);
+
+                    let state = { guid, url, wd: false };
+                    this.stateQueue.push(state);
                     this.assetmgr.download(guid, url, calcType(url), () =>
                     {
+                        state.wd = true;
                         ++dwpkgCount;
-                        // console.log(`${this.name} 下载分包 ${dwpkgCount}/${this.dw_fileCount} ,guid:${guid},${url}`);
                         if (dwpkgCount >= this.dw_fileCount)
                             this.parseFile();
                     });
@@ -97,8 +131,12 @@ namespace gd3d.framework
                 for (let k in this.files)
                 {
                     let guid = this.files[k];
-                    this.assetmgr.download(guid, `${this.baseUrl}Resources/${k}`, calcType(k), () =>
+                    let url = `${this.baseUrl}Resources/${k}`;
+                    let state = { guid, url, wd: false };
+                    this.stateQueue.push(state);
+                    this.assetmgr.download(guid, url, calcType(k), () =>
                     {
+                        state.wd = true;
                         ++dwpkgCount;
                         // console.log(`${this.name} 下载分包 ${dwpkgCount}/${this.dw_fileCount} ,guid:${guid},${url}`);
                         if (dwpkgCount >= this.dw_fileCount)
@@ -109,8 +147,9 @@ namespace gd3d.framework
 
 
             //下载图片
-            const imageNext = function ()
+            const imageNext = function (state)
             {
+                state.wd = true;
                 ++dwpkgCount;
                 // console.log(`${this.name} 下载分包 ${dwpkgCount}/${this.dw_fileCount} ,guid:${guid},${url}`);
                 if (dwpkgCount >= this.dw_fileCount)
@@ -118,23 +157,25 @@ namespace gd3d.framework
             }
             for (let k in this.texs)
             {
-                var guid = this.texs[k];
+                let guid = this.texs[k];
                 this.files[k] = guid;//先下载 然后给解析器补充一个key
+                let url = `${this.baseUrl}resources/${k}`;
+                let state = { guid, url, wd: false };
+                this.stateQueue.push(state);
                 if (k.endsWith(".png") || k.endsWith(".jpg"))
-                    this.assetmgr.loadImg(guid, `${this.baseUrl}resources/${k}`, imageNext.bind(this));
+                    this.assetmgr.loadImg(guid, url, imageNext.bind(this, state));
                 else
-                    this.assetmgr.download(guid, `${this.baseUrl}resources/${k}`, AssetTypeEnum.PVR, imageNext.bind(this));
+                    this.assetmgr.download(guid, url, AssetTypeEnum.PVR, imageNext.bind(this, state));
             }
-
         }
 
         //解包
         private unpkg()
         {
             // console.log(`${this.name}开始解包 0/${this.pkgsGuid.length}`)
+            this.stateText = "解包";
             for (let i = this.pkgsGuid.length - 1; i >= 0; --i)
             {
-
                 var pkgGuid = this.pkgsGuid[i];
                 var pkgld = assetMgr.mapLoading[pkgGuid];
                 if (!pkgld || !pkgld.data || pkgld.data == 0)//被解析过了不再解析 项目中标记的 
@@ -187,6 +228,7 @@ namespace gd3d.framework
         //解析
         async parseFile()
         {
+
             if (this.onDownloadFinish)
                 this.onDownloadFinish();
             if (!this.ready)
@@ -200,8 +242,9 @@ namespace gd3d.framework
                 // let time = Date.now();
                 if (this.pkgs)//如果需要解包就解
                     this.unpkg();
-
+                this.stateText = "资源解析";
                 let assets: Array<any> = [];
+                let idx = 0;
                 for (let k in this.files)
                 {
                     //已经解析的资源不再做解析
@@ -213,7 +256,9 @@ namespace gd3d.framework
                         name: k,
                         guid: this.files[k]
                     });
+                    this.stateParse[k] = { name: k, i: idx++, type: AssetTypeEnum[type], st: false };
                 }
+                this.stateParse.count = idx;
                 //解析顺序按枚举从小到大来排序
                 assets.sort((a, b) => { return a.type - b.type; });
 
@@ -222,6 +267,7 @@ namespace gd3d.framework
                     if (assetMgr.mapGuid[asset.guid])
                         continue;//已经解析好的资源不需要再解析
                     await this.assetmgr.parseRes(asset, this);
+                    this.stateParse[asset.name].st = true;
                 }
                 this.ready = true;
                 // console.log(`资源包:${this.name} 准备完毕. 解析耗时${Date.now() - time}/ms`);
@@ -232,6 +278,10 @@ namespace gd3d.framework
                 this.onReady();
                 this.onReady = null;
             }
+            this.stateQueue = null;
+            this.stateParse = null;
+            this.stateText = null;
+            clearTimeout(this.thd);
         }
 
         unload(disposeNow: boolean = false)

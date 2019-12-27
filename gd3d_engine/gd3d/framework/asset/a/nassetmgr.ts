@@ -347,14 +347,20 @@ namespace gd3d.framework {
             if (assetMgr.mapGuid[asset.guid])
                 return assetMgr.mapGuid[asset.guid].asset;
             // let ctime = Date.now();
-            let data = assetMgr.mapLoading[asset.guid].data;
+            let loading = assetMgr.mapLoading[asset.guid];
+            if(!loading)
+            {
+                error.push(new Error(`资源解析失败 name:${asset.name},bundle:${bundle?bundle.url:""} assetMgr.mapLoading 无法找到guid:${asset.guid}`));
+                return ;
+            }
+            let data = loading.data;
             let factory = assetParseMap[asset.type];
             if (!factory) {
-                console.warn(`无法找到[${AssetTypeEnum[asset.type]}]的解析器`);
+                error.push(new Error(`无法找到[${AssetTypeEnum[asset.type]}]的解析器`));
                 return;
             }
             if (!factory.parse) {
-                console.warn(`解析器 ${factory.constructor.name} 没有实现parse方法`);
+                error.push(new Error(`解析器 ${factory.constructor.name} 没有实现parse方法`));
                 return;
             }
 
