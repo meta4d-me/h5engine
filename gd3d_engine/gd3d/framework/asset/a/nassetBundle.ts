@@ -67,7 +67,7 @@ namespace gd3d.framework
                     temp.push(this.stateParse[k]);
             temp.sort((a, b) => { return a.i - b.i });
             fcount = 0;
-            for (let item of this.stateQueue)
+            for (let item of temp)
             {
                 text += `name:${item.name},i:${item.i},type:${item.type} ,st:${item.st}\n`;
                 if (item.wd)

@@ -8466,8 +8466,8 @@ var gd3d;
                         temp.push(this.stateParse[k]);
                 temp.sort(function (a, b) { return a.i - b.i; });
                 fcount = 0;
-                for (var _b = 0, _c = this.stateQueue; _b < _c.length; _b++) {
-                    var item = _c[_b];
+                for (var _b = 0, temp_1 = temp; _b < temp_1.length; _b++) {
+                    var item = temp_1[_b];
                     text += "name:" + item.name + ",i:" + item.i + ",type:" + item.type + " ,st:" + item.st + "\n";
                     if (item.wd)
                         ++fcount;
