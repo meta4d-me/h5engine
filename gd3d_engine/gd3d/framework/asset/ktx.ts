@@ -12,12 +12,6 @@ namespace gd3d.framework
     {
         private static HEADER_LEN = 12 + (13 * 4); // identifier + header elements (not including key value meta-data pairs)
 
-        // load types
-        private static COMPRESSED_2D = 0; // uses a gl.compressedTexImage2D()
-        private static COMPRESSED_3D = 1; // uses a gl.compressedTexImage3D()
-        private static TEX_2D = 2; // uses a gl.texImage2D()
-        private static TEX_3D = 3; // uses a gl.texImage3D()
-
         /**
          * 
          * @param gl 
@@ -46,6 +40,8 @@ namespace gd3d.framework
                 console.error('texture missing KTX identifier');
                 return;
             }
+
+            gl.getExtension('WEBGL_compressed_texture_etc1');
 
             // load the reset of the header in native 32 bit uint
             var dataSize = Uint32Array.BYTES_PER_ELEMENT;
@@ -123,7 +119,7 @@ namespace gd3d.framework
                 {
                     var byteArray = new Uint8Array(arrayBuffer, dataOffset, imageSize);
 
-                    gl.compressedTexImage2D(target, level, glFormat, width, height, 0, byteArray);
+                    gl.compressedTexImage2D(target, level, glInternalFormat, width, height, 0, byteArray);
 
                     dataOffset += imageSize;
                     dataOffset += 3 - ((imageSize + 3) % 4); // add padding for odd sized image
