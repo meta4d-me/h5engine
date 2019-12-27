@@ -1457,6 +1457,12 @@ declare namespace gd3d.framework {
         init?(): any;
     }
 }
+declare namespace gd3d.framework {
+    class KTXParse {
+        private static HEADER_LEN;
+        static parse(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer, facesExpected?: number, loadMipmaps?: boolean): gd3d.render.glTexture2D;
+    }
+}
 declare class PvrParse {
     private version;
     private flags;
@@ -1513,12 +1519,13 @@ declare namespace gd3d.framework {
         PackTxt = 17,
         PathAsset = 18,
         PVR = 19,
-        F14Effect = 20,
-        DDS = 21,
-        Scene = 22,
-        Prefab = 23,
-        cPrefab = 24,
-        ParticleSystem = 25
+        KTX = 20,
+        F14Effect = 21,
+        DDS = 22,
+        Scene = 23,
+        Prefab = 24,
+        cPrefab = 25,
+        ParticleSystem = 26
     }
     class ResourceState {
         res: IAsset;
@@ -1587,13 +1594,13 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     type loadCallback = (state?: stateLoad) => void;
-    export const assetParseMap: {
+    const assetParseMap: {
         [key: number]: IAssetFactory;
     };
-    export function assetF(type: AssetTypeEnum): (ctor: any) => void;
-    export function calcType(url: string | any): AssetTypeEnum;
-    export function calcReqType(type: AssetTypeEnum): "text" | "arraybuffer";
-    export class assetMgr {
+    function assetF(type: AssetTypeEnum): (ctor: any) => void;
+    function calcType(url: string | any): AssetTypeEnum;
+    function calcReqType(type: AssetTypeEnum): "text" | "arraybuffer";
+    class assetMgr {
         static urlmapGuid: {
             [key: string]: number;
         };
@@ -1703,12 +1710,11 @@ declare namespace gd3d.framework {
         loadScene(sceneName: string, onComplete: (firstChilds: Array<transform>) => void): void;
         unload(url: string): void;
     }
-    export class SaveInfo {
+    class SaveInfo {
         files: {
             [key: string]: string;
         };
     }
-    export {};
 }
 declare namespace gd3d.framework {
     class defmaterial {
@@ -1794,6 +1800,11 @@ declare var WebGLTextureUtil: any;
 declare namespace gd3d.framework {
     class AssetFactory_DDS implements IAssetFactory {
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, bytes: ArrayBuffer): void;
+    }
+}
+declare namespace gd3d.framework {
+    class AssetFactory_ETC1 implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer, dwguid: number): texture;
     }
 }
 declare namespace gd3d.framework {
@@ -2506,7 +2517,7 @@ declare namespace gd3d.framework {
         getCloneTrans2D(): transform2D;
         apply(trans: transform): void;
         jsonstr: string;
-        Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<unknown>;
+        Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<{}>;
         cParse(data: any): void;
     }
 }
@@ -7770,7 +7781,7 @@ declare namespace gd3d.io {
     function xhrLoad(url: string, fun: (ContentData: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void, responseType: XMLHttpRequestResponseType, loadedFun: (req: XMLHttpRequest) => void): void;
     function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function JSONParse(text: string): threading.gdPromise<any>;
-    function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): threading.gdPromise<unknown>;
+    function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): threading.gdPromise<{}>;
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err?: Error, loadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
@@ -8158,7 +8169,8 @@ declare namespace gd3d.render {
         PVRTC4_RGB = 4,
         PVRTC4_RGBA = 4,
         PVRTC2_RGB = 4,
-        PVRTC2_RGBA = 4
+        PVRTC2_RGBA = 4,
+        KTX = 5
     }
     class textureReader {
         constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);
