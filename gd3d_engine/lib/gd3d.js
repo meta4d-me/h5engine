@@ -10209,6 +10209,7 @@ var gd3d;
                 this.t_Normal = "t_Normal";
                 this.t_PVR = "t_PVR";
                 this.t_DDS = "t_DDS";
+                this.t_KTX = "t_KTX";
             }
             AssetFactory_TextureDesc.prototype.parse = function (assetmgr, bundle, name, data, dwguid) {
                 var _texturedesc = JSON.parse(data);
@@ -10254,6 +10255,9 @@ var gd3d;
                 else if (_name.indexOf(".dds.bin") >= 0) {
                     tType = this.t_DDS;
                 }
+                else if (_name.indexOf(".ktx") >= 0) {
+                    tType = this.t_KTX;
+                }
                 var img = framework.assetMgr.mapImage[imgGuid];
                 var loadingObj = framework.assetMgr.mapLoading[imgGuid];
                 if (!img && loadingObj)
@@ -10269,6 +10273,9 @@ var gd3d;
                     case this.t_PVR:
                         var pvr = new PvrParse(assetmgr.webgl);
                         _texture.glTexture = pvr.parse(img);
+                        break;
+                    case this.t_KTX:
+                        _texture.glTexture = framework.KTXParse.parse(assetmgr.webgl, img);
                         break;
                     case this.t_DDS:
                         throw new Error("暂不支持DDS");

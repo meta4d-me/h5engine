@@ -6,6 +6,7 @@ namespace gd3d.framework
         private readonly t_Normal = "t_Normal";
         private readonly t_PVR = "t_PVR";
         private readonly t_DDS = "t_DDS";
+        private readonly t_KTX = "t_KTX";
         //#region 废弃de参考代码
         // newAsset(): texture
         // {
@@ -191,6 +192,9 @@ namespace gd3d.framework
             } else if (_name.indexOf(".dds.bin") >= 0)
             {
                 tType = this.t_DDS;
+            } else if (_name.indexOf(".ktx") >= 0)
+            {
+                tType = this.t_KTX;
             }
             let img : any = assetMgr.mapImage[imgGuid] ;
             let loadingObj = assetMgr.mapLoading[imgGuid];
@@ -207,6 +211,9 @@ namespace gd3d.framework
                 case this.t_PVR:
                     let pvr: PvrParse = new PvrParse(assetmgr.webgl);
                     _texture.glTexture = pvr.parse(img);
+                    break;
+                case this.t_KTX:
+                    _texture.glTexture = KTXParse.parse(assetmgr.webgl,img);
                     break;
                 case this.t_DDS:
                     throw new Error("暂不支持DDS");

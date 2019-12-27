@@ -1900,6 +1900,7 @@ declare namespace gd3d.framework {
         private readonly t_Normal;
         private readonly t_PVR;
         private readonly t_DDS;
+        private readonly t_KTX;
         parse(assetmgr: assetMgr, bundle: assetBundle, name: string, data: string, dwguid: number): texture;
         needDownload(text: string): any;
     }
