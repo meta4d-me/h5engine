@@ -50,50 +50,7 @@ namespace gd3d.framework
         {
             let _texture = new texture(name);
             let pvr: PvrParse = new PvrParse(assetmgr.webgl);
-            let imgGuid = dwguid || bundle.texs[name];
-            let texName = name.split(".")[0];
-            let texDescName = `${texName}.imgdesc.json`;
-            let hasImgdesc = bundle && bundle.files[texDescName] != null;
-            let guidList : number[] = [imgGuid];
-            if(hasImgdesc) {
-                guidList.push(bundle.files[texDescName]);
-            }
-
-            let len = guidList.length;
-            for(let i=0;i < len ;i++){
-                //如找到已近加载过的资源，不再重复构建
-                let _guid = guidList[i];
-                let assRef = assetMgr.mapGuid[_guid]
-                if(assRef){
-                    _texture = assRef.asset as texture;
-                    if(_texture && _texture instanceof texture) {
-                        let loading = assetMgr.mapLoading[imgGuid];
-                        if(loading){
-                            delete loading.data;
-                        }
-                        return _texture;
-                    }
-                }
-            }
-
-            // let assRef = assetMgr.mapGuid[imgGuid];
-            // if(assRef){
-            //     _texture = assRef.asset as texture;
-            //     if(_texture && _texture instanceof texture) return _texture;
-            // }
-
-
-            // let texName = name.split(".")[0];
-            // let texDesc = `${texName}.imgdesc.json`;
-            if(!hasImgdesc){
-                _texture.glTexture = pvr.parse(bytes);
-                //清理 HTMLImageElement 的占用
-                let loading = assetMgr.mapLoading[imgGuid];
-                if(loading){
-                    delete loading.data;
-                }
-            }
-
+            _texture.glTexture = pvr.parse(bytes);
             return _texture;
         }
     }
