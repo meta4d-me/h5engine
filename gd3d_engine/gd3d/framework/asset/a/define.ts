@@ -148,7 +148,7 @@ namespace gd3d.framework
         /**
          * Android平台ETC1压缩纹理
          */
-        ETC1,
+        KTX,
 
         F14Effect,
 

@@ -1,6 +1,6 @@
 namespace gd3d.framework
 {
-    @assetF(AssetTypeEnum.ETC1)
+    @assetF(AssetTypeEnum.KTX)
     export class AssetFactory_ETC1 implements IAssetFactory
     {
         parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer, dwguid: number)
@@ -41,7 +41,7 @@ namespace gd3d.framework
             // let texDesc = `${texName}.imgdesc.json`;
             if (!hasImgdesc)
             {
-                _texture.glTexture = KhronosTextureContainer.parse(assetmgr.webgl, bytes);
+                _texture.glTexture = KTXParse.parse(assetmgr.webgl, bytes);
                 //清理 HTMLImageElement 的占用
                 let loading = assetMgr.mapLoading[imgGuid];
                 if (loading)
