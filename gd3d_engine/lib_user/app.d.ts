@@ -641,6 +641,7 @@ declare class test_ETC1_KTX implements IState {
     start(app: gd3d.framework.application): Promise<void>;
     private init;
     private loadPrefabs;
+    ry: number;
     update(delta: number): void;
 }
 declare namespace gd3d.math {

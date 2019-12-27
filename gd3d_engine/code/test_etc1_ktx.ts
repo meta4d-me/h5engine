@@ -23,8 +23,8 @@ class test_ETC1_KTX implements IState
         var ext = app.webgl.getExtension('WEBGL_compressed_texture_etc1');
         if (!ext)
         {
-            // alert(`需要使用Android平台才能运行！`)
-            // return;
+            alert(`需要使用Android平台才能运行！`)
+            return;
         }
 
         this.app = app;
@@ -51,16 +51,8 @@ class test_ETC1_KTX implements IState
         this.camera.backgroundColor = new gd3d.math.color(0.2784, 0.2784, 0.2784, 1);
         objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-        //
-        let hoverc = this.camera.gameObject.addComponent("HoverCameraScript") as gd3d.framework.HoverCameraScript;
-        hoverc.panAngle = 180;
-        hoverc.tiltAngle = 45;
-        hoverc.distance = 10;
-        hoverc.scaleSpeed = 0.1;
-        hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0)
 
         this.loadPrefabs();
-        // this.initParticleSystem();
     }
 
     private async loadPrefabs()
@@ -72,31 +64,29 @@ class test_ETC1_KTX implements IState
         let cubeP = this.astMgr.getAssetByName(`${res}.prefab.json`, `${res}.assetbundle.json`) as gd3d.framework.prefab;
         let cubeTran = this.transform = cubeP.getCloneTrans();
 
+        cubeTran.localPosition.x = 0;
+        cubeTran.localPosition.y = 0;
+        cubeTran.localPosition.z = 0;
+
+        cubeTran.localScale.x = 8;
+        cubeTran.localScale.y = 8;
+        cubeTran.localScale.z = 8;
+
         this.scene.addChild(cubeTran);
 
         this._particleStartPosition = new gd3d.math.vector3();
         gd3d.math.vec3Clone(this.transform.localPosition, this._particleStartPosition);
     }
 
+    ry = 0;
+
     update(delta: number)
     {
         if (!this.transform) return;
 
-        if (this._isMove)
-        {
-            var offsetX = Math.cos(this._moveAngle / 180 * Math.PI) * this._moveRadius;
-            var offsetZ = Math.sin(this._moveAngle / 180 * Math.PI) * this._moveRadius;
+        //圆柱朝向
+        gd3d.math.quatFromEulerAngles(0, this.ry, 0, this.transform.localRotate);
 
-            // this._particleCurrentPosition.x = this._particleStartPosition.x + offsetX;
-            this._particleCurrentPosition.y = this._particleStartPosition.y;
-            this._particleCurrentPosition.z = this._particleStartPosition.z + offsetZ;
-
-            this.transform.localPosition = this._particleCurrentPosition;
-
-            this._moveAngle += this._moveAngleSpeed;
-        } else
-        {
-            this.transform.localPosition = this._particleStartPosition;
-        }
+        this.ry++;
     }
 }

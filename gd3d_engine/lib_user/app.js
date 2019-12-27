@@ -4170,6 +4170,7 @@ var test_ETC1_KTX = (function () {
         this._moveRadius = 5;
         this._moveAngle = 0;
         this._moveAngleSpeed = 1;
+        this.ry = 0;
     }
     test_ETC1_KTX.prototype.start = function (app) {
         return __awaiter(this, void 0, void 0, function () {
@@ -4179,6 +4180,8 @@ var test_ETC1_KTX = (function () {
                     case 0:
                         ext = app.webgl.getExtension('WEBGL_compressed_texture_etc1');
                         if (!ext) {
+                            alert("\u9700\u8981\u4F7F\u7528Android\u5E73\u53F0\u624D\u80FD\u8FD0\u884C\uFF01");
+                            return [2];
                         }
                         this.app = app;
                         this.scene = this.app.getScene();
@@ -4204,12 +4207,6 @@ var test_ETC1_KTX = (function () {
         this.camera.backgroundColor = new gd3d.math.color(0.2784, 0.2784, 0.2784, 1);
         objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-        var hoverc = this.camera.gameObject.addComponent("HoverCameraScript");
-        hoverc.panAngle = 180;
-        hoverc.tiltAngle = 45;
-        hoverc.distance = 10;
-        hoverc.scaleSpeed = 0.1;
-        hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0);
         this.loadPrefabs();
     };
     test_ETC1_KTX.prototype.loadPrefabs = function () {
@@ -4224,6 +4221,12 @@ var test_ETC1_KTX = (function () {
                         _a.sent();
                         cubeP = this.astMgr.getAssetByName(res + ".prefab.json", res + ".assetbundle.json");
                         cubeTran = this.transform = cubeP.getCloneTrans();
+                        cubeTran.localPosition.x = 0;
+                        cubeTran.localPosition.y = 0;
+                        cubeTran.localPosition.z = 0;
+                        cubeTran.localScale.x = 8;
+                        cubeTran.localScale.y = 8;
+                        cubeTran.localScale.z = 8;
                         this.scene.addChild(cubeTran);
                         this._particleStartPosition = new gd3d.math.vector3();
                         gd3d.math.vec3Clone(this.transform.localPosition, this._particleStartPosition);
@@ -4235,17 +4238,8 @@ var test_ETC1_KTX = (function () {
     test_ETC1_KTX.prototype.update = function (delta) {
         if (!this.transform)
             return;
-        if (this._isMove) {
-            var offsetX = Math.cos(this._moveAngle / 180 * Math.PI) * this._moveRadius;
-            var offsetZ = Math.sin(this._moveAngle / 180 * Math.PI) * this._moveRadius;
-            this._particleCurrentPosition.y = this._particleStartPosition.y;
-            this._particleCurrentPosition.z = this._particleStartPosition.z + offsetZ;
-            this.transform.localPosition = this._particleCurrentPosition;
-            this._moveAngle += this._moveAngleSpeed;
-        }
-        else {
-            this.transform.localPosition = this._particleStartPosition;
-        }
+        gd3d.math.quatFromEulerAngles(0, this.ry, 0, this.transform.localRotate);
+        this.ry++;
     };
     return test_ETC1_KTX;
 }());
