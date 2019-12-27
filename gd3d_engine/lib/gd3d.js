@@ -9943,7 +9943,7 @@ var gd3d;
         var AssetFactory_PVR = (function () {
             function AssetFactory_PVR() {
             }
-            AssetFactory_PVR.prototype.__parse = function (assetmgr, bundle, name, bytes, dwguid) {
+            AssetFactory_PVR.prototype.parse = function (assetmgr, bundle, name, bytes, dwguid) {
                 var _texture = new framework.texture(name);
                 var pvr = new PvrParse(assetmgr.webgl);
                 var imgGuid = dwguid || bundle.texs[name];
@@ -9978,7 +9978,7 @@ var gd3d;
                 }
                 return _texture;
             };
-            AssetFactory_PVR.prototype.parse = function (assetmgr, bundle, name, bytes, dwguid) {
+            AssetFactory_PVR.prototype._parse = function (assetmgr, bundle, name, bytes, dwguid) {
                 var _texture = new framework.texture(name);
                 var pvr = new PvrParse(assetmgr.webgl);
                 _texture.glTexture = pvr.parse(bytes);
