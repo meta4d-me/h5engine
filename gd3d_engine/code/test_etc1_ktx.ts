@@ -8,15 +8,7 @@ class test_ETC1_KTX implements IState
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
 
-    private _particles = ["ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames", "shark-levelup"];
     private transform: gd3d.framework.transform;
-
-    private _isMove = false;
-    private _particleStartPosition = new gd3d.math.vector3();
-    private _particleCurrentPosition = new gd3d.math.vector3();
-    private _moveRadius = 5;
-    private _moveAngle = 0;
-    private _moveAngleSpeed = 1;
 
     async start(app: gd3d.framework.application)
     {
@@ -73,9 +65,6 @@ class test_ETC1_KTX implements IState
         cubeTran.localScale.z = 8;
 
         this.scene.addChild(cubeTran);
-
-        this._particleStartPosition = new gd3d.math.vector3();
-        gd3d.math.vec3Clone(this.transform.localPosition, this._particleStartPosition);
     }
 
     ry = 0;

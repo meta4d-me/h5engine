@@ -4163,13 +4163,6 @@ var test_Decal = (function () {
 }());
 var test_ETC1_KTX = (function () {
     function test_ETC1_KTX() {
-        this._particles = ["ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames", "shark-levelup"];
-        this._isMove = false;
-        this._particleStartPosition = new gd3d.math.vector3();
-        this._particleCurrentPosition = new gd3d.math.vector3();
-        this._moveRadius = 5;
-        this._moveAngle = 0;
-        this._moveAngleSpeed = 1;
         this.ry = 0;
     }
     test_ETC1_KTX.prototype.start = function (app) {
@@ -4228,8 +4221,6 @@ var test_ETC1_KTX = (function () {
                         cubeTran.localScale.y = 8;
                         cubeTran.localScale.z = 8;
                         this.scene.addChild(cubeTran);
-                        this._particleStartPosition = new gd3d.math.vector3();
-                        gd3d.math.vec3Clone(this.transform.localPosition, this._particleStartPosition);
                         return [2];
                 }
             });

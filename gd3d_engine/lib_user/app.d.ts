@@ -630,14 +630,7 @@ declare class test_ETC1_KTX implements IState {
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
-    private _particles;
     private transform;
-    private _isMove;
-    private _particleStartPosition;
-    private _particleCurrentPosition;
-    private _moveRadius;
-    private _moveAngle;
-    private _moveAngleSpeed;
     start(app: gd3d.framework.application): Promise<void>;
     private init;
     private loadPrefabs;
