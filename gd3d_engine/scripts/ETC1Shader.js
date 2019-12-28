@@ -7,20 +7,33 @@ var inDir = "res_etc1/可编辑Shaderlab/shader";
 var outDir = "res_etc1/etc1_shader";
 
 var shaderRegExp = /([\w\d]+)\.(vs|fs)\.glsl/;
+var texture2DRegExp = /texture2D\s*\(/g;
+var mainRegExp = /(void\s+main\s*\()/;
 
 var filepaths = getFilePaths(inDir);
 filepaths.forEach(inPath =>
 {
     var outPath = inPath.replace(inDir, outDir);
-    var result = shaderRegExp.exec(inDir);
+    var result = shaderRegExp.exec(inPath);
     if (result)
     {
         var shaderStr = readFile(inPath);
         if (!shaderStr.includes(`#define ETC1`))
         {
-            if (shaderStr.indexOf(`texture2D(`))
+            var result1 = texture2DRegExp.exec(shaderStr);
+            if (result1)
             {
+                shaderStr = shaderStr.replace(texture2DRegExp, `texture2DEtC1(`);
 
+                shaderStr = shaderStr.replace(mainRegExp,
+                    `
+
+vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
+{
+    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
+}
+
+$1`);
             }
         }
         writeFile(outPath, shaderStr);
@@ -46,16 +59,14 @@ function makeDir(dir)
 
 function writeFile(filePath, content)
 {
-    options = options || 'utf8';
     fs.openSync(filePath, "w");
     fs.writeFileSync(filePath, content, 'utf8');
 }
 
-function readFile(filePath, options)
+function readFile(filePath)
 {
-    options = options || 'utf8';
     fs.openSync(filePath, "r");
-    var result = fs.readFileSync(filePath, options);
+    var result = fs.readFileSync(filePath, `utf8`);
     return result;
 }
 
