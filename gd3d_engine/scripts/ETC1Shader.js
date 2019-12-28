@@ -3,9 +3,13 @@
 var fs = require("fs");
 var path = require('path');
 
-var inDir = "res_etc1/可编辑Shaderlab/shader";
-var outDir = "res_etc1/etc1_shader";
-var exclude = [];
+var configStr = readFile("scripts/ETC1ShaderConfig.json");
+var config;
+eval(`config =` + configStr);
+
+var inDir = config.inDir;
+var outDir = config.outDir;
+var exclude = config.exclude;
 // var exclude = ["asi.fs.glsl", "barrel_blur.fs.glsl"];
 
 var shaderRegExp = /([\w\d]+)\.(vs|fs)\.glsl/;
