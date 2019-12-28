@@ -5,6 +5,8 @@ var path = require('path');
 
 var inDir = "res_etc1/可编辑Shaderlab/shader";
 var outDir = "res_etc1/etc1_shader";
+var exclude = [];
+// var exclude = ["asi.fs.glsl", "barrel_blur.fs.glsl"];
 
 var shaderRegExp = /([\w\d]+)\.(vs|fs)\.glsl/;
 var texture2DRegExp = /texture2D\s*\(/g;
@@ -18,7 +20,8 @@ filepaths.forEach(inPath =>
     if (result)
     {
         var shaderStr = readFile(inPath);
-        if (!shaderStr.includes(`#define ETC1`))
+        var isExc = isExclude(inPath);
+        if (!isExc && !shaderStr.includes(`texture2DEtC1`))
         {
             var result1 = texture2DRegExp.exec(shaderStr);
             if (result1)
@@ -47,6 +50,18 @@ $1`);
 });
 console.log(filepaths);
 
+function isExclude(pathStr)
+{
+    for (var i = 0; i < exclude.length; i++)
+    {
+        if (pathStr.includes(exclude[i]))
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 function makeDir(dir)
 {
     if (fs.existsSync(dir)) return;
@@ -59,6 +74,9 @@ function makeDir(dir)
 
 function writeFile(filePath, content)
 {
+    var pDir = path.dirname(filePath);
+    makeDir(pDir);
+
     fs.openSync(filePath, "w");
     fs.writeFileSync(filePath, content, 'utf8');
 }
