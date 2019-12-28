@@ -1,0 +1,15 @@
+{
+  "name": "gd3d_engine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "ETC1Shader": "node scripts/ETC1Shader.js"
+  },
+  "author": "",
+  "license": "ISC"
+}

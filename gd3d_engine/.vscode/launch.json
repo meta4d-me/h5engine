@@ -4,7 +4,15 @@
     // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "ETC1Shader",
+            "program": "${workspaceFolder}/scripts/ETC1Shader.js",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
         {
             "type": "chrome",
             "request": "launch",
