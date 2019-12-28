@@ -18,10 +18,17 @@ vec4 blur_filter(mat3 filter, vec2 filter_pos_delta[9], sampler2D image, vec2 xy
         {
             vec2 new_xy = vec2(xy.x + filter_pos_delta[3 * i + j].x, xy.y + filter_pos_delta[3 * i + j].y);
             vec2 new_uv = vec2(new_xy.x / texSize.x, new_xy.y / texSize.y);
-            final_color += texture2D(_MainTex, new_uv) * filter[i][j];
+            final_color += texture2DEtC1(_MainTex, new_uv) * filter[i][j];
         }
     }
     return final_color;
+}
+
+
+
+vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
+{
+    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
 }
 
 void main()

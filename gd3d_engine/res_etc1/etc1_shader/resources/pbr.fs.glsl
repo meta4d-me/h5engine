@@ -159,11 +159,11 @@ st_core init() {
     st_core temp;
 
     // PBR Material
-    temp.Basecolor  = sRGBtoLINEAR(texture2D(uv_Basecolor, xlv_TEXCOORD0)) * CustomBasecolor;
-    temp.Normal     = texture2D(uv_Normal, xlv_TEXCOORD0);
-    temp.Metallic   = sRGBtoLINEAR(texture2D(uv_MetallicRoughness, xlv_TEXCOORD0)).TEX_FORMAT_METALLIC * CustomMetallic;
-    temp.Roughness  = sRGBtoLINEAR(texture2D(uv_MetallicRoughness, xlv_TEXCOORD0)).TEX_FORMAT_ROUGHNESS * CustomRoughness;
-    temp.AO         = sRGBtoLINEAR(texture2D(uv_AO, xlv_TEXCOORD0));
+    temp.Basecolor  = sRGBtoLINEAR(texture2DEtC1(uv_Basecolor, xlv_TEXCOORD0)) * CustomBasecolor;
+    temp.Normal     = texture2DEtC1(uv_Normal, xlv_TEXCOORD0);
+    temp.Metallic   = sRGBtoLINEAR(texture2DEtC1(uv_MetallicRoughness, xlv_TEXCOORD0)).TEX_FORMAT_METALLIC * CustomMetallic;
+    temp.Roughness  = sRGBtoLINEAR(texture2DEtC1(uv_MetallicRoughness, xlv_TEXCOORD0)).TEX_FORMAT_ROUGHNESS * CustomRoughness;
+    temp.AO         = sRGBtoLINEAR(texture2DEtC1(uv_AO, xlv_TEXCOORD0));
     temp.alphaRoughness = temp.Roughness * temp.Roughness;
 
     vec3 f0 = vec3(0.04);
@@ -207,11 +207,18 @@ vec3 lightBRDF(vec3 L, st_core core) {
     return color;
 }
 
+
+
+vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
+{
+    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
+}
+
 void main () {
     st_core c = init();
 
     vec3 envLight   = sRGBtoLINEAR(vec4(getIBL(c.Roughness, c.R),1)).rgb;
-    // vec2 envBRDF    = texture2D(brdf, vec2(clamp(c.NoV, 0.0, 0.9999999), clamp(1.0-c.Roughness, 0.0, 0.9999999))).rg;
+    // vec2 envBRDF    = texture2DEtC1(brdf, vec2(clamp(c.NoV, 0.0, 0.9999999), clamp(1.0-c.Roughness, 0.0, 0.9999999))).rg;
 
     // vec3 F = Fresnel(c.f0, c.NdotV, c.Roughness);
     // vec3 indirectSpecular = envLight * (F * envBRDF.r + envBRDF.g) * vec3(0.3, 0.4, 0.8);
@@ -221,7 +228,7 @@ void main () {
     finalColor += lightBRDF(light_2.xyz - v_pos, c) * vec3(0.6, 0.6, 0.4);
     // finalColor += ((1.0 - F) * (1.0 - c.Metallic) * c.Basecolor.rgb + indirectSpecular) * c.AO.rgb; // IBL+PBR
 
-    vec3 brdf = sRGBtoLINEAR(texture2D(brdf, vec2(clamp(c.NoV, 0.0, 0.8), clamp(1.0 - c.alphaRoughness, 0.0, 0.8)))).rgb;
+    vec3 brdf = sRGBtoLINEAR(texture2DEtC1(brdf, vec2(clamp(c.NoV, 0.0, 0.8), clamp(1.0 - c.alphaRoughness, 0.0, 0.8)))).rgb;
     vec3 IBLspecular = 1.0 * envLight * (c.f0 * brdf.x + brdf.y);
     finalColor += IBLspecular;
 

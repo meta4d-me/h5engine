@@ -8,6 +8,13 @@ uniform sampler2D _MainTex;
 uniform lowp float _FilterType;
 uniform lowp float _Step;
 varying highp vec2 xlv_TEXCOORD0;
+
+
+vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
+{
+    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
+}
+
 void main()
 {
     vec2 tcOffset[25];
@@ -24,21 +31,21 @@ void main()
     // 灰度图
     if (_FilterType == 1.)
     {
-        float gray = dot(texture2D(_MainTex, xlv_TEXCOORD0.xy).rgb, vec3(0.299, 0.587, 0.114));
+        float gray = dot(texture2DEtC1(_MainTex, xlv_TEXCOORD0.xy).rgb, vec3(0.299, 0.587, 0.114));
         gl_FragData[0] = vec4(gray, gray, gray, 1.0);
     }
 
     // 棕褐色调
     else if (_FilterType == 2.)
     {
-        float gray = dot(texture2D(_MainTex, xlv_TEXCOORD0.xy).rgb, vec3(0.299, 0.587, 0.114));
+        float gray = dot(texture2DEtC1(_MainTex, xlv_TEXCOORD0.xy).rgb, vec3(0.299, 0.587, 0.114));
         gl_FragData[0] = vec4(gray * vec3(1.2, 1.0, 0.8), 1.0);
     }
 
     // 反色
     else if (_FilterType == 3.)
     {
-        vec4 color = texture2D(_MainTex, xlv_TEXCOORD0.xy);
+        vec4 color = texture2DEtC1(_MainTex, xlv_TEXCOORD0.xy);
         gl_FragData[0] = vec4(1.0 - color.rgb, 1.0);
     }
 
@@ -48,7 +55,7 @@ void main()
         vec4 sample[25];
         for (int i = 0; i < 25; i++)
         {
-            sample[i] = texture2D(_MainTex, xlv_TEXCOORD0.xy + tcOffset[i]);
+            sample[i] = texture2DEtC1(_MainTex, xlv_TEXCOORD0.xy + tcOffset[i]);
         }
 
         // 1  4  7  4 1
@@ -72,7 +79,7 @@ void main()
         vec4 sample[25];
         for (int i = 0; i < 25; i++)
         {
-            sample[i] = texture2D(_MainTex, xlv_TEXCOORD0.xy + tcOffset[i]);
+            sample[i] = texture2DEtC1(_MainTex, xlv_TEXCOORD0.xy + tcOffset[i]);
         }
 
         vec4 color;
@@ -90,7 +97,7 @@ void main()
         vec4 sample[25];
         for (int i = 0; i < 25; i++)
         {
-            sample[i] = texture2D(_MainTex, xlv_TEXCOORD0.xy + tcOffset[i]);
+            sample[i] = texture2DEtC1(_MainTex, xlv_TEXCOORD0.xy + tcOffset[i]);
         }
 
         // -1 -1 -1 -1 -1
@@ -117,7 +124,7 @@ void main()
         vec4 maxValue = vec4(0.0);
         for (int i = 0; i < 25; i++)
         {
-            sample[i] = texture2D(_MainTex, xlv_TEXCOORD0.xy + tcOffset[i]);
+            sample[i] = texture2DEtC1(_MainTex, xlv_TEXCOORD0.xy + tcOffset[i]);
             maxValue = max(sample[i], maxValue);
         }
 
@@ -131,7 +138,7 @@ void main()
         vec4 minValue = vec4(1.0);
         for (int i = 0; i < 25; i++)
         {
-            sample[i] = texture2D(_MainTex, xlv_TEXCOORD0.xy + tcOffset[i]);
+            sample[i] = texture2DEtC1(_MainTex, xlv_TEXCOORD0.xy + tcOffset[i]);
             minValue = min(sample[i], minValue);
         }
         gl_FragData[0] = minValue;
@@ -140,6 +147,6 @@ void main()
     // 标准
     else
     {
-        gl_FragData[0] = texture2D(_MainTex, xlv_TEXCOORD0.xy);
+        gl_FragData[0] = texture2DEtC1(_MainTex, xlv_TEXCOORD0.xy);
     }
 }

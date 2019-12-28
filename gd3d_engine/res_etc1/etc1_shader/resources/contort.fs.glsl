@@ -9,6 +9,13 @@ uniform sampler2D _MainTex;
 uniform float _UD;
 uniform float _UR;
 varying highp vec2 xlv_TEXCOORD0;
+
+
+vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
+{
+    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
+}
+
 void main()
 {
     ivec2 ires = ivec2(1024, 1024);
@@ -29,7 +36,7 @@ void main()
     }
     st = xy1 / Res;
 
-    vec3 irgb = texture2D(_MainTex, st).rgb;
+    vec3 irgb = texture2DEtC1(_MainTex, st).rgb;
 
     gl_FragData[0] = vec4(irgb, 1.0);
 }

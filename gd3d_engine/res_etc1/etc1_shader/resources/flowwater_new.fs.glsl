@@ -8,9 +8,16 @@ varying lowp float factor;
 #endif
 
 
+
+
+vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
+{
+    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
+}
+
 void main() 
 {
-    lowp vec4 basecolor = texture2D(_MainTex, _base_uv);
+    lowp vec4 basecolor = texture2DEtC1(_MainTex, _base_uv);
     lowp vec4 emission=basecolor*attcolor;
 
     #ifdef FOG
