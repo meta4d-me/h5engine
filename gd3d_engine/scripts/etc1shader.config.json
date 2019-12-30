@@ -6,7 +6,5 @@
     // 排除列表
     // "exclude": []
     "exclude": [
-        "asi.fs.glsl",
-        "barrel_blur.fs.glsl"
     ]
 }
