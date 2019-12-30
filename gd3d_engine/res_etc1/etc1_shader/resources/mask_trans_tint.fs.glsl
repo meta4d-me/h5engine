@@ -22,17 +22,10 @@ lowp vec3 decode_hdr(lowp vec4 data)
 uniform lowp vec4 glstate_fog_color; 
 varying lowp float factor;
 #endif
-
-
-vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
-{
-    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
-}
-
 void main()    
 {
-    highp vec4 basecolor=texture2DEtC1(_MainTex,_maintex_uv);
-    highp vec4 maskcolor=texture2DEtC1(_Mask,_mask_uv);
+    highp vec4 basecolor=texture2D(_MainTex,_maintex_uv);
+    highp vec4 maskcolor=texture2D(_Mask,_mask_uv);
 
     lowp vec3 tempcolor=_Main_Color.rgb*basecolor.rgb*maskcolor.rgb*_mixColorRate;
     lowp float tempAlpha=_Main_Color.a*basecolor.a*maskcolor.a*_mixAlphaRate;
@@ -40,7 +33,7 @@ void main()
 
     //----------------------------------------------------------
     #ifdef LIGHTMAP
-    lowp vec4 lightmap = texture2DEtC1(_LightmapTex, lightmap_TEXCOORD);
+    lowp vec4 lightmap = texture2D(_LightmapTex, lightmap_TEXCOORD);
     emission.xyz *= decode_hdr(lightmap);
     #endif
 

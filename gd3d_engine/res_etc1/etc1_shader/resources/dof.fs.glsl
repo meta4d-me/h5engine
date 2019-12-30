@@ -24,18 +24,11 @@ highp float unpackRGBAToDepth( const in vec4 v )
     return dot( v, UnpackFactors );
 }
 
-
-
-vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
-{
-    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
-}
-
 void main() 
 {
-	lowp vec4 basecolor =texture2DEtC1(_MainTex,xlv_TEXCOORD0);
-    lowp vec4 blurcolor=texture2DEtC1(_BlurTex,xlv_TEXCOORD0);
-    lowp vec4 depthcolor=texture2DEtC1(_DepthTex,xlv_TEXCOORD0);
+	lowp vec4 basecolor =texture2D(_MainTex,xlv_TEXCOORD0);
+    lowp vec4 blurcolor=texture2D(_BlurTex,xlv_TEXCOORD0);
+    lowp vec4 depthcolor=texture2D(_DepthTex,xlv_TEXCOORD0);
     highp float depth=unpackRGBAToDepth(depthcolor);
 
 

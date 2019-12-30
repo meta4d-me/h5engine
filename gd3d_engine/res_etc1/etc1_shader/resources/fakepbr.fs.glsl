@@ -60,16 +60,9 @@ lowp float calcSpec(lowp vec3 N,lowp vec3 worldpos,lowp vec3 eyedir,lowp vec4 li
     return spec;
 }
 
-
-
-vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
-{
-    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
-}
-
 void main() 
 {
-    lowp float _opacity_var = texture2DEtC1(_opacity,xlv_TEXCOORD0).g;
+    lowp float _opacity_var = texture2D(_opacity,xlv_TEXCOORD0).g;
     if(_opacity_var<0.5)  discard;
 
 
@@ -82,7 +75,7 @@ void main()
     for(int i=0;i<8;i++)
     {
         lowp vec3 normal;// = TBN*N;
-		normal =  texture2DEtC1(_normal, xlv_TEXCOORD0).xyz *2.0 -1.0;
+		normal =  texture2D(_normal, xlv_TEXCOORD0).xyz *2.0 -1.0;
         normal =normalize(normal);
 		normal =TBNmat*(normal);
         
@@ -93,17 +86,17 @@ void main()
     //gloss //假的光洁度，只影响了高光
     lowp float Pi = 3.141592654;
     lowp float InvPi = 0.31830988618;
-    lowp vec4 _gloss_var = texture2DEtC1(_gloss,xlv_TEXCOORD0);
+    lowp vec4 _gloss_var = texture2D(_gloss,xlv_TEXCOORD0);
     lowp float gloss = _gloss_var.r;
     lowp float specPow = exp2( gloss * 10.0+1.0);
     //spec //受到高光贴图的过滤
     lowp float normTerm = (specPow + 8.0 ) / (8.0 * Pi);
-    lowp vec4 specularColor = texture2DEtC1(_specular,xlv_TEXCOORD0);
+    lowp vec4 specularColor = texture2D(_specular,xlv_TEXCOORD0);
     lowp float specularMonochrome = max( max(specularColor.r, specularColor.g), specularColor.b);
     specularColor*=pow(specularPower,specPow)*normTerm;
     //diffuse
 
-    lowp vec4 diffuseColor= texture2DEtC1(_albedo, xlv_TEXCOORD0);//光照颜色
+    lowp vec4 diffuseColor= texture2D(_albedo, xlv_TEXCOORD0);//光照颜色
     diffuseColor *= 1.0-specularMonochrome;//均衡能量
     lowp vec3 directDiffuse = vec3(diff,diff,diff);//直接光照
     lowp vec3 indirectDiffuse = vec3(0.3,0.3,0.3);//间接光照

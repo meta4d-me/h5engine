@@ -19,13 +19,6 @@ lowp float getGausWeight(lowp float rx,lowp float ry)
 	return exp(-(xDistance + yDistance)/sigma22)/sigma22PI;
 }
 
-
-
-vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
-{
-    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
-}
-
 void main() 
 {
 	lowp float size =2.0 * _BlurLayer + 1.0;
@@ -47,7 +40,7 @@ void main()
 			tx = rx * _MainTex_TexelSize.x * _BlurGap;
 			ty = ry * _MainTex_TexelSize.y * _BlurGap;
 			tempWeight = getGausWeight(rx,ry);
-			sample = texture2DEtC1(_MainTex,vec2(xlv_TEXCOORD0.x + tx ,xlv_TEXCOORD0.y + ty));   
+			sample = texture2D(_MainTex,vec2(xlv_TEXCOORD0.x + tx ,xlv_TEXCOORD0.y + ty));   
 			color +=sample * tempWeight;  
 			sum += tempWeight; 
 		}

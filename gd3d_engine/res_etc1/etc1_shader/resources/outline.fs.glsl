@@ -36,25 +36,18 @@ float planeDistance(const in vec3 positionA, const in vec3 normalA,
   return planeDistanceDelta;
 }
 
-
-
-vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
-{
-    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
-}
-
 void main()         
 {
-    lowp vec4 c1=texture2DEtC1(_DepthTex, xlv_TEXCOORD0+vec2(0.001,0));
-    lowp vec4 c2=texture2DEtC1(_DepthTex, xlv_TEXCOORD0+vec2(-0.001,0));
-    lowp vec4 c3=texture2DEtC1(_DepthTex, xlv_TEXCOORD0+vec2(0,0.001));
-    lowp vec4 c4=texture2DEtC1(_DepthTex, xlv_TEXCOORD0+vec2(0,-0.001));
+    lowp vec4 c1=texture2D(_DepthTex, xlv_TEXCOORD0+vec2(0.001,0));
+    lowp vec4 c2=texture2D(_DepthTex, xlv_TEXCOORD0+vec2(-0.001,0));
+    lowp vec4 c3=texture2D(_DepthTex, xlv_TEXCOORD0+vec2(0,0.001));
+    lowp vec4 c4=texture2D(_DepthTex, xlv_TEXCOORD0+vec2(0,-0.001));
     lowp float z1 = unpackRGBAToDepth(c1);
     lowp float z2 = unpackRGBAToDepth(c2);
     lowp float z3 = unpackRGBAToDepth(c3);
     lowp float z4 = unpackRGBAToDepth(c4);
     lowp float d = clamp(  (abs(z2-z1)+abs(z4-z3))*10.0,0.0,1.0);
-    lowp vec4 c=texture2DEtC1(_MainTex, xlv_TEXCOORD0);
+    lowp vec4 c=texture2D(_MainTex, xlv_TEXCOORD0);
     lowp float g = c.r*0.3+c.g*0.6+c.b*0.1;
 
     gl_FragColor =mix(vec4(g,g,g,1.),vec4(1.0,1.0,0.0,1.0),d);// vec4(g*d,g*d,g*d,1.0);

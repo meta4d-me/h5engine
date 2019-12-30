@@ -107,11 +107,11 @@ st_core init() {
     st_core temp;
 
     // PBR Material
-    temp.Basecolor  = texture2DEtC1(uv_Basecolor, xlv_TEXCOORD0) * CustomBasecolor;
-    temp.Normal     = texture2DEtC1(uv_Normal, xlv_TEXCOORD0);
-    temp.Metallic   = texture2DEtC1(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_METALLIC * 0.01;
-    temp.Roughness  = texture2DEtC1(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_ROUGHNESS * 0.5;
-    temp.AO         = texture2DEtC1(uv_AO, xlv_TEXCOORD0);
+    temp.Basecolor  = texture2D(uv_Basecolor, xlv_TEXCOORD0) * CustomBasecolor;
+    temp.Normal     = texture2D(uv_Normal, xlv_TEXCOORD0);
+    temp.Metallic   = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_METALLIC * 0.01;
+    temp.Roughness  = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).TEX_FORMAT_ROUGHNESS * 0.5;
+    temp.AO         = texture2D(uv_AO, xlv_TEXCOORD0);
 
     vec3 f0 = vec3(0.04);
     temp.f0 = mix(f0, temp.Basecolor.xyz, temp.Metallic);
@@ -156,25 +156,18 @@ vec3 T(float s) {
          vec3(0.078, 0.0,   0.0)   * exp(-s * s / 7.41);
 }
 vec3 translucency(vec3 l, st_core c) {
-    float thick = 1.0 -texture2DEtC1(uv_Thickness, xlv_TEXCOORD0).r;
+    float thick = 1.0 -texture2D(uv_Thickness, xlv_TEXCOORD0).r;
     vec3 vLTLight = normalize(l);
     float fLTDot = pow(max(dot(c.N, -vLTLight), 0.4), 2.0) * 1.0;
     vec3 fLT = 1.0 * (fLTDot + 0.0) * thick * T(thick);
     return fLT;
 }
 
-
-
-vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
-{
-    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
-}
-
 void main () {
     st_core c = init();
 
     vec3 envLight   = textureCube(u_sky, c.R).xyz;
-    vec2 envBRDF    = texture2DEtC1(brdf, vec2(clamp(c.NdotV, 0.0, 0.9999999), clamp(1.0-c.Roughness, 0.0, 0.9999999))).rg;
+    vec2 envBRDF    = texture2D(brdf, vec2(clamp(c.NdotV, 0.0, 0.9999999), clamp(1.0-c.Roughness, 0.0, 0.9999999))).rg;
 
     vec3 F = Fresnel(c.f0, c.NdotV, c.Roughness);
     vec3 indirectSpecular = envLight * (F * envBRDF.r + envBRDF.g) * vec3(0.3, 0.4, 0.8);
@@ -186,6 +179,6 @@ void main () {
     finalColor += translucency(vec3(-10.0, 10.0, -10.0), c) * vec3(1.0, 1.0, 1.0);
 
     // gl_FragColor = vec4(0.0, 1.0, 1.0, 1.0);
-    // gl_FragColor = texture2DEtC1(uv_Basecolor, xlv_TEXCOORD0);
+    // gl_FragColor = texture2D(uv_Basecolor, xlv_TEXCOORD0);
     gl_FragColor = vec4(finalColor, 1.0);
 }

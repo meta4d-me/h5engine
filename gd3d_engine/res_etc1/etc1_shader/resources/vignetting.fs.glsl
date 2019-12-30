@@ -30,13 +30,6 @@ vec2 adjustUV(vec2 uv) {
     return uv;
 }
 
-
-
-vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
-{
-    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
-}
-
 void main () {
     float dist = distance(xlv_TEXCOORD0, vec2(0.5));
     // NOTE Unity Parameters:
@@ -56,15 +49,15 @@ void main () {
     vec2 r_uv = adjustUV(xlv_TEXCOORD0 - direction * direction * 0.01 * Chromatic_Aberration);
     vec2 b_uv = adjustUV(xlv_TEXCOORD0 + direction * direction * 0.01 * Chromatic_Aberration);
 
-    float base_r = texture2DEtC1(_MainTex, r_uv).r;
-    float base_b = texture2DEtC1(_MainTex, b_uv).b;
+    float base_r = texture2D(_MainTex, r_uv).r;
+    float base_b = texture2D(_MainTex, b_uv).b;
 
-    vec4 base_color = texture2DEtC1(_MainTex, xlv_TEXCOORD0);
+    vec4 base_color = texture2D(_MainTex, xlv_TEXCOORD0);
 
-    float blur_r = texture2DEtC1(_BlurTex, r_uv).r;
-    float blur_b = texture2DEtC1(_BlurTex, b_uv).b;
+    float blur_r = texture2D(_BlurTex, r_uv).r;
+    float blur_b = texture2D(_BlurTex, b_uv).b;
 
-    vec4 blur_color = texture2DEtC1(_BlurTex, xlv_TEXCOORD0);
+    vec4 blur_color = texture2D(_BlurTex, xlv_TEXCOORD0);
 
     float ch_r = mix(base_r, blur_r, Blurred_Corners);
     float ch_b = mix(base_b, blur_b, Blurred_Corners);

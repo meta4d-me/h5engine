@@ -16,13 +16,6 @@ varying highp vec3 worldpos;
 lowp float calcDiffuse(lowp vec3 N,lowp vec3 worldpos,lowp vec4 lightPos,lowp vec4 lightDir,lowp float cosspot);
 // highp mat3 cotangentFrame(vec3 normal,highp vec3 position,vec2 uv);
 
-
-
-vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
-{
-    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
-}
-
 void main() 
 {
 	//切空间逆矩阵的计算 应该在vertex shader 里面完成，不需要dfdx 和 dfdy
@@ -49,7 +42,7 @@ void main()
 		
 		//这是进入切空间的原因
 		lowp vec3 normal;// = TBN*N;
-		normal =  texture2DEtC1(_NormalTex, xlv_TEXCOORD0).xyz *2.0 -1.0;
+		normal =  texture2D(_NormalTex, xlv_TEXCOORD0).xyz *2.0 -1.0;
         normal =normalize(normal);
 		normal =TBN*(normal);
 
@@ -60,7 +53,7 @@ void main()
 	lowp vec4 color = vec4(diff,diff,diff,1.0);       
 
     lowp vec4 tmpvar_3;
-    tmpvar_3 = (color * texture2DEtC1(_MainTex, xlv_TEXCOORD0));
+    tmpvar_3 = (color * texture2D(_MainTex, xlv_TEXCOORD0));
 
     gl_FragData[0] = tmpvar_3;
 }

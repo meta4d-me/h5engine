@@ -24,18 +24,11 @@ float unpackRGBAToDepth(const in vec4 v)
     return dot(v, UnpackFactors);
 }
 
-
-
-vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
-{
-    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
-}
-
 void main() 
 {
-    lowp vec4 tmpvar_3 = texture2DEtC1(_MainTex, xlv_TEXCOORD0);
+    lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);
 
-	float shadowDepth = unpackRGBAToDepth(texture2DEtC1(_Light_Depth, _WorldPos.xy));
+	float shadowDepth = unpackRGBAToDepth(texture2D(_Light_Depth, _WorldPos.xy));
     float worldDepth = (_WorldPos.z +1.)/2.;//不理解这里为啥要做变换。
 
     float _depth = step(shadowDepth + _bias,worldDepth);

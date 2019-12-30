@@ -80,18 +80,11 @@ float D_GGX(float a, float NoH) {
     return a / (PI * f * f);
 }
 
-
-
-vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
-{
-    return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
-}
-
 void main()
 {
     //gl_FragData[0] = v_color;
 
-    vec4 base = sRGBtoLINEAR(texture2DEtC1(uv_Basecolor, xlv_TEXCOORD0));
+    vec4 base = sRGBtoLINEAR(texture2D(uv_Basecolor, xlv_TEXCOORD0));
     // vec4 base = sRGBtoLINEAR(vec4(0.8, 0.69, 0.13,1));
     // if(base.a < 0.1)
     //     discard;
@@ -99,7 +92,7 @@ void main()
 
 
     vec4 fristColor = vec4(v_color.rgb, 1);
-    vec3 normalAddation = texture2DEtC1(uv_Normal, xlv_TEXCOORD0).rgb * 2.0 - 1.0;
+    vec3 normalAddation = texture2D(uv_Normal, xlv_TEXCOORD0).rgb * 2.0 - 1.0;
 
     vec3 L = normalize(LIGHT_DIRECTION);
     vec3 N = normalize(TBN * normalAddation);
@@ -137,7 +130,7 @@ void main()
 
 
     // IBL
-    vec3 brdf = sRGBtoLINEAR(texture2DEtC1(brdf, vec2(NoV, 1.0 - alphaRoughness))).rgb;
+    vec3 brdf = sRGBtoLINEAR(texture2D(brdf, vec2(NoV, 1.0 - alphaRoughness))).rgb;
     // vec3 IBLcolor = vec3(1);
     vec3 IBLcolor = vec3(1, 0.6, 0);
     // vec3 IBLcolor = sRGBtoLINEAR(textureCube(envTex, R)).rgb + vec3(0.5);
