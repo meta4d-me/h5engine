@@ -13,10 +13,17 @@ var input = path.resolve(__dirname, "t_0012lvyeshu_obj_p_d.png");
 var res = "test_ktx";
 var assetbundlePath = path.resolve(__dirname, `../res/prefabs/test_ktx/resources/t_0012lvyeshu_obj_p_d.imgdesc.json`);
 
+
+
 etcpackImgdesc(assetbundlePath);
 // etcpack(input, outDir);
 
 // `t_0012lvyeshu_obj_p_d.imgdesc.json`
+
+function etcpackImgdescInFolder()
+{
+
+}
 
 function etcpackImgdesc(imgdescPath, callback)
 {
@@ -31,14 +38,15 @@ function etcpackImgdesc(imgdescPath, callback)
         return;
     }
 
-    var imgPath = path.resolve(path.dirname(imgdescPath), imgdesc.name);
+    var imgName = imgdesc.name;
+    var imgPath = path.resolve(path.dirname(imgdescPath), imgName);
     if (!fs.existsSync(imgPath))
     {
         console.warn(`${imgdescPath} 中图片资源 ${imgPath} 不存在！`)
         callback();
         return;
     }
-    var dotIndex = imgdesc.name.lastIndexOf(".");
+    var dotIndex = imgName.lastIndexOf(".");
     if (dotIndex == -1)
     {
         console.warn(`图片路径 ${imgPath} 格式不对！`);
@@ -46,7 +54,13 @@ function etcpackImgdesc(imgdescPath, callback)
         return;
     }
 
-    var newImgName = imgdesc.name.substring(0, dotIndex + 1) + "ktx";
+    if (imgName.substring(imgName.length - 4) == ".ktx")
+    {
+        callback();
+        return;
+    }
+
+    var newImgName = imgName.substring(0, dotIndex + 1) + "ktx";
     etcpack(imgPath, path.dirname(imgPath), (err) =>
     {
         if (err)
