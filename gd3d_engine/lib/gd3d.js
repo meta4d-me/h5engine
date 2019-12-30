@@ -9820,36 +9820,7 @@ var gd3d;
             }
             AssetFactory_ETC1.prototype.parse = function (assetmgr, bundle, name, bytes, dwguid) {
                 var _texture = new framework.texture(name);
-                var imgGuid = dwguid || bundle.texs[name];
-                var texName = name.split(".")[0];
-                var texDescName = texName + ".imgdesc.json";
-                var hasImgdesc = bundle && bundle.files[texDescName] != null;
-                var guidList = [imgGuid];
-                if (hasImgdesc) {
-                    guidList.push(bundle.files[texDescName]);
-                }
-                var len = guidList.length;
-                for (var i = 0; i < len; i++) {
-                    var _guid = guidList[i];
-                    var assRef = framework.assetMgr.mapGuid[_guid];
-                    if (assRef) {
-                        _texture = assRef.asset;
-                        if (_texture && _texture instanceof framework.texture) {
-                            var loading = framework.assetMgr.mapLoading[imgGuid];
-                            if (loading) {
-                                delete loading.data;
-                            }
-                            return _texture;
-                        }
-                    }
-                }
-                if (!hasImgdesc) {
-                    _texture.glTexture = framework.KTXParse.parse(assetmgr.webgl, bytes);
-                    var loading = framework.assetMgr.mapLoading[imgGuid];
-                    if (loading) {
-                        delete loading.data;
-                    }
-                }
+                _texture.glTexture = framework.KTXParse.parse(assetmgr.webgl, bytes);
                 return _texture;
             };
             AssetFactory_ETC1 = __decorate([
