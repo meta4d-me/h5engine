@@ -14,7 +14,7 @@ var exeDir = path.dirname(exePath);
 // var assetbundlePath = path.resolve(__dirname, `../res/prefabs/test_ktx/resources/t_0012lvyeshu_obj_p_d.imgdesc.json`);
 // etcpackImgdesc(assetbundlePath);
 
-var assetDir = path.resolve(__dirname, `../res/prefabs/test_ktx`);
+var assetDir = path.resolve(__dirname, `../res/prefabs`);
 etcpackImgdescInFolder(assetDir);
 
 
@@ -32,10 +32,12 @@ function etcpackImgdescInFolder(dir, callback)
     {
         return p.substring(p.length - ".imgdesc.json".length) == ".imgdesc.json";
     })
+    var total = imgdescs.length;
     handlers();
 
     function handlers()
     {
+        console.log(`进度 ${totaltotal - imgdescs.length}/${total}`);
         if (imgdescs.length == 0)
         {
             callback();
