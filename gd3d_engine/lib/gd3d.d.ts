@@ -1584,8 +1584,14 @@ declare namespace gd3d.framework {
         onReady: () => void;
         onDownloadFinish: () => void;
         ready: boolean;
+        outTime: number;
+        stateQueue: any[];
+        stateParse: any;
+        stateText: string;
+        thd: number;
         constructor(url: string, assetmgr: assetMgr, guid?: number);
         static buildGuid(): number;
+        timeOut(): void;
         parseBundle(data: string): void;
         private unpkg;
         parseFile(): Promise<void>;
@@ -1870,7 +1876,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AssetFactory_PVR implements IAssetFactory {
-        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer, dwguid: number): texture;
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer): texture;
     }
 }
 declare namespace gd3d.framework {

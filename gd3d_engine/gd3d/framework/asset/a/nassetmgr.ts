@@ -115,7 +115,8 @@ namespace gd3d.framework {
             case e.PackBin:
                 return "arraybuffer";
             default:
-                throw Error(`无法识别类型 enum:${AssetTypeEnum[type]},type:${type}`);
+                // throw Error(`无法识别类型 enum:${AssetTypeEnum[type]},type:${type}`);
+                return null;
         }
     }
     //#endregion
@@ -234,9 +235,6 @@ namespace gd3d.framework {
         }
 
         download(guid: number, url: string, type: AssetTypeEnum, finish: () => void) {
-            if(assetMgr.mapGuid[guid]){
-                return finish();
-            }
             let loading = assetMgr.mapLoading[guid];
             //下载完成的不再下载
             if (loading && loading.readyok && finish)
@@ -254,6 +252,10 @@ namespace gd3d.framework {
             }
 
             let repType: "text" | "arraybuffer" = calcReqType(type);
+            if(repType == null){
+                error.push(new Error(`无法识别类型 url:${url} , guid:${guid} , enum:${AssetTypeEnum[type]},type:${type}`));
+                return;                
+            }
             io.xhrLoad(url, (data, err) => {
                 console.error(err.stack);
 
@@ -271,23 +273,14 @@ namespace gd3d.framework {
 
         //加载图片
         loadImg(guid: number, url: string, cb: (img) => void) {
-            let _img = assetMgr.mapImage[guid] ;
-            if (_img){
-                (_img as any).guid = guid;
-                return cb(_img);
-            }else{
-                if(assetMgr.mapGuid[guid]) {    //因为 资源解析完assetMgr.mapImage 缓存会被清理 ，此环节退出 避免loadimg 
-                    cb(null);
-                    return;
-                }
-            }
+            if (assetMgr.mapImage[guid])
+                return cb(assetMgr.mapImage[guid]);
 
             let loading = assetMgr.mapLoading[guid];
             if (!loading)
                 loading = assetMgr.mapLoading[guid] = { readyok: false, cbQueue: [] }
             loading.cbQueue.push(cb);
             this._loadImg(url, (img) => {
-                img.guid = guid;
                 assetMgr.mapImage[guid] = img;
                 loading.readyok = true;
                 loading.data = img;
@@ -346,14 +339,20 @@ namespace gd3d.framework {
             if (assetMgr.mapGuid[asset.guid])
                 return assetMgr.mapGuid[asset.guid].asset;
             // let ctime = Date.now();
-            let data = assetMgr.mapLoading[asset.guid].data;
+            let loading = assetMgr.mapLoading[asset.guid];
+            if(!loading)
+            {
+                error.push(new Error(`资源解析失败 name:${asset.name},bundle:${bundle?bundle.url:""} assetMgr.mapLoading 无法找到guid:${asset.guid}`));
+                return ;
+            }
+            let data = loading.data;
             let factory = assetParseMap[asset.type];
             if (!factory) {
-                console.warn(`无法找到[${AssetTypeEnum[asset.type]}]的解析器`);
+                error.push(new Error(`无法找到[${AssetTypeEnum[asset.type]}]的解析器`));
                 return;
             }
             if (!factory.parse) {
-                console.warn(`解析器 ${factory.constructor.name} 没有实现parse方法`);
+                error.push(new Error(`解析器 ${factory.constructor.name} 没有实现parse方法`));
                 return;
             }
 
@@ -365,7 +364,6 @@ namespace gd3d.framework {
                     __asset["id"].id = asset.guid;
                 __asset.bundle = bundle;
                 this.use(__asset);
-                delete assetMgr.mapLoading[asset.guid];
             }
             return __asset;
             // console.log(`解析完成[${AssetTypeEnum[asset.type]}]${Date.now() - ctime}ms,解析器:${factory.constructor.name},guid:${asset.guid},name:${asset.name}`);

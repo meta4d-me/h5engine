@@ -9,8 +9,7 @@ namespace gd3d.framework
         {
             if (this.openQueue && this.onError)
                 this.onError(err);
-            else
-                console.error(err.stack);
+            console.error(err.stack);
         }
     }
 }

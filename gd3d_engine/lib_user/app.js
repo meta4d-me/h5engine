@@ -4161,79 +4161,6 @@ var test_Decal = (function () {
     };
     return test_Decal;
 }());
-var test_ETC1_KTX = (function () {
-    function test_ETC1_KTX() {
-        this.ry = 0;
-    }
-    test_ETC1_KTX.prototype.start = function (app) {
-        return __awaiter(this, void 0, void 0, function () {
-            var ext;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        ext = app.webgl.getExtension('WEBGL_compressed_texture_etc1');
-                        if (!ext) {
-                            alert("\u9700\u8981\u4F7F\u7528Android\u5E73\u53F0\u624D\u80FD\u8FD0\u884C\uFF01");
-                            return [2];
-                        }
-                        this.app = app;
-                        this.scene = this.app.getScene();
-                        this.astMgr = this.app.getAssetMgr();
-                        gd3d.framework.assetMgr.openGuid = false;
-                        return [4, demoTool.loadbySync("res_etc1/shader/MainShader.assetbundle.json", this.astMgr)];
-                    case 1:
-                        _a.sent();
-                        this.init();
-                        return [2];
-                }
-            });
-        });
-    };
-    test_ETC1_KTX.prototype.init = function () {
-        var objCam = new gd3d.framework.transform();
-        objCam.name = "sth.";
-        this.scene.addChild(objCam);
-        this.camera = objCam.gameObject.addComponent("camera");
-        this.camera.near = 0.01;
-        this.camera.far = 1000;
-        this.camera.fov = Math.PI * 2 / 3;
-        this.camera.backgroundColor = new gd3d.math.color(0.2784, 0.2784, 0.2784, 1);
-        objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
-        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-        this.loadPrefabs();
-    };
-    test_ETC1_KTX.prototype.loadPrefabs = function () {
-        return __awaiter(this, void 0, void 0, function () {
-            var res, cubeP, cubeTran;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        res = "test_ktx";
-                        return [4, demoTool.loadbySync("res/prefabs/" + res + "/" + res + ".assetbundle.json", this.astMgr)];
-                    case 1:
-                        _a.sent();
-                        cubeP = this.astMgr.getAssetByName(res + ".prefab.json", res + ".assetbundle.json");
-                        cubeTran = this.transform = cubeP.getCloneTrans();
-                        cubeTran.localPosition.x = 0;
-                        cubeTran.localPosition.y = 0;
-                        cubeTran.localPosition.z = 0;
-                        cubeTran.localScale.x = 8;
-                        cubeTran.localScale.y = 8;
-                        cubeTran.localScale.z = 8;
-                        this.scene.addChild(cubeTran);
-                        return [2];
-                }
-            });
-        });
-    };
-    test_ETC1_KTX.prototype.update = function (delta) {
-        if (!this.transform)
-            return;
-        gd3d.math.quatFromEulerAngles(0, this.ry, 0, this.transform.localRotate);
-        this.ry++;
-    };
-    return test_ETC1_KTX;
-}());
 var test_ParticleSystem = (function () {
     function test_ParticleSystem() {
         this._particles = ["ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames", "shark-levelup"];
@@ -5086,6 +5013,79 @@ var t;
     }());
     t_1.test_blend = test_blend;
 })(t || (t = {}));
+var test_ETC1_KTX = (function () {
+    function test_ETC1_KTX() {
+        this.ry = 0;
+    }
+    test_ETC1_KTX.prototype.start = function (app) {
+        return __awaiter(this, void 0, void 0, function () {
+            var ext;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        ext = app.webgl.getExtension('WEBGL_compressed_texture_etc1');
+                        if (!ext) {
+                            alert("\u9700\u8981\u4F7F\u7528Android\u5E73\u53F0\u624D\u80FD\u8FD0\u884C\uFF01");
+                            return [2];
+                        }
+                        this.app = app;
+                        this.scene = this.app.getScene();
+                        this.astMgr = this.app.getAssetMgr();
+                        gd3d.framework.assetMgr.openGuid = false;
+                        return [4, demoTool.loadbySync("res_etc1/shader/MainShader.assetbundle.json", this.astMgr)];
+                    case 1:
+                        _a.sent();
+                        this.init();
+                        return [2];
+                }
+            });
+        });
+    };
+    test_ETC1_KTX.prototype.init = function () {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 1000;
+        this.camera.fov = Math.PI * 2 / 3;
+        this.camera.backgroundColor = new gd3d.math.color(0.2784, 0.2784, 0.2784, 1);
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        this.loadPrefabs();
+    };
+    test_ETC1_KTX.prototype.loadPrefabs = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var res, cubeP, cubeTran;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        res = "test_ktx";
+                        return [4, demoTool.loadbySync("res/prefabs/" + res + "/" + res + ".assetbundle.json", this.astMgr)];
+                    case 1:
+                        _a.sent();
+                        cubeP = this.astMgr.getAssetByName(res + ".prefab.json", res + ".assetbundle.json");
+                        cubeTran = this.transform = cubeP.getCloneTrans();
+                        cubeTran.localPosition.x = 0;
+                        cubeTran.localPosition.y = 0;
+                        cubeTran.localPosition.z = 0;
+                        cubeTran.localScale.x = 8;
+                        cubeTran.localScale.y = 8;
+                        cubeTran.localScale.z = 8;
+                        this.scene.addChild(cubeTran);
+                        return [2];
+                }
+            });
+        });
+    };
+    test_ETC1_KTX.prototype.update = function (delta) {
+        if (!this.transform)
+            return;
+        gd3d.math.quatFromEulerAngles(0, this.ry, 0, this.transform.localRotate);
+        this.ry++;
+    };
+    return test_ETC1_KTX;
+}());
 var test_fakepbr = (function () {
     function test_fakepbr() {
         this.timer = 0;
