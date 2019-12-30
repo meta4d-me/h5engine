@@ -1,6 +1,6 @@
 {
     // 输入文件夹
-    "inDir": "res_etc1/可编辑Shaderlab/shader",
+    "inDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/shader/customShader",
     // 输出文件夹
     "outDir": "res_etc1/etc1_shader",
     // 排除列表

@@ -14,7 +14,8 @@ var exeDir = path.dirname(exePath);
 // var assetbundlePath = path.resolve(__dirname, `../res/prefabs/test_ktx/resources/t_0012lvyeshu_obj_p_d.imgdesc.json`);
 // etcpackImgdesc(assetbundlePath);
 
-var assetDir = path.resolve(__dirname, `../res/prefabs`);
+// var assetDir = path.resolve(__dirname, `../res/prefabs`);
+var assetDir = `D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/props/ETC`;
 etcpackImgdescInFolder(assetDir);
 
 
@@ -37,7 +38,7 @@ function etcpackImgdescInFolder(dir, callback)
 
     function handlers()
     {
-        console.log(`进度 ${totaltotal - imgdescs.length}/${total}`);
+        console.log(`进度 ${total - imgdescs.length}/${total}`);
         if (imgdescs.length == 0)
         {
             callback();

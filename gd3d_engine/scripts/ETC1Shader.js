@@ -15,6 +15,7 @@ var exclude = config.exclude;
 var shaderRegExp = /([\w\d]+)\.(vs|fs)\.glsl/;
 var texture2DRegExp = /texture2D\s*\(/g;
 var mainRegExp = /(void\s+main\s*\()/;
+var precisionExp = /precision\s+\w+\sfloat/;
 
 var filepaths = getFilePaths(inDir);
 filepaths.forEach(inPath =>
@@ -30,15 +31,35 @@ filepaths.forEach(inPath =>
             var result1 = texture2DRegExp.exec(shaderStr);
             if (result1)
             {
-                shaderStr = shaderStr.replace(texture2DRegExp, `texture2DEtC1(`);
-
-                shaderStr = shaderStr.replace(mainRegExp,
-                    `
-
+                var texture2DEtC1Str = `
 vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
 {
     return vec4( texture2D(sampler, fract(uv) * vec2(1.0,0.5)).xyz, texture2D(sampler, fract(uv) * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
 }
+                `;
+
+                if (!precisionExp.exec(shaderStr))
+                {
+                    texture2DEtC1Str = `
+mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
+{
+    mediump vec2 scale = vec2(1.0,0.5);
+    mediump vec2 offset = vec2(1.0,0.5);
+    return vec4( texture2D(sampler, fract(uv) * scale).xyz, texture2D(sampler, fract(uv) * scale + offset).x);
+}
+`;
+                }
+
+                shaderStr = shaderStr.replace(texture2DRegExp, `texture2DEtC1(`);
+
+
+
+                `precision highp float`
+
+                shaderStr = shaderStr.replace(mainRegExp,
+                    `
+
+${texture2DEtC1Str}
 
 $1`);
             }
