@@ -8,7 +8,7 @@
   },
   "scripts": {
     "etcpack": "node scripts/etcpack.js",
-    "ETC1Shader": "node scripts/etc1shader.js",
+    "etc1shader": "node scripts/etc1shader.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
