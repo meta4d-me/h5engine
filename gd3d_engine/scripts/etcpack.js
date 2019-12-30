@@ -6,22 +6,44 @@ const path = require("path");
 
 var exePath = path.resolve(__dirname, "tools/etcpack.exe");
 var exeDir = path.dirname(exePath);
-var outDir = path.resolve(__dirname, "out");
-var input = path.resolve(__dirname, "t_0012lvyeshu_obj_p_d.png");
+// var outDir = path.resolve(__dirname, "out");
+// var input = path.resolve(__dirname, "t_0012lvyeshu_obj_p_d.png");
 // var input = path.resolve(__dirname, "orange.JPG");
-
-var res = "test_ktx";
-var assetbundlePath = path.resolve(__dirname, `../res/prefabs/test_ktx/resources/t_0012lvyeshu_obj_p_d.imgdesc.json`);
-
-
-
-etcpackImgdesc(assetbundlePath);
 // etcpack(input, outDir);
 
-// `t_0012lvyeshu_obj_p_d.imgdesc.json`
+// var assetbundlePath = path.resolve(__dirname, `../res/prefabs/test_ktx/resources/t_0012lvyeshu_obj_p_d.imgdesc.json`);
+// etcpackImgdesc(assetbundlePath);
 
-function etcpackImgdescInFolder()
+var assetDir = path.resolve(__dirname, `../res/prefabs/test_ktx`);
+etcpackImgdescInFolder(assetDir);
+
+
+
+function etcpackImgdescInFolder(dir, callback)
 {
+    callback = callback || (() => { });
+    if (!fs.existsSync(dir))
+    {
+        console.warn(`文件夹 ${dir} 不存在！`)
+        callback();
+        return;
+    }
+    var imgdescs = getFilePaths(dir).filter(p =>
+    {
+        return p.substring(p.length - ".imgdesc.json".length) == ".imgdesc.json";
+    })
+    handlers();
+
+    function handlers()
+    {
+        if (imgdescs.length == 0)
+        {
+            callback();
+            return;
+        }
+        var imgdescPath = imgdescs.pop();
+        etcpackImgdesc(imgdescPath, handlers);
+    }
 
 }
 
@@ -54,7 +76,7 @@ function etcpackImgdesc(imgdescPath, callback)
         return;
     }
 
-    if (imgName.substring(imgName.length - 4) == ".ktx")
+    if (imgName.substring(imgName.length - ".ktx".length) == ".ktx")
     {
         callback();
         return;
