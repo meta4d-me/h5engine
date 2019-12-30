@@ -3,7 +3,7 @@
 var fs = require("fs");
 var path = require('path');
 
-var configStr = readFile("scripts/ETC1ShaderConfig.json");
+var configStr = readFile("scripts/etc1shader.config.json");
 var config;
 eval(`config =` + configStr);
 

@@ -7,8 +7,9 @@
     "lib": "lib"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "ETC1Shader": "node scripts/ETC1Shader.js"
+    "etcpack": "node scripts/etcpack.js",
+    "ETC1Shader": "node scripts/etc1shader.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
   "license": "ISC"
