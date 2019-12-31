@@ -15,7 +15,7 @@ var exeDir = path.dirname(exePath);
 // etcpackImgdesc(assetbundlePath);
 
 // var assetDir = path.resolve(__dirname, `../res/prefabs`);
-var assetDir = `D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/props/ETC`;
+var assetDir = `D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/props/ANDROID`;
 etcpackImgdescInFolder(assetDir);
 
 
@@ -93,6 +93,9 @@ function etcpackImgdesc(imgdescPath, callback)
             callback();
             return;
         }
+        // 删除原图片
+        fs.unlinkSync(imgPath);
+        //
         imgdesc.name = newImgName;
         writeFile(imgdescPath, JSON.stringify(imgdesc));
         callback();
