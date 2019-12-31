@@ -79,7 +79,9 @@ namespace gd3d.framework
         //解析资源包描述文件 和下载
         parseBundle(data: string)
         {
-            this.thd = setTimeout(this.timeOut.bind(this), this.outTime);
+            this.thd = setTimeout(()=>{
+                this.timeOut();
+            }, this.outTime);
             let json = JSON.parse(data);
             this.files = json.files;
             this.texs = json.texs;
@@ -256,11 +258,13 @@ namespace gd3d.framework
                         name: k,
                         guid: this.files[k]
                     });
-                    this.stateParse[k] = { name: k, i: idx++, type: AssetTypeEnum[type], st: false };
+                    
                 }
                 this.stateParse.count = idx;
                 //解析顺序按枚举从小到大来排序
                 assets.sort((a, b) => { return a.type - b.type; });
+                for (let asset of assets)                
+                    this.stateParse[asset.name] = { name: asset.name, i: idx++, type: AssetTypeEnum[asset.type], st: false,guid:asset.guid };
 
                 for (let asset of assets)
                 {

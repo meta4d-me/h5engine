@@ -810,9 +810,9 @@ var gd3d;
             function error() {
             }
             error.push = function (err) {
+                console.error(err.stack);
                 if (this.openQueue && this.onError)
                     this.onError(err);
-                console.error(err.stack);
             };
             return error;
         }());
@@ -8477,7 +8477,9 @@ var gd3d;
             };
             assetBundle.prototype.parseBundle = function (data) {
                 var _this = this;
-                this.thd = setTimeout(this.timeOut.bind(this), this.outTime);
+                this.thd = setTimeout(function () {
+                    _this.timeOut();
+                }, this.outTime);
                 var json = JSON.parse(data);
                 this.files = json.files;
                 this.texs = json.texs;
@@ -8597,9 +8599,9 @@ var gd3d;
             };
             assetBundle.prototype.parseFile = function () {
                 return __awaiter(this, void 0, void 0, function () {
-                    var assets, idx, k, type, _i, assets_1, asset;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
+                    var assets, idx, k, type, _i, assets_1, asset, _a, assets_2, asset;
+                    return __generator(this, function (_b) {
+                        switch (_b.label) {
                             case 0:
                                 if (this.onDownloadFinish)
                                     this.onDownloadFinish();
@@ -8618,28 +8620,31 @@ var gd3d;
                                         name: k,
                                         guid: this.files[k]
                                     });
-                                    this.stateParse[k] = { name: k, i: idx++, type: framework.AssetTypeEnum[type], st: false };
                                 }
                                 this.stateParse.count = idx;
                                 assets.sort(function (a, b) { return a.type - b.type; });
-                                _i = 0, assets_1 = assets;
-                                _a.label = 1;
+                                for (_i = 0, assets_1 = assets; _i < assets_1.length; _i++) {
+                                    asset = assets_1[_i];
+                                    this.stateParse[asset.name] = { name: asset.name, i: idx++, type: framework.AssetTypeEnum[asset.type], st: false, guid: asset.guid };
+                                }
+                                _a = 0, assets_2 = assets;
+                                _b.label = 1;
                             case 1:
-                                if (!(_i < assets_1.length)) return [3, 4];
-                                asset = assets_1[_i];
+                                if (!(_a < assets_2.length)) return [3, 4];
+                                asset = assets_2[_a];
                                 if (framework.assetMgr.mapGuid[asset.guid])
                                     return [3, 3];
                                 return [4, this.assetmgr.parseRes(asset, this)];
                             case 2:
-                                _a.sent();
+                                _b.sent();
                                 this.stateParse[asset.name].st = true;
-                                _a.label = 3;
+                                _b.label = 3;
                             case 3:
-                                _i++;
+                                _a++;
                                 return [3, 1];
                             case 4:
                                 this.ready = true;
-                                _a.label = 5;
+                                _b.label = 5;
                             case 5:
                                 if (this.onReady) {
                                     this.onReady();

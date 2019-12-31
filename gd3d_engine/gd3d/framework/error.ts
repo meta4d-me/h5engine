@@ -7,9 +7,9 @@ namespace gd3d.framework
         public static onError: (err: Error) => void;
         public static push(err: Error)
         {
+            console.error(err.stack);
             if (this.openQueue && this.onError)
                 this.onError(err);
-            console.error(err.stack);
         }
     }
 }
