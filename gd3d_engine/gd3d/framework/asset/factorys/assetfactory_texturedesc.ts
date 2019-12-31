@@ -141,20 +141,6 @@ namespace gd3d.framework
         {
             var _texturedesc = JSON.parse(data);
             var _name: string = _texturedesc["name"];
-            let imgGuid = dwguid || bundle.texs[_name];
-            let _texture : texture;
-
-            if(!bundle){
-                _texture = assetMgr.mapNamed[name] as texture;
-            }else{
-                let imgdescGuid = bundle.files[name];
-                let assRef = assetMgr.mapGuid[imgdescGuid];
-                if(assRef)  _texture = assRef.asset as texture;
-            }
-
-            if(_texture && _texture instanceof texture) return _texture;
-
-            _texture = new texture(name);
             var _filterMode: string = _texturedesc["filterMode"];
             var _format: string = _texturedesc["format"];
             var _mipmap: boolean = _texturedesc["mipmap"];
@@ -182,6 +168,7 @@ namespace gd3d.framework
 
 
             // let _texture = asset ? asset : new texture(url);
+            let _texture = new texture(name);
 
             _texture.realName = _name;
             let tType = this.t_Normal;
@@ -192,10 +179,8 @@ namespace gd3d.framework
             {
                 tType = this.t_DDS;
             }
-            let img : any = assetMgr.mapImage[imgGuid] ;
-            let loadingObj = assetMgr.mapLoading[imgGuid];
-            if(!img && loadingObj) img = loadingObj.data;
-            if(!img) return _texture; 
+            let imgGuid = dwguid || bundle.texs[_name];
+            let img = assetMgr.mapImage[imgGuid] || assetMgr.mapLoading[imgGuid].data;
             //构建贴图
             switch (tType)
             {
@@ -220,11 +205,6 @@ namespace gd3d.framework
                 //     _texture.glTexture = t2d;
                 // });
                 // break;
-            }
-            
-            delete assetMgr.mapImage[imgGuid];  //清理 HTMLImageElement 资源
-            if(loadingObj){
-                delete loadingObj.data;
             }
 
             return _texture;

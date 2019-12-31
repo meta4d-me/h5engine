@@ -30,7 +30,7 @@ namespace gd3d.framework
         onReady: () => void;
         onDownloadFinish: () => void;
         ready: boolean;
-        outTime: number = 8000;
+        outTime: number = 1000*30;
         stateQueue = [];
         stateParse: any = {};
         stateText: string;
