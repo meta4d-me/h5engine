@@ -8900,10 +8900,18 @@ var gd3d;
                 this.download(guid, url, type, function () {
                     var loading = assetMgr.mapLoading[guid];
                     if (type == framework.AssetTypeEnum.Bundle) {
-                        var bundle = new framework.assetBundle(url, _this, guid);
-                        _this.name_bundles[bundle.name] = _this.kurl_bundles[keyUrl] = _this.guid_bundles[bundle.guid] = bundle;
-                        bundle.onDownloadFinish = downloadFinish;
-                        bundle.parseBundle(loading.data);
+                        var bundle_1 = new framework.assetBundle(url, _this, guid);
+                        _this.name_bundles[bundle_1.name] = _this.kurl_bundles[keyUrl] = _this.guid_bundles[bundle_1.guid] = bundle_1;
+                        bundle_1.onDownloadFinish = downloadFinish;
+                        bundle_1.parseBundle(loading.data).then(function () {
+                            state.bundle = bundle_1;
+                            state.isfinish = true;
+                            onstate(state);
+                        }).catch(function (err) {
+                            framework.error.push(err);
+                            state.iserror = true;
+                            onstate(state);
+                        });
                     }
                     else {
                         var filename = framework.getFileName(url);
