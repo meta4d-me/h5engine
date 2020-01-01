@@ -382,9 +382,16 @@ namespace gd3d.framework
          */
         Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext)
         {
-            return new threading.gdPromise<mesh>((reslove) =>
+            return new Promise<IAsset>((reslove, reject) =>
             {
-                this.parseCMesh(inData, webgl);
+                try
+                {
+                    this.parseCMesh(inData, webgl);
+                } catch (error)
+                {
+                    reject(error.stack);
+                    return;
+                }
                 reslove(this);
             });
         }

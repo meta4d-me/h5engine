@@ -5,13 +5,13 @@ namespace gd3d.framework
     {
         static idNext = -1;//id起始位置               
 
-        files: { [key: string]: number }; //Array<{ name: string, guid: number }>;
+        files: { [key: string]: number } = {}; //Array<{ name: string, guid: number }>;
 
-        texs: { [name: string]: number };
+        texs: { [name: string]: number } = {};
 
-        pkgs: string[];
+        pkgs: string[]=[];
 
-        pkgsGuid: number[];
+        pkgsGuid: number[]=[];
 
         url: string;
 
@@ -30,11 +30,15 @@ namespace gd3d.framework
         onReady: () => void;
         onDownloadFinish: () => void;
         ready: boolean;
-        outTime: number = 1000*30;
+        parseOutTime: number = 1000 * 30;
+        dwOutTime: number = 1000 * 30;
         stateQueue = [];
         stateParse: any = {};
         stateText: string;
         thd: number;
+        dhd: number;
+        parseResolve: (o?) => void;
+        parseReject: (o: Error) => void;
         constructor(url: string, private assetmgr: assetMgr, guid?: number)
         {
             this.guid = guid || assetBundle.buildGuid();
@@ -49,18 +53,10 @@ namespace gd3d.framework
             return --assetBundle.idNext;
         }
 
-        timeOut()
+        parseTimeOut()
         {
-            let text = "\ndownload :\n";
             let fcount = 0;
-            for (let item of this.stateQueue)
-            {
-                text += `${item.url} ,guid:${item.guid} ,wd:${item.wd}\n`;
-                if (item.wd)
-                    ++fcount;
-            }
-            text += `${fcount}/${this.stateQueue.length}`;
-            text += "\nparse:\n";
+            let text = "\nparse:\n";
             let temp = []
             for (let k in this.stateParse)
                 if (k != "count")
@@ -74,15 +70,40 @@ namespace gd3d.framework
                     ++fcount;
             }
             text += `${fcount}/${this.stateParse.count}`;
-            error.push(new Error(`[资源包超时] ${this.url} , state:${this.stateText},${text}`));
+            // error.push(new Error(`[资源解析超时] ${this.url} , state:${this.stateText},${text}`));
+            this.fail(new Error(`[资源]解析超时 ${this.url} , state:${this.stateText},${text}`));
+        }
+        downloadTimeOut()
+        {
+            let text = "\ndownload :\n";
+            let fcount = 0;
+            for (let item of this.stateQueue)
+            {
+                text += `${item.url} ,guid:${item.guid} ,wd:${item.wd}\n`;
+                if (item.wd)
+                    ++fcount;
+            }
+            text += `${fcount}/${this.stateQueue.length}`;
+            this.fail(new Error(`[资源]下载超时 ${this.url} , state:${this.stateText},${text}`));
         }
         //解析资源包描述文件 和下载
         parseBundle(data: string)
         {
-            this.thd = setTimeout(()=>{
-                this.timeOut();
-            }, this.outTime);
-            let json = JSON.parse(data);
+
+            this.dhd = setTimeout(() =>
+            {
+                this.downloadTimeOut();
+            }, this.dwOutTime);
+
+            let json;
+            try
+            {
+                json = JSON.parse(data);
+            } catch (error)
+            {
+                this.fail(new Error(`[资源]描述文件错误 ${this.url} ,${error.message}`));
+                return;
+            }
             this.files = json.files;
             this.texs = json.texs;
             this.pkgs = json.pkg;
@@ -169,6 +190,11 @@ namespace gd3d.framework
                 else
                     this.assetmgr.download(guid, url, AssetTypeEnum.PVR, imageNext.bind(this, state));
             }
+            return new Promise((resolve, reject) =>
+            {
+                this.parseResolve = resolve;
+                this.parseReject = reject;
+            });
         }
 
         //解包
@@ -186,39 +212,52 @@ namespace gd3d.framework
                 pkgld.subRes = [];
                 if (isbin)
                 {   //二进制压缩 带图片
-                    var buffer: ArrayBuffer = pkgld.data;
-                    var reader = new io.binReader(buffer);
-                    var count = reader.readByte();
-                    // console.log(`解压二进制包,文件数:${count}`);
-                    while (count-- > 0)
+                    try
                     {
-                        var nl = reader.readByte();
-                        var namebytes = reader.readBytesRef(nl);
-                        var name = String.fromCharCode.apply(null, namebytes);
-                        var fsize = reader.readUInt32();
-                        var bin = reader.readBytesRef(fsize);
-                        var guid = this.files[name] || this.texs[name];//如果文件找不到,就去找图片
-                        assetMgr.mapLoading[guid] = {
-                            readyok: true,
-                            data: bin.buffer
-                        };
-                        pkgld.subRes.push(guid);
-                        // console.log(`解压 bin文件${name},size:${fsize},guid:${guid}`);
+                        var buffer: ArrayBuffer = pkgld.data;
+                        var reader = new io.binReader(buffer);
+                        var count = reader.readByte();
+                        // console.log(`解压二进制包,文件数:${count}`);
+                        while (count-- > 0)
+                        {
+                            var nl = reader.readByte();
+                            var namebytes = reader.readBytesRef(nl);
+                            var name = String.fromCharCode.apply(null, namebytes);
+                            var fsize = reader.readUInt32();
+                            var bin = reader.readBytesRef(fsize);
+                            var guid = this.files[name] || this.texs[name];//如果文件找不到,就去找图片
+                            assetMgr.mapLoading[guid] = {
+                                readyok: true,
+                                data: bin.buffer
+                            };
+                            pkgld.subRes.push(guid);
+                            // console.log(`解压 bin文件${name},size:${fsize},guid:${guid}`);
+                        }
+                    } catch (error)
+                    {
+                        throw new Error(`[资源]unpkg bpkg失败:${this.url},${this.pkgs[i]}\n${error.message}`);
                     }
                 } else
                 {
-                    let json = JSON.parse(pkgld.data);
-                    // console.log(`解压文本包,文件数:${Object.keys(json).length}`);
-                    for (let k in json)
+                    try
                     {
-                        var guid = this.files[k];
-                        assetMgr.mapLoading[guid] = {
-                            readyok: true,
-                            data: json[k]
-                        };
-                        pkgld.subRes.push(guid);
-                        // console.log(`解压 text文件${k},size:${json[k].length},${guid}`);
+                        let json = JSON.parse(pkgld.data);
+                        // console.log(`解压文本包,文件数:${Object.keys(json).length}`);
+                        for (let k in json)
+                        {
+                            var guid = this.files[k];
+                            assetMgr.mapLoading[guid] = {
+                                readyok: true,
+                                data: json[k]
+                            };
+                            pkgld.subRes.push(guid);
+                            // console.log(`解压 text文件${k},size:${json[k].length},${guid}`);
+                        }
+                    } catch (error)
+                    {
+                        throw new Error(`[资源]unpkg jpkg失败:${this.url},${this.pkgs[i]}\n${error.message}`);
                     }
+
                 }
                 //释放原数据
                 delete pkgld.data;
@@ -230,7 +269,11 @@ namespace gd3d.framework
         //解析
         async parseFile()
         {
-
+            clearTimeout(this.dhd);
+            this.thd = setTimeout(() =>
+            {
+                this.parseTimeOut();
+            }, this.parseOutTime);
             if (this.onDownloadFinish)
                 this.onDownloadFinish();
             if (!this.ready)
@@ -243,7 +286,16 @@ namespace gd3d.framework
 
                 // let time = Date.now();
                 if (this.pkgs)//如果需要解包就解
-                    this.unpkg();
+                {
+                    try
+                    {
+                        this.unpkg();
+                    } catch (error)
+                    {
+                        this.fail(error);
+                        return;
+                    }
+                }
                 this.stateText = "资源解析";
                 let assets: Array<any> = [];
                 let idx = 0;
@@ -258,34 +310,36 @@ namespace gd3d.framework
                         name: k,
                         guid: this.files[k]
                     });
-                    
+
                 }
                 this.stateParse.count = idx;
                 //解析顺序按枚举从小到大来排序
                 assets.sort((a, b) => { return a.type - b.type; });
-                for (let asset of assets)                
-                    this.stateParse[asset.name] = { name: asset.name, i: idx++, type: AssetTypeEnum[asset.type], st: false,guid:asset.guid };
+                for (let asset of assets)
+                    this.stateParse[asset.name] = { name: asset.name, i: idx++, type: AssetTypeEnum[asset.type], st: false, guid: asset.guid };
 
                 for (let asset of assets)
                 {
                     if (assetMgr.mapGuid[asset.guid])
                         continue;//已经解析好的资源不需要再解析
-                    await this.assetmgr.parseRes(asset, this);
+                    try
+                    {
+                        await this.assetmgr.parseRes(asset, this);
+                    } catch (error)
+                    {
+                        this.fail(error);
+                        return;
+                    }
                     this.stateParse[asset.name].st = true;
                 }
                 this.ready = true;
                 // console.log(`资源包:${this.name} 准备完毕. 解析耗时${Date.now() - time}/ms`);
             }
-
-            if (this.onReady)
-            {
-                this.onReady();
-                this.onReady = null;
-            }
             this.stateQueue = null;
             this.stateParse = null;
             this.stateText = null;
             clearTimeout(this.thd);
+            this.parseResolve();
         }
 
         unload(disposeNow: boolean = false)
@@ -312,9 +366,11 @@ namespace gd3d.framework
             delete this.assetmgr.name_bundles[this.name];
             delete this.assetmgr.kurl_bundles[this.keyUrl];
             delete assetMgr.mapBundleNamed[this.guid];
-
-
         }
-
+        fail(error: Error)
+        {
+            this.unload(true);
+            this.parseReject(error);
+        }
     }
 }

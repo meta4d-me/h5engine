@@ -167,10 +167,11 @@ namespace gd3d.framework {
                 else
                     guid = resID.next();//生成一个guid
             }
+            let state = new stateLoad();
             type = type == AssetTypeEnum.Auto ? calcType(url) : type;
             if (assetMgr.mapGuid[guid])//已下载的资源
             {
-                let state = new stateLoad();
+                
                 state.bundle = this.guid_bundles[guid];
                 state.isfinish = true;
                 onstate(state);
@@ -183,22 +184,21 @@ namespace gd3d.framework {
                 if (type == AssetTypeEnum.Bundle) {
                     let bundle = new assetBundle(url, this, guid);
                     this.name_bundles[bundle.name] = this.kurl_bundles[keyUrl] = this.guid_bundles[bundle.guid] = bundle;
-                    bundle.onReady = () => {
-                        if (this.name_bundles[keyUrl])
-                            console.warn(`assetbundle命名冲突:${keyUrl},${bundle.url}`);
-                        let state = new stateLoad();
-                        state.bundle = bundle;
-                        state.isfinish = true;
-                        onstate(state);
-                    };
+                    // bundle.onReady = () => {
+                    //     if (this.name_bundles[keyUrl])
+                    //         console.warn(`assetbundle命名冲突:${keyUrl},${bundle.url}`);
+                       
+                    //     state.bundle = bundle;
+                    //     state.isfinish = true;
+                    //     onstate(state);
+                    // };
                     bundle.onDownloadFinish = downloadFinish;
                     bundle.parseBundle(loading.data);
                 } else {
                     let filename = getFileName(url);
                     const next = (name, guid, type, dwguid?: number) => {
                         this.parseRes({ name, guid, type, dwguid }).then((asset: IAsset) => {
-                            //解析完毕
-                            let state = new stateLoad();
+                            //解析完毕                       
                             state.isfinish = true;
                             if (asset) {
                                 state.resstateFirst = {
@@ -353,7 +353,7 @@ namespace gd3d.framework {
             }
 
             let __asset = factory.parse(this, bundle, asset.name, data, asset.dwguid);
-            if (__asset instanceof gd3d.threading.gdPromise)
+            if (__asset instanceof Promise)
                 __asset = (await __asset);
             if (__asset) {
                 if (bundle)

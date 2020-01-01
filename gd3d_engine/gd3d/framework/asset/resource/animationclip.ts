@@ -126,73 +126,83 @@ namespace gd3d.framework
          * @param buf buffer数组
          * @version gd3d 1.0
          */
-        Parse(buf: ArrayBuffer): threading.gdPromise<animationClip>
+        Parse(buf: ArrayBuffer): Promise<animationClip>
         {
-            return new threading.gdPromise((resolve) =>
+            return new Promise((resolve,reject) =>
             {
-                var read: gd3d.io.binReader = new gd3d.io.binReader(buf);
-                // var _name =
-                read.readStringAnsi();
-                this.fps = read.readFloat();
-                const scaleMagic = read.readByte();
-                this.hasScaled = scaleMagic == 0xFA
-                if (this.hasScaled) {
-                    console.log("动画有缩放");
-                    this.loop = read.readBoolean();
-                } else {
-                    this.loop = scaleMagic > 0;
-                }
-
-                this.boneCount = read.readInt();
-                this.bones = [];
-                for (let i = 0; i < this.boneCount; i++)
+                try
                 {
-                    let bonename = read.readStringAnsi();
-                    this.bones.push(bonename);
-                    this.indexDic[bonename] = i;
-                }
-                this.indexDic["len"] = this.boneCount;
+                    var read: gd3d.io.binReader = new gd3d.io.binReader(buf);
+                    // var _name =
+                    read.readStringAnsi();
+                    this.fps = read.readFloat();
+                    const scaleMagic = read.readByte();
+                    this.hasScaled = scaleMagic == 0xFA
+                    if (this.hasScaled)
+                    {
+                        console.log("动画有缩放");
+                        this.loop = read.readBoolean();
+                    } else
+                    {
+                        this.loop = scaleMagic > 0;
+                    }
 
-                this.subclipCount = read.readInt();
-                this.subclips = [];
-                for (let i = 0; i < this.subclipCount; i++)
-                {
-                    let _subClip = new subClip();
-                    _subClip.name = read.readStringAnsi();
-                    _subClip.loop = read.readBoolean();
-                    this.subclips.push(_subClip);
-                }
-
-                this.frameCount = read.readInt();
-                this.frames = {};
-                // byte stride
-                const bs = this.hasScaled
-                    ? 8
-                    : 7;
-
-                for (let i = 0; i < this.frameCount; i++)
-                {
-                    let _fid = read.readInt().toString();
-                    let _key = read.readBoolean();
-                    let _frame = new Float32Array(this.boneCount * bs + 1);
-                    _frame[0] = _key ? 1 : 0;
-
-                    let _boneInfo = new PoseBoneMatrix();
+                    this.boneCount = read.readInt();
+                    this.bones = [];
                     for (let i = 0; i < this.boneCount; i++)
                     {
-                        _boneInfo.load(read, this.hasScaled);
-                        _frame[i * bs + 1] = _boneInfo.r.x;
-                        _frame[i * bs + 2] = _boneInfo.r.y;
-                        _frame[i * bs + 3] = _boneInfo.r.z;
-                        _frame[i * bs + 4] = _boneInfo.r.w;
-                        _frame[i * bs + 5] = _boneInfo.t.x;
-                        _frame[i * bs + 6] = _boneInfo.t.y;
-                        _frame[i * bs + 7] = _boneInfo.t.z;
-                        if (this.hasScaled) {
-                            _frame[i * bs + 8] = _boneInfo.s;
-                        }
+                        let bonename = read.readStringAnsi();
+                        this.bones.push(bonename);
+                        this.indexDic[bonename] = i;
                     }
-                    this.frames[_fid] = _frame;
+                    this.indexDic["len"] = this.boneCount;
+
+                    this.subclipCount = read.readInt();
+                    this.subclips = [];
+                    for (let i = 0; i < this.subclipCount; i++)
+                    {
+                        let _subClip = new subClip();
+                        _subClip.name = read.readStringAnsi();
+                        _subClip.loop = read.readBoolean();
+                        this.subclips.push(_subClip);
+                    }
+
+                    this.frameCount = read.readInt();
+                    this.frames = {};
+                    // byte stride
+                    const bs = this.hasScaled
+                        ? 8
+                        : 7;
+
+                    for (let i = 0; i < this.frameCount; i++)
+                    {
+                        let _fid = read.readInt().toString();
+                        let _key = read.readBoolean();
+                        let _frame = new Float32Array(this.boneCount * bs + 1);
+                        _frame[0] = _key ? 1 : 0;
+
+                        let _boneInfo = new PoseBoneMatrix();
+                        for (let i = 0; i < this.boneCount; i++)
+                        {
+                            _boneInfo.load(read, this.hasScaled);
+                            _frame[i * bs + 1] = _boneInfo.r.x;
+                            _frame[i * bs + 2] = _boneInfo.r.y;
+                            _frame[i * bs + 3] = _boneInfo.r.z;
+                            _frame[i * bs + 4] = _boneInfo.r.w;
+                            _frame[i * bs + 5] = _boneInfo.t.x;
+                            _frame[i * bs + 6] = _boneInfo.t.y;
+                            _frame[i * bs + 7] = _boneInfo.t.z;
+                            if (this.hasScaled)
+                            {
+                                _frame[i * bs + 8] = _boneInfo.s;
+                            }
+                        }
+                        this.frames[_fid] = _frame;
+                    }
+                } catch (error)
+                {
+                    reject(error.stack);
+                    return;
                 }
                 resolve(this);
             });
@@ -315,7 +325,8 @@ namespace gd3d.framework
                 this.t = new math.vector3(x, y, z);
             }
             {
-                if (hasScaled) {
+                if (hasScaled)
+                {
                     this.s = read.readSingle();
                 }
             }
@@ -343,7 +354,7 @@ namespace gd3d.framework
             this.t.x = src[seek + 4];
             this.t.y = src[seek + 5];
             this.t.z = src[seek + 6];
-                        // TODO:
+            // TODO:
             // this.s = src[seek + 7];
         }
         invert()
