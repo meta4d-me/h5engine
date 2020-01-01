@@ -22,11 +22,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -8900,10 +8899,18 @@ var gd3d;
                 this.download(guid, url, type, function () {
                     var loading = assetMgr.mapLoading[guid];
                     if (type == framework.AssetTypeEnum.Bundle) {
-                        var bundle = new framework.assetBundle(url, _this, guid);
-                        _this.name_bundles[bundle.name] = _this.kurl_bundles[keyUrl] = _this.guid_bundles[bundle.guid] = bundle;
-                        bundle.onDownloadFinish = downloadFinish;
-                        bundle.parseBundle(loading.data);
+                        var bundle_1 = new framework.assetBundle(url, _this, guid);
+                        _this.name_bundles[bundle_1.name] = _this.kurl_bundles[keyUrl] = _this.guid_bundles[bundle_1.guid] = bundle_1;
+                        bundle_1.onDownloadFinish = downloadFinish;
+                        bundle_1.parseBundle(loading.data).then(function () {
+                            state.bundle = bundle_1;
+                            state.isfinish = true;
+                            onstate(state);
+                        }).catch(function (err) {
+                            framework.error.push(err);
+                            state.iserror = true;
+                            onstate(state);
+                        });
                     }
                     else {
                         var filename = framework.getFileName(url);

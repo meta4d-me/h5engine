@@ -193,7 +193,15 @@ namespace gd3d.framework {
                     //     onstate(state);
                     // };
                     bundle.onDownloadFinish = downloadFinish;
-                    bundle.parseBundle(loading.data);
+                    bundle.parseBundle(loading.data).then(()=>{
+                        state.bundle = bundle;
+                        state.isfinish = true;
+                        onstate(state);
+                    }).catch((err)=>{
+                        error.push(err);
+                        state.iserror = true;
+                        onstate(state);
+                    });
                 } else {
                     let filename = getFileName(url);
                     const next = (name, guid, type, dwguid?: number) => {
