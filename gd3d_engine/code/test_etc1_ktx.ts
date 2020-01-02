@@ -25,8 +25,9 @@ class test_ETC1_KTX implements IState
 
         gd3d.framework.assetMgr.openGuid = false;
 
-        await demoTool.loadbySync(`res_etc1/shader/MainShader.assetbundle.json`, this.astMgr);
+        // await demoTool.loadbySync(`res_etc1/shader/MainShader.assetbundle.json`, this.astMgr);
         // await demoTool.loadbySync(`newRes/shader/MainShader.assetbundle.json`, this.astMgr);
+        await demoTool.loadbySync(`res_etc1/etc1_shader/MainShader.assetbundle.json`, this.astMgr);
         //
         this.init();
     }

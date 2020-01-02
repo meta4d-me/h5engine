@@ -12,12 +12,14 @@ var outDir = "res_etc1/etc1_shader";
 var exclude = [];
 // var exclude = ["asi.fs.glsl", "barrel_blur.fs.glsl"];
 
-var shaderRegExp = /([\w\d]+)\.(vs|fs)\.glsl/;
-var texture2DRegExp = /texture2D\s*\(/g;
+const shaderRegExp = /([\w\d]+)\.(vs|fs)\.glsl/;
+const texture2DRegExp = /texture2D\s*\(/g;
 // 第一个函数声明
-var firstFuncRegExp = /((\w+\s+)*\w+\s+\w+\s*\([\w\s\,\.\*\[\]]*\)\s*\{)/;
+const firstFuncRegExp = /((\w+\s+)*\w+\s+\w+\s*\([\w\s\,\.\*\[\]]*\)\s*\{)/;
 // 精度声明
-var precisionExp = /(precision\s+\w+\sfloat\s*;)/;
+const precisionExp = /(precision\s+\w+\sfloat\s*;)/;
+// 检测该标记，在该位置新增texture2DEtC1方法
+const texture2DEtC1Mark = "//texture2DEtC1Mark";
 
 var filepaths = getFilePaths(inDir);
 filepaths.forEach(inPath =>
@@ -28,13 +30,11 @@ filepaths.forEach(inPath =>
     {
         var shaderStr = readFile(inPath);
         var isExc = isExclude(inPath);
-        if (!isExc && !shaderStr.includes(`texture2DEtC1`))
+        if (!isExc && shaderStr.includes(texture2DEtC1Mark))
         {
-            var result1 = texture2DRegExp.exec(shaderStr);
-            if (result1)
-            {
-                
-                var texture2DEtC1Str = `
+            shaderStr = shaderStr.replace(texture2DRegExp, `texture2DEtC1(`);
+
+            var texture2DEtC1Str = `
 vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
 {
     uv = uv - floor(uv);
@@ -43,9 +43,9 @@ vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
 }
                 `;
 
-                if (!precisionExp.exec(shaderStr))
-                {
-                    texture2DEtC1Str = `
+            if (!precisionExp.exec(shaderStr))
+            {
+                texture2DEtC1Str = `
 mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
 {
     uv = uv - floor(uv);
@@ -55,17 +55,15 @@ mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
     return vec4( texture2D(sampler, uv * scale).xyz, texture2D(sampler, uv * scale + offset).x);
 }
 `;
-                }
+            }
 
-
-                // 把texture2DEtC1放在第一个函数前面
-                shaderStr = shaderStr.replace(firstFuncRegExp,
-                    `
+            // 把texture2DEtC1放在第一个函数前面
+            shaderStr = shaderStr.replace(texture2DEtC1Mark,
+                `
 
 ${texture2DEtC1Str}
 
-$1`);
-            }
+`);
         }
         writeFile(outPath, shaderStr);
     } else

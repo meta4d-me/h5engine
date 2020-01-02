@@ -5031,7 +5031,7 @@ var test_ETC1_KTX = (function () {
                         this.scene = this.app.getScene();
                         this.astMgr = this.app.getAssetMgr();
                         gd3d.framework.assetMgr.openGuid = false;
-                        return [4, demoTool.loadbySync("res_etc1/shader/MainShader.assetbundle.json", this.astMgr)];
+                        return [4, demoTool.loadbySync("res_etc1/etc1_shader/MainShader.assetbundle.json", this.astMgr)];
                     case 1:
                         _a.sent();
                         this.init();
