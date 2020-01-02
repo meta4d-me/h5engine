@@ -1,0 +1,20 @@
+// {
+//     // 输入文件夹
+//     "inDir": "newRes/可编辑Shaderlab/shader",
+//     // 输出文件夹
+//     "outDir": "res_etc1/etc1_shader",
+//     // 排除列表
+//     "exclude": []
+// }
+{
+    // shader输入文件夹
+    "shaderInDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/shader/customShader",
+    // shader输出文件夹
+    "shaderOutDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/shader/customShader_ETC1",
+    // shader排除列表
+    "exclude": [],
+    // 资源输入文件夹
+    "assetInDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/props/ANDROID",
+    // 资源输出文件夹
+    "assetOutDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/props/ANDROID"
+}

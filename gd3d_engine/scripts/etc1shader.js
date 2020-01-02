@@ -3,12 +3,12 @@
 var fs = require("fs");
 var path = require('path');
 
-var configStr = readFile("scripts/etc1shader.config.json");
+var configStr = readFile("scripts/etc1.config.json");
 var config;
 eval(`config =` + configStr);
 
-var inDir = config.inDir;
-var outDir = config.outDir;
+var inDir = config.shaderInDir;
+var outDir = config.shaderOutDir;
 var exclude = config.exclude;
 
 const shaderRegExp = /([\w\d]+)\.(vs|fs)\.glsl/;
@@ -20,20 +20,33 @@ const precisionExp = /(precision\s+\w+\sfloat\s*;)/;
 // 检测该标记，在该位置新增texture2DEtC1方法
 const texture2DEtC1Mark = "//texture2DEtC1Mark";
 
-var filepaths = getFilePaths(inDir);
-filepaths.forEach(inPath =>
+// 拷贝文件
+if (inDir != outDir)
 {
-    var outPath = inPath.replace(inDir, outDir);
-    var result = shaderRegExp.exec(inPath);
-    if (result)
-    {
-        var shaderStr = readFile(inPath);
-        var isExc = isExclude(inPath);
-        if (!isExc && shaderStr.includes(texture2DEtC1Mark))
-        {
-            shaderStr = shaderStr.replace(texture2DRegExp, `texture2DEtC1(`);
+    copyFolder(inDir, outDir);
+}
+handleShader(outDir);
 
-            var texture2DEtC1Str = `
+/**
+ * 处理shader
+ * 
+ * @param {string} shaderDir shader文件夹 
+ */
+function handleShader(shaderDir)
+{
+    var filepaths = getFilePaths(shaderDir);
+    filepaths.forEach(path =>
+    {
+        var result = shaderRegExp.exec(path);
+        if (result)
+        {
+            var shaderStr = readFile(path);
+            var isExc = isExclude(path);
+            if (!isExc && shaderStr.includes(texture2DEtC1Mark))
+            {
+                shaderStr = shaderStr.replace(texture2DRegExp, `texture2DEtC1(`);
+
+                var texture2DEtC1Str = `
 vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
 {
     uv = uv - floor(uv);
@@ -42,9 +55,9 @@ vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
 }
                 `;
 
-            if (!precisionExp.exec(shaderStr))
-            {
-                texture2DEtC1Str = `
+                if (!precisionExp.exec(shaderStr))
+                {
+                    texture2DEtC1Str = `
 mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
 {
     uv = uv - floor(uv);
@@ -54,26 +67,19 @@ mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
     return vec4( texture2D(sampler, uv * scale).xyz, texture2D(sampler, uv * scale + offset).x);
 }
 `;
-            }
+                }
 
-            // 把texture2DEtC1放在第一个函数前面
-            shaderStr = shaderStr.replace(texture2DEtC1Mark,
-                `
-
+                // 把texture2DEtC1放在第一个函数前面
+                shaderStr = shaderStr.replace(texture2DEtC1Mark,
+                    `
 ${texture2DEtC1Str}
-
 `);
+            }
+            writeFile(path, shaderStr);
         }
-        writeFile(outPath, shaderStr);
-    } else
-    {
-        var pDir = path.dirname(outPath);
-        makeDir(pDir);
-
-        fs.copyFileSync(inPath, outPath);
-    }
-});
-console.log(filepaths);
+    });
+    console.log(`转换shader完成！`);
+}
 
 function isExclude(pathStr)
 {
@@ -95,6 +101,19 @@ function makeDir(dir)
     makeDir(pDir);
 
     fs.mkdirSync(dir);
+}
+
+function copyFolder(inDir, outDir)
+{
+    var filepaths = getFilePaths(inDir);
+    filepaths.forEach(inPath =>
+    {
+        var outPath = inPath.replace(inDir, outDir);
+        var pDir = path.dirname(outPath);
+        makeDir(pDir);
+
+        fs.copyFileSync(inPath, outPath);
+    });
 }
 
 function writeFile(filePath, content)
