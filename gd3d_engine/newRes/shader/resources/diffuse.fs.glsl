@@ -19,6 +19,8 @@ uniform lowp float glstate_float_lightintensity[8];
 varying lowp vec3 v_N;
 varying lowp vec3 v_Mpos;
 
+//texture2DEtC1Mark
+
 
 #ifdef LIGHTMAP
 uniform lowp sampler2D _LightmapTex;

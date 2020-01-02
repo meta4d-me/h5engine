@@ -21,6 +21,8 @@ varying lowp float factor;
 
 varying highp vec4 vcolor;
 
+//texture2DEtC1Mark
+
 void main()
 {
     // lowp vec4 basecolor = vec4(1);

@@ -44,6 +44,8 @@ uniform lowp vec4 glstate_fog_color;
 varying lowp float factor;
 #endif
 
+//texture2DEtC1Mark
+
 vec4 sRGBtoLINEAR(vec4 color) {
     return vec4(pow(color.rgb, vec3(GAMMA)), color.a);
 }

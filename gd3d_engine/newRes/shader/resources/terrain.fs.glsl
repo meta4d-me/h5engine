@@ -25,6 +25,8 @@ uniform lowp vec4 glstate_fog_color;
 varying lowp float factor;
 #endif
 
+//texture2DEtC1Mark
+
 void main() 
 {
     lowp vec4 control = texture2D(_Control, xlv_TEXCOORD0);

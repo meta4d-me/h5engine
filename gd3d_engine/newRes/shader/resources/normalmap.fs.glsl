@@ -13,6 +13,8 @@ varying mediump vec2 xlv_TEXCOORD0;
 varying lowp mat3 TBNmat;
 varying highp vec3 worldpos; 
 
+//texture2DEtC1Mark
+
 lowp float calcDiffuse(lowp vec3 N,lowp vec3 worldpos,lowp vec4 lightPos,lowp vec4 lightDir,lowp float cosspot);
 // highp mat3 cotangentFrame(vec3 normal,highp vec3 position,vec2 uv);
 

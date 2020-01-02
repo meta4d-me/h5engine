@@ -8,6 +8,8 @@ varying mediump vec2 _mask_uv;
 uniform lowp float _mixColorRate;
 uniform lowp float _mixAlphaRate;
 
+//texture2DEtC1Mark
+
 #ifdef LIGHTMAP
 uniform lowp sampler2D _LightmapTex;
 varying mediump vec2 lightmap_TEXCOORD;
