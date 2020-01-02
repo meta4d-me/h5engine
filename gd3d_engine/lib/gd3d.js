@@ -9197,12 +9197,17 @@ var gd3d;
                 onComplete(firstChilds);
             };
             assetMgr.prototype.unload = function (url) {
-                var guid = assetMgr.urlmapGuid[url];
+                var keyUrl = url.replace(assetMgr.cdnRoot, "");
+                var guid = assetMgr.urlmapGuid[keyUrl];
                 if (guid) {
-                    var name_1 = framework.getFileName(url);
+                    var name_1 = framework.getFileName(keyUrl);
                     delete assetMgr.mapNamed[name_1];
                     delete assetMgr.mapLoading[guid];
                     delete assetMgr.mapGuid[guid];
+                }
+                else if (this.kurl_bundles[keyUrl]) {
+                    var bundle = this.kurl_bundles[keyUrl];
+                    bundle.unload();
                 }
             };
             assetMgr.urlmapGuid = {};
