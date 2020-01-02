@@ -8921,6 +8921,7 @@ var gd3d;
                         }).catch(function (err) {
                             framework.error.push(err);
                             state.iserror = true;
+                            console.error("##\u629B\u51FA\u91CD\u8BD5 " + bundle_1.name + " ---- ");
                             onstate(state);
                         });
                     }

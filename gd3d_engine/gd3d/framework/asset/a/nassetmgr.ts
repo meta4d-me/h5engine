@@ -207,6 +207,7 @@ namespace gd3d.framework
                     }).catch((err)=>{
                         error.push(err);
                         state.iserror = true;
+                        console.error(`##抛出重试 ${bundle.name} ---- `);
                         onstate(state);
                     });
                 } else
