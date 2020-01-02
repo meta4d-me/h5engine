@@ -814,6 +814,7 @@ var gd3d;
                 if (this.openQueue && this.onError)
                     this.onError(err);
             };
+            error.openQueue = true;
             return error;
         }());
         framework.error = error;
@@ -8454,7 +8455,7 @@ var gd3d;
             assetBundle.buildGuid = function () {
                 return --assetBundle.idNext;
             };
-            assetBundle.prototype.parseTimeOut = function () {
+            assetBundle.prototype.getParseInfo = function () {
                 var fcount = 0;
                 var text = "\nparse:\n";
                 var temp = [];
@@ -8470,9 +8471,9 @@ var gd3d;
                         ++fcount;
                 }
                 text += fcount + "/" + this.stateParse.count;
-                this.fail(new Error("[\u8D44\u6E90]\u89E3\u6790\u8D85\u65F6 " + this.url + " , state:" + this.stateText + "," + text));
+                return text;
             };
-            assetBundle.prototype.downloadTimeOut = function () {
+            assetBundle.prototype.getDownloadInfo = function () {
                 var text = "\ndownload :\n";
                 var fcount = 0;
                 for (var _i = 0, _a = this.stateQueue; _i < _a.length; _i++) {
@@ -8482,98 +8483,101 @@ var gd3d;
                         ++fcount;
                 }
                 text += fcount + "/" + this.stateQueue.length;
-                this.fail(new Error("[\u8D44\u6E90]\u4E0B\u8F7D\u8D85\u65F6 " + this.url + " , state:" + this.stateText + "," + text));
+                return text;
             };
             assetBundle.prototype.parseBundle = function (data) {
                 var _this = this;
-                this.dhd = setTimeout(function () {
-                    _this.downloadTimeOut();
-                }, this.dwOutTime);
-                var json;
-                try {
-                    json = JSON.parse(data);
-                }
-                catch (error) {
-                    this.fail(new Error("[\u8D44\u6E90]\u63CF\u8FF0\u6587\u4EF6\u9519\u8BEF " + this.url + " ," + error.message));
-                    return;
-                }
-                this.files = json.files;
-                this.texs = json.texs;
-                this.pkgs = json.pkg;
-                this.stateText = "下载资源";
-                if (!framework.assetMgr.openGuid) {
-                    for (var k in this.files)
-                        this.files[k] = assetBundle.buildGuid();
-                    for (var k in this.texs)
-                        this.texs[k] = assetBundle.buildGuid();
-                }
-                this.dw_imgCount = this.dw_fileCount = Object.keys(this.texs || {}).length;
-                var dwpkgCount = 0;
-                if (this.pkgs) {
-                    this.dw_fileCount += Object.keys(this.pkgs).length;
-                    this.pkgsGuid = this.pkgsGuid || [];
-                    var nameURL = this.url.substring(0, this.url.lastIndexOf(".assetbundle"));
-                    var _loop_2 = function (i, len) {
-                        var extName = this_2.pkgs[i].substring(this_2.pkgs[i].indexOf("."));
-                        var url = nameURL + extName;
-                        var kurl = url.replace(framework.assetMgr.cdnRoot, "");
-                        var guid = framework.assetMgr.urlmapGuid[kurl];
-                        if (!guid)
-                            guid = assetBundle.buildGuid();
-                        this_2.pkgsGuid.push(guid);
-                        var state = { guid: guid, url: url, wd: false };
-                        this_2.stateQueue.push(state);
-                        this_2.assetmgr.download(guid, url, framework.calcType(url), function () {
-                            state.wd = true;
-                            ++dwpkgCount;
-                            if (dwpkgCount >= _this.dw_fileCount)
-                                _this.parseFile();
-                        });
-                    };
-                    var this_2 = this;
-                    for (var i = 0, len = this.pkgs.length; i < len; ++i) {
-                        _loop_2(i, len);
-                    }
-                }
-                else {
-                    this.dw_fileCount += Object.keys(this.files).length;
-                    var _loop_3 = function (k) {
-                        var guid = this_3.files[k];
-                        var url = this_3.baseUrl + "Resources/" + k;
-                        var state = { guid: guid, url: url, wd: false };
-                        this_3.stateQueue.push(state);
-                        this_3.assetmgr.download(guid, url, framework.calcType(k), function () {
-                            state.wd = true;
-                            ++dwpkgCount;
-                            if (dwpkgCount >= _this.dw_fileCount)
-                                _this.parseFile();
-                        });
-                    };
-                    var this_3 = this;
-                    for (var k in this.files) {
-                        _loop_3(k);
-                    }
-                }
-                var imageNext = function (state) {
-                    state.wd = true;
-                    ++dwpkgCount;
-                    if (dwpkgCount >= this.dw_fileCount)
-                        this.parseFile();
-                };
-                for (var k in this.texs) {
-                    var guid = this.texs[k];
-                    this.files[k] = guid;
-                    var url = this.baseUrl + "resources/" + k;
-                    var state = { guid: guid, url: url, wd: false };
-                    this.stateQueue.push(state);
-                    if (k.endsWith(".png") || k.endsWith(".jpg"))
-                        this.assetmgr.loadImg(guid, url, imageNext.bind(this, state));
-                    else
-                        this.assetmgr.download(guid, url, framework.AssetTypeEnum.PVR, imageNext.bind(this, state));
-                }
                 return new Promise(function (resolve, reject) {
                     _this.parseResolve = resolve;
                     _this.parseReject = reject;
+                    if (assetBundle.reTryTest[_this.name]) {
+                        console.error("\u8D44\u6E90 " + _this.name + " \u6B63\u5728\u91CD\u8BD5 , " + _this.url);
+                        delete assetBundle.reTryTest[_this.name];
+                        _this.ready;
+                    }
+                    _this.dhd = setTimeout(function () {
+                        _this.fail(new Error("[\u8D44\u6E90]\u4E0B\u8F7D\u8D85\u65F6 " + _this.url + " , state:" + _this.stateText));
+                    }, _this.dwOutTime);
+                    var json;
+                    try {
+                        json = JSON.parse(data);
+                    }
+                    catch (error) {
+                        _this.fail(new Error("[\u8D44\u6E90]\u63CF\u8FF0\u6587\u4EF6\u9519\u8BEF " + _this.url + " ," + error.message));
+                        return;
+                    }
+                    _this.files = json.files;
+                    _this.texs = json.texs;
+                    _this.pkgs = json.pkg;
+                    _this.stateText = "下载资源";
+                    if (!framework.assetMgr.openGuid) {
+                        for (var k in _this.files)
+                            _this.files[k] = assetBundle.buildGuid();
+                        for (var k in _this.texs)
+                            _this.texs[k] = assetBundle.buildGuid();
+                    }
+                    _this.dw_imgCount = _this.dw_fileCount = Object.keys(_this.texs || {}).length;
+                    var dwpkgCount = 0;
+                    if (_this.pkgs) {
+                        _this.dw_fileCount += Object.keys(_this.pkgs).length;
+                        _this.pkgsGuid = _this.pkgsGuid || [];
+                        var nameURL = _this.url.substring(0, _this.url.lastIndexOf(".assetbundle"));
+                        var _loop_2 = function (i, len) {
+                            var extName = _this.pkgs[i].substring(_this.pkgs[i].indexOf("."));
+                            var url = nameURL + extName;
+                            var kurl = url.replace(framework.assetMgr.cdnRoot, "");
+                            var guid = framework.assetMgr.urlmapGuid[kurl];
+                            if (!guid)
+                                guid = assetBundle.buildGuid();
+                            _this.pkgsGuid.push(guid);
+                            var state = { guid: guid, url: url, wd: false };
+                            _this.stateQueue.push(state);
+                            _this.assetmgr.download(guid, url, framework.calcType(url), function () {
+                                state.wd = true;
+                                ++dwpkgCount;
+                                if (dwpkgCount >= _this.dw_fileCount)
+                                    _this.parseFile();
+                            });
+                        };
+                        for (var i = 0, len = _this.pkgs.length; i < len; ++i) {
+                            _loop_2(i, len);
+                        }
+                    }
+                    else {
+                        _this.dw_fileCount += Object.keys(_this.files).length;
+                        var _loop_3 = function (k) {
+                            var guid = _this.files[k];
+                            var url = _this.baseUrl + "Resources/" + k;
+                            var state = { guid: guid, url: url, wd: false };
+                            _this.stateQueue.push(state);
+                            _this.assetmgr.download(guid, url, framework.calcType(k), function () {
+                                state.wd = true;
+                                ++dwpkgCount;
+                                if (dwpkgCount >= _this.dw_fileCount)
+                                    _this.parseFile();
+                            });
+                        };
+                        for (var k in _this.files) {
+                            _loop_3(k);
+                        }
+                    }
+                    var imageNext = function (state) {
+                        state.wd = true;
+                        ++dwpkgCount;
+                        if (dwpkgCount >= this.dw_fileCount)
+                            this.parseFile();
+                    };
+                    for (var k in _this.texs) {
+                        var guid = _this.texs[k];
+                        _this.files[k] = guid;
+                        var url = _this.baseUrl + "resources/" + k;
+                        var state = { guid: guid, url: url, wd: false };
+                        _this.stateQueue.push(state);
+                        if (k.endsWith(".png") || k.endsWith(".jpg"))
+                            _this.assetmgr.loadImg(guid, url, imageNext.bind(_this, state));
+                        else
+                            _this.assetmgr.download(guid, url, framework.AssetTypeEnum.PVR, imageNext.bind(_this, state));
+                    }
                 });
             };
             assetBundle.prototype.unpkg = function () {
@@ -8636,7 +8640,7 @@ var gd3d;
                             case 0:
                                 clearTimeout(this.dhd);
                                 this.thd = setTimeout(function () {
-                                    _this.parseTimeOut();
+                                    _this.fail(new Error("[\u8D44\u6E90]\u89E3\u6790\u8D85\u65F6 " + _this.url + " , state:" + _this.stateText));
                                 }, this.parseOutTime);
                                 if (this.onDownloadFinish)
                                     this.onDownloadFinish();
@@ -8730,10 +8734,17 @@ var gd3d;
                 delete framework.assetMgr.mapBundleNamed[this.guid];
             };
             assetBundle.prototype.fail = function (error) {
+                assetBundle.reTryTest[this.name] = 1;
+                var dwinfo = this.getDownloadInfo();
+                var pinfo = this.getParseInfo();
                 this.unload(true);
-                this.parseReject(error);
+                console.error(dwinfo);
+                console.error(pinfo);
+                console.error(error.message + "\n" + error.stack + "\n");
+                this.parseReject(new Error("#########" + error.message + "\n" + error.stack + "\n" + dwinfo + "\n" + pinfo));
             };
             assetBundle.idNext = -1;
+            assetBundle.reTryTest = {};
             return assetBundle;
         }());
         framework.assetBundle = assetBundle;
@@ -12808,7 +12819,7 @@ var gd3d;
                 var shaderName = json["shader"];
                 var shader = assetmgr.getShader(shaderName);
                 if (shader == null) {
-                    console.error("shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
+                    throw new Error("mat解析错误:" + this.name + "  shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
                 }
                 this.setShader(shader);
                 var queue = json["queue"];

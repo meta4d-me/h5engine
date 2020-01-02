@@ -1586,10 +1586,11 @@ declare namespace gd3d.framework {
         dhd: number;
         parseResolve: (o?: any) => void;
         parseReject: (o: Error) => void;
+        static reTryTest: {};
         constructor(url: string, assetmgr: assetMgr, guid?: number);
         static buildGuid(): number;
-        parseTimeOut(): void;
-        downloadTimeOut(): void;
+        getParseInfo(): string;
+        getDownloadInfo(): string;
         parseBundle(data: string): Promise<unknown>;
         private unpkg;
         parseFile(): Promise<void>;
