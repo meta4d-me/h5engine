@@ -3,14 +3,13 @@
 var fs = require("fs");
 var path = require('path');
 
-// 输入文件夹
-// var inDir = "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/shader/customShader";
-var inDir = "newRes/可编辑Shaderlab/shader";
-// 输出文件夹
-var outDir = "res_etc1/etc1_shader";
-// 排除列表
-var exclude = [];
-// var exclude = ["asi.fs.glsl", "barrel_blur.fs.glsl"];
+var configStr = readFile("scripts/etc1shader.config.json");
+var config;
+eval(`config =` + configStr);
+
+var inDir = config.inDir;
+var outDir = config.outDir;
+var exclude = config.exclude;
 
 const shaderRegExp = /([\w\d]+)\.(vs|fs)\.glsl/;
 const texture2DRegExp = /texture2D\s*\(/g;
