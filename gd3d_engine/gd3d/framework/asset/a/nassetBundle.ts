@@ -287,7 +287,8 @@ namespace gd3d.framework
             }, this.parseOutTime);
             if (this.onDownloadFinish)
                 this.onDownloadFinish();
-            if (!this.ready)
+            // console.error(`解析资源:${this.url}`);
+            // if (!this.ready)
             {
                 // if (!assetMgr.atonceParse)
                 // {
@@ -328,11 +329,22 @@ namespace gd3d.framework
                 assets.sort((a, b) => { return a.type - b.type; });
                 for (let asset of assets)
                     this.stateParse[asset.name] = { name: asset.name, i: idx++, type: AssetTypeEnum[asset.type], st: false, guid: asset.guid };
-
-                for (let asset of assets)
+                // if(this.name.indexOf("Jellyfish3") !=-1)
+                // {
+                //     console.error(`### 水母3 解析资源:${assets.length}  第一个是:${assets[0].name}`);
+                // }
+                // for (let asset of assets)
+                for(var i=0,len =assets.length;i<len;++i)
                 {
+                    let asset = assets[i];
                     if (assetMgr.mapGuid[asset.guid])
                         continue;//已经解析好的资源不需要再解析
+                    // if(this.name.indexOf("Jellyfish3") !=-1)
+                    // {
+                    //     console.error(`@@水母3解析中第[${0}]个 name:${asset.name},${AssetTypeEnum[asset.type]} ${asset.guid} 当前数据:`);
+                    //     let data =  assetMgr.mapLoading[asset.guid];
+                    //     console.error(data)
+                    // }
                     try
                     {
                         await this.assetmgr.parseRes(asset, this);
@@ -387,10 +399,13 @@ namespace gd3d.framework
             let dwinfo = this.getDownloadInfo();
             let pinfo = this.getParseInfo();
             this.unload(true);
-            console.error(dwinfo);
-            console.error(pinfo);
-            console.error(`${error.message}\n${error.stack}\n`);
-            this.parseReject(new Error(`#########${error.message}\n${error.stack}\n${dwinfo}\n${pinfo}`));
+            // console.error(dwinfo);
+            // console.error(pinfo);
+            // console.error(`## ${this.name}  ${error.message}\n${error.stack}\n`);
+            setTimeout(() =>
+            {
+                this.parseReject(new Error(`#########${error.message}\n${error.stack}\n${dwinfo}\n${pinfo}`));
+            }, 1000);
         }
     }
 }

@@ -1790,7 +1790,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AssetFactory_Aniclip implements IAssetFactory {
-        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, bytes: ArrayBuffer): Promise<animationClip>;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, bytes: ArrayBuffer): threading.gdPromise<animationClip>;
     }
 }
 declare namespace gd3d.framework {
@@ -1834,7 +1834,7 @@ declare namespace gd3d.framework {
         newAsset?(assetName?: string): IAsset;
         load?(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
         loadByPack?(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
-        parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: string | ArrayBuffer, dwguid?: number): IAsset | Promise<IAsset> | void;
+        parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: string | ArrayBuffer, dwguid?: number): IAsset | threading.gdPromise<IAsset> | void;
         needDownload?(textJSON: string): string;
     }
     class AssetFactoryTools {
@@ -1857,7 +1857,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AssetFactory_Mesh implements IAssetFactory {
-        parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: ArrayBuffer): Promise<IAsset> | mesh;
+        parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: ArrayBuffer): threading.gdPromise<IAsset> | mesh;
     }
 }
 declare namespace gd3d.framework {
@@ -1877,7 +1877,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AssetFactory_Scene implements IAssetFactory {
-        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, txt: string): Promise<rawscene>;
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, txt: string): threading.gdPromise<rawscene>;
     }
 }
 declare namespace gd3d.framework {
@@ -1919,7 +1919,7 @@ declare namespace gd3d.framework {
         unuse(disposeNow?: boolean): void;
         dispose(): void;
         caclByteLength(): number;
-        Parse(buf: ArrayBuffer): Promise<animationClip>;
+        Parse(buf: ArrayBuffer): threading.gdPromise<animationClip>;
         fps: number;
         loop: boolean;
         hasScaled: boolean;
@@ -2446,7 +2446,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess;
         private readFinish;
-        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): Promise<IAsset>;
+        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<IAsset>;
         parseCMesh(inData: any, webgl: any): void;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
@@ -2539,7 +2539,7 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         resetLightMap(assetmgr: assetMgr, bundleName?: string): void;
         private lightmapData;
-        Parse(txt: string, assetmgr: assetMgr): Promise<rawscene>;
+        Parse(txt: string, assetmgr: assetMgr): threading.gdPromise<rawscene>;
         getSceneRoot(): transform;
         useLightMap(scene: scene): void;
         useFog(scene: scene): void;
@@ -7782,8 +7782,8 @@ declare namespace gd3d.framework {
 declare namespace gd3d.io {
     function xhrLoad(url: string, fun: (ContentData: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void, responseType: XMLHttpRequestResponseType, loadedFun: (req: XMLHttpRequest) => void): void;
     function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
-    function JSONParse(text: string): Promise<any>;
-    function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): Promise<{}>;
+    function JSONParse(text: string): threading.gdPromise<any>;
+    function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): threading.gdPromise<{}>;
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err?: Error, loadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;

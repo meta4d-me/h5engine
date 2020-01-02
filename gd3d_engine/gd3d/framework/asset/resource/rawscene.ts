@@ -135,7 +135,7 @@ namespace gd3d.framework
          */
         Parse(txt: string, assetmgr: assetMgr)
         {
-            return new Promise<rawscene>((resolve, reject) =>
+            return new threading.gdPromise<rawscene>((resolve, reject) =>
             {
                 io.JSONParse(txt).then((_json) =>
                 {

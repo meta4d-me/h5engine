@@ -207,7 +207,7 @@ namespace gd3d.framework
                     }).catch((err)=>{
                         error.push(err);
                         state.iserror = true;
-                        console.error(`##抛出重试 ${bundle.name} ---- `);
+                        // console.error(`##抛出重试 ${bundle.name} ---- `);
                         onstate(state);
                     });
                 } else
@@ -405,7 +405,7 @@ namespace gd3d.framework
             }
 
             let __asset = factory.parse(this, bundle, asset.name, data, asset.dwguid);
-            if (__asset instanceof Promise)
+            if (__asset instanceof threading.gdPromise)
                 __asset = (await __asset);
             if (__asset)
             {

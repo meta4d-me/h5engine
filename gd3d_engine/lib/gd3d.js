@@ -8632,10 +8632,10 @@ var gd3d;
             };
             assetBundle.prototype.parseFile = function () {
                 return __awaiter(this, void 0, void 0, function () {
-                    var assets, idx, k, type, _i, assets_1, asset, _a, assets_2, asset, error_1;
+                    var assets, idx, k, type, _i, assets_1, asset, i, len, asset, error_1;
                     var _this = this;
-                    return __generator(this, function (_b) {
-                        switch (_b.label) {
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
                             case 0:
                                 clearTimeout(this.dhd);
                                 this.thd = setTimeout(function () {
@@ -8643,7 +8643,6 @@ var gd3d;
                                 }, this.parseOutTime);
                                 if (this.onDownloadFinish)
                                     this.onDownloadFinish();
-                                if (!!this.ready) return [3, 8];
                                 if (this.pkgs) {
                                     try {
                                         this.unpkg();
@@ -8672,34 +8671,32 @@ var gd3d;
                                     asset = assets_1[_i];
                                     this.stateParse[asset.name] = { name: asset.name, i: idx++, type: framework.AssetTypeEnum[asset.type], st: false, guid: asset.guid };
                                 }
-                                _a = 0, assets_2 = assets;
-                                _b.label = 1;
+                                i = 0, len = assets.length;
+                                _a.label = 1;
                             case 1:
-                                if (!(_a < assets_2.length)) return [3, 7];
-                                asset = assets_2[_a];
+                                if (!(i < len)) return [3, 7];
+                                asset = assets[i];
                                 if (framework.assetMgr.mapGuid[asset.guid])
                                     return [3, 6];
-                                _b.label = 2;
+                                _a.label = 2;
                             case 2:
-                                _b.trys.push([2, 4, , 5]);
+                                _a.trys.push([2, 4, , 5]);
                                 return [4, this.assetmgr.parseRes(asset, this)];
                             case 3:
-                                _b.sent();
+                                _a.sent();
                                 return [3, 5];
                             case 4:
-                                error_1 = _b.sent();
+                                error_1 = _a.sent();
                                 this.fail(error_1);
                                 return [2];
                             case 5:
                                 this.stateParse[asset.name].st = true;
-                                _b.label = 6;
+                                _a.label = 6;
                             case 6:
-                                _a++;
+                                ++i;
                                 return [3, 1];
                             case 7:
                                 this.ready = true;
-                                _b.label = 8;
-                            case 8:
                                 this.stateQueue = null;
                                 this.stateParse = null;
                                 this.stateText = null;
@@ -8734,14 +8731,14 @@ var gd3d;
                 delete framework.assetMgr.mapGuid[this.guid];
             };
             assetBundle.prototype.fail = function (error) {
+                var _this = this;
                 assetBundle.reTryTest[this.name] = 1;
                 var dwinfo = this.getDownloadInfo();
                 var pinfo = this.getParseInfo();
                 this.unload(true);
-                console.error(dwinfo);
-                console.error(pinfo);
-                console.error(error.message + "\n" + error.stack + "\n");
-                this.parseReject(new Error("#########" + error.message + "\n" + error.stack + "\n" + dwinfo + "\n" + pinfo));
+                setTimeout(function () {
+                    _this.parseReject(new Error("#########" + error.message + "\n" + error.stack + "\n" + dwinfo + "\n" + pinfo));
+                }, 1000);
             };
             assetBundle.idNext = -1;
             assetBundle.reTryTest = {};
@@ -8921,7 +8918,6 @@ var gd3d;
                         }).catch(function (err) {
                             framework.error.push(err);
                             state.iserror = true;
-                            console.error("##\u629B\u51FA\u91CD\u8BD5 " + bundle_1.name + " ---- ");
                             onstate(state);
                         });
                     }
@@ -9085,7 +9081,7 @@ var gd3d;
                                     return [2];
                                 }
                                 __asset = factory.parse(this, bundle, asset.name, data, asset.dwguid);
-                                if (!(__asset instanceof Promise)) return [3, 2];
+                                if (!(__asset instanceof gd3d.threading.gdPromise)) return [3, 2];
                                 return [4, __asset];
                             case 1:
                                 __asset = (_a.sent());
@@ -10249,7 +10245,7 @@ var gd3d;
             };
             animationClip.prototype.Parse = function (buf) {
                 var _this = this;
-                return new Promise(function (resolve, reject) {
+                return new gd3d.threading.gdPromise(function (resolve, reject) {
                     try {
                         var read = new gd3d.io.binReader(buf);
                         read.readStringAnsi();
@@ -13197,7 +13193,7 @@ var gd3d;
             };
             mesh.prototype.Parse = function (inData, webgl) {
                 var _this = this;
-                return new Promise(function (reslove, reject) {
+                return new gd3d.threading.gdPromise(function (reslove, reject) {
                     try {
                         _this.parseCMesh(inData, webgl);
                     }
@@ -13765,7 +13761,7 @@ var gd3d;
             };
             rawscene.prototype.Parse = function (txt, assetmgr) {
                 var _this = this;
-                return new Promise(function (resolve, reject) {
+                return new gd3d.threading.gdPromise(function (resolve, reject) {
                     gd3d.io.JSONParse(txt).then(function (_json) {
                         try {
                             _this.rootNode = new framework.transform();
@@ -40297,7 +40293,7 @@ var gd3d;
             });
         }
         function JSONParse(text) {
-            return new Promise(function (resolve, resaon) {
+            return new gd3d.threading.gdPromise(function (resolve, resaon) {
                 var json;
                 try {
                     json = JSON.parse(text);
@@ -40311,7 +40307,7 @@ var gd3d;
         io.JSONParse = JSONParse;
         function loadJSON(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
-            return new Promise(function (r) {
+            return new gd3d.threading.gdPromise(function (r) {
                 var now = Date.now();
                 if (now - checkClsTime > 15000) {
                     checkClsTime = now;

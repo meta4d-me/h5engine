@@ -105,9 +105,18 @@ namespace gd3d.framework
 
         parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: ArrayBuffer)
         {
+            
+            // if (name.lastIndexOf("jellysh3") != -1)
+            // {
+            //     console.error(`######### 水母3 #######`);
+            //     console.error(data);
+            //     console.error(data.byteLength);
+            // }
             if (!(data instanceof ArrayBuffer))
             {
-                error.push(new Error(`data not ArrayBuffer instance ,mesh name:${name},bundle:${bundle ? bundle.url : null} `));                
+                // console.error(`####### data not ArrayBuffer instance ,mesh name:${name},bundle:${bundle ? bundle.url : null} `);
+                // console.error(data);
+                error.push(new Error(`data not ArrayBuffer instance ,mesh name:${name},bundle:${bundle ? bundle.url : null} `));
                 return new mesh(name);
             }
             return new mesh(name).Parse(data, assetMgr.webgl);

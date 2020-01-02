@@ -126,9 +126,9 @@ namespace gd3d.framework
          * @param buf buffer数组
          * @version gd3d 1.0
          */
-        Parse(buf: ArrayBuffer): Promise<animationClip>
+        Parse(buf: ArrayBuffer): threading.gdPromise<animationClip>
         {
-            return new Promise((resolve,reject) =>
+            return new threading.gdPromise((resolve,reject) =>
             {
                 try
                 {
