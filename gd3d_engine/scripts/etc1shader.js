@@ -11,12 +11,16 @@ var inDir = config.shaderInDir;
 var outDir = config.shaderOutDir;
 var exclude = config.exclude;
 
-const shaderRegExp = /([\w\d]+)\.(vs|fs)\.glsl/;
+const shaderRegExp = /([\w\d]+)\.(shader)\.json/;
 const texture2DRegExp = /texture2D\s*\(/g;
 // 第一个函数声明
 const firstFuncRegExp = /((\w+\s+)*\w+\s+\w+\s*\([\w\s\,\.\*\[\]]*\)\s*\{)/;
 // 精度声明
 const precisionExp = /(precision\s+\w+\sfloat\s*;)/;
+// shader中纹理属性
+const textureExp = /(\w+)\([\'\"\w\s]+\,\s*Texture\s*\)/;
+
+
 // 检测该标记，在该位置新增texture2DEtC1方法
 const texture2DEtC1Mark = "//texture2DEtC1Mark";
 
@@ -36,18 +40,50 @@ handleShader(outDir);
 function handleShader(shaderDir)
 {
     var filepaths = getFilePaths(shaderDir);
-    filepaths.forEach(path =>
-    {
-        var result = shaderRegExp.exec(path);
-        if (result)
-        {
-            var shaderStr = readFile(path);
-            var isExc = isExclude(path);
-            if (!isExc && shaderStr.includes(texture2DEtC1Mark))
-            {
-                shaderStr = shaderStr.replace(texture2DRegExp, `texture2DEtC1(`);
+    var shaderPaths = filepaths.filter(path => (!!shaderRegExp.exec(path) && !isExclude(path)));
 
-                var texture2DEtC1Str = `
+    // shader中包含的glsl列表
+    var glslList = [];
+
+    shaderPaths.forEach(shaderpath =>
+    {
+        var shaderStr = readFile(shaderpath);
+        var shaderObj = JSON.parse(shaderStr);
+        var properties = shaderObj.properties;
+        // shader中包含的纹理列表
+        if (properties)
+        {
+            var textures = properties.reduce((pv, cv) =>
+            {
+                var result = textureExp.exec(cv);
+                if (!!result) pv.push(result[1]); return pv;
+            }, []);
+        }
+
+        for (const passName in shaderObj.passes)
+        {
+            var pass = shaderObj.passes[passName];
+            for (let i = 0; i < pass.length; i++)
+            {
+                var vsglsl = pass[i].vs + ".vs.glsl";
+                vsglsl = path.resolve(path.dirname(shaderpath), vsglsl);
+                if (!glslList.includes(vsglsl)) glslList.push(vsglsl);
+                var fsglsl = pass[i].fs + ".fs.glsl";
+                fsglsl = path.resolve(path.dirname(shaderpath), fsglsl);
+                if (!glslList.includes(fsglsl)) glslList.push(fsglsl);
+            }
+
+        }
+    });
+
+    glslList.forEach(path =>
+    {
+        var shaderStr = readFile(path);
+        if (shaderStr.includes(texture2DEtC1Mark))
+        {
+            shaderStr = shaderStr.replace(texture2DRegExp, `texture2DEtC1(`);
+
+            var texture2DEtC1Str = `
 vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
 {
     uv = uv - floor(uv);
@@ -56,9 +92,9 @@ vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
 }
                 `;
 
-                if (!precisionExp.exec(shaderStr))
-                {
-                    texture2DEtC1Str = `
+            if (!precisionExp.exec(shaderStr))
+            {
+                texture2DEtC1Str = `
 mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
 {
     uv = uv - floor(uv);
@@ -68,30 +104,24 @@ mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
     return vec4( texture2D(sampler, uv * scale).xyz, texture2D(sampler, uv * scale + offset).x);
 }
 `;
-                }
+            }
 
-                // 把texture2DEtC1放在第一个函数前面
-                shaderStr = shaderStr.replace(texture2DEtC1Mark,
-                    `
+            // 把texture2DEtC1放在第一个函数前面
+            shaderStr = shaderStr.replace(texture2DEtC1Mark,
+                `
 ${texture2DEtC1Str}
 `);
-            }
-            writeFile(path, shaderStr);
         }
+        writeFile(path, shaderStr);
     });
     console.log(`转换shader完成！`);
 }
 
 function isExclude(pathStr)
 {
-    for (var i = 0; i < exclude.length; i++)
-    {
-        if (pathStr.includes(exclude[i]))
-        {
-            return true;
-        }
-    }
-    return false;
+    var basename = path.basename(pathStr);
+    var result = exclude.includes(basename);
+    return result;
 }
 
 function makeDir(dir)
@@ -147,6 +177,13 @@ function readFiles(filePaths)
     return result;
 }
 
+/**
+ * 获取文件路径列表
+ * 
+ * @param {string} rootPath 根路径
+ * @param {string[]} filePaths 用于保存文件路径列表
+ * @param {number} depth 深度
+ */
 function getFilePaths(rootPath, filePaths, depth)
 {
     if (depth == undefined) depth = 10000;
