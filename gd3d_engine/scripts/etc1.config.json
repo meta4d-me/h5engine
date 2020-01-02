@@ -1,20 +1,28 @@
-// {
-//     // 输入文件夹
-//     "inDir": "newRes/可编辑Shaderlab/shader",
-//     // 输出文件夹
-//     "outDir": "res_etc1/etc1_shader",
-//     // 排除列表
-//     "exclude": []
-// }
 {
     // shader输入文件夹
-    "shaderInDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/shader/customShader",
+    "shaderInDir": "D:/work/enginesource/gd3d_engine/newRes/可编辑Shaderlab/shader",
     // shader输出文件夹
-    "shaderOutDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/shader/customShader_ETC1",
+    "shaderOutDir": "D:/work/enginesource/gd3d_engine/res_etc1/etc1_shader",
     // shader排除列表
-    "exclude": [],
+    "exclude": [
+        "diffuse.shader.json"
+    ],
     // 资源输入文件夹
-    "assetInDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/props/PC",
+    "assetInDir": "D:/work/enginesource/gd3d_engine/res/prefabs/test_ktx",
     // 资源输出文件夹
-    "assetOutDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/props/ANDROID"
+    "assetOutDir": "D:/work/enginesource/gd3d_engine/res/prefabs/test_ktx"
 }
+// {
+//     // shader输入文件夹
+//     "shaderInDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/shader/customShader",
+//     // shader输出文件夹
+//     "shaderOutDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/shader/customShader_ETC1",
+//     // shader排除列表
+//     "exclude": [
+//         "diffuse.shader.json"
+//     ],
+//     // 资源输入文件夹
+//     "assetInDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/props/PC",
+//     // 资源输出文件夹
+//     "assetOutDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/props/ANDROID"
+// }

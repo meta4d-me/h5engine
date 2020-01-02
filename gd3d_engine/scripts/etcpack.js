@@ -4,6 +4,17 @@ const { execFile } = require('child_process');
 var fs = require("fs");
 const path = require("path");
 
+//----------------------常量----------------
+/**
+ * 材质配置文件后缀
+ */
+const matExt = ".mat.json";
+/**
+ * 图片描述文件后缀
+ */
+const imgdescExt = ".imgdesc.json";
+
+// 读取配置
 var configStr = readFile("scripts/etc1.config.json");
 var config;
 eval(`config =` + configStr);
@@ -41,11 +52,21 @@ function etcpackImgdescInFolder(dir, callback)
         callback();
         return;
     }
-    var imgdescs = getFilePaths(dir).filter(p =>
+
+    var mats = getFilePaths(dir).filter(p =>
     {
-        return p.substring(p.length - ".imgdesc.json".length) == ".imgdesc.json";
-    })
+        return p.substring(p.length - matExt.length) == matExt;
+    });
+
+    var imgdescs = [];
+    for (var i = 0; i < mats.length; i++)
+    {
+        var addImgdescs = getImgdescFromMat(mats[i], exclude);
+        imgdescs = imgdescs.concat(addImgdescs);
+    }
+
     var total = imgdescs.length;
+    console.log(`开始压缩ETC1`);
     handlers();
 
     function handlers()
@@ -54,15 +75,51 @@ function etcpackImgdescInFolder(dir, callback)
         if (imgdescs.length == 0)
         {
             callback();
+            console.log(`结束压缩ETC1`);
             return;
         }
         var imgdescPath = imgdescs.pop();
-        etcpackImgdesc(imgdescPath, handlers);
+        etcpackImgdesc(imgdescPath.imgdescPath, imgdescPath.isDiscardAlpha, handlers);
     }
 
 }
 
-function etcpackImgdesc(imgdescPath, callback)
+/**
+ * 获取材质中图片描述列表
+ * 
+ * @param {string} matPath 材质路径
+ * @param {string[]} exclude shader排除列表
+ */
+function getImgdescFromMat(matPath, exclude)
+{
+    try
+    {
+        var mat = JSON.parse(readFile(matPath));
+    } catch (error)
+    {
+        console.warn(`JSON.parse ${matPath} 错误！ ${error}`)
+        callback(error)
+        return;
+    }
+
+    var result = [];
+
+    var isExclude = exclude.includes(mat.shader)
+    var mapUniform = mat.mapUniform;
+    for (const key in mapUniform)
+    {
+        var itemValue = mapUniform[key].value;
+        if (typeof itemValue == "string" && isFileOfExt(itemValue, imgdescExt))
+        {
+            var imgdescPath = path.resolve(path.dirname(matPath), itemValue);
+            result.push({ imgdescPath: imgdescPath, isDiscardAlpha: isExclude });
+        }
+    }
+    return result;
+}
+
+
+function etcpackImgdesc(imgdescPath, isDiscardAlpha, callback)
 {
     callback = callback || (() => { });
     try
@@ -98,7 +155,7 @@ function etcpackImgdesc(imgdescPath, callback)
     }
 
     var newImgName = imgName.substring(0, dotIndex + 1) + "ktx";
-    etcpack(imgPath, path.dirname(imgPath), (err) =>
+    etcpack(imgPath, path.dirname(imgPath), isDiscardAlpha, (err) =>
     {
         if (err)
         {
@@ -114,9 +171,21 @@ function etcpackImgdesc(imgdescPath, callback)
     });
 }
 
-function etcpack(input, outDir, callback)
+/**
+ * 压缩ETC纹理
+ * 
+ * @param {string} input 输入图片文件路径
+ * @param {string} outDir 输出文件夹路径
+ * @param {boolean} isDiscardAlpha 如果为真则丢弃alpha通道，否则生成包含alpha的图集
+ * @param {(err:Error)=>void} callback 完成回调
+ */
+function etcpack(input, outDir, isDiscardAlpha, callback)
 {
-    execFile(exePath, [input, outDir, `-s`, `fast`, `-c`, `etc1`, `-ktx`, `-aa`], { cwd: exeDir }, function (err, data)
+    var args = [input, outDir, `-s`, `fast`, `-c`, `etc1`, `-ktx`];
+    if (!isDiscardAlpha)
+        args.push("-aa");
+
+    execFile(exePath, args, { cwd: exeDir }, function (err, data)
     {
         callback && callback(err);
 
@@ -124,6 +193,17 @@ function etcpack(input, outDir, callback)
     });
 }
 
+/**
+ * 是否为指定后缀名称的文件
+ * 
+ * @param {string} path 文件路径
+ * @param {string} ext 后缀名称
+ */
+function isFileOfExt(path, ext)
+{
+    var b = path.substring(path.length - ext.length) == ext
+    return b;
+}
 
 function isExclude(pathStr)
 {
