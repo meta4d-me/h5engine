@@ -634,7 +634,7 @@ namespace gd3d.framework
             var shader = assetmgr.getShader(shaderName) as gd3d.framework.shader;
             if (shader == null)
             {
-                console.error("shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
+                throw new Error("mat解析错误:"+this.name+"  shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
             }
             this.setShader(shader);
             var queue = json["queue"];

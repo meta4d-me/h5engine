@@ -9,9 +9,9 @@ namespace gd3d.framework
 
         texs: { [name: string]: number } = {};
 
-        pkgs: string[]=[];
+        pkgs: string[] = [];
 
-        pkgsGuid: number[]=[];
+        pkgsGuid: number[] = [];
 
         url: string;
 
@@ -39,6 +39,8 @@ namespace gd3d.framework
         dhd: number;
         parseResolve: (o?) => void;
         parseReject: (o: Error) => void;
+
+        static reTryTest = {};
         constructor(url: string, private assetmgr: assetMgr, guid?: number)
         {
             this.guid = guid || assetBundle.buildGuid();
@@ -53,7 +55,7 @@ namespace gd3d.framework
             return --assetBundle.idNext;
         }
 
-        parseTimeOut()
+        getParseInfo()
         {
             let fcount = 0;
             let text = "\nparse:\n";
@@ -70,10 +72,11 @@ namespace gd3d.framework
                     ++fcount;
             }
             text += `${fcount}/${this.stateParse.count}`;
-            // error.push(new Error(`[资源解析超时] ${this.url} , state:${this.stateText},${text}`));
-            this.fail(new Error(`[资源]解析超时 ${this.url} , state:${this.stateText},${text}`));
+
+            return text;
+            // this.fail(new Error(`[资源]解析超时 ${this.url} , state:${this.stateText},${text}`));
         }
-        downloadTimeOut()
+        getDownloadInfo()
         {
             let text = "\ndownload :\n";
             let fcount = 0;
@@ -84,116 +87,124 @@ namespace gd3d.framework
                     ++fcount;
             }
             text += `${fcount}/${this.stateQueue.length}`;
-            this.fail(new Error(`[资源]下载超时 ${this.url} , state:${this.stateText},${text}`));
+            // this.fail(new Error(`[资源]下载超时 ${this.url} , state:${this.stateText},${text}`));
+            return text;
         }
         //解析资源包描述文件 和下载
         parseBundle(data: string)
         {
-
-            this.dhd = setTimeout(() =>
-            {
-                this.downloadTimeOut();
-            }, this.dwOutTime);
-
-            let json;
-            try
-            {
-                json = JSON.parse(data);
-            } catch (error)
-            {
-                this.fail(new Error(`[资源]描述文件错误 ${this.url} ,${error.message}`));
-                return;
-            }
-            this.files = json.files;
-            this.texs = json.texs;
-            this.pkgs = json.pkg;
-            this.stateText = "下载资源";
-            if (!assetMgr.openGuid)
-            {
-                for (let k in this.files)
-                    this.files[k] = assetBundle.buildGuid();
-                for (let k in this.texs)
-                    this.texs[k] = assetBundle.buildGuid();
-            }
-
-            this.dw_imgCount = this.dw_fileCount = Object.keys(this.texs || {}).length;
-            let dwpkgCount = 0;
-            if (this.pkgs)
-            {
-                this.dw_fileCount += Object.keys(this.pkgs).length;
-                // console.log(`当前资源是压缩状态.`);
-
-                this.pkgsGuid = this.pkgsGuid || [];
-
-                var nameURL = this.url.substring(0, this.url.lastIndexOf(".assetbundle"));
-
-                for (let i = 0, len = this.pkgs.length; i < len; ++i)
-                {
-                    let extName = this.pkgs[i].substring(this.pkgs[i].indexOf("."));
-                    let url = nameURL + extName;
-                    let kurl = url.replace(assetMgr.cdnRoot, "");
-                    let guid = assetMgr.urlmapGuid[kurl];
-                    if (!guid)
-                        guid = assetBundle.buildGuid();
-                    this.pkgsGuid.push(guid);
-
-                    let state = { guid, url, wd: false };
-                    this.stateQueue.push(state);
-                    this.assetmgr.download(guid, url, calcType(url), () =>
-                    {
-                        state.wd = true;
-                        ++dwpkgCount;
-                        if (dwpkgCount >= this.dw_fileCount)
-                            this.parseFile();
-                    });
-                }
-            } else
-            {
-                this.dw_fileCount += Object.keys(this.files).length;
-                // console.log(`当前资源是分包状态.`);
-                for (let k in this.files)
-                {
-                    let guid = this.files[k];
-                    let url = `${this.baseUrl}Resources/${k}`;
-                    let state = { guid, url, wd: false };
-                    this.stateQueue.push(state);
-                    this.assetmgr.download(guid, url, calcType(k), () =>
-                    {
-                        state.wd = true;
-                        ++dwpkgCount;
-                        // console.log(`${this.name} 下载分包 ${dwpkgCount}/${this.dw_fileCount} ,guid:${guid},${url}`);
-                        if (dwpkgCount >= this.dw_fileCount)
-                            this.parseFile();
-                    });
-                }
-            }
-
-
-            //下载图片
-            const imageNext = function (state)
-            {
-                state.wd = true;
-                ++dwpkgCount;
-                // console.log(`${this.name} 下载分包 ${dwpkgCount}/${this.dw_fileCount} ,guid:${guid},${url}`);
-                if (dwpkgCount >= this.dw_fileCount)
-                    this.parseFile();
-            }
-            for (let k in this.texs)
-            {
-                let guid = this.texs[k];
-                this.files[k] = guid;//先下载 然后给解析器补充一个key
-                let url = `${this.baseUrl}resources/${k}`;
-                let state = { guid, url, wd: false };
-                this.stateQueue.push(state);
-                if (k.endsWith(".png") || k.endsWith(".jpg"))
-                    this.assetmgr.loadImg(guid, url, imageNext.bind(this, state));
-                else
-                    this.assetmgr.download(guid, url, AssetTypeEnum.PVR, imageNext.bind(this, state));
-            }
             return new Promise((resolve, reject) =>
             {
                 this.parseResolve = resolve;
                 this.parseReject = reject;
+
+                if (assetBundle.reTryTest[this.name])
+                {
+                    console.error(`资源 ${this.name} 正在重试 , ${this.url}`);
+                    delete assetBundle.reTryTest[this.name];
+                    this.ready
+                }
+                this.dhd = setTimeout(() =>
+                {
+
+                    this.fail(new Error(`[资源]下载超时 ${this.url} , state:${this.stateText}`));
+                }, this.dwOutTime);
+
+                let json;
+                try
+                {
+                    json = JSON.parse(data);
+                } catch (error)
+                {
+                    this.fail(new Error(`[资源]描述文件错误 ${this.url} ,${error.message}`));
+                    return;
+                }
+                this.files = json.files;
+                this.texs = json.texs;
+                this.pkgs = json.pkg;
+                this.stateText = "下载资源";
+                if (!assetMgr.openGuid)
+                {
+                    for (let k in this.files)
+                        this.files[k] = assetBundle.buildGuid();
+                    for (let k in this.texs)
+                        this.texs[k] = assetBundle.buildGuid();
+                }
+
+                this.dw_imgCount = this.dw_fileCount = Object.keys(this.texs || {}).length;
+                let dwpkgCount = 0;
+                if (this.pkgs)
+                {
+                    this.dw_fileCount += Object.keys(this.pkgs).length;
+                    // console.log(`当前资源是压缩状态.`);
+
+                    this.pkgsGuid = this.pkgsGuid || [];
+
+                    var nameURL = this.url.substring(0, this.url.lastIndexOf(".assetbundle"));
+
+                    for (let i = 0, len = this.pkgs.length; i < len; ++i)
+                    {
+                        let extName = this.pkgs[i].substring(this.pkgs[i].indexOf("."));
+                        let url = nameURL + extName;
+                        let kurl = url.replace(assetMgr.cdnRoot, "");
+                        let guid = assetMgr.urlmapGuid[kurl];
+                        if (!guid)
+                            guid = assetBundle.buildGuid();
+                        this.pkgsGuid.push(guid);
+
+                        let state = { guid, url, wd: false };
+                        this.stateQueue.push(state);
+                        this.assetmgr.download(guid, url, calcType(url), () =>
+                        {
+                            state.wd = true;
+                            ++dwpkgCount;
+                            if (dwpkgCount >= this.dw_fileCount)
+                                this.parseFile();
+                        });
+                    }
+                } else
+                {
+                    this.dw_fileCount += Object.keys(this.files).length;
+                    // console.log(`当前资源是分包状态.`);
+                    for (let k in this.files)
+                    {
+                        let guid = this.files[k];
+                        let url = `${this.baseUrl}Resources/${k}`;
+                        let state = { guid, url, wd: false };
+                        this.stateQueue.push(state);
+                        this.assetmgr.download(guid, url, calcType(k), () =>
+                        {
+                            state.wd = true;
+                            ++dwpkgCount;
+                            // console.log(`${this.name} 下载分包 ${dwpkgCount}/${this.dw_fileCount} ,guid:${guid},${url}`);
+                            if (dwpkgCount >= this.dw_fileCount)
+                                this.parseFile();
+                        });
+                    }
+                }
+
+
+                //下载图片
+                const imageNext = function (state)
+                {
+                    state.wd = true;
+                    ++dwpkgCount;
+                    // console.log(`${this.name} 下载分包 ${dwpkgCount}/${this.dw_fileCount} ,guid:${guid},${url}`);
+                    if (dwpkgCount >= this.dw_fileCount)
+                        this.parseFile();
+                }
+                for (let k in this.texs)
+                {
+                    let guid = this.texs[k];
+                    this.files[k] = guid;//先下载 然后给解析器补充一个key
+                    let url = `${this.baseUrl}resources/${k}`;
+                    let state = { guid, url, wd: false };
+                    this.stateQueue.push(state);
+                    if (k.endsWith(".png") || k.endsWith(".jpg"))
+                        this.assetmgr.loadImg(guid, url, imageNext.bind(this, state));
+                    else
+                        this.assetmgr.download(guid, url, AssetTypeEnum.PVR, imageNext.bind(this, state));
+                }
             });
         }
 
@@ -272,7 +283,7 @@ namespace gd3d.framework
             clearTimeout(this.dhd);
             this.thd = setTimeout(() =>
             {
-                this.parseTimeOut();
+                this.fail(new Error(`[资源]解析超时 ${this.url} , state:${this.stateText}`));
             }, this.parseOutTime);
             if (this.onDownloadFinish)
                 this.onDownloadFinish();
@@ -327,6 +338,7 @@ namespace gd3d.framework
                         await this.assetmgr.parseRes(asset, this);
                     } catch (error)
                     {
+
                         this.fail(error);
                         return;
                     }
@@ -366,11 +378,19 @@ namespace gd3d.framework
             delete this.assetmgr.name_bundles[this.name];
             delete this.assetmgr.kurl_bundles[this.keyUrl];
             delete assetMgr.mapBundleNamed[this.guid];
+            delete assetMgr.mapGuid[this.guid];
         }
         fail(error: Error)
         {
+            assetBundle.reTryTest[this.name] = 1;
+
+            let dwinfo = this.getDownloadInfo();
+            let pinfo = this.getParseInfo();
             this.unload(true);
-            this.parseReject(error);
+            console.error(dwinfo);
+            console.error(pinfo);
+            console.error(`${error.message}\n${error.stack}\n`);
+            this.parseReject(new Error(`#########${error.message}\n${error.stack}\n${dwinfo}\n${pinfo}`));
         }
     }
 }
