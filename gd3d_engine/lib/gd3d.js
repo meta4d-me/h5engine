@@ -8731,6 +8731,7 @@ var gd3d;
                 delete this.assetmgr.name_bundles[this.name];
                 delete this.assetmgr.kurl_bundles[this.keyUrl];
                 delete framework.assetMgr.mapBundleNamed[this.guid];
+                delete framework.assetMgr.mapGuid[this.guid];
             };
             assetBundle.prototype.fail = function (error) {
                 assetBundle.reTryTest[this.name] = 1;
@@ -8947,16 +8948,26 @@ var gd3d;
                             if (ntype == framework.AssetTypeEnum.Texture)
                                 _this.loadImg(nguid, nurl, next.bind(_this, filename, guid, type, nguid));
                             else
-                                _this.download(nguid, nurl, ntype, next.bind(_this, filename, guid, type, nguid));
+                                _this.download(nguid, nurl, ntype, next.bind(_this, filename, guid, type, nguid), function (err) {
+                                    assetMgr.setStateError(state, onstate, err);
+                                });
                         }
                         else {
                             var dwguid = type == framework.AssetTypeEnum.Texture ? guid : null;
                             next.call(_this, filename, guid, type, dwguid);
                         }
                     }
+                }, function (err) {
+                    assetMgr.setStateError(state, onstate, err);
                 });
             };
-            assetMgr.prototype.download = function (guid, url, type, finish) {
+            assetMgr.setStateError = function (state, onstate, err) {
+                state.errs.push(err);
+                state.iserror = true;
+                onstate(state);
+            };
+            assetMgr.prototype.download = function (guid, url, type, finish, errcb) {
+                if (errcb === void 0) { errcb = null; }
                 var loading = assetMgr.mapLoading[guid];
                 if (loading && loading.readyok && finish)
                     return finish();
@@ -8976,6 +8987,7 @@ var gd3d;
                 }
                 gd3d.io.xhrLoad(url, function (data, err) {
                     console.error(err.stack);
+                    errcb(err);
                 }, function () { }, repType, function (xhr) {
                     var loading = assetMgr.mapLoading[guid];
                     if (!loading) {
