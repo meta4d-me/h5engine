@@ -22,11 +22,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -8493,7 +8492,7 @@ var gd3d;
                     if (assetBundle.reTryTest[_this.name]) {
                         console.error("\u8D44\u6E90 " + _this.name + " \u6B63\u5728\u91CD\u8BD5 , " + _this.url);
                         delete assetBundle.reTryTest[_this.name];
-                        _this.ready;
+                        _this.ready = false;
                     }
                     _this.dhd = setTimeout(function () {
                         _this.fail(new Error("[\u8D44\u6E90]\u4E0B\u8F7D\u8D85\u65F6 " + _this.url + " , state:" + _this.stateText));

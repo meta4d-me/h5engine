@@ -102,7 +102,7 @@ namespace gd3d.framework
                 {
                     console.error(`资源 ${this.name} 正在重试 , ${this.url}`);
                     delete assetBundle.reTryTest[this.name];
-                    this.ready
+                    this.ready = false;
                 }
                 this.dhd = setTimeout(() =>
                 {
