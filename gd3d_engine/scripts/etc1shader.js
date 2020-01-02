@@ -5,7 +5,7 @@ var path = require('path');
 
 // 输入文件夹
 // var inDir = "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/shader/customShader";
-var inDir = "res_etc1/可编辑Shaderlab/shader";
+var inDir = "newRes/可编辑Shaderlab/shader";
 // 输出文件夹
 var outDir = "res_etc1/etc1_shader";
 // 排除列表
@@ -14,8 +14,10 @@ var exclude = [];
 
 var shaderRegExp = /([\w\d]+)\.(vs|fs)\.glsl/;
 var texture2DRegExp = /texture2D\s*\(/g;
-var mainRegExp = /(void\s+main\s*\()/;
-var precisionExp = /precision\s+\w+\sfloat/;
+// 第一个函数声明
+var firstFuncRegExp = /((\w+\s+)*\w+\s+\w+\s*\([\w\s\,\.\*\[\]]*\)\s*\{)/;
+// 精度声明
+var precisionExp = /(precision\s+\w+\sfloat\s*;)/;
 
 var filepaths = getFilePaths(inDir);
 filepaths.forEach(inPath =>
@@ -31,6 +33,7 @@ filepaths.forEach(inPath =>
             var result1 = texture2DRegExp.exec(shaderStr);
             if (result1)
             {
+                
                 var texture2DEtC1Str = `
 vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
 {
@@ -54,13 +57,9 @@ mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
 `;
                 }
 
-                shaderStr = shaderStr.replace(texture2DRegExp, `texture2DEtC1(`);
 
-
-
-                `precision highp float`
-
-                shaderStr = shaderStr.replace(mainRegExp,
+                // 把texture2DEtC1放在第一个函数前面
+                shaderStr = shaderStr.replace(firstFuncRegExp,
                     `
 
 ${texture2DEtC1Str}
