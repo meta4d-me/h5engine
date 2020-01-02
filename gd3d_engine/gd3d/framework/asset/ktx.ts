@@ -97,10 +97,6 @@ namespace gd3d.framework
 
             var target = gl.TEXTURE_2D;
 
-            //v3
-            gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);//对齐方式
-            gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);//不对Y翻转
-
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(target, t2d.texture);
 

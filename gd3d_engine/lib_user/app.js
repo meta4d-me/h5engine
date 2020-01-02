@@ -5026,7 +5026,6 @@ var test_ETC1_KTX = (function () {
                         ext = app.webgl.getExtension('WEBGL_compressed_texture_etc1');
                         if (!ext) {
                             alert("\u9700\u8981\u4F7F\u7528Android\u5E73\u53F0\u624D\u80FD\u8FD0\u884C\uFF01");
-                            return [2];
                         }
                         this.app = app;
                         this.scene = this.app.getScene();

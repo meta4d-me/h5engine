@@ -8225,8 +8225,6 @@ var gd3d;
                 var t2d = new gd3d.render.glTexture2D(gl);
                 t2d.format = gd3d.render.TextureFormatEnum.KTX;
                 var target = gl.TEXTURE_2D;
-                gl.pixelStorei(gl.UNPACK_ALIGNMENT, 1);
-                gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, 0);
                 gl.activeTexture(gl.TEXTURE0);
                 gl.bindTexture(target, t2d.texture);
                 var dataOffset = KTXParse.HEADER_LEN + bytesOfKeyValueData;
