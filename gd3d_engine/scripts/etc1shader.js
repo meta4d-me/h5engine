@@ -25,6 +25,7 @@ if (inDir != outDir)
 {
     copyFolder(inDir, outDir);
 }
+// 处理shader
 handleShader(outDir);
 
 /**
@@ -105,15 +106,19 @@ function makeDir(dir)
 
 function copyFolder(inDir, outDir)
 {
+    console.log(`开始拷贝文件。`);
     var filepaths = getFilePaths(inDir);
-    filepaths.forEach(inPath =>
+    var len = filepaths.length;
+    filepaths.forEach((inPath, i) =>
     {
         var outPath = inPath.replace(inDir, outDir);
         var pDir = path.dirname(outPath);
         makeDir(pDir);
 
         fs.copyFileSync(inPath, outPath);
+        console.log(`拷贝文件 ${i} / ${len}`)
     });
+    console.log(`结束拷贝文件。`);
 }
 
 function writeFile(filePath, content)

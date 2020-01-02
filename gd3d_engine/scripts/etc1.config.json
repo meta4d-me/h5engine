@@ -14,7 +14,7 @@
     // shader排除列表
     "exclude": [],
     // 资源输入文件夹
-    "assetInDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/props/ANDROID",
+    "assetInDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/props/PC",
     // 资源输出文件夹
     "assetOutDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/props/ANDROID"
 }

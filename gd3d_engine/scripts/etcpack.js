@@ -4,6 +4,14 @@ const { execFile } = require('child_process');
 var fs = require("fs");
 const path = require("path");
 
+var configStr = readFile("scripts/etc1.config.json");
+var config;
+eval(`config =` + configStr);
+
+var inDir = config.assetInDir;
+var outDir = config.assetOutDir;
+var exclude = config.exclude;
+
 var exePath = path.resolve(__dirname, "tools/etcpack.exe");
 var exeDir = path.dirname(exePath);
 // var outDir = path.resolve(__dirname, "out");
@@ -15,10 +23,14 @@ var exeDir = path.dirname(exePath);
 // etcpackImgdesc(assetbundlePath);
 
 // var assetDir = path.resolve(__dirname, `../res/prefabs`);
-var assetDir = `D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/props/ANDROID`;
-etcpackImgdescInFolder(assetDir);
 
-
+// 拷贝文件
+if (inDir != outDir)
+{
+    copyFolder(inDir, outDir);
+}
+// 处理shader
+etcpackImgdescInFolder(outDir);
 
 function etcpackImgdescInFolder(dir, callback)
 {
@@ -133,6 +145,23 @@ function makeDir(dir)
     makeDir(pDir);
 
     fs.mkdirSync(dir);
+}
+
+function copyFolder(inDir, outDir)
+{
+    console.log(`开始拷贝文件。`);
+    var filepaths = getFilePaths(inDir);
+    var len = filepaths.length;
+    filepaths.forEach((inPath, i) =>
+    {
+        var outPath = inPath.replace(inDir, outDir);
+        var pDir = path.dirname(outPath);
+        makeDir(pDir);
+
+        fs.copyFileSync(inPath, outPath);
+        console.log(`拷贝文件 ${i} / ${len}`)
+    });
+    console.log(`结束拷贝文件。`);
 }
 
 function writeFile(filePath, content)
