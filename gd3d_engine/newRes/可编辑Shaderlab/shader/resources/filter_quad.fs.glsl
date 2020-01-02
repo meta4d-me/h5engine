@@ -8,6 +8,8 @@ uniform sampler2D _MainTex;
 uniform lowp float _FilterType;
 uniform lowp float _Step;
 varying highp vec2 xlv_TEXCOORD0;
+//texture2DEtC1Mark
+
 void main()
 {
     vec2 tcOffset[25];

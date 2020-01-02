@@ -6,6 +6,8 @@ varying mediump vec2 _mask_uv;
 
 varying mediump vec4 v_color;
 
+//texture2DEtC1Mark
+
 void main()    
 {
     highp vec4 basecolor=texture2D(_Main_Tex,_maintex_uv);

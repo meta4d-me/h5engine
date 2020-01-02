@@ -8,6 +8,8 @@ uniform sampler2D _MainTex;
 uniform float _K;
 varying highp vec2 xlv_TEXCOORD0;
 
+//texture2DEtC1Mark
+
 vec4 xposure(vec4 color, float gray, float ex)
 {
     float b = (4. * ex - 1.);

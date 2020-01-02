@@ -9,6 +9,8 @@ const vec2 texSize = vec2(256., 256.);
 uniform sampler2D _MainTex;
 varying highp vec2 xlv_TEXCOORD0;
 
+//texture2DEtC1Mark
+
 vec4 blur_filter(mat3 filter, vec2 filter_pos_delta[9], sampler2D image, vec2 xy, vec2 texSize)
 {
     vec4 final_color = vec4(0., 0., 0., 0.);

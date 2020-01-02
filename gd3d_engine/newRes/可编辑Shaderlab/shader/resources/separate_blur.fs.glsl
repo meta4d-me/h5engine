@@ -5,6 +5,8 @@ varying highp vec4 uv01;
 varying highp vec4 uv23;
 varying highp vec4 uv45;
 
+//texture2DEtC1Mark
+
 void main() 
 {
     lowp vec4 color=vec4(0,0,0,0);

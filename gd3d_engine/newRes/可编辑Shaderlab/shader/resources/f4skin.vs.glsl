@@ -23,6 +23,7 @@ varying mediump vec2 xlv_TEXCOORD0;
 varying mediump vec2 lightmap_TEXCOORD;
 
 
+//texture2DEtC1Mark
 
 
 #ifdef FOG
