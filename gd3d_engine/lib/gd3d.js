@@ -22,11 +22,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -9135,12 +9134,17 @@ var gd3d;
                 onComplete(firstChilds);
             };
             assetMgr.prototype.unload = function (url) {
-                var guid = assetMgr.urlmapGuid[url];
+                var keyUrl = url.replace(assetMgr.cdnRoot, "");
+                var guid = assetMgr.urlmapGuid[keyUrl];
                 if (guid) {
-                    var name_1 = framework.getFileName(url);
+                    var name_1 = framework.getFileName(keyUrl);
                     delete assetMgr.mapNamed[name_1];
                     delete assetMgr.mapLoading[guid];
                     delete assetMgr.mapGuid[guid];
+                }
+                else if (this.kurl_bundles[keyUrl]) {
+                    var bundle = this.kurl_bundles[keyUrl];
+                    bundle.unload();
                 }
             };
             assetMgr.urlmapGuid = {};
