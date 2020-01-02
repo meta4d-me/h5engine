@@ -198,15 +198,7 @@ namespace gd3d.framework
                 if (type == AssetTypeEnum.Bundle)
                 {
                     let bundle = new assetBundle(url, this, guid);
-                    this.name_bundles[bundle.name] = this.kurl_bundles[keyUrl] = this.guid_bundles[bundle.guid] = bundle;
-                    // bundle.onReady = () => {
-                    //     if (this.name_bundles[keyUrl])
-                    //         console.warn(`assetbundle命名冲突:${keyUrl},${bundle.url}`);
-                       
-                    //     state.bundle = bundle;
-                    //     state.isfinish = true;
-                    //     onstate(state);
-                    // };
+                    this.name_bundles[bundle.name] = this.kurl_bundles[keyUrl] = this.guid_bundles[bundle.guid] = bundle;                 
                     bundle.onDownloadFinish = downloadFinish;
                     bundle.parseBundle(loading.data).then(()=>{
                         state.bundle = bundle;
@@ -248,7 +240,9 @@ namespace gd3d.framework
                         if (ntype == AssetTypeEnum.Texture)
                             this.loadImg(nguid, nurl, next.bind(this, filename, guid, type, nguid));//不一样的是这里带了一个需要下载的GUID
                         else
-                            this.download(nguid, nurl, ntype, next.bind(this, filename, guid, type, nguid));//不一样的是这里带了一个需要下载的GUID
+                            this.download(nguid, nurl, ntype, next.bind(this, filename, guid, type, nguid),(err)=>{
+                                assetMgr.setStateError(state,onstate,err);
+                            });//不一样的是这里带了一个需要下载的GUID
                     } else
                     {
                         let dwguid = type == AssetTypeEnum.Texture ? guid : null;
@@ -256,10 +250,17 @@ namespace gd3d.framework
                     }
 
                 }
+            },(err)=>{
+                assetMgr.setStateError(state,onstate,err);
             });
         }
-
-        download(guid: number, url: string, type: AssetTypeEnum, finish: () => void)
+        static setStateError(state:stateLoad,onstate: (state?: stateLoad) => void,err:Error)
+        {
+            state.errs.push(err);
+            state.iserror= true;
+            onstate(state); 
+        }
+        download(guid: number, url: string, type: AssetTypeEnum, finish: () => void,errcb:(err:Error)=>void=null)
         {
             let loading = assetMgr.mapLoading[guid];
             //下载完成的不再下载
@@ -287,7 +288,7 @@ namespace gd3d.framework
             io.xhrLoad(url, (data, err) =>
             {
                 console.error(err.stack);
-
+                errcb(err);
             }, () => { }, repType, (xhr) =>
             {
                 let loading = assetMgr.mapLoading[guid];

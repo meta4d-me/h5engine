@@ -1654,7 +1654,8 @@ declare namespace gd3d.framework {
         };
         static initGuidList(): void;
         load(url: string, type?: AssetTypeEnum, onstate?: loadCallback, downloadFinish?: () => void): void;
-        download(guid: number, url: string, type: AssetTypeEnum, finish: () => void): void;
+        static setStateError(state: stateLoad, onstate: (state?: stateLoad) => void, err: Error): void;
+        download(guid: number, url: string, type: AssetTypeEnum, finish: () => void, errcb?: (err: Error) => void): void;
         loadImg(guid: number, url: string, cb: (img: any) => void): void;
         protected _loadImg(url: string, cb: (img: any) => void): void;
         use(asset: IAsset): void;

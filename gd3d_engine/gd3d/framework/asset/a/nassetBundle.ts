@@ -378,6 +378,7 @@ namespace gd3d.framework
             delete this.assetmgr.name_bundles[this.name];
             delete this.assetmgr.kurl_bundles[this.keyUrl];
             delete assetMgr.mapBundleNamed[this.guid];
+            delete assetMgr.mapGuid[this.guid];
         }
         fail(error: Error)
         {
