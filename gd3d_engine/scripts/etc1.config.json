@@ -5,9 +5,14 @@
     "shaderOutDir": "D:/work/enginesource/gd3d_engine/res_etc1/etc1_shader",
     // shader排除列表
     "exclude": {
-        "diffuse.shader.json": [
-            "_MainTex"
-        ]
+        "diffuse.shader.json": {
+            "_MainTex": {
+                // 是否使用ETC1压缩纹理，没有配置时默认为true。
+                "useETC1": true,
+                // 压缩ETC1时是否丢弃alpha通道，没有配置时默认为false。当useETC1为true时生效。
+                "isDiscardAlpha": true
+            }
+        }
     },
     // 资源输入文件夹
     "assetInDir": "D:/work/enginesource/gd3d_engine/res/prefabs/test_ktx",

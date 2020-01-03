@@ -50,7 +50,7 @@ function handleShader(shaderDir)
     {
         var excludeInfo = exclude[path.basename(shaderpath)];
         // 排除属性列表
-        var excludeProperties = excludeInfo ? excludeInfo : [];
+        var excludeProperties = excludeInfo ? Object.keys(excludeInfo) : [];
         var glslExt = "_etc1";
         if (excludeProperties.length > 0)
             glslExt += excludeProperties.join("_");

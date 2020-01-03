@@ -88,7 +88,7 @@ function etcpackImgdescInFolder(dir, callback)
  * 获取材质中图片描述列表
  * 
  * @param {string} matPath 材质路径
- * @param {string[]} exclude shader排除列表
+ * @param {{[shader:string]:[]}} exclude shader排除列表
  */
 function getImgdescFromMat(matPath, exclude)
 {
@@ -104,15 +104,36 @@ function getImgdescFromMat(matPath, exclude)
 
     var result = [];
 
-    var isExclude = exclude.includes(mat.shader)
+    var excludeInfo = exclude[mat.shader];
+
     var mapUniform = mat.mapUniform;
     for (const key in mapUniform)
     {
         var itemValue = mapUniform[key].value;
         if (typeof itemValue == "string" && isFileOfExt(itemValue, imgdescExt))
         {
-            var imgdescPath = path.resolve(path.dirname(matPath), itemValue);
-            result.push({ imgdescPath: imgdescPath, isDiscardAlpha: isExclude });
+            // 判断是否为排除
+            var isDiscardAlpha = false;
+            var useETC1 = true;
+
+            if (excludeInfo && excludeInfo[key])
+            {
+                var textureExcludeInfo = excludeInfo[key];
+                if (textureExcludeInfo.useETC1 !== undefined)
+                {
+                    useETC1 = textureExcludeInfo.useETC1;
+                }
+                if (textureExcludeInfo.isDiscardAlpha !== undefined)
+                {
+                    isDiscardAlpha = textureExcludeInfo.isDiscardAlpha;
+                }
+            }
+            //
+            if (useETC1)
+            {
+                var imgdescPath = path.resolve(path.dirname(matPath), itemValue);
+                result.push({ imgdescPath: imgdescPath, isDiscardAlpha: isDiscardAlpha });
+            }
         }
     }
     return result;
