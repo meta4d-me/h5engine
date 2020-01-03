@@ -27,6 +27,7 @@ const texture2DEtC1Mark = "//texture2DEtC1Mark";
 // 拷贝文件
 if (inDir != outDir)
 {
+    //
     copyFolder(inDir, outDir);
 }
 // 处理shader
@@ -84,6 +85,7 @@ function handleShader(shaderDir)
             for (let i = 0; i < pass.length; i++)
             {
                 glslList.push({
+                    shaderpath: shaderpath,
                     source: path.resolve(path.dirname(shaderpath), pass[i].vs + ".vs.glsl"),
                     target: path.resolve(path.dirname(shaderpath), pass[i].vs + glslExt + ".vs.glsl"),
                     textures: textures
@@ -91,6 +93,7 @@ function handleShader(shaderDir)
                 pass[i].vs += glslExt;
 
                 glslList.push({
+                    shaderpath: shaderpath,
                     source: path.resolve(path.dirname(shaderpath), pass[i].fs + ".fs.glsl"),
                     target: path.resolve(path.dirname(shaderpath), pass[i].fs + glslExt + ".fs.glsl"),
                     textures: textures
@@ -101,11 +104,25 @@ function handleShader(shaderDir)
         writeFile(shaderpath, JSON.stringify(shaderObj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1'));
     });
 
+    var newGLSL = {};
+    var oldGLSL = {};
     //
     for (var i = 0; i < glslList.length; i++)
     {
-        handleGLSL(glslList[i].source, glslList[i].target, glslList[i].textures);
+        if (!newGLSL[glslList[i].target])
+        {
+            handleGLSL(glslList[i].source, glslList[i].target, glslList[i].textures);
+        }
+        oldGLSL[glslList[i].source] = true;
+        newGLSL[glslList[i].target] = true;
     }
+
+    // 删除被替换的GLSL
+    for (const glslpath in oldGLSL)
+    {
+        fs.unlinkSync(glslpath);
+    }
+
     console.log(`转换shader完成！`);
 }
 
@@ -124,20 +141,18 @@ function handleGLSL(source, target, textures)
         var hasTexture2D = false;
         for (var i = 0; i < textures.length; i++)
         {
-            var textureRegExp0 = new RegExp(`\w+\s*\(\s*${textures[i]}`);
-            var textureRegResult = textureRegExp0.exec(shaderStr);
-            while (textureRegResult)
+            shaderStr = shaderStr.replace(new RegExp(`(\\w+)\\s*\\(\\s*${textures[i]}`), (substring, ...args) =>
             {
-                hasTexture2D = true;
-                if (textureRegResult[2] == `texture2D`)
+                if (args[0] == "texture2D")
                 {
-                    shaderStr.replace(textureRegResult[0], `texture2DEtC1(${textures[i]}`);
+                    hasTexture2D = true;
+                    return `texture2DEtC1(${textures[i]}`;
                 } else
                 {
-                    console.warn(`无法处理 ${source} 中 ${textureRegResult[0]}`);
+                    console.warn(`无法处理 ${source} 中 ${substring}`);
                 }
-                textureRegResult = textureRegExp0.exec(shaderStr);
-            }
+                return substring;
+            });
         }
 
         // 替换 texture2DEtC1Mark
