@@ -7,9 +7,9 @@
     "exclude": {
         "diffuse.shader.json": {
             "_MainTex": {
-                // 是否使用ETC1压缩纹理，没有配置时默认为true。
+                // 是否使用ETC1压缩纹理。
                 "useETC1": true,
-                // 压缩ETC1时是否丢弃alpha通道，没有配置时默认为false。当useETC1为true时生效。
+                // 值为true时压缩ETC1时丢弃alpha通道，否则保留。当useETC1为true时生效。
                 "isDiscardAlpha": true
             }
         }
