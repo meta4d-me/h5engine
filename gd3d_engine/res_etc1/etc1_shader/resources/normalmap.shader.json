@@ -1,17 +1,15 @@
 {
 	"layer": "transparent",
 	"properties": [
-        "_MainTex('MainTex',Texture)='white'{}",
-		"_NormalTex('NormalTex',Texture)='white'{}"
-    ],
+		"_MainTex('MainTex',Texture)='white'{}",
+		"_NormalTex('NormalTex',Texture)='white'{}"],
 	"passes": {
 		"base": [
 			{
 				"showface": "all",
-				"vs": "normalmap",
-				"fs": "normalmap"
-			}
-		],
+				"vs": "normalmap_etc1",
+				"fs": "normalmap_etc1"
+			}],
 		"shadowgen": [],
 		"bone": [],
 		"shadowuse": []

@@ -1,39 +1,34 @@
 {
-    "layer": "geometry",
+	"layer": "geometry",
 	"properties": [
-        "_MainTex('MainTex',Texture)='white'{}"
-    ],
-    "passes": {
-        "base": [
-            {
-                "showface": "ccw",
-                "vs": "asi",
-                "fs": "asi"
-            }
-        ],
-        "base_fog": [
-            {
-                "showface": "ccw",
-                "vs": "asi",
-                "fs": "asi"
-            }
-        ],
-        "skin": [
-            {
-                "showface": "ccw",
-                "vs": "asi",
-                "fs": "asi"
-            }
-        ],
-        "skin_fog": [
-            {
-                "showface": "ccw",
-                "vs": "asi",
-                "fs": "asi"
-            }
-        ],
-        "shadowgen": [],
-        "bone": [],
-        "shadowuse": []
-    }
+		"_MainTex('MainTex',Texture)='white'{}"],
+	"passes": {
+		"base": [
+			{
+				"showface": "ccw",
+				"vs": "asi_etc1",
+				"fs": "asi_etc1"
+			}],
+		"base_fog": [
+			{
+				"showface": "ccw",
+				"vs": "asi_etc1",
+				"fs": "asi_etc1"
+			}],
+		"skin": [
+			{
+				"showface": "ccw",
+				"vs": "asi_etc1",
+				"fs": "asi_etc1"
+			}],
+		"skin_fog": [
+			{
+				"showface": "ccw",
+				"vs": "asi_etc1",
+				"fs": "asi_etc1"
+			}],
+		"shadowgen": [],
+		"bone": [],
+		"shadowuse": []
+	}
 }

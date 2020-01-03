@@ -1,24 +1,17 @@
 {
-    "layer": "geometry",
-    "passes": {
-        "base": [
-            {
-                "showface": "all",
-                "vs": "skybox",
-                "fs": "skybox"
-            }
-        ],
-        "base_fog": [
-
-        ],
-        "skin": [
-
-        ],
-        "skin_fog": [
-
-        ],
-        "shadowgen": [],
-        "bone": [],
-        "shadowuse": []
-    }
+	"layer": "geometry",
+	"passes": {
+		"base": [
+			{
+				"showface": "all",
+				"vs": "skybox_etc1",
+				"fs": "skybox_etc1"
+			}],
+		"base_fog": [],
+		"skin": [],
+		"skin_fog": [],
+		"shadowgen": [],
+		"bone": [],
+		"shadowuse": []
+	}
 }
