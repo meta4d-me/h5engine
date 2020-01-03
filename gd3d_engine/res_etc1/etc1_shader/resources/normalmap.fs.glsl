@@ -13,20 +13,7 @@ varying mediump vec2 xlv_TEXCOORD0;
 varying lowp mat3 TBNmat;
 varying highp vec3 worldpos; 
 
-
-
-
-mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
-{
-    uv = uv - floor(uv);
-    uv.y = 1.0 - uv.y;
-    mediump vec2 scale = vec2(1.0,0.5);
-    mediump vec2 offset = vec2(0.0,0.5);
-    return vec4( texture2D(sampler, uv * scale).xyz, texture2D(sampler, uv * scale + offset).x);
-}
-
-
-
+//texture2DEtC1Mark
 
 lowp float calcDiffuse(lowp vec3 N,lowp vec3 worldpos,lowp vec4 lightPos,lowp vec4 lightDir,lowp float cosspot);
 // highp mat3 cotangentFrame(vec3 normal,highp vec3 position,vec2 uv);
@@ -57,7 +44,7 @@ void main()
 		
 		//这是进入切空间的原因
 		lowp vec3 normal;// = TBN*N;
-		normal =  texture2DEtC1(_NormalTex, xlv_TEXCOORD0).xyz *2.0 -1.0;
+		normal =  texture2D(_NormalTex, xlv_TEXCOORD0).xyz *2.0 -1.0;
         normal =normalize(normal);
 		normal =TBN*(normal);
 
@@ -68,7 +55,7 @@ void main()
 	lowp vec4 color = vec4(diff,diff,diff,1.0);       
 
     lowp vec4 tmpvar_3;
-    tmpvar_3 = (color * texture2DEtC1(_MainTex, xlv_TEXCOORD0));
+    tmpvar_3 = (color * texture2D(_MainTex, xlv_TEXCOORD0));
 
     gl_FragData[0] = tmpvar_3;
 }

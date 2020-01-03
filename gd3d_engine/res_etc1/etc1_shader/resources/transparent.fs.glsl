@@ -8,24 +8,11 @@ uniform lowp vec4 glstate_fog_color;
 varying lowp float factor;
 #endif
 
-
-
-
-mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
-{
-    uv = uv - floor(uv);
-    uv.y = 1.0 - uv.y;
-    mediump vec2 scale = vec2(1.0,0.5);
-    mediump vec2 offset = vec2(0.0,0.5);
-    return vec4( texture2D(sampler, uv * scale).xyz, texture2D(sampler, uv * scale + offset).x);
-}
-
-
-
+//texture2DEtC1Mark
 
 void main() 
 {
-    lowp vec4 emission = texture2DEtC1(_MainTex, xlv_TEXCOORD0);
+    lowp vec4 emission = texture2D(_MainTex, xlv_TEXCOORD0);
     emission.a=emission.a*_Alpha;
     emission.xyz *= _Superimposition;
     //----------------------------------------------------------

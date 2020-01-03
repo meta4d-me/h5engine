@@ -10,20 +10,7 @@ varying lowp vec3 vNormal;
 varying mediump vec2 xlv_TEXCOORD0;
 varying lowp vec3 vEyepos;
 
-
-
-
-mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
-{
-    uv = uv - floor(uv);
-    uv.y = 1.0 - uv.y;
-    mediump vec2 scale = vec2(1.0,0.5);
-    mediump vec2 offset = vec2(0.0,0.5);
-    return vec4( texture2D(sampler, uv * scale).xyz, texture2D(sampler, uv * scale + offset).x);
-}
-
-
-
+//texture2DEtC1Mark
 
 
 //calcDiffuse 计算漫反射强度函数
@@ -88,7 +75,7 @@ void main()
     lowp vec4 col_1;    
     lowp vec4 prev_2;
     lowp vec4 tmpvar_3;
-    tmpvar_3 = (xlv_COLOR * texture2DEtC1(_MainTex, xlv_TEXCOORD0));
+    tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));
 
     prev_2 = tmpvar_3;
     lowp vec4 tmpvar_4;

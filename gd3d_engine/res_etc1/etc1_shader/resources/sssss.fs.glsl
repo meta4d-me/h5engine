@@ -25,18 +25,7 @@ const float UnpackDownscale = 255. / 256.;
 const vec3 PackFactors = vec3( 256. * 256. * 256., 256. * 256.,  256. );
 const vec4 UnpackFactors = UnpackDownscale / vec4( PackFactors, 1. );
 
-
-
-
-vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
-{
-    uv = uv - floor(uv);
-    uv.y = 1.0 - uv.y;
-    return vec4( texture2D(sampler, uv * vec2(1.0,0.5)).xyz, texture2D(sampler, uv * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
-}
-                
-
-
+//texture2DEtC1Mark
 
 float unpackRGBAToDepth( const in vec4 v )
 {
@@ -60,16 +49,16 @@ vec4 blur(vec2 _step) {
     o[4] = 0.6667;
     o[5] = 1.0;
     // Fetch color and depth for current pixel
-    vec4 curColor = texture2DEtC1(_MainTex, xlv_TEXCOORD0);
-    float curDepth = unpackRGBAToDepth(texture2DEtC1(_DepthTex, xlv_TEXCOORD0));
+    vec4 curColor = texture2D(_MainTex, xlv_TEXCOORD0);
+    float curDepth = unpackRGBAToDepth(texture2D(_DepthTex, xlv_TEXCOORD0));
     vec4 blur = curColor;
     blur.rgb *= 0.382;
     vec2 finalStep = curColor.a * _step;
 
     for(int i = 0; i < 6; i++) {
         vec2 offset = xlv_TEXCOORD0 + o[i] * finalStep;
-        vec3 color = texture2DEtC1(_MainTex, offset).rgb;
-        float depth = unpackRGBAToDepth(texture2DEtC1(_DepthTex, offset));
+        vec3 color = texture2D(_MainTex, offset).rgb;
+        float depth = unpackRGBAToDepth(texture2D(_DepthTex, offset));
 
         // if the difference in depth is huge, we mix color back to center color:
         float s = min(abs(curDepth - depth) * DEPTH_CORRECTION, 1.0);
@@ -85,7 +74,7 @@ vec4 blur(vec2 _step) {
 
 
 void main () {
-    vec4 color = texture2DEtC1(_MainTex, xlv_TEXCOORD0);
+    vec4 color = texture2D(_MainTex, xlv_TEXCOORD0);
     vec4 cblur = blur(_MainTex_TexelSize.xy * _BlurDirection.xy * BLUR_WIDTH * 1.);
     gl_FragColor = color + cblur * BLUR_W_RGBA;
 

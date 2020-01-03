@@ -15,20 +15,7 @@ varying lowp vec3 vNormal;
 varying mediump vec2 xlv_TEXCOORD0;
 varying lowp vec3 vEyepos;
 
-
-
-
-mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
-{
-    uv = uv - floor(uv);
-    uv.y = 1.0 - uv.y;
-    mediump vec2 scale = vec2(1.0,0.5);
-    mediump vec2 offset = vec2(0.0,0.5);
-    return vec4( texture2D(sampler, uv * scale).xyz, texture2D(sampler, uv * scale + offset).x);
-}
-
-
-
+//texture2DEtC1Mark
 
 
 void main()
@@ -45,7 +32,7 @@ void main()
     lowp mat4 vnormalMat = glstate_matrix_model;
     vnormalMat[3] =vec4(0,0,0,1);
     xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;
-    lowp vec3 NormalMap = texture2DEtC1(_NormalTex, xlv_TEXCOORD0).rgb;
+    lowp vec3 NormalMap = texture2D(_NormalTex, xlv_TEXCOORD0).rgb;
     lowp vec3 N = normalize(NormalMap * 2.0 - vec3(1.0));
 
     vNormal =normalize((vec4(_glesNormal,1)*vnormalMat).xyz);

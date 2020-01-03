@@ -9,18 +9,7 @@ uniform lowp float _Level;
 uniform lowp float _CenterX;
 uniform lowp float _CenterY;
 varying highp vec2 xlv_TEXCOORD0;
-
-
-
-vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
-{
-    uv = uv - floor(uv);
-    uv.y = 1.0 - uv.y;
-    return vec4( texture2D(sampler, uv * vec2(1.0,0.5)).xyz, texture2D(sampler, uv * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
-}
-                
-
-
+//texture2DEtC1Mark
 
 void main()
 {
@@ -30,7 +19,7 @@ void main()
     for (lowp float i = 0.0; i < 100.0; i++)// for循环只能用i与常量比较
     {
         if (i >= _Level) break;// 在这里跳出循环
-        tmp += texture2DEtC1(_MainTex, uv * (1.0 - 0.002 * i) + center).xyz;
+        tmp += texture2D(_MainTex, uv * (1.0 - 0.002 * i) + center).xyz;
     }
     lowp vec4 col = vec4(tmp.xyz / _Level, 1);
     gl_FragData[0] = col;

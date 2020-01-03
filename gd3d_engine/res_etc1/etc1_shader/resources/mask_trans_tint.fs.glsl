@@ -8,20 +8,7 @@ varying mediump vec2 _mask_uv;
 uniform lowp float _mixColorRate;
 uniform lowp float _mixAlphaRate;
 
-
-
-
-mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
-{
-    uv = uv - floor(uv);
-    uv.y = 1.0 - uv.y;
-    mediump vec2 scale = vec2(1.0,0.5);
-    mediump vec2 offset = vec2(0.0,0.5);
-    return vec4( texture2D(sampler, uv * scale).xyz, texture2D(sampler, uv * scale + offset).x);
-}
-
-
-
+//texture2DEtC1Mark
 
 #ifdef LIGHTMAP
 uniform lowp sampler2D _LightmapTex;
@@ -39,8 +26,8 @@ varying lowp float factor;
 #endif
 void main()    
 {
-    highp vec4 basecolor=texture2DEtC1(_MainTex,_maintex_uv);
-    highp vec4 maskcolor=texture2DEtC1(_Mask,_mask_uv);
+    highp vec4 basecolor=texture2D(_MainTex,_maintex_uv);
+    highp vec4 maskcolor=texture2D(_Mask,_mask_uv);
 
     lowp vec3 tempcolor=_Main_Color.rgb*basecolor.rgb*maskcolor.rgb*_mixColorRate;
     lowp float tempAlpha=_Main_Color.a*basecolor.a*maskcolor.a*_mixAlphaRate;
@@ -48,7 +35,7 @@ void main()
 
     //----------------------------------------------------------
     #ifdef LIGHTMAP
-    lowp vec4 lightmap = texture2DEtC1(_LightmapTex, lightmap_TEXCOORD);
+    lowp vec4 lightmap = texture2D(_LightmapTex, lightmap_TEXCOORD);
     emission.xyz *= decode_hdr(lightmap);
     #endif
 

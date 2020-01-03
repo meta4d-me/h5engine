@@ -22,29 +22,16 @@ uniform lowp vec4 glstate_fog_color;
 varying lowp float factor;
 #endif
 
-
-
-
-mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
-{
-    uv = uv - floor(uv);
-    uv.y = 1.0 - uv.y;
-    mediump vec2 scale = vec2(1.0,0.5);
-    mediump vec2 offset = vec2(0.0,0.5);
-    return vec4( texture2D(sampler, uv * scale).xyz, texture2D(sampler, uv * scale + offset).x);
-}
-
-
-
+//texture2DEtC1Mark
 
 void main() 
 {
-    lowp vec4 emission = texture2DEtC1(_MainTex, xlv_TEXCOORD0);
+    lowp vec4 emission = texture2D(_MainTex, xlv_TEXCOORD0);
     if(emission.a < _AlphaCut)
         discard;
 
     #ifdef LIGHTMAP
-    lowp vec4 lightmap = texture2DEtC1(_LightmapTex, lightmap_TEXCOORD);
+    lowp vec4 lightmap = texture2D(_LightmapTex, lightmap_TEXCOORD);
     emission.xyz *= decode_hdr(lightmap);
     #endif
 
@@ -52,8 +39,8 @@ void main()
     emission.xyz = mix(glstate_fog_color.rgb, emission.rgb, factor);
     #endif
 
-    lowp vec4 light = texture2DEtC1(_LightTex, _StreamLightUV) * _LightColor * _LightRate;
-    lowp vec4 mask = texture2DEtC1(_MaskTex, xlv_TEXCOORD0);
+    lowp vec4 light = texture2D(_LightTex, _StreamLightUV) * _LightColor * _LightRate;
+    lowp vec4 mask = texture2D(_MaskTex, xlv_TEXCOORD0);
     light = min(light,mask);
 
     emission.rgb += light.rgb;

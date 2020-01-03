@@ -21,20 +21,9 @@ varying highp vec2      xlv_TEXCOORD0;   // 每个片元的纹素坐标
 #define THRESHOLD       _bloomThreshold
 #define BLUR_SPREAD     vec2(_blurSpread.xy * _MainTex_TexelSize.xy)
 
-#define tex(t, uv)      texture2DEtC1((t), (uv))
+#define tex(t, uv)      texture2D((t), (uv))
 
-
-
-
-vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
-{
-    uv = uv - floor(uv);
-    uv.y = 1.0 - uv.y;
-    return vec4( texture2D(sampler, uv * vec2(1.0,0.5)).xyz, texture2D(sampler, uv * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
-}
-                
-
-
+//texture2DEtC1Mark
 
 float luminance(vec3 rgb) {
     const vec3 w = vec3(0.2125, 0.7154, 0.0721);
@@ -48,10 +37,10 @@ vec4 fragDownsample(sampler2D image, vec2 uv) {
     uv2[2] = uv + _MainTex_TexelSize.xy * vec2(-1.5, -1.5);
     uv2[3] = uv + _MainTex_TexelSize.xy * vec2(1.5, -1.5);
     vec4 color;
-    color += texture2DEtC1(image, uv2[0]);
-    color += texture2DEtC1(image, uv2[1]);
-    color += texture2DEtC1(image, uv2[2]);
-    color += texture2DEtC1(image, uv2[3]);
+    color += texture2D(image, uv2[0]);
+    color += texture2D(image, uv2[1]);
+    color += texture2D(image, uv2[2]);
+    color += texture2D(image, uv2[3]);
     return max(color/4.0 - THRESHOLD, vec4(0.0)) * INTENSITY;
 }
 vec4 fastBlur(sampler2D image, vec2 uv, vec2 netFilterWidth) {
@@ -87,13 +76,13 @@ void main () {
     } else if(THRESHOLD == 1.0){    // 不过滤, 只泛光
         gl_FragColor = fastBlur(_MainTex, xlv_TEXCOORD0, BLUR_SPREAD);
     } else {    // Final Composition
-        vec4 originColor = texture2DEtC1(_MainTex, xlv_TEXCOORD0);
+        vec4 originColor = texture2D(_MainTex, xlv_TEXCOORD0);
         originColor = vec4(originColor.rgb * INTENSITY, originColor.a);
-        vec4 bloomColor = texture2DEtC1(_BlurTex, xlv_TEXCOORD0);
+        vec4 bloomColor = texture2D(_BlurTex, xlv_TEXCOORD0);
         gl_FragColor = originColor + bloomColor;
     }
 
-    // vec4 c = texture2DEtC1(_MainTex, xlv_TEXCOORD0);
+    // vec4 c = texture2D(_MainTex, xlv_TEXCOORD0);
     // vec4 cur_color;
     // cur_color = fastBlur(_MainTex, xlv_TEXCOORD0,BLUR_SPREAD);
     //

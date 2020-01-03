@@ -10,18 +10,7 @@ varying highp vec2 xlv_TEXCOORD0;
 
 const int num_iter = 20;
 
-
-
-
-vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
-{
-    uv = uv - floor(uv);
-    uv.y = 1.0 - uv.y;
-    return vec4( texture2D(sampler, uv * vec2(1.0,0.5)).xyz, texture2D(sampler, uv * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
-}
-                
-
-
+//texture2DEtC1Mark
 
 vec2 barrelDistortion(vec2 coord, float amt)
 {
@@ -61,7 +50,7 @@ void main()
         float t = float(i) * reci_num_iter_f;
         vec3 w = spectrum_offset(t);
         sumw += w;
-        sumcol += w * texture2DEtC1(_MainTex, barrelDistortion(uv, _Power * t)).rgb;
+        sumcol += w * texture2D(_MainTex, barrelDistortion(uv, _Power * t)).rgb;
     }
 
     gl_FragData[0] = vec4(sumcol.rgb / sumw, 1.0);

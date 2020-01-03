@@ -7,20 +7,7 @@ varying highp vec2 xlv_TEXCOORD0;
 
 const lowp float max_Num = 100.0;
 
-
-
-
-mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
-{
-    uv = uv - floor(uv);
-    uv.y = 1.0 - uv.y;
-    mediump vec2 scale = vec2(1.0,0.5);
-    mediump vec2 offset = vec2(0.0,0.5);
-    return vec4( texture2D(sampler, uv * scale).xyz, texture2D(sampler, uv * scale + offset).x);
-}
-
-
-
+//texture2DEtC1Mark
 
 //高斯模糊 算法获取权重矩阵 rx ,ry 以当前采样点 为原点的相对坐标
 lowp float getGausWeight(lowp float rx,lowp float ry)
@@ -55,7 +42,7 @@ void main()
 			tx = rx * _MainTex_TexelSize.x * _BlurGap;
 			ty = ry * _MainTex_TexelSize.y * _BlurGap;
 			tempWeight = getGausWeight(rx,ry);
-			sample = texture2DEtC1(_MainTex,vec2(xlv_TEXCOORD0.x + tx ,xlv_TEXCOORD0.y + ty));   
+			sample = texture2D(_MainTex,vec2(xlv_TEXCOORD0.x + tx ,xlv_TEXCOORD0.y + ty));   
 			color +=sample * tempWeight;  
 			sum += tempWeight; 
 		}

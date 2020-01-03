@@ -23,18 +23,7 @@ varying mediump vec2 xlv_TEXCOORD0;
 varying mediump vec2 lightmap_TEXCOORD;
 
 
-
-
-
-vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
-{
-    uv = uv - floor(uv);
-    uv.y = 1.0 - uv.y;
-    return vec4( texture2D(sampler, uv * vec2(1.0,0.5)).xyz, texture2D(sampler, uv * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
-}
-                
-
-
+//texture2DEtC1Mark
 
 
 #ifdef FOG
@@ -60,10 +49,10 @@ uniform highp vec4 boneSampler_TexelSize;
 mat4 readMatrixSampler(sampler2D smp, float index) {
     float offset = index * 4.;
     return mat4(
-		texture2DEtC1(smp, vec2(boneSamplerTexelSize * (offset + 0.5), 0)),
-		texture2DEtC1(smp, vec2(boneSamplerTexelSize * (offset + 1.5), 0)),
-		texture2DEtC1(smp, vec2(boneSamplerTexelSize * (offset + 2.5), 0)),
-		texture2DEtC1(smp, vec2(boneSamplerTexelSize * (offset + 3.5), 0))
+		texture2D(smp, vec2(boneSamplerTexelSize * (offset + 0.5), 0)),
+		texture2D(smp, vec2(boneSamplerTexelSize * (offset + 1.5), 0)),
+		texture2D(smp, vec2(boneSamplerTexelSize * (offset + 2.5), 0)),
+		texture2D(smp, vec2(boneSamplerTexelSize * (offset + 3.5), 0))
 		);
 }
 highp vec4 calcVertexF4(highp vec4 srcVertex) {
@@ -134,7 +123,7 @@ void main()
 	// 		+ _glesBlendWeight4.y * glstate_matrix_bones[int(_glesBlendIndex4.y)]
 	// 		+ _glesBlendWeight4.z * glstate_matrix_bones[int(_glesBlendIndex4.z)]
 	// 		+ _glesBlendWeight4.w * glstate_matrix_bones[int(_glesBlendIndex4.w)];
-	vcolor = vec4(texture2DEtC1(boneSampler, _glesVertex.xz / vec2(8., 0)/ 3.).rgb, 1);
+	vcolor = vec4(texture2D(boneSampler, _glesVertex.xz / vec2(8., 0)/ 3.).rgb, 1);
     // xlv_TEXCOORD0 = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;
     highp vec4 position=vec4(_glesVertex.xyz,1.0);
 
