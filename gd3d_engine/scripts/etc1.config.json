@@ -4,9 +4,11 @@
     // shader输出文件夹
     "shaderOutDir": "D:/work/enginesource/gd3d_engine/res_etc1/etc1_shader",
     // shader排除列表
-    "exclude": [
-        "diffuse.shader.json"
-    ],
+    "exclude": {
+        "diffuse.shader.json": [
+            "_MainTex"
+        ]
+    },
     // 资源输入文件夹
     "assetInDir": "D:/work/enginesource/gd3d_engine/res/prefabs/test_ktx",
     // 资源输出文件夹

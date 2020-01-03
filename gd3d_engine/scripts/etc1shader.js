@@ -40,68 +40,128 @@ handleShader(outDir);
 function handleShader(shaderDir)
 {
     var filepaths = getFilePaths(shaderDir);
-    var shaderPaths = filepaths.filter(path => (!!shaderRegExp.exec(path) && !isExclude(path)));
+    var shaderPaths = filepaths.filter(path => !!shaderRegExp.exec(path));
 
     // shader中包含的glsl列表
     var glslList = [];
 
     shaderPaths.forEach(shaderpath =>
     {
+        var excludeInfo = exclude[path.basename(shaderpath)];
+        // 排除属性列表
+        var excludeProperties = excludeInfo ? excludeInfo : [];
+        var glslExt = "_etc1";
+        if (excludeProperties.length > 0)
+            glslExt += excludeProperties.join("_");
+
         var shaderStr = readFile(shaderpath);
         var shaderObj = JSON.parse(shaderStr);
         var properties = shaderObj.properties;
         // shader中包含的纹理列表
+        var textures = [];
         if (properties)
         {
-            var textures = properties.reduce((pv, cv) =>
+            textures = properties.reduce((pv, cv) =>
             {
                 var result = textureExp.exec(cv);
                 if (!!result) pv.push(result[1]); return pv;
             }, []);
         }
+        // 处理排除纹理
+        for (var i = 0; i < excludeProperties.length; i++)
+        {
+            var index = textures.indexOf(excludeProperties[i]);
+            if (index != -1)
+            {
+                textures.splice(index, 1);
+            }
+        }
 
+        //
         for (const passName in shaderObj.passes)
         {
             var pass = shaderObj.passes[passName];
             for (let i = 0; i < pass.length; i++)
             {
-                var vsglsl = pass[i].vs + ".vs.glsl";
-                vsglsl = path.resolve(path.dirname(shaderpath), vsglsl);
-                if (!glslList.includes(vsglsl)) glslList.push(vsglsl);
-                var fsglsl = pass[i].fs + ".fs.glsl";
-                fsglsl = path.resolve(path.dirname(shaderpath), fsglsl);
-                if (!glslList.includes(fsglsl)) glslList.push(fsglsl);
-            }
+                glslList.push({
+                    source: path.resolve(path.dirname(shaderpath), pass[i].vs + ".vs.glsl"),
+                    target: path.resolve(path.dirname(shaderpath), pass[i].vs + glslExt + ".vs.glsl"),
+                    textures: textures
+                });
+                pass[i].vs += glslExt;
 
+                glslList.push({
+                    source: path.resolve(path.dirname(shaderpath), pass[i].fs + ".fs.glsl"),
+                    target: path.resolve(path.dirname(shaderpath), pass[i].fs + glslExt + ".fs.glsl"),
+                    textures: textures
+                });
+                pass[i].fs += glslExt;
+            }
         }
+        writeFile(shaderpath, JSON.stringify(shaderObj, null, '\t').replace(/[\n\t]+([\d\.e\-\[\]]+)/g, '$1'));
     });
 
-    glslList.forEach(path =>
+    //
+    for (var i = 0; i < glslList.length; i++)
     {
-        var shaderStr = readFile(path);
-        if (shaderStr.includes(texture2DEtC1Mark))
-        {
-            shaderStr = shaderStr.replace(texture2DRegExp, `texture2DEtC1(`);
+        handleGLSL(glslList[i].source, glslList[i].target, glslList[i].textures);
+    }
+    console.log(`转换shader完成！`);
+}
 
+/**
+ * 处理GLSL
+ * 
+ * @param {string} source 原始路径
+ * @param {string} target 目标路径
+ * @param {string[]} textures 需要转换的纹理
+ */
+function handleGLSL(source, target, textures)
+{
+    var shaderStr = readFile(source);
+    if (textures.length > 0 && shaderStr.includes(texture2DEtC1Mark))
+    {
+        var hasTexture2D = false;
+        for (var i = 0; i < textures.length; i++)
+        {
+            var textureRegExp0 = new RegExp(`\w+\s*\(\s*${textures[i]}`);
+            var textureRegResult = textureRegExp0.exec(shaderStr);
+            while (textureRegResult)
+            {
+                hasTexture2D = true;
+                if (textureRegResult[2] == `texture2D`)
+                {
+                    shaderStr.replace(textureRegResult[0], `texture2DEtC1(${textures[i]}`);
+                } else
+                {
+                    console.warn(`无法处理 ${source} 中 ${textureRegResult[0]}`);
+                }
+                textureRegResult = textureRegExp0.exec(shaderStr);
+            }
+        }
+
+        // 替换 texture2DEtC1Mark
+        if (hasTexture2D)
+        {
             var texture2DEtC1Str = `
 vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
 {
-    uv = uv - floor(uv);
-    uv.y = 1.0 - uv.y;
-    return vec4( texture2D(sampler, uv * vec2(1.0,0.5)).xyz, texture2D(sampler, uv * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
+uv = uv - floor(uv);
+uv.y = 1.0 - uv.y;
+return vec4( texture2D(sampler, uv * vec2(1.0,0.5)).xyz, texture2D(sampler, uv * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
 }
-                `;
+            `;
 
             if (!precisionExp.exec(shaderStr))
             {
                 texture2DEtC1Str = `
 mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
 {
-    uv = uv - floor(uv);
-    uv.y = 1.0 - uv.y;
-    mediump vec2 scale = vec2(1.0,0.5);
-    mediump vec2 offset = vec2(0.0,0.5);
-    return vec4( texture2D(sampler, uv * scale).xyz, texture2D(sampler, uv * scale + offset).x);
+uv = uv - floor(uv);
+uv.y = 1.0 - uv.y;
+mediump vec2 scale = vec2(1.0,0.5);
+mediump vec2 offset = vec2(0.0,0.5);
+return vec4( texture2D(sampler, uv * scale).xyz, texture2D(sampler, uv * scale + offset).x);
 }
 `;
             }
@@ -112,16 +172,8 @@ mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
 ${texture2DEtC1Str}
 `);
         }
-        writeFile(path, shaderStr);
-    });
-    console.log(`转换shader完成！`);
-}
-
-function isExclude(pathStr)
-{
-    var basename = path.basename(pathStr);
-    var result = exclude.includes(basename);
-    return result;
+    }
+    writeFile(target, shaderStr);
 }
 
 function makeDir(dir)
