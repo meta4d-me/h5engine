@@ -112,28 +112,14 @@ function getImgdescFromMat(matPath, exclude)
         var itemValue = mapUniform[key].value;
         if (typeof itemValue == "string" && isFileOfExt(itemValue, imgdescExt))
         {
-            // 判断是否为排除
             var isDiscardAlpha = false;
-            var useETC1 = true;
-
-            if (excludeInfo && excludeInfo[key])
+            if (excludeInfo && excludeInfo.includes(key))
             {
-                var textureExcludeInfo = excludeInfo[key];
-                if (textureExcludeInfo.useETC1 !== undefined)
-                {
-                    useETC1 = textureExcludeInfo.useETC1;
-                }
-                if (textureExcludeInfo.isDiscardAlpha !== undefined)
-                {
-                    isDiscardAlpha = textureExcludeInfo.isDiscardAlpha;
-                }
+                isDiscardAlpha = true;
             }
             //
-            if (useETC1)
-            {
-                var imgdescPath = path.resolve(path.dirname(matPath), itemValue);
-                result.push({ imgdescPath: imgdescPath, isDiscardAlpha: isDiscardAlpha });
-            }
+            var imgdescPath = path.resolve(path.dirname(matPath), itemValue);
+            result.push({ imgdescPath: imgdescPath, isDiscardAlpha: isDiscardAlpha });
         }
     }
     return result;

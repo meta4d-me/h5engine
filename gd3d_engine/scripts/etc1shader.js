@@ -48,31 +48,7 @@ function handleShader(shaderDir)
     {
         var excludeInfo = exclude[path.basename(shaderpath)];
         // 排除属性列表
-        var excludeProperties = [];
-        if (excludeInfo)
-        {
-            for (const key in excludeInfo)
-            {
-                // 判断是否为排除
-                var isDiscardAlpha = false;
-                var useETC1 = true;
-                const textureExcludeInfo = excludeInfo[key];
-                if (textureExcludeInfo.useETC1 !== undefined)
-                {
-                    useETC1 = textureExcludeInfo.useETC1;
-                }
-                if (textureExcludeInfo.isDiscardAlpha !== undefined)
-                {
-                    isDiscardAlpha = textureExcludeInfo.isDiscardAlpha;
-                }
-                // 当使用 不使用ETC1 或者 丢弃alpha通道时，不需要修改采样方式，进去排除属性列表
-                if (!useETC1 || isDiscardAlpha)
-                {
-                    excludeProperties.push(key);
-                }
-            }
-        }
-
+        var excludeProperties = excludeInfo ? Object.keys(excludeInfo) : [];
         var glslExt = "_etc1";
         if (excludeProperties.length > 0)
             glslExt += excludeProperties.join("_");

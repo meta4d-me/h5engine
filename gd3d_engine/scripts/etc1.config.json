@@ -5,14 +5,9 @@
     "shaderOutDir": "D:/work/enginesource/gd3d_engine/res_etc1/etc1_shader",
     // shader排除列表
     "exclude": {
-        "diffuse.shader.json": {
-            "_MainTex": {
-                // 是否使用ETC1压缩纹理。
-                "useETC1": true,
-                // 值为true时压缩ETC1时丢弃alpha通道，否则保留。当useETC1为true时生效。
-                "isDiscardAlpha": true
-            }
-        }
+        "diffuse.shader.json": [
+            "_MainTex"
+        ]
     },
     // 资源输入文件夹
     "assetInDir": "D:/work/enginesource/gd3d_engine/res/prefabs/test_ktx",
@@ -25,9 +20,11 @@
 //     // shader输出文件夹
 //     "shaderOutDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/shader/customShader_ETC1",
 //     // shader排除列表
-//     "exclude": [
-//         "diffuse.shader.json"
-//     ],
+//     "exclude": {
+//         "actionlinecaustics.shader.json": [
+//             "_MainTex" 
+//         ]
+//     },
 //     // 资源输入文件夹
 //     "assetInDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/props/PC",
 //     // 资源输出文件夹
