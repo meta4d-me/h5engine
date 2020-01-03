@@ -1,5 +1,5 @@
 // 修改Shader使其支持ETC1包含透明度的压缩纹理
-
+const { execFile } = require('child_process');
 var fs = require("fs");
 var path = require('path');
 
@@ -25,13 +25,11 @@ const textureExp = /(\w+)\([\'\"\w\s]+\,\s*Texture\s*\)/;
 const texture2DEtC1Mark = "//texture2DEtC1Mark";
 
 // 拷贝文件
-if (inDir != outDir)
-{
-    //
-    copyFolder(inDir, outDir);
-}
-// 处理shader
+copyFolder(inDir, outDir);
+// 转换ETC1shader
 handleShader(outDir);
+// 调用ShaderPackTool.exe
+callShaderPackTool(outDir);
 
 /**
  * 处理shader
@@ -191,6 +189,29 @@ ${texture2DEtC1Str}
     writeFile(target, shaderStr);
 }
 
+function callShaderPackTool(outDir)
+{
+    console.log(`调用ShaderPackTool.exe`);
+    var exePath = path.resolve(outDir, "ShaderPackTool.exe");
+
+    if (!fs.existsSync(exePath))
+    {
+        console.warn(`应用程序 ${exePath} 不存在！`)
+        return;
+    }
+    var exeDir = path.dirname(exePath)
+    execFile(exePath, [], { cwd: exeDir }, function (err, data)
+    // execFile(exePath, function (err, data)
+    {
+        if (err)
+        {
+            console.log(`调用ShaderPackTool.exe错误，请手动执行 ${exePath}`);
+        }
+
+        console.log(data.toString());
+    });
+}
+
 function makeDir(dir)
 {
     if (fs.existsSync(dir)) return;
@@ -203,6 +224,8 @@ function makeDir(dir)
 
 function copyFolder(inDir, outDir)
 {
+    if (inDir == outDir) return;
+
     console.log(`开始拷贝文件。`);
     var filepaths = getFilePaths(inDir);
     var len = filepaths.length;
