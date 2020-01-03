@@ -24,7 +24,7 @@ var outDir = config.assetOutDir;
 var exclude = config.exclude;
 
 var exePath = path.resolve(__dirname, "tools/etcpack.exe");
-var exeDir = path.dirname(exePath);
+var convertPath = path.resolve(__dirname, "tools/convert.exe");
 // var outDir = path.resolve(__dirname, "out");
 // var input = path.resolve(__dirname, "t_0012lvyeshu_obj_p_d.png");
 // var input = path.resolve(__dirname, "orange.JPG");
@@ -161,21 +161,27 @@ function etcpackImgdesc(imgdescPath, isDiscardAlpha, callback)
         return;
     }
 
-    var newImgName = imgName.substring(0, dotIndex + 1) + "ktx";
-    etcpack(imgPath, path.dirname(imgPath), isDiscardAlpha, (err) =>
+    // 翻转图片
+    filpImage(imgPath, (err) =>
     {
-        if (err)
+        // 压缩ETC1
+        var newImgName = imgName.substring(0, dotIndex + 1) + "ktx";
+        etcpack(imgPath, path.dirname(imgPath), isDiscardAlpha, (err) =>
         {
+            if (err)
+            {
+                callback();
+                return;
+            }
+            // 删除原图片
+            fs.unlinkSync(imgPath);
+            //
+            imgdesc.name = newImgName;
+            writeFile(imgdescPath, JSON.stringify(imgdesc));
             callback();
-            return;
-        }
-        // 删除原图片
-        fs.unlinkSync(imgPath);
-        //
-        imgdesc.name = newImgName;
-        writeFile(imgdescPath, JSON.stringify(imgdesc));
-        callback();
+        });
     });
+
 }
 
 /**
@@ -192,11 +198,30 @@ function etcpack(input, outDir, isDiscardAlpha, callback)
     if (!isDiscardAlpha)
         args.push("-aa");
 
+    var exeDir = path.dirname(exePath);
+
     execFile(exePath, args, { cwd: exeDir }, function (err, data)
     {
         callback && callback(err);
 
         console.log(data.toString());
+    });
+}
+
+function filpImage(imgPath, callback)
+{
+    var exeDir = path.dirname(convertPath);
+
+    var args = [imgPath, "-flip", imgPath];
+
+    execFile(convertPath, args, { cwd: exeDir }, function (err, data)
+    {
+        if (err)
+            console.log(`error: ` + err);
+
+        console.log(data.toString());
+
+        callback && callback();
     });
 }
 
