@@ -8222,7 +8222,6 @@ var gd3d;
                     console.warn('number of faces expected' + facesExpected + ', but found ' + numberOfFaces);
                     return null;
                 }
-                console.assert(numberOfFaces == 1, "\u4E0D\u652F\u6301\u5904\u7406KTX\u4E2D numberOfFaces > 1 \u7684\u60C5\u51B5\uFF01");
                 var t2d = new gd3d.render.glTexture2D(gl);
                 t2d.format = gd3d.render.TextureFormatEnum.KTX;
                 var target = gl.TEXTURE_2D;
@@ -31249,7 +31248,6 @@ var gd3d;
                         var particle = this._activeParticles[i];
                         data.push(particle.position.x, particle.position.y, particle.position.z, 1, particle.size.x, particle.size.y, particle.size.z, 1, particle.rotation.x, particle.rotation.y, (isbillboard ? -1 : 1) * particle.rotation.z, 1, particle.color.r, particle.color.g, particle.color.b, particle.color.a, particle.tilingOffset.x, particle.tilingOffset.y, particle.tilingOffset.z, particle.tilingOffset.w, particle.flipUV.x, particle.flipUV.y, 0, 0);
                     }
-                    console.assert(data.length == 24 * this._activeParticles.length);
                     var stride = this._attributes.reduce(function (pv, cv) { return pv += cv[1]; }, 0) * 4;
                     if (isSupportDrawInstancedArrays && this.particleCount > 0) {
                         var vbo = this._getVBO(context.webgl);
@@ -38214,7 +38212,6 @@ var gd3d;
             };
             ClassUtils.getInstanceByName = function (name) {
                 var cls = this.getDefinitionByName(name);
-                console.assert(cls);
                 if (!cls)
                     return undefined;
                 return new cls();
@@ -38875,7 +38872,6 @@ var gd3d;
                     var tpv = target[property];
                     var spv = source[property];
                     if (Array.isArray(spv)) {
-                        console.assert(!!tpv);
                         var keys = Object.keys(spv);
                         keys.forEach(function (key) {
                             propertyHandler(tpv, spv, key, handlers, serialization);
@@ -38904,7 +38900,6 @@ var gd3d;
                     var tpv = target[property];
                     var spv = source[property];
                     if (framework.ObjectUtil.isObject(spv) && spv[framework.CLASS_KEY] == undefined) {
-                        console.assert(!!tpv);
                         var keys = Object.keys(spv);
                         keys.forEach(function (key) {
                             propertyHandler(tpv, spv, key, handlers, serialization);

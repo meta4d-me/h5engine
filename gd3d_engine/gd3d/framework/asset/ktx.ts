@@ -88,9 +88,6 @@ namespace gd3d.framework
                 return null;
             }
 
-            console.assert(numberOfFaces == 1, `不支持处理KTX中 numberOfFaces > 1 的情况！`)
-
-
             // 初始化纹理
             var t2d = new gd3d.render.glTexture2D(gl);
             t2d.format = gd3d.render.TextureFormatEnum.KTX;
