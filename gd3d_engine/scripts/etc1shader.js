@@ -10,6 +10,7 @@ eval(`config =` + configStr);
 var inDir = config.shaderInDir;
 var outDir = config.shaderOutDir;
 var exclude = config.exclude;
+var unUseETC1 = config.unUseETC1;
 
 const shaderRegExp = /([\w\d]+)\.(shader)\.json/;
 const texture2DRegExp = /texture2D\s*\(/g;
@@ -46,7 +47,14 @@ function handleShader(shaderDir)
 
     shaderPaths.forEach(shaderpath =>
     {
-        var excludeInfo = exclude[path.basename(shaderpath)];
+        var shadername = path.basename(shaderpath);
+
+        if (unUseETC1.includes(shadername))
+        {
+            return;
+        }
+
+        var excludeInfo = exclude[shadername];
         // 排除属性列表
         var excludeProperties = excludeInfo ? excludeInfo : [];
         var glslExt = "_etc1";

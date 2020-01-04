@@ -22,6 +22,7 @@ eval(`config =` + configStr);
 var inDir = config.assetInDir;
 var outDir = config.assetOutDir;
 var exclude = config.exclude;
+var unUseETC1 = config.unUseETC1;
 
 var exePath = path.resolve(__dirname, "tools/etcpack.exe");
 var convertPath = path.resolve(__dirname, "tools/convert.exe");
@@ -105,6 +106,11 @@ function getImgdescFromMat(matPath, exclude)
     var result = [];
 
     var excludeInfo = exclude[mat.shader];
+
+    if (unUseETC1.includes(mat.shader))
+    {
+        return;
+    }
 
     var mapUniform = mat.mapUniform;
     for (const key in mapUniform)
