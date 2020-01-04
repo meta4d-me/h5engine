@@ -100,7 +100,7 @@ function getImgdescFromMat(matPath, exclude)
     {
         console.warn(`JSON.parse ${matPath} 错误！ ${error}`)
         callback(error)
-        return;
+        return [];
     }
 
     var result = [];
@@ -109,7 +109,7 @@ function getImgdescFromMat(matPath, exclude)
 
     if (unUseETC1.includes(mat.shader))
     {
-        return;
+        return [];
     }
 
     var mapUniform = mat.mapUniform;
