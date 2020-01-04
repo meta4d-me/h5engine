@@ -1584,18 +1584,25 @@ declare namespace gd3d.framework {
         onReady: () => void;
         onDownloadFinish: () => void;
         ready: boolean;
-        outTime: number;
+        parseOutTime: number;
+        dwOutTime: number;
         stateQueue: any[];
         stateParse: any;
         stateText: string;
         thd: number;
+        dhd: number;
+        parseResolve: (o?: any) => void;
+        parseReject: (o: Error) => void;
+        static reTryTest: {};
         constructor(url: string, assetmgr: assetMgr, guid?: number);
         static buildGuid(): number;
-        timeOut(): void;
-        parseBundle(data: string): void;
+        getParseInfo(): string;
+        getDownloadInfo(): string;
+        parseBundle(data: string): Promise<{}>;
         private unpkg;
         parseFile(): Promise<void>;
         unload(disposeNow?: boolean): void;
+        fail(error: Error): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1654,7 +1661,8 @@ declare namespace gd3d.framework {
         };
         static initGuidList(): void;
         load(url: string, type?: AssetTypeEnum, onstate?: loadCallback, downloadFinish?: () => void): void;
-        download(guid: number, url: string, type: AssetTypeEnum, finish: () => void): void;
+        static setStateError(state: stateLoad, onstate: (state?: stateLoad) => void, err: Error): void;
+        download(guid: number, url: string, type: AssetTypeEnum, finish: () => void, errcb?: (err: Error) => void): void;
         loadImg(guid: number, url: string, cb: (img: any) => void): void;
         protected _loadImg(url: string, cb: (img: any) => void): void;
         use(asset: IAsset): void;
@@ -1838,7 +1846,7 @@ declare namespace gd3d.framework {
         newAsset?(assetName?: string): IAsset;
         load?(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
         loadByPack?(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
-        parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: string | ArrayBuffer, dwguid?: number): IAsset | gd3d.threading.gdPromise<IAsset> | void;
+        parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: string | ArrayBuffer, dwguid?: number): IAsset | threading.gdPromise<IAsset> | void;
         needDownload?(textJSON: string): string;
     }
     class AssetFactoryTools {
@@ -1861,7 +1869,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AssetFactory_Mesh implements IAssetFactory {
-        parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: ArrayBuffer): mesh | threading.gdPromise<mesh>;
+        parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: ArrayBuffer): threading.gdPromise<IAsset> | mesh;
     }
 }
 declare namespace gd3d.framework {
@@ -2451,7 +2459,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess;
         private readFinish;
-        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<mesh>;
+        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<IAsset>;
         parseCMesh(inData: any, webgl: any): void;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
@@ -2524,7 +2532,7 @@ declare namespace gd3d.framework {
         getCloneTrans2D(): transform2D;
         apply(trans: transform): void;
         jsonstr: string;
-        Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<{}>;
+        Parse(jsonStr: string, assetmgr: assetMgr): Promise<{}>;
         cParse(data: any): void;
     }
 }

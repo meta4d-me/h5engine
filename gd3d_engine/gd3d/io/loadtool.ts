@@ -118,7 +118,7 @@
     var checkClsTime = 0;
     function GetJSON(url: string, text: string = undefined)
     {
-        return new threading.gdPromise<any>((r) =>
+        return new Promise<any>((r) =>
         {
             let cached = cachedMap[url];
             cached.ready = true;

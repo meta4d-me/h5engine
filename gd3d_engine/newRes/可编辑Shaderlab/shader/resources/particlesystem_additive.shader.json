@@ -11,8 +11,8 @@
         "blendmode": "add",
         "showface": "all",
         "zwrite": "off",
-        "vs": "particlesystem_additive",
-        "fs": "particlesystem_additive"
+        "vs": "particlesystem",
+        "fs": "particlesystem"
       }
     ],
     "base_fog": [
@@ -20,8 +20,8 @@
         "blendmode": "add",
         "showface": "all",
         "zwrite": "off",
-        "vs": "particlesystem_additive",
-        "fs": "particlesystem_additive"
+        "vs": "particlesystem",
+        "fs": "particlesystem"
       }
     ],
     "shadowgen": [],

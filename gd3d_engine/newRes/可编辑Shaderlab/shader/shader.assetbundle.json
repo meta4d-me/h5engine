@@ -189,15 +189,19 @@
           "length":0
           },
       {
-          "name":"resources/particlesystem_additive.vs.glsl",
+          "name":"resources/particlesystem.vs.glsl",
           "length":0
           },
       {
-          "name":"resources/particlesystem_additive.fs.glsl",
+          "name":"resources/particlesystem.fs.glsl",
           "length":0
           },
       {
           "name":"resources/particlesystem_additive.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/particlesystem_alphablended.shader.json",
           "length":0
           },
       {

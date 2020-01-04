@@ -135,59 +135,69 @@ namespace gd3d.framework
          */
         Parse(txt: string, assetmgr: assetMgr)
         {
-            return new threading.gdPromise<rawscene>((resolve) =>
+            return new threading.gdPromise<rawscene>((resolve, reject) =>
             {
                 io.JSONParse(txt).then((_json) =>
                 {
-                    this.rootNode = new transform();
-                    this.rootNode.name = this.getName();
-                    io.deSerialize(_json["rootNode"], this.rootNode, assetmgr, this.assetbundle);
-
-                    this.lightmaps = [];
-                    this.lightmapData = _json["lightmap"];
-                    let lightmapCount = this.lightmapData.length;
-                    for (let i = 0; i < lightmapCount; i++)
+                    try
                     {
-                        if (this.lightmapData[i] == null)
+                        this.rootNode = new transform();
+                        this.rootNode.name = this.getName();
+                        io.deSerialize(_json["rootNode"], this.rootNode, assetmgr, this.assetbundle);
+
+                        this.lightmaps = [];
+                        this.lightmapData = _json["lightmap"];
+                        let lightmapCount = this.lightmapData.length;
+                        for (let i = 0; i < lightmapCount; i++)
                         {
-                            this.lightmaps.push(null);
-                        }
-                        else
-                        {
-                            let lightmapName = this.lightmapData[i].name;
-                            let lightmap = assetmgr.getAssetByName(lightmapName, this.assetbundle) as texture;
-                            if (lightmap)
+                            if (this.lightmapData[i] == null)
                             {
-                                lightmap.use();
-                                this.lightmaps.push(lightmap);
+                                this.lightmaps.push(null);
+                            }
+                            else
+                            {
+                                let lightmapName = this.lightmapData[i].name;
+                                let lightmap = assetmgr.getAssetByName(lightmapName, this.assetbundle) as texture;
+                                if (lightmap)
+                                {
+                                    lightmap.use();
+                                    this.lightmaps.push(lightmap);
+                                }
                             }
                         }
-                    }
 
-                    let fogData = _json["fog"];
-                    if (fogData != undefined)
-                    {
-                        this.fog = new Fog();
-                        this.fog._Start = <number>fogData["_Start"];
-                        this.fog._End = <number>fogData["_End"];
-
-                        let cor: string = fogData["_Color"];
-                        if (typeof (cor) == "string")
+                        let fogData = _json["fog"];
+                        if (fogData != undefined)
                         {
-                            let array: string[] = cor.split(",");
-                            this.fog._Color = new gd3d.math.vector4(parseFloat(array[0]), parseFloat(array[1]), parseFloat(array[2]), parseFloat(array[3]));
-                        } else
-                            this.fog._Color = cor;
-                        this.fog._Density = <number>fogData["_Density"];
-                    }
+                            this.fog = new Fog();
+                            this.fog._Start = <number>fogData["_Start"];
+                            this.fog._End = <number>fogData["_End"];
 
-                    //navMesh
-                    let nav = _json["navmesh"];
-                    if (nav != undefined && nav.data != null)
+                            let cor: string = fogData["_Color"];
+                            if (typeof (cor) == "string")
+                            {
+                                let array: string[] = cor.split(",");
+                                this.fog._Color = new gd3d.math.vector4(parseFloat(array[0]), parseFloat(array[1]), parseFloat(array[2]), parseFloat(array[3]));
+                            } else
+                                this.fog._Color = cor;
+                            this.fog._Density = <number>fogData["_Density"];
+                        }
+
+                        //navMesh
+                        let nav = _json["navmesh"];
+                        if (nav != undefined && nav.data != null)
+                        {
+                            this.navMeshJson = nav.data;
+                        }
+                    } catch (error)
                     {
-                        this.navMeshJson = nav.data;
+                        reject(error.stack);
+                        return;
                     }
                     resolve(this);
+                }).catch(e =>
+                {
+                    reject(e);
                 });
             });
         }

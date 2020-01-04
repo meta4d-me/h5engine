@@ -183,7 +183,7 @@
          */
         Parse(jsonStr: string, assetmgr: assetMgr)
         {
-            return new threading.gdPromise((resolve) =>
+            return new Promise((resolve, reject) =>
             {
                 this.jsonstr = jsonStr;
                 io.JSONParse(jsonStr).then((jsonObj) =>
@@ -194,9 +194,15 @@
                         case "transform": this.trans = new transform; break;
                         case "transform2D": this.trans = new transform2D; break;
                     }
+                    try
+                    {
+                        if (type != null)
+                            io.deSerialize(jsonObj, this.trans, assetmgr, this.assetbundle);
+                    } catch (error)
+                    {
+                        reject(error);
+                    }
 
-                    if (type != null)
-                        io.deSerialize(jsonObj, this.trans, assetmgr, this.assetbundle);
                     resolve(this);
                 });
                 // let jsonObj = JSON.parse(jsonStr);

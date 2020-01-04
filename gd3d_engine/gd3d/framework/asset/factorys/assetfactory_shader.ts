@@ -106,10 +106,14 @@ namespace gd3d.framework
 
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string)
         {
+            // if(assetmgr.mapShader[filename]!=null)            
+            //     console.error(`##shader重复设置:${filename}`);                
+            
+            // assetmgr.setAssetUrl(_shader, url);
             var _shader = new shader(filename);
             this.parseShader(_shader,assetmgr,txt,filename);            
-            // assetmgr.setAssetUrl(_shader, url);
             assetmgr.mapShader[filename] = _shader;
+            // console.warn(`@@ shader :${filename} 加载成功`);
             return _shader;
         }
     }
