@@ -48,10 +48,10 @@ function handleShader(shaderDir)
     {
         var excludeInfo = exclude[path.basename(shaderpath)];
         // 排除属性列表
-        var excludeProperties = excludeInfo ? Object.keys(excludeInfo) : [];
+        var excludeProperties = excludeInfo ? excludeInfo : [];
         var glslExt = "_etc1";
         if (excludeProperties.length > 0)
-            glslExt += excludeProperties.join("_");
+            glslExt += "_" + excludeProperties.join("_");
 
         var shaderStr = readFile(shaderpath);
         var shaderObj = JSON.parse(shaderStr);
