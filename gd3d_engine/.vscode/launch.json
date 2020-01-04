@@ -7,8 +7,8 @@
         {
             "type": "node",
             "request": "launch",
-            "name": "ETC1Shader",
-            "program": "${workspaceFolder}/scripts/ETC1Shader.js",
+            "name": "etc1shader",
+            "program": "${workspaceFolder}/scripts/etc1shader.js",
             "skipFiles": [
                 "<node_internals>/**"
             ]
