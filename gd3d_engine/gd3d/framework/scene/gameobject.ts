@@ -340,17 +340,22 @@ namespace gd3d.framework
          */
         addComponentDirect(comp: INodeComponent): INodeComponent
         {
-            if(!comp) throw new Error("this component is null");
+            if(!comp){
+                console.error("this component is null");
+                return;
+            }
             this.transform.markHaveComponent();
             if (comp.gameObject != null)
             {
-                throw new Error("this components has added to a  gameObject");
+                console.error("this components has added to a  gameObject");
+                return;
             }
             comp.gameObject = this;
 
             let typeStr = getClassName(comp);
             if(this.componentTypes[typeStr]){
-                throw new Error(this.getName()+"   已经有一个" + typeStr + "的组件了，不能俩"); 
+                console.error(this.getName()+"   已经有一个" + typeStr + "的组件了，不能俩"); 
+                return;
             }
             
 

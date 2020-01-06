@@ -30,12 +30,12 @@ namespace gd3d.framework {
     }
 
     /**
-     * 实例对象是 I2DPointListener 
-     * @param object 
+     * 实例对象是 I2DPointListener
+     * @param object
      */
     export function instanceOfI2DPointListener(object){
         return "onPointEvent" in object;
-    } 
+    }
 
     // /**
     //  * @public
@@ -92,7 +92,7 @@ namespace gd3d.framework {
     @gd3d.reflect.SerializeType
     export class C2DComponent {
         static readonly ClassName:string="C2DComponent";
-        
+
         @gd3d.reflect.Field("I2DComponent")
         comp: I2DComponent;
         init: boolean;
@@ -169,7 +169,7 @@ namespace gd3d.framework {
         /**
          * 启用 UI 布局功能
          */
-        enableUILayout = true;    
+        enableUILayout = true;
 
         /**
          * 启用 UI 矩形遮罩裁剪显示 功能
@@ -385,8 +385,8 @@ namespace gd3d.framework {
         private _maskrectId = "";
         /** 裁剪遮罩矩形 ID */
         get maskRectId () {return this._maskrectId; }
-        
-        
+
+
         private _maskRect: math.rect;
         private _temp_maskRect: math.rect;
         /** 裁剪遮罩矩形 */
@@ -435,7 +435,7 @@ namespace gd3d.framework {
 
                 if (this.isMask) {
                     this._maskrectId += `_${this.insId.getInsID()}`;
-                    //计算 maskrect 
+                    //计算 maskrect
                     let wPos = this.getWorldTranslate();
                     let wW = this.canvas.pixelWidth;
                     let wH = this.canvas.pixelHeight;
@@ -548,7 +548,8 @@ namespace gd3d.framework {
                 return;
             }
             if (node._parent != this || this._children == null) {
-                throw new Error("not my child.");
+                console.warn("not my child.");
+                return ;
             }
             var i = this._children.indexOf(node);
             if(i < 0 ) return;
@@ -616,7 +617,7 @@ namespace gd3d.framework {
                 else {
                     gd3d.math.matrix3x2Multiply(this.parent.worldMatrix, this.localMatrix, this.worldMatrix);
                 }
-                
+
                 this.dirtyWorldDecompose = true;
                 if(this.enableUIMaskRect){
                     this.updateMaskRect();
@@ -975,14 +976,19 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         addComponentDirect(comp: I2DComponent): I2DComponent {
-            if(!comp) throw new Error("this component is null");
+            if(!comp) {
+                console.error("this component is null");
+                return;
+            }
             if (comp.transform != null) {
-                throw new Error("this components has added to a  gameObject");
+                console.error("this components has added to a  gameObject");
+                return;
             }
             comp.transform = this;
             let typeStr = getClassName(comp);
             if(this.componentTypes[typeStr]){
-                throw new Error(this.name+"   已经有一个" + typeStr + "的组件了，不能俩"); 
+                console.error(this.name+"   已经有一个" + typeStr + "的组件了，不能俩");
+                return;
             }
 
             if (this.components == null)
@@ -997,7 +1003,8 @@ namespace gd3d.framework {
                     // console.warn("add renderer:" + this.name);
                 }
                 else {
-                    throw new Error("已经有一个渲染器的组件了，不能俩");
+                    console.error("已经有一个渲染器的组件了，不能俩");
+                    return;
                 }
             }
             if (reflect.getClassTag(comp["__proto__"], "boxcollider2d") == "1") {//这货是个boxcollider2d
@@ -1005,7 +1012,8 @@ namespace gd3d.framework {
                     this.collider = comp as any;
                 }
                 else {
-                    throw new Error("已经有一个碰撞组件了，不能俩");
+                    console.error("已经有一个碰撞组件了，不能俩");
+                    return;
                 }
             }
             if (reflect.getClassTag(comp["__proto__"], "node2dphysicsbody") == "1") {//这货是个node2dphysicsbody
@@ -1013,11 +1021,12 @@ namespace gd3d.framework {
                     this.physicsBody = comp as any;
                 }
                 else {
-                    throw new Error("已经有一个碰撞组件了，不能俩");
+                    console.error("已经有一个碰撞组件了，不能俩");
+                    return;
                 }
             }
 
-            
+
             if(functionIsEmpty(comp.update))
                 comp.update =undefined;//update空转
 
@@ -1042,7 +1051,7 @@ namespace gd3d.framework {
                 return;
             delete this.componentTypes[typeName];
             for (var i = 0; i < this.components.length; i++) {
-                if (this.components[i].comp == comp) {                    
+                if (this.components[i].comp == comp) {
                     this.clearOfCompRemove(this.components[i]);
                     this.components.splice(i, 1);
                     break;
@@ -1164,9 +1173,9 @@ namespace gd3d.framework {
         /**
          * @private
          * 之前给编辑器开的接口
-         * @param node 
-         * @param _type 
-         * @param comps 
+         * @param node
+         * @param _type
+         * @param comps
          */
         private getNodeCompoents(node: transform2D, _type: string, comps: I2DComponent[]) {
             let len = node.components.length;
@@ -1196,8 +1205,8 @@ namespace gd3d.framework {
 
         /**
          * 获取节点的第一个组件
-         * @param node 
-         * @param type 
+         * @param node
+         * @param type
          */
         private getNodeFirstComponent(node: transform2D, type: string){
             let len = node.components.length;
