@@ -10,7 +10,6 @@ varying highp vec4 uv45;
 mediump vec4 texture2DEtC1(mediump sampler2D sampler,mediump vec2 uv)
 {
 uv = uv - floor(uv);
-uv.y = 1.0 - uv.y;
 mediump vec2 scale = vec2(1.0,0.5);
 mediump vec2 offset = vec2(0.0,0.5);
 return vec4( texture2D(sampler, uv * scale).xyz, texture2D(sampler, uv * scale + offset).x);

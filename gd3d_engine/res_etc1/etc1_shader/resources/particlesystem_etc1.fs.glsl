@@ -14,7 +14,6 @@ varying vec4 v_particle_color;
 vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
 {
 uv = uv - floor(uv);
-uv.y = 1.0 - uv.y;
 return vec4( texture2D(sampler, uv * vec2(1.0,0.5)).xyz, texture2D(sampler, uv * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
 }
             
