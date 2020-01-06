@@ -15,11 +15,13 @@
 //     "assetOutDir": "D:/work/enginesource/gd3d_engine/res/prefabs/test_ktx"
 // }
 {
+    // 不删除目标文件夹，只转换新增资源
+    "isfastETCPack": true,
     // shader输入文件夹
     "shaderInDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/shader/customShader",
     // shader输出文件夹
-    "shaderOutDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/shader/customShader_ETC1",
-    // 不适用ETC1
+    "shaderOutDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/shader/customShader_etc1",
+    // 不使用ETC1的shader列表
     "unUseETC1": [
         "particles_add.shader.json",
         "particles_blend.shader.json",

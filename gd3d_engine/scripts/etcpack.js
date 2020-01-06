@@ -23,6 +23,7 @@ var inDir = config.assetInDir;
 var outDir = config.assetOutDir;
 var exclude = config.exclude;
 var unUseETC1 = config.unUseETC1;
+var isfastETCPack = config.isfastETCPack;
 
 var exePath = path.resolve(__dirname, "tools/etcpack.exe");
 var convertPath = path.resolve(__dirname, "tools/convert.exe");
@@ -39,6 +40,9 @@ var convertPath = path.resolve(__dirname, "tools/convert.exe");
 // 拷贝文件
 if (inDir != outDir)
 {
+    // 清理目标文件夹
+
+    // 拷贝文件夹
     copyFolder(inDir, outDir);
 }
 // 处理shader
@@ -263,6 +267,11 @@ function makeDir(dir)
     makeDir(pDir);
 
     fs.mkdirSync(dir);
+}
+
+function deleteFolder(inDir)
+{
+
 }
 
 function copyFolder(inDir, outDir)
