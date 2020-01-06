@@ -8140,7 +8140,7 @@ var gd3d;
             resID.prototype.getID = function () {
                 return this.id;
             };
-            resID.idAll = 1;
+            resID.idAll = 100000000;
             return resID;
         }());
         framework.resID = resID;
@@ -8983,7 +8983,6 @@ var gd3d;
             assetMgr.initGuidList = function () {
                 gd3d.io.loadJSON(assetMgr.guidlistURL, function (json) {
                     assetMgr.urlmapGuid = json.res;
-                    framework.resID.idAll = json.__useid;
                     if (assetMgr.onGuidInit)
                         assetMgr.onGuidInit();
                 });
