@@ -12,6 +12,7 @@
         PVRTC4_RGBA = 4,
         PVRTC2_RGB = 4,
         PVRTC2_RGBA = 4,
+        KTX = 5,
     }
     /**
      * @private

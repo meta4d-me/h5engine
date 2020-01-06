@@ -8,6 +8,8 @@ uniform lowp vec4 glstate_fog_color;
 varying lowp float factor;
 #endif
 
+//texture2DEtC1Mark
+
 void main() 
 {
     lowp vec4 emission = texture2D(_MainTex, xlv_TEXCOORD0);

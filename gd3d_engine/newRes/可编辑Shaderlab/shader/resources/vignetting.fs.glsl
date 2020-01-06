@@ -15,6 +15,8 @@ uniform highp float     _Chromatic_Aberration;
 
 varying highp vec2      xlv_TEXCOORD0;   // 每个片元的纹素坐标
 
+//texture2DEtC1Mark
+
 
 vec2 adjustUV(vec2 uv) {
     if(uv.x > 1.0) {

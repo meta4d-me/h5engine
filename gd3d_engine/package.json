@@ -1,0 +1,16 @@
+{
+  "name": "gd3d_engine",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "etcpack": "node scripts/etcpack.js",
+    "etc1shader": "node scripts/etc1shader.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

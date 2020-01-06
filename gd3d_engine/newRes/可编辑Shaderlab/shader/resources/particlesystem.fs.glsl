@@ -9,6 +9,8 @@ uniform vec4 _MainTex_ST;
 
 varying vec4 v_particle_color;
 
+//texture2DEtC1Mark
+
 vec4 particleAnimation(vec4 color) {
 
     color.xyz = color.xyz * v_particle_color.xyz;

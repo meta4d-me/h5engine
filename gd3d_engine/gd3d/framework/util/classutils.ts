@@ -103,7 +103,6 @@ namespace gd3d.framework
         static getInstanceByName(name: string)
         {
             var cls = this.getDefinitionByName(name);
-            console.assert(cls);
             if (!cls) return undefined;
             return new cls();
         }

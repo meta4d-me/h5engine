@@ -24,6 +24,8 @@ highp float unpackRGBAToDepth( const in vec4 v )
     return dot( v, UnpackFactors );
 }
 
+//texture2DEtC1Mark
+
 void main() 
 {
 	lowp vec4 basecolor =texture2D(_MainTex,xlv_TEXCOORD0);

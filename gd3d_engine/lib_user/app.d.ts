@@ -755,6 +755,18 @@ declare namespace t {
         update(delta: number): void;
     }
 }
+declare class test_ETC1_KTX implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    astMgr: gd3d.framework.assetMgr;
+    private transform;
+    start(app: gd3d.framework.application): Promise<void>;
+    private init;
+    private loadPrefabs;
+    ry: number;
+    update(delta: number): void;
+}
 declare class test_fakepbr implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;

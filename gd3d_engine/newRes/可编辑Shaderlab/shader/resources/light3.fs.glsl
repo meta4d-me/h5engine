@@ -15,6 +15,8 @@ varying lowp mat3 TBNmat;
 varying lowp vec3 worldpos; 
 varying lowp vec3 eyedir;
 
+//texture2DEtC1Mark
+
 lowp float calcDiffuse(lowp vec3 N,lowp vec3 worldpos,lowp vec4 lightPos,lowp vec4 lightDir,lowp float cosspot);
 lowp float calcSpec(lowp vec3 N,lowp vec3 worldpos,lowp vec3 eyedir,lowp vec4 lightPos,lowp vec4 lightDir,lowp float cosspot);
 void main() 

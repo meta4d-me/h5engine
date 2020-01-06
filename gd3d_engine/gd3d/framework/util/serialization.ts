@@ -664,7 +664,6 @@ namespace gd3d.framework
                 var spv = source[property];
                 if (Array.isArray(spv))
                 {
-                    console.assert(!!tpv);
                     var keys = Object.keys(spv);
                     keys.forEach(key =>
                     {
@@ -700,7 +699,6 @@ namespace gd3d.framework
                 var spv = source[property];
                 if (ObjectUtil.isObject(spv) && spv[CLASS_KEY] == undefined)
                 {
-                    console.assert(!!tpv);
                     var keys = Object.keys(spv);
                     keys.forEach(key =>
                     {

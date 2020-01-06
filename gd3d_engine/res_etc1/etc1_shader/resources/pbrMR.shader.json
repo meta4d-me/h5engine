@@ -1,0 +1,23 @@
+{
+	"layer": "geometry",
+	"properties": [
+		"_MainTex('MainTex',Texture)='white'{}",
+		"_MainTex_ST('MainTex_ST',Vector) = (1,1,0,0)",
+		"_MainColor ('MainColor', Color) = (1,1,1,1)",
+		"_NormalTex('NormalTex', Texture) = 'white'{}",
+		"OFFSET ('OFFSET', Vector) = (0,0,0,0)"],
+	"passes": {
+		"base_fog": [
+			{
+				"showface": "ccw",
+				"vs": "pbrMR_etc1",
+				"fs": "pbrMR_etc1"
+			}],
+		"base": [
+			{
+				"showface": "ccw",
+				"vs": "pbrMR_etc1",
+				"fs": "pbrMR_etc1"
+			}]
+	}
+}

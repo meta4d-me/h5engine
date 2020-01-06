@@ -4,7 +4,24 @@
     // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
-
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "etc1shader",
+            "program": "${workspaceFolder}/scripts/etc1shader.js",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "etcpack",
+            "program": "${workspaceFolder}/scripts/etcpack.js",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
         {
             "type": "chrome",
             "request": "launch",

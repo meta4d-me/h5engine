@@ -1457,6 +1457,12 @@ declare namespace gd3d.framework {
         init?(): any;
     }
 }
+declare namespace gd3d.framework {
+    class KTXParse {
+        private static HEADER_LEN;
+        static parse(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer, facesExpected?: number, loadMipmaps?: boolean): gd3d.render.glTexture2D;
+    }
+}
 declare class PvrParse {
     private version;
     private flags;
@@ -1513,12 +1519,13 @@ declare namespace gd3d.framework {
         PackTxt = 17,
         PathAsset = 18,
         PVR = 19,
-        F14Effect = 20,
-        DDS = 21,
-        Scene = 22,
-        Prefab = 23,
-        cPrefab = 24,
-        ParticleSystem = 25
+        KTX = 20,
+        F14Effect = 21,
+        DDS = 22,
+        Scene = 23,
+        Prefab = 24,
+        cPrefab = 25,
+        ParticleSystem = 26
     }
     class ResourceState {
         res: IAsset;
@@ -1810,6 +1817,11 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class AssetFactory_ETC1 implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer, dwguid: number): texture;
+    }
+}
+declare namespace gd3d.framework {
     class AssetFactory_f14eff implements IAssetFactory {
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): f14eff;
     }
@@ -1902,6 +1914,7 @@ declare namespace gd3d.framework {
         private readonly t_Normal;
         private readonly t_PVR;
         private readonly t_DDS;
+        private readonly t_KTX;
         parse(assetmgr: assetMgr, bundle: assetBundle, name: string, data: string, dwguid: number): texture;
         needDownload(text: string): any;
     }
@@ -8171,7 +8184,8 @@ declare namespace gd3d.render {
         PVRTC4_RGB = 4,
         PVRTC4_RGBA = 4,
         PVRTC2_RGB = 4,
-        PVRTC2_RGBA = 4
+        PVRTC2_RGBA = 4,
+        KTX = 5
     }
     class textureReader {
         constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);

@@ -569,8 +569,6 @@ namespace gd3d.framework
 
                 }
 
-                console.assert(data.length == 24 * this._activeParticles.length);
-
                 var stride = this._attributes.reduce((pv, cv) => pv += cv[1], 0) * 4;
                 if (isSupportDrawInstancedArrays && this.particleCount > 0)
                 {

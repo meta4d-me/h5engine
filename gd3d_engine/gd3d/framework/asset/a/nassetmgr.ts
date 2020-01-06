@@ -41,6 +41,10 @@ namespace gd3d.framework
                 case ".pvr":
                 case ".pvr.bin.js":
                     return AssetTypeEnum.PVR;
+                    case ".ktx.bin":
+                    case ".ktx":
+                    case ".ktx.bin.js":
+                    return AssetTypeEnum.KTX;
                 case ".imgdesc.json":
                     return AssetTypeEnum.TextureDesc;
                 case ".mesh.bin":

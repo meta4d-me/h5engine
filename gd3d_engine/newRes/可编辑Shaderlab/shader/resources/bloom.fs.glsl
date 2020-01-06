@@ -23,6 +23,7 @@ varying highp vec2      xlv_TEXCOORD0;   // 每个片元的纹素坐标
 
 #define tex(t, uv)      texture2D((t), (uv))
 
+//texture2DEtC1Mark
 
 float luminance(vec3 rgb) {
     const vec3 w = vec3(0.2125, 0.7154, 0.0721);

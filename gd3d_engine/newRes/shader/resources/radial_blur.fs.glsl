@@ -9,6 +9,8 @@ uniform lowp float _Level;
 uniform lowp float _CenterX;
 uniform lowp float _CenterY;
 varying highp vec2 xlv_TEXCOORD0;
+//texture2DEtC1Mark
+
 void main()
 {
     lowp vec2 center = vec2(_CenterX, _CenterY);// 这里为什么要加1.0？？？

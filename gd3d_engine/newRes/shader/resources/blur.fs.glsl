@@ -2,6 +2,8 @@ uniform sampler2D _MainTex;
 uniform lowp float _BlurGap; //卷积每层间隔单位
 uniform highp vec4 _MainTex_TexelSize;
 varying highp vec2 xlv_TEXCOORD0;
+//texture2DEtC1Mark
+
 void main() 
 {
 	lowp float offset_x = _MainTex_TexelSize.x * _BlurGap;

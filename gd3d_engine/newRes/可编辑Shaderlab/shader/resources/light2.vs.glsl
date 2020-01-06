@@ -15,6 +15,8 @@ varying lowp vec3 vNormal;
 varying mediump vec2 xlv_TEXCOORD0;
 varying lowp vec3 vEyepos;
 
+//texture2DEtC1Mark
+
 
 void main()
 {
