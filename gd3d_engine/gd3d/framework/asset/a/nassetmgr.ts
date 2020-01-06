@@ -160,7 +160,7 @@ namespace gd3d.framework
             {
                 assetMgr.urlmapGuid = json.res;
                 // console.log(`initGuidList  资源GUID从[${json.__useid}]开始计数`);
-                resID.idAll = json.__useid;
+                // resID.idAll = json.__useid;
                 if (assetMgr.onGuidInit)
                     assetMgr.onGuidInit();
             });

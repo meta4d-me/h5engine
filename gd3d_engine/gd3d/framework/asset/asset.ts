@@ -15,7 +15,7 @@ namespace gd3d.framework
         {
             this.id = resID.next();
         }
-        public static idAll: number = 1;
+        public static idAll: number = 100000000;    //从 100000000 开始累加ID， 避免 guidlist 冲突
         public static next(): number
         {
             var next = resID.idAll;
