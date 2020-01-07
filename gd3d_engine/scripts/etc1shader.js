@@ -11,6 +11,7 @@ var inDir = config.shaderInDir;
 var outDir = config.shaderOutDir;
 var exclude = config.exclude;
 var unUseETC1 = config.unUseETC1;
+var shaderPackTool = config.shaderPackTool;
 
 const shaderRegExp = /([\w\d]+)\.(shader)\.json/;
 const texture2DRegExp = /texture2D\s*\(/g;
@@ -34,9 +35,13 @@ if (inDir != outDir)
 }
 // 转换ETC1shader
 handleShader(outDir);
-// 调用ShaderPackTool.exe
-callShaderPackTool(outDir, "ShaderPackTool.exe");
-// callShaderPackTool(outDir, "AssetbundlePackTool.exe");
+// 删除 customShader.assetbundle.json
+var oldAssetbundleJson = path.resolve(outDir, path.basename(inDir) + ".assetbundle.json");
+if (fs.existsSync(oldAssetbundleJson))
+    fs.unlinkSync(oldAssetbundleJson);
+// 调用ShaderPackTool 生成 .assetbundle.json
+callShaderPackTool(outDir, shaderPackTool);
+
 
 /**
  * 处理shader
@@ -222,6 +227,7 @@ function callShaderPackTool(outDir, exeName)
 
         console.log(data.toString());
     });
+    console.log(`目前自动调用${exePath}有问题，请手动执行！`)
 }
 
 function makeDir(dir)

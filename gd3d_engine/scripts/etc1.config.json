@@ -3,6 +3,8 @@
 //     "shaderInDir": "D:/work/enginesource/gd3d_engine/newRes/可编辑Shaderlab/shader",
 //     // shader输出文件夹
 //     "shaderOutDir": "D:/work/enginesource/gd3d_engine/res_etc1/etc1_shader",
+//     // etc1shader.js 脚本执行结束时调用的工具，目前调用会失败，需要手动运行。
+//     "shaderPackTool": "ShaderPackTool.exe",
 //     // 不使用ETC1的shader列表
 //     "unUseETC1": [],
 //     // shader排除列表
@@ -23,6 +25,8 @@
     "shaderInDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/shader/customShader",
     // shader输出文件夹
     "shaderOutDir": "D:/work/hungryshark_ubi/editor/server/userdir/1/hungryshark@project/Resources/shader/customShader_etc1",
+    // etc1shader.js 脚本执行结束时调用的工具，目前调用会失败，需要手动运行。
+    "shaderPackTool": "AssetbundlePackTool.exe",
     // 不使用ETC1的shader列表
     "unUseETC1": [
         "particles_add.shader.json",
