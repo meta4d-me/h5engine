@@ -25,12 +25,18 @@ const textureExp = /(\w+)\([\'\"\w\s]+\,\s*Texture\s*\)/;
 // 检测该标记，在该位置新增texture2DEtC1方法
 const texture2DEtC1Mark = "//texture2DEtC1Mark";
 
-// 拷贝文件
-copyFolder(inDir, outDir);
+if (inDir != outDir)
+{
+    // 删除文件夹
+    deleteFolder(outDir);
+    // 拷贝文件
+    copyFolder(inDir, outDir);
+}
 // 转换ETC1shader
 handleShader(outDir);
 // 调用ShaderPackTool.exe
-callShaderPackTool(outDir);
+callShaderPackTool(outDir, "ShaderPackTool.exe");
+// callShaderPackTool(outDir, "AssetbundlePackTool.exe");
 
 /**
  * 处理shader
@@ -170,7 +176,7 @@ vec4 texture2DEtC1(sampler2D sampler,vec2 uv)
 uv = uv - floor(uv);
 return vec4( texture2D(sampler, uv * vec2(1.0,0.5)).xyz, texture2D(sampler, uv * vec2(1.0,0.5) + vec2(0.0,0.5)).x);
 }
-            `;
+`;
 
             if (!precisionExp.exec(shaderStr))
             {
@@ -195,10 +201,10 @@ ${texture2DEtC1Str}
     writeFile(target, shaderStr);
 }
 
-function callShaderPackTool(outDir)
+function callShaderPackTool(outDir, exeName)
 {
-    console.log(`调用ShaderPackTool.exe`);
-    var exePath = path.resolve(outDir, "ShaderPackTool.exe");
+    console.log(`调用${exeName}`);
+    var exePath = path.resolve(outDir, exeName);
 
     if (!fs.existsSync(exePath))
     {
@@ -211,7 +217,7 @@ function callShaderPackTool(outDir)
     {
         if (err)
         {
-            console.log(`调用ShaderPackTool.exe错误，请手动执行 ${exePath}`);
+            console.log(`调用${exeName}错误，请手动执行 ${exePath}`);
         }
 
         console.log(data.toString());
@@ -230,8 +236,6 @@ function makeDir(dir)
 
 function copyFolder(inDir, outDir)
 {
-    if (inDir == outDir) return;
-
     console.log(`开始拷贝文件。`);
     var filepaths = getFilePaths(inDir);
     var len = filepaths.length;
@@ -245,6 +249,27 @@ function copyFolder(inDir, outDir)
         console.log(`拷贝文件 ${i} / ${len}`)
     });
     console.log(`结束拷贝文件。`);
+}
+
+function deleteFolder(folder)
+{
+    console.log(`删除文件夹`);
+
+    var filepaths = getFilePaths(folder, true);
+    filepaths.reverse();
+    var len = filepaths.length;
+    filepaths.forEach((inPath, i) =>
+    {
+        if (fs.statSync(inPath).isDirectory())
+        {
+            fs.rmdirSync(inPath);
+        } else
+        {
+            fs.unlinkSync(inPath);
+        }
+        console.log(`删除文件 ${i} / ${len}`)
+    });
+    console.log(`结束删除目标文件夹。`);
 }
 
 function writeFile(filePath, content)
@@ -277,24 +302,30 @@ function readFiles(filePaths)
  * 获取文件路径列表
  * 
  * @param {string} rootPath 根路径
+ * @param {string[]} containFolder 是否包含文件夹
  * @param {string[]} filePaths 用于保存文件路径列表
  * @param {number} depth 深度
  */
-function getFilePaths(rootPath, filePaths, depth)
+function getFilePaths(rootPath, containFolder, filePaths, depth)
 {
+    containFolder = containFolder || false;
     if (depth == undefined) depth = 10000;
     if (depth < 0) return;
     filePaths = filePaths || [];
+    if (!fs.existsSync(rootPath)) return filePaths;
     var stats = fs.statSync(rootPath);
     if (stats.isFile())
     {
         filePaths.push(rootPath);
     } else if (stats.isDirectory)
     {
+        if (containFolder)
+            filePaths.push(rootPath);
+
         var childPaths = fs.readdirSync(rootPath);
         for (var i = 0; i < childPaths.length; i++)
         {
-            getFilePaths(rootPath + "/" + childPaths[i], filePaths, depth - 1);
+            getFilePaths(rootPath + "/" + childPaths[i], containFolder, filePaths, depth - 1);
         }
     }
     return filePaths;

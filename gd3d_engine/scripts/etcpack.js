@@ -19,6 +19,9 @@ var configStr = readFile("scripts/etc1.config.json");
 var config;
 eval(`config =` + configStr);
 
+// 错误信息
+var errMsgs = [];
+
 var inDir = config.assetInDir;
 var outDir = config.assetOutDir;
 var exclude = config.exclude;
@@ -27,26 +30,27 @@ var isfastETCPack = config.isfastETCPack;
 
 var exePath = path.resolve(__dirname, "tools/etcpack.exe");
 var convertPath = path.resolve(__dirname, "tools/convert.exe");
-// var outDir = path.resolve(__dirname, "out");
-// var input = path.resolve(__dirname, "t_0012lvyeshu_obj_p_d.png");
-// var input = path.resolve(__dirname, "orange.JPG");
-// etcpack(input, outDir);
 
-// var assetbundlePath = path.resolve(__dirname, `../res/prefabs/test_ktx/resources/t_0012lvyeshu_obj_p_d.imgdesc.json`);
-// etcpackImgdesc(assetbundlePath);
-
-// var assetDir = path.resolve(__dirname, `../res/prefabs`);
+console.time(1);
 
 // 拷贝文件
 if (inDir != outDir)
 {
-    // 清理目标文件夹
-
+    // 删除文件夹
+    if (!isfastETCPack)
+        deleteFolder(outDir);
     // 拷贝文件夹
     copyFolder(inDir, outDir);
 }
 // 处理shader
 etcpackImgdescInFolder(outDir);
+
+if (errMsgs.length > 0)
+{
+    console.log(errMsgs.join("\n"));
+}
+
+console.timeEnd(1);
 
 function etcpackImgdescInFolder(dir, callback)
 {
@@ -102,7 +106,7 @@ function getImgdescFromMat(matPath, exclude)
         var mat = JSON.parse(readFile(matPath));
     } catch (error)
     {
-        console.warn(`JSON.parse ${matPath} 错误！ ${error}`)
+        errMsgs.push(error);
         callback(error)
         return [];
     }
@@ -144,7 +148,7 @@ function etcpackImgdesc(imgdescPath, isDiscardAlpha, callback)
         var imgdesc = JSON.parse(readFile(imgdescPath));
     } catch (error)
     {
-        console.warn(`JSON.parse ${imgdescPath} 错误！ ${error}`)
+        errMsgs.push(error);
         callback(error)
         return;
     }
@@ -153,14 +157,14 @@ function etcpackImgdesc(imgdescPath, isDiscardAlpha, callback)
     var imgPath = path.resolve(path.dirname(imgdescPath), imgName);
     if (!fs.existsSync(imgPath))
     {
-        console.warn(`${imgdescPath} 中图片资源 ${imgPath} 不存在！`)
+        errMsgs.push(`${imgdescPath} 中图片资源 ${imgPath} 不存在！`)
         callback();
         return;
     }
     var dotIndex = imgName.lastIndexOf(".");
     if (dotIndex == -1)
     {
-        console.warn(`图片路径 ${imgPath} 格式不对！`);
+        errMsgs.push(`图片路径 ${imgPath} 格式不对！`);
         callback();
         return;
     }
@@ -170,12 +174,24 @@ function etcpackImgdesc(imgdescPath, isDiscardAlpha, callback)
         callback();
         return;
     }
+    // 压缩ETC1
+    var newImgName = imgName.substring(0, dotIndex + 1) + "ktx";
+    var newImgPath = path.resolve(path.dirname(imgPath), newImgName);
+    if (fs.existsSync(newImgPath))
+    {
+        // 删除原图片
+        if (fs.existsSync(imgPath))
+            fs.unlinkSync(imgPath);
+        //
+        imgdesc.name = newImgName;
+        writeFile(imgdescPath, JSON.stringify(imgdesc));
+        callback();
+        return;
+    }
 
     // 翻转图片
     filpImage(imgPath, (err) =>
     {
-        // 压缩ETC1
-        var newImgName = imgName.substring(0, dotIndex + 1) + "ktx";
         etcpack(imgPath, path.dirname(imgPath), isDiscardAlpha, (err) =>
         {
             if (err)
@@ -269,9 +285,25 @@ function makeDir(dir)
     fs.mkdirSync(dir);
 }
 
-function deleteFolder(inDir)
+function deleteFolder(folder)
 {
+    console.log(`删除文件夹`);
 
+    var filepaths = getFilePaths(folder, true);
+    filepaths.reverse();
+    var len = filepaths.length;
+    filepaths.forEach((inPath, i) =>
+    {
+        if (fs.statSync(inPath).isDirectory())
+        {
+            fs.rmdirSync(inPath);
+        } else
+        {
+            fs.unlinkSync(inPath);
+        }
+        console.log(`删除文件 ${i + 1} / ${len}`)
+    });
+    console.log(`结束删除目标文件夹。`);
 }
 
 function copyFolder(inDir, outDir)
@@ -286,7 +318,7 @@ function copyFolder(inDir, outDir)
         makeDir(pDir);
 
         fs.copyFileSync(inPath, outPath);
-        console.log(`拷贝文件 ${i} / ${len}`)
+        console.log(`拷贝文件 ${i + 1} / ${len}`)
     });
     console.log(`结束拷贝文件。`);
 }
@@ -317,21 +349,34 @@ function readFiles(filePaths)
     return result;
 }
 
-function getFilePaths(rootPath, filePaths, depth)
+/**
+ * 获取文件路径列表
+ * 
+ * @param {string} rootPath 根路径
+ * @param {string[]} containFolder 是否包含文件夹
+ * @param {string[]} filePaths 用于保存文件路径列表
+ * @param {number} depth 深度
+ */
+function getFilePaths(rootPath, containFolder, filePaths, depth)
 {
+    containFolder = containFolder || false;
     if (depth == undefined) depth = 10000;
     if (depth < 0) return;
     filePaths = filePaths || [];
+    if (!fs.existsSync(rootPath)) return filePaths;
     var stats = fs.statSync(rootPath);
     if (stats.isFile())
     {
         filePaths.push(rootPath);
     } else if (stats.isDirectory)
     {
+        if (containFolder)
+            filePaths.push(rootPath);
+
         var childPaths = fs.readdirSync(rootPath);
         for (var i = 0; i < childPaths.length; i++)
         {
-            getFilePaths(rootPath + "/" + childPaths[i], filePaths, depth - 1);
+            getFilePaths(rootPath + "/" + childPaths[i], containFolder, filePaths, depth - 1);
         }
     }
     return filePaths;

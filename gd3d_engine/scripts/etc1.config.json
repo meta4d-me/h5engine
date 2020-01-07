@@ -3,6 +3,8 @@
 //     "shaderInDir": "D:/work/enginesource/gd3d_engine/newRes/可编辑Shaderlab/shader",
 //     // shader输出文件夹
 //     "shaderOutDir": "D:/work/enginesource/gd3d_engine/res_etc1/etc1_shader",
+//     // 不使用ETC1的shader列表
+//     "unUseETC1": [],
 //     // shader排除列表
 //     "exclude": {
 //         "diffuse.shader.json": [
