@@ -208,7 +208,8 @@ namespace gd3d.framework
                     bundle.parseBundle(loading.data).then(() =>
                     {
                         //加载完成时再次 存储引用
-                        this.name_bundles[bundle.name] = this.kurl_bundles[keyUrl] = this.guid_bundles[bundle.guid] = bundle;
+                        if (!this.name_bundles[bundle.name] || !this.kurl_bundles[keyUrl] || !this.guid_bundles[bundle.guid])
+                            this.name_bundles[bundle.name] = this.kurl_bundles[keyUrl] = this.guid_bundles[bundle.guid] = bundle;
                         state.bundle = bundle;
                         state.isfinish = true;
                         onstate(state);
@@ -272,7 +273,7 @@ namespace gd3d.framework
             state.iserror = true;
             onstate(state);
         }
-        download(guid: number, url: string, type: AssetTypeEnum, finish: () => void, errcb: (err: Error) => void = null)
+        download(guid: number, url: string, type: AssetTypeEnum, finish: () => void, errcb?: (err: Error) => void, bundle?: assetBundle)
         {
             let loading = assetMgr.mapLoading[guid];
             //下载完成的不再下载
@@ -287,7 +288,7 @@ namespace gd3d.framework
                 this.loadImg(guid, url, (img) =>
                 {
                     finish();
-                });
+                }, bundle);
                 return;
             }
 
@@ -300,12 +301,18 @@ namespace gd3d.framework
             io.xhrLoad(url, (data, err) =>
             {
                 console.error(err.stack);
-                errcb(err);
+                if (errcb)
+                    errcb(err);
             }, () => { }, repType, (xhr) =>
             {
                 let loading = assetMgr.mapLoading[guid];
                 if (!loading)
                 {
+                    if (bundle && bundle.isunload == true)
+                    {
+                        console.error(`资源下载取消:${url} , bundle:${bundle.name} 已释放`);
+                        return;
+                    }
                     loading = assetMgr.mapLoading[guid] = { readyok: true };
                 } else
                 {
@@ -317,7 +324,7 @@ namespace gd3d.framework
         }
 
         //加载图片
-        loadImg(guid: number, url: string, cb: (img) => void)
+        loadImg(guid: number, url: string, cb: (img) => void, bundle?: assetBundle)
         {
             if (assetMgr.mapImage[guid])
                 return cb(assetMgr.mapImage[guid]);
@@ -328,6 +335,12 @@ namespace gd3d.framework
             loading.cbQueue.push(cb);
             this._loadImg(url, (img) =>
             {
+                if (bundle && bundle.isunload == true)
+                {
+                    console.error(`img下载取消:${url} , bundle:${bundle.name} 已释放`);
+                    loading.cbQueue = [];
+                    return;
+                }
                 assetMgr.mapImage[guid] = img;
                 loading.readyok = true;
                 loading.data = img;
@@ -398,33 +411,30 @@ namespace gd3d.framework
             // let ctime = Date.now();
             let loading = assetMgr.mapLoading[asset.guid];
             if (!loading)
-            {
-                // error.push(new Error(`资源解析失败 name:${asset.name},bundle:${bundle ? bundle.url : ""} assetMgr.mapLoading 无法找到guid:${asset.guid}`));
-                // return;
                 throw new Error(`资源解析失败 name:${asset.name},bundle:${bundle ? bundle.url : ""} assetMgr.mapLoading 无法找到guid:${asset.guid}`);
-            }
             let data = loading.data;
             let factory = assetParseMap[asset.type];
             if (!factory)
-            {
                 throw new Error(`无法找到[${AssetTypeEnum[asset.type]}]的解析器`);
-                // error.push(new Error(`无法找到[${AssetTypeEnum[asset.type]}]的解析器`));
-                // return;
-            }
             if (!factory.parse)
-            {
                 throw new Error(`解析器 ${factory.constructor.name} 没有实现parse方法`);
-                // error.push(new Error(`解析器 ${factory.constructor.name} 没有实现parse方法`));
-                // return;
-            }
+
 
             let __asset = factory.parse(this, bundle, asset.name, data, asset.dwguid);
             if (__asset instanceof threading.gdPromise)
                 __asset = (await __asset);
             if (__asset)
             {
+
                 if (bundle)
+                {
+                    if (bundle.isunload == true)
+                    {
+                        console.error(`资源解析取消 name:${asset.name} , bundle:${bundle.name}`);
+                        return;
+                    }
                     __asset["id"].id = asset.guid;
+                }
                 __asset.bundle = bundle;
                 this.use(__asset);
             }
