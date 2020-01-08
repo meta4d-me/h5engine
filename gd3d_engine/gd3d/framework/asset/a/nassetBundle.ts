@@ -36,7 +36,7 @@ namespace gd3d.framework
         stateParse: any = {};
         stateText: string;
         thd: number;
-        dhd: number;
+        dhd: number;        
         parseResolve: (o?) => void;
         parseReject: (o: Error) => void;
 
@@ -97,7 +97,7 @@ namespace gd3d.framework
             {
                 this.parseResolve = resolve;
                 this.parseReject = reject;
-
+                
                 if (assetBundle.reTryTest[this.name])
                 {
                     console.error(`资源 ${this.name} 正在重试 , ${this.url}`);
@@ -106,8 +106,9 @@ namespace gd3d.framework
                 }
                 this.dhd = setTimeout(() =>
                 {
-
-                    this.fail(new Error(`[资源]下载超时 ${this.url} , state:${this.stateText}`));
+                    console.error(`[资源]下载超时 ${this.url} , state:${this.stateText}`);
+                    console.error(this.getDownloadInfo());
+                    console.error(this.getParseInfo());
                 }, this.dwOutTime);
 
                 let json;
@@ -283,7 +284,11 @@ namespace gd3d.framework
             clearTimeout(this.dhd);
             this.thd = setTimeout(() =>
             {
-                this.fail(new Error(`[资源]解析超时 ${this.url} , state:${this.stateText}`));
+                // this.fail(new Error(`[资源]解析超时 ${this.url} , state:${this.stateText}`));
+                console.error(`[资源]解析超时 ${this.url} , state:${this.stateText}`);
+                console.error(this.getDownloadInfo());
+                console.error(this.getParseInfo());
+
             }, this.parseOutTime);
             if (this.onDownloadFinish)
                 this.onDownloadFinish();
@@ -334,7 +339,7 @@ namespace gd3d.framework
                 //     console.error(`### 水母3 解析资源:${assets.length}  第一个是:${assets[0].name}`);
                 // }
                 // for (let asset of assets)
-                for(var i=0,len =assets.length;i<len;++i)
+                for (var i = 0, len = assets.length; i < len; ++i)
                 {
                     let asset = assets[i];
                     if (assetMgr.mapGuid[asset.guid])
@@ -350,7 +355,6 @@ namespace gd3d.framework
                         await this.assetmgr.parseRes(asset, this);
                     } catch (error)
                     {
-
                         this.fail(error);
                         return;
                     }
@@ -364,6 +368,7 @@ namespace gd3d.framework
             this.stateText = null;
             clearTimeout(this.thd);
             this.parseResolve();
+
         }
 
         unload(disposeNow: boolean = false)
@@ -393,19 +398,10 @@ namespace gd3d.framework
             delete assetMgr.mapGuid[this.guid];
         }
         fail(error: Error)
-        {
+        {            
             assetBundle.reTryTest[this.name] = 1;
-
-            let dwinfo = this.getDownloadInfo();
-            let pinfo = this.getParseInfo();
             this.unload(true);
-            // console.error(dwinfo);
-            // console.error(pinfo);
-            // console.error(`## ${this.name}  ${error.message}\n${error.stack}\n`);
-            setTimeout(() =>
-            {
-                this.parseReject(new Error(`#########${error.message}\n${error.stack}\n${dwinfo}\n${pinfo}`));
-            }, 1000);
+            this.parseReject(error);
         }
     }
 }

@@ -41,9 +41,9 @@ namespace gd3d.framework
                 case ".pvr":
                 case ".pvr.bin.js":
                     return AssetTypeEnum.PVR;
-                    case ".ktx.bin":
-                    case ".ktx":
-                    case ".ktx.bin.js":
+                case ".ktx.bin":
+                case ".ktx":
+                case ".ktx.bin.js":
                     return AssetTypeEnum.KTX;
                 case ".imgdesc.json":
                     return AssetTypeEnum.TextureDesc;
@@ -188,7 +188,7 @@ namespace gd3d.framework
             type = type == AssetTypeEnum.Auto ? calcType(url) : type;
             if (assetMgr.mapGuid[guid])//已下载的资源
             {
-                
+
                 state.bundle = this.guid_bundles[guid];
                 state.isfinish = true;
                 onstate(state);
@@ -202,13 +202,18 @@ namespace gd3d.framework
                 if (type == AssetTypeEnum.Bundle)
                 {
                     let bundle = new assetBundle(url, this, guid);
-                    this.name_bundles[bundle.name] = this.kurl_bundles[keyUrl] = this.guid_bundles[bundle.guid] = bundle;                 
                     bundle.onDownloadFinish = downloadFinish;
-                    bundle.parseBundle(loading.data).then(()=>{
+                    this.name_bundles[bundle.name] = this.kurl_bundles[keyUrl] = this.guid_bundles[bundle.guid] = bundle;
+                    //这个过程中有可能会被释放 ,所以以下从新赋值引用
+                    bundle.parseBundle(loading.data).then(() =>
+                    {
+                        //加载完成时再次 存储引用
+                        this.name_bundles[bundle.name] = this.kurl_bundles[keyUrl] = this.guid_bundles[bundle.guid] = bundle;
                         state.bundle = bundle;
                         state.isfinish = true;
                         onstate(state);
-                    }).catch((err)=>{
+                    }).catch((err) =>
+                    {
                         error.push(err);
                         state.iserror = true;
                         // console.error(`##抛出重试 ${bundle.name} ---- `);
@@ -245,8 +250,9 @@ namespace gd3d.framework
                         if (ntype == AssetTypeEnum.Texture)
                             this.loadImg(nguid, nurl, next.bind(this, filename, guid, type, nguid));//不一样的是这里带了一个需要下载的GUID
                         else
-                            this.download(nguid, nurl, ntype, next.bind(this, filename, guid, type, nguid),(err)=>{
-                                assetMgr.setStateError(state,onstate,err);
+                            this.download(nguid, nurl, ntype, next.bind(this, filename, guid, type, nguid), (err) =>
+                            {
+                                assetMgr.setStateError(state, onstate, err);
                             });//不一样的是这里带了一个需要下载的GUID
                     } else
                     {
@@ -255,17 +261,18 @@ namespace gd3d.framework
                     }
 
                 }
-            },(err)=>{
-                assetMgr.setStateError(state,onstate,err);
+            }, (err) =>
+            {
+                assetMgr.setStateError(state, onstate, err);
             });
         }
-        static setStateError(state:stateLoad,onstate: (state?: stateLoad) => void,err:Error)
+        static setStateError(state: stateLoad, onstate: (state?: stateLoad) => void, err: Error)
         {
             state.errs.push(err);
-            state.iserror= true;
-            onstate(state); 
+            state.iserror = true;
+            onstate(state);
         }
-        download(guid: number, url: string, type: AssetTypeEnum, finish: () => void,errcb:(err:Error)=>void=null)
+        download(guid: number, url: string, type: AssetTypeEnum, finish: () => void, errcb: (err: Error) => void = null)
         {
             let loading = assetMgr.mapLoading[guid];
             //下载完成的不再下载
@@ -392,20 +399,23 @@ namespace gd3d.framework
             let loading = assetMgr.mapLoading[asset.guid];
             if (!loading)
             {
-                error.push(new Error(`资源解析失败 name:${asset.name},bundle:${bundle ? bundle.url : ""} assetMgr.mapLoading 无法找到guid:${asset.guid}`));
-                return;
+                // error.push(new Error(`资源解析失败 name:${asset.name},bundle:${bundle ? bundle.url : ""} assetMgr.mapLoading 无法找到guid:${asset.guid}`));
+                // return;
+                throw new Error(`资源解析失败 name:${asset.name},bundle:${bundle ? bundle.url : ""} assetMgr.mapLoading 无法找到guid:${asset.guid}`);
             }
             let data = loading.data;
             let factory = assetParseMap[asset.type];
             if (!factory)
             {
-                error.push(new Error(`无法找到[${AssetTypeEnum[asset.type]}]的解析器`));
-                return;
+                throw new Error(`无法找到[${AssetTypeEnum[asset.type]}]的解析器`);
+                // error.push(new Error(`无法找到[${AssetTypeEnum[asset.type]}]的解析器`));
+                // return;
             }
             if (!factory.parse)
             {
-                error.push(new Error(`解析器 ${factory.constructor.name} 没有实现parse方法`));
-                return;
+                throw new Error(`解析器 ${factory.constructor.name} 没有实现parse方法`);
+                // error.push(new Error(`解析器 ${factory.constructor.name} 没有实现parse方法`));
+                // return;
             }
 
             let __asset = factory.parse(this, bundle, asset.name, data, asset.dwguid);

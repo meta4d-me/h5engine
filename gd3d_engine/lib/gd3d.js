@@ -2866,7 +2866,8 @@ var gd3d;
                     return;
                 }
                 if (node._parent != this || this._children == null) {
-                    throw new Error("not my child.");
+                    console.warn("not my child.");
+                    return;
                 }
                 var i = this._children.indexOf(node);
                 if (i < 0)
@@ -3068,15 +3069,19 @@ var gd3d;
                 return this.addComponentDirect(comp);
             };
             transform2D.prototype.addComponentDirect = function (comp) {
-                if (!comp)
-                    throw new Error("this component is null");
+                if (!comp) {
+                    console.error("this component is null");
+                    return;
+                }
                 if (comp.transform != null) {
-                    throw new Error("this components has added to a  gameObject");
+                    console.error("this components has added to a  gameObject");
+                    return;
                 }
                 comp.transform = this;
                 var typeStr = framework.getClassName(comp);
                 if (this.componentTypes[typeStr]) {
-                    throw new Error(this.name + "   已经有一个" + typeStr + "的组件了，不能俩");
+                    console.error(this.name + "   已经有一个" + typeStr + "的组件了，不能俩");
+                    return;
                 }
                 if (this.components == null)
                     this.components = [];
@@ -3088,7 +3093,8 @@ var gd3d;
                         this.renderer = comp;
                     }
                     else {
-                        throw new Error("已经有一个渲染器的组件了，不能俩");
+                        console.error("已经有一个渲染器的组件了，不能俩");
+                        return;
                     }
                 }
                 if (gd3d.reflect.getClassTag(comp["__proto__"], "boxcollider2d") == "1") {
@@ -3096,7 +3102,8 @@ var gd3d;
                         this.collider = comp;
                     }
                     else {
-                        throw new Error("已经有一个碰撞组件了，不能俩");
+                        console.error("已经有一个碰撞组件了，不能俩");
+                        return;
                     }
                 }
                 if (gd3d.reflect.getClassTag(comp["__proto__"], "node2dphysicsbody") == "1") {
@@ -3104,7 +3111,8 @@ var gd3d;
                         this.physicsBody = comp;
                     }
                     else {
-                        throw new Error("已经有一个碰撞组件了，不能俩");
+                        console.error("已经有一个碰撞组件了，不能俩");
+                        return;
                     }
                 }
                 if (framework.functionIsEmpty(comp.update))
@@ -8595,7 +8603,9 @@ var gd3d;
                         _this.ready = false;
                     }
                     _this.dhd = setTimeout(function () {
-                        _this.fail(new Error("[\u8D44\u6E90]\u4E0B\u8F7D\u8D85\u65F6 " + _this.url + " , state:" + _this.stateText));
+                        console.error("[\u8D44\u6E90]\u4E0B\u8F7D\u8D85\u65F6 " + _this.url + " , state:" + _this.stateText);
+                        console.error(_this.getDownloadInfo());
+                        console.error(_this.getParseInfo());
                     }, _this.dwOutTime);
                     var json;
                     try {
@@ -8739,7 +8749,9 @@ var gd3d;
                             case 0:
                                 clearTimeout(this.dhd);
                                 this.thd = setTimeout(function () {
-                                    _this.fail(new Error("[\u8D44\u6E90]\u89E3\u6790\u8D85\u65F6 " + _this.url + " , state:" + _this.stateText));
+                                    console.error("[\u8D44\u6E90]\u89E3\u6790\u8D85\u65F6 " + _this.url + " , state:" + _this.stateText);
+                                    console.error(_this.getDownloadInfo());
+                                    console.error(_this.getParseInfo());
                                 }, this.parseOutTime);
                                 if (this.onDownloadFinish)
                                     this.onDownloadFinish();
@@ -8831,14 +8843,9 @@ var gd3d;
                 delete framework.assetMgr.mapGuid[this.guid];
             };
             assetBundle.prototype.fail = function (error) {
-                var _this = this;
                 assetBundle.reTryTest[this.name] = 1;
-                var dwinfo = this.getDownloadInfo();
-                var pinfo = this.getParseInfo();
                 this.unload(true);
-                setTimeout(function () {
-                    _this.parseReject(new Error("#########" + error.message + "\n" + error.stack + "\n" + dwinfo + "\n" + pinfo));
-                }, 1000);
+                this.parseReject(error);
             };
             assetBundle.idNext = -1;
             assetBundle.reTryTest = {};
@@ -9012,9 +9019,10 @@ var gd3d;
                     var loading = assetMgr.mapLoading[guid];
                     if (type == framework.AssetTypeEnum.Bundle) {
                         var bundle_1 = new framework.assetBundle(url, _this, guid);
-                        _this.name_bundles[bundle_1.name] = _this.kurl_bundles[keyUrl] = _this.guid_bundles[bundle_1.guid] = bundle_1;
                         bundle_1.onDownloadFinish = downloadFinish;
+                        _this.name_bundles[bundle_1.name] = _this.kurl_bundles[keyUrl] = _this.guid_bundles[bundle_1.guid] = bundle_1;
                         bundle_1.parseBundle(loading.data).then(function () {
+                            _this.name_bundles[bundle_1.name] = _this.kurl_bundles[keyUrl] = _this.guid_bundles[bundle_1.guid] = bundle_1;
                             state.bundle = bundle_1;
                             state.isfinish = true;
                             onstate(state);
@@ -9170,18 +9178,15 @@ var gd3d;
                                     return [2, assetMgr.mapGuid[asset.guid].asset];
                                 loading = assetMgr.mapLoading[asset.guid];
                                 if (!loading) {
-                                    framework.error.push(new Error("\u8D44\u6E90\u89E3\u6790\u5931\u8D25 name:" + asset.name + ",bundle:" + (bundle ? bundle.url : "") + " assetMgr.mapLoading \u65E0\u6CD5\u627E\u5230guid:" + asset.guid));
-                                    return [2];
+                                    throw new Error("\u8D44\u6E90\u89E3\u6790\u5931\u8D25 name:" + asset.name + ",bundle:" + (bundle ? bundle.url : "") + " assetMgr.mapLoading \u65E0\u6CD5\u627E\u5230guid:" + asset.guid);
                                 }
                                 data = loading.data;
                                 factory = framework.assetParseMap[asset.type];
                                 if (!factory) {
-                                    framework.error.push(new Error("\u65E0\u6CD5\u627E\u5230[" + framework.AssetTypeEnum[asset.type] + "]\u7684\u89E3\u6790\u5668"));
-                                    return [2];
+                                    throw new Error("\u65E0\u6CD5\u627E\u5230[" + framework.AssetTypeEnum[asset.type] + "]\u7684\u89E3\u6790\u5668");
                                 }
                                 if (!factory.parse) {
-                                    framework.error.push(new Error("\u89E3\u6790\u5668 " + factory.constructor.name + " \u6CA1\u6709\u5B9E\u73B0parse\u65B9\u6CD5"));
-                                    return [2];
+                                    throw new Error("\u89E3\u6790\u5668 " + factory.constructor.name + " \u6CA1\u6709\u5B9E\u73B0parse\u65B9\u6CD5");
                                 }
                                 __asset = factory.parse(this, bundle, asset.name, data, asset.dwguid);
                                 if (!(__asset instanceof gd3d.threading.gdPromise)) return [3, 2];
@@ -11167,7 +11172,8 @@ var gd3d;
             };
             transform.prototype.removeChild = function (node) {
                 if (node._parent != this || this.children == null) {
-                    throw new Error("not my child.");
+                    console.warn("not my child.");
+                    return;
                 }
                 var i = this.children.indexOf(node);
                 if (i >= 0) {
@@ -35604,16 +35610,20 @@ var gd3d;
                 }
             };
             gameObject.prototype.addComponentDirect = function (comp) {
-                if (!comp)
-                    throw new Error("this component is null");
+                if (!comp) {
+                    console.error("this component is null");
+                    return;
+                }
                 this.transform.markHaveComponent();
                 if (comp.gameObject != null) {
-                    throw new Error("this components has added to a  gameObject");
+                    console.error("this components has added to a  gameObject");
+                    return;
                 }
                 comp.gameObject = this;
                 var typeStr = framework.getClassName(comp);
                 if (this.componentTypes[typeStr]) {
-                    throw new Error(this.getName() + "   已经有一个" + typeStr + "的组件了，不能俩");
+                    console.error(this.getName() + "   已经有一个" + typeStr + "的组件了，不能俩");
+                    return;
                 }
                 var nodeObj = new nodeComponent(comp, false);
                 var add = true;
@@ -35766,7 +35776,7 @@ var gd3d;
                     }
                     ++i;
                 }
-                if (len < 1)
+                if (this.components.length < 1)
                     this.haveComponet = false;
             };
             gameObject.prototype.removeComponentByTypeName = function (type) {
@@ -35785,7 +35795,7 @@ var gd3d;
                     }
                     ++i;
                 }
-                if (len < 1)
+                if (this.components.length < 1)
                     this.haveComponet = false;
                 return result;
             };

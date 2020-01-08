@@ -638,7 +638,7 @@ namespace gd3d.framework
                 }
                 ++i;
             }
-            if (len < 1)
+            if (this.components.length < 1)
                 this.haveComponet = false;
         }
 
@@ -677,7 +677,7 @@ namespace gd3d.framework
                 }
                 ++i;
             }
-            if (len < 1)
+            if (this.components.length < 1)
                 this.haveComponet = false;
 
             return result;
