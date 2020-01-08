@@ -105,13 +105,17 @@ namespace gd3d.framework
                         if (!guid)
                             guid = assetBundle.buildGuid();
                         this.pkgsGuid.push(guid);
-
+                        console.error(`下載資源 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                         this.assetmgr.download(guid, url, calcType(url), () =>
                         {
                             ++dwpkgCount;
+                            console.error(`下載資源 11 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                             if (dwpkgCount >= this.dw_fileCount)
                                 this.parseFile();
-                        }, null, this);
+                        }, () =>
+                        {
+                            console.error(`资源下载失败:${kurl} ,bundle:${this.name}`);
+                        }, this);
                     }
                 } else
                 {
@@ -121,22 +125,26 @@ namespace gd3d.framework
                     {
                         let guid = this.files[k];
                         let url = `${this.baseUrl}Resources/${k}`;
-
+                        console.error(`下載資源 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                         this.assetmgr.download(guid, url, calcType(k), () =>
                         {
                             ++dwpkgCount;
+                            console.error(`下載資源 11 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                             if (dwpkgCount >= this.dw_fileCount)
                                 this.parseFile();
-                        }, null, this);
+                        }, () =>
+                        {
+                            console.error(`资源下载失败:${url} ,bundle:${this.name}`);
+                        }, this);
                     }
                 }
 
 
                 //下载图片
-                const imageNext = function ()
+                const imageNext = function (url)
                 {
                     ++dwpkgCount;
-
+                    console.error(`下載資源 11 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                     if (dwpkgCount >= this.dw_fileCount)
                         this.parseFile();
                 }
@@ -145,11 +153,14 @@ namespace gd3d.framework
                     let guid = this.texs[k];
                     this.files[k] = guid;//先下载 然后给解析器补充一个key
                     let url = `${this.baseUrl}resources/${k}`;
-
+                    console.error(`下載資源 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                     if (k.endsWith(".png") || k.endsWith(".jpg"))
-                        this.assetmgr.loadImg(guid, url, imageNext.bind(this), this);
+                        this.assetmgr.loadImg(guid, url, imageNext.bind(this,url), this);
                     else if (k.endsWith(".pvr.bin"))
-                        this.assetmgr.download(guid, url, AssetTypeEnum.PVR, imageNext.bind(this), null, this);
+                        this.assetmgr.download(guid, url, AssetTypeEnum.PVR, imageNext.bind(this,url), () =>
+                        {
+                            console.error(`资源下载失败:${url} ,bundle:${this.name}`);
+                        }, this);
                 }
             });
         }
@@ -278,6 +289,7 @@ namespace gd3d.framework
                         await this.assetmgr.parseRes(asset, this);
                     } catch (error)
                     {
+                        console.error(`资源解析失败:${asset.name} ,bundle:${this.name}`);
                         this.fail(error);
                         return;
                     }
@@ -319,7 +331,7 @@ namespace gd3d.framework
         fail(error: Error)
         {
             assetBundle.reTryTest[this.name] = 1;
-            this.unload(true);
+            // this.unload(true);
             this.parseReject(error);
         }
     }
