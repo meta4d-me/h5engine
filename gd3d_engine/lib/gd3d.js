@@ -8600,10 +8600,8 @@ var gd3d;
                             if (!guid)
                                 guid = assetBundle.buildGuid();
                             _this.pkgsGuid.push(guid);
-                            console.error("[\u4E0B\u8F09\u8CC7\u6E90] 00 " + _this.name + "," + url + "  ," + dwpkgCount + "/" + _this.dw_fileCount);
                             _this.assetmgr.download(guid, url, framework.calcType(url), function () {
                                 ++dwpkgCount;
-                                console.error("[\u4E0B\u8F09\u8CC7\u6E90] 11 " + _this.name + "," + url + "  ," + dwpkgCount + "/" + _this.dw_fileCount);
                                 if (dwpkgCount >= _this.dw_fileCount)
                                     _this.parseFile();
                             }, function () {
@@ -8619,10 +8617,8 @@ var gd3d;
                         var _loop_3 = function (k) {
                             var guid = _this.files[k];
                             var url = _this.baseUrl + "Resources/" + k;
-                            console.error("[\u4E0B\u8F09\u8CC7\u6E90] 00 " + _this.name + "," + url + "  ," + dwpkgCount + "/" + _this.dw_fileCount);
                             _this.assetmgr.download(guid, url, framework.calcType(k), function () {
                                 ++dwpkgCount;
-                                console.error("[\u4E0B\u8F09\u8CC7\u6E90] 11 " + _this.name + "," + url + "  ," + dwpkgCount + "/" + _this.dw_fileCount);
                                 if (dwpkgCount >= _this.dw_fileCount)
                                     _this.parseFile();
                             }, function () {
@@ -8635,7 +8631,6 @@ var gd3d;
                     }
                     var imageNext = function (url) {
                         ++dwpkgCount;
-                        console.error("[\u4E0B\u8F09\u8CC7\u6E90] 11 " + this.name + "," + url + "  ," + dwpkgCount + "/" + this.dw_fileCount);
                         if (dwpkgCount >= this.dw_fileCount)
                             this.parseFile();
                     };
@@ -8643,7 +8638,6 @@ var gd3d;
                         var guid = _this.texs[k];
                         _this.files[k] = guid;
                         var url = _this.baseUrl + "resources/" + k;
-                        console.error("[\u4E0B\u8F09\u8CC7\u6E90] 00 " + _this.name + "," + url + "  ," + dwpkgCount + "/" + _this.dw_fileCount);
                         if (k.endsWith(".png") || k.endsWith(".jpg"))
                             _this.assetmgr.loadImg(guid, url, imageNext.bind(_this, url), _this);
                         else if (k.endsWith(".pvr.bin"))
@@ -8740,7 +8734,6 @@ var gd3d;
                             case 1:
                                 if (!(i < len)) return [3, 6];
                                 asset = assets[i];
-                                console.error("[\u89E3\u6790\u8D44\u6E90] 00 name:" + asset.name + " ,bundle:" + this.name + "  " + i + "/" + assets.length);
                                 if (framework.assetMgr.mapGuid[asset.guid])
                                     return [3, 5];
                                 _a.label = 2;
@@ -8749,11 +8742,9 @@ var gd3d;
                                 return [4, this.assetmgr.parseRes(asset, this)];
                             case 3:
                                 _a.sent();
-                                console.error("[\u89E3\u6790\u8D44\u6E90] 11 name:" + asset.name + " ,bundle:" + this.name + " " + i + "/" + assets.length);
                                 return [3, 5];
                             case 4:
                                 error_1 = _a.sent();
-                                console.error("[\u89E3\u6790\u8D44\u6E90]\u5931\u8D25:" + asset.name + " ,bundle:" + this.name + " " + i + "/" + assets.length);
                                 this.fail(error_1);
                                 return [2];
                             case 5:
@@ -9165,7 +9156,6 @@ var gd3d;
                         }).catch(function (e) {
                             reject(e);
                         });
-                        console.error("[\u89E3\u6790\u8D44\u6E90] await \u5B8C\u6210 " + asset.name);
                     }
                     else
                         nextRes(retasset);
@@ -13294,16 +13284,13 @@ var gd3d;
             mesh.prototype.Parse = function (inData, webgl) {
                 var _this = this;
                 return new Promise(function (reslove, reject) {
-                    console.error("[\u89E3\u6790\u8D44\u6E90] mesh 00  " + _this.name.getText());
                     try {
                         _this.parseCMesh(inData, webgl);
                     }
                     catch (error) {
-                        console.error("[\u89E3\u6790\u8D44\u6E90] mesh 22  " + _this.name.getText() + " " + error.message);
                         reject(error.stack);
                         return;
                     }
-                    console.error("[\u89E3\u6790\u8D44\u6E90] mesh 11  " + _this.name.getText());
                     reslove(_this);
                 });
             };

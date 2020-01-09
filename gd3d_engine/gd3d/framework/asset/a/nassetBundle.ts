@@ -105,11 +105,11 @@ namespace gd3d.framework
                         if (!guid)
                             guid = assetBundle.buildGuid();
                         this.pkgsGuid.push(guid);
-                        console.error(`[下載資源] 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
+                        // console.error(`[下載資源] 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                         this.assetmgr.download(guid, url, calcType(url), () =>
                         {
                             ++dwpkgCount;
-                            console.error(`[下載資源] 11 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
+                            // console.error(`[下載資源] 11 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                             if (dwpkgCount >= this.dw_fileCount)
                                 this.parseFile();
                         }, () =>
@@ -125,11 +125,11 @@ namespace gd3d.framework
                     {
                         let guid = this.files[k];
                         let url = `${this.baseUrl}Resources/${k}`;
-                        console.error(`[下載資源] 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
+                        // console.error(`[下載資源] 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                         this.assetmgr.download(guid, url, calcType(k), () =>
                         {
                             ++dwpkgCount;
-                            console.error(`[下載資源] 11 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
+                            // console.error(`[下載資源] 11 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                             if (dwpkgCount >= this.dw_fileCount)
                                 this.parseFile();
                         }, () =>
@@ -144,7 +144,7 @@ namespace gd3d.framework
                 const imageNext = function (url)
                 {
                     ++dwpkgCount;
-                    console.error(`[下載資源] 11 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
+                    // console.error(`[下載資源] 11 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                     if (dwpkgCount >= this.dw_fileCount)
                         this.parseFile();
                 }
@@ -153,7 +153,7 @@ namespace gd3d.framework
                     let guid = this.texs[k];
                     this.files[k] = guid;//先下载 然后给解析器补充一个key
                     let url = `${this.baseUrl}resources/${k}`;
-                    console.error(`[下載資源] 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
+                    // console.error(`[下載資源] 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                     if (k.endsWith(".png") || k.endsWith(".jpg"))
                         this.assetmgr.loadImg(guid, url, imageNext.bind(this,url), this);
                     else if (k.endsWith(".pvr.bin"))
