@@ -21462,25 +21462,35 @@ var gd3d;
             };
             inputMgr.prototype._touchstart = function (ev) {
                 this._point.touch = true;
+                var lastTouche;
                 for (var i = 0; i < ev.changedTouches.length; i++) {
                     var touch = ev.changedTouches[i];
                     var id = touch.identifier;
                     this.tryAddTouchP(id);
                     this._touches[id].touch = true;
                     this.CalcuPoint(touch.clientX, touch.clientY, this._touches[id]);
+                    lastTouche = this._touches[id];
                 }
-                this.syncPointByTouches();
+                if (lastTouche) {
+                    this._point.x = lastTouche.x;
+                    this._point.y = lastTouche.y;
+                }
             };
             inputMgr.prototype._touchmove = function (ev) {
                 this._point.touch = true;
+                var lastTouche;
                 for (var i = 0; i < ev.changedTouches.length; i++) {
                     var touch = ev.changedTouches[i];
                     var id = touch.identifier;
                     this.tryAddTouchP(id);
                     this._touches[id].touch = true;
                     this.CalcuPoint(touch.clientX, touch.clientY, this._touches[id]);
+                    lastTouche = this._touches[id];
                 }
-                this.syncPointByTouches();
+                if (lastTouche) {
+                    this._point.x = lastTouche.x;
+                    this._point.y = lastTouche.y;
+                }
             };
             inputMgr.prototype._touchend = function (ev) {
                 for (var i = 0; i < ev.changedTouches.length; i++) {
@@ -21488,10 +21498,6 @@ var gd3d;
                     var id = touch.identifier;
                     this.tryAddTouchP(id);
                     this._touches[id].touch = false;
-                }
-                for (var key in this._touches) {
-                    if (this._touches[key].touch == true)
-                        return;
                 }
                 this._point.touch = false;
             };
