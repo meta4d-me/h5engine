@@ -112,12 +112,14 @@ namespace gd3d.framework
             //     console.error(data);
             //     console.error(data.byteLength);
             // }
+
             if (!(data instanceof ArrayBuffer))
             {
                 // console.error(`####### data not ArrayBuffer instance ,mesh name:${name},bundle:${bundle ? bundle.url : null} `);
                 // console.error(data);
-                error.push(new Error(`data not ArrayBuffer instance ,mesh name:${name},bundle:${bundle ? bundle.url : null} `));
-                return new mesh(name);
+                // error.push(new Error(`data not ArrayBuffer instance ,mesh name:${name},bundle:${bundle ? bundle.url : null} `));
+                // return new mesh(name);
+                throw new Error(`data not ArrayBuffer instance ,mesh name:${name},bundle:${bundle ? bundle.url : null} `);
             }
             return new mesh(name).Parse(data, assetMgr.webgl);
         }

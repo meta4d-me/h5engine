@@ -8600,12 +8600,14 @@ var gd3d;
                             if (!guid)
                                 guid = assetBundle.buildGuid();
                             _this.pkgsGuid.push(guid);
+                            console.error("[\u4E0B\u8F09\u8CC7\u6E90] 00 " + _this.name + "," + url + "  ," + dwpkgCount + "/" + _this.dw_fileCount);
                             _this.assetmgr.download(guid, url, framework.calcType(url), function () {
                                 ++dwpkgCount;
+                                console.error("[\u4E0B\u8F09\u8CC7\u6E90] 11 " + _this.name + "," + url + "  ," + dwpkgCount + "/" + _this.dw_fileCount);
                                 if (dwpkgCount >= _this.dw_fileCount)
                                     _this.parseFile();
                             }, function () {
-                                console.error("\u8D44\u6E90\u4E0B\u8F7D\u5931\u8D25:" + kurl + " ,bundle:" + _this.name);
+                                console.error("[\u4E0B\u8F09\u8CC7\u6E90]\u5931\u8D25:" + kurl + " ,bundle:" + _this.name);
                             }, _this);
                         };
                         for (var i = 0, len = _this.pkgs.length; i < len; ++i) {
@@ -8617,20 +8619,23 @@ var gd3d;
                         var _loop_3 = function (k) {
                             var guid = _this.files[k];
                             var url = _this.baseUrl + "Resources/" + k;
+                            console.error("[\u4E0B\u8F09\u8CC7\u6E90] 00 " + _this.name + "," + url + "  ," + dwpkgCount + "/" + _this.dw_fileCount);
                             _this.assetmgr.download(guid, url, framework.calcType(k), function () {
                                 ++dwpkgCount;
+                                console.error("[\u4E0B\u8F09\u8CC7\u6E90] 11 " + _this.name + "," + url + "  ," + dwpkgCount + "/" + _this.dw_fileCount);
                                 if (dwpkgCount >= _this.dw_fileCount)
                                     _this.parseFile();
                             }, function () {
-                                console.error("\u8D44\u6E90\u4E0B\u8F7D\u5931\u8D25:" + url + " ,bundle:" + _this.name);
+                                console.error("[\u4E0B\u8F09\u8CC7\u6E90]\u5931\u8D25:" + url + " ,bundle:" + _this.name);
                             }, _this);
                         };
                         for (var k in _this.files) {
                             _loop_3(k);
                         }
                     }
-                    var imageNext = function () {
+                    var imageNext = function (url) {
                         ++dwpkgCount;
+                        console.error("[\u4E0B\u8F09\u8CC7\u6E90] 11 " + this.name + "," + url + "  ," + dwpkgCount + "/" + this.dw_fileCount);
                         if (dwpkgCount >= this.dw_fileCount)
                             this.parseFile();
                     };
@@ -8638,11 +8643,12 @@ var gd3d;
                         var guid = _this.texs[k];
                         _this.files[k] = guid;
                         var url = _this.baseUrl + "resources/" + k;
+                        console.error("[\u4E0B\u8F09\u8CC7\u6E90] 00 " + _this.name + "," + url + "  ," + dwpkgCount + "/" + _this.dw_fileCount);
                         if (k.endsWith(".png") || k.endsWith(".jpg"))
-                            _this.assetmgr.loadImg(guid, url, imageNext.bind(_this), _this);
+                            _this.assetmgr.loadImg(guid, url, imageNext.bind(_this, url), _this);
                         else if (k.endsWith(".pvr.bin"))
-                            _this.assetmgr.download(guid, url, framework.AssetTypeEnum.PVR, imageNext.bind(_this), function () {
-                                console.error("\u8D44\u6E90\u4E0B\u8F7D\u5931\u8D25:" + url + " ,bundle:" + _this.name);
+                            _this.assetmgr.download(guid, url, framework.AssetTypeEnum.PVR, imageNext.bind(_this, url), function () {
+                                console.error("[\u4E0B\u8F09\u8CC7\u6E90]\u5931\u8D25:" + url + " ,bundle:" + _this.name);
                             }, _this);
                     };
                     for (var k in _this.texs) {
@@ -8678,7 +8684,7 @@ var gd3d;
                             }
                         }
                         catch (error) {
-                            throw new Error("[\u8D44\u6E90]unpkg bpkg\u5931\u8D25:" + this.url + "," + this.pkgs[i] + "\n" + error.message);
+                            throw new Error("[\u89E3\u6790\u8CC7\u6E90]unpkg bpkg\u5931\u8D25:" + this.url + "," + this.pkgs[i] + "\n" + error.message);
                         }
                     }
                     else {
@@ -8694,7 +8700,7 @@ var gd3d;
                             }
                         }
                         catch (error) {
-                            throw new Error("[\u8D44\u6E90]unpkg jpkg\u5931\u8D25:" + this.url + "," + this.pkgs[i] + "\n" + error.message);
+                            throw new Error("[\u89E3\u6790\u8CC7\u6E90]unpkg jpkg\u5931\u8D25:" + this.url + "," + this.pkgs[i] + "\n" + error.message);
                         }
                     }
                     delete pkgld.data;
@@ -8734,6 +8740,7 @@ var gd3d;
                             case 1:
                                 if (!(i < len)) return [3, 6];
                                 asset = assets[i];
+                                console.error("[\u89E3\u6790\u8D44\u6E90] 00 name:" + asset.name + " ,bundle:" + this.name + "  " + i + "/" + assets.length);
                                 if (framework.assetMgr.mapGuid[asset.guid])
                                     return [3, 5];
                                 _a.label = 2;
@@ -8742,10 +8749,11 @@ var gd3d;
                                 return [4, this.assetmgr.parseRes(asset, this)];
                             case 3:
                                 _a.sent();
+                                console.error("[\u89E3\u6790\u8D44\u6E90] 11 name:" + asset.name + " ,bundle:" + this.name + " " + i + "/" + assets.length);
                                 return [3, 5];
                             case 4:
                                 error_1 = _a.sent();
-                                console.error("\u8D44\u6E90\u89E3\u6790\u5931\u8D25:" + asset.name + " ,bundle:" + this.name);
+                                console.error("[\u89E3\u6790\u8D44\u6E90]\u5931\u8D25:" + asset.name + " ,bundle:" + this.name + " " + i + "/" + assets.length);
                                 this.fail(error_1);
                                 return [2];
                             case 5:
@@ -8935,7 +8943,7 @@ var gd3d;
                 });
             };
             assetMgr.prototype.load = function (url, type, onstate, downloadFinish) {
-                var _this = this;
+                var _this_1 = this;
                 if (type === void 0) { type = framework.AssetTypeEnum.Auto; }
                 if (onstate === void 0) { onstate = null; }
                 if (downloadFinish === void 0) { downloadFinish = null; }
@@ -8958,12 +8966,12 @@ var gd3d;
                 this.download(guid, url, type, function () {
                     var loading = assetMgr.mapLoading[guid];
                     if (type == framework.AssetTypeEnum.Bundle) {
-                        var bundle_1 = new framework.assetBundle(url, _this, guid);
+                        var bundle_1 = new framework.assetBundle(url, _this_1, guid);
                         bundle_1.onDownloadFinish = downloadFinish;
-                        _this.name_bundles[bundle_1.name] = _this.kurl_bundles[keyUrl] = _this.guid_bundles[bundle_1.guid] = bundle_1;
+                        _this_1.name_bundles[bundle_1.name] = _this_1.kurl_bundles[keyUrl] = _this_1.guid_bundles[bundle_1.guid] = bundle_1;
                         bundle_1.parseBundle(loading.data).then(function () {
-                            if (!_this.name_bundles[bundle_1.name] || !_this.kurl_bundles[keyUrl] || !_this.guid_bundles[bundle_1.guid])
-                                _this.name_bundles[bundle_1.name] = _this.kurl_bundles[keyUrl] = _this.guid_bundles[bundle_1.guid] = bundle_1;
+                            if (!_this_1.name_bundles[bundle_1.name] || !_this_1.kurl_bundles[keyUrl] || !_this_1.guid_bundles[bundle_1.guid])
+                                _this_1.name_bundles[bundle_1.name] = _this_1.kurl_bundles[keyUrl] = _this_1.guid_bundles[bundle_1.guid] = bundle_1;
                             state.bundle = bundle_1;
                             state.isfinish = true;
                             onstate(state);
@@ -8976,7 +8984,7 @@ var gd3d;
                     else {
                         var filename = framework.getFileName(url);
                         var next = function (name, guid, type, dwguid) {
-                            _this.parseRes({ name: name, guid: guid, type: type, dwguid: dwguid }).then(function (asset) {
+                            _this_1.parseRes({ name: name, guid: guid, type: type, dwguid: dwguid }).then(function (asset) {
                                 state.isfinish = true;
                                 if (asset) {
                                     state.resstateFirst = {
@@ -8995,15 +9003,15 @@ var gd3d;
                             var nguid = framework.resID.next();
                             var ntype = calcType(nname);
                             if (ntype == framework.AssetTypeEnum.Texture)
-                                _this.loadImg(nguid, nurl, next.bind(_this, filename, guid, type, nguid));
+                                _this_1.loadImg(nguid, nurl, next.bind(_this_1, filename, guid, type, nguid));
                             else
-                                _this.download(nguid, nurl, ntype, next.bind(_this, filename, guid, type, nguid), function (err) {
+                                _this_1.download(nguid, nurl, ntype, next.bind(_this_1, filename, guid, type, nguid), function (err) {
                                     assetMgr.setStateError(state, onstate, err);
                                 });
                         }
                         else {
                             var dwguid = type == framework.AssetTypeEnum.Texture ? guid : null;
-                            next.call(_this, filename, guid, type, dwguid);
+                            next.call(_this_1, filename, guid, type, dwguid);
                         }
                     }
                 }, function (err) {
@@ -9119,43 +9127,48 @@ var gd3d;
                 }
             };
             assetMgr.prototype.parseRes = function (asset, bundle) {
-                return __awaiter(this, void 0, void 0, function () {
-                    var loading, data, factory, __asset;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0:
-                                if (assetMgr.mapGuid[asset.guid])
-                                    return [2, assetMgr.mapGuid[asset.guid].asset];
-                                loading = assetMgr.mapLoading[asset.guid];
-                                if (!loading)
-                                    throw new Error("\u8D44\u6E90\u89E3\u6790\u5931\u8D25 name:" + asset.name + ",bundle:" + (bundle ? bundle.url : "") + " assetMgr.mapLoading \u65E0\u6CD5\u627E\u5230guid:" + asset.guid);
-                                data = loading.data;
-                                factory = framework.assetParseMap[asset.type];
-                                if (!factory)
-                                    throw new Error("\u65E0\u6CD5\u627E\u5230[" + framework.AssetTypeEnum[asset.type] + "]\u7684\u89E3\u6790\u5668");
-                                if (!factory.parse)
-                                    throw new Error("\u89E3\u6790\u5668 " + factory.constructor.name + " \u6CA1\u6709\u5B9E\u73B0parse\u65B9\u6CD5");
-                                __asset = factory.parse(this, bundle, asset.name, data, asset.dwguid);
-                                if (!(__asset instanceof gd3d.threading.gdPromise)) return [3, 2];
-                                return [4, __asset];
-                            case 1:
-                                __asset = (_a.sent());
-                                _a.label = 2;
-                            case 2:
-                                if (__asset) {
-                                    if (bundle) {
-                                        if (bundle.isunload == true) {
-                                            console.error("\u8D44\u6E90\u89E3\u6790\u53D6\u6D88 name:" + asset.name + " , bundle:" + bundle.name);
-                                            return [2];
-                                        }
-                                        __asset["id"].id = asset.guid;
-                                    }
-                                    __asset.bundle = bundle;
-                                    this.use(__asset);
+                var _this_1 = this;
+                return new Promise(function (resolve, reject) {
+                    if (assetMgr.mapGuid[asset.guid]) {
+                        resolve(assetMgr.mapGuid[asset.guid].asset);
+                        return;
+                    }
+                    var loading = assetMgr.mapLoading[asset.guid];
+                    if (!loading)
+                        return reject(new Error("\u8D44\u6E90\u89E3\u6790\u5931\u8D25 name:" + asset.name + ",bundle:" + (bundle ? bundle.url : "") + " assetMgr.mapLoading \u65E0\u6CD5\u627E\u5230guid:" + asset.guid));
+                    var data = loading.data;
+                    var factory = framework.assetParseMap[asset.type];
+                    if (!factory)
+                        return reject(new Error("\u65E0\u6CD5\u627E\u5230[" + framework.AssetTypeEnum[asset.type] + "]\u7684\u89E3\u6790\u5668"));
+                    if (!factory.parse)
+                        return reject(new Error("\u89E3\u6790\u5668 " + factory.constructor.name + " \u6CA1\u6709\u5B9E\u73B0parse\u65B9\u6CD5"));
+                    var __asset = factory.parse(_this_1, bundle, asset.name, data, asset.dwguid);
+                    var _this = _this_1;
+                    function nextRes(retasset) {
+                        if (retasset) {
+                            if (bundle) {
+                                if (bundle.isunload == true) {
+                                    console.error("\u8D44\u6E90\u89E3\u6790\u53D6\u6D88 name:" + asset.name + " , bundle:" + bundle.name);
+                                    return;
                                 }
-                                return [2, __asset];
+                                retasset["id"].id = asset.guid;
+                            }
+                            retasset.bundle = bundle;
+                            _this.use(retasset);
                         }
-                    });
+                        resolve(retasset);
+                    }
+                    var retasset = __asset;
+                    if (__asset && __asset["then"]) {
+                        __asset.then(function (res) {
+                            nextRes(res);
+                        }).catch(function (e) {
+                            reject(e);
+                        });
+                        console.error("[\u89E3\u6790\u8D44\u6E90] await \u5B8C\u6210 " + asset.name);
+                    }
+                    else
+                        nextRes(retasset);
                 });
             };
             assetMgr.prototype.getAssetByName = function (name, bundlename) {
@@ -10032,8 +10045,7 @@ var gd3d;
             }
             AssetFactory_Mesh.prototype.parse = function (assetMgr, bundle, name, data) {
                 if (!(data instanceof ArrayBuffer)) {
-                    framework.error.push(new Error("data not ArrayBuffer instance ,mesh name:" + name + ",bundle:" + (bundle ? bundle.url : null) + " "));
-                    return new framework.mesh(name);
+                    throw new Error("data not ArrayBuffer instance ,mesh name:" + name + ",bundle:" + (bundle ? bundle.url : null) + " ");
                 }
                 return new framework.mesh(name).Parse(data, assetMgr.webgl);
             };
@@ -10332,7 +10344,7 @@ var gd3d;
             };
             animationClip.prototype.Parse = function (buf) {
                 var _this = this;
-                return new gd3d.threading.gdPromise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     try {
                         var read = new gd3d.io.binReader(buf);
                         read.readStringAnsi();
@@ -13281,14 +13293,17 @@ var gd3d;
             };
             mesh.prototype.Parse = function (inData, webgl) {
                 var _this = this;
-                return new gd3d.threading.gdPromise(function (reslove, reject) {
+                return new Promise(function (reslove, reject) {
+                    console.error("[\u89E3\u6790\u8D44\u6E90] mesh 00  " + _this.name.getText());
                     try {
                         _this.parseCMesh(inData, webgl);
                     }
                     catch (error) {
+                        console.error("[\u89E3\u6790\u8D44\u6E90] mesh 22  " + _this.name.getText() + " " + error.message);
                         reject(error.stack);
                         return;
                     }
+                    console.error("[\u89E3\u6790\u8D44\u6E90] mesh 11  " + _this.name.getText());
                     reslove(_this);
                 });
             };
@@ -13849,7 +13864,7 @@ var gd3d;
             };
             rawscene.prototype.Parse = function (txt, assetmgr) {
                 var _this = this;
-                return new gd3d.threading.gdPromise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     gd3d.io.JSONParse(txt).then(function (_json) {
                         try {
                             _this.rootNode = new framework.transform();
@@ -40381,7 +40396,7 @@ var gd3d;
             });
         }
         function JSONParse(text) {
-            return new gd3d.threading.gdPromise(function (resolve, resaon) {
+            return new Promise(function (resolve, resaon) {
                 var json;
                 try {
                     json = JSON.parse(text);
@@ -40395,7 +40410,7 @@ var gd3d;
         io.JSONParse = JSONParse;
         function loadJSON(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
-            return new gd3d.threading.gdPromise(function (r) {
+            return new Promise(function (r) {
                 var now = Date.now();
                 if (now - checkClsTime > 15000) {
                     checkClsTime = now;

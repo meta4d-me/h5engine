@@ -404,42 +404,63 @@ namespace gd3d.framework
             }
         }
 
-        async parseRes(asset: { guid: number, type: number, name: string, dwguid?: number }, bundle?: assetBundle)
+        parseRes(asset: { guid: number, type: number, name: string, dwguid?: number }, bundle?: assetBundle)
         {
-            if (assetMgr.mapGuid[asset.guid])
-                return assetMgr.mapGuid[asset.guid].asset;
-            // let ctime = Date.now();
-            let loading = assetMgr.mapLoading[asset.guid];
-            if (!loading)
-                throw new Error(`资源解析失败 name:${asset.name},bundle:${bundle ? bundle.url : ""} assetMgr.mapLoading 无法找到guid:${asset.guid}`);
-            let data = loading.data;
-            let factory = assetParseMap[asset.type];
-            if (!factory)
-                throw new Error(`无法找到[${AssetTypeEnum[asset.type]}]的解析器`);
-            if (!factory.parse)
-                throw new Error(`解析器 ${factory.constructor.name} 没有实现parse方法`);
-
-
-            let __asset = factory.parse(this, bundle, asset.name, data, asset.dwguid);
-            if (__asset instanceof threading.gdPromise)
-                __asset = (await __asset);
-            if (__asset)
+            return new Promise<IAsset>((resolve, reject) =>
             {
-
-                if (bundle)
+                if (assetMgr.mapGuid[asset.guid])
                 {
-                    if (bundle.isunload == true)
-                    {
-                        console.error(`资源解析取消 name:${asset.name} , bundle:${bundle.name}`);
-                        return;
-                    }
-                    __asset["id"].id = asset.guid;
+                    resolve(assetMgr.mapGuid[asset.guid].asset);
+                    return;
                 }
-                __asset.bundle = bundle;
-                this.use(__asset);
-            }
-            return __asset;
-            // console.log(`解析完成[${AssetTypeEnum[asset.type]}]${Date.now() - ctime}ms,解析器:${factory.constructor.name},guid:${asset.guid},name:${asset.name}`);
+                // let ctime = Date.now();
+                let loading = assetMgr.mapLoading[asset.guid];
+                if (!loading)
+                    return reject(new Error(`资源解析失败 name:${asset.name},bundle:${bundle ? bundle.url : ""} assetMgr.mapLoading 无法找到guid:${asset.guid}`));
+                let data = loading.data;
+                let factory = assetParseMap[asset.type];
+                if (!factory)
+                    return reject(new Error(`无法找到[${AssetTypeEnum[asset.type]}]的解析器`));
+                if (!factory.parse)
+                    return reject(new Error(`解析器 ${factory.constructor.name} 没有实现parse方法`));
+
+
+                let __asset: any = factory.parse(this, bundle, asset.name, data, asset.dwguid);
+                let _this = this;
+                function nextRes(retasset)
+                {
+                    if (retasset)
+                    {
+                        if (bundle)
+                        {
+                            if (bundle.isunload == true)
+                            {
+                                console.error(`资源解析取消 name:${asset.name} , bundle:${bundle.name}`);
+                                return;
+                            }
+                            retasset["id"].id = asset.guid;
+                        }
+                        retasset.bundle = bundle;
+                        _this.use(retasset);
+                    }
+                    resolve(retasset);
+                }
+                let retasset: IAsset = __asset;
+                // if (__asset instanceof threading.gdPromise){
+                if (__asset && __asset["then"])
+                {
+                    __asset.then((res) =>
+                    {
+                        nextRes(res);
+                    }).catch((e) =>
+                    {
+                        reject(e);
+                    });
+                    console.error(`[解析资源] await 完成 ${asset.name}`);
+                } else
+                    nextRes(retasset);
+                // console.log(`解析完成[${AssetTypeEnum[asset.type]}]${Date.now() - ctime}ms,解析器:${factory.constructor.name},guid:${asset.guid},name:${asset.name}`);
+            });
         }
 
 

@@ -105,16 +105,16 @@ namespace gd3d.framework
                         if (!guid)
                             guid = assetBundle.buildGuid();
                         this.pkgsGuid.push(guid);
-                        console.error(`下載資源 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
+                        console.error(`[下載資源] 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                         this.assetmgr.download(guid, url, calcType(url), () =>
                         {
                             ++dwpkgCount;
-                            console.error(`下載資源 11 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
+                            console.error(`[下載資源] 11 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                             if (dwpkgCount >= this.dw_fileCount)
                                 this.parseFile();
                         }, () =>
                         {
-                            console.error(`资源下载失败:${kurl} ,bundle:${this.name}`);
+                            console.error(`[下載資源]失败:${kurl} ,bundle:${this.name}`);
                         }, this);
                     }
                 } else
@@ -125,16 +125,16 @@ namespace gd3d.framework
                     {
                         let guid = this.files[k];
                         let url = `${this.baseUrl}Resources/${k}`;
-                        console.error(`下載資源 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
+                        console.error(`[下載資源] 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                         this.assetmgr.download(guid, url, calcType(k), () =>
                         {
                             ++dwpkgCount;
-                            console.error(`下載資源 11 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
+                            console.error(`[下載資源] 11 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                             if (dwpkgCount >= this.dw_fileCount)
                                 this.parseFile();
                         }, () =>
                         {
-                            console.error(`资源下载失败:${url} ,bundle:${this.name}`);
+                            console.error(`[下載資源]失败:${url} ,bundle:${this.name}`);
                         }, this);
                     }
                 }
@@ -144,7 +144,7 @@ namespace gd3d.framework
                 const imageNext = function (url)
                 {
                     ++dwpkgCount;
-                    console.error(`下載資源 11 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
+                    console.error(`[下載資源] 11 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                     if (dwpkgCount >= this.dw_fileCount)
                         this.parseFile();
                 }
@@ -153,13 +153,13 @@ namespace gd3d.framework
                     let guid = this.texs[k];
                     this.files[k] = guid;//先下载 然后给解析器补充一个key
                     let url = `${this.baseUrl}resources/${k}`;
-                    console.error(`下載資源 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
+                    console.error(`[下載資源] 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                     if (k.endsWith(".png") || k.endsWith(".jpg"))
                         this.assetmgr.loadImg(guid, url, imageNext.bind(this,url), this);
                     else if (k.endsWith(".pvr.bin"))
                         this.assetmgr.download(guid, url, AssetTypeEnum.PVR, imageNext.bind(this,url), () =>
                         {
-                            console.error(`资源下载失败:${url} ,bundle:${this.name}`);
+                            console.error(`[下載資源]失败:${url} ,bundle:${this.name}`);
                         }, this);
                 }
             });
@@ -201,7 +201,7 @@ namespace gd3d.framework
                         }
                     } catch (error)
                     {
-                        throw new Error(`[资源]unpkg bpkg失败:${this.url},${this.pkgs[i]}\n${error.message}`);
+                        throw new Error(`[解析資源]unpkg bpkg失败:${this.url},${this.pkgs[i]}\n${error.message}`);
                     }
                 } else
                 {
@@ -221,7 +221,7 @@ namespace gd3d.framework
                         }
                     } catch (error)
                     {
-                        throw new Error(`[资源]unpkg jpkg失败:${this.url},${this.pkgs[i]}\n${error.message}`);
+                        throw new Error(`[解析資源]unpkg jpkg失败:${this.url},${this.pkgs[i]}\n${error.message}`);
                     }
 
                 }
@@ -277,19 +277,21 @@ namespace gd3d.framework
 
                 //解析顺序按枚举从小到大来排序
                 assets.sort((a, b) => { return a.type - b.type; });
-
+                
                 for (var i = 0, len = assets.length; i < len; ++i)
                 {
                     let asset = assets[i];
+                    console.error(`[解析资源] 00 name:${asset.name} ,bundle:${this.name}  ${i}/${assets.length}`);
                     if (assetMgr.mapGuid[asset.guid])
                         continue;//已经解析好的资源不需要再解析
 
                     try
                     {
                         await this.assetmgr.parseRes(asset, this);
+                        console.error(`[解析资源] 11 name:${asset.name} ,bundle:${this.name} ${i}/${assets.length}`);
                     } catch (error)
                     {
-                        console.error(`资源解析失败:${asset.name} ,bundle:${this.name}`);
+                        console.error(`[解析资源]失败:${asset.name} ,bundle:${this.name} ${i}/${assets.length}`);
                         this.fail(error);
                         return;
                     }

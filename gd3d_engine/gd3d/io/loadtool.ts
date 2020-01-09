@@ -140,7 +140,7 @@
 
     export function JSONParse(text: string)
     {
-        return new threading.gdPromise<any>((resolve, resaon) =>
+        return new Promise<any>((resolve, resaon) =>
         {
             let json;
             try
@@ -156,7 +156,7 @@
     export function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null) 
     {
 
-        return new threading.gdPromise((r) =>
+        return new Promise((r) =>
         {
             // if (framework.assetMgr.useBinJs)
             //     url = framework.assetMgr.correctTxtFileName(url);
