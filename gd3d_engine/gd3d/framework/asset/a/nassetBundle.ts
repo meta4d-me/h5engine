@@ -281,17 +281,17 @@ namespace gd3d.framework
                 for (var i = 0, len = assets.length; i < len; ++i)
                 {
                     let asset = assets[i];
-                    console.error(`[解析资源] 00 name:${asset.name} ,bundle:${this.name}  ${i}/${assets.length}`);
+                    // console.error(`[解析资源] 00 name:${asset.name} ,bundle:${this.name}  ${i}/${assets.length}`);
                     if (assetMgr.mapGuid[asset.guid])
                         continue;//已经解析好的资源不需要再解析
 
                     try
                     {
                         await this.assetmgr.parseRes(asset, this);
-                        console.error(`[解析资源] 11 name:${asset.name} ,bundle:${this.name} ${i}/${assets.length}`);
+                        // console.error(`[解析资源] 11 name:${asset.name} ,bundle:${this.name} ${i}/${assets.length}`);
                     } catch (error)
                     {
-                        console.error(`[解析资源]失败:${asset.name} ,bundle:${this.name} ${i}/${assets.length}`);
+                        // console.error(`[解析资源]失败:${asset.name} ,bundle:${this.name} ${i}/${assets.length}`);
                         this.fail(error);
                         return;
                     }

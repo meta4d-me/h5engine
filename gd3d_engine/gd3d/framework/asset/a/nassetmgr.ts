@@ -456,7 +456,7 @@ namespace gd3d.framework
                     {
                         reject(e);
                     });
-                    console.error(`[解析资源] await 完成 ${asset.name}`);
+                    // console.error(`[解析资源] await 完成 ${asset.name}`);
                 } else
                     nextRes(retasset);
                 // console.log(`解析完成[${AssetTypeEnum[asset.type]}]${Date.now() - ctime}ms,解析器:${factory.constructor.name},guid:${asset.guid},name:${asset.name}`);

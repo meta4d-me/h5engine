@@ -384,17 +384,17 @@ namespace gd3d.framework
         {
             return new Promise<IAsset>((reslove, reject) =>
             {
-                console.error(`[解析资源] mesh 00  ${this.name.getText()}`);
+                // console.error(`[解析资源] mesh 00  ${this.name.getText()}`);
                 try
                 {
                     this.parseCMesh(inData, webgl);
                 } catch (error)
                 {
-                    console.error(`[解析资源] mesh 22  ${this.name.getText()} ${error.message}`);
+                    // console.error(`[解析资源] mesh 22  ${this.name.getText()} ${error.message}`);
                     reject(error.stack);
                     return;
                 }
-                console.error(`[解析资源] mesh 11  ${this.name.getText()}`);
+                // console.error(`[解析资源] mesh 11  ${this.name.getText()}`);
                 reslove(this);
             });
         }
