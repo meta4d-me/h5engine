@@ -143,7 +143,7 @@ namespace gd3d.framework
         private _touchstart(ev:TouchEvent){
             // this.CalcuPoint(ev.touches[0].clientX,ev.touches[0].clientY,this._point);
                 this._point.touch = true;
-
+                let lastTouche : pointinfo;
                 for (var i = 0; i < ev.changedTouches.length; i++)
                 {
                     var touch = ev.changedTouches[i];
@@ -154,12 +154,21 @@ namespace gd3d.framework
                     
                     // this._touches[id].x = touch.clientX;
                     // this._touches[id].y = touch.clientY;
+
+                    lastTouche = this._touches[id];
                 }
 
-                this.syncPointByTouches();
+                
+                // this.syncPointByTouches();
+
+                if(lastTouche){
+                    this._point.x = lastTouche.x;
+                    this._point.y = lastTouche.y;
+                }
         }
         private _touchmove(ev:TouchEvent){
             this._point.touch = true;
+            let lastTouche : pointinfo;
             for (var i = 0; i < ev.changedTouches.length; i++)
                 {
                     var touch = ev.changedTouches[i];
@@ -169,9 +178,16 @@ namespace gd3d.framework
                     this.CalcuPoint(touch.clientX,touch.clientY,this._touches[id]);
                     // this._touches[id].x = touch.clientX;
                     // this._touches[id].y = touch.clientY;
+
+                    lastTouche = this._touches[id];
                 }
 
-                this.syncPointByTouches();
+                // this.syncPointByTouches();
+
+                if(lastTouche){
+                    this._point.x = lastTouche.x;
+                    this._point.y = lastTouche.y;
+                }
         }
         private _touchend(ev:TouchEvent){
             for (var i = 0; i < ev.changedTouches.length; i++)
@@ -182,12 +198,12 @@ namespace gd3d.framework
                     this._touches[id].touch = false;
                 }
 
-                //所有触点全放开，point.touch才false
-                for (var key in this._touches)
-                {
-                    if (this._touches[key].touch == true)
-                        return;
-                }
+                // //所有触点全放开，point.touch才false
+                // for (var key in this._touches)
+                // {
+                //     if (this._touches[key].touch == true)
+                //         return;
+                // }
                 this._point.touch = false;
         }
         private _touchcancel(ev:TouchEvent){

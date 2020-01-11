@@ -533,7 +533,8 @@ namespace gd3d.framework
         {
             if (node._parent != this || this.children == null)
             {
-                throw new Error("not my child.");
+                console.warn("not my child.");
+                return ;   
             }
             var i = this.children.indexOf(node);
             if (i >= 0)

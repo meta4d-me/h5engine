@@ -2866,7 +2866,8 @@ var gd3d;
                     return;
                 }
                 if (node._parent != this || this._children == null) {
-                    throw new Error("not my child.");
+                    console.warn("not my child.");
+                    return;
                 }
                 var i = this._children.indexOf(node);
                 if (i < 0)
@@ -3068,15 +3069,19 @@ var gd3d;
                 return this.addComponentDirect(comp);
             };
             transform2D.prototype.addComponentDirect = function (comp) {
-                if (!comp)
-                    throw new Error("this component is null");
+                if (!comp) {
+                    console.error("this component is null");
+                    return;
+                }
                 if (comp.transform != null) {
-                    throw new Error("this components has added to a  gameObject");
+                    console.error("this components has added to a  gameObject");
+                    return;
                 }
                 comp.transform = this;
                 var typeStr = framework.getClassName(comp);
                 if (this.componentTypes[typeStr]) {
-                    throw new Error(this.name + "   已经有一个" + typeStr + "的组件了，不能俩");
+                    console.error(this.name + "   已经有一个" + typeStr + "的组件了，不能俩");
+                    return;
                 }
                 if (this.components == null)
                     this.components = [];
@@ -3088,7 +3093,8 @@ var gd3d;
                         this.renderer = comp;
                     }
                     else {
-                        throw new Error("已经有一个渲染器的组件了，不能俩");
+                        console.error("已经有一个渲染器的组件了，不能俩");
+                        return;
                     }
                 }
                 if (gd3d.reflect.getClassTag(comp["__proto__"], "boxcollider2d") == "1") {
@@ -3096,7 +3102,8 @@ var gd3d;
                         this.collider = comp;
                     }
                     else {
-                        throw new Error("已经有一个碰撞组件了，不能俩");
+                        console.error("已经有一个碰撞组件了，不能俩");
+                        return;
                     }
                 }
                 if (gd3d.reflect.getClassTag(comp["__proto__"], "node2dphysicsbody") == "1") {
@@ -3104,7 +3111,8 @@ var gd3d;
                         this.physicsBody = comp;
                     }
                     else {
-                        throw new Error("已经有一个碰撞组件了，不能俩");
+                        console.error("已经有一个碰撞组件了，不能俩");
+                        return;
                     }
                 }
                 if (framework.functionIsEmpty(comp.update))
@@ -8140,7 +8148,7 @@ var gd3d;
             resID.prototype.getID = function () {
                 return this.id;
             };
-            resID.idAll = 1;
+            resID.idAll = 100000000;
             return resID;
         }());
         framework.resID = resID;
@@ -8541,10 +8549,7 @@ var gd3d;
                 this.texs = {};
                 this.pkgs = [];
                 this.pkgsGuid = [];
-                this.parseOutTime = 1000 * 30;
-                this.dwOutTime = 1000 * 30;
-                this.stateQueue = [];
-                this.stateParse = {};
+                this.isunload = false;
                 this.guid = guid || assetBundle.buildGuid();
                 this.url = url;
                 this.baseUrl = url.substring(0, url.lastIndexOf("/") + 1);
@@ -8553,36 +8558,6 @@ var gd3d;
             }
             assetBundle.buildGuid = function () {
                 return --assetBundle.idNext;
-            };
-            assetBundle.prototype.getParseInfo = function () {
-                var fcount = 0;
-                var text = "\nparse:\n";
-                var temp = [];
-                for (var k in this.stateParse)
-                    if (k != "count")
-                        temp.push(this.stateParse[k]);
-                temp.sort(function (a, b) { return a.i - b.i; });
-                fcount = 0;
-                for (var _i = 0, temp_1 = temp; _i < temp_1.length; _i++) {
-                    var item = temp_1[_i];
-                    text += "name:" + item.name + ",i:" + item.i + ",type:" + item.type + " ,st:" + item.st + "\n";
-                    if (item.wd)
-                        ++fcount;
-                }
-                text += fcount + "/" + this.stateParse.count;
-                return text;
-            };
-            assetBundle.prototype.getDownloadInfo = function () {
-                var text = "\ndownload :\n";
-                var fcount = 0;
-                for (var _i = 0, _a = this.stateQueue; _i < _a.length; _i++) {
-                    var item = _a[_i];
-                    text += item.url + " ,guid:" + item.guid + " ,wd:" + item.wd + "\n";
-                    if (item.wd)
-                        ++fcount;
-                }
-                text += fcount + "/" + this.stateQueue.length;
-                return text;
             };
             assetBundle.prototype.parseBundle = function (data) {
                 var _this = this;
@@ -8594,9 +8569,6 @@ var gd3d;
                         delete assetBundle.reTryTest[_this.name];
                         _this.ready = false;
                     }
-                    _this.dhd = setTimeout(function () {
-                        _this.fail(new Error("[\u8D44\u6E90]\u4E0B\u8F7D\u8D85\u65F6 " + _this.url + " , state:" + _this.stateText));
-                    }, _this.dwOutTime);
                     var json;
                     try {
                         json = JSON.parse(data);
@@ -8608,7 +8580,6 @@ var gd3d;
                     _this.files = json.files;
                     _this.texs = json.texs;
                     _this.pkgs = json.pkg;
-                    _this.stateText = "下载资源";
                     if (!framework.assetMgr.openGuid) {
                         for (var k in _this.files)
                             _this.files[k] = assetBundle.buildGuid();
@@ -8629,14 +8600,13 @@ var gd3d;
                             if (!guid)
                                 guid = assetBundle.buildGuid();
                             _this.pkgsGuid.push(guid);
-                            var state = { guid: guid, url: url, wd: false };
-                            _this.stateQueue.push(state);
                             _this.assetmgr.download(guid, url, framework.calcType(url), function () {
-                                state.wd = true;
                                 ++dwpkgCount;
                                 if (dwpkgCount >= _this.dw_fileCount)
                                     _this.parseFile();
-                            });
+                            }, function () {
+                                console.error("[\u4E0B\u8F09\u8CC7\u6E90]\u5931\u8D25:" + kurl + " ,bundle:" + _this.name);
+                            }, _this);
                         };
                         for (var i = 0, len = _this.pkgs.length; i < len; ++i) {
                             _loop_2(i, len);
@@ -8647,40 +8617,40 @@ var gd3d;
                         var _loop_3 = function (k) {
                             var guid = _this.files[k];
                             var url = _this.baseUrl + "Resources/" + k;
-                            var state = { guid: guid, url: url, wd: false };
-                            _this.stateQueue.push(state);
                             _this.assetmgr.download(guid, url, framework.calcType(k), function () {
-                                state.wd = true;
                                 ++dwpkgCount;
                                 if (dwpkgCount >= _this.dw_fileCount)
                                     _this.parseFile();
-                            });
+                            }, function () {
+                                console.error("[\u4E0B\u8F09\u8CC7\u6E90]\u5931\u8D25:" + url + " ,bundle:" + _this.name);
+                            }, _this);
                         };
                         for (var k in _this.files) {
                             _loop_3(k);
                         }
                     }
-                    var imageNext = function (state) {
-                        state.wd = true;
+                    var imageNext = function (url) {
                         ++dwpkgCount;
                         if (dwpkgCount >= this.dw_fileCount)
                             this.parseFile();
                     };
-                    for (var k in _this.texs) {
+                    var _loop_4 = function (k) {
                         var guid = _this.texs[k];
                         _this.files[k] = guid;
                         var url = _this.baseUrl + "resources/" + k;
-                        var state = { guid: guid, url: url, wd: false };
-                        _this.stateQueue.push(state);
                         if (k.endsWith(".png") || k.endsWith(".jpg"))
-                            _this.assetmgr.loadImg(guid, url, imageNext.bind(_this, state));
-                        else
-                            _this.assetmgr.download(guid, url, framework.AssetTypeEnum.PVR, imageNext.bind(_this, state));
+                            _this.assetmgr.loadImg(guid, url, imageNext.bind(_this, url), _this);
+                        else if (k.endsWith(".pvr.bin"))
+                            _this.assetmgr.download(guid, url, framework.AssetTypeEnum.PVR, imageNext.bind(_this, url), function () {
+                                console.error("[\u4E0B\u8F09\u8CC7\u6E90]\u5931\u8D25:" + url + " ,bundle:" + _this.name);
+                            }, _this);
+                    };
+                    for (var k in _this.texs) {
+                        _loop_4(k);
                     }
                 });
             };
             assetBundle.prototype.unpkg = function () {
-                this.stateText = "解包";
                 for (var i = this.pkgsGuid.length - 1; i >= 0; --i) {
                     var pkgGuid = this.pkgsGuid[i];
                     var pkgld = framework.assetMgr.mapLoading[pkgGuid];
@@ -8708,7 +8678,7 @@ var gd3d;
                             }
                         }
                         catch (error) {
-                            throw new Error("[\u8D44\u6E90]unpkg bpkg\u5931\u8D25:" + this.url + "," + this.pkgs[i] + "\n" + error.message);
+                            throw new Error("[\u89E3\u6790\u8CC7\u6E90]unpkg bpkg\u5931\u8D25:" + this.url + "," + this.pkgs[i] + "\n" + error.message);
                         }
                     }
                     else {
@@ -8724,7 +8694,7 @@ var gd3d;
                             }
                         }
                         catch (error) {
-                            throw new Error("[\u8D44\u6E90]unpkg jpkg\u5931\u8D25:" + this.url + "," + this.pkgs[i] + "\n" + error.message);
+                            throw new Error("[\u89E3\u6790\u8CC7\u6E90]unpkg jpkg\u5931\u8D25:" + this.url + "," + this.pkgs[i] + "\n" + error.message);
                         }
                     }
                     delete pkgld.data;
@@ -8732,15 +8702,10 @@ var gd3d;
             };
             assetBundle.prototype.parseFile = function () {
                 return __awaiter(this, void 0, void 0, function () {
-                    var assets, idx, k, type, _i, assets_1, asset, i, len, asset, error_1;
-                    var _this = this;
+                    var assets, k, type, i, len, asset, error_1;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
-                                clearTimeout(this.dhd);
-                                this.thd = setTimeout(function () {
-                                    _this.fail(new Error("[\u8D44\u6E90]\u89E3\u6790\u8D85\u65F6 " + _this.url + " , state:" + _this.stateText));
-                                }, this.parseOutTime);
                                 if (this.onDownloadFinish)
                                     this.onDownloadFinish();
                                 if (this.pkgs) {
@@ -8752,9 +8717,7 @@ var gd3d;
                                         return [2];
                                     }
                                 }
-                                this.stateText = "资源解析";
                                 assets = [];
-                                idx = 0;
                                 for (k in this.files) {
                                     if (framework.assetMgr.mapGuid[this.files[k]])
                                         continue;
@@ -8765,19 +8728,14 @@ var gd3d;
                                         guid: this.files[k]
                                     });
                                 }
-                                this.stateParse.count = idx;
                                 assets.sort(function (a, b) { return a.type - b.type; });
-                                for (_i = 0, assets_1 = assets; _i < assets_1.length; _i++) {
-                                    asset = assets_1[_i];
-                                    this.stateParse[asset.name] = { name: asset.name, i: idx++, type: framework.AssetTypeEnum[asset.type], st: false, guid: asset.guid };
-                                }
                                 i = 0, len = assets.length;
                                 _a.label = 1;
                             case 1:
-                                if (!(i < len)) return [3, 7];
+                                if (!(i < len)) return [3, 6];
                                 asset = assets[i];
                                 if (framework.assetMgr.mapGuid[asset.guid])
-                                    return [3, 6];
+                                    return [3, 5];
                                 _a.label = 2;
                             case 2:
                                 _a.trys.push([2, 4, , 5]);
@@ -8790,17 +8748,10 @@ var gd3d;
                                 this.fail(error_1);
                                 return [2];
                             case 5:
-                                this.stateParse[asset.name].st = true;
-                                _a.label = 6;
-                            case 6:
                                 ++i;
                                 return [3, 1];
-                            case 7:
+                            case 6:
                                 this.ready = true;
-                                this.stateQueue = null;
-                                this.stateParse = null;
-                                this.stateText = null;
-                                clearTimeout(this.thd);
                                 this.parseResolve();
                                 return [2];
                         }
@@ -8809,6 +8760,7 @@ var gd3d;
             };
             assetBundle.prototype.unload = function (disposeNow) {
                 if (disposeNow === void 0) { disposeNow = false; }
+                this.isunload = true;
                 for (var k in this.files) {
                     var ref = framework.assetMgr.mapGuid[this.files[k]];
                     if (ref)
@@ -8831,14 +8783,8 @@ var gd3d;
                 delete framework.assetMgr.mapGuid[this.guid];
             };
             assetBundle.prototype.fail = function (error) {
-                var _this = this;
                 assetBundle.reTryTest[this.name] = 1;
-                var dwinfo = this.getDownloadInfo();
-                var pinfo = this.getParseInfo();
-                this.unload(true);
-                setTimeout(function () {
-                    _this.parseReject(new Error("#########" + error.message + "\n" + error.stack + "\n" + dwinfo + "\n" + pinfo));
-                }, 1000);
+                this.parseReject(error);
             };
             assetBundle.idNext = -1;
             assetBundle.reTryTest = {};
@@ -8983,13 +8929,12 @@ var gd3d;
             assetMgr.initGuidList = function () {
                 gd3d.io.loadJSON(assetMgr.guidlistURL, function (json) {
                     assetMgr.urlmapGuid = json.res;
-                    framework.resID.idAll = json.__useid;
                     if (assetMgr.onGuidInit)
                         assetMgr.onGuidInit();
                 });
             };
             assetMgr.prototype.load = function (url, type, onstate, downloadFinish) {
-                var _this = this;
+                var _this_1 = this;
                 if (type === void 0) { type = framework.AssetTypeEnum.Auto; }
                 if (onstate === void 0) { onstate = null; }
                 if (downloadFinish === void 0) { downloadFinish = null; }
@@ -9012,10 +8957,12 @@ var gd3d;
                 this.download(guid, url, type, function () {
                     var loading = assetMgr.mapLoading[guid];
                     if (type == framework.AssetTypeEnum.Bundle) {
-                        var bundle_1 = new framework.assetBundle(url, _this, guid);
-                        _this.name_bundles[bundle_1.name] = _this.kurl_bundles[keyUrl] = _this.guid_bundles[bundle_1.guid] = bundle_1;
+                        var bundle_1 = new framework.assetBundle(url, _this_1, guid);
                         bundle_1.onDownloadFinish = downloadFinish;
+                        _this_1.name_bundles[bundle_1.name] = _this_1.kurl_bundles[keyUrl] = _this_1.guid_bundles[bundle_1.guid] = bundle_1;
                         bundle_1.parseBundle(loading.data).then(function () {
+                            if (!_this_1.name_bundles[bundle_1.name] || !_this_1.kurl_bundles[keyUrl] || !_this_1.guid_bundles[bundle_1.guid])
+                                _this_1.name_bundles[bundle_1.name] = _this_1.kurl_bundles[keyUrl] = _this_1.guid_bundles[bundle_1.guid] = bundle_1;
                             state.bundle = bundle_1;
                             state.isfinish = true;
                             onstate(state);
@@ -9028,7 +8975,7 @@ var gd3d;
                     else {
                         var filename = framework.getFileName(url);
                         var next = function (name, guid, type, dwguid) {
-                            _this.parseRes({ name: name, guid: guid, type: type, dwguid: dwguid }).then(function (asset) {
+                            _this_1.parseRes({ name: name, guid: guid, type: type, dwguid: dwguid }).then(function (asset) {
                                 state.isfinish = true;
                                 if (asset) {
                                     state.resstateFirst = {
@@ -9047,15 +8994,15 @@ var gd3d;
                             var nguid = framework.resID.next();
                             var ntype = calcType(nname);
                             if (ntype == framework.AssetTypeEnum.Texture)
-                                _this.loadImg(nguid, nurl, next.bind(_this, filename, guid, type, nguid));
+                                _this_1.loadImg(nguid, nurl, next.bind(_this_1, filename, guid, type, nguid));
                             else
-                                _this.download(nguid, nurl, ntype, next.bind(_this, filename, guid, type, nguid), function (err) {
+                                _this_1.download(nguid, nurl, ntype, next.bind(_this_1, filename, guid, type, nguid), function (err) {
                                     assetMgr.setStateError(state, onstate, err);
                                 });
                         }
                         else {
                             var dwguid = type == framework.AssetTypeEnum.Texture ? guid : null;
-                            next.call(_this, filename, guid, type, dwguid);
+                            next.call(_this_1, filename, guid, type, dwguid);
                         }
                     }
                 }, function (err) {
@@ -9067,8 +9014,7 @@ var gd3d;
                 state.iserror = true;
                 onstate(state);
             };
-            assetMgr.prototype.download = function (guid, url, type, finish, errcb) {
-                if (errcb === void 0) { errcb = null; }
+            assetMgr.prototype.download = function (guid, url, type, finish, errcb, bundle) {
                 var loading = assetMgr.mapLoading[guid];
                 if (loading && loading.readyok && finish)
                     return finish();
@@ -9078,7 +9024,7 @@ var gd3d;
                     loading.cbQueue = [];
                     this.loadImg(guid, url, function (img) {
                         finish();
-                    });
+                    }, bundle);
                     return;
                 }
                 var repType = calcReqType(type);
@@ -9088,10 +9034,15 @@ var gd3d;
                 }
                 gd3d.io.xhrLoad(url, function (data, err) {
                     console.error(err.stack);
-                    errcb(err);
+                    if (errcb)
+                        errcb(err);
                 }, function () { }, repType, function (xhr) {
                     var loading = assetMgr.mapLoading[guid];
                     if (!loading) {
+                        if (bundle && bundle.isunload == true) {
+                            console.error("\u8D44\u6E90\u4E0B\u8F7D\u53D6\u6D88:" + url + " , bundle:" + bundle.name + " \u5DF2\u91CA\u653E");
+                            return;
+                        }
                         loading = assetMgr.mapLoading[guid] = { readyok: true };
                     }
                     else {
@@ -9101,7 +9052,7 @@ var gd3d;
                     finish();
                 });
             };
-            assetMgr.prototype.loadImg = function (guid, url, cb) {
+            assetMgr.prototype.loadImg = function (guid, url, cb, bundle) {
                 if (assetMgr.mapImage[guid])
                     return cb(assetMgr.mapImage[guid]);
                 var loading = assetMgr.mapLoading[guid];
@@ -9109,6 +9060,11 @@ var gd3d;
                     loading = assetMgr.mapLoading[guid] = { readyok: false, cbQueue: [] };
                 loading.cbQueue.push(cb);
                 this._loadImg(url, function (img) {
+                    if (bundle && bundle.isunload == true) {
+                        console.error("img\u4E0B\u8F7D\u53D6\u6D88:" + url + " , bundle:" + bundle.name + " \u5DF2\u91CA\u653E");
+                        loading.cbQueue = [];
+                        return;
+                    }
                     assetMgr.mapImage[guid] = img;
                     loading.readyok = true;
                     loading.data = img;
@@ -9162,44 +9118,47 @@ var gd3d;
                 }
             };
             assetMgr.prototype.parseRes = function (asset, bundle) {
-                return __awaiter(this, void 0, void 0, function () {
-                    var loading, data, factory, __asset;
-                    return __generator(this, function (_a) {
-                        switch (_a.label) {
-                            case 0:
-                                if (assetMgr.mapGuid[asset.guid])
-                                    return [2, assetMgr.mapGuid[asset.guid].asset];
-                                loading = assetMgr.mapLoading[asset.guid];
-                                if (!loading) {
-                                    framework.error.push(new Error("\u8D44\u6E90\u89E3\u6790\u5931\u8D25 name:" + asset.name + ",bundle:" + (bundle ? bundle.url : "") + " assetMgr.mapLoading \u65E0\u6CD5\u627E\u5230guid:" + asset.guid));
-                                    return [2];
+                var _this_1 = this;
+                return new Promise(function (resolve, reject) {
+                    if (assetMgr.mapGuid[asset.guid]) {
+                        resolve(assetMgr.mapGuid[asset.guid].asset);
+                        return;
+                    }
+                    var loading = assetMgr.mapLoading[asset.guid];
+                    if (!loading)
+                        return reject(new Error("\u8D44\u6E90\u89E3\u6790\u5931\u8D25 name:" + asset.name + ",bundle:" + (bundle ? bundle.url : "") + " assetMgr.mapLoading \u65E0\u6CD5\u627E\u5230guid:" + asset.guid));
+                    var data = loading.data;
+                    var factory = framework.assetParseMap[asset.type];
+                    if (!factory)
+                        return reject(new Error("\u65E0\u6CD5\u627E\u5230[" + framework.AssetTypeEnum[asset.type] + "]\u7684\u89E3\u6790\u5668"));
+                    if (!factory.parse)
+                        return reject(new Error("\u89E3\u6790\u5668 " + factory.constructor.name + " \u6CA1\u6709\u5B9E\u73B0parse\u65B9\u6CD5"));
+                    var __asset = factory.parse(_this_1, bundle, asset.name, data, asset.dwguid);
+                    var _this = _this_1;
+                    function nextRes(retasset) {
+                        if (retasset) {
+                            if (bundle) {
+                                if (bundle.isunload == true) {
+                                    console.error("\u8D44\u6E90\u89E3\u6790\u53D6\u6D88 name:" + asset.name + " , bundle:" + bundle.name);
+                                    return;
                                 }
-                                data = loading.data;
-                                factory = framework.assetParseMap[asset.type];
-                                if (!factory) {
-                                    framework.error.push(new Error("\u65E0\u6CD5\u627E\u5230[" + framework.AssetTypeEnum[asset.type] + "]\u7684\u89E3\u6790\u5668"));
-                                    return [2];
-                                }
-                                if (!factory.parse) {
-                                    framework.error.push(new Error("\u89E3\u6790\u5668 " + factory.constructor.name + " \u6CA1\u6709\u5B9E\u73B0parse\u65B9\u6CD5"));
-                                    return [2];
-                                }
-                                __asset = factory.parse(this, bundle, asset.name, data, asset.dwguid);
-                                if (!(__asset instanceof gd3d.threading.gdPromise)) return [3, 2];
-                                return [4, __asset];
-                            case 1:
-                                __asset = (_a.sent());
-                                _a.label = 2;
-                            case 2:
-                                if (__asset) {
-                                    if (bundle)
-                                        __asset["id"].id = asset.guid;
-                                    __asset.bundle = bundle;
-                                    this.use(__asset);
-                                }
-                                return [2, __asset];
+                                retasset["id"].id = asset.guid;
+                            }
+                            retasset.bundle = bundle;
+                            _this.use(retasset);
                         }
-                    });
+                        resolve(retasset);
+                    }
+                    var retasset = __asset;
+                    if (__asset && __asset["then"]) {
+                        __asset.then(function (res) {
+                            nextRes(res);
+                        }).catch(function (e) {
+                            reject(e);
+                        });
+                    }
+                    else
+                        nextRes(retasset);
                 });
             };
             assetMgr.prototype.getAssetByName = function (name, bundlename) {
@@ -10076,8 +10035,7 @@ var gd3d;
             }
             AssetFactory_Mesh.prototype.parse = function (assetMgr, bundle, name, data) {
                 if (!(data instanceof ArrayBuffer)) {
-                    framework.error.push(new Error("data not ArrayBuffer instance ,mesh name:" + name + ",bundle:" + (bundle ? bundle.url : null) + " "));
-                    return new framework.mesh(name);
+                    throw new Error("data not ArrayBuffer instance ,mesh name:" + name + ",bundle:" + (bundle ? bundle.url : null) + " ");
                 }
                 return new framework.mesh(name).Parse(data, assetMgr.webgl);
             };
@@ -10376,7 +10334,7 @@ var gd3d;
             };
             animationClip.prototype.Parse = function (buf) {
                 var _this = this;
-                return new gd3d.threading.gdPromise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     try {
                         var read = new gd3d.io.binReader(buf);
                         read.readStringAnsi();
@@ -11168,7 +11126,8 @@ var gd3d;
             };
             transform.prototype.removeChild = function (node) {
                 if (node._parent != this || this.children == null) {
-                    throw new Error("not my child.");
+                    console.warn("not my child.");
+                    return;
                 }
                 var i = this.children.indexOf(node);
                 if (i >= 0) {
@@ -13324,7 +13283,7 @@ var gd3d;
             };
             mesh.prototype.Parse = function (inData, webgl) {
                 var _this = this;
-                return new gd3d.threading.gdPromise(function (reslove, reject) {
+                return new Promise(function (reslove, reject) {
                     try {
                         _this.parseCMesh(inData, webgl);
                     }
@@ -13892,7 +13851,7 @@ var gd3d;
             };
             rawscene.prototype.Parse = function (txt, assetmgr) {
                 var _this = this;
-                return new gd3d.threading.gdPromise(function (resolve, reject) {
+                return new Promise(function (resolve, reject) {
                     gd3d.io.JSONParse(txt).then(function (_json) {
                         try {
                             _this.rootNode = new framework.transform();
@@ -21490,25 +21449,35 @@ var gd3d;
             };
             inputMgr.prototype._touchstart = function (ev) {
                 this._point.touch = true;
+                var lastTouche;
                 for (var i = 0; i < ev.changedTouches.length; i++) {
                     var touch = ev.changedTouches[i];
                     var id = touch.identifier;
                     this.tryAddTouchP(id);
                     this._touches[id].touch = true;
                     this.CalcuPoint(touch.clientX, touch.clientY, this._touches[id]);
+                    lastTouche = this._touches[id];
                 }
-                this.syncPointByTouches();
+                if (lastTouche) {
+                    this._point.x = lastTouche.x;
+                    this._point.y = lastTouche.y;
+                }
             };
             inputMgr.prototype._touchmove = function (ev) {
                 this._point.touch = true;
+                var lastTouche;
                 for (var i = 0; i < ev.changedTouches.length; i++) {
                     var touch = ev.changedTouches[i];
                     var id = touch.identifier;
                     this.tryAddTouchP(id);
                     this._touches[id].touch = true;
                     this.CalcuPoint(touch.clientX, touch.clientY, this._touches[id]);
+                    lastTouche = this._touches[id];
                 }
-                this.syncPointByTouches();
+                if (lastTouche) {
+                    this._point.x = lastTouche.x;
+                    this._point.y = lastTouche.y;
+                }
             };
             inputMgr.prototype._touchend = function (ev) {
                 for (var i = 0; i < ev.changedTouches.length; i++) {
@@ -21516,10 +21485,6 @@ var gd3d;
                     var id = touch.identifier;
                     this.tryAddTouchP(id);
                     this._touches[id].touch = false;
-                }
-                for (var key in this._touches) {
-                    if (this._touches[key].touch == true)
-                        return;
                 }
                 this._point.touch = false;
             };
@@ -35605,16 +35570,20 @@ var gd3d;
                 }
             };
             gameObject.prototype.addComponentDirect = function (comp) {
-                if (!comp)
-                    throw new Error("this component is null");
+                if (!comp) {
+                    console.error("this component is null");
+                    return;
+                }
                 this.transform.markHaveComponent();
                 if (comp.gameObject != null) {
-                    throw new Error("this components has added to a  gameObject");
+                    console.error("this components has added to a  gameObject");
+                    return;
                 }
                 comp.gameObject = this;
                 var typeStr = framework.getClassName(comp);
                 if (this.componentTypes[typeStr]) {
-                    throw new Error(this.getName() + "   已经有一个" + typeStr + "的组件了，不能俩");
+                    console.error(this.getName() + "   已经有一个" + typeStr + "的组件了，不能俩");
+                    return;
                 }
                 var nodeObj = new nodeComponent(comp, false);
                 var add = true;
@@ -35767,7 +35736,7 @@ var gd3d;
                     }
                     ++i;
                 }
-                if (len < 1)
+                if (this.components.length < 1)
                     this.haveComponet = false;
             };
             gameObject.prototype.removeComponentByTypeName = function (type) {
@@ -35786,7 +35755,7 @@ var gd3d;
                     }
                     ++i;
                 }
-                if (len < 1)
+                if (this.components.length < 1)
                     this.haveComponet = false;
                 return result;
             };
@@ -40420,7 +40389,7 @@ var gd3d;
             });
         }
         function JSONParse(text) {
-            return new gd3d.threading.gdPromise(function (resolve, resaon) {
+            return new Promise(function (resolve, resaon) {
                 var json;
                 try {
                     json = JSON.parse(text);
@@ -40434,7 +40403,7 @@ var gd3d;
         io.JSONParse = JSONParse;
         function loadJSON(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
-            return new gd3d.threading.gdPromise(function (r) {
+            return new Promise(function (r) {
                 var now = Date.now();
                 if (now - checkClsTime > 15000) {
                     checkClsTime = now;
