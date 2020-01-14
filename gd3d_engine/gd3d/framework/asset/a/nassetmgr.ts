@@ -120,6 +120,7 @@ namespace gd3d.framework
             case e.DDS:
             case e.Mesh:
             case e.PVR:
+            case e.KTX:
             case e.PackBin:
                 return "arraybuffer";
             default:

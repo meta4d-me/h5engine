@@ -8644,6 +8644,10 @@ var gd3d;
                             _this.assetmgr.download(guid, url, framework.AssetTypeEnum.PVR, imageNext.bind(_this, url), function () {
                                 console.error("[\u4E0B\u8F09\u8CC7\u6E90]\u5931\u8D25:" + url + " ,bundle:" + _this.name);
                             }, _this);
+                        else if (k.endsWith(".ktx"))
+                            _this.assetmgr.download(guid, url, framework.AssetTypeEnum.KTX, imageNext.bind(_this, url), function () {
+                                console.error("[\u4E0B\u8F09\u8CC7\u6E90]\u5931\u8D25:" + url + " ,bundle:" + _this.name);
+                            }, _this);
                     };
                     for (var k in _this.texs) {
                         _loop_4(k);
@@ -8903,6 +8907,7 @@ var gd3d;
                 case e.DDS:
                 case e.Mesh:
                 case e.PVR:
+                case e.KTX:
                 case e.PackBin:
                     return "arraybuffer";
                 default:

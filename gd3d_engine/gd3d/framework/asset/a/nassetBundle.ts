@@ -161,6 +161,11 @@ namespace gd3d.framework
                         {
                             console.error(`[下載資源]失败:${url} ,bundle:${this.name}`);
                         }, this);
+                    else if (k.endsWith(".ktx"))
+                        this.assetmgr.download(guid, url, AssetTypeEnum.KTX, imageNext.bind(this,url), () =>
+                        {
+                            console.error(`[下載資源]失败:${url} ,bundle:${this.name}`);
+                        }, this);
                 }
             });
         }
