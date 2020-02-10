@@ -62,7 +62,7 @@ namespace gd3d.framework
             this.handlers.push(["keyup",this._keyup.bind(this)]);
             this.handlers.push(["blur",this._blur.bind(this)]);
 
-            this.attach(app.webgl.canvas);
+            this.attach(<HTMLCanvasElement>app.webgl.canvas);
             this.disableContextMenu();
         }
 
