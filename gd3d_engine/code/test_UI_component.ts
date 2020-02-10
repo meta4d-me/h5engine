@@ -1,3 +1,8 @@
+// var fontjson = "STXINGKA.font.json";
+// var fontpng = "STXINGKA.TTF.png";
+var fontjson = "方正粗圆_GBK.font.json";
+var fontpng = "方正粗圆_GBK.TTF.png";
+
 //UI 组件样例
 class test_UI_Component implements IState {
     app: gd3d.framework.application;
@@ -38,7 +43,7 @@ class test_UI_Component implements IState {
         //9宫格拉伸底图
         let bg_t = new gd3d.framework.transform2D;
         bg_t.name = "框底图"
-        bg_t.width = 400;
+        bg_t.width = 800;
         bg_t.height = 260;
         bg_t.pivot.x = 0;
         bg_t.pivot.y = 0;
@@ -61,17 +66,70 @@ class test_UI_Component implements IState {
         //文本
         let lab_t = new gd3d.framework.transform2D;
         lab_t.name = "我是段文本_lable";
-        lab_t.width = 120;
+        lab_t.width = 800;
         lab_t.height = 100;
-        lab_t.localTranslate.x = -10;
-        lab_t.localTranslate.y = -10;
-        bg_t.addChild(lab_t);
+        lab_t.localTranslate.x = 50;
+        lab_t.localTranslate.y = 300;
+        this.rooto2d.addChild(lab_t);
         let lab_l = lab_t.addComponent("label") as gd3d.framework.label;
         test_UI_Component["lab"] = lab_l;
-        lab_l.font = this.assetMgr.getAssetByName("STXINGKA.font.json") as gd3d.framework.font;
-        lab_l.fontsize = 24;
-        lab_l.text = "我是段文本\n换行测试";
-        lab_l.color =new gd3d.math.color(0.2,0.2,0.2,1);
+        lab_l.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
+        lab_l.fontsize = 20;
+        // lab_l.text = "我是段文本\n换行测试";
+        lab_l.text = `${lab_l.fontsize}号字体 Innovation in China 中国制造，慧及全球 0123456789`;
+        lab_l.color =new gd3d.math.color(0.0,0.0,0.0,1);
+        lab_l.color2 = new gd3d.math.color(1.0,0.0,0.0,1);
+        test_UI_Component["obj"] = this;
+        
+        let lab_t1 = new gd3d.framework.transform2D;
+        lab_t1.name = "我是段文本_lable";
+        lab_t1.width = 800;
+        lab_t1.height = 100;
+        lab_t1.localTranslate.x = 50;
+        lab_t1.localTranslate.y = 350;
+        this.rooto2d.addChild(lab_t1);
+        let lab_l1 = lab_t1.addComponent("label") as gd3d.framework.label;
+        test_UI_Component["lab"] = lab_l1;
+        lab_l1.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
+        lab_l1.fontsize = 30;
+        // lab_l1.text = "我是段文本\n换行测试";
+        lab_l1.text = `${lab_l1.fontsize}号字体 Innovation in China 中国制造，慧及全球 0123456789`;
+        lab_l1.color =new gd3d.math.color(0.0,0.0,0.0,1);
+        lab_l1.color2 = new gd3d.math.color(1.0,0.0,0.0,1);
+        test_UI_Component["obj"] = this;
+
+        let lab_t2 = new gd3d.framework.transform2D;
+        lab_t2.name = "我是段文本_lable";
+        lab_t2.width = 800;
+        lab_t2.height = 100;
+        lab_t2.localTranslate.x = 50;
+        lab_t2.localTranslate.y = 420;
+        this.rooto2d.addChild(lab_t2);
+        let lab_l2 = lab_t2.addComponent("label") as gd3d.framework.label;
+        test_UI_Component["lab"] = lab_l2;
+        lab_l2.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
+        lab_l2.fontsize = 40;
+        // lab_l2.text = "我是段文本\n换行测试";
+        lab_l2.text = `${lab_l2.fontsize}号字体 Innovation in China 中国制造，慧及全球 0123456789`;
+        lab_l2.color =new gd3d.math.color(0.0,0.0,0.0,1);
+        lab_l2.color2 = new gd3d.math.color(1.0,0.0,0.0,1);
+        test_UI_Component["obj"] = this;
+
+        let lab_t3 = new gd3d.framework.transform2D;
+        lab_t3.name = "我是段文本_lable";
+        lab_t3.width = 800;
+        lab_t3.height = 100;
+        lab_t3.localTranslate.x = 50;
+        lab_t3.localTranslate.y = 500;
+        this.rooto2d.addChild(lab_t3);
+        let lab_l3 = lab_t3.addComponent("label") as gd3d.framework.label;
+        test_UI_Component["lab"] = lab_l3;
+        lab_l3.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
+        lab_l3.fontsize = 200;
+        // lab_l2.text = "我是段文本\n换行测试";
+        lab_l3.text = `${lab_l3.fontsize}号字体 Innovation in China 中国制造，慧及全球 0123456789`;
+        lab_l3.color =new gd3d.math.color(0.0,0.0,0.0,1);
+        lab_l3.color2 = new gd3d.math.color(1.0,0.0,0.0,1);
         test_UI_Component["obj"] = this;
 
         //按鈕
@@ -144,7 +202,7 @@ class test_UI_Component implements IState {
 
         //一个输入框
         let iptFrame_t = new gd3d.framework.transform2D;
-        iptFrame_t.width = 120;
+        iptFrame_t.width = 800;
         iptFrame_t.height = 30;
         iptFrame_t.pivot.x = 0;
         iptFrame_t.pivot.y = 0;
@@ -171,7 +229,7 @@ class test_UI_Component implements IState {
         text_t.height = iptFrame_t.height;
         iptFrame_t.addChild(text_t);
         ipt.TextLabel = text_t.addComponent("label") as gd3d.framework.label;
-        ipt.TextLabel.font = this.assetMgr.getAssetByName("STXINGKA.font.json") as gd3d.framework.font;
+        ipt.TextLabel.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
         ipt.TextLabel.fontsize = 24
         ipt.TextLabel.color =new gd3d.math.color(1,1,1,1);
         text_t.layoutState = 0 | gd3d.framework.layoutOption.H_CENTER | gd3d.framework.layoutOption.V_CENTER;
@@ -183,7 +241,7 @@ class test_UI_Component implements IState {
         p_t.height = iptFrame_t.height;
         iptFrame_t.addChild(p_t);
         ipt.PlaceholderLabel = p_t.addComponent("label") as gd3d.framework.label;
-        ipt.PlaceholderLabel.font = this.assetMgr.getAssetByName("STXINGKA.font.json") as gd3d.framework.font;
+        ipt.PlaceholderLabel.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
         ipt.PlaceholderLabel.fontsize = 24
         ipt.PlaceholderLabel.color =new gd3d.math.color(0.6,0.6,0.6,1);
 
@@ -243,9 +301,9 @@ class test_UI_Component implements IState {
                 this.assetMgr.load("res/comp/comp.atlas.json", gd3d.framework.AssetTypeEnum.Auto, (s) => {
                     if(s.isfinish){
                         //加载字体资源
-                        this.assetMgr.load("res/STXINGKA.TTF.png",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
+                        this.assetMgr.load("res/fonts/"+fontpng,gd3d.framework.AssetTypeEnum.Auto,(s)=>{
                             if(s.isfinish){
-                                this.assetMgr.load("res/resources/STXINGKA.font.json",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
+                                this.assetMgr.load("res/fonts/"+fontjson,gd3d.framework.AssetTypeEnum.Auto,(s)=>{
                                     this.assetMgr.load("res/zg03_256.png",gd3d.framework.AssetTypeEnum.Auto,(s)=>{
                                         if(s.isfinish){
                                             state.finish = true;

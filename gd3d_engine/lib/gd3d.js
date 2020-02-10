@@ -22,10 +22,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -9804,7 +9805,8 @@ var gd3d;
             function AssetFactory_Atlas() {
             }
             AssetFactory_Atlas.prototype.parse = function (assetmgr, bundle, filename, txt) {
-                return new framework.atlas(filename).Parse(txt, assetmgr, bundle.name);
+                var bName = bundle ? bundle.name : null;
+                return new framework.atlas(filename).Parse(txt, assetmgr, bName);
             };
             AssetFactory_Atlas = __decorate([
                 framework.assetF(framework.AssetTypeEnum.Atlas)
@@ -9902,7 +9904,8 @@ var gd3d;
             function AssetFactory_Font() {
             }
             AssetFactory_Font.prototype.parse = function (assetmgr, bundle, filename, txt) {
-                return new framework.font(filename).Parse(txt, assetmgr, bundle.name);
+                var bName = bundle ? bundle.name : null;
+                return new framework.font(filename).Parse(txt, assetmgr, bName);
             };
             AssetFactory_Font = __decorate([
                 framework.assetF(framework.AssetTypeEnum.Font)
