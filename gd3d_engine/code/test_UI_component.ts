@@ -64,6 +64,23 @@ class test_UI_Component implements IState {
         bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM,60);
 
         //文本
+        let lab_t0 = new gd3d.framework.transform2D;
+        lab_t0.name = "我是段文本_lable";
+        lab_t0.width = 800;
+        lab_t0.height = 100;
+        lab_t0.localTranslate.x = 50;
+        lab_t0.localTranslate.y = 280;
+        this.rooto2d.addChild(lab_t0);
+        let lab_l0 = lab_t0.addComponent("label") as gd3d.framework.label;
+        test_UI_Component["lab"] = lab_l0;
+        lab_l0.font = this.assetMgr.getAssetByName(fontjson) as gd3d.framework.font;
+        lab_l0.fontsize = 12;
+        // lab_l.text = "我是段文本\n换行测试";
+        lab_l0.text = `${lab_l0.fontsize}号字体 Innovation in China 中国制造，慧及全球 0123456789`;
+        lab_l0.color =new gd3d.math.color(0.0,0.0,0.0,1);
+        lab_l0.color2 = new gd3d.math.color(1.0,0.0,0.0,1);
+        test_UI_Component["obj"] = this;
+
         let lab_t = new gd3d.framework.transform2D;
         lab_t.name = "我是段文本_lable";
         lab_t.width = 800;
