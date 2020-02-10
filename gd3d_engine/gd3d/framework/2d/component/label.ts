@@ -172,7 +172,7 @@ namespace gd3d.framework
         {
             this.dirtyData = false;
 
-            var rate = this._fontsize / _font.lineHeight;
+            var rate = this._fontsize / _font.pointSize;
             var m = this.transform.getWorldMatrix();
             var m11 = m.rawData[0];
             var m12 = m.rawData[2];

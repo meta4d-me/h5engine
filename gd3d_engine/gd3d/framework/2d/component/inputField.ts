@@ -284,7 +284,7 @@ namespace gd3d.framework
         private filterContentText(){
             if(!this._textLable || this._text == null) return;
             let lab = this._textLable;
-            let rate = lab.fontsize / lab.font.lineHeight;
+            let rate = lab.fontsize / lab.font.pointSize;
             let font = lab.font;
             let addw = 0;
             let addh = 0;

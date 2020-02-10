@@ -1,9 +1,9 @@
 // var fontjson = "STXINGKA.font.json";
 // var fontpng = "STXINGKA.TTF.png";
-// var fontjson = "方正粗圆_GBK.font.json";
-// var fontpng = "方正粗圆_GBK.TTF.png";
-var fontjson = "方正粗圆_GBK_normal.font.json"; // 非sdf的正常位图字体
-var fontpng = "方正粗圆_GBK_normal.TTF.png";
+var fontjson = "方正粗圆_GBK.font.json";
+var fontpng = "方正粗圆_GBK.TTF.png";
+// var fontjson = "方正粗圆_GBK_normal.font.json"; // 非sdf的正常位图字体，使用该字体时需要手动到 defshader.ts 中 fscodefontUI 设置为正常位图字体shader
+// var fontpng = "方正粗圆_GBK_normal.TTF.png";
 
 //UI 组件样例
 class test_UI_Component implements IState {

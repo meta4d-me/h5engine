@@ -4653,8 +4653,8 @@ var test_UIGuideMask = (function () {
     };
     return test_UIGuideMask;
 }());
-var fontjson = "方正粗圆_GBK_normal.font.json";
-var fontpng = "方正粗圆_GBK_normal.TTF.png";
+var fontjson = "方正粗圆_GBK.font.json";
+var fontpng = "方正粗圆_GBK.TTF.png";
 var test_UI_Component = (function () {
     function test_UI_Component() {
         this.taskmgr = new gd3d.framework.taskMgr();
