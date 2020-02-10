@@ -22,10 +22,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -343,8 +344,9 @@ var gd3d;
                 if (!this.outcontainer)
                     return;
                 if (this.webgl && this.webgl.canvas) {
-                    this.ccWidth = this.webgl.canvas.clientWidth != null ? this.webgl.canvas.clientWidth : this.ccWidth;
-                    this.ccHeight = this.webgl.canvas.clientHeight != null ? this.webgl.canvas.clientHeight : this.ccHeight;
+                    var canvas = this.webgl.canvas;
+                    this.ccWidth = canvas.clientWidth != null ? canvas.clientWidth : this.ccWidth;
+                    this.ccHeight = canvas.clientHeight != null ? canvas.clientHeight : this.ccHeight;
                 }
                 if (this.ccWidth != this._canvasClientWidth || this.ccHeight != this._canvasClientHeight) {
                     this._canvasClientWidth = this.ccWidth;

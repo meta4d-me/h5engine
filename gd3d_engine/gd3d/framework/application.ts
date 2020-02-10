@@ -481,8 +481,9 @@ namespace gd3d.framework
                 return;
             if (this.webgl && this.webgl.canvas)
             {
-                this.ccWidth = this.webgl.canvas.clientWidth != null ? this.webgl.canvas.clientWidth : this.ccWidth;
-                this.ccHeight = this.webgl.canvas.clientHeight != null ? this.webgl.canvas.clientHeight : this.ccHeight;
+                var canvas = <HTMLCanvasElement>this.webgl.canvas;
+                this.ccWidth = canvas.clientWidth != null ? canvas.clientWidth : this.ccWidth;
+                this.ccHeight = canvas.clientHeight != null ? canvas.clientHeight : this.ccHeight;
             }
 
             if (this.ccWidth != this._canvasClientWidth || this.ccHeight != this._canvasClientHeight)

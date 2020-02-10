@@ -168,7 +168,7 @@ namespace gd3d.framework
             this.inputElement.style.opacity = "0";
             this.inputElement.style.visibility = "hidden";
             if (this.transform.canvas.scene){
-                let htmlCanv = this.transform.canvas.scene.webgl.canvas;
+                let htmlCanv = <HTMLCanvasElement>this.transform.canvas.scene.webgl.canvas;
                 if(htmlCanv)
                 htmlCanv.parentElement.appendChild(this.inputElement);
             }
