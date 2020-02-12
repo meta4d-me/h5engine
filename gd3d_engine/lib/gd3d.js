@@ -22,11 +22,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -21245,6 +21244,20 @@ var gd3d;
             return InputEvent;
         }(gd3d.AEvent));
         event_1.InputEvent = InputEvent;
+        var inputHtmlNativeEvent = (function (_super) {
+            __extends(inputHtmlNativeEvent, _super);
+            function inputHtmlNativeEvent() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            inputHtmlNativeEvent.prototype.On = function (tagName, func, thisArg) {
+                _super.prototype.On.call(this, tagName, func, thisArg);
+            };
+            inputHtmlNativeEvent.prototype.Emit = function (tagName, ev) {
+                _super.prototype.Emit.call(this, tagName, ev);
+            };
+            return inputHtmlNativeEvent;
+        }(gd3d.AEvent));
+        event_1.inputHtmlNativeEvent = inputHtmlNativeEvent;
     })(event = gd3d.event || (gd3d.event = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -21327,6 +21340,7 @@ var gd3d;
                 this._buttons = [false, false, false];
                 this._lastbuttons = [false, false, false];
                 this.eventer = new gd3d.event.InputEvent();
+                this.HtmlNativeEventer = new gd3d.event.inputHtmlNativeEvent();
                 this.inputlast = null;
                 this.keyboardMap = {};
                 this.handlers = [];
@@ -21360,7 +21374,7 @@ var gd3d;
                 this.handlers.push(["mousedown", this._mousedown.bind(this)]);
                 this.handlers.push(["mouseup", this._mouseup.bind(this)]);
                 this.handlers.push(["mousemove", this._mousemove.bind(this)]);
-                this.handlers.push(["mousewheel", this._mousewheel.bind(this)]);
+                this.handlers.push(["wheel", this._mousewheel.bind(this)]);
                 this.handlers.push(["DOMMouseScroll", this._mousewheel.bind(this)]);
                 this.handlers.push(["keydown", this._keydown.bind(this)]);
                 this.handlers.push(["keyup", this._keyup.bind(this)]);
@@ -21408,18 +21422,22 @@ var gd3d;
                 this._element = null;
             };
             inputMgr.prototype._mousedown = function (ev) {
+                this.HtmlNativeEventer.Emit("mousedown", ev);
                 this.CalcuPoint(ev.offsetX, ev.offsetY, this._point);
                 this._buttons[ev.button] = true;
                 this._point.touch = true;
             };
             inputMgr.prototype._mouseup = function (ev) {
+                this.HtmlNativeEventer.Emit("mouseup", ev);
                 this._buttons[ev.button] = false;
                 this._point.touch = false;
             };
             inputMgr.prototype._mousemove = function (ev) {
+                this.HtmlNativeEventer.Emit("mousemove", ev);
                 this.CalcuPoint(ev.offsetX, ev.offsetY, this._point);
             };
             inputMgr.prototype._mousewheel = function (ev) {
+                this.HtmlNativeEventer.Emit("wheel", ev);
                 this.hasWheel = true;
                 if (ev.detail) {
                     this.lastWheel = -1 * ev.detail;
@@ -21455,6 +21473,7 @@ var gd3d;
                 this._point.y = ys / count;
             };
             inputMgr.prototype._touchstart = function (ev) {
+                this.HtmlNativeEventer.Emit("touchstart", ev);
                 this._point.touch = true;
                 var lastTouche;
                 for (var i = 0; i < ev.changedTouches.length; i++) {
@@ -21471,6 +21490,7 @@ var gd3d;
                 }
             };
             inputMgr.prototype._touchmove = function (ev) {
+                this.HtmlNativeEventer.Emit("touchmove", ev);
                 this._point.touch = true;
                 var lastTouche;
                 for (var i = 0; i < ev.changedTouches.length; i++) {
@@ -21487,6 +21507,7 @@ var gd3d;
                 }
             };
             inputMgr.prototype._touchend = function (ev) {
+                this.HtmlNativeEventer.Emit("touchend", ev);
                 for (var i = 0; i < ev.changedTouches.length; i++) {
                     var touch = ev.changedTouches[i];
                     var id = touch.identifier;
@@ -21496,17 +21517,21 @@ var gd3d;
                 this._point.touch = false;
             };
             inputMgr.prototype._touchcancel = function (ev) {
+                this.HtmlNativeEventer.Emit("touchcancel", ev);
                 this._touchend(ev);
             };
             inputMgr.prototype._keydown = function (ev) {
+                this.HtmlNativeEventer.Emit("keydown", ev);
                 this.keyboardMap[ev.keyCode] = true;
                 this.keyDownCode = ev.keyCode;
             };
             inputMgr.prototype._keyup = function (ev) {
+                this.HtmlNativeEventer.Emit("keyup", ev);
                 delete this.keyboardMap[ev.keyCode];
                 this.keyUpCode = ev.keyCode;
             };
             inputMgr.prototype._blur = function (ev) {
+                this.HtmlNativeEventer.Emit("blur", ev);
                 this._point.touch = false;
             };
             inputMgr.prototype.update = function (delta) {
@@ -21592,6 +21617,12 @@ var gd3d;
             };
             inputMgr.prototype.removeKeyListener = function (eventEnum, func, thisArg) {
                 this.eventer.RemoveListener(gd3d.event.KeyEventEnum[eventEnum], func, thisArg);
+            };
+            inputMgr.prototype.addHTMLElementListener = function (tagName, func, thisArg) {
+                this.HtmlNativeEventer.On(tagName, func, thisArg);
+            };
+            inputMgr.prototype.removeHTMLElementListener = function (tagName, func, thisArg) {
+                this.HtmlNativeEventer.RemoveListener(tagName, func, thisArg);
             };
             inputMgr.prototype.anyKey = function () {
                 if (this._point.touch)

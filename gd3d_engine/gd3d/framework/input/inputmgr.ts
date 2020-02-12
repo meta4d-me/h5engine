@@ -493,7 +493,13 @@ namespace gd3d.framework
         private tempV2_0:gd3d.math.vector2 = new gd3d.math.vector2();
         private tempV2_1:gd3d.math.vector2 = new gd3d.math.vector2();
         private devicePixelRatio =  window.devicePixelRatio || 1;
-        private CalcuPoint(clientX:number,clientY:number , out:pointinfo){
+        /**
+         * 计算校准html 输入坐标点
+         * @param clientX 输入x
+         * @param clientY 输入y
+         * @param out 返回pointinfo 
+         */
+        CalcuPoint(clientX:number,clientY:number , out:pointinfo){
             if(!out || !this.app || isNaN(clientX) || isNaN(clientY)) return;
             this.tempV2_0.x = clientX * this.devicePixelRatio/ this.app.scaleFromPandding;
             this.tempV2_0.y = clientY * this.devicePixelRatio/ this.app.scaleFromPandding;
