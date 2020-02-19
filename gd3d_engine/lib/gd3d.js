@@ -17776,7 +17776,9 @@ var gd3d;
                 this.gameObject = null;
                 this.pathPropertyMap = null;
                 this.nowClip = null;
-                this.clips.length = 0;
+                if (this.clips) {
+                    this.clips.length = 0;
+                }
                 this.clips = null;
             };
             var keyFrameAniPlayer_1;

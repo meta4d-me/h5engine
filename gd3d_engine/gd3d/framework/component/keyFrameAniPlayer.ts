@@ -386,12 +386,12 @@ namespace gd3d.framework {
         }
 
         remove() {
-
-
             this.gameObject = null;
             this.pathPropertyMap = null;
             this.nowClip = null;
-            this.clips.length = 0;
+            if(this.clips){
+                this.clips.length = 0;
+            }
             this.clips = null;
         }
     }
