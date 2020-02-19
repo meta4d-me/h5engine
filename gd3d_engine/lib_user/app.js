@@ -5,10 +5,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -4652,6 +4653,8 @@ var test_UIGuideMask = (function () {
     };
     return test_UIGuideMask;
 }());
+var fontjson = "方正粗圆_GBK.font.json";
+var fontpng = "方正粗圆_GBK.TTF.png";
 var test_UI_Component = (function () {
     function test_UI_Component() {
         this.taskmgr = new gd3d.framework.taskMgr();
@@ -4676,7 +4679,7 @@ var test_UI_Component = (function () {
         var tex_0 = this.assetMgr.getAssetByName("zg03_256.png");
         var bg_t = new gd3d.framework.transform2D;
         bg_t.name = "框底图";
-        bg_t.width = 400;
+        bg_t.width = 800;
         bg_t.height = 260;
         bg_t.pivot.x = 0;
         bg_t.pivot.y = 0;
@@ -4694,19 +4697,80 @@ var test_UI_Component = (function () {
         bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP, 60);
         bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT, 60);
         bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM, 60);
+        var lab_t0 = new gd3d.framework.transform2D;
+        lab_t0.name = "我是段文本_lable";
+        lab_t0.width = 800;
+        lab_t0.height = 100;
+        lab_t0.localTranslate.x = 50;
+        lab_t0.localTranslate.y = 280;
+        this.rooto2d.addChild(lab_t0);
+        var lab_l0 = lab_t0.addComponent("label");
+        test_UI_Component["lab"] = lab_l0;
+        lab_l0.font = this.assetMgr.getAssetByName(fontjson);
+        lab_l0.fontsize = 12;
+        lab_l0.text = lab_l0.fontsize + "\u53F7\u5B57\u4F53 Innovation in China \u4E2D\u56FD\u5236\u9020\uFF0C\u6167\u53CA\u5168\u7403 0123456789";
+        lab_l0.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
+        lab_l0.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
+        test_UI_Component["obj"] = this;
         var lab_t = new gd3d.framework.transform2D;
         lab_t.name = "我是段文本_lable";
-        lab_t.width = 120;
+        lab_t.width = 800;
         lab_t.height = 100;
-        lab_t.localTranslate.x = -10;
-        lab_t.localTranslate.y = -10;
-        bg_t.addChild(lab_t);
+        lab_t.localTranslate.x = 50;
+        lab_t.localTranslate.y = 300;
+        this.rooto2d.addChild(lab_t);
         var lab_l = lab_t.addComponent("label");
         test_UI_Component["lab"] = lab_l;
-        lab_l.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
-        lab_l.fontsize = 24;
-        lab_l.text = "我是段文本\n换行测试";
-        lab_l.color = new gd3d.math.color(0.2, 0.2, 0.2, 1);
+        lab_l.font = this.assetMgr.getAssetByName(fontjson);
+        lab_l.fontsize = 20;
+        lab_l.text = lab_l.fontsize + "\u53F7\u5B57\u4F53 Innovation in China \u4E2D\u56FD\u5236\u9020\uFF0C\u6167\u53CA\u5168\u7403 0123456789";
+        lab_l.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
+        lab_l.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
+        test_UI_Component["obj"] = this;
+        var lab_t1 = new gd3d.framework.transform2D;
+        lab_t1.name = "我是段文本_lable";
+        lab_t1.width = 800;
+        lab_t1.height = 100;
+        lab_t1.localTranslate.x = 50;
+        lab_t1.localTranslate.y = 350;
+        this.rooto2d.addChild(lab_t1);
+        var lab_l1 = lab_t1.addComponent("label");
+        test_UI_Component["lab"] = lab_l1;
+        lab_l1.font = this.assetMgr.getAssetByName(fontjson);
+        lab_l1.fontsize = 30;
+        lab_l1.text = lab_l1.fontsize + "\u53F7\u5B57\u4F53 Innovation in China \u4E2D\u56FD\u5236\u9020\uFF0C\u6167\u53CA\u5168\u7403 0123456789";
+        lab_l1.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
+        lab_l1.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
+        test_UI_Component["obj"] = this;
+        var lab_t2 = new gd3d.framework.transform2D;
+        lab_t2.name = "我是段文本_lable";
+        lab_t2.width = 800;
+        lab_t2.height = 100;
+        lab_t2.localTranslate.x = 50;
+        lab_t2.localTranslate.y = 420;
+        this.rooto2d.addChild(lab_t2);
+        var lab_l2 = lab_t2.addComponent("label");
+        test_UI_Component["lab"] = lab_l2;
+        lab_l2.font = this.assetMgr.getAssetByName(fontjson);
+        lab_l2.fontsize = 40;
+        lab_l2.text = lab_l2.fontsize + "\u53F7\u5B57\u4F53 Innovation in China \u4E2D\u56FD\u5236\u9020\uFF0C\u6167\u53CA\u5168\u7403 0123456789";
+        lab_l2.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
+        lab_l2.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
+        test_UI_Component["obj"] = this;
+        var lab_t3 = new gd3d.framework.transform2D;
+        lab_t3.name = "我是段文本_lable";
+        lab_t3.width = 800;
+        lab_t3.height = 100;
+        lab_t3.localTranslate.x = 50;
+        lab_t3.localTranslate.y = 500;
+        this.rooto2d.addChild(lab_t3);
+        var lab_l3 = lab_t3.addComponent("label");
+        test_UI_Component["lab"] = lab_l3;
+        lab_l3.font = this.assetMgr.getAssetByName(fontjson);
+        lab_l3.fontsize = 200;
+        lab_l3.text = lab_l3.fontsize + "\u53F7\u5B57\u4F53 Innovation in China \u4E2D\u56FD\u5236\u9020\uFF0C\u6167\u53CA\u5168\u7403 0123456789";
+        lab_l3.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
+        lab_l3.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
         test_UI_Component["obj"] = this;
         var btn_t = new gd3d.framework.transform2D;
         btn_t.name = "btn_按鈕";
@@ -4769,7 +4833,7 @@ var test_UI_Component = (function () {
             nums = temp;
         }, this);
         var iptFrame_t = new gd3d.framework.transform2D;
-        iptFrame_t.width = 120;
+        iptFrame_t.width = 800;
         iptFrame_t.height = 30;
         iptFrame_t.pivot.x = 0;
         iptFrame_t.pivot.y = 0;
@@ -4794,7 +4858,7 @@ var test_UI_Component = (function () {
         text_t.height = iptFrame_t.height;
         iptFrame_t.addChild(text_t);
         ipt.TextLabel = text_t.addComponent("label");
-        ipt.TextLabel.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
+        ipt.TextLabel.font = this.assetMgr.getAssetByName(fontjson);
         ipt.TextLabel.fontsize = 24;
         ipt.TextLabel.color = new gd3d.math.color(1, 1, 1, 1);
         text_t.layoutState = 0 | gd3d.framework.layoutOption.H_CENTER | gd3d.framework.layoutOption.V_CENTER;
@@ -4805,7 +4869,7 @@ var test_UI_Component = (function () {
         p_t.height = iptFrame_t.height;
         iptFrame_t.addChild(p_t);
         ipt.PlaceholderLabel = p_t.addComponent("label");
-        ipt.PlaceholderLabel.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
+        ipt.PlaceholderLabel.font = this.assetMgr.getAssetByName(fontjson);
         ipt.PlaceholderLabel.fontsize = 24;
         ipt.PlaceholderLabel.color = new gd3d.math.color(0.6, 0.6, 0.6, 1);
         var scroll_t = new gd3d.framework.transform2D;
@@ -4846,9 +4910,9 @@ var test_UI_Component = (function () {
             if (s.isfinish) {
                 _this.assetMgr.load("res/comp/comp.atlas.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
-                        _this.assetMgr.load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                        _this.assetMgr.load("res/fonts/" + fontpng, gd3d.framework.AssetTypeEnum.Auto, function (s) {
                             if (s.isfinish) {
-                                _this.assetMgr.load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                _this.assetMgr.load("res/fonts/" + fontjson, gd3d.framework.AssetTypeEnum.Auto, function (s) {
                                     _this.assetMgr.load("res/zg03_256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                                         if (s.isfinish) {
                                             state.finish = true;

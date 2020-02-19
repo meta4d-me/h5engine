@@ -190,23 +190,85 @@ namespace gd3d.framework
             gl_Position = (glstate_matrix_mvp * tmpvar_1);   
         }`;
 
-        
+        // 使用正常位图字体shader
+        // static fscodefontUI: string = ` 
+        // precision mediump float ; 
+        // uniform sampler2D _MainTex; 
+        // varying lowp vec4 xlv_COLOR; // 字体颜色
+        // varying lowp vec4 xlv_COLOREx; // 描边颜色
+        // varying highp vec2 xlv_TEXCOORD0;     
+        // void main()   
+        // {  
+        //     vec4 col = texture2D(_MainTex, xlv_TEXCOORD0);
+        //     col.a = col.r * xlv_COLOR.a;
+        //     col.rgb = xlv_COLOR.rgb;
+            
+        //     gl_FragData[0] = col;
+        // }`;
+
+        // 原来sdf字体shader
+        // static fscodefontUI: string = ` 
+        // precision mediump float ; 
+        // uniform sampler2D _MainTex; 
+        // varying lowp vec4 xlv_COLOR; // 字体颜色
+        // varying lowp vec4 xlv_COLOREx; // 描边颜色
+        // varying highp vec2 xlv_TEXCOORD0;     
+        // void main()   
+        // {  
+        //     float scale = 10.0;    
+        //     float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.47)*scale;    
+        //     float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.4)*scale;    
+            
+        //     float c=xlv_COLOR.a * clamp ( d,0.0,1.0);   
+        //     float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);   
+        //     bc =min(1.0-c,bc);  
+        //     gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;  
+        // }`;
+
+        // 根据 https://zhuanlan.zhihu.com/p/26217154 文章进行修改的shader
         static fscodefontUI: string = ` 
             precision mediump float ; 
             uniform sampler2D _MainTex; 
-            varying lowp vec4 xlv_COLOR; 
-            varying lowp vec4 xlv_COLOREx; 
+            varying lowp vec4 xlv_COLOR; // 字体颜色
+            varying lowp vec4 xlv_COLOREx; // 描边颜色
             varying highp vec2 xlv_TEXCOORD0;     
             void main()   
             {  
-                float scale = 10.0;    
-                float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.47)*scale;    
-                float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.4)*scale;    
+                // 在gd3d中使用的sdf字体做了最大值为2像素的有向距离运算且保存到位图上。
+                // 颜色值[0,255]对于区间[-2,2]。
+                // 颜色值v表示距离字符边缘有 (v/255*4-2) 单位距离。单位距离为正表示在字符内，否则在字符外。
                 
-                float c=xlv_COLOR.a * clamp ( d,0.0,1.0);   
-                float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);   
-                bc =min(1.0-c,bc);  
-            gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;  
+                float _DistanceMark = 0.0; // 距离为 0 处是字符边缘
+                float _SmoothDelta = 0.5; // 在字符边缘 0.5 像素进行插值 
+                float _OutlineDistanceMark = -1.0; // 描边位置
+
+                vec4 col = texture2D(_MainTex, xlv_TEXCOORD0);
+                float distance = col.r * 4.0 - 2.0;
+
+                // 平滑字体边缘
+                col.a = smoothstep(_DistanceMark - _SmoothDelta, _DistanceMark + _SmoothDelta, distance);
+                // 不平滑 相当于 _SmoothDelta = 0
+                // if (distance < _DistanceMark)
+                //     col.a = 0.0;
+                // else
+                //     col.a = 1.0;
+
+                col.rgb = xlv_COLOR.rgb;
+            
+                // Outlining 描边
+                vec4 outlineCol = vec4(1.0,1.0,1.0,1.0);
+
+                outlineCol.a = smoothstep(_OutlineDistanceMark - _SmoothDelta, _OutlineDistanceMark + _SmoothDelta, distance);
+                outlineCol.rgb = xlv_COLOREx.rgb;
+                outlineCol.a = outlineCol.a * xlv_COLOREx.a;
+                
+                // 混合字体与描边颜色
+                col = mix(outlineCol, col, col.a);
+
+                col.rgb = col.rgb * xlv_COLOR.a;
+                
+                // 设置最终值
+                gl_FragData[0] = col;
         }`;
     
         static vscodeuifontmask: string = ` 

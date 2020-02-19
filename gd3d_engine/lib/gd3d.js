@@ -22,10 +22,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -5126,7 +5127,7 @@ var gd3d;
                 if (!this._textLable || this._text == null)
                     return;
                 var lab = this._textLable;
-                var rate = lab.fontsize / lab.font.lineHeight;
+                var rate = lab.fontsize / lab.font.pointSize;
                 var font = lab.font;
                 var addw = 0;
                 var addh = 0;
@@ -5350,7 +5351,7 @@ var gd3d;
             });
             label.prototype.updateData = function (_font) {
                 this.dirtyData = false;
-                var rate = this._fontsize / _font.lineHeight;
+                var rate = this._fontsize / _font.pointSize;
                 var m = this.transform.getWorldMatrix();
                 var m11 = m.rawData[0];
                 var m12 = m.rawData[2];
@@ -9621,7 +9622,7 @@ var gd3d;
             ]\
             }";
             defShader.vscodefontUI = " \n        attribute vec4 _glesVertex;    \n        attribute vec4 _glesColor;                   \n        attribute vec4 _glesColorEx;                   \n        attribute vec4 _glesMultiTexCoord0;          \n        uniform highp mat4 glstate_matrix_mvp;       \n        varying lowp vec4 xlv_COLOR;                 \n        varying lowp vec4 xlv_COLOREx;                                                  \n        varying highp vec2 xlv_TEXCOORD0;            \n        void main()                                      \n        {                                                \n            highp vec4 tmpvar_1;                         \n            tmpvar_1.w = 1.0;                            \n            tmpvar_1.xyz = _glesVertex.xyz;              \n            xlv_COLOR = _glesColor;                      \n            xlv_COLOREx = _glesColorEx;                      \n            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      \n            gl_Position = (glstate_matrix_mvp * tmpvar_1);   \n        }";
-            defShader.fscodefontUI = " \n            precision mediump float ; \n            uniform sampler2D _MainTex; \n            varying lowp vec4 xlv_COLOR; \n            varying lowp vec4 xlv_COLOREx; \n            varying highp vec2 xlv_TEXCOORD0;     \n            void main()   \n            {  \n                float scale = 10.0;    \n                float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.47)*scale;    \n                float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.4)*scale;    \n                \n                float c=xlv_COLOR.a * clamp ( d,0.0,1.0);   \n                float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);   \n                bc =min(1.0-c,bc);  \n            gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;  \n        }";
+            defShader.fscodefontUI = " \n            precision mediump float ; \n            uniform sampler2D _MainTex; \n            varying lowp vec4 xlv_COLOR; // \u5B57\u4F53\u989C\u8272\n            varying lowp vec4 xlv_COLOREx; // \u63CF\u8FB9\u989C\u8272\n            varying highp vec2 xlv_TEXCOORD0;     \n            void main()   \n            {  \n                // \u5728gd3d\u4E2D\u4F7F\u7528\u7684sdf\u5B57\u4F53\u505A\u4E86\u6700\u5927\u503C\u4E3A2\u50CF\u7D20\u7684\u6709\u5411\u8DDD\u79BB\u8FD0\u7B97\u4E14\u4FDD\u5B58\u5230\u4F4D\u56FE\u4E0A\u3002\n                // \u989C\u8272\u503C[0,255]\u5BF9\u4E8E\u533A\u95F4[-2,2]\u3002\n                // \u989C\u8272\u503Cv\u8868\u793A\u8DDD\u79BB\u5B57\u7B26\u8FB9\u7F18\u6709 (v/255*4-2) \u5355\u4F4D\u8DDD\u79BB\u3002\u5355\u4F4D\u8DDD\u79BB\u4E3A\u6B63\u8868\u793A\u5728\u5B57\u7B26\u5185\uFF0C\u5426\u5219\u5728\u5B57\u7B26\u5916\u3002\n                \n                float _DistanceMark = 0.0; // \u8DDD\u79BB\u4E3A 0 \u5904\u662F\u5B57\u7B26\u8FB9\u7F18\n                float _SmoothDelta = 0.5; // \u5728\u5B57\u7B26\u8FB9\u7F18 0.5 \u50CF\u7D20\u8FDB\u884C\u63D2\u503C \n                float _OutlineDistanceMark = -1.0; // \u63CF\u8FB9\u4F4D\u7F6E\n\n                vec4 col = texture2D(_MainTex, xlv_TEXCOORD0);\n                float distance = col.r * 4.0 - 2.0;\n\n                // \u5E73\u6ED1\u5B57\u4F53\u8FB9\u7F18\n                col.a = smoothstep(_DistanceMark - _SmoothDelta, _DistanceMark + _SmoothDelta, distance);\n                // \u4E0D\u5E73\u6ED1 \u76F8\u5F53\u4E8E _SmoothDelta = 0\n                // if (distance < _DistanceMark)\n                //     col.a = 0.0;\n                // else\n                //     col.a = 1.0;\n\n                col.rgb = xlv_COLOR.rgb;\n            \n                // Outlining \u63CF\u8FB9\n                vec4 outlineCol = vec4(1.0,1.0,1.0,1.0);\n\n                outlineCol.a = smoothstep(_OutlineDistanceMark - _SmoothDelta, _OutlineDistanceMark + _SmoothDelta, distance);\n                outlineCol.rgb = xlv_COLOREx.rgb;\n                outlineCol.a = outlineCol.a * xlv_COLOREx.a;\n                \n                // \u6DF7\u5408\u5B57\u4F53\u4E0E\u63CF\u8FB9\u989C\u8272\n                col = mix(outlineCol, col, col.a);\n\n                col.rgb = col.rgb * xlv_COLOR.a;\n                \n                // \u8BBE\u7F6E\u6700\u7EC8\u503C\n                gl_FragData[0] = col;\n        }";
             defShader.vscodeuifontmask = " \n            attribute vec4 _glesVertex;    \n            attribute vec4 _glesColor;                   \n            attribute vec4 _glesColorEx;                   \n            attribute vec4 _glesMultiTexCoord0;          \n            uniform highp mat4 glstate_matrix_mvp;       \n            varying lowp vec4 xlv_COLOR;                 \n            varying lowp vec4 xlv_COLOREx;                                                  \n            varying highp vec2 xlv_TEXCOORD0;            \n            varying highp vec2 mask_TEXCOORD;            \n            void main()                                      \n            {                                                \n                highp vec4 tmpvar_1;                         \n                tmpvar_1.w = 1.0;                            \n                tmpvar_1.xyz = _glesVertex.xyz;              \n                xlv_COLOR = _glesColor;                      \n                xlv_COLOREx = _glesColorEx;                      \n                xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      \n                mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0; \n                mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0; \n                gl_Position = (glstate_matrix_mvp * tmpvar_1);   \n            }";
             defShader.fscodeuifontmask = " \n            precision mediump float; \n            uniform sampler2D _MainTex;   \n            uniform highp vec4 _maskRect;        \n            varying lowp vec4 xlv_COLOR;  \n            varying lowp vec4 xlv_COLOREx;  \n            varying highp vec2 xlv_TEXCOORD0;     \n            varying highp vec2 mask_TEXCOORD;      \n            bool CalcuCut(){    \n                highp float l; \n                highp float t; \n                highp float r; \n                highp float b; \n                highp vec2 texc1; \n                bool beCut; \n                l = _maskRect.x; \n                t = _maskRect.y; \n                r = _maskRect.z + l; \n                b = _maskRect.w + t; \n                texc1 = mask_TEXCOORD; \n                if(texc1.x >(1.0 - l) || texc1.x <(1.0 - r) || texc1.y <t || texc1.y>b){  \n                    beCut = true;  \n                }else{ \n                    beCut = false; \n                } \n                return beCut; \n            } \n             \n            void main()   \n            {  \n                if(CalcuCut())  discard; \n                float scale = 10.0;    \n                float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.47)*scale;   \n                float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.4)*scale;   \n                \n                float c=xlv_COLOR.a * clamp ( d,0.0,1.0);   \n                float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);   \n                bc =min(1.0-c,bc);  \n                lowp vec4 final =  xlv_COLOR*c + xlv_COLOREx*bc ; \n                gl_FragData[0] = final ; \n            }";
             defShader.diffuseShader = "{\
@@ -9805,7 +9806,8 @@ var gd3d;
             function AssetFactory_Atlas() {
             }
             AssetFactory_Atlas.prototype.parse = function (assetmgr, bundle, filename, txt) {
-                return new framework.atlas(filename).Parse(txt, assetmgr, bundle.name);
+                var bName = bundle ? bundle.name : null;
+                return new framework.atlas(filename).Parse(txt, assetmgr, bName);
             };
             AssetFactory_Atlas = __decorate([
                 framework.assetF(framework.AssetTypeEnum.Atlas)
@@ -9903,7 +9905,8 @@ var gd3d;
             function AssetFactory_Font() {
             }
             AssetFactory_Font.prototype.parse = function (assetmgr, bundle, filename, txt) {
-                return new framework.font(filename).Parse(txt, assetmgr, bundle.name);
+                var bName = bundle ? bundle.name : null;
+                return new framework.font(filename).Parse(txt, assetmgr, bName);
             };
             AssetFactory_Font = __decorate([
                 framework.assetF(framework.AssetTypeEnum.Font)
