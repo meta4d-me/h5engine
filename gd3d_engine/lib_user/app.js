@@ -5,11 +5,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -2440,7 +2439,7 @@ var test_3DPhysics_compound = (function () {
                         this.astMgr = physics3dDemoTool.astMgr;
                         this.iptMgr = physics3dDemoTool.iptMgr;
                         this.camera = physics3dDemoTool.camera;
-                        return [4, demoTool.loadbySync("./res/prefabs/Capsule/Capsule.assetbundle.json", this.astMgr)];
+                        return [4, demoTool.loadbySync("./newRes/pfb/model/Capsule/Capsule.assetbundle.json", this.astMgr)];
                     case 2:
                         _a.sent();
                         this.init();
@@ -2492,7 +2491,7 @@ var test_3DPhysics_compound = (function () {
         combination.name = "Capsule";
         combination.localPosition.y = 10;
         this.scene.addChild(combination);
-        var p1 = this.astMgr.getAssetByName("Capsule.prefab.json");
+        var p1 = this.astMgr.getAssetByName("Capsule.prefab.json", "Capsule.assetbundle.json");
         var capsule = p1.getCloneTrans();
         capsule.name = "capsule";
         combination.addChild(capsule);
@@ -6605,6 +6604,8 @@ var test_pick_boxcollider = (function () {
     }
     test_pick_boxcollider.prototype.start = function (app) {
         var _this = this;
+        this.astMgr = app.getAssetMgr();
+        gd3d.framework.assetMgr.openGuid = false;
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
@@ -6619,10 +6620,8 @@ var test_pick_boxcollider = (function () {
         this.app.container.appendChild(descr);
         var names = ["MainCity_", "testnav", "city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
         var name = names[1];
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
-            if (state.isfinish) {
-                _this.loadScene(name);
-            }
+        demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", this.astMgr).then(function () {
+            _this.loadScene(name);
         });
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
@@ -6632,7 +6631,17 @@ var test_pick_boxcollider = (function () {
         objCam.localTranslate = new gd3d.math.vector3(0, 100, 0);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();
-        CameraController.instance().init(this.app, this.camera);
+        var hoverc = this.camera.gameObject.addComponent("HoverCameraScript");
+        hoverc.panAngle = 180;
+        hoverc.tiltAngle = 45;
+        hoverc.distance = 60;
+        hoverc.scaleSpeed = 0.1;
+        hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0);
+        var lObj = new gd3d.framework.transform();
+        gd3d.math.quatFromEulerAngles(0, 45, 60, lObj.localRotate);
+        var l = lObj.gameObject.addComponent("light");
+        this.scene.addChild(lObj);
+        l.type = gd3d.framework.LightTypeEnum.Direction;
     };
     test_pick_boxcollider.prototype.loadScene = function (assetName, isCompress) {
         var _this = this;
@@ -6658,7 +6667,7 @@ var test_pick_boxcollider = (function () {
         var addScene = function () {
             var beAddScene = true;
             if (beAddScene) {
-                var _scene = _this.app.getAssetMgr().getAssetByName(assetName + ".scene.json");
+                var _scene = _this.app.getAssetMgr().getAssetByName(assetName + ".scene.json", assetName + ".assetbundle.json");
                 var _root = _scene.getSceneRoot();
                 _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
                 _root.markDirty();
@@ -6668,22 +6677,11 @@ var test_pick_boxcollider = (function () {
                 ShowBoxcollder(_root);
             }
         };
-        if (isCompress) {
-            this.app.getAssetMgr().loadCompressBundle("res/scenes/" + assetName + "/" + assetName + ".packs.txt", function (s) {
-                if (s.isfinish) {
-                    {
-                        addScene();
-                    }
-                }
-            });
-        }
-        else {
-            this.app.getAssetMgr().load("res/scenes/" + assetName + "/" + assetName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
-                if (s1.isfinish) {
-                    addScene();
-                }
-            });
-        }
+        this.app.getAssetMgr().load("newRes/pfb/scene/" + assetName + "/" + assetName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+            if (s1.isfinish) {
+                addScene();
+            }
+        });
     };
     test_pick_boxcollider.prototype.getColor = function (r, g, b) {
         var key = r + "_" + g + "_" + b;
@@ -6739,7 +6737,6 @@ var test_pick_boxcollider = (function () {
             this.isAKeyDown = false;
         }
         this.timer += delta;
-        CameraController.instance().update(delta);
     };
     return test_pick_boxcollider;
 }());
@@ -16794,11 +16791,12 @@ var physics3dDemoTool = (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        gd3d.framework.assetMgr.openGuid = false;
                         this.app = app;
                         this.scene = this.app.getScene();
                         this.astMgr = this.app.getAssetMgr();
                         this.iptMgr = this.app.getInputMgr();
-                        return [4, demoTool.loadbySync("./res/shader/shader.assetbundle.json", this.astMgr)];
+                        return [4, demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", this.astMgr)];
                     case 1:
                         _a.sent();
                         return [4, datGui.init()];

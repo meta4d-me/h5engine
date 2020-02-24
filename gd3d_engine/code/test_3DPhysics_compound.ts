@@ -15,7 +15,7 @@ class test_3DPhysics_compound implements IState {
         this.astMgr = physics3dDemoTool.astMgr;
         this.iptMgr = physics3dDemoTool.iptMgr;
         this.camera = physics3dDemoTool.camera;
-        await demoTool.loadbySync(`./res/prefabs/Capsule/Capsule.assetbundle.json`,this.astMgr);
+        await demoTool.loadbySync(`./newRes/pfb/model/Capsule/Capsule.assetbundle.json`,this.astMgr);
         this.init();
         return null;
     }
@@ -78,7 +78,7 @@ class test_3DPhysics_compound implements IState {
         this.scene.addChild(combination);
         //显示模型
         //外部加载mesh (capsule)
-        let p1= this.astMgr.getAssetByName("Capsule.prefab.json") as gd3d.framework.prefab;
+        let p1= this.astMgr.getAssetByName("Capsule.prefab.json","Capsule.assetbundle.json") as gd3d.framework.prefab;
         let capsule = p1.getCloneTrans();
         capsule.name = "capsule"
         combination.addChild(capsule);

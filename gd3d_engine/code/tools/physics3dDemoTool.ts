@@ -9,11 +9,12 @@ class physics3dDemoTool{
     static mats : {[name:string] : gd3d.framework.material} = {};
 
     static async init(app:gd3d.framework.application){
+        gd3d.framework.assetMgr.openGuid = false;
         this.app = app;
         this.scene = this.app.getScene();
         this.astMgr = this.app.getAssetMgr();
         this.iptMgr = this.app.getInputMgr();
-        await demoTool.loadbySync(`./res/shader/shader.assetbundle.json`,this.astMgr);
+        await demoTool.loadbySync(`newRes/shader/MainShader.assetbundle.json`, this.astMgr);
         await datGui.init();
         this.initMats();
         this.initCamera();
