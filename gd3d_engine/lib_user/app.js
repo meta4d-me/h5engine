@@ -6706,7 +6706,9 @@ var test_pick_boxcollider = (function () {
         var inputMgr = this.app.getInputMgr();
         var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
         var temp = gd3d.math.pool.new_pickInfo();
-        var bool = this.scene.pick(ray, temp, false);
+        var tranRoot = this.scene.getRoot();
+        var mask = gd3d.framework.cullingmaskutil.layerToMask(this.pickLayer);
+        var bool = this.scene.pick(ray, temp, false, tranRoot, mask);
         return bool ? temp : null;
     };
     test_pick_boxcollider.prototype.generateGeomtry = function (meshType, color) {
