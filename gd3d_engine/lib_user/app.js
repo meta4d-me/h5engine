@@ -8496,15 +8496,14 @@ var test_uiPerfabLoad = (function () {
             var root, uiname;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        root = "res/prefabs/UI/template";
-                        uiname = "image2D";
-                        return [4, demoTool.loadbySync(root + "/defFont/defFont.assetbundle.json", this.assetMgr)];
+                    case 0: return [4, demoTool.loadbySync("res/prefabs/UI/template/defFont/defFont.assetbundle.json", this.assetMgr)];
                     case 1:
                         _a.sent();
-                        return [4, demoTool.loadbySync(root + "/common/common.assetbundle.json", this.assetMgr)];
+                        return [4, demoTool.loadbySync("res/prefabs/UI/template/common/common.assetbundle.json", this.assetMgr)];
                     case 2:
                         _a.sent();
+                        root = "res/prefabs/UI";
+                        uiname = "Image";
                         this._showUI(root, uiname);
                         return [2];
                 }

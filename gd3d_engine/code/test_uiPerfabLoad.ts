@@ -31,9 +31,14 @@ class test_uiPerfabLoad implements IState
 
     private async createUI()
     {
-        var root = "res/prefabs/UI/template";
+        await demoTool.loadbySync(`res/prefabs/UI/template/defFont/defFont.assetbundle.json`, this.assetMgr);
+        await demoTool.loadbySync(`res/prefabs/UI/template/common/common.assetbundle.json`, this.assetMgr);
+        
+        var root = "res/prefabs/UI";
+        var uiname = "Image";
 
-        var uiname = "image2D";
+        // var root = "res/prefabs/UI/template";
+        // var uiname = "image2D";
         // var uiname = "rawImage2D";
         // var uiname = "panel";
         // var uiname = "label";
@@ -41,9 +46,6 @@ class test_uiPerfabLoad implements IState
         // var uiname = "inputField";
         // var uiname = "progressBar";
         // var uiname = "scrollRect";
-
-        await demoTool.loadbySync(`${root}/defFont/defFont.assetbundle.json`, this.assetMgr);
-        await demoTool.loadbySync(`${root}/common/common.assetbundle.json`, this.assetMgr);
 
         this._showUI(root, uiname);
     }
