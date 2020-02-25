@@ -5,10 +5,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -8469,126 +8470,44 @@ var t;
 })(t || (t = {}));
 var test_uiPerfabLoad = (function () {
     function test_uiPerfabLoad() {
-        this.taskmgr = new gd3d.framework.taskMgr();
     }
     test_uiPerfabLoad.prototype.start = function (app) {
-        var _this = this;
-        this.app = app;
-        this.scene = this.app.getScene();
-        this.assetMgr = this.app.getAssetMgr();
-        this.app.closeFps();
-        var objCam = new gd3d.framework.transform();
-        objCam.name = "sth.";
-        this.scene.addChild(objCam);
-        this.camera = objCam.gameObject.addComponent("camera");
-        this.camera.near = 0.01;
-        this.camera.far = 10;
-        this.rooto2d = new gd3d.framework.overlay2D();
-        this.camera.addOverLay(this.rooto2d);
-        this.taskmgr.addTaskCall(this.loadShaders.bind(this));
-        this.taskmgr.addTaskCall(this.loadTexture.bind(this));
-        this.taskmgr.addTaskCall(this.createUI.bind(this));
-        var inputh = document.createElement("input");
-        this.app.container.appendChild(inputh);
-        inputh.style.position = "absolute";
-        inputh.style.width = 100 + "px";
-        inputh.style.height = 30 + "px";
-        inputh.value = "button_comb1";
-        var btn = document.createElement("button");
-        this.app.container.appendChild(btn);
-        btn.textContent = "加载";
-        btn.style.position = "absolute";
-        btn.style.left = 120 + "px";
-        btn.onclick = function () {
-            console.error(inputh.innerText);
-            console.error(inputh.textContent);
-            console.error(inputh.value);
-            _this.doLoad(inputh.value);
-        };
-    };
-    test_uiPerfabLoad.prototype.createUI = function (astState, state) {
-        var atlasComp = this.assetMgr.getAssetByName("comp.atlas.json");
-        var tex_0 = this.assetMgr.getAssetByName("zg03_256.png");
-        var bg_t = new gd3d.framework.transform2D;
-        bg_t.width = 400;
-        bg_t.height = 260;
-        bg_t.pivot.x = 0;
-        bg_t.pivot.y = 0;
-        bg_t.localTranslate.y = 100;
-        this.rooto2d.addChild(bg_t);
-        var bg_i = bg_t.addComponent("image2D");
-        bg_i.imageType = gd3d.framework.ImageType.Sliced;
-        bg_i.sprite = atlasComp.sprites["bg"];
-        bg_i.imageBorder.l = 10;
-        bg_i.imageBorder.t = 50;
-        bg_i.imageBorder.r = 10;
-        bg_i.imageBorder.b = 10;
-        bg_t.layoutState = 0 | gd3d.framework.layoutOption.LEFT | gd3d.framework.layoutOption.RIGHT | gd3d.framework.layoutOption.TOP | gd3d.framework.layoutOption.BOTTOM;
-        bg_t.setLayoutValue(gd3d.framework.layoutOption.LEFT, 60);
-        bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP, 60);
-        bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT, 60);
-        bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM, 60);
-        this.bgui = bg_t;
-        var prefabName = "button";
-        var inputMgr = this.app.getInputMgr();
-        this.app.webgl.canvas.addEventListener("keydown", function (ev) {
-            if (ev.keyCode == 81) {
-            }
-        }, false);
-        state.finish = true;
-    };
-    test_uiPerfabLoad.prototype.doLoad = function (name) {
-        var _this = this;
-        if (!this.bgui)
-            return;
-        if (this.targetui) {
-            this.bgui.removeChild(this.targetui);
-            this.targetui.dispose();
-        }
-        var prefabName = name;
-        this.assetMgr.load("res/prefabs/UI/" + prefabName + "/" + prefabName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
-            if (s1.isfinish) {
-                var ass = _this.assetMgr;
-                var temp = _this.assetMgr.getAssetByName(prefabName + ".prefab.json");
-                var t2d = temp.getCloneTrans2D();
-                _this.bgui.addChild(t2d);
-                t2d.layoutState = 0 | gd3d.framework.layoutOption.H_CENTER | gd3d.framework.layoutOption.V_CENTER;
-                t2d.markDirty();
-                _this.targetui = t2d;
-            }
+        return __awaiter(this, void 0, void 0, function () {
+            var objCam;
+            return __generator(this, function (_a) {
+                this.app = app;
+                this.scene = this.app.getScene();
+                this.assetMgr = this.app.getAssetMgr();
+                objCam = new gd3d.framework.transform();
+                objCam.name = "sth.";
+                this.scene.addChild(objCam);
+                this.camera = objCam.gameObject.addComponent("camera");
+                this.camera.near = 0.01;
+                this.camera.far = 10;
+                this.rooto2d = new gd3d.framework.overlay2D();
+                this.camera.addOverLay(this.rooto2d);
+                this._showUI("res/prefabs/UI/template", "button");
+                return [2];
+            });
         });
     };
-    test_uiPerfabLoad.prototype.loadShaders = function (lastState, state) {
-        this.assetMgr.load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-            if (s.isfinish) {
-                state.finish = true;
-            }
-        });
-    };
-    test_uiPerfabLoad.prototype.loadTexture = function (lastState, state) {
-        var _this = this;
-        this.assetMgr.load("res/comp/comp.json.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-            if (s.isfinish) {
-                _this.assetMgr.load("res/comp/comp.atlas.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                    if (s.isfinish) {
-                        _this.assetMgr.load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                            if (s.isfinish) {
-                                _this.assetMgr.load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                    _this.assetMgr.load("res/zg03_256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                        if (s.isfinish) {
-                                            state.finish = true;
-                                        }
-                                    });
-                                });
-                            }
-                        });
-                    }
-                });
-            }
+    test_uiPerfabLoad.prototype._showUI = function (root, res) {
+        return __awaiter(this, void 0, void 0, function () {
+            var cubeP, cubeTran;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, demoTool.loadbySync(root + "/" + res + "/" + res + ".assetbundle.json", this.assetMgr)];
+                    case 1:
+                        _a.sent();
+                        cubeP = this.assetMgr.getAssetByName(res + ".prefab.json", res + ".assetbundle.json");
+                        cubeTran = cubeP.getCloneTrans2D();
+                        this.rooto2d.addChild(cubeTran);
+                        return [2];
+                }
+            });
         });
     };
     test_uiPerfabLoad.prototype.update = function (delta) {
-        this.taskmgr.move(delta);
     };
     return test_uiPerfabLoad;
 }());
