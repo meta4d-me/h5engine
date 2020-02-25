@@ -14,8 +14,8 @@
 		"32": 0
 	},
 	"layoutPercentState": 0,
-	"width": 100,
-	"height": 100,
+	"width": 128,
+	"height": 256,
 	"pivot": {
 		"cls": "vector2",
 		"x": 0.5,
@@ -45,7 +45,7 @@
 			"imageType": 0,
 			"fillMethod": 0,
 			"fillAmmount": 1,
-			"_spriteName": "white_sprite",
+			"_spriteName": "spritesheet.atlas.json_Club",
 			"_imageBorder": {
 				"cls": "border",
 				"l": 0,

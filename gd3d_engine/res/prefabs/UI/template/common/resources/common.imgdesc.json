@@ -1,1 +1,8 @@
-{"name":"common.png","filterMode":"Bilinear","format":"RGBA","mipmap":false,"wrap":"Repeat","premultiplyAlpha":false}
+{
+    "name": "common.png",
+    "filterMode": "Bilinear",
+    "format": "RGBA",
+    "mipmap": false,
+    "wrap": "Repeat",
+    "premultiplyAlpha": false
+}

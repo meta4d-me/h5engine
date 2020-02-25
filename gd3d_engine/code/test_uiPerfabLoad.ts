@@ -32,7 +32,8 @@ class test_uiPerfabLoad implements IState
     private async createUI()
     {
         await demoTool.loadbySync(`res/prefabs/UI/template/defFont/defFont.assetbundle.json`, this.assetMgr);
-        await demoTool.loadbySync(`res/prefabs/UI/template/common/common.assetbundle.json`, this.assetMgr);
+        // await demoTool.loadbySync(`res/prefabs/UI/template/common/common.assetbundle.json`, this.assetMgr);
+        await demoTool.loadbySync(`res/prefabs/UI/spritesheet/spritesheet.assetbundle.json`, this.assetMgr);
         
         var root = "res/prefabs/UI";
         var uiname = "Image";

@@ -1,1 +1,12 @@
-{"files":{"common.atlas.json":153,"common.imgdesc.json":154},"texs":{"common.png":155},"pkg":["common.jpkg.json"]}
+{
+    "files": {
+        "common.atlas.json": 153,
+        "common.imgdesc.json": 154
+    },
+    "texs": {
+        "common.png": 155
+    },
+    "pkg": [
+        "common.jpkg.json"
+    ]
+}

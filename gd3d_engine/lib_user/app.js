@@ -8499,7 +8499,7 @@ var test_uiPerfabLoad = (function () {
                     case 0: return [4, demoTool.loadbySync("res/prefabs/UI/template/defFont/defFont.assetbundle.json", this.assetMgr)];
                     case 1:
                         _a.sent();
-                        return [4, demoTool.loadbySync("res/prefabs/UI/template/common/common.assetbundle.json", this.assetMgr)];
+                        return [4, demoTool.loadbySync("res/prefabs/UI/spritesheet/spritesheet.assetbundle.json", this.assetMgr)];
                     case 2:
                         _a.sent();
                         root = "res/prefabs/UI";
