@@ -1147,11 +1147,14 @@ declare class test_uiPerfabLoad implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
+    taskmgr: gd3d.framework.taskMgr;
     assetMgr: gd3d.framework.assetMgr;
     rooto2d: gd3d.framework.overlay2D;
     static temp: gd3d.framework.transform2D;
     start(app: gd3d.framework.application): Promise<void>;
+    private createUI;
     private _showUI;
+    private loadTexture;
     update(delta: number): void;
 }
 declare class test_uimove implements IState {

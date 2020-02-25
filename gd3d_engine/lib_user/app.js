@@ -8470,6 +8470,7 @@ var t;
 })(t || (t = {}));
 var test_uiPerfabLoad = (function () {
     function test_uiPerfabLoad() {
+        this.taskmgr = new gd3d.framework.taskMgr();
     }
     test_uiPerfabLoad.prototype.start = function (app) {
         return __awaiter(this, void 0, void 0, function () {
@@ -8486,10 +8487,36 @@ var test_uiPerfabLoad = (function () {
                 this.camera.far = 10;
                 this.rooto2d = new gd3d.framework.overlay2D();
                 this.camera.addOverLay(this.rooto2d);
-                this._showUI("res/prefabs/UI/template", "button");
+                this.taskmgr.addTaskCall(this.loadTexture.bind(this));
+                this.taskmgr.addTaskCall(this.createUI.bind(this));
                 return [2];
             });
         });
+    };
+    test_uiPerfabLoad.prototype.createUI = function (astState, state) {
+        var atlasComp = this.assetMgr.getAssetByName("comp.atlas.json");
+        var tex_0 = this.assetMgr.getAssetByName("zg03_256.png");
+        var bg_t = new gd3d.framework.transform2D;
+        bg_t.name = "框底图";
+        bg_t.width = 800;
+        bg_t.height = 260;
+        bg_t.pivot.x = 0;
+        bg_t.pivot.y = 0;
+        bg_t.localTranslate.y = 100;
+        this.rooto2d.addChild(bg_t);
+        var bg_i = bg_t.addComponent("image2D");
+        bg_i.imageType = gd3d.framework.ImageType.Sliced;
+        bg_i.sprite = atlasComp.sprites["bg"];
+        bg_i.imageBorder.l = 10;
+        bg_i.imageBorder.t = 50;
+        bg_i.imageBorder.r = 10;
+        bg_i.imageBorder.b = 10;
+        bg_t.layoutState = 0 | gd3d.framework.layoutOption.LEFT | gd3d.framework.layoutOption.RIGHT | gd3d.framework.layoutOption.TOP | gd3d.framework.layoutOption.BOTTOM;
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.LEFT, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT, 60);
+        bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM, 60);
+        state.finish = true;
     };
     test_uiPerfabLoad.prototype._showUI = function (root, res) {
         return __awaiter(this, void 0, void 0, function () {
@@ -8507,7 +8534,30 @@ var test_uiPerfabLoad = (function () {
             });
         });
     };
+    test_uiPerfabLoad.prototype.loadTexture = function (lastState, state) {
+        var _this = this;
+        this.assetMgr.load("res/comp/comp.json.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            if (s.isfinish) {
+                _this.assetMgr.load("res/comp/comp.atlas.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                    if (s.isfinish) {
+                        _this.assetMgr.load("res/fonts/" + fontpng, gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                            if (s.isfinish) {
+                                _this.assetMgr.load("res/fonts/" + fontjson, gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                    _this.assetMgr.load("res/zg03_256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                        if (s.isfinish) {
+                                            state.finish = true;
+                                        }
+                                    });
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    };
     test_uiPerfabLoad.prototype.update = function (delta) {
+        this.taskmgr.move(delta);
     };
     return test_uiPerfabLoad;
 }());
