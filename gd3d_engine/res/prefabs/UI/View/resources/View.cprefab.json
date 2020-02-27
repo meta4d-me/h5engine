@@ -1,0 +1,308 @@
+{
+	"cls": "transform2D",
+	"insid": 14132,
+	"prefab": "",
+	"layer": 5,
+	"tag": "Untagged",
+	"name": "View",
+	"isStatic": false,
+	"isMask": false,
+	"_visible": true,
+	"width": 200,
+	"height": 300,
+	"pivot": {
+		"cls": "vector2",
+		"x": 0,
+		"y": 0
+	},
+	"localTranslate": {
+		"cls": "vector2",
+		"x": 0,
+		"y": 277.5
+	},
+	"localScale": {
+		"cls": "vector2",
+		"x": 1,
+		"y": 1
+	},
+	"localRotate": 0,
+	"layoutState": 0,
+	"layoutValueMap": {},
+	"layoutPercentState": 0,
+	"components": [
+		{
+			"cls": "image2D",
+			"color": {
+				"cls": "color",
+				"r": 0,
+				"g": 1,
+				"b": 0,
+				"a": 1
+			},
+			"imageType": 0,
+			"fillMethod": 0,
+			"fillAmmount": 1,
+			"_spriteName": "white_sprite",
+			"_imageBorder": {
+				"cls": "border",
+				"l": 0,
+				"t": 0,
+				"r": 0,
+				"b": 0
+			}
+		}],
+	"children": [
+		{
+			"cls": "transform2D",
+			"insid": 14162,
+			"prefab": "",
+			"layer": 5,
+			"tag": "Untagged",
+			"name": "Image",
+			"isStatic": false,
+			"isMask": false,
+			"_visible": true,
+			"width": 200,
+			"height": 300,
+			"pivot": {
+				"cls": "vector2",
+				"x": 0.5,
+				"y": 0.5
+			},
+			"localTranslate": {
+				"cls": "vector2",
+				"x": 100,
+				"y": -150
+			},
+			"localScale": {
+				"cls": "vector2",
+				"x": 1,
+				"y": 1
+			},
+			"localRotate": 0,
+			"layoutState": 0,
+			"layoutValueMap": {},
+			"layoutPercentState": 0,
+			"components": [
+				{
+					"cls": "image2D",
+					"color": {
+						"cls": "color",
+						"r": 1,
+						"g": 1,
+						"b": 1,
+						"a": 1
+					},
+					"imageType": 0,
+					"fillMethod": 0,
+					"fillAmmount": 1,
+					"_spriteName": "spritesheet.atlas.json_Body",
+					"_imageBorder": {
+						"cls": "border",
+						"l": 0,
+						"t": 0,
+						"r": 0,
+						"b": 0
+					}
+				}],
+			"children": []
+		},
+		{
+			"cls": "transform2D",
+			"insid": 14124,
+			"prefab": "",
+			"layer": 5,
+			"tag": "Untagged",
+			"name": "Text",
+			"isStatic": false,
+			"isMask": false,
+			"_visible": true,
+			"width": 160,
+			"height": 35,
+			"pivot": {
+				"cls": "vector2",
+				"x": 0.5,
+				"y": 0.5
+			},
+			"localTranslate": {
+				"cls": "vector2",
+				"x": 100,
+				"y": -150
+			},
+			"localScale": {
+				"cls": "vector2",
+				"x": 1,
+				"y": 1
+			},
+			"localRotate": 0,
+			"layoutState": 0,
+			"layoutValueMap": {},
+			"layoutPercentState": 0,
+			"components": [
+				{
+					"cls": "label",
+					"text": "New Text",
+					"_fontName": "defFont.font.json",
+					"fontsize": 30,
+					"linespace": 1,
+					"horizontalOverflow": false,
+					"verticalOverflow": false,
+					"color": {
+						"cls": "color",
+						"r": 1,
+						"g": 0,
+						"b": 0,
+						"a": 1
+					},
+					"color2": {
+						"cls": "color",
+						"r": 0,
+						"g": 0,
+						"b": 0.5,
+						"a": 0.5
+					},
+					"verticalType": 1,
+					"horizontalType": 1
+				}],
+			"children": []
+		},
+		{
+			"cls": "transform2D",
+			"insid": -1790,
+			"prefab": "",
+			"layer": 5,
+			"tag": "Untagged",
+			"name": "Button",
+			"isStatic": false,
+			"isMask": false,
+			"_visible": true,
+			"width": 160,
+			"height": 30,
+			"pivot": {
+				"cls": "vector2",
+				"x": 0.5,
+				"y": 0.5
+			},
+			"localTranslate": {
+				"cls": "vector2",
+				"x": 368.7715759277344,
+				"y": -94.04498291015625
+			},
+			"localScale": {
+				"cls": "vector2",
+				"x": 1,
+				"y": 1
+			},
+			"localRotate": 0,
+			"layoutState": 0,
+			"layoutValueMap": {},
+			"layoutPercentState": 0,
+			"components": [
+				{
+					"cls": "image2D",
+					"color": {
+						"cls": "color",
+						"r": 0,
+						"g": 0.23211932182312012,
+						"b": 1,
+						"a": 1
+					},
+					"imageType": 0,
+					"fillMethod": 0,
+					"fillAmmount": 1,
+					"_spriteName": "spritesheet.atlas.json_UISprite",
+					"_imageBorder": {
+						"cls": "border",
+						"l": 0,
+						"t": 0,
+						"r": 0,
+						"b": 0
+					}
+				},
+				{
+					"cls": "button",
+					"transition": 1,
+					"_origianlSpriteName": "white_sprite",
+					"_pressedSpriteName": "",
+					"targetImage": {
+						"cls": "image2D",
+						"refid": -1790
+					},
+					"normalColor": {
+						"cls": "color",
+						"r": 1,
+						"g": 1,
+						"b": 1,
+						"a": 1
+					},
+					"pressedColor": {
+						"cls": "color",
+						"r": 0.7843137383460999,
+						"g": 0.7843137383460999,
+						"b": 0.7843137383460999,
+						"a": 1
+					},
+					"fadeDuration": 0.10000000149011612
+				}],
+			"children": [
+				{
+					"cls": "transform2D",
+					"insid": -1802,
+					"prefab": "",
+					"layer": 5,
+					"tag": "Untagged",
+					"name": "Text",
+					"isStatic": false,
+					"isMask": false,
+					"_visible": true,
+					"width": 160,
+					"height": 30,
+					"pivot": {
+						"cls": "vector2",
+						"x": 0.5,
+						"y": 0.5
+					},
+					"localTranslate": {
+						"cls": "vector2",
+						"x": 0,
+						"y": 0
+					},
+					"localScale": {
+						"cls": "vector2",
+						"x": 1,
+						"y": 1
+					},
+					"localRotate": 0,
+					"layoutState": 0,
+					"layoutValueMap": {},
+					"layoutPercentState": 0,
+					"components": [
+						{
+							"cls": "label",
+							"text": "Button",
+							"_fontName": "defFont.font.json",
+							"fontsize": 14,
+							"linespace": 1,
+							"horizontalOverflow": false,
+							"verticalOverflow": false,
+							"color": {
+								"cls": "color",
+								"r": 0.19607843458652496,
+								"g": 0.19607843458652496,
+								"b": 0.19607843458652496,
+								"a": 1
+							},
+							"color2": {
+								"cls": "color",
+								"r": 0,
+								"g": 0,
+								"b": 0.5,
+								"a": 0.5
+							},
+							"verticalType": 0,
+							"horizontalType": 0
+						}],
+					"children": []
+				}]
+		}]
+}

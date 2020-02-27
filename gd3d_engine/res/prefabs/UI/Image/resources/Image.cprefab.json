@@ -1,6 +1,6 @@
 {
 	"cls": "transform2D",
-	"insid": -5772,
+	"insid": 14162,
 	"prefab": "",
 	"layer": 5,
 	"tag": "Untagged",
@@ -8,14 +8,8 @@
 	"isStatic": false,
 	"isMask": false,
 	"_visible": true,
-	"layoutState": 48,
-	"layoutValueMap": {
-		"16": 0,
-		"32": 0
-	},
-	"layoutPercentState": 0,
-	"width": 389.3999938964844,
-	"height": 395.1000061035156,
+	"width": 100,
+	"height": 134,
 	"pivot": {
 		"cls": "vector2",
 		"x": 0.5,
@@ -23,8 +17,8 @@
 	},
 	"localTranslate": {
 		"cls": "vector2",
-		"x": 2.5,
-		"y": -2.5
+		"x": 200,
+		"y": 150
 	},
 	"localScale": {
 		"cls": "vector2",
@@ -32,6 +26,12 @@
 		"y": 1
 	},
 	"localRotate": 0,
+	"layoutState": 48,
+	"layoutValueMap": {
+		"16": -50,
+		"32": -67
+	},
+	"layoutPercentState": 0,
 	"components": [
 		{
 			"cls": "image2D",
