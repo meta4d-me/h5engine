@@ -1,1 +1,9 @@
-{"files":{"rawImage2D.cprefab.json":1494},"pkg":["rawImage2D.jpkg.json"]}
+{
+    "files": {
+        "common.imgdesc.json": 154,
+        "rawImage2D.cprefab.json": 1649
+    },
+    "pkg": [
+        "rawImage2D.jpkg.json"
+    ]
+}

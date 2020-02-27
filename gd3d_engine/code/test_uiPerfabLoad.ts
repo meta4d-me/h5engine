@@ -37,6 +37,12 @@ class test_uiPerfabLoad implements IState
         
         var root = "res/prefabs/UI";
         var uiname = "Image";
+        // var uiname = "RawImage";
+        // var uiname = "Text";
+        // var uiname = "Button";
+        // var uiname = "InputField";
+        // var uiname = "Panel";
+        // var uiname = "Scroll View";
 
         // var root = "res/prefabs/UI/template";
         // var uiname = "image2D";

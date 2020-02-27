@@ -1,1 +1,140 @@
-{"cls":"transform2D","insid":213,"prefab":"/Resources/auiPre/ui/scrollRect","layer":0,"tag":"Untagged","name":"scrollRect","isStatic":false,"children":[{"cls":"transform2D","insid":214,"prefab":"","layer":0,"tag":"Untagged","name":"scrollRect","isStatic":false,"children":[{"cls":"transform2D","insid":215,"prefab":"","layer":0,"tag":"Untagged","name":"content","isStatic":false,"width":200,"height":300,"pivot":{"cls":"vector2","x":0,"y":0},"_visible":true,"localTranslate":{"cls":"vector2","x":0,"y":0},"localScale":{"cls":"vector2","x":1,"y":1},"localRotate":0,"isMask":false,"layoutState":0,"layoutValueMap":{},"layoutPercentState":0}],"width":200,"height":200,"pivot":{"cls":"vector2","x":0,"y":0},"_visible":true,"localTranslate":{"cls":"vector2","x":0,"y":0},"localScale":{"cls":"vector2","x":1,"y":1},"localRotate":0,"isMask":true,"components":[{"cls":"scrollRect","content":{"cls":"transform2D","refid":215},"horizontal":true,"vertical":true,"inertia":true,"decelerationRate":0.135},{"cls":"image2D","color":{"cls":"color","r":0.3,"g":0.3,"b":0.3,"a":0.3},"imageType":0,"fillMethod":0,"fillAmmount":1,"_spriteName":"common.atlas.json_common_kuang_touxiang","_imageBorder":{"cls":"border","l":0,"t":0,"r":0,"b":0}}],"layoutState":48,"layoutValueMap":{"16":0,"32":0},"layoutPercentState":0}],"width":200,"height":200,"pivot":{"cls":"vector2","x":0,"y":0},"_visible":true,"localTranslate":{"cls":"vector2","x":460.5,"y":260},"localScale":{"cls":"vector2","x":1,"y":1},"localRotate":0,"isMask":true,"layoutState":48,"layoutValueMap":{"16":0,"32":0},"layoutPercentState":0}
+{
+    "cls": "transform2D",
+    "insid": 213,
+    "prefab": "/Resources/auiPre/ui/scrollRect",
+    "layer": 0,
+    "tag": "Untagged",
+    "name": "scrollRect",
+    "isStatic": false,
+    "children": [
+        {
+            "cls": "transform2D",
+            "insid": 214,
+            "prefab": "",
+            "layer": 0,
+            "tag": "Untagged",
+            "name": "scrollRect",
+            "isStatic": false,
+            "children": [
+                {
+                    "cls": "transform2D",
+                    "insid": 215,
+                    "prefab": "",
+                    "layer": 0,
+                    "tag": "Untagged",
+                    "name": "content",
+                    "isStatic": false,
+                    "width": 200,
+                    "height": 300,
+                    "pivot": {
+                        "cls": "vector2",
+                        "x": 0,
+                        "y": 0
+                    },
+                    "_visible": true,
+                    "localTranslate": {
+                        "cls": "vector2",
+                        "x": 0,
+                        "y": 0
+                    },
+                    "localScale": {
+                        "cls": "vector2",
+                        "x": 1,
+                        "y": 1
+                    },
+                    "localRotate": 0,
+                    "isMask": false,
+                    "layoutState": 0,
+                    "layoutValueMap": {},
+                    "layoutPercentState": 0
+                }
+            ],
+            "width": 200,
+            "height": 200,
+            "pivot": {
+                "cls": "vector2",
+                "x": 0,
+                "y": 0
+            },
+            "_visible": true,
+            "localTranslate": {
+                "cls": "vector2",
+                "x": 0,
+                "y": 0
+            },
+            "localScale": {
+                "cls": "vector2",
+                "x": 1,
+                "y": 1
+            },
+            "localRotate": 0,
+            "isMask": true,
+            "components": [
+                {
+                    "cls": "scrollRect",
+                    "content": {
+                        "cls": "transform2D",
+                        "refid": 215
+                    },
+                    "horizontal": true,
+                    "vertical": true,
+                    "inertia": true,
+                    "decelerationRate": 0.135
+                },
+                {
+                    "cls": "image2D",
+                    "color": {
+                        "cls": "color",
+                        "r": 0.3,
+                        "g": 0.3,
+                        "b": 0.3,
+                        "a": 0.3
+                    },
+                    "imageType": 0,
+                    "fillMethod": 0,
+                    "fillAmmount": 1,
+                    "_spriteName": "common.atlas.json_common_kuang_touxiang",
+                    "_imageBorder": {
+                        "cls": "border",
+                        "l": 0,
+                        "t": 0,
+                        "r": 0,
+                        "b": 0
+                    }
+                }
+            ],
+            "layoutState": 48,
+            "layoutValueMap": {
+                "16": 0,
+                "32": 0
+            },
+            "layoutPercentState": 0
+        }
+    ],
+    "width": 200,
+    "height": 200,
+    "pivot": {
+        "cls": "vector2",
+        "x": 0,
+        "y": 0
+    },
+    "_visible": true,
+    "localTranslate": {
+        "cls": "vector2",
+        "x": 460.5,
+        "y": 260
+    },
+    "localScale": {
+        "cls": "vector2",
+        "x": 1,
+        "y": 1
+    },
+    "localRotate": 0,
+    "isMask": true,
+    "layoutState": 48,
+    "layoutValueMap": {
+        "16": 0,
+        "32": 0
+    },
+    "layoutPercentState": 0
+}

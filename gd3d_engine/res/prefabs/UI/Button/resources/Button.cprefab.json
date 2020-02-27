@@ -1,0 +1,145 @@
+{
+	"cls": "transform2D",
+	"insid": -3424,
+	"prefab": "",
+	"layer": 5,
+	"tag": "Untagged",
+	"name": "Button",
+	"isStatic": false,
+	"isMask": false,
+	"_visible": true,
+	"layoutState": 48,
+	"layoutValueMap": {
+		"16": 0,
+		"32": 0
+	},
+	"layoutPercentState": 0,
+	"width": 53,
+	"height": 46,
+	"pivot": {
+		"cls": "vector2",
+		"x": 0.5,
+		"y": 0.5
+	},
+	"localTranslate": {
+		"cls": "vector2",
+		"x": -240,
+		"y": -112.45027923583984
+	},
+	"localScale": {
+		"cls": "vector2",
+		"x": 1,
+		"y": 1
+	},
+	"localRotate": 0,
+	"components": [
+		{
+			"cls": "image2D",
+			"color": {
+				"cls": "color",
+				"r": 1,
+				"g": 1,
+				"b": 1,
+				"a": 1
+			},
+			"imageType": 0,
+			"fillMethod": 0,
+			"fillAmmount": 1,
+			"_spriteName": "spritesheet.atlas.json_Foot_R",
+			"_imageBorder": {
+				"cls": "border",
+				"l": 0,
+				"t": 0,
+				"r": 0,
+				"b": 0
+			}
+		},
+		{
+			"cls": "button",
+			"transition": 1,
+			"_origianlSpriteName": "white_sprite",
+			"_pressedSpriteName": "",
+			"targetImage": {
+				"cls": "image2D",
+				"refid": -3424
+			},
+			"normalColor": {
+				"cls": "color",
+				"r": 0,
+				"g": 1,
+				"b": 0.03142428398132324,
+				"a": 1
+			},
+			"pressedColor": {
+				"cls": "color",
+				"r": 1,
+				"g": 0,
+				"b": 0,
+				"a": 1
+			},
+			"fadeDuration": 0.10000000149011612
+		}],
+	"children": [
+		{
+			"cls": "transform2D",
+			"insid": -3436,
+			"prefab": "",
+			"layer": 5,
+			"tag": "Untagged",
+			"name": "Text",
+			"isStatic": false,
+			"isMask": false,
+			"_visible": true,
+			"layoutState": 48,
+			"layoutValueMap": {
+				"16": 0,
+				"32": 0
+			},
+			"layoutPercentState": 0,
+			"width": 53,
+			"height": 46,
+			"pivot": {
+				"cls": "vector2",
+				"x": 0.5,
+				"y": 0.5
+			},
+			"localTranslate": {
+				"cls": "vector2",
+				"x": 0,
+				"y": 0
+			},
+			"localScale": {
+				"cls": "vector2",
+				"x": 1,
+				"y": 1
+			},
+			"localRotate": 0,
+			"components": [
+				{
+					"cls": "label",
+					"text": "Button",
+					"_fontName": "defFont.font.json",
+					"fontsize": 14,
+					"linespace": 1,
+					"horizontalOverflow": false,
+					"verticalOverflow": false,
+					"color": {
+						"cls": "color",
+						"r": 0.19607843458652496,
+						"g": 0.19607843458652496,
+						"b": 0.19607843458652496,
+						"a": 1
+					},
+					"color2": {
+						"cls": "color",
+						"r": 0,
+						"g": 0,
+						"b": 0.5,
+						"a": 0.5
+					},
+					"verticalType": 0,
+					"horizontalType": 0
+				}],
+			"children": []
+		}]
+}

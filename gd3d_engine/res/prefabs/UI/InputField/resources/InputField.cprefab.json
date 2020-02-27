@@ -1,0 +1,200 @@
+{
+	"cls": "transform2D",
+	"insid": -4158,
+	"prefab": "",
+	"layer": 5,
+	"tag": "Untagged",
+	"name": "InputField",
+	"isStatic": false,
+	"isMask": false,
+	"_visible": true,
+	"layoutState": 48,
+	"layoutValueMap": {
+		"16": 0,
+		"32": 0
+	},
+	"layoutPercentState": 0,
+	"width": 128,
+	"height": 128,
+	"pivot": {
+		"cls": "vector2",
+		"x": 0.5,
+		"y": 0.5
+	},
+	"localTranslate": {
+		"cls": "vector2",
+		"x": -326,
+		"y": -91.95027923583984
+	},
+	"localScale": {
+		"cls": "vector2",
+		"x": 1,
+		"y": 1
+	},
+	"localRotate": 0,
+	"components": [
+		{
+			"cls": "image2D",
+			"color": {
+				"cls": "color",
+				"r": 1,
+				"g": 1,
+				"b": 1,
+				"a": 1
+			},
+			"imageType": 0,
+			"fillMethod": 0,
+			"fillAmmount": 1,
+			"_spriteName": "spritesheet.atlas.json_Stone",
+			"_imageBorder": {
+				"cls": "border",
+				"l": 0,
+				"t": 0,
+				"r": 0,
+				"b": 0
+			}
+		},
+		{
+			"cls": "inputField",
+			"frameImage": {
+				"cls": "image2D",
+				"refid": -4158
+			},
+			"characterLimit": 0,
+			"LineType": 0,
+			"ContentType": 0,
+			"TextLabel": {
+				"cls": "label",
+				"refid": -4180
+			},
+			"PlaceholderLabel": {
+				"cls": "label",
+				"refid": -4170
+			}
+		}],
+	"children": [
+		{
+			"cls": "transform2D",
+			"insid": -4170,
+			"prefab": "",
+			"layer": 5,
+			"tag": "Untagged",
+			"name": "Placeholder",
+			"isStatic": false,
+			"isMask": false,
+			"_visible": true,
+			"layoutState": 48,
+			"layoutValueMap": {
+				"16": 0,
+				"32": 0
+			},
+			"layoutPercentState": 0,
+			"width": 108,
+			"height": 115,
+			"pivot": {
+				"cls": "vector2",
+				"x": 0.5,
+				"y": 0.5
+			},
+			"localTranslate": {
+				"cls": "vector2",
+				"x": 0,
+				"y": -0.5
+			},
+			"localScale": {
+				"cls": "vector2",
+				"x": 1,
+				"y": 1
+			},
+			"localRotate": 0,
+			"components": [
+				{
+					"cls": "label",
+					"text": "Enter text...",
+					"_fontName": "defFont.font.json",
+					"fontsize": 14,
+					"linespace": 1,
+					"horizontalOverflow": false,
+					"verticalOverflow": false,
+					"color": {
+						"cls": "color",
+						"r": 0.03270738571882248,
+						"g": 0.9905660152435303,
+						"b": 0.13553567230701447,
+						"a": 0.5
+					},
+					"color2": {
+						"cls": "color",
+						"r": 0,
+						"g": 0,
+						"b": 0.5,
+						"a": 0.5
+					},
+					"verticalType": 1,
+					"horizontalType": 1
+				}],
+			"children": []
+		},
+		{
+			"cls": "transform2D",
+			"insid": -4180,
+			"prefab": "",
+			"layer": 5,
+			"tag": "Untagged",
+			"name": "Text",
+			"isStatic": false,
+			"isMask": false,
+			"_visible": true,
+			"layoutState": 48,
+			"layoutValueMap": {
+				"16": 0,
+				"32": 0
+			},
+			"layoutPercentState": 0,
+			"width": 108,
+			"height": 115,
+			"pivot": {
+				"cls": "vector2",
+				"x": 0.5,
+				"y": 0.5
+			},
+			"localTranslate": {
+				"cls": "vector2",
+				"x": 0,
+				"y": -0.5
+			},
+			"localScale": {
+				"cls": "vector2",
+				"x": 1,
+				"y": 1
+			},
+			"localRotate": 0,
+			"components": [
+				{
+					"cls": "label",
+					"text": "啊啊啊",
+					"_fontName": "defFont.font.json",
+					"fontsize": 14,
+					"linespace": 1,
+					"horizontalOverflow": true,
+					"verticalOverflow": false,
+					"color": {
+						"cls": "color",
+						"r": 1,
+						"g": 0.10815292596817017,
+						"b": 0,
+						"a": 1
+					},
+					"color2": {
+						"cls": "color",
+						"r": 0,
+						"g": 0,
+						"b": 0.5,
+						"a": 0.5
+					},
+					"verticalType": 1,
+					"horizontalType": 1
+				}],
+			"children": []
+		}]
+}

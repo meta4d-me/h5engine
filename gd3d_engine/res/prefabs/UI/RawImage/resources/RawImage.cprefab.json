@@ -1,10 +1,10 @@
 {
 	"cls": "transform2D",
-	"insid": -5772,
+	"insid": -1928,
 	"prefab": "",
 	"layer": 5,
 	"tag": "Untagged",
-	"name": "Image",
+	"name": "RawImage",
 	"isStatic": false,
 	"isMask": false,
 	"_visible": true,
@@ -14,8 +14,8 @@
 		"32": 0
 	},
 	"layoutPercentState": 0,
-	"width": 389.3999938964844,
-	"height": 395.1000061035156,
+	"width": 512,
+	"height": 512,
 	"pivot": {
 		"cls": "vector2",
 		"x": 0.5,
@@ -23,8 +23,8 @@
 	},
 	"localTranslate": {
 		"cls": "vector2",
-		"x": 2.5,
-		"y": -2.5
+		"x": -270,
+		"y": -112.45027923583984
 	},
 	"localScale": {
 		"cls": "vector2",
@@ -34,24 +34,17 @@
 	"localRotate": 0,
 	"components": [
 		{
-			"cls": "image2D",
+			"cls": "rawImage2D",
+			"image": {
+				"cls": "texture",
+				"value": "spritesheet.imgdesc.json"
+			},
 			"color": {
 				"cls": "color",
 				"r": 1,
 				"g": 1,
 				"b": 1,
 				"a": 1
-			},
-			"imageType": 0,
-			"fillMethod": 0,
-			"fillAmmount": 1,
-			"_spriteName": "spritesheet.atlas.json_Body",
-			"_imageBorder": {
-				"cls": "border",
-				"l": 0,
-				"t": 0,
-				"r": 0,
-				"b": 0
 			}
 		}],
 	"children": []

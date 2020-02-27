@@ -1,0 +1,62 @@
+{
+	"cls": "transform2D",
+	"insid": -2938,
+	"prefab": "",
+	"layer": 5,
+	"tag": "Untagged",
+	"name": "Text",
+	"isStatic": false,
+	"isMask": false,
+	"_visible": true,
+	"layoutState": 48,
+	"layoutValueMap": {
+		"16": 0,
+		"32": 0
+	},
+	"layoutPercentState": 0,
+	"width": 160,
+	"height": 30,
+	"pivot": {
+		"cls": "vector2",
+		"x": 0.5,
+		"y": 0.5
+	},
+	"localTranslate": {
+		"cls": "vector2",
+		"x": -240,
+		"y": -112.45027923583984
+	},
+	"localScale": {
+		"cls": "vector2",
+		"x": 1,
+		"y": 1
+	},
+	"localRotate": 0,
+	"components": [
+		{
+			"cls": "label",
+			"text": "New Text New TextNew Text",
+			"_fontName": "defFont.font.json",
+			"fontsize": 14,
+			"linespace": 1,
+			"horizontalOverflow": false,
+			"verticalOverflow": false,
+			"color": {
+				"cls": "color",
+				"r": 0.19607843458652496,
+				"g": 0.19607843458652496,
+				"b": 0.19607843458652496,
+				"a": 1
+			},
+			"color2": {
+				"cls": "color",
+				"r": 0,
+				"g": 0,
+				"b": 0.5,
+				"a": 0.5
+			},
+			"verticalType": 1,
+			"horizontalType": 1
+		}],
+	"children": []
+}

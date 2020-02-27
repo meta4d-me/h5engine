@@ -1,0 +1,185 @@
+{
+	"cls": "transform2D",
+	"insid": -12254,
+	"prefab": "",
+	"layer": 5,
+	"tag": "Untagged",
+	"name": "Scroll View",
+	"isStatic": false,
+	"isMask": true,
+	"_visible": true,
+	"layoutState": 48,
+	"layoutValueMap": {
+		"16": 0,
+		"32": 0
+	},
+	"layoutPercentState": 0,
+	"width": 200,
+	"height": 200,
+	"pivot": {
+		"cls": "vector2",
+		"x": 0.5,
+		"y": 0.5
+	},
+	"localTranslate": {
+		"cls": "vector2",
+		"x": -136.34982299804688,
+		"y": -119.5
+	},
+	"localScale": {
+		"cls": "vector2",
+		"x": 1,
+		"y": 1
+	},
+	"localRotate": 0,
+	"components": [
+		{
+			"cls": "image2D",
+			"color": {
+				"cls": "color",
+				"r": 1,
+				"g": 1,
+				"b": 1,
+				"a": 0.3919999897480011
+			},
+			"imageType": 0,
+			"fillMethod": 0,
+			"fillAmmount": 1,
+			"_spriteName": "white_sprite",
+			"_imageBorder": {
+				"cls": "border",
+				"l": 0,
+				"t": 0,
+				"r": 0,
+				"b": 0
+			}
+		},
+		{
+			"cls": "scrollRect",
+			"content": {
+				"cls": "transform2D",
+				"refid": -12282
+			},
+			"horizontal": true,
+			"vertical": true,
+			"inertia": true,
+			"decelerationRate": 0.13500000536441803
+		}],
+	"children": [
+		{
+			"cls": "transform2D",
+			"insid": -12266,
+			"prefab": "",
+			"layer": 5,
+			"tag": "Untagged",
+			"name": "Viewport",
+			"isStatic": false,
+			"isMask": false,
+			"_visible": true,
+			"layoutState": 48,
+			"layoutValueMap": {
+				"16": 0,
+				"32": 0
+			},
+			"layoutPercentState": 0,
+			"width": 183,
+			"height": 183,
+			"pivot": {
+				"cls": "vector2",
+				"x": 0,
+				"y": 1
+			},
+			"localTranslate": {
+				"cls": "vector2",
+				"x": -100,
+				"y": 100
+			},
+			"localScale": {
+				"cls": "vector2",
+				"x": 1,
+				"y": 1
+			},
+			"localRotate": 0,
+			"components": [
+				{
+					"cls": "image2D",
+					"color": {
+						"cls": "color",
+						"r": 1,
+						"g": 1,
+						"b": 1,
+						"a": 1
+					},
+					"imageType": 0,
+					"fillMethod": 0,
+					"fillAmmount": 1,
+					"_spriteName": "spritesheet.atlas.json_UIMask",
+					"_imageBorder": {
+						"cls": "border",
+						"l": 0,
+						"t": 0,
+						"r": 0,
+						"b": 0
+					}
+				}],
+			"children": [
+				{
+					"cls": "transform2D",
+					"insid": -12282,
+					"prefab": "",
+					"layer": 5,
+					"tag": "Untagged",
+					"name": "Content",
+					"isStatic": false,
+					"isMask": false,
+					"_visible": true,
+					"layoutState": 48,
+					"layoutValueMap": {
+						"16": 0,
+						"32": 0
+					},
+					"layoutPercentState": 0,
+					"width": 183,
+					"height": 300,
+					"pivot": {
+						"cls": "vector2",
+						"x": 0,
+						"y": 1
+					},
+					"localTranslate": {
+						"cls": "vector2",
+						"x": 0,
+						"y": 0
+					},
+					"localScale": {
+						"cls": "vector2",
+						"x": 1,
+						"y": 1
+					},
+					"localRotate": 0,
+					"components": [
+						{
+							"cls": "image2D",
+							"color": {
+								"cls": "color",
+								"r": 1,
+								"g": 1,
+								"b": 1,
+								"a": 1
+							},
+							"imageType": 0,
+							"fillMethod": 0,
+							"fillAmmount": 1,
+							"_spriteName": "spritesheet.atlas.json_Axe",
+							"_imageBorder": {
+								"cls": "border",
+								"l": 0,
+								"t": 0,
+								"r": 0,
+								"b": 0
+							}
+						}],
+					"children": []
+				}]
+		}]
+}

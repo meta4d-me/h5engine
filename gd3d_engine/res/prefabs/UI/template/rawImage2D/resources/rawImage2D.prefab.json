@@ -1,1 +1,185 @@
-{"value":{"prefab":{"value":"/Resources/auiPre/ui/rawImage2D","type":"string","parse":"direct"},"layer":{"value":0,"type":"number","parse":"direct"},"tag":{"value":"Untagged","type":"string","parse":"direct"},"name":{"value":"rawImage2D","type":"string","parse":"direct"},"isStatic":{"value":false,"type":"boolean","parse":"direct"},"children":{"value":[],"type":"transform2D[]","parse":"direct"},"width":{"value":100,"type":"number","parse":"direct"},"height":{"value":100,"type":"number","parse":"direct"},"pivot":{"value":{"x":{"value":0,"type":"number","parse":"direct"},"y":{"value":0,"type":"number","parse":"direct"}},"type":"vector2","parse":"direct"},"_visible":{"value":true,"type":"boolean","parse":"direct"},"localTranslate":{"value":{"x":{"value":510.5,"type":"number","parse":"direct"},"y":{"value":310,"type":"number","parse":"direct"}},"type":"vector2","parse":"direct"},"localScale":{"value":{"x":{"value":1,"type":"number","parse":"direct"},"y":{"value":1,"type":"number","parse":"direct"}},"type":"vector2","parse":"direct"},"localRotate":{"value":0,"type":"number","parse":"direct"},"isMask":{"value":false,"type":"boolean","parse":"direct"},"components":{"value":[{"value":{"comp":{"value":{"image":{"value":"SystemDefaultAsset-white","type":"texture","parse":"nameonly"},"color":{"value":{"r":{"value":1,"type":"number","parse":"direct"},"g":{"value":1,"type":"number","parse":"direct"},"b":{"value":1,"type":"number","parse":"direct"},"a":{"value":1,"type":"number","parse":"direct"}},"type":"color","parse":"direct"}},"type":"rawImage2D","parse":"direct"}},"type":"C2DComponent","parse":"direct"}],"type":"C2DComponent[]","parse":"direct"},"layoutState":{"value":48,"type":"number","parse":"direct"},"layoutValueMap":{"value":{"16":{"value":0,"type":"number","parse":"direct"},"32":{"value":0,"type":"number","parse":"direct"}},"type":"numberdic","parse":"direct"},"layoutPercentState":{"value":0,"type":"number","parse":"direct"}},"type":"transform2D","parse":"direct","insid":222}
+{
+    "value": {
+        "prefab": {
+            "value": "/Resources/auiPre/ui/rawImage2D",
+            "type": "string",
+            "parse": "direct"
+        },
+        "layer": {
+            "value": 0,
+            "type": "number",
+            "parse": "direct"
+        },
+        "tag": {
+            "value": "Untagged",
+            "type": "string",
+            "parse": "direct"
+        },
+        "name": {
+            "value": "rawImage2D",
+            "type": "string",
+            "parse": "direct"
+        },
+        "isStatic": {
+            "value": false,
+            "type": "boolean",
+            "parse": "direct"
+        },
+        "children": {
+            "value": [],
+            "type": "transform2D[]",
+            "parse": "direct"
+        },
+        "width": {
+            "value": 300,
+            "type": "number",
+            "parse": "direct"
+        },
+        "height": {
+            "value": 300,
+            "type": "number",
+            "parse": "direct"
+        },
+        "pivot": {
+            "value": {
+                "x": {
+                    "value": 0,
+                    "type": "number",
+                    "parse": "direct"
+                },
+                "y": {
+                    "value": 0,
+                    "type": "number",
+                    "parse": "direct"
+                }
+            },
+            "type": "vector2",
+            "parse": "direct"
+        },
+        "_visible": {
+            "value": true,
+            "type": "boolean",
+            "parse": "direct"
+        },
+        "localTranslate": {
+            "value": {
+                "x": {
+                    "value": 410.5,
+                    "type": "number",
+                    "parse": "direct"
+                },
+                "y": {
+                    "value": 210,
+                    "type": "number",
+                    "parse": "direct"
+                }
+            },
+            "type": "vector2",
+            "parse": "direct"
+        },
+        "localScale": {
+            "value": {
+                "x": {
+                    "value": 1,
+                    "type": "number",
+                    "parse": "direct"
+                },
+                "y": {
+                    "value": 1,
+                    "type": "number",
+                    "parse": "direct"
+                }
+            },
+            "type": "vector2",
+            "parse": "direct"
+        },
+        "localRotate": {
+            "value": 0,
+            "type": "number",
+            "parse": "direct"
+        },
+        "isMask": {
+            "value": false,
+            "type": "boolean",
+            "parse": "direct"
+        },
+        "components": {
+            "value": [
+                {
+                    "value": {
+                        "comp": {
+                            "value": {
+                                "image": {
+                                    "value": "common.imgdesc.json",
+                                    "type": "texture",
+                                    "parse": "nameonly"
+                                },
+                                "color": {
+                                    "value": {
+                                        "r": {
+                                            "value": 1,
+                                            "type": "number",
+                                            "parse": "direct"
+                                        },
+                                        "g": {
+                                            "value": 1,
+                                            "type": "number",
+                                            "parse": "direct"
+                                        },
+                                        "b": {
+                                            "value": 1,
+                                            "type": "number",
+                                            "parse": "direct"
+                                        },
+                                        "a": {
+                                            "value": 1,
+                                            "type": "number",
+                                            "parse": "direct"
+                                        }
+                                    },
+                                    "type": "color",
+                                    "parse": "direct"
+                                }
+                            },
+                            "type": "rawImage2D",
+                            "parse": "direct"
+                        }
+                    },
+                    "type": "C2DComponent",
+                    "parse": "direct"
+                }
+            ],
+            "type": "C2DComponent[]",
+            "parse": "direct"
+        },
+        "layoutState": {
+            "value": 48,
+            "type": "number",
+            "parse": "direct"
+        },
+        "layoutValueMap": {
+            "value": {
+                "16": {
+                    "value": 0,
+                    "type": "number",
+                    "parse": "direct"
+                },
+                "32": {
+                    "value": 0,
+                    "type": "number",
+                    "parse": "direct"
+                }
+            },
+            "type": "numberdic",
+            "parse": "direct"
+        },
+        "layoutPercentState": {
+            "value": 0,
+            "type": "number",
+            "parse": "direct"
+        }
+    },
+    "type": "transform2D",
+    "parse": "direct",
+    "insid": 200
+}
