@@ -1,6 +1,6 @@
 {
 	"cls": "transform2D",
-	"insid": 21512,
+	"insid": 14512,
 	"prefab": "",
 	"layer": 5,
 	"tag": "Untagged",
@@ -58,24 +58,24 @@
 			"cls": "inputField",
 			"frameImage": {
 				"cls": "image2D",
-				"refid": 21512
+				"refid": 14512
 			},
 			"characterLimit": 0,
 			"LineType": 0,
 			"ContentType": 0,
 			"TextLabel": {
 				"cls": "label",
-				"refid": 21530
+				"refid": 14608
 			},
 			"PlaceholderLabel": {
 				"cls": "label",
-				"refid": 21522
+				"refid": 14606
 			}
 		}],
 	"children": [
 		{
 			"cls": "transform2D",
-			"insid": 21522,
+			"insid": 14606,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",
@@ -139,7 +139,7 @@
 		},
 		{
 			"cls": "transform2D",
-			"insid": 21530,
+			"insid": 14608,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",

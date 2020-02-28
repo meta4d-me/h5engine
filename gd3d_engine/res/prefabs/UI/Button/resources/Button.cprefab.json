@@ -1,6 +1,6 @@
 {
 	"cls": "transform2D",
-	"insid": 21628,
+	"insid": 14508,
 	"prefab": "",
 	"layer": 5,
 	"tag": "Untagged",
@@ -63,7 +63,7 @@
 			"_pressedSpriteName": "",
 			"targetImage": {
 				"cls": "image2D",
-				"refid": 21628
+				"refid": 14508
 			},
 			"normalColor": {
 				"cls": "color",
@@ -84,7 +84,7 @@
 	"children": [
 		{
 			"cls": "transform2D",
-			"insid": 21638,
+			"insid": 14572,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",

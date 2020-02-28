@@ -1,6 +1,6 @@
 {
 	"cls": "transform2D",
-	"insid": 21668,
+	"insid": 14518,
 	"prefab": "",
 	"layer": 5,
 	"tag": "Untagged",
@@ -58,7 +58,7 @@
 			"cls": "scrollRect",
 			"content": {
 				"cls": "transform2D",
-				"refid": 21688
+				"refid": 14654
 			},
 			"horizontal": true,
 			"vertical": true,
@@ -68,7 +68,7 @@
 	"children": [
 		{
 			"cls": "transform2D",
-			"insid": 21678,
+			"insid": 14652,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",
@@ -125,7 +125,7 @@
 			"children": [
 				{
 					"cls": "transform2D",
-					"insid": 21688,
+					"insid": 14654,
 					"prefab": "",
 					"layer": 5,
 					"tag": "Untagged",
@@ -184,7 +184,7 @@
 		},
 		{
 			"cls": "transform2D",
-			"insid": 21696,
+			"insid": 14664,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",
@@ -241,7 +241,7 @@
 			"children": [
 				{
 					"cls": "transform2D",
-					"insid": 21706,
+					"insid": 14696,
 					"prefab": "",
 					"layer": 5,
 					"tag": "Untagged",
@@ -279,7 +279,7 @@
 					"children": [
 						{
 							"cls": "transform2D",
-							"insid": 21710,
+							"insid": 14672,
 							"prefab": "",
 							"layer": 5,
 							"tag": "Untagged",
@@ -339,7 +339,7 @@
 		},
 		{
 			"cls": "transform2D",
-			"insid": 21718,
+			"insid": 14656,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",
@@ -396,7 +396,7 @@
 			"children": [
 				{
 					"cls": "transform2D",
-					"insid": 21728,
+					"insid": 14688,
 					"prefab": "",
 					"layer": 5,
 					"tag": "Untagged",
@@ -434,7 +434,7 @@
 					"children": [
 						{
 							"cls": "transform2D",
-							"insid": 21732,
+							"insid": 14694,
 							"prefab": "",
 							"layer": 5,
 							"tag": "Untagged",
