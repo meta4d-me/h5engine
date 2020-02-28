@@ -70,12 +70,12 @@
 			"pivot": {
 				"cls": "vector2",
 				"x": 0,
-				"y": 0
+				"y": 1
 			},
 			"localTranslate": {
 				"cls": "vector2",
 				"x": 126.5,
-				"y": -292.29998779296875
+				"y": -492.29998779296875
 			},
 			"localScale": {
 				"cls": "vector2",
@@ -143,7 +143,7 @@
 					"localTranslate": {
 						"cls": "vector2",
 						"x": 0,
-						"y": -200
+						"y": 0
 					},
 					"localScale": {
 						"cls": "vector2",
@@ -151,10 +151,10 @@
 						"y": 1
 					},
 					"localRotate": 0,
-					"layoutState": 9,
+					"layoutState": 3,
 					"layoutValueMap": {
 						"1": 0,
-						"8": 0
+						"2": 0
 					},
 					"layoutPercentState": 0,
 					"components": [
@@ -194,12 +194,12 @@
 							"height": 300,
 							"pivot": {
 								"cls": "vector2",
-								"x": 0,
+								"x": 1,
 								"y": 0
 							},
 							"localTranslate": {
 								"cls": "vector2",
-								"x": 0,
+								"x": 400,
 								"y": 0
 							},
 							"localScale": {
@@ -259,7 +259,7 @@
 					"localTranslate": {
 						"cls": "vector2",
 						"x": 0,
-						"y": -200
+						"y": 0
 					},
 					"localScale": {
 						"cls": "vector2",
@@ -414,7 +414,7 @@
 					"localTranslate": {
 						"cls": "vector2",
 						"x": 200,
-						"y": -200
+						"y": 0
 					},
 					"localScale": {
 						"cls": "vector2",

@@ -439,8 +439,8 @@ namespace gd3d.framework {
                     let wPos = this.getWorldTranslate();
                     let wW = this.canvas.pixelWidth;
                     let wH = this.canvas.pixelHeight;
-                    rect_x = wPos.x / wW;
-                    rect_y = wPos.y / wH;
+                    rect_x = (wPos.x - this.pivot.x * this.width)/ wW ;
+                    rect_y = (wPos.y - this.pivot.y * this.height) / wH;
                     rect_w = this.width / wW;
                     rect_h = this.height / wH;
                     if (this.parentIsMask && ParentRect != null) {

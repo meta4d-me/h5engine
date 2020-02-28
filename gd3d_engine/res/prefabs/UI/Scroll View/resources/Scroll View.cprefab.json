@@ -86,7 +86,7 @@
 			"localTranslate": {
 				"cls": "vector2",
 				"x": 0,
-				"y": -200
+				"y": 0
 			},
 			"localScale": {
 				"cls": "vector2",
@@ -94,10 +94,10 @@
 				"y": 1
 			},
 			"localRotate": 0,
-			"layoutState": 9,
+			"layoutState": 3,
 			"layoutValueMap": {
 				"1": 0,
-				"8": 0
+				"2": 0
 			},
 			"layoutPercentState": 0,
 			"components": [
