@@ -8493,7 +8493,7 @@ var test_uiPerfabLoad = (function () {
     };
     test_uiPerfabLoad.prototype.createUI = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var root, uiname, uiname;
+            var root, uiname;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4, demoTool.loadbySync("res/prefabs/UI/template/defFont/defFont.assetbundle.json", this.assetMgr)];
@@ -8503,8 +8503,7 @@ var test_uiPerfabLoad = (function () {
                     case 2:
                         _a.sent();
                         root = "res/prefabs/UI";
-                        uiname = "Image";
-                        uiname = "Panel";
+                        uiname = "View";
                         this._showUI(root, uiname);
                         return [2];
                 }

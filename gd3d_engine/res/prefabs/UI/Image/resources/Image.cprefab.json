@@ -1,6 +1,6 @@
 {
 	"cls": "transform2D",
-	"insid": 14162,
+	"insid": 21608,
 	"prefab": "",
 	"layer": 5,
 	"tag": "Untagged",
@@ -8,8 +8,8 @@
 	"isStatic": false,
 	"isMask": false,
 	"_visible": true,
-	"width": 100,
-	"height": 134,
+	"width": 53,
+	"height": 46,
 	"pivot": {
 		"cls": "vector2",
 		"x": 0.5,
@@ -17,8 +17,8 @@
 	},
 	"localTranslate": {
 		"cls": "vector2",
-		"x": 200,
-		"y": 150
+		"x": -23.5,
+		"y": 173.60000610351562
 	},
 	"localScale": {
 		"cls": "vector2",
@@ -28,8 +28,8 @@
 	"localRotate": 0,
 	"layoutState": 48,
 	"layoutValueMap": {
-		"16": -50,
-		"32": -67
+		"16": -23.5,
+		"32": -173.60000610351562
 	},
 	"layoutPercentState": 0,
 	"components": [
@@ -45,7 +45,7 @@
 			"imageType": 0,
 			"fillMethod": 0,
 			"fillAmmount": 1,
-			"_spriteName": "spritesheet.atlas.json_Body",
+			"_spriteName": "spritesheet.atlas.json_Foot_R",
 			"_imageBorder": {
 				"cls": "border",
 				"l": 0,

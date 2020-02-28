@@ -1,10 +1,10 @@
 {
 	"cls": "transform2D",
-	"insid": 21816,
+	"insid": 19336,
 	"prefab": "",
 	"layer": 5,
 	"tag": "Untagged",
-	"name": "View",
+	"name": "Panel",
 	"isStatic": false,
 	"isMask": false,
 	"_visible": true,
@@ -57,7 +57,7 @@
 	"children": [
 		{
 			"cls": "transform2D",
-			"insid": 21824,
+			"insid": 19344,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",
@@ -74,8 +74,8 @@
 			},
 			"localTranslate": {
 				"cls": "vector2",
-				"x": 126.5,
-				"y": -292.29998779296875
+				"x": 375,
+				"y": -263
 			},
 			"localScale": {
 				"cls": "vector2",
@@ -85,8 +85,8 @@
 			"localRotate": 0,
 			"layoutState": 3,
 			"layoutValueMap": {
-				"1": 126.5,
-				"2": 292.29998779296875
+				"1": 375,
+				"2": 263
 			},
 			"layoutPercentState": 0,
 			"components": [
@@ -115,7 +115,7 @@
 					"cls": "scrollRect",
 					"content": {
 						"cls": "transform2D",
-						"refid": 21844
+						"refid": 19364
 					},
 					"horizontal": true,
 					"vertical": true,
@@ -125,7 +125,7 @@
 			"children": [
 				{
 					"cls": "transform2D",
-					"insid": 21834,
+					"insid": 19354,
 					"prefab": "",
 					"layer": 5,
 					"tag": "Untagged",
@@ -182,7 +182,7 @@
 					"children": [
 						{
 							"cls": "transform2D",
-							"insid": 21844,
+							"insid": 19364,
 							"prefab": "",
 							"layer": 5,
 							"tag": "Untagged",
@@ -241,7 +241,7 @@
 				},
 				{
 					"cls": "transform2D",
-					"insid": 21852,
+					"insid": 19372,
 					"prefab": "",
 					"layer": 5,
 					"tag": "Untagged",
@@ -298,7 +298,7 @@
 					"children": [
 						{
 							"cls": "transform2D",
-							"insid": 21862,
+							"insid": 19382,
 							"prefab": "",
 							"layer": 5,
 							"tag": "Untagged",
@@ -336,7 +336,7 @@
 							"children": [
 								{
 									"cls": "transform2D",
-									"insid": 21866,
+									"insid": 19386,
 									"prefab": "",
 									"layer": 5,
 									"tag": "Untagged",
@@ -396,7 +396,7 @@
 				},
 				{
 					"cls": "transform2D",
-					"insid": 21874,
+					"insid": 19394,
 					"prefab": "",
 					"layer": 5,
 					"tag": "Untagged",
@@ -453,7 +453,7 @@
 					"children": [
 						{
 							"cls": "transform2D",
-							"insid": 21884,
+							"insid": 19404,
 							"prefab": "",
 							"layer": 5,
 							"tag": "Untagged",
@@ -491,7 +491,7 @@
 							"children": [
 								{
 									"cls": "transform2D",
-									"insid": 21888,
+									"insid": 19408,
 									"prefab": "",
 									"layer": 5,
 									"tag": "Untagged",
@@ -552,7 +552,7 @@
 		},
 		{
 			"cls": "transform2D",
-			"insid": 21896,
+			"insid": 19416,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",
@@ -569,8 +569,8 @@
 			},
 			"localTranslate": {
 				"cls": "vector2",
-				"x": -2275.2998046875,
-				"y": -668.10009765625
+				"x": -1933.62109375,
+				"y": -525.1484375
 			},
 			"localScale": {
 				"cls": "vector2",
@@ -580,10 +580,10 @@
 			"localRotate": 0,
 			"layoutState": 15,
 			"layoutValueMap": {
-				"1": 112.0185546875,
-				"2": 196.35009765625,
-				"4": 357.8115234375,
-				"8": 261.14990234375
+				"1": 453.697265625,
+				"2": 53.3984375,
+				"4": 16.1328125,
+				"8": 404.1015625
 			},
 			"layoutPercentState": 0,
 			"components": [
@@ -615,7 +615,7 @@
 					"_pressedSpriteName": "",
 					"targetImage": {
 						"cls": "image2D",
-						"refid": 21896
+						"refid": 19416
 					},
 					"normalColor": {
 						"cls": "color",
@@ -636,7 +636,7 @@
 			"children": [
 				{
 					"cls": "transform2D",
-					"insid": 21906,
+					"insid": 19426,
 					"prefab": "",
 					"layer": 5,
 					"tag": "Untagged",
@@ -701,7 +701,7 @@
 		},
 		{
 			"cls": "transform2D",
-			"insid": 21914,
+			"insid": 19434,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",
@@ -718,8 +718,8 @@
 			},
 			"localTranslate": {
 				"cls": "vector2",
-				"x": 276.5,
-				"y": -76.39999389648438
+				"x": 341,
+				"y": -72.89999389648438
 			},
 			"localScale": {
 				"cls": "vector2",
@@ -729,8 +729,8 @@
 			"localRotate": 0,
 			"layoutState": 48,
 			"layoutValueMap": {
-				"16": -23.5,
-				"32": -173.60000610351562
+				"16": 41,
+				"32": -177.10000610351562
 			},
 			"layoutPercentState": 0,
 			"components": [
@@ -759,7 +759,7 @@
 		},
 		{
 			"cls": "transform2D",
-			"insid": 21922,
+			"insid": 19442,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",
@@ -776,8 +776,8 @@
 			},
 			"localTranslate": {
 				"cls": "vector2",
-				"x": 169.1999969482422,
-				"y": -126.30000305175781
+				"x": 357,
+				"y": -173
 			},
 			"localScale": {
 				"cls": "vector2",
@@ -787,8 +787,8 @@
 			"localRotate": 0,
 			"layoutState": 48,
 			"layoutValueMap": {
-				"16": -130.8000030517578,
-				"32": -123.69999694824219
+				"16": 57,
+				"32": -77
 			},
 			"layoutPercentState": 0,
 			"components": [
@@ -810,7 +810,7 @@
 		},
 		{
 			"cls": "transform2D",
-			"insid": 21930,
+			"insid": 19450,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",
@@ -827,8 +827,8 @@
 			},
 			"localTranslate": {
 				"cls": "vector2",
-				"x": 191,
-				"y": -46.600006103515625
+				"x": 212,
+				"y": -38.399993896484375
 			},
 			"localScale": {
 				"cls": "vector2",
@@ -838,8 +838,8 @@
 			"localRotate": 0,
 			"layoutState": 48,
 			"layoutValueMap": {
-				"16": -109,
-				"32": -203.39999389648438
+				"16": -88,
+				"32": -211.60000610351562
 			},
 			"layoutPercentState": 0,
 			"components": [
@@ -872,7 +872,7 @@
 		},
 		{
 			"cls": "transform2D",
-			"insid": 21938,
+			"insid": 19458,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",
@@ -889,8 +889,8 @@
 			},
 			"localTranslate": {
 				"cls": "vector2",
-				"x": 206.5,
-				"y": -259.6000061035156
+				"x": 190,
+				"y": -102
 			},
 			"localScale": {
 				"cls": "vector2",
@@ -900,8 +900,8 @@
 			"localRotate": 0,
 			"layoutState": 48,
 			"layoutValueMap": {
-				"16": -93.5,
-				"32": 9.600000381469727
+				"16": -110,
+				"32": -148
 			},
 			"layoutPercentState": 0,
 			"components": [
@@ -930,24 +930,24 @@
 					"cls": "inputField",
 					"frameImage": {
 						"cls": "image2D",
-						"refid": 21938
+						"refid": 19458
 					},
 					"characterLimit": 0,
 					"LineType": 0,
 					"ContentType": 0,
 					"TextLabel": {
 						"cls": "label",
-						"refid": 21956
+						"refid": 19476
 					},
 					"PlaceholderLabel": {
 						"cls": "label",
-						"refid": 21948
+						"refid": 19468
 					}
 				}],
 			"children": [
 				{
 					"cls": "transform2D",
-					"insid": 21948,
+					"insid": 19468,
 					"prefab": "",
 					"layer": 5,
 					"tag": "Untagged",
@@ -1011,7 +1011,7 @@
 				},
 				{
 					"cls": "transform2D",
-					"insid": 21956,
+					"insid": 19476,
 					"prefab": "",
 					"layer": 5,
 					"tag": "Untagged",
@@ -1073,534 +1073,5 @@
 						}],
 					"children": []
 				}]
-		},
-		{
-			"cls": "transform2D",
-			"insid": 21964,
-			"prefab": "",
-			"layer": 5,
-			"tag": "Untagged",
-			"name": "Labels",
-			"isStatic": false,
-			"isMask": false,
-			"_visible": true,
-			"width": 100,
-			"height": 100,
-			"pivot": {
-				"cls": "vector2",
-				"x": 0.5,
-				"y": 0.5
-			},
-			"localTranslate": {
-				"cls": "vector2",
-				"x": 300,
-				"y": -250
-			},
-			"localScale": {
-				"cls": "vector2",
-				"x": 1,
-				"y": 1
-			},
-			"localRotate": 0,
-			"layoutState": 48,
-			"layoutValueMap": {
-				"16": 0,
-				"32": 0
-			},
-			"layoutPercentState": 0,
-			"components": [],
-			"children": [
-				{
-					"cls": "transform2D",
-					"insid": 21968,
-					"prefab": "",
-					"layer": 5,
-					"tag": "Untagged",
-					"name": "Text",
-					"isStatic": false,
-					"isMask": false,
-					"_visible": true,
-					"width": 160,
-					"height": 25.420000076293945,
-					"pivot": {
-						"cls": "vector2",
-						"x": 0.5,
-						"y": 0.5
-					},
-					"localTranslate": {
-						"cls": "vector2",
-						"x": -194.3000030517578,
-						"y": 199.3000030517578
-					},
-					"localScale": {
-						"cls": "vector2",
-						"x": 1,
-						"y": 1
-					},
-					"localRotate": 0,
-					"layoutState": 48,
-					"layoutValueMap": {
-						"16": -194.29998779296875,
-						"32": -199.30000972747803
-					},
-					"layoutPercentState": 0,
-					"components": [
-						{
-							"cls": "label",
-							"text": "Text",
-							"_fontName": "defFont.font.json",
-							"fontsize": 14,
-							"linespace": 1,
-							"horizontalOverflow": false,
-							"verticalOverflow": false,
-							"color": {
-								"cls": "color",
-								"r": 0.19607843458652496,
-								"g": 0.19607843458652496,
-								"b": 0.19607843458652496,
-								"a": 1
-							},
-							"color2": {
-								"cls": "color",
-								"r": 0,
-								"g": 0,
-								"b": 0.5,
-								"a": 0.5
-							},
-							"verticalType": 1,
-							"horizontalType": 1
-						}],
-					"children": []
-				},
-				{
-					"cls": "transform2D",
-					"insid": 21976,
-					"prefab": "",
-					"layer": 5,
-					"tag": "Untagged",
-					"name": "Text (1)",
-					"isStatic": false,
-					"isMask": false,
-					"_visible": true,
-					"width": 160,
-					"height": 25.420000076293945,
-					"pivot": {
-						"cls": "vector2",
-						"x": 0.5,
-						"y": 0.5
-					},
-					"localTranslate": {
-						"cls": "vector2",
-						"x": -194.3000030517578,
-						"y": 162.6999969482422
-					},
-					"localScale": {
-						"cls": "vector2",
-						"x": 1,
-						"y": 1
-					},
-					"localRotate": 0,
-					"layoutState": 48,
-					"layoutValueMap": {
-						"16": -194.29998779296875,
-						"32": -162.7000036239624
-					},
-					"layoutPercentState": 0,
-					"components": [
-						{
-							"cls": "label",
-							"text": "Image",
-							"_fontName": "defFont.font.json",
-							"fontsize": 14,
-							"linespace": 1,
-							"horizontalOverflow": false,
-							"verticalOverflow": false,
-							"color": {
-								"cls": "color",
-								"r": 0.19607843458652496,
-								"g": 0.19607843458652496,
-								"b": 0.19607843458652496,
-								"a": 1
-							},
-							"color2": {
-								"cls": "color",
-								"r": 0,
-								"g": 0,
-								"b": 0.5,
-								"a": 0.5
-							},
-							"verticalType": 1,
-							"horizontalType": 1
-						}],
-					"children": []
-				},
-				{
-					"cls": "transform2D",
-					"insid": 21984,
-					"prefab": "",
-					"layer": 5,
-					"tag": "Untagged",
-					"name": "Text (2)",
-					"isStatic": false,
-					"isMask": false,
-					"_visible": true,
-					"width": 160,
-					"height": 25.420000076293945,
-					"pivot": {
-						"cls": "vector2",
-						"x": 0.5,
-						"y": 0.5
-					},
-					"localTranslate": {
-						"cls": "vector2",
-						"x": -196.10000610351562,
-						"y": 20.79999542236328
-					},
-					"localScale": {
-						"cls": "vector2",
-						"x": 1,
-						"y": 1
-					},
-					"localRotate": 0,
-					"layoutState": 48,
-					"layoutValueMap": {
-						"16": -196.10000610351562,
-						"32": -20.799994468688965
-					},
-					"layoutPercentState": 0,
-					"components": [
-						{
-							"cls": "label",
-							"text": "Button",
-							"_fontName": "defFont.font.json",
-							"fontsize": 14,
-							"linespace": 1,
-							"horizontalOverflow": false,
-							"verticalOverflow": false,
-							"color": {
-								"cls": "color",
-								"r": 0.19607843458652496,
-								"g": 0.19607843458652496,
-								"b": 0.19607843458652496,
-								"a": 1
-							},
-							"color2": {
-								"cls": "color",
-								"r": 0,
-								"g": 0,
-								"b": 0.5,
-								"a": 0.5
-							},
-							"verticalType": 1,
-							"horizontalType": 1
-						}],
-					"children": []
-				},
-				{
-					"cls": "transform2D",
-					"insid": 21992,
-					"prefab": "",
-					"layer": 5,
-					"tag": "Untagged",
-					"name": "Text (3)",
-					"isStatic": false,
-					"isMask": false,
-					"_visible": true,
-					"width": 160,
-					"height": 25.420000076293945,
-					"pivot": {
-						"cls": "vector2",
-						"x": 0.5,
-						"y": 0.5
-					},
-					"localTranslate": {
-						"cls": "vector2",
-						"x": -194.3000030517578,
-						"y": 125.0999984741211
-					},
-					"localScale": {
-						"cls": "vector2",
-						"x": 1,
-						"y": 1
-					},
-					"localRotate": 0,
-					"layoutState": 48,
-					"layoutValueMap": {
-						"16": -194.29998779296875,
-						"32": -125.09999752044678
-					},
-					"layoutPercentState": 0,
-					"components": [
-						{
-							"cls": "label",
-							"text": "RawImage",
-							"_fontName": "defFont.font.json",
-							"fontsize": 14,
-							"linespace": 1,
-							"horizontalOverflow": false,
-							"verticalOverflow": false,
-							"color": {
-								"cls": "color",
-								"r": 0.19607843458652496,
-								"g": 0.19607843458652496,
-								"b": 0.19607843458652496,
-								"a": 1
-							},
-							"color2": {
-								"cls": "color",
-								"r": 0,
-								"g": 0,
-								"b": 0.5,
-								"a": 0.5
-							},
-							"verticalType": 1,
-							"horizontalType": 1
-						}],
-					"children": []
-				},
-				{
-					"cls": "transform2D",
-					"insid": 22000,
-					"prefab": "",
-					"layer": 5,
-					"tag": "Untagged",
-					"name": "Text (4)",
-					"isStatic": false,
-					"isMask": false,
-					"_visible": true,
-					"width": 160,
-					"height": 25.420000076293945,
-					"pivot": {
-						"cls": "vector2",
-						"x": 0.5,
-						"y": 0.5
-					},
-					"localTranslate": {
-						"cls": "vector2",
-						"x": -196.10000610351562,
-						"y": -16.800006866455078
-					},
-					"localScale": {
-						"cls": "vector2",
-						"x": 1,
-						"y": 1
-					},
-					"localRotate": 0,
-					"layoutState": 48,
-					"layoutValueMap": {
-						"16": -196.10000610351562,
-						"32": 16.800006866455078
-					},
-					"layoutPercentState": 0,
-					"components": [
-						{
-							"cls": "label",
-							"text": "InputField",
-							"_fontName": "defFont.font.json",
-							"fontsize": 14,
-							"linespace": 1,
-							"horizontalOverflow": false,
-							"verticalOverflow": false,
-							"color": {
-								"cls": "color",
-								"r": 0.19607843458652496,
-								"g": 0.19607843458652496,
-								"b": 0.19607843458652496,
-								"a": 1
-							},
-							"color2": {
-								"cls": "color",
-								"r": 0,
-								"g": 0,
-								"b": 0.5,
-								"a": 0.5
-							},
-							"verticalType": 1,
-							"horizontalType": 1
-						}],
-					"children": []
-				},
-				{
-					"cls": "transform2D",
-					"insid": 22008,
-					"prefab": "",
-					"layer": 5,
-					"tag": "Untagged",
-					"name": "Text (5)",
-					"isStatic": false,
-					"isMask": false,
-					"_visible": true,
-					"width": 160,
-					"height": 25.420000076293945,
-					"pivot": {
-						"cls": "vector2",
-						"x": 0.5,
-						"y": 0.5
-					},
-					"localTranslate": {
-						"cls": "vector2",
-						"x": -196.10000610351562,
-						"y": -58.599998474121094
-					},
-					"localScale": {
-						"cls": "vector2",
-						"x": 1,
-						"y": 1
-					},
-					"localRotate": 0,
-					"layoutState": 48,
-					"layoutValueMap": {
-						"16": -196.10000610351562,
-						"32": 58.59999942779541
-					},
-					"layoutPercentState": 0,
-					"components": [
-						{
-							"cls": "label",
-							"text": "ScrollView",
-							"_fontName": "defFont.font.json",
-							"fontsize": 14,
-							"linespace": 1,
-							"horizontalOverflow": false,
-							"verticalOverflow": false,
-							"color": {
-								"cls": "color",
-								"r": 0.19607843458652496,
-								"g": 0.19607843458652496,
-								"b": 0.19607843458652496,
-								"a": 1
-							},
-							"color2": {
-								"cls": "color",
-								"r": 0,
-								"g": 0,
-								"b": 0.5,
-								"a": 0.5
-							},
-							"verticalType": 1,
-							"horizontalType": 1
-						}],
-					"children": []
-				},
-				{
-					"cls": "transform2D",
-					"insid": 22016,
-					"prefab": "",
-					"layer": 5,
-					"tag": "Untagged",
-					"name": "Text (6)",
-					"isStatic": false,
-					"isMask": false,
-					"_visible": true,
-					"width": 160,
-					"height": 25.420000076293945,
-					"pivot": {
-						"cls": "vector2",
-						"x": 0.5,
-						"y": 0.5
-					},
-					"localTranslate": {
-						"cls": "vector2",
-						"x": -194.3000030517578,
-						"y": 73.80000305175781
-					},
-					"localScale": {
-						"cls": "vector2",
-						"x": 1,
-						"y": 1
-					},
-					"localRotate": 0,
-					"layoutState": 48,
-					"layoutValueMap": {
-						"16": -194.29998779296875,
-						"32": -73.8000020980835
-					},
-					"layoutPercentState": 0,
-					"components": [
-						{
-							"cls": "label",
-							"text": "Panel",
-							"_fontName": "defFont.font.json",
-							"fontsize": 14,
-							"linespace": 1,
-							"horizontalOverflow": false,
-							"verticalOverflow": false,
-							"color": {
-								"cls": "color",
-								"r": 0.19607843458652496,
-								"g": 0.19607843458652496,
-								"b": 0.19607843458652496,
-								"a": 1
-							},
-							"color2": {
-								"cls": "color",
-								"r": 0,
-								"g": 0,
-								"b": 0.5,
-								"a": 0.5
-							},
-							"verticalType": 1,
-							"horizontalType": 1
-						}],
-					"children": []
-				}]
-		},
-		{
-			"cls": "transform2D",
-			"insid": 22024,
-			"prefab": "",
-			"layer": 5,
-			"tag": "Untagged",
-			"name": "Panel",
-			"isStatic": false,
-			"isMask": false,
-			"_visible": true,
-			"width": 200,
-			"height": 100,
-			"pivot": {
-				"cls": "vector2",
-				"x": 0.5,
-				"y": 0.5
-			},
-			"localTranslate": {
-				"cls": "vector2",
-				"x": 342.1889953613281,
-				"y": -179
-			},
-			"localScale": {
-				"cls": "vector2",
-				"x": 1,
-				"y": 1
-			},
-			"localRotate": 0,
-			"layoutState": 48,
-			"layoutValueMap": {
-				"16": 42.18899917602539,
-				"32": -71
-			},
-			"layoutPercentState": 0,
-			"components": [
-				{
-					"cls": "image2D",
-					"color": {
-						"cls": "color",
-						"r": 1,
-						"g": 0,
-						"b": 0.8759045600891113,
-						"a": 1
-					},
-					"imageType": 0,
-					"fillMethod": 0,
-					"fillAmmount": 1,
-					"_spriteName": "white_sprite",
-					"_imageBorder": {
-						"cls": "border",
-						"l": 0,
-						"t": 0,
-						"r": 0,
-						"b": 0
-					}
-				}],
-			"children": []
 		}]
 }

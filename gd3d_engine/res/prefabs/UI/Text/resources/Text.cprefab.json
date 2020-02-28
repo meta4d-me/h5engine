@@ -1,6 +1,6 @@
 {
 	"cls": "transform2D",
-	"insid": -2938,
+	"insid": 21568,
 	"prefab": "",
 	"layer": 5,
 	"tag": "Untagged",
@@ -8,12 +8,6 @@
 	"isStatic": false,
 	"isMask": false,
 	"_visible": true,
-	"layoutState": 48,
-	"layoutValueMap": {
-		"16": 0,
-		"32": 0
-	},
-	"layoutPercentState": 0,
 	"width": 160,
 	"height": 30,
 	"pivot": {
@@ -23,8 +17,8 @@
 	},
 	"localTranslate": {
 		"cls": "vector2",
-		"x": -240,
-		"y": -112.45027923583984
+		"x": -109,
+		"y": 203.39999389648438
 	},
 	"localScale": {
 		"cls": "vector2",
@@ -32,20 +26,26 @@
 		"y": 1
 	},
 	"localRotate": 0,
+	"layoutState": 48,
+	"layoutValueMap": {
+		"16": -109,
+		"32": -203.39999389648438
+	},
+	"layoutPercentState": 0,
 	"components": [
 		{
 			"cls": "label",
-			"text": "New Text New TextNew Text",
+			"text": "New TextNew Text",
 			"_fontName": "defFont.font.json",
-			"fontsize": 14,
+			"fontsize": 16,
 			"linespace": 1,
 			"horizontalOverflow": false,
 			"verticalOverflow": false,
 			"color": {
 				"cls": "color",
-				"r": 0.19607843458652496,
-				"g": 0.19607843458652496,
-				"b": 0.19607843458652496,
+				"r": 0.9866247177124023,
+				"g": 1,
+				"b": 0,
 				"a": 1
 			},
 			"color2": {

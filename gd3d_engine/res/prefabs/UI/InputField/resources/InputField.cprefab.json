@@ -1,6 +1,6 @@
 {
 	"cls": "transform2D",
-	"insid": -4158,
+	"insid": 21512,
 	"prefab": "",
 	"layer": 5,
 	"tag": "Untagged",
@@ -8,14 +8,8 @@
 	"isStatic": false,
 	"isMask": false,
 	"_visible": true,
-	"layoutState": 48,
-	"layoutValueMap": {
-		"16": 0,
-		"32": 0
-	},
-	"layoutPercentState": 0,
-	"width": 128,
-	"height": 128,
+	"width": 160,
+	"height": 30,
 	"pivot": {
 		"cls": "vector2",
 		"x": 0.5,
@@ -23,8 +17,8 @@
 	},
 	"localTranslate": {
 		"cls": "vector2",
-		"x": -326,
-		"y": -91.95027923583984
+		"x": -93.5,
+		"y": -9.600000381469727
 	},
 	"localScale": {
 		"cls": "vector2",
@@ -32,6 +26,12 @@
 		"y": 1
 	},
 	"localRotate": 0,
+	"layoutState": 48,
+	"layoutValueMap": {
+		"16": -93.5,
+		"32": 9.600000381469727
+	},
+	"layoutPercentState": 0,
 	"components": [
 		{
 			"cls": "image2D",
@@ -58,24 +58,24 @@
 			"cls": "inputField",
 			"frameImage": {
 				"cls": "image2D",
-				"refid": -4158
+				"refid": 21512
 			},
 			"characterLimit": 0,
 			"LineType": 0,
 			"ContentType": 0,
 			"TextLabel": {
 				"cls": "label",
-				"refid": -4180
+				"refid": 21530
 			},
 			"PlaceholderLabel": {
 				"cls": "label",
-				"refid": -4170
+				"refid": 21522
 			}
 		}],
 	"children": [
 		{
 			"cls": "transform2D",
-			"insid": -4170,
+			"insid": 21522,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",
@@ -83,14 +83,8 @@
 			"isStatic": false,
 			"isMask": false,
 			"_visible": true,
-			"layoutState": 48,
-			"layoutValueMap": {
-				"16": 0,
-				"32": 0
-			},
-			"layoutPercentState": 0,
-			"width": 108,
-			"height": 115,
+			"width": 140,
+			"height": 17,
 			"pivot": {
 				"cls": "vector2",
 				"x": 0.5,
@@ -107,6 +101,14 @@
 				"y": 1
 			},
 			"localRotate": 0,
+			"layoutState": 15,
+			"layoutValueMap": {
+				"1": 10,
+				"2": 7,
+				"4": 10,
+				"8": 6
+			},
+			"layoutPercentState": 0,
 			"components": [
 				{
 					"cls": "label",
@@ -118,9 +120,9 @@
 					"verticalOverflow": false,
 					"color": {
 						"cls": "color",
-						"r": 0.03270738571882248,
-						"g": 0.9905660152435303,
-						"b": 0.13553567230701447,
+						"r": 0.19607843458652496,
+						"g": 0.19607843458652496,
+						"b": 0.19607843458652496,
 						"a": 0.5
 					},
 					"color2": {
@@ -137,7 +139,7 @@
 		},
 		{
 			"cls": "transform2D",
-			"insid": -4180,
+			"insid": 21530,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",
@@ -145,14 +147,8 @@
 			"isStatic": false,
 			"isMask": false,
 			"_visible": true,
-			"layoutState": 48,
-			"layoutValueMap": {
-				"16": 0,
-				"32": 0
-			},
-			"layoutPercentState": 0,
-			"width": 108,
-			"height": 115,
+			"width": 140,
+			"height": 17,
 			"pivot": {
 				"cls": "vector2",
 				"x": 0.5,
@@ -169,10 +165,18 @@
 				"y": 1
 			},
 			"localRotate": 0,
+			"layoutState": 15,
+			"layoutValueMap": {
+				"1": 10,
+				"2": 7,
+				"4": 10,
+				"8": 6
+			},
+			"layoutPercentState": 0,
 			"components": [
 				{
 					"cls": "label",
-					"text": "啊啊啊",
+					"text": "",
 					"_fontName": "defFont.font.json",
 					"fontsize": 14,
 					"linespace": 1,
@@ -180,9 +184,9 @@
 					"verticalOverflow": false,
 					"color": {
 						"cls": "color",
-						"r": 1,
-						"g": 0.10815292596817017,
-						"b": 0,
+						"r": 0.19607843458652496,
+						"g": 0.19607843458652496,
+						"b": 0.19607843458652496,
 						"a": 1
 					},
 					"color2": {

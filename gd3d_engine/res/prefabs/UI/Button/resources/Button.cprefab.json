@@ -1,6 +1,6 @@
 {
 	"cls": "transform2D",
-	"insid": -3424,
+	"insid": 21628,
 	"prefab": "",
 	"layer": 5,
 	"tag": "Untagged",
@@ -8,23 +8,17 @@
 	"isStatic": false,
 	"isMask": false,
 	"_visible": true,
-	"layoutState": 48,
-	"layoutValueMap": {
-		"16": 0,
-		"32": 0
-	},
-	"layoutPercentState": 0,
-	"width": 53,
-	"height": 46,
+	"width": -469.8299865722656,
+	"height": -457.5,
 	"pivot": {
 		"cls": "vector2",
-		"x": 0.5,
-		"y": 0.5
+		"x": -18.34000015258789,
+		"y": 11.100000381469727
 	},
 	"localTranslate": {
 		"cls": "vector2",
-		"x": -240,
-		"y": -112.45027923583984
+		"x": 8728.7001953125,
+		"y": 4881.89990234375
 	},
 	"localScale": {
 		"cls": "vector2",
@@ -32,6 +26,14 @@
 		"y": 1
 	},
 	"localRotate": 0,
+	"layoutState": 15,
+	"layoutValueMap": {
+		"1": 112.0185546875,
+		"2": 196.35009765625,
+		"4": 357.8115234375,
+		"8": 261.14990234375
+	},
+	"layoutPercentState": 0,
 	"components": [
 		{
 			"cls": "image2D",
@@ -45,7 +47,7 @@
 			"imageType": 0,
 			"fillMethod": 0,
 			"fillAmmount": 1,
-			"_spriteName": "spritesheet.atlas.json_Foot_R",
+			"_spriteName": "spritesheet.atlas.json_Stone",
 			"_imageBorder": {
 				"cls": "border",
 				"l": 0,
@@ -61,20 +63,20 @@
 			"_pressedSpriteName": "",
 			"targetImage": {
 				"cls": "image2D",
-				"refid": -3424
+				"refid": 21628
 			},
 			"normalColor": {
-				"cls": "color",
-				"r": 0,
-				"g": 1,
-				"b": 0.03142428398132324,
-				"a": 1
-			},
-			"pressedColor": {
 				"cls": "color",
 				"r": 1,
 				"g": 0,
 				"b": 0,
+				"a": 1
+			},
+			"pressedColor": {
+				"cls": "color",
+				"r": 0.7843137383460999,
+				"g": 0.7843137383460999,
+				"b": 0.7843137383460999,
 				"a": 1
 			},
 			"fadeDuration": 0.10000000149011612
@@ -82,7 +84,7 @@
 	"children": [
 		{
 			"cls": "transform2D",
-			"insid": -3436,
+			"insid": 21638,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",
@@ -90,14 +92,8 @@
 			"isStatic": false,
 			"isMask": false,
 			"_visible": true,
-			"layoutState": 48,
-			"layoutValueMap": {
-				"16": 0,
-				"32": 0
-			},
-			"layoutPercentState": 0,
-			"width": 53,
-			"height": 46,
+			"width": -469.830078125,
+			"height": -457.5,
 			"pivot": {
 				"cls": "vector2",
 				"x": 0.5,
@@ -105,8 +101,8 @@
 			},
 			"localTranslate": {
 				"cls": "vector2",
-				"x": 0,
-				"y": 0
+				"x": -8851.5966796875,
+				"y": -4849.5
 			},
 			"localScale": {
 				"cls": "vector2",
@@ -114,6 +110,14 @@
 				"y": 1
 			},
 			"localRotate": 0,
+			"layoutState": 15,
+			"layoutValueMap": {
+				"1": 0,
+				"2": 0,
+				"4": 0,
+				"8": 0
+			},
+			"layoutPercentState": 0,
 			"components": [
 				{
 					"cls": "label",

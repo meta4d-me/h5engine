@@ -1,6 +1,6 @@
 {
 	"cls": "transform2D",
-	"insid": -12254,
+	"insid": 21668,
 	"prefab": "",
 	"layer": 5,
 	"tag": "Untagged",
@@ -8,23 +8,17 @@
 	"isStatic": false,
 	"isMask": true,
 	"_visible": true,
-	"layoutState": 48,
-	"layoutValueMap": {
-		"16": 0,
-		"32": 0
-	},
-	"layoutPercentState": 0,
 	"width": 200,
 	"height": 200,
 	"pivot": {
 		"cls": "vector2",
-		"x": 0.5,
-		"y": 0.5
+		"x": 0,
+		"y": 0
 	},
 	"localTranslate": {
 		"cls": "vector2",
-		"x": -136.34982299804688,
-		"y": -119.5
+		"x": 126.5,
+		"y": -292.29998779296875
 	},
 	"localScale": {
 		"cls": "vector2",
@@ -32,6 +26,12 @@
 		"y": 1
 	},
 	"localRotate": 0,
+	"layoutState": 3,
+	"layoutValueMap": {
+		"1": 126.5,
+		"2": 292.29998779296875
+	},
+	"layoutPercentState": 0,
 	"components": [
 		{
 			"cls": "image2D",
@@ -58,7 +58,7 @@
 			"cls": "scrollRect",
 			"content": {
 				"cls": "transform2D",
-				"refid": -12282
+				"refid": 21688
 			},
 			"horizontal": true,
 			"vertical": true,
@@ -68,7 +68,7 @@
 	"children": [
 		{
 			"cls": "transform2D",
-			"insid": -12266,
+			"insid": 21678,
 			"prefab": "",
 			"layer": 5,
 			"tag": "Untagged",
@@ -76,23 +76,17 @@
 			"isStatic": false,
 			"isMask": false,
 			"_visible": true,
-			"layoutState": 48,
-			"layoutValueMap": {
-				"16": 0,
-				"32": 0
-			},
-			"layoutPercentState": 0,
-			"width": 183,
-			"height": 183,
+			"width": 0,
+			"height": 0,
 			"pivot": {
 				"cls": "vector2",
 				"x": 0,
-				"y": 1
+				"y": 0
 			},
 			"localTranslate": {
 				"cls": "vector2",
-				"x": -100,
-				"y": 100
+				"x": 0,
+				"y": -200
 			},
 			"localScale": {
 				"cls": "vector2",
@@ -100,6 +94,12 @@
 				"y": 1
 			},
 			"localRotate": 0,
+			"layoutState": 9,
+			"layoutValueMap": {
+				"1": 0,
+				"8": 0
+			},
+			"layoutPercentState": 0,
 			"components": [
 				{
 					"cls": "image2D",
@@ -125,7 +125,7 @@
 			"children": [
 				{
 					"cls": "transform2D",
-					"insid": -12282,
+					"insid": 21688,
 					"prefab": "",
 					"layer": 5,
 					"tag": "Untagged",
@@ -133,18 +133,12 @@
 					"isStatic": false,
 					"isMask": false,
 					"_visible": true,
-					"layoutState": 48,
-					"layoutValueMap": {
-						"16": 0,
-						"32": 0
-					},
-					"layoutPercentState": 0,
-					"width": 183,
+					"width": 400,
 					"height": 300,
 					"pivot": {
 						"cls": "vector2",
 						"x": 0,
-						"y": 1
+						"y": 0
 					},
 					"localTranslate": {
 						"cls": "vector2",
@@ -157,6 +151,12 @@
 						"y": 1
 					},
 					"localRotate": 0,
+					"layoutState": 3,
+					"layoutValueMap": {
+						"1": 0,
+						"2": 0
+					},
+					"layoutPercentState": 0,
 					"components": [
 						{
 							"cls": "image2D",
@@ -170,7 +170,7 @@
 							"imageType": 0,
 							"fillMethod": 0,
 							"fillAmmount": 1,
-							"_spriteName": "spritesheet.atlas.json_Axe",
+							"_spriteName": "spritesheet.atlas.json_Body",
 							"_imageBorder": {
 								"cls": "border",
 								"l": 0,
@@ -180,6 +180,316 @@
 							}
 						}],
 					"children": []
+				}]
+		},
+		{
+			"cls": "transform2D",
+			"insid": 21696,
+			"prefab": "",
+			"layer": 5,
+			"tag": "Untagged",
+			"name": "Scrollbar Horizontal",
+			"isStatic": false,
+			"isMask": false,
+			"_visible": true,
+			"width": 0,
+			"height": 20,
+			"pivot": {
+				"cls": "vector2",
+				"x": 0,
+				"y": 1
+			},
+			"localTranslate": {
+				"cls": "vector2",
+				"x": 0,
+				"y": -200
+			},
+			"localScale": {
+				"cls": "vector2",
+				"x": 1,
+				"y": 1
+			},
+			"localRotate": 0,
+			"layoutState": 9,
+			"layoutValueMap": {
+				"1": 0,
+				"8": 0
+			},
+			"layoutPercentState": 0,
+			"components": [
+				{
+					"cls": "image2D",
+					"color": {
+						"cls": "color",
+						"r": 1,
+						"g": 1,
+						"b": 1,
+						"a": 1
+					},
+					"imageType": 0,
+					"fillMethod": 0,
+					"fillAmmount": 1,
+					"_spriteName": "white_sprite",
+					"_imageBorder": {
+						"cls": "border",
+						"l": 0,
+						"t": 0,
+						"r": 0,
+						"b": 0
+					}
+				}],
+			"children": [
+				{
+					"cls": "transform2D",
+					"insid": 21706,
+					"prefab": "",
+					"layer": 5,
+					"tag": "Untagged",
+					"name": "Sliding Area",
+					"isStatic": false,
+					"isMask": false,
+					"_visible": true,
+					"width": -20,
+					"height": 0,
+					"pivot": {
+						"cls": "vector2",
+						"x": 0.5,
+						"y": 0.5
+					},
+					"localTranslate": {
+						"cls": "vector2",
+						"x": 0,
+						"y": 10
+					},
+					"localScale": {
+						"cls": "vector2",
+						"x": 1,
+						"y": 1
+					},
+					"localRotate": 0,
+					"layoutState": 15,
+					"layoutValueMap": {
+						"1": 10,
+						"2": 10,
+						"4": 10,
+						"8": 10
+					},
+					"layoutPercentState": 0,
+					"components": [],
+					"children": [
+						{
+							"cls": "transform2D",
+							"insid": 21710,
+							"prefab": "",
+							"layer": 5,
+							"tag": "Untagged",
+							"name": "Handle",
+							"isStatic": false,
+							"isMask": false,
+							"_visible": true,
+							"width": 20,
+							"height": 20,
+							"pivot": {
+								"cls": "vector2",
+								"x": 0.5,
+								"y": 0.5
+							},
+							"localTranslate": {
+								"cls": "vector2",
+								"x": 10,
+								"y": 0
+							},
+							"localScale": {
+								"cls": "vector2",
+								"x": 1,
+								"y": 1
+							},
+							"localRotate": 0,
+							"layoutState": 9,
+							"layoutValueMap": {
+								"1": -10,
+								"8": -10
+							},
+							"layoutPercentState": 0,
+							"components": [
+								{
+									"cls": "image2D",
+									"color": {
+										"cls": "color",
+										"r": 1,
+										"g": 1,
+										"b": 1,
+										"a": 1
+									},
+									"imageType": 0,
+									"fillMethod": 0,
+									"fillAmmount": 1,
+									"_spriteName": "spritesheet.atlas.json_UISprite",
+									"_imageBorder": {
+										"cls": "border",
+										"l": 0,
+										"t": 0,
+										"r": 0,
+										"b": 0
+									}
+								}],
+							"children": []
+						}]
+				}]
+		},
+		{
+			"cls": "transform2D",
+			"insid": 21718,
+			"prefab": "",
+			"layer": 5,
+			"tag": "Untagged",
+			"name": "Scrollbar Vertical",
+			"isStatic": false,
+			"isMask": false,
+			"_visible": true,
+			"width": 20,
+			"height": 0,
+			"pivot": {
+				"cls": "vector2",
+				"x": 1,
+				"y": 0
+			},
+			"localTranslate": {
+				"cls": "vector2",
+				"x": 200,
+				"y": -200
+			},
+			"localScale": {
+				"cls": "vector2",
+				"x": 1,
+				"y": 1
+			},
+			"localRotate": 0,
+			"layoutState": 12,
+			"layoutValueMap": {
+				"4": 0,
+				"8": 0
+			},
+			"layoutPercentState": 0,
+			"components": [
+				{
+					"cls": "image2D",
+					"color": {
+						"cls": "color",
+						"r": 1,
+						"g": 1,
+						"b": 1,
+						"a": 1
+					},
+					"imageType": 0,
+					"fillMethod": 0,
+					"fillAmmount": 1,
+					"_spriteName": "white_sprite",
+					"_imageBorder": {
+						"cls": "border",
+						"l": 0,
+						"t": 0,
+						"r": 0,
+						"b": 0
+					}
+				}],
+			"children": [
+				{
+					"cls": "transform2D",
+					"insid": 21728,
+					"prefab": "",
+					"layer": 5,
+					"tag": "Untagged",
+					"name": "Sliding Area",
+					"isStatic": false,
+					"isMask": false,
+					"_visible": true,
+					"width": 0,
+					"height": -20,
+					"pivot": {
+						"cls": "vector2",
+						"x": 0.5,
+						"y": 0.5
+					},
+					"localTranslate": {
+						"cls": "vector2",
+						"x": -10,
+						"y": 0
+					},
+					"localScale": {
+						"cls": "vector2",
+						"x": 1,
+						"y": 1
+					},
+					"localRotate": 0,
+					"layoutState": 15,
+					"layoutValueMap": {
+						"1": 10,
+						"2": 10,
+						"4": 10,
+						"8": 10
+					},
+					"layoutPercentState": 0,
+					"components": [],
+					"children": [
+						{
+							"cls": "transform2D",
+							"insid": 21732,
+							"prefab": "",
+							"layer": 5,
+							"tag": "Untagged",
+							"name": "Handle",
+							"isStatic": false,
+							"isMask": false,
+							"_visible": true,
+							"width": 20,
+							"height": 20,
+							"pivot": {
+								"cls": "vector2",
+								"x": 0.5,
+								"y": 0.5
+							},
+							"localTranslate": {
+								"cls": "vector2",
+								"x": 0,
+								"y": 10
+							},
+							"localScale": {
+								"cls": "vector2",
+								"x": 1,
+								"y": 1
+							},
+							"localRotate": 0,
+							"layoutState": 9,
+							"layoutValueMap": {
+								"1": -10,
+								"8": -10
+							},
+							"layoutPercentState": 0,
+							"components": [
+								{
+									"cls": "image2D",
+									"color": {
+										"cls": "color",
+										"r": 1,
+										"g": 1,
+										"b": 1,
+										"a": 1
+									},
+									"imageType": 0,
+									"fillMethod": 0,
+									"fillAmmount": 1,
+									"_spriteName": "spritesheet.atlas.json_UISprite",
+									"_imageBorder": {
+										"cls": "border",
+										"l": 0,
+										"t": 0,
+										"r": 0,
+										"b": 0
+									}
+								}],
+							"children": []
+						}]
 				}]
 		}]
 }
