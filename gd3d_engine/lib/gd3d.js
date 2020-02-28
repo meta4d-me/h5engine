@@ -22,11 +22,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -17042,6 +17041,7 @@ var gd3d;
                 this.issetq = false;
                 this._queue = 0;
                 this.useBoneTexture = true;
+                this.boneSamplerTexindex = -1;
                 this.tempMatrix = new gd3d.math.matrix();
                 this.inverseRootBone = new gd3d.math.matrix();
             }
@@ -17236,8 +17236,10 @@ var gd3d;
                 var drawType = context.drawtype;
                 var shader = mat.getShader();
                 var drawPasses = shader.passes[basetype + drawType][0];
-                var texindex = ctx.getUniform(drawPasses.program.program, drawPasses.mapuniforms[f4skinnedMeshRenderer_1.boneSampler].location);
-                ctx.activeTexture(gd3d.render.webglkit.GetTextureNumber(texindex));
+                if (this.boneSamplerTexindex == -1) {
+                    this.boneSamplerTexindex = ctx.getUniform(drawPasses.program.program, drawPasses.mapuniforms[f4skinnedMeshRenderer_1.boneSampler].location);
+                }
+                ctx.activeTexture(gd3d.render.webglkit.GetTextureNumber(this.boneSamplerTexindex));
                 this.boneMatricesTexture.glTexture.uploadByteArray(false, false, this.boneMatrices.length / 4, 1, this.boneMatrices, false, false, false, false, false, WebGLRenderingContext.FLOAT);
             };
             f4skinnedMeshRenderer.prototype.updateBoneMatrix = function () {

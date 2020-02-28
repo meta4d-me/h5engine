@@ -2242,8 +2242,7 @@ var test_f4skin = (function () {
     };
     test_f4skin.prototype.start = function (app) {
         return __awaiter(this, void 0, void 0, function () {
-            var objCam, sample, mr, joints, pf, orig, anip11, _a, f4, f5, anim, _b, anip, anip2, bite;
-            var _this = this;
+            var objCam, sample, mr, joints, loadNameRes, pf, orig, anip11, cName, _a, f4, f5, anim, _b, anip, anip2, bite;
             return __generator(this, function (_c) {
                 switch (_c.label) {
                     case 0:
@@ -2275,20 +2274,16 @@ var test_f4skin = (function () {
                         mr.initStaticPoseMatrices();
                         mr.initBoneMatrices();
                         objCam.lookat(sample);
-                        return [4, new Promise(function (res) {
-                                _this.app.getAssetMgr().load("res/prefabs/PF_PlayerSharkAlien/PF_PlayerSharkAlien.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
-                                    if (s.isfinish)
-                                        res();
-                                });
-                            })];
+                        loadNameRes = "PF_PlayerSharkAlien";
+                        return [4, demoTool.loadbySync("newRes/pfb/model/" + loadNameRes + "/" + loadNameRes + ".assetbundle.json", this.app.getAssetMgr())];
                     case 2:
                         _c.sent();
-                        pf = this.app.getAssetMgr().getAssetByName("PF_PlayerSharkAlien.prefab.json", "PF_PlayerSharkAlien.assetbundle.json").getCloneTrans();
+                        pf = this.app.getAssetMgr().getAssetByName(loadNameRes + ".prefab.json", loadNameRes + ".assetbundle.json").getCloneTrans();
                         orig = pf.clone();
                         this.scene.addChild(orig);
                         anip11 = orig.gameObject.getComponentsInChildren("keyFrameAniPlayer")[0];
-                        anip11.play();
-                        this.scene.addChild(pf);
+                        cName = anip11.clips[0].getName();
+                        anip11.playByName(cName);
                         _a = pf.gameObject.getComponentsInChildren('f4skinnedMeshRenderer'), f4 = _a[0], f5 = _a[1];
                         f4.materials[0].setShader(this.app.getAssetMgr().getShader("f4skin.shader.json"));
                         pf.gameObject.getComponentsInChildren("ParticleSystem").forEach(function (v) {

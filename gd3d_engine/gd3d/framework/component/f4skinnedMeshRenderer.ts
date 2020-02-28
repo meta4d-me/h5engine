@@ -303,6 +303,7 @@ namespace gd3d.framework {
             }
         }
 
+        private boneSamplerTexindex = -1;
         updateBoneTexture(context: renderContext) {
             let ctx: WebGLRenderingContext = context.webgl;
             if (!this.boneMatricesTexture) {
@@ -327,8 +328,10 @@ namespace gd3d.framework {
             let drawType = context.drawtype;
             let shader = mat.getShader();
             let drawPasses = shader.passes[basetype + drawType][0];
-            let texindex = ctx.getUniform(drawPasses.program.program , drawPasses.mapuniforms[f4skinnedMeshRenderer.boneSampler].location);
-            ctx.activeTexture(render.webglkit.GetTextureNumber( texindex ));
+            if(this.boneSamplerTexindex == -1){
+                this.boneSamplerTexindex = ctx.getUniform(drawPasses.program.program , drawPasses.mapuniforms[f4skinnedMeshRenderer.boneSampler].location);
+            }
+            ctx.activeTexture(render.webglkit.GetTextureNumber( this.boneSamplerTexindex ));
 
             // update data texture
             (this.boneMatricesTexture.glTexture as gd3d.render.glTexture2D).uploadByteArray(

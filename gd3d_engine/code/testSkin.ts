@@ -5,7 +5,8 @@ class test_f4skin implements IState
     scene: gd3d.framework.scene;
     camera: gd3d.framework.camera;
 
-    boneConfig(bone: gd3d.framework.transform, yOffset = 4, rotate = 10) {
+    boneConfig(bone: gd3d.framework.transform, yOffset = 4, rotate = 10)
+    {
         const mf = bone.gameObject.addComponent('meshFilter') as gd3d.framework.meshFilter;
         mf.mesh = this.app.getAssetMgr().getDefaultMesh("cube");
         const mr = bone.gameObject.addComponent('meshRenderer') as gd3d.framework.meshRenderer;
@@ -15,17 +16,21 @@ class test_f4skin implements IState
         bone.markDirty();
     }
 
-    assembSkeleton(segment: number) {
+    assembSkeleton(segment: number)
+    {
         let bones: gd3d.framework.transform[] = [];
-        for (let i = 0; i < segment; i++) {
+        for (let i = 0; i < segment; i++)
+        {
             const bone = new gd3d.framework.transform();
             bone.name = 'bone_' + i;
             bones[i] = bone;
-            if (i) {
+            if (i)
+            {
                 this.boneConfig(bone);
-                const parent = bones[i-1];
+                const parent = bones[i - 1];
                 parent.addChild(bone);
-            } else {
+            } else
+            {
                 this.boneConfig(bone, 0);
                 // bone.localTranslate.z = 0.5;
             }
@@ -33,7 +38,8 @@ class test_f4skin implements IState
         return bones;
     }
 
-    createMesh(ctx: WebGLRenderingContext) {
+    createMesh(ctx: WebGLRenderingContext)
+    {
         let mesh = new gd3d.framework.mesh();
 
         const NumVertsPerRow = 5;
@@ -50,11 +56,11 @@ class test_f4skin implements IState
         let _NumTriangles;
 
         _NumCellsPerRow = NumVertsPerRow - 1;
-		_NumCellsPerCol = NumVertsPerCol - 1;
-		_Width = _NumCellsPerRow * CellSpacing;
-		_Depth = _NumCellsPerCol * CellSpacing;
-		_NumVertices = NumVertsPerRow * NumVertsPerCol;
-		_NumTriangles = _NumCellsPerRow * _NumCellsPerCol * 2;
+        _NumCellsPerCol = NumVertsPerCol - 1;
+        _Width = _NumCellsPerRow * CellSpacing;
+        _Depth = _NumCellsPerCol * CellSpacing;
+        _NumVertices = NumVertsPerRow * NumVertsPerCol;
+        _NumTriangles = _NumCellsPerRow * _NumCellsPerCol * 2;
 
         let data = mesh.data = new gd3d.render.meshData();
 
@@ -95,10 +101,12 @@ class test_f4skin implements IState
             [0, 1, 2, 3],
         ];
 
-        for(let z = StartZ; z <= EndZ; z += CellSpacing) {
+        for (let z = StartZ; z <= EndZ; z += CellSpacing)
+        {
             let j = 0;
 
-            for(let x = StartX; x <= EndX; x += CellSpacing) {
+            for (let x = StartX; x <= EndX; x += CellSpacing)
+            {
                 let iIndex = i * NumVertsPerRow + j;
 
                 _Vertices[iIndex] = new gd3d.math.vector3();
@@ -149,8 +157,10 @@ class test_f4skin implements IState
         }
 
         let iBaseIndex = 0;
-        for(let i = 0; i < _NumCellsPerCol; ++i) {
-            for(let j = 0; j < _NumCellsPerRow; ++j) {
+        for (let i = 0; i < _NumCellsPerCol; ++i)
+        {
+            for (let j = 0; j < _NumCellsPerRow; ++j)
+            {
                 _Indices[iBaseIndex] = i * NumVertsPerRow + j;
                 _Indices[iBaseIndex + 1] = i * NumVertsPerRow + j + 1;
                 _Indices[iBaseIndex + 2] = (i + 1) * NumVertsPerRow + j;
@@ -185,7 +195,8 @@ class test_f4skin implements IState
         // const bs = 3 + 4;	// byteStride
         // const bs = 3 + 4 + 4;	// byteStride
         let vbo = new Float32Array(_Vertices.length * bs);
-        for (let v = 0; v < _Vertices.length; v++) {
+        for (let v = 0; v < _Vertices.length; v++)
+        {
             let cur = vbo.subarray(v * bs); // offset
             let position = cur.subarray(0, 3);
             let color = cur.subarray(3, 7);
@@ -299,32 +310,41 @@ class test_f4skin implements IState
         objCam.lookat(sample);
         // PF_PlayerSharkAlien
         // PF_EnemySharkAlien
-        await new Promise(res => {
-            this.app.getAssetMgr().load(
-                "res/prefabs/PF_PlayerSharkAlien/PF_PlayerSharkAlien.assetbundle.json",
-                // "res/prefabs/PF_EnemySharkPyro/PF_EnemySharkPyro.assetbundle.json",
-                // "res/prefabs/PF_CrabNormal/PF_CrabNormal.assetbundle.json",
-                gd3d.framework.AssetTypeEnum.Auto,
-                (s) => {
-                    if (s.isfinish)
-                        res();
-                });
-        });
 
-        let  pf = (this.app.getAssetMgr().getAssetByName("PF_PlayerSharkAlien.prefab.json" , "PF_PlayerSharkAlien.assetbundle.json") as gd3d.framework.prefab).getCloneTrans();
+        let loadNameRes = "PF_PlayerSharkAlien";
+        // let loadNameRes = "DragonHigh_prefab_boss";
+        await demoTool.loadbySync(`newRes/pfb/model/${loadNameRes}/${loadNameRes}.assetbundle.json`, this.app.getAssetMgr());
+        // await new Promise(res => {
+        //     this.app.getAssetMgr().load(
+        //         `res/prefabs/PF_PlayerSharkAlien/PF_PlayerSharkAlien.assetbundle.json`,
+        //         // "res/prefabs/PF_EnemySharkPyro/PF_EnemySharkPyro.assetbundle.json",
+        //         // "res/prefabs/PF_CrabNormal/PF_CrabNormal.assetbundle.json",
+        //         gd3d.framework.AssetTypeEnum.Auto,
+        //         (s) => {
+        //             if (s.isfinish)
+        //                 res();
+        //         });
+        // });
+
+        let pf = (this.app.getAssetMgr().getAssetByName(`${loadNameRes}.prefab.json`, `${loadNameRes}.assetbundle.json`) as gd3d.framework.prefab).getCloneTrans();
+
+
         let orig = pf.clone();
         this.scene.addChild(orig);
         let [anip11] = orig.gameObject.getComponentsInChildren("keyFrameAniPlayer") as gd3d.framework.keyFrameAniPlayer[];
-        anip11.play();
-        this.scene.addChild(pf);
+        // anip11.play();
+        let cName = anip11.clips[0].getName();
+        anip11.playByName(cName);
+        // this.scene.addChild(pf);
         let [f4, f5] = pf.gameObject.getComponentsInChildren('f4skinnedMeshRenderer') as gd3d.framework.f4skinnedMeshRenderer[];
         f4.materials[0].setShader(this.app.getAssetMgr().getShader("f4skin.shader.json"));
 
-        pf.gameObject.getComponentsInChildren("ParticleSystem").forEach(v=>{
+        pf.gameObject.getComponentsInChildren("ParticleSystem").forEach(v =>
+        {
 
-var ps =            (<gd3d.framework.ParticleSystem>v);
-ps.main.loop = true;
-ps.play();
+            var ps = (<gd3d.framework.ParticleSystem>v);
+            ps.main.loop = true;
+            ps.play();
         });
 
         // f4.initStaticPoseMatrices();
@@ -352,10 +372,10 @@ ps.play();
         // f4.gameObject.visible = false;
 
         // for(let bone of f4.bones) {
-            // let bone = f4.bones[3];
-            // const mf = bone.gameObject.addComponent('meshFilter') as gd3d.framework.meshFilter;
-            // mf.mesh = this.app.getAssetMgr().getDefaultMesh("cube");
-            // const mr2 = bone.gameObject.addComponent('meshRenderer') as gd3d.framework.meshRenderer;
+        // let bone = f4.bones[3];
+        // const mf = bone.gameObject.addComponent('meshFilter') as gd3d.framework.meshFilter;
+        // mf.mesh = this.app.getAssetMgr().getDefaultMesh("cube");
+        // const mr2 = bone.gameObject.addComponent('meshRenderer') as gd3d.framework.meshRenderer;
         // }
 
         let [anip, anip2] = pf.gameObject.getComponentsInChildren("keyFrameAniPlayer") as gd3d.framework.keyFrameAniPlayer[];
@@ -366,10 +386,12 @@ ps.play();
         anip.play();
         window['anip'] = anip2;
 
-        let bite = (value = 190) => {
+        let bite = (value = 190) =>
+        {
             anip.rewind();
             anip.playByName('bite.keyframeAniclip.json');
-            setTimeout(() => {
+            setTimeout(() =>
+            {
                 anip2.rewind();
                 anip2.play();
             }, value);
@@ -386,46 +408,46 @@ ps.play();
         //     if (state.isfinish)
         //     {
 
-                // mr.materials[0].setShader(this.app.getAssetMgr().getShader("diffuse.shader.json"));
+        // mr.materials[0].setShader(this.app.getAssetMgr().getShader("diffuse.shader.json"));
 
-                // this.app.getAssetMgr().load(`res/prefabs/baihu/${isSplitPcakge ? mpath:""}resources/res_baihu_baihu.FBX_baihu.mesh.bin`, gd3d.framework.AssetTypeEnum.Auto, (s) =>
-                // {
-                //     if (s.isfinish)
-                //     {
-                //         var smesh1 = this.app.getAssetMgr().getAssetByName("res_baihu_baihu.FBX_baihu.mesh.bin") as gd3d.framework.mesh;
-                //         var mesh1 = baihu.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
-                //         // mesh1.mesh = smesh1.clone();  //clone 失效
-                //         mesh1.mesh = smesh1;
-                //         var renderer = baihu.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
-                //         var collider = baihu.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
-                //         baihu.markDirty();
-                //         var sh = this.app.getAssetMgr().getShader("diffuse.shader.json");
-                //         renderer.materials = [];
-                //         renderer.materials.push(new gd3d.framework.material());
-                //         renderer.materials.push(new gd3d.framework.material());
-                //         renderer.materials.push(new gd3d.framework.material());
-                //         renderer.materials.push(new gd3d.framework.material());
-                //         renderer.materials[0].setShader(sh);
-                //         renderer.materials[1].setShader(sh);
-                //         renderer.materials[2].setShader(sh);
-                //         renderer.materials[3].setShader(sh);
-                //         this.app.getAssetMgr().load(`res/prefabs/baihu/${isSplitPcakge? tpath:""}resources/baihu.imgdesc.json`, gd3d.framework.AssetTypeEnum.Auto, (s2) =>
-                //         {
-                //             if (s2.isfinish)
-                //             {
-                //                 let texture = this.app.getAssetMgr().getAssetByName("baihu.imgdesc.json") as gd3d.framework.texture;
-                //                 renderer.materials[0].setTexture("_MainTex", texture);
-                //             }
-                //         });
-                //         this.app.getAssetMgr().load(`res/prefabs/baihu/${isSplitPcakge? tpath:""}resources/baihuan.png`, gd3d.framework.AssetTypeEnum.Auto, (s2) =>
-                //         {
-                //             if (s2.isfinish)
-                //             {
-                //                 let texture = this.app.getAssetMgr().getAssetByName("baihuan.png") as gd3d.framework.texture;
-                //                 renderer.materials[1].setTexture("_MainTex", texture);
-                //             }
-                //         });
-                // });
+        // this.app.getAssetMgr().load(`res/prefabs/baihu/${isSplitPcakge ? mpath:""}resources/res_baihu_baihu.FBX_baihu.mesh.bin`, gd3d.framework.AssetTypeEnum.Auto, (s) =>
+        // {
+        //     if (s.isfinish)
+        //     {
+        //         var smesh1 = this.app.getAssetMgr().getAssetByName("res_baihu_baihu.FBX_baihu.mesh.bin") as gd3d.framework.mesh;
+        //         var mesh1 = baihu.gameObject.addComponent("meshFilter") as gd3d.framework.meshFilter;
+        //         // mesh1.mesh = smesh1.clone();  //clone 失效
+        //         mesh1.mesh = smesh1;
+        //         var renderer = baihu.gameObject.addComponent("meshRenderer") as gd3d.framework.meshRenderer;
+        //         var collider = baihu.gameObject.addComponent("boxcollider") as gd3d.framework.boxcollider;
+        //         baihu.markDirty();
+        //         var sh = this.app.getAssetMgr().getShader("diffuse.shader.json");
+        //         renderer.materials = [];
+        //         renderer.materials.push(new gd3d.framework.material());
+        //         renderer.materials.push(new gd3d.framework.material());
+        //         renderer.materials.push(new gd3d.framework.material());
+        //         renderer.materials.push(new gd3d.framework.material());
+        //         renderer.materials[0].setShader(sh);
+        //         renderer.materials[1].setShader(sh);
+        //         renderer.materials[2].setShader(sh);
+        //         renderer.materials[3].setShader(sh);
+        //         this.app.getAssetMgr().load(`res/prefabs/baihu/${isSplitPcakge? tpath:""}resources/baihu.imgdesc.json`, gd3d.framework.AssetTypeEnum.Auto, (s2) =>
+        //         {
+        //             if (s2.isfinish)
+        //             {
+        //                 let texture = this.app.getAssetMgr().getAssetByName("baihu.imgdesc.json") as gd3d.framework.texture;
+        //                 renderer.materials[0].setTexture("_MainTex", texture);
+        //             }
+        //         });
+        //         this.app.getAssetMgr().load(`res/prefabs/baihu/${isSplitPcakge? tpath:""}resources/baihuan.png`, gd3d.framework.AssetTypeEnum.Auto, (s2) =>
+        //         {
+        //             if (s2.isfinish)
+        //             {
+        //                 let texture = this.app.getAssetMgr().getAssetByName("baihuan.png") as gd3d.framework.texture;
+        //                 renderer.materials[1].setTexture("_MainTex", texture);
+        //             }
+        //         });
+        // });
         //     }
         // });
 
@@ -436,7 +458,8 @@ ps.play();
     // f4: gd3d.framework.transform[];
     f4: gd3d.framework.transform;
 
-    rotate(bone: gd3d.framework.transform, valuey: number, valuez: number) {
+    rotate(bone: gd3d.framework.transform, valuey: number, valuez: number)
+    {
         gd3d.math.quatFromEulerAngles(0, valuey, valuez, bone.localRotate);
     }
 
@@ -444,12 +467,14 @@ ps.play();
     update(delta: number)
     {
         this.timer += delta;
-        if(this.bones && this.bones.length) {
+        if (this.bones && this.bones.length)
+        {
             this.rotate(this.bones[0], Math.sin(this.timer * 2) * 50, Math.cos(this.timer * 4) * 40 * 0);
             this.rotate(this.bones[1], Math.sin(this.timer * 2) * 80, Math.cos(this.timer * 4) * -80 * 0);
             this.rotate(this.bones[2], Math.sin(this.timer * 2) * 60, Math.cos(this.timer * 4) * 80 * 0);
         }
-        if(window['f4']) {
+        if (window['f4'])
+        {
             // console.log(this.f4[0].localRotate)
             // console.log(this.f4[1].localRotate)
             // console.log(this.f4[2].localRotate)
