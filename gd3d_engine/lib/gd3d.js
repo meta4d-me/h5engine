@@ -6363,18 +6363,30 @@ var gd3d;
         }
         math.matrixGetTranslation = matrixGetTranslation;
         function matrixTranspose(src, out) {
-            out.rawData[1] = src.rawData[4];
-            out.rawData[2] = src.rawData[8];
-            out.rawData[3] = src.rawData[12];
-            out.rawData[4] = src.rawData[1];
-            out.rawData[6] = src.rawData[9];
-            out.rawData[7] = src.rawData[13];
-            out.rawData[8] = src.rawData[2];
-            out.rawData[9] = src.rawData[6];
-            out.rawData[11] = src.rawData[14];
-            out.rawData[12] = src.rawData[3];
-            out.rawData[13] = src.rawData[7];
-            out.rawData[14] = src.rawData[11];
+            var s1 = src.rawData[1];
+            var s2 = src.rawData[2];
+            var s3 = src.rawData[3];
+            var s4 = src.rawData[4];
+            var s6 = src.rawData[6];
+            var s7 = src.rawData[7];
+            var s8 = src.rawData[8];
+            var s9 = src.rawData[9];
+            var s11 = src.rawData[11];
+            var s12 = src.rawData[12];
+            var s13 = src.rawData[13];
+            var s14 = src.rawData[14];
+            out.rawData[1] = s4;
+            out.rawData[2] = s8;
+            out.rawData[3] = s12;
+            out.rawData[4] = s1;
+            out.rawData[6] = s9;
+            out.rawData[7] = s13;
+            out.rawData[8] = s2;
+            out.rawData[9] = s6;
+            out.rawData[11] = s14;
+            out.rawData[12] = s3;
+            out.rawData[13] = s7;
+            out.rawData[14] = s11;
         }
         math.matrixTranspose = matrixTranspose;
         function matrixDecompose(src, scale, rotation, translation) {
@@ -13039,6 +13051,7 @@ var gd3d;
                 glstate_matrix_model: true,
                 glstate_matrix_world2object: true,
                 glstate_matrix_modelview: true,
+                glstate_matrix_it_modelview: true,
                 glstate_matrix_mvp: true,
                 glstate_vec4_bones: true,
                 glstate_matrix_bones: true,
@@ -35888,9 +35901,12 @@ var gd3d;
                 this.matrixView = new gd3d.math.matrix();
                 this.matrixProject = new gd3d.math.matrix();
                 this.matrixModel = new gd3d.math.matrix();
+                this._lastM_IT = new gd3d.math.matrix();
                 this._matrixWorld2Object = new gd3d.math.matrix();
                 this.matrixModelViewProject = new gd3d.math.matrix;
-                this.matrixModelView = new gd3d.math.matrix;
+                this._matrixModelView = new gd3d.math.matrix;
+                this._matrixInverseModelView = new gd3d.math.matrix;
+                this._lastMV_IT = new gd3d.math.matrix;
                 this.matrixViewProject = new gd3d.math.matrix;
                 this.floatTimer = 0;
                 this.intLightCount = 0;
@@ -35915,8 +35931,31 @@ var gd3d;
             }
             Object.defineProperty(renderContext.prototype, "matrixWorld2Object", {
                 get: function () {
-                    gd3d.math.matrixInverse(this.matrixModel, this._matrixWorld2Object);
+                    if (!gd3d.math.matrixEqual(this._lastM_IT, this.matrixModel, 0)) {
+                        gd3d.math.matrixInverse(this.matrixModel, this._matrixWorld2Object);
+                        gd3d.math.matrixClone(this.matrixModel, this._lastM_IT);
+                    }
                     return this._matrixWorld2Object;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(renderContext.prototype, "matrixModelView", {
+                get: function () {
+                    gd3d.math.matrixMultiply(this.matrixView, this.matrixModel, this._matrixModelView);
+                    return this._matrixModelView;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(renderContext.prototype, "matrixInverseModelView", {
+                get: function () {
+                    if (!gd3d.math.matrixEqual(this._lastMV_IT, this.matrixModelView, 0)) {
+                        gd3d.math.matrixInverse(this.matrixModelView, this._matrixInverseModelView);
+                        gd3d.math.matrixTranspose(this._matrixInverseModelView, this._matrixInverseModelView);
+                        gd3d.math.matrixClone(this._matrixModelView, this._lastMV_IT);
+                    }
+                    return this._matrixInverseModelView;
                 },
                 enumerable: true,
                 configurable: true
@@ -36521,6 +36560,9 @@ var gd3d;
                 };
                 this.autoUniformDic["glstate_matrix_modelview"] = function (context) {
                     return context.matrixModelView;
+                };
+                this.autoUniformDic["glstate_matrix_it_modelview"] = function (context) {
+                    return context.matrixInverseModelView;
                 };
                 this.autoUniformDic["glstate_matrix_viewproject"] = function (context) {
                     return context.matrixViewProject;

@@ -20,14 +20,37 @@ namespace gd3d.framework
         matrixView: gd3d.math.matrix = new gd3d.math.matrix();
         matrixProject: gd3d.math.matrix = new gd3d.math.matrix();
         matrixModel: gd3d.math.matrix = new gd3d.math.matrix();
+        private _lastM_IT: gd3d.math.matrix = new gd3d.math.matrix();
         private _matrixWorld2Object: gd3d.math.matrix = new gd3d.math.matrix();
+        /** M 矩阵的逆矩阵 */
         get matrixWorld2Object()
         {
-            gd3d.math.matrixInverse(this.matrixModel, this._matrixWorld2Object);
+            if(!gd3d.math.matrixEqual(this._lastM_IT,this.matrixModel , 0)){
+                gd3d.math.matrixInverse(this.matrixModel, this._matrixWorld2Object);
+                gd3d.math.matrixClone(this.matrixModel ,this._lastM_IT);
+            }
             return this._matrixWorld2Object;
         }
         matrixModelViewProject: gd3d.math.matrix = new gd3d.math.matrix;
-        matrixModelView: gd3d.math.matrix = new gd3d.math.matrix;
+
+        private _matrixModelView: gd3d.math.matrix = new gd3d.math.matrix;
+        get matrixModelView(){
+            gd3d.math.matrixMultiply(this.matrixView , this.matrixModel ,this._matrixModelView);
+            return this._matrixModelView;
+        }
+
+        private _matrixInverseModelView: gd3d.math.matrix = new gd3d.math.matrix;
+        private _lastMV_IT : gd3d.math.matrix = new gd3d.math.matrix;
+        /** MV 矩阵的逆转置矩阵 */
+        get matrixInverseModelView(){
+            if(!gd3d.math.matrixEqual(this._lastMV_IT , this.matrixModelView , 0)){
+                gd3d.math.matrixInverse(this.matrixModelView, this._matrixInverseModelView);
+                gd3d.math.matrixTranspose(this._matrixInverseModelView,this._matrixInverseModelView);
+                gd3d.math.matrixClone(this._matrixModelView ,this._lastMV_IT);
+            }
+            return this._matrixInverseModelView;
+        }
+
         matrixViewProject: gd3d.math.matrix = new gd3d.math.matrix;
         //matrixNormal: gd3d.math.matrix = new gd3d.math.matrix();
         floatTimer: number = 0;

@@ -6812,10 +6812,15 @@ declare namespace gd3d.framework {
         matrixView: gd3d.math.matrix;
         matrixProject: gd3d.math.matrix;
         matrixModel: gd3d.math.matrix;
+        private _lastM_IT;
         private _matrixWorld2Object;
         readonly matrixWorld2Object: math.matrix;
         matrixModelViewProject: gd3d.math.matrix;
-        matrixModelView: gd3d.math.matrix;
+        private _matrixModelView;
+        readonly matrixModelView: math.matrix;
+        private _matrixInverseModelView;
+        private _lastMV_IT;
+        readonly matrixInverseModelView: math.matrix;
         matrixViewProject: gd3d.math.matrix;
         floatTimer: number;
         intLightCount: number;

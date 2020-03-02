@@ -217,6 +217,7 @@ namespace gd3d.framework
             glstate_matrix_model: true,
             glstate_matrix_world2object: true,
             glstate_matrix_modelview: true,
+            glstate_matrix_it_modelview: true,
             glstate_matrix_mvp: true,
             glstate_vec4_bones: true,
             glstate_matrix_bones: true,
