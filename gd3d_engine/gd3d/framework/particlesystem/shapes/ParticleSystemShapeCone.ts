@@ -111,12 +111,14 @@ namespace gd3d.framework
         emitFrom = ParticleSystemShapeConeEmitFrom.Base;
 
         /**
-         * 初始化粒子状态
-         * @param particle 粒子
+         * 计算粒子的发射位置与方向
+         * 
+         * @param particle 
+         * @param position 
+         * @param dir 
          */
-        initParticleState(particle: Particle1)
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3)
         {
-            var speed = math.vec3Length(particle.velocity);
             var radius = this.radius;
             var angle = this.angle;
             var arc = this.arc;
@@ -139,9 +141,6 @@ namespace gd3d.framework
                     radiusAngle = arc - radiusAngle;
                 }
             }
-            // else if (this.arcMode == ParticleSystemShapeMultiModeValue.BurstSpread)
-            // {
-            // }
             if (this.arcSpread > 0)
             {
                 radiusAngle = Math.floor(radiusAngle / arc / this.arcSpread) * arc * this.arcSpread;
@@ -160,20 +159,19 @@ namespace gd3d.framework
             // 顶面位置
             var scale = (radius + this.length * Math.tan(math.degToRad(angle))) * radiusRate;
             var topPos = new math.vector3(basePos.x * scale, basePos.y * scale, this.length);
-            // 计算速度
-            math.vec3Subtract(topPos, bottomPos, particle.velocity);
-            math.vec3Normalize(particle.velocity, particle.velocity);
-            math.vec3ScaleByNum(particle.velocity, speed, particle.velocity);
+
+            // 计算方向
+            math.vec3Subtract(topPos, bottomPos, dir);
+            math.vec3Normalize(dir, dir);
             // 计算位置
-            var position = new math.vector3(bottomPos.x, bottomPos.y, bottomPos.z);
+            position.x = bottomPos.x;
+            position.y = bottomPos.y;
+            position.z = bottomPos.z;
             if (this.emitFrom == ParticleSystemShapeConeEmitFrom.Volume || this.emitFrom == ParticleSystemShapeConeEmitFrom.VolumeShell)
             {
                 // 上下点进行插值
                 math.vec3SLerp(position, topPos, Math.random(), position);
             }
-            particle.position.x = position.x;
-            particle.position.y = position.y;
-            particle.position.z = position.z;
         }
     }
 }

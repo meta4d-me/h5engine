@@ -5,10 +5,11 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -4158,7 +4159,7 @@ var test_Decal = (function () {
 }());
 var test_ParticleSystem = (function () {
     function test_ParticleSystem() {
-        this._particles = ["ParticleAdditive", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames", "shark-levelup"];
+        this._particles = ["ParticleAdditive", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames", "shark-levelup"];
         this._isMove = false;
         this._particleStartPosition = new gd3d.math.vector3();
         this._particleCurrentPosition = new gd3d.math.vector3();
@@ -4256,8 +4257,10 @@ var test_ParticleSystem = (function () {
                     case 1:
                         _a.sent();
                         cubeP = this.astMgr.getAssetByName(res + ".prefab.json", res + ".assetbundle.json");
-                        cubeTran = this._particle = cubeP.getCloneTrans();
-                        this.scene.addChild(cubeTran);
+                        cubeTran = cubeP.getCloneTrans();
+                        this._particle = new gd3d.framework.transform();
+                        this._particle.addChild(cubeTran);
+                        this.scene.addChild(this._particle);
                         this._particleStartPosition = new gd3d.math.vector3();
                         gd3d.math.vec3Clone(this._particle.localPosition, this._particleStartPosition);
                         this.play();

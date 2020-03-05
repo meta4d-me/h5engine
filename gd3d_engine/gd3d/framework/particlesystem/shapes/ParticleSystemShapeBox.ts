@@ -73,56 +73,58 @@ namespace gd3d.framework
         emitFrom = ParticleSystemShapeBoxEmitFrom.Volume;
 
         /**
-         * 初始化粒子状态
-         * @param particle 粒子
+         * 计算粒子的发射位置与方向
+         * 
+         * @param particle 
+         * @param position 
+         * @param dir 
          */
-        initParticleState(particle: Particle1)
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3)
         {
-            var speed = math.vec3Length(particle.velocity);
-
             // 计算位置
-            var p = new math.vector3(this.boxX * (Math.random() * 2 - 1), this.boxY * (Math.random() * 2 - 1), this.boxZ * (Math.random() * 2 - 1));
+            position.x = this.boxX * (Math.random() * 2 - 1);
+            position.y = this.boxY * (Math.random() * 2 - 1);
+            position.z = this.boxZ * (Math.random() * 2 - 1);
 
             if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Shell)
             {
-                var max = Math.max(Math.abs(p.x), Math.abs(p.y), Math.abs(p.z));
-                if (Math.abs(p.x) == max)
+                var max = Math.max(Math.abs(position.x), Math.abs(position.y), Math.abs(position.z));
+                if (Math.abs(position.x) == max)
                 {
-                    p.x = p.x < 0 ? -1 : 1;
-                } else if (Math.abs(p.y) == max)
+                    position.x = position.x < 0 ? -1 : 1;
+                } else if (Math.abs(position.y) == max)
                 {
-                    p.y = p.y < 0 ? -1 : 1;
-                } else if (Math.abs(p.z) == max)
+                    position.y = position.y < 0 ? -1 : 1;
+                } else if (Math.abs(position.z) == max)
                 {
-                    p.z = p.z < 0 ? -1 : 1;
+                    position.z = position.z < 0 ? -1 : 1;
                 }
             } else if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Edge)
             {
-                var min = Math.min(Math.abs(p.x), Math.abs(p.y), Math.abs(p.z));
-                if (Math.abs(p.x) == min)
+                var min = Math.min(Math.abs(position.x), Math.abs(position.y), Math.abs(position.z));
+                if (Math.abs(position.x) == min)
                 {
-                    p.y = p.y < 0 ? -1 : 1;
-                    p.z = p.z < 0 ? -1 : 1;
-                } else if (Math.abs(p.y) == min)
+                    position.y = position.y < 0 ? -1 : 1;
+                    position.z = position.z < 0 ? -1 : 1;
+                } else if (Math.abs(position.y) == min)
                 {
-                    p.x = p.x < 0 ? -1 : 1;
-                    p.z = p.z < 0 ? -1 : 1;
-                } else if (Math.abs(p.z) == min)
+                    position.x = position.x < 0 ? -1 : 1;
+                    position.z = position.z < 0 ? -1 : 1;
+                } else if (Math.abs(position.z) == min)
                 {
-                    p.x = p.x < 0 ? -1 : 1;
-                    p.y = p.y < 0 ? -1 : 1;
+                    position.x = position.x < 0 ? -1 : 1;
+                    position.y = position.y < 0 ? -1 : 1;
                 }
             }
 
-            particle.position.x = p.x;
-            particle.position.y = p.y;
-            particle.position.z = p.z;
+            particle.position.x = position.x;
+            particle.position.y = position.y;
+            particle.position.z = position.z;
 
             // 计算速度
-            var dir = new math.vector3(0, 0, 1);
-            particle.velocity.x = dir.x * speed;
-            particle.velocity.y = dir.y * speed;
-            particle.velocity.z = dir.z * speed;
+            dir.x = 0;
+            dir.y = 0;
+            dir.z = 1;
         }
     }
 }

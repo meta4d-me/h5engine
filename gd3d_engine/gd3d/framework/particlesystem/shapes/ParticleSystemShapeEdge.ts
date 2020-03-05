@@ -66,12 +66,14 @@ namespace gd3d.framework
         }
 
         /**
-         * 初始化粒子状态
-         * @param particle 粒子
+         * 计算粒子的发射位置与方向
+         * 
+         * @param particle 
+         * @param position 
+         * @param dir 
          */
-        initParticleState(particle: Particle1)
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3)
         {
-            var speed = math.vec3Length(particle.velocity);
             var arc = 360 * this.radius;
             // 在圆心的方向
             var radiusAngle = 0;
@@ -91,9 +93,6 @@ namespace gd3d.framework
                     radiusAngle = arc - radiusAngle;
                 }
             }
-            // else if (this.arcMode == ParticleSystemShapeMultiModeValue.BurstSpread)
-            // {
-            // }
             if (this.radiusSpread > 0)
             {
                 radiusAngle = Math.floor(radiusAngle / arc / this.radiusSpread) * arc * this.radiusSpread;
@@ -101,18 +100,13 @@ namespace gd3d.framework
             radiusAngle = radiusAngle / arc;
 
             // 计算位置
-            var dir = new math.vector3(0, 1, 0);
-            var p = new math.vector3(this.radius * (radiusAngle * 2 - 1), 0, 0);
+            dir.x = 0;
+            dir.x = 1;
+            dir.x = 0;
 
-            //
-            particle.position.x = p.x;
-            particle.position.y = p.y;
-            particle.position.z = p.z;
-
-            // 计算速度
-            particle.velocity.x = dir.x * speed;
-            particle.velocity.y = dir.y * speed;
-            particle.velocity.z = dir.z * speed;
+            position.x = this.radius * (radiusAngle * 2 - 1);
+            position.y = 0;
+            position.z = 0;
         }
     }
 }

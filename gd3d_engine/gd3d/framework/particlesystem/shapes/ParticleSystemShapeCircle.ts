@@ -79,12 +79,14 @@ namespace gd3d.framework
         emitFromEdge = false;
 
         /**
-         * 初始化粒子状态
-         * @param particle 粒子
+         * 计算粒子的发射位置与方向
+         * 
+         * @param particle 
+         * @param position 
+         * @param dir 
          */
-        initParticleState(particle: Particle1)
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3)
         {
-            var speed = math.vec3Length(particle.velocity);
             var radius = this.radius;
             var arc = this.arc;
             // 在圆心的方向
@@ -105,33 +107,26 @@ namespace gd3d.framework
                     radiusAngle = arc - radiusAngle;
                 }
             }
-            // else if (this.arcMode == ParticleSystemShapeMultiModeValue.BurstSpread)
-            // {
-            // }
             if (this.arcSpread > 0)
             {
                 radiusAngle = Math.floor(radiusAngle / arc / this.arcSpread) * arc * this.arcSpread;
             }
             radiusAngle = math.degToRad(radiusAngle);
             // 计算位置
-            var dir = new math.vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
-            var p = new math.vector3(radius * dir.x, radius * dir.y, radius * dir.z);
+            dir.x = Math.cos(radiusAngle);
+            dir.y = Math.sin(radiusAngle);
+            dir.z = 0;
+            //
+            position.x = dir.x * radius;
+            position.y = dir.y * radius;
+            position.z = dir.z * radius;
             if (!this.emitFromEdge)
             {
                 var rand = Math.random();
-                p.x *= rand;
-                p.y *= rand;
-                p.z *= rand;
+                position.x *= rand;
+                position.y *= rand;
+                position.z *= rand;
             }
-            //
-            particle.position.x = p.x;
-            particle.position.y = p.y;
-            particle.position.z = p.z;
-
-            // 计算速度
-            particle.velocity.x = dir.x * speed;
-            particle.velocity.y = dir.y * speed;
-            particle.velocity.z = dir.z * speed;
         }
     }
 }
