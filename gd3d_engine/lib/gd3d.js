@@ -31914,36 +31914,29 @@ var gd3d;
                 var limit = this.limit.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
                 var pVelocity = new gd3d.math.vector3();
                 gd3d.math.vec3Clone(particle.velocity, pVelocity);
-                if (this.space == framework.ParticleSystemSimulationSpace.World) {
-                    var localToWorldMatrix = this.particleSystem.localToWorldMatrix;
-                    var worldToLocalMatrix = this.particleSystem.worldToLocalMatrix;
-                    gd3d.math.matrixTransformNormal(pVelocity, localToWorldMatrix, pVelocity);
-                    if (this.separateAxes) {
-                        pVelocity.x = gd3d.math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
-                        pVelocity.y = gd3d.math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
-                        pVelocity.z = gd3d.math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
+                var mat = new gd3d.math.matrix();
+                if (this.space != this.particleSystem.main.simulationSpace) {
+                    if (this.space == framework.ParticleSystemSimulationSpace.World) {
+                        gd3d.math.matrixClone(this.particleSystem.localToWorldMatrix, mat);
                     }
                     else {
-                        if (gd3d.math.vec3SqrLength(pVelocity) > limit * limit) {
-                            gd3d.math.vec3Normalize(pVelocity, pVelocity);
-                            gd3d.math.vec3ScaleByNum(pVelocity, limit, pVelocity);
-                        }
+                        gd3d.math.matrixClone(this.particleSystem.worldToLocalMatrix, mat);
                     }
-                    gd3d.math.matrixTransformNormal(pVelocity, worldToLocalMatrix, pVelocity);
+                }
+                gd3d.math.matrixTransformNormal(pVelocity, mat, pVelocity);
+                if (this.separateAxes) {
+                    pVelocity.x = gd3d.math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
+                    pVelocity.y = gd3d.math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
+                    pVelocity.z = gd3d.math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
                 }
                 else {
-                    if (this.separateAxes) {
-                        pVelocity.x = gd3d.math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
-                        pVelocity.y = gd3d.math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
-                        pVelocity.z = gd3d.math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
-                    }
-                    else {
-                        if (gd3d.math.vec3SqrLength(pVelocity) > limit * limit) {
-                            gd3d.math.vec3Normalize(pVelocity, pVelocity);
-                            gd3d.math.vec3ScaleByNum(pVelocity, limit, pVelocity);
-                        }
+                    if (gd3d.math.vec3SqrLength(pVelocity) > limit * limit) {
+                        gd3d.math.vec3Normalize(pVelocity, pVelocity);
+                        gd3d.math.vec3ScaleByNum(pVelocity, limit, pVelocity);
                     }
                 }
+                gd3d.math.matrixInverse(mat, mat);
+                gd3d.math.matrixTransformNormal(pVelocity, mat, pVelocity);
                 gd3d.math.vec3SLerp(particle.velocity, pVelocity, this.dampen, particle.velocity);
             };
             return ParticleLimitVelocityOverLifetimeModule;
@@ -32183,12 +32176,9 @@ var gd3d;
             });
             ParticleMainModule.prototype.initParticleState = function (particle) {
                 var birthRateAtDuration = particle.birthRateAtDuration;
-                particle.position.x = 0;
-                particle.position.y = 0;
-                particle.position.z = 0;
                 particle.velocity.x = 0;
                 particle.velocity.y = 0;
-                particle.velocity.z = this.startSpeed.getValue(birthRateAtDuration);
+                particle.velocity.z = 0;
                 particle.acceleration.x = 0;
                 particle.acceleration.y = 0;
                 particle.acceleration.z = 0;

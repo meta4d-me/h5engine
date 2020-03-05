@@ -179,42 +179,40 @@ namespace gd3d.framework
             var limit = this.limit.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
             var pVelocity = new math.vector3();
             math.vec3Clone(particle.velocity, pVelocity);
-            if (this.space == ParticleSystemSimulationSpace.World)
+
+
+            // 计算变换矩阵
+            var mat = new math.matrix();
+            //
+            if (this.space != this.particleSystem.main.simulationSpace)
             {
-                var localToWorldMatrix = this.particleSystem.localToWorldMatrix;
-                var worldToLocalMatrix = this.particleSystem.worldToLocalMatrix;
-                //
-                math.matrixTransformNormal(pVelocity, localToWorldMatrix, pVelocity);
-                if (this.separateAxes)
+                if (this.space == ParticleSystemSimulationSpace.World)
                 {
-                    pVelocity.x = math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
-                    pVelocity.y = math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
-                    pVelocity.z = math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
+                    math.matrixClone(this.particleSystem.localToWorldMatrix, mat);
                 } else
                 {
-                    if (math.vec3SqrLength(pVelocity) > limit * limit)
-                    {
-                        math.vec3Normalize(pVelocity, pVelocity);
-                        math.vec3ScaleByNum(pVelocity, limit, pVelocity);
-                    }
-                }
-                math.matrixTransformNormal(pVelocity, worldToLocalMatrix, pVelocity);
-            } else
-            {
-                if (this.separateAxes)
-                {
-                    pVelocity.x = math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
-                    pVelocity.y = math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
-                    pVelocity.z = math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
-                } else
-                {
-                    if (math.vec3SqrLength(pVelocity) > limit * limit)
-                    {
-                        math.vec3Normalize(pVelocity, pVelocity);
-                        math.vec3ScaleByNum(pVelocity, limit, pVelocity);
-                    }
+                    math.matrixClone(this.particleSystem.worldToLocalMatrix, mat);
                 }
             }
+            // 变换到现在空间进行限速
+            math.matrixTransformNormal(pVelocity, mat, pVelocity);
+            if (this.separateAxes)
+            {
+                pVelocity.x = math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
+                pVelocity.y = math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
+                pVelocity.z = math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
+            } else
+            {
+                if (math.vec3SqrLength(pVelocity) > limit * limit)
+                {
+                    math.vec3Normalize(pVelocity, pVelocity);
+                    math.vec3ScaleByNum(pVelocity, limit, pVelocity);
+                }
+            }
+            math.matrixInverse(mat, mat);
+            // 还原到原空间
+            math.matrixTransformNormal(pVelocity, mat, pVelocity);
+            // 
             math.vec3SLerp(particle.velocity, pVelocity, this.dampen, particle.velocity);
         }
     }
