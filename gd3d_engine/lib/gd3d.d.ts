@@ -6550,12 +6550,12 @@ declare namespace gd3d.framework {
         get radius(): number;
         set radius(v: number);
         emitFromShell: boolean;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
     class ParticleSystemShapeHemisphere extends ParticleSystemShapeBase {
         radius: number;
         emitFromShell: boolean;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {

@@ -33682,23 +33682,20 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            ParticleSystemShapeSphere.prototype.initParticleState = function (particle) {
-                var speed = gd3d.math.vec3Length(particle.velocity);
-                var dir = new gd3d.math.vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+            ParticleSystemShapeSphere.prototype.calcParticlePosDir = function (particle, position, dir) {
+                dir.x = Math.random() * 2 - 1;
+                dir.y = Math.random() * 2 - 1;
+                dir.z = Math.random() * 2 - 1;
                 gd3d.math.vec3Normalize(dir, dir);
-                var p = new gd3d.math.vector3(this.radius * dir.x, this.radius * dir.y, this.radius * dir.z);
+                position.x = this.radius * dir.x;
+                position.y = this.radius * dir.y;
+                position.z = this.radius * dir.z;
                 if (!this.emitFromShell) {
                     var rand = Math.random();
-                    p.x *= rand;
-                    p.y *= rand;
-                    p.z *= rand;
+                    position.x *= rand;
+                    position.y *= rand;
+                    position.z *= rand;
                 }
-                particle.position.x = p.x;
-                particle.position.y = p.y;
-                particle.position.z = p.z;
-                particle.velocity.x = dir.x * speed;
-                particle.velocity.y = dir.y * speed;
-                particle.velocity.z = dir.z * speed;
             };
             return ParticleSystemShapeSphere;
         }(framework.ParticleSystemShapeBase));
@@ -33711,24 +33708,21 @@ var gd3d;
                 _this.emitFromShell = false;
                 return _this;
             }
-            ParticleSystemShapeHemisphere.prototype.initParticleState = function (particle) {
-                var speed = gd3d.math.vec3Length(particle.velocity);
-                var dir = new gd3d.math.vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+            ParticleSystemShapeHemisphere.prototype.calcParticlePosDir = function (particle, position, dir) {
+                dir.x = Math.random() * 2 - 1;
+                dir.y = Math.random() * 2 - 1;
+                dir.z = Math.random() * 2 - 1;
                 gd3d.math.vec3Normalize(dir, dir);
                 dir.z = Math.abs(dir.z);
-                var p = new gd3d.math.vector3(this.radius * dir.x, this.radius * dir.y, this.radius * dir.z);
+                position.x = this.radius * dir.x;
+                position.y = this.radius * dir.y;
+                position.z = this.radius * dir.z;
                 if (!this.emitFromShell) {
                     var rand = Math.random();
-                    p.x *= rand;
-                    p.y *= rand;
-                    p.z *= rand;
+                    position.x *= rand;
+                    position.y *= rand;
+                    position.z *= rand;
                 }
-                particle.position.x = p.x;
-                particle.position.y = p.y;
-                particle.position.z = p.z;
-                particle.velocity.x = dir.x * speed;
-                particle.velocity.y = dir.y * speed;
-                particle.velocity.z = dir.z * speed;
             };
             return ParticleSystemShapeHemisphere;
         }(framework.ParticleSystemShapeBase));
