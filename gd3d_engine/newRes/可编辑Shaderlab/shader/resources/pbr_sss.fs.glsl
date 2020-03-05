@@ -38,6 +38,8 @@ varying vec3        v_normal;
 varying vec3        v_pos;
 varying vec2        xlv_TEXCOORD0;
 
+//texture2DEtC1Mark
+
 vec3 Fresnel(vec3 f0, float LoN, float roughness) {
     return f0 + (max(vec3(1.0 - roughness), f0) - f0) * pow(1.0 - LoN, 5.0);
 }

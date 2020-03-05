@@ -1,0 +1,20 @@
+{
+	"layer": "geometry",
+	"properties": [
+		"_MainTex('MainTex',Texture)='white'{}",
+		"_bloomFactor('bloomFactor',Range(0.0,1.0)) = 2.0"],
+	"passes": {
+		"base": [
+			{
+				"showface": "ccw",
+				"vs": "quad_etc1",
+				"fs": "vignetting_etc1"
+			}],
+		"quad": [
+			{
+				"showface": "ccw",
+				"vs": "quad_etc1",
+				"fs": "vignetting_etc1"
+			}]
+	}
+}

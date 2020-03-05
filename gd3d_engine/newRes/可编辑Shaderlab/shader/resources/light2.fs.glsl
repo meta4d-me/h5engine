@@ -10,6 +10,8 @@ varying lowp vec3 vNormal;
 varying mediump vec2 xlv_TEXCOORD0;
 varying lowp vec3 vEyepos;
 
+//texture2DEtC1Mark
+
 
 //calcDiffuse 计算漫反射强度函数
 //统一三种光源的传参方式，在函数内混合，方便就不高效

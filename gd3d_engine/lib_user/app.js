@@ -1181,6 +1181,7 @@ var main = (function () {
             demoList.addBtn("射线检测", function () { return new test_pick_boxcollider(); });
             demoList.addBtn("关键帧动画", function () { return new test_keyFrameAni(); });
             demoList.addBtn("粒子系統", function () { return new test_ParticleSystem(); });
+            demoList.addBtn("Android平台ETC1压缩纹理", function () { return new test_ETC1_KTX(); });
             return new demoList();
         });
         this.addBtn("渲染==>", function () {
@@ -2439,7 +2440,7 @@ var test_3DPhysics_compound = (function () {
                         this.astMgr = physics3dDemoTool.astMgr;
                         this.iptMgr = physics3dDemoTool.iptMgr;
                         this.camera = physics3dDemoTool.camera;
-                        return [4, demoTool.loadbySync("./res/prefabs/Capsule/Capsule.assetbundle.json", this.astMgr)];
+                        return [4, demoTool.loadbySync("./newRes/pfb/model/Capsule/Capsule.assetbundle.json", this.astMgr)];
                     case 2:
                         _a.sent();
                         this.init();
@@ -2491,7 +2492,7 @@ var test_3DPhysics_compound = (function () {
         combination.name = "Capsule";
         combination.localPosition.y = 10;
         this.scene.addChild(combination);
-        var p1 = this.astMgr.getAssetByName("Capsule.prefab.json");
+        var p1 = this.astMgr.getAssetByName("Capsule.prefab.json", "Capsule.assetbundle.json");
         var capsule = p1.getCloneTrans();
         capsule.name = "capsule";
         combination.addChild(capsule);
@@ -4652,6 +4653,8 @@ var test_UIGuideMask = (function () {
     };
     return test_UIGuideMask;
 }());
+var fontjson = "方正粗圆_GBK.font.json";
+var fontpng = "方正粗圆_GBK.TTF.png";
 var test_UI_Component = (function () {
     function test_UI_Component() {
         this.taskmgr = new gd3d.framework.taskMgr();
@@ -4676,7 +4679,7 @@ var test_UI_Component = (function () {
         var tex_0 = this.assetMgr.getAssetByName("zg03_256.png");
         var bg_t = new gd3d.framework.transform2D;
         bg_t.name = "框底图";
-        bg_t.width = 400;
+        bg_t.width = 800;
         bg_t.height = 260;
         bg_t.pivot.x = 0;
         bg_t.pivot.y = 0;
@@ -4694,19 +4697,80 @@ var test_UI_Component = (function () {
         bg_t.setLayoutValue(gd3d.framework.layoutOption.TOP, 60);
         bg_t.setLayoutValue(gd3d.framework.layoutOption.RIGHT, 60);
         bg_t.setLayoutValue(gd3d.framework.layoutOption.BOTTOM, 60);
+        var lab_t0 = new gd3d.framework.transform2D;
+        lab_t0.name = "我是段文本_lable";
+        lab_t0.width = 800;
+        lab_t0.height = 100;
+        lab_t0.localTranslate.x = 50;
+        lab_t0.localTranslate.y = 280;
+        this.rooto2d.addChild(lab_t0);
+        var lab_l0 = lab_t0.addComponent("label");
+        test_UI_Component["lab"] = lab_l0;
+        lab_l0.font = this.assetMgr.getAssetByName(fontjson);
+        lab_l0.fontsize = 12;
+        lab_l0.text = lab_l0.fontsize + "\u53F7\u5B57\u4F53 Innovation in China \u4E2D\u56FD\u5236\u9020\uFF0C\u6167\u53CA\u5168\u7403 0123456789";
+        lab_l0.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
+        lab_l0.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
+        test_UI_Component["obj"] = this;
         var lab_t = new gd3d.framework.transform2D;
         lab_t.name = "我是段文本_lable";
-        lab_t.width = 120;
+        lab_t.width = 800;
         lab_t.height = 100;
-        lab_t.localTranslate.x = -10;
-        lab_t.localTranslate.y = -10;
-        bg_t.addChild(lab_t);
+        lab_t.localTranslate.x = 50;
+        lab_t.localTranslate.y = 300;
+        this.rooto2d.addChild(lab_t);
         var lab_l = lab_t.addComponent("label");
         test_UI_Component["lab"] = lab_l;
-        lab_l.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
-        lab_l.fontsize = 24;
-        lab_l.text = "我是段文本\n换行测试";
-        lab_l.color = new gd3d.math.color(0.2, 0.2, 0.2, 1);
+        lab_l.font = this.assetMgr.getAssetByName(fontjson);
+        lab_l.fontsize = 20;
+        lab_l.text = lab_l.fontsize + "\u53F7\u5B57\u4F53 Innovation in China \u4E2D\u56FD\u5236\u9020\uFF0C\u6167\u53CA\u5168\u7403 0123456789";
+        lab_l.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
+        lab_l.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
+        test_UI_Component["obj"] = this;
+        var lab_t1 = new gd3d.framework.transform2D;
+        lab_t1.name = "我是段文本_lable";
+        lab_t1.width = 800;
+        lab_t1.height = 100;
+        lab_t1.localTranslate.x = 50;
+        lab_t1.localTranslate.y = 350;
+        this.rooto2d.addChild(lab_t1);
+        var lab_l1 = lab_t1.addComponent("label");
+        test_UI_Component["lab"] = lab_l1;
+        lab_l1.font = this.assetMgr.getAssetByName(fontjson);
+        lab_l1.fontsize = 30;
+        lab_l1.text = lab_l1.fontsize + "\u53F7\u5B57\u4F53 Innovation in China \u4E2D\u56FD\u5236\u9020\uFF0C\u6167\u53CA\u5168\u7403 0123456789";
+        lab_l1.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
+        lab_l1.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
+        test_UI_Component["obj"] = this;
+        var lab_t2 = new gd3d.framework.transform2D;
+        lab_t2.name = "我是段文本_lable";
+        lab_t2.width = 800;
+        lab_t2.height = 100;
+        lab_t2.localTranslate.x = 50;
+        lab_t2.localTranslate.y = 420;
+        this.rooto2d.addChild(lab_t2);
+        var lab_l2 = lab_t2.addComponent("label");
+        test_UI_Component["lab"] = lab_l2;
+        lab_l2.font = this.assetMgr.getAssetByName(fontjson);
+        lab_l2.fontsize = 40;
+        lab_l2.text = lab_l2.fontsize + "\u53F7\u5B57\u4F53 Innovation in China \u4E2D\u56FD\u5236\u9020\uFF0C\u6167\u53CA\u5168\u7403 0123456789";
+        lab_l2.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
+        lab_l2.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
+        test_UI_Component["obj"] = this;
+        var lab_t3 = new gd3d.framework.transform2D;
+        lab_t3.name = "我是段文本_lable";
+        lab_t3.width = 800;
+        lab_t3.height = 100;
+        lab_t3.localTranslate.x = 50;
+        lab_t3.localTranslate.y = 500;
+        this.rooto2d.addChild(lab_t3);
+        var lab_l3 = lab_t3.addComponent("label");
+        test_UI_Component["lab"] = lab_l3;
+        lab_l3.font = this.assetMgr.getAssetByName(fontjson);
+        lab_l3.fontsize = 200;
+        lab_l3.text = lab_l3.fontsize + "\u53F7\u5B57\u4F53 Innovation in China \u4E2D\u56FD\u5236\u9020\uFF0C\u6167\u53CA\u5168\u7403 0123456789";
+        lab_l3.color = new gd3d.math.color(0.0, 0.0, 0.0, 1);
+        lab_l3.color2 = new gd3d.math.color(1.0, 0.0, 0.0, 1);
         test_UI_Component["obj"] = this;
         var btn_t = new gd3d.framework.transform2D;
         btn_t.name = "btn_按鈕";
@@ -4769,7 +4833,7 @@ var test_UI_Component = (function () {
             nums = temp;
         }, this);
         var iptFrame_t = new gd3d.framework.transform2D;
-        iptFrame_t.width = 120;
+        iptFrame_t.width = 800;
         iptFrame_t.height = 30;
         iptFrame_t.pivot.x = 0;
         iptFrame_t.pivot.y = 0;
@@ -4794,7 +4858,7 @@ var test_UI_Component = (function () {
         text_t.height = iptFrame_t.height;
         iptFrame_t.addChild(text_t);
         ipt.TextLabel = text_t.addComponent("label");
-        ipt.TextLabel.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
+        ipt.TextLabel.font = this.assetMgr.getAssetByName(fontjson);
         ipt.TextLabel.fontsize = 24;
         ipt.TextLabel.color = new gd3d.math.color(1, 1, 1, 1);
         text_t.layoutState = 0 | gd3d.framework.layoutOption.H_CENTER | gd3d.framework.layoutOption.V_CENTER;
@@ -4805,7 +4869,7 @@ var test_UI_Component = (function () {
         p_t.height = iptFrame_t.height;
         iptFrame_t.addChild(p_t);
         ipt.PlaceholderLabel = p_t.addComponent("label");
-        ipt.PlaceholderLabel.font = this.assetMgr.getAssetByName("STXINGKA.font.json");
+        ipt.PlaceholderLabel.font = this.assetMgr.getAssetByName(fontjson);
         ipt.PlaceholderLabel.fontsize = 24;
         ipt.PlaceholderLabel.color = new gd3d.math.color(0.6, 0.6, 0.6, 1);
         var scroll_t = new gd3d.framework.transform2D;
@@ -4846,9 +4910,9 @@ var test_UI_Component = (function () {
             if (s.isfinish) {
                 _this.assetMgr.load("res/comp/comp.atlas.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                     if (s.isfinish) {
-                        _this.assetMgr.load("res/STXINGKA.TTF.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                        _this.assetMgr.load("res/fonts/" + fontpng, gd3d.framework.AssetTypeEnum.Auto, function (s) {
                             if (s.isfinish) {
-                                _this.assetMgr.load("res/resources/STXINGKA.font.json", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+                                _this.assetMgr.load("res/fonts/" + fontjson, gd3d.framework.AssetTypeEnum.Auto, function (s) {
                                     _this.assetMgr.load("res/zg03_256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                                         if (s.isfinish) {
                                             state.finish = true;
@@ -5013,6 +5077,78 @@ var t;
     }());
     t_1.test_blend = test_blend;
 })(t || (t = {}));
+var test_ETC1_KTX = (function () {
+    function test_ETC1_KTX() {
+        this.ry = 0;
+    }
+    test_ETC1_KTX.prototype.start = function (app) {
+        return __awaiter(this, void 0, void 0, function () {
+            var ext;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        ext = app.webgl.getExtension('WEBGL_compressed_texture_etc1');
+                        if (!ext) {
+                            alert("\u9700\u8981\u4F7F\u7528Android\u5E73\u53F0\u624D\u80FD\u8FD0\u884C\uFF01");
+                        }
+                        this.app = app;
+                        this.scene = this.app.getScene();
+                        this.astMgr = this.app.getAssetMgr();
+                        gd3d.framework.assetMgr.openGuid = false;
+                        return [4, demoTool.loadbySync("res_etc1/etc1_shader/MainShader.assetbundle.json", this.astMgr)];
+                    case 1:
+                        _a.sent();
+                        this.init();
+                        return [2];
+                }
+            });
+        });
+    };
+    test_ETC1_KTX.prototype.init = function () {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 1000;
+        this.camera.fov = Math.PI * 2 / 3;
+        this.camera.backgroundColor = new gd3d.math.color(0.2784, 0.2784, 0.2784, 1);
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        this.loadPrefabs();
+    };
+    test_ETC1_KTX.prototype.loadPrefabs = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var res, cubeP, cubeTran;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        res = "test_ktx";
+                        return [4, demoTool.loadbySync("res/prefabs/" + res + "/" + res + ".assetbundle.json", this.astMgr)];
+                    case 1:
+                        _a.sent();
+                        cubeP = this.astMgr.getAssetByName(res + ".prefab.json", res + ".assetbundle.json");
+                        cubeTran = this.transform = cubeP.getCloneTrans();
+                        cubeTran.localPosition.x = 0;
+                        cubeTran.localPosition.y = 0;
+                        cubeTran.localPosition.z = 0;
+                        cubeTran.localScale.x = 8;
+                        cubeTran.localScale.y = 8;
+                        cubeTran.localScale.z = 8;
+                        this.scene.addChild(cubeTran);
+                        return [2];
+                }
+            });
+        });
+    };
+    test_ETC1_KTX.prototype.update = function (delta) {
+        if (!this.transform)
+            return;
+        gd3d.math.quatFromEulerAngles(0, this.ry, 0, this.transform.localRotate);
+        this.ry++;
+    };
+    return test_ETC1_KTX;
+}());
 var test_fakepbr = (function () {
     function test_fakepbr() {
         this.timer = 0;
@@ -6469,6 +6605,8 @@ var test_pick_boxcollider = (function () {
     }
     test_pick_boxcollider.prototype.start = function (app) {
         var _this = this;
+        this.astMgr = app.getAssetMgr();
+        gd3d.framework.assetMgr.openGuid = false;
         console.log("i am here.");
         this.app = app;
         this.scene = this.app.getScene();
@@ -6483,10 +6621,8 @@ var test_pick_boxcollider = (function () {
         this.app.container.appendChild(descr);
         var names = ["MainCity_", "testnav", "city", "1042_pata_shenyuan_01", "1030_huodongchuangguan", "xinshoucun_fuben_day", "chuangjue-01"];
         var name = names[1];
-        this.app.getAssetMgr().load("res/shader/shader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (state) {
-            if (state.isfinish) {
-                _this.loadScene(name);
-            }
+        demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", this.astMgr).then(function () {
+            _this.loadScene(name);
         });
         var objCam = new gd3d.framework.transform();
         objCam.name = "sth.";
@@ -6496,7 +6632,17 @@ var test_pick_boxcollider = (function () {
         objCam.localTranslate = new gd3d.math.vector3(0, 100, 0);
         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
         objCam.markDirty();
-        CameraController.instance().init(this.app, this.camera);
+        var hoverc = this.camera.gameObject.addComponent("HoverCameraScript");
+        hoverc.panAngle = 180;
+        hoverc.tiltAngle = 45;
+        hoverc.distance = 60;
+        hoverc.scaleSpeed = 0.1;
+        hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0);
+        var lObj = new gd3d.framework.transform();
+        gd3d.math.quatFromEulerAngles(0, 45, 60, lObj.localRotate);
+        var l = lObj.gameObject.addComponent("light");
+        this.scene.addChild(lObj);
+        l.type = gd3d.framework.LightTypeEnum.Direction;
     };
     test_pick_boxcollider.prototype.loadScene = function (assetName, isCompress) {
         var _this = this;
@@ -6522,7 +6668,7 @@ var test_pick_boxcollider = (function () {
         var addScene = function () {
             var beAddScene = true;
             if (beAddScene) {
-                var _scene = _this.app.getAssetMgr().getAssetByName(assetName + ".scene.json");
+                var _scene = _this.app.getAssetMgr().getAssetByName(assetName + ".scene.json", assetName + ".assetbundle.json");
                 var _root = _scene.getSceneRoot();
                 _root.localEulerAngles = new gd3d.math.vector3(0, 0, 0);
                 _root.markDirty();
@@ -6532,22 +6678,11 @@ var test_pick_boxcollider = (function () {
                 ShowBoxcollder(_root);
             }
         };
-        if (isCompress) {
-            this.app.getAssetMgr().loadCompressBundle("res/scenes/" + assetName + "/" + assetName + ".packs.txt", function (s) {
-                if (s.isfinish) {
-                    {
-                        addScene();
-                    }
-                }
-            });
-        }
-        else {
-            this.app.getAssetMgr().load("res/scenes/" + assetName + "/" + assetName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
-                if (s1.isfinish) {
-                    addScene();
-                }
-            });
-        }
+        this.app.getAssetMgr().load("newRes/pfb/scene/" + assetName + "/" + assetName + ".assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (s1) {
+            if (s1.isfinish) {
+                addScene();
+            }
+        });
     };
     test_pick_boxcollider.prototype.getColor = function (r, g, b) {
         var key = r + "_" + g + "_" + b;
@@ -6572,7 +6707,9 @@ var test_pick_boxcollider = (function () {
         var inputMgr = this.app.getInputMgr();
         var ray = this.camera.creatRayByScreen(new gd3d.math.vector2(inputMgr.point.x, inputMgr.point.y), this.app);
         var temp = gd3d.math.pool.new_pickInfo();
-        var bool = this.scene.pick(ray, temp, false);
+        var tranRoot = this.scene.getRoot();
+        var mask = gd3d.framework.cullingmaskutil.layerToMask(this.pickLayer);
+        var bool = this.scene.pick(ray, temp, false, tranRoot, mask);
         return bool ? temp : null;
     };
     test_pick_boxcollider.prototype.generateGeomtry = function (meshType, color) {
@@ -6603,7 +6740,6 @@ var test_pick_boxcollider = (function () {
             this.isAKeyDown = false;
         }
         this.timer += delta;
-        CameraController.instance().update(delta);
     };
     return test_pick_boxcollider;
 }());
@@ -16658,11 +16794,12 @@ var physics3dDemoTool = (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        gd3d.framework.assetMgr.openGuid = false;
                         this.app = app;
                         this.scene = this.app.getScene();
                         this.astMgr = this.app.getAssetMgr();
                         this.iptMgr = this.app.getInputMgr();
-                        return [4, demoTool.loadbySync("./res/shader/shader.assetbundle.json", this.astMgr)];
+                        return [4, demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", this.astMgr)];
                     case 1:
                         _a.sent();
                         return [4, datGui.init()];

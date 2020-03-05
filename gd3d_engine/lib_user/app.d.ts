@@ -720,6 +720,8 @@ declare class test_UIGuideMask implements IState {
     init(): void;
     update(delta: number): void;
 }
+declare var fontjson: string;
+declare var fontpng: string;
 declare class test_UI_Component implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -755,6 +757,18 @@ declare namespace t {
         start(app: gd3d.framework.application): void;
         update(delta: number): void;
     }
+}
+declare class test_ETC1_KTX implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    astMgr: gd3d.framework.assetMgr;
+    private transform;
+    start(app: gd3d.framework.application): Promise<void>;
+    private init;
+    private loadPrefabs;
+    ry: number;
+    update(delta: number): void;
 }
 declare class test_fakepbr implements IState {
     app: gd3d.framework.application;
@@ -942,6 +956,7 @@ declare class test_pick_boxcollider implements IState {
     sim: any;
     goals: any[];
     mods: gd3d.framework.transform[];
+    astMgr: gd3d.framework.assetMgr;
     start(app: gd3d.framework.application): void;
     private loadScene;
     private colorMap;

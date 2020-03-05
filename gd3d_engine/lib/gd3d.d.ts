@@ -1497,6 +1497,12 @@ declare namespace gd3d.framework {
         init?(): any;
     }
 }
+declare namespace gd3d.framework {
+    class KTXParse {
+        private static HEADER_LEN;
+        static parse(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer, facesExpected?: number, loadMipmaps?: boolean): gd3d.render.glTexture2D;
+    }
+}
 declare class PvrParse {
     private version;
     private flags;
@@ -1553,12 +1559,13 @@ declare namespace gd3d.framework {
         PackTxt = 17,
         PathAsset = 18,
         PVR = 19,
-        F14Effect = 20,
-        DDS = 21,
-        Scene = 22,
-        Prefab = 23,
-        cPrefab = 24,
-        ParticleSystem = 25
+        KTX = 20,
+        F14Effect = 21,
+        DDS = 22,
+        Scene = 23,
+        Prefab = 24,
+        cPrefab = 25,
+        ParticleSystem = 26
     }
     class ResourceState {
         res: IAsset;
@@ -1617,18 +1624,17 @@ declare namespace gd3d.framework {
         onReady: () => void;
         onDownloadFinish: () => void;
         ready: boolean;
-        outTime: number;
-        stateQueue: any[];
-        stateParse: any;
-        stateText: string;
-        thd: number;
+        isunload: boolean;
+        parseResolve: (o?: any) => void;
+        parseReject: (o: Error) => void;
+        static reTryTest: {};
         constructor(url: string, assetmgr: assetMgr, guid?: number);
         static buildGuid(): number;
-        timeOut(): void;
-        parseBundle(data: string): void;
+        parseBundle(data: string): Promise<unknown>;
         private unpkg;
         parseFile(): Promise<void>;
         unload(disposeNow?: boolean): void;
+        fail(error: Error): void;
     }
 }
 declare namespace gd3d.framework {
@@ -1687,8 +1693,9 @@ declare namespace gd3d.framework {
         };
         static initGuidList(): void;
         load(url: string, type?: AssetTypeEnum, onstate?: loadCallback, downloadFinish?: () => void): void;
-        download(guid: number, url: string, type: AssetTypeEnum, finish: () => void): void;
-        loadImg(guid: number, url: string, cb: (img: any) => void): void;
+        static setStateError(state: stateLoad, onstate: (state?: stateLoad) => void, err: Error): void;
+        download(guid: number, url: string, type: AssetTypeEnum, finish: () => void, errcb?: (err: Error) => void, bundle?: assetBundle): void;
+        loadImg(guid: number, url: string, cb: (img: any) => void, bundle?: assetBundle): void;
         protected _loadImg(url: string, cb: (img: any) => void): void;
         use(asset: IAsset): void;
         unuse(asset: IAsset, disposeNow?: boolean): void;
@@ -1697,7 +1704,7 @@ declare namespace gd3d.framework {
             type: number;
             name: string;
             dwguid?: number;
-        }, bundle?: assetBundle): Promise<void | IAsset>;
+        }, bundle?: assetBundle): Promise<IAsset>;
         getAssetByName<T extends IAsset>(name: string, bundlename?: string): T;
         mapDefaultMesh: {
             [id: string]: mesh;
@@ -1823,7 +1830,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AssetFactory_Aniclip implements IAssetFactory {
-        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, bytes: ArrayBuffer): threading.gdPromise<animationClip>;
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, bytes: ArrayBuffer): Promise<animationClip>;
     }
 }
 declare namespace gd3d.framework {
@@ -1840,6 +1847,11 @@ declare var WebGLTextureUtil: any;
 declare namespace gd3d.framework {
     class AssetFactory_DDS implements IAssetFactory {
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, bytes: ArrayBuffer): void;
+    }
+}
+declare namespace gd3d.framework {
+    class AssetFactory_ETC1 implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer, dwguid: number): texture;
     }
 }
 declare namespace gd3d.framework {
@@ -1867,7 +1879,7 @@ declare namespace gd3d.framework {
         newAsset?(assetName?: string): IAsset;
         load?(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
         loadByPack?(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: IAsset, call: (handle: () => void) => void): void;
-        parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: string | ArrayBuffer, dwguid?: number): IAsset | gd3d.threading.gdPromise<IAsset> | void;
+        parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: string | ArrayBuffer, dwguid?: number): IAsset | Promise<IAsset> | void;
         needDownload?(textJSON: string): string;
     }
     class AssetFactoryTools {
@@ -1890,7 +1902,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AssetFactory_Mesh implements IAssetFactory {
-        parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: ArrayBuffer): mesh | threading.gdPromise<mesh>;
+        parse(assetMgr: assetMgr, bundle: assetBundle, name: string, data: ArrayBuffer): Promise<IAsset>;
     }
 }
 declare namespace gd3d.framework {
@@ -1910,7 +1922,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class AssetFactory_Scene implements IAssetFactory {
-        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, txt: string): threading.gdPromise<rawscene>;
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, txt: string): Promise<rawscene>;
     }
 }
 declare namespace gd3d.framework {
@@ -1935,6 +1947,7 @@ declare namespace gd3d.framework {
         private readonly t_Normal;
         private readonly t_PVR;
         private readonly t_DDS;
+        private readonly t_KTX;
         parse(assetmgr: assetMgr, bundle: assetBundle, name: string, data: string, dwguid: number): texture;
         needDownload(text: string): any;
     }
@@ -1952,7 +1965,7 @@ declare namespace gd3d.framework {
         unuse(disposeNow?: boolean): void;
         dispose(): void;
         caclByteLength(): number;
-        Parse(buf: ArrayBuffer): threading.gdPromise<animationClip>;
+        Parse(buf: ArrayBuffer): Promise<animationClip>;
         fps: number;
         loop: boolean;
         hasScaled: boolean;
@@ -2497,7 +2510,7 @@ declare namespace gd3d.framework {
         private reading;
         private readProcess;
         private readFinish;
-        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): threading.gdPromise<mesh>;
+        Parse(inData: ArrayBuffer | any, webgl: WebGLRenderingContext): Promise<IAsset>;
         parseCMesh(inData: any, webgl: any): void;
         intersects(ray: ray, matrix: gd3d.math.matrix, outInfo: pickinfo): boolean;
         clone(): mesh;
@@ -2570,7 +2583,7 @@ declare namespace gd3d.framework {
         getCloneTrans2D(): transform2D;
         apply(trans: transform): void;
         jsonstr: string;
-        Parse(jsonStr: string, assetmgr: assetMgr): threading.gdPromise<unknown>;
+        Parse(jsonStr: string, assetmgr: assetMgr): Promise<unknown>;
         cParse(data: any): void;
     }
 }
@@ -2590,7 +2603,7 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         resetLightMap(assetmgr: assetMgr, bundleName?: string): void;
         private lightmapData;
-        Parse(txt: string, assetmgr: assetMgr): threading.gdPromise<rawscene>;
+        Parse(txt: string, assetmgr: assetMgr): Promise<rawscene>;
         getSceneRoot(): transform;
         useLightMap(scene: scene): void;
         useFog(scene: scene): void;
@@ -4238,6 +4251,23 @@ declare namespace gd3d.event {
         OnEnum_point(event: PointEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         EmitEnum_point(event: PointEventEnum, ...args: Array<any>): void;
     }
+    interface inputHtmlNativeEventMap {
+        "blur": FocusEvent;
+        "keydown": KeyboardEvent;
+        "keyup": KeyboardEvent;
+        "mousedown": MouseEvent;
+        "mousemove": MouseEvent;
+        "mouseup": MouseEvent;
+        "touchcancel": TouchEvent;
+        "touchend": TouchEvent;
+        "touchmove": TouchEvent;
+        "touchstart": TouchEvent;
+        "wheel": WheelEvent;
+    }
+    class inputHtmlNativeEvent extends AEvent {
+        On<K extends keyof inputHtmlNativeEventMap>(tagName: K, func: (ev: any) => void, thisArg: any): void;
+        Emit<K extends keyof inputHtmlNativeEventMap>(tagName: K, ev: any): void;
+    }
 }
 declare namespace gd3d.event {
     class Physic2dEvent extends AEvent {
@@ -4279,6 +4309,7 @@ declare namespace gd3d.framework {
         private _buttons;
         private _lastbuttons;
         private eventer;
+        private HtmlNativeEventer;
         private inputlast;
         private keyboardMap;
         private handlers;
@@ -4332,6 +4363,8 @@ declare namespace gd3d.framework {
         removePointListener(eventEnum: event.PointEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         addKeyListener(eventEnum: event.KeyEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
         removeKeyListener(eventEnum: event.KeyEventEnum, func: (...args: Array<any>) => void, thisArg: any): void;
+        addHTMLElementListener<K extends keyof event.inputHtmlNativeEventMap>(tagName: K, func: (ev: any) => void, thisArg: any): void;
+        removeHTMLElementListener<K extends keyof event.inputHtmlNativeEventMap>(tagName: K, func: (ev: any) => void, thisArg: any): void;
         anyKey(): boolean;
         GetKeyDown(name: string): any;
         GetKeyDown(key: event.KeyCode): any;
@@ -4341,7 +4374,7 @@ declare namespace gd3d.framework {
         private tempV2_0;
         private tempV2_1;
         private devicePixelRatio;
-        private CalcuPoint;
+        CalcuPoint(clientX: number, clientY: number, out: pointinfo): void;
     }
 }
 declare namespace gd3d.io {
@@ -6476,7 +6509,7 @@ declare namespace gd3d.framework {
     class ParticleSystemShapeBase {
         protected _module: ParticleShapeModule;
         constructor(module: ParticleShapeModule);
-        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
+        initParticleState(particle: Particle1): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6493,7 +6526,7 @@ declare namespace gd3d.framework {
         get boxZ(): number;
         set boxZ(v: number);
         emitFrom: ParticleSystemShapeBoxEmitFrom;
-        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
+        initParticleState(particle: Particle1): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6509,7 +6542,7 @@ declare namespace gd3d.framework {
         get arcSpeed(): MinMaxCurve;
         set arcSpeed(v: MinMaxCurve);
         emitFromEdge: boolean;
-        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
+        initParticleState(particle: Particle1): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6529,7 +6562,7 @@ declare namespace gd3d.framework {
         get arcSpeed(): MinMaxCurve;
         set arcSpeed(v: MinMaxCurve);
         emitFrom: ParticleSystemShapeConeEmitFrom;
-        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
+        initParticleState(particle: Particle1): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6542,7 +6575,7 @@ declare namespace gd3d.framework {
         set radiusSpread(v: number);
         get radiusSpeed(): MinMaxCurve;
         set radiusSpeed(v: MinMaxCurve);
-        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
+        initParticleState(particle: Particle1): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6550,12 +6583,12 @@ declare namespace gd3d.framework {
         get radius(): number;
         set radius(v: number);
         emitFromShell: boolean;
-        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
+        initParticleState(particle: Particle1): void;
     }
     class ParticleSystemShapeHemisphere extends ParticleSystemShapeBase {
         radius: number;
         emitFromShell: boolean;
-        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
+        initParticleState(particle: Particle1): void;
     }
 }
 declare namespace gd3d.framework {
@@ -8008,8 +8041,8 @@ declare namespace gd3d.framework {
 declare namespace gd3d.io {
     function xhrLoad(url: string, fun: (ContentData: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void, responseType: XMLHttpRequestResponseType, loadedFun: (req: XMLHttpRequest) => void): void;
     function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
-    function JSONParse(text: string): threading.gdPromise<any>;
-    function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): threading.gdPromise<unknown>;
+    function JSONParse(text: string): Promise<any>;
+    function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): Promise<unknown>;
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err?: Error, loadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
@@ -8397,7 +8430,8 @@ declare namespace gd3d.render {
         PVRTC4_RGB = 4,
         PVRTC4_RGBA = 4,
         PVRTC2_RGB = 4,
-        PVRTC2_RGBA = 4
+        PVRTC2_RGBA = 4,
+        KTX = 5
     }
     class textureReader {
         constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);

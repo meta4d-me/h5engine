@@ -7,6 +7,8 @@ varying highp vec2 xlv_TEXCOORD0;
 
 const lowp float max_Num = 100.0;
 
+//texture2DEtC1Mark
+
 //高斯模糊 算法获取权重矩阵 rx ,ry 以当前采样点 为原点的相对坐标
 lowp float getGausWeight(lowp float rx,lowp float ry)
 {

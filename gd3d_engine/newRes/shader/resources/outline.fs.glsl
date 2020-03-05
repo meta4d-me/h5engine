@@ -7,6 +7,8 @@ varying mediump vec2 xlv_TEXCOORD0;
 uniform lowp sampler2D _DepthTex;   
 uniform lowp sampler2D _MainTex;  
 
+//texture2DEtC1Mark
+
 
 const float PackUpscale = 256. / 255.; 
 // fraction -> 0..1 (including 1)

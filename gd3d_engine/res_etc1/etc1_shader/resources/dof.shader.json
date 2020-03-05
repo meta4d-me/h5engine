@@ -1,0 +1,21 @@
+{
+	"layer": "geometry",
+	"properties": [
+		"_MainTex('MainTex',Texture)='white'{}",
+		"_farBlurScale('farBlurScale',Range(0.0,1.0)) = 1.0",
+		"_farBlurScale('farBlurScale',Range(0.0,1.0)) = 100.0"],
+	"passes": {
+		"base": [
+			{
+				"showface": "ccw",
+				"vs": "quad_etc1",
+				"fs": "dof_etc1"
+			}],
+		"quad": [
+			{
+				"showface": "ccw",
+				"vs": "quad_etc1",
+				"fs": "dof_etc1"
+			}]
+	}
+}

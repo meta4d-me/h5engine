@@ -145,6 +145,11 @@ namespace gd3d.framework
          */
         PVR,
 
+        /**
+         * Android平台ETC1压缩纹理
+         */
+        KTX,
+
         F14Effect,
 
         /**

@@ -1,0 +1,18 @@
+{
+	"layer": "geometry",
+	"passes": {
+		"base": [
+			{
+				"showface": "all",
+				"vs": "fakepbr_etc1",
+				"fs": "fakepbr_etc1",
+				"zwrite": "on",
+				"ztest": "lequal"
+			}],
+		"base_fog": [],
+		"skin": [],
+		"lightmap": [],
+		"quad": [],
+		"base_depth": []
+	}
+}

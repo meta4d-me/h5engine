@@ -29,6 +29,7 @@ namespace gd3d.framework
         private _buttons:boolean[] = [false, false, false];
         private _lastbuttons:boolean[] = [false, false, false];
         private eventer:event.InputEvent = new event.InputEvent();
+        private HtmlNativeEventer:event.inputHtmlNativeEvent = new event.inputHtmlNativeEvent();
         private inputlast: HTMLInputElement = null;
         private keyboardMap: { [id: number]: boolean } = {};
         private handlers:Array<any> = [];
@@ -56,13 +57,14 @@ namespace gd3d.framework
             this.handlers.push(["mousedown",this._mousedown.bind(this)]);
             this.handlers.push(["mouseup",this._mouseup.bind(this)]);
             this.handlers.push(["mousemove",this._mousemove.bind(this)]);
-            this.handlers.push(["mousewheel",this._mousewheel.bind(this)]);
+            // this.handlers.push(["mousewheel",this._mousewheel.bind(this)]);
+            this.handlers.push(["wheel",this._mousewheel.bind(this)]);
             this.handlers.push(["DOMMouseScroll",this._mousewheel.bind(this)]);
             this.handlers.push(["keydown",this._keydown.bind(this)]);
             this.handlers.push(["keyup",this._keyup.bind(this)]);
             this.handlers.push(["blur",this._blur.bind(this)]);
 
-            this.attach(app.webgl.canvas);
+            this.attach(<HTMLCanvasElement>app.webgl.canvas);
             this.disableContextMenu();
         }
 
@@ -88,23 +90,31 @@ namespace gd3d.framework
 
         //mouse
         private _mousedown(ev:MouseEvent){
+            this.HtmlNativeEventer.Emit("mousedown",ev);
+
             this.CalcuPoint(ev.offsetX,ev.offsetY,this._point);
             this._buttons[ev.button] = true;
             this._point.touch = true;
         }
         private _mouseup(ev:MouseEvent){
+            this.HtmlNativeEventer.Emit("mouseup",ev);
+
             this._buttons[ev.button] = false;
             this._point.touch = false;
         }
         private _mousemove(ev:MouseEvent){
+            this.HtmlNativeEventer.Emit("mousemove",ev);
+
             this.CalcuPoint(ev.offsetX,ev.offsetY,this._point);
         }
-        private _mousewheel(ev:any){
+        private _mousewheel(ev:WheelEvent){
+            this.HtmlNativeEventer.Emit("wheel",ev);
+
             this.hasWheel = true;
             if (ev.detail) {
                 this.lastWheel = -1 * ev.detail;
-            }  else if (ev.wheelDelta) {
-                this.lastWheel = ev.wheelDelta / 120;
+            }  else if ((ev as any).wheelDelta) {
+                this.lastWheel = (ev as any).wheelDelta / 120;
             } else if (ev.DOM_DELTA_PIXEL) {
                 this.lastWheel = ev.DOM_DELTA_PIXEL / 120;
             } else {
@@ -141,9 +151,11 @@ namespace gd3d.framework
         }
 
         private _touchstart(ev:TouchEvent){
+            this.HtmlNativeEventer.Emit("touchstart",ev);
+
             // this.CalcuPoint(ev.touches[0].clientX,ev.touches[0].clientY,this._point);
                 this._point.touch = true;
-
+                let lastTouche : pointinfo;
                 for (var i = 0; i < ev.changedTouches.length; i++)
                 {
                     var touch = ev.changedTouches[i];
@@ -154,12 +166,23 @@ namespace gd3d.framework
                     
                     // this._touches[id].x = touch.clientX;
                     // this._touches[id].y = touch.clientY;
+
+                    lastTouche = this._touches[id];
                 }
 
-                this.syncPointByTouches();
+                
+                // this.syncPointByTouches();
+
+                if(lastTouche){
+                    this._point.x = lastTouche.x;
+                    this._point.y = lastTouche.y;
+                }
         }
         private _touchmove(ev:TouchEvent){
+            this.HtmlNativeEventer.Emit("touchmove",ev);
+
             this._point.touch = true;
+            let lastTouche : pointinfo;
             for (var i = 0; i < ev.changedTouches.length; i++)
                 {
                     var touch = ev.changedTouches[i];
@@ -169,11 +192,20 @@ namespace gd3d.framework
                     this.CalcuPoint(touch.clientX,touch.clientY,this._touches[id]);
                     // this._touches[id].x = touch.clientX;
                     // this._touches[id].y = touch.clientY;
+
+                    lastTouche = this._touches[id];
                 }
 
-                this.syncPointByTouches();
+                // this.syncPointByTouches();
+
+                if(lastTouche){
+                    this._point.x = lastTouche.x;
+                    this._point.y = lastTouche.y;
+                }
         }
         private _touchend(ev:TouchEvent){
+            this.HtmlNativeEventer.Emit("touchend",ev);
+
             for (var i = 0; i < ev.changedTouches.length; i++)
                 {
                     var touch = ev.changedTouches[i];
@@ -182,29 +214,37 @@ namespace gd3d.framework
                     this._touches[id].touch = false;
                 }
 
-                //所有触点全放开，point.touch才false
-                for (var key in this._touches)
-                {
-                    if (this._touches[key].touch == true)
-                        return;
-                }
+                // //所有触点全放开，point.touch才false
+                // for (var key in this._touches)
+                // {
+                //     if (this._touches[key].touch == true)
+                //         return;
+                // }
                 this._point.touch = false;
         }
         private _touchcancel(ev:TouchEvent){
+            this.HtmlNativeEventer.Emit("touchcancel",ev);
+
             this._touchend(ev);
         }
 
         //key
         private _keydown(ev:KeyboardEvent){
+            this.HtmlNativeEventer.Emit("keydown",ev);
+
             this.keyboardMap[ev.keyCode] = true;
             this.keyDownCode = ev.keyCode;
         }
         private _keyup(ev:KeyboardEvent){
+            this.HtmlNativeEventer.Emit("keyup",ev);
+
             delete this.keyboardMap[ev.keyCode];
             this.keyUpCode = ev.keyCode;
         }
         //
         private _blur(ev){
+            this.HtmlNativeEventer.Emit("blur",ev);
+
             this._point.touch = false;
         }
 
@@ -361,6 +401,26 @@ namespace gd3d.framework
         }
 
         /**
+        * 添加HTMLElement原生事件监听者
+        * @param tagName 事件类型名字
+        * @param func 事件触发回调方法 (Warn: 不要使用 func.bind() , 它会导致相等判断失败)
+        * @param thisArg 回调方法执行者
+        */
+        addHTMLElementListener<K extends keyof event.inputHtmlNativeEventMap>(tagName: K, func: (ev: any) => void , thisArg:any){
+            this.HtmlNativeEventer.On(tagName,func,thisArg);
+        }
+        /**
+         * 移除HTMLElement原生事件监听者
+         * @param tagName 事件类型名字
+         * @param func 事件触发回调方法
+         * @param thisArg 回调方法执行者
+         */
+        removeHTMLElementListener<K extends keyof event.inputHtmlNativeEventMap>(tagName: K, func: (ev: any) => void, thisArg:any){
+            this.HtmlNativeEventer.RemoveListener(tagName,func,thisArg);
+        }
+
+
+        /**
          * 任意一按键被按下
          */
         anyKey(){
@@ -433,7 +493,13 @@ namespace gd3d.framework
         private tempV2_0:gd3d.math.vector2 = new gd3d.math.vector2();
         private tempV2_1:gd3d.math.vector2 = new gd3d.math.vector2();
         private devicePixelRatio =  window.devicePixelRatio || 1;
-        private CalcuPoint(clientX:number,clientY:number , out:pointinfo){
+        /**
+         * 计算校准html 输入坐标点
+         * @param clientX 输入x
+         * @param clientY 输入y
+         * @param out 返回pointinfo 
+         */
+        CalcuPoint(clientX:number,clientY:number , out:pointinfo){
             if(!out || !this.app || isNaN(clientX) || isNaN(clientY)) return;
             this.tempV2_0.x = clientX * this.devicePixelRatio/ this.app.scaleFromPandding;
             this.tempV2_0.y = clientY * this.devicePixelRatio/ this.app.scaleFromPandding;

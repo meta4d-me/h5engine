@@ -1,6 +1,8 @@
 uniform lowp sampler2D _MainTex;                                                 
 varying lowp vec4 xlv_COLOR;                                                 
 varying mediump vec2 xlv_TEXCOORD0;   
+//texture2DEtC1Mark
+
 void main() 
 {
     lowp vec4 tmpvar_3= (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));

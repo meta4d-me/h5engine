@@ -2,6 +2,8 @@ uniform sampler2D _MainTex;
 uniform lowp float _MosaicSize;
 uniform highp vec4 _MainTex_TexelSize;
 varying highp vec2 xlv_TEXCOORD0;
+//texture2DEtC1Mark
+
 void main() //马赛克效果
 {
     // lowp vec4 tmpvar_3 = texture2D(_MainTex, xlv_TEXCOORD0);

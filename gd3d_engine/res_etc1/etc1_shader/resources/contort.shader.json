@@ -1,0 +1,21 @@
+{
+	"layer": "geometry",
+	"properties": [
+		"_MainTex('MainTex',Texture)='white'{}",
+		"_UD('UD',float)=90",
+		"_UR('UR',float)=0.2"],
+	"passes": {
+		"base": [
+			{
+				"showface": "ccw",
+				"vs": "quad_etc1",
+				"fs": "contort_etc1"
+			}],
+		"quad": [
+			{
+				"showface": "ccw",
+				"vs": "quad_etc1",
+				"fs": "contort_etc1"
+			}]
+	}
+}

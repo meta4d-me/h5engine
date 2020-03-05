@@ -38,6 +38,8 @@ varying lowp float factor;
 // uniform float ROUGHNESS;
 // uniform float METALLIC;
 
+//texture2DEtC1Mark
+
 vec4 sRGBtoLINEAR(vec4 color) {
     return vec4(pow(color.rgb, vec3(GAMMA)), color.a);
 }

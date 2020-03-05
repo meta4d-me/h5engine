@@ -4,6 +4,8 @@ uniform lowp vec4 _MainColor;
 uniform lowp float _AlphaCut;
 varying mediump vec2 xlv_TEXCOORD0;
 
+//texture2DEtC1Mark
+
 #ifdef LIGHTMAP
 uniform lowp sampler2D _LightmapTex;
 varying mediump vec2 lightmap_TEXCOORD;

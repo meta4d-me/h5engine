@@ -9,6 +9,8 @@ uniform sampler2D _MainTex;
 uniform float _UD;
 uniform float _UR;
 varying highp vec2 xlv_TEXCOORD0;
+//texture2DEtC1Mark
+
 void main()
 {
     ivec2 ires = ivec2(1024, 1024);

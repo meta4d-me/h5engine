@@ -10,6 +10,8 @@ varying highp vec2 xlv_TEXCOORD0;
 
 const int num_iter = 20;
 
+//texture2DEtC1Mark
+
 vec2 barrelDistortion(vec2 coord, float amt)
 {
     vec2 cc = coord - 0.5;
