@@ -22,10 +22,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -58,6 +59,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var gd3d;
 (function (gd3d) {
+    var version = (function () {
+        function version() {
+        }
+        version.VERSION = "0.0.1";
+        return version;
+    }());
+    gd3d.version = version;
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
     var framework;
     (function (framework) {
         var NotifyType;
@@ -78,8 +89,6 @@ var gd3d;
             function application() {
                 this.globalMacros = [];
                 this.limitFrame = true;
-                this.version = "v0.0.1";
-                this.build = "b000077";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.canvasFixedType = CanvasFixedType.Free;
@@ -178,7 +187,6 @@ var gd3d;
                 if (type === void 0) { type = CanvasFixedType.Free; }
                 if (val === void 0) { val = 1200; }
                 if (webglDebug === void 0) { webglDebug = false; }
-                console.log("version: " + this.version + "  build: " + this.build);
                 if (div == null) {
                     console.error("root div does Null at application start ");
                     return;
@@ -214,6 +222,7 @@ var gd3d;
                 if (type === void 0) { type = CanvasFixedType.Free; }
                 if (val === void 0) { val = 1200; }
                 if (webglDebug === void 0) { webglDebug = false; }
+                console.log("engine version: " + gd3d.version.VERSION);
                 this.ccWidth = this.ccWidth == undefined ? canvas.clientWidth : this.ccWidth;
                 this.ccHeight = this.ccHeight == undefined ? canvas.clientHeight : this.ccHeight;
                 this._timeScale = 1;

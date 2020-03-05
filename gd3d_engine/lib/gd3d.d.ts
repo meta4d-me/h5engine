@@ -1,4 +1,9 @@
 /// <reference path="Reflect.d.ts" />
+declare namespace gd3d {
+    class version {
+        static readonly VERSION = "0.0.1";
+    }
+}
 declare namespace gd3d.framework {
     interface INotify {
         notify(trans: any, type: NotifyType): any;
@@ -29,8 +34,6 @@ declare namespace gd3d.framework {
         private _timeScale;
         set timeScale(val: number);
         get timeScale(): number;
-        private version;
-        private build;
         private _tar;
         private _standDeltaTime;
         set targetFrame(val: number);
@@ -3237,6 +3240,7 @@ declare namespace gd3d.framework {
         boneMatricesTexture: gd3d.framework.texture;
         initBoneMatrices(): void;
         initStaticPoseMatrices(): void;
+        private boneSamplerTexindex;
         updateBoneTexture(context: renderContext): void;
         tempMatrix: math.matrix;
         inverseRootBone: math.matrix;
@@ -7043,10 +7047,15 @@ declare namespace gd3d.framework {
         matrixView: gd3d.math.matrix;
         matrixProject: gd3d.math.matrix;
         matrixModel: gd3d.math.matrix;
+        private _lastM_IT;
         private _matrixWorld2Object;
         get matrixWorld2Object(): math.matrix;
         matrixModelViewProject: gd3d.math.matrix;
-        matrixModelView: gd3d.math.matrix;
+        private _matrixModelView;
+        get matrixModelView(): math.matrix;
+        private _matrixInverseModelView;
+        private _lastMV_IT;
+        get matrixInverseModelView(): math.matrix;
         matrixViewProject: gd3d.math.matrix;
         floatTimer: number;
         intLightCount: number;
