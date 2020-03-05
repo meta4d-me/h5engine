@@ -6509,7 +6509,7 @@ declare namespace gd3d.framework {
     class ParticleSystemShapeBase {
         protected _module: ParticleShapeModule;
         constructor(module: ParticleShapeModule);
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6526,7 +6526,7 @@ declare namespace gd3d.framework {
         get boxZ(): number;
         set boxZ(v: number);
         emitFrom: ParticleSystemShapeBoxEmitFrom;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6542,7 +6542,7 @@ declare namespace gd3d.framework {
         get arcSpeed(): MinMaxCurve;
         set arcSpeed(v: MinMaxCurve);
         emitFromEdge: boolean;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6562,7 +6562,7 @@ declare namespace gd3d.framework {
         get arcSpeed(): MinMaxCurve;
         set arcSpeed(v: MinMaxCurve);
         emitFrom: ParticleSystemShapeConeEmitFrom;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6575,7 +6575,7 @@ declare namespace gd3d.framework {
         set radiusSpread(v: number);
         get radiusSpeed(): MinMaxCurve;
         set radiusSpeed(v: MinMaxCurve);
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6583,12 +6583,12 @@ declare namespace gd3d.framework {
         get radius(): number;
         set radius(v: number);
         emitFromShell: boolean;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
     class ParticleSystemShapeHemisphere extends ParticleSystemShapeBase {
         radius: number;
         emitFromShell: boolean;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {

@@ -4164,7 +4164,7 @@ var test_Decal = (function () {
 }());
 var test_ParticleSystem = (function () {
     function test_ParticleSystem() {
-        this._particles = ["ParticleAdditive", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames", "shark-levelup"];
+        this._particles = ["ParticleAdditive", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames", "shark-levelup"];
         this._isMove = false;
         this._particleStartPosition = new gd3d.math.vector3();
         this._particleCurrentPosition = new gd3d.math.vector3();
@@ -4262,8 +4262,10 @@ var test_ParticleSystem = (function () {
                     case 1:
                         _a.sent();
                         cubeP = this.astMgr.getAssetByName(res + ".prefab.json", res + ".assetbundle.json");
-                        cubeTran = this._particle = cubeP.getCloneTrans();
-                        this.scene.addChild(cubeTran);
+                        cubeTran = cubeP.getCloneTrans();
+                        this._particle = new gd3d.framework.transform();
+                        this._particle.addChild(cubeTran);
+                        this.scene.addChild(this._particle);
                         this._particleStartPosition = new gd3d.math.vector3();
                         gd3d.math.vec3Clone(this._particle.localPosition, this._particleStartPosition);
                         this.play();

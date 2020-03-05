@@ -8170,6 +8170,105 @@ var gd3d;
         framework.constText = constText;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var KTXParse = (function () {
+            function KTXParse() {
+            }
+            KTXParse.parse = function (gl, arrayBuffer, facesExpected, loadMipmaps) {
+                if (facesExpected === void 0) { facesExpected = 1; }
+                if (loadMipmaps === void 0) { loadMipmaps = true; }
+                var identifier = new Uint8Array(arrayBuffer, 0, 12);
+                if (identifier[0] !== 0xAB ||
+                    identifier[1] !== 0x4B ||
+                    identifier[2] !== 0x54 ||
+                    identifier[3] !== 0x58 ||
+                    identifier[4] !== 0x20 ||
+                    identifier[5] !== 0x31 ||
+                    identifier[6] !== 0x31 ||
+                    identifier[7] !== 0xBB ||
+                    identifier[8] !== 0x0D ||
+                    identifier[9] !== 0x0A ||
+                    identifier[10] !== 0x1A ||
+                    identifier[11] !== 0x0A) {
+                    console.error('texture missing KTX identifier');
+                    return;
+                }
+                gl.getExtension('WEBGL_compressed_texture_etc1');
+                var dataSize = Uint32Array.BYTES_PER_ELEMENT;
+                var headerDataView = new DataView(arrayBuffer, 12, 13 * dataSize);
+                var endianness = headerDataView.getUint32(0, true);
+                var littleEndian = endianness === 0x04030201;
+                var glType = headerDataView.getUint32(1 * dataSize, littleEndian);
+                var glTypeSize = headerDataView.getUint32(2 * dataSize, littleEndian);
+                var glFormat = headerDataView.getUint32(3 * dataSize, littleEndian);
+                var glInternalFormat = headerDataView.getUint32(4 * dataSize, littleEndian);
+                var glBaseInternalFormat = headerDataView.getUint32(5 * dataSize, littleEndian);
+                var pixelWidth = headerDataView.getUint32(6 * dataSize, littleEndian);
+                var pixelHeight = headerDataView.getUint32(7 * dataSize, littleEndian);
+                var pixelDepth = headerDataView.getUint32(8 * dataSize, littleEndian);
+                var numberOfArrayElements = headerDataView.getUint32(9 * dataSize, littleEndian);
+                var numberOfFaces = headerDataView.getUint32(10 * dataSize, littleEndian);
+                var numberOfMipmapLevels = headerDataView.getUint32(11 * dataSize, littleEndian);
+                var bytesOfKeyValueData = headerDataView.getUint32(12 * dataSize, littleEndian);
+                if (glType !== 0) {
+                    console.warn('only compressed formats currently supported');
+                    return null;
+                }
+                else {
+                    numberOfMipmapLevels = Math.max(1, numberOfMipmapLevels);
+                }
+                if (pixelHeight === 0 || pixelDepth !== 0) {
+                    console.warn('only 2D textures currently supported');
+                    return null;
+                }
+                if (numberOfArrayElements !== 0) {
+                    console.warn('texture arrays not currently supported');
+                    return null;
+                }
+                if (numberOfFaces !== facesExpected) {
+                    console.warn('number of faces expected' + facesExpected + ', but found ' + numberOfFaces);
+                    return null;
+                }
+                var t2d = new gd3d.render.glTexture2D(gl);
+                t2d.format = gd3d.render.TextureFormatEnum.KTX;
+                var target = gl.TEXTURE_2D;
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(target, t2d.texture);
+                var dataOffset = KTXParse.HEADER_LEN + bytesOfKeyValueData;
+                var width = pixelWidth;
+                var height = pixelHeight;
+                var mipmapCount = loadMipmaps ? numberOfMipmapLevels : 1;
+                for (var level = 0; level < mipmapCount; level++) {
+                    var imageSize = new Int32Array(arrayBuffer, dataOffset, 1)[0];
+                    dataOffset += 4;
+                    for (var face = 0; face < numberOfFaces; face++) {
+                        var byteArray = new Uint8Array(arrayBuffer, dataOffset, imageSize);
+                        gl.compressedTexImage2D(target, level, glInternalFormat, width, height, 0, byteArray);
+                        dataOffset += imageSize;
+                        dataOffset += 3 - ((imageSize + 3) % 4);
+                    }
+                    width = Math.max(1.0, width * 0.5);
+                    height = Math.max(1.0, height * 0.5);
+                }
+                if (mipmapCount > 1) {
+                    gl.texParameteri(target, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                    gl.texParameteri(target, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+                }
+                else {
+                    gl.texParameteri(target, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                    gl.texParameteri(target, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                }
+                return t2d;
+            };
+            KTXParse.HEADER_LEN = 12 + (13 * 4);
+            return KTXParse;
+        }());
+        framework.KTXParse = KTXParse;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
 var PvrParse = (function () {
     function PvrParse(gl) {
         this.version = 0x03525650;
@@ -9766,7 +9865,7 @@ var gd3d;
             }
             AssetFactory_ETC1.prototype.parse = function (assetmgr, bundle, name, bytes, dwguid) {
                 var _texture = new framework.texture(name);
-                _texture.glTexture = KTXParse.parse(assetmgr.webgl, bytes);
+                _texture.glTexture = framework.KTXParse.parse(assetmgr.webgl, bytes);
                 return _texture;
             };
             AssetFactory_ETC1 = __decorate([
@@ -10177,7 +10276,7 @@ var gd3d;
                         _texture.glTexture = pvr.parse(img);
                         break;
                     case this.t_KTX:
-                        _texture.glTexture = KTXParse.parse(assetmgr.webgl, img);
+                        _texture.glTexture = framework.KTXParse.parse(assetmgr.webgl, img);
                         break;
                     case this.t_DDS:
                         throw new Error("暂不支持DDS");
