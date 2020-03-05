@@ -288,8 +288,35 @@ namespace gd3d.framework
          */
         initParticleState(particle: Particle1)
         {
+            var startSpeed = this.particleSystem.main.startSpeed.getValue(particle.birthRateAtDuration);
+            //
+            var position = new math.vector3(0, 0, 0);
+            var dir = new math.vector3(0, 0, 1);
+            //
+            if (this.enabled)
+            {
+                this.activeShape.calcParticlePosDir(particle, position, dir);
+            }
+            dir.x *= startSpeed;
+            dir.y *= startSpeed;
+            dir.z *= startSpeed;
+            if (this.particleSystem.main.simulationSpace == ParticleSystemSimulationSpace.World)
+            {
+                var localToWorldMatrix = this.particleSystem.localToWorldMatrix;
+
+                math.matrixTransformVector3(position, localToWorldMatrix, position);
+                math.matrixTransformNormal(dir, localToWorldMatrix, dir);
+            }
+            particle.position.x += position.x;
+            particle.position.y += position.y;
+            particle.position.z += position.z;
+
+            particle.velocity.x += dir.x;
+            particle.velocity.y += dir.y;
+            particle.velocity.z += dir.z;
+
             if (!this.enabled) return;
-            this.activeShape.initParticleState(particle);
+
             if (this.alignToDirection)
             {
                 // 看向矩阵
@@ -517,6 +544,5 @@ namespace gd3d.framework
             }
         }
     }
-
 
 }

@@ -113,7 +113,7 @@ declare namespace t {
 }
 declare class localSave {
     private static _instance;
-    static readonly Instance: localSave;
+    static get Instance(): localSave;
     localServerPath: string;
     stringToUtf8Array(str: string): number[];
     file_str2blob(string: string): Blob;
@@ -650,7 +650,8 @@ declare class test_ParticleSystem implements IState {
     setGUI(): void;
     play(): void;
     stop(): void;
-    private particleName;
+    private get particleName();
+    private set particleName(value);
     private _particleName;
     private init;
     private _showParticle;
@@ -1041,8 +1042,8 @@ declare class Joystick {
     private touchRight;
     private mouseLeft;
     private mouseRight;
-    readonly leftTouching: boolean;
-    readonly rightTouching: boolean;
+    get leftTouching(): boolean;
+    get rightTouching(): boolean;
     private onMouseDown;
     private onMouseUp;
     private onMouseMove;
@@ -1420,9 +1421,9 @@ declare class test_multipleplayer_anim implements IState {
         [id: string]: gd3d.framework.transform;
     };
     resName: string;
-    readonly abName: string;
-    readonly prefabName: string;
-    readonly resPath: string;
+    get abName(): string;
+    get prefabName(): string;
+    get resPath(): string;
     start(app: gd3d.framework.application): void;
     camera: gd3d.framework.camera;
     cube: gd3d.framework.transform;
@@ -2323,10 +2324,12 @@ declare namespace gd3d.framework {
         private _lastDistance;
         private _panAngle;
         private _panRad;
-        panAngle: number;
+        set panAngle(value: number);
+        get panAngle(): number;
         private _tiltAngle;
         private _tiltRad;
-        tiltAngle: number;
+        set tiltAngle(value: number);
+        get tiltAngle(): number;
         onPlay(): void;
         start(): void;
         private cupTargetV3;
@@ -2399,7 +2402,8 @@ declare class DecalVertex {
 }
 declare class guideMask extends gd3d.framework.behaviour2d {
     private _holeRect;
-    holeRect: gd3d.math.rect;
+    get holeRect(): gd3d.math.rect;
+    set holeRect(val: gd3d.math.rect);
     template: gd3d.framework.transform2D;
     private inited;
     onPlay(): void;
