@@ -31201,6 +31201,11 @@ var gd3d;
                 this._preRealTime = 0;
                 this._particlePool = this._particlePool.concat(this._activeParticles);
                 this._activeParticles.length = 0;
+                this._preworldPos.x = this.worldPos.x;
+                this._preworldPos.y = this.worldPos.y;
+                this._preworldPos.z = this.worldPos.z;
+                this._isRateOverDistance = false;
+                this._leftRateOverDistance = 0;
                 this.emission.bursts.forEach(function (element) {
                     element.calculateProbability();
                 });
