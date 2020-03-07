@@ -78,7 +78,8 @@ vec4 particleAnimation(vec4 position)
     position.xyz = position.xyz + a_particle_position.xyz;
 
     // 颜色
-    v_particle_color = a_particle_color * _glesColor;
+    // v_particle_color = a_particle_color * _glesColor;
+    v_particle_color = a_particle_color;
 
     if(a_particle_flipUV.x > 0.5) v_uv.x = 1.0 - v_uv.x;
     if(a_particle_flipUV.y > 0.5) v_uv.y = 1.0 - v_uv.y;
