@@ -1000,13 +1000,6 @@ var gd3d;
             if (target["__gdmeta__"][funcname] == null)
                 target["__gdmeta__"][funcname] = {};
             target["__gdmeta__"][funcname]["type"] = "function";
-            var tp = Reflect.getMetadata("design:paramtypes", target, funcname);
-            var tr = Reflect.getMetadata("design:returntype", target, funcname);
-            target["__gdmeta__"][funcname]["paramtypes"] = [];
-            for (var i in tp) {
-                target["__gdmeta__"][funcname]["paramtypes"][i] = tp[i]["name"];
-            }
-            target["__gdmeta__"][funcname]["returntype"] = tr == null ? null : tr["name"];
             if (target["__gdmeta__"][funcname]["custom"] == null)
                 target["__gdmeta__"][funcname]["custom"] = {};
             if (customInfo != null) {

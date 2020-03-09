@@ -1,4 +1,3 @@
-/// <reference path="Reflect.d.ts" />
 declare namespace gd3d {
     class version {
         static readonly VERSION = "0.0.1";
@@ -1593,7 +1592,7 @@ declare namespace gd3d.framework {
         static reTryTest: {};
         constructor(url: string, assetmgr: assetMgr, guid?: number);
         static buildGuid(): number;
-        parseBundle(data: string): Promise<{}>;
+        parseBundle(data: string): Promise<unknown>;
         private unpkg;
         parseFile(): Promise<void>;
         unload(disposeNow?: boolean): void;
@@ -1602,13 +1601,13 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     type loadCallback = (state?: stateLoad) => void;
-    const assetParseMap: {
+    export const assetParseMap: {
         [key: number]: IAssetFactory;
     };
-    function assetF(type: AssetTypeEnum): (ctor: any) => void;
-    function calcType(url: string | any): AssetTypeEnum;
-    function calcReqType(type: AssetTypeEnum): "text" | "arraybuffer";
-    class assetMgr {
+    export function assetF(type: AssetTypeEnum): (ctor: any) => void;
+    export function calcType(url: string | any): AssetTypeEnum;
+    export function calcReqType(type: AssetTypeEnum): "text" | "arraybuffer";
+    export class assetMgr {
         static urlmapGuid: {
             [key: string]: number;
         };
@@ -1719,11 +1718,12 @@ declare namespace gd3d.framework {
         loadScene(sceneName: string, onComplete: (firstChilds: Array<transform>) => void): void;
         unload(url: string): void;
     }
-    class SaveInfo {
+    export class SaveInfo {
         files: {
             [key: string]: string;
         };
     }
+    export {};
 }
 declare namespace gd3d.framework {
     class defmaterial {
@@ -2527,7 +2527,7 @@ declare namespace gd3d.framework {
         getCloneTrans2D(): transform2D;
         apply(trans: transform): void;
         jsonstr: string;
-        Parse(jsonStr: string, assetmgr: assetMgr): Promise<{}>;
+        Parse(jsonStr: string, assetmgr: assetMgr): Promise<unknown>;
         cParse(data: any): void;
     }
 }
@@ -3213,15 +3213,11 @@ declare namespace gd3d.framework {
     class keyFrameAniPlayer implements INodeComponent {
         static readonly ClassName: string;
         clips: keyFrameAniClip[];
-        private _nowClip;
+        private nowClip;
         private readonly nowFrame;
         private nowTime;
         private pathPropertyMap;
         gameObject: gameObject;
-        private playEndDic;
-        private _currClipName;
-        readonly currClipName: string;
-        speed: number;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
@@ -3242,13 +3238,10 @@ declare namespace gd3d.framework {
         private checkPlayEnd;
         private init;
         isPlaying(ClipName: string): boolean;
-        playByName(ClipName: string, onPlayEnd?: () => void): void;
-        play(onPlayEnd?: () => void): void;
-        playByIndex(index: number, onPlayEnd?: () => void): void;
-        private playByClip;
+        playByName(ClipName: string): void;
+        play(): void;
         stop(): void;
         rewind(): void;
-        onPlayEnd: (clip: keyFrameAniClip) => {};
         private collectPropertyObj;
         private collectPathPropertyObj;
         private serchChild;
@@ -7824,7 +7817,7 @@ declare namespace gd3d.io {
     function xhrLoad(url: string, fun: (ContentData: any, _err: Error, isloadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void, responseType: XMLHttpRequestResponseType, loadedFun: (req: XMLHttpRequest) => void): void;
     function loadText(url: string, fun: (_txt: string, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function JSONParse(text: string): Promise<any>;
-    function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): Promise<{}>;
+    function loadJSON(url: string, fun: (_txt: any, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): Promise<unknown>;
     function loadArrayBuffer(url: string, fun: (_bin: ArrayBuffer, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadBlob(url: string, fun: (_blob: Blob, _err: Error, isloadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
     function loadImg(url: string, fun: (_tex: HTMLImageElement, _err?: Error, loadFail?: boolean) => void, onprocess?: (curLength: number, totalLength: number) => void): void;
