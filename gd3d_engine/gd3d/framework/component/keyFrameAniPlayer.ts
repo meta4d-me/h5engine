@@ -16,11 +16,11 @@ namespace gd3d.framework {
         clips: keyFrameAniClip[];
 
         //当前播放的clip
-        private nowClip: keyFrameAniClip;
+        private _nowClip: keyFrameAniClip;
         //当前播放到的帧
         private get nowFrame() {
-            if (!this.nowClip) return 0;
-            return Math.floor(this.nowClip.fps * this.nowTime);
+            if (!this._nowClip) return 0;
+            return Math.floor(this._nowClip.fps * this.nowTime);
         };
         //当前播放到的时间
         private nowTime: number = 0;
@@ -28,27 +28,41 @@ namespace gd3d.framework {
         private pathPropertyMap = {};
 
         gameObject: gameObject;
+
+        private playEndDic: { [aniName: string]: () => void } = {};
+
+        private _currClipName : string = "";
+        /** 获得当前片段的名字 */
+        get currClipName(){return this._currClipName;}
+
+        /** 播放速度 */
+        speed = 1;
+
         start() {
             this.init();
         }
 
         onPlay()
         {
-
+            
         }
 
         update(delta: number) {
-            let clip = this.nowClip;
+            let clip = this._nowClip;
             if (!clip) return;
+            this.nowTime += delta * this.speed;
+            let clipTime = clip.time;
             //是否播完
             if (this.checkPlayEnd(clip)) {
-                this.nowClip = null;
-                this.nowTime = 0;
-                return ;
+                let clipName = clip.getName();
+                if(this.playEndDic[clipName]){
+                    this.playEndDic[clipName]();
+                }
+                this._nowClip = null;
             }
-            this.nowTime += delta;
-            let playTime = this.nowTime % this.nowClip.time;  //当前播放时间
-            this.displayByTime(clip,playTime);
+           
+            this.nowTime = this._nowClip == null ?  clipTime : this.nowTime % clipTime;  //当前播放时间
+            this.displayByTime(clip,this.nowTime);
         }
 
         //播放到指定时间状态
@@ -260,7 +274,9 @@ namespace gd3d.framework {
         }
 
         private init() {
-
+            if(this.clips && this.clips[0]){
+                this._currClipName = this.clips[0].getName();
+            }
         }
 
         /**
@@ -271,7 +287,7 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         isPlaying(ClipName: string) {
-            return (this.nowClip && this.nowClip.getName() == ClipName);
+            return (this._nowClip && this._nowClip.getName() == ClipName);
         }
 
         /**
@@ -281,14 +297,14 @@ namespace gd3d.framework {
          * 播放指定动画
          * @version gd3d 1.0
          */
-        playByName(ClipName: string) {
+        playByName(ClipName: string , onPlayEnd: () => void = null) {
             if (!this.clips || this.clips.length < 1) return;
             for(var i=0;i<this.clips.length ;i++){
                 let clip = this.clips[i];
                 if(!clip) continue;
                 if(clip.getName() == ClipName){
-                    this.nowClip = clip;
-                    this.collectPathPropertyObj(this.nowClip, this.pathPropertyMap);
+                    this.playByClip(clip , onPlayEnd);
+                    break;
                 }
             }
         }
@@ -300,11 +316,27 @@ namespace gd3d.framework {
          * 播放默认动画
          * @version gd3d 1.0
          */
-        play() {
-            if (!this.clips || this.clips.length < 1) return;
-            this.nowClip = this.clips[0];
-            if (!this.nowClip) return;
-            this.collectPathPropertyObj(this.nowClip, this.pathPropertyMap);
+        play(onPlayEnd: () => void = null) {
+            this.playByIndex(0,onPlayEnd);
+        }
+
+        playByIndex(index : number , onPlayEnd: () => void = null){
+            if(!this.clips || this.clips.length < 1 || isNaN(index)) return;
+            this.playByClip(this.clips[index] , onPlayEnd);
+        }
+
+        /**
+         * 播放动画 通过 clip
+         * @param clip 
+         */
+        private playByClip(clip : keyFrameAniClip , onPlayEnd: () => void = null){
+            if(!clip) return;
+            let clipName = clip.getName();
+            this.playEndDic[clipName] = onPlayEnd;
+            this.nowTime = 0;
+            this._nowClip = clip;
+            this._currClipName = clipName;
+            this.collectPathPropertyObj(this._nowClip, this.pathPropertyMap);
         }
 
         /**
@@ -315,7 +347,7 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         stop(){
-           this.nowClip = null;
+           this._nowClip = null;
         }
 
         /**
@@ -326,10 +358,12 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         rewind(){
-            if(!this.nowClip) return ;
-            this.displayByTime(this.nowClip,0);  //到第一帧
+            if(!this._nowClip) return ;
+            this.displayByTime(this._nowClip,0);  //到第一帧
             this.nowTime = 0;
         }
+
+        onPlayEnd : (clip: keyFrameAniClip)=>{};
 
         private collectPropertyObj(clip: keyFrameAniClip) {
             if (!clip) return;
@@ -388,7 +422,7 @@ namespace gd3d.framework {
         remove() {
             this.gameObject = null;
             this.pathPropertyMap = null;
-            this.nowClip = null;
+            this._nowClip = null;
             if(this.clips){
                 this.clips.length = 0;
             }

@@ -22,11 +22,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -17518,37 +17517,48 @@ var gd3d;
             function keyFrameAniPlayer() {
                 this.nowTime = 0;
                 this.pathPropertyMap = {};
+                this.playEndDic = {};
+                this._currClipName = "";
+                this.speed = 1;
                 this.eulerStatusMap = {};
                 this.eulerMap = {};
             }
             keyFrameAniPlayer_1 = keyFrameAniPlayer;
             Object.defineProperty(keyFrameAniPlayer.prototype, "nowFrame", {
                 get: function () {
-                    if (!this.nowClip)
+                    if (!this._nowClip)
                         return 0;
-                    return Math.floor(this.nowClip.fps * this.nowTime);
+                    return Math.floor(this._nowClip.fps * this.nowTime);
                 },
                 enumerable: true,
                 configurable: true
             });
             ;
+            Object.defineProperty(keyFrameAniPlayer.prototype, "currClipName", {
+                get: function () { return this._currClipName; },
+                enumerable: true,
+                configurable: true
+            });
             keyFrameAniPlayer.prototype.start = function () {
                 this.init();
             };
             keyFrameAniPlayer.prototype.onPlay = function () {
             };
             keyFrameAniPlayer.prototype.update = function (delta) {
-                var clip = this.nowClip;
+                var clip = this._nowClip;
                 if (!clip)
                     return;
+                this.nowTime += delta * this.speed;
+                var clipTime = clip.time;
                 if (this.checkPlayEnd(clip)) {
-                    this.nowClip = null;
-                    this.nowTime = 0;
-                    return;
+                    var clipName = clip.getName();
+                    if (this.playEndDic[clipName]) {
+                        this.playEndDic[clipName]();
+                    }
+                    this._nowClip = null;
                 }
-                this.nowTime += delta;
-                var playTime = this.nowTime % this.nowClip.time;
-                this.displayByTime(clip, playTime);
+                this.nowTime = this._nowClip == null ? clipTime : this.nowTime % clipTime;
+                this.displayByTime(clip, this.nowTime);
             };
             keyFrameAniPlayer.prototype.displayByTime = function (clip, playTime) {
                 var curves = this.timeFilterCurves(clip, playTime);
@@ -17712,11 +17722,15 @@ var gd3d;
                     return true;
             };
             keyFrameAniPlayer.prototype.init = function () {
+                if (this.clips && this.clips[0]) {
+                    this._currClipName = this.clips[0].getName();
+                }
             };
             keyFrameAniPlayer.prototype.isPlaying = function (ClipName) {
-                return (this.nowClip && this.nowClip.getName() == ClipName);
+                return (this._nowClip && this._nowClip.getName() == ClipName);
             };
-            keyFrameAniPlayer.prototype.playByName = function (ClipName) {
+            keyFrameAniPlayer.prototype.playByName = function (ClipName, onPlayEnd) {
+                if (onPlayEnd === void 0) { onPlayEnd = null; }
                 if (!this.clips || this.clips.length < 1)
                     return;
                 for (var i = 0; i < this.clips.length; i++) {
@@ -17724,26 +17738,39 @@ var gd3d;
                     if (!clip)
                         continue;
                     if (clip.getName() == ClipName) {
-                        this.nowClip = clip;
-                        this.collectPathPropertyObj(this.nowClip, this.pathPropertyMap);
+                        this.playByClip(clip, onPlayEnd);
+                        break;
                     }
                 }
             };
-            keyFrameAniPlayer.prototype.play = function () {
-                if (!this.clips || this.clips.length < 1)
+            keyFrameAniPlayer.prototype.play = function (onPlayEnd) {
+                if (onPlayEnd === void 0) { onPlayEnd = null; }
+                this.playByIndex(0, onPlayEnd);
+            };
+            keyFrameAniPlayer.prototype.playByIndex = function (index, onPlayEnd) {
+                if (onPlayEnd === void 0) { onPlayEnd = null; }
+                if (!this.clips || this.clips.length < 1 || isNaN(index))
                     return;
-                this.nowClip = this.clips[0];
-                if (!this.nowClip)
+                this.playByClip(this.clips[index], onPlayEnd);
+            };
+            keyFrameAniPlayer.prototype.playByClip = function (clip, onPlayEnd) {
+                if (onPlayEnd === void 0) { onPlayEnd = null; }
+                if (!clip)
                     return;
-                this.collectPathPropertyObj(this.nowClip, this.pathPropertyMap);
+                var clipName = clip.getName();
+                this.playEndDic[clipName] = onPlayEnd;
+                this.nowTime = 0;
+                this._nowClip = clip;
+                this._currClipName = clipName;
+                this.collectPathPropertyObj(this._nowClip, this.pathPropertyMap);
             };
             keyFrameAniPlayer.prototype.stop = function () {
-                this.nowClip = null;
+                this._nowClip = null;
             };
             keyFrameAniPlayer.prototype.rewind = function () {
-                if (!this.nowClip)
+                if (!this._nowClip)
                     return;
-                this.displayByTime(this.nowClip, 0);
+                this.displayByTime(this._nowClip, 0);
                 this.nowTime = 0;
             };
             keyFrameAniPlayer.prototype.collectPropertyObj = function (clip) {
@@ -17802,7 +17829,7 @@ var gd3d;
             keyFrameAniPlayer.prototype.remove = function () {
                 this.gameObject = null;
                 this.pathPropertyMap = null;
-                this.nowClip = null;
+                this._nowClip = null;
                 if (this.clips) {
                     this.clips.length = 0;
                 }
