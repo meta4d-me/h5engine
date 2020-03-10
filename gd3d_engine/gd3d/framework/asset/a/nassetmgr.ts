@@ -88,6 +88,8 @@ namespace gd3d.framework
                     return AssetTypeEnum.KeyFrameAniclip;
                 case ".particlesystem.json":
                     return AssetTypeEnum.ParticleSystem;
+                case ".trailrenderer.json":
+                    return AssetTypeEnum.TrailRenderer;
             }
 
             i = file.indexOf(".", i + 1);

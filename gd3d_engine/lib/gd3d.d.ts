@@ -1568,7 +1568,8 @@ declare namespace gd3d.framework {
         Scene = 23,
         Prefab = 24,
         cPrefab = 25,
-        ParticleSystem = 26
+        ParticleSystem = 26,
+        TrailRenderer = 27
     }
     class ResourceState {
         res: IAsset;
@@ -1955,6 +1956,11 @@ declare namespace gd3d.framework {
         private readonly t_KTX;
         parse(assetmgr: assetMgr, bundle: assetBundle, name: string, data: string, dwguid: number): texture;
         needDownload(text: string): any;
+    }
+}
+declare namespace gd3d.framework {
+    class AssetFactory_TrailRenderer implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, txt: string): TrailRendererData;
     }
 }
 declare namespace gd3d.framework {
@@ -4229,6 +4235,9 @@ declare namespace gd3d.framework {
         set startColor(v: math.color);
         get startWidth(): number;
         set startWidth(v: number);
+        get trailRendererData(): TrailRendererData;
+        set trailRendererData(v: TrailRendererData);
+        private _trailRendererData;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         onPlay(): void;
         start(): void;
@@ -4249,6 +4258,29 @@ declare namespace gd3d.framework {
         private _preworldPos;
         private localToWorldMatrix;
         private worldToLocalMatrix;
+    }
+}
+declare namespace gd3d.framework {
+    class TrailRendererData implements IAsset {
+        static readonly ClassName: string;
+        private static _datas;
+        trailRenderer: TrailRenderer;
+        static get(valueName: string): TrailRendererData;
+        private name;
+        private id;
+        defaultAsset: boolean;
+        get value(): string;
+        set value(v: string);
+        private _value;
+        constructor(assetName?: string);
+        getName(): string;
+        getGUID(): number;
+        dispose(): void;
+        use(): void;
+        unuse(disposeNow?: boolean): void;
+        caclByteLength(): number;
+        setData(v: string): void;
+        objectData: any;
     }
 }
 declare namespace gd3d.framework {

@@ -8483,6 +8483,7 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["Prefab"] = 24] = "Prefab";
             AssetTypeEnum[AssetTypeEnum["cPrefab"] = 25] = "cPrefab";
             AssetTypeEnum[AssetTypeEnum["ParticleSystem"] = 26] = "ParticleSystem";
+            AssetTypeEnum[AssetTypeEnum["TrailRenderer"] = 27] = "TrailRenderer";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
         var ResourceState = (function () {
             function ResourceState() {
@@ -8900,6 +8901,8 @@ var gd3d;
                         return framework.AssetTypeEnum.KeyFrameAniclip;
                     case ".particlesystem.json":
                         return framework.AssetTypeEnum.ParticleSystem;
+                    case ".trailrenderer.json":
+                        return framework.AssetTypeEnum.TrailRenderer;
                 }
                 i = file.indexOf(".", i + 1);
             }
@@ -10324,6 +10327,26 @@ var gd3d;
             return AssetFactory_TextureDesc;
         }());
         framework.AssetFactory_TextureDesc = AssetFactory_TextureDesc;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_TrailRenderer = (function () {
+            function AssetFactory_TrailRenderer() {
+            }
+            AssetFactory_TrailRenderer.prototype.parse = function (assetmgr, bundle, name, txt) {
+                var data = framework.TrailRendererData.get(name);
+                data.setData(txt);
+                return data;
+            };
+            AssetFactory_TrailRenderer = __decorate([
+                framework.assetF(framework.AssetTypeEnum.TrailRenderer)
+            ], AssetFactory_TrailRenderer);
+            return AssetFactory_TrailRenderer;
+        }());
+        framework.AssetFactory_TrailRenderer = AssetFactory_TrailRenderer;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -21613,6 +21636,23 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(TrailRenderer.prototype, "trailRendererData", {
+                get: function () {
+                    return this._trailRendererData;
+                },
+                set: function (v) {
+                    var data = framework.TrailRendererData.get(v.value);
+                    if (data.objectData) {
+                        framework.serialization.setValue(this, data.objectData);
+                    }
+                    else {
+                        data.trailRenderer = this;
+                    }
+                    this._trailRendererData = data;
+                },
+                enumerable: true,
+                configurable: true
+            });
             TrailRenderer.prototype.render = function (context, assetmgr, camera) {
                 gd3d.math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
                 gd3d.math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
@@ -21730,6 +21770,11 @@ var gd3d;
                 gd3d.reflect.Field("material"),
                 __metadata("design:type", framework.material)
             ], TrailRenderer.prototype, "material", void 0);
+            __decorate([
+                gd3d.reflect.Field("TrailRendererData"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], TrailRenderer.prototype, "trailRendererData", null);
             TrailRenderer = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent
@@ -21737,6 +21782,89 @@ var gd3d;
             return TrailRenderer;
         }());
         framework.TrailRenderer = TrailRenderer;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var TrailRendererData = (function () {
+            function TrailRendererData(assetName) {
+                if (assetName === void 0) { assetName = null; }
+                this.name = null;
+                this.id = new framework.resID();
+                this.defaultAsset = false;
+                if (!assetName) {
+                    assetName = "TrailRenderer_" + this.getGUID();
+                }
+                this.name = new framework.constText(assetName);
+            }
+            TrailRendererData_1 = TrailRendererData;
+            TrailRendererData.get = function (valueName) {
+                return this._datas[valueName];
+            };
+            Object.defineProperty(TrailRendererData.prototype, "value", {
+                get: function () {
+                    return this._value;
+                },
+                set: function (v) {
+                    this._value = v;
+                    if (TrailRendererData_1._datas[v]) {
+                        console.log("\u91CD\u590D\u521B\u5EFA\u7C92\u5B50\u7CFB\u7EDF\u8D44\u6E90 " + v);
+                        return;
+                    }
+                    TrailRendererData_1._datas[v] = this;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            TrailRendererData.prototype.getName = function () {
+                if (this.name == undefined) {
+                    return null;
+                }
+                return this.name.getText();
+            };
+            TrailRendererData.prototype.getGUID = function () {
+                return this.id.getID();
+            };
+            TrailRendererData.prototype.dispose = function () {
+            };
+            TrailRendererData.prototype.use = function () {
+                framework.sceneMgr.app.getAssetMgr().use(this);
+            };
+            TrailRendererData.prototype.unuse = function (disposeNow) {
+                if (disposeNow === void 0) { disposeNow = false; }
+                framework.sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
+            };
+            TrailRendererData.prototype.caclByteLength = function () {
+                var total = 0;
+                return total;
+            };
+            TrailRendererData.prototype.setData = function (v) {
+                this.objectData = JSON.parse(v);
+                if (this.trailRenderer) {
+                    framework.serialization.setValue(this.trailRenderer, this.objectData);
+                }
+            };
+            var TrailRendererData_1;
+            TrailRendererData.ClassName = "TrailRendererData";
+            TrailRendererData._datas = {};
+            __decorate([
+                gd3d.reflect.Field("constText"),
+                __metadata("design:type", framework.constText)
+            ], TrailRendererData.prototype, "name", void 0);
+            __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], TrailRendererData.prototype, "value", null);
+            TrailRendererData = TrailRendererData_1 = __decorate([
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [String])
+            ], TrailRendererData);
+            return TrailRendererData;
+        }());
+        framework.TrailRendererData = TrailRendererData;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

@@ -3,7 +3,7 @@ namespace gd3d.framework
     /**
      * The trail renderer is used to make trails behind objects in the Scene as they move about.
      * 
-     * 线渲染器用于在三维空间中绘制自由浮动的线。
+     * 拖尾染器
      */
     @reflect.nodeRender
     @reflect.nodeComponent
@@ -267,6 +267,26 @@ namespace gd3d.framework
             this.widthCurve.keys[0].value = v / this.widthMultiplier;
         }
 
+        @gd3d.reflect.Field("TrailRendererData")
+        get trailRendererData()
+        {
+            return this._trailRendererData;
+        }
+
+        set trailRendererData(v)
+        {
+            var data = TrailRendererData.get(v.value);
+            if (data.objectData)
+            {
+                serialization.setValue(this, data.objectData);
+            } else
+            {
+                data.trailRenderer = this;
+            }
+            this._trailRendererData = data;
+        }
+        private _trailRendererData: TrailRendererData;
+
         render(context: renderContext, assetmgr: assetMgr, camera: camera)
         {
             math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
@@ -284,7 +304,7 @@ namespace gd3d.framework
             this.BakeMesh(this.mesh, camera, false);
 
             if (this.positions.length < 2) return;
-            
+
             // 上传网格数据
             LineRenderer.uploadMesh(this.mesh, assetmgr.webgl);
 
