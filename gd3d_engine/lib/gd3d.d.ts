@@ -4120,6 +4120,148 @@ declare namespace gd3d.framework {
         moveTo(to: transform): void;
     }
 }
+declare namespace gd3d.framework {
+    class LineRenderer implements IRenderer {
+        private mesh;
+        material: material;
+        layer: RenderLayerEnum;
+        get renderLayer(): number;
+        set renderLayer(layer: number);
+        queue: number;
+        get transform(): transform;
+        gameObject: gameObject;
+        loop: boolean;
+        positions: math.vector3[];
+        lineWidth: MinMaxCurve;
+        lineColor: MinMaxGradient;
+        numCornerVertices: number;
+        numCapVertices: number;
+        alignment: LineAlignment;
+        textureMode: LineTextureMode;
+        shadowBias: number;
+        generateLightingData: boolean;
+        useWorldSpace: boolean;
+        get widthCurve(): AnimationCurve1;
+        get widthMultiplier(): number;
+        set widthMultiplier(v: number);
+        get colorGradient(): Gradient;
+        get endColor(): math.color;
+        set endColor(v: math.color);
+        get endWidth(): number;
+        set endWidth(v: number);
+        get positionCount(): number;
+        set positionCount(v: number);
+        get startColor(): math.color;
+        set startColor(v: math.color);
+        get startWidth(): number;
+        set startWidth(v: number);
+        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        onPlay(): void;
+        start(): void;
+        update(interval?: number): void;
+        remove(): void;
+        clone(): void;
+        BakeMesh(mesh: mesh, camera: camera, useTransform: boolean): void;
+        GetPosition(index: number): math.vector3;
+        GetPositions(positions?: math.vector3[]): math.vector3[];
+        setPosition(index: number, position: math.vector3): void;
+        SetPositions(positions: math.vector3[]): void;
+        Simplify(tolerance: number): void;
+        private localToWorldMatrix;
+        private worldToLocalMatrix;
+        static draw(context: renderContext, go: gameObject, mesh: mesh, material: material): void;
+        static clearMesh(mesh: mesh): void;
+        static uploadMesh(_mesh: mesh, webgl: WebGLRenderingContext): void;
+        static calcMesh(positionVectex: {
+            vertexs: math.vector3[];
+            tangent: math.vector3;
+            normal: math.vector3;
+            rateAtLine: number;
+        }[], textureMode: LineTextureMode, colorGradient: Gradient, totalLength: number, mesh: mesh): void;
+        static calcPositionVectex(positions: math.vector3[], loop: boolean, rateAtLines: number[], lineWidth: MinMaxCurve, alignment: LineAlignment, cameraPosition: math.vector3): {
+            vertexs: math.vector3[];
+            tangent: math.vector3;
+            normal: math.vector3;
+            rateAtLine: number;
+        }[];
+        static calcTotalLength(positions: math.vector3[], loop: boolean): number;
+        static calcRateAtLines(positions: math.vector3[], loop: boolean, textureMode: LineTextureMode): number[];
+    }
+}
+declare namespace gd3d.framework {
+    class TrailRenderer implements IRenderer {
+        private mesh;
+        material: material;
+        layer: RenderLayerEnum;
+        get renderLayer(): number;
+        set renderLayer(layer: number);
+        queue: number;
+        get transform(): transform;
+        gameObject: gameObject;
+        private positions;
+        lineWidth: MinMaxCurve;
+        lineColor: MinMaxGradient;
+        numCornerVertices: number;
+        numCapVertices: number;
+        alignment: LineAlignment;
+        autodestruct: boolean;
+        emitting: boolean;
+        minVertexDistance: number;
+        time: number;
+        textureMode: LineTextureMode;
+        shadowBias: number;
+        generateLightingData: boolean;
+        get widthCurve(): AnimationCurve1;
+        get widthMultiplier(): number;
+        set widthMultiplier(v: number);
+        get colorGradient(): Gradient;
+        get endColor(): math.color;
+        set endColor(v: math.color);
+        get endWidth(): number;
+        set endWidth(v: number);
+        get positionCount(): number;
+        set positionCount(v: number);
+        get startColor(): math.color;
+        set startColor(v: math.color);
+        get startWidth(): number;
+        set startWidth(v: number);
+        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        onPlay(): void;
+        start(): void;
+        remove(): void;
+        clone(): void;
+        update(interval?: number): void;
+        BakeMesh(mesh: mesh, camera: camera, useTransform: boolean): void;
+        AddPosition(position: math.vector3): void;
+        AddPositions(positions: math.vector3[]): void;
+        Clear(): void;
+        GetPosition(index: number): {
+            position: math.vector3;
+            birthTime: number;
+        };
+        GetPositions(positions?: math.vector3[]): math.vector3[];
+        setPosition(index: number, position: math.vector3): void;
+        SetPositions(positions: math.vector3[]): void;
+        private _preworldPos;
+        private localToWorldMatrix;
+        private worldToLocalMatrix;
+    }
+}
+declare namespace gd3d.framework {
+    enum LineAlignment {
+        View = 0,
+        TransformZ = 1,
+        None = 2
+    }
+}
+declare namespace gd3d.framework {
+    enum LineTextureMode {
+        Stretch = 0,
+        Tile = 1,
+        DistributePerSegment = 2,
+        RepeatPerSegment = 3
+    }
+}
 declare namespace gd3d {
     abstract class AEvent {
         private events;
@@ -4738,6 +4880,7 @@ declare namespace gd3d.math {
     function vec3ScaleByNum(from: vector3, scale: number, out: vector3): void;
     function vec3Product(a: vector3, b: vector3, out: vector3): void;
     function vec3Cross(lhs: vector3, rhs: vector3, out: vector3): void;
+    function vec3IsParallel(lhs: vector3, rhs: vector3, precision?: number): boolean;
     function vec3Reflect(inDirection: vector3, inNormal: vector3, out: vector3): void;
     function vec3Dot(lhs: vector3, rhs: vector3): number;
     function vec3Project(vector: vector3, onNormal: vector3, out: vector3): void;
@@ -7579,7 +7722,6 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     var serialization: Serialization;
-    function serialize(target: any, propertyKey: string): void;
     interface PropertyHandler {
         (target: any, source: any, property: string, handlers: PropertyHandler[], serialization: Serialization): boolean;
     }
