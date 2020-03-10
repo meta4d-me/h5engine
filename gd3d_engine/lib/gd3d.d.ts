@@ -1742,6 +1742,8 @@ declare namespace gd3d.framework {
         static correctFileName(name: string): string;
         static correctTxtFileName(name: string): string;
         getShader(name: string): gd3d.framework.shader;
+        private linerenderermat;
+        getDefLineRendererMat(): material;
         private particlemat;
         getDefParticleMat(): material;
         private assetUrlDic;
@@ -4191,6 +4193,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class TrailRenderer implements IRenderer {
+        static readonly ClassName: string;
         private mesh;
         material: material;
         layer: RenderLayerEnum;

@@ -705,6 +705,26 @@ declare class test_Rvo2 implements IState {
     setPreferredVelocities(sim: any, goals: any): void;
     updateVisualization(sim: any): void;
 }
+declare class test_TrailRenderer implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    astMgr: gd3d.framework.assetMgr;
+    lr: gd3d.framework.TrailRenderer;
+    move: boolean;
+    viewcamera: boolean;
+    start(app: gd3d.framework.application): Promise<void>;
+    setGUI(): void;
+    private init;
+    private initLineRenderer;
+    private _showParticle;
+    private _particleStartPosition;
+    private _particleCurrentPosition;
+    private _moveRadius;
+    private _moveAngle;
+    private _moveAngleSpeed;
+    update(delta: number): void;
+}
 declare class test_UIEffect implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;

@@ -9,7 +9,8 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class TrailRenderer implements IRenderer
     {
-        private mesh: mesh;
+        static readonly ClassName: string = "TrailRenderer";
+        private mesh = new gd3d.framework.mesh("TrailRenderer" + ".mesh.bin");
 
         /**
          * @public
@@ -273,9 +274,7 @@ namespace gd3d.framework
 
             if (!this.material)
             {
-                let material = this.material = new framework.material();
-                material.use();
-                material.setShader(sceneMgr.app.getAssetMgr().getShader("shader/def"));
+                this.material = sceneMgr.app.getAssetMgr().getDefLineRendererMat();
             }
 
             // 清理网格
@@ -284,6 +283,8 @@ namespace gd3d.framework
             // 烘焙网格
             this.BakeMesh(this.mesh, camera, false);
 
+            if (this.positions.length < 2) return;
+            
             // 上传网格数据
             LineRenderer.uploadMesh(this.mesh, assetmgr.webgl);
 
@@ -326,7 +327,7 @@ namespace gd3d.framework
 
                 // 初始化一个必定添加顶点的值
                 var moveDistance = this.minVertexDistance * 2;
-                if (this._preworldPos) moveDistance = math.vec2Distance(currentPosition, this._preworldPos);
+                if (this._preworldPos) moveDistance = math.vec3Distance(currentPosition, this._preworldPos);
 
                 // 移动新增结点
                 if (moveDistance >= this.minVertexDistance)

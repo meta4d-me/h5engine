@@ -1182,6 +1182,7 @@ var main = (function () {
             demoList.addBtn("关键帧动画", function () { return new test_keyFrameAni(); });
             demoList.addBtn("粒子系統", function () { return new test_ParticleSystem(); });
             demoList.addBtn("线条", function () { return new test_LineRenderer(); });
+            demoList.addBtn("拖尾", function () { return new test_TrailRenderer(); });
             demoList.addBtn("Android平台ETC1压缩纹理", function () { return new test_ETC1_KTX(); });
             return new demoList();
         });
@@ -4606,6 +4607,94 @@ var test_Rvo2 = (function () {
         }
     };
     return test_Rvo2;
+}());
+var test_TrailRenderer = (function () {
+    function test_TrailRenderer() {
+        this.move = true;
+        this.viewcamera = false;
+        this._particleStartPosition = new gd3d.math.vector3();
+        this._particleCurrentPosition = new gd3d.math.vector3();
+        this._moveRadius = 5;
+        this._moveAngle = 0;
+        this._moveAngleSpeed = 5;
+    }
+    test_TrailRenderer.prototype.start = function (app) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.app = app;
+                        this.scene = this.app.getScene();
+                        this.astMgr = this.app.getAssetMgr();
+                        gd3d.framework.assetMgr.openGuid = false;
+                        return [4, datGui.init()];
+                    case 1:
+                        _a.sent();
+                        this.setGUI();
+                        this.init();
+                        return [2];
+                }
+            });
+        });
+    };
+    test_TrailRenderer.prototype.setGUI = function () {
+        if (!dat)
+            return;
+        var gui = new dat.GUI();
+        gui.add(this, 'move');
+        gui.add(this, 'viewcamera');
+    };
+    test_TrailRenderer.prototype.init = function () {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 1000;
+        this.camera.fov = Math.PI * 2 / 3;
+        this.camera.backgroundColor = new gd3d.math.color(0.2784, 0.2784, 0.2784, 1);
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        var hoverc = this.camera.gameObject.addComponent("HoverCameraScript");
+        hoverc.panAngle = 180;
+        hoverc.tiltAngle = 45;
+        hoverc.distance = 10;
+        hoverc.scaleSpeed = 0.1;
+        hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0);
+        this.initLineRenderer();
+    };
+    test_TrailRenderer.prototype.initLineRenderer = function () {
+        var tran = new gd3d.framework.transform();
+        tran.name = "TrailRenderer";
+        this.scene.addChild(tran);
+        var lr = tran.gameObject.getComponent("TrailRenderer");
+        if (!lr)
+            lr = tran.gameObject.addComponent("TrailRenderer");
+        this.lr = lr;
+    };
+    test_TrailRenderer.prototype._showParticle = function (res) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2];
+            });
+        });
+    };
+    test_TrailRenderer.prototype.update = function (delta) {
+        if (this.lr) {
+            if (this.move) {
+                var offsetX = Math.cos(this._moveAngle / 180 * Math.PI) * this._moveRadius;
+                var offsetY = (this._moveAngle % 3600) / 3600 * this._moveRadius;
+                var offsetZ = Math.sin(this._moveAngle / 180 * Math.PI) * this._moveRadius;
+                this._particleCurrentPosition.x = this._particleStartPosition.x + offsetX;
+                this._particleCurrentPosition.y = this._particleStartPosition.y + offsetY;
+                this._particleCurrentPosition.z = this._particleStartPosition.z + offsetZ;
+                this.lr.transform.localPosition = this._particleCurrentPosition;
+                this._moveAngle += this._moveAngleSpeed;
+            }
+            this.lr.alignment = this.viewcamera ? gd3d.framework.LineAlignment.View : gd3d.framework.LineAlignment.TransformZ;
+        }
+    };
+    return test_TrailRenderer;
 }());
 var test_UIEffect = (function () {
     function test_UIEffect() {

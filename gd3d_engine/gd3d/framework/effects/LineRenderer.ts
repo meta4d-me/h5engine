@@ -10,7 +10,7 @@ namespace gd3d.framework
     export class LineRenderer implements IRenderer
     {
         static readonly ClassName: string = "LineRenderer";
-        
+
         private mesh = new gd3d.framework.mesh("LineRenderer" + ".mesh.bin");
 
         /**
@@ -269,9 +269,7 @@ namespace gd3d.framework
 
             if (!this.material)
             {
-                let material = this.material = new framework.material();
-                material.use();
-                material.setShader(sceneMgr.app.getAssetMgr().getShader("shader/def"));
+                this.material = sceneMgr.app.getAssetMgr().getDefLineRendererMat();
             }
 
             // 清理网格
@@ -279,6 +277,8 @@ namespace gd3d.framework
 
             // 烘焙网格
             this.BakeMesh(this.mesh, camera, false);
+
+            if (this.positions.length < 2) return;
 
             // 上传网格数据
             LineRenderer.uploadMesh(this.mesh, assetmgr.webgl);

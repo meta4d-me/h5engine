@@ -9229,6 +9229,17 @@ var gd3d;
             assetMgr.prototype.getShader = function (name) {
                 return this.mapShader[name];
             };
+            assetMgr.prototype.getDefLineRendererMat = function () {
+                if (this.linerenderermat == null) {
+                    var material_1 = new framework.material();
+                    material_1.use();
+                    material_1.setShader(framework.sceneMgr.app.getAssetMgr().getShader("shader/def2"));
+                    var tex = this.getDefaultTexture(framework.defTexture.white);
+                    material_1.setTexture("_MainTex", tex);
+                    this.linerenderermat = material_1;
+                }
+                return this.linerenderermat;
+            };
             assetMgr.prototype.getDefParticleMat = function () {
                 if (this.particlemat == null) {
                     var mat = new framework.material("defparticle");
@@ -11943,9 +11954,9 @@ var gd3d;
             meshRenderer.prototype.refreshLayerAndQue = function () {
                 if (this.materials == null || this.materials.length == 0) {
                     this.materials = [];
-                    var material_1 = new framework.material();
-                    material_1.use();
-                    this.materials.push(material_1);
+                    var material_2 = new framework.material();
+                    material_2.use();
+                    this.materials.push(material_2);
                     this.materials[0].setShader(framework.sceneMgr.app.getAssetMgr().getShader("shader/def"));
                 }
                 this.layer = this.materials[0].getLayer();
@@ -12665,7 +12676,7 @@ var gd3d;
                 this.name = new framework.constText(assetName);
                 gd3d.io.enumMgr.enumMap["UniformTypeEnum"] = gd3d.render.UniformTypeEnum;
             }
-            material_2 = material;
+            material_3 = material;
             material.prototype.getName = function () {
                 if (this.name == undefined) {
                     return null;
@@ -12741,7 +12752,7 @@ var gd3d;
                 var udMap = this.uniformDirtyMap;
                 for (var key in pass.mapuniforms) {
                     var unifom = pass.mapuniforms[key];
-                    if (lastMatSame && !material_2.sameMatPassMap[unifom.name] && !udMap[unifom.name]) {
+                    if (lastMatSame && !material_3.sameMatPassMap[unifom.name] && !udMap[unifom.name]) {
                         continue;
                     }
                     udMap[unifom.name] = false;
@@ -12903,8 +12914,8 @@ var gd3d;
                 if (drawInstanceInfo === void 0) { drawInstanceInfo = undefined; }
                 var matGUID = this.getGUID();
                 var meshGUID = mesh.getGUID();
-                var LastMatSame = matGUID == material_2.lastDrawMatID;
-                var LastMeshSame = meshGUID == material_2.lastDrawMeshID;
+                var LastMatSame = matGUID == material_3.lastDrawMatID;
+                var LastMeshSame = meshGUID == material_3.lastDrawMeshID;
                 var drawPasses = this.shader.passes[basetype + context.drawtype];
                 if (drawPasses == undefined) {
                     basetype = basetype.indexOf("fog") != -1 ? "base_fog" : "base";
@@ -12943,8 +12954,8 @@ var gd3d;
                     }
                     drawInstanceInfo && drawInstanceInfo.disableAttributes(context.webgl, pass.program.program);
                 }
-                material_2.lastDrawMatID = matGUID;
-                material_2.lastDrawMeshID = meshGUID;
+                material_3.lastDrawMatID = matGUID;
+                material_3.lastDrawMeshID = meshGUID;
             };
             material.prototype.Parse = function (assetmgr, json, bundleName) {
                 if (bundleName === void 0) { bundleName = null; }
@@ -13001,7 +13012,7 @@ var gd3d;
                 return this;
             };
             material.prototype.clone = function () {
-                var mat = new material_2(this.getName());
+                var mat = new material_3(this.getName());
                 mat.setShader(this.shader);
                 for (var i in this.statedMapUniforms) {
                     var _uniformType = this.defaultMapUniform[i].type;
@@ -13054,7 +13065,7 @@ var gd3d;
                 }
                 return JSON.stringify(obj);
             };
-            var material_2;
+            var material_3;
             material.ClassName = "material";
             material.sameMatPassMap = {
                 glstate_matrix_model: true,
@@ -13076,7 +13087,7 @@ var gd3d;
                 gd3d.reflect.Field("shader"),
                 __metadata("design:type", framework.shader)
             ], material.prototype, "shader", void 0);
-            material = material_2 = __decorate([
+            material = material_3 = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
             ], material);
@@ -21180,12 +21191,12 @@ var gd3d;
                 gd3d.math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
                 gd3d.math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
                 if (!this.material) {
-                    var material_3 = this.material = new framework.material();
-                    material_3.use();
-                    material_3.setShader(framework.sceneMgr.app.getAssetMgr().getShader("shader/def"));
+                    this.material = framework.sceneMgr.app.getAssetMgr().getDefLineRendererMat();
                 }
                 LineRenderer_1.clearMesh(this.mesh);
                 this.BakeMesh(this.mesh, camera, false);
+                if (this.positions.length < 2)
+                    return;
                 LineRenderer_1.uploadMesh(this.mesh, assetmgr.webgl);
                 LineRenderer_1.draw(context, this.gameObject, this.mesh, this.material);
             };
@@ -21471,6 +21482,7 @@ var gd3d;
     (function (framework) {
         var TrailRenderer = (function () {
             function TrailRenderer() {
+                this.mesh = new gd3d.framework.mesh("TrailRenderer" + ".mesh.bin");
                 this.layer = framework.RenderLayerEnum.Transparent;
                 this.queue = 0;
                 this.positions = [];
@@ -21605,12 +21617,12 @@ var gd3d;
                 gd3d.math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
                 gd3d.math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
                 if (!this.material) {
-                    var material_4 = this.material = new framework.material();
-                    material_4.use();
-                    material_4.setShader(framework.sceneMgr.app.getAssetMgr().getShader("shader/def"));
+                    this.material = framework.sceneMgr.app.getAssetMgr().getDefLineRendererMat();
                 }
                 framework.LineRenderer.clearMesh(this.mesh);
                 this.BakeMesh(this.mesh, camera, false);
+                if (this.positions.length < 2)
+                    return;
                 framework.LineRenderer.uploadMesh(this.mesh, assetmgr.webgl);
                 framework.LineRenderer.draw(context, this.gameObject, this.mesh, this.material);
             };
@@ -21633,7 +21645,7 @@ var gd3d;
                     gd3d.math.vec3Clone(this.transform.getWorldPosition(), currentPosition);
                     var moveDistance = this.minVertexDistance * 2;
                     if (this._preworldPos)
-                        moveDistance = gd3d.math.vec2Distance(currentPosition, this._preworldPos);
+                        moveDistance = gd3d.math.vec3Distance(currentPosition, this._preworldPos);
                     if (moveDistance >= this.minVertexDistance) {
                         this.AddPosition(currentPosition);
                         this._preworldPos = currentPosition;
@@ -21713,6 +21725,7 @@ var gd3d;
                     }
                 }
             };
+            TrailRenderer.ClassName = "TrailRenderer";
             __decorate([
                 gd3d.reflect.Field("material"),
                 __metadata("design:type", framework.material)

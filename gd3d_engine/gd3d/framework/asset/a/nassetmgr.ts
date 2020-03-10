@@ -538,6 +538,21 @@ namespace gd3d.framework
         {
             return this.mapShader[name];
         }
+        private linerenderermat: material;
+        getDefLineRendererMat(): material
+        {
+            if (this.linerenderermat == null)
+            {
+                let material = new framework.material();
+                material.use();
+                material.setShader(sceneMgr.app.getAssetMgr().getShader("shader/def2"));
+
+                var tex = this.getDefaultTexture(defTexture.white);
+                material.setTexture("_MainTex", tex);
+                this.linerenderermat = material;
+            }
+            return this.linerenderermat;
+        }
         private particlemat: material;
         getDefParticleMat(): material
         {
