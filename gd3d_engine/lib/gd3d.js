@@ -21765,7 +21765,7 @@ var gd3d;
                     }
                 }
             };
-            TrailRenderer.ClassName = "TrailRenderer";
+            TrailRenderer.ClassName = "trailrenderer";
             __decorate([
                 gd3d.reflect.Field("material"),
                 __metadata("design:type", framework.material)
@@ -21810,7 +21810,6 @@ var gd3d;
                 set: function (v) {
                     this._value = v;
                     if (TrailRendererData_1._datas[v]) {
-                        console.log("\u91CD\u590D\u521B\u5EFA\u7C92\u5B50\u7CFB\u7EDF\u8D44\u6E90 " + v);
                         return;
                     }
                     TrailRendererData_1._datas[v] = this;
@@ -32470,7 +32469,6 @@ var gd3d;
                 set: function (v) {
                     this._value = v;
                     if (ParticleSystemData_1._datas[v]) {
-                        console.log("\u91CD\u590D\u521B\u5EFA\u7C92\u5B50\u7CFB\u7EDF\u8D44\u6E90 " + v);
                         return;
                     }
                     ParticleSystemData_1._datas[v] = this;

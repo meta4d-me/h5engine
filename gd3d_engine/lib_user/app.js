@@ -4612,6 +4612,7 @@ var test_TrailRenderer = (function () {
     function test_TrailRenderer() {
         this.move = true;
         this.viewcamera = false;
+        this.res = "Trail_SpeedLines";
         this._particleStartPosition = new gd3d.math.vector3();
         this._particleCurrentPosition = new gd3d.math.vector3();
         this._moveRadius = 5;
@@ -4627,8 +4628,11 @@ var test_TrailRenderer = (function () {
                         this.scene = this.app.getScene();
                         this.astMgr = this.app.getAssetMgr();
                         gd3d.framework.assetMgr.openGuid = false;
-                        return [4, datGui.init()];
+                        return [4, demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", this.astMgr)];
                     case 1:
+                        _a.sent();
+                        return [4, datGui.init()];
+                    case 2:
                         _a.sent();
                         this.setGUI();
                         this.init();
@@ -4661,21 +4665,38 @@ var test_TrailRenderer = (function () {
         hoverc.distance = 10;
         hoverc.scaleSpeed = 0.1;
         hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0);
-        this.initLineRenderer();
+        this.loadRes(this.res);
     };
     test_TrailRenderer.prototype.initLineRenderer = function () {
         var tran = new gd3d.framework.transform();
         tran.name = "TrailRenderer";
         this.scene.addChild(tran);
-        var lr = tran.gameObject.getComponent("TrailRenderer");
+        var lr = tran.gameObject.getComponent("trailrenderer");
         if (!lr)
-            lr = tran.gameObject.addComponent("TrailRenderer");
+            lr = tran.gameObject.addComponent("trailrenderer");
         this.lr = lr;
     };
-    test_TrailRenderer.prototype._showParticle = function (res) {
+    test_TrailRenderer.prototype.loadRes = function (res) {
         return __awaiter(this, void 0, void 0, function () {
+            var cubeP, cubeTran;
             return __generator(this, function (_a) {
-                return [2];
+                switch (_a.label) {
+                    case 0:
+                        if (this.lr) {
+                            this.scene.removeChild(this.lr.transform);
+                            this.lr = null;
+                        }
+                        return [4, demoTool.loadbySync("res/prefabs/" + res + "/" + res + ".assetbundle.json", this.astMgr)];
+                    case 1:
+                        _a.sent();
+                        cubeP = this.astMgr.getAssetByName(res + ".prefab.json", res + ".assetbundle.json");
+                        cubeTran = cubeP.getCloneTrans();
+                        this.lr = cubeTran.gameObject.getComponent("TrailRenderer");
+                        this.scene.addChild(cubeTran);
+                        this._particleStartPosition = new gd3d.math.vector3();
+                        gd3d.math.vec3Clone(cubeTran.localPosition, this._particleStartPosition);
+                        return [2];
+                }
             });
         });
     };

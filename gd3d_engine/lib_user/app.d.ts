@@ -713,11 +713,12 @@ declare class test_TrailRenderer implements IState {
     lr: gd3d.framework.TrailRenderer;
     move: boolean;
     viewcamera: boolean;
+    res: string;
     start(app: gd3d.framework.application): Promise<void>;
     setGUI(): void;
     private init;
     private initLineRenderer;
-    private _showParticle;
+    private loadRes;
     private _particleStartPosition;
     private _particleCurrentPosition;
     private _moveRadius;

@@ -48,7 +48,6 @@ namespace gd3d.framework
 
             if (TrailRendererData._datas[v])
             {
-                console.log(`重复创建粒子系统资源 ${v}`);
                 return;
             }
             TrailRendererData._datas[v] = this;

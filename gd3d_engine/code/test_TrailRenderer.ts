@@ -15,6 +15,8 @@ class test_TrailRenderer implements IState
     move = true;
     viewcamera = false;
 
+    res = "Trail_SpeedLines";
+
     async start(app: gd3d.framework.application)
     {
         this.app = app;
@@ -23,6 +25,7 @@ class test_TrailRenderer implements IState
 
         gd3d.framework.assetMgr.openGuid = false;
 
+        await demoTool.loadbySync(`newRes/shader/MainShader.assetbundle.json`, this.astMgr);
         await datGui.init();
 
         //
@@ -60,8 +63,8 @@ class test_TrailRenderer implements IState
         hoverc.scaleSpeed = 0.1;
         hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0)
 
-        // this._showParticle(this._particles[0]);
-        this.initLineRenderer();
+        // this.initLineRenderer();
+        this.loadRes(this.res);
     }
 
     private initLineRenderer()
@@ -71,14 +74,31 @@ class test_TrailRenderer implements IState
         this.scene.addChild(tran);
 
         //
-        let lr = tran.gameObject.getComponent("TrailRenderer") as gd3d.framework.TrailRenderer;
-        if (!lr) lr = tran.gameObject.addComponent("TrailRenderer") as any;
+        let lr = tran.gameObject.getComponent("trailrenderer") as gd3d.framework.TrailRenderer;
+        if (!lr) lr = tran.gameObject.addComponent("trailrenderer") as any;
         //
         this.lr = lr;
     }
 
-    private async _showParticle(res: string)
+    private async loadRes(res: string)
     {
+        if (this.lr)
+        {
+            this.scene.removeChild(this.lr.transform);
+            this.lr = null;
+        }
+
+        await demoTool.loadbySync(`res/prefabs/${res}/${res}.assetbundle.json`, this.astMgr);
+
+        let cubeP = this.astMgr.getAssetByName(`${res}.prefab.json`, `${res}.assetbundle.json`) as gd3d.framework.prefab;
+        let cubeTran = cubeP.getCloneTrans();
+
+        this.lr = cubeTran.gameObject.getComponent("TrailRenderer") as gd3d.framework.TrailRenderer;
+
+        this.scene.addChild(cubeTran);
+
+        this._particleStartPosition = new gd3d.math.vector3();
+        gd3d.math.vec3Clone(cubeTran.localPosition, this._particleStartPosition);
     }
 
     private _particleStartPosition = new gd3d.math.vector3();

@@ -9,7 +9,8 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class TrailRenderer implements IRenderer
     {
-        static readonly ClassName: string = "TrailRenderer";
+        static readonly ClassName: string = "trailrenderer";
+
         private mesh = new gd3d.framework.mesh("TrailRenderer" + ".mesh.bin");
 
         /**
