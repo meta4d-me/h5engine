@@ -3209,9 +3209,16 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    enum AnimationCullingType {
+        AlwaysAnimate = 0,
+        BasedOnRenderers = 1,
+        BasedOnClipBounds = 2,
+        BasedOnUserBounds = 3
+    }
     class keyFrameAniPlayer implements INodeComponent {
         static readonly ClassName: string;
         clips: keyFrameAniClip[];
+        private clipMap;
         private _nowClip;
         private readonly nowFrame;
         private nowTime;
@@ -3220,10 +3227,19 @@ declare namespace gd3d.framework {
         private playEndDic;
         private _currClipName;
         readonly currClipName: string;
+        private _speed;
         speed: number;
+        private _animateOnlyIfVisible;
+        animateOnlyIfVisible: boolean;
+        private _cullingType;
+        cullingType: AnimationCullingType;
+        private _localBounds;
+        localBounds: aabb;
+        private endNormalizedTime;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
+        getClip(clipName: string): keyFrameAniClip;
         private displayByTime;
         private static lhvec;
         private static rhvec;
@@ -3240,14 +3256,13 @@ declare namespace gd3d.framework {
         private timeFilterCurves;
         private checkPlayEnd;
         private init;
-        isPlaying(ClipName: string): boolean;
-        playByName(ClipName: string, onPlayEnd?: () => void): void;
-        play(onPlayEnd?: () => void): void;
-        playByIndex(index: number, onPlayEnd?: () => void): void;
+        isPlaying(ClipName?: string): boolean;
+        play(ClipName?: string, onPlayEnd?: () => void, normalizedTime?: number): void;
         private playByClip;
+        private OnClipPlayEnd;
         stop(): void;
         rewind(): void;
-        onPlayEnd: (clip: keyFrameAniClip) => {};
+        addClip(clip: keyFrameAniClip): void;
         private collectPropertyObj;
         private collectPathPropertyObj;
         private serchChild;

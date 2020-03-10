@@ -334,7 +334,7 @@ class test_f4skin implements IState
         let [anip11] = orig.gameObject.getComponentsInChildren("keyFrameAniPlayer") as gd3d.framework.keyFrameAniPlayer[];
         // anip11.play();
         let cName = anip11.clips[0].getName();
-        anip11.playByName(cName);
+        anip11.play(cName);
         // this.scene.addChild(pf);
         let [f4, f5] = pf.gameObject.getComponentsInChildren('f4skinnedMeshRenderer') as gd3d.framework.f4skinnedMeshRenderer[];
         f4.materials[0].setShader(this.app.getAssetMgr().getShader("f4skin.shader.json"));
@@ -389,7 +389,7 @@ class test_f4skin implements IState
         let bite = (value = 190) =>
         {
             anip.rewind();
-            anip.playByName('bite.keyframeAniclip.json');
+            anip.play('bite.keyframeAniclip.json');
             setTimeout(() =>
             {
                 anip2.rewind();

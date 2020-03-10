@@ -1,4 +1,8 @@
-/// <reference path="Reflect.d.ts" />
+declare namespace gd3d {
+    class version {
+        static readonly VERSION = "0.0.1";
+    }
+}
 declare namespace gd3d.framework {
     interface INotify {
         notify(trans: any, type: NotifyType): any;
@@ -28,8 +32,6 @@ declare namespace gd3d.framework {
         notify: INotify;
         private _timeScale;
         timeScale: number;
-        private version;
-        private build;
         private _tar;
         private _standDeltaTime;
         targetFrame: number;
@@ -3207,17 +3209,37 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    enum AnimationCullingType {
+        AlwaysAnimate = 0,
+        BasedOnRenderers = 1,
+        BasedOnClipBounds = 2,
+        BasedOnUserBounds = 3
+    }
     class keyFrameAniPlayer implements INodeComponent {
         static readonly ClassName: string;
         clips: keyFrameAniClip[];
-        private nowClip;
+        private clipMap;
+        private _nowClip;
         private readonly nowFrame;
         private nowTime;
         private pathPropertyMap;
         gameObject: gameObject;
+        private playEndDic;
+        private _currClipName;
+        readonly currClipName: string;
+        private _speed;
+        speed: number;
+        private _animateOnlyIfVisible;
+        animateOnlyIfVisible: boolean;
+        private _cullingType;
+        cullingType: AnimationCullingType;
+        private _localBounds;
+        localBounds: aabb;
+        private endNormalizedTime;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
+        getClip(clipName: string): keyFrameAniClip;
         private displayByTime;
         private static lhvec;
         private static rhvec;
@@ -3234,11 +3256,13 @@ declare namespace gd3d.framework {
         private timeFilterCurves;
         private checkPlayEnd;
         private init;
-        isPlaying(ClipName: string): boolean;
-        playByName(ClipName: string): void;
-        play(): void;
+        isPlaying(ClipName?: string): boolean;
+        play(ClipName?: string, onPlayEnd?: () => void, normalizedTime?: number): void;
+        private playByClip;
+        private OnClipPlayEnd;
         stop(): void;
         rewind(): void;
+        addClip(clip: keyFrameAniClip): void;
         private collectPropertyObj;
         private collectPathPropertyObj;
         private serchChild;
@@ -6305,7 +6329,7 @@ declare namespace gd3d.framework {
     class ParticleSystemShapeBase {
         protected _module: ParticleShapeModule;
         constructor(module: ParticleShapeModule);
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6319,7 +6343,7 @@ declare namespace gd3d.framework {
         boxY: number;
         boxZ: number;
         emitFrom: ParticleSystemShapeBoxEmitFrom;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6330,7 +6354,7 @@ declare namespace gd3d.framework {
         arcSpread: number;
         arcSpeed: MinMaxCurve;
         emitFromEdge: boolean;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6343,7 +6367,7 @@ declare namespace gd3d.framework {
         arcSpread: number;
         arcSpeed: MinMaxCurve;
         emitFrom: ParticleSystemShapeConeEmitFrom;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6352,19 +6376,19 @@ declare namespace gd3d.framework {
         radiusMode: ParticleSystemShapeMultiModeValue;
         radiusSpread: number;
         radiusSpeed: MinMaxCurve;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
     class ParticleSystemShapeSphere extends ParticleSystemShapeBase {
         radius: number;
         emitFromShell: boolean;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
     class ParticleSystemShapeHemisphere extends ParticleSystemShapeBase {
         radius: number;
         emitFromShell: boolean;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {

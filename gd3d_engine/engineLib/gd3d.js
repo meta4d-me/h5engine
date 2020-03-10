@@ -58,6 +58,16 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var gd3d;
 (function (gd3d) {
+    var version = (function () {
+        function version() {
+        }
+        version.VERSION = "0.0.1";
+        return version;
+    }());
+    gd3d.version = version;
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
     var framework;
     (function (framework) {
         var NotifyType;
@@ -78,8 +88,6 @@ var gd3d;
             function application() {
                 this.globalMacros = [];
                 this.limitFrame = true;
-                this.version = "v0.0.1";
-                this.build = "b000077";
                 this._tar = -1;
                 this._standDeltaTime = -1;
                 this.canvasFixedType = CanvasFixedType.Free;
@@ -178,7 +186,6 @@ var gd3d;
                 if (type === void 0) { type = CanvasFixedType.Free; }
                 if (val === void 0) { val = 1200; }
                 if (webglDebug === void 0) { webglDebug = false; }
-                console.log("version: " + this.version + "  build: " + this.build);
                 if (div == null) {
                     console.error("root div does Null at application start ");
                     return;
@@ -214,6 +221,7 @@ var gd3d;
                 if (type === void 0) { type = CanvasFixedType.Free; }
                 if (val === void 0) { val = 1200; }
                 if (webglDebug === void 0) { webglDebug = false; }
+                console.log("engine version: " + gd3d.version.VERSION);
                 this.ccWidth = this.ccWidth == undefined ? canvas.clientWidth : this.ccWidth;
                 this.ccHeight = this.ccHeight == undefined ? canvas.clientHeight : this.ccHeight;
                 this._timeScale = 1;
@@ -992,13 +1000,6 @@ var gd3d;
             if (target["__gdmeta__"][funcname] == null)
                 target["__gdmeta__"][funcname] = {};
             target["__gdmeta__"][funcname]["type"] = "function";
-            var tp = Reflect.getMetadata("design:paramtypes", target, funcname);
-            var tr = Reflect.getMetadata("design:returntype", target, funcname);
-            target["__gdmeta__"][funcname]["paramtypes"] = [];
-            for (var i in tp) {
-                target["__gdmeta__"][funcname]["paramtypes"][i] = tp[i]["name"];
-            }
-            target["__gdmeta__"][funcname]["returntype"] = tr == null ? null : tr["name"];
             if (target["__gdmeta__"][funcname]["custom"] == null)
                 target["__gdmeta__"][funcname]["custom"] = {};
             if (customInfo != null) {
@@ -17505,41 +17506,98 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var AnimationCullingType;
+        (function (AnimationCullingType) {
+            AnimationCullingType[AnimationCullingType["AlwaysAnimate"] = 0] = "AlwaysAnimate";
+            AnimationCullingType[AnimationCullingType["BasedOnRenderers"] = 1] = "BasedOnRenderers";
+            AnimationCullingType[AnimationCullingType["BasedOnClipBounds"] = 2] = "BasedOnClipBounds";
+            AnimationCullingType[AnimationCullingType["BasedOnUserBounds"] = 3] = "BasedOnUserBounds";
+        })(AnimationCullingType = framework.AnimationCullingType || (framework.AnimationCullingType = {}));
         var keyFrameAniPlayer = (function () {
             function keyFrameAniPlayer() {
+                this.clipMap = {};
                 this.nowTime = 0;
                 this.pathPropertyMap = {};
+                this.playEndDic = {};
+                this._currClipName = "";
+                this._speed = 1;
+                this._animateOnlyIfVisible = true;
+                this._cullingType = AnimationCullingType.AlwaysAnimate;
+                this.endNormalizedTime = 1;
                 this.eulerStatusMap = {};
                 this.eulerMap = {};
             }
             keyFrameAniPlayer_1 = keyFrameAniPlayer;
             Object.defineProperty(keyFrameAniPlayer.prototype, "nowFrame", {
                 get: function () {
-                    if (!this.nowClip)
+                    if (!this._nowClip)
                         return 0;
-                    return Math.floor(this.nowClip.fps * this.nowTime);
+                    return Math.floor(this._nowClip.fps * this.nowTime);
                 },
                 enumerable: true,
                 configurable: true
             });
             ;
+            Object.defineProperty(keyFrameAniPlayer.prototype, "currClipName", {
+                get: function () { return this._currClipName; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(keyFrameAniPlayer.prototype, "speed", {
+                get: function () { return this._speed; },
+                set: function (v) { this._speed = v; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(keyFrameAniPlayer.prototype, "animateOnlyIfVisible", {
+                get: function () { return this._animateOnlyIfVisible; },
+                set: function (v) { this._animateOnlyIfVisible = v; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(keyFrameAniPlayer.prototype, "cullingType", {
+                get: function () { return this._cullingType; },
+                set: function (v) { this._cullingType = v; },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(keyFrameAniPlayer.prototype, "localBounds", {
+                get: function () { return this._localBounds; },
+                set: function (v) { this._localBounds = v; },
+                enumerable: true,
+                configurable: true
+            });
             keyFrameAniPlayer.prototype.start = function () {
                 this.init();
             };
             keyFrameAniPlayer.prototype.onPlay = function () {
             };
             keyFrameAniPlayer.prototype.update = function (delta) {
-                var clip = this.nowClip;
+                if (this._animateOnlyIfVisible && !this.gameObject.visible)
+                    return;
+                var clip = this._nowClip;
                 if (!clip)
                     return;
+                this.nowTime += delta * this._speed;
+                var clipTime = clip.time;
+                this.nowTime = this.nowTime % clipTime;
                 if (this.checkPlayEnd(clip)) {
-                    this.nowClip = null;
-                    this.nowTime = 0;
-                    return;
+                    this.OnClipPlayEnd();
                 }
-                this.nowTime += delta;
-                var playTime = this.nowTime % this.nowClip.time;
+                var playTime = this._nowClip == null ? clipTime : this.nowTime;
                 this.displayByTime(clip, playTime);
+            };
+            keyFrameAniPlayer.prototype.getClip = function (clipName) {
+                if (!this.clips || this.clips.length < 1)
+                    return;
+                if (this.clipMap[clipName])
+                    return this.clipMap[clipName];
+                var len = this.clips.length;
+                for (var i = 0; i < len; i++) {
+                    var clip = this.clips[i];
+                    if (clip)
+                        return clip;
+                }
             };
             keyFrameAniPlayer.prototype.displayByTime = function (clip, playTime) {
                 var curves = this.timeFilterCurves(clip, playTime);
@@ -17699,43 +17757,79 @@ var gd3d;
                     return true;
                 if (clip._wrapMode == framework.WrapMode.Loop || clip._wrapMode == framework.WrapMode.PingPong)
                     return false;
-                if (this.nowTime >= clip.time)
+                if (this.nowTime >= clip.time * this.endNormalizedTime)
                     return true;
             };
             keyFrameAniPlayer.prototype.init = function () {
-            };
-            keyFrameAniPlayer.prototype.isPlaying = function (ClipName) {
-                return (this.nowClip && this.nowClip.getName() == ClipName);
-            };
-            keyFrameAniPlayer.prototype.playByName = function (ClipName) {
-                if (!this.clips || this.clips.length < 1)
-                    return;
-                for (var i = 0; i < this.clips.length; i++) {
-                    var clip = this.clips[i];
-                    if (!clip)
-                        continue;
-                    if (clip.getName() == ClipName) {
-                        this.nowClip = clip;
-                        this.collectPathPropertyObj(this.nowClip, this.pathPropertyMap);
+                if (this.clips) {
+                    var len = this.clips.length;
+                    for (var i = 0; i < len; i++) {
+                        var clip = this.clips[0];
+                        if (i == 0)
+                            this._currClipName = clip.getName();
+                        this.clipMap[clip.getName()] = clip;
                     }
                 }
             };
-            keyFrameAniPlayer.prototype.play = function () {
-                if (!this.clips || this.clips.length < 1)
+            keyFrameAniPlayer.prototype.isPlaying = function (ClipName) {
+                if (ClipName === void 0) { ClipName = ""; }
+                if (!this._nowClip)
+                    return false;
+                if (ClipName)
+                    return this._nowClip.getName() == ClipName;
+                return true;
+            };
+            keyFrameAniPlayer.prototype.play = function (ClipName, onPlayEnd, normalizedTime) {
+                if (ClipName === void 0) { ClipName = ""; }
+                if (onPlayEnd === void 0) { onPlayEnd = null; }
+                if (normalizedTime === void 0) { normalizedTime = 1; }
+                if (!this.clips)
                     return;
-                this.nowClip = this.clips[0];
-                if (!this.nowClip)
+                if (!isNaN(normalizedTime)) {
+                    this.endNormalizedTime = gd3d.math.floatClamp(normalizedTime, 0, 1);
+                }
+                var clip = this.getClip(ClipName);
+                this.playByClip(clip, onPlayEnd);
+            };
+            keyFrameAniPlayer.prototype.playByClip = function (clip, onPlayEnd) {
+                if (onPlayEnd === void 0) { onPlayEnd = null; }
+                if (this._nowClip) {
+                    this.OnClipPlayEnd();
+                }
+                if (!clip)
                     return;
-                this.collectPathPropertyObj(this.nowClip, this.pathPropertyMap);
+                var clipName = clip.getName();
+                this.playEndDic[clipName] = onPlayEnd;
+                this.nowTime = 0;
+                this._nowClip = clip;
+                this._currClipName = clipName;
+                this.collectPathPropertyObj(this._nowClip, this.pathPropertyMap);
+            };
+            keyFrameAniPlayer.prototype.OnClipPlayEnd = function () {
+                if (!this._nowClip)
+                    return;
+                var clipName = this._nowClip.getName();
+                this._nowClip = null;
+                this.nowTime = 0;
+                this.endNormalizedTime = 1;
+                var endFunc = this.playEndDic[clipName];
+                if (endFunc)
+                    endFunc();
             };
             keyFrameAniPlayer.prototype.stop = function () {
-                this.nowClip = null;
+                this._nowClip = null;
             };
             keyFrameAniPlayer.prototype.rewind = function () {
-                if (!this.nowClip)
+                if (!this._nowClip)
                     return;
-                this.displayByTime(this.nowClip, 0);
+                this.displayByTime(this._nowClip, 0);
                 this.nowTime = 0;
+            };
+            keyFrameAniPlayer.prototype.addClip = function (clip) {
+                if (!this.clips)
+                    this.clips = [];
+                this.clips.push(clip);
+                this.clipMap[clip.getName()] = clip;
             };
             keyFrameAniPlayer.prototype.collectPropertyObj = function (clip) {
                 if (!clip)
@@ -17793,11 +17887,13 @@ var gd3d;
             keyFrameAniPlayer.prototype.remove = function () {
                 this.gameObject = null;
                 this.pathPropertyMap = null;
-                this.nowClip = null;
+                this._nowClip = null;
                 if (this.clips) {
                     this.clips.length = 0;
                 }
                 this.clips = null;
+                this.clipMap = null;
+                this.playEndDic = null;
             };
             var keyFrameAniPlayer_1;
             keyFrameAniPlayer.ClassName = "keyFrameAniPlayer";
@@ -31192,6 +31288,11 @@ var gd3d;
                 this._preRealTime = 0;
                 this._particlePool = this._particlePool.concat(this._activeParticles);
                 this._activeParticles.length = 0;
+                this._preworldPos.x = this.worldPos.x;
+                this._preworldPos.y = this.worldPos.y;
+                this._preworldPos.z = this.worldPos.z;
+                this._isRateOverDistance = false;
+                this._leftRateOverDistance = 0;
                 this.emission.bursts.forEach(function (element) {
                     element.calculateProbability();
                 });
@@ -32172,36 +32273,29 @@ var gd3d;
                 var limit = this.limit.getValue(particle.rateAtLifeTime, particle[_LimitVelocityOverLifetime_rate]);
                 var pVelocity = new gd3d.math.vector3();
                 gd3d.math.vec3Clone(particle.velocity, pVelocity);
-                if (this.space == framework.ParticleSystemSimulationSpace.World) {
-                    var localToWorldMatrix = this.particleSystem.localToWorldMatrix;
-                    var worldToLocalMatrix = this.particleSystem.worldToLocalMatrix;
-                    gd3d.math.matrixTransformNormal(pVelocity, localToWorldMatrix, pVelocity);
-                    if (this.separateAxes) {
-                        pVelocity.x = gd3d.math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
-                        pVelocity.y = gd3d.math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
-                        pVelocity.z = gd3d.math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
+                var mat = new gd3d.math.matrix();
+                if (this.space != this.particleSystem.main.simulationSpace) {
+                    if (this.space == framework.ParticleSystemSimulationSpace.World) {
+                        gd3d.math.matrixClone(this.particleSystem.localToWorldMatrix, mat);
                     }
                     else {
-                        if (gd3d.math.vec3SqrLength(pVelocity) > limit * limit) {
-                            gd3d.math.vec3Normalize(pVelocity, pVelocity);
-                            gd3d.math.vec3ScaleByNum(pVelocity, limit, pVelocity);
-                        }
+                        gd3d.math.matrixClone(this.particleSystem.worldToLocalMatrix, mat);
                     }
-                    gd3d.math.matrixTransformNormal(pVelocity, worldToLocalMatrix, pVelocity);
+                }
+                gd3d.math.matrixTransformNormal(pVelocity, mat, pVelocity);
+                if (this.separateAxes) {
+                    pVelocity.x = gd3d.math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
+                    pVelocity.y = gd3d.math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
+                    pVelocity.z = gd3d.math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
                 }
                 else {
-                    if (this.separateAxes) {
-                        pVelocity.x = gd3d.math.floatClamp(pVelocity.x, -limit3D.x, limit3D.x);
-                        pVelocity.y = gd3d.math.floatClamp(pVelocity.y, -limit3D.y, limit3D.y);
-                        pVelocity.z = gd3d.math.floatClamp(pVelocity.z, -limit3D.z, limit3D.z);
-                    }
-                    else {
-                        if (gd3d.math.vec3SqrLength(pVelocity) > limit * limit) {
-                            gd3d.math.vec3Normalize(pVelocity, pVelocity);
-                            gd3d.math.vec3ScaleByNum(pVelocity, limit, pVelocity);
-                        }
+                    if (gd3d.math.vec3SqrLength(pVelocity) > limit * limit) {
+                        gd3d.math.vec3Normalize(pVelocity, pVelocity);
+                        gd3d.math.vec3ScaleByNum(pVelocity, limit, pVelocity);
                     }
                 }
+                gd3d.math.matrixInverse(mat, mat);
+                gd3d.math.matrixTransformNormal(pVelocity, mat, pVelocity);
                 gd3d.math.vec3SLerp(particle.velocity, pVelocity, this.dampen, particle.velocity);
             };
             return ParticleLimitVelocityOverLifetimeModule;
@@ -32441,12 +32535,9 @@ var gd3d;
             });
             ParticleMainModule.prototype.initParticleState = function (particle) {
                 var birthRateAtDuration = particle.birthRateAtDuration;
-                particle.position.x = 0;
-                particle.position.y = 0;
-                particle.position.z = 0;
                 particle.velocity.x = 0;
                 particle.velocity.y = 0;
-                particle.velocity.z = this.startSpeed.getValue(birthRateAtDuration);
+                particle.velocity.z = 0;
                 particle.acceleration.x = 0;
                 particle.acceleration.y = 0;
                 particle.acceleration.z = 0;
@@ -32780,9 +32871,28 @@ var gd3d;
                 configurable: true
             });
             ParticleShapeModule.prototype.initParticleState = function (particle) {
+                var startSpeed = this.particleSystem.main.startSpeed.getValue(particle.birthRateAtDuration);
+                var position = new gd3d.math.vector3(0, 0, 0);
+                var dir = new gd3d.math.vector3(0, 0, 1);
+                if (this.enabled) {
+                    this.activeShape.calcParticlePosDir(particle, position, dir);
+                }
+                dir.x *= startSpeed;
+                dir.y *= startSpeed;
+                dir.z *= startSpeed;
+                if (this.particleSystem.main.simulationSpace == framework.ParticleSystemSimulationSpace.World) {
+                    var localToWorldMatrix = this.particleSystem.localToWorldMatrix;
+                    gd3d.math.matrixTransformVector3(position, localToWorldMatrix, position);
+                    gd3d.math.matrixTransformNormal(dir, localToWorldMatrix, dir);
+                }
+                particle.position.x += position.x;
+                particle.position.y += position.y;
+                particle.position.z += position.z;
+                particle.velocity.x += dir.x;
+                particle.velocity.y += dir.y;
+                particle.velocity.z += dir.z;
                 if (!this.enabled)
                     return;
-                this.activeShape.initParticleState(particle);
                 if (this.alignToDirection) {
                     var mat = new gd3d.math.matrix();
                     var dir = particle.velocity;
@@ -33493,7 +33603,7 @@ var gd3d;
             function ParticleSystemShapeBase(module) {
                 this._module = module;
             }
-            ParticleSystemShapeBase.prototype.initParticleState = function (particle) {
+            ParticleSystemShapeBase.prototype.calcParticlePosDir = function (particle, position, dir) {
             };
             return ParticleSystemShapeBase;
         }());
@@ -33547,43 +33657,43 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            ParticleSystemShapeBox.prototype.initParticleState = function (particle) {
-                var speed = gd3d.math.vec3Length(particle.velocity);
-                var p = new gd3d.math.vector3(this.boxX * (Math.random() * 2 - 1), this.boxY * (Math.random() * 2 - 1), this.boxZ * (Math.random() * 2 - 1));
+            ParticleSystemShapeBox.prototype.calcParticlePosDir = function (particle, position, dir) {
+                position.x = this.boxX * (Math.random() * 2 - 1);
+                position.y = this.boxY * (Math.random() * 2 - 1);
+                position.z = this.boxZ * (Math.random() * 2 - 1);
                 if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Shell) {
-                    var max = Math.max(Math.abs(p.x), Math.abs(p.y), Math.abs(p.z));
-                    if (Math.abs(p.x) == max) {
-                        p.x = p.x < 0 ? -1 : 1;
+                    var max = Math.max(Math.abs(position.x), Math.abs(position.y), Math.abs(position.z));
+                    if (Math.abs(position.x) == max) {
+                        position.x = position.x < 0 ? -1 : 1;
                     }
-                    else if (Math.abs(p.y) == max) {
-                        p.y = p.y < 0 ? -1 : 1;
+                    else if (Math.abs(position.y) == max) {
+                        position.y = position.y < 0 ? -1 : 1;
                     }
-                    else if (Math.abs(p.z) == max) {
-                        p.z = p.z < 0 ? -1 : 1;
+                    else if (Math.abs(position.z) == max) {
+                        position.z = position.z < 0 ? -1 : 1;
                     }
                 }
                 else if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Edge) {
-                    var min = Math.min(Math.abs(p.x), Math.abs(p.y), Math.abs(p.z));
-                    if (Math.abs(p.x) == min) {
-                        p.y = p.y < 0 ? -1 : 1;
-                        p.z = p.z < 0 ? -1 : 1;
+                    var min = Math.min(Math.abs(position.x), Math.abs(position.y), Math.abs(position.z));
+                    if (Math.abs(position.x) == min) {
+                        position.y = position.y < 0 ? -1 : 1;
+                        position.z = position.z < 0 ? -1 : 1;
                     }
-                    else if (Math.abs(p.y) == min) {
-                        p.x = p.x < 0 ? -1 : 1;
-                        p.z = p.z < 0 ? -1 : 1;
+                    else if (Math.abs(position.y) == min) {
+                        position.x = position.x < 0 ? -1 : 1;
+                        position.z = position.z < 0 ? -1 : 1;
                     }
-                    else if (Math.abs(p.z) == min) {
-                        p.x = p.x < 0 ? -1 : 1;
-                        p.y = p.y < 0 ? -1 : 1;
+                    else if (Math.abs(position.z) == min) {
+                        position.x = position.x < 0 ? -1 : 1;
+                        position.y = position.y < 0 ? -1 : 1;
                     }
                 }
-                particle.position.x = p.x;
-                particle.position.y = p.y;
-                particle.position.z = p.z;
-                var dir = new gd3d.math.vector3(0, 0, 1);
-                particle.velocity.x = dir.x * speed;
-                particle.velocity.y = dir.y * speed;
-                particle.velocity.z = dir.z * speed;
+                particle.position.x = position.x;
+                particle.position.y = position.y;
+                particle.position.z = position.z;
+                dir.x = 0;
+                dir.y = 0;
+                dir.z = 1;
             };
             return ParticleSystemShapeBox;
         }(framework.ParticleSystemShapeBase));
@@ -33651,8 +33761,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            ParticleSystemShapeCircle.prototype.initParticleState = function (particle) {
-                var speed = gd3d.math.vec3Length(particle.velocity);
+            ParticleSystemShapeCircle.prototype.calcParticlePosDir = function (particle, position, dir) {
                 var radius = this.radius;
                 var arc = this.arc;
                 var radiusAngle = 0;
@@ -33674,20 +33783,18 @@ var gd3d;
                     radiusAngle = Math.floor(radiusAngle / arc / this.arcSpread) * arc * this.arcSpread;
                 }
                 radiusAngle = gd3d.math.degToRad(radiusAngle);
-                var dir = new gd3d.math.vector3(Math.cos(radiusAngle), Math.sin(radiusAngle), 0);
-                var p = new gd3d.math.vector3(radius * dir.x, radius * dir.y, radius * dir.z);
+                dir.x = Math.cos(radiusAngle);
+                dir.y = Math.sin(radiusAngle);
+                dir.z = 0;
+                position.x = dir.x * radius;
+                position.y = dir.y * radius;
+                position.z = dir.z * radius;
                 if (!this.emitFromEdge) {
                     var rand = Math.random();
-                    p.x *= rand;
-                    p.y *= rand;
-                    p.z *= rand;
+                    position.x *= rand;
+                    position.y *= rand;
+                    position.z *= rand;
                 }
-                particle.position.x = p.x;
-                particle.position.y = p.y;
-                particle.position.z = p.z;
-                particle.velocity.x = dir.x * speed;
-                particle.velocity.y = dir.y * speed;
-                particle.velocity.z = dir.z * speed;
             };
             return ParticleSystemShapeCircle;
         }(framework.ParticleSystemShapeBase));
@@ -33775,8 +33882,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            ParticleSystemShapeCone.prototype.initParticleState = function (particle) {
-                var speed = gd3d.math.vec3Length(particle.velocity);
+            ParticleSystemShapeCone.prototype.calcParticlePosDir = function (particle, position, dir) {
                 var radius = this.radius;
                 var angle = this.angle;
                 var arc = this.arc;
@@ -33808,16 +33914,14 @@ var gd3d;
                 var bottomPos = new gd3d.math.vector3(basePos.x * radius * radiusRate, basePos.y * radius * radiusRate, 0);
                 var scale = (radius + this.length * Math.tan(gd3d.math.degToRad(angle))) * radiusRate;
                 var topPos = new gd3d.math.vector3(basePos.x * scale, basePos.y * scale, this.length);
-                gd3d.math.vec3Subtract(topPos, bottomPos, particle.velocity);
-                gd3d.math.vec3Normalize(particle.velocity, particle.velocity);
-                gd3d.math.vec3ScaleByNum(particle.velocity, speed, particle.velocity);
-                var position = new gd3d.math.vector3(bottomPos.x, bottomPos.y, bottomPos.z);
+                gd3d.math.vec3Subtract(topPos, bottomPos, dir);
+                gd3d.math.vec3Normalize(dir, dir);
+                position.x = bottomPos.x;
+                position.y = bottomPos.y;
+                position.z = bottomPos.z;
                 if (this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.Volume || this.emitFrom == framework.ParticleSystemShapeConeEmitFrom.VolumeShell) {
                     gd3d.math.vec3SLerp(position, topPos, Math.random(), position);
                 }
-                particle.position.x = position.x;
-                particle.position.y = position.y;
-                particle.position.z = position.z;
             };
             return ParticleSystemShapeCone;
         }(framework.ParticleSystemShapeBase));
@@ -33873,8 +33977,7 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            ParticleSystemShapeEdge.prototype.initParticleState = function (particle) {
-                var speed = gd3d.math.vec3Length(particle.velocity);
+            ParticleSystemShapeEdge.prototype.calcParticlePosDir = function (particle, position, dir) {
                 var arc = 360 * this.radius;
                 var radiusAngle = 0;
                 if (this.radiusMode == framework.ParticleSystemShapeMultiModeValue.Random) {
@@ -33895,14 +33998,12 @@ var gd3d;
                     radiusAngle = Math.floor(radiusAngle / arc / this.radiusSpread) * arc * this.radiusSpread;
                 }
                 radiusAngle = radiusAngle / arc;
-                var dir = new gd3d.math.vector3(0, 1, 0);
-                var p = new gd3d.math.vector3(this.radius * (radiusAngle * 2 - 1), 0, 0);
-                particle.position.x = p.x;
-                particle.position.y = p.y;
-                particle.position.z = p.z;
-                particle.velocity.x = dir.x * speed;
-                particle.velocity.y = dir.y * speed;
-                particle.velocity.z = dir.z * speed;
+                dir.x = 0;
+                dir.x = 1;
+                dir.x = 0;
+                position.x = this.radius * (radiusAngle * 2 - 1);
+                position.y = 0;
+                position.z = 0;
             };
             return ParticleSystemShapeEdge;
         }(framework.ParticleSystemShapeBase));
@@ -33930,23 +34031,20 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            ParticleSystemShapeSphere.prototype.initParticleState = function (particle) {
-                var speed = gd3d.math.vec3Length(particle.velocity);
-                var dir = new gd3d.math.vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+            ParticleSystemShapeSphere.prototype.calcParticlePosDir = function (particle, position, dir) {
+                dir.x = Math.random() * 2 - 1;
+                dir.y = Math.random() * 2 - 1;
+                dir.z = Math.random() * 2 - 1;
                 gd3d.math.vec3Normalize(dir, dir);
-                var p = new gd3d.math.vector3(this.radius * dir.x, this.radius * dir.y, this.radius * dir.z);
+                position.x = this.radius * dir.x;
+                position.y = this.radius * dir.y;
+                position.z = this.radius * dir.z;
                 if (!this.emitFromShell) {
                     var rand = Math.random();
-                    p.x *= rand;
-                    p.y *= rand;
-                    p.z *= rand;
+                    position.x *= rand;
+                    position.y *= rand;
+                    position.z *= rand;
                 }
-                particle.position.x = p.x;
-                particle.position.y = p.y;
-                particle.position.z = p.z;
-                particle.velocity.x = dir.x * speed;
-                particle.velocity.y = dir.y * speed;
-                particle.velocity.z = dir.z * speed;
             };
             return ParticleSystemShapeSphere;
         }(framework.ParticleSystemShapeBase));
@@ -33959,24 +34057,21 @@ var gd3d;
                 _this.emitFromShell = false;
                 return _this;
             }
-            ParticleSystemShapeHemisphere.prototype.initParticleState = function (particle) {
-                var speed = gd3d.math.vec3Length(particle.velocity);
-                var dir = new gd3d.math.vector3(Math.random() * 2 - 1, Math.random() * 2 - 1, Math.random() * 2 - 1);
+            ParticleSystemShapeHemisphere.prototype.calcParticlePosDir = function (particle, position, dir) {
+                dir.x = Math.random() * 2 - 1;
+                dir.y = Math.random() * 2 - 1;
+                dir.z = Math.random() * 2 - 1;
                 gd3d.math.vec3Normalize(dir, dir);
                 dir.z = Math.abs(dir.z);
-                var p = new gd3d.math.vector3(this.radius * dir.x, this.radius * dir.y, this.radius * dir.z);
+                position.x = this.radius * dir.x;
+                position.y = this.radius * dir.y;
+                position.z = this.radius * dir.z;
                 if (!this.emitFromShell) {
                     var rand = Math.random();
-                    p.x *= rand;
-                    p.y *= rand;
-                    p.z *= rand;
+                    position.x *= rand;
+                    position.y *= rand;
+                    position.z *= rand;
                 }
-                particle.position.x = p.x;
-                particle.position.y = p.y;
-                particle.position.z = p.z;
-                particle.velocity.x = dir.x * speed;
-                particle.velocity.y = dir.y * speed;
-                particle.velocity.z = dir.z * speed;
             };
             return ParticleSystemShapeHemisphere;
         }(framework.ParticleSystemShapeBase));

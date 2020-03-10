@@ -2283,7 +2283,7 @@ var test_f4skin = (function () {
                         this.scene.addChild(orig);
                         anip11 = orig.gameObject.getComponentsInChildren("keyFrameAniPlayer")[0];
                         cName = anip11.clips[0].getName();
-                        anip11.playByName(cName);
+                        anip11.play(cName);
                         _a = pf.gameObject.getComponentsInChildren('f4skinnedMeshRenderer'), f4 = _a[0], f5 = _a[1];
                         f4.materials[0].setShader(this.app.getAssetMgr().getShader("f4skin.shader.json"));
                         pf.gameObject.getComponentsInChildren("ParticleSystem").forEach(function (v) {
@@ -2309,7 +2309,7 @@ var test_f4skin = (function () {
                         bite = function (value) {
                             if (value === void 0) { value = 190; }
                             anip.rewind();
-                            anip.playByName('bite.keyframeAniclip.json');
+                            anip.play('bite.keyframeAniclip.json');
                             setTimeout(function () {
                                 anip2.rewind();
                                 anip2.play();
