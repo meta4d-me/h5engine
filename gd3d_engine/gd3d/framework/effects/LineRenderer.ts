@@ -9,6 +9,8 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class LineRenderer implements IRenderer
     {
+        static readonly ClassName: string = "LineRenderer";
+        
         private mesh = new gd3d.framework.mesh("LineRenderer" + ".mesh.bin");
 
         /**

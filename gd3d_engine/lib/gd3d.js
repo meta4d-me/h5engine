@@ -21451,6 +21451,7 @@ var gd3d;
                 return rateAtLines;
             };
             var LineRenderer_1;
+            LineRenderer.ClassName = "LineRenderer";
             __decorate([
                 gd3d.reflect.Field("material"),
                 __metadata("design:type", framework.material)
@@ -21733,7 +21734,6 @@ var gd3d;
         (function (LineAlignment) {
             LineAlignment[LineAlignment["View"] = 0] = "View";
             LineAlignment[LineAlignment["TransformZ"] = 1] = "TransformZ";
-            LineAlignment[LineAlignment["None"] = 2] = "None";
         })(LineAlignment = framework.LineAlignment || (framework.LineAlignment = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));

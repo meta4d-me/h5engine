@@ -1181,6 +1181,7 @@ var main = (function () {
             demoList.addBtn("射线检测", function () { return new test_pick_boxcollider(); });
             demoList.addBtn("关键帧动画", function () { return new test_keyFrameAni(); });
             demoList.addBtn("粒子系統", function () { return new test_ParticleSystem(); });
+            demoList.addBtn("线条", function () { return new test_LineRenderer(); });
             demoList.addBtn("Android平台ETC1压缩纹理", function () { return new test_ETC1_KTX(); });
             return new demoList();
         });
@@ -4156,6 +4157,81 @@ var test_Decal = (function () {
         this.building.localRotate = this.building.localRotate;
     };
     return test_Decal;
+}());
+var test_LineRenderer = (function () {
+    function test_LineRenderer() {
+        this.loop = false;
+        this.viewcamera = false;
+    }
+    test_LineRenderer.prototype.start = function (app) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        this.app = app;
+                        this.scene = this.app.getScene();
+                        this.astMgr = this.app.getAssetMgr();
+                        gd3d.framework.assetMgr.openGuid = false;
+                        return [4, datGui.init()];
+                    case 1:
+                        _a.sent();
+                        this.setGUI();
+                        this.init();
+                        return [2];
+                }
+            });
+        });
+    };
+    test_LineRenderer.prototype.setGUI = function () {
+        if (!dat)
+            return;
+        var gui = new dat.GUI();
+        gui.add(this, 'loop');
+        gui.add(this, 'viewcamera');
+    };
+    test_LineRenderer.prototype.init = function () {
+        var objCam = new gd3d.framework.transform();
+        objCam.name = "sth.";
+        this.scene.addChild(objCam);
+        this.camera = objCam.gameObject.addComponent("camera");
+        this.camera.near = 0.01;
+        this.camera.far = 1000;
+        this.camera.fov = Math.PI * 2 / 3;
+        this.camera.backgroundColor = new gd3d.math.color(0.2784, 0.2784, 0.2784, 1);
+        objCam.localTranslate = new gd3d.math.vector3(0, 0, -10);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        var hoverc = this.camera.gameObject.addComponent("HoverCameraScript");
+        hoverc.panAngle = 180;
+        hoverc.tiltAngle = 45;
+        hoverc.distance = 10;
+        hoverc.scaleSpeed = 0.1;
+        hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0);
+        this.initLineRenderer();
+    };
+    test_LineRenderer.prototype.initLineRenderer = function () {
+        var tran = new gd3d.framework.transform();
+        tran.name = "LineRenderer";
+        this.scene.addChild(tran);
+        var lr = tran.gameObject.getComponent("LineRenderer");
+        if (!lr)
+            lr = tran.gameObject.addComponent("LineRenderer");
+        this.lr = lr;
+        lr.positions = [new gd3d.math.vector3(0, 0, 0), new gd3d.math.vector3(1, 0, 0), new gd3d.math.vector3(0, 1, 0),];
+    };
+    test_LineRenderer.prototype._showParticle = function (res) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                return [2];
+            });
+        });
+    };
+    test_LineRenderer.prototype.update = function (delta) {
+        if (this.lr) {
+            this.lr.loop = this.loop;
+            this.lr.alignment = this.viewcamera ? gd3d.framework.LineAlignment.View : gd3d.framework.LineAlignment.TransformZ;
+        }
+    };
+    return test_LineRenderer;
 }());
 var test_ParticleSystem = (function () {
     function test_ParticleSystem() {

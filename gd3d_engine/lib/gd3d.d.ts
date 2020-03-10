@@ -4122,6 +4122,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     class LineRenderer implements IRenderer {
+        static readonly ClassName: string;
         private mesh;
         material: material;
         layer: RenderLayerEnum;
@@ -4250,8 +4251,7 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     enum LineAlignment {
         View = 0,
-        TransformZ = 1,
-        None = 2
+        TransformZ = 1
     }
 }
 declare namespace gd3d.framework {

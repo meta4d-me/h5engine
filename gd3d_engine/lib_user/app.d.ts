@@ -625,6 +625,21 @@ declare class test_Decal implements IState {
     private Y_ag;
     update(delta: number): void;
 }
+declare class test_LineRenderer implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    astMgr: gd3d.framework.assetMgr;
+    lr: gd3d.framework.LineRenderer;
+    loop: boolean;
+    viewcamera: boolean;
+    start(app: gd3d.framework.application): Promise<void>;
+    setGUI(): void;
+    private init;
+    private initLineRenderer;
+    private _showParticle;
+    update(delta: number): void;
+}
 declare namespace gd3d.math {
     interface color {
         "__class__"?: "gd3d.math.color";
