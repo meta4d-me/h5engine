@@ -6,24 +6,6 @@ namespace gd3d.framework
     export var serialization: Serialization;
 
     /**
-     * 序列化装饰器
-     * 
-     * 在属性定义前使用 @serialize 进行标记需要序列化
-     * 
-     * @param {*} target                序列化原型
-     * @param {string} propertyKey      序列化属性
-     */
-    export function serialize(target: any, propertyKey: string)
-    {
-        if (!Object.getOwnPropertyDescriptor(target, SERIALIZE_KEY))
-        {
-            Object.defineProperty(target, SERIALIZE_KEY, { value: [] });
-        }
-        var serializePropertys: string[] = target[SERIALIZE_KEY];
-        serializePropertys.push(propertyKey);
-    }
-
-    /**
      * 序列化属性函数
      * 
      * 序列化对象时建议使用 serialization.serialize
@@ -740,19 +722,3 @@ namespace gd3d.framework
 
 
 }
-
-
-
-// [Float32Array, Float64Array, Int8Array, Int16Array, Int32Array, Uint8Array, Uint16Array, Uint32Array, Uint8ClampedArray].forEach(element =>
-// {
-//     element.prototype["serialize"] = function (object: { value: number[] })
-//     {
-//         object.value = Array.from(this);
-//         return object;
-//     }
-
-//     element.prototype["deserialize"] = function (object: { value: number[] })
-//     {
-//         return new (<any>(this.constructor))(object.value);
-//     }
-// });

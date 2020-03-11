@@ -1,16 +1,16 @@
 namespace gd3d.framework
 {
     /**
-     * 粒子系统数据
+     * 拖尾染器数据
      */
     @gd3d.reflect.SerializeType
-    export class ParticleSystemData implements IAsset
+    export class TrailRendererData implements IAsset
     {
-        static readonly ClassName: string = "ParticleSystemData";
+        static readonly ClassName: string = "TrailRendererData";
 
-        private static _datas: { [name: string]: ParticleSystemData } = {};
+        private static _datas: { [name: string]: TrailRendererData } = {};
 
-        particleSystem: ParticleSystem;
+        trailRenderer: TrailRenderer;
 
         /**
          * 获取已经创建了的粒子系统数据
@@ -46,11 +46,11 @@ namespace gd3d.framework
         {
             this._value = v;
 
-            if (ParticleSystemData._datas[v])
+            if (TrailRendererData._datas[v])
             {
                 return;
             }
-            ParticleSystemData._datas[v] = this;
+            TrailRendererData._datas[v] = this;
         }
         private _value: string;
 
@@ -58,7 +58,7 @@ namespace gd3d.framework
         {
             if (!assetName)
             {
-                assetName = "ParticleSystem_" + this.getGUID();
+                assetName = "TrailRenderer_" + this.getGUID();
             }
             this.name = new constText(assetName);
         }
@@ -140,9 +140,9 @@ namespace gd3d.framework
         setData(v: string)
         {
             this.objectData = JSON.parse(v);
-            if (this.particleSystem)
+            if (this.trailRenderer)
             {
-                serialization.setValue(this.particleSystem, this.objectData);
+                serialization.setValue(this.trailRenderer, this.objectData);
             }
         }
 

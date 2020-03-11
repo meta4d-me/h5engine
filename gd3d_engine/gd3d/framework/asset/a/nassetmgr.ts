@@ -88,6 +88,8 @@ namespace gd3d.framework
                     return AssetTypeEnum.KeyFrameAniclip;
                 case ".particlesystem.json":
                     return AssetTypeEnum.ParticleSystem;
+                case ".trailrenderer.json":
+                    return AssetTypeEnum.TrailRenderer;
             }
 
             i = file.indexOf(".", i + 1);
@@ -537,6 +539,21 @@ namespace gd3d.framework
         getShader(name: string): gd3d.framework.shader
         {
             return this.mapShader[name];
+        }
+        private linerenderermat: material;
+        getDefLineRendererMat(): material
+        {
+            if (this.linerenderermat == null)
+            {
+                let material = new framework.material();
+                material.use();
+                material.setShader(sceneMgr.app.getAssetMgr().getShader("shader/deflinetrail"));
+
+                var tex = this.getDefaultTexture(defTexture.white);
+                material.setTexture("_MainTex", tex);
+                this.linerenderermat = material;
+            }
+            return this.linerenderermat;
         }
         private particlemat: material;
         getDefParticleMat(): material
