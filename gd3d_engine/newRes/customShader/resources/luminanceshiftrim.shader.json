@@ -1,0 +1,38 @@
+{
+    "layer": "geometry",
+    "properties": [
+        "_MainTex('MainTex',Texture)='white'{}",
+        "_RimSize('Rim Size',Range(0.0,5.0)) = 0.0",
+        "_RimIntensity('Rim intensity',Range(0.0,50.0)) = 1.0"
+    ],
+    "passes": {
+        "base": [
+            {
+                "showface": "ccw",
+                "vs": "luminanceshiftrim",
+                "fs": "luminanceshiftrim"
+            }
+        ],
+        "base_fog": [
+            {
+                "showface": "ccw",
+                "vs": "luminanceshiftrim",
+                "fs": "luminanceshiftrim"
+            }
+        ],
+        "skin": [
+            {
+                "showface": "ccw",
+                "vs": "luminanceshiftrim",
+                "fs": "luminanceshiftrim"
+            }
+        ],
+        "skin_fog": [
+            {
+                "showface": "ccw",
+                "vs": "luminanceshiftrim",
+                "fs": "luminanceshiftrim"
+            }
+        ]
+    }
+}

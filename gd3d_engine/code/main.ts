@@ -18,6 +18,9 @@ class main implements gd3d.framework.IUserCode
         console.log("i am here.");
         this.app = app;
 
+        //关闭 guid 依赖
+        gd3d.framework.assetMgr.openGuid = false;
+
         //-------------------------------------基础
         this.addBtn("基础==>",()=>{
             demoList.addBtn("f14effect",()=>new dome.db_test_f14eff());

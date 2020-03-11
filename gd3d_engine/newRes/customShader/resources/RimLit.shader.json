@@ -1,0 +1,37 @@
+{
+    "layer": "geometry",
+    "properties": [
+        "_MainTex('MainTex',Texture)='white'{}",
+        "_MainTex_ST('MainTex_ST',Vector) = (1,1,0,0)"
+    ],
+    "passes": {
+        "base": [
+            {
+                "showface": "ccw",
+                "vs": "RimLit",
+                "fs": "RimLit"
+            }
+        ],
+        "base_fog": [
+            {
+                "showface": "ccw",
+                "vs": "RimLit",
+                "fs": "RimLit"
+            }
+        ],
+        "skin": [
+            {
+                "showface": "ccw",
+                "vs": "RimLit",
+                "fs": "RimLit"
+            }
+        ],
+        "skin_fog": [
+            {
+                "showface": "ccw",
+                "vs": "RimLit",
+                "fs": "RimLit"
+            }
+        ]
+    }
+}

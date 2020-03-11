@@ -17,7 +17,7 @@ namespace gd3d.framework
         gameObject: gameObject;
 
         @reflect.Field("animationClip[]")
-        clips: animationClip[];
+        clips: animationClip[] = [];
         @reflect.Field("boolean")
         public autoplay: boolean = true;
 
@@ -183,9 +183,17 @@ namespace gd3d.framework
         }
         start()
         {
-            if (this.bones != null)
-            {
-                this.init();
+            if(!this.bones) return;
+            this.init();
+            let len = this.clips.length;
+            for(let i = 0 ;i < len ;i++){
+                let clip = this.clips[i];
+                if(!clip.frames || Object.keys(clip.frames).length < 1) break;
+                this.addClip(clip);
+            }
+
+            if(this.autoplay && len > 0 ){
+                this.playAniclip(this.clips[0]);
             }
         }
 
@@ -194,7 +202,7 @@ namespace gd3d.framework
 
         }
         private temptMat: math.matrix = math.pool.new_matrix();
-        frameDirty : boolean = false;
+        frameDirty : boolean = true;
         update(delta: number)
         {
             if (!this.bePlay) return;
@@ -546,7 +554,7 @@ namespace gd3d.framework
 
         fillPoseData(data: Float32Array, bones: transform[]): void
         {
-            if(!this.curFrame || !bones || !data) return;
+            if( !bones || !data) return;
             if (!this.bePlay)
             {
                 if (this.beActived) return;
@@ -565,6 +573,7 @@ namespace gd3d.framework
                 }
                 return;
             }
+            if(!this.curFrame ) return;
             if (this._playClip.indexDic.len)
                 for (let i = 0, len = bones.length; i < len; i++)
                 {

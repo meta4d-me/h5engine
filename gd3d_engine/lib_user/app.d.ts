@@ -234,11 +234,11 @@ declare class test_loadprefab implements IState {
 declare class testReload implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
-    start(app: gd3d.framework.application): void;
+    resRoot: string;
+    start(app: gd3d.framework.application): Promise<void>;
     uileft: number;
     createChangeBtn(role: gd3d.framework.transform, role1: gd3d.framework.transform, o2d: gd3d.framework.overlay2D, part: string): void;
     camera: gd3d.framework.camera;
-    cube: gd3d.framework.transform;
     timer: number;
     update(delta: number): void;
 }

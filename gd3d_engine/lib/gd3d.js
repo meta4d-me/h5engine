@@ -14534,6 +14534,7 @@ var gd3d;
     (function (framework) {
         var aniplayer = (function () {
             function aniplayer() {
+                this.clips = [];
                 this.autoplay = true;
                 this._playClip = null;
                 this.clipnames = {};
@@ -14555,7 +14556,7 @@ var gd3d;
                 this._allClipNames = [];
                 this.collected = false;
                 this.temptMat = gd3d.math.pool.new_matrix();
-                this.frameDirty = false;
+                this.frameDirty = true;
                 this.playEndDic = {};
                 this.beActivedEndFrame = false;
                 this.endFrame = 0;
@@ -14672,8 +14673,18 @@ var gd3d;
                 return this.clipnames[name];
             };
             aniplayer.prototype.start = function () {
-                if (this.bones != null) {
-                    this.init();
+                if (!this.bones)
+                    return;
+                this.init();
+                var len = this.clips.length;
+                for (var i = 0; i < len; i++) {
+                    var clip = this.clips[i];
+                    if (!clip.frames || Object.keys(clip.frames).length < 1)
+                        break;
+                    this.addClip(clip);
+                }
+                if (this.autoplay && len > 0) {
+                    this.playAniclip(this.clips[0]);
                 }
             };
             aniplayer.prototype.onPlay = function () {
@@ -14922,7 +14933,7 @@ var gd3d;
                 this.boneCache = {};
             };
             aniplayer.prototype.fillPoseData = function (data, bones) {
-                if (!this.curFrame || !bones || !data)
+                if (!bones || !data)
                     return;
                 if (!this.bePlay) {
                     if (this.beActived)
@@ -14941,6 +14952,8 @@ var gd3d;
                     }
                     return;
                 }
+                if (!this.curFrame)
+                    return;
                 if (this._playClip.indexDic.len)
                     for (var i = 0, len = bones.length; i < len; i++) {
                         var bonename = bones[i].name;
