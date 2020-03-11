@@ -201,6 +201,18 @@
           "length":0
           },
       {
+          "name":"resources/linetrail.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/linetrail.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/linetrail.vs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/mask_add_tint.shader.json",
           "length":0
           },
