@@ -235,9 +235,13 @@ declare class testReload implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
     resRoot: string;
+    careSubList: string[];
+    r_a_Name: string;
+    r_b_Name: string;
     start(app: gd3d.framework.application): Promise<void>;
     uileft: number;
     createChangeBtn(role: gd3d.framework.transform, role1: gd3d.framework.transform, o2d: gd3d.framework.overlay2D, part: string): void;
+    excangeSub(r_a_part: gd3d.framework.skinnedMeshRenderer, r_b_part: gd3d.framework.skinnedMeshRenderer): void;
     camera: gd3d.framework.camera;
     timer: number;
     update(delta: number): void;
