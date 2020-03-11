@@ -547,7 +547,7 @@ namespace gd3d.framework
             {
                 let material = new framework.material();
                 material.use();
-                material.setShader(sceneMgr.app.getAssetMgr().getShader("shader/def2"));
+                material.setShader(sceneMgr.app.getAssetMgr().getShader("shader/deflinetrail"));
 
                 var tex = this.getDefaultTexture(defTexture.white);
                 material.setTexture("_MainTex", tex);

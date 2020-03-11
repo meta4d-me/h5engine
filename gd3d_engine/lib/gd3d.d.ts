@@ -1812,6 +1812,9 @@ declare namespace gd3d.framework {
         static fsline: string;
         static materialShader: string;
         static vsmaterialcolor: string;
+        static vslinetrail: string;
+        static linetrailShader: string;
+        static fslinetrail: string;
         static initDefaultShader(assetmgr: assetMgr): void;
     }
 }

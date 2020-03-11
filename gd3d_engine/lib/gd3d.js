@@ -9236,7 +9236,7 @@ var gd3d;
                 if (this.linerenderermat == null) {
                     var material_1 = new framework.material();
                     material_1.use();
-                    material_1.setShader(framework.sceneMgr.app.getAssetMgr().getShader("shader/def2"));
+                    material_1.setShader(framework.sceneMgr.app.getAssetMgr().getShader("shader/deflinetrail"));
                     var tex = this.getDefaultTexture(framework.defTexture.white);
                     material_1.setTexture("_MainTex", tex);
                     this.linerenderermat = material_1;
@@ -9448,6 +9448,8 @@ var gd3d;
                 pool.compileFS(assetmgr.webgl, "defUIMaskFS", defShader.fscodeMaskUI);
                 pool.compileVS(assetmgr.webgl, "defuifontMaskVS", defShader.vscodeuifontmask);
                 pool.compileFS(assetmgr.webgl, "defuifontMaskFS", defShader.fscodeuifontmask);
+                pool.compileVS(assetmgr.webgl, "deflinetrailVS", defShader.vslinetrail);
+                pool.compileFS(assetmgr.webgl, "deflinetrailFS", defShader.fslinetrail);
                 var program = pool.linkProgram(assetmgr.webgl, "def", "def");
                 var program2 = pool.linkProgram(assetmgr.webgl, "defui", "defui");
                 var programuifont = pool.linkProgram(assetmgr.webgl, "defuifont", "defuifont");
@@ -9456,6 +9458,7 @@ var gd3d;
                 var programmaterialcolor = pool.linkProgram(assetmgr.webgl, "materialcolor", "line");
                 var programMaskUI = pool.linkProgram(assetmgr.webgl, "defUIMaskVS", "defUIMaskFS");
                 var programMaskfont = pool.linkProgram(assetmgr.webgl, "defuifontMaskVS", "defuifontMaskFS");
+                var programlinetrail = pool.linkProgram(assetmgr.webgl, "deflinetrailVS", "deflinetrailFS");
                 {
                     var sh = new framework.shader("shader/def");
                     sh.defaultAsset = true;
@@ -9585,6 +9588,22 @@ var gd3d;
                     sh.passes["base"].push(p);
                     sh._parseProperties(assetmgr, JSON.parse(this.shaderuifront).properties);
                     p.setProgram(programMaskfont);
+                    sh.fillUnDefUniform(p);
+                    p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
+                    p.state_ztest = false;
+                    p.state_zwrite = false;
+                    p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend);
+                    assetmgr.mapShader[sh.getName()] = sh;
+                }
+                {
+                    var sh = new framework.shader("shader/deflinetrail");
+                    sh.defaultAsset = true;
+                    sh.passes["base"] = [];
+                    var p = new gd3d.render.glDrawPass();
+                    sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.linetrailShader).properties);
+                    p.setProgram(programlinetrail);
                     sh.fillUnDefUniform(p);
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
                     p.state_ztest = false;
@@ -9729,6 +9748,13 @@ var gd3d;
             xlv_COLOR.a = xlv_COLOR.a * _Alpha;\
             gl_Position = (glstate_matrix_mvp * tmpvar_1);\
         }";
+            defShader.vslinetrail = "\n        attribute vec4 _glesVertex;\n        attribute vec2 _glesMultiTexCoord0;\n        attribute vec4 _glesColor;\n        \n        uniform mat4 glstate_matrix_mvp;\n        \n        varying vec2 xlv_TEXCOORD0;\n        varying vec4 xlv_COLOR;\n        \n        void main() \n        {\n            gl_Position = glstate_matrix_mvp * _glesVertex;\n            xlv_TEXCOORD0 = _glesMultiTexCoord0;\n            xlv_COLOR = _glesColor;\n        }\n        ";
+            defShader.linetrailShader = "{\
+            \"properties\": [\
+              \"_MainTex('MainTex',Texture)='white'{}\"\
+            ]\
+            }";
+            defShader.fslinetrail = "\n        precision mediump float;\n\n        uniform sampler2D _MainTex; \n        \n        varying vec2 xlv_TEXCOORD0;\n        varying vec4 xlv_COLOR;\n        \n        void main() \n        {\n            vec4 color = texture2D(_MainTex, xlv_TEXCOORD0);\n            gl_FragColor = color * xlv_COLOR;\n        }\n        ";
             return defShader;
         }());
         framework.defShader = defShader;
