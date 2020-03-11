@@ -33,7 +33,7 @@ namespace gd3d.math
         out.x = a.x + b.x;
         out.y = a.y + b.y;
         out.z = a.z + b.z;
-        
+
         // out.rawData[0] = a.x + b.x;
         // out.rawData[1] = a.y + b.y;
         // out.rawData[2] = a.z + b.z;
@@ -43,7 +43,7 @@ namespace gd3d.math
         out.x = a.x - b.x;
         out.y = a.y - b.y;
         out.z = a.z - b.z;
-        
+
         // out.rawData[0] = a.x - b.x;
         // out.rawData[1] = a.y - b.y;
         // out.rawData[2] = a.z - b.z;
@@ -53,7 +53,7 @@ namespace gd3d.math
         out.x = -a.x;
         out.y = -a.y;
         out.z = -a.z;
-        
+
         // out.rawData[0] = -a.x;
         // out.rawData[1] = -a.y;
         // out.rawData[2] = -a.z;
@@ -75,7 +75,7 @@ namespace gd3d.math
     {
         out.x = out.y = 0;
         out.z = 1;
-        
+
         // out.rawData[0] = out.rawData[1] = 0;
         // out.rawData[2] = 1;
     }
@@ -83,7 +83,7 @@ namespace gd3d.math
     {
         out.x = out.y = 0;
         out.z = -1;
-        
+
         // out.rawData[0] = out.rawData[1] = 0;
         // out.rawData[2] = -1;
     }
@@ -91,7 +91,7 @@ namespace gd3d.math
     {
         out.x = out.z = 0;
         out.y = 1;
-        
+
         // out.rawData[0] = out.rawData[2] = 0;
         // out.rawData[1] = 1;
     }
@@ -99,23 +99,23 @@ namespace gd3d.math
     {
         out.x = out.z = 0;
         out.y = -1;
-        
+
         // out.rawData[0] = out.rawData[2] = 0;
         // out.rawData[1] = -1;
     }
     export function vec3Set_Left(out: vector3)
     {
         out.x = -1;
-        out.y = out.z = 0; 
-        
+        out.y = out.z = 0;
+
         // out.rawData[0] = -1;
         // out.rawData[1] = out.rawData[2] = 0;
     }
     export function vec3Set_Right(out: vector3)
     {
         out.x = 1;
-        out.y = out.z = 0; 
-        
+        out.y = out.z = 0;
+
         // out.rawData[0] = 1;
         // out.rawData[1] = out.rawData[2] = 0;
     }
@@ -127,7 +127,7 @@ namespace gd3d.math
             out.x = value.x / num;
             out.y = value.y / num;
             out.z = value.z / num;
-            
+
             // out.rawData[0] = value.x / num;
             // out.rawData[1] = value.y / num;
             // out.rawData[2] = value.z / num;
@@ -136,7 +136,7 @@ namespace gd3d.math
             out.x = 0;
             out.y = 0;
             out.z = 0;
-            
+
             // out.rawData[0] = 0;
             // out.rawData[1] = 0;
             // out.rawData[2] = 0;
@@ -148,7 +148,7 @@ namespace gd3d.math
         out.x = from.x * scale.x;
         out.y = from.y * scale.y;
         out.z = from.z * scale.z;
-        
+
         // out.rawData[0] = from.x * scale.x;
         // out.rawData[1] = from.y * scale.y;
         // out.rawData[2] = from.z * scale.z;
@@ -157,8 +157,8 @@ namespace gd3d.math
     {
         out.x = from.x * scale;
         out.y = from.y * scale;
-        out.z = from.z * scale; 
-        
+        out.z = from.z * scale;
+
         // out.rawData[0] = from.x * scale;
         // out.rawData[1] = from.y * scale;
         // out.rawData[2] = from.z * scale;
@@ -167,8 +167,8 @@ namespace gd3d.math
     {
         out.x = a.x * b.x;
         out.y = a.y * b.y;
-        out.z = a.z * b.z; 
-        
+        out.z = a.z * b.z;
+
         // out.rawData[0] = a.x * b.x;
         // out.rawData[1] = a.y * b.y;
         // out.rawData[2] = a.z * b.z;
@@ -185,6 +185,29 @@ namespace gd3d.math
         out.y = y;
         out.z = z;
     }
+
+    /**
+     * 指定两个向量是否平行
+     * 
+     * @param lhs 向量
+     * @param rhs 向量
+     * @param precision 精度
+     */
+    export function vec3IsParallel(lhs: vector3, rhs: vector3, precision = 1e-6)
+    {
+        var out1 = pool.new_vector3(lhs.x, lhs.y, lhs.z);
+        var out2 = pool.new_vector3(rhs.x, rhs.y, rhs.z);
+        math.vec3Normalize(out1, out1);
+        math.vec3Normalize(out2, out2);
+
+        var dot = math.vec3Dot(out1, out2);
+        dot = Math.abs(dot);
+        
+        if(Math.abs( dot-1)<precision) return true;
+
+        return false;
+    }
+
     export function vec3Reflect(inDirection: vector3, inNormal: vector3, out: vector3)
     {
         //return -2 * vector3.Dot(inNormal, inDirection) * inNormal + inDirection;
@@ -259,7 +282,7 @@ namespace gd3d.math
         out.x = vector.x;
         out.y = vector.y;
         out.z = vector.z;
-        
+
     }
     export function vec3Min(v0: vector3, v1: vector3, out: vector3)
     {
@@ -353,16 +376,16 @@ namespace gd3d.math
 
     ////又有参数又有返回值的必须是static
     export function vec3Equal(vector: vector3, vector2: vector3, threshold = 0.00001): boolean {
-       if (Math.abs(vector.x - vector2.x) > threshold)
-           return false;
+        if (Math.abs(vector.x - vector2.x) > threshold)
+            return false;
+ 
+        if (Math.abs(vector.y - vector2.y) > threshold)
+            return false;
 
-       if (Math.abs(vector.y - vector2.y) > threshold)
-           return false;
+        if (Math.abs(vector.z - vector2.z) > threshold)
+            return false;
 
-       if (Math.abs(vector.z - vector2.z) > threshold)
-           return false;
-
-       return true;
+        return true;
     }
 
     export function vec3SetAll(vector : vector3 , value : number){
