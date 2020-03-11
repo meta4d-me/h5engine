@@ -188,12 +188,12 @@ namespace gd3d.framework
             let len = this.clips.length;
             for(let i = 0 ;i < len ;i++){
                 let clip = this.clips[i];
-                if(!clip.frames || Object.keys(clip.frames).length < 1) break;
+                if(!clip.frames || Object.keys(clip.frames).length < 1) continue;
                 this.addClip(clip);
             }
-
-            if(this.autoplay && len > 0 ){
-                this.playAniclip(this.clips[0]);
+            let firstClip = this.clips[0];
+            if(this.autoplay && firstClip  &&  firstClip.frames && Object.keys(firstClip.frames).length >= 1){
+                this.playAniclip(firstClip);
             }
         }
 
