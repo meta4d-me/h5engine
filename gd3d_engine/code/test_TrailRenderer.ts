@@ -74,7 +74,7 @@ class test_TrailRenderer implements IState
         this.scene.addChild(tran);
 
         //
-        let lr = tran.gameObject.getComponent("trailrenderer") as gd3d.framework.TrailRenderer;
+        let lr = tran.gameObject.getComponent("TrailRenderer") as gd3d.framework.TrailRenderer;
         if (!lr) lr = tran.gameObject.addComponent("trailrenderer") as any;
         //
         this.lr = lr;

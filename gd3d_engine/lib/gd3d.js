@@ -21544,6 +21544,9 @@ var gd3d;
                 get: function () {
                     return this.lineWidth.curve;
                 },
+                set: function (v) {
+                    this.lineWidth.curve = v;
+                },
                 enumerable: true,
                 configurable: true
             });
@@ -21560,6 +21563,9 @@ var gd3d;
             Object.defineProperty(TrailRenderer.prototype, "colorGradient", {
                 get: function () {
                     return this.lineColor.gradient;
+                },
+                set: function (v) {
+                    this.lineColor.gradient = v;
                 },
                 enumerable: true,
                 configurable: true
@@ -21587,10 +21593,10 @@ var gd3d;
             });
             Object.defineProperty(TrailRenderer.prototype, "endWidth", {
                 get: function () {
-                    return this.widthCurve.keys[this.widthCurve.keys.length - 1].value;
+                    return this.widthCurve.keys[this.widthCurve.keys.length - 1].value * this.widthMultiplier;
                 },
                 set: function (v) {
-                    this.widthCurve.keys[this.widthCurve.keys.length - 1].value = v;
+                    this.widthCurve.keys[this.widthCurve.keys.length - 1].value = v / this.widthMultiplier;
                 },
                 enumerable: true,
                 configurable: true

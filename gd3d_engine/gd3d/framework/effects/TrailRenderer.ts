@@ -144,6 +144,11 @@ namespace gd3d.framework
             return this.lineWidth.curve;
         }
 
+        set widthCurve(v)
+        {
+            this.lineWidth.curve = v;
+        }
+
         /**
          * Set an overall multiplier that is applied to the LineRenderer.widthCurve to get the final width of the line.
          * 
@@ -167,6 +172,11 @@ namespace gd3d.framework
         get colorGradient()
         {
             return this.lineColor.gradient;
+        }
+
+        set colorGradient(v)
+        {
+            this.lineColor.gradient = v;
         }
 
         /**
@@ -204,12 +214,12 @@ namespace gd3d.framework
          */
         get endWidth()
         {
-            return this.widthCurve.keys[this.widthCurve.keys.length - 1].value;
+            return this.widthCurve.keys[this.widthCurve.keys.length - 1].value * this.widthMultiplier;
         }
 
         set endWidth(v)
         {
-            this.widthCurve.keys[this.widthCurve.keys.length - 1].value = v;
+            this.widthCurve.keys[this.widthCurve.keys.length - 1].value = v / this.widthMultiplier;
         }
 
         /**

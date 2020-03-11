@@ -4222,9 +4222,11 @@ declare namespace gd3d.framework {
         shadowBias: number;
         generateLightingData: boolean;
         get widthCurve(): AnimationCurve1;
+        set widthCurve(v: AnimationCurve1);
         get widthMultiplier(): number;
         set widthMultiplier(v: number);
         get colorGradient(): Gradient;
+        set colorGradient(v: Gradient);
         get endColor(): math.color;
         set endColor(v: math.color);
         get endWidth(): number;

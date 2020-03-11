@@ -4671,7 +4671,7 @@ var test_TrailRenderer = (function () {
         var tran = new gd3d.framework.transform();
         tran.name = "TrailRenderer";
         this.scene.addChild(tran);
-        var lr = tran.gameObject.getComponent("trailrenderer");
+        var lr = tran.gameObject.getComponent("TrailRenderer");
         if (!lr)
             lr = tran.gameObject.addComponent("trailrenderer");
         this.lr = lr;
