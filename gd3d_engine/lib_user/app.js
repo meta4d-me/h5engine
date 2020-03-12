@@ -4163,6 +4163,7 @@ var test_LineRenderer = (function () {
     function test_LineRenderer() {
         this.loop = false;
         this.viewcamera = false;
+        this.res = "Line";
     }
     test_LineRenderer.prototype.start = function (app) {
         return __awaiter(this, void 0, void 0, function () {
@@ -4173,8 +4174,11 @@ var test_LineRenderer = (function () {
                         this.scene = this.app.getScene();
                         this.astMgr = this.app.getAssetMgr();
                         gd3d.framework.assetMgr.openGuid = false;
-                        return [4, datGui.init()];
+                        return [4, demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", this.astMgr)];
                     case 1:
+                        _a.sent();
+                        return [4, datGui.init()];
+                    case 2:
                         _a.sent();
                         this.setGUI();
                         this.init();
@@ -4207,7 +4211,7 @@ var test_LineRenderer = (function () {
         hoverc.distance = 10;
         hoverc.scaleSpeed = 0.1;
         hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0);
-        this.initLineRenderer();
+        this.loadRes(this.res);
     };
     test_LineRenderer.prototype.initLineRenderer = function () {
         var tran = new gd3d.framework.transform();
@@ -4215,14 +4219,29 @@ var test_LineRenderer = (function () {
         this.scene.addChild(tran);
         var lr = tran.gameObject.getComponent("LineRenderer");
         if (!lr)
-            lr = tran.gameObject.addComponent("LineRenderer");
+            lr = tran.gameObject.addComponent("linerenderer");
         this.lr = lr;
         lr.positions = [new gd3d.math.vector3(0, 0, 0), new gd3d.math.vector3(1, 0, 0), new gd3d.math.vector3(0, 1, 0),];
     };
-    test_LineRenderer.prototype._showParticle = function (res) {
+    test_LineRenderer.prototype.loadRes = function (res) {
         return __awaiter(this, void 0, void 0, function () {
+            var cubeP, cubeTran;
             return __generator(this, function (_a) {
-                return [2];
+                switch (_a.label) {
+                    case 0:
+                        if (this.lr) {
+                            this.scene.removeChild(this.lr.transform);
+                            this.lr = null;
+                        }
+                        return [4, demoTool.loadbySync("res/prefabs/effects/" + res + "/" + res + ".assetbundle.json", this.astMgr)];
+                    case 1:
+                        _a.sent();
+                        cubeP = this.astMgr.getAssetByName(res + ".prefab.json", res + ".assetbundle.json");
+                        cubeTran = cubeP.getCloneTrans();
+                        this.lr = cubeTran.gameObject.getComponent("LineRenderer");
+                        this.scene.addChild(cubeTran);
+                        return [2];
+                }
             });
         });
     };
@@ -4613,8 +4632,8 @@ var test_TrailRenderer = (function () {
         this.move = true;
         this.viewcamera = false;
         this.res = "Trail_SpeedLines";
-        this._particleStartPosition = new gd3d.math.vector3();
-        this._particleCurrentPosition = new gd3d.math.vector3();
+        this._startPosition = new gd3d.math.vector3();
+        this._currentPosition = new gd3d.math.vector3();
         this._moveRadius = 5;
         this._moveAngle = 0;
         this._moveAngleSpeed = 5;
@@ -4686,15 +4705,15 @@ var test_TrailRenderer = (function () {
                             this.scene.removeChild(this.lr.transform);
                             this.lr = null;
                         }
-                        return [4, demoTool.loadbySync("res/prefabs/" + res + "/" + res + ".assetbundle.json", this.astMgr)];
+                        return [4, demoTool.loadbySync("res/prefabs/effects/" + res + "/" + res + ".assetbundle.json", this.astMgr)];
                     case 1:
                         _a.sent();
                         cubeP = this.astMgr.getAssetByName(res + ".prefab.json", res + ".assetbundle.json");
                         cubeTran = cubeP.getCloneTrans();
                         this.lr = cubeTran.gameObject.getComponent("TrailRenderer");
                         this.scene.addChild(cubeTran);
-                        this._particleStartPosition = new gd3d.math.vector3();
-                        gd3d.math.vec3Clone(cubeTran.localPosition, this._particleStartPosition);
+                        this._startPosition = new gd3d.math.vector3();
+                        gd3d.math.vec3Clone(cubeTran.localPosition, this._startPosition);
                         return [2];
                 }
             });
@@ -4706,10 +4725,10 @@ var test_TrailRenderer = (function () {
                 var offsetX = Math.cos(this._moveAngle / 180 * Math.PI) * this._moveRadius;
                 var offsetY = (this._moveAngle % 3600) / 3600 * this._moveRadius;
                 var offsetZ = Math.sin(this._moveAngle / 180 * Math.PI) * this._moveRadius;
-                this._particleCurrentPosition.x = this._particleStartPosition.x + offsetX;
-                this._particleCurrentPosition.y = this._particleStartPosition.y + offsetY;
-                this._particleCurrentPosition.z = this._particleStartPosition.z + offsetZ;
-                this.lr.transform.localPosition = this._particleCurrentPosition;
+                this._currentPosition.x = this._startPosition.x + offsetX;
+                this._currentPosition.y = this._startPosition.y + offsetY;
+                this._currentPosition.z = this._startPosition.z + offsetZ;
+                this.lr.transform.localPosition = this._currentPosition;
                 this._moveAngle += this._moveAngleSpeed;
             }
             this.lr.alignment = this.viewcamera ? gd3d.framework.LineAlignment.View : gd3d.framework.LineAlignment.TransformZ;

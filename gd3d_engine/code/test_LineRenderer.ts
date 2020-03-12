@@ -15,6 +15,8 @@ class test_LineRenderer implements IState
     loop = false;
     viewcamera = false;
 
+    res = "Line";
+
     async start(app: gd3d.framework.application)
     {
         this.app = app;
@@ -23,6 +25,7 @@ class test_LineRenderer implements IState
 
         gd3d.framework.assetMgr.openGuid = false;
 
+        await demoTool.loadbySync(`newRes/shader/MainShader.assetbundle.json`, this.astMgr);
         await datGui.init();
 
         //
@@ -61,7 +64,8 @@ class test_LineRenderer implements IState
         hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0)
 
         // this._showParticle(this._particles[0]);
-        this.initLineRenderer();
+        // this.initLineRenderer();
+        this.loadRes(this.res);
     }
 
     private initLineRenderer()
@@ -72,15 +76,29 @@ class test_LineRenderer implements IState
 
         //
         let lr = tran.gameObject.getComponent("LineRenderer") as gd3d.framework.LineRenderer;
-        if (!lr) lr = tran.gameObject.addComponent("LineRenderer") as any;
+        if (!lr) lr = tran.gameObject.addComponent("linerenderer") as any;
         //
         this.lr = lr;
         //
         lr.positions = [new gd3d.math.vector3(0, 0, 0), new gd3d.math.vector3(1, 0, 0), new gd3d.math.vector3(0, 1, 0),];
     }
 
-    private async _showParticle(res: string)
+    private async loadRes(res: string)
     {
+        if (this.lr)
+        {
+            this.scene.removeChild(this.lr.transform);
+            this.lr = null;
+        }
+
+        await demoTool.loadbySync(`res/prefabs/effects/${res}/${res}.assetbundle.json`, this.astMgr);
+
+        let cubeP = this.astMgr.getAssetByName(`${res}.prefab.json`, `${res}.assetbundle.json`) as gd3d.framework.prefab;
+        let cubeTran = cubeP.getCloneTrans();
+
+        this.lr = cubeTran.gameObject.getComponent("LineRenderer") as gd3d.framework.LineRenderer;
+
+        this.scene.addChild(cubeTran);
     }
 
     update(delta: number)

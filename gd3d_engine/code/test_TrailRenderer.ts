@@ -88,7 +88,7 @@ class test_TrailRenderer implements IState
             this.lr = null;
         }
 
-        await demoTool.loadbySync(`res/prefabs/${res}/${res}.assetbundle.json`, this.astMgr);
+        await demoTool.loadbySync(`res/prefabs/effects/${res}/${res}.assetbundle.json`, this.astMgr);
 
         let cubeP = this.astMgr.getAssetByName(`${res}.prefab.json`, `${res}.assetbundle.json`) as gd3d.framework.prefab;
         let cubeTran = cubeP.getCloneTrans();
@@ -97,12 +97,12 @@ class test_TrailRenderer implements IState
 
         this.scene.addChild(cubeTran);
 
-        this._particleStartPosition = new gd3d.math.vector3();
-        gd3d.math.vec3Clone(cubeTran.localPosition, this._particleStartPosition);
+        this._startPosition = new gd3d.math.vector3();
+        gd3d.math.vec3Clone(cubeTran.localPosition, this._startPosition);
     }
 
-    private _particleStartPosition = new gd3d.math.vector3();
-    private _particleCurrentPosition = new gd3d.math.vector3();
+    private _startPosition = new gd3d.math.vector3();
+    private _currentPosition = new gd3d.math.vector3();
     private _moveRadius = 5;
     private _moveAngle = 0;
     private _moveAngleSpeed = 5;
@@ -117,11 +117,11 @@ class test_TrailRenderer implements IState
                 var offsetY = (this._moveAngle % 3600) / 3600 * this._moveRadius;
                 var offsetZ = Math.sin(this._moveAngle / 180 * Math.PI) * this._moveRadius;
 
-                this._particleCurrentPosition.x = this._particleStartPosition.x + offsetX;
-                this._particleCurrentPosition.y = this._particleStartPosition.y + offsetY;
-                this._particleCurrentPosition.z = this._particleStartPosition.z + offsetZ;
+                this._currentPosition.x = this._startPosition.x + offsetX;
+                this._currentPosition.y = this._startPosition.y + offsetY;
+                this._currentPosition.z = this._startPosition.z + offsetZ;
 
-                this.lr.transform.localPosition = this._particleCurrentPosition;
+                this.lr.transform.localPosition = this._currentPosition;
 
                 this._moveAngle += this._moveAngleSpeed;
             }

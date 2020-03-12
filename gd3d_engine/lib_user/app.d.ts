@@ -633,11 +633,12 @@ declare class test_LineRenderer implements IState {
     lr: gd3d.framework.LineRenderer;
     loop: boolean;
     viewcamera: boolean;
+    res: string;
     start(app: gd3d.framework.application): Promise<void>;
     setGUI(): void;
     private init;
     private initLineRenderer;
-    private _showParticle;
+    private loadRes;
     update(delta: number): void;
 }
 declare namespace gd3d.math {
@@ -719,8 +720,8 @@ declare class test_TrailRenderer implements IState {
     private init;
     private initLineRenderer;
     private loadRes;
-    private _particleStartPosition;
-    private _particleCurrentPosition;
+    private _startPosition;
+    private _currentPosition;
     private _moveRadius;
     private _moveAngle;
     private _moveAngleSpeed;
