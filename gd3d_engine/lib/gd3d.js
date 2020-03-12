@@ -8483,7 +8483,8 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["Prefab"] = 24] = "Prefab";
             AssetTypeEnum[AssetTypeEnum["cPrefab"] = 25] = "cPrefab";
             AssetTypeEnum[AssetTypeEnum["ParticleSystem"] = 26] = "ParticleSystem";
-            AssetTypeEnum[AssetTypeEnum["TrailRenderer"] = 27] = "TrailRenderer";
+            AssetTypeEnum[AssetTypeEnum["LineRenderer"] = 27] = "LineRenderer";
+            AssetTypeEnum[AssetTypeEnum["TrailRenderer"] = 28] = "TrailRenderer";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
         var ResourceState = (function () {
             function ResourceState() {
@@ -8901,6 +8902,8 @@ var gd3d;
                         return framework.AssetTypeEnum.KeyFrameAniclip;
                     case ".particlesystem.json":
                         return framework.AssetTypeEnum.ParticleSystem;
+                    case ".linerenderer.json":
+                        return framework.AssetTypeEnum.LineRenderer;
                     case ".trailrenderer.json":
                         return framework.AssetTypeEnum.TrailRenderer;
                 }
@@ -10075,6 +10078,26 @@ var gd3d;
             return assetfactory_keyFrameAniClip;
         }());
         framework.assetfactory_keyFrameAniClip = assetfactory_keyFrameAniClip;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_LineRenderer = (function () {
+            function AssetFactory_LineRenderer() {
+            }
+            AssetFactory_LineRenderer.prototype.parse = function (assetmgr, bundle, name, txt) {
+                var data = framework.LineRendererData.get(name);
+                data.setData(txt);
+                return data;
+            };
+            AssetFactory_LineRenderer = __decorate([
+                framework.assetF(framework.AssetTypeEnum.LineRenderer)
+            ], AssetFactory_LineRenderer);
+            return AssetFactory_LineRenderer;
+        }());
+        framework.AssetFactory_LineRenderer = AssetFactory_LineRenderer;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -21144,6 +21167,9 @@ var gd3d;
                 get: function () {
                     return this.lineWidth.curve;
                 },
+                set: function (v) {
+                    this.lineWidth.curve = v;
+                },
                 enumerable: true,
                 configurable: true
             });
@@ -21160,6 +21186,9 @@ var gd3d;
             Object.defineProperty(LineRenderer.prototype, "colorGradient", {
                 get: function () {
                     return this.lineColor.gradient;
+                },
+                set: function (v) {
+                    this.lineColor.gradient = v;
                 },
                 enumerable: true,
                 configurable: true
@@ -21232,6 +21261,23 @@ var gd3d;
                 },
                 set: function (v) {
                     this.widthCurve.keys[0].value = v / this.widthMultiplier;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(LineRenderer.prototype, "lineRendererData", {
+                get: function () {
+                    return this._lineRendererData;
+                },
+                set: function (v) {
+                    var data = framework.LineRendererData.get(v.value);
+                    if (data.objectData) {
+                        framework.serialization.setValue(this, data.objectData);
+                    }
+                    else {
+                        data.lineRenderer = this;
+                    }
+                    this._lineRendererData = data;
                 },
                 enumerable: true,
                 configurable: true
@@ -21511,11 +21557,16 @@ var gd3d;
                 return rateAtLines;
             };
             var LineRenderer_1;
-            LineRenderer.ClassName = "LineRenderer";
+            LineRenderer.ClassName = "linerenderer";
             __decorate([
                 gd3d.reflect.Field("material"),
                 __metadata("design:type", framework.material)
             ], LineRenderer.prototype, "material", void 0);
+            __decorate([
+                gd3d.reflect.Field("LineRendererData"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], LineRenderer.prototype, "lineRendererData", null);
             LineRenderer = LineRenderer_1 = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent
@@ -21523,6 +21574,88 @@ var gd3d;
             return LineRenderer;
         }());
         framework.LineRenderer = LineRenderer;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var LineRendererData = (function () {
+            function LineRendererData(assetName) {
+                if (assetName === void 0) { assetName = null; }
+                this.name = null;
+                this.id = new framework.resID();
+                this.defaultAsset = false;
+                if (!assetName) {
+                    assetName = "LineRenderer_" + this.getGUID();
+                }
+                this.name = new framework.constText(assetName);
+            }
+            LineRendererData_1 = LineRendererData;
+            LineRendererData.get = function (valueName) {
+                return this._datas[valueName];
+            };
+            Object.defineProperty(LineRendererData.prototype, "value", {
+                get: function () {
+                    return this._value;
+                },
+                set: function (v) {
+                    this._value = v;
+                    if (LineRendererData_1._datas[v]) {
+                        return;
+                    }
+                    LineRendererData_1._datas[v] = this;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            LineRendererData.prototype.getName = function () {
+                if (this.name == undefined) {
+                    return null;
+                }
+                return this.name.getText();
+            };
+            LineRendererData.prototype.getGUID = function () {
+                return this.id.getID();
+            };
+            LineRendererData.prototype.dispose = function () {
+            };
+            LineRendererData.prototype.use = function () {
+                framework.sceneMgr.app.getAssetMgr().use(this);
+            };
+            LineRendererData.prototype.unuse = function (disposeNow) {
+                if (disposeNow === void 0) { disposeNow = false; }
+                framework.sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
+            };
+            LineRendererData.prototype.caclByteLength = function () {
+                var total = 0;
+                return total;
+            };
+            LineRendererData.prototype.setData = function (v) {
+                this.objectData = JSON.parse(v);
+                if (this.lineRenderer) {
+                    framework.serialization.setValue(this.lineRenderer, this.objectData);
+                }
+            };
+            var LineRendererData_1;
+            LineRendererData.ClassName = "LineRendererData";
+            LineRendererData._datas = {};
+            __decorate([
+                gd3d.reflect.Field("constText"),
+                __metadata("design:type", framework.constText)
+            ], LineRendererData.prototype, "name", void 0);
+            __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], LineRendererData.prototype, "value", null);
+            LineRendererData = LineRendererData_1 = __decorate([
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [String])
+            ], LineRendererData);
+            return LineRendererData;
+        }());
+        framework.LineRendererData = LineRendererData;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

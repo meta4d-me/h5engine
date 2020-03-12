@@ -9,7 +9,7 @@ namespace gd3d.framework
     @reflect.nodeComponent
     export class LineRenderer implements IRenderer
     {
-        static readonly ClassName: string = "LineRenderer";
+        static readonly ClassName: string = "linerenderer";
 
         private mesh = new gd3d.framework.mesh("LineRenderer" + ".mesh.bin");
 
@@ -138,6 +138,11 @@ namespace gd3d.framework
             return this.lineWidth.curve;
         }
 
+        set widthCurve(v)
+        {
+            this.lineWidth.curve = v;
+        }
+
         /**
          * Set an overall multiplier that is applied to the LineRenderer.widthCurve to get the final width of the line.
          * 
@@ -161,6 +166,11 @@ namespace gd3d.framework
         get colorGradient()
         {
             return this.lineColor.gradient;
+        }
+
+        set colorGradient(v)
+        {
+            this.lineColor.gradient = v;
         }
 
         /**
@@ -261,6 +271,26 @@ namespace gd3d.framework
         {
             this.widthCurve.keys[0].value = v / this.widthMultiplier;
         }
+
+        @gd3d.reflect.Field("LineRendererData")
+        get lineRendererData()
+        {
+            return this._lineRendererData;
+        }
+
+        set lineRendererData(v)
+        {
+            var data = LineRendererData.get(v.value);
+            if (data.objectData)
+            {
+                serialization.setValue(this, data.objectData);
+            } else
+            {
+                data.lineRenderer = this;
+            }
+            this._lineRendererData = data;
+        }
+        private _lineRendererData: LineRendererData;
 
         render(context: renderContext, assetmgr: assetMgr, camera: camera)
         {

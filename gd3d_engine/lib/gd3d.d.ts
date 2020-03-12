@@ -1569,7 +1569,8 @@ declare namespace gd3d.framework {
         Prefab = 24,
         cPrefab = 25,
         ParticleSystem = 26,
-        TrailRenderer = 27
+        LineRenderer = 27,
+        TrailRenderer = 28
     }
     class ResourceState {
         res: IAsset;
@@ -1902,6 +1903,11 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class assetfactory_keyFrameAniClip implements IAssetFactory {
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): keyFrameAniClip;
+    }
+}
+declare namespace gd3d.framework {
+    class AssetFactory_LineRenderer implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, txt: string): LineRendererData;
     }
 }
 declare namespace gd3d.framework {
@@ -4154,9 +4160,11 @@ declare namespace gd3d.framework {
         generateLightingData: boolean;
         useWorldSpace: boolean;
         get widthCurve(): AnimationCurve1;
+        set widthCurve(v: AnimationCurve1);
         get widthMultiplier(): number;
         set widthMultiplier(v: number);
         get colorGradient(): Gradient;
+        set colorGradient(v: Gradient);
         get endColor(): math.color;
         set endColor(v: math.color);
         get endWidth(): number;
@@ -4167,6 +4175,9 @@ declare namespace gd3d.framework {
         set startColor(v: math.color);
         get startWidth(): number;
         set startWidth(v: number);
+        get lineRendererData(): LineRendererData;
+        set lineRendererData(v: LineRendererData);
+        private _lineRendererData;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         onPlay(): void;
         start(): void;
@@ -4198,6 +4209,29 @@ declare namespace gd3d.framework {
         }[];
         static calcTotalLength(positions: math.vector3[], loop: boolean): number;
         static calcRateAtLines(positions: math.vector3[], loop: boolean, textureMode: LineTextureMode): number[];
+    }
+}
+declare namespace gd3d.framework {
+    class LineRendererData implements IAsset {
+        static readonly ClassName: string;
+        private static _datas;
+        lineRenderer: LineRenderer;
+        static get(valueName: string): LineRendererData;
+        private name;
+        private id;
+        defaultAsset: boolean;
+        get value(): string;
+        set value(v: string);
+        private _value;
+        constructor(assetName?: string);
+        getName(): string;
+        getGUID(): number;
+        dispose(): void;
+        use(): void;
+        unuse(disposeNow?: boolean): void;
+        caclByteLength(): number;
+        setData(v: string): void;
+        objectData: any;
     }
 }
 declare namespace gd3d.framework {

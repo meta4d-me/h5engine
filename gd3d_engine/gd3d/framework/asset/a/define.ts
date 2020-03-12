@@ -179,6 +179,10 @@ namespace gd3d.framework
          */
         ParticleSystem,
         /**
+         * 线条
+         */
+        LineRenderer,
+        /**
          * 拖尾
          */
         TrailRenderer,
