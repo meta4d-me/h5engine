@@ -63,6 +63,16 @@ namespace gd3d.framework
         loop = false;
 
         /**
+         * 是否使用曲线。
+         */
+        useCurve = false;
+
+        /**
+         * 曲线采样频率。
+         */
+        curveSamples = 10;
+
+        /**
          * 顶点列表。
          */
         positions: math.vector3[] = [];
@@ -357,6 +367,14 @@ namespace gd3d.framework
         BakeMesh(mesh: mesh, camera: camera, useTransform: boolean)
         {
             var positions = this.positions.concat();
+            // 移除重复点
+            positions = positions.filter((p, i) =>
+            {
+                if (i == 0) return true;
+                if (math.vec3Distance(p, positions[i - 1]) < 0.01)
+                    return false;
+                return true;
+            });
             if (positions.length < 2) return;
 
             var textureMode = this.textureMode;
@@ -376,11 +394,26 @@ namespace gd3d.framework
             // 计算结点所在线段位置
             var rateAtLines = LineRenderer.calcRateAtLines(positions, loop, textureMode);
 
+            if (this.useCurve)
+            {
+                LineRenderer.calcPositionsToCurve(positions, loop, rateAtLines, loop ? (this.curveSamples * this.positionCount) : (this.positionCount + (this.curveSamples - 1) * (this.positionCount - 1)));
+            }
+
             // 计算结点的顶点
-            var positionVectex = LineRenderer.calcPositionVectex(positions, loop, rateAtLines, lineWidth, alignment, cameraPosition);
+            var positionVertex = LineRenderer.calcPositionVertex(positions, loop, rateAtLines, lineWidth, alignment, cameraPosition);
+
+            // 计算线条拐点接缝
+            LineRenderer.calcCornerVertices(this.numCornerVertices, positionVertex);
+
+            // 计算两端帽子
+            if (!loop)
+            {
+                LineRenderer.calcCapVertices(this.numCapVertices, positionVertex, true);
+                LineRenderer.calcCapVertices(this.numCapVertices, positionVertex, false);
+            }
 
             // 计算网格
-            LineRenderer.calcMesh(positionVectex, textureMode, colorGradient, totalLength, mesh);
+            LineRenderer.calcMesh(positionVertex, textureMode, colorGradient, totalLength, mesh);
         }
 
         /**
@@ -632,10 +665,10 @@ namespace gd3d.framework
          * @param alignment 朝向方式
          * @param cameraPosition 摄像机局部坐标
          */
-        static calcPositionVectex(positions: math.vector3[], loop: boolean, rateAtLines: number[], lineWidth: MinMaxCurve, alignment: LineAlignment, cameraPosition: math.vector3)
+        static calcPositionVertex(positions: math.vector3[], loop: boolean, rateAtLines: number[], lineWidth: MinMaxCurve, alignment: LineAlignment, cameraPosition: math.vector3)
         {
             // 
-            var positionVectex: { vertexs: math.vector3[], tangent: math.vector3, normal: math.vector3, rateAtLine: number }[] = [];
+            var positionVertex: VertexInfo[] = [];
 
             // 处理两端循环情况
             if (loop)
@@ -739,9 +772,16 @@ namespace gd3d.framework
                 var offset1 = new math.vector3();
                 math.vec3Subtract(currentPosition, offset, offset1);
                 //
-                positionVectex[i] = { vertexs: [offset0, offset1], tangent: tangent0, normal: normal, rateAtLine: rateAtLine };
+                positionVertex[i] = {
+                    width: currentLineWidth,
+                    position: new math.vector3(currentPosition.x, currentPosition.y, currentPosition.z),
+                    vertexs: [offset0, offset1],
+                    rateAtLine: rateAtLine,
+                    tangent: tangent,
+                    normal: normal,
+                };
             }
-            return positionVectex;
+            return positionVertex;
         }
 
         /**
@@ -800,5 +840,292 @@ namespace gd3d.framework
             });
             return rateAtLines;
         }
+
+        /**
+         * 拟合线段为曲线
+         * 
+         * @param positions 点列表
+         * @param loop 是否为环线
+         * @param rateAtLines 点在线条中的位置
+         * @param numSamples 采样次数
+         */
+        static calcPositionsToCurve(positions: math.vector3[], loop: boolean, rateAtLines: number[], numSamples = 100)
+        {
+            var xCurve = new AnimationCurve1();
+            var yCurve = new AnimationCurve1();
+            var zCurve = new AnimationCurve1();
+
+            xCurve.keys.length = 0;
+            yCurve.keys.length = 0;
+            zCurve.keys.length = 0;
+
+            var position: math.vector3;
+            var length = positions.length;
+            for (let i = 0; i < length; i++)
+            {
+                position = positions[i];
+
+                // 计算切线
+                var prei = i - 1;
+                var nexti = i + 1;
+                var pretime = rateAtLines[prei];
+                var nexttime = rateAtLines[nexti];
+                if (i == 0)
+                {
+                    prei = 0;
+                    pretime = 0;
+                    if (loop)
+                    {
+                        prei = length - 1;
+                    }
+                } else if (i == length - 1)
+                {
+                    nexti = length - 1;
+                    nexttime = 1;
+                    if (loop)
+                    {
+                        nexti = 0;
+                    }
+                }
+                var tangent = new math.vector3(0, 0, 0);
+                math.vec3Subtract(position[nexti], positions[prei], tangent);
+                math.vec3ScaleByNum(tangent, 1 / (nexttime - pretime), tangent);
+
+                xCurve.keys[i] = { time: rateAtLines[i], value: position.x, inTangent: tangent.x, outTangent: tangent.x };
+                yCurve.keys[i] = { time: rateAtLines[i], value: position.y, inTangent: tangent.y, outTangent: tangent.y };
+                zCurve.keys[i] = { time: rateAtLines[i], value: position.z, inTangent: tangent.z, outTangent: tangent.z };
+            }
+            if (loop && length > 0)
+            {
+                position = positions[0];
+                xCurve.keys[length] = { time: 1, value: position.x, inTangent: xCurve.keys[0].inTangent, outTangent: xCurve.keys[0].outTangent };
+                yCurve.keys[length] = { time: 1, value: position.y, inTangent: yCurve.keys[0].inTangent, outTangent: yCurve.keys[0].outTangent };
+                zCurve.keys[length] = { time: 1, value: position.z, inTangent: zCurve.keys[0].inTangent, outTangent: zCurve.keys[0].outTangent };
+            }
+
+            // 重新计算 positions以及rateAtLines
+            positions.length = 0;
+            rateAtLines.length = 0;
+            if (loop) numSamples = numSamples + 1;
+            var step = 1 / (numSamples - 1);
+            for (var i = 0, currentStep = 0; i < numSamples; i++, currentStep += step)
+            {
+                var x = xCurve.getValue(currentStep)
+                var y = yCurve.getValue(currentStep)
+                var z = zCurve.getValue(currentStep)
+                positions[i] = new math.vector3(x, y, z);
+                rateAtLines[i] = currentStep;
+            }
+
+            if (loop && length > 0)
+            {
+                positions.pop();
+            }
+        }
+
+        /**
+         * 计算线条拐点接缝
+         * 
+         * @param numCornerVertices 接缝顶点数量
+         * @param positionVertex 结点信息列表
+         */
+        static calcCornerVertices(numCornerVertices: number, positionVertex: VertexInfo[])
+        {
+            var numNode = positionVertex.length;
+            if (numNode < 3 || numCornerVertices == 0) return;
+
+            var positionVertex0 = positionVertex;
+            positionVertex = positionVertex.concat();
+            positionVertex0.length = 0;
+            positionVertex0.push(positionVertex[0]);
+
+            for (let i = 0; i < numNode - 2; i++)
+            {
+                var preVertex = positionVertex[i];
+                var curVertex = positionVertex[i + 1];
+                var nexVertex = positionVertex[i + 2];
+                //
+                var width = curVertex.width;
+                //
+                var prePosition = preVertex.position;
+                var curPosition = curVertex.position;
+                var nexPosition = nexVertex.position;
+                // 计算前后切线
+                var preTanget = new math.vector3();
+                math.vec3Subtract(curPosition, prePosition, preTanget);
+                math.vec3Normalize(preTanget, preTanget);
+                var nexTanget = new math.vector3();
+                math.vec3Subtract(nexPosition, curPosition, nexTanget);
+                math.vec3Normalize(nexTanget, nexTanget);
+                // 计算内线方向
+                var insideDir = new math.vector3();
+                math.vec3Subtract(nexTanget, preTanget, insideDir);
+                math.vec3Normalize(insideDir, insideDir);
+                // 半夹角cos
+                var halfcos = math.vec3Dot(insideDir, nexTanget);
+                // 半夹角sin
+                var halfsin = Math.sqrt(1 - halfcos * halfcos);
+                // 计算内线点离顶点距离
+                var insideDistance = 0.5 * width / halfsin;
+                // 计算内线点
+                var insidePosition = new math.vector3();
+                math.vec3ScaleByNum(insideDir, insideDistance, insidePosition);
+                math.vec3Add(insidePosition, curPosition, insidePosition);
+                // 计算补充弧线的两端坐标
+                var startPosition = new math.vector3();
+                math.vec3ScaleByNum(preTanget, halfcos, startPosition);
+                math.vec3Add(startPosition, insideDir, startPosition);
+                math.vec3ScaleByNum(startPosition, -1, startPosition);
+                math.vec3Normalize(startPosition, startPosition);
+                math.vec3ScaleByNum(startPosition, width, startPosition);
+                math.vec3Add(startPosition, insidePosition, startPosition);
+                //
+                var endPosition = new math.vector3();
+                math.vec3ScaleByNum(nexTanget, halfcos, endPosition);
+                math.vec3Subtract(endPosition, insideDir, endPosition);
+                math.vec3Normalize(endPosition, endPosition);
+                math.vec3ScaleByNum(endPosition, width, endPosition);
+                math.vec3Add(endPosition, insidePosition, endPosition);
+                // 计算内线点是否为第一个点
+                var temp2 = new math.vector3();
+                math.vec3Subtract(insidePosition, startPosition, temp2);
+                math.vec3Cross(temp2, preTanget, temp2);
+                var insideIsFirst = math.vec3Dot(temp2, curVertex.normal) > 0;
+                // 计算起点
+                var startVertex = curVertex;
+                startVertex.vertexs = [insidePosition, startPosition];
+                if (!insideIsFirst)
+                {
+                    startVertex.vertexs = [startPosition, insidePosition];
+                }
+                startVertex.position = new math.vector3();
+                math.vec3Add(startVertex.vertexs[0], startVertex.vertexs[1], startVertex.position);
+                math.vec3ScaleByNum(startVertex.position, 0.5, startVertex.position);
+                startVertex.tangent = preTanget;
+                // 计算终点
+                var endVertex: VertexInfo = {
+                    position: new math.vector3(insidePosition.x * endPosition.x * 0.5, insidePosition.y * endPosition.y * 0.5, insidePosition.z * endPosition.z * 0.5),
+                    vertexs: [insidePosition, endPosition],
+                    width: width,
+                    tangent: nexTanget,
+                    normal: curVertex.normal,
+                    rateAtLine: curVertex.rateAtLine
+                };
+                if (!insideIsFirst)
+                {
+                    endVertex.vertexs = [endPosition, insidePosition];
+                }
+                positionVertex0.push(startVertex);
+                // 计算中间补充夹角
+                var outAngle = Math.acos(math.vec3Dot(preTanget, nexTanget));
+                var angleStep = outAngle / (numCornerVertices);
+                var startLineDir = new math.vector3();
+                math.vec3Subtract(startPosition, insidePosition, startLineDir);
+                math.vec3Normalize(startLineDir, startLineDir);
+                for (let j = 1; j < numCornerVertices; j++)
+                {
+                    var curAngle = angleStep * j;
+                    var curOutSidePosition = new math.vector3();
+                    var temp3 = new math.vector3();
+                    math.vec3ScaleByNum(startLineDir, Math.cos(curAngle) * width, temp3);
+                    var temp4 = new math.vector3();
+                    math.vec3ScaleByNum(preTanget, Math.sin(curAngle) * width, temp4);
+                    math.vec3Add(temp3, temp4, curOutSidePosition);
+                    math.vec3Add(curOutSidePosition, insidePosition, curOutSidePosition);
+                    //
+                    var tangentTemp = new math.vector3();
+                    math.vec3SLerp(preTanget, nexTanget, 1 - (j / numCornerVertices), tangentTemp);
+                    var addNewVertex: VertexInfo = {
+                        position: new math.vector3((insidePosition.x + curOutSidePosition.x) * 0.5, (insidePosition.y + curOutSidePosition.y) * 0.5, (insidePosition.z + curOutSidePosition.z) * 0.5),
+                        vertexs: [insidePosition, curOutSidePosition],
+                        width: width,
+                        tangent: tangentTemp,
+                        normal: curVertex.normal,
+                        rateAtLine: curVertex.rateAtLine
+                    };
+                    if (!insideIsFirst)
+                    {
+                        addNewVertex.vertexs = [curOutSidePosition, insidePosition];
+                    }
+                    positionVertex0.push(addNewVertex);
+                }
+                //
+                positionVertex0.push(endVertex);
+            }
+            //
+            positionVertex0.push(positionVertex[numNode - 1]);
+        }
+
+        /**
+         * 计算线条帽子顶点
+         * 
+         * @param numCapVertices 帽子顶点数量
+         * @param positionVertex 结点信息列表
+         * @param ishead 是否为线条头部
+         */
+        static calcCapVertices(numCapVertices: number, positionVertex: VertexInfo[], ishead: boolean)
+        {
+            if (numCapVertices < 1) return;
+
+            var step = Math.PI / (numCapVertices + 1);
+            var vertex = positionVertex[0];
+            if (!ishead)
+                vertex = positionVertex[positionVertex.length - 1];
+            var rateAtLine = vertex.rateAtLine;
+            var normal = new math.vector3(vertex.normal.x, vertex.normal.y, vertex.normal.z);
+            var tangent = vertex.tangent;
+            if (ishead)
+            {
+                tangent.x = - tangent.x;
+                tangent.y = - tangent.y;
+                tangent.z = - tangent.z;
+            }
+            var offset0 = vertex.vertexs[0];
+            var offset1 = vertex.vertexs[1];
+            var center = new math.vector3();
+            math.vec3Add(offset0, offset1, center);
+            math.vec3ScaleByNum(center, 0.5, center);
+            var width = math.vec3Distance(offset0, offset1);
+            for (var i = 0; i <= numCapVertices + 1; i++)
+            {
+                var angle = step * i;
+                // 计算新增点坐标
+                var temp0 = new math.vector3();
+                math.vec3Add(offset0, offset1, temp0);
+                math.vec3ScaleByNum(temp0, 0.5 * Math.cos(angle), temp0);
+                var temp1 = new math.vector3();
+                math.vec3ScaleByNum(tangent, Math.sin(angle) * width / 2, tangent);
+                var addPoint = new math.vector3();
+                math.vec3Add(temp0, temp1, addPoint);
+                //
+                var newVertex = {
+                    width: vertex.width / 2,
+                    position: new math.vector3((addPoint.x + center.x) * 0.5, (addPoint.y + center.y) * 0.5, (addPoint.z + center.z) * 0.5),
+                    rateAtLine: rateAtLine,
+                    vertexs: [addPoint, center],
+                    tangent: tangent,
+                    normal: normal,
+                };
+
+                // 添加
+                if (ishead)
+                    positionVertex.unshift(newVertex);
+                else
+                    positionVertex.push(newVertex);
+            }
+        }
+
+    }
+
+    /**
+     * 顶点信息
+     */
+    type VertexInfo = {
+        width: number;
+        position: math.vector3;
+        rateAtLine: number;
+        vertexs: math.vector3[];
+        tangent: math.vector3;
+        normal: math.vector3;
     }
 }

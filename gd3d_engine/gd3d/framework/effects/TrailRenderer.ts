@@ -410,10 +410,20 @@ namespace gd3d.framework
             var rateAtLines = LineRenderer.calcRateAtLines(positions, loop, textureMode);
 
             // 计算结点的顶点
-            var positionVectex = LineRenderer.calcPositionVectex(positions, loop, rateAtLines, lineWidth, alignment, cameraPosition);
+            var positionVertex = LineRenderer.calcPositionVertex(positions, loop, rateAtLines, lineWidth, alignment, cameraPosition);
+
+            // 计算线条拐点接缝
+            LineRenderer.calcCornerVertices(this.numCornerVertices, positionVertex);
+
+            // 计算两端帽子
+            if (!loop)
+            {
+                LineRenderer.calcCapVertices(this.numCapVertices, positionVertex, true);
+                LineRenderer.calcCapVertices(this.numCapVertices, positionVertex, false);
+            }
 
             // 世界坐标转换为局部坐标
-            positionVectex.forEach(v =>
+            positionVertex.forEach(v =>
             {
                 v.vertexs.forEach(ver =>
                 {
@@ -422,7 +432,7 @@ namespace gd3d.framework
             });
 
             // 计算网格
-            LineRenderer.calcMesh(positionVectex, textureMode, colorGradient, totalLength, mesh);
+            LineRenderer.calcMesh(positionVertex, textureMode, colorGradient, totalLength, mesh);
         }
 
         /**
