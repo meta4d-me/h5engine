@@ -888,7 +888,7 @@ namespace gd3d.framework
                     }
                 }
                 var tangent = new math.vector3(0, 0, 0);
-                math.vec3Subtract(position[nexti], positions[prei], tangent);
+                math.vec3Subtract(positions[nexti], positions[prei], tangent);
                 math.vec3ScaleByNum(tangent, 1 / (nexttime - pretime), tangent);
 
                 xCurve.keys[i] = { time: rateAtLines[i], value: position.x, inTangent: tangent.x, outTangent: tangent.x };

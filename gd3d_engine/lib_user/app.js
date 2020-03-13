@@ -4163,6 +4163,10 @@ var test_LineRenderer = (function () {
     function test_LineRenderer() {
         this.loop = false;
         this.viewcamera = false;
+        this.useCurve = false;
+        this.curveSamples = 10;
+        this.numCapVertices = 0;
+        this.numCornerVertices = 0;
         this.res = "Line";
     }
     test_LineRenderer.prototype.start = function (app) {
@@ -4193,6 +4197,10 @@ var test_LineRenderer = (function () {
         var gui = new dat.GUI();
         gui.add(this, 'loop');
         gui.add(this, 'viewcamera');
+        gui.add(this, 'useCurve');
+        gui.add(this, 'curveSamples');
+        gui.add(this, 'numCapVertices');
+        gui.add(this, 'numCornerVertices');
     };
     test_LineRenderer.prototype.init = function () {
         var objCam = new gd3d.framework.transform();
@@ -4211,7 +4219,7 @@ var test_LineRenderer = (function () {
         hoverc.distance = 10;
         hoverc.scaleSpeed = 0.1;
         hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0);
-        this.loadRes(this.res);
+        this.initLineRenderer();
     };
     test_LineRenderer.prototype.initLineRenderer = function () {
         var tran = new gd3d.framework.transform();
@@ -4249,6 +4257,10 @@ var test_LineRenderer = (function () {
         if (this.lr) {
             this.lr.loop = this.loop;
             this.lr.alignment = this.viewcamera ? gd3d.framework.LineAlignment.View : gd3d.framework.LineAlignment.TransformZ;
+            this.lr.useCurve = this.useCurve;
+            this.lr.curveSamples = this.curveSamples;
+            this.lr.numCapVertices = this.numCapVertices;
+            this.lr.numCornerVertices = this.numCornerVertices;
         }
     };
     return test_LineRenderer;

@@ -633,6 +633,10 @@ declare class test_LineRenderer implements IState {
     lr: gd3d.framework.LineRenderer;
     loop: boolean;
     viewcamera: boolean;
+    useCurve: boolean;
+    curveSamples: number;
+    numCapVertices: number;
+    numCornerVertices: number;
     res: string;
     start(app: gd3d.framework.application): Promise<void>;
     setGUI(): void;

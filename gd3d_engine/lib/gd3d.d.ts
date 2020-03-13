@@ -4138,7 +4138,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class LineRenderer implements IRenderer {
+    export class LineRenderer implements IRenderer {
         static readonly ClassName: string;
         private mesh;
         material: material;
@@ -4149,6 +4149,8 @@ declare namespace gd3d.framework {
         get transform(): transform;
         gameObject: gameObject;
         loop: boolean;
+        useCurve: boolean;
+        curveSamples: number;
         positions: math.vector3[];
         lineWidth: MinMaxCurve;
         lineColor: MinMaxGradient;
@@ -4201,15 +4203,22 @@ declare namespace gd3d.framework {
             normal: math.vector3;
             rateAtLine: number;
         }[], textureMode: LineTextureMode, colorGradient: Gradient, totalLength: number, mesh: mesh): void;
-        static calcPositionVectex(positions: math.vector3[], loop: boolean, rateAtLines: number[], lineWidth: MinMaxCurve, alignment: LineAlignment, cameraPosition: math.vector3): {
-            vertexs: math.vector3[];
-            tangent: math.vector3;
-            normal: math.vector3;
-            rateAtLine: number;
-        }[];
+        static calcPositionVertex(positions: math.vector3[], loop: boolean, rateAtLines: number[], lineWidth: MinMaxCurve, alignment: LineAlignment, cameraPosition: math.vector3): VertexInfo[];
         static calcTotalLength(positions: math.vector3[], loop: boolean): number;
         static calcRateAtLines(positions: math.vector3[], loop: boolean, textureMode: LineTextureMode): number[];
+        static calcPositionsToCurve(positions: math.vector3[], loop: boolean, rateAtLines: number[], numSamples?: number): void;
+        static calcCornerVertices(numCornerVertices: number, positionVertex: VertexInfo[]): void;
+        static calcCapVertices(numCapVertices: number, positionVertex: VertexInfo[], ishead: boolean): void;
     }
+    type VertexInfo = {
+        width: number;
+        position: math.vector3;
+        rateAtLine: number;
+        vertexs: math.vector3[];
+        tangent: math.vector3;
+        normal: math.vector3;
+    };
+    export {};
 }
 declare namespace gd3d.framework {
     class LineRendererData implements IAsset {

@@ -21134,6 +21134,8 @@ var gd3d;
                 this.layer = framework.RenderLayerEnum.Transparent;
                 this.queue = 0;
                 this.loop = false;
+                this.useCurve = false;
+                this.curveSamples = 10;
                 this.positions = [];
                 this.lineWidth = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, curveMultiplier: 0.1, mode: framework.MinMaxCurveMode.Curve });
                 this.lineColor = framework.serialization.setValue(new framework.MinMaxGradient(), { mode: framework.MinMaxGradientMode.Gradient });
@@ -21309,6 +21311,13 @@ var gd3d;
             };
             LineRenderer.prototype.BakeMesh = function (mesh, camera, useTransform) {
                 var positions = this.positions.concat();
+                positions = positions.filter(function (p, i) {
+                    if (i == 0)
+                        return true;
+                    if (gd3d.math.vec3Distance(p, positions[i - 1]) < 0.01)
+                        return false;
+                    return true;
+                });
                 if (positions.length < 2)
                     return;
                 var textureMode = this.textureMode;
@@ -21321,8 +21330,16 @@ var gd3d;
                 gd3d.math.matrixTransformVector3(cameraPosition, this.worldToLocalMatrix, cameraPosition);
                 var totalLength = LineRenderer_1.calcTotalLength(positions, loop);
                 var rateAtLines = LineRenderer_1.calcRateAtLines(positions, loop, textureMode);
-                var positionVectex = LineRenderer_1.calcPositionVectex(positions, loop, rateAtLines, lineWidth, alignment, cameraPosition);
-                LineRenderer_1.calcMesh(positionVectex, textureMode, colorGradient, totalLength, mesh);
+                if (this.useCurve) {
+                    LineRenderer_1.calcPositionsToCurve(positions, loop, rateAtLines, loop ? (this.curveSamples * this.positionCount) : (this.positionCount + (this.curveSamples - 1) * (this.positionCount - 1)));
+                }
+                var positionVertex = LineRenderer_1.calcPositionVertex(positions, loop, rateAtLines, lineWidth, alignment, cameraPosition);
+                LineRenderer_1.calcCornerVertices(this.numCornerVertices, positionVertex);
+                if (!loop) {
+                    LineRenderer_1.calcCapVertices(this.numCapVertices, positionVertex, true);
+                    LineRenderer_1.calcCapVertices(this.numCapVertices, positionVertex, false);
+                }
+                LineRenderer_1.calcMesh(positionVertex, textureMode, colorGradient, totalLength, mesh);
             };
             LineRenderer.prototype.GetPosition = function (index) {
                 return this.positions[index];
@@ -21446,8 +21463,8 @@ var gd3d;
                     }
                 }
             };
-            LineRenderer.calcPositionVectex = function (positions, loop, rateAtLines, lineWidth, alignment, cameraPosition) {
-                var positionVectex = [];
+            LineRenderer.calcPositionVertex = function (positions, loop, rateAtLines, lineWidth, alignment, cameraPosition) {
+                var positionVertex = [];
                 if (loop) {
                     positions.unshift(positions[positions.length - 1]);
                     positions.push(positions[1]);
@@ -21521,9 +21538,16 @@ var gd3d;
                     gd3d.math.vec3Add(currentPosition, offset, offset0);
                     var offset1 = new gd3d.math.vector3();
                     gd3d.math.vec3Subtract(currentPosition, offset, offset1);
-                    positionVectex[i] = { vertexs: [offset0, offset1], tangent: tangent0, normal: normal, rateAtLine: rateAtLine };
+                    positionVertex[i] = {
+                        width: currentLineWidth,
+                        position: new gd3d.math.vector3(currentPosition.x, currentPosition.y, currentPosition.z),
+                        vertexs: [offset0, offset1],
+                        rateAtLine: rateAtLine,
+                        tangent: tangent,
+                        normal: normal,
+                    };
                 }
-                return positionVectex;
+                return positionVertex;
             };
             LineRenderer.calcTotalLength = function (positions, loop) {
                 var total = 0;
@@ -21555,6 +21579,211 @@ var gd3d;
                     return i / (loop ? positionCount : (positionCount - 1));
                 });
                 return rateAtLines;
+            };
+            LineRenderer.calcPositionsToCurve = function (positions, loop, rateAtLines, numSamples) {
+                if (numSamples === void 0) { numSamples = 100; }
+                var xCurve = new framework.AnimationCurve1();
+                var yCurve = new framework.AnimationCurve1();
+                var zCurve = new framework.AnimationCurve1();
+                xCurve.keys.length = 0;
+                yCurve.keys.length = 0;
+                zCurve.keys.length = 0;
+                var position;
+                var length = positions.length;
+                for (var i_7 = 0; i_7 < length; i_7++) {
+                    position = positions[i_7];
+                    var prei = i_7 - 1;
+                    var nexti = i_7 + 1;
+                    var pretime = rateAtLines[prei];
+                    var nexttime = rateAtLines[nexti];
+                    if (i_7 == 0) {
+                        prei = 0;
+                        pretime = 0;
+                        if (loop) {
+                            prei = length - 1;
+                        }
+                    }
+                    else if (i_7 == length - 1) {
+                        nexti = length - 1;
+                        nexttime = 1;
+                        if (loop) {
+                            nexti = 0;
+                        }
+                    }
+                    var tangent = new gd3d.math.vector3(0, 0, 0);
+                    gd3d.math.vec3Subtract(positions[nexti], positions[prei], tangent);
+                    gd3d.math.vec3ScaleByNum(tangent, 1 / (nexttime - pretime), tangent);
+                    xCurve.keys[i_7] = { time: rateAtLines[i_7], value: position.x, inTangent: tangent.x, outTangent: tangent.x };
+                    yCurve.keys[i_7] = { time: rateAtLines[i_7], value: position.y, inTangent: tangent.y, outTangent: tangent.y };
+                    zCurve.keys[i_7] = { time: rateAtLines[i_7], value: position.z, inTangent: tangent.z, outTangent: tangent.z };
+                }
+                if (loop && length > 0) {
+                    position = positions[0];
+                    xCurve.keys[length] = { time: 1, value: position.x, inTangent: xCurve.keys[0].inTangent, outTangent: xCurve.keys[0].outTangent };
+                    yCurve.keys[length] = { time: 1, value: position.y, inTangent: yCurve.keys[0].inTangent, outTangent: yCurve.keys[0].outTangent };
+                    zCurve.keys[length] = { time: 1, value: position.z, inTangent: zCurve.keys[0].inTangent, outTangent: zCurve.keys[0].outTangent };
+                }
+                positions.length = 0;
+                rateAtLines.length = 0;
+                if (loop)
+                    numSamples = numSamples + 1;
+                var step = 1 / (numSamples - 1);
+                for (var i = 0, currentStep = 0; i < numSamples; i++, currentStep += step) {
+                    var x = xCurve.getValue(currentStep);
+                    var y = yCurve.getValue(currentStep);
+                    var z = zCurve.getValue(currentStep);
+                    positions[i] = new gd3d.math.vector3(x, y, z);
+                    rateAtLines[i] = currentStep;
+                }
+                if (loop && length > 0) {
+                    positions.pop();
+                }
+            };
+            LineRenderer.calcCornerVertices = function (numCornerVertices, positionVertex) {
+                var numNode = positionVertex.length;
+                if (numNode < 3 || numCornerVertices == 0)
+                    return;
+                var positionVertex0 = positionVertex;
+                positionVertex = positionVertex.concat();
+                positionVertex0.length = 0;
+                positionVertex0.push(positionVertex[0]);
+                for (var i = 0; i < numNode - 2; i++) {
+                    var preVertex = positionVertex[i];
+                    var curVertex = positionVertex[i + 1];
+                    var nexVertex = positionVertex[i + 2];
+                    var width = curVertex.width;
+                    var prePosition = preVertex.position;
+                    var curPosition = curVertex.position;
+                    var nexPosition = nexVertex.position;
+                    var preTanget = new gd3d.math.vector3();
+                    gd3d.math.vec3Subtract(curPosition, prePosition, preTanget);
+                    gd3d.math.vec3Normalize(preTanget, preTanget);
+                    var nexTanget = new gd3d.math.vector3();
+                    gd3d.math.vec3Subtract(nexPosition, curPosition, nexTanget);
+                    gd3d.math.vec3Normalize(nexTanget, nexTanget);
+                    var insideDir = new gd3d.math.vector3();
+                    gd3d.math.vec3Subtract(nexTanget, preTanget, insideDir);
+                    gd3d.math.vec3Normalize(insideDir, insideDir);
+                    var halfcos = gd3d.math.vec3Dot(insideDir, nexTanget);
+                    var halfsin = Math.sqrt(1 - halfcos * halfcos);
+                    var insideDistance = 0.5 * width / halfsin;
+                    var insidePosition = new gd3d.math.vector3();
+                    gd3d.math.vec3ScaleByNum(insideDir, insideDistance, insidePosition);
+                    gd3d.math.vec3Add(insidePosition, curPosition, insidePosition);
+                    var startPosition = new gd3d.math.vector3();
+                    gd3d.math.vec3ScaleByNum(preTanget, halfcos, startPosition);
+                    gd3d.math.vec3Add(startPosition, insideDir, startPosition);
+                    gd3d.math.vec3ScaleByNum(startPosition, -1, startPosition);
+                    gd3d.math.vec3Normalize(startPosition, startPosition);
+                    gd3d.math.vec3ScaleByNum(startPosition, width, startPosition);
+                    gd3d.math.vec3Add(startPosition, insidePosition, startPosition);
+                    var endPosition = new gd3d.math.vector3();
+                    gd3d.math.vec3ScaleByNum(nexTanget, halfcos, endPosition);
+                    gd3d.math.vec3Subtract(endPosition, insideDir, endPosition);
+                    gd3d.math.vec3Normalize(endPosition, endPosition);
+                    gd3d.math.vec3ScaleByNum(endPosition, width, endPosition);
+                    gd3d.math.vec3Add(endPosition, insidePosition, endPosition);
+                    var temp2 = new gd3d.math.vector3();
+                    gd3d.math.vec3Subtract(insidePosition, startPosition, temp2);
+                    gd3d.math.vec3Cross(temp2, preTanget, temp2);
+                    var insideIsFirst = gd3d.math.vec3Dot(temp2, curVertex.normal) > 0;
+                    var startVertex = curVertex;
+                    startVertex.vertexs = [insidePosition, startPosition];
+                    if (!insideIsFirst) {
+                        startVertex.vertexs = [startPosition, insidePosition];
+                    }
+                    startVertex.position = new gd3d.math.vector3();
+                    gd3d.math.vec3Add(startVertex.vertexs[0], startVertex.vertexs[1], startVertex.position);
+                    gd3d.math.vec3ScaleByNum(startVertex.position, 0.5, startVertex.position);
+                    startVertex.tangent = preTanget;
+                    var endVertex = {
+                        position: new gd3d.math.vector3(insidePosition.x * endPosition.x * 0.5, insidePosition.y * endPosition.y * 0.5, insidePosition.z * endPosition.z * 0.5),
+                        vertexs: [insidePosition, endPosition],
+                        width: width,
+                        tangent: nexTanget,
+                        normal: curVertex.normal,
+                        rateAtLine: curVertex.rateAtLine
+                    };
+                    if (!insideIsFirst) {
+                        endVertex.vertexs = [endPosition, insidePosition];
+                    }
+                    positionVertex0.push(startVertex);
+                    var outAngle = Math.acos(gd3d.math.vec3Dot(preTanget, nexTanget));
+                    var angleStep = outAngle / (numCornerVertices);
+                    var startLineDir = new gd3d.math.vector3();
+                    gd3d.math.vec3Subtract(startPosition, insidePosition, startLineDir);
+                    gd3d.math.vec3Normalize(startLineDir, startLineDir);
+                    for (var j = 1; j < numCornerVertices; j++) {
+                        var curAngle = angleStep * j;
+                        var curOutSidePosition = new gd3d.math.vector3();
+                        var temp3 = new gd3d.math.vector3();
+                        gd3d.math.vec3ScaleByNum(startLineDir, Math.cos(curAngle) * width, temp3);
+                        var temp4 = new gd3d.math.vector3();
+                        gd3d.math.vec3ScaleByNum(preTanget, Math.sin(curAngle) * width, temp4);
+                        gd3d.math.vec3Add(temp3, temp4, curOutSidePosition);
+                        gd3d.math.vec3Add(curOutSidePosition, insidePosition, curOutSidePosition);
+                        var tangentTemp = new gd3d.math.vector3();
+                        gd3d.math.vec3SLerp(preTanget, nexTanget, 1 - (j / numCornerVertices), tangentTemp);
+                        var addNewVertex = {
+                            position: new gd3d.math.vector3((insidePosition.x + curOutSidePosition.x) * 0.5, (insidePosition.y + curOutSidePosition.y) * 0.5, (insidePosition.z + curOutSidePosition.z) * 0.5),
+                            vertexs: [insidePosition, curOutSidePosition],
+                            width: width,
+                            tangent: tangentTemp,
+                            normal: curVertex.normal,
+                            rateAtLine: curVertex.rateAtLine
+                        };
+                        if (!insideIsFirst) {
+                            addNewVertex.vertexs = [curOutSidePosition, insidePosition];
+                        }
+                        positionVertex0.push(addNewVertex);
+                    }
+                    positionVertex0.push(endVertex);
+                }
+                positionVertex0.push(positionVertex[numNode - 1]);
+            };
+            LineRenderer.calcCapVertices = function (numCapVertices, positionVertex, ishead) {
+                if (numCapVertices < 1)
+                    return;
+                var step = Math.PI / (numCapVertices + 1);
+                var vertex = positionVertex[0];
+                if (!ishead)
+                    vertex = positionVertex[positionVertex.length - 1];
+                var rateAtLine = vertex.rateAtLine;
+                var normal = new gd3d.math.vector3(vertex.normal.x, vertex.normal.y, vertex.normal.z);
+                var tangent = vertex.tangent;
+                if (ishead) {
+                    tangent.x = -tangent.x;
+                    tangent.y = -tangent.y;
+                    tangent.z = -tangent.z;
+                }
+                var offset0 = vertex.vertexs[0];
+                var offset1 = vertex.vertexs[1];
+                var center = new gd3d.math.vector3();
+                gd3d.math.vec3Add(offset0, offset1, center);
+                gd3d.math.vec3ScaleByNum(center, 0.5, center);
+                var width = gd3d.math.vec3Distance(offset0, offset1);
+                for (var i = 0; i <= numCapVertices + 1; i++) {
+                    var angle = step * i;
+                    var temp0 = new gd3d.math.vector3();
+                    gd3d.math.vec3Add(offset0, offset1, temp0);
+                    gd3d.math.vec3ScaleByNum(temp0, 0.5 * Math.cos(angle), temp0);
+                    var temp1 = new gd3d.math.vector3();
+                    gd3d.math.vec3ScaleByNum(tangent, Math.sin(angle) * width / 2, tangent);
+                    var addPoint = new gd3d.math.vector3();
+                    gd3d.math.vec3Add(temp0, temp1, addPoint);
+                    var newVertex = {
+                        width: vertex.width / 2,
+                        position: new gd3d.math.vector3((addPoint.x + center.x) * 0.5, (addPoint.y + center.y) * 0.5, (addPoint.z + center.z) * 0.5),
+                        rateAtLine: rateAtLine,
+                        vertexs: [addPoint, center],
+                        tangent: tangent,
+                        normal: normal,
+                    };
+                    if (ishead)
+                        positionVertex.unshift(newVertex);
+                    else
+                        positionVertex.push(newVertex);
+                }
             };
             var LineRenderer_1;
             LineRenderer.ClassName = "linerenderer";
@@ -21876,13 +22105,18 @@ var gd3d;
                 gd3d.math.vec3Clone(camera.gameObject.transform.getWorldPosition(), cameraPosition);
                 var totalLength = framework.LineRenderer.calcTotalLength(positions, loop);
                 var rateAtLines = framework.LineRenderer.calcRateAtLines(positions, loop, textureMode);
-                var positionVectex = framework.LineRenderer.calcPositionVectex(positions, loop, rateAtLines, lineWidth, alignment, cameraPosition);
-                positionVectex.forEach(function (v) {
+                var positionVertex = framework.LineRenderer.calcPositionVertex(positions, loop, rateAtLines, lineWidth, alignment, cameraPosition);
+                framework.LineRenderer.calcCornerVertices(this.numCornerVertices, positionVertex);
+                if (!loop) {
+                    framework.LineRenderer.calcCapVertices(this.numCapVertices, positionVertex, true);
+                    framework.LineRenderer.calcCapVertices(this.numCapVertices, positionVertex, false);
+                }
+                positionVertex.forEach(function (v) {
                     v.vertexs.forEach(function (ver) {
                         gd3d.math.matrixTransformVector3(ver, _this.worldToLocalMatrix, ver);
                     });
                 });
-                framework.LineRenderer.calcMesh(positionVectex, textureMode, colorGradient, totalLength, mesh);
+                framework.LineRenderer.calcMesh(positionVertex, textureMode, colorGradient, totalLength, mesh);
             };
             TrailRenderer.prototype.AddPosition = function (position) {
                 this.positions.unshift({ position: position, birthTime: Date.now() });
@@ -32427,8 +32661,8 @@ var gd3d;
                     }
                     var inCycleStart = startTime - cycleStartTime;
                     var inCycleEnd = endTime - cycleStartTime;
-                    for (var i_7 = 0; i_7 < bursts.length; i_7++) {
-                        var burst = bursts[i_7];
+                    for (var i_8 = 0; i_8 < bursts.length; i_8++) {
+                        var burst = bursts[i_8];
                         if (burst.isProbability && inCycleStart <= burst.time && burst.time < inCycleEnd) {
                             emits.push({ time: cycleStartTime + burst.time, num: burst.count.getValue(rateAtDuration) });
                         }

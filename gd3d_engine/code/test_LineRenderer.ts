@@ -14,6 +14,10 @@ class test_LineRenderer implements IState
 
     loop = false;
     viewcamera = false;
+    useCurve = false;
+    curveSamples = 10;
+    numCapVertices = 0;
+    numCornerVertices = 0;
 
     res = "Line";
 
@@ -40,6 +44,10 @@ class test_LineRenderer implements IState
         let gui = new dat.GUI();
         gui.add(this, 'loop');
         gui.add(this, 'viewcamera');
+        gui.add(this, 'useCurve');
+        gui.add(this, 'curveSamples');
+        gui.add(this, 'numCapVertices');
+        gui.add(this, 'numCornerVertices');
     }
 
     private init()
@@ -64,8 +72,8 @@ class test_LineRenderer implements IState
         hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0)
 
         // this._showParticle(this._particles[0]);
-        // this.initLineRenderer();
-        this.loadRes(this.res);
+        this.initLineRenderer();
+        // this.loadRes(this.res);
     }
 
     private initLineRenderer()
@@ -107,6 +115,10 @@ class test_LineRenderer implements IState
         {
             this.lr.loop = this.loop;
             this.lr.alignment = this.viewcamera ? gd3d.framework.LineAlignment.View : gd3d.framework.LineAlignment.TransformZ;
+            this.lr.useCurve = this.useCurve;
+            this.lr.curveSamples = this.curveSamples;
+            this.lr.numCapVertices = this.numCapVertices;
+            this.lr.numCornerVertices = this.numCornerVertices;
         }
     }
 }
