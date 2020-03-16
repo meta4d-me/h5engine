@@ -4216,10 +4216,10 @@ var test_LineRenderer = (function () {
         var hoverc = this.camera.gameObject.addComponent("HoverCameraScript");
         hoverc.panAngle = 180;
         hoverc.tiltAngle = 45;
-        hoverc.distance = 10;
+        hoverc.distance = 3;
         hoverc.scaleSpeed = 0.1;
         hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0);
-        this.initLineRenderer();
+        this.loadRes(this.res);
     };
     test_LineRenderer.prototype.initLineRenderer = function () {
         var tran = new gd3d.framework.transform();

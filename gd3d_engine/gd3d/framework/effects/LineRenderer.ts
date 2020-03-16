@@ -1091,12 +1091,13 @@ namespace gd3d.framework
                 var angle = step * i;
                 // 计算新增点坐标
                 var temp0 = new math.vector3();
-                math.vec3Add(offset0, offset1, temp0);
+                math.vec3Subtract(offset0, offset1, temp0);
                 math.vec3ScaleByNum(temp0, 0.5 * Math.cos(angle), temp0);
                 var temp1 = new math.vector3();
-                math.vec3ScaleByNum(tangent, Math.sin(angle) * width / 2, tangent);
+                math.vec3ScaleByNum(tangent, Math.sin(angle) * width / 2, temp1);
                 var addPoint = new math.vector3();
                 math.vec3Add(temp0, temp1, addPoint);
+                math.vec3Add(center, addPoint, addPoint);
                 //
                 var newVertex = {
                     width: vertex.width / 2,

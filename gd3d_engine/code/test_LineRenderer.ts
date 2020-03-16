@@ -67,13 +67,12 @@ class test_LineRenderer implements IState
         let hoverc = this.camera.gameObject.addComponent("HoverCameraScript") as gd3d.framework.HoverCameraScript;
         hoverc.panAngle = 180;
         hoverc.tiltAngle = 45;
-        hoverc.distance = 10;
+        hoverc.distance = 3;
         hoverc.scaleSpeed = 0.1;
         hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0)
 
-        // this._showParticle(this._particles[0]);
-        this.initLineRenderer();
-        // this.loadRes(this.res);
+        // this.initLineRenderer();
+        this.loadRes(this.res);
     }
 
     private initLineRenderer()

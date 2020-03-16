@@ -21765,12 +21765,13 @@ var gd3d;
                 for (var i = 0; i <= numCapVertices + 1; i++) {
                     var angle = step * i;
                     var temp0 = new gd3d.math.vector3();
-                    gd3d.math.vec3Add(offset0, offset1, temp0);
+                    gd3d.math.vec3Subtract(offset0, offset1, temp0);
                     gd3d.math.vec3ScaleByNum(temp0, 0.5 * Math.cos(angle), temp0);
                     var temp1 = new gd3d.math.vector3();
-                    gd3d.math.vec3ScaleByNum(tangent, Math.sin(angle) * width / 2, tangent);
+                    gd3d.math.vec3ScaleByNum(tangent, Math.sin(angle) * width / 2, temp1);
                     var addPoint = new gd3d.math.vector3();
                     gd3d.math.vec3Add(temp0, temp1, addPoint);
+                    gd3d.math.vec3Add(center, addPoint, addPoint);
                     var newVertex = {
                         width: vertex.width / 2,
                         position: new gd3d.math.vector3((addPoint.x + center.x) * 0.5, (addPoint.y + center.y) * 0.5, (addPoint.z + center.z) * 0.5),
