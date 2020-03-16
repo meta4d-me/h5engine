@@ -6,6 +6,8 @@ varying vec2 v_uv;
 uniform vec4 _TintColor;
 uniform sampler2D _MainTex;
 uniform vec4 _MainTex_ST;
+        
+uniform vec4 _uvOffset; 
 
 void main()
 {
@@ -13,6 +15,7 @@ void main()
 
     vec2 uv = v_uv;
     uv = uv * _MainTex_ST.xy + _MainTex_ST.zw;
+    uv = uv + _uvOffset.xy;
     finalColor = finalColor * _TintColor * texture2D(_MainTex, uv);
 
     gl_FragColor = finalColor;

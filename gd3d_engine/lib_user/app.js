@@ -4167,6 +4167,8 @@ var test_LineRenderer = (function () {
         this.curveSamples = 10;
         this.numCapVertices = 0;
         this.numCornerVertices = 0;
+        this.uSpeed = 0;
+        this.vSpeed = 0;
         this.res = "Line";
     }
     test_LineRenderer.prototype.start = function (app) {
@@ -4201,6 +4203,8 @@ var test_LineRenderer = (function () {
         gui.add(this, 'curveSamples');
         gui.add(this, 'numCapVertices');
         gui.add(this, 'numCornerVertices');
+        gui.add(this, 'uSpeed');
+        gui.add(this, 'vSpeed');
     };
     test_LineRenderer.prototype.init = function () {
         var objCam = new gd3d.framework.transform();
@@ -4261,6 +4265,8 @@ var test_LineRenderer = (function () {
             this.lr.curveSamples = this.curveSamples;
             this.lr.numCapVertices = this.numCapVertices;
             this.lr.numCornerVertices = this.numCornerVertices;
+            this.lr.uvSpeed.x = this.uSpeed;
+            this.lr.uvSpeed.y = this.vSpeed;
         }
     };
     return test_LineRenderer;

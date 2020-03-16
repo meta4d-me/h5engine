@@ -4161,6 +4161,8 @@ declare namespace gd3d.framework {
         shadowBias: number;
         generateLightingData: boolean;
         useWorldSpace: boolean;
+        uvSpeed: math.vector2;
+        uvOffset: math.vector4;
         get widthCurve(): AnimationCurve1;
         set widthCurve(v: AnimationCurve1);
         get widthMultiplier(): number;

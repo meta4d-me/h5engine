@@ -9757,7 +9757,7 @@ var gd3d;
               \"_MainTex('MainTex',Texture)='white'{}\"\
             ]\
             }";
-            defShader.fslinetrail = "\n        precision mediump float;\n\n        uniform sampler2D _MainTex; \n        \n        varying vec2 xlv_TEXCOORD0;\n        varying vec4 xlv_COLOR;\n        \n        void main() \n        {\n            vec4 color = texture2D(_MainTex, xlv_TEXCOORD0);\n            gl_FragColor = color * xlv_COLOR;\n        }\n        ";
+            defShader.fslinetrail = "\n        precision mediump float;\n\n        uniform sampler2D _MainTex; \n        \n        uniform vec4 _uvOffset; \n\n        varying vec2 xlv_TEXCOORD0;\n        varying vec4 xlv_COLOR;\n        \n        void main() \n        {\n            vec2 uv = xlv_TEXCOORD0 + _uvOffset.xy;\n            vec4 color = texture2D(_MainTex, uv);\n            gl_FragColor = color * xlv_COLOR;\n        }\n        ";
             return defShader;
         }());
         framework.defShader = defShader;
@@ -21146,6 +21146,8 @@ var gd3d;
                 this.shadowBias = 0.5;
                 this.generateLightingData = false;
                 this.useWorldSpace = false;
+                this.uvSpeed = new gd3d.math.vector2();
+                this.uvOffset = new gd3d.math.vector4();
                 this.localToWorldMatrix = new gd3d.math.matrix();
                 this.worldToLocalMatrix = new gd3d.math.matrix();
             }
@@ -21290,6 +21292,9 @@ var gd3d;
                 if (!this.material) {
                     this.material = framework.sceneMgr.app.getAssetMgr().getDefLineRendererMat();
                 }
+                this.uvOffset.x += this.uvSpeed.x;
+                this.uvOffset.y += this.uvSpeed.y;
+                this.material.setVector4("_uvOffset", this.uvOffset);
                 LineRenderer_1.clearMesh(this.mesh);
                 this.BakeMesh(this.mesh, camera, false);
                 if (this.positions.length < 2)

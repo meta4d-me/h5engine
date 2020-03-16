@@ -18,6 +18,8 @@ class test_LineRenderer implements IState
     curveSamples = 10;
     numCapVertices = 0;
     numCornerVertices = 0;
+    uSpeed = 0;
+    vSpeed = 0;
 
     res = "Line";
 
@@ -48,6 +50,8 @@ class test_LineRenderer implements IState
         gui.add(this, 'curveSamples');
         gui.add(this, 'numCapVertices');
         gui.add(this, 'numCornerVertices');
+        gui.add(this, 'uSpeed');
+        gui.add(this, 'vSpeed');
     }
 
     private init()
@@ -118,6 +122,8 @@ class test_LineRenderer implements IState
             this.lr.curveSamples = this.curveSamples;
             this.lr.numCapVertices = this.numCapVertices;
             this.lr.numCornerVertices = this.numCornerVertices;
+            this.lr.uvSpeed.x = this.uSpeed;
+            this.lr.uvSpeed.y = this.vSpeed;
         }
     }
 }

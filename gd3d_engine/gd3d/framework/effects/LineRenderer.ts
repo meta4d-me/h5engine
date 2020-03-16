@@ -139,6 +139,16 @@ namespace gd3d.framework
         useWorldSpace = false;
 
         /**
+         * uv流动速度
+         */
+        uvSpeed = new math.vector2();
+
+        /**
+         * uv偏移
+         */
+        uvOffset = new math.vector4();
+
+        /**
          * Set the curve describing the width of the line at various points along its length.
          * 
          * 设置曲线，以描述沿线长度在各个点处的线宽。
@@ -311,6 +321,9 @@ namespace gd3d.framework
             {
                 this.material = sceneMgr.app.getAssetMgr().getDefLineRendererMat();
             }
+            this.uvOffset.x += this.uvSpeed.x;
+            this.uvOffset.y += this.uvSpeed.y;
+            this.material.setVector4("_uvOffset", this.uvOffset);
 
             // 清理网格
             LineRenderer.clearMesh(this.mesh);

@@ -444,12 +444,15 @@ namespace gd3d.framework
 
         uniform sampler2D _MainTex; 
         
+        uniform vec4 _uvOffset; 
+
         varying vec2 xlv_TEXCOORD0;
         varying vec4 xlv_COLOR;
         
         void main() 
         {
-            vec4 color = texture2D(_MainTex, xlv_TEXCOORD0);
+            vec2 uv = xlv_TEXCOORD0 + _uvOffset.xy;
+            vec4 color = texture2D(_MainTex, uv);
             gl_FragColor = color * xlv_COLOR;
         }
         `;
