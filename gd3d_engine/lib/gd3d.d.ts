@@ -946,6 +946,7 @@ declare namespace gd3d.framework {
         private datar;
         color: math.color;
         color2: math.color;
+        outlineWidth: number;
         private static readonly defUIShader;
         private static readonly defMaskUIShader;
         private _CustomShaderName;
