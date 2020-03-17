@@ -20,6 +20,7 @@ class main implements gd3d.framework.IUserCode
 
         //-------------------------------------基础
         this.addBtn("基础==>",()=>{
+            demoList.addBtn("最小demo",()=>new mini_sample());
             demoList.addBtn("f14effect",()=>new dome.db_test_f14eff());
             demoList.addBtn("物理2d_dome",()=>new physic2d_dome());
             demoList.addBtn("test_load", () => new test_load());
