@@ -22,10 +22,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -5285,6 +5286,7 @@ var gd3d;
                 this.datar = [];
                 this.color = new gd3d.math.color(1, 1, 1, 1);
                 this.color2 = new gd3d.math.color(0, 0, 0.5, 0.5);
+                this.outlineWidth = 0.75;
                 this._CustomShaderName = "";
                 this.dirtyData = true;
                 this.min_x = Number.MAX_VALUE;
@@ -5564,6 +5566,9 @@ var gd3d;
                             mat.setVector4("_maskRect", this._cacheMaskV4);
                         }
                     }
+                    else {
+                        mat.setFloat("_outlineWidth", this.outlineWidth);
+                    }
                     if (this.datar.length != 0)
                         canvas.pushRawData(mat, this.datar);
                 }
@@ -5683,6 +5688,10 @@ var gd3d;
                 gd3d.reflect.UIStyle("color"),
                 __metadata("design:type", gd3d.math.color)
             ], label.prototype, "color2", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Object)
+            ], label.prototype, "outlineWidth", void 0);
             label = label_1 = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender
@@ -8475,6 +8484,7 @@ var gd3d;
             AssetTypeEnum[AssetTypeEnum["Prefab"] = 24] = "Prefab";
             AssetTypeEnum[AssetTypeEnum["cPrefab"] = 25] = "cPrefab";
             AssetTypeEnum[AssetTypeEnum["ParticleSystem"] = 26] = "ParticleSystem";
+            AssetTypeEnum[AssetTypeEnum["TrailRenderer"] = 27] = "TrailRenderer";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
         var ResourceState = (function () {
             function ResourceState() {
@@ -8892,6 +8902,8 @@ var gd3d;
                         return framework.AssetTypeEnum.KeyFrameAniclip;
                     case ".particlesystem.json":
                         return framework.AssetTypeEnum.ParticleSystem;
+                    case ".trailrenderer.json":
+                        return framework.AssetTypeEnum.TrailRenderer;
                 }
                 i = file.indexOf(".", i + 1);
             }
@@ -9221,6 +9233,17 @@ var gd3d;
             assetMgr.prototype.getShader = function (name) {
                 return this.mapShader[name];
             };
+            assetMgr.prototype.getDefLineRendererMat = function () {
+                if (this.linerenderermat == null) {
+                    var material_1 = new framework.material();
+                    material_1.use();
+                    material_1.setShader(framework.sceneMgr.app.getAssetMgr().getShader("shader/deflinetrail"));
+                    var tex = this.getDefaultTexture(framework.defTexture.white);
+                    material_1.setTexture("_MainTex", tex);
+                    this.linerenderermat = material_1;
+                }
+                return this.linerenderermat;
+            };
             assetMgr.prototype.getDefParticleMat = function () {
                 if (this.particlemat == null) {
                     var mat = new framework.material("defparticle");
@@ -9426,6 +9449,8 @@ var gd3d;
                 pool.compileFS(assetmgr.webgl, "defUIMaskFS", defShader.fscodeMaskUI);
                 pool.compileVS(assetmgr.webgl, "defuifontMaskVS", defShader.vscodeuifontmask);
                 pool.compileFS(assetmgr.webgl, "defuifontMaskFS", defShader.fscodeuifontmask);
+                pool.compileVS(assetmgr.webgl, "deflinetrailVS", defShader.vslinetrail);
+                pool.compileFS(assetmgr.webgl, "deflinetrailFS", defShader.fslinetrail);
                 var program = pool.linkProgram(assetmgr.webgl, "def", "def");
                 var program2 = pool.linkProgram(assetmgr.webgl, "defui", "defui");
                 var programuifont = pool.linkProgram(assetmgr.webgl, "defuifont", "defuifont");
@@ -9434,6 +9459,7 @@ var gd3d;
                 var programmaterialcolor = pool.linkProgram(assetmgr.webgl, "materialcolor", "line");
                 var programMaskUI = pool.linkProgram(assetmgr.webgl, "defUIMaskVS", "defUIMaskFS");
                 var programMaskfont = pool.linkProgram(assetmgr.webgl, "defuifontMaskVS", "defuifontMaskFS");
+                var programlinetrail = pool.linkProgram(assetmgr.webgl, "deflinetrailVS", "deflinetrailFS");
                 {
                     var sh = new framework.shader("shader/def");
                     sh.defaultAsset = true;
@@ -9502,7 +9528,6 @@ var gd3d;
                     p.setProgram(programuifont);
                     sh.passes["base"].push(p);
                     sh.fillUnDefUniform(p);
-                    sh._parseProperties(assetmgr, JSON.parse(this.shaderuifront).properties);
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
                     p.state_ztest = false;
                     p.state_zwrite = false;
@@ -9563,6 +9588,22 @@ var gd3d;
                     sh.passes["base"].push(p);
                     sh._parseProperties(assetmgr, JSON.parse(this.shaderuifront).properties);
                     p.setProgram(programMaskfont);
+                    sh.fillUnDefUniform(p);
+                    p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
+                    p.state_ztest = false;
+                    p.state_zwrite = false;
+                    p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
+                    p.setAlphaBlend(gd3d.render.BlendModeEnum.Blend);
+                    assetmgr.mapShader[sh.getName()] = sh;
+                }
+                {
+                    var sh = new framework.shader("shader/deflinetrail");
+                    sh.defaultAsset = true;
+                    sh.passes["base"] = [];
+                    var p = new gd3d.render.glDrawPass();
+                    sh.passes["base"].push(p);
+                    sh._parseProperties(assetmgr, JSON.parse(this.linetrailShader).properties);
+                    p.setProgram(programlinetrail);
                     sh.fillUnDefUniform(p);
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
                     p.state_ztest = false;
@@ -9634,7 +9675,7 @@ var gd3d;
             ]\
             }";
             defShader.vscodefontUI = " \n        attribute vec4 _glesVertex;    \n        attribute vec4 _glesColor;                   \n        attribute vec4 _glesColorEx;                   \n        attribute vec4 _glesMultiTexCoord0;          \n        uniform highp mat4 glstate_matrix_mvp;       \n        varying lowp vec4 xlv_COLOR;                 \n        varying lowp vec4 xlv_COLOREx;                                                  \n        varying highp vec2 xlv_TEXCOORD0;            \n        void main()                                      \n        {                                                \n            highp vec4 tmpvar_1;                         \n            tmpvar_1.w = 1.0;                            \n            tmpvar_1.xyz = _glesVertex.xyz;              \n            xlv_COLOR = _glesColor;                      \n            xlv_COLOREx = _glesColorEx;                      \n            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      \n            gl_Position = (glstate_matrix_mvp * tmpvar_1);   \n        }";
-            defShader.fscodefontUI = " \n            precision mediump float ; \n            uniform sampler2D _MainTex; \n            varying lowp vec4 xlv_COLOR; // \u5B57\u4F53\u989C\u8272\n            varying lowp vec4 xlv_COLOREx; // \u63CF\u8FB9\u989C\u8272\n            varying highp vec2 xlv_TEXCOORD0;     \n            void main()   \n            {  \n                // \u5728gd3d\u4E2D\u4F7F\u7528\u7684sdf\u5B57\u4F53\u505A\u4E86\u6700\u5927\u503C\u4E3A2\u50CF\u7D20\u7684\u6709\u5411\u8DDD\u79BB\u8FD0\u7B97\u4E14\u4FDD\u5B58\u5230\u4F4D\u56FE\u4E0A\u3002\n                // \u989C\u8272\u503C[0,255]\u5BF9\u4E8E\u533A\u95F4[-2,2]\u3002\n                // \u989C\u8272\u503Cv\u8868\u793A\u8DDD\u79BB\u5B57\u7B26\u8FB9\u7F18\u6709 (v/255*4-2) \u5355\u4F4D\u8DDD\u79BB\u3002\u5355\u4F4D\u8DDD\u79BB\u4E3A\u6B63\u8868\u793A\u5728\u5B57\u7B26\u5185\uFF0C\u5426\u5219\u5728\u5B57\u7B26\u5916\u3002\n                \n                float _DistanceMark = 0.0; // \u8DDD\u79BB\u4E3A 0 \u5904\u662F\u5B57\u7B26\u8FB9\u7F18\n                float _SmoothDelta = 0.5; // \u5728\u5B57\u7B26\u8FB9\u7F18 0.5 \u50CF\u7D20\u8FDB\u884C\u63D2\u503C \n                float _OutlineDistanceMark = -1.0; // \u63CF\u8FB9\u4F4D\u7F6E\n\n                vec4 col = texture2D(_MainTex, xlv_TEXCOORD0);\n                float distance = col.r * 4.0 - 2.0;\n\n                // \u5E73\u6ED1\u5B57\u4F53\u8FB9\u7F18\n                col.a = smoothstep(_DistanceMark - _SmoothDelta, _DistanceMark + _SmoothDelta, distance);\n                // \u4E0D\u5E73\u6ED1 \u76F8\u5F53\u4E8E _SmoothDelta = 0\n                // if (distance < _DistanceMark)\n                //     col.a = 0.0;\n                // else\n                //     col.a = 1.0;\n\n                col.rgb = xlv_COLOR.rgb;\n            \n                // Outlining \u63CF\u8FB9\n                vec4 outlineCol = vec4(1.0,1.0,1.0,1.0);\n\n                outlineCol.a = smoothstep(_OutlineDistanceMark - _SmoothDelta, _OutlineDistanceMark + _SmoothDelta, distance);\n                outlineCol.rgb = xlv_COLOREx.rgb;\n                outlineCol.a = outlineCol.a * xlv_COLOREx.a;\n                \n                // \u6DF7\u5408\u5B57\u4F53\u4E0E\u63CF\u8FB9\u989C\u8272\n                col = mix(outlineCol, col, col.a);\n\n                col.rgb = col.rgb * xlv_COLOR.a;\n                \n                // \u8BBE\u7F6E\u6700\u7EC8\u503C\n                gl_FragData[0] = col;\n        }";
+            defShader.fscodefontUI = " \n            precision mediump float ; \n            uniform sampler2D _MainTex; \n\n            uniform highp float _outlineWidth; // \u63CF\u8FB9\u5BBD\u5EA6\n\n            varying lowp vec4 xlv_COLOR; // \u5B57\u4F53\u989C\u8272\n            varying lowp vec4 xlv_COLOREx; // \u63CF\u8FB9\u989C\u8272\n            varying highp vec2 xlv_TEXCOORD0;     \n            void main()   \n            {  \n                // \u5728gd3d\u4E2D\u4F7F\u7528\u7684sdf\u5B57\u4F53\u505A\u4E86\u6700\u5927\u503C\u4E3A2\u50CF\u7D20\u7684\u6709\u5411\u8DDD\u79BB\u8FD0\u7B97\u4E14\u4FDD\u5B58\u5230\u4F4D\u56FE\u4E0A\u3002\n                // \u989C\u8272\u503C[0,255]\u5BF9\u4E8E\u533A\u95F4[-2,2]\u3002\n                // \u989C\u8272\u503Cv\u8868\u793A\u8DDD\u79BB\u5B57\u7B26\u8FB9\u7F18\u6709 (v/255*4-2) \u5355\u4F4D\u8DDD\u79BB\u3002\u5355\u4F4D\u8DDD\u79BB\u4E3A\u6B63\u8868\u793A\u5728\u5B57\u7B26\u5185\uFF0C\u5426\u5219\u5728\u5B57\u7B26\u5916\u3002\n                \n                float _DistanceMark = 0.0; // \u8DDD\u79BB\u4E3A 0 \u5904\u662F\u5B57\u7B26\u8FB9\u7F18\n                float _SmoothDelta = 0.5; // \u5728\u5B57\u7B26\u8FB9\u7F18 0.5 \u50CF\u7D20\u8FDB\u884C\u63D2\u503C \n\n                float _OutlineDistanceMark = -_outlineWidth; // \u63CF\u8FB9\u4F4D\u7F6E\n\n                vec4 col = texture2D(_MainTex, xlv_TEXCOORD0);\n                float distance = col.r * 4.0 - 2.0;\n\n                // \u5E73\u6ED1\u5B57\u4F53\u8FB9\u7F18\n                col.a = smoothstep(_DistanceMark - _SmoothDelta, _DistanceMark + _SmoothDelta, distance);\n                // \u4E0D\u5E73\u6ED1 \u76F8\u5F53\u4E8E _SmoothDelta = 0\n                // if (distance < _DistanceMark)\n                //     col.a = 0.0;\n                // else\n                //     col.a = 1.0;\n\n                col.rgb = xlv_COLOR.rgb;\n            \n                // Outlining \u63CF\u8FB9\n                vec4 outlineCol = vec4(1.0,1.0,1.0,1.0);\n\n                outlineCol.a = smoothstep(_OutlineDistanceMark - _outlineWidth, _OutlineDistanceMark + _outlineWidth, distance);\n                outlineCol.rgb = xlv_COLOREx.rgb;\n                outlineCol.a = outlineCol.a * xlv_COLOREx.a;\n                \n                // \u6DF7\u5408\u5B57\u4F53\u4E0E\u63CF\u8FB9\u989C\u8272\n                col = mix(outlineCol, col, col.a);\n\n                col.rgb = col.rgb * xlv_COLOR.a;\n                \n                // \u8BBE\u7F6E\u6700\u7EC8\u503C\n                gl_FragData[0] = col;\n        }";
             defShader.vscodeuifontmask = " \n            attribute vec4 _glesVertex;    \n            attribute vec4 _glesColor;                   \n            attribute vec4 _glesColorEx;                   \n            attribute vec4 _glesMultiTexCoord0;          \n            uniform highp mat4 glstate_matrix_mvp;       \n            varying lowp vec4 xlv_COLOR;                 \n            varying lowp vec4 xlv_COLOREx;                                                  \n            varying highp vec2 xlv_TEXCOORD0;            \n            varying highp vec2 mask_TEXCOORD;            \n            void main()                                      \n            {                                                \n                highp vec4 tmpvar_1;                         \n                tmpvar_1.w = 1.0;                            \n                tmpvar_1.xyz = _glesVertex.xyz;              \n                xlv_COLOR = _glesColor;                      \n                xlv_COLOREx = _glesColorEx;                      \n                xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      \n                mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0; \n                mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0; \n                gl_Position = (glstate_matrix_mvp * tmpvar_1);   \n            }";
             defShader.fscodeuifontmask = " \n            precision mediump float; \n            uniform sampler2D _MainTex;   \n            uniform highp vec4 _maskRect;        \n            varying lowp vec4 xlv_COLOR;  \n            varying lowp vec4 xlv_COLOREx;  \n            varying highp vec2 xlv_TEXCOORD0;     \n            varying highp vec2 mask_TEXCOORD;      \n            bool CalcuCut(){    \n                highp float l; \n                highp float t; \n                highp float r; \n                highp float b; \n                highp vec2 texc1; \n                bool beCut; \n                l = _maskRect.x; \n                t = _maskRect.y; \n                r = _maskRect.z + l; \n                b = _maskRect.w + t; \n                texc1 = mask_TEXCOORD; \n                if(texc1.x >(1.0 - l) || texc1.x <(1.0 - r) || texc1.y <t || texc1.y>b){  \n                    beCut = true;  \n                }else{ \n                    beCut = false; \n                } \n                return beCut; \n            } \n             \n            void main()   \n            {  \n                if(CalcuCut())  discard; \n                float scale = 10.0;    \n                float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.47)*scale;   \n                float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.4)*scale;   \n                \n                float c=xlv_COLOR.a * clamp ( d,0.0,1.0);   \n                float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);   \n                bc =min(1.0-c,bc);  \n                lowp vec4 final =  xlv_COLOR*c + xlv_COLOREx*bc ; \n                gl_FragData[0] = final ; \n            }";
             defShader.diffuseShader = "{\
@@ -9707,6 +9748,13 @@ var gd3d;
             xlv_COLOR.a = xlv_COLOR.a * _Alpha;\
             gl_Position = (glstate_matrix_mvp * tmpvar_1);\
         }";
+            defShader.vslinetrail = "\n        attribute vec4 _glesVertex;\n        attribute vec2 _glesMultiTexCoord0;\n        attribute vec4 _glesColor;\n        \n        uniform mat4 glstate_matrix_mvp;\n        \n        varying vec2 xlv_TEXCOORD0;\n        varying vec4 xlv_COLOR;\n        \n        void main() \n        {\n            gl_Position = glstate_matrix_mvp * _glesVertex;\n            xlv_TEXCOORD0 = _glesMultiTexCoord0;\n            xlv_COLOR = _glesColor;\n        }\n        ";
+            defShader.linetrailShader = "{\
+            \"properties\": [\
+              \"_MainTex('MainTex',Texture)='white'{}\"\
+            ]\
+            }";
+            defShader.fslinetrail = "\n        precision mediump float;\n\n        uniform sampler2D _MainTex; \n        \n        varying vec2 xlv_TEXCOORD0;\n        varying vec4 xlv_COLOR;\n        \n        void main() \n        {\n            vec4 color = texture2D(_MainTex, xlv_TEXCOORD0);\n            gl_FragColor = color * xlv_COLOR;\n        }\n        ";
             return defShader;
         }());
         framework.defShader = defShader;
@@ -10305,6 +10353,26 @@ var gd3d;
             return AssetFactory_TextureDesc;
         }());
         framework.AssetFactory_TextureDesc = AssetFactory_TextureDesc;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_TrailRenderer = (function () {
+            function AssetFactory_TrailRenderer() {
+            }
+            AssetFactory_TrailRenderer.prototype.parse = function (assetmgr, bundle, name, txt) {
+                var data = framework.TrailRendererData.get(name);
+                data.setData(txt);
+                return data;
+            };
+            AssetFactory_TrailRenderer = __decorate([
+                framework.assetF(framework.AssetTypeEnum.TrailRenderer)
+            ], AssetFactory_TrailRenderer);
+            return AssetFactory_TrailRenderer;
+        }());
+        framework.AssetFactory_TrailRenderer = AssetFactory_TrailRenderer;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -11935,9 +12003,9 @@ var gd3d;
             meshRenderer.prototype.refreshLayerAndQue = function () {
                 if (this.materials == null || this.materials.length == 0) {
                     this.materials = [];
-                    var material_1 = new framework.material();
-                    material_1.use();
-                    this.materials.push(material_1);
+                    var material_2 = new framework.material();
+                    material_2.use();
+                    this.materials.push(material_2);
                     this.materials[0].setShader(framework.sceneMgr.app.getAssetMgr().getShader("shader/def"));
                 }
                 this.layer = this.materials[0].getLayer();
@@ -12657,7 +12725,7 @@ var gd3d;
                 this.name = new framework.constText(assetName);
                 gd3d.io.enumMgr.enumMap["UniformTypeEnum"] = gd3d.render.UniformTypeEnum;
             }
-            material_2 = material;
+            material_3 = material;
             material.prototype.getName = function () {
                 if (this.name == undefined) {
                     return null;
@@ -12733,7 +12801,7 @@ var gd3d;
                 var udMap = this.uniformDirtyMap;
                 for (var key in pass.mapuniforms) {
                     var unifom = pass.mapuniforms[key];
-                    if (lastMatSame && !material_2.sameMatPassMap[unifom.name] && !udMap[unifom.name]) {
+                    if (lastMatSame && !material_3.sameMatPassMap[unifom.name] && !udMap[unifom.name]) {
                         continue;
                     }
                     udMap[unifom.name] = false;
@@ -12895,8 +12963,8 @@ var gd3d;
                 if (drawInstanceInfo === void 0) { drawInstanceInfo = undefined; }
                 var matGUID = this.getGUID();
                 var meshGUID = mesh.getGUID();
-                var LastMatSame = matGUID == material_2.lastDrawMatID;
-                var LastMeshSame = meshGUID == material_2.lastDrawMeshID;
+                var LastMatSame = matGUID == material_3.lastDrawMatID;
+                var LastMeshSame = meshGUID == material_3.lastDrawMeshID;
                 var drawPasses = this.shader.passes[basetype + context.drawtype];
                 if (drawPasses == undefined) {
                     basetype = basetype.indexOf("fog") != -1 ? "base_fog" : "base";
@@ -12935,8 +13003,8 @@ var gd3d;
                     }
                     drawInstanceInfo && drawInstanceInfo.disableAttributes(context.webgl, pass.program.program);
                 }
-                material_2.lastDrawMatID = matGUID;
-                material_2.lastDrawMeshID = meshGUID;
+                material_3.lastDrawMatID = matGUID;
+                material_3.lastDrawMeshID = meshGUID;
             };
             material.prototype.Parse = function (assetmgr, json, bundleName) {
                 if (bundleName === void 0) { bundleName = null; }
@@ -12993,7 +13061,7 @@ var gd3d;
                 return this;
             };
             material.prototype.clone = function () {
-                var mat = new material_2(this.getName());
+                var mat = new material_3(this.getName());
                 mat.setShader(this.shader);
                 for (var i in this.statedMapUniforms) {
                     var _uniformType = this.defaultMapUniform[i].type;
@@ -13046,7 +13114,7 @@ var gd3d;
                 }
                 return JSON.stringify(obj);
             };
-            var material_2;
+            var material_3;
             material.ClassName = "material";
             material.sameMatPassMap = {
                 glstate_matrix_model: true,
@@ -13068,7 +13136,7 @@ var gd3d;
                 gd3d.reflect.Field("shader"),
                 __metadata("design:type", framework.shader)
             ], material.prototype, "shader", void 0);
-            material = material_2 = __decorate([
+            material = material_3 = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [String])
             ], material);
@@ -14534,6 +14602,7 @@ var gd3d;
     (function (framework) {
         var aniplayer = (function () {
             function aniplayer() {
+                this.clips = [];
                 this.autoplay = true;
                 this._playClip = null;
                 this.clipnames = {};
@@ -14555,7 +14624,7 @@ var gd3d;
                 this._allClipNames = [];
                 this.collected = false;
                 this.temptMat = gd3d.math.pool.new_matrix();
-                this.frameDirty = false;
+                this.frameDirty = true;
                 this.playEndDic = {};
                 this.beActivedEndFrame = false;
                 this.endFrame = 0;
@@ -14672,8 +14741,19 @@ var gd3d;
                 return this.clipnames[name];
             };
             aniplayer.prototype.start = function () {
-                if (this.bones != null) {
-                    this.init();
+                if (!this.bones)
+                    return;
+                this.init();
+                var len = this.clips.length;
+                for (var i = 0; i < len; i++) {
+                    var clip = this.clips[i];
+                    if (!clip.frames || Object.keys(clip.frames).length < 1)
+                        continue;
+                    this.addClip(clip);
+                }
+                var firstClip = this.clips[0];
+                if (this.autoplay && firstClip && firstClip.frames && Object.keys(firstClip.frames).length >= 1) {
+                    this.playAniclip(firstClip);
                 }
             };
             aniplayer.prototype.onPlay = function () {
@@ -14922,7 +15002,7 @@ var gd3d;
                 this.boneCache = {};
             };
             aniplayer.prototype.fillPoseData = function (data, bones) {
-                if (!this.curFrame || !bones || !data)
+                if (!bones || !data)
                     return;
                 if (!this.bePlay) {
                     if (this.beActived)
@@ -14941,6 +15021,8 @@ var gd3d;
                     }
                     return;
                 }
+                if (!this.curFrame)
+                    return;
                 if (this._playClip.indexDic.len)
                     for (var i = 0, len = bones.length; i < len; i++) {
                         var bonename = bones[i].name;
@@ -21131,6 +21213,827 @@ var gd3d;
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
+    var framework;
+    (function (framework) {
+        var LineRenderer = (function () {
+            function LineRenderer() {
+                this.mesh = new gd3d.framework.mesh("LineRenderer" + ".mesh.bin");
+                this.layer = framework.RenderLayerEnum.Transparent;
+                this.queue = 0;
+                this.loop = false;
+                this.positions = [];
+                this.lineWidth = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, curveMultiplier: 0.1, mode: framework.MinMaxCurveMode.Curve });
+                this.lineColor = framework.serialization.setValue(new framework.MinMaxGradient(), { mode: framework.MinMaxGradientMode.Gradient });
+                this.numCornerVertices = 0;
+                this.numCapVertices = 0;
+                this.alignment = framework.LineAlignment.TransformZ;
+                this.textureMode = framework.LineTextureMode.Stretch;
+                this.shadowBias = 0.5;
+                this.generateLightingData = false;
+                this.useWorldSpace = false;
+                this.localToWorldMatrix = new gd3d.math.matrix();
+                this.worldToLocalMatrix = new gd3d.math.matrix();
+            }
+            LineRenderer_1 = LineRenderer;
+            Object.defineProperty(LineRenderer.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(LineRenderer.prototype, "transform", {
+                get: function () {
+                    return this.gameObject && this.gameObject.transform;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(LineRenderer.prototype, "widthCurve", {
+                get: function () {
+                    return this.lineWidth.curve;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(LineRenderer.prototype, "widthMultiplier", {
+                get: function () {
+                    return this.lineWidth.curveMultiplier;
+                },
+                set: function (v) {
+                    this.lineWidth.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(LineRenderer.prototype, "colorGradient", {
+                get: function () {
+                    return this.lineColor.gradient;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(LineRenderer.prototype, "endColor", {
+                get: function () {
+                    var color4 = new gd3d.math.color();
+                    var color3 = this.colorGradient.colorKeys[this.colorGradient.colorKeys.length - 1];
+                    var alpha = this.colorGradient.alphaKeys[this.colorGradient.alphaKeys.length - 1];
+                    color4.r = color3.color.r;
+                    color4.g = color3.color.g;
+                    color4.b = color3.color.b;
+                    color4.a = alpha.alpha;
+                    return color4;
+                },
+                set: function (v) {
+                    this.colorGradient.alphaKeys[this.colorGradient.alphaKeys.length - 1].alpha = v.a;
+                    var color = this.colorGradient.colorKeys[this.colorGradient.colorKeys.length - 1].color;
+                    color.r = v.r;
+                    color.g = v.g;
+                    color.b = v.b;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(LineRenderer.prototype, "endWidth", {
+                get: function () {
+                    return this.widthCurve.keys[this.widthCurve.keys.length - 1].value;
+                },
+                set: function (v) {
+                    this.widthCurve.keys[this.widthCurve.keys.length - 1].value = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(LineRenderer.prototype, "positionCount", {
+                get: function () {
+                    return this.positions.length;
+                },
+                set: function (v) {
+                    this.positions.length = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(LineRenderer.prototype, "startColor", {
+                get: function () {
+                    var color4 = new gd3d.math.color();
+                    var color3 = this.colorGradient.colorKeys[0];
+                    var alpha = this.colorGradient.alphaKeys[0];
+                    color4.r = color3.color.r;
+                    color4.g = color3.color.g;
+                    color4.b = color3.color.b;
+                    color4.a = alpha.alpha;
+                    return color4;
+                },
+                set: function (v) {
+                    this.colorGradient.alphaKeys[0].alpha = v.a;
+                    var color = this.colorGradient.colorKeys[0].color;
+                    color.r = v.r;
+                    color.g = v.g;
+                    color.b = v.b;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(LineRenderer.prototype, "startWidth", {
+                get: function () {
+                    return this.widthCurve.keys[0].value * this.widthMultiplier;
+                },
+                set: function (v) {
+                    this.widthCurve.keys[0].value = v / this.widthMultiplier;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            LineRenderer.prototype.render = function (context, assetmgr, camera) {
+                gd3d.math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
+                gd3d.math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
+                if (!this.material) {
+                    this.material = framework.sceneMgr.app.getAssetMgr().getDefLineRendererMat();
+                }
+                LineRenderer_1.clearMesh(this.mesh);
+                this.BakeMesh(this.mesh, camera, false);
+                if (this.positions.length < 2)
+                    return;
+                LineRenderer_1.uploadMesh(this.mesh, assetmgr.webgl);
+                LineRenderer_1.draw(context, this.gameObject, this.mesh, this.material);
+            };
+            LineRenderer.prototype.onPlay = function () {
+            };
+            LineRenderer.prototype.start = function () {
+            };
+            LineRenderer.prototype.update = function (interval) {
+            };
+            LineRenderer.prototype.remove = function () {
+                throw "未实现";
+            };
+            LineRenderer.prototype.clone = function () {
+                throw "未实现";
+            };
+            LineRenderer.prototype.BakeMesh = function (mesh, camera, useTransform) {
+                var positions = this.positions.concat();
+                if (positions.length < 2)
+                    return;
+                var textureMode = this.textureMode;
+                var loop = this.loop;
+                var lineWidth = this.lineWidth;
+                var alignment = this.alignment;
+                var colorGradient = this.colorGradient;
+                var cameraPosition = new gd3d.math.vector3();
+                gd3d.math.vec3Clone(camera.gameObject.transform.getWorldPosition(), cameraPosition);
+                gd3d.math.matrixTransformVector3(cameraPosition, this.worldToLocalMatrix, cameraPosition);
+                var totalLength = LineRenderer_1.calcTotalLength(positions, loop);
+                var rateAtLines = LineRenderer_1.calcRateAtLines(positions, loop, textureMode);
+                var positionVectex = LineRenderer_1.calcPositionVectex(positions, loop, rateAtLines, lineWidth, alignment, cameraPosition);
+                LineRenderer_1.calcMesh(positionVectex, textureMode, colorGradient, totalLength, mesh);
+            };
+            LineRenderer.prototype.GetPosition = function (index) {
+                return this.positions[index];
+            };
+            LineRenderer.prototype.GetPositions = function (positions) {
+                if (positions === void 0) { positions = []; }
+                positions.length = this.positions.length;
+                for (var i = 0; i < this.positions.length; i++) {
+                    positions[i] = positions[i] || new gd3d.math.vector3();
+                    positions[i].x = this.positions[i].x;
+                    positions[i].y = this.positions[i].y;
+                    positions[i].z = this.positions[i].z;
+                }
+                return positions;
+            };
+            LineRenderer.prototype.setPosition = function (index, position) {
+                this.positions[index].x = position.x;
+                this.positions[index].y = position.y;
+                this.positions[index].z = position.z;
+            };
+            LineRenderer.prototype.SetPositions = function (positions) {
+                this.positions.length = positions.length;
+                for (var i = 0; i < positions.length; i++) {
+                    this.positions[i] = this.positions[i] || new gd3d.math.vector3();
+                    this.positions[i].x = positions[i].x;
+                    this.positions[i].y = positions[i].y;
+                    this.positions[i].z = positions[i].z;
+                }
+            };
+            LineRenderer.prototype.Simplify = function (tolerance) {
+            };
+            LineRenderer.draw = function (context, go, mesh, material) {
+                framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.EffectSystem;
+                var tran = go.transform;
+                context.updateLightMask(go.layer);
+                context.updateModel(tran);
+                if (!material)
+                    return;
+                if (mesh == null || mesh.glMesh == null || mesh.submesh == null)
+                    return;
+                var subMeshs = mesh.submesh;
+                if (subMeshs == null)
+                    return;
+                mesh.glMesh.bindVboBuffer(context.webgl);
+                material.draw(context, mesh, subMeshs[0]);
+            };
+            LineRenderer.clearMesh = function (mesh) {
+                if (!mesh.data) {
+                    mesh.data = new gd3d.render.meshData();
+                }
+                var data = mesh.data;
+                data.pos = [];
+                data.trisindex = [];
+                data.normal = [];
+                data.tangent = [];
+                data.uv = [];
+                data.color = [];
+            };
+            LineRenderer.uploadMesh = function (_mesh, webgl) {
+                var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal | gd3d.render.VertexFormatMask.Tangent | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
+                _mesh.data.originVF = vf;
+                var v32 = _mesh.data.genVertexDataArray(vf);
+                var i16 = _mesh.data.genIndexDataArray();
+                _mesh.glMesh = new gd3d.render.glMesh();
+                _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
+                _mesh.glMesh.uploadVertexData(webgl, v32);
+                _mesh.glMesh.addIndex(webgl, i16.length);
+                _mesh.glMesh.uploadIndexData(webgl, 0, i16);
+                _mesh.submesh = [];
+                {
+                    var sm = new gd3d.framework.subMeshInfo();
+                    sm.matIndex = 0;
+                    sm.useVertexIndex = 0;
+                    sm.start = 0;
+                    sm.size = i16.length;
+                    sm.line = false;
+                    _mesh.submesh.push(sm);
+                }
+            };
+            LineRenderer.calcMesh = function (positionVectex, textureMode, colorGradient, totalLength, mesh) {
+                var data = mesh.data;
+                var a_positions = [];
+                var a_uvs = [];
+                var a_colors = [];
+                for (var i = 0, n = positionVectex.length; i < n; i++) {
+                    var vertex = positionVectex[i];
+                    var offset0 = vertex.vertexs[0];
+                    var offset1 = vertex.vertexs[1];
+                    var rateAtLine = vertex.rateAtLine;
+                    var currentColor = colorGradient.getValue(rateAtLine);
+                    a_positions.push(offset0.x, offset0.y, offset0.z, offset1.x, offset1.y, offset1.z);
+                    a_colors.push(currentColor.r, currentColor.g, currentColor.b, currentColor.a, currentColor.r, currentColor.g, currentColor.b, currentColor.a);
+                    if (textureMode == framework.LineTextureMode.Stretch) {
+                        a_uvs.push(rateAtLine, 1, rateAtLine, 0);
+                    }
+                    else if (textureMode == framework.LineTextureMode.Tile) {
+                        a_uvs.push(rateAtLine * totalLength, 1, rateAtLine * totalLength, 0);
+                    }
+                    else if (textureMode == framework.LineTextureMode.DistributePerSegment) {
+                        a_uvs.push(rateAtLine, 1, rateAtLine, 0);
+                    }
+                    else if (textureMode == framework.LineTextureMode.RepeatPerSegment) {
+                        a_uvs.push(i, 1, i, 0);
+                    }
+                    if (i > 0) {
+                        gd3d.render.meshData.addQuadVec3ByValue(data.normal, vertex.normal);
+                        gd3d.render.meshData.addQuadPos(data, [
+                            new gd3d.math.vector3(a_positions[(i - 1) * 6], a_positions[(i - 1) * 6 + 1], a_positions[(i - 1) * 6 + 2]),
+                            new gd3d.math.vector3(a_positions[(i - 1) * 6 + 3], a_positions[(i - 1) * 6 + 4], a_positions[(i - 1) * 6 + 5]),
+                            new gd3d.math.vector3(a_positions[i * 6], a_positions[i * 6 + 1], a_positions[i * 6 + 2]),
+                            new gd3d.math.vector3(a_positions[i * 6 + 3], a_positions[i * 6 + 4], a_positions[i * 6 + 5]),
+                        ]);
+                        gd3d.render.meshData.addQuadVec2(data.uv, [
+                            new gd3d.math.vector2(a_uvs[(i - 1) * 4], a_uvs[(i - 1) * 4 + 1]),
+                            new gd3d.math.vector2(a_uvs[(i - 1) * 4 + 2], a_uvs[(i - 1) * 4 + 3]),
+                            new gd3d.math.vector2(a_uvs[i * 4], a_uvs[i * 4 + 1]),
+                            new gd3d.math.vector2(a_uvs[i * 4 + 2], a_uvs[i * 4 + 3])
+                        ]);
+                        gd3d.render.meshData.addQuadVec3ByValue(data.tangent, vertex.tangent);
+                        data.color.push(new gd3d.math.color(a_colors[(i - 1) * 8], a_colors[(i - 1) * 8 + 1], a_colors[(i - 1) * 8 + 2], a_colors[(i - 1) * 8 + 3]), new gd3d.math.color(a_colors[(i - 1) * 8 + 4], a_colors[(i - 1) * 8 + 5], a_colors[(i - 1) * 8 + 6], a_colors[(i - 1) * 8 + 7]), new gd3d.math.color(a_colors[i * 8], a_colors[i * 8 + 1], a_colors[i * 8 + 2], a_colors[i * 8 + 3]), new gd3d.math.color(a_colors[i * 8 + 4], a_colors[i * 8 + 5], a_colors[i * 8 + 6], a_colors[i * 8 + 7]));
+                    }
+                }
+            };
+            LineRenderer.calcPositionVectex = function (positions, loop, rateAtLines, lineWidth, alignment, cameraPosition) {
+                var positionVectex = [];
+                if (loop) {
+                    positions.unshift(positions[positions.length - 1]);
+                    positions.push(positions[1]);
+                    positions.push(positions[2]);
+                }
+                else {
+                    positions.unshift(positions[0]);
+                    positions.push(positions[positions.length - 1]);
+                }
+                var positionCount = positions.length;
+                for (var i = 0; i < positionCount - 2; i++) {
+                    var prePosition = positions[i];
+                    var currentPosition = positions[i + 1];
+                    var nextPosition = positions[i + 2];
+                    var rateAtLine = rateAtLines[i];
+                    var currentLineWidth = lineWidth.getValue(rateAtLine);
+                    var tangent0 = new gd3d.math.vector3(0, 0, 0);
+                    gd3d.math.vec3Subtract(currentPosition, prePosition, tangent0);
+                    gd3d.math.vec3Normalize(tangent0, tangent0);
+                    var tangent1 = new gd3d.math.vector3(0, 0, 0);
+                    gd3d.math.vec3Subtract(nextPosition, currentPosition, tangent1);
+                    gd3d.math.vec3Normalize(tangent1, tangent1);
+                    var tangent = new gd3d.math.vector3(1, 0, 0);
+                    gd3d.math.vec2Add(tangent0, tangent1, tangent);
+                    gd3d.math.vec3Normalize(tangent, tangent);
+                    if (gd3d.math.vec3SqrLength(tangent) == 0) {
+                        if (gd3d.math.vec3SqrLength(tangent0) != 0)
+                            gd3d.math.vec3Clone(tangent0, tangent);
+                        else {
+                            tangent.x = 1;
+                            tangent.y = 0;
+                            tangent.y = 0;
+                        }
+                    }
+                    var normal = new gd3d.math.vector3(0, 0, -1);
+                    if (alignment == framework.LineAlignment.View) {
+                        gd3d.math.vec3Subtract(cameraPosition, currentPosition, normal);
+                        gd3d.math.vec3Normalize(normal, normal);
+                    }
+                    else if (alignment == framework.LineAlignment.TransformZ) {
+                        normal.x = 0;
+                        normal.y = 0;
+                        normal.z = -1;
+                    }
+                    if (gd3d.math.vec3IsParallel(tangent, normal)) {
+                        tangent.x = 1;
+                        tangent.y = 0;
+                        tangent.z = 0;
+                        if (gd3d.math.vec3IsParallel(tangent, normal)) {
+                            tangent.x = 0;
+                            tangent.y = 1;
+                            tangent.z = 0;
+                        }
+                        var tempTN = new gd3d.math.vector3();
+                        gd3d.math.vec3Cross(tangent, normal, tempTN);
+                        gd3d.math.vec3Cross(normal, tempTN, tangent);
+                        gd3d.math.vec3Normalize(tangent, tangent);
+                    }
+                    var offset = new gd3d.math.vector3();
+                    gd3d.math.vec3Cross(tangent, normal, offset);
+                    gd3d.math.vec3Normalize(offset, offset);
+                    gd3d.math.vec3ScaleByNum(offset, currentLineWidth / 2, offset);
+                    var temp = new gd3d.math.vector3();
+                    gd3d.math.vec3Clone(offset, temp);
+                    gd3d.math.vec3Normalize(temp, temp);
+                    var cos = gd3d.math.vec3Dot(temp, tangent0);
+                    var sin = Math.sqrt(1 - Math.pow(cos, 2));
+                    sin = Math.min(Math.max(sin, 0.2), 5);
+                    gd3d.math.vec3ScaleByNum(offset, 1 / sin, offset);
+                    var offset0 = new gd3d.math.vector3();
+                    gd3d.math.vec3Add(currentPosition, offset, offset0);
+                    var offset1 = new gd3d.math.vector3();
+                    gd3d.math.vec3Subtract(currentPosition, offset, offset1);
+                    positionVectex[i] = { vertexs: [offset0, offset1], tangent: tangent0, normal: normal, rateAtLine: rateAtLine };
+                }
+                return positionVectex;
+            };
+            LineRenderer.calcTotalLength = function (positions, loop) {
+                var total = 0;
+                var length = positions.length;
+                for (var i = 0, n = length - 1; i < n; i++) {
+                    total += gd3d.math.vec3Distance(positions[i + 1], positions[i]);
+                }
+                if (loop && length > 0) {
+                    total += gd3d.math.vec3Distance(positions[length - 1], positions[0]);
+                }
+                return total;
+            };
+            LineRenderer.calcRateAtLines = function (positions, loop, textureMode) {
+                var rateAtLines = [0];
+                var totalLength = 0;
+                var positionCount = positions.length;
+                for (var i = 0, n = positionCount - 1; i < n; i++) {
+                    totalLength += gd3d.math.vec3Distance(positions[i + 1], positions[i]);
+                    rateAtLines[i + 1] = totalLength;
+                }
+                if (loop && positionCount > 0) {
+                    totalLength += gd3d.math.vec3Distance(positions[positionCount - 1], positions[0]);
+                    rateAtLines[positionCount] = totalLength;
+                }
+                rateAtLines = rateAtLines.map(function (v, i) {
+                    if (textureMode == framework.LineTextureMode.Stretch || textureMode == framework.LineTextureMode.Tile) {
+                        return v / totalLength;
+                    }
+                    return i / (loop ? positionCount : (positionCount - 1));
+                });
+                return rateAtLines;
+            };
+            var LineRenderer_1;
+            LineRenderer.ClassName = "LineRenderer";
+            __decorate([
+                gd3d.reflect.Field("material"),
+                __metadata("design:type", framework.material)
+            ], LineRenderer.prototype, "material", void 0);
+            LineRenderer = LineRenderer_1 = __decorate([
+                gd3d.reflect.nodeRender,
+                gd3d.reflect.nodeComponent
+            ], LineRenderer);
+            return LineRenderer;
+        }());
+        framework.LineRenderer = LineRenderer;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var TrailRenderer = (function () {
+            function TrailRenderer() {
+                this.mesh = new gd3d.framework.mesh("TrailRenderer" + ".mesh.bin");
+                this.layer = framework.RenderLayerEnum.Transparent;
+                this.queue = 0;
+                this.positions = [];
+                this.lineWidth = framework.serialization.setValue(new framework.MinMaxCurve(), { between0And1: true, curveMultiplier: 0.1, mode: framework.MinMaxCurveMode.Curve });
+                this.lineColor = framework.serialization.setValue(new framework.MinMaxGradient(), { mode: framework.MinMaxGradientMode.Gradient });
+                this.numCornerVertices = 0;
+                this.numCapVertices = 0;
+                this.alignment = framework.LineAlignment.TransformZ;
+                this.autodestruct = false;
+                this.emitting = true;
+                this.minVertexDistance = 0.1;
+                this.time = 5;
+                this.textureMode = framework.LineTextureMode.Stretch;
+                this.shadowBias = 0.5;
+                this.generateLightingData = false;
+                this._preworldPos = null;
+                this.localToWorldMatrix = new gd3d.math.matrix();
+                this.worldToLocalMatrix = new gd3d.math.matrix();
+            }
+            Object.defineProperty(TrailRenderer.prototype, "renderLayer", {
+                get: function () { return this.gameObject.layer; },
+                set: function (layer) {
+                    this.gameObject.layer = layer;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TrailRenderer.prototype, "transform", {
+                get: function () {
+                    return this.gameObject && this.gameObject.transform;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TrailRenderer.prototype, "widthCurve", {
+                get: function () {
+                    return this.lineWidth.curve;
+                },
+                set: function (v) {
+                    this.lineWidth.curve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TrailRenderer.prototype, "widthMultiplier", {
+                get: function () {
+                    return this.lineWidth.curveMultiplier;
+                },
+                set: function (v) {
+                    this.lineWidth.curveMultiplier = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TrailRenderer.prototype, "colorGradient", {
+                get: function () {
+                    return this.lineColor.gradient;
+                },
+                set: function (v) {
+                    this.lineColor.gradient = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TrailRenderer.prototype, "endColor", {
+                get: function () {
+                    var color4 = new gd3d.math.color();
+                    var color3 = this.colorGradient.colorKeys[this.colorGradient.colorKeys.length - 1];
+                    var alpha = this.colorGradient.alphaKeys[this.colorGradient.alphaKeys.length - 1];
+                    color4.r = color3.color.r;
+                    color4.g = color3.color.g;
+                    color4.b = color3.color.b;
+                    color4.a = alpha.alpha;
+                    return color4;
+                },
+                set: function (v) {
+                    this.colorGradient.alphaKeys[this.colorGradient.alphaKeys.length - 1].alpha = v.a;
+                    var color = this.colorGradient.colorKeys[this.colorGradient.colorKeys.length - 1].color;
+                    color.r = v.r;
+                    color.g = v.g;
+                    color.b = v.b;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TrailRenderer.prototype, "endWidth", {
+                get: function () {
+                    return this.widthCurve.keys[this.widthCurve.keys.length - 1].value * this.widthMultiplier;
+                },
+                set: function (v) {
+                    this.widthCurve.keys[this.widthCurve.keys.length - 1].value = v / this.widthMultiplier;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TrailRenderer.prototype, "positionCount", {
+                get: function () {
+                    return this.positions.length;
+                },
+                set: function (v) {
+                    this.positions.length = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TrailRenderer.prototype, "startColor", {
+                get: function () {
+                    var color4 = new gd3d.math.color();
+                    var color3 = this.colorGradient.colorKeys[0];
+                    var alpha = this.colorGradient.alphaKeys[0];
+                    color4.r = color3.color.r;
+                    color4.g = color3.color.g;
+                    color4.b = color3.color.b;
+                    color4.a = alpha.alpha;
+                    return color4;
+                },
+                set: function (v) {
+                    this.colorGradient.alphaKeys[0].alpha = v.a;
+                    var color = this.colorGradient.colorKeys[0].color;
+                    color.r = v.r;
+                    color.g = v.g;
+                    color.b = v.b;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TrailRenderer.prototype, "startWidth", {
+                get: function () {
+                    return this.widthCurve.keys[0].value * this.widthMultiplier;
+                },
+                set: function (v) {
+                    this.widthCurve.keys[0].value = v / this.widthMultiplier;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(TrailRenderer.prototype, "trailRendererData", {
+                get: function () {
+                    return this._trailRendererData;
+                },
+                set: function (v) {
+                    var data = framework.TrailRendererData.get(v.value);
+                    if (data.objectData) {
+                        framework.serialization.setValue(this, data.objectData);
+                    }
+                    else {
+                        data.trailRenderer = this;
+                    }
+                    this._trailRendererData = data;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            TrailRenderer.prototype.render = function (context, assetmgr, camera) {
+                gd3d.math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
+                gd3d.math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
+                if (!this.material) {
+                    this.material = framework.sceneMgr.app.getAssetMgr().getDefLineRendererMat();
+                }
+                framework.LineRenderer.clearMesh(this.mesh);
+                this.BakeMesh(this.mesh, camera, false);
+                if (this.positions.length < 2)
+                    return;
+                framework.LineRenderer.uploadMesh(this.mesh, assetmgr.webgl);
+                framework.LineRenderer.draw(context, this.gameObject, this.mesh, this.material);
+            };
+            TrailRenderer.prototype.onPlay = function () {
+            };
+            TrailRenderer.prototype.start = function () {
+            };
+            TrailRenderer.prototype.remove = function () {
+                throw "未实现";
+            };
+            TrailRenderer.prototype.clone = function () {
+                throw "未实现";
+            };
+            TrailRenderer.prototype.update = function (interval) {
+                var _this = this;
+                gd3d.math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
+                gd3d.math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
+                if (this.emitting) {
+                    var currentPosition = new gd3d.math.vector3();
+                    gd3d.math.vec3Clone(this.transform.getWorldPosition(), currentPosition);
+                    var moveDistance = this.minVertexDistance * 2;
+                    if (this._preworldPos)
+                        moveDistance = gd3d.math.vec3Distance(currentPosition, this._preworldPos);
+                    if (moveDistance >= this.minVertexDistance) {
+                        this.AddPosition(currentPosition);
+                        this._preworldPos = currentPosition;
+                    }
+                }
+                var nowTime = Date.now();
+                this.positions = this.positions.filter(function (v) { return ((nowTime - v.birthTime) < _this.time * 1000); });
+                if (this.positions.length == 0) {
+                    this._preworldPos == null;
+                }
+            };
+            TrailRenderer.prototype.BakeMesh = function (mesh, camera, useTransform) {
+                var _this = this;
+                var positions = this.positions.map(function (v) { return v.position; });
+                if (positions.length < 2)
+                    return;
+                var textureMode = this.textureMode;
+                var loop = false;
+                var lineWidth = this.lineWidth;
+                var alignment = this.alignment;
+                var colorGradient = this.colorGradient;
+                var cameraPosition = new gd3d.math.vector3();
+                gd3d.math.vec3Clone(camera.gameObject.transform.getWorldPosition(), cameraPosition);
+                var totalLength = framework.LineRenderer.calcTotalLength(positions, loop);
+                var rateAtLines = framework.LineRenderer.calcRateAtLines(positions, loop, textureMode);
+                var positionVectex = framework.LineRenderer.calcPositionVectex(positions, loop, rateAtLines, lineWidth, alignment, cameraPosition);
+                positionVectex.forEach(function (v) {
+                    v.vertexs.forEach(function (ver) {
+                        gd3d.math.matrixTransformVector3(ver, _this.worldToLocalMatrix, ver);
+                    });
+                });
+                framework.LineRenderer.calcMesh(positionVectex, textureMode, colorGradient, totalLength, mesh);
+            };
+            TrailRenderer.prototype.AddPosition = function (position) {
+                this.positions.unshift({ position: position, birthTime: Date.now() });
+            };
+            TrailRenderer.prototype.AddPositions = function (positions) {
+                var preTime = Date.now();
+                if (this.positions.length > 0)
+                    preTime = this.positions[this.positions.length - 1].birthTime;
+                for (var i = 0, n = positions.length; i < n; i++) {
+                    this.positions.unshift({
+                        position: positions[i], birthTime: preTime + (Date.now() - preTime) * (i + 1) / n
+                    });
+                }
+            };
+            TrailRenderer.prototype.Clear = function () {
+                this.positions.length = 0;
+                this._preworldPos = null;
+            };
+            TrailRenderer.prototype.GetPosition = function (index) {
+                return this.positions[index];
+            };
+            TrailRenderer.prototype.GetPositions = function (positions) {
+                if (positions === void 0) { positions = []; }
+                positions.length = this.positions.length;
+                for (var i = 0; i < this.positions.length; i++) {
+                    positions[i] = positions[i] || new gd3d.math.vector3();
+                    positions[i].x = this.positions[i].position.x;
+                    positions[i].y = this.positions[i].position.y;
+                    positions[i].z = this.positions[i].position.z;
+                }
+                return positions;
+            };
+            TrailRenderer.prototype.setPosition = function (index, position) {
+                this.positions[index].position.x = position.x;
+                this.positions[index].position.y = position.y;
+                this.positions[index].position.z = position.z;
+            };
+            TrailRenderer.prototype.SetPositions = function (positions) {
+                this.positions.length = positions.length;
+                for (var i = 0; i < positions.length; i++) {
+                    if (this.positions[i]) {
+                        this.positions[i].position.x = positions[i].x;
+                        this.positions[i].position.y = positions[i].y;
+                        this.positions[i].position.z = positions[i].z;
+                    }
+                }
+            };
+            TrailRenderer.ClassName = "trailrenderer";
+            __decorate([
+                gd3d.reflect.Field("material"),
+                __metadata("design:type", framework.material)
+            ], TrailRenderer.prototype, "material", void 0);
+            __decorate([
+                gd3d.reflect.Field("TrailRendererData"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], TrailRenderer.prototype, "trailRendererData", null);
+            TrailRenderer = __decorate([
+                gd3d.reflect.nodeRender,
+                gd3d.reflect.nodeComponent
+            ], TrailRenderer);
+            return TrailRenderer;
+        }());
+        framework.TrailRenderer = TrailRenderer;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var TrailRendererData = (function () {
+            function TrailRendererData(assetName) {
+                if (assetName === void 0) { assetName = null; }
+                this.name = null;
+                this.id = new framework.resID();
+                this.defaultAsset = false;
+                if (!assetName) {
+                    assetName = "TrailRenderer_" + this.getGUID();
+                }
+                this.name = new framework.constText(assetName);
+            }
+            TrailRendererData_1 = TrailRendererData;
+            TrailRendererData.get = function (valueName) {
+                return this._datas[valueName];
+            };
+            Object.defineProperty(TrailRendererData.prototype, "value", {
+                get: function () {
+                    return this._value;
+                },
+                set: function (v) {
+                    this._value = v;
+                    if (TrailRendererData_1._datas[v]) {
+                        return;
+                    }
+                    TrailRendererData_1._datas[v] = this;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            TrailRendererData.prototype.getName = function () {
+                if (this.name == undefined) {
+                    return null;
+                }
+                return this.name.getText();
+            };
+            TrailRendererData.prototype.getGUID = function () {
+                return this.id.getID();
+            };
+            TrailRendererData.prototype.dispose = function () {
+            };
+            TrailRendererData.prototype.use = function () {
+                framework.sceneMgr.app.getAssetMgr().use(this);
+            };
+            TrailRendererData.prototype.unuse = function (disposeNow) {
+                if (disposeNow === void 0) { disposeNow = false; }
+                framework.sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
+            };
+            TrailRendererData.prototype.caclByteLength = function () {
+                var total = 0;
+                return total;
+            };
+            TrailRendererData.prototype.setData = function (v) {
+                this.objectData = JSON.parse(v);
+                if (this.trailRenderer) {
+                    framework.serialization.setValue(this.trailRenderer, this.objectData);
+                }
+            };
+            var TrailRendererData_1;
+            TrailRendererData.ClassName = "TrailRendererData";
+            TrailRendererData._datas = {};
+            __decorate([
+                gd3d.reflect.Field("constText"),
+                __metadata("design:type", framework.constText)
+            ], TrailRendererData.prototype, "name", void 0);
+            __decorate([
+                gd3d.reflect.Field("string"),
+                __metadata("design:type", Object),
+                __metadata("design:paramtypes", [Object])
+            ], TrailRendererData.prototype, "value", null);
+            TrailRendererData = TrailRendererData_1 = __decorate([
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [String])
+            ], TrailRendererData);
+            return TrailRendererData;
+        }());
+        framework.TrailRendererData = TrailRendererData;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var LineAlignment;
+        (function (LineAlignment) {
+            LineAlignment[LineAlignment["View"] = 0] = "View";
+            LineAlignment[LineAlignment["TransformZ"] = 1] = "TransformZ";
+        })(LineAlignment = framework.LineAlignment || (framework.LineAlignment = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var LineTextureMode;
+        (function (LineTextureMode) {
+            LineTextureMode[LineTextureMode["Stretch"] = 0] = "Stretch";
+            LineTextureMode[LineTextureMode["Tile"] = 1] = "Tile";
+            LineTextureMode[LineTextureMode["DistributePerSegment"] = 2] = "DistributePerSegment";
+            LineTextureMode[LineTextureMode["RepeatPerSegment"] = 3] = "RepeatPerSegment";
+        })(LineTextureMode = framework.LineTextureMode || (framework.LineTextureMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
     var AEvent = (function () {
         function AEvent() {
             this.events = {};
@@ -25133,6 +26036,19 @@ var gd3d;
             out.z = z;
         }
         math.vec3Cross = vec3Cross;
+        function vec3IsParallel(lhs, rhs, precision) {
+            if (precision === void 0) { precision = 1e-6; }
+            var out1 = math.pool.new_vector3(lhs.x, lhs.y, lhs.z);
+            var out2 = math.pool.new_vector3(rhs.x, rhs.y, rhs.z);
+            math.vec3Normalize(out1, out1);
+            math.vec3Normalize(out2, out2);
+            var dot = math.vec3Dot(out1, out2);
+            dot = Math.abs(dot);
+            if (Math.abs(dot - 1) < precision)
+                return true;
+            return false;
+        }
+        math.vec3IsParallel = vec3IsParallel;
         function vec3Reflect(inDirection, inNormal, out) {
             var v1 = 0;
             v1 = vec3Dot(inNormal, inDirection);
@@ -31695,7 +32611,6 @@ var gd3d;
                 set: function (v) {
                     this._value = v;
                     if (ParticleSystemData_1._datas[v]) {
-                        console.log("\u91CD\u590D\u521B\u5EFA\u7C92\u5B50\u7CFB\u7EDF\u8D44\u6E90 " + v);
                         return;
                     }
                     ParticleSystemData_1._datas[v] = this;
@@ -38627,14 +39542,6 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
-        function serialize(target, propertyKey) {
-            if (!Object.getOwnPropertyDescriptor(target, SERIALIZE_KEY)) {
-                Object.defineProperty(target, SERIALIZE_KEY, { value: [] });
-            }
-            var serializePropertys = target[SERIALIZE_KEY];
-            serializePropertys.push(propertyKey);
-        }
-        framework.serialize = serialize;
         function propertyHandler(target, source, property, handlers, serialization) {
             for (var i = 0; i < handlers.length; i++) {
                 if (handlers[i](target, source, property, handlers, serialization)) {

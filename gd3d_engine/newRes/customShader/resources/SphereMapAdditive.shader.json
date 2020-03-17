@@ -1,0 +1,38 @@
+{
+    "layer": "geometry",
+    "properties": [
+        "_MainTex('MainTex',Texture)='white'{}",
+        "_SphereMap('SphereMap',Texture) = 'white' {}",
+        "_SphereMapIntensity('Lighting Intensity',Range(0.0,1.0)) = 1.0"
+    ],
+    "passes": {
+        "base": [
+            {
+                "showface": "ccw",
+                "vs": "SphereMapAdditive",
+                "fs": "SphereMapAdditive"
+            }
+        ],
+        "base_fog": [
+            {
+                "showface": "ccw",
+                "vs": "SphereMapAdditive",
+                "fs": "SphereMapAdditive"
+            }
+        ],
+        "skin": [
+            {
+                "showface": "ccw",
+                "vs": "SphereMapAdditive",
+                "fs": "SphereMapAdditive"
+            }
+        ],
+        "skin_fog": [
+            {
+                "showface": "ccw",
+                "vs": "SphereMapAdditive",
+                "fs": "SphereMapAdditive"
+            }
+        ]
+    }
+}

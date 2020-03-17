@@ -1,0 +1,49 @@
+{
+    "layer": "transparent",
+    "properties": [
+        "_Rimsize('AlphaCut',Range(0.0,1.0)) = 1.0",
+        "_RimColour ('MainColor', Color) = (1,1,1,0.4)"
+    ],
+    "passes": {
+        "base": [
+            {
+                "blendmode": "add",
+                "ztest": "lequal",
+                "zwrite": "on",
+                "showface": "ccw",
+                "vs": "CloakingDevice",
+                "fs": "PreZCloakingDevice"
+            }
+        ],
+        "base_fog": [
+            {
+                "blendmode": "add",
+                "ztest": "lequal",
+                "zwrite": "on",
+                "showface": "ccw",
+                "vs": "CloakingDevice",
+                "fs": "PreZCloakingDevice"
+            }
+        ],
+        "skin": [
+            {
+                "blendmode": "add",
+                "ztest": "lequal",
+                "zwrite": "on",
+                "showface": "ccw",
+                "vs": "CloakingDevice",
+                "fs": "PreZCloakingDevice"
+            }
+        ],
+        "skin_fog": [
+            {
+                "blendmode": "add",
+                "ztest": "lequal",
+                "zwrite": "on",
+                "showface": "ccw",
+                "vs": "CloakingDevice",
+                "fs": "PreZCloakingDevice"
+            }
+        ]
+    }
+}

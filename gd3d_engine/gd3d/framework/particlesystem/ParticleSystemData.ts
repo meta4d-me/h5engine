@@ -48,7 +48,6 @@ namespace gd3d.framework
 
             if (ParticleSystemData._datas[v])
             {
-                console.log(`重复创建粒子系统资源 ${v}`);
                 return;
             }
             ParticleSystemData._datas[v] = this;
