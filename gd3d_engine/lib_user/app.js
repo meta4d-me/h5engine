@@ -5,11 +5,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -1172,6 +1171,7 @@ var main = (function () {
         this.app = app;
         gd3d.framework.assetMgr.openGuid = false;
         this.addBtn("基础==>", function () {
+            demoList.addBtn("最小demo", function () { return new mini_sample(); });
             demoList.addBtn("f14effect", function () { return new dome.db_test_f14eff(); });
             demoList.addBtn("物理2d_dome", function () { return new physic2d_dome(); });
             demoList.addBtn("test_load", function () { return new test_load(); });
@@ -1305,6 +1305,32 @@ var main = (function () {
         gd3d.reflect.userCode
     ], main);
     return main;
+}());
+var mini_sample = (function () {
+    function mini_sample() {
+    }
+    mini_sample.prototype.start = function (app) {
+        var obj = gd3d.framework.TransformUtil.CreatePrimitive(gd3d.framework.PrimitiveType.Cube, app);
+        var scene = app.getScene();
+        scene.addChild(obj);
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var cam = objCam.gameObject.addComponent("camera");
+        cam.near = 0.01;
+        cam.far = 120;
+        cam.fov = Math.PI * 0.3;
+        objCam.localTranslate = new gd3d.math.vector3(0, 15, -15);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        var hoverc = cam.gameObject.addComponent("HoverCameraScript");
+        hoverc.panAngle = 180;
+        hoverc.tiltAngle = 45;
+        hoverc.distance = 30;
+        hoverc.scaleSpeed = 0.1;
+        hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0);
+    };
+    mini_sample.prototype.update = function (delta) {
+    };
+    return mini_sample;
 }());
 var test_01 = (function () {
     function test_01() {

@@ -150,13 +150,13 @@
 
             //绑定vbo和shader顶点格式，这部分应该要区分材质改变与参数改变，可以少切换一些状态
             var seek = 0;
-            var channel = 0;
+            // var channel = 0;
             {//pos
                 if (shadercode.posPos >= 0)
                 {
                     webgl.enableVertexAttribArray(shadercode.posPos);
                     webgl.vertexAttribPointer(shadercode.posPos, 3, webgl.FLOAT, false, total, seek);
-                    channel++;
+                    // channel++;
                 }
                 seek += 12;
             }
@@ -166,14 +166,14 @@
                 {
                     webgl.enableVertexAttribArray(shadercode.posNormal);
                     webgl.vertexAttribPointer(shadercode.posNormal, 3, webgl.FLOAT, true, total, seek);
-                    channel++;
+                    // channel++;
                 }
                 seek += 12;
             }
             else if (shadercode.posNormal >= 0)//需要处理mesh里没有这个通道，但是shader里有的情况
             {
                 webgl.disableVertexAttribArray(shadercode.posNormal);
-                channel++;
+                // channel++;
             }
             if (this.vertexFormat & VertexFormatMask.Tangent)
             {
@@ -181,14 +181,14 @@
                 {
                     webgl.enableVertexAttribArray(shadercode.posTangent);
                     webgl.vertexAttribPointer(shadercode.posTangent, 3, webgl.FLOAT, true, total, seek);
-                    channel++;
+                    // channel++;
                 }
                 seek += 12;
             }
             else if (shadercode.posTangent >= 0)//需要处理mesh里没有这个通道，但是shader里有的情况
             {
                 webgl.disableVertexAttribArray(shadercode.posTangent);
-                channel++;
+                // channel++;
             }
             if (this.vertexFormat & VertexFormatMask.Color)
             {
@@ -196,14 +196,14 @@
                 {
                     webgl.enableVertexAttribArray(shadercode.posColor);
                     webgl.vertexAttribPointer(shadercode.posColor, 4, webgl.FLOAT, false, total, seek);
-                    channel++;
+                    // channel++;
                 }
                 seek += 16;
             }
             else if (shadercode.posColor >= 0)
             {
                 webgl.disableVertexAttribArray(shadercode.posColor);
-                channel++;
+                // channel++;
             }
             if (this.vertexFormat & VertexFormatMask.UV0)
             {
@@ -211,7 +211,7 @@
                 {
                     webgl.enableVertexAttribArray(shadercode.posUV0);
                     webgl.vertexAttribPointer(shadercode.posUV0, 2, webgl.FLOAT, false, total, seek);
-                    channel++;
+                    // channel++;
                 }
                 seek += 8;
 
@@ -219,7 +219,7 @@
             else if (shadercode.posUV0 >= 0)
             {
                 webgl.disableVertexAttribArray(shadercode.posUV0);
-                channel++;
+                // channel++;
             }
             if (this.vertexFormat & VertexFormatMask.UV1)
             {
@@ -227,14 +227,14 @@
                 {
                     webgl.enableVertexAttribArray(shadercode.posUV2);
                     webgl.vertexAttribPointer(shadercode.posUV2, 2, webgl.FLOAT, false, total, seek);
-                    channel++;
+                    // channel++;
                 }
                 seek += 8;
             }
             else if (shadercode.posUV2 >= 0)
             {
                 webgl.disableVertexAttribArray(shadercode.posUV2);
-                channel++;
+                // channel++;
             }
             if (this.vertexFormat & VertexFormatMask.BlendIndex4)
             {
@@ -242,14 +242,14 @@
                 {
                     webgl.enableVertexAttribArray(shadercode.posBlendIndex4);
                     webgl.vertexAttribPointer(shadercode.posBlendIndex4, 4, webgl.FLOAT, false, total, seek);
-                    channel++;
+                    // channel++;
                 }
                 seek += 16;
             }
             else if (shadercode.posBlendIndex4 >= 0)
             {
                 webgl.disableVertexAttribArray(shadercode.posBlendIndex4);
-                channel++;
+                // channel++;
             }
             if (this.vertexFormat & VertexFormatMask.BlendWeight4)
             {
@@ -257,14 +257,14 @@
                 {
                     webgl.enableVertexAttribArray(shadercode.posBlendWeight4);
                     webgl.vertexAttribPointer(shadercode.posBlendWeight4, 4, webgl.FLOAT, false, total, seek);
-                    channel++;
+                    // channel++;
                 }
                 seek += 16;
             }
             else if (shadercode.posBlendWeight4 >= 0)
             {
                 webgl.disableVertexAttribArray(shadercode.posBlendWeight4);
-                channel++;
+                // channel++;
             }
             if (this.vertexFormat & VertexFormatMask.ColorEX)
             {
@@ -272,16 +272,16 @@
                 {
                     webgl.enableVertexAttribArray(shadercode.posColorEx);
                     webgl.vertexAttribPointer(shadercode.posColorEx, 4, webgl.FLOAT, false, total, seek);
-                    channel++;
+                    // channel++;
                 }
                 seek += 16;
             }
             else if (shadercode.posColorEx >= 0)
             {
                 webgl.disableVertexAttribArray(shadercode.posColorEx);
-                channel++;
+                // channel++;
             }
-            webglkit.SetMaxVertexAttribArray(webgl, channel);
+            // webglkit.SetMaxVertexAttribArray(webgl, channel);
         }
 
         uploadVertexSubData(webgl: WebGLRenderingContext, varray: Float32Array, offset: number = 0)
