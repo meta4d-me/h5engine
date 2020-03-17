@@ -5116,6 +5116,11 @@ var test_UI_Component = (function () {
         var raw_i2 = raw_t2.addComponent("rawImage2D");
         raw_i2.image = tex_0;
         ct.addChild(raw_t2);
+        var line = new gd3d.framework.transform2D();
+        line.name = "线条";
+        line.width = 400;
+        line.height = 300;
+        var linec = line.addComponent("LineRenderer2d");
         test_UI_Component.temp = iptFrame_t;
         var inputMgr = this.app.getInputMgr();
         this.app.webgl.canvas.addEventListener("keydown", function (ev) {

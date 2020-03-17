@@ -4138,15 +4138,14 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    export class LineRenderer implements IRenderer {
+    export class LineRendererBase {
         static readonly ClassName: string;
-        private mesh;
+        protected mesh: mesh;
         material: material;
         layer: RenderLayerEnum;
         get renderLayer(): number;
         set renderLayer(layer: number);
         queue: number;
-        get transform(): transform;
         gameObject: gameObject;
         loop: boolean;
         useCurve: boolean;
@@ -4179,10 +4178,6 @@ declare namespace gd3d.framework {
         set startColor(v: math.color);
         get startWidth(): number;
         set startWidth(v: number);
-        get lineRendererData(): LineRendererData;
-        set lineRendererData(v: LineRendererData);
-        private _lineRendererData;
-        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         onPlay(): void;
         start(): void;
         update(interval?: number): void;
@@ -4194,8 +4189,8 @@ declare namespace gd3d.framework {
         setPosition(index: number, position: math.vector3): void;
         SetPositions(positions: math.vector3[]): void;
         Simplify(tolerance: number): void;
-        private localToWorldMatrix;
-        private worldToLocalMatrix;
+        protected localToWorldMatrix: math.matrix;
+        protected worldToLocalMatrix: math.matrix;
         static draw(context: renderContext, go: gameObject, mesh: mesh, material: material): void;
         static clearMesh(mesh: mesh): void;
         static uploadMesh(_mesh: mesh, webgl: WebGLRenderingContext): void;
@@ -4221,6 +4216,59 @@ declare namespace gd3d.framework {
         normal: math.vector3;
     };
     export {};
+}
+declare namespace gd3d.framework {
+    export class LineRenderer extends LineRendererBase implements IRenderer {
+        static readonly ClassName: string;
+        protected mesh: mesh;
+        get lineRendererData(): LineRendererData;
+        set lineRendererData(v: LineRendererData);
+        private _lineRendererData;
+        get transform(): transform;
+        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        onPlay(): void;
+        start(): void;
+        update(interval?: number): void;
+        remove(): void;
+        clone(): void;
+        BakeMesh(mesh: mesh, camera: camera, useTransform: boolean): void;
+        static draw(context: renderContext, go: gameObject, mesh: mesh, material: material): void;
+        static clearMesh(mesh: mesh): void;
+        static uploadMesh(_mesh: mesh, webgl: WebGLRenderingContext): void;
+        static calcMesh(positionVectex: {
+            vertexs: math.vector3[];
+            tangent: math.vector3;
+            normal: math.vector3;
+            rateAtLine: number;
+        }[], textureMode: LineTextureMode, colorGradient: Gradient, totalLength: number, mesh: mesh): void;
+        static calcPositionVertex(positions: math.vector3[], loop: boolean, rateAtLines: number[], lineWidth: MinMaxCurve, alignment: LineAlignment, cameraPosition: math.vector3): VertexInfo[];
+        static calcTotalLength(positions: math.vector3[], loop: boolean): number;
+        static calcRateAtLines(positions: math.vector3[], loop: boolean, textureMode: LineTextureMode): number[];
+        static calcPositionsToCurve(positions: math.vector3[], loop: boolean, rateAtLines: number[], numSamples?: number): void;
+        static calcCornerVertices(numCornerVertices: number, positionVertex: VertexInfo[]): void;
+        static calcCapVertices(numCapVertices: number, positionVertex: VertexInfo[], ishead: boolean): void;
+    }
+    type VertexInfo = {
+        width: number;
+        position: math.vector3;
+        rateAtLine: number;
+        vertexs: math.vector3[];
+        tangent: math.vector3;
+        normal: math.vector3;
+    };
+    export {};
+}
+declare namespace gd3d.framework {
+    class LineRenderer2d extends LineRendererBase implements IRectRenderer {
+        transform: transform2D;
+        private datar;
+        render(canvas: canvas): void;
+        static readonly ClassName: string;
+        protected mesh: mesh;
+        updateTran(): void;
+        getMaterial(): material;
+        getDrawBounds(): math.rect;
+    }
 }
 declare namespace gd3d.framework {
     class LineRendererData implements IAsset {
