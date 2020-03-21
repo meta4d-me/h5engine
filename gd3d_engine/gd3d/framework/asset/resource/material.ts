@@ -630,6 +630,7 @@ namespace gd3d.framework
             var instanceCount = (drawInstanceInfo && drawInstanceInfo.instanceCount) || 1;
             for (var i = 0, l = drawPasses.length; i < l; i++)
             {
+                mesh.glMesh.bindVboBuffer(context.webgl);
                 var pass = drawPasses[i];
                 pass.use(context.webgl);
                 this.uploadUnifoms(pass, context, LastMatSame);

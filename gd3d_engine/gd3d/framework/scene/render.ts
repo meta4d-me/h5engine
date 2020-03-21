@@ -291,10 +291,11 @@ namespace gd3d.framework
             {
                 idx = 2;
             }
-            if(!(renderer as IRendererGpuIns).isGpuInstancing()){
+            let gpuInsR = (renderer as IRendererGpuIns);
+            if(!gpuInsR.isGpuInstancing || !gpuInsR.isGpuInstancing()){
                 this.renderLayers[idx].list.push(renderer);
             }else{
-                this.renderLayers[idx].addInstance(renderer as IRendererGpuIns);
+                this.renderLayers[idx].addInstance(gpuInsR);
             }
         }
 

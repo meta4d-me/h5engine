@@ -12089,7 +12089,6 @@ var gd3d;
                 if (mesh == null || mesh.glMesh == null || mesh.submesh == null)
                     return;
                 var subMeshs = mesh.submesh;
-                mesh.glMesh.bindVboBuffer(context.webgl);
                 var len = subMeshs.length;
                 var _loop_5 = function (i) {
                     var sm = subMeshs[i];
@@ -13140,6 +13139,7 @@ var gd3d;
                 }
                 var instanceCount = (drawInstanceInfo && drawInstanceInfo.instanceCount) || 1;
                 for (var i = 0, l = drawPasses.length; i < l; i++) {
+                    mesh.glMesh.bindVboBuffer(context.webgl);
                     var pass = drawPasses[i];
                     pass.use(context.webgl);
                     this.uploadUnifoms(pass, context, LastMatSame);
@@ -37269,11 +37269,12 @@ var gd3d;
                 else if (renderer.layer == RenderLayerEnum.Overlay) {
                     idx = 2;
                 }
-                if (!renderer.isGpuInstancing()) {
+                var gpuInsR = renderer;
+                if (!gpuInsR.isGpuInstancing || !gpuInsR.isGpuInstancing()) {
                     this.renderLayers[idx].list.push(renderer);
                 }
                 else {
-                    this.renderLayers[idx].addInstance(renderer);
+                    this.renderLayers[idx].addInstance(gpuInsR);
                 }
             };
             return renderList;

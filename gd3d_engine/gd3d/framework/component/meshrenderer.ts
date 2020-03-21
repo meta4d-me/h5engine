@@ -233,7 +233,7 @@ namespace gd3d.framework
             if(mesh == null || mesh.glMesh == null || mesh.submesh == null) return;
             let subMeshs = mesh.submesh;
 
-            mesh.glMesh.bindVboBuffer(context.webgl);
+            // mesh.glMesh.bindVboBuffer(context.webgl);
 
             let len = subMeshs.length;
             for (let i = 0; i < len; i++)
