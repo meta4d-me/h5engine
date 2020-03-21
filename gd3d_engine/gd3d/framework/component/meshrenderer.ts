@@ -11,7 +11,7 @@ namespace gd3d.framework
      */
     @reflect.nodeRender
     @reflect.nodeComponent
-    export class meshRenderer implements IRenderer
+    export class meshRenderer implements IRendererGpuIns
     {
         static readonly ClassName:string="meshRenderer";
 
@@ -172,7 +172,7 @@ namespace gd3d.framework
         }
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
-            DrawCallInfo.inc.currentState=DrawCallEnum.Meshrender;
+            DrawCallInfo.inc.currentState = DrawCallEnum.Meshrender;
             let go = this.gameObject;
             let tran = go.transform;
             let filter = this.filter; 
@@ -187,45 +187,175 @@ namespace gd3d.framework
 
             mesh.glMesh.bindVboBuffer(context.webgl);
 
+        }
+
+        private static helpIMatrix = new gd3d.math.matrix();
+        static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera , instanceArray : IRendererGpuIns[]){
+            let insLen = instanceArray.length;
+            if(insLen < 1) return;
+            DrawCallInfo.inc.currentState=DrawCallEnum.Meshrender;
+            let mr = instanceArray[0] as gd3d.framework.meshRenderer;
+            let go = instanceArray[0].gameObject;
+            let tran = go.transform;
+            let filter = mr.filter; 
+
+            context.updateLightMask(go.layer);
+            context.updateModelByMatrix(this.helpIMatrix);
+            if(filter == null) return;
+            let mesh = filter.getMeshOutput();
+            if(mesh == null || mesh.glMesh == null || mesh.submesh == null) return;
+            let subMeshs = mesh.submesh;
+
+            mesh.glMesh.bindVboBuffer(context.webgl);
 
             let len = subMeshs.length;
-            let scene = tran.scene;
-            let lightIdx = this.lightmapIndex;
             for (let i = 0; i < len; i++)
             {
                 let sm = subMeshs[i];
                 let mid = subMeshs[i].matIndex;//根据这个找到使用的具体哪个材质    
-                let usemat = this.materials[mid];
-                let drawtype = scene.fog ? "base_fog" : "base";
-                if (lightIdx >= 0 && scene.lightmaps.length>0)
-                {
-                    drawtype = scene.fog ? "lightmap_fog" : "lightmap";
-                    //usemat.shaderStatus = shaderStatus.Lightmap;
-                    if (scene.lightmaps.length > lightIdx)
-                    {
-                        context.lightmap = scene.lightmaps[lightIdx];
-                        context.lightmapOffset = this.lightmapScaleOffset;
-                        context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
-                    }
+                let usemat = mr.materials[mid];
+                let drawtype = this.instanceDrawType(context,mr,sm);
 
-                }
-                else
-                {
-                    if(!this.useGlobalLightMap)
+                ///--------------------------darw instancing--------------------------------------
+                // let _attributes = this._attributes;
+                // let data: number[] = [];
+                // for (let i = 0, n = insLen; i < n; i++)
+                // {
+                //     let insObj = instanceArray[i];
+                //     let _wmat = insObj.gameObject.transform.getWorldMatrix();
+                //     let rawdata = _wmat.rawData;
+                //     data.push(
+                //         rawdata[0],rawdata[1],rawdata[2],rawdata[3],
+                //         rawdata[4],rawdata[5],rawdata[6],rawdata[7],
+                //         rawdata[8],rawdata[9],rawdata[10],rawdata[11],
+                //         rawdata[12],rawdata[13],rawdata[14],rawdata[15],
+                //         // Math.random(),Math.random(),Math.random(),1
+                //         1,0,1,1
+                //     );
+    
+                // }
+                
+
+                // let stride = _attributes.reduce((pv, cv) => pv += cv[1], 0) * 4;
+                
+                let vbo = this._getVBO(context.webgl);
+                let drawInstanceInfo: DrawInstanceInfo = {
+                    instanceCount: insLen,
+                    initBuffer: (gl ) =>
                     {
-                        drawtype = scene.fog ? "lightmap_fog" : "lightmap";
-                        context.lightmap = usemat.statedMapUniforms["_LightmapTex"];
-                        context.lightmapOffset = this.lightmapScaleOffset;
-                        context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
-                    }
-                }
-                if (scene.fog)
-                {
-                    context.fog = scene.fog;
-                }
+                        // gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                        
+                    },
+                    activeAttributes: (gl, pass) =>
+                    {
+                        // let program = pass.program.program;
+                        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                        let data = [];
+                        for(let i=0;i < insLen ;i++){
+                            let mr = instanceArray[i] as meshRenderer;
+                            let mat = mr.materials[mid];
+                            this.setInstanceOffsetMatrix(mr.gameObject.transform,mat); //RTS offset 矩阵
+                            mat.uploadInstanceAtteribute( pass ,data);  //收集 各material instance atteribute
+                        }
+                        
+                        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+                        
+                        let offset = 0;
+                        // _attributes.forEach(element =>
+                        // {
+                            //     let location = gl.getAttribLocation(program, element[0]);
+                            //     if (location == -1) return;
+                            
+                            //     gl.enableVertexAttribArray(location);
+                            //     gl.vertexAttribPointer(location, element[1], gl.FLOAT, false, stride, offset);
+                        //     gl.vertexAttribDivisor(location, 1);
+                        //     offset += element[1] * 4;
+                        
+                        // });
+
+                        let attMap = pass.program.mapCustomAttrib;
+                        for(let key in attMap){
+                            let att = attMap[key];
+                            let location = att.location;
+                            if (location == -1) break;
+    
+                            gl.enableVertexAttribArray(location);
+                            gl.vertexAttribPointer(location, att.size, gl.FLOAT, false, pass.program.strideInsAttrib, offset);
+                            gl.vertexAttribDivisor(location, 1);
+                            offset += att.size * 4;
+                        }
+                    },
+                    disableAttributes: (gl, pass) =>
+                    {
+                        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+
+                        let attMap = pass.program.mapCustomAttrib;
+                        for(let key in attMap){
+                            let att = attMap[key];
+                            let location = att.location;
+                            if (location == -1) break;
+    
+                            gl.vertexAttribDivisor(location, 0);
+                            gl.disableVertexAttribArray(location);
+                        }
+                    },
+                };
+                ///----------------------------------------------------------------
+
                 if (usemat != null)
-                    usemat.draw(context, mesh, sm, drawtype);
+                    usemat.draw(context, mesh, sm, drawtype , drawInstanceInfo);
             }
+
+
+                // mr.materials[0].draw(context,mesh , subMeshs[0], "base", drawInstanceInfo);
+
+            //---------------------
+            // mr.render(context,assetmgr,camera);
+        }
+
+        private static setInstanceOffsetMatrix(tran: gd3d.framework.transform, mat: material){
+            let _wmat = tran.getWorldMatrix();
+            let insOffsetMtxStr = "instance_offset_matrix_";
+            let len = 4;
+            let rawdata = _wmat.rawData;
+            for(let i=0;i<len;i++){
+                let arr = mat.instanceAttribValMap[`${insOffsetMtxStr}${i}`];
+                if(!arr) arr = mat.instanceAttribValMap[`${insOffsetMtxStr}${i}`] = [];
+                 arr[0] = rawdata[0 + 4 * i];
+                 arr[1] = rawdata[1 + 4 * i];
+                 arr[2] = rawdata[2 + 4 * i];
+                 arr[3] = rawdata[3 + 4 * i];
+            }
+        }
+
+        private static instanceDrawType(context : renderContext , mr : meshRenderer ,  _subMeshInfo : subMeshInfo){
+            let drawtype = "instance_base";
+            //fog
+            let _fog = gd3d.framework.sceneMgr.scene.fog;
+            if (_fog)
+            {
+                drawtype +="_fog" 
+                context.fog = _fog;
+            }
+            return drawtype;
+        }
+
+        private static _vbos: [WebGLRenderingContext, WebGLBuffer][] = [];
+        private static _getVBO(gl: WebGLRenderingContext)
+        {
+            for (let i = 0, n = this._vbos.length; i < n; i++)
+            {
+                if (this._vbos[i][0] == gl)
+                    return this._vbos[i][1];
+            }
+            let vbo = gl.createBuffer();
+            this._vbos.push([gl, vbo]);
+            return vbo;
+        }
+
+        isGpuInstancing(){
+            if(!this.materials || !this.materials[0]) return false;
+            return this.materials[0].enableGpuInstancing;
         }
          /**
          * @private

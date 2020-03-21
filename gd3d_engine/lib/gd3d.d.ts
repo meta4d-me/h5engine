@@ -212,6 +212,9 @@ declare namespace gd3d.framework {
         queue: number;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): any;
     }
+    interface IRendererGpuIns extends IRenderer {
+        isGpuInstancing(): boolean;
+    }
 }
 declare namespace gd3d.framework {
     class sceneMgr {
@@ -2249,7 +2252,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class meshRenderer implements IRenderer {
+    class meshRenderer implements IRendererGpuIns {
         static readonly ClassName: string;
         constructor();
         gameObject: gameObject;
@@ -2268,8 +2271,17 @@ declare namespace gd3d.framework {
         private refreshLayerAndQue;
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
+        private static helpIMatrix;
+        static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera, instanceArray: IRendererGpuIns[]): void;
+        private static setInstanceOffsetMatrix;
+        private static instanceDrawType;
+        private static _vbos;
+        private static _getVBO;
+        isGpuInstancing(): boolean;
         remove(): void;
         clone(): void;
+        getPropertyBlock(properties: render.materialPropertyBlock): void;
+        setPropertyBlock(properties: render.materialPropertyBlock): void;
     }
 }
 declare namespace gd3d.framework {
@@ -2390,14 +2402,16 @@ declare namespace gd3d.framework {
     interface DrawInstanceInfo {
         instanceCount: number;
         initBuffer(gl: WebGLRenderingContext): void;
-        activeAttributes(gl: WebGLRenderingContext, program: WebGLProgram): void;
-        disableAttributes(gl: WebGLRenderingContext, program: WebGLProgram): void;
+        activeAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
+        disableAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
     }
     class material implements IAsset {
         static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
+        private _enableGpuInstancing;
+        enableGpuInstancing: boolean;
         constructor(assetName?: string);
         getName(): string;
         getGUID(): number;
@@ -2407,6 +2421,12 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         private static sameMatPassMap;
         uploadUnifoms(pass: render.glDrawPass, context: renderContext, lastMatSame?: boolean): void;
+        instanceAttribValMap: {
+            [id: string]: number[];
+        };
+        uploadInstanceAtteribute(pass: render.glDrawPass, setContainer: number[]): void;
+        private setInstanceAttribValue;
+        private isNotBuildinAttribId;
         setShader(shader: shader): void;
         getLayer(): RenderLayerEnum;
         private queue;
@@ -7038,6 +7058,7 @@ declare namespace gd3d.framework {
         updateLights(lights: light[]): void;
         updateOverlay(): void;
         updateModel(model: transform): void;
+        updateModelByMatrix(m_matrix: gd3d.math.matrix): void;
         updateModeTrail(): void;
         updateLightMask(layer: number): void;
     }
@@ -7056,6 +7077,10 @@ declare namespace gd3d.framework {
         needSort: boolean;
         list: IRenderer[];
         constructor(_sort?: boolean);
+        gpuInstanceMap: {
+            [sID: number]: IRendererGpuIns[];
+        };
+        addInstance(r: IRendererGpuIns): void;
     }
 }
 declare namespace gd3d.framework {
@@ -8204,6 +8229,46 @@ declare namespace gd3d.render {
     }
 }
 declare namespace gd3d.render {
+    class materialPropertyBlock {
+        static readonly ClassName: string;
+        getName(): string;
+        private _enableGpuInstancing;
+        enableGpuInstancing: boolean;
+        defaultMapUniform: {
+            [key: string]: {
+                type: render.UniformTypeEnum;
+                value?: any;
+                becolor?: boolean;
+                min?: number;
+                max?: number;
+            };
+        };
+        statedMapUniforms: {
+            [id: string]: any;
+        };
+        instanceAttribValMap: {
+            [id: string]: number[];
+        };
+        private uniformDirtyMap;
+        private blockMap;
+        private currTransId;
+        GetInt(): number;
+        uploadInstanceAtteribute(pass: render.glDrawPass, setContainer: number[]): void;
+        private setInstanceAttribValue;
+        private isNotBuildinAttribId;
+        setFloat(_id: string, _number: number): void;
+        setFloatv(_id: string, _numbers: Float32Array): void;
+        setVector4(_id: string, _vector4: math.vector4): void;
+        setVector4v(_id: string, _vector4v: Float32Array): void;
+        setMatrix(_id: string, _matrix: math.matrix): void;
+        setMatrixv(_id: string, _matrixv: Float32Array): void;
+        setTexture(_id: string, _texture: gd3d.framework.texture, resname?: string): void;
+        setCubeTexture(_id: string, _texture: gd3d.framework.texture): void;
+        private setMat;
+        private saveMat;
+    }
+}
+declare namespace gd3d.render {
     enum VertexFormatMask {
         Position = 1,
         Normal = 2,
@@ -8326,6 +8391,11 @@ declare namespace gd3d.render {
         type: UniformTypeEnum;
         location: WebGLUniformLocation;
     }
+    class attribute {
+        name: string;
+        size: number;
+        location: number;
+    }
     enum ShaderTypeEnum {
         VS = 0,
         FS = 1
@@ -8337,8 +8407,19 @@ declare namespace gd3d.render {
         shader: WebGLShader;
     }
     class glProgram {
+        private static buildInAtrribute;
+        static isBuildInAttrib(attribID: string): boolean;
         constructor(vs: glShader, fs: glShader, program: WebGLProgram);
+        mapAttrib: {
+            [id: string]: attribute;
+        };
+        mapCustomAttrib: {
+            [id: string]: attribute;
+        };
+        private _strideInsAttrib;
+        readonly strideInsAttrib: number;
         initAttribute(webgl: WebGLRenderingContext): void;
+        private tryGetLocation;
         vs: glShader;
         fs: glShader;
         program: WebGLProgram;

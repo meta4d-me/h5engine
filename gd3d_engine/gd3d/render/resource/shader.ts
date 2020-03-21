@@ -28,6 +28,13 @@ namespace gd3d.render
         location: WebGLUniformLocation;
         //默认值跟着类型走即可
     }
+    export class attribute
+    {
+        name: string;
+        // type: number;  //webgl.FLOAT、webgl.FLOAT_VEC2、webgl.FLOAT_VEC3、webgl.FLOAT_VEC4
+        size: number;  //只 支持 1~4
+        location: number;
+    }
     /**
      * @private
      */
@@ -125,28 +132,93 @@ namespace gd3d.render
      */
     export class glProgram
     {
+        private static buildInAtrribute : {[id:string]:string}= {
+            "_glesVertex":"posPos",
+            "_glesColor":"posColor",
+            "_glesMultiTexCoord0":"posUV0",
+            "_glesMultiTexCoord1":"posUV2",
+            "_glesNormal":"posNormal",
+            "_glesTangent":"posTangent",
+            "_glesBlendIndex4":"posBlendIndex4",
+            "_glesBlendWeight4":"posBlendWeight4",
+            "_glesColorEx":"posColorEx"
+        }
+
+        /**
+         * 是否是引擎系统内建的 attrib ID
+         * @param attribID 
+         */
+        static isBuildInAttrib(attribID: string){
+            return this.buildInAtrribute[attribID] != null;
+        }
+
         constructor(vs: glShader, fs: glShader, program: WebGLProgram)
         {
             this.vs = vs;
             this.fs = fs;
             this.program = program;
         }
+
+        /** attribute map */
+        mapAttrib: { [id: string]: attribute } = {};
+        /** 自定义 attribute map */
+        mapCustomAttrib : { [id: string]: attribute } = {};
+
+        private _strideInsAttrib : number = 0;
+        get strideInsAttrib() {return this._strideInsAttrib;}
         initAttribute(webgl: WebGLRenderingContext)
         {
-            //绑定vbo和shader顶点格式，这部分应该要区分材质改变与参数改变，可以少切换一些状态
-            this.posPos = webgl.getAttribLocation(this.program, "_glesVertex");
-            this.posColor = webgl.getAttribLocation(this.program, "_glesColor");
-            this.posUV0 = webgl.getAttribLocation(this.program, "_glesMultiTexCoord0");
-            this.posUV2 = webgl.getAttribLocation(this.program, "_glesMultiTexCoord1");//猜测
-            this.posNormal = webgl.getAttribLocation(this.program, "_glesNormal");//未测试
-            this.posTangent = webgl.getAttribLocation(this.program, "_glesTangent");
-            this.posBlendIndex4 = webgl.getAttribLocation(this.program, "_glesBlendIndex4");//未测试
-            this.posBlendWeight4 = webgl.getAttribLocation(this.program, "_glesBlendWeight4");//未测试
-            this.posColorEx = webgl.getAttribLocation(this.program, "_glesColorEx");
+            // //绑定vbo和shader顶点格式，这部分应该要区分材质改变与参数改变，可以少切换一些状态
+            // this.posPos = webgl.getAttribLocation(this.program, "_glesVertex");
+            // this.posColor = webgl.getAttribLocation(this.program, "_glesColor");
+            // this.posUV0 = webgl.getAttribLocation(this.program, "_glesMultiTexCoord0");
+            // this.posUV2 = webgl.getAttribLocation(this.program, "_glesMultiTexCoord1");//猜测
+            // this.posNormal = webgl.getAttribLocation(this.program, "_glesNormal");//未测试
+            // this.posTangent = webgl.getAttribLocation(this.program, "_glesTangent");
+            // this.posBlendIndex4 = webgl.getAttribLocation(this.program, "_glesBlendIndex4");//未测试
+            // this.posBlendWeight4 = webgl.getAttribLocation(this.program, "_glesBlendWeight4");//未测试
+            // this.posColorEx = webgl.getAttribLocation(this.program, "_glesColorEx");
 
 
-            this["xxx"] = webgl.getAttribLocation(this.program, "xxx");
+            // this["xxx"] = webgl.getAttribLocation(this.program, "xxx");
+
+            let attributesLen = webgl.getProgramParameter(this.program, webgl.ACTIVE_ATTRIBUTES);
+            let attMap = glProgram.buildInAtrribute;
+            for (let i = 0; i < attributesLen; i++)
+            {
+                let attributeInfo = webgl.getActiveAttrib(this.program, i);
+                if (!attributeInfo) break;
+
+                let att = new attribute();
+                let name = attributeInfo.name;
+                att.name = name;
+                switch(attributeInfo.type){
+                    case webgl.FLOAT : att.size = 1; break;
+                    case webgl.FLOAT_VEC2 : att.size = 2; break;
+                    case webgl.FLOAT_VEC3 : att.size = 3; break;
+                    case webgl.FLOAT_VEC4 : att.size = 4; break;
+                }
+                att.location = webgl.getAttribLocation(this.program, name);
+                this.mapAttrib[name] = att;
+                if(!attMap[name]){
+                    this.mapCustomAttrib[name] = att;
+                    this._strideInsAttrib += att.size * 4; 
+                }
+            }
+
+            //设置 引擎内建的attribute 地址
+            for(let key in attMap){
+                let val = attMap[key];
+                this[val] = this.tryGetLocation(key);
+            }
         }
+
+        private tryGetLocation(id:string){
+            let att = this.mapAttrib[id];
+            if(!att) return -1;
+            return att.location;
+        }
+
         vs: glShader;
         fs: glShader;
         program: WebGLProgram;

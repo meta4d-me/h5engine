@@ -12040,36 +12040,118 @@ var gd3d;
                 if (subMeshs == null)
                     return;
                 mesh.glMesh.bindVboBuffer(context.webgl);
+            };
+            meshRenderer.GpuInstancingRender = function (context, assetmgr, camera, instanceArray) {
+                var _this = this;
+                var insLen = instanceArray.length;
+                if (insLen < 1)
+                    return;
+                framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.Meshrender;
+                var mr = instanceArray[0];
+                var go = instanceArray[0].gameObject;
+                var tran = go.transform;
+                var filter = mr.filter;
+                context.updateLightMask(go.layer);
+                context.updateModelByMatrix(this.helpIMatrix);
+                if (filter == null)
+                    return;
+                var mesh = filter.getMeshOutput();
+                if (mesh == null || mesh.glMesh == null || mesh.submesh == null)
+                    return;
+                var subMeshs = mesh.submesh;
+                mesh.glMesh.bindVboBuffer(context.webgl);
                 var len = subMeshs.length;
-                var scene = tran.scene;
-                var lightIdx = this.lightmapIndex;
-                for (var i = 0; i < len; i++) {
+                var _loop_5 = function (i) {
                     var sm = subMeshs[i];
                     var mid = subMeshs[i].matIndex;
-                    var usemat = this.materials[mid];
-                    var drawtype = scene.fog ? "base_fog" : "base";
-                    if (lightIdx >= 0 && scene.lightmaps.length > 0) {
-                        drawtype = scene.fog ? "lightmap_fog" : "lightmap";
-                        if (scene.lightmaps.length > lightIdx) {
-                            context.lightmap = scene.lightmaps[lightIdx];
-                            context.lightmapOffset = this.lightmapScaleOffset;
-                            context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
-                        }
-                    }
-                    else {
-                        if (!this.useGlobalLightMap) {
-                            drawtype = scene.fog ? "lightmap_fog" : "lightmap";
-                            context.lightmap = usemat.statedMapUniforms["_LightmapTex"];
-                            context.lightmapOffset = this.lightmapScaleOffset;
-                            context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
-                        }
-                    }
-                    if (scene.fog) {
-                        context.fog = scene.fog;
-                    }
+                    var usemat = mr.materials[mid];
+                    var drawtype = this_2.instanceDrawType(context, mr, sm);
+                    var vbo = this_2._getVBO(context.webgl);
+                    var drawInstanceInfo = {
+                        instanceCount: insLen,
+                        initBuffer: function (gl) {
+                        },
+                        activeAttributes: function (gl, pass) {
+                            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                            var data = [];
+                            for (var i_2 = 0; i_2 < insLen; i_2++) {
+                                var mr_1 = instanceArray[i_2];
+                                var mat = mr_1.materials[mid];
+                                _this.setInstanceOffsetMatrix(mr_1.gameObject.transform, mat);
+                                mat.uploadInstanceAtteribute(pass, data);
+                            }
+                            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+                            var offset = 0;
+                            var attMap = pass.program.mapCustomAttrib;
+                            for (var key in attMap) {
+                                var att = attMap[key];
+                                var location_1 = att.location;
+                                if (location_1 == -1)
+                                    break;
+                                gl.enableVertexAttribArray(location_1);
+                                gl.vertexAttribPointer(location_1, att.size, gl.FLOAT, false, pass.program.strideInsAttrib, offset);
+                                gl.vertexAttribDivisor(location_1, 1);
+                                offset += att.size * 4;
+                            }
+                        },
+                        disableAttributes: function (gl, pass) {
+                            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                            var attMap = pass.program.mapCustomAttrib;
+                            for (var key in attMap) {
+                                var att = attMap[key];
+                                var location_2 = att.location;
+                                if (location_2 == -1)
+                                    break;
+                                gl.vertexAttribDivisor(location_2, 0);
+                                gl.disableVertexAttribArray(location_2);
+                            }
+                        },
+                    };
                     if (usemat != null)
-                        usemat.draw(context, mesh, sm, drawtype);
+                        usemat.draw(context, mesh, sm, drawtype, drawInstanceInfo);
+                };
+                var this_2 = this;
+                for (var i = 0; i < len; i++) {
+                    _loop_5(i);
                 }
+            };
+            meshRenderer.setInstanceOffsetMatrix = function (tran, mat) {
+                var _wmat = tran.getWorldMatrix();
+                var insOffsetMtxStr = "instance_offset_matrix_";
+                var len = 4;
+                var rawdata = _wmat.rawData;
+                for (var i = 0; i < len; i++) {
+                    var arr = mat.instanceAttribValMap["" + insOffsetMtxStr + i];
+                    if (!arr)
+                        arr = mat.instanceAttribValMap["" + insOffsetMtxStr + i] = [];
+                    arr[0] = rawdata[0 + 4 * i];
+                    arr[1] = rawdata[1 + 4 * i];
+                    arr[2] = rawdata[2 + 4 * i];
+                    arr[3] = rawdata[3 + 4 * i];
+                }
+            };
+            meshRenderer.instanceDrawType = function (context, mr, _subMeshInfo) {
+                var drawtype = "instance_base";
+                var _fog = gd3d.framework.sceneMgr.scene.fog;
+                if (_fog) {
+                    drawtype += "_fog";
+                    context.fog = _fog;
+                }
+                return drawtype;
+            };
+            meshRenderer._getVBO = function (gl) {
+                for (var i = 0, n = this._vbos.length; i < n; i++) {
+                    if (this._vbos[i][0] == gl)
+                        return this._vbos[i][1];
+                }
+                var vbo = gl.createBuffer();
+                this._vbos.push([gl, vbo]);
+                return vbo;
+            };
+            meshRenderer.prototype.isGpuInstancing = function () {
+                if (!this.materials || !this.materials[0])
+                    return false;
+                return this.materials[0].enableGpuInstancing;
             };
             meshRenderer.prototype.remove = function () {
                 this.materials.forEach(function (element) {
@@ -12080,7 +12162,26 @@ var gd3d;
             };
             meshRenderer.prototype.clone = function () {
             };
+            meshRenderer.prototype.getPropertyBlock = function (properties) {
+            };
+            meshRenderer.prototype.setPropertyBlock = function (properties) {
+                if (!this.materials || this.materials.length < 1)
+                    return;
+                var len = this.materials.length;
+                var insid = this.gameObject.transform.insId.getInsID();
+                for (var i = 0; i < len; i++) {
+                    var mat = this.materials[i];
+                    if (!mat.enableGpuInstancing) {
+                    }
+                    else {
+                    }
+                    var p = properties;
+                    p.currTransId = insid;
+                }
+            };
             meshRenderer.ClassName = "meshRenderer";
+            meshRenderer.helpIMatrix = new gd3d.math.matrix();
+            meshRenderer._vbos = [];
             __decorate([
                 gd3d.reflect.Field("material[]"),
                 __metadata("design:type", Array)
@@ -12715,6 +12816,8 @@ var gd3d;
                 this.name = null;
                 this.id = new framework.resID();
                 this.defaultAsset = false;
+                this._enableGpuInstancing = false;
+                this.instanceAttribValMap = {};
                 this.queue = 0;
                 this.statedMapUniforms = {};
                 this.uniformDirtyMap = {};
@@ -12725,6 +12828,14 @@ var gd3d;
                 gd3d.io.enumMgr.enumMap["UniformTypeEnum"] = gd3d.render.UniformTypeEnum;
             }
             material_3 = material;
+            Object.defineProperty(material.prototype, "enableGpuInstancing", {
+                get: function () { return this._enableGpuInstancing; },
+                set: function (enable) { this._enableGpuInstancing = enable; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            ;
             material.prototype.getName = function () {
                 if (this.name == undefined) {
                     return null;
@@ -12828,6 +12939,29 @@ var gd3d;
                     func(unifom.location, unifomValue);
                 }
             };
+            material.prototype.uploadInstanceAtteribute = function (pass, setContainer) {
+                var attmap = pass.program.mapCustomAttrib;
+                for (var key in attmap) {
+                    var arr = this.instanceAttribValMap[key];
+                    if (!arr) {
+                        var att = pass.program.mapCustomAttrib[key];
+                        var oldLen = setContainer.length;
+                        setContainer.length = oldLen + att.size;
+                        setContainer.fill(0, oldLen);
+                    }
+                    else {
+                        arr.forEach(function (v) { setContainer.push(v); });
+                    }
+                }
+            };
+            material.prototype.setInstanceAttribValue = function (id, arr) {
+                if (!id)
+                    return;
+                this.instanceAttribValMap[id] = arr;
+            };
+            material.prototype.isNotBuildinAttribId = function (id) {
+                return !gd3d.render.glProgram.isBuildInAttrib(id);
+            };
             material.prototype.setShader = function (shader) {
                 this.shader = shader;
                 this.defaultMapUniform = shader.defaultMapUniform;
@@ -12852,7 +12986,12 @@ var gd3d;
                     this.statedMapUniforms[_id] = _number;
                 }
                 else {
-                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                        this.setInstanceAttribValue(_id, [_number]);
+                    }
+                    else {
+                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                    }
                 }
             };
             material.prototype.setFloatv = function (_id, _numbers) {
@@ -12861,7 +13000,16 @@ var gd3d;
                     this.uniformDirtyMap[_id] = true;
                 }
                 else {
-                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                        var arr_1 = [];
+                        _numbers.forEach(function (v) {
+                            arr_1.push(v);
+                        });
+                        this.setInstanceAttribValue(_id, arr_1);
+                    }
+                    else {
+                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                    }
                 }
             };
             material.prototype.setVector4 = function (_id, _vector4) {
@@ -12870,7 +13018,12 @@ var gd3d;
                     this.uniformDirtyMap[_id] = true;
                 }
                 else {
-                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                        this.setInstanceAttribValue(_id, [_vector4.x, _vector4.y, _vector4.z, _vector4.w]);
+                    }
+                    else {
+                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                    }
                 }
             };
             material.prototype.setVector4v = function (_id, _vector4v) {
@@ -12879,7 +13032,16 @@ var gd3d;
                     this.uniformDirtyMap[_id] = true;
                 }
                 else {
-                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                        var arr_2 = [];
+                        _vector4v.forEach(function (v) {
+                            arr_2.push(v);
+                        });
+                        this.setInstanceAttribValue(_id, arr_2);
+                    }
+                    else {
+                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                    }
                 }
             };
             material.prototype.setMatrix = function (_id, _matrix) {
@@ -12916,9 +13078,6 @@ var gd3d;
                 }
                 this.statedMapUniforms[_id] = _texture;
                 if (_texture != null) {
-                    if (_texture.getName() == "_color") {
-                        _texture;
-                    }
                     if (!_texture.defaultAsset) {
                         _texture.use();
                     }
@@ -12982,7 +13141,7 @@ var gd3d;
                     if (!LastMatSame || !LastMeshSame)
                         mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
                     drawInstanceInfo && drawInstanceInfo.initBuffer(context.webgl);
-                    drawInstanceInfo && drawInstanceInfo.activeAttributes(context.webgl, pass.program.program);
+                    drawInstanceInfo && drawInstanceInfo.activeAttributes(context.webgl, pass);
                     framework.DrawCallInfo.inc.add();
                     if (sm.useVertexIndex < 0) {
                         if (sm.line) {
@@ -13000,7 +13159,7 @@ var gd3d;
                             mesh.glMesh.drawElementTris(context.webgl, sm.start, sm.size, instanceCount);
                         }
                     }
-                    drawInstanceInfo && drawInstanceInfo.disableAttributes(context.webgl, pass.program.program);
+                    drawInstanceInfo && drawInstanceInfo.disableAttributes(context.webgl, pass);
                 }
                 material_3.lastDrawMatID = matGUID;
                 material_3.lastDrawMeshID = meshGUID;
@@ -13062,6 +13221,7 @@ var gd3d;
             material.prototype.clone = function () {
                 var mat = new material_3(this.getName());
                 mat.setShader(this.shader);
+                mat._enableGpuInstancing = this._enableGpuInstancing;
                 for (var i in this.statedMapUniforms) {
                     var _uniformType = this.defaultMapUniform[i].type;
                     var value = this.statedMapUniforms[i];
@@ -13131,6 +13291,11 @@ var gd3d;
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
             ], material.prototype, "name", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Boolean),
+                __metadata("design:paramtypes", [Boolean])
+            ], material.prototype, "enableGpuInstancing", null);
             __decorate([
                 gd3d.reflect.Field("shader"),
                 __metadata("design:type", framework.shader)
@@ -13390,7 +13555,7 @@ var gd3d;
                 var vertexCount = read.readUInt32();
                 var fmt = gd3d.render.VertexFormatMask;
                 data.pos = [];
-                for (var i_2 = 0; i_2 < vertexCount; ++i_2) {
+                for (var i_3 = 0; i_3 < vertexCount; ++i_3) {
                     data.pos.push({
                         x: read.readSingle(),
                         y: read.readSingle(),
@@ -15482,19 +15647,19 @@ var gd3d;
             bloomctr.prototype.remove = function () {
                 this._init = false;
                 if (this.camera) {
-                    var arr_1 = this.camera.postQueues;
+                    var arr_3 = this.camera.postQueues;
                     var dArr = [];
-                    for (var i = 0; i < arr_1.length; i++) {
-                        var temp = arr_1[i];
+                    for (var i = 0; i < arr_3.length; i++) {
+                        var temp = arr_3[i];
                         if (temp[this.tag]) {
                             dArr.push(temp);
                         }
                     }
                     dArr.forEach(function (element) {
                         if (element) {
-                            var idx = arr_1.indexOf(element);
+                            var idx = arr_3.indexOf(element);
                             if (idx != -1) {
-                                arr_1.splice(idx, 1);
+                                arr_3.splice(idx, 1);
                             }
                         }
                     });
@@ -16112,9 +16277,17 @@ var gd3d;
                 var rlayers = scene.renderList.renderLayers;
                 for (var i = 0, l = rlayers.length; i < l; ++i) {
                     var ls = rlayers[i].list;
-                    for (var j = 0, jl = ls.length; j < jl; ++j) {
+                    var len = ls.length;
+                    for (var j = 0; j < len; ++j) {
                         var item = ls[j];
                         item.render(context, assetmgr, this);
+                    }
+                    var rmap = rlayers[i].gpuInstanceMap;
+                    for (var key in rmap) {
+                        var gpuList = rmap[key];
+                        if (!gpuList)
+                            continue;
+                        framework.meshRenderer.GpuInstancingRender(context, assetmgr, this, gpuList);
                     }
                 }
             };
@@ -16147,8 +16320,8 @@ var gd3d;
                     this._renderOnce(scene, context, "");
                 }
                 else {
-                    for (var i_3 = 0, l_1 = this.postQueues.length; i_3 < l_1; ++i_3) {
-                        this.postQueues[i_3].render(scene, context, this);
+                    for (var i_4 = 0, l_1 = this.postQueues.length; i_4 < l_1; ++i_4) {
+                        this.postQueues[i_4].render(scene, context, this);
                     }
                     context.webgl.flush();
                 }
@@ -16711,9 +16884,9 @@ var gd3d;
                     return;
                 var index = -1;
                 if (_initFrameData.attrsData.mat != null) {
-                    for (var i_4 = 0; i_4 < this.matDataGroups.length; i_4++) {
-                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_4], _initFrameData.attrsData.mat)) {
-                            index = i_4;
+                    for (var i_5 = 0; i_5 < this.matDataGroups.length; i_5++) {
+                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_5], _initFrameData.attrsData.mat)) {
+                            index = i_5;
                             break;
                         }
                     }
@@ -16771,41 +16944,41 @@ var gd3d;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
                 element.update();
                 subEffectBatcher.effectElements.push(element);
-                for (var i_5 = 0; i_5 < vertexCount; i_5++) {
+                for (var i_6 = 0; i_6 < vertexCount; i_6++) {
                     {
                         var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = vertexArr[i_5 * vertexSize + 0];
-                        vertex.y = vertexArr[i_5 * vertexSize + 1];
-                        vertex.z = vertexArr[i_5 * vertexSize + 2];
+                        vertex.x = vertexArr[i_6 * vertexSize + 0];
+                        vertex.y = vertexArr[i_6 * vertexSize + 1];
+                        vertex.z = vertexArr[i_6 * vertexSize + 2];
                         gd3d.math.matrixTransformVector3(vertex, element.curAttrData.matrix, vertex);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 0] = vertex.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 1] = vertex.y;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 2] = vertex.z;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 0] = vertex.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 1] = vertex.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 2] = vertex.z;
                         gd3d.math.pool.delete_vector3(vertex);
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 3] = vertexArr[i_5 * vertexSize + 3];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 4] = vertexArr[i_5 * vertexSize + 4];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 5] = vertexArr[i_5 * vertexSize + 5];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 3] = vertexArr[i_6 * vertexSize + 3];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 4] = vertexArr[i_6 * vertexSize + 4];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 5] = vertexArr[i_6 * vertexSize + 5];
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 6] = vertexArr[i_5 * vertexSize + 6];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 7] = vertexArr[i_5 * vertexSize + 7];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 8] = vertexArr[i_5 * vertexSize + 8];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 6] = vertexArr[i_6 * vertexSize + 6];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 7] = vertexArr[i_6 * vertexSize + 7];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 8] = vertexArr[i_6 * vertexSize + 8];
                     }
                     {
                         var r = gd3d.math.floatClamp(element.curAttrData.color.x, 0, 1);
                         var g = gd3d.math.floatClamp(element.curAttrData.color.y, 0, 1);
                         var b = gd3d.math.floatClamp(element.curAttrData.color.z, 0, 1);
-                        var a = gd3d.math.floatClamp(vertexArr[i_5 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 9] = r;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 10] = g;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 11] = b;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 12] = a;
+                        var a = gd3d.math.floatClamp(vertexArr[i_6 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 9] = r;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 10] = g;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 11] = b;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 12] = a;
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 13] = vertexArr[i_5 * vertexSize + 13] * element.curAttrData.tilling.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 14] = vertexArr[i_5 * vertexSize + 14] * element.curAttrData.tilling.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 13] = vertexArr[i_6 * vertexSize + 13] * element.curAttrData.tilling.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 14] = vertexArr[i_6 * vertexSize + 14] * element.curAttrData.tilling.y;
                     }
                 }
                 var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
@@ -16976,11 +17149,11 @@ var gd3d;
                 if (this.delayElements.length > 0) {
                     if (this.refElements.length > 0)
                         this.refElements = [];
-                    for (var i_6 = this.delayElements.length - 1; i_6 >= 0; i_6--) {
-                        var data = this.delayElements[i_6];
+                    for (var i_7 = this.delayElements.length - 1; i_7 >= 0; i_7--) {
+                        var data = this.delayElements[i_7];
                         if (data.delayTime <= this.playTimer) {
-                            this.addElement(this.delayElements[i_6]);
-                            this.delayElements.splice(i_6, 1);
+                            this.addElement(this.delayElements[i_7]);
+                            this.delayElements.splice(i_7, 1);
                         }
                     }
                 }
@@ -18918,19 +19091,19 @@ var gd3d;
             vignettingCtr.prototype.remove = function () {
                 this._init = false;
                 if (this.camera) {
-                    var arr_2 = this.camera.postQueues;
+                    var arr_4 = this.camera.postQueues;
                     var dArr = [];
-                    for (var i = 0; i < arr_2.length; i++) {
-                        var temp = arr_2[i];
+                    for (var i = 0; i < arr_4.length; i++) {
+                        var temp = arr_4[i];
                         if (temp[this.tag]) {
                             dArr.push(temp);
                         }
                     }
                     dArr.forEach(function (element) {
                         if (element) {
-                            var idx = arr_2.indexOf(element);
+                            var idx = arr_4.indexOf(element);
                             if (idx != -1) {
-                                arr_2.splice(idx, 1);
+                                arr_4.splice(idx, 1);
                             }
                         }
                     });
@@ -22044,8 +22217,8 @@ var gd3d;
                 arr = this.events[event] = [];
             }
             else {
-                for (var _i = 0, arr_3 = arr; _i < arr_3.length; _i++) {
-                    var ft = arr_3[_i];
+                for (var _i = 0, arr_5 = arr; _i < arr_5.length; _i++) {
+                    var ft = arr_5[_i];
                     if (ft.func == func) {
                         FT = ft;
                         break;
@@ -22068,8 +22241,8 @@ var gd3d;
             var arr = this.events[event];
             if (!arr)
                 return;
-            for (var _a = 0, arr_4 = arr; _a < arr_4.length; _a++) {
-                var FT = arr_4[_a];
+            for (var _a = 0, arr_6 = arr; _a < arr_6.length; _a++) {
+                var FT = arr_6[_a];
                 for (var _b = 0, _c = FT.thisArgs; _b < _c.length; _b++) {
                     var thisArg = _c[_b];
                     FT.func.apply(thisArg, args);
@@ -32297,7 +32470,8 @@ var gd3d;
                                 gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                                 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
                             },
-                            activeAttributes: function (gl, program) {
+                            activeAttributes: function (gl, pass) {
+                                var program = pass.program.program;
                                 gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                                 var offset = 0;
                                 _this._attributes.forEach(function (element) {
@@ -32310,7 +32484,8 @@ var gd3d;
                                     offset += element[1] * 4;
                                 });
                             },
-                            disableAttributes: function (gl, program) {
+                            disableAttributes: function (gl, pass) {
+                                var program = pass.program.program;
                                 gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                                 _this._attributes.forEach(function (element) {
                                     var location = gl.getAttribLocation(program, element[0]);
@@ -32403,8 +32578,8 @@ var gd3d;
                     }
                     var inCycleStart = startTime - cycleStartTime;
                     var inCycleEnd = endTime - cycleStartTime;
-                    for (var i_7 = 0; i_7 < bursts.length; i_7++) {
-                        var burst = bursts[i_7];
+                    for (var i_8 = 0; i_8 < bursts.length; i_8++) {
+                        var burst = bursts[i_8];
                         if (burst.isProbability && inCycleStart <= burst.time && burst.time < inCycleEnd) {
                             emits.push({ time: cycleStartTime + burst.time, num: burst.count.getValue(rateAtDuration) });
                         }
@@ -37012,7 +37187,10 @@ var gd3d;
                 gd3d.math.matrixMakeIdentity(this.matrixModelViewProject);
             };
             renderContext.prototype.updateModel = function (model) {
-                gd3d.math.matrixClone(model.getWorldMatrix(), this.matrixModel);
+                this.updateModelByMatrix(model.getWorldMatrix());
+            };
+            renderContext.prototype.updateModelByMatrix = function (m_matrix) {
+                gd3d.math.matrixClone(m_matrix, this.matrixModel);
                 gd3d.math.matrixMultiply(this.matrixViewProject, this.matrixModel, this.matrixModelViewProject);
             };
             renderContext.prototype.updateModeTrail = function () {
@@ -37070,19 +37248,27 @@ var gd3d;
                 this.renderLayers.push(overlay);
             }
             renderList.prototype.clear = function () {
-                this.renderLayers[0].list.length =
-                    this.renderLayers[1].list.length =
-                        this.renderLayers[2].list.length = 0;
+                var len = this.renderLayers.length;
+                for (var i = 0; i < len; i++) {
+                    this.renderLayers[i].list.length = 0;
+                    this.renderLayers[i].gpuInstanceMap = {};
+                }
             };
             renderList.prototype.addRenderer = function (renderer) {
+                var idx = 0;
                 if (renderer.layer == RenderLayerEnum.Common) {
-                    this.renderLayers[0].list.push(renderer);
                 }
                 else if (renderer.layer == RenderLayerEnum.Transparent) {
-                    this.renderLayers[1].list.push(renderer);
+                    idx = 1;
                 }
                 else if (renderer.layer == RenderLayerEnum.Overlay) {
-                    this.renderLayers[2].list.push(renderer);
+                    idx = 2;
+                }
+                if (!renderer.isGpuInstancing) {
+                    this.renderLayers[idx].list.push(renderer);
+                }
+                else {
+                    this.renderLayers[idx].addInstance(renderer);
                 }
             };
             return renderList;
@@ -37093,8 +37279,22 @@ var gd3d;
                 if (_sort === void 0) { _sort = false; }
                 this.needSort = false;
                 this.list = [];
+                this.gpuInstanceMap = {};
                 this.needSort = _sort;
             }
+            renderLayer.prototype.addInstance = function (r) {
+                var mr = r;
+                if (!mr.materials[0])
+                    return;
+                var sh = mr.materials[0].getShader();
+                if (!sh)
+                    return;
+                var id = sh.getGUID();
+                var list = this.gpuInstanceMap[id];
+                if (!list)
+                    list = this.gpuInstanceMap[id] = [];
+                list.push(r);
+            };
             return renderLayer;
         }());
         framework.renderLayer = renderLayer;
@@ -39660,12 +39860,12 @@ var gd3d;
             handler: function (target, source, property, handlers, serialization) {
                 var spv = source[property];
                 if (Array.isArray(spv)) {
-                    var arr_5 = target[property] || [];
+                    var arr_7 = target[property] || [];
                     var keys = Object.keys(spv);
                     keys.forEach(function (v) {
-                        propertyHandler(arr_5, spv, v, handlers, serialization);
+                        propertyHandler(arr_7, spv, v, handlers, serialization);
                     });
-                    target[property] = arr_5;
+                    target[property] = arr_7;
                     return true;
                 }
                 return false;
@@ -42452,6 +42652,215 @@ var gd3d;
 (function (gd3d) {
     var render;
     (function (render) {
+        var materialPropertyBlock = (function () {
+            function materialPropertyBlock() {
+                this._enableGpuInstancing = false;
+                this.statedMapUniforms = {};
+                this.instanceAttribValMap = {};
+                this.uniformDirtyMap = {};
+                this.blockMap = {};
+                this.currTransId = -1;
+            }
+            materialPropertyBlock.prototype.getName = function () {
+                return "materialPropertyBlock";
+            };
+            Object.defineProperty(materialPropertyBlock.prototype, "enableGpuInstancing", {
+                get: function () { return this._enableGpuInstancing; },
+                set: function (enable) { this._enableGpuInstancing = enable; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            ;
+            materialPropertyBlock.prototype.GetInt = function () {
+                return Object.keys(this.blockMap).length;
+            };
+            materialPropertyBlock.prototype.uploadInstanceAtteribute = function (pass, setContainer) {
+                var attmap = pass.program.mapCustomAttrib;
+                for (var key in attmap) {
+                    var arr = this.instanceAttribValMap[key];
+                    if (!arr) {
+                        var att = pass.program.mapCustomAttrib[key];
+                        var oldLen = setContainer.length;
+                        setContainer.length = oldLen + att.size;
+                        setContainer.fill(0, oldLen);
+                    }
+                    else {
+                        arr.forEach(function (v) { setContainer.push(v); });
+                    }
+                }
+            };
+            materialPropertyBlock.prototype.setInstanceAttribValue = function (id, arr) {
+                if (!id)
+                    return;
+                this.instanceAttribValMap[id] = arr;
+            };
+            materialPropertyBlock.prototype.isNotBuildinAttribId = function (id) {
+                return !render.glProgram.isBuildInAttrib(id);
+            };
+            materialPropertyBlock.prototype.setFloat = function (_id, _number) {
+                if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float) {
+                    if (this.statedMapUniforms[_id] != _number) {
+                        this.uniformDirtyMap[_id] = true;
+                    }
+                    this.statedMapUniforms[_id] = _number;
+                }
+                else {
+                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                        this.setInstanceAttribValue(_id, [_number]);
+                    }
+                    else {
+                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                    }
+                }
+            };
+            materialPropertyBlock.prototype.setFloatv = function (_id, _numbers) {
+                if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Floatv) {
+                    this.statedMapUniforms[_id] = _numbers;
+                    this.uniformDirtyMap[_id] = true;
+                }
+                else {
+                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                        var arr_8 = [];
+                        _numbers.forEach(function (v) {
+                            arr_8.push(v);
+                        });
+                        this.setInstanceAttribValue(_id, arr_8);
+                    }
+                    else {
+                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                    }
+                }
+            };
+            materialPropertyBlock.prototype.setVector4 = function (_id, _vector4) {
+                if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4) {
+                    this.statedMapUniforms[_id] = _vector4;
+                    this.uniformDirtyMap[_id] = true;
+                }
+                else {
+                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                        this.setInstanceAttribValue(_id, [_vector4.x, _vector4.y, _vector4.z, _vector4.w]);
+                    }
+                    else {
+                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                    }
+                }
+            };
+            materialPropertyBlock.prototype.setVector4v = function (_id, _vector4v) {
+                if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4v) {
+                    this.statedMapUniforms[_id] = _vector4v;
+                    this.uniformDirtyMap[_id] = true;
+                }
+                else {
+                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                        var arr_9 = [];
+                        _vector4v.forEach(function (v) {
+                            arr_9.push(v);
+                        });
+                        this.setInstanceAttribValue(_id, arr_9);
+                    }
+                    else {
+                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                    }
+                }
+            };
+            materialPropertyBlock.prototype.setMatrix = function (_id, _matrix) {
+                if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4) {
+                    this.statedMapUniforms[_id] = _matrix;
+                    this.uniformDirtyMap[_id] = true;
+                }
+                else {
+                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                }
+            };
+            materialPropertyBlock.prototype.setMatrixv = function (_id, _matrixv) {
+                if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4v) {
+                    this.statedMapUniforms[_id] = _matrixv;
+                    this.uniformDirtyMap[_id] = true;
+                }
+                else {
+                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                }
+            };
+            materialPropertyBlock.prototype.setTexture = function (_id, _texture, resname) {
+                if (resname === void 0) { resname = ""; }
+                if (!(this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) && _id != "_LightmapTex") {
+                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                    return;
+                }
+                var oldTex = this.statedMapUniforms[_id];
+                if (oldTex != null) {
+                    if (oldTex == _texture)
+                        return;
+                    if (this.statedMapUniforms[_id].defaultAsset) {
+                        oldTex = null;
+                    }
+                }
+                this.statedMapUniforms[_id] = _texture;
+                if (_texture != null) {
+                    if (!_texture.defaultAsset) {
+                        _texture.use();
+                    }
+                    var _texelsizeName = _id + "_TexelSize";
+                    var _gltexture = _texture.glTexture;
+                    if (_gltexture != null && this.defaultMapUniform[_texelsizeName] != null) {
+                        this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
+                    }
+                    this.uniformDirtyMap[_id] = true;
+                }
+                else {
+                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                }
+                if (oldTex)
+                    oldTex.unuse();
+            };
+            materialPropertyBlock.prototype.setCubeTexture = function (_id, _texture) {
+                if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.CubeTexture) {
+                    if (this.statedMapUniforms[_id] != null && (!this.statedMapUniforms[_id].defaultAsset)) {
+                        this.statedMapUniforms[_id].unuse();
+                    }
+                    this.statedMapUniforms[_id] = _texture;
+                    if (_texture != null) {
+                        if (!_texture.defaultAsset) {
+                            _texture.use();
+                        }
+                        var _texelsizeName = _id + "_TexelSize";
+                        var _gltexture = _texture.glTexture;
+                        if (_gltexture != null) {
+                            this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
+                        }
+                    }
+                    this.uniformDirtyMap[_id] = true;
+                }
+                else {
+                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                }
+            };
+            materialPropertyBlock.prototype.setMat = function () {
+            };
+            materialPropertyBlock.prototype.saveMat = function (transId) {
+                var block = this.blockMap[transId];
+                for (var key in block.instanceAttribValMap) {
+                    this.instanceAttribValMap[key] = block.instanceAttribValMap[key].slice();
+                }
+            };
+            materialPropertyBlock.ClassName = "materialPropertyBlock";
+            return materialPropertyBlock;
+        }());
+        render.materialPropertyBlock = materialPropertyBlock;
+        var materialBlockData = (function () {
+            function materialBlockData() {
+                this.statedMapUniforms = {};
+                this.instanceAttribValMap = {};
+            }
+            return materialBlockData;
+        }());
+    })(render = gd3d.render || (gd3d.render = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var render;
+    (function (render) {
         var VertexFormatMask;
         (function (VertexFormatMask) {
             VertexFormatMask[VertexFormatMask["Position"] = 1] = "Position";
@@ -43707,6 +44116,12 @@ var gd3d;
             return uniform;
         }());
         render.uniform = uniform;
+        var attribute = (function () {
+            function attribute() {
+            }
+            return attribute;
+        }());
+        render.attribute = attribute;
         var ShaderTypeEnum;
         (function (ShaderTypeEnum) {
             ShaderTypeEnum[ShaderTypeEnum["VS"] = 0] = "VS";
@@ -43723,6 +44138,9 @@ var gd3d;
         render.glShader = glShader;
         var glProgram = (function () {
             function glProgram(vs, fs, program) {
+                this.mapAttrib = {};
+                this.mapCustomAttrib = {};
+                this._strideInsAttrib = 0;
                 this.posPos = -1;
                 this.posNormal = -1;
                 this.posTangent = -1;
@@ -43737,17 +44155,55 @@ var gd3d;
                 this.fs = fs;
                 this.program = program;
             }
+            glProgram.isBuildInAttrib = function (attribID) {
+                return this.buildInAtrribute[attribID] != null;
+            };
+            Object.defineProperty(glProgram.prototype, "strideInsAttrib", {
+                get: function () { return this._strideInsAttrib; },
+                enumerable: true,
+                configurable: true
+            });
             glProgram.prototype.initAttribute = function (webgl) {
-                this.posPos = webgl.getAttribLocation(this.program, "_glesVertex");
-                this.posColor = webgl.getAttribLocation(this.program, "_glesColor");
-                this.posUV0 = webgl.getAttribLocation(this.program, "_glesMultiTexCoord0");
-                this.posUV2 = webgl.getAttribLocation(this.program, "_glesMultiTexCoord1");
-                this.posNormal = webgl.getAttribLocation(this.program, "_glesNormal");
-                this.posTangent = webgl.getAttribLocation(this.program, "_glesTangent");
-                this.posBlendIndex4 = webgl.getAttribLocation(this.program, "_glesBlendIndex4");
-                this.posBlendWeight4 = webgl.getAttribLocation(this.program, "_glesBlendWeight4");
-                this.posColorEx = webgl.getAttribLocation(this.program, "_glesColorEx");
-                this["xxx"] = webgl.getAttribLocation(this.program, "xxx");
+                var attributesLen = webgl.getProgramParameter(this.program, webgl.ACTIVE_ATTRIBUTES);
+                var attMap = glProgram.buildInAtrribute;
+                for (var i = 0; i < attributesLen; i++) {
+                    var attributeInfo = webgl.getActiveAttrib(this.program, i);
+                    if (!attributeInfo)
+                        break;
+                    var att = new attribute();
+                    var name_10 = attributeInfo.name;
+                    att.name = name_10;
+                    switch (attributeInfo.type) {
+                        case webgl.FLOAT:
+                            att.size = 1;
+                            break;
+                        case webgl.FLOAT_VEC2:
+                            att.size = 2;
+                            break;
+                        case webgl.FLOAT_VEC3:
+                            att.size = 3;
+                            break;
+                        case webgl.FLOAT_VEC4:
+                            att.size = 4;
+                            break;
+                    }
+                    att.location = webgl.getAttribLocation(this.program, name_10);
+                    this.mapAttrib[name_10] = att;
+                    if (!attMap[name_10]) {
+                        this.mapCustomAttrib[name_10] = att;
+                        this._strideInsAttrib += att.size * 4;
+                    }
+                }
+                for (var key in attMap) {
+                    var val = attMap[key];
+                    this[val] = this.tryGetLocation(key);
+                }
+            };
+            glProgram.prototype.tryGetLocation = function (id) {
+                var att = this.mapAttrib[id];
+                if (!att)
+                    return -1;
+                return att.location;
             };
             glProgram.prototype.use = function (webgl) {
                 webgl.useProgram(this.program);
@@ -43797,6 +44253,17 @@ var gd3d;
                         console.log("Unifrom parse Erorr : not have this type!");
                     }
                 }
+            };
+            glProgram.buildInAtrribute = {
+                "_glesVertex": "posPos",
+                "_glesColor": "posColor",
+                "_glesMultiTexCoord0": "posUV0",
+                "_glesMultiTexCoord1": "posUV2",
+                "_glesNormal": "posNormal",
+                "_glesTangent": "posTangent",
+                "_glesBlendIndex4": "posBlendIndex4",
+                "_glesBlendWeight4": "posBlendWeight4",
+                "_glesColorEx": "posColorEx"
             };
             return glProgram;
         }());

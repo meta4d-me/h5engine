@@ -151,11 +151,12 @@ namespace gd3d.framework
         }
         updateModel(model: transform)
         {
+            this.updateModelByMatrix(model.getWorldMatrix());
+        }
+        updateModelByMatrix(m_matrix: gd3d.math.matrix)
+        {
             //注意，这tm是个引用
-            gd3d.math.matrixClone(model.getWorldMatrix(), this.matrixModel);
-            //gd3d.math.matrixMultiply(this.matrixView, this.matrixModel, this.matrixModelView);
-            // gd3d.math.matrixInverse(this.matrixModelView, this.matrixNormal);
-            // gd3d.math.matrixTranspose(this.matrixNormal, this.matrixNormal);
+            gd3d.math.matrixClone(m_matrix, this.matrixModel);
             gd3d.math.matrixMultiply(this.matrixViewProject, this.matrixModel, this.matrixModelViewProject);
         }
 
@@ -270,23 +271,30 @@ namespace gd3d.framework
         }
         clear()
         {            
-            this.renderLayers[0].list.length =
-                this.renderLayers[1].list.length =
-                this.renderLayers[2].list.length = 0;
+            let len = this.renderLayers.length;
+            for(let i=0;i < len;i++){
+                this.renderLayers[i].list.length = 0;
+                this.renderLayers[i].gpuInstanceMap = {};
+            }
         }
         addRenderer(renderer: IRenderer)
         {
+            let idx = 0;
             if (renderer.layer == RenderLayerEnum.Common)
             {
-                this.renderLayers[0].list.push(renderer);
             }
             else if (renderer.layer == RenderLayerEnum.Transparent)
             {
-                this.renderLayers[1].list.push(renderer);
+                idx = 1;
             }
             else if (renderer.layer == RenderLayerEnum.Overlay)
             {
-                this.renderLayers[2].list.push(renderer);
+                idx = 2;
+            }
+            if(!(renderer as IRendererGpuIns).isGpuInstancing){
+                this.renderLayers[idx].list.push(renderer);
+            }else{
+                this.renderLayers[idx].addInstance(renderer as IRendererGpuIns);
             }
         }
 
@@ -305,6 +313,17 @@ namespace gd3d.framework
         constructor(_sort: boolean = false)
         {
             this.needSort = _sort;
+        }
+        gpuInstanceMap: {[sID:number] : IRendererGpuIns[]} = {}; 
+        addInstance(r : IRendererGpuIns){
+            let mr = r as meshRenderer;
+            if(!mr.materials[0]) return;
+            let sh = mr.materials[0].getShader();
+            if(!sh) return;
+            let id = sh.getGUID();
+            let list = this.gpuInstanceMap[id];
+            if(!list) list = this.gpuInstanceMap[id] = [];
+            list.push(r);
         }
     }
 

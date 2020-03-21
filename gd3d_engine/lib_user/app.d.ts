@@ -633,6 +633,22 @@ declare class test_Decal implements IState {
     private Y_ag;
     update(delta: number): void;
 }
+declare let testSh_vs: string;
+declare let testSh_fs: string;
+declare class test_GPU_instancing implements IState {
+    _app: gd3d.framework.application;
+    _scene: gd3d.framework.scene;
+    _mat: gd3d.framework.material;
+    _mat_ins: gd3d.framework.material;
+    private shBase;
+    private instanceShBase;
+    start(app: gd3d.framework.application): void;
+    initMaterails(): void;
+    private makeShader;
+    createOne(app: any, needInstance?: boolean): void;
+    private getRandom;
+    update(delta: number): void;
+}
 declare class test_LineRenderer implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
