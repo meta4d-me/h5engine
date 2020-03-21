@@ -7076,7 +7076,7 @@ declare namespace gd3d.framework {
         list: IRenderer[];
         constructor(_sort?: boolean);
         gpuInstanceMap: {
-            [sID: number]: IRendererGpuIns[];
+            [sID: string]: IRendererGpuIns[];
         };
         addInstance(r: IRendererGpuIns): void;
     }

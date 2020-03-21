@@ -315,13 +315,15 @@ namespace gd3d.framework
         {
             this.needSort = _sort;
         }
-        gpuInstanceMap: {[sID:number] : IRendererGpuIns[]} = {}; 
+        gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {}; 
         addInstance(r : IRendererGpuIns){
             let mr = r as meshRenderer;
+            let mf = mr.filter;
+            if(!mf || !mf.mesh) return;
             if(!mr.materials[0]) return;
             let sh = mr.materials[0].getShader();
             if(!sh) return;
-            let id = sh.getGUID();
+            let id = `${sh.getGUID()}_${mf.mesh.getGUID()}`;
             let list = this.gpuInstanceMap[id];
             if(!list) list = this.gpuInstanceMap[id] = [];
             list.push(r);

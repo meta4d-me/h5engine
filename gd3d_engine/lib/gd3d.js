@@ -37290,12 +37290,15 @@ var gd3d;
             }
             renderLayer.prototype.addInstance = function (r) {
                 var mr = r;
+                var mf = mr.filter;
+                if (!mf || !mf.mesh)
+                    return;
                 if (!mr.materials[0])
                     return;
                 var sh = mr.materials[0].getShader();
                 if (!sh)
                     return;
-                var id = sh.getGUID();
+                var id = sh.getGUID() + "_" + mf.mesh.getGUID();
                 var list = this.gpuInstanceMap[id];
                 if (!list)
                     list = this.gpuInstanceMap[id] = [];
