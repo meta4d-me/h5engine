@@ -4183,78 +4183,90 @@ var test_Decal = (function () {
     };
     return test_Decal;
 }());
-var testSh_vs = "\n        attribute vec3 _glesNormal;\n        attribute vec4 _glesVertex;\n        attribute vec4 _glesColor;\n        attribute vec4 _glesMultiTexCoord0;\n\n        attribute vec4 a_particle_color;\n\n        attribute highp vec4 instance_offset_matrix_0;\n        attribute highp vec4 instance_offset_matrix_1;\n        attribute highp vec4 instance_offset_matrix_2;\n        attribute highp vec4 instance_offset_matrix_3;\n\n        uniform highp mat4 glstate_matrix_mvp;\n        varying lowp vec4 xlv_COLOR;\n        varying highp vec2 xlv_TEXCOORD0;\n        void main()\n        {\n            lowp vec3 aaa = _glesNormal;\n\n            highp mat4 instance_offset_matrix = mat4(instance_offset_matrix_0,instance_offset_matrix_1,instance_offset_matrix_2,instance_offset_matrix_3);\n            highp vec4 tmpvar_1;\n            tmpvar_1.w = _glesNormal.x;\n            tmpvar_1.w = 1.0;\n            tmpvar_1.xyz = _glesVertex.xyz;\n            tmpvar_1 = instance_offset_matrix * tmpvar_1;\n            xlv_COLOR = a_particle_color;\n            // xlv_COLOR = _glesColor - a_particle_color;\n            xlv_TEXCOORD0 = _glesMultiTexCoord0.xy;\n            gl_Position = (glstate_matrix_mvp * tmpvar_1);\n        }\n";
-var testSh_fs = "\n        uniform sampler2D _MainTex;\n        varying lowp vec4 xlv_COLOR;\n        varying highp vec2 xlv_TEXCOORD0;\n        void main()\n        {\n            lowp vec4 col_1;\n            mediump vec4 prev_2;\n            lowp vec4 tmpvar_3;\n            tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));\n            prev_2 = tmpvar_3;\n            mediump vec4 tmpvar_4;\n            tmpvar_4 = mix(vec4(1.0, 1.0, 1.0, 1.0), prev_2, prev_2.wwww);\n            col_1 = tmpvar_4;\n            col_1.x =xlv_TEXCOORD0.x;\n            col_1.y =xlv_TEXCOORD0.y;\n            //gl_FragData[0] = col_1;\n            tmpvar_3 = xlv_COLOR;\n            // tmpvar_3.x = 1.0;\n            gl_FragData[0] = tmpvar_3;\n        }\n";
 var test_GPU_instancing = (function () {
     function test_GPU_instancing() {
+        this.createCount = 500;
+        this.mats = [];
+        this.isInstancing = true;
     }
     test_GPU_instancing.prototype.start = function (app) {
-        var scene = this._scene = app.getScene();
-        this._app = app;
-        var objCam = new gd3d.framework.transform();
-        scene.addChild(objCam);
-        var cam = objCam.gameObject.addComponent("camera");
-        cam.near = 0.01;
-        cam.far = 120;
-        cam.fov = Math.PI * 0.3;
-        objCam.localTranslate = new gd3d.math.vector3(0, 15, -15);
-        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
-        var hoverc = cam.gameObject.addComponent("HoverCameraScript");
-        hoverc.panAngle = 180;
-        hoverc.tiltAngle = 45;
-        hoverc.distance = 30;
-        hoverc.scaleSpeed = 0.1;
-        hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0);
-        this.initMaterails();
-        var xx = 100;
+        return __awaiter(this, void 0, void 0, function () {
+            var scene, objCam, cam, hoverc, _dat;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", app.getAssetMgr())];
+                    case 1:
+                        _a.sent();
+                        return [4, datGui.init()];
+                    case 2:
+                        _a.sent();
+                        scene = this._scene = app.getScene();
+                        this.cubeRoot = new gd3d.framework.transform();
+                        scene.addChild(this.cubeRoot);
+                        this._app = app;
+                        objCam = new gd3d.framework.transform();
+                        scene.addChild(objCam);
+                        cam = objCam.gameObject.addComponent("camera");
+                        cam.near = 0.01;
+                        cam.far = 120;
+                        cam.fov = Math.PI * 0.3;
+                        objCam.localTranslate = new gd3d.math.vector3(0, 15, -15);
+                        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+                        hoverc = cam.gameObject.addComponent("HoverCameraScript");
+                        hoverc.panAngle = 180;
+                        hoverc.tiltAngle = 45;
+                        hoverc.distance = 30;
+                        hoverc.scaleSpeed = 0.1;
+                        hoverc.lookAtPoint = new gd3d.math.vector3(0, 2.5, 0);
+                        this.initMaterails();
+                        this.refresh();
+                        app.showDrawCall();
+                        app.showFps();
+                        _dat = new dat.GUI();
+                        _dat.add(this, 'isInstancing');
+                        _dat.add(this, 'createCount');
+                        _dat.add(this, 'refresh');
+                        return [2];
+                }
+            });
+        });
+    };
+    test_GPU_instancing.prototype.refresh = function () {
+        this.cubeRoot.removeAllChild();
+        this.createByNum(this.createCount);
+    };
+    test_GPU_instancing.prototype.createByNum = function (num) {
+        if (num < 1)
+            num = 1;
         var count = 0;
-        while (count < xx) {
-            this.createOne(app, true);
+        while (count < num) {
+            this.createOne(this._app, this.isInstancing);
             count++;
         }
-        app.showDrawCall();
-        app.showFps();
+    };
+    test_GPU_instancing.prototype.instanceSwitch = function () {
+        var _this = this;
+        this.isInstancing = !this.isInstancing;
+        this.mats.forEach(function (v) {
+            v.enableGpuInstancing = _this.isInstancing;
+        });
     };
     test_GPU_instancing.prototype.initMaterails = function () {
-        this._mat = new gd3d.framework.material("base");
         this._mat_ins = new gd3d.framework.material("GPU_Instancing");
-        this.instanceShBase = this.makeShader(this._app.getAssetMgr(), testSh_vs, testSh_fs, "instance_base");
-        this.shBase = this.makeShader(this._app.getAssetMgr(), testSh_vs, testSh_fs);
+        this.instanceShBase = this._app.getAssetMgr().getShader("demo_gpu_instancing.shader.json");
         this._mat_ins.setShader(this.instanceShBase);
-        this._mat_ins.enableGpuInstancing = true;
-        this._mat.setShader(this.shBase);
-    };
-    test_GPU_instancing.prototype.makeShader = function (assetmgr, vs, fs, passId) {
-        if (passId === void 0) { passId = "base"; }
-        var pool = assetmgr.shaderPool;
-        pool.compileVS(assetmgr.webgl, "gpuInstancing", vs);
-        pool.compileFS(assetmgr.webgl, "gpuInstancing", fs);
-        var program = pool.linkProgram(assetmgr.webgl, "gpuInstancing", "gpuInstancing");
-        var sh = new gd3d.framework.shader("shader/gpuInstancing");
-        sh.defaultAsset = true;
-        sh.passes[passId] = [];
-        var p = new gd3d.render.glDrawPass();
-        p.setProgram(program);
-        sh.passes[passId].push(p);
-        sh.fillUnDefUniform(p);
-        p.state_ztest = true;
-        p.state_ztest_method = gd3d.render.webglkit.LEQUAL;
-        p.state_zwrite = true;
-        p.state_showface = gd3d.render.ShowFaceStateEnum.CCW;
-        p.setAlphaBlend(gd3d.render.BlendModeEnum.Close);
-        assetmgr.mapShader[sh.getName()] = sh;
-        return sh;
     };
     test_GPU_instancing.prototype.createOne = function (app, needInstance) {
-        if (needInstance === void 0) { needInstance = true; }
         var obj = gd3d.framework.TransformUtil.CreatePrimitive(gd3d.framework.PrimitiveType.Cube, app);
-        this._scene.addChild(obj);
+        this.cubeRoot.addChild(obj);
         var range = 10;
         gd3d.math.vec3Set(obj.localPosition, this.getRandom(range), this.getRandom(range), this.getRandom(range));
         var mr = obj.gameObject.getComponent("meshRenderer");
-        var mat = needInstance ? this._mat_ins : this._mat;
+        var mat = this._mat_ins;
         mr.materials[0] = mat.clone();
+        mr.materials[0].enableGpuInstancing = needInstance;
         mr.materials[0].setVector4("a_particle_color", new gd3d.math.vector4(Math.random(), Math.random(), Math.random(), 1));
+        this.mats.push(mr.materials[0]);
     };
     test_GPU_instancing.prototype.getRandom = function (range) {
         return range * Math.random() * (Math.random() > 0.5 ? 1 : -1);

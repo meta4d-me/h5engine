@@ -445,7 +445,17 @@ namespace gd3d.render
             {
                 vsStr = "#define FOG \n" + vsStr;
                 fsStr = "#define FOG \n" + fsStr;
-            } else if (type == "skin")
+            }else if (type == "instance" )
+            {
+                vsStr = "#define INSTANCE \n" + vsStr;
+                fsStr = "#define INSTANCE \n" + fsStr;
+            }
+            else if (type == "instance_fog" )
+            {
+                vsStr = "#define FOG \n"+ "#define INSTANCE \n" + vsStr;
+                fsStr = "#define FOG \n"+ "#define INSTANCE \n" + fsStr;
+            } 
+            else if (type == "skin")
             {
                 vsStr = "#define SKIN \n" + vsStr;
                 fsStr = "#define SKIN \n" + fsStr;

@@ -53,6 +53,18 @@
           "length":0
           },
       {
+          "name":"resources/demo_gpu_ins.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/demo_gpu_ins.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/demo_gpu_instancing.shader.json",
+          "length":0
+          },
+      {
           "name":"resources/diffuse.fs.glsl",
           "length":0
           },

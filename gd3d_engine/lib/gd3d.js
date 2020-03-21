@@ -12040,6 +12040,36 @@ var gd3d;
                 if (subMeshs == null)
                     return;
                 mesh.glMesh.bindVboBuffer(context.webgl);
+                var len = subMeshs.length;
+                var scene = tran.scene;
+                var lightIdx = this.lightmapIndex;
+                for (var i = 0; i < len; i++) {
+                    var sm = subMeshs[i];
+                    var mid = subMeshs[i].matIndex;
+                    var usemat = this.materials[mid];
+                    var drawtype = scene.fog ? "base_fog" : "base";
+                    if (lightIdx >= 0 && scene.lightmaps.length > 0) {
+                        drawtype = scene.fog ? "lightmap_fog" : "lightmap";
+                        if (scene.lightmaps.length > lightIdx) {
+                            context.lightmap = scene.lightmaps[lightIdx];
+                            context.lightmapOffset = this.lightmapScaleOffset;
+                            context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
+                        }
+                    }
+                    else {
+                        if (!this.useGlobalLightMap) {
+                            drawtype = scene.fog ? "lightmap_fog" : "lightmap";
+                            context.lightmap = usemat.statedMapUniforms["_LightmapTex"];
+                            context.lightmapOffset = this.lightmapScaleOffset;
+                            context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
+                        }
+                    }
+                    if (scene.fog) {
+                        context.fog = scene.fog;
+                    }
+                    if (usemat != null)
+                        usemat.draw(context, mesh, sm, drawtype);
+                }
             };
             meshRenderer.GpuInstancingRender = function (context, assetmgr, camera, instanceArray) {
                 var _this = this;
@@ -12131,7 +12161,7 @@ var gd3d;
                 }
             };
             meshRenderer.instanceDrawType = function (context, mr, _subMeshInfo) {
-                var drawtype = "instance_base";
+                var drawtype = "instance";
                 var _fog = gd3d.framework.sceneMgr.scene.fog;
                 if (_fog) {
                     drawtype += "_fog";
@@ -12161,23 +12191,6 @@ var gd3d;
                 this.materials.length = 0;
             };
             meshRenderer.prototype.clone = function () {
-            };
-            meshRenderer.prototype.getPropertyBlock = function (properties) {
-            };
-            meshRenderer.prototype.setPropertyBlock = function (properties) {
-                if (!this.materials || this.materials.length < 1)
-                    return;
-                var len = this.materials.length;
-                var insid = this.gameObject.transform.insId.getInsID();
-                for (var i = 0; i < len; i++) {
-                    var mat = this.materials[i];
-                    if (!mat.enableGpuInstancing) {
-                    }
-                    else {
-                    }
-                    var p = properties;
-                    p.currTransId = insid;
-                }
             };
             meshRenderer.ClassName = "meshRenderer";
             meshRenderer.helpIMatrix = new gd3d.math.matrix();
@@ -12986,12 +12999,10 @@ var gd3d;
                     this.statedMapUniforms[_id] = _number;
                 }
                 else {
-                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
-                        this.setInstanceAttribValue(_id, [_number]);
-                    }
-                    else {
-                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                    }
+                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                }
+                if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                    this.setInstanceAttribValue(_id, [_number]);
                 }
             };
             material.prototype.setFloatv = function (_id, _numbers) {
@@ -13000,16 +13011,14 @@ var gd3d;
                     this.uniformDirtyMap[_id] = true;
                 }
                 else {
-                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
-                        var arr_1 = [];
-                        _numbers.forEach(function (v) {
-                            arr_1.push(v);
-                        });
-                        this.setInstanceAttribValue(_id, arr_1);
-                    }
-                    else {
-                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                    }
+                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                }
+                if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                    var arr_1 = [];
+                    _numbers.forEach(function (v) {
+                        arr_1.push(v);
+                    });
+                    this.setInstanceAttribValue(_id, arr_1);
                 }
             };
             material.prototype.setVector4 = function (_id, _vector4) {
@@ -13018,12 +13027,10 @@ var gd3d;
                     this.uniformDirtyMap[_id] = true;
                 }
                 else {
-                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
-                        this.setInstanceAttribValue(_id, [_vector4.x, _vector4.y, _vector4.z, _vector4.w]);
-                    }
-                    else {
-                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                    }
+                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                }
+                if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                    this.setInstanceAttribValue(_id, [_vector4.x, _vector4.y, _vector4.z, _vector4.w]);
                 }
             };
             material.prototype.setVector4v = function (_id, _vector4v) {
@@ -13032,16 +13039,14 @@ var gd3d;
                     this.uniformDirtyMap[_id] = true;
                 }
                 else {
-                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
-                        var arr_2 = [];
-                        _vector4v.forEach(function (v) {
-                            arr_2.push(v);
-                        });
-                        this.setInstanceAttribValue(_id, arr_2);
-                    }
-                    else {
-                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                    }
+                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                }
+                if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                    var arr_2 = [];
+                    _vector4v.forEach(function (v) {
+                        arr_2.push(v);
+                    });
+                    this.setInstanceAttribValue(_id, arr_2);
                 }
             };
             material.prototype.setMatrix = function (_id, _matrix) {
@@ -14255,9 +14260,9 @@ var gd3d;
                 for (var key in passes) {
                     var passbass = passes[key];
                     var curpasses;
-                    if (key == "base" || key == "lightmap" || key == "skin" || key == "quad") {
+                    if (key == "base" || key == "instance" || key == "lightmap" || key == "skin" || key == "quad") {
                     }
-                    else if (key.indexOf("base_") == 0 || key.indexOf("lightmap_") == 0 || key.indexOf("skin_") == 0) {
+                    else if (key.indexOf("base_") == 0 || key.indexOf("instance_") == 0 || key.indexOf("lightmap_") == 0 || key.indexOf("skin_") == 0) {
                     }
                     else {
                         continue;
@@ -37264,7 +37269,7 @@ var gd3d;
                 else if (renderer.layer == RenderLayerEnum.Overlay) {
                     idx = 2;
                 }
-                if (!renderer.isGpuInstancing) {
+                if (!renderer.isGpuInstancing()) {
                     this.renderLayers[idx].list.push(renderer);
                 }
                 else {
@@ -42652,215 +42657,6 @@ var gd3d;
 (function (gd3d) {
     var render;
     (function (render) {
-        var materialPropertyBlock = (function () {
-            function materialPropertyBlock() {
-                this._enableGpuInstancing = false;
-                this.statedMapUniforms = {};
-                this.instanceAttribValMap = {};
-                this.uniformDirtyMap = {};
-                this.blockMap = {};
-                this.currTransId = -1;
-            }
-            materialPropertyBlock.prototype.getName = function () {
-                return "materialPropertyBlock";
-            };
-            Object.defineProperty(materialPropertyBlock.prototype, "enableGpuInstancing", {
-                get: function () { return this._enableGpuInstancing; },
-                set: function (enable) { this._enableGpuInstancing = enable; },
-                enumerable: true,
-                configurable: true
-            });
-            ;
-            ;
-            materialPropertyBlock.prototype.GetInt = function () {
-                return Object.keys(this.blockMap).length;
-            };
-            materialPropertyBlock.prototype.uploadInstanceAtteribute = function (pass, setContainer) {
-                var attmap = pass.program.mapCustomAttrib;
-                for (var key in attmap) {
-                    var arr = this.instanceAttribValMap[key];
-                    if (!arr) {
-                        var att = pass.program.mapCustomAttrib[key];
-                        var oldLen = setContainer.length;
-                        setContainer.length = oldLen + att.size;
-                        setContainer.fill(0, oldLen);
-                    }
-                    else {
-                        arr.forEach(function (v) { setContainer.push(v); });
-                    }
-                }
-            };
-            materialPropertyBlock.prototype.setInstanceAttribValue = function (id, arr) {
-                if (!id)
-                    return;
-                this.instanceAttribValMap[id] = arr;
-            };
-            materialPropertyBlock.prototype.isNotBuildinAttribId = function (id) {
-                return !render.glProgram.isBuildInAttrib(id);
-            };
-            materialPropertyBlock.prototype.setFloat = function (_id, _number) {
-                if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float) {
-                    if (this.statedMapUniforms[_id] != _number) {
-                        this.uniformDirtyMap[_id] = true;
-                    }
-                    this.statedMapUniforms[_id] = _number;
-                }
-                else {
-                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
-                        this.setInstanceAttribValue(_id, [_number]);
-                    }
-                    else {
-                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                    }
-                }
-            };
-            materialPropertyBlock.prototype.setFloatv = function (_id, _numbers) {
-                if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Floatv) {
-                    this.statedMapUniforms[_id] = _numbers;
-                    this.uniformDirtyMap[_id] = true;
-                }
-                else {
-                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
-                        var arr_8 = [];
-                        _numbers.forEach(function (v) {
-                            arr_8.push(v);
-                        });
-                        this.setInstanceAttribValue(_id, arr_8);
-                    }
-                    else {
-                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                    }
-                }
-            };
-            materialPropertyBlock.prototype.setVector4 = function (_id, _vector4) {
-                if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4) {
-                    this.statedMapUniforms[_id] = _vector4;
-                    this.uniformDirtyMap[_id] = true;
-                }
-                else {
-                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
-                        this.setInstanceAttribValue(_id, [_vector4.x, _vector4.y, _vector4.z, _vector4.w]);
-                    }
-                    else {
-                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                    }
-                }
-            };
-            materialPropertyBlock.prototype.setVector4v = function (_id, _vector4v) {
-                if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4v) {
-                    this.statedMapUniforms[_id] = _vector4v;
-                    this.uniformDirtyMap[_id] = true;
-                }
-                else {
-                    if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
-                        var arr_9 = [];
-                        _vector4v.forEach(function (v) {
-                            arr_9.push(v);
-                        });
-                        this.setInstanceAttribValue(_id, arr_9);
-                    }
-                    else {
-                        console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                    }
-                }
-            };
-            materialPropertyBlock.prototype.setMatrix = function (_id, _matrix) {
-                if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4) {
-                    this.statedMapUniforms[_id] = _matrix;
-                    this.uniformDirtyMap[_id] = true;
-                }
-                else {
-                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                }
-            };
-            materialPropertyBlock.prototype.setMatrixv = function (_id, _matrixv) {
-                if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Float4x4v) {
-                    this.statedMapUniforms[_id] = _matrixv;
-                    this.uniformDirtyMap[_id] = true;
-                }
-                else {
-                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                }
-            };
-            materialPropertyBlock.prototype.setTexture = function (_id, _texture, resname) {
-                if (resname === void 0) { resname = ""; }
-                if (!(this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.Texture) && _id != "_LightmapTex") {
-                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                    return;
-                }
-                var oldTex = this.statedMapUniforms[_id];
-                if (oldTex != null) {
-                    if (oldTex == _texture)
-                        return;
-                    if (this.statedMapUniforms[_id].defaultAsset) {
-                        oldTex = null;
-                    }
-                }
-                this.statedMapUniforms[_id] = _texture;
-                if (_texture != null) {
-                    if (!_texture.defaultAsset) {
-                        _texture.use();
-                    }
-                    var _texelsizeName = _id + "_TexelSize";
-                    var _gltexture = _texture.glTexture;
-                    if (_gltexture != null && this.defaultMapUniform[_texelsizeName] != null) {
-                        this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
-                    }
-                    this.uniformDirtyMap[_id] = true;
-                }
-                else {
-                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                }
-                if (oldTex)
-                    oldTex.unuse();
-            };
-            materialPropertyBlock.prototype.setCubeTexture = function (_id, _texture) {
-                if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == render.UniformTypeEnum.CubeTexture) {
-                    if (this.statedMapUniforms[_id] != null && (!this.statedMapUniforms[_id].defaultAsset)) {
-                        this.statedMapUniforms[_id].unuse();
-                    }
-                    this.statedMapUniforms[_id] = _texture;
-                    if (_texture != null) {
-                        if (!_texture.defaultAsset) {
-                            _texture.use();
-                        }
-                        var _texelsizeName = _id + "_TexelSize";
-                        var _gltexture = _texture.glTexture;
-                        if (_gltexture != null) {
-                            this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
-                        }
-                    }
-                    this.uniformDirtyMap[_id] = true;
-                }
-                else {
-                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                }
-            };
-            materialPropertyBlock.prototype.setMat = function () {
-            };
-            materialPropertyBlock.prototype.saveMat = function (transId) {
-                var block = this.blockMap[transId];
-                for (var key in block.instanceAttribValMap) {
-                    this.instanceAttribValMap[key] = block.instanceAttribValMap[key].slice();
-                }
-            };
-            materialPropertyBlock.ClassName = "materialPropertyBlock";
-            return materialPropertyBlock;
-        }());
-        render.materialPropertyBlock = materialPropertyBlock;
-        var materialBlockData = (function () {
-            function materialBlockData() {
-                this.statedMapUniforms = {};
-                this.instanceAttribValMap = {};
-            }
-            return materialBlockData;
-        }());
-    })(render = gd3d.render || (gd3d.render = {}));
-})(gd3d || (gd3d = {}));
-var gd3d;
-(function (gd3d) {
-    var render;
-    (function (render) {
         var VertexFormatMask;
         (function (VertexFormatMask) {
             VertexFormatMask[VertexFormatMask["Position"] = 1] = "Position";
@@ -44359,6 +44155,14 @@ var gd3d;
                 else if (type == "base_fog" || type == "fog") {
                     vsStr = "#define FOG \n" + vsStr;
                     fsStr = "#define FOG \n" + fsStr;
+                }
+                else if (type == "instance") {
+                    vsStr = "#define INSTANCE \n" + vsStr;
+                    fsStr = "#define INSTANCE \n" + fsStr;
+                }
+                else if (type == "instance_fog") {
+                    vsStr = "#define FOG \n" + "#define INSTANCE \n" + vsStr;
+                    fsStr = "#define FOG \n" + "#define INSTANCE \n" + fsStr;
                 }
                 else if (type == "skin") {
                     vsStr = "#define SKIN \n" + vsStr;

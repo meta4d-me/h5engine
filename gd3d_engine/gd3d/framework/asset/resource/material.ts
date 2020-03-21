@@ -406,11 +406,11 @@ namespace gd3d.framework
                 this.statedMapUniforms[_id] = _number;
             } else
             {
-                if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
-                    this.setInstanceAttribValue(_id,[_number]);
-                }else{
-                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                }
+                console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+            }
+            
+            if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
+                this.setInstanceAttribValue(_id,[_number]);
             }
         }
         /**
@@ -424,15 +424,15 @@ namespace gd3d.framework
                 this.uniformDirtyMap[_id] = true;
             } else
             {
-                if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
-                    let arr : number [] = []
-                    _numbers.forEach((v)=>{
-                        arr.push(v);
-                    });
-                    this.setInstanceAttribValue(_id,arr);
-                }else{
-                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                }
+                console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+            }
+
+            if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
+                let arr : number [] = []
+                _numbers.forEach((v)=>{
+                    arr.push(v);
+                });
+                this.setInstanceAttribValue(_id,arr);
             }
         }
         /**
@@ -446,11 +446,11 @@ namespace gd3d.framework
                 this.uniformDirtyMap[_id] = true;
             } else
             {
-                if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
-                    this.setInstanceAttribValue(_id,[_vector4.x,_vector4.y,_vector4.z,_vector4.w]);
-                }else{
-                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                }
+                console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+            }
+
+            if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
+                this.setInstanceAttribValue(_id,[_vector4.x,_vector4.y,_vector4.z,_vector4.w]);
             }
         }
         /**
@@ -465,15 +465,14 @@ namespace gd3d.framework
 
             } else
             {
-                if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
-                    let arr : number [] = []
-                    _vector4v.forEach((v)=>{
-                        arr.push(v);
-                    });
-                    this.setInstanceAttribValue(_id,arr);
-                }else{
-                    console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
-                }
+                console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+            }
+            if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
+                let arr : number [] = []
+                _vector4v.forEach((v)=>{
+                    arr.push(v);
+                });
+                this.setInstanceAttribValue(_id,arr);
             }
         }
         /**

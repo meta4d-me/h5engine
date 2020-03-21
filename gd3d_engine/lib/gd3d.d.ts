@@ -2280,8 +2280,6 @@ declare namespace gd3d.framework {
         isGpuInstancing(): boolean;
         remove(): void;
         clone(): void;
-        getPropertyBlock(properties: render.materialPropertyBlock): void;
-        setPropertyBlock(properties: render.materialPropertyBlock): void;
     }
 }
 declare namespace gd3d.framework {
@@ -8226,46 +8224,6 @@ declare namespace gd3d.render {
         private getCurDrawState;
         private getCurBlendVal;
         private formate;
-    }
-}
-declare namespace gd3d.render {
-    class materialPropertyBlock {
-        static readonly ClassName: string;
-        getName(): string;
-        private _enableGpuInstancing;
-        enableGpuInstancing: boolean;
-        defaultMapUniform: {
-            [key: string]: {
-                type: render.UniformTypeEnum;
-                value?: any;
-                becolor?: boolean;
-                min?: number;
-                max?: number;
-            };
-        };
-        statedMapUniforms: {
-            [id: string]: any;
-        };
-        instanceAttribValMap: {
-            [id: string]: number[];
-        };
-        private uniformDirtyMap;
-        private blockMap;
-        private currTransId;
-        GetInt(): number;
-        uploadInstanceAtteribute(pass: render.glDrawPass, setContainer: number[]): void;
-        private setInstanceAttribValue;
-        private isNotBuildinAttribId;
-        setFloat(_id: string, _number: number): void;
-        setFloatv(_id: string, _numbers: Float32Array): void;
-        setVector4(_id: string, _vector4: math.vector4): void;
-        setVector4v(_id: string, _vector4v: Float32Array): void;
-        setMatrix(_id: string, _matrix: math.matrix): void;
-        setMatrixv(_id: string, _matrixv: Float32Array): void;
-        setTexture(_id: string, _texture: gd3d.framework.texture, resname?: string): void;
-        setCubeTexture(_id: string, _texture: gd3d.framework.texture): void;
-        private setMat;
-        private saveMat;
     }
 }
 declare namespace gd3d.render {

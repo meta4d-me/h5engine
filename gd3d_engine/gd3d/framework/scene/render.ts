@@ -291,7 +291,7 @@ namespace gd3d.framework
             {
                 idx = 2;
             }
-            if(!(renderer as IRendererGpuIns).isGpuInstancing){
+            if(!(renderer as IRendererGpuIns).isGpuInstancing()){
                 this.renderLayers[idx].list.push(renderer);
             }else{
                 this.renderLayers[idx].addInstance(renderer as IRendererGpuIns);
