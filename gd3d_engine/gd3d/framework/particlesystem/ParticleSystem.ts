@@ -588,8 +588,9 @@ namespace gd3d.framework
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
                         },
-                        activeAttributes: (gl, program) =>
+                        activeAttributes: (gl, pass) =>
                         {
+                            let program = pass.program.program;
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
 
                             var offset = 0;
@@ -605,8 +606,9 @@ namespace gd3d.framework
 
                             });
                         },
-                        disableAttributes: (gl, program) =>
+                        disableAttributes: (gl, pass) =>
                         {
+                            let program = pass.program.program;
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
 
                             this._attributes.forEach(element =>
