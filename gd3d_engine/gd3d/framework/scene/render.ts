@@ -277,7 +277,7 @@ namespace gd3d.framework
                 this.renderLayers[i].gpuInstanceMap = {};
             }
         }
-        addRenderer(renderer: IRenderer)
+        addRenderer(renderer: IRenderer , webgl : WebGLRenderingContext)
         {
             let idx = 0;
             if (renderer.layer == RenderLayerEnum.Common)
@@ -292,7 +292,7 @@ namespace gd3d.framework
                 idx = 2;
             }
             let gpuInsR = (renderer as IRendererGpuIns);
-            if(!gpuInsR.isGpuInstancing || !gpuInsR.isGpuInstancing()){
+            if(!webgl.drawArraysInstanced || !gpuInsR.isGpuInstancing || !gpuInsR.isGpuInstancing()){
                 this.renderLayers[idx].list.push(renderer);
             }else{
                 this.renderLayers[idx].addInstance(gpuInsR);
