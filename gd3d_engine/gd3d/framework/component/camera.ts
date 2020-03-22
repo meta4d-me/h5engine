@@ -878,7 +878,7 @@ namespace gd3d.framework
 
             if (islayerPass && !this.cullingMap[id])  //判断加入到渲染列表
             {
-                scene.renderList.addRenderer(renderer);
+                scene.renderList.addRenderer(renderer,scene.webgl);
             }
 
             if (node.children)
