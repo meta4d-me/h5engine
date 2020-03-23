@@ -22,11 +22,10 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -12107,7 +12106,9 @@ var gd3d;
                             for (var i_2 = 0; i_2 < insLen; i_2++) {
                                 var mr_1 = instanceArray[i_2];
                                 var mat = mr_1.materials[mid];
-                                _this.setInstanceOffsetMatrix(mr_1.gameObject.transform, mat);
+                                if (pass.program.mapAttrib[_this.insOffsetMatrixStr + "0"]) {
+                                    _this.setInstanceOffsetMatrix(mr_1.gameObject.transform, mat);
+                                }
                                 mat.uploadInstanceAtteribute(pass, data);
                             }
                             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
@@ -12147,7 +12148,7 @@ var gd3d;
             };
             meshRenderer.setInstanceOffsetMatrix = function (tran, mat) {
                 var _wmat = tran.getWorldMatrix();
-                var insOffsetMtxStr = "instance_offset_matrix_";
+                var insOffsetMtxStr = this.insOffsetMatrixStr;
                 var len = 4;
                 var rawdata = _wmat.rawData;
                 for (var i = 0; i < len; i++) {
@@ -12194,6 +12195,7 @@ var gd3d;
             };
             meshRenderer.ClassName = "meshRenderer";
             meshRenderer.helpIMatrix = new gd3d.math.matrix();
+            meshRenderer.insOffsetMatrixStr = "instance_offset_matrix_";
             meshRenderer._vbos = [];
             __decorate([
                 gd3d.reflect.Field("material[]"),
@@ -16161,7 +16163,7 @@ var gd3d;
                         node.dirtiedOfFrustumCulling = false;
                 }
                 if (islayerPass && !this.cullingMap[id]) {
-                    scene.renderList.addRenderer(renderer);
+                    scene.renderList.addRenderer(renderer, scene.webgl);
                 }
                 if (node.children) {
                     for (var i = 0, l = node.children.length; i < l; ++i)
@@ -37260,7 +37262,7 @@ var gd3d;
                     this.renderLayers[i].gpuInstanceMap = {};
                 }
             };
-            renderList.prototype.addRenderer = function (renderer) {
+            renderList.prototype.addRenderer = function (renderer, webgl) {
                 var idx = 0;
                 if (renderer.layer == RenderLayerEnum.Common) {
                 }
@@ -37271,7 +37273,7 @@ var gd3d;
                     idx = 2;
                 }
                 var gpuInsR = renderer;
-                if (!gpuInsR.isGpuInstancing || !gpuInsR.isGpuInstancing()) {
+                if (!webgl.drawArraysInstanced || !gpuInsR.isGpuInstancing || !gpuInsR.isGpuInstancing()) {
                     this.renderLayers[idx].list.push(renderer);
                 }
                 else {

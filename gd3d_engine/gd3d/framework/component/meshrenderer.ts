@@ -256,7 +256,9 @@ namespace gd3d.framework
                         for(let i=0;i < insLen ;i++){
                             let mr = instanceArray[i] as meshRenderer;
                             let mat = mr.materials[mid];
-                            this.setInstanceOffsetMatrix(mr.gameObject.transform,mat); //RTS offset 矩阵
+                            if(pass.program.mapAttrib[`${this.insOffsetMatrixStr}0`]){//vs中 注册过 offsetmatrix的才处理
+                                this.setInstanceOffsetMatrix(mr.gameObject.transform,mat); //RTS offset 矩阵
+                            }
                             mat.uploadInstanceAtteribute( pass ,data);  //收集 各material instance atteribute
                         }
                         
@@ -297,9 +299,10 @@ namespace gd3d.framework
             }
         }
 
+        private static readonly insOffsetMatrixStr = "instance_offset_matrix_";
         private static setInstanceOffsetMatrix(tran: gd3d.framework.transform, mat: material){
             let _wmat = tran.getWorldMatrix();
-            let insOffsetMtxStr = "instance_offset_matrix_";
+            let insOffsetMtxStr = this.insOffsetMatrixStr;
             let len = 4;
             let rawdata = _wmat.rawData;
             for(let i=0;i<len;i++){
