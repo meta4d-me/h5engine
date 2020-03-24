@@ -4,54 +4,46 @@ uniform sampler2D _MainTex;
 
 uniform vec4 u_color;
 
-#ifdef EXTENDED_PARTICLES
-    uniform float _EmissionSaturation;
-    uniform float _OpacitySaturation;
-    uniform float _ColorMultiplier;
+uniform float EXTENDED_PARTICLES;
+uniform float _EmissionSaturation;
+uniform float _OpacitySaturation;
+uniform float _ColorMultiplier;
 
-    #ifdef COLOR_RAMP
-        uniform sampler2D _ColorRamp;
-        uniform vec4 _ColorRamp_ST;
-    #else
-        #if defined(COLOR_TINT)
-            uniform vec4 _BasicColor;
-        #else
-            uniform vec4 _BasicColor;
-            uniform vec4 _SaturatedColor;
-        #endif
-    #endif
+uniform float COLOR_RAMP;
+uniform sampler2D _ColorRamp;
+uniform vec4 _ColorRamp_ST;
+uniform float COLOR_TINT;
+uniform vec4 _BasicColor;
+uniform vec4 _SaturatedColor;
 
-    #ifdef DISSOLVE_ENABLED
-        uniform vec4 _DissolveStep;
-    #endif
+uniform float DISSOLVE_ENABLED;
+uniform vec4 _DissolveStep;
 
-    #ifdef NOISE_TEXTURE
-        uniform sampler2D _NoiseTex;
-    #endif
-#else
-    uniform vec4 _TintColor;
+uniform float NOISE_TEXTURE;
+uniform sampler2D _NoiseTex;
+uniform vec4 _TintColor;
 
-    #ifdef EMISSIVEPOWER
-        uniform float _EmissivePower;
-    #endif
-#endif
+uniform float EMISSIVEPOWER;
+uniform float _EmissivePower;
 
-#ifdef BLENDMODE_ADDITIVEALPHABLEND
-    uniform float _ABOffset;
-#endif
+uniform float BLENDMODE_ADDITIVEALPHABLEND;
+uniform float _ABOffset;
 
 uniform float _GlobalAlpha;
 
 varying vec2 v_uv;
 varying vec4 v_color;
 
-#ifdef EXTENDED_PARTICLES
-    varying vec2 v_particledata;
-#endif
+varying vec2 v_particledata;
+varying vec2 v_noiseuv;
 
-#ifdef NOISE_TEXTURE
-    varying vec2 v_noiseuv;
-#endif
+uniform float APPLY_RGB_COLOR_VERTEX;
+uniform float NOISE_TEXTURE_EMISSION;
+uniform float NOISE_TEXTURE_ALPHA;
+uniform float NOISE_TEXTURE_DISSOLVE;
+uniform float BLENDMODE_ALPHABLEND;
+uniform float BLENDMODE_ADDITIVEDOUBLE;
+uniform float BLENDMODE_SOFTADDITIVE;
 
 void main() 
 {
@@ -59,110 +51,148 @@ void main()
 
     vec4 col = vec4(1.0, 1.0, 1.0, 1.0);
 
+    vec4 vcolor = vec4(1.0, 1.0, 1.0, v_color.w);
 
-    #ifdef EXTENDED_PARTICLES
+    if( EXTENDED_PARTICLES > 0.5 )
+    {
+        if( APPLY_RGB_COLOR_VERTEX > 0.5)
+        {
+            vcolor = v_color;
+        }
 
-        #ifdef APPLY_RGB_COLOR_VERTEX
-            vec4 vcolor = v_color;
-        #else
-            vec4 vcolor = vec4(1.0, 1.0, 1.0, v_color.w);
-        #endif
-    
-        #ifdef NOISE_TEXTURE
+        float nEmission = 1.0;
+        float nAlpha = 1.0;
+        float nDissolve = 1.0;
         
+        if( NOISE_TEXTURE > 0.5)
+        {
             vec3 noise = texture2D(_NoiseTex, v_noiseuv).xyz;
         
-            #ifdef NOISE_TEXTURE_EMISSION
-                float nEmission = noise.x;
-            #else
-                float nEmission = 1.0;
-            #endif
+            if( NOISE_TEXTURE_EMISSION > 0.5)
+            {
+                nEmission = noise.x;
+            }
+            else
+            {
+                nEmission = 1.0;
+            }
             
-            #ifdef NOISE_TEXTURE_ALPHA
-                float nAlpha = noise.y;
-            #else
-                float nAlpha = 1.0;
-            #endif
+            if( NOISE_TEXTURE_ALPHA > 0.5)
+            {
+                nAlpha = noise.y;
+            }
+            else
+            {
+                nAlpha = 1.0;
+            }
             
-            #ifdef NOISE_TEXTURE_DISSOLVE
-                float nDissolve = noise.z;
-            #else
-                float nDissolve = 1.0;
-            #endif
-        
-        #else
-            float nEmission = 1.0;
-            float nAlpha = 1.0;
-            float nDissolve = 1.0;
-        #endif
+            if( NOISE_TEXTURE_DISSOLVE > 0.5)
+            {
+                nDissolve = noise.z;
+            }
+            else
+            {
+                nDissolve = 1.0;
+            }
+        }
     
-        #ifdef DISSOLVE_ENABLED
+        if( DISSOLVE_ENABLED > 0.5)
+        {
             float ramp = -1.0 + (v_particledata.x * 2.0);
             col.a = clamp(tex.g * smoothstep(_DissolveStep.x, _DissolveStep.y, (tex.b + ramp) * nDissolve) * _OpacitySaturation * vcolor.w * nAlpha, 0.0, 1.0);
-        #else
+        }
+        else
+        {
             col.a = clamp(tex.g * _OpacitySaturation * vcolor.w, 0.0, 1.0) * nAlpha;
-        #endif
+        }
     
-        #if !defined(COLOR_TINT)
-            float lerpValue = clamp(tex.r * v_particledata.y * _ColorMultiplier * nEmission, 0.0, 1.0);
-        #endif
+        float lerpValue = 0.0;
+        if(COLOR_TINT < 0.5)
+        {
+            lerpValue = clamp(tex.r * v_particledata.y * _ColorMultiplier * nEmission, 0.0, 1.0);
+        }
     
-        #ifdef BLENDMODE_ALPHABLEND
-            #ifdef COLOR_RAMP
+        if( BLENDMODE_ALPHABLEND > 0.5)
+        {
+            if( COLOR_RAMP > 0.5)
+            {
                 col.xyz = texture2D(_ColorRamp, vec2((1.0 - lerpValue), 0.0)).xyz * vcolor.xyz * _EmissionSaturation;
-            #else
-                #ifdef COLOR_TINT
+            }
+            else
+            {
+                if( COLOR_TINT > 0.5)
+                {
                     col.xyz = tex.x * _BasicColor.xyz * vcolor.xyz * nEmission * _EmissionSaturation;
-                #else
+                }
+                else
+                {
                     col.xyz = mix(_BasicColor.xyz * vcolor.xyz, _SaturatedColor.xyz, lerpValue) * _EmissionSaturation;
-                #endif
-            #endif
+                }
+            }
             col.a *= _GlobalAlpha;
-        #else
-            #ifdef COLOR_RAMP
+        }
+        else
+        {
+            if( COLOR_RAMP > 0.5)
+            {
                 col.xyz = texture2D(_ColorRamp, vec2((1.0 - lerpValue), 0.0)).xyz * vcolor.xyz * col.a * _EmissionSaturation;
-            #else
-                #ifdef COLOR_TINT
+            }
+            else
+            {
+                if( COLOR_TINT > 0.5 )
+                {
                     col.xyz = tex.x * _BasicColor.xyz * vcolor.xyz * nEmission * _EmissionSaturation * col.a;
-                #else
+                }
+                else
+                {
                     col.xyz = mix(_BasicColor.xyz * vcolor.xyz, _SaturatedColor.xyz, lerpValue) * col.a * _EmissionSaturation;
-                #endif
-            #endif
+                }
+            }
             col *= _GlobalAlpha;
-        #endif
-    
-    #else
-    
-        #ifdef BLENDMODE_ADDITIVEALPHABLEND
+        }
+    }
+    else
+    {
+        if( BLENDMODE_ADDITIVEALPHABLEND > 0.5)
+        {
             tex *= _TintColor;
             float luminance = clamp(dot(tex, vec4(0.2126, 0.7152, 0.0722, 0.0)) * tex.a * _ABOffset, 0.0, 1.0);
-            fixed4 one = fixed4(1, 1, 1, 1);
-            col = lerp(2.0 * (v_color * tex), one - 2.0 * (one - v_color) * (one - tex), luminance);
-        #else
+            vec4 one = vec4(1, 1, 1, 1);
+            col = mix(2.0 * (v_color * tex), one - 2.0 * (one - v_color) * (one - tex), luminance);
+        }
+        else
+        {
             col = v_color * tex;
             col *= _TintColor;
         
-            #ifdef EMISSIVEPOWER
+            if( EMISSIVEPOWER > 0.5)
+            {
                 col *= _EmissivePower;
-            #endif
+            }
             
-            #ifdef BLENDMODE_SOFTADDITIVE
+            if( BLENDMODE_SOFTADDITIVE > 0.5 )
+            {
                 col.rgb *= col.a;
-            #else
-                #ifdef BLENDMODE_ALPHABLEND
+            }
+            else
+            {
+                if( BLENDMODE_ALPHABLEND > 0.5 )
+                {
                     col *= 2.0;
-                #else
-                    #ifdef BLENDMODE_ADDITIVEDOUBLE
+                }
+                else
+                {
+                    if( BLENDMODE_ADDITIVEDOUBLE > 0.5 )
+                    {
                         col *= 4.0;
-                    #endif
-                #endif
-            #endif
-        
-        #endif
+                    }
+                }
+            }
+        }
     
         col *= _GlobalAlpha;
 
-    #endif
+    }
 
     gl_FragColor = col;
 }
