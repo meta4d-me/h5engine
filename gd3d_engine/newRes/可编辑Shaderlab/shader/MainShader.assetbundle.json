@@ -277,7 +277,23 @@
           "length":0
           },
       {
+          "name":"resources/particlesystem_additive_particles_standard.shader.json",
+          "length":0
+          },
+      {
           "name":"resources/particlesystem_alphablended.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/particlesystem_alphablended_particles_standard.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/particlesystem_particles_standard.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/particlesystem_particles_standard.vs.glsl",
           "length":0
           },
       {
