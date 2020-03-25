@@ -26,7 +26,6 @@ uniform vec4 _TintColor;
 uniform float EMISSIVEPOWER;
 uniform float _EmissivePower;
 
-uniform float BLENDMODE_ADDITIVEALPHABLEND;
 uniform float _ABOffset;
 
 uniform float _GlobalAlpha;
@@ -41,9 +40,8 @@ uniform float APPLY_RGB_COLOR_VERTEX;
 uniform float NOISE_TEXTURE_EMISSION;
 uniform float NOISE_TEXTURE_ALPHA;
 uniform float NOISE_TEXTURE_DISSOLVE;
-uniform float BLENDMODE_ALPHABLEND;
-uniform float BLENDMODE_ADDITIVEDOUBLE;
-uniform float BLENDMODE_SOFTADDITIVE;
+
+uniform float BlendMode;
 
 void main() 
 {
@@ -112,7 +110,7 @@ void main()
             lerpValue = clamp(tex.r * v_particledata.y * _ColorMultiplier * nEmission, 0.0, 1.0);
         }
     
-        if( BLENDMODE_ALPHABLEND > 0.5)
+        if( 2.5 < BlendMode && BlendMode < 3.5 ) //3
         {
             if( COLOR_RAMP > 0.5)
             {
@@ -153,7 +151,7 @@ void main()
     }
     else
     {
-        if( BLENDMODE_ADDITIVEALPHABLEND > 0.5)
+        if( 3.5 < BlendMode && BlendMode < 4.5 ) //4
         {
             tex *= _TintColor;
             float luminance = clamp(dot(tex, vec4(0.2126, 0.7152, 0.0722, 0.0)) * tex.a * _ABOffset, 0.0, 1.0);
@@ -170,19 +168,19 @@ void main()
                 col *= _EmissivePower;
             }
             
-            if( BLENDMODE_SOFTADDITIVE > 0.5 )
+            if( 0.5 < BlendMode && BlendMode < 1.5 ) //1
             {
                 col.rgb *= col.a;
             }
             else
             {
-                if( BLENDMODE_ALPHABLEND > 0.5 )
+                if( 2.5 < BlendMode && BlendMode < 3.5 ) //3
                 {
                     col *= 2.0;
                 }
                 else
                 {
-                    if( BLENDMODE_ADDITIVEDOUBLE > 0.5 )
+                    if( 1.5 < BlendMode && BlendMode < 2.5 ) //2
                     {
                         col *= 4.0;
                     }
