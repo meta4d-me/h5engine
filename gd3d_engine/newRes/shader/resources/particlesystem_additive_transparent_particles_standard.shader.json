@@ -48,8 +48,8 @@
         "blendmode": "add",
         "showface": "all",
         "zwrite": "off",
-        "vs": "transparent_particles_standard",
-        "fs": "transparent_particles_standard"
+        "vs": "particlesystem_transparent_particles_standard",
+        "fs": "particlesystem_transparent_particles_standard"
       }
     ],
     "base_fog": [
@@ -57,8 +57,8 @@
         "blendmode": "add",
         "showface": "all",
         "zwrite": "off",
-        "vs": "transparent_particles_standard",
-        "fs": "transparent_particles_standard"
+        "vs": "particlesystem_transparent_particles_standard",
+        "fs": "particlesystem_transparent_particles_standard"
       }
     ],
     "shadowgen": [],

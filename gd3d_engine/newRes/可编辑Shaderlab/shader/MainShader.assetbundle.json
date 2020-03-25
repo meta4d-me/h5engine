@@ -277,7 +277,7 @@
           "length":0
           },
       {
-          "name":"resources/particlesystem_additive_particles_standard.shader.json",
+          "name":"resources/particlesystem_additive_transparent_particles_standard.shader.json",
           "length":0
           },
       {
@@ -285,15 +285,15 @@
           "length":0
           },
       {
-          "name":"resources/particlesystem_alphablended_particles_standard.shader.json",
+          "name":"resources/particlesystem_alphablended_transparent_particles_standard.shader.json",
           "length":0
           },
       {
-          "name":"resources/particlesystem_particles_standard.fs.glsl",
+          "name":"resources/particlesystem_transparent_particles_standard.fs.glsl",
           "length":0
           },
       {
-          "name":"resources/particlesystem_particles_standard.vs.glsl",
+          "name":"resources/particlesystem_transparent_particles_standard.vs.glsl",
           "length":0
           },
       {

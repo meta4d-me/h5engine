@@ -30,8 +30,8 @@ void main()
     vec3 position = _glesVertex;
     gl_Position = glstate_matrix_mvp * vec4(position, 1.0);
     v_uv = _glesMultiTexCoord0 * _MainTex_ST.xy + _MainTex_ST.zw + (_Panning.xy * glstate_timer);
-    // v_color = _glesColor;
-    v_color = vec4(1.0,1.0,1.0,1.0);
+    v_color = _glesColor;
+    // v_color = vec4(1.0,1.0,1.0,1.0);
 
     if(EXTENDED_PARTICLES > 0.5)
     {
