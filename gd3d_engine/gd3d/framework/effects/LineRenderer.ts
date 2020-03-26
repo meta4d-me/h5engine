@@ -15,6 +15,11 @@ namespace gd3d.framework
 
         protected mesh = new gd3d.framework.mesh("LineRenderer" + ".mesh.bin");
 
+        /**
+         * 使用线段渲染
+         */
+        useSegmentMode = false;
+
         @gd3d.reflect.Field("LineRendererData")
         get lineRendererData()
         {
@@ -62,7 +67,7 @@ namespace gd3d.framework
             if (this.positions.length < 2) return;
 
             // 上传网格数据
-            LineRenderer.uploadMesh(this.mesh, assetmgr.webgl);
+            LineRenderer.uploadMesh(this.mesh, assetmgr.webgl, this.useSegmentMode);
 
             // 绘制
             LineRenderer.draw(context, this.gameObject, this.mesh, this.material);
@@ -123,6 +128,11 @@ namespace gd3d.framework
             var lineWidth = this.lineWidth;
             var alignment = this.alignment;
             var colorGradient = this.colorGradient;
+
+            if(this.useSegmentMode)
+            {
+                lineWidth = new MinMaxCurve();
+            }
 
             // 计算摄像机本地坐标
             var cameraPosition = new math.vector3();
@@ -202,12 +212,16 @@ namespace gd3d.framework
             data.color = [];
         }
 
-        static uploadMesh(_mesh: mesh, webgl: WebGLRenderingContext)
+        static uploadMesh(_mesh: mesh, webgl: WebGLRenderingContext, line = false)
         {
             var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal | gd3d.render.VertexFormatMask.Tangent | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
             _mesh.data.originVF = vf;
             var v32 = _mesh.data.genVertexDataArray(vf);
             var i16 = _mesh.data.genIndexDataArray();
+            if (line)
+            {
+                i16 = _mesh.data.genIndexDataArrayTri2Line();
+            }
 
             _mesh.glMesh = new gd3d.render.glMesh();
             _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
@@ -223,7 +237,7 @@ namespace gd3d.framework
                 sm.useVertexIndex = 0;
                 sm.start = 0;
                 sm.size = i16.length;
-                sm.line = false;
+                sm.line = line;
                 _mesh.submesh.push(sm);
             }
         }

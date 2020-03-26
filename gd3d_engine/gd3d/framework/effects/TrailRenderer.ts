@@ -13,6 +13,8 @@ namespace gd3d.framework
 
         private mesh = new gd3d.framework.mesh("TrailRenderer" + ".mesh.bin");
 
+        
+        
         /**
          * @public
          * @language zh_CN

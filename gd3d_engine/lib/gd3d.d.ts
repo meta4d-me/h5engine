@@ -4267,6 +4267,7 @@ declare namespace gd3d.framework {
     export class LineRenderer extends LineRendererBase implements IRenderer {
         static readonly ClassName: string;
         protected mesh: mesh;
+        useSegmentMode: boolean;
         get lineRendererData(): LineRendererData;
         set lineRendererData(v: LineRendererData);
         private _lineRendererData;
@@ -4280,7 +4281,7 @@ declare namespace gd3d.framework {
         BakeMesh(mesh: mesh, camera: camera, useTransform: boolean): void;
         static draw(context: renderContext, go: gameObject, mesh: mesh, material: material): void;
         static clearMesh(mesh: mesh): void;
-        static uploadMesh(_mesh: mesh, webgl: WebGLRenderingContext): void;
+        static uploadMesh(_mesh: mesh, webgl: WebGLRenderingContext, line?: boolean): void;
         static calcMesh(positionVectex: {
             vertexs: math.vector3[];
             tangent: math.vector3;

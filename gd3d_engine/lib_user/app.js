@@ -4286,6 +4286,7 @@ var test_LineRenderer = (function () {
         this.numCornerVertices = 0;
         this.uSpeed = 0;
         this.vSpeed = 0;
+        this.useSegmentMode = false;
         this.res = "Line";
     }
     test_LineRenderer.prototype.start = function (app) {
@@ -4322,6 +4323,7 @@ var test_LineRenderer = (function () {
         gui.add(this, 'numCornerVertices');
         gui.add(this, 'uSpeed');
         gui.add(this, 'vSpeed');
+        gui.add(this, 'useSegmentMode');
     };
     test_LineRenderer.prototype.init = function () {
         var objCam = new gd3d.framework.transform();
@@ -4384,6 +4386,7 @@ var test_LineRenderer = (function () {
             this.lr.numCornerVertices = this.numCornerVertices;
             this.lr.uvSpeed.x = this.uSpeed;
             this.lr.uvSpeed.y = this.vSpeed;
+            this.lr.useSegmentMode = this.useSegmentMode;
         }
     };
     return test_LineRenderer;

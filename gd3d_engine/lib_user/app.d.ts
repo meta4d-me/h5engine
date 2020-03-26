@@ -665,6 +665,7 @@ declare class test_LineRenderer implements IState {
     numCornerVertices: number;
     uSpeed: number;
     vSpeed: number;
+    useSegmentMode: boolean;
     res: string;
     start(app: gd3d.framework.application): Promise<void>;
     setGUI(): void;

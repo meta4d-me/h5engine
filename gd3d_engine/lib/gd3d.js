@@ -22063,6 +22063,7 @@ var gd3d;
             function LineRenderer() {
                 var _this = _super !== null && _super.apply(this, arguments) || this;
                 _this.mesh = new gd3d.framework.mesh("LineRenderer" + ".mesh.bin");
+                _this.useSegmentMode = false;
                 return _this;
             }
             LineRenderer_1 = LineRenderer;
@@ -22103,7 +22104,7 @@ var gd3d;
                 this.BakeMesh(this.mesh, camera, false);
                 if (this.positions.length < 2)
                     return;
-                LineRenderer_1.uploadMesh(this.mesh, assetmgr.webgl);
+                LineRenderer_1.uploadMesh(this.mesh, assetmgr.webgl, this.useSegmentMode);
                 LineRenderer_1.draw(context, this.gameObject, this.mesh, this.material);
             };
             LineRenderer.prototype.onPlay = function () {
@@ -22134,6 +22135,9 @@ var gd3d;
                 var lineWidth = this.lineWidth;
                 var alignment = this.alignment;
                 var colorGradient = this.colorGradient;
+                if (this.useSegmentMode) {
+                    lineWidth = new framework.MinMaxCurve();
+                }
                 var cameraPosition = new gd3d.math.vector3();
                 gd3d.math.vec3Clone(camera.gameObject.transform.getWorldPosition(), cameraPosition);
                 gd3d.math.matrixTransformVector3(cameraPosition, this.worldToLocalMatrix, cameraPosition);
@@ -22177,11 +22181,15 @@ var gd3d;
                 data.uv = [];
                 data.color = [];
             };
-            LineRenderer.uploadMesh = function (_mesh, webgl) {
+            LineRenderer.uploadMesh = function (_mesh, webgl, line) {
+                if (line === void 0) { line = false; }
                 var vf = gd3d.render.VertexFormatMask.Position | gd3d.render.VertexFormatMask.Normal | gd3d.render.VertexFormatMask.Tangent | gd3d.render.VertexFormatMask.Color | gd3d.render.VertexFormatMask.UV0;
                 _mesh.data.originVF = vf;
                 var v32 = _mesh.data.genVertexDataArray(vf);
                 var i16 = _mesh.data.genIndexDataArray();
+                if (line) {
+                    i16 = _mesh.data.genIndexDataArrayTri2Line();
+                }
                 _mesh.glMesh = new gd3d.render.glMesh();
                 _mesh.glMesh.initBuffer(webgl, vf, _mesh.data.pos.length);
                 _mesh.glMesh.uploadVertexData(webgl, v32);
@@ -22194,7 +22202,7 @@ var gd3d;
                     sm.useVertexIndex = 0;
                     sm.start = 0;
                     sm.size = i16.length;
-                    sm.line = false;
+                    sm.line = line;
                     _mesh.submesh.push(sm);
                 }
             };

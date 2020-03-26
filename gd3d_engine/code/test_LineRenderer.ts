@@ -20,6 +20,7 @@ class test_LineRenderer implements IState
     numCornerVertices = 0;
     uSpeed = 0;
     vSpeed = 0;
+    useSegmentMode = false;
 
     res = "Line";
 
@@ -52,6 +53,7 @@ class test_LineRenderer implements IState
         gui.add(this, 'numCornerVertices');
         gui.add(this, 'uSpeed');
         gui.add(this, 'vSpeed');
+        gui.add(this, 'useSegmentMode');
     }
 
     private init()
@@ -124,6 +126,7 @@ class test_LineRenderer implements IState
             this.lr.numCornerVertices = this.numCornerVertices;
             this.lr.uvSpeed.x = this.uSpeed;
             this.lr.uvSpeed.y = this.vSpeed;
+            this.lr.useSegmentMode = this.useSegmentMode;
         }
     }
 }
