@@ -293,13 +293,6 @@ class test_UI_Component implements IState {
         ct.addChild(raw_t2);
         
 
-        let line = new gd3d.framework.transform2D();
-        line.name = "线条";
-        line.width = 400;
-        line.height = 300;
-        let linec = line.addComponent("LineRenderer2d") as gd3d.framework.LineRenderer2d;
-        
-
         test_UI_Component.temp = iptFrame_t;
 
 
