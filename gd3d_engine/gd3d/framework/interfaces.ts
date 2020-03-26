@@ -80,4 +80,19 @@ namespace gd3d.framework {
 
         render(context: renderContext, assetmgr: assetMgr, camera: camera);
     }
+
+    /**
+     * 
+     */
+    export interface IRendererGpuIns extends IRenderer{
+        // /**
+        //  * 执行GPU Instancing 绘制
+        //  * @param context 
+        //  * @param assetmgr 
+        //  * @param camera 
+        //  */
+        // GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera);
+        /** 是否开启 GPU Instancing 绘制 */
+        isGpuInstancing () : boolean;
+    }
 }

@@ -1,4 +1,3 @@
-/// <reference path="Reflect.d.ts" />
 declare namespace gd3d {
     class version {
         static readonly VERSION = "0.0.1";
@@ -217,6 +216,9 @@ declare namespace gd3d.framework {
         renderLayer: number;
         queue: number;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): any;
+    }
+    interface IRendererGpuIns extends IRenderer {
+        isGpuInstancing(): boolean;
     }
 }
 declare namespace gd3d.framework {
@@ -947,6 +949,7 @@ declare namespace gd3d.framework {
         private datar;
         color: math.color;
         color2: math.color;
+        outlineWidth: number;
         private static readonly defUIShader;
         private static readonly defMaskUIShader;
         private _CustomShaderName;
@@ -2308,7 +2311,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class meshRenderer implements IRenderer {
+    class meshRenderer implements IRendererGpuIns {
         static readonly ClassName: string;
         constructor();
         gameObject: gameObject;
@@ -2329,6 +2332,14 @@ declare namespace gd3d.framework {
         private refreshLayerAndQue;
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
+        private static helpIMatrix;
+        static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera, instanceArray: IRendererGpuIns[]): void;
+        private static readonly insOffsetMatrixStr;
+        private static setInstanceOffsetMatrix;
+        private static instanceDrawType;
+        private static _vbos;
+        private static _getVBO;
+        isGpuInstancing(): boolean;
         remove(): void;
         clone(): void;
     }
@@ -2455,14 +2466,17 @@ declare namespace gd3d.framework {
     interface DrawInstanceInfo {
         instanceCount: number;
         initBuffer(gl: WebGLRenderingContext): void;
-        activeAttributes(gl: WebGLRenderingContext, program: WebGLProgram): void;
-        disableAttributes(gl: WebGLRenderingContext, program: WebGLProgram): void;
+        activeAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
+        disableAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
     }
     class material implements IAsset {
         static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
+        private _enableGpuInstancing;
+        get enableGpuInstancing(): boolean;
+        set enableGpuInstancing(enable: boolean);
         constructor(assetName?: string);
         getName(): string;
         getGUID(): number;
@@ -2472,6 +2486,12 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         private static sameMatPassMap;
         uploadUnifoms(pass: render.glDrawPass, context: renderContext, lastMatSame?: boolean): void;
+        instanceAttribValMap: {
+            [id: string]: number[];
+        };
+        uploadInstanceAtteribute(pass: render.glDrawPass, setContainer: number[]): void;
+        private setInstanceAttribValue;
+        private isNotBuildinAttribId;
         setShader(shader: shader): void;
         getLayer(): RenderLayerEnum;
         private queue;
@@ -3309,17 +3329,41 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    enum AnimationCullingType {
+        AlwaysAnimate = 0,
+        BasedOnRenderers = 1,
+        BasedOnClipBounds = 2,
+        BasedOnUserBounds = 3
+    }
     class keyFrameAniPlayer implements INodeComponent {
         static readonly ClassName: string;
         clips: keyFrameAniClip[];
-        private nowClip;
+        private clipMap;
+        private _nowClip;
         private get nowFrame();
         private nowTime;
         private pathPropertyMap;
         gameObject: gameObject;
+        private playEndDic;
+        private _currClipName;
+        get currClipName(): string;
+        private _speed;
+        get speed(): number;
+        set speed(v: number);
+        private _animateOnlyIfVisible;
+        get animateOnlyIfVisible(): boolean;
+        set animateOnlyIfVisible(v: boolean);
+        private _cullingType;
+        get cullingType(): AnimationCullingType;
+        set cullingType(v: AnimationCullingType);
+        private _localBounds;
+        get localBounds(): aabb;
+        set localBounds(v: aabb);
+        private endNormalizedTime;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
+        getClip(clipName: string): keyFrameAniClip;
         private displayByTime;
         private static lhvec;
         private static rhvec;
@@ -3336,11 +3380,13 @@ declare namespace gd3d.framework {
         private timeFilterCurves;
         private checkPlayEnd;
         private init;
-        isPlaying(ClipName: string): boolean;
-        playByName(ClipName: string): void;
-        play(): void;
+        isPlaying(ClipName?: string): boolean;
+        play(ClipName?: string, onPlayEnd?: () => void, normalizedTime?: number): void;
+        private playByClip;
+        private OnClipPlayEnd;
         stop(): void;
         rewind(): void;
+        addClip(clip: keyFrameAniClip): void;
         private collectPropertyObj;
         private collectPathPropertyObj;
         private serchChild;
@@ -7359,6 +7405,7 @@ declare namespace gd3d.framework {
         updateLights(lights: light[]): void;
         updateOverlay(): void;
         updateModel(model: transform): void;
+        updateModelByMatrix(m_matrix: gd3d.math.matrix): void;
         updateModeTrail(): void;
         updateLightMask(layer: number): void;
     }
@@ -7370,13 +7417,17 @@ declare namespace gd3d.framework {
     class renderList {
         constructor();
         clear(): void;
-        addRenderer(renderer: IRenderer): void;
+        addRenderer(renderer: IRenderer, webgl: WebGLRenderingContext): void;
         renderLayers: renderLayer[];
     }
     class renderLayer {
         needSort: boolean;
         list: IRenderer[];
         constructor(_sort?: boolean);
+        gpuInstanceMap: {
+            [sID: string]: IRendererGpuIns[];
+        };
+        addInstance(r: IRendererGpuIns): void;
     }
 }
 declare namespace gd3d.framework {
@@ -8649,6 +8700,11 @@ declare namespace gd3d.render {
         type: UniformTypeEnum;
         location: WebGLUniformLocation;
     }
+    class attribute {
+        name: string;
+        size: number;
+        location: number;
+    }
     enum ShaderTypeEnum {
         VS = 0,
         FS = 1
@@ -8660,8 +8716,19 @@ declare namespace gd3d.render {
         shader: WebGLShader;
     }
     class glProgram {
+        private static buildInAtrribute;
+        static isBuildInAttrib(attribID: string): boolean;
         constructor(vs: glShader, fs: glShader, program: WebGLProgram);
+        mapAttrib: {
+            [id: string]: attribute;
+        };
+        mapCustomAttrib: {
+            [id: string]: attribute;
+        };
+        private _strideInsAttrib;
+        get strideInsAttrib(): number;
         initAttribute(webgl: WebGLRenderingContext): void;
+        private tryGetLocation;
         vs: glShader;
         fs: glShader;
         program: WebGLProgram;

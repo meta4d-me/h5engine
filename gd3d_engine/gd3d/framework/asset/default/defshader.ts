@@ -229,6 +229,9 @@ namespace gd3d.framework
         static fscodefontUI: string = ` 
             precision mediump float ; 
             uniform sampler2D _MainTex; 
+
+            uniform highp float _outlineWidth; // 描边宽度
+
             varying lowp vec4 xlv_COLOR; // 字体颜色
             varying lowp vec4 xlv_COLOREx; // 描边颜色
             varying highp vec2 xlv_TEXCOORD0;     
@@ -240,7 +243,8 @@ namespace gd3d.framework
                 
                 float _DistanceMark = 0.0; // 距离为 0 处是字符边缘
                 float _SmoothDelta = 0.5; // 在字符边缘 0.5 像素进行插值 
-                float _OutlineDistanceMark = -1.0; // 描边位置
+
+                float _OutlineDistanceMark = -_outlineWidth; // 描边位置
 
                 vec4 col = texture2D(_MainTex, xlv_TEXCOORD0);
                 float distance = col.r * 4.0 - 2.0;
@@ -258,7 +262,7 @@ namespace gd3d.framework
                 // Outlining 描边
                 vec4 outlineCol = vec4(1.0,1.0,1.0,1.0);
 
-                outlineCol.a = smoothstep(_OutlineDistanceMark - _SmoothDelta, _OutlineDistanceMark + _SmoothDelta, distance);
+                outlineCol.a = smoothstep(_OutlineDistanceMark - _outlineWidth, _OutlineDistanceMark + _outlineWidth, distance);
                 outlineCol.rgb = xlv_COLOREx.rgb;
                 outlineCol.a = outlineCol.a * xlv_COLOREx.a;
                 
@@ -595,7 +599,7 @@ namespace gd3d.framework
                 p.setProgram(programuifont);
                 sh.passes["base"].push(p);
                 sh.fillUnDefUniform(p);
-                sh._parseProperties(assetmgr, JSON.parse(this.shaderuifront).properties);
+                // sh._parseProperties(assetmgr, JSON.parse(this.shaderuifront).properties);
                 p.state_showface = render.ShowFaceStateEnum.ALL;
                 p.state_ztest = false;
                 p.state_zwrite = false;

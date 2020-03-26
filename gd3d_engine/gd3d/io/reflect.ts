@@ -1,4 +1,4 @@
-/// <reference path="../../lib/Reflect.d.ts"/>
+///// <reference path="../../lib/Reflect.d.ts"/>
 
 
 namespace gd3d {
@@ -59,13 +59,13 @@ namespace gd3d {
             target["__gdmeta__"][funcname]["type"] = "function";
 
             //fill meta
-            var tp = Reflect.getMetadata("design:paramtypes", target, funcname);
-            var tr = Reflect.getMetadata("design:returntype", target, funcname);
-            target["__gdmeta__"][funcname]["paramtypes"] = [];
-            for (var i in tp) {
-                target["__gdmeta__"][funcname]["paramtypes"][i] = tp[i]["name"];
-            }
-            target["__gdmeta__"][funcname]["returntype"] = tr == null ? null : tr["name"];
+            // var tp = Reflect.getMetadata("design:paramtypes", target, funcname);
+            // var tr = Reflect.getMetadata("design:returntype", target, funcname);
+            // target["__gdmeta__"][funcname]["paramtypes"] = [];
+            // for (var i in tp) {
+            //     target["__gdmeta__"][funcname]["paramtypes"][i] = tp[i]["name"];
+            // }
+            // target["__gdmeta__"][funcname]["returntype"] = tr == null ? null : tr["name"];
 
             //fill custom info
             if (target["__gdmeta__"][funcname]["custom"] == null)

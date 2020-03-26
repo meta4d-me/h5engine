@@ -878,7 +878,7 @@ namespace gd3d.framework
 
             if (islayerPass && !this.cullingMap[id])  //判断加入到渲染列表
             {
-                scene.renderList.addRenderer(renderer);
+                scene.renderList.addRenderer(renderer,scene.webgl);
             }
 
             if (node.children)
@@ -1114,7 +1114,8 @@ namespace gd3d.framework
             for (let i = 0, l = rlayers.length; i < l; ++i)
             {
                 let ls = rlayers[i].list;
-                for (let j = 0, jl = ls.length; j < jl; ++j)
+                let len = ls.length;
+                for (let j = 0 ; j < len; ++j)
                 // for (let item of layer.list)
                 {
                     let item = ls[j];
@@ -1125,6 +1126,14 @@ namespace gd3d.framework
                     //     if (item.gameObject && item.gameObject.visible == true)
                     //         item.render(context, assetmgr, this);
                     // }
+                }
+
+                //gpu instancing process
+                let rmap = rlayers[i].gpuInstanceMap;
+                for(let key in rmap){
+                    let gpuList = rmap[key];
+                    if(!gpuList) continue;
+                    meshRenderer.GpuInstancingRender(context, assetmgr, this , gpuList);
                 }
             }
             // for (var i = 0; i < scene.renderList.renderLayers.length; i++)

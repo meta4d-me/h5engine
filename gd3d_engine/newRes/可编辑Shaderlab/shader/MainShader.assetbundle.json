@@ -53,6 +53,18 @@
           "length":0
           },
       {
+          "name":"resources/demo_gpu_ins.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/demo_gpu_ins.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/demo_gpu_instancing.shader.json",
+          "length":0
+          },
+      {
           "name":"resources/diffuse.fs.glsl",
           "length":0
           },
@@ -277,7 +289,23 @@
           "length":0
           },
       {
+          "name":"resources/particlesystem_additive_transparent_particles_standard.shader.json",
+          "length":0
+          },
+      {
           "name":"resources/particlesystem_alphablended.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/particlesystem_alphablended_transparent_particles_standard.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/particlesystem_transparent_particles_standard.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/particlesystem_transparent_particles_standard.vs.glsl",
           "length":0
           },
       {
@@ -397,6 +425,18 @@
           "length":0
           },
       {
+          "name":"resources/simple.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/simple.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/simple.vs.glsl",
+          "length":0
+          },
+      {
           "name":"resources/skybox.fs.glsl",
           "length":0
           },
@@ -470,6 +510,18 @@
           },
       {
           "name":"resources/transparent.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/transparent_particles_standard.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/transparent_particles_standard.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/transparent_particles_standard.vs.glsl",
           "length":0
           },
       {
