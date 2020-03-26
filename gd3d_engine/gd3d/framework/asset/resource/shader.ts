@@ -162,11 +162,11 @@ namespace gd3d.framework
                 var curpasses: render.glDrawPass[];
 
                 //限制一下pass的名字
-                if (key == "base" || key == "lightmap" || key == "skin" || key == "quad")
+                if (key == "base" || key == "instance" || key == "lightmap" || key == "skin" || key == "quad")
                 {
 
                 }
-                else if (key.indexOf("base_") == 0 || key.indexOf("lightmap_") == 0 || key.indexOf("skin_") == 0)
+                else if (key.indexOf("base_") == 0 || key.indexOf("instance_") == 0 || key.indexOf("lightmap_") == 0 || key.indexOf("skin_") == 0)
                 {
 
                 }
