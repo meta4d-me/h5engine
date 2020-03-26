@@ -446,6 +446,12 @@ namespace gd3d.framework
         @reflect.UIStyle("color")
         color2: math.color = new math.color(0, 0, 0.5, 0.5);
 
+        /**
+         * 描边宽度
+         */
+        @reflect.Field("number")
+        outlineWidth = 0.75;
+
         private static readonly defUIShader = `shader/defuifont`;
         private static readonly defMaskUIShader = `shader/defmaskfont`;
 
@@ -585,6 +591,9 @@ namespace gd3d.framework
                         this._cacheMaskV4.x = rect.x; this._cacheMaskV4.y = rect.y; this._cacheMaskV4.z = rect.w; this._cacheMaskV4.w = rect.h;
                         mat.setVector4("_maskRect", this._cacheMaskV4);
                     }
+                }else
+                {
+                    mat.setFloat("_outlineWidth", this.outlineWidth);
                 }
 
                 if (this.datar.length != 0)

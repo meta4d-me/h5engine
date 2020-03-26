@@ -5286,6 +5286,7 @@ var gd3d;
                 this.datar = [];
                 this.color = new gd3d.math.color(1, 1, 1, 1);
                 this.color2 = new gd3d.math.color(0, 0, 0.5, 0.5);
+                this.outlineWidth = 0.75;
                 this._CustomShaderName = "";
                 this.dirtyData = true;
                 this.min_x = Number.MAX_VALUE;
@@ -5565,6 +5566,9 @@ var gd3d;
                             mat.setVector4("_maskRect", this._cacheMaskV4);
                         }
                     }
+                    else {
+                        mat.setFloat("_outlineWidth", this.outlineWidth);
+                    }
                     if (this.datar.length != 0)
                         canvas.pushRawData(mat, this.datar);
                 }
@@ -5684,6 +5688,10 @@ var gd3d;
                 gd3d.reflect.UIStyle("color"),
                 __metadata("design:type", gd3d.math.color)
             ], label.prototype, "color2", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Object)
+            ], label.prototype, "outlineWidth", void 0);
             label = label_1 = __decorate([
                 gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeRender
@@ -9520,7 +9528,6 @@ var gd3d;
                     p.setProgram(programuifont);
                     sh.passes["base"].push(p);
                     sh.fillUnDefUniform(p);
-                    sh._parseProperties(assetmgr, JSON.parse(this.shaderuifront).properties);
                     p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
                     p.state_ztest = false;
                     p.state_zwrite = false;
@@ -9668,7 +9675,7 @@ var gd3d;
             ]\
             }";
             defShader.vscodefontUI = " \n        attribute vec4 _glesVertex;    \n        attribute vec4 _glesColor;                   \n        attribute vec4 _glesColorEx;                   \n        attribute vec4 _glesMultiTexCoord0;          \n        uniform highp mat4 glstate_matrix_mvp;       \n        varying lowp vec4 xlv_COLOR;                 \n        varying lowp vec4 xlv_COLOREx;                                                  \n        varying highp vec2 xlv_TEXCOORD0;            \n        void main()                                      \n        {                                                \n            highp vec4 tmpvar_1;                         \n            tmpvar_1.w = 1.0;                            \n            tmpvar_1.xyz = _glesVertex.xyz;              \n            xlv_COLOR = _glesColor;                      \n            xlv_COLOREx = _glesColorEx;                      \n            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      \n            gl_Position = (glstate_matrix_mvp * tmpvar_1);   \n        }";
-            defShader.fscodefontUI = " \n            precision mediump float ; \n            uniform sampler2D _MainTex; \n            varying lowp vec4 xlv_COLOR; // \u5B57\u4F53\u989C\u8272\n            varying lowp vec4 xlv_COLOREx; // \u63CF\u8FB9\u989C\u8272\n            varying highp vec2 xlv_TEXCOORD0;     \n            void main()   \n            {  \n                // \u5728gd3d\u4E2D\u4F7F\u7528\u7684sdf\u5B57\u4F53\u505A\u4E86\u6700\u5927\u503C\u4E3A2\u50CF\u7D20\u7684\u6709\u5411\u8DDD\u79BB\u8FD0\u7B97\u4E14\u4FDD\u5B58\u5230\u4F4D\u56FE\u4E0A\u3002\n                // \u989C\u8272\u503C[0,255]\u5BF9\u4E8E\u533A\u95F4[-2,2]\u3002\n                // \u989C\u8272\u503Cv\u8868\u793A\u8DDD\u79BB\u5B57\u7B26\u8FB9\u7F18\u6709 (v/255*4-2) \u5355\u4F4D\u8DDD\u79BB\u3002\u5355\u4F4D\u8DDD\u79BB\u4E3A\u6B63\u8868\u793A\u5728\u5B57\u7B26\u5185\uFF0C\u5426\u5219\u5728\u5B57\u7B26\u5916\u3002\n                \n                float _DistanceMark = 0.0; // \u8DDD\u79BB\u4E3A 0 \u5904\u662F\u5B57\u7B26\u8FB9\u7F18\n                float _SmoothDelta = 0.5; // \u5728\u5B57\u7B26\u8FB9\u7F18 0.5 \u50CF\u7D20\u8FDB\u884C\u63D2\u503C \n                float _OutlineDistanceMark = -1.0; // \u63CF\u8FB9\u4F4D\u7F6E\n\n                vec4 col = texture2D(_MainTex, xlv_TEXCOORD0);\n                float distance = col.r * 4.0 - 2.0;\n\n                // \u5E73\u6ED1\u5B57\u4F53\u8FB9\u7F18\n                col.a = smoothstep(_DistanceMark - _SmoothDelta, _DistanceMark + _SmoothDelta, distance);\n                // \u4E0D\u5E73\u6ED1 \u76F8\u5F53\u4E8E _SmoothDelta = 0\n                // if (distance < _DistanceMark)\n                //     col.a = 0.0;\n                // else\n                //     col.a = 1.0;\n\n                col.rgb = xlv_COLOR.rgb;\n            \n                // Outlining \u63CF\u8FB9\n                vec4 outlineCol = vec4(1.0,1.0,1.0,1.0);\n\n                outlineCol.a = smoothstep(_OutlineDistanceMark - _SmoothDelta, _OutlineDistanceMark + _SmoothDelta, distance);\n                outlineCol.rgb = xlv_COLOREx.rgb;\n                outlineCol.a = outlineCol.a * xlv_COLOREx.a;\n                \n                // \u6DF7\u5408\u5B57\u4F53\u4E0E\u63CF\u8FB9\u989C\u8272\n                col = mix(outlineCol, col, col.a);\n\n                col.rgb = col.rgb * xlv_COLOR.a;\n                \n                // \u8BBE\u7F6E\u6700\u7EC8\u503C\n                gl_FragData[0] = col;\n        }";
+            defShader.fscodefontUI = " \n            precision mediump float ; \n            uniform sampler2D _MainTex; \n\n            uniform highp float _outlineWidth; // \u63CF\u8FB9\u5BBD\u5EA6\n\n            varying lowp vec4 xlv_COLOR; // \u5B57\u4F53\u989C\u8272\n            varying lowp vec4 xlv_COLOREx; // \u63CF\u8FB9\u989C\u8272\n            varying highp vec2 xlv_TEXCOORD0;     \n            void main()   \n            {  \n                // \u5728gd3d\u4E2D\u4F7F\u7528\u7684sdf\u5B57\u4F53\u505A\u4E86\u6700\u5927\u503C\u4E3A2\u50CF\u7D20\u7684\u6709\u5411\u8DDD\u79BB\u8FD0\u7B97\u4E14\u4FDD\u5B58\u5230\u4F4D\u56FE\u4E0A\u3002\n                // \u989C\u8272\u503C[0,255]\u5BF9\u4E8E\u533A\u95F4[-2,2]\u3002\n                // \u989C\u8272\u503Cv\u8868\u793A\u8DDD\u79BB\u5B57\u7B26\u8FB9\u7F18\u6709 (v/255*4-2) \u5355\u4F4D\u8DDD\u79BB\u3002\u5355\u4F4D\u8DDD\u79BB\u4E3A\u6B63\u8868\u793A\u5728\u5B57\u7B26\u5185\uFF0C\u5426\u5219\u5728\u5B57\u7B26\u5916\u3002\n                \n                float _DistanceMark = 0.0; // \u8DDD\u79BB\u4E3A 0 \u5904\u662F\u5B57\u7B26\u8FB9\u7F18\n                float _SmoothDelta = 0.5; // \u5728\u5B57\u7B26\u8FB9\u7F18 0.5 \u50CF\u7D20\u8FDB\u884C\u63D2\u503C \n\n                float _OutlineDistanceMark = -_outlineWidth; // \u63CF\u8FB9\u4F4D\u7F6E\n\n                vec4 col = texture2D(_MainTex, xlv_TEXCOORD0);\n                float distance = col.r * 4.0 - 2.0;\n\n                // \u5E73\u6ED1\u5B57\u4F53\u8FB9\u7F18\n                col.a = smoothstep(_DistanceMark - _SmoothDelta, _DistanceMark + _SmoothDelta, distance);\n                // \u4E0D\u5E73\u6ED1 \u76F8\u5F53\u4E8E _SmoothDelta = 0\n                // if (distance < _DistanceMark)\n                //     col.a = 0.0;\n                // else\n                //     col.a = 1.0;\n\n                col.rgb = xlv_COLOR.rgb;\n            \n                // Outlining \u63CF\u8FB9\n                vec4 outlineCol = vec4(1.0,1.0,1.0,1.0);\n\n                outlineCol.a = smoothstep(_OutlineDistanceMark - _outlineWidth, _OutlineDistanceMark + _outlineWidth, distance);\n                outlineCol.rgb = xlv_COLOREx.rgb;\n                outlineCol.a = outlineCol.a * xlv_COLOREx.a;\n                \n                // \u6DF7\u5408\u5B57\u4F53\u4E0E\u63CF\u8FB9\u989C\u8272\n                col = mix(outlineCol, col, col.a);\n\n                col.rgb = col.rgb * xlv_COLOR.a;\n                \n                // \u8BBE\u7F6E\u6700\u7EC8\u503C\n                gl_FragData[0] = col;\n        }";
             defShader.vscodeuifontmask = " \n            attribute vec4 _glesVertex;    \n            attribute vec4 _glesColor;                   \n            attribute vec4 _glesColorEx;                   \n            attribute vec4 _glesMultiTexCoord0;          \n            uniform highp mat4 glstate_matrix_mvp;       \n            varying lowp vec4 xlv_COLOR;                 \n            varying lowp vec4 xlv_COLOREx;                                                  \n            varying highp vec2 xlv_TEXCOORD0;            \n            varying highp vec2 mask_TEXCOORD;            \n            void main()                                      \n            {                                                \n                highp vec4 tmpvar_1;                         \n                tmpvar_1.w = 1.0;                            \n                tmpvar_1.xyz = _glesVertex.xyz;              \n                xlv_COLOR = _glesColor;                      \n                xlv_COLOREx = _glesColorEx;                      \n                xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      \n                mask_TEXCOORD.x = (_glesVertex.x - 1.0)/-2.0; \n                mask_TEXCOORD.y = (_glesVertex.y - 1.0)/-2.0; \n                gl_Position = (glstate_matrix_mvp * tmpvar_1);   \n            }";
             defShader.fscodeuifontmask = " \n            precision mediump float; \n            uniform sampler2D _MainTex;   \n            uniform highp vec4 _maskRect;        \n            varying lowp vec4 xlv_COLOR;  \n            varying lowp vec4 xlv_COLOREx;  \n            varying highp vec2 xlv_TEXCOORD0;     \n            varying highp vec2 mask_TEXCOORD;      \n            bool CalcuCut(){    \n                highp float l; \n                highp float t; \n                highp float r; \n                highp float b; \n                highp vec2 texc1; \n                bool beCut; \n                l = _maskRect.x; \n                t = _maskRect.y; \n                r = _maskRect.z + l; \n                b = _maskRect.w + t; \n                texc1 = mask_TEXCOORD; \n                if(texc1.x >(1.0 - l) || texc1.x <(1.0 - r) || texc1.y <t || texc1.y>b){  \n                    beCut = true;  \n                }else{ \n                    beCut = false; \n                } \n                return beCut; \n            } \n             \n            void main()   \n            {  \n                if(CalcuCut())  discard; \n                float scale = 10.0;    \n                float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.47)*scale;   \n                float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.4)*scale;   \n                \n                float c=xlv_COLOR.a * clamp ( d,0.0,1.0);   \n                float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);   \n                bc =min(1.0-c,bc);  \n                lowp vec4 final =  xlv_COLOR*c + xlv_COLOREx*bc ; \n                gl_FragData[0] = final ; \n            }";
             defShader.diffuseShader = "{\
@@ -12065,6 +12072,119 @@ var gd3d;
                         usemat.draw(context, mesh, sm, drawtype);
                 }
             };
+            meshRenderer.GpuInstancingRender = function (context, assetmgr, camera, instanceArray) {
+                var _this = this;
+                var insLen = instanceArray.length;
+                if (insLen < 1)
+                    return;
+                framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.Meshrender;
+                var mr = instanceArray[0];
+                var go = instanceArray[0].gameObject;
+                var tran = go.transform;
+                var filter = mr.filter;
+                context.updateLightMask(go.layer);
+                context.updateModelByMatrix(this.helpIMatrix);
+                if (filter == null)
+                    return;
+                var mesh = filter.getMeshOutput();
+                if (mesh == null || mesh.glMesh == null || mesh.submesh == null)
+                    return;
+                var subMeshs = mesh.submesh;
+                var len = subMeshs.length;
+                var _loop_5 = function (i) {
+                    var sm = subMeshs[i];
+                    var mid = subMeshs[i].matIndex;
+                    var usemat = mr.materials[mid];
+                    var drawtype = this_2.instanceDrawType(context, mr, sm);
+                    var vbo = this_2._getVBO(context.webgl);
+                    var drawInstanceInfo = {
+                        instanceCount: insLen,
+                        initBuffer: function (gl) {
+                        },
+                        activeAttributes: function (gl, pass) {
+                            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                            var data = [];
+                            for (var i_2 = 0; i_2 < insLen; i_2++) {
+                                var mr_1 = instanceArray[i_2];
+                                var mat = mr_1.materials[mid];
+                                if (pass.program.mapAttrib[_this.insOffsetMatrixStr + "0"]) {
+                                    _this.setInstanceOffsetMatrix(mr_1.gameObject.transform, mat);
+                                }
+                                mat.uploadInstanceAtteribute(pass, data);
+                            }
+                            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+                            var offset = 0;
+                            var attMap = pass.program.mapCustomAttrib;
+                            for (var key in attMap) {
+                                var att = attMap[key];
+                                var location_1 = att.location;
+                                if (location_1 == -1)
+                                    break;
+                                gl.enableVertexAttribArray(location_1);
+                                gl.vertexAttribPointer(location_1, att.size, gl.FLOAT, false, pass.program.strideInsAttrib, offset);
+                                gl.vertexAttribDivisor(location_1, 1);
+                                offset += att.size * 4;
+                            }
+                        },
+                        disableAttributes: function (gl, pass) {
+                            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                            var attMap = pass.program.mapCustomAttrib;
+                            for (var key in attMap) {
+                                var att = attMap[key];
+                                var location_2 = att.location;
+                                if (location_2 == -1)
+                                    break;
+                                gl.vertexAttribDivisor(location_2, 0);
+                                gl.disableVertexAttribArray(location_2);
+                            }
+                        },
+                    };
+                    if (usemat != null)
+                        usemat.draw(context, mesh, sm, drawtype, drawInstanceInfo);
+                };
+                var this_2 = this;
+                for (var i = 0; i < len; i++) {
+                    _loop_5(i);
+                }
+            };
+            meshRenderer.setInstanceOffsetMatrix = function (tran, mat) {
+                var _wmat = tran.getWorldMatrix();
+                var insOffsetMtxStr = this.insOffsetMatrixStr;
+                var len = 4;
+                var rawdata = _wmat.rawData;
+                for (var i = 0; i < len; i++) {
+                    var arr = mat.instanceAttribValMap["" + insOffsetMtxStr + i];
+                    if (!arr)
+                        arr = mat.instanceAttribValMap["" + insOffsetMtxStr + i] = [];
+                    arr[0] = rawdata[0 + 4 * i];
+                    arr[1] = rawdata[1 + 4 * i];
+                    arr[2] = rawdata[2 + 4 * i];
+                    arr[3] = rawdata[3 + 4 * i];
+                }
+            };
+            meshRenderer.instanceDrawType = function (context, mr, _subMeshInfo) {
+                var drawtype = "instance";
+                var _fog = gd3d.framework.sceneMgr.scene.fog;
+                if (_fog) {
+                    drawtype += "_fog";
+                    context.fog = _fog;
+                }
+                return drawtype;
+            };
+            meshRenderer._getVBO = function (gl) {
+                for (var i = 0, n = this._vbos.length; i < n; i++) {
+                    if (this._vbos[i][0] == gl)
+                        return this._vbos[i][1];
+                }
+                var vbo = gl.createBuffer();
+                this._vbos.push([gl, vbo]);
+                return vbo;
+            };
+            meshRenderer.prototype.isGpuInstancing = function () {
+                if (!this.materials || !this.materials[0])
+                    return false;
+                return this.materials[0].enableGpuInstancing;
+            };
             meshRenderer.prototype.remove = function () {
                 this.materials.forEach(function (element) {
                     if (element)
@@ -12075,6 +12195,9 @@ var gd3d;
             meshRenderer.prototype.clone = function () {
             };
             meshRenderer.ClassName = "meshRenderer";
+            meshRenderer.helpIMatrix = new gd3d.math.matrix();
+            meshRenderer.insOffsetMatrixStr = "instance_offset_matrix_";
+            meshRenderer._vbos = [];
             __decorate([
                 gd3d.reflect.Field("material[]"),
                 __metadata("design:type", Array)
@@ -12709,6 +12832,8 @@ var gd3d;
                 this.name = null;
                 this.id = new framework.resID();
                 this.defaultAsset = false;
+                this._enableGpuInstancing = false;
+                this.instanceAttribValMap = {};
                 this.queue = 0;
                 this.statedMapUniforms = {};
                 this.uniformDirtyMap = {};
@@ -12719,6 +12844,14 @@ var gd3d;
                 gd3d.io.enumMgr.enumMap["UniformTypeEnum"] = gd3d.render.UniformTypeEnum;
             }
             material_3 = material;
+            Object.defineProperty(material.prototype, "enableGpuInstancing", {
+                get: function () { return this._enableGpuInstancing; },
+                set: function (enable) { this._enableGpuInstancing = enable; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            ;
             material.prototype.getName = function () {
                 if (this.name == undefined) {
                     return null;
@@ -12822,6 +12955,29 @@ var gd3d;
                     func(unifom.location, unifomValue);
                 }
             };
+            material.prototype.uploadInstanceAtteribute = function (pass, setContainer) {
+                var attmap = pass.program.mapCustomAttrib;
+                for (var key in attmap) {
+                    var arr = this.instanceAttribValMap[key];
+                    if (!arr) {
+                        var att = pass.program.mapCustomAttrib[key];
+                        var oldLen = setContainer.length;
+                        setContainer.length = oldLen + att.size;
+                        setContainer.fill(0, oldLen);
+                    }
+                    else {
+                        arr.forEach(function (v) { setContainer.push(v); });
+                    }
+                }
+            };
+            material.prototype.setInstanceAttribValue = function (id, arr) {
+                if (!id)
+                    return;
+                this.instanceAttribValMap[id] = arr;
+            };
+            material.prototype.isNotBuildinAttribId = function (id) {
+                return !gd3d.render.glProgram.isBuildInAttrib(id);
+            };
             material.prototype.setShader = function (shader) {
                 this.shader = shader;
                 this.defaultMapUniform = shader.defaultMapUniform;
@@ -12848,6 +13004,9 @@ var gd3d;
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
                 }
+                if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                    this.setInstanceAttribValue(_id, [_number]);
+                }
             };
             material.prototype.setFloatv = function (_id, _numbers) {
                 if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == gd3d.render.UniformTypeEnum.Floatv) {
@@ -12856,6 +13015,13 @@ var gd3d;
                 }
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                }
+                if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                    var arr_1 = [];
+                    _numbers.forEach(function (v) {
+                        arr_1.push(v);
+                    });
+                    this.setInstanceAttribValue(_id, arr_1);
                 }
             };
             material.prototype.setVector4 = function (_id, _vector4) {
@@ -12866,6 +13032,9 @@ var gd3d;
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
                 }
+                if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                    this.setInstanceAttribValue(_id, [_vector4.x, _vector4.y, _vector4.z, _vector4.w]);
+                }
             };
             material.prototype.setVector4v = function (_id, _vector4v) {
                 if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == gd3d.render.UniformTypeEnum.Float4v) {
@@ -12874,6 +13043,13 @@ var gd3d;
                 }
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
+                }
+                if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
+                    var arr_2 = [];
+                    _vector4v.forEach(function (v) {
+                        arr_2.push(v);
+                    });
+                    this.setInstanceAttribValue(_id, arr_2);
                 }
             };
             material.prototype.setMatrix = function (_id, _matrix) {
@@ -12910,9 +13086,6 @@ var gd3d;
                 }
                 this.statedMapUniforms[_id] = _texture;
                 if (_texture != null) {
-                    if (_texture.getName() == "_color") {
-                        _texture;
-                    }
                     if (!_texture.defaultAsset) {
                         _texture.use();
                     }
@@ -12970,13 +13143,14 @@ var gd3d;
                 }
                 var instanceCount = (drawInstanceInfo && drawInstanceInfo.instanceCount) || 1;
                 for (var i = 0, l = drawPasses.length; i < l; i++) {
+                    mesh.glMesh.bindVboBuffer(context.webgl);
                     var pass = drawPasses[i];
                     pass.use(context.webgl);
                     this.uploadUnifoms(pass, context, LastMatSame);
                     if (!LastMatSame || !LastMeshSame)
                         mesh.glMesh.bind(context.webgl, pass.program, sm.useVertexIndex);
                     drawInstanceInfo && drawInstanceInfo.initBuffer(context.webgl);
-                    drawInstanceInfo && drawInstanceInfo.activeAttributes(context.webgl, pass.program.program);
+                    drawInstanceInfo && drawInstanceInfo.activeAttributes(context.webgl, pass);
                     framework.DrawCallInfo.inc.add();
                     if (sm.useVertexIndex < 0) {
                         if (sm.line) {
@@ -12994,7 +13168,7 @@ var gd3d;
                             mesh.glMesh.drawElementTris(context.webgl, sm.start, sm.size, instanceCount);
                         }
                     }
-                    drawInstanceInfo && drawInstanceInfo.disableAttributes(context.webgl, pass.program.program);
+                    drawInstanceInfo && drawInstanceInfo.disableAttributes(context.webgl, pass);
                 }
                 material_3.lastDrawMatID = matGUID;
                 material_3.lastDrawMeshID = meshGUID;
@@ -13056,6 +13230,7 @@ var gd3d;
             material.prototype.clone = function () {
                 var mat = new material_3(this.getName());
                 mat.setShader(this.shader);
+                mat._enableGpuInstancing = this._enableGpuInstancing;
                 for (var i in this.statedMapUniforms) {
                     var _uniformType = this.defaultMapUniform[i].type;
                     var value = this.statedMapUniforms[i];
@@ -13125,6 +13300,11 @@ var gd3d;
                 gd3d.reflect.Field("constText"),
                 __metadata("design:type", framework.constText)
             ], material.prototype, "name", void 0);
+            __decorate([
+                gd3d.reflect.Field("number"),
+                __metadata("design:type", Boolean),
+                __metadata("design:paramtypes", [Boolean])
+            ], material.prototype, "enableGpuInstancing", null);
             __decorate([
                 gd3d.reflect.Field("shader"),
                 __metadata("design:type", framework.shader)
@@ -13384,7 +13564,7 @@ var gd3d;
                 var vertexCount = read.readUInt32();
                 var fmt = gd3d.render.VertexFormatMask;
                 data.pos = [];
-                for (var i_2 = 0; i_2 < vertexCount; ++i_2) {
+                for (var i_3 = 0; i_3 < vertexCount; ++i_3) {
                     data.pos.push({
                         x: read.readSingle(),
                         y: read.readSingle(),
@@ -14084,9 +14264,9 @@ var gd3d;
                 for (var key in passes) {
                     var passbass = passes[key];
                     var curpasses;
-                    if (key == "base" || key == "lightmap" || key == "skin" || key == "quad") {
+                    if (key == "base" || key == "instance" || key == "lightmap" || key == "skin" || key == "quad") {
                     }
-                    else if (key.indexOf("base_") == 0 || key.indexOf("lightmap_") == 0 || key.indexOf("skin_") == 0) {
+                    else if (key.indexOf("base_") == 0 || key.indexOf("instance_") == 0 || key.indexOf("lightmap_") == 0 || key.indexOf("skin_") == 0) {
                     }
                     else {
                         continue;
@@ -14741,11 +14921,12 @@ var gd3d;
                 for (var i = 0; i < len; i++) {
                     var clip = this.clips[i];
                     if (!clip.frames || Object.keys(clip.frames).length < 1)
-                        break;
+                        continue;
                     this.addClip(clip);
                 }
-                if (this.autoplay && len > 0) {
-                    this.playAniclip(this.clips[0]);
+                var firstClip = this.clips[0];
+                if (this.autoplay && firstClip && firstClip.frames && Object.keys(firstClip.frames).length >= 1) {
+                    this.playAniclip(firstClip);
                 }
             };
             aniplayer.prototype.onPlay = function () {
@@ -15475,19 +15656,19 @@ var gd3d;
             bloomctr.prototype.remove = function () {
                 this._init = false;
                 if (this.camera) {
-                    var arr_1 = this.camera.postQueues;
+                    var arr_3 = this.camera.postQueues;
                     var dArr = [];
-                    for (var i = 0; i < arr_1.length; i++) {
-                        var temp = arr_1[i];
+                    for (var i = 0; i < arr_3.length; i++) {
+                        var temp = arr_3[i];
                         if (temp[this.tag]) {
                             dArr.push(temp);
                         }
                     }
                     dArr.forEach(function (element) {
                         if (element) {
-                            var idx = arr_1.indexOf(element);
+                            var idx = arr_3.indexOf(element);
                             if (idx != -1) {
-                                arr_1.splice(idx, 1);
+                                arr_3.splice(idx, 1);
                             }
                         }
                     });
@@ -15983,7 +16164,7 @@ var gd3d;
                         node.dirtiedOfFrustumCulling = false;
                 }
                 if (islayerPass && !this.cullingMap[id]) {
-                    scene.renderList.addRenderer(renderer);
+                    scene.renderList.addRenderer(renderer, scene.webgl);
                 }
                 if (node.children) {
                     for (var i = 0, l = node.children.length; i < l; ++i)
@@ -16105,9 +16286,17 @@ var gd3d;
                 var rlayers = scene.renderList.renderLayers;
                 for (var i = 0, l = rlayers.length; i < l; ++i) {
                     var ls = rlayers[i].list;
-                    for (var j = 0, jl = ls.length; j < jl; ++j) {
+                    var len = ls.length;
+                    for (var j = 0; j < len; ++j) {
                         var item = ls[j];
                         item.render(context, assetmgr, this);
+                    }
+                    var rmap = rlayers[i].gpuInstanceMap;
+                    for (var key in rmap) {
+                        var gpuList = rmap[key];
+                        if (!gpuList)
+                            continue;
+                        framework.meshRenderer.GpuInstancingRender(context, assetmgr, this, gpuList);
                     }
                 }
             };
@@ -16140,8 +16329,8 @@ var gd3d;
                     this._renderOnce(scene, context, "");
                 }
                 else {
-                    for (var i_3 = 0, l_1 = this.postQueues.length; i_3 < l_1; ++i_3) {
-                        this.postQueues[i_3].render(scene, context, this);
+                    for (var i_4 = 0, l_1 = this.postQueues.length; i_4 < l_1; ++i_4) {
+                        this.postQueues[i_4].render(scene, context, this);
                     }
                     context.webgl.flush();
                 }
@@ -16704,9 +16893,9 @@ var gd3d;
                     return;
                 var index = -1;
                 if (_initFrameData.attrsData.mat != null) {
-                    for (var i_4 = 0; i_4 < this.matDataGroups.length; i_4++) {
-                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_4], _initFrameData.attrsData.mat)) {
-                            index = i_4;
+                    for (var i_5 = 0; i_5 < this.matDataGroups.length; i_5++) {
+                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_5], _initFrameData.attrsData.mat)) {
+                            index = i_5;
                             break;
                         }
                     }
@@ -16764,41 +16953,41 @@ var gd3d;
                 var vertexArr = _initFrameData.attrsData.mesh.data.genVertexDataArray(this.vf);
                 element.update();
                 subEffectBatcher.effectElements.push(element);
-                for (var i_5 = 0; i_5 < vertexCount; i_5++) {
+                for (var i_6 = 0; i_6 < vertexCount; i_6++) {
                     {
                         var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = vertexArr[i_5 * vertexSize + 0];
-                        vertex.y = vertexArr[i_5 * vertexSize + 1];
-                        vertex.z = vertexArr[i_5 * vertexSize + 2];
+                        vertex.x = vertexArr[i_6 * vertexSize + 0];
+                        vertex.y = vertexArr[i_6 * vertexSize + 1];
+                        vertex.z = vertexArr[i_6 * vertexSize + 2];
                         gd3d.math.matrixTransformVector3(vertex, element.curAttrData.matrix, vertex);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 0] = vertex.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 1] = vertex.y;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 2] = vertex.z;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 0] = vertex.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 1] = vertex.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 2] = vertex.z;
                         gd3d.math.pool.delete_vector3(vertex);
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 3] = vertexArr[i_5 * vertexSize + 3];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 4] = vertexArr[i_5 * vertexSize + 4];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 5] = vertexArr[i_5 * vertexSize + 5];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 3] = vertexArr[i_6 * vertexSize + 3];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 4] = vertexArr[i_6 * vertexSize + 4];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 5] = vertexArr[i_6 * vertexSize + 5];
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 6] = vertexArr[i_5 * vertexSize + 6];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 7] = vertexArr[i_5 * vertexSize + 7];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 8] = vertexArr[i_5 * vertexSize + 8];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 6] = vertexArr[i_6 * vertexSize + 6];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 7] = vertexArr[i_6 * vertexSize + 7];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 8] = vertexArr[i_6 * vertexSize + 8];
                     }
                     {
                         var r = gd3d.math.floatClamp(element.curAttrData.color.x, 0, 1);
                         var g = gd3d.math.floatClamp(element.curAttrData.color.y, 0, 1);
                         var b = gd3d.math.floatClamp(element.curAttrData.color.z, 0, 1);
-                        var a = gd3d.math.floatClamp(vertexArr[i_5 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 9] = r;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 10] = g;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 11] = b;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 12] = a;
+                        var a = gd3d.math.floatClamp(vertexArr[i_6 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 9] = r;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 10] = g;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 11] = b;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 12] = a;
                     }
                     {
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 13] = vertexArr[i_5 * vertexSize + 13] * element.curAttrData.tilling.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 14] = vertexArr[i_5 * vertexSize + 14] * element.curAttrData.tilling.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 13] = vertexArr[i_6 * vertexSize + 13] * element.curAttrData.tilling.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 14] = vertexArr[i_6 * vertexSize + 14] * element.curAttrData.tilling.y;
                     }
                 }
                 var indexArray = _initFrameData.attrsData.mesh.data.genIndexDataArray();
@@ -16969,11 +17158,11 @@ var gd3d;
                 if (this.delayElements.length > 0) {
                     if (this.refElements.length > 0)
                         this.refElements = [];
-                    for (var i_6 = this.delayElements.length - 1; i_6 >= 0; i_6--) {
-                        var data = this.delayElements[i_6];
+                    for (var i_7 = this.delayElements.length - 1; i_7 >= 0; i_7--) {
+                        var data = this.delayElements[i_7];
                         if (data.delayTime <= this.playTimer) {
-                            this.addElement(this.delayElements[i_6]);
-                            this.delayElements.splice(i_6, 1);
+                            this.addElement(this.delayElements[i_7]);
+                            this.delayElements.splice(i_7, 1);
                         }
                     }
                 }
@@ -18911,19 +19100,19 @@ var gd3d;
             vignettingCtr.prototype.remove = function () {
                 this._init = false;
                 if (this.camera) {
-                    var arr_2 = this.camera.postQueues;
+                    var arr_4 = this.camera.postQueues;
                     var dArr = [];
-                    for (var i = 0; i < arr_2.length; i++) {
-                        var temp = arr_2[i];
+                    for (var i = 0; i < arr_4.length; i++) {
+                        var temp = arr_4[i];
                         if (temp[this.tag]) {
                             dArr.push(temp);
                         }
                     }
                     dArr.forEach(function (element) {
                         if (element) {
-                            var idx = arr_2.indexOf(element);
+                            var idx = arr_4.indexOf(element);
                             if (idx != -1) {
-                                arr_2.splice(idx, 1);
+                                arr_4.splice(idx, 1);
                             }
                         }
                     });
@@ -22037,8 +22226,8 @@ var gd3d;
                 arr = this.events[event] = [];
             }
             else {
-                for (var _i = 0, arr_3 = arr; _i < arr_3.length; _i++) {
-                    var ft = arr_3[_i];
+                for (var _i = 0, arr_5 = arr; _i < arr_5.length; _i++) {
+                    var ft = arr_5[_i];
                     if (ft.func == func) {
                         FT = ft;
                         break;
@@ -22061,8 +22250,8 @@ var gd3d;
             var arr = this.events[event];
             if (!arr)
                 return;
-            for (var _a = 0, arr_4 = arr; _a < arr_4.length; _a++) {
-                var FT = arr_4[_a];
+            for (var _a = 0, arr_6 = arr; _a < arr_6.length; _a++) {
+                var FT = arr_6[_a];
                 for (var _b = 0, _c = FT.thisArgs; _b < _c.length; _b++) {
                     var thisArg = _c[_b];
                     FT.func.apply(thisArg, args);
@@ -32290,7 +32479,8 @@ var gd3d;
                                 gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                                 gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
                             },
-                            activeAttributes: function (gl, program) {
+                            activeAttributes: function (gl, pass) {
+                                var program = pass.program.program;
                                 gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                                 var offset = 0;
                                 _this._attributes.forEach(function (element) {
@@ -32303,7 +32493,8 @@ var gd3d;
                                     offset += element[1] * 4;
                                 });
                             },
-                            disableAttributes: function (gl, program) {
+                            disableAttributes: function (gl, pass) {
+                                var program = pass.program.program;
                                 gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                                 _this._attributes.forEach(function (element) {
                                     var location = gl.getAttribLocation(program, element[0]);
@@ -32396,8 +32587,8 @@ var gd3d;
                     }
                     var inCycleStart = startTime - cycleStartTime;
                     var inCycleEnd = endTime - cycleStartTime;
-                    for (var i_7 = 0; i_7 < bursts.length; i_7++) {
-                        var burst = bursts[i_7];
+                    for (var i_8 = 0; i_8 < bursts.length; i_8++) {
+                        var burst = bursts[i_8];
                         if (burst.isProbability && inCycleStart <= burst.time && burst.time < inCycleEnd) {
                             emits.push({ time: cycleStartTime + burst.time, num: burst.count.getValue(rateAtDuration) });
                         }
@@ -37005,7 +37196,10 @@ var gd3d;
                 gd3d.math.matrixMakeIdentity(this.matrixModelViewProject);
             };
             renderContext.prototype.updateModel = function (model) {
-                gd3d.math.matrixClone(model.getWorldMatrix(), this.matrixModel);
+                this.updateModelByMatrix(model.getWorldMatrix());
+            };
+            renderContext.prototype.updateModelByMatrix = function (m_matrix) {
+                gd3d.math.matrixClone(m_matrix, this.matrixModel);
                 gd3d.math.matrixMultiply(this.matrixViewProject, this.matrixModel, this.matrixModelViewProject);
             };
             renderContext.prototype.updateModeTrail = function () {
@@ -37063,19 +37257,28 @@ var gd3d;
                 this.renderLayers.push(overlay);
             }
             renderList.prototype.clear = function () {
-                this.renderLayers[0].list.length =
-                    this.renderLayers[1].list.length =
-                        this.renderLayers[2].list.length = 0;
+                var len = this.renderLayers.length;
+                for (var i = 0; i < len; i++) {
+                    this.renderLayers[i].list.length = 0;
+                    this.renderLayers[i].gpuInstanceMap = {};
+                }
             };
-            renderList.prototype.addRenderer = function (renderer) {
+            renderList.prototype.addRenderer = function (renderer, webgl) {
+                var idx = 0;
                 if (renderer.layer == RenderLayerEnum.Common) {
-                    this.renderLayers[0].list.push(renderer);
                 }
                 else if (renderer.layer == RenderLayerEnum.Transparent) {
-                    this.renderLayers[1].list.push(renderer);
+                    idx = 1;
                 }
                 else if (renderer.layer == RenderLayerEnum.Overlay) {
-                    this.renderLayers[2].list.push(renderer);
+                    idx = 2;
+                }
+                var gpuInsR = renderer;
+                if (!webgl.drawArraysInstanced || !gpuInsR.isGpuInstancing || !gpuInsR.isGpuInstancing()) {
+                    this.renderLayers[idx].list.push(renderer);
+                }
+                else {
+                    this.renderLayers[idx].addInstance(gpuInsR);
                 }
             };
             return renderList;
@@ -37086,8 +37289,25 @@ var gd3d;
                 if (_sort === void 0) { _sort = false; }
                 this.needSort = false;
                 this.list = [];
+                this.gpuInstanceMap = {};
                 this.needSort = _sort;
             }
+            renderLayer.prototype.addInstance = function (r) {
+                var mr = r;
+                var mf = mr.filter;
+                if (!mf || !mf.mesh)
+                    return;
+                if (!mr.materials[0])
+                    return;
+                var sh = mr.materials[0].getShader();
+                if (!sh)
+                    return;
+                var id = sh.getGUID() + "_" + mf.mesh.getGUID();
+                var list = this.gpuInstanceMap[id];
+                if (!list)
+                    list = this.gpuInstanceMap[id] = [];
+                list.push(r);
+            };
             return renderLayer;
         }());
         framework.renderLayer = renderLayer;
@@ -39653,12 +39873,12 @@ var gd3d;
             handler: function (target, source, property, handlers, serialization) {
                 var spv = source[property];
                 if (Array.isArray(spv)) {
-                    var arr_5 = target[property] || [];
+                    var arr_7 = target[property] || [];
                     var keys = Object.keys(spv);
                     keys.forEach(function (v) {
-                        propertyHandler(arr_5, spv, v, handlers, serialization);
+                        propertyHandler(arr_7, spv, v, handlers, serialization);
                     });
-                    target[property] = arr_5;
+                    target[property] = arr_7;
                     return true;
                 }
                 return false;
@@ -42560,12 +42780,10 @@ var gd3d;
                 }
                 var total = this.vertexByteSize;
                 var seek = 0;
-                var channel = 0;
                 {
                     if (shadercode.posPos >= 0) {
                         webgl.enableVertexAttribArray(shadercode.posPos);
                         webgl.vertexAttribPointer(shadercode.posPos, 3, webgl.FLOAT, false, total, seek);
-                        channel++;
                     }
                     seek += 12;
                 }
@@ -42573,99 +42791,82 @@ var gd3d;
                     if (shadercode.posNormal >= 0) {
                         webgl.enableVertexAttribArray(shadercode.posNormal);
                         webgl.vertexAttribPointer(shadercode.posNormal, 3, webgl.FLOAT, true, total, seek);
-                        channel++;
                     }
                     seek += 12;
                 }
                 else if (shadercode.posNormal >= 0) {
                     webgl.disableVertexAttribArray(shadercode.posNormal);
-                    channel++;
                 }
                 if (this.vertexFormat & VertexFormatMask.Tangent) {
                     if (shadercode.posTangent >= 0) {
                         webgl.enableVertexAttribArray(shadercode.posTangent);
                         webgl.vertexAttribPointer(shadercode.posTangent, 3, webgl.FLOAT, true, total, seek);
-                        channel++;
                     }
                     seek += 12;
                 }
                 else if (shadercode.posTangent >= 0) {
                     webgl.disableVertexAttribArray(shadercode.posTangent);
-                    channel++;
                 }
                 if (this.vertexFormat & VertexFormatMask.Color) {
                     if (shadercode.posColor >= 0) {
                         webgl.enableVertexAttribArray(shadercode.posColor);
                         webgl.vertexAttribPointer(shadercode.posColor, 4, webgl.FLOAT, false, total, seek);
-                        channel++;
                     }
                     seek += 16;
                 }
                 else if (shadercode.posColor >= 0) {
                     webgl.disableVertexAttribArray(shadercode.posColor);
-                    channel++;
                 }
                 if (this.vertexFormat & VertexFormatMask.UV0) {
                     if (shadercode.posUV0 >= 0) {
                         webgl.enableVertexAttribArray(shadercode.posUV0);
                         webgl.vertexAttribPointer(shadercode.posUV0, 2, webgl.FLOAT, false, total, seek);
-                        channel++;
                     }
                     seek += 8;
                 }
                 else if (shadercode.posUV0 >= 0) {
                     webgl.disableVertexAttribArray(shadercode.posUV0);
-                    channel++;
                 }
                 if (this.vertexFormat & VertexFormatMask.UV1) {
                     if (shadercode.posUV2 >= 0) {
                         webgl.enableVertexAttribArray(shadercode.posUV2);
                         webgl.vertexAttribPointer(shadercode.posUV2, 2, webgl.FLOAT, false, total, seek);
-                        channel++;
                     }
                     seek += 8;
                 }
                 else if (shadercode.posUV2 >= 0) {
                     webgl.disableVertexAttribArray(shadercode.posUV2);
-                    channel++;
                 }
                 if (this.vertexFormat & VertexFormatMask.BlendIndex4) {
                     if (shadercode.posBlendIndex4 >= 0) {
                         webgl.enableVertexAttribArray(shadercode.posBlendIndex4);
                         webgl.vertexAttribPointer(shadercode.posBlendIndex4, 4, webgl.FLOAT, false, total, seek);
-                        channel++;
                     }
                     seek += 16;
                 }
                 else if (shadercode.posBlendIndex4 >= 0) {
                     webgl.disableVertexAttribArray(shadercode.posBlendIndex4);
-                    channel++;
                 }
                 if (this.vertexFormat & VertexFormatMask.BlendWeight4) {
                     if (shadercode.posBlendWeight4 >= 0) {
                         webgl.enableVertexAttribArray(shadercode.posBlendWeight4);
                         webgl.vertexAttribPointer(shadercode.posBlendWeight4, 4, webgl.FLOAT, false, total, seek);
-                        channel++;
                     }
                     seek += 16;
                 }
                 else if (shadercode.posBlendWeight4 >= 0) {
                     webgl.disableVertexAttribArray(shadercode.posBlendWeight4);
-                    channel++;
                 }
                 if (this.vertexFormat & VertexFormatMask.ColorEX) {
                     if (shadercode.posColorEx >= 0) {
                         webgl.enableVertexAttribArray(shadercode.posColorEx);
                         webgl.vertexAttribPointer(shadercode.posColorEx, 4, webgl.FLOAT, false, total, seek);
-                        channel++;
                     }
                     seek += 16;
                 }
                 else if (shadercode.posColorEx >= 0) {
                     webgl.disableVertexAttribArray(shadercode.posColorEx);
-                    channel++;
                 }
-                render.webglkit.SetMaxVertexAttribArray(webgl, channel);
             };
             glMesh.prototype.uploadVertexSubData = function (webgl, varray, offset) {
                 if (offset === void 0) { offset = 0; }
@@ -43719,6 +43920,12 @@ var gd3d;
             return uniform;
         }());
         render.uniform = uniform;
+        var attribute = (function () {
+            function attribute() {
+            }
+            return attribute;
+        }());
+        render.attribute = attribute;
         var ShaderTypeEnum;
         (function (ShaderTypeEnum) {
             ShaderTypeEnum[ShaderTypeEnum["VS"] = 0] = "VS";
@@ -43735,6 +43942,9 @@ var gd3d;
         render.glShader = glShader;
         var glProgram = (function () {
             function glProgram(vs, fs, program) {
+                this.mapAttrib = {};
+                this.mapCustomAttrib = {};
+                this._strideInsAttrib = 0;
                 this.posPos = -1;
                 this.posNormal = -1;
                 this.posTangent = -1;
@@ -43749,17 +43959,55 @@ var gd3d;
                 this.fs = fs;
                 this.program = program;
             }
+            glProgram.isBuildInAttrib = function (attribID) {
+                return this.buildInAtrribute[attribID] != null;
+            };
+            Object.defineProperty(glProgram.prototype, "strideInsAttrib", {
+                get: function () { return this._strideInsAttrib; },
+                enumerable: true,
+                configurable: true
+            });
             glProgram.prototype.initAttribute = function (webgl) {
-                this.posPos = webgl.getAttribLocation(this.program, "_glesVertex");
-                this.posColor = webgl.getAttribLocation(this.program, "_glesColor");
-                this.posUV0 = webgl.getAttribLocation(this.program, "_glesMultiTexCoord0");
-                this.posUV2 = webgl.getAttribLocation(this.program, "_glesMultiTexCoord1");
-                this.posNormal = webgl.getAttribLocation(this.program, "_glesNormal");
-                this.posTangent = webgl.getAttribLocation(this.program, "_glesTangent");
-                this.posBlendIndex4 = webgl.getAttribLocation(this.program, "_glesBlendIndex4");
-                this.posBlendWeight4 = webgl.getAttribLocation(this.program, "_glesBlendWeight4");
-                this.posColorEx = webgl.getAttribLocation(this.program, "_glesColorEx");
-                this["xxx"] = webgl.getAttribLocation(this.program, "xxx");
+                var attributesLen = webgl.getProgramParameter(this.program, webgl.ACTIVE_ATTRIBUTES);
+                var attMap = glProgram.buildInAtrribute;
+                for (var i = 0; i < attributesLen; i++) {
+                    var attributeInfo = webgl.getActiveAttrib(this.program, i);
+                    if (!attributeInfo)
+                        break;
+                    var att = new attribute();
+                    var name_10 = attributeInfo.name;
+                    att.name = name_10;
+                    switch (attributeInfo.type) {
+                        case webgl.FLOAT:
+                            att.size = 1;
+                            break;
+                        case webgl.FLOAT_VEC2:
+                            att.size = 2;
+                            break;
+                        case webgl.FLOAT_VEC3:
+                            att.size = 3;
+                            break;
+                        case webgl.FLOAT_VEC4:
+                            att.size = 4;
+                            break;
+                    }
+                    att.location = webgl.getAttribLocation(this.program, name_10);
+                    this.mapAttrib[name_10] = att;
+                    if (!attMap[name_10]) {
+                        this.mapCustomAttrib[name_10] = att;
+                        this._strideInsAttrib += att.size * 4;
+                    }
+                }
+                for (var key in attMap) {
+                    var val = attMap[key];
+                    this[val] = this.tryGetLocation(key);
+                }
+            };
+            glProgram.prototype.tryGetLocation = function (id) {
+                var att = this.mapAttrib[id];
+                if (!att)
+                    return -1;
+                return att.location;
             };
             glProgram.prototype.use = function (webgl) {
                 webgl.useProgram(this.program);
@@ -43809,6 +44057,17 @@ var gd3d;
                         console.log("Unifrom parse Erorr : not have this type!");
                     }
                 }
+            };
+            glProgram.buildInAtrribute = {
+                "_glesVertex": "posPos",
+                "_glesColor": "posColor",
+                "_glesMultiTexCoord0": "posUV0",
+                "_glesMultiTexCoord1": "posUV2",
+                "_glesNormal": "posNormal",
+                "_glesTangent": "posTangent",
+                "_glesBlendIndex4": "posBlendIndex4",
+                "_glesBlendWeight4": "posBlendWeight4",
+                "_glesColorEx": "posColorEx"
             };
             return glProgram;
         }());
@@ -43904,6 +44163,14 @@ var gd3d;
                 else if (type == "base_fog" || type == "fog") {
                     vsStr = "#define FOG \n" + vsStr;
                     fsStr = "#define FOG \n" + fsStr;
+                }
+                else if (type == "instance") {
+                    vsStr = "#define INSTANCE \n" + vsStr;
+                    fsStr = "#define INSTANCE \n" + fsStr;
+                }
+                else if (type == "instance_fog") {
+                    vsStr = "#define FOG \n" + "#define INSTANCE \n" + vsStr;
+                    fsStr = "#define FOG \n" + "#define INSTANCE \n" + fsStr;
                 }
                 else if (type == "skin") {
                     vsStr = "#define SKIN \n" + vsStr;

@@ -22,10 +22,10 @@ class main implements gd3d.framework.IUserCode
         gd3d.framework.assetMgr.openGuid = false;
 
         //-------------------------------------基础
-        this.addBtn("基础==>", () =>
-        {
-            demoList.addBtn("f14effect", () => new dome.db_test_f14eff());
-            demoList.addBtn("物理2d_dome", () => new physic2d_dome());
+        this.addBtn("基础==>",()=>{
+            demoList.addBtn("最小demo",()=>new mini_sample());
+            demoList.addBtn("f14effect",()=>new dome.db_test_f14eff());
+            demoList.addBtn("物理2d_dome",()=>new physic2d_dome());
             demoList.addBtn("test_load", () => new test_load());
             demoList.addBtn("test_loadScene", () => new test_loadScene());
             demoList.addBtn("test_pick", () => new test_pick());
@@ -55,6 +55,7 @@ class main implements gd3d.framework.IUserCode
             demoList.addBtn("test_light_d1", () => new t.light_d1());
             demoList.addBtn("test_normalmap", () => new t.Test_NormalMap());
             demoList.addBtn("test_f4skin", () => new test_f4skin());
+            demoList.addBtn("GPU_Instancing 绘制",()=>new test_GPU_instancing());
             return new demoList();
         });
 
