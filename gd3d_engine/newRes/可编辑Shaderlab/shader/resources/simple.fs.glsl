@@ -20,8 +20,6 @@ void main()
 
     basecolor = basecolor * _MainColor;
 
-    basecolor.rgb = basecolor.rgb * basecolor.a;
-
     #ifdef FOG
     basecolor.xyz = mix(glstate_fog_color.rgb, basecolor.rgb, factor);
     #endif
