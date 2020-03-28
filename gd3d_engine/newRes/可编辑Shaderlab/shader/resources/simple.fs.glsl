@@ -1,6 +1,7 @@
 precision highp float;
 
 uniform sampler2D _MainTex;
+uniform float _AlphaCut;
 uniform vec4 _MainColor;
 
 varying vec2 xlv_TEXCOORD0;    
@@ -13,6 +14,9 @@ varying lowp float factor;
 void main() 
 {
     vec4 basecolor = texture2D(_MainTex, xlv_TEXCOORD0);
+
+    if(basecolor.a < _AlphaCut)
+        discard;
 
     basecolor = basecolor * _MainColor;
 
