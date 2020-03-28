@@ -1,8 +1,7 @@
 {
-    "layer": "geometry",
+    "layer": "transparent",
     "properties": [
         "_MainTex('MainTex',Texture)='white'{}",
-        "_AlphaCut('AlphaCut',Range(0.0,1.0)) = 0.1",
         "_MainTex_ST('MainTex_ST',Vector) = (1,1,0,0)",
         "_MainColor ('MainColor', Color) = (1,1,1,1)"
     ],
@@ -10,14 +9,18 @@
 
         "base": [
             {
-                "showface": "ccw",
+                "blendmode": "blend",
+                "showface": "all",
+                "zwrite": "off",
                 "vs": "simple",
                 "fs": "simple"
             }
         ],
         "base_fog": [
             {
-                "showface": "ccw",
+                "blendmode": "blend",
+                "showface": "all",
+                "zwrite": "off",
                 "vs": "simple",
                 "fs": "simple"
             }
