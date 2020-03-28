@@ -6116,6 +6116,8 @@ var gd3d;
                             sp.y = tempc.y;
                             gd3d.math.vec2Clone(this._content.transform.localTranslate, this.strPos);
                             this.canfly = false;
+                            if (this.onDownFun)
+                                this.onDownFun(sp.x, sp.y);
                         }
                         if (ev.type == gd3d.event.PointEventEnum.PointHold && this.isPointDown) {
                             var lp = this.lastPoint;
@@ -6126,6 +6128,8 @@ var gd3d;
                                 var addtransY = lp.y - sp.y;
                                 gd3d.math.vec2Clone(this.strPos, this._content.localTranslate);
                                 this.SlideTo(addtransX, addtransY);
+                                if (this.onMoveFun)
+                                    this.onMoveFun(addtransX, addtransY);
                             }
                             if (this.inertia) {
                                 this.collectPointing();
@@ -6138,6 +6142,8 @@ var gd3d;
                     if (this.inertia) {
                         this.onInertiaSliderUp();
                     }
+                    if (this.onUpFun)
+                        this.onUpFun();
                 }
             };
             scrollRect.prototype.SlideTo = function (addtransX, addtransY) {
@@ -21547,10 +21553,10 @@ var gd3d;
             LineRenderer.prototype.update = function (interval) {
             };
             LineRenderer.prototype.remove = function () {
-                throw "未实现";
+                console.warn("\u672A\u5B9E\u73B0 LineRenderer  remove");
             };
             LineRenderer.prototype.clone = function () {
-                throw "未实现";
+                console.warn("\u672A\u5B9E\u73B0 LineRenderer  clone");
             };
             LineRenderer.prototype.BakeMesh = function (mesh, camera, useTransform) {
                 var positions = this.positions.concat();
@@ -21994,10 +22000,10 @@ var gd3d;
             TrailRenderer.prototype.start = function () {
             };
             TrailRenderer.prototype.remove = function () {
-                throw "未实现";
+                console.warn("\u672A\u5B9E\u73B0 TrailRenderer  remove");
             };
             TrailRenderer.prototype.clone = function () {
-                throw "未实现";
+                console.warn("\u672A\u5B9E\u73B0 TrailRenderer  remove");
             };
             TrailRenderer.prototype.update = function (interval) {
                 var _this = this;
@@ -32338,10 +32344,10 @@ var gd3d;
                 }
             };
             ParticleSystem.prototype.remove = function () {
-                throw "未实现";
+                console.warn("\u672A\u5B9E\u73B0 ParticleSystem  remove");
             };
             ParticleSystem.prototype.clone = function () {
-                throw "未实现";
+                console.warn("\u672A\u5B9E\u73B0 ParticleSystem  clone");
             };
             ParticleSystem.prototype.update = function (interval) {
                 if (!this.isPlaying)
