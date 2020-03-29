@@ -12,11 +12,12 @@ declare namespace gd3d.plugins.preview {
         target: gd3d.framework.transform;
         constructor();
         createCamera(parent: any, name: any): framework.transform;
-        start(gameStage: HTMLCanvasElement): void;
+        loadAssetBundle(url: string): Promise<unknown>;
+        start(gameStage: HTMLCanvasElement): Promise<void>;
         initParam(): void;
         handleEvent(): void;
         pview3DTrans(trans: framework.transform): void;
-        pview2DTrans(trans: framework.transform2D): void;
+        pview2DTrans(trans: framework.transform2D): Promise<void>;
     }
 }
 //# sourceMappingURL=plug_preview.d.ts.map

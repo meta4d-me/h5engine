@@ -1,4 +1,5 @@
 namespace gd3d.plugins.preview {
+
     export class main {
         urlParam: { [key: string]: string } = {};
         app: gd3d.framework.application;
@@ -24,8 +25,17 @@ namespace gd3d.plugins.preview {
             objCam.markDirty();//标记为需要刷新
             return objCam;
         }
+        loadAssetBundle(url: string) {
+            return new Promise((resolve, reject) => {
+                this.assetMgr.load(url, gd3d.framework.AssetTypeEnum.Auto, (state) => {
+                    if (state.isfinish) {
+                        resolve(url);
+                    }
+                })
+            });
+        }
 
-        start(gameStage: HTMLCanvasElement) {
+        async start(gameStage: HTMLCanvasElement) {
 
             var gdapp = new gd3d.framework.application();
             gdapp.bePlay = true;
@@ -46,18 +56,18 @@ namespace gd3d.plugins.preview {
             // createCube();
             var pviewPath = this.urlParam["pviewPath"];
             console.log(`pview:Resources/${pviewPath}`);
-            this.assetMgr.load(`Resources/${pviewPath}`, gd3d.framework.AssetTypeEnum.Auto, (state) => {
-                if (state.isfinish) {
-                    var resName = pviewPath.split("/").pop().replace(".assetbundle.json", "");
-                    let prefab = this.assetMgr.getAssetByName(`${resName}.cprefab.json`, `${resName}.assetbundle.json`) as gd3d.framework.prefab;
 
-                    let trans: any = prefab.getCloneTrans();
-                    if (trans.constructor.name == "transform2D")
-                        this.pview2DTrans(trans);
-                    else
-                        this.pview3DTrans(trans);
-                }
-            });
+            await this.loadAssetBundle(`Resources/${pviewPath}`);
+
+            var resName = pviewPath.split("/").pop().replace(".assetbundle.json", "");
+            let prefab = this.assetMgr.getAssetByName(`${resName}.cprefab.json`, `${resName}.assetbundle.json`) as gd3d.framework.prefab;
+
+            let trans: any = prefab.getCloneTrans();
+            if (trans.constructor.name == "transform2D")
+                this.pview2DTrans(trans);
+            else
+                this.pview3DTrans(trans);
+
             this.handleEvent();
         }
 
@@ -159,7 +169,10 @@ namespace gd3d.plugins.preview {
             this.target = trans;
         }
 
-        pview2DTrans(trans: framework.transform2D) {
+        async pview2DTrans(trans: framework.transform2D) {
+
+            await this.loadAssetBundle("Resources/defFont/defFont.assetbundle.json");
+
             let overlay = new gd3d.framework.overlay2D();
             overlay.scaleMode = gd3d.framework.UIScaleMode.SCALE_WITH_SCREEN_SIZE;
             let wwidth: number = 1280;
@@ -189,5 +202,6 @@ namespace gd3d.plugins.preview {
             uiRoot.addChild(trans);
             trans.markDirty();
         }
+
     }
 }
