@@ -1077,6 +1077,9 @@ declare namespace gd3d.framework {
         private cgCount;
         private lastfv;
         private flyingSlidr;
+        onMoveFun: (x: number, y: number) => {};
+        onDownFun: (x: number, y: number) => {};
+        onUpFun: () => {};
         remove(): void;
     }
 }
@@ -4721,9 +4724,9 @@ declare namespace gd3d.io {
     class SerializeDependent {
         static resourseDatas: any[];
         static GetAssetContent(asset: any): {
-            "name": string;
-            "value": string;
-            "type": SaveAssetType;
+            name: string;
+            value: string;
+            type: SaveAssetType;
         };
         static GetAssetUrl(asset: any, assetMgr: any): void;
     }
@@ -7931,179 +7934,179 @@ declare namespace gd3d.framework {
     class WebGLDebugUtils {
         private log;
         static readonly glValidEnumContexts: {
-            'enable': {
+            enable: {
                 0: boolean;
             };
-            'disable': {
+            disable: {
                 0: boolean;
             };
-            'getParameter': {
+            getParameter: {
                 0: boolean;
             };
-            'drawArrays': {
+            drawArrays: {
                 0: boolean;
             };
-            'drawElements': {
+            drawElements: {
                 0: boolean;
                 2: boolean;
             };
-            'createShader': {
+            createShader: {
                 0: boolean;
             };
-            'getShaderParameter': {
+            getShaderParameter: {
                 1: boolean;
             };
-            'getProgramParameter': {
+            getProgramParameter: {
                 1: boolean;
             };
-            'getVertexAttrib': {
+            getVertexAttrib: {
                 1: boolean;
             };
-            'vertexAttribPointer': {
+            vertexAttribPointer: {
                 2: boolean;
             };
-            'bindTexture': {
+            bindTexture: {
                 0: boolean;
             };
-            'activeTexture': {
+            activeTexture: {
                 0: boolean;
             };
-            'getTexParameter': {
-                0: boolean;
-                1: boolean;
-            };
-            'texParameterf': {
+            getTexParameter: {
                 0: boolean;
                 1: boolean;
             };
-            'texParameteri': {
+            texParameterf: {
+                0: boolean;
+                1: boolean;
+            };
+            texParameteri: {
                 0: boolean;
                 1: boolean;
                 2: boolean;
             };
-            'texImage2D': {
+            texImage2D: {
                 0: boolean;
                 2: boolean;
                 6: boolean;
                 7: boolean;
             };
-            'texSubImage2D': {
+            texSubImage2D: {
                 0: boolean;
                 6: boolean;
                 7: boolean;
             };
-            'copyTexImage2D': {
+            copyTexImage2D: {
                 0: boolean;
                 2: boolean;
             };
-            'copyTexSubImage2D': {
+            copyTexSubImage2D: {
                 0: boolean;
             };
-            'generateMipmap': {
+            generateMipmap: {
                 0: boolean;
             };
-            'bindBuffer': {
+            bindBuffer: {
                 0: boolean;
             };
-            'bufferData': {
+            bufferData: {
                 0: boolean;
                 2: boolean;
             };
-            'bufferSubData': {
+            bufferSubData: {
                 0: boolean;
             };
-            'getBufferParameter': {
-                0: boolean;
-                1: boolean;
-            };
-            'pixelStorei': {
+            getBufferParameter: {
                 0: boolean;
                 1: boolean;
             };
-            'readPixels': {
+            pixelStorei: {
+                0: boolean;
+                1: boolean;
+            };
+            readPixels: {
                 4: boolean;
                 5: boolean;
             };
-            'bindRenderbuffer': {
+            bindRenderbuffer: {
                 0: boolean;
             };
-            'bindFramebuffer': {
+            bindFramebuffer: {
                 0: boolean;
             };
-            'checkFramebufferStatus': {
+            checkFramebufferStatus: {
                 0: boolean;
             };
-            'framebufferRenderbuffer': {
-                0: boolean;
-                1: boolean;
-                2: boolean;
-            };
-            'framebufferTexture2D': {
+            framebufferRenderbuffer: {
                 0: boolean;
                 1: boolean;
                 2: boolean;
             };
-            'getFramebufferAttachmentParameter': {
+            framebufferTexture2D: {
                 0: boolean;
                 1: boolean;
                 2: boolean;
             };
-            'getRenderbufferParameter': {
-                0: boolean;
-                1: boolean;
-            };
-            'renderbufferStorage': {
-                0: boolean;
-                1: boolean;
-            };
-            'clear': {
-                0: boolean;
-            };
-            'depthFunc': {
-                0: boolean;
-            };
-            'blendFunc': {
-                0: boolean;
-                1: boolean;
-            };
-            'blendFuncSeparate': {
-                0: boolean;
-                1: boolean;
-                2: boolean;
-                3: boolean;
-            };
-            'blendEquation': {
-                0: boolean;
-            };
-            'blendEquationSeparate': {
-                0: boolean;
-                1: boolean;
-            };
-            'stencilFunc': {
-                0: boolean;
-            };
-            'stencilFuncSeparate': {
-                0: boolean;
-                1: boolean;
-            };
-            'stencilMaskSeparate': {
-                0: boolean;
-            };
-            'stencilOp': {
+            getFramebufferAttachmentParameter: {
                 0: boolean;
                 1: boolean;
                 2: boolean;
             };
-            'stencilOpSeparate': {
+            getRenderbufferParameter: {
+                0: boolean;
+                1: boolean;
+            };
+            renderbufferStorage: {
+                0: boolean;
+                1: boolean;
+            };
+            clear: {
+                0: boolean;
+            };
+            depthFunc: {
+                0: boolean;
+            };
+            blendFunc: {
+                0: boolean;
+                1: boolean;
+            };
+            blendFuncSeparate: {
                 0: boolean;
                 1: boolean;
                 2: boolean;
                 3: boolean;
             };
-            'cullFace': {
+            blendEquation: {
                 0: boolean;
             };
-            'frontFace': {
+            blendEquationSeparate: {
+                0: boolean;
+                1: boolean;
+            };
+            stencilFunc: {
+                0: boolean;
+            };
+            stencilFuncSeparate: {
+                0: boolean;
+                1: boolean;
+            };
+            stencilMaskSeparate: {
+                0: boolean;
+            };
+            stencilOp: {
+                0: boolean;
+                1: boolean;
+                2: boolean;
+            };
+            stencilOpSeparate: {
+                0: boolean;
+                1: boolean;
+                2: boolean;
+                3: boolean;
+            };
+            cullFace: {
+                0: boolean;
+            };
+            frontFace: {
                 0: boolean;
             };
         };

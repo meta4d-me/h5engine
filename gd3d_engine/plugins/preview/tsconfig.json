@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+      "module": "system",
+      "target": "es5",
+      "declaration": true,
+      "declarationMap": true,
+      "sourceMap": true,
+      "removeComments": true,
+      "experimentalDecorators": true,
+      "emitDecoratorMetadata": true,
+      "outFile": "../../lib/plug_preview.js",    
+      "lib": [
+        "es2015",
+        "es2015.promise",
+        "DOM",
+        "DOM.Iterable",
+        "es5",
+        "es2015.iterable",
+        "es2015.core"
+      ],
+      "types": [
+        "../../lib/gd3d"
+      ]
+    }
+  }

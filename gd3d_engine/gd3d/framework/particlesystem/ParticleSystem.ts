@@ -334,12 +334,14 @@ namespace gd3d.framework
 
         remove()
         {
-            throw "未实现";
+            console.warn(`未实现 ParticleSystem  remove`);
+            // throw "未实现";
         }
 
         clone()
         {
-            throw "未实现";
+            console.warn(`未实现 ParticleSystem  clone`);
+            //throw "未实现";
         }
 
         gameObject: gameObject;
