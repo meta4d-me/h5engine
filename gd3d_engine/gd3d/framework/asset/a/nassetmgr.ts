@@ -426,9 +426,7 @@ namespace gd3d.framework
                     return reject(new Error(`无法找到[${AssetTypeEnum[asset.type]}]的解析器`));
                 if (!factory.parse)
                     return reject(new Error(`解析器 ${factory.constructor.name} 没有实现parse方法`));
-
-
-                let __asset: any = factory.parse(this, bundle, asset.name, data, asset.dwguid);
+                
                 let _this = this;
                 function nextRes(retasset)
                 {
@@ -448,20 +446,27 @@ namespace gd3d.framework
                     }
                     resolve(retasset);
                 }
-                let retasset: IAsset = __asset;
-                // if (__asset instanceof threading.gdPromise){
-                if (__asset && __asset["then"])
-                {
-                    __asset.then((res) =>
+                try {
+                    let __asset: any = factory.parse(this, bundle, asset.name, data, asset.dwguid);                   
+                  
+                    let retasset: IAsset = __asset;
+                    // if (__asset instanceof threading.gdPromise){
+                    if (__asset && __asset["then"])
                     {
-                        nextRes(res);
-                    }).catch((e) =>
-                    {
-                        reject(e);
-                    });
-                    // console.error(`[解析资源] await 完成 ${asset.name}`);
-                } else
-                    nextRes(retasset);
+                        __asset.then((res) =>
+                        {
+                            nextRes(res);
+                        }).catch((e) =>
+                        {
+                            reject(e);
+                        });
+                        // console.error(`[解析资源] await 完成 ${asset.name}`);
+                    } else
+                        nextRes(retasset);
+                } catch (error) {
+                    console.error(`资源解析错误:${error.message}\n${error.stack}`);
+                    reject(error);
+                }
                 // console.log(`解析完成[${AssetTypeEnum[asset.type]}]${Date.now() - ctime}ms,解析器:${factory.constructor.name},guid:${asset.guid},name:${asset.name}`);
             });
         }

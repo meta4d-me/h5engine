@@ -179,12 +179,27 @@ var gd3d;
                 };
                 main.prototype.pview2DTrans = function (trans) {
                     return __awaiter(this, void 0, void 0, function () {
-                        var overlay, wwidth, hheight, isLowPix, pixChange, asp, min, max, uiRoot;
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
+                        var _i, _a, item, atlasUrl, overlay, wwidth, hheight, isLowPix, pixChange, asp, min, max, uiRoot;
+                        return __generator(this, function (_b) {
+                            switch (_b.label) {
                                 case 0: return [4, this.loadAssetBundle("Resources/defFont/defFont.assetbundle.json")];
                                 case 1:
-                                    _a.sent();
+                                    _b.sent();
+                                    _i = 0, _a = this.urlParam["atlas"].split(",");
+                                    _b.label = 2;
+                                case 2:
+                                    if (!(_i < _a.length)) return [3, 5];
+                                    item = _a[_i];
+                                    atlasUrl = "Resources/" + item + "/" + item + ".assetbundle.json";
+                                    console.log("\u52A0\u8F7D\u56FE\u96C6:" + atlasUrl);
+                                    return [4, this.loadAssetBundle(atlasUrl)];
+                                case 3:
+                                    _b.sent();
+                                    _b.label = 4;
+                                case 4:
+                                    _i++;
+                                    return [3, 2];
+                                case 5:
                                     overlay = new gd3d.framework.overlay2D();
                                     overlay.scaleMode = gd3d.framework.UIScaleMode.SCALE_WITH_SCREEN_SIZE;
                                     wwidth = 1280;

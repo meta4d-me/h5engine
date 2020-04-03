@@ -124,7 +124,7 @@ namespace gd3d.framework
                     for (let k in this.files)
                     {
                         let guid = this.files[k];
-                        let url = `${this.baseUrl}Resources/${k}`;
+                        let url = `${this.baseUrl}resources/${k}`;
                         // console.error(`[下載資源] 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                         this.assetmgr.download(guid, url, calcType(k), () =>
                         {

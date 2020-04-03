@@ -8646,7 +8646,7 @@ var gd3d;
                         _this.dw_fileCount += Object.keys(_this.files).length;
                         var _loop_3 = function (k) {
                             var guid = _this.files[k];
-                            var url = _this.baseUrl + "Resources/" + k;
+                            var url = _this.baseUrl + "resources/" + k;
                             _this.assetmgr.download(guid, url, framework.calcType(k), function () {
                                 ++dwpkgCount;
                                 if (dwpkgCount >= _this.dw_fileCount)
@@ -9170,7 +9170,6 @@ var gd3d;
                         return reject(new Error("\u65E0\u6CD5\u627E\u5230[" + framework.AssetTypeEnum[asset.type] + "]\u7684\u89E3\u6790\u5668"));
                     if (!factory.parse)
                         return reject(new Error("\u89E3\u6790\u5668 " + factory.constructor.name + " \u6CA1\u6709\u5B9E\u73B0parse\u65B9\u6CD5"));
-                    var __asset = factory.parse(_this_1, bundle, asset.name, data, asset.dwguid);
                     var _this = _this_1;
                     function nextRes(retasset) {
                         if (retasset) {
@@ -9186,16 +9185,23 @@ var gd3d;
                         }
                         resolve(retasset);
                     }
-                    var retasset = __asset;
-                    if (__asset && __asset["then"]) {
-                        __asset.then(function (res) {
-                            nextRes(res);
-                        }).catch(function (e) {
-                            reject(e);
-                        });
+                    try {
+                        var __asset = factory.parse(_this_1, bundle, asset.name, data, asset.dwguid);
+                        var retasset = __asset;
+                        if (__asset && __asset["then"]) {
+                            __asset.then(function (res) {
+                                nextRes(res);
+                            }).catch(function (e) {
+                                reject(e);
+                            });
+                        }
+                        else
+                            nextRes(retasset);
                     }
-                    else
-                        nextRes(retasset);
+                    catch (error) {
+                        console.error("\u8D44\u6E90\u89E3\u6790\u9519\u8BEF:" + error.message + "\n" + error.stack);
+                        reject(error);
+                    }
                 });
             };
             assetMgr.prototype.getAssetByName = function (name, bundlename) {
