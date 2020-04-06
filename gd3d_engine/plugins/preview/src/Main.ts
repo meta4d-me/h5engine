@@ -172,10 +172,14 @@ namespace gd3d.plugins.preview {
         async pview2DTrans(trans: framework.transform2D) {
 
             await this.loadAssetBundle("Resources/defFont/defFont.assetbundle.json");
-            
-            for(let item of this.urlParam["atlas"].split(","))
-            {
-                var atlasUrl = `Resources/${item}/${item}.assetbundle.json`;
+
+            for (let item of this.urlParam["atlas"].split(",")) {
+                var atlasUrl;
+                var splits = item.split("/");
+                if (splits.length < 1)
+                    atlasUrl = `Resources/${item}/${item}.assetbundle.json`;
+                else
+                    atlasUrl = `Resources/${item}/${splits[splits.length - 1]}.assetbundle.json`;
                 console.log(`加载图集:${atlasUrl}`);
                 await this.loadAssetBundle(atlasUrl);
             }

@@ -179,7 +179,7 @@ var gd3d;
                 };
                 main.prototype.pview2DTrans = function (trans) {
                     return __awaiter(this, void 0, void 0, function () {
-                        var _i, _a, item, atlasUrl, overlay, wwidth, hheight, isLowPix, pixChange, asp, min, max, uiRoot;
+                        var _i, _a, item, atlasUrl, splits, overlay, wwidth, hheight, isLowPix, pixChange, asp, min, max, uiRoot;
                         return __generator(this, function (_b) {
                             switch (_b.label) {
                                 case 0: return [4, this.loadAssetBundle("Resources/defFont/defFont.assetbundle.json")];
@@ -190,7 +190,11 @@ var gd3d;
                                 case 2:
                                     if (!(_i < _a.length)) return [3, 5];
                                     item = _a[_i];
-                                    atlasUrl = "Resources/" + item + "/" + item + ".assetbundle.json";
+                                    splits = item.split("/");
+                                    if (splits.length < 1)
+                                        atlasUrl = "Resources/" + item + "/" + item + ".assetbundle.json";
+                                    else
+                                        atlasUrl = "Resources/" + item + "/" + splits[splits.length - 1] + ".assetbundle.json";
                                     console.log("\u52A0\u8F7D\u56FE\u96C6:" + atlasUrl);
                                     return [4, this.loadAssetBundle(atlasUrl)];
                                 case 3:
