@@ -1,6 +1,8 @@
-namespace gd3d.plugins.preview {
+namespace gd3d.plugins.preview
+{
 
-    export class main {
+    export class main
+    {
         urlParam: { [key: string]: string } = {};
         app: gd3d.framework.application;
         scene: gd3d.framework.scene;
@@ -8,11 +10,13 @@ namespace gd3d.plugins.preview {
         root: gd3d.framework.transform;
         pviewCam: gd3d.framework.transform;
         target: gd3d.framework.transform;
-        constructor() {
+        constructor()
+        {
             window.oncontextmenu = (e) => { e.preventDefault(); };
             this.initParam();
         }
-        createCamera(parent, name) {
+        createCamera(parent, name)
+        {
             var objCam = new gd3d.framework.transform();
             objCam.name = name;
             parent.addChild(objCam);
@@ -25,17 +29,22 @@ namespace gd3d.plugins.preview {
             objCam.markDirty();//标记为需要刷新
             return objCam;
         }
-        loadAssetBundle(url: string) {
-            return new Promise((resolve, reject) => {
-                this.assetMgr.load(url, gd3d.framework.AssetTypeEnum.Auto, (state) => {
-                    if (state.isfinish) {
+        loadAssetBundle(url: string)
+        {
+            return new Promise((resolve, reject) =>
+            {
+                this.assetMgr.load(url, gd3d.framework.AssetTypeEnum.Auto, (state) =>
+                {
+                    if (state.isfinish)
+                    {
                         resolve(url);
                     }
                 })
             });
         }
 
-        async start(gameStage: HTMLCanvasElement) {
+        async start(gameStage: HTMLCanvasElement)
+        {
 
             var gdapp = new gd3d.framework.application();
             gdapp.bePlay = true;
@@ -71,9 +80,11 @@ namespace gd3d.plugins.preview {
             this.handleEvent();
         }
 
-        initParam() {
+        initParam()
+        {
             let params = window.location.href.replace("?", "&").split("&");
-            for (var i = 1; i < params.length; ++i) {
+            for (var i = 1; i < params.length; ++i)
+            {
                 var pair = params[i].split("=");
                 this.urlParam[pair[0]] = pair[1];
             }
@@ -81,18 +92,22 @@ namespace gd3d.plugins.preview {
         }
 
 
-        handleEvent() {
-            (document as any).onmousewheel = (e) => {
+        handleEvent()
+        {
+            (document as any).onmousewheel = (e) =>
+            {
                 this.pviewCam.localTranslate.z += e.deltaY / 100;
                 this.pviewCam.lookat(this.root);
                 this.pviewCam.markDirty();
             }
             let thita = 0;
-            document.onmousedown = (event) => {
+            document.onmousedown = (event) =>
+            {
                 event.preventDefault();
                 let ev = event;
 
-                document.onmousemove = (e) => {
+                document.onmousemove = (e) =>
+                {
                     e.preventDefault();
                     if (!this.target)
                         return;
@@ -110,9 +125,11 @@ namespace gd3d.plugins.preview {
 
                     gd3d.math.quatNormalize(this.target.localRotate, this.target.localRotate);
 
-                    if (ry != 0) {
+                    if (ry != 0)
+                    {
                         thita += ry * 0.4;
-                        if (thita >= -90 && thita <= 90) {
+                        if (thita >= -90 && thita <= 90)
+                        {
                             let vc3x = new gd3d.math.vector3(0.4, 0, 0);
 
                             let q = new gd3d.math.quaternion();
@@ -134,7 +151,8 @@ namespace gd3d.plugins.preview {
 
                             gd3d.math.quatNormalize(this.target.localRotate, this.target.localRotate);
 
-                        } else {
+                        } else
+                        {
                             thita -= ry * 0.4;
                         }
                     }
@@ -144,14 +162,16 @@ namespace gd3d.plugins.preview {
                     ev = e;
                 }
 
-                document.onmouseup = (e) => {
+                document.onmouseup = (e) =>
+                {
 
                     document.onmousemove = null;
                     document.onmouseup = null;
                     document.onmouseup = null;
                 }
 
-                document.onmouseout = (e) => {
+                document.onmouseout = (e) =>
+                {
                     document.onmousemove = null;
                     document.onmouseup = null;
                     document.onmouseup = null;
@@ -160,7 +180,8 @@ namespace gd3d.plugins.preview {
 
         }
 
-        pview3DTrans(trans: framework.transform) {
+        pview3DTrans(trans: framework.transform)
+        {
 
             trans.localTranslate = new gd3d.math.vector3(0, 0, 0);
             this.root.addChild(trans);
@@ -169,14 +190,18 @@ namespace gd3d.plugins.preview {
             this.target = trans;
         }
 
-        async pview2DTrans(trans: framework.transform2D) {
+        async pview2DTrans(trans: framework.transform2D)
+        {
 
             await this.loadAssetBundle("Resources/defFont/defFont.assetbundle.json");
 
-            for (let item of this.urlParam["atlas"].split(",")) {
+            for (let item of this.urlParam["atlas"].split(","))
+            {
+                if (item.trim().length < 1)
+                    continue;
                 var atlasUrl;
                 var splits = item.split("/");
-                if (splits.length < 1)
+                if (splits.length < 2)
                     atlasUrl = `Resources/${item}/${item}.assetbundle.json`;
                 else
                     atlasUrl = `Resources/${item}/${splits[splits.length - 1]}.assetbundle.json`;
@@ -203,7 +228,8 @@ namespace gd3d.plugins.preview {
             let min = 0.6;
             let max = 1.68;
             asp = asp < min ? min : asp;
-            if (asp < max) {
+            if (asp < max)
+            {
                 overlay.screenMatchRate = (asp - min) / (max - min);
             }
 

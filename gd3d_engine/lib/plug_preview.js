@@ -190,8 +190,10 @@ var gd3d;
                                 case 2:
                                     if (!(_i < _a.length)) return [3, 5];
                                     item = _a[_i];
+                                    if (item.trim().length < 1)
+                                        return [3, 4];
                                     splits = item.split("/");
-                                    if (splits.length < 1)
+                                    if (splits.length < 2)
                                         atlasUrl = "Resources/" + item + "/" + item + ".assetbundle.json";
                                     else
                                         atlasUrl = "Resources/" + item + "/" + splits[splits.length - 1] + ".assetbundle.json";
