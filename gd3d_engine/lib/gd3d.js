@@ -14975,7 +14975,7 @@ var gd3d;
                         var trans = this.carelist[bonename];
                         var transMat = this.careBoneMat[bonename];
                         var index = this._playClip.indexDic[bonename];
-                        if (index) {
+                        if (index != null) {
                             if (this.beCross && this.lastFrame) {
                                 transMat.lerpInWorldWithData(this.inversTpos[bonename], this.lastFrame[bonename], this.curFrame, index * 7 + 1, 1 - this.crossPercentage);
                             }
