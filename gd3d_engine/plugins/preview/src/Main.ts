@@ -31,7 +31,7 @@ namespace gd3d.plugins.preview
         }
         loadAssetBundle(url: string)
         {
-            return new Promise((resolve, reject) =>
+            return new Promise((resolve) =>
             {
                 this.assetMgr.load(url, gd3d.framework.AssetTypeEnum.Auto, (state) =>
                 {
