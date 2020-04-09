@@ -240,7 +240,7 @@ namespace gd3d.framework
                     let transMat = this.careBoneMat[bonename];
 
                     let index = this._playClip.indexDic[bonename];
-                    if (index)
+                    if (index != null)
                     {
                         if (this.beCross && this.lastFrame)
                         {

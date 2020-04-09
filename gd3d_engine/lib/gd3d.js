@@ -5273,7 +5273,7 @@ var gd3d;
         var label = (function () {
             function label() {
                 this.needRefreshFont = false;
-                this._fontName = "defFont";
+                this._fontName = "defFont.font.json";
                 this._fontsize = 14;
                 this.linespace = 1;
                 this.horizontalType = HorizontalType.Left;
@@ -14975,7 +14975,7 @@ var gd3d;
                         var trans = this.carelist[bonename];
                         var transMat = this.careBoneMat[bonename];
                         var index = this._playClip.indexDic[bonename];
-                        if (index) {
+                        if (index != null) {
                             if (this.beCross && this.lastFrame) {
                                 transMat.lerpInWorldWithData(this.inversTpos[bonename], this.lastFrame[bonename], this.curFrame, index * 7 + 1, 1 - this.crossPercentage);
                             }

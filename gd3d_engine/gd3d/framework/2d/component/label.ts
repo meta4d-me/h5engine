@@ -92,7 +92,7 @@ namespace gd3d.framework
         private needRefreshFont = false;
 
         @gd3d.reflect.Field("string")
-        private _fontName = "defFont";
+        private _fontName = "defFont.font.json";
         private _fontsize: number = 14;
         /**
          * @public
