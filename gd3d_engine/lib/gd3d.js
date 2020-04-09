@@ -5273,7 +5273,7 @@ var gd3d;
         var label = (function () {
             function label() {
                 this.needRefreshFont = false;
-                this._fontName = "defFont";
+                this._fontName = "defFont.font.json";
                 this._fontsize = 14;
                 this.linespace = 1;
                 this.horizontalType = HorizontalType.Left;
