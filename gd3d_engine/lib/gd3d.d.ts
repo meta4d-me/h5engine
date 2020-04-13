@@ -1,4 +1,8 @@
-/// <reference path="Reflect.d.ts" />
+declare namespace gd3d {
+    class version {
+        static readonly VERSION = "0.0.1";
+    }
+}
 declare namespace gd3d.framework {
     interface INotify {
         notify(trans: any, type: NotifyType): any;
@@ -29,8 +33,6 @@ declare namespace gd3d.framework {
         private _timeScale;
         set timeScale(val: number);
         get timeScale(): number;
-        private version;
-        private build;
         private _tar;
         private _standDeltaTime;
         set targetFrame(val: number);
@@ -214,6 +216,9 @@ declare namespace gd3d.framework {
         renderLayer: number;
         queue: number;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): any;
+    }
+    interface IRendererGpuIns extends IRenderer {
+        isGpuInstancing(): boolean;
     }
 }
 declare namespace gd3d.framework {
@@ -944,6 +949,7 @@ declare namespace gd3d.framework {
         private datar;
         color: math.color;
         color2: math.color;
+        outlineWidth: number;
         private static readonly defUIShader;
         private static readonly defMaskUIShader;
         private _CustomShaderName;
@@ -1071,6 +1077,9 @@ declare namespace gd3d.framework {
         private cgCount;
         private lastfv;
         private flyingSlidr;
+        onMoveFun: (x: number, y: number) => {};
+        onDownFun: (x: number, y: number) => {};
+        onUpFun: () => {};
         remove(): void;
     }
 }
@@ -1565,7 +1574,8 @@ declare namespace gd3d.framework {
         Scene = 23,
         Prefab = 24,
         cPrefab = 25,
-        ParticleSystem = 26
+        ParticleSystem = 26,
+        TrailRenderer = 27
     }
     class ResourceState {
         res: IAsset;
@@ -1739,6 +1749,8 @@ declare namespace gd3d.framework {
         static correctFileName(name: string): string;
         static correctTxtFileName(name: string): string;
         getShader(name: string): gd3d.framework.shader;
+        private linerenderermat;
+        getDefLineRendererMat(): material;
         private particlemat;
         getDefParticleMat(): material;
         private assetUrlDic;
@@ -1806,6 +1818,9 @@ declare namespace gd3d.framework {
         static fsline: string;
         static materialShader: string;
         static vsmaterialcolor: string;
+        static vslinetrail: string;
+        static linetrailShader: string;
+        static fslinetrail: string;
         static initDefaultShader(assetmgr: assetMgr): void;
     }
 }
@@ -1950,6 +1965,11 @@ declare namespace gd3d.framework {
         private readonly t_KTX;
         parse(assetmgr: assetMgr, bundle: assetBundle, name: string, data: string, dwguid: number): texture;
         needDownload(text: string): any;
+    }
+}
+declare namespace gd3d.framework {
+    class AssetFactory_TrailRenderer implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, txt: string): TrailRendererData;
     }
 }
 declare namespace gd3d.framework {
@@ -2288,7 +2308,7 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
-    class meshRenderer implements IRenderer {
+    class meshRenderer implements IRendererGpuIns {
         static readonly ClassName: string;
         constructor();
         gameObject: gameObject;
@@ -2309,6 +2329,14 @@ declare namespace gd3d.framework {
         private refreshLayerAndQue;
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
+        private static helpIMatrix;
+        static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera, instanceArray: IRendererGpuIns[]): void;
+        private static readonly insOffsetMatrixStr;
+        private static setInstanceOffsetMatrix;
+        private static instanceDrawType;
+        private static _vbos;
+        private static _getVBO;
+        isGpuInstancing(): boolean;
         remove(): void;
         clone(): void;
     }
@@ -2435,14 +2463,17 @@ declare namespace gd3d.framework {
     interface DrawInstanceInfo {
         instanceCount: number;
         initBuffer(gl: WebGLRenderingContext): void;
-        activeAttributes(gl: WebGLRenderingContext, program: WebGLProgram): void;
-        disableAttributes(gl: WebGLRenderingContext, program: WebGLProgram): void;
+        activeAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
+        disableAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
     }
     class material implements IAsset {
         static readonly ClassName: string;
         private name;
         private id;
         defaultAsset: boolean;
+        private _enableGpuInstancing;
+        get enableGpuInstancing(): boolean;
+        set enableGpuInstancing(enable: boolean);
         constructor(assetName?: string);
         getName(): string;
         getGUID(): number;
@@ -2452,6 +2483,12 @@ declare namespace gd3d.framework {
         caclByteLength(): number;
         private static sameMatPassMap;
         uploadUnifoms(pass: render.glDrawPass, context: renderContext, lastMatSame?: boolean): void;
+        instanceAttribValMap: {
+            [id: string]: number[];
+        };
+        uploadInstanceAtteribute(pass: render.glDrawPass, setContainer: number[]): void;
+        private setInstanceAttribValue;
+        private isNotBuildinAttribId;
         setShader(shader: shader): void;
         getLayer(): RenderLayerEnum;
         private queue;
@@ -3237,6 +3274,7 @@ declare namespace gd3d.framework {
         boneMatricesTexture: gd3d.framework.texture;
         initBoneMatrices(): void;
         initStaticPoseMatrices(): void;
+        private boneSamplerTexindex;
         updateBoneTexture(context: renderContext): void;
         tempMatrix: math.matrix;
         inverseRootBone: math.matrix;
@@ -3288,17 +3326,41 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    enum AnimationCullingType {
+        AlwaysAnimate = 0,
+        BasedOnRenderers = 1,
+        BasedOnClipBounds = 2,
+        BasedOnUserBounds = 3
+    }
     class keyFrameAniPlayer implements INodeComponent {
         static readonly ClassName: string;
         clips: keyFrameAniClip[];
-        private nowClip;
+        private clipMap;
+        private _nowClip;
         private get nowFrame();
         private nowTime;
         private pathPropertyMap;
         gameObject: gameObject;
+        private playEndDic;
+        private _currClipName;
+        get currClipName(): string;
+        private _speed;
+        get speed(): number;
+        set speed(v: number);
+        private _animateOnlyIfVisible;
+        get animateOnlyIfVisible(): boolean;
+        set animateOnlyIfVisible(v: boolean);
+        private _cullingType;
+        get cullingType(): AnimationCullingType;
+        set cullingType(v: AnimationCullingType);
+        private _localBounds;
+        get localBounds(): aabb;
+        set localBounds(v: aabb);
+        private endNormalizedTime;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
+        getClip(clipName: string): keyFrameAniClip;
         private displayByTime;
         private static lhvec;
         private static rhvec;
@@ -3315,11 +3377,13 @@ declare namespace gd3d.framework {
         private timeFilterCurves;
         private checkPlayEnd;
         private init;
-        isPlaying(ClipName: string): boolean;
-        playByName(ClipName: string): void;
-        play(): void;
+        isPlaying(ClipName?: string): boolean;
+        play(ClipName?: string, onPlayEnd?: () => void, normalizedTime?: number): void;
+        private playByClip;
+        private OnClipPlayEnd;
         stop(): void;
         rewind(): void;
+        addClip(clip: keyFrameAniClip): void;
         private collectPropertyObj;
         private collectPathPropertyObj;
         private serchChild;
@@ -4116,6 +4180,177 @@ declare namespace gd3d.framework {
         moveTo(to: transform): void;
     }
 }
+declare namespace gd3d.framework {
+    class LineRenderer implements IRenderer {
+        static readonly ClassName: string;
+        private mesh;
+        material: material;
+        layer: RenderLayerEnum;
+        get renderLayer(): number;
+        set renderLayer(layer: number);
+        queue: number;
+        get transform(): transform;
+        gameObject: gameObject;
+        loop: boolean;
+        positions: math.vector3[];
+        lineWidth: MinMaxCurve;
+        lineColor: MinMaxGradient;
+        numCornerVertices: number;
+        numCapVertices: number;
+        alignment: LineAlignment;
+        textureMode: LineTextureMode;
+        shadowBias: number;
+        generateLightingData: boolean;
+        useWorldSpace: boolean;
+        get widthCurve(): AnimationCurve1;
+        get widthMultiplier(): number;
+        set widthMultiplier(v: number);
+        get colorGradient(): Gradient;
+        get endColor(): math.color;
+        set endColor(v: math.color);
+        get endWidth(): number;
+        set endWidth(v: number);
+        get positionCount(): number;
+        set positionCount(v: number);
+        get startColor(): math.color;
+        set startColor(v: math.color);
+        get startWidth(): number;
+        set startWidth(v: number);
+        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        onPlay(): void;
+        start(): void;
+        update(interval?: number): void;
+        remove(): void;
+        clone(): void;
+        BakeMesh(mesh: mesh, camera: camera, useTransform: boolean): void;
+        GetPosition(index: number): math.vector3;
+        GetPositions(positions?: math.vector3[]): math.vector3[];
+        setPosition(index: number, position: math.vector3): void;
+        SetPositions(positions: math.vector3[]): void;
+        Simplify(tolerance: number): void;
+        private localToWorldMatrix;
+        private worldToLocalMatrix;
+        static draw(context: renderContext, go: gameObject, mesh: mesh, material: material): void;
+        static clearMesh(mesh: mesh): void;
+        static uploadMesh(_mesh: mesh, webgl: WebGLRenderingContext): void;
+        static calcMesh(positionVectex: {
+            vertexs: math.vector3[];
+            tangent: math.vector3;
+            normal: math.vector3;
+            rateAtLine: number;
+        }[], textureMode: LineTextureMode, colorGradient: Gradient, totalLength: number, mesh: mesh): void;
+        static calcPositionVectex(positions: math.vector3[], loop: boolean, rateAtLines: number[], lineWidth: MinMaxCurve, alignment: LineAlignment, cameraPosition: math.vector3): {
+            vertexs: math.vector3[];
+            tangent: math.vector3;
+            normal: math.vector3;
+            rateAtLine: number;
+        }[];
+        static calcTotalLength(positions: math.vector3[], loop: boolean): number;
+        static calcRateAtLines(positions: math.vector3[], loop: boolean, textureMode: LineTextureMode): number[];
+    }
+}
+declare namespace gd3d.framework {
+    class TrailRenderer implements IRenderer {
+        static readonly ClassName: string;
+        private mesh;
+        material: material;
+        layer: RenderLayerEnum;
+        get renderLayer(): number;
+        set renderLayer(layer: number);
+        queue: number;
+        get transform(): transform;
+        gameObject: gameObject;
+        private positions;
+        lineWidth: MinMaxCurve;
+        lineColor: MinMaxGradient;
+        numCornerVertices: number;
+        numCapVertices: number;
+        alignment: LineAlignment;
+        autodestruct: boolean;
+        emitting: boolean;
+        minVertexDistance: number;
+        time: number;
+        textureMode: LineTextureMode;
+        shadowBias: number;
+        generateLightingData: boolean;
+        get widthCurve(): AnimationCurve1;
+        set widthCurve(v: AnimationCurve1);
+        get widthMultiplier(): number;
+        set widthMultiplier(v: number);
+        get colorGradient(): Gradient;
+        set colorGradient(v: Gradient);
+        get endColor(): math.color;
+        set endColor(v: math.color);
+        get endWidth(): number;
+        set endWidth(v: number);
+        get positionCount(): number;
+        set positionCount(v: number);
+        get startColor(): math.color;
+        set startColor(v: math.color);
+        get startWidth(): number;
+        set startWidth(v: number);
+        get trailRendererData(): TrailRendererData;
+        set trailRendererData(v: TrailRendererData);
+        private _trailRendererData;
+        render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
+        onPlay(): void;
+        start(): void;
+        remove(): void;
+        clone(): void;
+        update(interval?: number): void;
+        BakeMesh(mesh: mesh, camera: camera, useTransform: boolean): void;
+        AddPosition(position: math.vector3): void;
+        AddPositions(positions: math.vector3[]): void;
+        Clear(): void;
+        GetPosition(index: number): {
+            position: math.vector3;
+            birthTime: number;
+        };
+        GetPositions(positions?: math.vector3[]): math.vector3[];
+        setPosition(index: number, position: math.vector3): void;
+        SetPositions(positions: math.vector3[]): void;
+        private _preworldPos;
+        private localToWorldMatrix;
+        private worldToLocalMatrix;
+    }
+}
+declare namespace gd3d.framework {
+    class TrailRendererData implements IAsset {
+        static readonly ClassName: string;
+        private static _datas;
+        trailRenderer: TrailRenderer;
+        static get(valueName: string): TrailRendererData;
+        private name;
+        private id;
+        defaultAsset: boolean;
+        get value(): string;
+        set value(v: string);
+        private _value;
+        constructor(assetName?: string);
+        getName(): string;
+        getGUID(): number;
+        dispose(): void;
+        use(): void;
+        unuse(disposeNow?: boolean): void;
+        caclByteLength(): number;
+        setData(v: string): void;
+        objectData: any;
+    }
+}
+declare namespace gd3d.framework {
+    enum LineAlignment {
+        View = 0,
+        TransformZ = 1
+    }
+}
+declare namespace gd3d.framework {
+    enum LineTextureMode {
+        Stretch = 0,
+        Tile = 1,
+        DistributePerSegment = 2,
+        RepeatPerSegment = 3
+    }
+}
 declare namespace gd3d {
     abstract class AEvent {
         private events;
@@ -4734,6 +4969,7 @@ declare namespace gd3d.math {
     function vec3ScaleByNum(from: vector3, scale: number, out: vector3): void;
     function vec3Product(a: vector3, b: vector3, out: vector3): void;
     function vec3Cross(lhs: vector3, rhs: vector3, out: vector3): void;
+    function vec3IsParallel(lhs: vector3, rhs: vector3, precision?: number): boolean;
     function vec3Reflect(inDirection: vector3, inNormal: vector3, out: vector3): void;
     function vec3Dot(lhs: vector3, rhs: vector3): number;
     function vec3Project(vector: vector3, onNormal: vector3, out: vector3): void;
@@ -6509,7 +6745,7 @@ declare namespace gd3d.framework {
     class ParticleSystemShapeBase {
         protected _module: ParticleShapeModule;
         constructor(module: ParticleShapeModule);
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6526,7 +6762,7 @@ declare namespace gd3d.framework {
         get boxZ(): number;
         set boxZ(v: number);
         emitFrom: ParticleSystemShapeBoxEmitFrom;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6542,7 +6778,7 @@ declare namespace gd3d.framework {
         get arcSpeed(): MinMaxCurve;
         set arcSpeed(v: MinMaxCurve);
         emitFromEdge: boolean;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6562,7 +6798,7 @@ declare namespace gd3d.framework {
         get arcSpeed(): MinMaxCurve;
         set arcSpeed(v: MinMaxCurve);
         emitFrom: ParticleSystemShapeConeEmitFrom;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6575,7 +6811,7 @@ declare namespace gd3d.framework {
         set radiusSpread(v: number);
         get radiusSpeed(): MinMaxCurve;
         set radiusSpeed(v: MinMaxCurve);
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6583,12 +6819,12 @@ declare namespace gd3d.framework {
         get radius(): number;
         set radius(v: number);
         emitFromShell: boolean;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
     class ParticleSystemShapeHemisphere extends ParticleSystemShapeBase {
         radius: number;
         emitFromShell: boolean;
-        initParticleState(particle: Particle1): void;
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3): void;
     }
 }
 declare namespace gd3d.framework {
@@ -7043,10 +7279,15 @@ declare namespace gd3d.framework {
         matrixView: gd3d.math.matrix;
         matrixProject: gd3d.math.matrix;
         matrixModel: gd3d.math.matrix;
+        private _lastM_IT;
         private _matrixWorld2Object;
         get matrixWorld2Object(): math.matrix;
         matrixModelViewProject: gd3d.math.matrix;
-        matrixModelView: gd3d.math.matrix;
+        private _matrixModelView;
+        get matrixModelView(): math.matrix;
+        private _matrixInverseModelView;
+        private _lastMV_IT;
+        get matrixInverseModelView(): math.matrix;
         matrixViewProject: gd3d.math.matrix;
         floatTimer: number;
         intLightCount: number;
@@ -7074,6 +7315,7 @@ declare namespace gd3d.framework {
         updateLights(lights: light[]): void;
         updateOverlay(): void;
         updateModel(model: transform): void;
+        updateModelByMatrix(m_matrix: gd3d.math.matrix): void;
         updateModeTrail(): void;
         updateLightMask(layer: number): void;
     }
@@ -7085,13 +7327,17 @@ declare namespace gd3d.framework {
     class renderList {
         constructor();
         clear(): void;
-        addRenderer(renderer: IRenderer): void;
+        addRenderer(renderer: IRenderer, webgl: WebGLRenderingContext): void;
         renderLayers: renderLayer[];
     }
     class renderLayer {
         needSort: boolean;
         list: IRenderer[];
         constructor(_sort?: boolean);
+        gpuInstanceMap: {
+            [sID: string]: IRendererGpuIns[];
+        };
+        addInstance(r: IRendererGpuIns): void;
     }
 }
 declare namespace gd3d.framework {
@@ -7570,7 +7816,6 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     var serialization: Serialization;
-    function serialize(target: any, propertyKey: string): void;
     interface PropertyHandler {
         (target: any, source: any, property: string, handlers: PropertyHandler[], serialization: Serialization): boolean;
     }
@@ -8365,6 +8610,11 @@ declare namespace gd3d.render {
         type: UniformTypeEnum;
         location: WebGLUniformLocation;
     }
+    class attribute {
+        name: string;
+        size: number;
+        location: number;
+    }
     enum ShaderTypeEnum {
         VS = 0,
         FS = 1
@@ -8376,8 +8626,19 @@ declare namespace gd3d.render {
         shader: WebGLShader;
     }
     class glProgram {
+        private static buildInAtrribute;
+        static isBuildInAttrib(attribID: string): boolean;
         constructor(vs: glShader, fs: glShader, program: WebGLProgram);
+        mapAttrib: {
+            [id: string]: attribute;
+        };
+        mapCustomAttrib: {
+            [id: string]: attribute;
+        };
+        private _strideInsAttrib;
+        get strideInsAttrib(): number;
         initAttribute(webgl: WebGLRenderingContext): void;
+        private tryGetLocation;
         vs: glShader;
         fs: glShader;
         program: WebGLProgram;

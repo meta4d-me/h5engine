@@ -8,6 +8,9 @@ attribute vec4 _glesColor;
 
 uniform mat4 glstate_matrix_mvp;
 
+uniform vec4 _MainTex_ST;
+
+varying vec4 v_color;
 varying vec2 v_uv;
 
 
@@ -20,7 +23,6 @@ attribute vec2 a_particle_flipUV;
 
 uniform mat4 u_particle_billboardMatrix;
 
-varying vec4 v_particle_color;
 
 mat3 makeParticleRotationMatrix(vec3 rotation)
 {
@@ -78,7 +80,7 @@ vec4 particleAnimation(vec4 position)
     position.xyz = position.xyz + a_particle_position.xyz;
 
     // 颜色
-    v_particle_color = a_particle_color * _glesColor;
+    v_color = a_particle_color * _glesColor;
 
     if(a_particle_flipUV.x > 0.5) v_uv.x = 1.0 - v_uv.x;
     if(a_particle_flipUV.y > 0.5) v_uv.y = 1.0 - v_uv.y;
@@ -91,7 +93,7 @@ void main()
 {
     vec4 position = vec4(_glesVertex.xyz, 1.0);
     //输出uv
-    v_uv = _glesMultiTexCoord0.xy;
+    v_uv = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;
 
     position = particleAnimation(position);
 

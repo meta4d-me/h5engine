@@ -20,6 +20,8 @@ attribute vec2 a_particle_flipUV;
 
 uniform mat4 u_particle_billboardMatrix;
 
+uniform vec4 _MainTex_ST;
+
 varying vec4 v_particle_color;
 
 mat3 makeParticleRotationMatrix(vec3 rotation)
@@ -91,7 +93,7 @@ void main()
 {
     vec4 position = vec4(_glesVertex.xyz, 1.0);
     //输出uv
-    v_uv = _glesMultiTexCoord0.xy;
+    v_uv = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;
 
     position = particleAnimation(position);
 

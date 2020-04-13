@@ -482,12 +482,9 @@ namespace gd3d.framework
             //
             var birthRateAtDuration = particle.birthRateAtDuration;
 
-            particle.position.x = 0;
-            particle.position.y = 0;
-            particle.position.z = 0;
             particle.velocity.x = 0;
             particle.velocity.y = 0;
-            particle.velocity.z = this.startSpeed.getValue(birthRateAtDuration);
+            particle.velocity.z = 0;
 
             particle.acceleration.x = 0;
             particle.acceleration.y = 0;

@@ -21,6 +21,9 @@ namespace gd3d.framework
             this.autoUniformDic["glstate_matrix_modelview"]=(context: renderContext)=>{
                 return context.matrixModelView;
             };
+            this.autoUniformDic["glstate_matrix_it_modelview"]=(context: renderContext)=>{
+                return context.matrixInverseModelView;
+            };
             this.autoUniformDic["glstate_matrix_viewproject"]=(context: renderContext)=>{
                 return context.matrixViewProject;
             };

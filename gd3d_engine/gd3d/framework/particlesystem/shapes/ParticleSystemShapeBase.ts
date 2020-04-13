@@ -14,11 +14,15 @@ namespace gd3d.framework
             this._module = module;
         }
 
+
         /**
-         * 初始化粒子状态
-         * @param particle 粒子
+         * 计算粒子的发射位置与方向
+         * 
+         * @param particle 
+         * @param position 
+         * @param dir 
          */
-        initParticleState(particle: Particle1)
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3)
         {
 
         }

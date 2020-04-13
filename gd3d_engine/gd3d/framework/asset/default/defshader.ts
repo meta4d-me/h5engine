@@ -82,7 +82,7 @@ namespace gd3d.framework
               \"_MaskTex('MaskTex',Texture)='white'{}\"\
             ]\
             }";
-        
+
         static fscodeUI: string = `
             uniform sampler2D _MainTex;
             varying lowp vec4 xlv_COLOR;
@@ -93,7 +93,7 @@ namespace gd3d.framework
                 tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));
                 gl_FragData[0] = tmpvar_3;
             }`;
-        static vscodeUI : string =`
+        static vscodeUI: string = `
             attribute vec4 _glesVertex;    
             attribute vec4 _glesColor;                   
             attribute vec4 _glesMultiTexCoord0;          
@@ -110,7 +110,7 @@ namespace gd3d.framework
                 gl_Position = (glstate_matrix_mvp * tmpvar_1);   
             }
         `;
-        static vscodeMaskUI:string = ` 
+        static vscodeMaskUI: string = ` 
         attribute vec4 _glesVertex;    
         attribute vec4 _glesColor;                   
         attribute vec4 _glesMultiTexCoord0;          
@@ -130,7 +130,7 @@ namespace gd3d.framework
             gl_Position = (glstate_matrix_mvp * tmpvar_1);   
         }`;
 
-        static fscodeMaskUI:string = `          
+        static fscodeMaskUI: string = `          
         uniform sampler2D _MainTex;                                                  
         uniform highp vec4 _maskRect;                                                  
         varying lowp vec4 xlv_COLOR;                                                  
@@ -202,7 +202,7 @@ namespace gd3d.framework
         //     vec4 col = texture2D(_MainTex, xlv_TEXCOORD0);
         //     col.a = col.r * xlv_COLOR.a;
         //     col.rgb = xlv_COLOR.rgb;
-            
+
         //     gl_FragData[0] = col;
         // }`;
 
@@ -218,7 +218,7 @@ namespace gd3d.framework
         //     float scale = 10.0;    
         //     float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.47)*scale;    
         //     float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.4)*scale;    
-            
+
         //     float c=xlv_COLOR.a * clamp ( d,0.0,1.0);   
         //     float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);   
         //     bc =min(1.0-c,bc);  
@@ -229,6 +229,9 @@ namespace gd3d.framework
         static fscodefontUI: string = ` 
             precision mediump float ; 
             uniform sampler2D _MainTex; 
+
+            uniform highp float _outlineWidth; // 描边宽度
+
             varying lowp vec4 xlv_COLOR; // 字体颜色
             varying lowp vec4 xlv_COLOREx; // 描边颜色
             varying highp vec2 xlv_TEXCOORD0;     
@@ -240,7 +243,8 @@ namespace gd3d.framework
                 
                 float _DistanceMark = 0.0; // 距离为 0 处是字符边缘
                 float _SmoothDelta = 0.5; // 在字符边缘 0.5 像素进行插值 
-                float _OutlineDistanceMark = -1.0; // 描边位置
+
+                float _OutlineDistanceMark = -_outlineWidth; // 描边位置
 
                 vec4 col = texture2D(_MainTex, xlv_TEXCOORD0);
                 float distance = col.r * 4.0 - 2.0;
@@ -258,7 +262,7 @@ namespace gd3d.framework
                 // Outlining 描边
                 vec4 outlineCol = vec4(1.0,1.0,1.0,1.0);
 
-                outlineCol.a = smoothstep(_OutlineDistanceMark - _SmoothDelta, _OutlineDistanceMark + _SmoothDelta, distance);
+                outlineCol.a = smoothstep(_OutlineDistanceMark - _outlineWidth, _OutlineDistanceMark + _outlineWidth, distance);
                 outlineCol.rgb = xlv_COLOREx.rgb;
                 outlineCol.a = outlineCol.a * xlv_COLOREx.a;
                 
@@ -270,7 +274,7 @@ namespace gd3d.framework
                 // 设置最终值
                 gl_FragData[0] = col;
         }`;
-    
+
         static vscodeuifontmask: string = ` 
             attribute vec4 _glesVertex;    
             attribute vec4 _glesColor;                   
@@ -294,7 +298,7 @@ namespace gd3d.framework
                 gl_Position = (glstate_matrix_mvp * tmpvar_1);   
             }`;
 
-        static fscodeuifontmask:string = ` 
+        static fscodeuifontmask: string = ` 
             precision mediump float; 
             uniform sampler2D _MainTex;   
             uniform highp vec4 _maskRect;        
@@ -415,6 +419,45 @@ namespace gd3d.framework
             gl_Position = (glstate_matrix_mvp * tmpvar_1);\
         }";
 
+        static vslinetrail = `
+        attribute vec4 _glesVertex;
+        attribute vec2 _glesMultiTexCoord0;
+        attribute vec4 _glesColor;
+        
+        uniform mat4 glstate_matrix_mvp;
+        
+        varying vec2 xlv_TEXCOORD0;
+        varying vec4 xlv_COLOR;
+        
+        void main() 
+        {
+            gl_Position = glstate_matrix_mvp * _glesVertex;
+            xlv_TEXCOORD0 = _glesMultiTexCoord0;
+            xlv_COLOR = _glesColor;
+        }
+        `;
+
+        static linetrailShader: string = "{\
+            \"properties\": [\
+              \"_MainTex('MainTex',Texture)='white'{}\"\
+            ]\
+            }";
+
+        static fslinetrail = `
+        precision mediump float;
+
+        uniform sampler2D _MainTex; 
+        
+        varying vec2 xlv_TEXCOORD0;
+        varying vec4 xlv_COLOR;
+        
+        void main() 
+        {
+            vec4 color = texture2D(_MainTex, xlv_TEXCOORD0);
+            gl_FragColor = color * xlv_COLOR;
+        }
+        `;
+
         static initDefaultShader(assetmgr: assetMgr)
         {
             var pool = assetmgr.shaderPool;
@@ -441,12 +484,15 @@ namespace gd3d.framework
             pool.compileFS(assetmgr.webgl, "line", defShader.fsline);
 
             pool.compileVS(assetmgr.webgl, "materialcolor", defShader.vsmaterialcolor);
-            
+
             pool.compileVS(assetmgr.webgl, "defUIMaskVS", defShader.vscodeMaskUI);
             pool.compileFS(assetmgr.webgl, "defUIMaskFS", defShader.fscodeMaskUI);
 
             pool.compileVS(assetmgr.webgl, "defuifontMaskVS", defShader.vscodeuifontmask);
             pool.compileFS(assetmgr.webgl, "defuifontMaskFS", defShader.fscodeuifontmask);
+
+            pool.compileVS(assetmgr.webgl, "deflinetrailVS", defShader.vslinetrail);
+            pool.compileFS(assetmgr.webgl, "deflinetrailFS", defShader.fslinetrail);
 
             // var program_test = pool.linkProgram(assetmgr.webgl, "test", "test");
 
@@ -456,8 +502,9 @@ namespace gd3d.framework
             var programdiffuse = pool.linkProgram(assetmgr.webgl, "diffuse", "diffuse");
             var programline = pool.linkProgram(assetmgr.webgl, "line", "line");
             var programmaterialcolor = pool.linkProgram(assetmgr.webgl, "materialcolor", "line");
-            var programMaskUI = pool.linkProgram(assetmgr.webgl,"defUIMaskVS","defUIMaskFS");
-            var programMaskfont = pool.linkProgram(assetmgr.webgl,"defuifontMaskVS","defuifontMaskFS");
+            var programMaskUI = pool.linkProgram(assetmgr.webgl, "defUIMaskVS", "defUIMaskFS");
+            var programMaskfont = pool.linkProgram(assetmgr.webgl, "defuifontMaskVS", "defuifontMaskFS");
+            var programlinetrail = pool.linkProgram(assetmgr.webgl, "deflinetrailVS", "deflinetrailFS");
             // {
             //     var sh = new shader("shader/test");
             //     sh.defaultAsset = true;
@@ -533,7 +580,7 @@ namespace gd3d.framework
                 p.setProgram(program2);
                 sh.passes["base"].push(p);
                 sh.fillUnDefUniform(p);
-                sh._parseProperties(assetmgr,JSON.parse(this.uishader).properties);
+                sh._parseProperties(assetmgr, JSON.parse(this.uishader).properties);
                 p.state_showface = render.ShowFaceStateEnum.ALL;
                 p.state_ztest = false;
                 p.state_zwrite = false;
@@ -549,7 +596,7 @@ namespace gd3d.framework
                 p.setProgram(programuifont);
                 sh.passes["base"].push(p);
                 sh.fillUnDefUniform(p);
-                sh._parseProperties(assetmgr,JSON.parse(this.shaderuifront).properties); 
+                // sh._parseProperties(assetmgr, JSON.parse(this.shaderuifront).properties);
                 p.state_showface = render.ShowFaceStateEnum.ALL;
                 p.state_ztest = false;
                 p.state_zwrite = false;
@@ -564,7 +611,7 @@ namespace gd3d.framework
                 var p = new render.glDrawPass();
                 sh.passes["base"].push(p);
                 p.setProgram(programline);
-                sh.fillUnDefUniform(p);                
+                sh.fillUnDefUniform(p);
                 p.state_ztest = true;
                 p.state_ztest_method = render.webglkit.LEQUAL;
                 p.state_zwrite = true;
@@ -580,7 +627,7 @@ namespace gd3d.framework
                 sh.passes["base"].push(p);
                 //sh._parseProperties(assetmgr,JSON.parse(this.materialShader).properties);
                 p.setProgram(programmaterialcolor);
-                sh.fillUnDefUniform(p);                
+                sh.fillUnDefUniform(p);
                 p.state_ztest = false;
                 //p.state_ztest_method = render.webglkit.LEQUAL;
                 //p.state_zwrite = true;
@@ -595,9 +642,9 @@ namespace gd3d.framework
                 sh.passes["base"] = [];
                 var p = new render.glDrawPass();
                 sh.passes["base"].push(p);
-                sh._parseProperties(assetmgr,JSON.parse(this.uishader).properties);
+                sh._parseProperties(assetmgr, JSON.parse(this.uishader).properties);
                 p.setProgram(programMaskUI);
-                sh.fillUnDefUniform(p);                
+                sh.fillUnDefUniform(p);
                 p.state_showface = render.ShowFaceStateEnum.ALL;
                 p.state_ztest = false;
                 p.state_zwrite = false;
@@ -611,10 +658,27 @@ namespace gd3d.framework
                 sh.passes["base"] = [];
                 var p = new render.glDrawPass();
                 sh.passes["base"].push(p);
-                sh._parseProperties(assetmgr,JSON.parse(this.shaderuifront).properties);                
+                sh._parseProperties(assetmgr, JSON.parse(this.shaderuifront).properties);
                 p.setProgram(programMaskfont);
                 sh.fillUnDefUniform(p);
-                
+
+                p.state_showface = render.ShowFaceStateEnum.ALL;
+                p.state_ztest = false;
+                p.state_zwrite = false;
+                p.state_ztest_method = render.webglkit.LEQUAL;
+                p.setAlphaBlend(render.BlendModeEnum.Blend);
+                assetmgr.mapShader[sh.getName()] = sh;
+            }
+            {
+                var sh = new shader("shader/deflinetrail");
+                sh.defaultAsset = true;
+                sh.passes["base"] = [];
+                var p = new render.glDrawPass();
+                sh.passes["base"].push(p);
+                sh._parseProperties(assetmgr, JSON.parse(this.linetrailShader).properties);
+                p.setProgram(programlinetrail);
+                sh.fillUnDefUniform(p);
+
                 p.state_showface = render.ShowFaceStateEnum.ALL;
                 p.state_ztest = false;
                 p.state_zwrite = false;

@@ -25,10 +25,12 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("reference",null,"transform2D")
-        get content():transform2D{
+        get content(): transform2D
+        {
             return this._content;
         }
-        set content(content:transform2D){
+        set content(content: transform2D)
+        {
             this._content = content;
         }
 
@@ -72,20 +74,24 @@ namespace gd3d.framework
         @gd3d.reflect.Field("number")
         decelerationRate:number = 0.135;
 
-        start() {
+        start()
+        {
         }
 
-        onPlay(){
+        onPlay()
+        {
 
         }
         
-        update(delta: number) {
+        update(delta: number)
+        {
             this.flyingSlidr(delta);
         }
         transform: transform2D;
         //暂停滑动
         pauseSlide:boolean=false;
-        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean) {
+        onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean)
+        {
             if(this.pauseSlide)
             {
                 this.isPointDown = false;
@@ -111,37 +117,49 @@ namespace gd3d.framework
                     this.transform.canvas.clipPosToCanvasPos(temps,tempc);
 
                     let sp = this.strPoint;
-                    if(ev.type == event.PointEventEnum.PointDown ) {
+                    if (ev.type == event.PointEventEnum.PointDown)
+                    {
                         //点下
                         this.isPointDown = true;
                         sp.x = tempc.x;
                         sp.y = tempc.y;
                         math.vec2Clone(this._content.transform.localTranslate,this.strPos);
                         this.canfly = false;
+                        if (this.onDownFun)
+                            this.onDownFun(sp.x, sp.y);
                     }
-                    if(ev.type == event.PointEventEnum.PointHold && this.isPointDown){
+                    if (ev.type == event.PointEventEnum.PointHold && this.isPointDown)
+                    {
                         //滑动中
                         let lp = this.lastPoint;
-                        if(lp.x != tempc.x || lp.y != tempc.y){
+                        if (lp.x != tempc.x || lp.y != tempc.y)
+                        {
                             lp.x = tempc.x; lp.y = tempc.y;
                             let addtransX = lp.x - sp.x;
                             let addtransY = lp.y - sp.y;
                             math.vec2Clone(this.strPos,this._content.localTranslate);
                             this.SlideTo(addtransX,addtransY);
+                            if (this.onMoveFun)
+                                this.onMoveFun(addtransX, addtransY);
                         }
-                        if(this.inertia){
+                        if (this.inertia)
+                        {
                             this.collectPointing();
                         }
 
                     }
                 }
             }
-                if(ev.type == event.PointEventEnum.PointUp ) {
+            if (ev.type == event.PointEventEnum.PointUp)
+            {
                     //滑动结束
                     this.isPointDown = false;
-                    if(this.inertia){
+                if (this.inertia)
+                {
                         this.onInertiaSliderUp();
                     }
+                if (this.onUpFun)
+                    this.onUpFun();
                 }
         }
         private isPointDown = false;
@@ -149,18 +167,21 @@ namespace gd3d.framework
         private strPoint = new math.vector2();
         private strPos = new math.vector2();
         //滑动一定距离
-        private SlideTo(addtransX,addtransY){
+        private SlideTo(addtransX, addtransY)
+        {
             if(!this._content) return;
             let ctrans =  this._content.transform;
             let cpos = ctrans.localTranslate;
             let trans = this.transform;
 
-            if(this.horizontal){
+            if (this.horizontal)
+            {
                 cpos.x += addtransX;
                 if(cpos.x > ctrans.pivot.x * ctrans.width || ctrans.width <= trans.width)  cpos.x = ctrans.pivot.x * ctrans.width;
                 if(ctrans.width > trans.width && cpos.x < ctrans.pivot.x * ctrans.width - ctrans.width + trans.width) cpos.x = ctrans.pivot.x * ctrans.width + trans.width - ctrans.width;
             }
-            if(this.vertical){
+            if (this.vertical)
+            {
                 cpos.y += addtransY;
                 if(cpos.y > ctrans.pivot.y * ctrans.height || ctrans.height <= trans.height)  cpos.y = ctrans.pivot.y * ctrans.height;
                 if(ctrans.height > trans.height && cpos.y < ctrans.pivot.y * ctrans.height + trans.height - ctrans.height)  cpos.y = ctrans.pivot.y * ctrans.height + trans.height - ctrans.height;
@@ -172,11 +193,13 @@ namespace gd3d.framework
         private readonly collectNum = 3; //控制采集精度
         private points : gd3d.math.vector2[] = [];
         //收集点数据
-        private collectPointing(){
+        private collectPointing()
+        {
             if(!this.isPointDown) return;
             // let p = this.iptmgr.point;
             let p = this.lastPoint;
-            if(this.points.length>this.collectNum){
+            if (this.points.length > this.collectNum)
+            {
                 let v2 = this.points.shift();
                 gd3d.math.pool.delete_vector2(v2);
             }
@@ -186,8 +209,10 @@ namespace gd3d.framework
 
         private flyVelocity = new math.vector2(); //速度
         //点up
-        private onInertiaSliderUp(){
-            if(this.points.length<2){
+        private onInertiaSliderUp()
+        {
+            if (this.points.length < 2)
+            {
                 gd3d.math.pool.delete_vector2Array(this.points);
                 return;
             }
@@ -196,7 +221,8 @@ namespace gd3d.framework
             fv.x = fv.y = 0;
             let len = this.points.length;
             let tv2 = scrollRect.helpv2;
-            for(let i = 1 ; i< len ; i++){
+            for (let i = 1; i < len; i++)
+            {
                 let p_0 = this.points[i -1];
                 let p_1 = this.points[i];
                 math.vec2Subtract(p_1,p_0,tv2);
@@ -214,17 +240,20 @@ namespace gd3d.framework
         private cgCount = this.cgTime;
         private lastfv = new math.vector2();
         //惯性滑动
-        private flyingSlidr(delta: number){
+        private flyingSlidr(delta: number)
+        {
             if(!this.canfly || !this.inertia) return;
             let fv = this.flyVelocity;
             this.cgCount += delta;
-            if(this.cgCount >= this.cgTime){
+            if (this.cgCount >= this.cgTime)
+            {
                 math.vec2Clone(fv,this.lastfv);
                 math.vec2ScaleByNum(fv,this.decelerationRate,fv);
                 this.cgCount = 0;
             }
 
-            if(math.vec2Length(fv) < this.threshold){
+            if (math.vec2Length(fv) < this.threshold)
+            {
                 this.canfly = false;
                 this.cgCount = this.cgTime;
             }
@@ -232,8 +261,11 @@ namespace gd3d.framework
             math.vec2SLerp(this.lastfv , fv , this.cgCount/this.cgTime , tv2);
             this.SlideTo(tv2.x,tv2.y);
         }
-        
-        remove() {
+        public onMoveFun: (x: number, y: number) => {};
+        public onDownFun: (x: number, y: number) => {};
+        public onUpFun: () => {};
+        remove()
+        {
             this._content = null;
             this.transform = null;
         }

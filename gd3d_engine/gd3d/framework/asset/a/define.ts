@@ -178,6 +178,10 @@ namespace gd3d.framework
          * 粒子系统
          */
         ParticleSystem,
+        /**
+         * 拖尾
+         */
+        TrailRenderer,
     }
 
     /**

@@ -26,37 +26,30 @@ namespace gd3d.framework
         emitFromShell = false;
 
         /**
-         * 初始化粒子状态
-         * @param particle 粒子
+         * 计算粒子的发射位置与方向
+         * 
+         * @param particle 
+         * @param position 
+         * @param dir 
          */
-        initParticleState(particle: Particle1)
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3)
         {
-            var speed = math.vec3Length(particle.velocity);
-
-            // 计算位置
-            var dir = new math.vector3(
-                Math.random() * 2 - 1,
-                Math.random() * 2 - 1,
-                Math.random() * 2 - 1,
-            );
+            //
+            dir.x = Math.random() * 2 - 1;
+            dir.y = Math.random() * 2 - 1;
+            dir.z = Math.random() * 2 - 1;
             math.vec3Normalize(dir, dir);
-
-            var p = new math.vector3(this.radius * dir.x, this.radius * dir.y, this.radius * dir.z);
+            //
+            position.x = this.radius * dir.x;
+            position.y = this.radius * dir.y;
+            position.z = this.radius * dir.z;
             if (!this.emitFromShell)
             {
                 var rand = Math.random();
-                p.x *= rand;
-                p.y *= rand;
-                p.z *= rand;
+                position.x *= rand;
+                position.y *= rand;
+                position.z *= rand;
             }
-            particle.position.x = p.x;
-            particle.position.y = p.y;
-            particle.position.z = p.z;
-
-            // 计算速度
-            particle.velocity.x = dir.x * speed;
-            particle.velocity.y = dir.y * speed;
-            particle.velocity.z = dir.z * speed;
         }
     }
 
@@ -73,38 +66,33 @@ namespace gd3d.framework
         emitFromShell = false;
 
         /**
-         * 初始化粒子状态
-         * @param particle 粒子
+         * 计算粒子的发射位置与方向
+         * 
+         * @param particle 
+         * @param position 
+         * @param dir 
          */
-        initParticleState(particle: Particle1)
+        calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3)
         {
-            var speed = math.vec3Length(particle.velocity);
+            //
+            dir.x = Math.random() * 2 - 1;
+            dir.y = Math.random() * 2 - 1;
+            dir.z = Math.random() * 2 - 1;
 
-            // 计算位置
-            var dir = new math.vector3(
-                Math.random() * 2 - 1,
-                Math.random() * 2 - 1,
-                Math.random() * 2 - 1,
-            );
             math.vec3Normalize(dir, dir);
             dir.z = Math.abs(dir.z);
 
-            var p = new math.vector3(this.radius * dir.x, this.radius * dir.y, this.radius * dir.z);
+            //
+            position.x = this.radius * dir.x;
+            position.y = this.radius * dir.y;
+            position.z = this.radius * dir.z;
             if (!this.emitFromShell)
             {
                 var rand = Math.random();
-                p.x *= rand;
-                p.y *= rand;
-                p.z *= rand;
+                position.x *= rand;
+                position.y *= rand;
+                position.z *= rand;
             }
-            particle.position.x = p.x;
-            particle.position.y = p.y;
-            particle.position.z = p.z;
-
-            // 计算速度
-            particle.velocity.x = dir.x * speed;
-            particle.velocity.y = dir.y * speed;
-            particle.velocity.z = dir.z * speed;
         }
     }
 }

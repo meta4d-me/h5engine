@@ -20,14 +20,37 @@ namespace gd3d.framework
         matrixView: gd3d.math.matrix = new gd3d.math.matrix();
         matrixProject: gd3d.math.matrix = new gd3d.math.matrix();
         matrixModel: gd3d.math.matrix = new gd3d.math.matrix();
+        private _lastM_IT: gd3d.math.matrix = new gd3d.math.matrix();
         private _matrixWorld2Object: gd3d.math.matrix = new gd3d.math.matrix();
+        /** M 矩阵的逆矩阵 */
         get matrixWorld2Object()
         {
-            gd3d.math.matrixInverse(this.matrixModel, this._matrixWorld2Object);
+            if(!gd3d.math.matrixEqual(this._lastM_IT,this.matrixModel , 0)){
+                gd3d.math.matrixInverse(this.matrixModel, this._matrixWorld2Object);
+                gd3d.math.matrixClone(this.matrixModel ,this._lastM_IT);
+            }
             return this._matrixWorld2Object;
         }
         matrixModelViewProject: gd3d.math.matrix = new gd3d.math.matrix;
-        matrixModelView: gd3d.math.matrix = new gd3d.math.matrix;
+
+        private _matrixModelView: gd3d.math.matrix = new gd3d.math.matrix;
+        get matrixModelView(){
+            gd3d.math.matrixMultiply(this.matrixView , this.matrixModel ,this._matrixModelView);
+            return this._matrixModelView;
+        }
+
+        private _matrixInverseModelView: gd3d.math.matrix = new gd3d.math.matrix;
+        private _lastMV_IT : gd3d.math.matrix = new gd3d.math.matrix;
+        /** MV 矩阵的逆转置矩阵 */
+        get matrixInverseModelView(){
+            if(!gd3d.math.matrixEqual(this._lastMV_IT , this.matrixModelView , 0)){
+                gd3d.math.matrixInverse(this.matrixModelView, this._matrixInverseModelView);
+                gd3d.math.matrixTranspose(this._matrixInverseModelView,this._matrixInverseModelView);
+                gd3d.math.matrixClone(this._matrixModelView ,this._lastMV_IT);
+            }
+            return this._matrixInverseModelView;
+        }
+
         matrixViewProject: gd3d.math.matrix = new gd3d.math.matrix;
         //matrixNormal: gd3d.math.matrix = new gd3d.math.matrix();
         floatTimer: number = 0;
@@ -128,11 +151,12 @@ namespace gd3d.framework
         }
         updateModel(model: transform)
         {
+            this.updateModelByMatrix(model.getWorldMatrix());
+        }
+        updateModelByMatrix(m_matrix: gd3d.math.matrix)
+        {
             //注意，这tm是个引用
-            gd3d.math.matrixClone(model.getWorldMatrix(), this.matrixModel);
-            //gd3d.math.matrixMultiply(this.matrixView, this.matrixModel, this.matrixModelView);
-            // gd3d.math.matrixInverse(this.matrixModelView, this.matrixNormal);
-            // gd3d.math.matrixTranspose(this.matrixNormal, this.matrixNormal);
+            gd3d.math.matrixClone(m_matrix, this.matrixModel);
             gd3d.math.matrixMultiply(this.matrixViewProject, this.matrixModel, this.matrixModelViewProject);
         }
 
@@ -247,23 +271,31 @@ namespace gd3d.framework
         }
         clear()
         {            
-            this.renderLayers[0].list.length =
-                this.renderLayers[1].list.length =
-                this.renderLayers[2].list.length = 0;
+            let len = this.renderLayers.length;
+            for(let i=0;i < len;i++){
+                this.renderLayers[i].list.length = 0;
+                this.renderLayers[i].gpuInstanceMap = {};
+            }
         }
-        addRenderer(renderer: IRenderer)
+        addRenderer(renderer: IRenderer , webgl : WebGLRenderingContext)
         {
+            let idx = 0;
             if (renderer.layer == RenderLayerEnum.Common)
             {
-                this.renderLayers[0].list.push(renderer);
             }
             else if (renderer.layer == RenderLayerEnum.Transparent)
             {
-                this.renderLayers[1].list.push(renderer);
+                idx = 1;
             }
             else if (renderer.layer == RenderLayerEnum.Overlay)
             {
-                this.renderLayers[2].list.push(renderer);
+                idx = 2;
+            }
+            let gpuInsR = (renderer as IRendererGpuIns);
+            if(!webgl.drawArraysInstanced || !gpuInsR.isGpuInstancing || !gpuInsR.isGpuInstancing()){
+                this.renderLayers[idx].list.push(renderer);
+            }else{
+                this.renderLayers[idx].addInstance(gpuInsR);
             }
         }
 
@@ -282,6 +314,19 @@ namespace gd3d.framework
         constructor(_sort: boolean = false)
         {
             this.needSort = _sort;
+        }
+        gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {}; 
+        addInstance(r : IRendererGpuIns){
+            let mr = r as meshRenderer;
+            let mf = mr.filter;
+            if(!mf || !mf.mesh) return;
+            if(!mr.materials[0]) return;
+            let sh = mr.materials[0].getShader();
+            if(!sh) return;
+            let id = `${sh.getGUID()}_${mf.mesh.getGUID()}`;
+            let list = this.gpuInstanceMap[id];
+            if(!list) list = this.gpuInstanceMap[id] = [];
+            list.push(r);
         }
     }
 

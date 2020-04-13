@@ -22,18 +22,31 @@ namespace gd3d.math
     */
     export function matrixTranspose(src: matrix, out: matrix)
     {
-        out.rawData[1] = src.rawData[4];
-        out.rawData[2] = src.rawData[8];
-        out.rawData[3] = src.rawData[12];
-        out.rawData[4] = src.rawData[1];
-        out.rawData[6] = src.rawData[9];
-        out.rawData[7] = src.rawData[13];
-        out.rawData[8] = src.rawData[2];
-        out.rawData[9] = src.rawData[6];
-        out.rawData[11] = src.rawData[14];
-        out.rawData[12] = src.rawData[3];
-        out.rawData[13] = src.rawData[7];
-        out.rawData[14] = src.rawData[11];
+        let s1 = src.rawData[1];
+        let s2 = src.rawData[2];
+        let s3 = src.rawData[3];
+        let s4 = src.rawData[4];
+        let s6 = src.rawData[6];
+        let s7 = src.rawData[7];
+        let s8 = src.rawData[8];
+        let s9 = src.rawData[9];
+        let s11 = src.rawData[11];
+        let s12 = src.rawData[12];
+        let s13 = src.rawData[13];
+        let s14 = src.rawData[14];
+
+        out.rawData[1]  = s4;
+        out.rawData[2]  = s8;
+        out.rawData[3]  = s12;
+        out.rawData[4]  = s1;
+        out.rawData[6]  = s9;
+        out.rawData[7]  = s13;
+        out.rawData[8]  = s2;
+        out.rawData[9]  = s6;
+        out.rawData[11] = s14;
+        out.rawData[12] = s3;
+        out.rawData[13] = s7;
+        out.rawData[14] = s11;
     }
 
 
