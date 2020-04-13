@@ -174,7 +174,7 @@ namespace gd3d.plugins.preview {
             await this.loadAssetBundle("Resources/defFont/defFont.assetbundle.json");
 
             let overlay = new gd3d.framework.overlay2D();
-            overlay.scaleMode = gd3d.framework.UIScaleMode.SCALE_WITH_SCREEN_SIZE;
+            overlay.scaleMode = gd3d.framework.UIScaleMode.CONSTANT_PIXEL_SIZE;
             let wwidth: number = 1280;
             let hheight: number = 720;
             //因会被广告位档到  iphone  5  5s   iphone 8  ui整体微调缩小
