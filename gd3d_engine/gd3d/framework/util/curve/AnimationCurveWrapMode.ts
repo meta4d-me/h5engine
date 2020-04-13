@@ -19,5 +19,15 @@ namespace gd3d.framework
          * 来回循环; 0->1,1->0
          */
         PingPong = 4,
+
+        /**
+         * When time reaches the end of the animation clip, the clip will automatically stop playing and time will be reset to beginning of the clip.
+         */
+        Once,
+
+        /**
+         * Reads the default repeat mode set higher up.
+         */
+        Default,
     }
 }
