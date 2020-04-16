@@ -153,7 +153,7 @@ namespace gd3d.framework
         /**
          * Sets the playback position in the recording buffer.
          */
-        playbackTime = -1;
+        playbackTime = 0;
 
         /**
          * Gets the mode of the Animator recorder.
@@ -259,7 +259,7 @@ namespace gd3d.framework
         {
             if (!this._isPlaying) return;
 
-            this.playbackTime += deltaTime / 1000 * this.speed;
+            this.playbackTime += deltaTime * this.speed;
 
             if (this._activeAnimationClip)
             {
@@ -824,6 +824,7 @@ namespace gd3d.framework
         StartPlayback()
         {
             this._isPlaying = true;
+            this.playbackTime = 0;
         }
 
         /**

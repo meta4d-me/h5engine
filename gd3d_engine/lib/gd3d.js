@@ -8215,10 +8215,14 @@ var gd3d;
             AnimationClip.prototype.EnsureQuaternionContinuity = function () {
             };
             AnimationClip.prototype.SampleAnimation = function (go, time) {
+                time = time % 0.5;
                 this.curvedatas.forEach(function (cd) {
-                    var anitrans = go.transform.find(cd.path);
-                    if (!anitrans)
-                        return;
+                    var anitrans = go.transform;
+                    if (cd.path != "") {
+                        anitrans = go.transform.find(cd.path);
+                        if (!anitrans)
+                            return;
+                    }
                     var propertys = cd.propertyName.split(".");
                     cd.path;
                     cd.type;
@@ -8347,7 +8351,7 @@ var gd3d;
                 this.pivotPosition = new gd3d.math.vector3();
                 this.pivotWeight = 0.5;
                 this.playableGraph = new framework.PlayableGraph();
-                this.playbackTime = -1;
+                this.playbackTime = 0;
                 this.recorderMode = framework.AnimatorRecorderMode.Offline;
                 this.recorderStartTime = -1;
                 this.recorderStopTime = -1;
@@ -8369,7 +8373,7 @@ var gd3d;
             Animator.prototype.update = function (deltaTime) {
                 if (!this._isPlaying)
                     return;
-                this.playbackTime += deltaTime / 1000 * this.speed;
+                this.playbackTime += deltaTime * this.speed;
                 if (this._activeAnimationClip) {
                     this._activeAnimationClip.SampleAnimation(this.gameObject, this.playbackTime);
                 }
@@ -8522,6 +8526,7 @@ var gd3d;
             };
             Animator.prototype.StartPlayback = function () {
                 this._isPlaying = true;
+                this.playbackTime = 0;
             };
             Animator.prototype.StartRecording = function (frameCount) {
             };
@@ -24800,7 +24805,15 @@ var gd3d;
                 fullValue(comp, k, prop);
         }
         function fullValue(obj, key, json) {
-            if (!json.cls || baseType[json.cls])
+            if (Array.isArray(json)) {
+                var arr = [];
+                for (var index in json) {
+                    var element = json[index];
+                    fullValue(arr, index, element);
+                }
+                obj[key] = arr;
+            }
+            else if (!json.cls || baseType[json.cls])
                 obj[key] = json;
             else {
                 var ctor = gd3d.math[json.cls] || gd3d.framework[json.cls];
@@ -42097,11 +42110,12 @@ var gd3d;
     (function (framework) {
         var AnimationCurveWrapMode;
         (function (AnimationCurveWrapMode) {
+            AnimationCurveWrapMode[AnimationCurveWrapMode["Default"] = 0] = "Default";
+            AnimationCurveWrapMode[AnimationCurveWrapMode["Once"] = 1] = "Once";
             AnimationCurveWrapMode[AnimationCurveWrapMode["Clamp"] = 1] = "Clamp";
             AnimationCurveWrapMode[AnimationCurveWrapMode["Loop"] = 2] = "Loop";
             AnimationCurveWrapMode[AnimationCurveWrapMode["PingPong"] = 4] = "PingPong";
-            AnimationCurveWrapMode[AnimationCurveWrapMode["Once"] = 5] = "Once";
-            AnimationCurveWrapMode[AnimationCurveWrapMode["Default"] = 6] = "Default";
+            AnimationCurveWrapMode[AnimationCurveWrapMode["ClampForever"] = 8] = "ClampForever";
         })(AnimationCurveWrapMode = framework.AnimationCurveWrapMode || (framework.AnimationCurveWrapMode = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));

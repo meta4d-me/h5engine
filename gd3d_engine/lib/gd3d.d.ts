@@ -8712,11 +8712,12 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     enum AnimationCurveWrapMode {
+        Default = 0,
+        Once = 1,
         Clamp = 1,
         Loop = 2,
         PingPong = 4,
-        Once = 5,
-        Default = 6
+        ClampForever = 8
     }
 }
 declare namespace gd3d.framework {

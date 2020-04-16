@@ -128,10 +128,16 @@ namespace gd3d.framework
          */
         SampleAnimation(go: framework.gameObject, time: number)
         {
+            time = time % 0.5;
+
             this.curvedatas.forEach(cd =>
             {
-                var anitrans = go.transform.find(cd.path);
-                if (!anitrans) return;
+                var anitrans = go.transform;
+                if (cd.path != "")
+                {
+                    anitrans = go.transform.find(cd.path);
+                    if (!anitrans) return;
+                }
 
                 var propertys = cd.propertyName.split(".");
 

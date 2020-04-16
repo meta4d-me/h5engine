@@ -8,26 +8,30 @@ namespace gd3d.framework
     export enum AnimationCurveWrapMode
     {
         /**
+         * Reads the default repeat mode set higher up.
+         */
+        Default = 0,
+
+        /**
+         * When time reaches the end of the animation clip, the clip will automatically stop playing and time will be reset to beginning of the clip.
+         */
+        Once = 1,
+
+        /**
          * 夹紧; 0>-<1
          */
         Clamp = 1,
+
         /**
          * 循环; 0->1,0->1
          */
         Loop = 2,
+
         /**
          * 来回循环; 0->1,1->0
          */
         PingPong = 4,
 
-        /**
-         * When time reaches the end of the animation clip, the clip will automatically stop playing and time will be reset to beginning of the clip.
-         */
-        Once,
-
-        /**
-         * Reads the default repeat mode set higher up.
-         */
-        Default,
+        ClampForever = 8
     }
 }
