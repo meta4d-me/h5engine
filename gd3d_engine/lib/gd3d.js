@@ -8228,11 +8228,20 @@ var gd3d;
                     cd.type;
                     var value = cd.curve.getValue(time);
                     switch (propertys[0]) {
+                        case "m_LocalPosition":
+                            var localPosition = anitrans.localPosition;
+                            localPosition[propertys[1]] = value;
+                            anitrans.localPosition = localPosition;
+                            break;
                         case "m_LocalScale":
-                            anitrans.localScale[propertys[1]] = value;
+                            var localScale = anitrans.localScale;
+                            localScale[propertys[1]] = value;
+                            anitrans.localScale = localScale;
                             break;
                         case "localEulerAnglesRaw":
-                            anitrans.localEulerAngles[propertys[1]] = value;
+                            var localEulerAngles = anitrans.localEulerAngles;
+                            localEulerAngles[propertys[1]] = value;
+                            anitrans.localEulerAngles = localEulerAngles;
                             break;
                         case "material":
                             var meshRenderer = anitrans.gameObject.getComponent("meshRenderer");
@@ -8371,6 +8380,7 @@ var gd3d;
             Animator.prototype.onPlay = function () {
             };
             Animator.prototype.update = function (deltaTime) {
+                this.init();
                 if (!this._isPlaying)
                     return;
                 this.playbackTime += deltaTime * this.speed;
@@ -8381,6 +8391,17 @@ var gd3d;
             Animator.prototype.remove = function () {
             };
             Animator.prototype.clone = function () {
+            };
+            Animator.prototype.init = function () {
+                if (this.isInitialized)
+                    return;
+                if (this.runtimeAnimatorController == null)
+                    return;
+                var animationClip = this.runtimeAnimatorController.animationClips[0];
+                if (animationClip == null)
+                    return;
+                this._activeAnimationClip = animationClip;
+                this.StartPlayback();
             };
             Animator.prototype.ApplyBuiltinRootMotion = function (stateName, normalizedTransitionDuration, layer, normalizedTimeOffset, normalizedTransitionTime) {
                 if (layer === void 0) { layer = -1; }
@@ -8527,6 +8548,7 @@ var gd3d;
             Animator.prototype.StartPlayback = function () {
                 this._isPlaying = true;
                 this.playbackTime = 0;
+                this.isInitialized = true;
             };
             Animator.prototype.StartRecording = function (frameCount) {
             };

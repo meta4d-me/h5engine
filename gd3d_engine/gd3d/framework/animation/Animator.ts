@@ -230,7 +230,6 @@ namespace gd3d.framework
          */
         private _isPlaying = false;
 
-
         /**
          * @public
          * @language zh_CN
@@ -257,6 +256,8 @@ namespace gd3d.framework
          */
         update(deltaTime?: number)
         {
+            this.init();
+
             if (!this._isPlaying) return;
 
             this.playbackTime += deltaTime * this.speed;
@@ -281,6 +282,23 @@ namespace gd3d.framework
         clone()
         {
 
+        }
+
+        /**
+         * 初始化，自动播放默认动画
+         */
+        private init()
+        {
+            if (this.isInitialized) return;
+
+            if (this.runtimeAnimatorController == null) return;
+
+            var animationClip = this.runtimeAnimatorController.animationClips[0];
+            if (animationClip == null) return;
+
+            this._activeAnimationClip = animationClip;
+
+            this.StartPlayback();
         }
 
         /**
@@ -825,6 +843,8 @@ namespace gd3d.framework
         {
             this._isPlaying = true;
             this.playbackTime = 0;
+
+            this.isInitialized = true;
         }
 
         /**

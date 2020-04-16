@@ -1602,6 +1602,7 @@ declare namespace gd3d.framework {
         update(deltaTime?: number): void;
         remove(): void;
         clone(): void;
+        private init;
         ApplyBuiltinRootMotion(stateName: string, normalizedTransitionDuration: number, layer?: number, normalizedTimeOffset?: number, normalizedTransitionTime?: number): void;
         CrossFade(stateName: string, normalizedTransitionDuration: number, layer?: number, normalizedTimeOffset?: number, normalizedTransitionTime?: number): void;
         CrossFadeInFixedTime(stateName: String, fixedTransitionDuration: number, layer?: number, fixedTimeOffset?: number, normalizedTransitionTime?: number): void;

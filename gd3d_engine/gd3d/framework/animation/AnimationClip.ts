@@ -147,11 +147,20 @@ namespace gd3d.framework
 
                 switch (propertys[0])
                 {
+                    case "m_LocalPosition":
+                        var localPosition = anitrans.localPosition;
+                        localPosition[propertys[1]] = value;
+                        anitrans.localPosition = localPosition;
+                        break;
                     case "m_LocalScale":
-                        anitrans.localScale[propertys[1]] = value;
+                        var localScale = anitrans.localScale;
+                        localScale[propertys[1]] = value;
+                        anitrans.localScale = localScale;
                         break;
                     case "localEulerAnglesRaw":
-                        anitrans.localEulerAngles[propertys[1]] = value;
+                        var localEulerAngles = anitrans.localEulerAngles;
+                        localEulerAngles[propertys[1]] = value;
+                        anitrans.localEulerAngles = localEulerAngles;
                         break;
                     case "material":
                         var meshRenderer = anitrans.gameObject.getComponent("meshRenderer") as framework.meshRenderer;
