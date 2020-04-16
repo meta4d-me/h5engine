@@ -8165,6 +8165,967 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var AnimationClip = (function () {
+            function AnimationClip() {
+                this.name = "";
+                this.events = [];
+                this.frameRate = 60;
+                this.hasGenericRootTransform = false;
+                this.hasMotionCurves = false;
+                this.hasMotionFloatCurves = false;
+                this.hasRootCurves = false;
+                this.humanMotion = false;
+                this.legacy = false;
+                this.localBounds = new framework.Bounds();
+                this.curvedatas = [];
+            }
+            Object.defineProperty(AnimationClip.prototype, "empty", {
+                get: function () {
+                    if (this.events.length > 0)
+                        return false;
+                    if (this.curvedatas.length > 0)
+                        return false;
+                    return true;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(AnimationClip.prototype, "length", {
+                get: function () {
+                    var l = this.curvedatas.reduce(function (pv, cv) {
+                        var animationCurve = cv.curve;
+                        var keys = animationCurve.keys;
+                        if (keys.length > 0) {
+                            var lastkey = keys[keys.length - 1];
+                            pv = Math.max(pv, lastkey.time);
+                        }
+                        return pv;
+                    }, 0);
+                    return l;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            AnimationClip.prototype.AddEvent = function (evt) {
+                this.events.push(evt);
+            };
+            AnimationClip.prototype.ClearCurves = function () {
+                this.curvedatas = [];
+            };
+            AnimationClip.prototype.EnsureQuaternionContinuity = function () {
+            };
+            AnimationClip.prototype.SampleAnimation = function (go, time) {
+                this.curvedatas.forEach(function (cd) {
+                    var anitrans = go.transform.find(cd.path);
+                    if (!anitrans)
+                        return;
+                    var propertys = cd.propertyName.split(".");
+                    cd.path;
+                    cd.type;
+                    var value = cd.curve.getValue(time);
+                    switch (propertys[0]) {
+                        case "m_LocalScale":
+                            anitrans.localScale[propertys[1]] = value;
+                            break;
+                        case "localEulerAnglesRaw":
+                            anitrans.localEulerAngles[propertys[1]] = value;
+                            break;
+                        case "material":
+                            var meshRenderer = anitrans.gameObject.getComponent("meshRenderer");
+                            if (meshRenderer && meshRenderer.materials) {
+                                var material = meshRenderer.materials[0];
+                                if (material) {
+                                    material.setVector4;
+                                    material;
+                                }
+                            }
+                            break;
+                        default:
+                            console.warn("\u65E0\u6CD5\u5904\u7406\u52A8\u753B\u5C5E\u6027 " + propertys[0]);
+                            break;
+                    }
+                });
+            };
+            AnimationClip.prototype.SetCurve = function (relativePath, type, propertyName, curve) {
+                var data = new framework.AnimationClipCurveData();
+                data.path = relativePath;
+                data.type = type;
+                data.propertyName = propertyName;
+                data.curve = curve;
+                this.curvedatas.push(data);
+            };
+            AnimationClip.prototype.GetAllCurves = function () {
+                return this.curvedatas;
+            };
+            AnimationClip.prototype.GetCurveBindings = function () {
+                var bindings = this.curvedatas.map(function (v) {
+                    var binding = new framework.EditorCurveBinding();
+                    binding.path = v.path;
+                    binding.propertyName = v.propertyName;
+                    binding.type = v.type;
+                    return binding;
+                });
+                return bindings;
+            };
+            return AnimationClip;
+        }());
+        framework.AnimationClip = AnimationClip;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimationClipCurveData = (function () {
+            function AnimationClipCurveData() {
+            }
+            return AnimationClipCurveData;
+        }());
+        framework.AnimationClipCurveData = AnimationClipCurveData;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimationEvent = (function () {
+            function AnimationEvent() {
+            }
+            return AnimationEvent;
+        }());
+        framework.AnimationEvent = AnimationEvent;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimationState = (function () {
+            function AnimationState() {
+            }
+            AnimationState.prototype.AddMixingTransform = function (mix, recursive) {
+                if (recursive === void 0) { recursive = true; }
+            };
+            AnimationState.prototype.RemoveMixingTransform = function (mix) {
+            };
+            return AnimationState;
+        }());
+        framework.AnimationState = AnimationState;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var Animator = (function () {
+            function Animator() {
+                this.angularVelocity = new gd3d.math.vector3();
+                this.applyRootMotion = false;
+                this.avatar = null;
+                this.bodyPosition = new gd3d.math.vector3();
+                this.bodyRotation = new gd3d.math.quaternion();
+                this.cullingMode = framework.AnimatorCullingMode.AlwaysAnimate;
+                this.deltaPosition = new gd3d.math.vector3();
+                this.deltaRotation = new gd3d.math.quaternion();
+                this.feetPivotActive = 1;
+                this.fireEvents = true;
+                this.gravityWeight = 0;
+                this.hasBoundPlayables = true;
+                this.hasRootMotion = false;
+                this.hasTransformHierarchy = true;
+                this.humanScale = 1;
+                this.isHuman = false;
+                this.isInitialized = false;
+                this.isMatchingTarget = false;
+                this.isOptimizable = false;
+                this.keepAnimatorControllerStateOnDisable = false;
+                this.layerCount = 0;
+                this.layersAffectMassCenter = false;
+                this.leftFeetBottomHeight = 0;
+                this.parameterCount = 0;
+                this.parameters = [];
+                this.pivotPosition = new gd3d.math.vector3();
+                this.pivotWeight = 0.5;
+                this.playableGraph = new framework.PlayableGraph();
+                this.playbackTime = -1;
+                this.recorderMode = framework.AnimatorRecorderMode.Offline;
+                this.recorderStartTime = -1;
+                this.recorderStopTime = -1;
+                this.rightFeetBottomHeight = 0;
+                this.rootPosition = new gd3d.math.vector3();
+                this.rootRotation = new gd3d.math.quaternion();
+                this.speed = 1;
+                this.stabilizeFeet = false;
+                this.targetPosition = new gd3d.math.vector3();
+                this.targetRotation = new gd3d.math.quaternion();
+                this.updateMode = framework.AnimatorUpdateMode.Normal;
+                this.velocity = new gd3d.math.vector3();
+                this._isPlaying = false;
+            }
+            Animator.prototype.start = function () {
+            };
+            Animator.prototype.onPlay = function () {
+            };
+            Animator.prototype.update = function (deltaTime) {
+                if (!this._isPlaying)
+                    return;
+                this.playbackTime += deltaTime / 1000 * this.speed;
+                if (this._activeAnimationClip) {
+                    this._activeAnimationClip.SampleAnimation(this.gameObject, this.playbackTime);
+                }
+            };
+            Animator.prototype.remove = function () {
+            };
+            Animator.prototype.clone = function () {
+            };
+            Animator.prototype.ApplyBuiltinRootMotion = function (stateName, normalizedTransitionDuration, layer, normalizedTimeOffset, normalizedTransitionTime) {
+                if (layer === void 0) { layer = -1; }
+                if (normalizedTimeOffset === void 0) { normalizedTimeOffset = Number.MIN_SAFE_INTEGER; }
+                if (normalizedTransitionTime === void 0) { normalizedTransitionTime = 0.0; }
+            };
+            Animator.prototype.CrossFade = function (stateName, normalizedTransitionDuration, layer, normalizedTimeOffset, normalizedTransitionTime) {
+                if (layer === void 0) { layer = -1; }
+                if (normalizedTimeOffset === void 0) { normalizedTimeOffset = Number.MIN_SAFE_INTEGER; }
+                if (normalizedTransitionTime === void 0) { normalizedTransitionTime = 0.0; }
+            };
+            Animator.prototype.CrossFadeInFixedTime = function (stateName, fixedTransitionDuration, layer, fixedTimeOffset, normalizedTransitionTime) {
+                if (layer === void 0) { layer = -1; }
+                if (fixedTimeOffset === void 0) { fixedTimeOffset = 0.0; }
+                if (normalizedTransitionTime === void 0) { normalizedTransitionTime = 0.0; }
+            };
+            Animator.prototype.GetAnimatorTransitionInfo = function (layerIndex) {
+            };
+            Animator.prototype.GetBehaviour = function (type) {
+                return null;
+            };
+            Animator.prototype.GetBehaviours = function (type) {
+                return null;
+            };
+            Animator.prototype.GetBoneTransform = function (humanBoneId) {
+            };
+            Animator.prototype.GetBool = function (name) {
+                return false;
+            };
+            Animator.prototype.GetCurrentAnimatorClipInfo = function (layerIndex) {
+                return null;
+            };
+            Animator.prototype.GetCurrentAnimatorClipInfoCount = function (layerIndex) {
+                return 0;
+            };
+            Animator.prototype.GetCurrentAnimatorStateInfo = function (layerIndex) {
+                return null;
+            };
+            Animator.prototype.GetFloat = function (name) {
+                return 0;
+            };
+            Animator.prototype.GetIKHintPosition = function (hint) {
+                return null;
+            };
+            Animator.prototype.GetIKHintPositionWeight = function (hint) {
+                return 0;
+            };
+            Animator.prototype.GetIKPosition = function (goal) {
+                return null;
+            };
+            Animator.prototype.GetIKPositionWeight = function (goal) {
+            };
+            Animator.prototype.GetIKRotation = function (goal) {
+            };
+            Animator.prototype.GetIKRotationWeight = function (goal) {
+            };
+            Animator.prototype.GetInteger = function (name) {
+                return 0;
+            };
+            Animator.prototype.GetLayerIndex = function (layerName) {
+            };
+            Animator.prototype.GetLayerName = function (layerIndex) {
+            };
+            Animator.prototype.GetLayerWeight = function (layerIndex) {
+            };
+            Animator.prototype.GetNextAnimatorClipInfo = function (layerIndex) {
+                return null;
+            };
+            Animator.prototype.GetNextAnimatorClipInfoCount = function (layerIndex) {
+                return 0;
+            };
+            Animator.prototype.GetNextAnimatorStateInfo = function (layerIndex) {
+                return null;
+            };
+            Animator.prototype.GetParameter = function (index) {
+                return null;
+            };
+            Animator.prototype.HasState = function (layerIndex, stateID) {
+                return false;
+            };
+            Animator.prototype.InterruptMatchTarget = function (completeMatch) {
+                if (completeMatch === void 0) { completeMatch = true; }
+            };
+            Animator.prototype.IsInTransition = function (layerIndex) {
+            };
+            Animator.prototype.IsParameterControlledByCurve = function (name) {
+            };
+            Animator.prototype.MatchTarget = function (matchPosition, matchRotation, targetBodyPart, weightMask, startNormalizedTime, targetNormalizedTime) {
+                if (targetNormalizedTime === void 0) { targetNormalizedTime = 1; }
+            };
+            Animator.prototype.Play = function (stateName, layer, normalizedTime) {
+                if (layer === void 0) { layer = -1; }
+                if (normalizedTime === void 0) { normalizedTime = Number.MIN_SAFE_INTEGER; }
+                if (this.runtimeAnimatorController == null)
+                    return;
+                var animationClip = this.runtimeAnimatorController.animationClips.filter(function (v) { return v.name == stateName; })[0];
+                if (animationClip == null)
+                    return;
+                this._activeAnimationClip = animationClip;
+                this.StartPlayback();
+            };
+            Animator.prototype.PlayInFixedTime = function (stateName, layer, fixedTime) {
+                if (layer === void 0) { layer = -1; }
+                if (fixedTime === void 0) { fixedTime = Number.MIN_SAFE_INTEGER; }
+            };
+            Animator.prototype.Rebind = function () {
+            };
+            Animator.prototype.ResetTrigger = function (name) {
+            };
+            Animator.prototype.SetBoneLocalRotation = function (humanBoneId, rotation) {
+            };
+            Animator.prototype.SetBool = function (name, value) {
+            };
+            Animator.prototype.SetFloat = function (name, value, dampTime, deltaTime) {
+            };
+            Animator.prototype.SetIKHintPosition = function (hint, hintPosition) {
+            };
+            Animator.prototype.SetIKHintPositionWeight = function (hint, value) {
+            };
+            Animator.prototype.SetIKPosition = function (goal, goalPosition) {
+            };
+            Animator.prototype.SetIKPositionWeight = function (goal, value) {
+            };
+            Animator.prototype.SetIKRotation = function (goal, goalRotation) {
+            };
+            Animator.prototype.SetIKRotationWeight = function (goal, value) {
+            };
+            Animator.prototype.SetInteger = function (name, value) {
+            };
+            Animator.prototype.SetLayerWeight = function (layerIndex, weight) {
+            };
+            Animator.prototype.SetLookAtPosition = function (lookAtPosition) {
+            };
+            Animator.prototype.SetLookAtWeight = function (weight, bodyWeight, headWeight, eyesWeight, clampWeight) {
+                if (bodyWeight === void 0) { bodyWeight = 0.0; }
+                if (headWeight === void 0) { headWeight = 1.0; }
+                if (eyesWeight === void 0) { eyesWeight = 0.0; }
+                if (clampWeight === void 0) { clampWeight = 0.5; }
+            };
+            Animator.prototype.SetTarget = function (targetIndex, targetNormalizedTime) {
+            };
+            Animator.prototype.SetTrigger = function (name) {
+            };
+            Animator.prototype.StartPlayback = function () {
+                this._isPlaying = true;
+            };
+            Animator.prototype.StartRecording = function (frameCount) {
+            };
+            Animator.prototype.StopPlayback = function () {
+                this._isPlaying = false;
+            };
+            Animator.prototype.StopRecording = function () {
+            };
+            Animator.prototype.WriteDefaultValues = function () {
+            };
+            Animator.StringToHash = function (name) {
+            };
+            Animator.ClassName = "Animator";
+            Animator = __decorate([
+                gd3d.reflect.nodeComponent
+            ], Animator);
+            return Animator;
+        }());
+        framework.Animator = Animator;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorClipInfo = (function () {
+            function AnimatorClipInfo() {
+            }
+            return AnimatorClipInfo;
+        }());
+        framework.AnimatorClipInfo = AnimatorClipInfo;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorCondition = (function () {
+            function AnimatorCondition() {
+            }
+            return AnimatorCondition;
+        }());
+        framework.AnimatorCondition = AnimatorCondition;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var RuntimeAnimatorController = (function () {
+            function RuntimeAnimatorController() {
+            }
+            return RuntimeAnimatorController;
+        }());
+        framework.RuntimeAnimatorController = RuntimeAnimatorController;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorController = (function (_super) {
+            __extends(AnimatorController, _super);
+            function AnimatorController() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            return AnimatorController;
+        }(framework.RuntimeAnimatorController));
+        framework.AnimatorController = AnimatorController;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorControllerLayer = (function () {
+            function AnimatorControllerLayer() {
+            }
+            AnimatorControllerLayer.prototype.GetOverrideBehaviours = function (state) {
+            };
+            AnimatorControllerLayer.prototype.GetOverrideMotion = function (state) {
+            };
+            AnimatorControllerLayer.prototype.SetOverrideBehaviours = function (state, behaviours) {
+            };
+            AnimatorControllerLayer.prototype.SetOverrideMotion = function (state, motion) {
+            };
+            return AnimatorControllerLayer;
+        }());
+        framework.AnimatorControllerLayer = AnimatorControllerLayer;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorControllerParameter = (function () {
+            function AnimatorControllerParameter() {
+            }
+            return AnimatorControllerParameter;
+        }());
+        framework.AnimatorControllerParameter = AnimatorControllerParameter;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorState = (function () {
+            function AnimatorState() {
+            }
+            AnimatorState.prototype.AddExitTransition = function (defaultExitTime) {
+            };
+            AnimatorState.prototype.AddStateMachineBehaviour = function (stateMachineBehaviourType) {
+            };
+            AnimatorState.prototype.AddTransition = function (destinationState, defaultExitTime) {
+            };
+            AnimatorState.prototype.RemoveTransition = function (transition) {
+                this.transitions = this.transitions.filter(function (v) { return v != transition; });
+            };
+            return AnimatorState;
+        }());
+        framework.AnimatorState = AnimatorState;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorStateInfo = (function () {
+            function AnimatorStateInfo() {
+            }
+            AnimatorStateInfo.prototype.IsName = function (name) {
+            };
+            AnimatorStateInfo.prototype.IsTag = function (tag) {
+            };
+            return AnimatorStateInfo;
+        }());
+        framework.AnimatorStateInfo = AnimatorStateInfo;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorStateMachine = (function () {
+            function AnimatorStateMachine() {
+            }
+            return AnimatorStateMachine;
+        }());
+        framework.AnimatorStateMachine = AnimatorStateMachine;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorTransitionBase = (function () {
+            function AnimatorTransitionBase() {
+            }
+            AnimatorTransitionBase.prototype.AddCondition = function (mode, threshold, parameter) {
+                var condition = new framework.AnimatorCondition();
+                condition.mode = mode;
+                condition.threshold = threshold;
+                condition.parameter = parameter;
+                this.conditions.push(condition);
+            };
+            AnimatorTransitionBase.prototype.RemoveCondition = function (condition) {
+                this.conditions = this.conditions.filter(function (v) { return v != condition; });
+            };
+            return AnimatorTransitionBase;
+        }());
+        framework.AnimatorTransitionBase = AnimatorTransitionBase;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorStateTransition = (function (_super) {
+            __extends(AnimatorStateTransition, _super);
+            function AnimatorStateTransition() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            return AnimatorStateTransition;
+        }(framework.AnimatorTransitionBase));
+        framework.AnimatorStateTransition = AnimatorStateTransition;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorTransition = (function (_super) {
+            __extends(AnimatorTransition, _super);
+            function AnimatorTransition() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            return AnimatorTransition;
+        }(framework.AnimatorTransitionBase));
+        framework.AnimatorTransition = AnimatorTransition;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var Avatar = (function () {
+            function Avatar() {
+            }
+            return Avatar;
+        }());
+        framework.Avatar = Avatar;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AvatarMask = (function () {
+            function AvatarMask() {
+            }
+            AvatarMask.prototype.AddTransformPath = function (transform, recursive) {
+                if (recursive === void 0) { recursive = true; }
+            };
+            AvatarMask.prototype.GetHumanoidBodyPartActive = function (index) {
+            };
+            AvatarMask.prototype.GetTransformActive = function (index) {
+            };
+            AvatarMask.prototype.GetTransformPath = function (index) {
+            };
+            AvatarMask.prototype.RemoveTransformPath = function (transform, recursive) {
+                if (recursive === void 0) { recursive = true; }
+            };
+            AvatarMask.prototype.SetHumanoidBodyPartActive = function (index, value) {
+            };
+            AvatarMask.prototype.SetTransformActive = function (index, value) {
+            };
+            AvatarMask.prototype.SetTransformPath = function (index, path) {
+            };
+            return AvatarMask;
+        }());
+        framework.AvatarMask = AvatarMask;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AvatarMaskBodyPart;
+        (function (AvatarMaskBodyPart) {
+            AvatarMaskBodyPart[AvatarMaskBodyPart["Root"] = 0] = "Root";
+            AvatarMaskBodyPart[AvatarMaskBodyPart["Body"] = 1] = "Body";
+            AvatarMaskBodyPart[AvatarMaskBodyPart["Head"] = 2] = "Head";
+            AvatarMaskBodyPart[AvatarMaskBodyPart["LeftLeg"] = 3] = "LeftLeg";
+            AvatarMaskBodyPart[AvatarMaskBodyPart["RightLeg"] = 4] = "RightLeg";
+            AvatarMaskBodyPart[AvatarMaskBodyPart["LeftArm"] = 5] = "LeftArm";
+            AvatarMaskBodyPart[AvatarMaskBodyPart["RightArm"] = 6] = "RightArm";
+            AvatarMaskBodyPart[AvatarMaskBodyPart["LeftFingers"] = 7] = "LeftFingers";
+            AvatarMaskBodyPart[AvatarMaskBodyPart["RightFingers"] = 8] = "RightFingers";
+            AvatarMaskBodyPart[AvatarMaskBodyPart["LeftFootIK"] = 9] = "LeftFootIK";
+            AvatarMaskBodyPart[AvatarMaskBodyPart["RightFootIK"] = 10] = "RightFootIK";
+            AvatarMaskBodyPart[AvatarMaskBodyPart["LeftHandIK"] = 11] = "LeftHandIK";
+            AvatarMaskBodyPart[AvatarMaskBodyPart["RightHandIK"] = 12] = "RightHandIK";
+            AvatarMaskBodyPart[AvatarMaskBodyPart["LastBodyPart"] = 13] = "LastBodyPart";
+        })(AvatarMaskBodyPart = framework.AvatarMaskBodyPart || (framework.AvatarMaskBodyPart = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ChildAnimatorState = (function () {
+            function ChildAnimatorState() {
+            }
+            return ChildAnimatorState;
+        }());
+        framework.ChildAnimatorState = ChildAnimatorState;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ChildAnimatorStateMachine = (function () {
+            function ChildAnimatorStateMachine() {
+            }
+            return ChildAnimatorStateMachine;
+        }());
+        framework.ChildAnimatorStateMachine = ChildAnimatorStateMachine;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var EditorCurveBinding = (function () {
+            function EditorCurveBinding() {
+            }
+            EditorCurveBinding.DiscreteCurve = function (inPath, inType, inPropertyName) {
+            };
+            EditorCurveBinding.FloatCurve = function (inPath, inType, inPropertyName) {
+            };
+            EditorCurveBinding.PPtrCurve = function (inPath, inType, inPropertyName) {
+            };
+            return EditorCurveBinding;
+        }());
+        framework.EditorCurveBinding = EditorCurveBinding;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var MatchTargetWeightMask = (function () {
+            function MatchTargetWeightMask() {
+            }
+            return MatchTargetWeightMask;
+        }());
+        framework.MatchTargetWeightMask = MatchTargetWeightMask;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var Motion = (function () {
+            function Motion() {
+            }
+            return Motion;
+        }());
+        framework.Motion = Motion;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var StateMachineBehaviour = (function () {
+            function StateMachineBehaviour() {
+            }
+            StateMachineBehaviour.prototype.OnStateMachineEnter = function (animator, stateMachinePathHash) {
+            };
+            StateMachineBehaviour.prototype.OnStateMachineExit = function (animator, stateMachinePathHash) {
+            };
+            StateMachineBehaviour.prototype.OnStateEnter = function (animator, animatorStateInfo, layerIndex) {
+            };
+            StateMachineBehaviour.prototype.OnStateExit = function (animator, animatorStateInfo, layerIndex) {
+            };
+            StateMachineBehaviour.prototype.OnStateIK = function (animator, animatorStateInfo, layerIndex) {
+            };
+            StateMachineBehaviour.prototype.OnStateMove = function (animator, animatorStateInfo, layerIndex) {
+            };
+            StateMachineBehaviour.prototype.OnStateUpdate = function (animator, animatorStateInfo, layerIndex) {
+            };
+            return StateMachineBehaviour;
+        }());
+        framework.StateMachineBehaviour = StateMachineBehaviour;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var Bounds = (function () {
+            function Bounds() {
+            }
+            return Bounds;
+        }());
+        framework.Bounds = Bounds;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimationBlendMode;
+        (function (AnimationBlendMode) {
+            AnimationBlendMode[AnimationBlendMode["Blend"] = 0] = "Blend";
+            AnimationBlendMode[AnimationBlendMode["Additive"] = 1] = "Additive";
+        })(AnimationBlendMode = framework.AnimationBlendMode || (framework.AnimationBlendMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorConditionMode;
+        (function (AnimatorConditionMode) {
+            AnimatorConditionMode[AnimatorConditionMode["If"] = 0] = "If";
+            AnimatorConditionMode[AnimatorConditionMode["IfNot"] = 1] = "IfNot";
+            AnimatorConditionMode[AnimatorConditionMode["Greater"] = 2] = "Greater";
+            AnimatorConditionMode[AnimatorConditionMode["Less"] = 3] = "Less";
+            AnimatorConditionMode[AnimatorConditionMode["Equals"] = 4] = "Equals";
+            AnimatorConditionMode[AnimatorConditionMode["NotEqual"] = 5] = "NotEqual";
+        })(AnimatorConditionMode = framework.AnimatorConditionMode || (framework.AnimatorConditionMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorControllerParameterType;
+        (function (AnimatorControllerParameterType) {
+            AnimatorControllerParameterType[AnimatorControllerParameterType["Float"] = 0] = "Float";
+            AnimatorControllerParameterType[AnimatorControllerParameterType["Int"] = 1] = "Int";
+            AnimatorControllerParameterType[AnimatorControllerParameterType["Bool"] = 2] = "Bool";
+            AnimatorControllerParameterType[AnimatorControllerParameterType["Trigger"] = 3] = "Trigger";
+        })(AnimatorControllerParameterType = framework.AnimatorControllerParameterType || (framework.AnimatorControllerParameterType = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorCullingMode;
+        (function (AnimatorCullingMode) {
+            AnimatorCullingMode[AnimatorCullingMode["AlwaysAnimate"] = 0] = "AlwaysAnimate";
+            AnimatorCullingMode[AnimatorCullingMode["CullUpdateTransforms"] = 1] = "CullUpdateTransforms";
+            AnimatorCullingMode[AnimatorCullingMode["CullCompletely"] = 2] = "CullCompletely";
+        })(AnimatorCullingMode = framework.AnimatorCullingMode || (framework.AnimatorCullingMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorLayerBlendingMode;
+        (function (AnimatorLayerBlendingMode) {
+            AnimatorLayerBlendingMode[AnimatorLayerBlendingMode["Override"] = 0] = "Override";
+            AnimatorLayerBlendingMode[AnimatorLayerBlendingMode["Additive"] = 1] = "Additive";
+        })(AnimatorLayerBlendingMode = framework.AnimatorLayerBlendingMode || (framework.AnimatorLayerBlendingMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorRecorderMode;
+        (function (AnimatorRecorderMode) {
+            AnimatorRecorderMode[AnimatorRecorderMode["Offline"] = 0] = "Offline";
+            AnimatorRecorderMode[AnimatorRecorderMode["Playback"] = 1] = "Playback";
+            AnimatorRecorderMode[AnimatorRecorderMode["Record"] = 2] = "Record";
+        })(AnimatorRecorderMode = framework.AnimatorRecorderMode || (framework.AnimatorRecorderMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AnimatorUpdateMode;
+        (function (AnimatorUpdateMode) {
+            AnimatorUpdateMode[AnimatorUpdateMode["Normal"] = 0] = "Normal";
+            AnimatorUpdateMode[AnimatorUpdateMode["AnimatePhysics"] = 1] = "AnimatePhysics";
+            AnimatorUpdateMode[AnimatorUpdateMode["UnscaledTime"] = 2] = "UnscaledTime";
+        })(AnimatorUpdateMode = framework.AnimatorUpdateMode || (framework.AnimatorUpdateMode = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AvatarIKGoal;
+        (function (AvatarIKGoal) {
+            AvatarIKGoal[AvatarIKGoal["LeftFoot"] = 0] = "LeftFoot";
+            AvatarIKGoal[AvatarIKGoal["RightFoot"] = 1] = "RightFoot";
+            AvatarIKGoal[AvatarIKGoal["LeftHand"] = 2] = "LeftHand";
+            AvatarIKGoal[AvatarIKGoal["RightHand"] = 3] = "RightHand";
+        })(AvatarIKGoal = framework.AvatarIKGoal || (framework.AvatarIKGoal = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AvatarIKHint;
+        (function (AvatarIKHint) {
+            AvatarIKHint[AvatarIKHint["LeftKnee"] = 0] = "LeftKnee";
+            AvatarIKHint[AvatarIKHint["RightKnee"] = 1] = "RightKnee";
+            AvatarIKHint[AvatarIKHint["LeftElbow"] = 2] = "LeftElbow";
+            AvatarIKHint[AvatarIKHint["RightElbow"] = 3] = "RightElbow";
+        })(AvatarIKHint = framework.AvatarIKHint || (framework.AvatarIKHint = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AvatarTarget;
+        (function (AvatarTarget) {
+            AvatarTarget[AvatarTarget["Root"] = 0] = "Root";
+            AvatarTarget[AvatarTarget["Body"] = 1] = "Body";
+            AvatarTarget[AvatarTarget["LeftFoot"] = 2] = "LeftFoot";
+            AvatarTarget[AvatarTarget["RightFoot"] = 3] = "RightFoot";
+            AvatarTarget[AvatarTarget["LeftHand"] = 4] = "LeftHand";
+            AvatarTarget[AvatarTarget["RightHand"] = 5] = "RightHand";
+        })(AvatarTarget = framework.AvatarTarget || (framework.AvatarTarget = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var HumanBodyBones;
+        (function (HumanBodyBones) {
+            HumanBodyBones[HumanBodyBones["Hips"] = 0] = "Hips";
+            HumanBodyBones[HumanBodyBones["LeftUpperLeg"] = 1] = "LeftUpperLeg";
+            HumanBodyBones[HumanBodyBones["RightUpperLeg"] = 2] = "RightUpperLeg";
+            HumanBodyBones[HumanBodyBones["LeftLowerLeg"] = 3] = "LeftLowerLeg";
+            HumanBodyBones[HumanBodyBones["RightLowerLeg"] = 4] = "RightLowerLeg";
+            HumanBodyBones[HumanBodyBones["LeftFoot"] = 5] = "LeftFoot";
+            HumanBodyBones[HumanBodyBones["RightFoot"] = 6] = "RightFoot";
+            HumanBodyBones[HumanBodyBones["Spine"] = 7] = "Spine";
+            HumanBodyBones[HumanBodyBones["Chest"] = 8] = "Chest";
+            HumanBodyBones[HumanBodyBones["UpperChest"] = 9] = "UpperChest";
+            HumanBodyBones[HumanBodyBones["Neck"] = 10] = "Neck";
+            HumanBodyBones[HumanBodyBones["Head"] = 11] = "Head";
+            HumanBodyBones[HumanBodyBones["LeftShoulder"] = 12] = "LeftShoulder";
+            HumanBodyBones[HumanBodyBones["RightShoulder"] = 13] = "RightShoulder";
+            HumanBodyBones[HumanBodyBones["LeftUpperArm"] = 14] = "LeftUpperArm";
+            HumanBodyBones[HumanBodyBones["RightUpperArm"] = 15] = "RightUpperArm";
+            HumanBodyBones[HumanBodyBones["LeftLowerArm"] = 16] = "LeftLowerArm";
+            HumanBodyBones[HumanBodyBones["RightLowerArm"] = 17] = "RightLowerArm";
+            HumanBodyBones[HumanBodyBones["LeftHand"] = 18] = "LeftHand";
+            HumanBodyBones[HumanBodyBones["RightHand"] = 19] = "RightHand";
+            HumanBodyBones[HumanBodyBones["LeftToes"] = 20] = "LeftToes";
+            HumanBodyBones[HumanBodyBones["RightToes"] = 21] = "RightToes";
+            HumanBodyBones[HumanBodyBones["LeftEye"] = 22] = "LeftEye";
+            HumanBodyBones[HumanBodyBones["RightEye"] = 23] = "RightEye";
+            HumanBodyBones[HumanBodyBones["Jaw"] = 24] = "Jaw";
+            HumanBodyBones[HumanBodyBones["LeftThumbProximal"] = 25] = "LeftThumbProximal";
+            HumanBodyBones[HumanBodyBones["LeftThumbIntermediate"] = 26] = "LeftThumbIntermediate";
+            HumanBodyBones[HumanBodyBones["LeftThumbDistal"] = 27] = "LeftThumbDistal";
+            HumanBodyBones[HumanBodyBones["LeftIndexProximal"] = 28] = "LeftIndexProximal";
+            HumanBodyBones[HumanBodyBones["LeftIndexIntermediate"] = 29] = "LeftIndexIntermediate";
+            HumanBodyBones[HumanBodyBones["LeftIndexDistal"] = 30] = "LeftIndexDistal";
+            HumanBodyBones[HumanBodyBones["LeftMiddleProximal"] = 31] = "LeftMiddleProximal";
+            HumanBodyBones[HumanBodyBones["LeftMiddleIntermediate"] = 32] = "LeftMiddleIntermediate";
+            HumanBodyBones[HumanBodyBones["LeftMiddleDistal"] = 33] = "LeftMiddleDistal";
+            HumanBodyBones[HumanBodyBones["LeftRingProximal"] = 34] = "LeftRingProximal";
+            HumanBodyBones[HumanBodyBones["LeftRingIntermediate"] = 35] = "LeftRingIntermediate";
+            HumanBodyBones[HumanBodyBones["LeftRingDistal"] = 36] = "LeftRingDistal";
+            HumanBodyBones[HumanBodyBones["LeftLittleProximal"] = 37] = "LeftLittleProximal";
+            HumanBodyBones[HumanBodyBones["LeftLittleIntermediate"] = 38] = "LeftLittleIntermediate";
+            HumanBodyBones[HumanBodyBones["LeftLittleDistal"] = 39] = "LeftLittleDistal";
+            HumanBodyBones[HumanBodyBones["RightThumbProximal"] = 40] = "RightThumbProximal";
+            HumanBodyBones[HumanBodyBones["RightThumbIntermediate"] = 41] = "RightThumbIntermediate";
+            HumanBodyBones[HumanBodyBones["RightThumbDistal"] = 42] = "RightThumbDistal";
+            HumanBodyBones[HumanBodyBones["RightIndexProximal"] = 43] = "RightIndexProximal";
+            HumanBodyBones[HumanBodyBones["RightIndexIntermediate"] = 44] = "RightIndexIntermediate";
+            HumanBodyBones[HumanBodyBones["RightIndexDistal"] = 45] = "RightIndexDistal";
+            HumanBodyBones[HumanBodyBones["RightMiddleProximal"] = 46] = "RightMiddleProximal";
+            HumanBodyBones[HumanBodyBones["RightMiddleIntermediate"] = 47] = "RightMiddleIntermediate";
+            HumanBodyBones[HumanBodyBones["RightMiddleDistal"] = 48] = "RightMiddleDistal";
+            HumanBodyBones[HumanBodyBones["RightRingProximal"] = 49] = "RightRingProximal";
+            HumanBodyBones[HumanBodyBones["RightRingIntermediate"] = 50] = "RightRingIntermediate";
+            HumanBodyBones[HumanBodyBones["RightRingDistal"] = 51] = "RightRingDistal";
+            HumanBodyBones[HumanBodyBones["RightLittleProximal"] = 52] = "RightLittleProximal";
+            HumanBodyBones[HumanBodyBones["RightLittleIntermediate"] = 53] = "RightLittleIntermediate";
+            HumanBodyBones[HumanBodyBones["RightLittleDistal"] = 54] = "RightLittleDistal";
+            HumanBodyBones[HumanBodyBones["LastBone"] = 55] = "LastBone";
+        })(HumanBodyBones = framework.HumanBodyBones || (framework.HumanBodyBones = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var SendMessageOptions;
+        (function (SendMessageOptions) {
+            SendMessageOptions[SendMessageOptions["RequireReceiver"] = 0] = "RequireReceiver";
+            SendMessageOptions[SendMessageOptions["DontRequireReceiver"] = 1] = "DontRequireReceiver";
+        })(SendMessageOptions = framework.SendMessageOptions || (framework.SendMessageOptions = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var TransitionInterruptionSource;
+        (function (TransitionInterruptionSource) {
+            TransitionInterruptionSource[TransitionInterruptionSource["None"] = 0] = "None";
+            TransitionInterruptionSource[TransitionInterruptionSource["Source"] = 1] = "Source";
+            TransitionInterruptionSource[TransitionInterruptionSource["Destination"] = 2] = "Destination";
+            TransitionInterruptionSource[TransitionInterruptionSource["SourceThenDestination"] = 3] = "SourceThenDestination";
+            TransitionInterruptionSource[TransitionInterruptionSource["DestinationThenSource"] = 4] = "DestinationThenSource";
+        })(TransitionInterruptionSource = framework.TransitionInterruptionSource || (framework.TransitionInterruptionSource = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var PlayableGraph = (function () {
+            function PlayableGraph() {
+            }
+            return PlayableGraph;
+        }());
+        framework.PlayableGraph = PlayableGraph;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var resID = (function () {
             function resID() {
                 this.id = resID.next();
@@ -41139,6 +42100,8 @@ var gd3d;
             AnimationCurveWrapMode[AnimationCurveWrapMode["Clamp"] = 1] = "Clamp";
             AnimationCurveWrapMode[AnimationCurveWrapMode["Loop"] = 2] = "Loop";
             AnimationCurveWrapMode[AnimationCurveWrapMode["PingPong"] = 4] = "PingPong";
+            AnimationCurveWrapMode[AnimationCurveWrapMode["Once"] = 5] = "Once";
+            AnimationCurveWrapMode[AnimationCurveWrapMode["Default"] = 6] = "Default";
         })(AnimationCurveWrapMode = framework.AnimationCurveWrapMode || (framework.AnimationCurveWrapMode = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));

@@ -1,4 +1,4 @@
-namespace gd3d.unity
+namespace gd3d.framework
 {
     /**
      * The mode of the condition.

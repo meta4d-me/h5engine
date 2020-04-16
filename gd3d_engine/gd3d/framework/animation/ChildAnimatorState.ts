@@ -1,4 +1,4 @@
-namespace gd3d.unity
+namespace gd3d.framework
 {
     /**
      * Structure that represents a state in the context of its parent state machine.

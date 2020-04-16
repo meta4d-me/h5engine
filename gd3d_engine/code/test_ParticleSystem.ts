@@ -23,7 +23,7 @@ class test_ParticleSystem implements IState
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
 
-    private _particles = ["ParticleAdditive","FX_Laser","Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames", "shark-levelup"];
+    private _particles = ["Cube", "FX_Laser", "Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames", "shark-levelup"];
     private _particle: gd3d.framework.transform;
 
     private _isMove = false;
@@ -60,6 +60,7 @@ class test_ParticleSystem implements IState
         gui.add(this, '_moveAngleSpeed', -10, 10, 0.2);
         gui.add(this, 'play');
         gui.add(this, 'stop');
+        gui.add(this, 'play1');
     }
 
     play()
@@ -78,6 +79,12 @@ class test_ParticleSystem implements IState
             var ps: gd3d.framework.ParticleSystem = <any>v;
             ps.stop();
         })
+    }
+
+    play1()
+    {
+        var animator: gd3d.framework.Animator = <any>this._particle.gameObject.getComponentsInChildren("Animator")[0];
+        animator.Play("New Animation");
     }
 
     private get particleName()
@@ -112,7 +119,7 @@ class test_ParticleSystem implements IState
         hoverc.scaleSpeed = 0.1;
         hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0)
 
-        this._showParticle(this._particles[0]);
+        this.particleName = this._particles[0];
         // this.initParticleSystem();
     }
 
@@ -131,7 +138,7 @@ class test_ParticleSystem implements IState
 
         this._particle = new gd3d.framework.transform();
         this._particle.addChild(cubeTran);
-        
+
         this.scene.addChild(this._particle);
 
         this._particleStartPosition = new gd3d.math.vector3();

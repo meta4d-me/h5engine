@@ -1,4 +1,4 @@
-namespace gd3d.unity
+namespace gd3d.framework
 {
     /**
      * The AnimationState gives full control over animation blending.

@@ -1,4 +1,4 @@
-namespace gd3d.unity
+namespace gd3d.framework
 {
     /**
      * StateMachineBehaviour is a component that can be added to a state machine state. It's the base class every script on a state derives from.

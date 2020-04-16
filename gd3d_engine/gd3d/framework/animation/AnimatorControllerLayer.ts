@@ -1,4 +1,4 @@
-namespace gd3d.unity
+namespace gd3d.framework
 {
     /**
      * The Animation Layer contains a state machine that controls animations of a model or part of it.

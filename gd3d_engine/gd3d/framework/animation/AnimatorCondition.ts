@@ -1,4 +1,4 @@
-namespace gd3d.unity
+namespace gd3d.framework
 {
     /**
      * AnimatorCondition conditions that need to be met for a transition to happen.

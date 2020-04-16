@@ -1,4 +1,4 @@
-namespace gd3d.unity
+namespace gd3d.framework
 {
     /**
      * A graph controlling the interaction of states. Each state references a motion.

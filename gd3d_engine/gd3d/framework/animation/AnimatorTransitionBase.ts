@@ -1,4 +1,4 @@
-namespace gd3d.unity
+namespace gd3d.framework
 {
     /**
      * Base class for animator transitions. Transitions define when and how the state machine switches from one state to another.

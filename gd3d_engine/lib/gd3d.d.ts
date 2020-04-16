@@ -1482,6 +1482,557 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class AnimationClip {
+        name: string;
+        get empty(): boolean;
+        events: AnimationEvent[];
+        frameRate: number;
+        hasGenericRootTransform: boolean;
+        hasMotionCurves: boolean;
+        hasMotionFloatCurves: boolean;
+        hasRootCurves: boolean;
+        humanMotion: boolean;
+        legacy: boolean;
+        get length(): number;
+        localBounds: Bounds;
+        wrapMode: framework.AnimationCurveWrapMode.Default;
+        private curvedatas;
+        AddEvent(evt: AnimationEvent): void;
+        ClearCurves(): void;
+        EnsureQuaternionContinuity(): void;
+        SampleAnimation(go: framework.gameObject, time: number): void;
+        SetCurve(relativePath: string, type: (new () => any), propertyName: string, curve: framework.AnimationCurve1): void;
+        GetAllCurves(): AnimationClipCurveData[];
+        GetCurveBindings(): EditorCurveBinding[];
+    }
+}
+declare namespace gd3d.framework {
+    class AnimationClipCurveData {
+        __class__: "gd3d.framework.AnimationClipCurveData";
+        curve: framework.AnimationCurve1;
+        path: string;
+        propertyName: string;
+        type: new () => any;
+    }
+}
+declare namespace gd3d.framework {
+    class AnimationEvent {
+        animationState: AnimationState;
+        animatorClipInfo: AnimatorClipInfo;
+        animatorStateInfo: AnimatorStateInfo;
+        floatParameter: number;
+        functionName: string;
+        intParameter: number;
+        isFiredByAnimator: boolean;
+        isFiredByLegacy: boolean;
+        messageOptions: SendMessageOptions;
+        objectReferenceParameter: Object;
+        stringParameter: string;
+        time: number;
+    }
+}
+declare namespace gd3d.framework {
+    class AnimationState {
+        blendMode: AnimationBlendMode;
+        clip: AnimationClip;
+        enabled: boolean;
+        length: number;
+        name: string;
+        normalizedSpeed: number;
+        normalizedTime: number;
+        speed: number;
+        time: number;
+        weight: number;
+        wrapMode: framework.AnimationCurveWrapMode;
+        AddMixingTransform(mix: framework.transform, recursive?: boolean): void;
+        RemoveMixingTransform(mix: framework.transform): void;
+    }
+}
+declare namespace gd3d.framework {
+    type Constructor<T> = (new (...args: any[]) => T);
+    class Animator implements framework.INodeComponent {
+        static readonly ClassName: string;
+        angularVelocity: math.vector3;
+        applyRootMotion: boolean;
+        avatar: Avatar;
+        bodyPosition: math.vector3;
+        bodyRotation: math.quaternion;
+        cullingMode: AnimatorCullingMode;
+        deltaPosition: math.vector3;
+        deltaRotation: math.quaternion;
+        feetPivotActive: number;
+        fireEvents: boolean;
+        gravityWeight: number;
+        hasBoundPlayables: boolean;
+        hasRootMotion: boolean;
+        hasTransformHierarchy: boolean;
+        humanScale: number;
+        isHuman: boolean;
+        isInitialized: boolean;
+        isMatchingTarget: boolean;
+        isOptimizable: boolean;
+        keepAnimatorControllerStateOnDisable: boolean;
+        layerCount: number;
+        layersAffectMassCenter: boolean;
+        leftFeetBottomHeight: number;
+        parameterCount: number;
+        parameters: AnimatorControllerParameter[];
+        pivotPosition: math.vector3;
+        pivotWeight: number;
+        playableGraph: PlayableGraph;
+        playbackTime: number;
+        recorderMode: AnimatorRecorderMode;
+        recorderStartTime: number;
+        recorderStopTime: number;
+        rightFeetBottomHeight: number;
+        rootPosition: math.vector3;
+        rootRotation: math.quaternion;
+        runtimeAnimatorController: RuntimeAnimatorController;
+        speed: number;
+        stabilizeFeet: boolean;
+        targetPosition: math.vector3;
+        targetRotation: math.quaternion;
+        updateMode: AnimatorUpdateMode;
+        velocity: math.vector3;
+        private _activeAnimationClip;
+        private _isPlaying;
+        gameObject: framework.gameObject;
+        start(): void;
+        onPlay(): void;
+        update(deltaTime?: number): void;
+        remove(): void;
+        clone(): void;
+        ApplyBuiltinRootMotion(stateName: string, normalizedTransitionDuration: number, layer?: number, normalizedTimeOffset?: number, normalizedTransitionTime?: number): void;
+        CrossFade(stateName: string, normalizedTransitionDuration: number, layer?: number, normalizedTimeOffset?: number, normalizedTransitionTime?: number): void;
+        CrossFadeInFixedTime(stateName: String, fixedTransitionDuration: number, layer?: number, fixedTimeOffset?: number, normalizedTransitionTime?: number): void;
+        GetAnimatorTransitionInfo(layerIndex: number): void;
+        GetBehaviour<T extends StateMachineBehaviour>(type: Constructor<T>): T;
+        GetBehaviours<T extends StateMachineBehaviour>(type: Constructor<T>): T[];
+        GetBoneTransform(humanBoneId: HumanBodyBones): void;
+        GetBool(name: string): boolean;
+        GetCurrentAnimatorClipInfo(layerIndex: number): AnimatorClipInfo[];
+        GetCurrentAnimatorClipInfoCount(layerIndex: number): number;
+        GetCurrentAnimatorStateInfo(layerIndex: number): AnimatorStateInfo;
+        GetFloat(name: string): number;
+        GetIKHintPosition(hint: AvatarIKHint): math.vector3;
+        GetIKHintPositionWeight(hint: AvatarIKHint): number;
+        GetIKPosition(goal: AvatarIKGoal): math.vector3;
+        GetIKPositionWeight(goal: AvatarIKGoal): void;
+        GetIKRotation(goal: AvatarIKGoal): void;
+        GetIKRotationWeight(goal: AvatarIKGoal): void;
+        GetInteger(name: string): number;
+        GetLayerIndex(layerName: string): void;
+        GetLayerName(layerIndex: number): void;
+        GetLayerWeight(layerIndex: number): void;
+        GetNextAnimatorClipInfo(layerIndex: number): AnimatorClipInfo[];
+        GetNextAnimatorClipInfoCount(layerIndex: number): number;
+        GetNextAnimatorStateInfo(layerIndex: number): AnimatorStateInfo;
+        GetParameter(index: number): AnimatorControllerParameter;
+        HasState(layerIndex: number, stateID: number): boolean;
+        InterruptMatchTarget(completeMatch?: boolean): void;
+        IsInTransition(layerIndex: number): void;
+        IsParameterControlledByCurve(name: string): void;
+        MatchTarget(matchPosition: math.vector3, matchRotation: math.quaternion, targetBodyPart: AvatarTarget, weightMask: MatchTargetWeightMask, startNormalizedTime: number, targetNormalizedTime?: number): void;
+        Play(stateName: string, layer?: number, normalizedTime?: number): void;
+        PlayInFixedTime(stateName: string, layer?: number, fixedTime?: number): void;
+        Rebind(): void;
+        ResetTrigger(name: string): void;
+        SetBoneLocalRotation(humanBoneId: HumanBodyBones, rotation: math.quaternion): void;
+        SetBool(name: string, value: boolean): void;
+        SetFloat(name: string, value: number, dampTime: number, deltaTime: number): void;
+        SetIKHintPosition(hint: AvatarIKHint, hintPosition: math.vector3): void;
+        SetIKHintPositionWeight(hint: AvatarIKHint, value: number): void;
+        SetIKPosition(goal: AvatarIKGoal, goalPosition: math.vector3): void;
+        SetIKPositionWeight(goal: AvatarIKGoal, value: number): void;
+        SetIKRotation(goal: AvatarIKGoal, goalRotation: math.quaternion): void;
+        SetIKRotationWeight(goal: AvatarIKGoal, value: number): void;
+        SetInteger(name: string, value: number): void;
+        SetLayerWeight(layerIndex: number, weight: number): void;
+        SetLookAtPosition(lookAtPosition: math.vector3): void;
+        SetLookAtWeight(weight: number, bodyWeight?: number, headWeight?: number, eyesWeight?: number, clampWeight?: number): void;
+        SetTarget(targetIndex: AvatarTarget, targetNormalizedTime: number): void;
+        SetTrigger(name: string): void;
+        StartPlayback(): void;
+        StartRecording(frameCount: number): void;
+        StopPlayback(): void;
+        StopRecording(): void;
+        WriteDefaultValues(): void;
+        static StringToHash(name: string): void;
+    }
+}
+declare namespace gd3d.framework {
+    class AnimatorClipInfo {
+        clip: AnimationClip;
+        weight: number;
+    }
+}
+declare namespace gd3d.framework {
+    class AnimatorCondition {
+        mode: AnimatorConditionMode;
+        parameter: string;
+        threshold: number;
+    }
+}
+declare namespace gd3d.framework {
+    class RuntimeAnimatorController {
+        animationClips: AnimationClip[];
+    }
+}
+declare namespace gd3d.framework {
+    class AnimatorController extends RuntimeAnimatorController {
+        layers: AnimatorControllerLayer[];
+        parameters: AnimatorControllerParameter[];
+    }
+}
+declare namespace gd3d.framework {
+    class AnimatorControllerLayer {
+        avatarMask: AvatarMask;
+        blendingMode: AnimatorLayerBlendingMode;
+        defaultWeight: number;
+        iKPass: boolean;
+        name: string;
+        stateMachine: AnimatorStateMachine;
+        syncedLayerAffectsTiming: boolean;
+        syncedLayerIndex: number;
+        GetOverrideBehaviours(state: AnimatorState): void;
+        GetOverrideMotion(state: AnimatorState): void;
+        SetOverrideBehaviours(state: AnimatorState, behaviours: StateMachineBehaviour[]): void;
+        SetOverrideMotion(state: AnimatorState, motion: Motion): void;
+    }
+}
+declare namespace gd3d.framework {
+    class AnimatorControllerParameter {
+        defaultBool: boolean;
+        defaultFloat: number;
+        defaultInt: number;
+        name: string;
+        nameHash: number;
+        type: AnimatorControllerParameterType;
+    }
+}
+declare namespace gd3d.framework {
+    class AnimatorState {
+        behaviours: StateMachineBehaviour[];
+        cycleOffset: number;
+        cycleOffsetParameter: string;
+        cycleOffsetParameterActive: boolean;
+        iKOnFeet: boolean;
+        mirror: boolean;
+        mirrorParameter: string;
+        mirrorParameterActive: boolean;
+        motion: Motion;
+        nameHash: number;
+        speed: number;
+        speedParameter: string;
+        speedParameterActive: boolean;
+        tag: string;
+        timeParameter: string;
+        timeParameterActive: boolean;
+        transitions: AnimatorStateTransition[];
+        writeDefaultValues: boolean;
+        AddExitTransition(defaultExitTime: boolean): void;
+        AddStateMachineBehaviour(stateMachineBehaviourType: new () => any): void;
+        AddTransition(destinationState: AnimatorState | AnimatorStateMachine | AnimatorStateTransition, defaultExitTime: boolean): void;
+        RemoveTransition(transition: AnimatorStateTransition): void;
+    }
+}
+declare namespace gd3d.framework {
+    class AnimatorStateInfo {
+        fullPathHash: number;
+        length: number;
+        loop: boolean;
+        normalizedTime: number;
+        shortNameHash: number;
+        speed: number;
+        speedMultiplier: number;
+        tagHash: number;
+        IsName(name: string): void;
+        IsTag(tag: string): void;
+    }
+}
+declare namespace gd3d.framework {
+    class AnimatorStateMachine {
+        anyStatePosition: math.vector3;
+        anyStateTransitions: AnimatorStateTransition[];
+        behaviours: StateMachineBehaviour[];
+        defaultState: AnimatorState;
+        entryPosition: math.vector3;
+        entryTransitions: AnimatorTransition[];
+        exitPosition: math.vector3;
+        parentStateMachinePosition: math.vector3;
+        stateMachines: ChildAnimatorStateMachine[];
+        states: ChildAnimatorState[];
+    }
+}
+declare namespace gd3d.framework {
+    class AnimatorTransitionBase {
+        conditions: AnimatorCondition[];
+        destinationState: AnimatorState;
+        destinationStateMachine: AnimatorStateMachine;
+        isExit: boolean;
+        mute: boolean;
+        solo: boolean;
+        AddCondition(mode: AnimatorConditionMode, threshold: number, parameter: string): void;
+        RemoveCondition(condition: AnimatorCondition): void;
+    }
+}
+declare namespace gd3d.framework {
+    class AnimatorStateTransition extends AnimatorTransitionBase {
+        canTransitionToSelf: boolean;
+        duration: number;
+        exitTime: number;
+        hasExitTime: boolean;
+        hasFixedDuration: boolean;
+        interruptionSource: TransitionInterruptionSource;
+        offset: number;
+        orderedInterruption: boolean;
+    }
+}
+declare namespace gd3d.framework {
+    class AnimatorTransition extends AnimatorTransitionBase {
+    }
+}
+declare namespace gd3d.framework {
+    class Avatar {
+        isHuman: boolean;
+        isValid: boolean;
+    }
+}
+declare namespace gd3d.framework {
+    class AvatarMask {
+        transformCount: number;
+        AddTransformPath(transform: framework.transform, recursive?: boolean): void;
+        GetHumanoidBodyPartActive(index: AvatarMaskBodyPart): void;
+        GetTransformActive(index: number): void;
+        GetTransformPath(index: number): void;
+        RemoveTransformPath(transform: framework.transform, recursive?: boolean): void;
+        SetHumanoidBodyPartActive(index: AvatarMaskBodyPart, value: boolean): void;
+        SetTransformActive(index: number, value: boolean): void;
+        SetTransformPath(index: number, path: string): void;
+    }
+}
+declare namespace gd3d.framework {
+    enum AvatarMaskBodyPart {
+        Root = 0,
+        Body = 1,
+        Head = 2,
+        LeftLeg = 3,
+        RightLeg = 4,
+        LeftArm = 5,
+        RightArm = 6,
+        LeftFingers = 7,
+        RightFingers = 8,
+        LeftFootIK = 9,
+        RightFootIK = 10,
+        LeftHandIK = 11,
+        RightHandIK = 12,
+        LastBodyPart = 13
+    }
+}
+declare namespace gd3d.framework {
+    class ChildAnimatorState {
+        position: math.vector3;
+        state: AnimatorState;
+    }
+}
+declare namespace gd3d.framework {
+    class ChildAnimatorStateMachine {
+        position: math.vector3;
+        stateMachine: AnimatorStateMachine;
+    }
+}
+declare namespace gd3d.framework {
+    class EditorCurveBinding {
+        path: string;
+        propertyName: string;
+        type: new () => any;
+        static DiscreteCurve(inPath: string, inType: new () => any, inPropertyName: string): void;
+        static FloatCurve(inPath: string, inType: new () => any, inPropertyName: string): void;
+        static PPtrCurve(inPath: string, inType: new () => any, inPropertyName: string): void;
+    }
+}
+declare namespace gd3d.framework {
+    class MatchTargetWeightMask {
+        positionXYZWeight: math.vector3;
+        rotationWeight: number;
+    }
+}
+declare namespace gd3d.framework {
+    class Motion {
+    }
+}
+declare namespace gd3d.framework {
+    class StateMachineBehaviour {
+        OnStateMachineEnter(animator: Animator, stateMachinePathHash: number): void;
+        OnStateMachineExit(animator: Animator, stateMachinePathHash: number): void;
+        OnStateEnter(animator: Animator, animatorStateInfo: AnimatorStateInfo, layerIndex: number): void;
+        OnStateExit(animator: Animator, animatorStateInfo: AnimatorStateInfo, layerIndex: number): void;
+        OnStateIK(animator: Animator, animatorStateInfo: AnimatorStateInfo, layerIndex: number): void;
+        OnStateMove(animator: Animator, animatorStateInfo: AnimatorStateInfo, layerIndex: number): void;
+        OnStateUpdate(animator: Animator, animatorStateInfo: AnimatorStateInfo, layerIndex: number): void;
+    }
+}
+declare namespace gd3d.framework {
+    class Bounds {
+    }
+}
+declare namespace gd3d.framework {
+    enum AnimationBlendMode {
+        Blend = 0,
+        Additive = 1
+    }
+}
+declare namespace gd3d.framework {
+    enum AnimatorConditionMode {
+        If = 0,
+        IfNot = 1,
+        Greater = 2,
+        Less = 3,
+        Equals = 4,
+        NotEqual = 5
+    }
+}
+declare namespace gd3d.framework {
+    enum AnimatorControllerParameterType {
+        Float = 0,
+        Int = 1,
+        Bool = 2,
+        Trigger = 3
+    }
+}
+declare namespace gd3d.framework {
+    enum AnimatorCullingMode {
+        AlwaysAnimate = 0,
+        CullUpdateTransforms = 1,
+        CullCompletely = 2
+    }
+}
+declare namespace gd3d.framework {
+    enum AnimatorLayerBlendingMode {
+        Override = 0,
+        Additive = 1
+    }
+}
+declare namespace gd3d.framework {
+    enum AnimatorRecorderMode {
+        Offline = 0,
+        Playback = 1,
+        Record = 2
+    }
+}
+declare namespace gd3d.framework {
+    enum AnimatorUpdateMode {
+        Normal = 0,
+        AnimatePhysics = 1,
+        UnscaledTime = 2
+    }
+}
+declare namespace gd3d.framework {
+    enum AvatarIKGoal {
+        LeftFoot = 0,
+        RightFoot = 1,
+        LeftHand = 2,
+        RightHand = 3
+    }
+}
+declare namespace gd3d.framework {
+    enum AvatarIKHint {
+        LeftKnee = 0,
+        RightKnee = 1,
+        LeftElbow = 2,
+        RightElbow = 3
+    }
+}
+declare namespace gd3d.framework {
+    enum AvatarTarget {
+        Root = 0,
+        Body = 1,
+        LeftFoot = 2,
+        RightFoot = 3,
+        LeftHand = 4,
+        RightHand = 5
+    }
+}
+declare namespace gd3d.framework {
+    enum HumanBodyBones {
+        Hips = 0,
+        LeftUpperLeg = 1,
+        RightUpperLeg = 2,
+        LeftLowerLeg = 3,
+        RightLowerLeg = 4,
+        LeftFoot = 5,
+        RightFoot = 6,
+        Spine = 7,
+        Chest = 8,
+        UpperChest = 9,
+        Neck = 10,
+        Head = 11,
+        LeftShoulder = 12,
+        RightShoulder = 13,
+        LeftUpperArm = 14,
+        RightUpperArm = 15,
+        LeftLowerArm = 16,
+        RightLowerArm = 17,
+        LeftHand = 18,
+        RightHand = 19,
+        LeftToes = 20,
+        RightToes = 21,
+        LeftEye = 22,
+        RightEye = 23,
+        Jaw = 24,
+        LeftThumbProximal = 25,
+        LeftThumbIntermediate = 26,
+        LeftThumbDistal = 27,
+        LeftIndexProximal = 28,
+        LeftIndexIntermediate = 29,
+        LeftIndexDistal = 30,
+        LeftMiddleProximal = 31,
+        LeftMiddleIntermediate = 32,
+        LeftMiddleDistal = 33,
+        LeftRingProximal = 34,
+        LeftRingIntermediate = 35,
+        LeftRingDistal = 36,
+        LeftLittleProximal = 37,
+        LeftLittleIntermediate = 38,
+        LeftLittleDistal = 39,
+        RightThumbProximal = 40,
+        RightThumbIntermediate = 41,
+        RightThumbDistal = 42,
+        RightIndexProximal = 43,
+        RightIndexIntermediate = 44,
+        RightIndexDistal = 45,
+        RightMiddleProximal = 46,
+        RightMiddleIntermediate = 47,
+        RightMiddleDistal = 48,
+        RightRingProximal = 49,
+        RightRingIntermediate = 50,
+        RightRingDistal = 51,
+        RightLittleProximal = 52,
+        RightLittleIntermediate = 53,
+        RightLittleDistal = 54,
+        LastBone = 55
+    }
+}
+declare namespace gd3d.framework {
+    enum SendMessageOptions {
+        RequireReceiver = 0,
+        DontRequireReceiver = 1
+    }
+}
+declare namespace gd3d.framework {
+    enum TransitionInterruptionSource {
+        None = 0,
+        Source = 1,
+        Destination = 2,
+        SourceThenDestination = 3,
+        DestinationThenSource = 4
+    }
+}
+declare namespace gd3d.framework {
+    class PlayableGraph {
+    }
+}
+declare namespace gd3d.framework {
     class resID {
         constructor();
         static idAll: number;
@@ -4724,9 +5275,9 @@ declare namespace gd3d.io {
     class SerializeDependent {
         static resourseDatas: any[];
         static GetAssetContent(asset: any): {
-            name: string;
-            value: string;
-            type: SaveAssetType;
+            "name": string;
+            "value": string;
+            "type": SaveAssetType;
         };
         static GetAssetUrl(asset: any, assetMgr: any): void;
     }
@@ -7934,179 +8485,179 @@ declare namespace gd3d.framework {
     class WebGLDebugUtils {
         private log;
         static readonly glValidEnumContexts: {
-            enable: {
+            'enable': {
                 0: boolean;
             };
-            disable: {
+            'disable': {
                 0: boolean;
             };
-            getParameter: {
+            'getParameter': {
                 0: boolean;
             };
-            drawArrays: {
+            'drawArrays': {
                 0: boolean;
             };
-            drawElements: {
+            'drawElements': {
                 0: boolean;
                 2: boolean;
             };
-            createShader: {
+            'createShader': {
                 0: boolean;
             };
-            getShaderParameter: {
+            'getShaderParameter': {
                 1: boolean;
             };
-            getProgramParameter: {
+            'getProgramParameter': {
                 1: boolean;
             };
-            getVertexAttrib: {
+            'getVertexAttrib': {
                 1: boolean;
             };
-            vertexAttribPointer: {
+            'vertexAttribPointer': {
                 2: boolean;
             };
-            bindTexture: {
+            'bindTexture': {
                 0: boolean;
             };
-            activeTexture: {
+            'activeTexture': {
                 0: boolean;
             };
-            getTexParameter: {
-                0: boolean;
-                1: boolean;
-            };
-            texParameterf: {
+            'getTexParameter': {
                 0: boolean;
                 1: boolean;
             };
-            texParameteri: {
+            'texParameterf': {
+                0: boolean;
+                1: boolean;
+            };
+            'texParameteri': {
                 0: boolean;
                 1: boolean;
                 2: boolean;
             };
-            texImage2D: {
+            'texImage2D': {
                 0: boolean;
                 2: boolean;
                 6: boolean;
                 7: boolean;
             };
-            texSubImage2D: {
+            'texSubImage2D': {
                 0: boolean;
                 6: boolean;
                 7: boolean;
             };
-            copyTexImage2D: {
+            'copyTexImage2D': {
                 0: boolean;
                 2: boolean;
             };
-            copyTexSubImage2D: {
+            'copyTexSubImage2D': {
                 0: boolean;
             };
-            generateMipmap: {
+            'generateMipmap': {
                 0: boolean;
             };
-            bindBuffer: {
+            'bindBuffer': {
                 0: boolean;
             };
-            bufferData: {
+            'bufferData': {
                 0: boolean;
                 2: boolean;
             };
-            bufferSubData: {
+            'bufferSubData': {
                 0: boolean;
             };
-            getBufferParameter: {
-                0: boolean;
-                1: boolean;
-            };
-            pixelStorei: {
+            'getBufferParameter': {
                 0: boolean;
                 1: boolean;
             };
-            readPixels: {
+            'pixelStorei': {
+                0: boolean;
+                1: boolean;
+            };
+            'readPixels': {
                 4: boolean;
                 5: boolean;
             };
-            bindRenderbuffer: {
+            'bindRenderbuffer': {
                 0: boolean;
             };
-            bindFramebuffer: {
+            'bindFramebuffer': {
                 0: boolean;
             };
-            checkFramebufferStatus: {
+            'checkFramebufferStatus': {
                 0: boolean;
             };
-            framebufferRenderbuffer: {
-                0: boolean;
-                1: boolean;
-                2: boolean;
-            };
-            framebufferTexture2D: {
+            'framebufferRenderbuffer': {
                 0: boolean;
                 1: boolean;
                 2: boolean;
             };
-            getFramebufferAttachmentParameter: {
+            'framebufferTexture2D': {
                 0: boolean;
                 1: boolean;
                 2: boolean;
             };
-            getRenderbufferParameter: {
-                0: boolean;
-                1: boolean;
-            };
-            renderbufferStorage: {
-                0: boolean;
-                1: boolean;
-            };
-            clear: {
-                0: boolean;
-            };
-            depthFunc: {
-                0: boolean;
-            };
-            blendFunc: {
-                0: boolean;
-                1: boolean;
-            };
-            blendFuncSeparate: {
-                0: boolean;
-                1: boolean;
-                2: boolean;
-                3: boolean;
-            };
-            blendEquation: {
-                0: boolean;
-            };
-            blendEquationSeparate: {
-                0: boolean;
-                1: boolean;
-            };
-            stencilFunc: {
-                0: boolean;
-            };
-            stencilFuncSeparate: {
-                0: boolean;
-                1: boolean;
-            };
-            stencilMaskSeparate: {
-                0: boolean;
-            };
-            stencilOp: {
+            'getFramebufferAttachmentParameter': {
                 0: boolean;
                 1: boolean;
                 2: boolean;
             };
-            stencilOpSeparate: {
+            'getRenderbufferParameter': {
+                0: boolean;
+                1: boolean;
+            };
+            'renderbufferStorage': {
+                0: boolean;
+                1: boolean;
+            };
+            'clear': {
+                0: boolean;
+            };
+            'depthFunc': {
+                0: boolean;
+            };
+            'blendFunc': {
+                0: boolean;
+                1: boolean;
+            };
+            'blendFuncSeparate': {
                 0: boolean;
                 1: boolean;
                 2: boolean;
                 3: boolean;
             };
-            cullFace: {
+            'blendEquation': {
                 0: boolean;
             };
-            frontFace: {
+            'blendEquationSeparate': {
+                0: boolean;
+                1: boolean;
+            };
+            'stencilFunc': {
+                0: boolean;
+            };
+            'stencilFuncSeparate': {
+                0: boolean;
+                1: boolean;
+            };
+            'stencilMaskSeparate': {
+                0: boolean;
+            };
+            'stencilOp': {
+                0: boolean;
+                1: boolean;
+                2: boolean;
+            };
+            'stencilOpSeparate': {
+                0: boolean;
+                1: boolean;
+                2: boolean;
+                3: boolean;
+            };
+            'cullFace': {
+                0: boolean;
+            };
+            'frontFace': {
                 0: boolean;
             };
         };
@@ -8163,7 +8714,9 @@ declare namespace gd3d.framework {
     enum AnimationCurveWrapMode {
         Clamp = 1,
         Loop = 2,
-        PingPong = 4
+        PingPong = 4,
+        Once = 5,
+        Default = 6
     }
 }
 declare namespace gd3d.framework {

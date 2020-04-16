@@ -691,6 +691,7 @@ declare class test_ParticleSystem implements IState {
     setGUI(): void;
     play(): void;
     stop(): void;
+    play1(): void;
     private get particleName();
     private set particleName(value);
     private _particleName;

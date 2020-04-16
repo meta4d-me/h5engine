@@ -1,4 +1,6 @@
-namespace gd3d.unity
+/// <reference path="./AnimatorTransitionBase.ts" />
+
+namespace gd3d.framework
 {
     /**
      * Transitions define when and how the state machine switch from one state to another. AnimatorStateTransition always originate from an Animator State (or AnyState) and have timing parameters.

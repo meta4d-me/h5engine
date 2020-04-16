@@ -1,11 +1,11 @@
-namespace gd3d.unity
+namespace gd3d.framework
 {
     /**
      * An AnimationClipCurveData object contains all the information needed to identify a specific curve in an AnimationClip. The curve animates a specific property of a component / material attached to a game object / animated bone.
      */
     export class AnimationClipCurveData
     {
-        __class__: "gd3d.unity.AnimationClipCurveData";
+        __class__: "gd3d.framework.AnimationClipCurveData";
 
         /**
          * The actual animation curve.

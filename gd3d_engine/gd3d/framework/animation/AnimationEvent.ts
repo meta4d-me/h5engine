@@ -1,4 +1,4 @@
-namespace gd3d.unity
+namespace gd3d.framework
 {
     /**
      * AnimationEvent lets you call a script function similar to SendMessage as part of playing back an animation.

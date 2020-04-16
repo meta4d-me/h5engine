@@ -1,4 +1,6 @@
-namespace gd3d.unity
+/// <reference path="./RuntimeAnimatorController.ts" />
+
+namespace gd3d.framework
 {
     /**
      * The Animator Controller controls animation through layers with state machines, controlled by parameters.

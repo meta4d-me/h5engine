@@ -1,4 +1,4 @@
-namespace gd3d.unity
+namespace gd3d.framework
 {
     /**
      * Stores keyframe based animations.
@@ -99,7 +99,7 @@ namespace gd3d.unity
         /**
          * Adds an animation event to the clip.
          */
-        AddEvent(evt: unity.AnimationEvent)
+        AddEvent(evt: AnimationEvent)
         {
             this.events.push(evt);
         }
