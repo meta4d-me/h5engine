@@ -1524,6 +1524,37 @@ namespace gd3d.framework {
         clone(): transform2D {
             return io.cloneObj(this) as transform2D;
         }
+
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 查找自己以及子物体中是否有指定名称的transform2D
+         * @param name
+         * @version gd3d 1.0
+         */
+        find(name: string): transform2D
+        {
+            if (this.name == name)
+                return this;
+            else
+            {
+                if (this.children != undefined)
+                {
+                    for (let i in this.children)
+                    {
+                        let res = this.children[i].find(name);
+                        if (res != null)
+                            return res;
+                        else
+                        {
+                            continue;
+                        }
+                    }
+                }
+            }
+            return null;
+        }
     }
 
     export class t2dInfo {

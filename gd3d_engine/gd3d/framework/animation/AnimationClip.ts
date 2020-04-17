@@ -140,9 +140,6 @@ namespace gd3d.framework
                 }
 
                 var propertys = cd.propertyName.split(".");
-
-                cd.path
-                cd.type
                 var value = cd.curve.getValue(time);
 
                 switch (propertys[0])
@@ -173,6 +170,76 @@ namespace gd3d.framework
                                 material
                             }
                         }
+                        break;
+                    default:
+                        console.warn(`无法处理动画属性 ${propertys[0]}`);
+                        break;
+                }
+
+
+            });
+        }
+
+        /**
+         * Samples an animation at a given time for any animated properties.
+         * 
+         * @param go The animated game object.
+         * @param time The time to sample an animation.
+         */
+        SampleAnimation1(go: framework.transform2D, time: number)
+        {
+            time = time % 0.5;
+
+            this.curvedatas.forEach(cd =>
+            {
+                var anitrans = go.transform;
+                if (cd.path != "")
+                {
+                    anitrans = go.transform.find(cd.path);
+                    if (!anitrans) return;
+                }
+
+                var propertys = cd.propertyName.split(".");
+                var value = cd.curve.getValue(time);
+
+                switch (propertys[0])
+                {
+                    case "m_AnchoredPosition":
+                        if (propertys[1] == "x")
+                        {
+                            anitrans.localTranslate.x = value;
+                        } else if (propertys[1] == "y")
+                        {
+                            anitrans.localTranslate.y = -value;
+                        }
+                        anitrans.markDirty();
+                        break;
+                    case "m_LocalScale":
+                        var localScale = anitrans.localScale;
+                        localScale[propertys[1]] = value;
+                        anitrans.localScale = localScale;
+                        anitrans.markDirty();
+                        break;
+                    case "localEulerAnglesRaw":
+                        if (propertys[1] == "z")
+                        {
+                            anitrans.localRotate = -value / 180 * Math.PI;
+                            anitrans.markDirty();
+                        }
+                        break;
+                    case "material":
+                        anitrans
+
+                        // var meshRenderer = anitrans.getComponent("meshRenderer") as framework.meshRenderer;
+                        // if (meshRenderer && meshRenderer.materials)
+                        // {
+                        //     var material = meshRenderer.materials[0];
+                        //     if (material)
+                        //     {
+                        //         material.setVector4
+                        //         material
+                        //     }
+                        // }
                         break;
                     default:
                         console.warn(`无法处理动画属性 ${propertys[0]}`);

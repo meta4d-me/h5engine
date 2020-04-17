@@ -5,8 +5,9 @@ namespace gd3d.framework
     /**
      * Interface to control the Mecanim animation system.
      */
+    @reflect.node2DComponent
     @reflect.nodeComponent
-    export class Animator implements framework.INodeComponent
+    export class Animator implements INodeComponent, I2DComponent
     {
         static readonly ClassName: string = "Animator";
 
@@ -239,6 +240,11 @@ namespace gd3d.framework
          */
         gameObject: framework.gameObject;
 
+        /**
+         * 作为2D组件时变换
+         */
+        transform: transform2D;
+
         start()
         {
 
@@ -264,7 +270,13 @@ namespace gd3d.framework
 
             if (this._activeAnimationClip)
             {
-                this._activeAnimationClip.SampleAnimation(this.gameObject, this.playbackTime);
+                if (this.gameObject)
+                {
+                    this._activeAnimationClip.SampleAnimation(this.gameObject, this.playbackTime);
+                } else if (this.transform)
+                {
+                    this._activeAnimationClip.SampleAnimation1(this.transform, this.playbackTime);
+                }
             }
         }
 

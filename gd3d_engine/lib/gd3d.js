@@ -3398,6 +3398,23 @@ var gd3d;
             transform2D.prototype.clone = function () {
                 return gd3d.io.cloneObj(this);
             };
+            transform2D.prototype.find = function (name) {
+                if (this.name == name)
+                    return this;
+                else {
+                    if (this.children != undefined) {
+                        for (var i in this.children) {
+                            var res = this.children[i].find(name);
+                            if (res != null)
+                                return res;
+                            else {
+                                continue;
+                            }
+                        }
+                    }
+                }
+                return null;
+            };
             var transform2D_1;
             transform2D.ClassName = "transform2D";
             transform2D.help_v2 = new gd3d.math.vector2();
@@ -8224,8 +8241,6 @@ var gd3d;
                             return;
                     }
                     var propertys = cd.propertyName.split(".");
-                    cd.path;
-                    cd.type;
                     var value = cd.curve.getValue(time);
                     switch (propertys[0]) {
                         case "m_LocalPosition":
@@ -8252,6 +8267,48 @@ var gd3d;
                                     material;
                                 }
                             }
+                            break;
+                        default:
+                            console.warn("\u65E0\u6CD5\u5904\u7406\u52A8\u753B\u5C5E\u6027 " + propertys[0]);
+                            break;
+                    }
+                });
+            };
+            AnimationClip.prototype.SampleAnimation1 = function (go, time) {
+                time = time % 0.5;
+                this.curvedatas.forEach(function (cd) {
+                    var anitrans = go.transform;
+                    if (cd.path != "") {
+                        anitrans = go.transform.find(cd.path);
+                        if (!anitrans)
+                            return;
+                    }
+                    var propertys = cd.propertyName.split(".");
+                    var value = cd.curve.getValue(time);
+                    switch (propertys[0]) {
+                        case "m_AnchoredPosition":
+                            if (propertys[1] == "x") {
+                                anitrans.localTranslate.x = value;
+                            }
+                            else if (propertys[1] == "y") {
+                                anitrans.localTranslate.y = -value;
+                            }
+                            anitrans.markDirty();
+                            break;
+                        case "m_LocalScale":
+                            var localScale = anitrans.localScale;
+                            localScale[propertys[1]] = value;
+                            anitrans.localScale = localScale;
+                            anitrans.markDirty();
+                            break;
+                        case "localEulerAnglesRaw":
+                            if (propertys[1] == "z") {
+                                anitrans.localRotate = -value / 180 * Math.PI;
+                                anitrans.markDirty();
+                            }
+                            break;
+                        case "material":
+                            anitrans;
                             break;
                         default:
                             console.warn("\u65E0\u6CD5\u5904\u7406\u52A8\u753B\u5C5E\u6027 " + propertys[0]);
@@ -8385,7 +8442,12 @@ var gd3d;
                     return;
                 this.playbackTime += deltaTime * this.speed;
                 if (this._activeAnimationClip) {
-                    this._activeAnimationClip.SampleAnimation(this.gameObject, this.playbackTime);
+                    if (this.gameObject) {
+                        this._activeAnimationClip.SampleAnimation(this.gameObject, this.playbackTime);
+                    }
+                    else if (this.transform) {
+                        this._activeAnimationClip.SampleAnimation1(this.transform, this.playbackTime);
+                    }
                 }
             };
             Animator.prototype.remove = function () {
@@ -8563,6 +8625,7 @@ var gd3d;
             };
             Animator.ClassName = "Animator";
             Animator = __decorate([
+                gd3d.reflect.node2DComponent,
                 gd3d.reflect.nodeComponent
             ], Animator);
             return Animator;

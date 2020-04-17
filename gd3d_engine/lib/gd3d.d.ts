@@ -716,6 +716,7 @@ declare namespace gd3d.framework {
         setSiblingIndex(siblingIndex: number): void;
         getSiblingIndex(): number;
         clone(): transform2D;
+        find(name: string): transform2D;
     }
     class t2dInfo {
         pivot: math.vector2;
@@ -1501,6 +1502,7 @@ declare namespace gd3d.framework {
         ClearCurves(): void;
         EnsureQuaternionContinuity(): void;
         SampleAnimation(go: framework.gameObject, time: number): void;
+        SampleAnimation1(go: framework.transform2D, time: number): void;
         SetCurve(relativePath: string, type: (new () => any), propertyName: string, curve: framework.AnimationCurve1): void;
         GetAllCurves(): AnimationClipCurveData[];
         GetCurveBindings(): EditorCurveBinding[];
@@ -1550,7 +1552,7 @@ declare namespace gd3d.framework {
 }
 declare namespace gd3d.framework {
     type Constructor<T> = (new (...args: any[]) => T);
-    class Animator implements framework.INodeComponent {
+    class Animator implements INodeComponent, I2DComponent {
         static readonly ClassName: string;
         angularVelocity: math.vector3;
         applyRootMotion: boolean;
@@ -1597,6 +1599,7 @@ declare namespace gd3d.framework {
         private _activeAnimationClip;
         private _isPlaying;
         gameObject: framework.gameObject;
+        transform: transform2D;
         start(): void;
         onPlay(): void;
         update(deltaTime?: number): void;
