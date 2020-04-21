@@ -205,14 +205,60 @@ namespace gd3d.framework
                 switch (propertys[0])
                 {
                     case "m_AnchoredPosition":
+
+                        var layoutState = anitrans.layoutState;
+
                         if (propertys[1] == "x")
                         {
-                            anitrans.localTranslate.x = value;
-                        } else if (propertys[1] == "y")
-                        {
-                            anitrans.localTranslate.y = -value;
+                            if (layoutState & layoutOption.LEFT)
+                            {
+                                if (layoutState & layoutOption.RIGHT)
+                                {
+                                    var left = anitrans.getLayoutValue(layoutOption.LEFT);
+                                    var right = anitrans.getLayoutValue(layoutOption.RIGHT);
+                                    var initleft = (left + right) / 2;
+                                    anitrans.setLayoutValue(layoutOption.LEFT, initleft + value);
+                                    anitrans.setLayoutValue(layoutOption.RIGHT, initleft - value);
+                                }
+                                else
+                                {
+                                    anitrans.setLayoutValue(layoutOption.LEFT, value - anitrans.pivot.x * anitrans.width);
+                                }
+                            } else if (layoutState & layoutOption.RIGHT)
+                            {
+                                anitrans.setLayoutValue(layoutOption.RIGHT, -value - anitrans.pivot.x * anitrans.width);
+                            }
+
+                            if (layoutState & layoutOption.H_CENTER)
+                            {
+                                anitrans.setLayoutValue(layoutOption.H_CENTER, value);
+                            }
                         }
-                        anitrans.markDirty();
+                        else if (propertys[1] == "y")
+                        {
+                            if (layoutState & layoutOption.TOP)
+                            {
+                                if (layoutState & layoutOption.BOTTOM)
+                                {
+                                    var top = anitrans.getLayoutValue(layoutOption.TOP);
+                                    var bottom = anitrans.getLayoutValue(layoutOption.BOTTOM);
+                                    var inittop = (top + bottom) / 2;
+                                    anitrans.setLayoutValue(layoutOption.TOP, inittop - value);
+                                    anitrans.setLayoutValue(layoutOption.BOTTOM, inittop + value);
+                                } else
+                                {
+                                    anitrans.setLayoutValue(layoutOption.TOP, -value - anitrans.pivot.y * anitrans.height);
+                                }
+                            } else if (layoutState & layoutOption.BOTTOM)
+                            {
+                                anitrans.setLayoutValue(layoutOption.BOTTOM, value - anitrans.pivot.y * anitrans.height);
+                            }
+
+                            if (layoutState & layoutOption.V_CENTER)
+                            {
+                                anitrans.setLayoutValue(layoutOption.V_CENTER, -value);
+                            }
+                        }
                         break;
                     case "m_LocalScale":
                         var localScale = anitrans.localScale;
