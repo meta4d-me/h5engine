@@ -8293,16 +8293,16 @@ var gd3d;
                                     if (layoutState & framework.layoutOption.RIGHT) {
                                         var left = anitrans.getLayoutValue(framework.layoutOption.LEFT);
                                         var right = anitrans.getLayoutValue(framework.layoutOption.RIGHT);
-                                        var offsetx = value - (left - right) / 2;
-                                        anitrans.setLayoutValue(framework.layoutOption.LEFT, left + offsetx);
-                                        anitrans.setLayoutValue(framework.layoutOption.RIGHT, right + offsetx);
+                                        var initleft = (left + right) / 2;
+                                        anitrans.setLayoutValue(framework.layoutOption.LEFT, initleft + value);
+                                        anitrans.setLayoutValue(framework.layoutOption.RIGHT, initleft - value);
                                     }
                                     else {
                                         anitrans.setLayoutValue(framework.layoutOption.LEFT, value - anitrans.pivot.x * anitrans.width);
                                     }
                                 }
                                 else if (layoutState & framework.layoutOption.RIGHT) {
-                                    anitrans.setLayoutValue(framework.layoutOption.RIGHT, -value + (1 - anitrans.pivot.x) * anitrans.width);
+                                    anitrans.setLayoutValue(framework.layoutOption.RIGHT, -value - anitrans.pivot.x * anitrans.width);
                                 }
                                 if (layoutState & framework.layoutOption.H_CENTER) {
                                     anitrans.setLayoutValue(framework.layoutOption.H_CENTER, value);
@@ -8313,16 +8313,16 @@ var gd3d;
                                     if (layoutState & framework.layoutOption.BOTTOM) {
                                         var top = anitrans.getLayoutValue(framework.layoutOption.TOP);
                                         var bottom = anitrans.getLayoutValue(framework.layoutOption.BOTTOM);
-                                        var offsety = value - (top - bottom) / 2;
-                                        anitrans.setLayoutValue(framework.layoutOption.TOP, top - offsety);
-                                        anitrans.setLayoutValue(framework.layoutOption.BOTTOM, bottom - offsety);
+                                        var inittop = (top + bottom) / 2;
+                                        anitrans.setLayoutValue(framework.layoutOption.TOP, inittop - value);
+                                        anitrans.setLayoutValue(framework.layoutOption.BOTTOM, inittop + value);
                                     }
                                     else {
                                         anitrans.setLayoutValue(framework.layoutOption.TOP, -value - anitrans.pivot.y * anitrans.height);
                                     }
                                 }
                                 else if (layoutState & framework.layoutOption.BOTTOM) {
-                                    anitrans.setLayoutValue(framework.layoutOption.BOTTOM, value + (1 - anitrans.pivot.y) * anitrans.height);
+                                    anitrans.setLayoutValue(framework.layoutOption.BOTTOM, value - anitrans.pivot.y * anitrans.height);
                                 }
                                 if (layoutState & framework.layoutOption.V_CENTER) {
                                     anitrans.setLayoutValue(framework.layoutOption.V_CENTER, -value);
