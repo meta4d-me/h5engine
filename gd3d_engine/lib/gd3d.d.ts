@@ -5980,6 +5980,9 @@ declare namespace gd3d.framework {
         get rotationBySpeed(): ParticleRotationBySpeedModule;
         set rotationBySpeed(v: ParticleRotationBySpeedModule);
         private _rotationBySpeed;
+        get noise(): ParticleNoiseModule;
+        set noise(v: ParticleNoiseModule);
+        private _noise;
         get textureSheetAnimation(): ParticleTextureSheetAnimationModule;
         set textureSheetAnimation(v: ParticleTextureSheetAnimationModule);
         private _textureSheetAnimation;

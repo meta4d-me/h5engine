@@ -231,6 +231,18 @@ namespace gd3d.framework
         private _rotationBySpeed: ParticleRotationBySpeedModule;
 
         /**
+         * 旋转角度随速度变化模块
+         */
+        get noise() { return this._noise; }
+        set noise(v)
+        {
+            ArrayUtil.replace(this._modules, this._noise, v);
+            v.particleSystem = this;
+            this._noise = v;
+        }
+        private _noise: ParticleNoiseModule;
+
+        /**
          * 粒子系统纹理表动画模块。
          */
         get textureSheetAnimation() { return this._textureSheetAnimation; }
@@ -359,6 +371,8 @@ namespace gd3d.framework
             this.sizeBySpeed = new ParticleSizeBySpeedModule();
             this.rotationOverLifetime = new ParticleRotationOverLifetimeModule();
             this.rotationBySpeed = new ParticleRotationBySpeedModule();
+            this.noise = new ParticleNoiseModule();
+            this.noise.enabled = true;
             this.textureSheetAnimation = new ParticleTextureSheetAnimationModule();
 
             this.main.enabled = true;

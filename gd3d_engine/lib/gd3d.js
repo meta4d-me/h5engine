@@ -31155,6 +31155,8 @@ var gd3d;
                 this.sizeBySpeed = new framework.ParticleSizeBySpeedModule();
                 this.rotationOverLifetime = new framework.ParticleRotationOverLifetimeModule();
                 this.rotationBySpeed = new framework.ParticleRotationBySpeedModule();
+                this.noise = new framework.ParticleNoiseModule();
+                this.noise.enabled = true;
                 this.textureSheetAnimation = new framework.ParticleTextureSheetAnimationModule();
                 this.main.enabled = true;
                 this.emission.enabled = true;
@@ -31329,6 +31331,16 @@ var gd3d;
                     framework.ArrayUtil.replace(this._modules, this._rotationBySpeed, v);
                     v.particleSystem = this;
                     this._rotationBySpeed = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "noise", {
+                get: function () { return this._noise; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._noise, v);
+                    v.particleSystem = this;
+                    this._noise = v;
                 },
                 enumerable: true,
                 configurable: true
