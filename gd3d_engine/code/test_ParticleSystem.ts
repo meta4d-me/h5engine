@@ -124,7 +124,7 @@ class test_ParticleSystem implements IState
             this._particle = null;
         }
 
-        await demoTool.loadbySync(`res/prefabs/${res}/${res}.assetbundle.json`, this.astMgr);
+        await demoTool.loadbySync(`res/prefabs/particlesystems/${res}/${res}.assetbundle.json`, this.astMgr);
 
         let cubeP = this.astMgr.getAssetByName(`${res}.prefab.json`, `${res}.assetbundle.json`) as gd3d.framework.prefab;
         let cubeTran = cubeP.getCloneTrans();

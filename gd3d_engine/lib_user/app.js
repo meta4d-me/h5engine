@@ -4447,7 +4447,7 @@ var test_ParticleSystem = (function () {
                             this.scene.removeChild(this._particle);
                             this._particle = null;
                         }
-                        return [4, demoTool.loadbySync("res/prefabs/" + res + "/" + res + ".assetbundle.json", this.astMgr)];
+                        return [4, demoTool.loadbySync("res/prefabs/particlesystems/" + res + "/" + res + ".assetbundle.json", this.astMgr)];
                     case 1:
                         _a.sent();
                         cubeP = this.astMgr.getAssetByName(res + ".prefab.json", res + ".assetbundle.json");
