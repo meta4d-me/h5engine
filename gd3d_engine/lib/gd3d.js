@@ -32371,7 +32371,6 @@ var gd3d;
                 this.rotationOverLifetime = new framework.ParticleRotationOverLifetimeModule();
                 this.rotationBySpeed = new framework.ParticleRotationBySpeedModule();
                 this.noise = new framework.ParticleNoiseModule();
-                this.noise.enabled = true;
                 this.textureSheetAnimation = new framework.ParticleTextureSheetAnimationModule();
                 this.main.enabled = true;
                 this.emission.enabled = true;

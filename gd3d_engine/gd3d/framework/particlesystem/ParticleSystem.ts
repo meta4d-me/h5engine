@@ -374,7 +374,6 @@ namespace gd3d.framework
             this.rotationOverLifetime = new ParticleRotationOverLifetimeModule();
             this.rotationBySpeed = new ParticleRotationBySpeedModule();
             this.noise = new ParticleNoiseModule();
-            this.noise.enabled = true;
             this.textureSheetAnimation = new ParticleTextureSheetAnimationModule();
 
             this.main.enabled = true;
