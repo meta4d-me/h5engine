@@ -346,12 +346,14 @@ namespace gd3d.framework
 
         remove()
         {
-            throw "未实现";
+            console.warn(`未实现 ParticleSystem  remove`);
+            // throw "未实现";
         }
 
         clone()
         {
-            throw "未实现";
+            console.warn(`未实现 ParticleSystem  clone`);
+            //throw "未实现";
         }
 
         gameObject: gameObject;
@@ -452,6 +454,13 @@ namespace gd3d.framework
 
             this._particlePool = this._particlePool.concat(this._activeParticles);
             this._activeParticles.length = 0;
+
+            this._preworldPos.x = this.worldPos.x;
+            this._preworldPos.y = this.worldPos.y;
+            this._preworldPos.z = this.worldPos.z;
+
+            this._isRateOverDistance = false;
+            this._leftRateOverDistance = 0;
 
             // 重新计算喷发概率
             this.emission.bursts.forEach(element =>
@@ -595,8 +604,9 @@ namespace gd3d.framework
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                             gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
                         },
-                        activeAttributes: (gl, program) =>
+                        activeAttributes: (gl, pass) =>
                         {
+                            let program = pass.program.program;
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
 
                             var offset = 0;
@@ -612,8 +622,9 @@ namespace gd3d.framework
 
                             });
                         },
-                        disableAttributes: (gl, program) =>
+                        disableAttributes: (gl, pass) =>
                         {
+                            let program = pass.program.program;
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
 
                             this._attributes.forEach(element =>

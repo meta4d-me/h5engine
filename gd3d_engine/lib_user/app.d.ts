@@ -144,6 +144,10 @@ declare class main implements gd3d.framework.IUserCode {
     onUpdate(delta: number): void;
     isClosed(): boolean;
 }
+declare class mini_sample implements IState {
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
 declare class test_01 implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -234,11 +238,15 @@ declare class test_loadprefab implements IState {
 declare class testReload implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
-    start(app: gd3d.framework.application): void;
+    resRoot: string;
+    careSubList: string[];
+    r_a_Name: string;
+    r_b_Name: string;
+    start(app: gd3d.framework.application): Promise<void>;
     uileft: number;
     createChangeBtn(role: gd3d.framework.transform, role1: gd3d.framework.transform, o2d: gd3d.framework.overlay2D, part: string): void;
+    excangeSub(r_a_part: gd3d.framework.skinnedMeshRenderer, r_b_part: gd3d.framework.skinnedMeshRenderer): void;
     camera: gd3d.framework.camera;
-    cube: gd3d.framework.transform;
     timer: number;
     update(delta: number): void;
 }
@@ -625,6 +633,39 @@ declare class test_Decal implements IState {
     private Y_ag;
     update(delta: number): void;
 }
+declare class test_GPU_instancing implements IState {
+    private _app;
+    private _scene;
+    private _mat_ins;
+    private createCount;
+    private instanceShBase;
+    private mats;
+    private isInstancing;
+    private cubeRoot;
+    start(app: gd3d.framework.application): Promise<void>;
+    refresh(): void;
+    createByNum(num: number): void;
+    instanceSwitch(): void;
+    initMaterails(): void;
+    createOne(app: any, needInstance: boolean): void;
+    private getRandom;
+    update(delta: number): void;
+}
+declare class test_LineRenderer implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    astMgr: gd3d.framework.assetMgr;
+    lr: gd3d.framework.LineRenderer;
+    loop: boolean;
+    viewcamera: boolean;
+    start(app: gd3d.framework.application): Promise<void>;
+    setGUI(): void;
+    private init;
+    private initLineRenderer;
+    private _showParticle;
+    update(delta: number): void;
+}
 declare namespace gd3d.math {
     interface color {
         "__class__"?: "gd3d.math.color";
@@ -689,6 +730,27 @@ declare class test_Rvo2 implements IState {
     reachedGoals(sim: any, goals: any): boolean;
     setPreferredVelocities(sim: any, goals: any): void;
     updateVisualization(sim: any): void;
+}
+declare class test_TrailRenderer implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    camera: gd3d.framework.camera;
+    astMgr: gd3d.framework.assetMgr;
+    lr: gd3d.framework.TrailRenderer;
+    move: boolean;
+    viewcamera: boolean;
+    res: string;
+    start(app: gd3d.framework.application): Promise<void>;
+    setGUI(): void;
+    private init;
+    private initLineRenderer;
+    private loadRes;
+    private _particleStartPosition;
+    private _particleCurrentPosition;
+    private _moveRadius;
+    private _moveAngle;
+    private _moveAngleSpeed;
+    update(delta: number): void;
 }
 declare class test_UIEffect implements IState {
     app: gd3d.framework.application;

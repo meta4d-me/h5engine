@@ -10,6 +10,7 @@ class test_anim implements IState
     list = [];
     start(app: gd3d.framework.application)
     {
+        gd3d.framework.assetMgr.openGuid = false;
         console.log("i am here.");
         this.app = app;
         window['app'] = app
@@ -158,7 +159,7 @@ class test_anim implements IState
 
 
         };
-        gd3d.framework.assetMgr.initGuidList();
+        // gd3d.framework.assetMgr.initGuidList();
         //let resName = "taidao@qirenzhan"; //elong
         // let resName = "elong"; //PF_Angler
 

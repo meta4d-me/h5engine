@@ -121,8 +121,8 @@ namespace gd3d.framework
         {
             return this._timeScale;
         }
-        private version: string = "v0.0.1";
-        private build: string = "b000077";
+        // private version: string = "v0.0.1";
+        // private build: string = "b000077";
         private _tar: number = -1;
         private _standDeltaTime: number = -1;
         /**
@@ -192,7 +192,6 @@ namespace gd3d.framework
          */
         start(div: HTMLDivElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false)
         {
-            console.log("version: " + this.version + "  build: " + this.build);
             // var metas = document.getElementsByName("viewport") as NodeListOf<HTMLMetaElement>;
             // var meta: HTMLMetaElement;
             // if (!metas || metas.length < 1)
@@ -255,6 +254,8 @@ namespace gd3d.framework
 
         startForCanvas(canvas: HTMLCanvasElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false)
         {
+            console.log("engine version: " + version.VERSION);
+
             this.ccWidth = this.ccWidth == undefined ? canvas.clientWidth : this.ccWidth;
             this.ccHeight = this.ccHeight == undefined ? canvas.clientHeight : this.ccHeight;
 
