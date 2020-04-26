@@ -34769,9 +34769,9 @@ var gd3d;
                 configurable: true
             });
             ParticleSystemShapeBox.prototype.calcParticlePosDir = function (particle, position, dir) {
-                position.x = this.boxX * (Math.random() * 2 - 1);
-                position.y = this.boxY * (Math.random() * 2 - 1);
-                position.z = this.boxZ * (Math.random() * 2 - 1);
+                position.x = this.boxX * (Math.random() * 2 - 1) / 2;
+                position.y = this.boxY * (Math.random() * 2 - 1) / 2;
+                position.z = this.boxZ * (Math.random() * 2 - 1) / 2;
                 if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Shell) {
                     var max = Math.max(Math.abs(position.x), Math.abs(position.y), Math.abs(position.z));
                     if (Math.abs(position.x) == max) {
