@@ -55,6 +55,8 @@ namespace gd3d.plugins.preview
             this.assetMgr = this.app.getAssetMgr();
             this.scene = gd3d.framework.sceneMgr.scene;
 
+            gd3d.framework.assetMgr.openGuid = false;
+
             this.root = new gd3d.framework.transform();
             this.root.name = "pviewroot";
             this.root.gameObject.hideFlags = gd3d.framework.HideFlags.HideAndDontSave;
@@ -62,6 +64,10 @@ namespace gd3d.plugins.preview
 
             var cam = this.createCamera(this.root, "pviewCam");
             this.pviewCam = cam;
+
+            // 加载默认shader
+            await this.loadAssetBundle(`Resources/shader/MainShader.assetbundle.json`);
+            
             // createCube();
             var pviewPath = this.urlParam["pviewPath"];
             console.log(`pview:Resources/${pviewPath}`);

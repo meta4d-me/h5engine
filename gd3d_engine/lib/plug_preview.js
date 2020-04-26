@@ -60,7 +60,7 @@ var gd3d;
                 };
                 main.prototype.loadAssetBundle = function (url) {
                     var _this = this;
-                    return new Promise(function (resolve, reject) {
+                    return new Promise(function (resolve) {
                         _this.assetMgr.load(url, gd3d.framework.AssetTypeEnum.Auto, function (state) {
                             if (state.isfinish) {
                                 resolve(url);
@@ -80,16 +80,20 @@ var gd3d;
                                     this.app = gdapp;
                                     this.assetMgr = this.app.getAssetMgr();
                                     this.scene = gd3d.framework.sceneMgr.scene;
+                                    gd3d.framework.assetMgr.openGuid = false;
                                     this.root = new gd3d.framework.transform();
                                     this.root.name = "pviewroot";
                                     this.root.gameObject.hideFlags = gd3d.framework.HideFlags.HideAndDontSave;
                                     this.scene.addChild(this.root);
                                     cam = this.createCamera(this.root, "pviewCam");
                                     this.pviewCam = cam;
+                                    return [4, this.loadAssetBundle("Resources/shader/MainShader.assetbundle.json")];
+                                case 1:
+                                    _a.sent();
                                     pviewPath = this.urlParam["pviewPath"];
                                     console.log("pview:Resources/" + pviewPath);
                                     return [4, this.loadAssetBundle("Resources/" + pviewPath)];
-                                case 1:
+                                case 2:
                                     _a.sent();
                                     resName = pviewPath.split("/").pop().replace(".assetbundle.json", "");
                                     prefab = this.assetMgr.getAssetByName(resName + ".cprefab.json", resName + ".assetbundle.json");
