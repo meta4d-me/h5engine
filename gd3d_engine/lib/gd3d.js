@@ -8934,6 +8934,7 @@ var gd3d;
                 case e.TextAsset:
                 case e.TextureDesc:
                 case e.PackTxt:
+                case e.ParticleSystem:
                     return "text";
                 case e.Aniclip:
                 case e.DDS:
