@@ -5273,7 +5273,7 @@ var gd3d;
         var label = (function () {
             function label() {
                 this.needRefreshFont = false;
-                this._fontName = "defFont";
+                this._fontName = "defFont.font.json";
                 this._fontsize = 14;
                 this.linespace = 1;
                 this.horizontalType = HorizontalType.Left;
@@ -8646,7 +8646,7 @@ var gd3d;
                         _this.dw_fileCount += Object.keys(_this.files).length;
                         var _loop_3 = function (k) {
                             var guid = _this.files[k];
-                            var url = _this.baseUrl + "Resources/" + k;
+                            var url = _this.baseUrl + "resources/" + k;
                             _this.assetmgr.download(guid, url, framework.calcType(k), function () {
                                 ++dwpkgCount;
                                 if (dwpkgCount >= _this.dw_fileCount)
@@ -8934,6 +8934,7 @@ var gd3d;
                 case e.TextAsset:
                 case e.TextureDesc:
                 case e.PackTxt:
+                case e.ParticleSystem:
                     return "text";
                 case e.Aniclip:
                 case e.DDS:
@@ -9170,7 +9171,6 @@ var gd3d;
                         return reject(new Error("\u65E0\u6CD5\u627E\u5230[" + framework.AssetTypeEnum[asset.type] + "]\u7684\u89E3\u6790\u5668"));
                     if (!factory.parse)
                         return reject(new Error("\u89E3\u6790\u5668 " + factory.constructor.name + " \u6CA1\u6709\u5B9E\u73B0parse\u65B9\u6CD5"));
-                    var __asset = factory.parse(_this_1, bundle, asset.name, data, asset.dwguid);
                     var _this = _this_1;
                     function nextRes(retasset) {
                         if (retasset) {
@@ -9186,16 +9186,23 @@ var gd3d;
                         }
                         resolve(retasset);
                     }
-                    var retasset = __asset;
-                    if (__asset && __asset["then"]) {
-                        __asset.then(function (res) {
-                            nextRes(res);
-                        }).catch(function (e) {
-                            reject(e);
-                        });
+                    try {
+                        var __asset = factory.parse(_this_1, bundle, asset.name, data, asset.dwguid);
+                        var retasset = __asset;
+                        if (__asset && __asset["then"]) {
+                            __asset.then(function (res) {
+                                nextRes(res);
+                            }).catch(function (e) {
+                                reject(e);
+                            });
+                        }
+                        else
+                            nextRes(retasset);
                     }
-                    else
-                        nextRes(retasset);
+                    catch (error) {
+                        console.error("\u8D44\u6E90\u89E3\u6790\u9519\u8BEF:" + error.message + "\n" + error.stack);
+                        reject(error);
+                    }
                 });
             };
             assetMgr.prototype.getAssetByName = function (name, bundlename) {
@@ -14969,7 +14976,7 @@ var gd3d;
                         var trans = this.carelist[bonename];
                         var transMat = this.careBoneMat[bonename];
                         var index = this._playClip.indexDic[bonename];
-                        if (index) {
+                        if (index != null) {
                             if (this.beCross && this.lastFrame) {
                                 transMat.lerpInWorldWithData(this.inversTpos[bonename], this.lastFrame[bonename], this.curFrame, index * 7 + 1, 1 - this.crossPercentage);
                             }
@@ -35327,9 +35334,9 @@ var gd3d;
                 configurable: true
             });
             ParticleSystemShapeBox.prototype.calcParticlePosDir = function (particle, position, dir) {
-                position.x = this.boxX * (Math.random() * 2 - 1);
-                position.y = this.boxY * (Math.random() * 2 - 1);
-                position.z = this.boxZ * (Math.random() * 2 - 1);
+                position.x = this.boxX * (Math.random() * 2 - 1) / 2;
+                position.y = this.boxY * (Math.random() * 2 - 1) / 2;
+                position.z = this.boxZ * (Math.random() * 2 - 1) / 2;
                 if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Shell) {
                     var max = Math.max(Math.abs(position.x), Math.abs(position.y), Math.abs(position.z));
                     if (Math.abs(position.x) == max) {

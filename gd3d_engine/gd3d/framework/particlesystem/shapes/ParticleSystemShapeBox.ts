@@ -82,9 +82,9 @@ namespace gd3d.framework
         calcParticlePosDir(particle: Particle1, position: math.vector3, dir: math.vector3)
         {
             // 计算位置
-            position.x = this.boxX * (Math.random() * 2 - 1);
-            position.y = this.boxY * (Math.random() * 2 - 1);
-            position.z = this.boxZ * (Math.random() * 2 - 1);
+            position.x = this.boxX * (Math.random() * 2 - 1) / 2;
+            position.y = this.boxY * (Math.random() * 2 - 1) / 2;
+            position.z = this.boxZ * (Math.random() * 2 - 1) / 2;
 
             if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Shell)
             {

@@ -60,7 +60,7 @@ var gd3d;
                 };
                 main.prototype.loadAssetBundle = function (url) {
                     var _this = this;
-                    return new Promise(function (resolve, reject) {
+                    return new Promise(function (resolve) {
                         _this.assetMgr.load(url, gd3d.framework.AssetTypeEnum.Auto, function (state) {
                             if (state.isfinish) {
                                 resolve(url);
@@ -80,16 +80,20 @@ var gd3d;
                                     this.app = gdapp;
                                     this.assetMgr = this.app.getAssetMgr();
                                     this.scene = gd3d.framework.sceneMgr.scene;
+                                    gd3d.framework.assetMgr.openGuid = false;
                                     this.root = new gd3d.framework.transform();
                                     this.root.name = "pviewroot";
                                     this.root.gameObject.hideFlags = gd3d.framework.HideFlags.HideAndDontSave;
                                     this.scene.addChild(this.root);
                                     cam = this.createCamera(this.root, "pviewCam");
                                     this.pviewCam = cam;
+                                    return [4, this.loadAssetBundle("Resources/shader/MainShader.assetbundle.json")];
+                                case 1:
+                                    _a.sent();
                                     pviewPath = this.urlParam["pviewPath"];
                                     console.log("pview:Resources/" + pviewPath);
                                     return [4, this.loadAssetBundle("Resources/" + pviewPath)];
-                                case 1:
+                                case 2:
                                     _a.sent();
                                     resName = pviewPath.split("/").pop().replace(".assetbundle.json", "");
                                     prefab = this.assetMgr.getAssetByName(resName + ".cprefab.json", resName + ".assetbundle.json");
@@ -179,12 +183,33 @@ var gd3d;
                 };
                 main.prototype.pview2DTrans = function (trans) {
                     return __awaiter(this, void 0, void 0, function () {
-                        var overlay, wwidth, hheight, isLowPix, pixChange, asp, min, max, uiRoot;
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
+                        var _i, _a, item, atlasUrl, splits, overlay, wwidth, hheight, isLowPix, pixChange, asp, min, max, uiRoot;
+                        return __generator(this, function (_b) {
+                            switch (_b.label) {
                                 case 0: return [4, this.loadAssetBundle("Resources/defFont/defFont.assetbundle.json")];
                                 case 1:
-                                    _a.sent();
+                                    _b.sent();
+                                    _i = 0, _a = this.urlParam["atlas"].split(",");
+                                    _b.label = 2;
+                                case 2:
+                                    if (!(_i < _a.length)) return [3, 5];
+                                    item = _a[_i];
+                                    if (item.trim().length < 1)
+                                        return [3, 4];
+                                    splits = item.split("/");
+                                    if (splits.length < 2)
+                                        atlasUrl = "Resources/" + item + "/" + item + ".assetbundle.json";
+                                    else
+                                        atlasUrl = "Resources/" + item + "/" + splits[splits.length - 1] + ".assetbundle.json";
+                                    console.log("\u52A0\u8F7D\u56FE\u96C6:" + atlasUrl);
+                                    return [4, this.loadAssetBundle(atlasUrl)];
+                                case 3:
+                                    _b.sent();
+                                    _b.label = 4;
+                                case 4:
+                                    _i++;
+                                    return [3, 2];
+                                case 5:
                                     overlay = new gd3d.framework.overlay2D();
                                     overlay.scaleMode = gd3d.framework.UIScaleMode.SCALE_WITH_SCREEN_SIZE;
                                     wwidth = 1280;
