@@ -35334,9 +35334,9 @@ var gd3d;
                 configurable: true
             });
             ParticleSystemShapeBox.prototype.calcParticlePosDir = function (particle, position, dir) {
-                position.x = this.boxX * (Math.random() * 2 - 1) / 2;
-                position.y = this.boxY * (Math.random() * 2 - 1) / 2;
-                position.z = this.boxZ * (Math.random() * 2 - 1) / 2;
+                position.x = Math.random() * 2 - 1;
+                position.y = Math.random() * 2 - 1;
+                position.z = Math.random() * 2 - 1;
                 if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Shell) {
                     var max = Math.max(Math.abs(position.x), Math.abs(position.y), Math.abs(position.z));
                     if (Math.abs(position.x) == max) {
@@ -35364,9 +35364,10 @@ var gd3d;
                         position.y = position.y < 0 ? -1 : 1;
                     }
                 }
-                particle.position.x = position.x;
-                particle.position.y = position.y;
-                particle.position.z = position.z;
+                var scale = 0.5;
+                position.x = position.x * this.boxX * scale;
+                position.y = position.y * this.boxY * scale;
+                position.z = position.z * this.boxZ * scale;
                 dir.x = 0;
                 dir.y = 0;
                 dir.z = 1;
