@@ -116,27 +116,40 @@ namespace gd3d.framework
 		/**
 		 * 更新状态
 		 */
-		updateState(preTime: number, time: number)
+		updateState(time: number)
 		{
-			preTime = Math.max(preTime, this.birthTime);
+			var preTime = Math.max(this.curTime, this.birthTime);
 			time = Math.max(this.birthTime, time);
 
-			var pTime = time - preTime;
+			//
+			var deltaTime = time - preTime;
 
 			// 计算速度
-			this.velocity.x += this.acceleration.x * pTime;
-			this.velocity.y += this.acceleration.y * pTime;
-			this.velocity.z += this.acceleration.z * pTime;
+			this.velocity.x += this.acceleration.x * deltaTime;
+			this.velocity.y += this.acceleration.y * deltaTime;
+			this.velocity.z += this.acceleration.z * deltaTime;
 
 			// 计算位置
-			this.position.x += this.velocity.x * pTime;
-			this.position.y += this.velocity.y * pTime;
-			this.position.z += this.velocity.z * pTime;
+			this.position.x += this.velocity.x * deltaTime;
+			this.position.y += this.velocity.y * deltaTime;
+			this.position.z += this.velocity.z * deltaTime;
 
 			// 计算角度
-			this.rotation.x += this.angularVelocity.x * pTime;
-			this.rotation.y += this.angularVelocity.y * pTime;
-			this.rotation.z += this.angularVelocity.z * pTime;
+			this.rotation.x += this.angularVelocity.x * deltaTime;
+			this.rotation.y += this.angularVelocity.y * deltaTime;
+			this.rotation.z += this.angularVelocity.z * deltaTime;
+
+			// 记录粒子此次移动的起始时间以及起始位置
+			this.prePosition.x = this.curPosition.x;
+			this.prePosition.y = this.curPosition.y;
+			this.prePosition.z = this.curPosition.z;
+
+			this.curPosition.x = this.position.x;
+			this.curPosition.y = this.position.y;
+			this.curPosition.z = this.position.z;
+
+			this.preTime = this.curTime;
+			this.curTime = time;
 		}
 	}
 }

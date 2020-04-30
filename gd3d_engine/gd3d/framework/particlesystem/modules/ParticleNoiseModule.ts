@@ -420,7 +420,7 @@ namespace gd3d.framework
          */
         update(interval: number)
         {
-            this._scrollValue += this.scrollSpeed.getValue(this.particleSystem.rateAtDuration) * interval / 1000;
+            this._scrollValue += this.scrollSpeed.getValue(this.particleSystem._emitInfo.rateAtDuration) * interval;
         }
         private _scrollValue = 0;
     }

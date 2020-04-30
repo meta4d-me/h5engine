@@ -527,7 +527,7 @@ namespace gd3d.framework
         {
             // 加速度
             var gravity = new math.vector3(world_gravity.x, world_gravity.y, world_gravity.z);
-            math.vec3ScaleByNum(gravity, this.gravityModifier.getValue(this.particleSystem.rateAtDuration), gravity)
+            math.vec3ScaleByNum(gravity, this.gravityModifier.getValue(this.particleSystem._emitInfo.rateAtDuration), gravity)
 
             this.particleSystem.addParticleAcceleration(particle, gravity, ParticleSystemSimulationSpace.World, _Main_preGravity);
             //

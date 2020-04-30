@@ -32310,19 +32310,27 @@ var gd3d;
                 this.flipUV = new gd3d.math.vector2();
                 this.cache = {};
             }
-            Particle1.prototype.updateState = function (preTime, time) {
-                preTime = Math.max(preTime, this.birthTime);
+            Particle1.prototype.updateState = function (time) {
+                var preTime = Math.max(this.curTime, this.birthTime);
                 time = Math.max(this.birthTime, time);
-                var pTime = time - preTime;
-                this.velocity.x += this.acceleration.x * pTime;
-                this.velocity.y += this.acceleration.y * pTime;
-                this.velocity.z += this.acceleration.z * pTime;
-                this.position.x += this.velocity.x * pTime;
-                this.position.y += this.velocity.y * pTime;
-                this.position.z += this.velocity.z * pTime;
-                this.rotation.x += this.angularVelocity.x * pTime;
-                this.rotation.y += this.angularVelocity.y * pTime;
-                this.rotation.z += this.angularVelocity.z * pTime;
+                var deltaTime = time - preTime;
+                this.velocity.x += this.acceleration.x * deltaTime;
+                this.velocity.y += this.acceleration.y * deltaTime;
+                this.velocity.z += this.acceleration.z * deltaTime;
+                this.position.x += this.velocity.x * deltaTime;
+                this.position.y += this.velocity.y * deltaTime;
+                this.position.z += this.velocity.z * deltaTime;
+                this.rotation.x += this.angularVelocity.x * deltaTime;
+                this.rotation.y += this.angularVelocity.y * deltaTime;
+                this.rotation.z += this.angularVelocity.z * deltaTime;
+                this.prePosition.x = this.curPosition.x;
+                this.prePosition.y = this.curPosition.y;
+                this.prePosition.z = this.curPosition.z;
+                this.curPosition.x = this.position.x;
+                this.curPosition.y = this.position.y;
+                this.curPosition.z = this.position.z;
+                this.preTime = this.curTime;
+                this.curTime = time;
             };
             return Particle1;
         }());
@@ -32340,7 +32348,6 @@ var gd3d;
                 this._isPlaying = false;
                 this.time = 0;
                 this.startDelay = 0;
-                this._startDelay_rate = Math.random();
                 this._vbos = [];
                 this._attributes = [
                     ["a_particle_position", 4],
@@ -32351,8 +32358,6 @@ var gd3d;
                     ["a_particle_flipUV", 4],
                 ];
                 this._awaked = false;
-                this._realTime = 0;
-                this._preRealTime = 0;
                 this._particlePool = [];
                 this._activeParticles = [];
                 this._modules = [];
@@ -32362,6 +32367,7 @@ var gd3d;
                 this.worldPos = new gd3d.math.vector3();
                 this.moveVec = new gd3d.math.vector3();
                 this.speed = new gd3d.math.vector3();
+                this._isSubParticleSystem = false;
                 this.localToWorldMatrix = new gd3d.math.matrix();
                 this.worldToLocalMatrix = new gd3d.math.matrix();
                 this.main = new framework.ParticleMainModule();
@@ -32378,6 +32384,7 @@ var gd3d;
                 this.rotationOverLifetime = new framework.ParticleRotationOverLifetimeModule();
                 this.rotationBySpeed = new framework.ParticleRotationBySpeedModule();
                 this.noise = new framework.ParticleNoiseModule();
+                this.subEmitters = new framework.ParticleSubEmittersModule();
                 this.textureSheetAnimation = new framework.ParticleTextureSheetAnimationModule();
                 this.main.enabled = true;
                 this.emission.enabled = true;
@@ -32566,6 +32573,16 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(ParticleSystem.prototype, "subEmitters", {
+                get: function () { return this._subEmitters; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._subEmitters, v);
+                    v.particleSystem = this;
+                    this._subEmitters = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
             Object.defineProperty(ParticleSystem.prototype, "textureSheetAnimation", {
                 get: function () { return this._textureSheetAnimation; },
                 set: function (v) {
@@ -32631,31 +32648,40 @@ var gd3d;
                 console.warn("\u672A\u5B9E\u73B0 ParticleSystem  clone");
             };
             ParticleSystem.prototype.update = function (interval) {
+                var _this = this;
                 if (!this.isPlaying)
                     return;
                 gd3d.math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
                 gd3d.math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
-                this.time = this.time + this.main.simulationSpeed * interval;
-                this._realTime = this.time - this.startDelay;
-                gd3d.math.matrixGetTranslation(this.localToWorldMatrix, this.worldPos);
-                this.moveVec.x = this.worldPos.x - this._preworldPos.x;
-                this.moveVec.y = this.worldPos.y - this._preworldPos.y;
-                this.moveVec.z = this.worldPos.z - this._preworldPos.z;
-                this.speed.x = this.moveVec.x / (this.main.simulationSpeed * interval);
-                this.speed.y = this.moveVec.y / (this.main.simulationSpeed * interval);
-                this.speed.z = this.moveVec.z / (this.main.simulationSpeed * interval);
-                this._updateActiveParticlesState();
-                if (this.main.loop && Math.floor(this._preRealTime / this.main.duration) < Math.floor(this._realTime / this.main.duration)) {
+                var deltaTime = this.main.simulationSpeed * interval;
+                this.time = this.time + deltaTime;
+                var emitInfo = this._emitInfo;
+                emitInfo.preTime = emitInfo.currentTime;
+                emitInfo.currentTime = this.time - emitInfo.startDelay;
+                emitInfo.preWorldPos.x = emitInfo.currentWorldPos.x;
+                emitInfo.preWorldPos.y = emitInfo.currentWorldPos.y;
+                emitInfo.preWorldPos.z = emitInfo.currentWorldPos.z;
+                gd3d.math.matrixGetTranslation(this.localToWorldMatrix, emitInfo.currentWorldPos);
+                emitInfo.moveVec.x = emitInfo.currentWorldPos.x - emitInfo.preWorldPos.x;
+                emitInfo.moveVec.y = emitInfo.currentWorldPos.y - emitInfo.preWorldPos.y;
+                emitInfo.moveVec.z = emitInfo.currentWorldPos.z - emitInfo.preWorldPos.z;
+                emitInfo.speed.x = emitInfo.moveVec.x / deltaTime;
+                emitInfo.speed.y = emitInfo.moveVec.y / deltaTime;
+                emitInfo.speed.z = emitInfo.moveVec.z / deltaTime;
+                this._updateActiveParticlesState(deltaTime);
+                if (this.main.loop && Math.floor(emitInfo.preTime / this.main.duration) < Math.floor(emitInfo.currentTime / this.main.duration)) {
                     this.emission.bursts.forEach(function (element) {
                         element.calculateProbability();
                     });
                 }
-                this._emit();
-                this._preRealTime = this._realTime;
-                this._preworldPos.x = this.worldPos.x;
-                this._preworldPos.y = this.worldPos.y;
-                this._preworldPos.z = this.worldPos.z;
-                if (!this.main.loop && this._activeParticles.length == 0 && this._realTime > this.main.duration) {
+                if (!this._isSubParticleSystem) {
+                    var emits = this._emit(emitInfo);
+                    emits.sort(function (a, b) { return a.time - b.time; });
+                    emits.forEach(function (v) {
+                        _this._emitParticles(v);
+                    });
+                }
+                if (!this.main.loop && this._activeParticles.length == 0 && emitInfo.currentTime > this.main.duration) {
                     this.stop();
                 }
             };
@@ -32668,22 +32694,26 @@ var gd3d;
             ParticleSystem.prototype.play = function () {
                 this._isPlaying = true;
                 this.time = 0;
-                this._startDelay_rate = Math.random();
-                this.updateStartDelay();
-                this._preRealTime = 0;
                 this._particlePool = this._particlePool.concat(this._activeParticles);
                 this._activeParticles.length = 0;
-                this._preworldPos.x = this.worldPos.x;
-                this._preworldPos.y = this.worldPos.y;
-                this._preworldPos.z = this.worldPos.z;
-                this._isRateOverDistance = false;
-                this._leftRateOverDistance = 0;
+                var startDelay = this.main.startDelay.getValue(Math.random());
+                this._emitInfo =
+                    {
+                        preTime: -startDelay,
+                        currentTime: -startDelay,
+                        preWorldPos: new gd3d.math.vector3(),
+                        currentWorldPos: new gd3d.math.vector3(),
+                        rateAtDuration: 0,
+                        _leftRateOverDistance: 0,
+                        _isRateOverDistance: false,
+                        startDelay: startDelay,
+                        moveVec: new gd3d.math.vector3(),
+                        speed: new gd3d.math.vector3(),
+                        position: new gd3d.math.vector3(),
+                    };
                 this.emission.bursts.forEach(function (element) {
                     element.calculateProbability();
                 });
-            };
-            ParticleSystem.prototype.updateStartDelay = function () {
-                this.startDelay = this.main.startDelay.getValue(this._startDelay_rate);
             };
             ParticleSystem.prototype.pause = function () {
                 this._isPlaying = false;
@@ -32694,7 +32724,7 @@ var gd3d;
                 }
                 else {
                     this._isPlaying = true;
-                    this._preRealTime = Math.max(0, this._realTime);
+                    this._emitInfo.preTime = Math.max(0, this._emitInfo.currentTime);
                 }
             };
             ParticleSystem.prototype.render = function (context, assetmgr, camera) {
@@ -32805,135 +32835,149 @@ var gd3d;
                 this._vbos.push([gl, vbo]);
                 return vbo;
             };
-            Object.defineProperty(ParticleSystem.prototype, "rateAtDuration", {
-                get: function () {
-                    return (this._realTime % this.main.duration) / this.main.duration;
-                },
-                enumerable: true,
-                configurable: true
-            });
-            ParticleSystem.prototype._emit = function () {
-                var _this = this;
+            ParticleSystem.prototype._emit = function (emitInfo) {
+                var emits = [];
+                var startTime = emitInfo.preTime;
+                var endTime = emitInfo.currentTime;
                 if (!this.emission.enabled)
-                    return;
-                if (this._activeParticles.length >= this.main.maxParticles)
-                    return;
-                if (this._realTime <= 0)
-                    return;
+                    return emits;
+                if (endTime <= 0)
+                    return emits;
                 var loop = this.main.loop;
                 var duration = this.main.duration;
-                var rateAtDuration = this.rateAtDuration;
-                var preRealTime = this._preRealTime;
-                if (!loop && preRealTime >= duration)
-                    return;
-                var realEmitTime = this._realTime;
+                if (!loop && startTime >= duration)
+                    return emits;
                 if (!loop)
-                    realEmitTime = Math.min(realEmitTime, duration);
+                    endTime = Math.min(endTime, duration);
+                var rateAtDuration = (endTime % duration) / duration;
+                if (rateAtDuration == 0 && endTime >= duration)
+                    rateAtDuration = 1;
+                emitInfo.rateAtDuration = rateAtDuration;
+                var moveEmits = this._emitWithMove(emitInfo);
+                emits = emits.concat(moveEmits);
+                var timeEmits = this._emitWithTime(emitInfo, duration);
+                emits = emits.concat(timeEmits);
+                return emits;
+            };
+            ParticleSystem.prototype._emitWithMove = function (emitInfo) {
+                var emits = [];
+                if (this.main.simulationSpace == framework.ParticleSystemSimulationSpace.World) {
+                    if (emitInfo._isRateOverDistance) {
+                        var moveVec = new gd3d.math.vector3();
+                        moveVec.x = emitInfo.currentWorldPos.x - emitInfo.preWorldPos.x;
+                        moveVec.y = emitInfo.currentWorldPos.y - emitInfo.preWorldPos.y;
+                        moveVec.z = emitInfo.currentWorldPos.z - emitInfo.preWorldPos.z;
+                        var moveDistance = gd3d.math.vec3Length(moveVec);
+                        var worldPos = emitInfo.currentWorldPos;
+                        if (moveDistance > 0) {
+                            var moveDir = new gd3d.math.vector3(moveVec.x, moveVec.y, moveVec.z);
+                            gd3d.math.vec3Normalize(moveDir, moveDir);
+                            var leftRateOverDistance = emitInfo._leftRateOverDistance + moveDistance;
+                            var rateOverDistance = this.emission.rateOverDistance.getValue(emitInfo.rateAtDuration);
+                            var invRateOverDistance = 1 / rateOverDistance;
+                            var invRateOverDistanceVec = new gd3d.math.vector3(moveDir.x / rateOverDistance, moveDir.y / rateOverDistance, moveDir.z / rateOverDistance);
+                            var lastRateOverDistance = new gd3d.math.vector3(emitInfo.preWorldPos.x - moveDir.x * emitInfo._leftRateOverDistance, emitInfo.preWorldPos.y - moveDir.y * emitInfo._leftRateOverDistance, emitInfo.preWorldPos.z - moveDir.z * emitInfo._leftRateOverDistance);
+                            while (invRateOverDistance < leftRateOverDistance) {
+                                lastRateOverDistance.x += invRateOverDistanceVec.x;
+                                lastRateOverDistance.y += invRateOverDistanceVec.y;
+                                lastRateOverDistance.z += invRateOverDistanceVec.z;
+                                emits.push({
+                                    position: new gd3d.math.vector3(lastRateOverDistance.x - worldPos.x, lastRateOverDistance.y - worldPos.y, lastRateOverDistance.z - worldPos.z),
+                                    time: emitInfo.preTime + (emitInfo.currentTime - emitInfo.preTime) * (1 - leftRateOverDistance / moveDistance),
+                                    num: 1,
+                                    emitInfo: emitInfo
+                                });
+                                leftRateOverDistance -= invRateOverDistance;
+                            }
+                            emitInfo._leftRateOverDistance = leftRateOverDistance;
+                        }
+                    }
+                    emitInfo._isRateOverDistance = true;
+                }
+                else {
+                    emitInfo._isRateOverDistance = false;
+                    emitInfo._leftRateOverDistance = 0;
+                }
+                return emits;
+            };
+            ParticleSystem.prototype._emitWithTime = function (emitInfo, duration) {
+                var rateAtDuration = emitInfo.rateAtDuration;
+                var preTime = emitInfo.preTime;
+                var currentTime = emitInfo.currentTime;
                 var emits = [];
                 var step = 1 / this.emission.rateOverTime.getValue(rateAtDuration);
                 var bursts = this.emission.bursts;
-                if (this.main.simulationSpace == framework.ParticleSystemSimulationSpace.World) {
-                    if (this._isRateOverDistance) {
-                        var moveVec = this.moveVec;
-                        var worldPos = this.worldPos;
-                        if (gd3d.math.vec3SqrLength(moveVec) > 0) {
-                            var moveDir = new gd3d.math.vector3(moveVec.x, moveVec.y, moveVec.z);
-                            gd3d.math.vec3Normalize(moveDir, moveDir);
-                            var leftRateOverDistance = this._leftRateOverDistance + gd3d.math.vec3Length(moveVec);
-                            var rateOverDistance = this.emission.rateOverDistance.getValue(rateAtDuration);
-                            var invRateOverDistance = 1 / rateOverDistance;
-                            var invRateOverDistanceVec = new gd3d.math.vector3(moveDir.x / rateOverDistance, moveDir.y / rateOverDistance, moveDir.z / rateOverDistance);
-                            var lastRateOverDistance = new gd3d.math.vector3(this._preworldPos.x - moveDir.x * this._leftRateOverDistance, this._preworldPos.y - moveDir.y * this._leftRateOverDistance, this._preworldPos.z - moveDir.z * this._leftRateOverDistance);
-                            var emitPosArr = [];
-                            while (invRateOverDistance < leftRateOverDistance) {
-                                emitPosArr.push(new gd3d.math.vector3(lastRateOverDistance.x + invRateOverDistanceVec.x, lastRateOverDistance.y + invRateOverDistanceVec.y, lastRateOverDistance.z + invRateOverDistanceVec.z));
-                                leftRateOverDistance -= invRateOverDistance;
-                            }
-                            this._leftRateOverDistance = leftRateOverDistance;
-                            emitPosArr.forEach(function (p) {
-                                emits.push({ time: _this.time, num: 1, position: new gd3d.math.vector3(p.x - worldPos.x, p.y - worldPos.y, p.z - worldPos.z) });
-                            });
-                        }
-                    }
-                    this._isRateOverDistance = true;
-                }
-                else {
-                    this._isRateOverDistance = false;
-                    this._leftRateOverDistance = 0;
-                }
-                var cycleStartIndex = Math.floor(preRealTime / duration);
-                var cycleEndIndex = Math.ceil(realEmitTime / duration);
+                var cycleStartIndex = Math.floor(preTime / duration);
+                var cycleEndIndex = Math.ceil(currentTime / duration);
                 for (var k = cycleStartIndex; k < cycleEndIndex; k++) {
                     var cycleStartTime = k * duration;
                     var cycleEndTime = (k + 1) * duration;
-                    var startTime = Math.max(preRealTime, cycleStartTime);
-                    var endTime = Math.min(realEmitTime, cycleEndTime);
+                    var startTime = Math.max(preTime, cycleStartTime);
+                    var endTime = Math.min(currentTime, cycleEndTime);
                     var singleStart = Math.ceil(startTime / step) * step;
                     for (var i = singleStart; i < endTime; i += step) {
-                        emits.push({ time: i, num: 1 });
+                        emits.push({ time: i, num: 1, emitInfo: emitInfo, position: new gd3d.math.vector3(emitInfo.position.x, emitInfo.position.y, emitInfo.position.z) });
                     }
                     var inCycleStart = startTime - cycleStartTime;
                     var inCycleEnd = endTime - cycleStartTime;
                     for (var i_8 = 0; i_8 < bursts.length; i_8++) {
                         var burst = bursts[i_8];
                         if (burst.isProbability && inCycleStart <= burst.time && burst.time < inCycleEnd) {
-                            emits.push({ time: cycleStartTime + burst.time, num: burst.count.getValue(rateAtDuration) });
+                            emits.push({ time: cycleStartTime + burst.time, num: burst.count.getValue(rateAtDuration), emitInfo: emitInfo, position: new gd3d.math.vector3(emitInfo.position.x, emitInfo.position.y, emitInfo.position.z) });
                         }
                     }
                 }
-                emits.sort(function (a, b) { return a.time - b.time; });
-                ;
-                emits.forEach(function (v) {
-                    _this._emitParticles(v);
-                });
+                return emits;
             };
             ParticleSystem.prototype._emitParticles = function (v) {
-                var rateAtDuration = this.rateAtDuration;
                 var num = v.num;
                 var birthTime = v.time;
-                var position = v.position || new gd3d.math.vector3();
+                var position = v.position;
+                var emitInfo = v.emitInfo;
                 for (var i = 0; i < num; i++) {
                     if (this._activeParticles.length >= this.main.maxParticles)
                         return;
-                    var lifetime = this.main.startLifetime.getValue(rateAtDuration);
-                    var birthRateAtDuration = (birthTime - this.startDelay) / this.main.duration;
-                    var rateAtLifeTime = (this._realTime - birthTime) / lifetime;
+                    var lifetime = this.main.startLifetime.getValue(emitInfo.rateAtDuration);
+                    var birthRateAtDuration = (birthTime - emitInfo.startDelay) / this.main.duration;
+                    var rateAtLifeTime = (emitInfo.currentTime - birthTime) / lifetime;
                     if (rateAtLifeTime < 1) {
                         var particle = this._particlePool.pop() || new framework.Particle1();
                         particle.cache = {};
-                        particle.position.x = position.x;
-                        particle.position.y = position.y;
-                        particle.position.z = position.z;
+                        particle.position = new gd3d.math.vector3(position.x, position.y, position.z);
                         particle.birthTime = birthTime;
                         particle.lifetime = lifetime;
                         particle.rateAtLifeTime = rateAtLifeTime;
                         particle.birthRateAtDuration = birthRateAtDuration - Math.floor(birthRateAtDuration);
+                        particle.preTime = emitInfo.currentTime;
+                        particle.curTime = emitInfo.currentTime;
+                        particle.prePosition = new gd3d.math.vector3(position.x, position.y, position.z);
+                        particle.curPosition = new gd3d.math.vector3(position.x, position.y, position.z);
                         this._activeParticles.push(particle);
                         this._initParticleState(particle);
-                        this._updateParticleState(particle);
+                        this._updateParticleState(particle, 0);
                     }
                 }
             };
-            ParticleSystem.prototype._updateActiveParticlesState = function () {
+            ParticleSystem.prototype._updateActiveParticlesState = function (deltaTime) {
                 for (var i = this._activeParticles.length - 1; i >= 0; i--) {
                     var particle = this._activeParticles[i];
-                    particle.rateAtLifeTime = (this._realTime - particle.birthTime) / particle.lifetime;
+                    particle.rateAtLifeTime = (particle.curTime + deltaTime - particle.birthTime) / particle.lifetime;
                     if (particle.rateAtLifeTime < 0 || particle.rateAtLifeTime > 1) {
                         this._activeParticles.splice(i, 1);
                         this._particlePool.push(particle);
+                        particle.subEmitInfo = null;
                     }
                     else {
-                        this._updateParticleState(particle);
+                        this._updateParticleState(particle, deltaTime);
                     }
                 }
             };
             ParticleSystem.prototype._initParticleState = function (particle) {
                 this._modules.forEach(function (v) { v.initParticleState(particle); });
             };
-            ParticleSystem.prototype._updateParticleState = function (particle) {
-                var preTime = Math.max(this._preRealTime, particle.birthTime);
+            ParticleSystem.prototype._updateParticleState = function (particle, deltaTime) {
                 this._modules.forEach(function (v) { v.updateParticleState(particle); });
-                particle.updateState(preTime, this._realTime);
+                particle.updateState(particle.curTime + deltaTime);
             };
             ParticleSystem.prototype._simulationSpaceChanged = function () {
                 if (!this.transform)
@@ -33064,6 +33108,57 @@ var gd3d;
                     particle.acceleration.y -= value.y;
                     particle.acceleration.z -= value.z;
                 }
+            };
+            ParticleSystem.prototype.TriggerSubEmitter = function (subEmitterIndex, particles) {
+                var _this = this;
+                if (particles === void 0) { particles = null; }
+                if (!this.subEmitters.enabled)
+                    return;
+                var subEmitter = this.subEmitters.GetSubEmitterSystem(subEmitterIndex);
+                if (!subEmitter)
+                    return;
+                var probability = this.subEmitters.GetSubEmitterEmitProbability(subEmitterIndex);
+                this.subEmitters.GetSubEmitterProperties(subEmitterIndex);
+                this.subEmitters.GetSubEmitterType(subEmitterIndex);
+                particles = particles || this._activeParticles;
+                var emits = [];
+                particles.forEach(function (particle) {
+                    if (Math.random() > probability)
+                        return;
+                    var particleWoldPos = new gd3d.math.vector3(particle.position.x, particle.position.y, particle.position.z);
+                    gd3d.math.matrixTransformVector3(particleWoldPos, _this.localToWorldMatrix, particleWoldPos);
+                    var subEmitPos = new gd3d.math.vector3(particleWoldPos.x, particleWoldPos.y, particleWoldPos.z);
+                    gd3d.math.matrixTransformVector3(subEmitPos, subEmitter.worldToLocalMatrix, subEmitPos);
+                    if (!particle.subEmitInfo) {
+                        var startDelay = _this.main.startDelay.getValue(Math.random());
+                        particle.subEmitInfo = {
+                            preTime: particle.preTime - particle.birthTime - startDelay,
+                            currentTime: particle.preTime - particle.birthTime - startDelay,
+                            preWorldPos: new gd3d.math.vector3(particleWoldPos.x, particleWoldPos.y, particleWoldPos.z),
+                            currentWorldPos: new gd3d.math.vector3(particleWoldPos.x, particleWoldPos.y, particleWoldPos.z),
+                            rateAtDuration: 0,
+                            _leftRateOverDistance: 0,
+                            _isRateOverDistance: false,
+                            startDelay: startDelay,
+                            moveVec: new gd3d.math.vector3(),
+                            speed: new gd3d.math.vector3(),
+                            position: subEmitPos,
+                        };
+                    }
+                    else {
+                        particle.subEmitInfo.preTime = particle.preTime - particle.birthTime - particle.subEmitInfo.startDelay;
+                        particle.subEmitInfo.currentTime = particle.curTime - particle.birthTime - particle.subEmitInfo.startDelay;
+                        particle.subEmitInfo.position.x = subEmitPos.x;
+                        particle.subEmitInfo.position.y = subEmitPos.y;
+                        particle.subEmitInfo.position.z = subEmitPos.z;
+                    }
+                    var subEmits = subEmitter._emit(particle.subEmitInfo);
+                    emits = emits.concat(subEmits);
+                });
+                emits.sort(function (a, b) { return a.time - b.time; });
+                emits.forEach(function (v) {
+                    subEmitter._emitParticles(v);
+                });
             };
             ParticleSystem.ClassName = "particlesystem";
             __decorate([
@@ -33310,6 +33405,36 @@ var gd3d;
             ParticleSystemSimulationSpace[ParticleSystemSimulationSpace["Local"] = 0] = "Local";
             ParticleSystemSimulationSpace[ParticleSystemSimulationSpace["World"] = 1] = "World";
         })(ParticleSystemSimulationSpace = framework.ParticleSystemSimulationSpace || (framework.ParticleSystemSimulationSpace = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemSubEmitterProperties;
+        (function (ParticleSystemSubEmitterProperties) {
+            ParticleSystemSubEmitterProperties[ParticleSystemSubEmitterProperties["InheritNothing"] = 0] = "InheritNothing";
+            ParticleSystemSubEmitterProperties[ParticleSystemSubEmitterProperties["InheritEverything"] = 1] = "InheritEverything";
+            ParticleSystemSubEmitterProperties[ParticleSystemSubEmitterProperties["InheritColor"] = 2] = "InheritColor";
+            ParticleSystemSubEmitterProperties[ParticleSystemSubEmitterProperties["InheritSize"] = 3] = "InheritSize";
+            ParticleSystemSubEmitterProperties[ParticleSystemSubEmitterProperties["InheritRotation"] = 4] = "InheritRotation";
+            ParticleSystemSubEmitterProperties[ParticleSystemSubEmitterProperties["InheritLifetime"] = 5] = "InheritLifetime";
+            ParticleSystemSubEmitterProperties[ParticleSystemSubEmitterProperties["InheritDuration"] = 6] = "InheritDuration";
+        })(ParticleSystemSubEmitterProperties = framework.ParticleSystemSubEmitterProperties || (framework.ParticleSystemSubEmitterProperties = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemSubEmitterType;
+        (function (ParticleSystemSubEmitterType) {
+            ParticleSystemSubEmitterType[ParticleSystemSubEmitterType["Birth"] = 0] = "Birth";
+            ParticleSystemSubEmitterType[ParticleSystemSubEmitterType["Collision"] = 1] = "Collision";
+            ParticleSystemSubEmitterType[ParticleSystemSubEmitterType["Death"] = 2] = "Death";
+            ParticleSystemSubEmitterType[ParticleSystemSubEmitterType["Trigger"] = 3] = "Trigger";
+            ParticleSystemSubEmitterType[ParticleSystemSubEmitterType["Manual"] = 4] = "Manual";
+        })(ParticleSystemSubEmitterType = framework.ParticleSystemSubEmitterType || (framework.ParticleSystemSubEmitterType = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -34000,7 +34125,7 @@ var gd3d;
             };
             ParticleMainModule.prototype.updateParticleState = function (particle) {
                 var gravity = new gd3d.math.vector3(world_gravity.x, world_gravity.y, world_gravity.z);
-                gd3d.math.vec3ScaleByNum(gravity, this.gravityModifier.getValue(this.particleSystem.rateAtDuration), gravity);
+                gd3d.math.vec3ScaleByNum(gravity, this.gravityModifier.getValue(this.particleSystem._emitInfo.rateAtDuration), gravity);
                 this.particleSystem.addParticleAcceleration(particle, gravity, framework.ParticleSystemSimulationSpace.World, _Main_preGravity);
                 gd3d.math.vec3Clone(particle.startSize, particle.size);
                 gd3d.math.colorClone(particle.startColor, particle.color);
@@ -34241,7 +34366,7 @@ var gd3d;
                 return framework.noise.perlin3(x, y, scrollValue);
             };
             ParticleNoiseModule.prototype.update = function (interval) {
-                this._scrollValue += this.scrollSpeed.getValue(this.particleSystem.rateAtDuration) * interval / 1000;
+                this._scrollValue += this.scrollSpeed.getValue(this.particleSystem._emitInfo.rateAtDuration) * interval;
             };
             ParticleNoiseModule._frequencyScale = 5;
             ParticleNoiseModule._strengthScale = 0.3;
@@ -35001,6 +35126,86 @@ var gd3d;
         }(framework.ParticleModule));
         framework.ParticleSizeOverLifetimeModule = ParticleSizeOverLifetimeModule;
         var _SizeOverLifetime_rate = "_SizeOverLifetime_rate";
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSubEmittersModule = (function (_super) {
+            __extends(ParticleSubEmittersModule, _super);
+            function ParticleSubEmittersModule() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.subEmitters = [];
+                return _this;
+            }
+            Object.defineProperty(ParticleSubEmittersModule.prototype, "subEmittersCount", {
+                get: function () {
+                    return this.subEmitters.length;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleSubEmittersModule.prototype.AddSubEmitter = function (subEmitter, type, properties, emitProbability) {
+                subEmitter._isSubParticleSystem = true;
+                this.subEmitters.push({ subEmitter: subEmitter, type: type, properties: properties, emitProbability: emitProbability });
+            };
+            ParticleSubEmittersModule.prototype.GetSubEmitterEmitProbability = function (index) {
+                if (!this.subEmitters[index])
+                    return 0;
+                return this.subEmitters[index].emitProbability;
+            };
+            ParticleSubEmittersModule.prototype.GetSubEmitterProperties = function (index) {
+                if (!this.subEmitters[index])
+                    return null;
+                return this.subEmitters[index].properties;
+            };
+            ParticleSubEmittersModule.prototype.GetSubEmitterSystem = function (index) {
+                if (!this.subEmitters[index])
+                    return null;
+                return this.subEmitters[index].subEmitter;
+            };
+            ParticleSubEmittersModule.prototype.GetSubEmitterType = function (index) {
+                if (!this.subEmitters[index])
+                    return null;
+                return this.subEmitters[index].type;
+            };
+            ParticleSubEmittersModule.prototype.RemoveSubEmitter = function (index) {
+                if (!this.subEmitters[index])
+                    return;
+                this.subEmitters.splice(index, 1);
+            };
+            ParticleSubEmittersModule.prototype.SetSubEmitterEmitProbability = function (index, emitProbability) {
+                if (!this.subEmitters[index])
+                    return;
+                this.subEmitters[index].emitProbability = emitProbability;
+            };
+            ParticleSubEmittersModule.prototype.SetSubEmitterProperties = function (index, properties) {
+                if (!this.subEmitters[index])
+                    return;
+                this.subEmitters[index].properties = properties;
+            };
+            ParticleSubEmittersModule.prototype.SetSubEmitterSystem = function (index, subEmitter) {
+                if (!this.subEmitters[index])
+                    return;
+                this.subEmitters[index].subEmitter = subEmitter;
+            };
+            ParticleSubEmittersModule.prototype.SetSubEmitterType = function (index, type) {
+                if (!this.subEmitters[index])
+                    return;
+                this.subEmitters[index].type = type;
+            };
+            ParticleSubEmittersModule.prototype.updateParticleState = function (particle) {
+                for (var i = 0, n = this.subEmittersCount; i < n; i++) {
+                    var emitterType = this.GetSubEmitterType(i);
+                    if (emitterType == framework.ParticleSystemSubEmitterType.Birth) {
+                        this.particleSystem.TriggerSubEmitter(i, [particle]);
+                    }
+                }
+            };
+            return ParticleSubEmittersModule;
+        }(framework.ParticleModule));
+        framework.ParticleSubEmittersModule = ParticleSubEmittersModule;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;

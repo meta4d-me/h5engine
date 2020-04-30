@@ -401,40 +401,56 @@ namespace gd3d.framework
             math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
             math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
 
-            this.time = this.time + this.main.simulationSpeed * interval;
-            this._realTime = this.time - this.startDelay;
-            // 粒子系统位置
-            math.matrixGetTranslation(this.localToWorldMatrix, this.worldPos);
-            // 粒子系统位移
-            this.moveVec.x = this.worldPos.x - this._preworldPos.x;
-            this.moveVec.y = this.worldPos.y - this._preworldPos.y;
-            this.moveVec.z = this.worldPos.z - this._preworldPos.z;
-            // 粒子系统速度
-            this.speed.x = this.moveVec.x / (this.main.simulationSpeed * interval);
-            this.speed.y = this.moveVec.y / (this.main.simulationSpeed * interval);
-            this.speed.z = this.moveVec.z / (this.main.simulationSpeed * interval);
+            var deltaTime = this.main.simulationSpeed * interval;
+            this.time = this.time + deltaTime;
 
-            this._updateActiveParticlesState();
+            var emitInfo = this._emitInfo;
+
+            emitInfo.preTime = emitInfo.currentTime;
+            emitInfo.currentTime = this.time - emitInfo.startDelay;
+            emitInfo.preWorldPos.x = emitInfo.currentWorldPos.x;
+            emitInfo.preWorldPos.y = emitInfo.currentWorldPos.y;
+            emitInfo.preWorldPos.z = emitInfo.currentWorldPos.z;
+
+            // 粒子系统位置
+            math.matrixGetTranslation(this.localToWorldMatrix, emitInfo.currentWorldPos);
+
+            // 粒子系统位移
+            emitInfo.moveVec.x = emitInfo.currentWorldPos.x - emitInfo.preWorldPos.x;
+            emitInfo.moveVec.y = emitInfo.currentWorldPos.y - emitInfo.preWorldPos.y;
+            emitInfo.moveVec.z = emitInfo.currentWorldPos.z - emitInfo.preWorldPos.z;
+            // 粒子系统速度
+            emitInfo.speed.x = emitInfo.moveVec.x / deltaTime;
+            emitInfo.speed.y = emitInfo.moveVec.y / deltaTime;
+            emitInfo.speed.z = emitInfo.moveVec.z / deltaTime;
+
+            this._updateActiveParticlesState(deltaTime);
 
             // 完成一个循环
-            if (this.main.loop && Math.floor(this._preRealTime / this.main.duration) < Math.floor(this._realTime / this.main.duration))
+            if (this.main.loop && Math.floor(emitInfo.preTime / this.main.duration) < Math.floor(emitInfo.currentTime / this.main.duration))
             {
                 // 重新计算喷发概率
                 this.emission.bursts.forEach(element =>
                 {
                     element.calculateProbability();
                 });
+                // this.dispatch("particleCycled", this);
             }
 
-            this._emit();
+            // 发射粒子
+            if (!this._isSubParticleSystem) // 子粒子系统自身不会自动发射粒子
+            {
+                var emits = this._emit(emitInfo);
 
-            this._preRealTime = this._realTime;
-            this._preworldPos.x = this.worldPos.x;
-            this._preworldPos.y = this.worldPos.y;
-            this._preworldPos.z = this.worldPos.z;
+                emits.sort((a, b) => { return a.time - b.time });
+                emits.forEach(v =>
+                {
+                    this._emitParticles(v);
+                });
+            }
 
             // 判断非循环的效果是否播放结束
-            if (!this.main.loop && this._activeParticles.length == 0 && this._realTime > this.main.duration)
+            if (!this.main.loop && this._activeParticles.length == 0 && emitInfo.currentTime > this.main.duration)
             {
                 this.stop();
                 // this.dispatch("particleCompleted", this);
@@ -460,35 +476,32 @@ namespace gd3d.framework
         {
             this._isPlaying = true;
             this.time = 0;
-            this._startDelay_rate = Math.random();
-            this.updateStartDelay();
-            this._preRealTime = 0;
 
             this._particlePool = this._particlePool.concat(this._activeParticles);
             this._activeParticles.length = 0;
 
-            this._preworldPos.x = this.worldPos.x;
-            this._preworldPos.y = this.worldPos.y;
-            this._preworldPos.z = this.worldPos.z;
+            var startDelay = this.main.startDelay.getValue(Math.random());
 
-            this._isRateOverDistance = false;
-            this._leftRateOverDistance = 0;
+            this._emitInfo =
+            {
+                preTime: -startDelay,
+                currentTime: -startDelay,
+                preWorldPos: new math.vector3(),
+                currentWorldPos: new math.vector3(),
+                rateAtDuration: 0,
+                _leftRateOverDistance: 0,
+                _isRateOverDistance: false,
+                startDelay: startDelay,
+                moveVec: new math.vector3(),
+                speed: new math.vector3(),
+                position: new math.vector3(),
+            };
 
             // 重新计算喷发概率
             this.emission.bursts.forEach(element =>
             {
                 element.calculateProbability();
             });
-        }
-
-        private _startDelay_rate = Math.random();
-
-        /**
-         * @private
-         */
-        updateStartDelay()
-        {
-            this.startDelay = this.main.startDelay.getValue(this._startDelay_rate);
         }
 
         /**
@@ -510,7 +523,7 @@ namespace gd3d.framework
             } else
             {
                 this._isPlaying = true;
-                this._preRealTime = Math.max(0, this._realTime);
+                this._emitInfo.preTime = Math.max(0, this._emitInfo.currentTime);
             }
         }
 
@@ -680,15 +693,6 @@ namespace gd3d.framework
         private _awaked = false;
 
         /**
-         * 当前真实时间（time - startDelay）
-         */
-        private _realTime = 0;
-        /**
-         * 上次真实时间
-         */
-        private _preRealTime = 0;
-
-        /**
          * 粒子池，用于存放未发射或者死亡粒子
          */
         private _particlePool: Particle1[] = [];
@@ -698,14 +702,6 @@ namespace gd3d.framework
         private _activeParticles: Particle1[] = [];
 
         private readonly _modules: ParticleModule[] = [];
-
-        /**
-         * 此时在周期中的位置
-         */
-        get rateAtDuration()
-        {
-            return (this._realTime % this.main.duration) / this.main.duration;
-        }
 
         /**
          * 发射粒子
@@ -885,35 +881,39 @@ namespace gd3d.framework
          * @param birthTime 发射时间
          * @param num 发射数量
          */
-        private _emitParticles(v: { time: number; num: number; position?: math.vector3; })
+        private _emitParticles(v: { time: number; num: number; position: math.vector3; emitInfo: ParticleSystemEmitInfo })
         {
-            var rateAtDuration = this.rateAtDuration;
             var num = v.num;
             var birthTime = v.time;
-            var position = v.position || new math.vector3();
+            var position = v.position;
+            var emitInfo = v.emitInfo;
             for (let i = 0; i < num; i++)
             {
                 if (this._activeParticles.length >= this.main.maxParticles) return;
-                var lifetime = this.main.startLifetime.getValue(rateAtDuration);
-                var birthRateAtDuration = (birthTime - this.startDelay) / this.main.duration;
-                var rateAtLifeTime = (this._realTime - birthTime) / lifetime;
+                var lifetime = this.main.startLifetime.getValue(emitInfo.rateAtDuration);
+                var birthRateAtDuration = (birthTime - emitInfo.startDelay) / this.main.duration;
+                var rateAtLifeTime = (emitInfo.currentTime - birthTime) / lifetime;
 
                 if (rateAtLifeTime < 1)
                 {
                     var particle = this._particlePool.pop() || new Particle1();
                     particle.cache = {};
-                    particle.position.x = position.x;
-                    particle.position.y = position.y;
-                    particle.position.z = position.z;
+                    particle.position = new math.vector3(position.x, position.y, position.z);
                     particle.birthTime = birthTime;
                     particle.lifetime = lifetime;
                     particle.rateAtLifeTime = rateAtLifeTime;
                     //
                     particle.birthRateAtDuration = birthRateAtDuration - Math.floor(birthRateAtDuration);
+                    //
+                    particle.preTime = emitInfo.currentTime;
+                    particle.curTime = emitInfo.currentTime;
+                    particle.prePosition = new math.vector3(position.x, position.y, position.z);
+                    particle.curPosition = new math.vector3(position.x, position.y, position.z);
 
+                    //
                     this._activeParticles.push(particle);
                     this._initParticleState(particle);
-                    this._updateParticleState(particle);
+                    this._updateParticleState(particle, 0);
                 }
             }
         }
@@ -921,19 +921,21 @@ namespace gd3d.framework
         /**
          * 更新活跃粒子状态
          */
-        private _updateActiveParticlesState()
+        private _updateActiveParticlesState(deltaTime: number)
         {
             for (let i = this._activeParticles.length - 1; i >= 0; i--)
             {
                 var particle = this._activeParticles[i];
-                particle.rateAtLifeTime = (this._realTime - particle.birthTime) / particle.lifetime;
+
+                particle.rateAtLifeTime = (particle.curTime + deltaTime - particle.birthTime) / particle.lifetime;
                 if (particle.rateAtLifeTime < 0 || particle.rateAtLifeTime > 1)
                 {
                     this._activeParticles.splice(i, 1);
                     this._particlePool.push(particle);
+                    particle.subEmitInfo = null;
                 } else
                 {
-                    this._updateParticleState(particle);
+                    this._updateParticleState(particle, deltaTime);
                 }
             }
         }
@@ -951,12 +953,11 @@ namespace gd3d.framework
          * 更新粒子状态
          * @param particle 粒子
          */
-        private _updateParticleState(particle: Particle1)
+        private _updateParticleState(particle: Particle1, deltaTime: number)
         {
-            var preTime = Math.max(this._preRealTime, particle.birthTime);
             //
             this._modules.forEach(v => { v.updateParticleState(particle) });
-            particle.updateState(preTime, this._realTime);
+            particle.updateState(particle.curTime + deltaTime);
         }
 
         _simulationSpaceChanged()

@@ -6153,7 +6153,12 @@ declare namespace gd3d.framework {
         birthRateAtDuration: number;
         rateAtLifeTime: number;
         cache: {};
-        updateState(preTime: number, time: number): void;
+        preTime: number;
+        curTime: number;
+        prePosition: math.vector3;
+        curPosition: math.vector3;
+        subEmitInfo: ParticleSystemEmitInfo;
+        updateState(time: number): void;
     }
 }
 declare namespace gd3d.framework {
@@ -6219,6 +6224,9 @@ declare namespace gd3d.framework {
         get noise(): ParticleNoiseModule;
         set noise(v: ParticleNoiseModule);
         private _noise;
+        get subEmitters(): ParticleSubEmittersModule;
+        set subEmitters(v: ParticleSubEmittersModule);
+        private _subEmitters;
         get textureSheetAnimation(): ParticleTextureSheetAnimationModule;
         set textureSheetAnimation(v: ParticleTextureSheetAnimationModule);
         private _textureSheetAnimation;
@@ -6240,8 +6248,6 @@ declare namespace gd3d.framework {
         update(interval: number): void;
         stop(): void;
         play(): void;
-        private _startDelay_rate;
-        updateStartDelay(): void;
         pause(): void;
         continue(): void;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
@@ -6249,13 +6255,12 @@ declare namespace gd3d.framework {
         private _getVBO;
         private _attributes;
         private _awaked;
-        private _realTime;
-        private _preRealTime;
         private _particlePool;
         private _activeParticles;
         private readonly _modules;
-        get rateAtDuration(): number;
         private _emit;
+        private _emitWithMove;
+        private _emitWithTime;
         private _emitParticles;
         private _updateActiveParticlesState;
         private _initParticleState;
@@ -6267,14 +6272,30 @@ declare namespace gd3d.framework {
         removeParticleVelocity(particle: Particle1, name: string): void;
         addParticleAcceleration(particle: Particle1, acceleration: math.vector3, space: ParticleSystemSimulationSpace, name?: string): void;
         removeParticleAcceleration(particle: Particle1, name: string): void;
+        TriggerSubEmitter(subEmitterIndex: number, particles?: Particle1[]): void;
         private _preworldPos;
         private _isRateOverDistance;
         private _leftRateOverDistance;
         worldPos: math.vector3;
         moveVec: math.vector3;
         speed: math.vector3;
+        _isSubParticleSystem: boolean;
+        _emitInfo: ParticleSystemEmitInfo;
         localToWorldMatrix: math.matrix;
         worldToLocalMatrix: math.matrix;
+    }
+    interface ParticleSystemEmitInfo {
+        preTime: number;
+        currentTime: number;
+        preWorldPos: math.vector3;
+        currentWorldPos: math.vector3;
+        position: math.vector3;
+        startDelay: number;
+        moveVec: math.vector3;
+        speed: math.vector3;
+        rateAtDuration: number;
+        _leftRateOverDistance: number;
+        _isRateOverDistance: boolean;
     }
 }
 declare namespace gd3d.framework {
@@ -6387,6 +6408,26 @@ declare namespace gd3d.framework {
     enum ParticleSystemSimulationSpace {
         Local = 0,
         World = 1
+    }
+}
+declare namespace gd3d.framework {
+    enum ParticleSystemSubEmitterProperties {
+        InheritNothing = 0,
+        InheritEverything = 1,
+        InheritColor = 2,
+        InheritSize = 3,
+        InheritRotation = 4,
+        InheritLifetime = 5,
+        InheritDuration = 6
+    }
+}
+declare namespace gd3d.framework {
+    enum ParticleSystemSubEmitterType {
+        Birth = 0,
+        Collision = 1,
+        Death = 2,
+        Trigger = 3,
+        Manual = 4
     }
 }
 declare namespace gd3d.framework {
@@ -6741,6 +6782,23 @@ declare namespace gd3d.framework {
         get zMultiplier(): number;
         set zMultiplier(v: number);
         initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleSubEmittersModule extends ParticleModule {
+        get subEmittersCount(): number;
+        private subEmitters;
+        AddSubEmitter(subEmitter: ParticleSystem, type: ParticleSystemSubEmitterType, properties: ParticleSystemSubEmitterProperties, emitProbability: number): void;
+        GetSubEmitterEmitProbability(index: number): number;
+        GetSubEmitterProperties(index: number): ParticleSystemSubEmitterProperties;
+        GetSubEmitterSystem(index: number): ParticleSystem;
+        GetSubEmitterType(index: number): ParticleSystemSubEmitterType;
+        RemoveSubEmitter(index: number): void;
+        SetSubEmitterEmitProbability(index: number, emitProbability: number): void;
+        SetSubEmitterProperties(index: number, properties: ParticleSystemSubEmitterProperties): void;
+        SetSubEmitterSystem(index: number, subEmitter: ParticleSystem): void;
+        SetSubEmitterType(index: number, type: ParticleSystemSubEmitterType): void;
         updateParticleState(particle: Particle1): void;
     }
 }
