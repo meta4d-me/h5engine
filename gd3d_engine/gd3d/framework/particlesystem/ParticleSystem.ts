@@ -788,14 +788,30 @@ namespace gd3d.framework
                         // 发射间隔距离
                         var invRateOverDistance = 1 / rateOverDistance;
                         // 发射间隔位移
-                        var invRateOverDistanceVec = moveDir.scaleNumberTo(1 / rateOverDistance);
+                        var invRateOverDistanceVec = new math.vector3(
+                            moveDir.x / rateOverDistance,
+                            moveDir.y / rateOverDistance,
+                            moveDir.z / rateOverDistance,
+                        );
                         // 上次发射位置
-                        var lastRateOverDistance = emitInfo.preWorldPos.addTo(moveDir.negateTo().scaleNumber(emitInfo._leftRateOverDistance));
+                        var lastRateOverDistance = new math.vector3(
+                            emitInfo.preWorldPos.x - moveDir.x * emitInfo._leftRateOverDistance,
+                            emitInfo.preWorldPos.y - moveDir.y * emitInfo._leftRateOverDistance,
+                            emitInfo.preWorldPos.z - moveDir.z * emitInfo._leftRateOverDistance,
+                        );
 
                         while (invRateOverDistance < leftRateOverDistance)
                         {
+                            lastRateOverDistance.x += invRateOverDistanceVec.x;
+                            lastRateOverDistance.y += invRateOverDistanceVec.y;
+                            lastRateOverDistance.z += invRateOverDistanceVec.z;
+
                             emits.push({
-                                position: lastRateOverDistance.add(invRateOverDistanceVec).clone().sub(worldPos),
+                                position: new math.vector3(
+                                    lastRateOverDistance.x - worldPos.x,
+                                    lastRateOverDistance.y - worldPos.y,
+                                    lastRateOverDistance.z - worldPos.z,
+                                ),
                                 time: emitInfo.preTime + (emitInfo.currentTime - emitInfo.preTime) * (1 - leftRateOverDistance / moveDistance),
                                 num: 1,
                                 emitInfo: emitInfo
