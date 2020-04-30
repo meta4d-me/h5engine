@@ -1,4 +1,4 @@
-namespace gd3d.unity
+namespace gd3d.framework
 {
     /**
      * Use the PlayableGraph to manage Playable creations and destructions.

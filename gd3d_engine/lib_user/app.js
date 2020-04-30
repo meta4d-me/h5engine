@@ -4353,7 +4353,7 @@ var test_LineRenderer = (function () {
 }());
 var test_ParticleSystem = (function () {
     function test_ParticleSystem() {
-        this._particles = ["ParticleAdditive", "FX_Laser", "Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames", "shark-levelup"];
+        this._particles = ["Cube", "FX_Laser", "Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames", "shark-levelup"];
         this._isMove = false;
         this._particleStartPosition = new gd3d.math.vector3();
         this._particleCurrentPosition = new gd3d.math.vector3();
@@ -4394,6 +4394,7 @@ var test_ParticleSystem = (function () {
         gui.add(this, '_moveAngleSpeed', -10, 10, 0.2);
         gui.add(this, 'play');
         gui.add(this, 'stop');
+        gui.add(this, 'play1');
     };
     test_ParticleSystem.prototype.play = function () {
         this._particle.gameObject.getComponentsInChildren("ParticleSystem").forEach(function (v) {
@@ -4406,6 +4407,10 @@ var test_ParticleSystem = (function () {
             var ps = v;
             ps.stop();
         });
+    };
+    test_ParticleSystem.prototype.play1 = function () {
+        var animator = this._particle.gameObject.getComponentsInChildren("Animator")[0];
+        animator.Play("New Animation");
     };
     Object.defineProperty(test_ParticleSystem.prototype, "particleName", {
         get: function () {
@@ -4435,7 +4440,7 @@ var test_ParticleSystem = (function () {
         hoverc.distance = 10;
         hoverc.scaleSpeed = 0.1;
         hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0);
-        this._showParticle(this._particles[0]);
+        this.particleName = this._particles[0];
     };
     test_ParticleSystem.prototype._showParticle = function (res) {
         return __awaiter(this, void 0, void 0, function () {

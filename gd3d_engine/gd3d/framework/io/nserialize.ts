@@ -140,7 +140,16 @@ namespace gd3d.io
     }
     function fullValue(obj: any, key: string | number, json)
     {
-        if (!json.cls || baseType[json.cls])
+        if (Array.isArray(json))
+        {
+            var arr = [];
+            for (const index in json) 
+            {
+                const element = json[index];
+                fullValue(arr, index, element);
+            }
+            obj[key] = arr;
+        } else if (!json.cls || baseType[json.cls])
             obj[key] = json;
         else
         {

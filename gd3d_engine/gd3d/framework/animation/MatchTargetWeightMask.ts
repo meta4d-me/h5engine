@@ -1,4 +1,4 @@
-namespace gd3d.unity
+namespace gd3d.framework
 {
     /**
      * Use this struct to specify the position and rotation weight mask for Animator.MatchTarget.

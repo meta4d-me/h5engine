@@ -1,4 +1,4 @@
-namespace gd3d.unity
+namespace gd3d.framework
 {
     /**
      * The runtime representation of the AnimatorController. Use this representation to change the Animator Controller during runtime.
@@ -8,6 +8,6 @@ namespace gd3d.unity
         /**
          * Retrieves all AnimationClip used by the controller.
          */
-        animationClips: unity.AnimationClip[];
+        animationClips: AnimationClip[];
     }
 }
