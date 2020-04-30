@@ -696,6 +696,7 @@ declare class test_ParticleSystem implements IState {
     private _particleName;
     private init;
     private _showParticle;
+    private initParticleSystem;
     update(delta: number): void;
 }
 declare class test_RangeScreen implements IState {

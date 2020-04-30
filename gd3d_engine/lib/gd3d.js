@@ -9271,6 +9271,20 @@ var gd3d;
                 }
                 return this.particlemat;
             };
+            assetMgr.prototype.getDefParticleSystemMat = function () {
+                if (this.particlesystemmat == null) {
+                    var mat = new framework.material("defparticle");
+                    var shader = this.getShader("particlesystem_additive.shader.json");
+                    if (shader == null) {
+                        shader = this.getShader("shader/def");
+                    }
+                    mat.setShader(shader);
+                    var tex = this.getDefaultTexture("grid");
+                    mat.setTexture("_MainTex", tex);
+                    this.particlesystemmat = mat;
+                }
+                return this.particlesystemmat;
+            };
             assetMgr.prototype.setAssetUrl = function (asset, url) {
             };
             assetMgr.prototype.getAssetUrl = function (asset) {
@@ -32638,7 +32652,7 @@ var gd3d;
                     this._mesh = framework.sceneMgr.app.getAssetMgr().getDefaultMesh(gd3d.framework.defMesh.quad);
                 }
                 if (!this.material) {
-                    this.material = framework.sceneMgr.app.getAssetMgr().getDefParticleMat();
+                    this.material = framework.sceneMgr.app.getAssetMgr().getDefParticleSystemMat();
                 }
             };
             ParticleSystem.prototype.remove = function () {
@@ -32732,7 +32746,9 @@ var gd3d;
                 gd3d.math.matrixClone(this.transform.getWorldMatrix(), this.localToWorldMatrix);
                 gd3d.math.matrixInverse(this.localToWorldMatrix, this.worldToLocalMatrix);
                 if (!this._awaked) {
-                    this._isPlaying = this._isPlaying || this.main.playOnAwake;
+                    if (this.main.playOnAwake && !this._isPlaying) {
+                        this.play();
+                    }
                     this._awaked = true;
                 }
                 if (this.particleCount < 1)

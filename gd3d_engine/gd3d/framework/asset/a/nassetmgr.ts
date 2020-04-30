@@ -579,6 +579,24 @@ namespace gd3d.framework
             }
             return this.particlemat;
         }
+        private particlesystemmat: material;
+        getDefParticleSystemMat(): material
+        {
+            if (this.particlesystemmat == null)
+            {
+                var mat = new material("defparticle");
+                var shader = this.getShader("particlesystem_additive.shader.json");
+                if (shader == null)
+                {
+                    shader = this.getShader("shader/def");
+                }
+                mat.setShader(shader);
+                var tex = this.getDefaultTexture("grid");
+                mat.setTexture("_MainTex", tex);
+                this.particlesystemmat = mat;
+            }
+            return this.particlesystemmat;
+        }
         private assetUrlDic: { [id: number]: string };// = {};
         setAssetUrl(asset: IAsset, url: string)
         {

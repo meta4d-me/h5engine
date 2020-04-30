@@ -352,7 +352,7 @@ namespace gd3d.framework
 
             if (!this.material)
             {
-                this.material = sceneMgr.app.getAssetMgr().getDefParticleMat();
+                this.material = sceneMgr.app.getAssetMgr().getDefParticleSystemMat();
             }
         }
 
@@ -534,7 +534,10 @@ namespace gd3d.framework
 
             if (!this._awaked)
             {
-                this._isPlaying = this._isPlaying || this.main.playOnAwake;
+                if (this.main.playOnAwake && !this._isPlaying)
+                {
+                    this.play();
+                }
                 this._awaked = true;
             }
 

@@ -23,7 +23,7 @@ class test_ParticleSystem implements IState
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
 
-    private _particles = ["ParticleAdditive","FX_Laser","Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "ps_noise", "Fire", "Flames", "shark-levelup"];
+    private _particles = ["ParticleAdditive", "FX_Laser", "Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "ps_noise", "Fire", "Flames", "shark-levelup"];
     private _particle: gd3d.framework.transform;
 
     private _isMove = false;
@@ -131,13 +131,39 @@ class test_ParticleSystem implements IState
 
         this._particle = new gd3d.framework.transform();
         this._particle.addChild(cubeTran);
-        
+
         this.scene.addChild(this._particle);
 
         this._particleStartPosition = new gd3d.math.vector3();
         gd3d.math.vec3Clone(this._particle.localPosition, this._particleStartPosition);
 
         this.play();
+    }
+
+    private initParticleSystem()
+    {
+        this._particle = new gd3d.framework.transform();
+        this.scene.addChild(this._particle);
+
+        // 添加粒子系统模块
+        var ps = this._particle.gameObject.addComponent("particlesystem") as gd3d.framework.ParticleSystem;
+
+        ps.emission.rateOverTime.constant = 1;
+
+        var subo = new gd3d.framework.transform();
+        var subps = subo.gameObject.addComponent("particlesystem") as gd3d.framework.ParticleSystem;
+
+        subps.main.startColor.color.r = 1;
+        subps.main.startColor.color.b = 0;
+        subps.main.startColor.color.g = 0;
+
+        ps.subEmitters.enabled = true;
+        ps.subEmitters.AddSubEmitter(subps, gd3d.framework.ParticleSystemSubEmitterType.Birth, gd3d.framework.ParticleSystemSubEmitterProperties.InheritNothing, 1);
+
+        subo.localEulerAngles = new gd3d.math.vector3(-90, 0, 0);
+
+        this._particle.addChild(subo);
+
     }
 
     update(delta: number)

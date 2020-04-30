@@ -4463,6 +4463,21 @@ var test_ParticleSystem = (function () {
             });
         });
     };
+    test_ParticleSystem.prototype.initParticleSystem = function () {
+        this._particle = new gd3d.framework.transform();
+        this.scene.addChild(this._particle);
+        var ps = this._particle.gameObject.addComponent("particlesystem");
+        ps.emission.rateOverTime.constant = 1;
+        var subo = new gd3d.framework.transform();
+        var subps = subo.gameObject.addComponent("particlesystem");
+        subps.main.startColor.color.r = 1;
+        subps.main.startColor.color.b = 0;
+        subps.main.startColor.color.g = 0;
+        ps.subEmitters.enabled = true;
+        ps.subEmitters.AddSubEmitter(subps, gd3d.framework.ParticleSystemSubEmitterType.Birth, gd3d.framework.ParticleSystemSubEmitterProperties.InheritNothing, 1);
+        subo.localEulerAngles = new gd3d.math.vector3(-90, 0, 0);
+        this._particle.addChild(subo);
+    };
     test_ParticleSystem.prototype.update = function (delta) {
         if (!this._particle)
             return;

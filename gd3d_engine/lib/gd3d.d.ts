@@ -1753,6 +1753,8 @@ declare namespace gd3d.framework {
         getDefLineRendererMat(): material;
         private particlemat;
         getDefParticleMat(): material;
+        private particlesystemmat;
+        getDefParticleSystemMat(): material;
         private assetUrlDic;
         setAssetUrl(asset: IAsset, url: string): void;
         getAssetUrl(asset: IAsset): string;
