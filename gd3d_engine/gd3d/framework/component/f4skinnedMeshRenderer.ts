@@ -345,7 +345,8 @@ namespace gd3d.framework {
                 false,
                 false,
                 false,
-                WebGLRenderingContext.FLOAT
+                //WebGLRenderingContext.FLOAT
+                sceneMgr.app.webgl.FLOAT
             );
         }
 
