@@ -243,6 +243,18 @@ namespace gd3d.framework
         private _noise: ParticleNoiseModule;
 
         /**
+         * 旋转角度随速度变化模块
+         */
+        get subEmitters() { return this._subEmitters; }
+        set subEmitters(v)
+        {
+            ArrayUtil.replace(this._modules, this._subEmitters, v);
+            v.particleSystem = this;
+            this._subEmitters = v;
+        }
+        private _subEmitters: ParticleSubEmittersModule;
+
+        /**
          * 粒子系统纹理表动画模块。
          */
         get textureSheetAnimation() { return this._textureSheetAnimation; }
@@ -374,6 +386,7 @@ namespace gd3d.framework
             this.rotationOverLifetime = new ParticleRotationOverLifetimeModule();
             this.rotationBySpeed = new ParticleRotationBySpeedModule();
             this.noise = new ParticleNoiseModule();
+            this.subEmitters = new ParticleSubEmittersModule();
             this.textureSheetAnimation = new ParticleTextureSheetAnimationModule();
 
             this.main.enabled = true;
@@ -696,107 +709,146 @@ namespace gd3d.framework
 
         /**
          * 发射粒子
-         * @param time 当前粒子时间
+         * 
+         * @param startTime 发射起始时间
+         * @param endTime 发射终止时间
+         * @param startPos 发射起始位置
+         * @param stopPos 发射终止位置
          */
-        private _emit()
+        private _emit(emitInfo: ParticleSystemEmitInfo)
         {
-            if (!this.emission.enabled) return;
+            // 
+            var emits: { time: number, num: number, position: math.vector3, emitInfo: ParticleSystemEmitInfo }[] = [];
 
-            // 判断是否达到最大粒子数量
-            if (this._activeParticles.length >= this.main.maxParticles) return;
+            var startTime = emitInfo.preTime;
+            var endTime = emitInfo.currentTime;
+
+            if (!this.emission.enabled) return emits;
 
             // 判断是否开始发射
-            if (this._realTime <= 0) return;
+            if (endTime <= 0) return emits;
 
             var loop = this.main.loop;
             var duration = this.main.duration;
-            var rateAtDuration = this.rateAtDuration;
-            var preRealTime = this._preRealTime;
 
             // 判断是否结束发射
-            if (!loop && preRealTime >= duration) return;
+            if (!loop && startTime >= duration) return emits;
 
             // 计算最后发射时间
-            var realEmitTime = this._realTime;
-            if (!loop) realEmitTime = Math.min(realEmitTime, duration);
+            if (!loop) endTime = Math.min(endTime, duration);
 
-            // 
-            var emits: { time: number, num: number, position?: math.vector3 }[] = [];
-            // 单粒子发射周期
-            var step = 1 / this.emission.rateOverTime.getValue(rateAtDuration);
-            var bursts = this.emission.bursts;
+            // 计算此处在发射周期的位置
+            var rateAtDuration = (endTime % duration) / duration;
+            if (rateAtDuration == 0 && endTime >= duration) rateAtDuration = 1;
+
+            emitInfo.rateAtDuration = rateAtDuration;
+
             // 处理移动发射粒子
+            var moveEmits = this._emitWithMove(emitInfo);
+            emits = emits.concat(moveEmits);
+
+            // 单粒子发射周期
+            var timeEmits = this._emitWithTime(emitInfo, duration);
+            emits = emits.concat(timeEmits);
+
+            return emits;
+        }
+
+        /**
+         * 计算在指定移动的位移线段中发射的粒子列表。
+         * 
+         * @param rateAtDuration 
+         * @param prePos 
+         * @param currentPos 
+         */
+        private _emitWithMove(emitInfo: ParticleSystemEmitInfo)
+        {
+            var emits: { time: number; num: number; position: math.vector3; emitInfo: ParticleSystemEmitInfo; }[] = [];
             if (this.main.simulationSpace == ParticleSystemSimulationSpace.World)
             {
-                if (this._isRateOverDistance)
+                if (emitInfo._isRateOverDistance)
                 {
-                    var moveVec = this.moveVec;
-                    var worldPos = this.worldPos;
+                    var moveVec = new math.vector3();
+                    moveVec.x = emitInfo.currentWorldPos.x - emitInfo.preWorldPos.x;
+                    moveVec.y = emitInfo.currentWorldPos.y - emitInfo.preWorldPos.y;
+                    moveVec.z = emitInfo.currentWorldPos.z - emitInfo.preWorldPos.z;
+                    var moveDistance = math.vec3Length(moveVec);
+                    var worldPos = emitInfo.currentWorldPos;
                     // 本次移动距离
-                    if (math.vec3SqrLength(moveVec) > 0)
+                    if (moveDistance > 0)
                     {
                         // 移动方向
                         var moveDir = new math.vector3(moveVec.x, moveVec.y, moveVec.z);
                         math.vec3Normalize(moveDir, moveDir);
+
                         // 剩余移动量
-                        var leftRateOverDistance = this._leftRateOverDistance + math.vec3Length(moveVec);
+                        var leftRateOverDistance = emitInfo._leftRateOverDistance + moveDistance;
                         // 发射频率
-                        var rateOverDistance = this.emission.rateOverDistance.getValue(rateAtDuration);
+                        var rateOverDistance = this.emission.rateOverDistance.getValue(emitInfo.rateAtDuration);
                         // 发射间隔距离
                         var invRateOverDistance = 1 / rateOverDistance;
                         // 发射间隔位移
-                        var invRateOverDistanceVec = new math.vector3(moveDir.x / rateOverDistance, moveDir.y / rateOverDistance, moveDir.z / rateOverDistance);
+                        var invRateOverDistanceVec = moveDir.scaleNumberTo(1 / rateOverDistance);
                         // 上次发射位置
-                        var lastRateOverDistance = new math.vector3(
-                            this._preworldPos.x - moveDir.x * this._leftRateOverDistance,
-                            this._preworldPos.y - moveDir.y * this._leftRateOverDistance,
-                            this._preworldPos.z - moveDir.z * this._leftRateOverDistance,
-                        );
-                        // 发射位置列表
-                        var emitPosArr: math.vector3[] = [];
+                        var lastRateOverDistance = emitInfo.preWorldPos.addTo(moveDir.negateTo().scaleNumber(emitInfo._leftRateOverDistance));
+
                         while (invRateOverDistance < leftRateOverDistance)
                         {
-                            emitPosArr.push(new math.vector3(
-                                lastRateOverDistance.x + invRateOverDistanceVec.x,
-                                lastRateOverDistance.y + invRateOverDistanceVec.y,
-                                lastRateOverDistance.z + invRateOverDistanceVec.z,
-                            ));
-
+                            emits.push({
+                                position: lastRateOverDistance.add(invRateOverDistanceVec).clone().sub(worldPos),
+                                time: emitInfo.preTime + (emitInfo.currentTime - emitInfo.preTime) * (1 - leftRateOverDistance / moveDistance),
+                                num: 1,
+                                emitInfo: emitInfo
+                            });
                             leftRateOverDistance -= invRateOverDistance;
                         }
-                        this._leftRateOverDistance = leftRateOverDistance;
-                        emitPosArr.forEach(p =>
-                        {
-                            emits.push({ time: this.time, num: 1, position: new math.vector3(p.x - worldPos.x, p.y - worldPos.y, p.z - worldPos.z) });
-                        });
+                        emitInfo._leftRateOverDistance = leftRateOverDistance;
                     }
                 }
-                this._isRateOverDistance = true;
-            } else
-            {
-                this._isRateOverDistance = false;
-                this._leftRateOverDistance = 0;
+                emitInfo._isRateOverDistance = true;
             }
+            else
+            {
+                emitInfo._isRateOverDistance = false;
+                emitInfo._leftRateOverDistance = 0;
+            }
+            return emits;
+        }
 
+        /**
+         * 计算在指定时间段内发射的粒子列表
+         * 
+         * @param rateAtDuration 
+         * @param preRealTime 
+         * @param duration 
+         * @param realEmitTime 
+         */
+        private _emitWithTime(emitInfo: ParticleSystemEmitInfo, duration: number)
+        {
+            var rateAtDuration = emitInfo.rateAtDuration;
+            var preTime = emitInfo.preTime;
+            var currentTime = emitInfo.currentTime;
+
+            var emits: { time: number; num: number; position: math.vector3; emitInfo: ParticleSystemEmitInfo }[] = [];
+
+            var step = 1 / this.emission.rateOverTime.getValue(rateAtDuration);
+            var bursts = this.emission.bursts;
             // 遍历所有发射周期
-            var cycleStartIndex = Math.floor(preRealTime / duration);
-            var cycleEndIndex = Math.ceil(realEmitTime / duration);
+            var cycleStartIndex = Math.floor(preTime / duration);
+            var cycleEndIndex = Math.ceil(currentTime / duration);
             for (let k = cycleStartIndex; k < cycleEndIndex; k++)
             {
                 var cycleStartTime = k * duration;
                 var cycleEndTime = (k + 1) * duration;
-
                 // 单个周期内的起始与结束时间
-                var startTime = Math.max(preRealTime, cycleStartTime);
-                var endTime = Math.min(realEmitTime, cycleEndTime);
-
+                var startTime = Math.max(preTime, cycleStartTime);
+                var endTime = Math.min(currentTime, cycleEndTime);
                 // 处理稳定发射
                 var singleStart = Math.ceil(startTime / step) * step;
                 for (var i = singleStart; i < endTime; i += step)
                 {
-                    emits.push({ time: i, num: 1 });
+                    emits.push({ time: i, num: 1, emitInfo: emitInfo, position: new math.vector3(emitInfo.position.x, emitInfo.position.y, emitInfo.position.z) });
                 }
-
                 // 处理喷发
                 var inCycleStart = startTime - cycleStartTime;
                 var inCycleEnd = endTime - cycleStartTime;
@@ -805,17 +857,11 @@ namespace gd3d.framework
                     const burst = bursts[i];
                     if (burst.isProbability && inCycleStart <= burst.time && burst.time < inCycleEnd)
                     {
-                        emits.push({ time: cycleStartTime + burst.time, num: burst.count.getValue(rateAtDuration) });
+                        emits.push({ time: cycleStartTime + burst.time, num: burst.count.getValue(rateAtDuration), emitInfo: emitInfo, position: new math.vector3(emitInfo.position.x, emitInfo.position.y, emitInfo.position.z) });
                     }
                 }
             }
-
-            emits.sort((a, b) => { return a.time - b.time });;
-
-            emits.forEach(v =>
-            {
-                this._emitParticles(v);
-            });
+            return emits;
         }
 
         /**
@@ -1116,6 +1162,83 @@ namespace gd3d.framework
         }
 
         /**
+         * 触发子发射器
+         * 
+         * @param subEmitterIndex 子发射器索引
+         */
+        TriggerSubEmitter(subEmitterIndex: number, particles: Particle1[] = null)
+        {
+            if (!this.subEmitters.enabled) return;
+
+            var subEmitter = this.subEmitters.GetSubEmitterSystem(subEmitterIndex);
+            if (!subEmitter) return;
+
+            // if (!subEmitter.enabled) return;
+
+            var probability = this.subEmitters.GetSubEmitterEmitProbability(subEmitterIndex);
+            this.subEmitters.GetSubEmitterProperties(subEmitterIndex);
+            this.subEmitters.GetSubEmitterType(subEmitterIndex);
+
+            particles = particles || this._activeParticles;
+
+            var emits: {
+                time: number;
+                num: number;
+                position: math.vector3;
+                emitInfo: ParticleSystemEmitInfo;
+            }[] = [];
+
+            particles.forEach(particle =>
+            {
+                if (Math.random() > probability) return;
+
+                // 粒子所在世界坐标
+                var particleWoldPos = new math.vector3(particle.position.x, particle.position.y, particle.position.z);
+                math.matrixTransformVector3(particleWoldPos, this.localToWorldMatrix, particleWoldPos);
+
+                // 粒子在子粒子系统的坐标
+                var subEmitPos = new math.vector3(particleWoldPos.x, particleWoldPos.y, particleWoldPos.z);
+                math.matrixTransformVector3(subEmitPos, subEmitter.worldToLocalMatrix, subEmitPos);
+
+                if (!particle.subEmitInfo)
+                {
+                    var startDelay = this.main.startDelay.getValue(Math.random());
+                    particle.subEmitInfo = {
+                        preTime: particle.preTime - particle.birthTime - startDelay,
+                        currentTime: particle.preTime - particle.birthTime - startDelay,
+                        preWorldPos: new math.vector3(particleWoldPos.x, particleWoldPos.y, particleWoldPos.z),
+                        currentWorldPos: new math.vector3(particleWoldPos.x, particleWoldPos.y, particleWoldPos.z),
+                        rateAtDuration: 0,
+                        _leftRateOverDistance: 0,
+                        _isRateOverDistance: false,
+                        startDelay: startDelay,
+                        moveVec: new math.vector3(),
+                        speed: new math.vector3(),
+                        position: subEmitPos,
+                    };
+                } else
+                {
+                    particle.subEmitInfo.preTime = particle.preTime - particle.birthTime - particle.subEmitInfo.startDelay;
+                    particle.subEmitInfo.currentTime = particle.curTime - particle.birthTime - particle.subEmitInfo.startDelay;
+
+                    particle.subEmitInfo.position.x = subEmitPos.x;
+                    particle.subEmitInfo.position.y = subEmitPos.y;
+                    particle.subEmitInfo.position.z = subEmitPos.z;
+                }
+
+                var subEmits = subEmitter._emit(particle.subEmitInfo);
+
+                emits = emits.concat(subEmits);
+            });
+
+            emits.sort((a, b) => { return a.time - b.time });
+            emits.forEach(v =>
+            {
+                subEmitter._emitParticles(v);
+            });
+        }
+
+        /**
          * 上次移动发射的位置
          */
         private _preworldPos = new math.vector3();
@@ -1126,8 +1249,81 @@ namespace gd3d.framework
         moveVec = new math.vector3();
         speed = new math.vector3();
 
+        /**
+         * 是否为被上级粒子系统引用的子粒子系统。
+         */
+        _isSubParticleSystem = false;
+
+        /**
+         * 发射信息
+         */
+        _emitInfo: ParticleSystemEmitInfo;
+
         //
         localToWorldMatrix = new math.matrix();
         worldToLocalMatrix = new math.matrix();
+    }
+
+
+    /**
+     * 粒子系统发射器状态信息
+     */
+    export interface ParticleSystemEmitInfo
+    {
+        /**
+         * 上次粒子系统时间
+         */
+        preTime: number;
+
+        /**
+         * 当前粒子系统时间
+         */
+        currentTime: number;
+
+        /**
+         * 上次世界坐标
+         */
+        preWorldPos: math.vector3;
+
+        /**
+         * 当前世界坐标
+         */
+        currentWorldPos: math.vector3;
+
+        /**
+         * 发射器本地位置
+         */
+        position: math.vector3;
+
+        /**
+         * Start delay in seconds.
+         * 启动延迟(以秒为单位)。在调用.play()时初始化值。
+         */
+        startDelay: number;
+
+        /**
+         * 此次位移
+         */
+        moveVec: math.vector3;
+
+        /**
+         * 当前移动速度
+         */
+        speed: math.vector3;
+
+        /**
+         * 此时在发射周期的位置
+         */
+        rateAtDuration: number;
+
+        /**
+         * 用于处理移动发射的剩余移动距离。
+         */
+        _leftRateOverDistance: number;
+
+        /**
+         * 是否已经执行位移发射。
+         */
+        _isRateOverDistance: boolean;
     }
 }

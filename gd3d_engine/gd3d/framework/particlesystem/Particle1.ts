@@ -89,6 +89,31 @@ namespace gd3d.framework
 		cache = {};
 
 		/**
+		 * 上次记录的时间
+		 */
+		preTime: number;
+
+		/**
+		 * 当前记录的时间
+		 */
+		curTime: number;
+
+		/**
+		 * 上次记录位置
+		 */
+		prePosition: math.vector3;
+
+		/**
+		 * 当前记录位置
+		 */
+		curPosition: math.vector3;
+
+		/**
+		 * 子发射器信息
+		 */
+		subEmitInfo: ParticleSystemEmitInfo;
+
+		/**
 		 * 更新状态
 		 */
 		updateState(preTime: number, time: number)
