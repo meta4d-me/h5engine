@@ -35229,7 +35229,7 @@ var gd3d;
         var ParticleEmissionBurst = (function () {
             function ParticleEmissionBurst() {
                 this.time = 0;
-                this.count = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 30, constantMin: 30, constantMax: 30 });
+                this.count = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 30, constantMin: 30, constantMax: 30, mode: framework.MinMaxCurveMode.TwoConstants });
                 this.cycleCount = 1;
                 this.repeatInterval = 0.01;
                 this.probability = 1.0;
