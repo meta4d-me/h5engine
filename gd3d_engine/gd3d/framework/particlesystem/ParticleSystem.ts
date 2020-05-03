@@ -231,6 +231,18 @@ namespace gd3d.framework
         private _rotationBySpeed: ParticleRotationBySpeedModule;
 
         /**
+         * 旋转角度随速度变化模块
+         */
+        get noise() { return this._noise; }
+        set noise(v)
+        {
+            ArrayUtil.replace(this._modules, this._noise, v);
+            v.particleSystem = this;
+            this._noise = v;
+        }
+        private _noise: ParticleNoiseModule;
+
+        /**
          * 粒子系统纹理表动画模块。
          */
         get textureSheetAnimation() { return this._textureSheetAnimation; }
@@ -361,6 +373,7 @@ namespace gd3d.framework
             this.sizeBySpeed = new ParticleSizeBySpeedModule();
             this.rotationOverLifetime = new ParticleRotationOverLifetimeModule();
             this.rotationBySpeed = new ParticleRotationBySpeedModule();
+            this.noise = new ParticleNoiseModule();
             this.textureSheetAnimation = new ParticleTextureSheetAnimationModule();
 
             this.main.enabled = true;
@@ -907,6 +920,70 @@ namespace gd3d.framework
                     math.matrixTransformNormal(p.velocity, localToWorldMatrix, p.velocity);
                     math.matrixTransformNormal(p.acceleration, localToWorldMatrix, p.acceleration);
                 });
+            }
+        }
+
+        /**
+         * 给指定粒子添加指定空间的位移。
+         * 
+         * @param particle 粒子。
+         * @param position 速度。
+         * @param space 速度所在空间。
+         * @param name  速度名称。如果不为 undefined 时保存，调用 removeParticleVelocity 可以移除该部分速度。
+         */
+        addParticlePosition(particle: Particle1, position: math.vector3, space: ParticleSystemSimulationSpace, name?: string)
+        {
+            if (name != undefined)
+            {
+                this.removeParticleVelocity(particle, name);
+                particle.cache[name] = { value: new math.vector3(position.x, position.y, position.z), space: space };
+            }
+
+            if (space != this.main.simulationSpace)
+            {
+                if (space == ParticleSystemSimulationSpace.World)
+                {
+                    math.matrixTransformVector3(position, this.worldToLocalMatrix, position);
+                } else
+                {
+                    math.matrixTransformVector3(position, this.localToWorldMatrix, position);
+                }
+            }
+            //
+            particle.position.x += position.x;
+            particle.position.y += position.y;
+            particle.position.z += position.z;
+        }
+
+        /**
+         * 移除指定粒子上的位移
+         * 
+         * @param particle 粒子。
+         * @param name 位移名称。
+         */
+        removeParticlePosition(particle: Particle1, name: string)
+        {
+            var obj: { value: math.vector3, space: ParticleSystemSimulationSpace } = particle.cache[name];
+            if (obj)
+            {
+                delete particle.cache[name];
+
+                var space = obj.space;
+                var value = obj.value;
+                if (space != this.main.simulationSpace)
+                {
+                    if (space == ParticleSystemSimulationSpace.World)
+                    {
+                        math.matrixTransformVector3(value, this.worldToLocalMatrix, value);
+                    } else
+                    {
+                        math.matrixTransformVector3(value, this.localToWorldMatrix, value);
+                    }
+                }
+                //
+                particle.position.x -= value.x;
+                particle.position.y -= value.y;
+                particle.position.z -= value.z;
             }
         }
 

@@ -4353,7 +4353,7 @@ var test_LineRenderer = (function () {
 }());
 var test_ParticleSystem = (function () {
     function test_ParticleSystem() {
-        this._particles = ["ParticleAdditive", "FX_Laser", "Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames", "shark-levelup"];
+        this._particles = ["ParticleAdditive", "FX_Laser", "Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "ps_noise", "Fire", "Flames", "shark-levelup"];
         this._isMove = false;
         this._particleStartPosition = new gd3d.math.vector3();
         this._particleCurrentPosition = new gd3d.math.vector3();
@@ -4447,7 +4447,7 @@ var test_ParticleSystem = (function () {
                             this.scene.removeChild(this._particle);
                             this._particle = null;
                         }
-                        return [4, demoTool.loadbySync("res/prefabs/" + res + "/" + res + ".assetbundle.json", this.astMgr)];
+                        return [4, demoTool.loadbySync("res/prefabs/particlesystems/" + res + "/" + res + ".assetbundle.json", this.astMgr)];
                     case 1:
                         _a.sent();
                         cubeP = this.astMgr.getAssetByName(res + ".prefab.json", res + ".assetbundle.json");

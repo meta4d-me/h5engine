@@ -23,7 +23,7 @@ class test_ParticleSystem implements IState
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
 
-    private _particles = ["ParticleAdditive","FX_Laser","Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "aaaaa", "Fire", "Flames", "shark-levelup"];
+    private _particles = ["ParticleAdditive","FX_Laser","Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "ps_noise", "Fire", "Flames", "shark-levelup"];
     private _particle: gd3d.framework.transform;
 
     private _isMove = false;
@@ -124,7 +124,7 @@ class test_ParticleSystem implements IState
             this._particle = null;
         }
 
-        await demoTool.loadbySync(`res/prefabs/${res}/${res}.assetbundle.json`, this.astMgr);
+        await demoTool.loadbySync(`res/prefabs/particlesystems/${res}/${res}.assetbundle.json`, this.astMgr);
 
         let cubeP = this.astMgr.getAssetByName(`${res}.prefab.json`, `${res}.assetbundle.json`) as gd3d.framework.prefab;
         let cubeTran = cubeP.getCloneTrans();

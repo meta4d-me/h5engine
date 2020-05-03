@@ -4847,6 +4847,22 @@ declare namespace gd3d.framework {
         static line(f: (x: number) => number, a: number, b: number, precision?: number, errorcallback?: (err: Error) => void): number;
     }
 }
+declare namespace gd3d.framework {
+    var noise: Noise;
+    class Noise {
+        constructor(seed?: number);
+        perlin1(x: number): number;
+        perlin2(x: number, y: number): number;
+        perlin3(x: number, y: number, z: number): number;
+        perlinN(...ps: number[]): number;
+        get seed(): number;
+        set seed(v: number);
+        private _seed;
+        private _p;
+    }
+    function createGrad(n: number): number[][];
+    function getBits(n: number): number[][];
+}
 declare namespace gd3d.math {
     enum RotationOrder {
         XYZ = 0,
@@ -6200,6 +6216,9 @@ declare namespace gd3d.framework {
         get rotationBySpeed(): ParticleRotationBySpeedModule;
         set rotationBySpeed(v: ParticleRotationBySpeedModule);
         private _rotationBySpeed;
+        get noise(): ParticleNoiseModule;
+        set noise(v: ParticleNoiseModule);
+        private _noise;
         get textureSheetAnimation(): ParticleTextureSheetAnimationModule;
         set textureSheetAnimation(v: ParticleTextureSheetAnimationModule);
         private _textureSheetAnimation;
@@ -6242,6 +6261,8 @@ declare namespace gd3d.framework {
         private _initParticleState;
         private _updateParticleState;
         _simulationSpaceChanged(): void;
+        addParticlePosition(particle: Particle1, position: math.vector3, space: ParticleSystemSimulationSpace, name?: string): void;
+        removeParticlePosition(particle: Particle1, name: string): void;
         addParticleVelocity(particle: Particle1, velocity: math.vector3, space: ParticleSystemSimulationSpace, name?: string): void;
         removeParticleVelocity(particle: Particle1, name: string): void;
         addParticleAcceleration(particle: Particle1, acceleration: math.vector3, space: ParticleSystemSimulationSpace, name?: string): void;
@@ -6296,6 +6317,13 @@ declare namespace gd3d.framework {
         Vertex = 0,
         Edge = 1,
         Triangle = 2
+    }
+}
+declare namespace gd3d.framework {
+    enum ParticleSystemNoiseQuality {
+        Low = 0,
+        Medium = 1,
+        High = 2
     }
 }
 declare namespace gd3d.framework {
@@ -6533,6 +6561,48 @@ declare namespace gd3d.framework {
         maxParticles: number;
         initParticleState(particle: Particle1): void;
         updateParticleState(particle: Particle1): void;
+    }
+}
+declare namespace gd3d.framework {
+    class ParticleNoiseModule extends ParticleModule {
+        separateAxes: boolean;
+        get strength(): MinMaxCurve;
+        set strength(v: MinMaxCurve);
+        strength3D: MinMaxCurveVector3;
+        get strengthX(): MinMaxCurve;
+        set strengthX(v: MinMaxCurve);
+        get strengthY(): MinMaxCurve;
+        set strengthY(v: MinMaxCurve);
+        get strengthZ(): MinMaxCurve;
+        set strengthZ(v: MinMaxCurve);
+        frequency: number;
+        scrollSpeed: MinMaxCurve;
+        damping: boolean;
+        octaveCount: number;
+        octaveMultiplier: number;
+        octaveScale: number;
+        quality: ParticleSystemNoiseQuality;
+        remapEnabled: boolean;
+        get remap(): MinMaxCurve;
+        set remap(v: MinMaxCurve);
+        remap3D: MinMaxCurveVector3;
+        get remapX(): MinMaxCurve;
+        set remapX(v: MinMaxCurve);
+        get remapY(): MinMaxCurve;
+        set remapY(v: MinMaxCurve);
+        get remapZ(): MinMaxCurve;
+        set remapZ(v: MinMaxCurve);
+        initParticleState(particle: Particle1): void;
+        updateParticleState(particle: Particle1): void;
+        static _frequencyScale: number;
+        static _strengthScale: number;
+        static _timeScale: number;
+        drawImage(image: ImageData): void;
+        private _getDrawImageStrength;
+        private _getNoiseValue;
+        private _getNoiseValueBase;
+        update(interval: number): void;
+        private _scrollValue;
     }
 }
 declare namespace gd3d.framework {

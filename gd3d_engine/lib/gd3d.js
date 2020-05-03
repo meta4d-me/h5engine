@@ -5273,7 +5273,7 @@ var gd3d;
         var label = (function () {
             function label() {
                 this.needRefreshFont = false;
-                this._fontName = "defFont";
+                this._fontName = "defFont.font.json";
                 this._fontsize = 14;
                 this.linespace = 1;
                 this.horizontalType = HorizontalType.Left;
@@ -8934,6 +8934,7 @@ var gd3d;
                 case e.TextAsset:
                 case e.TextureDesc:
                 case e.PackTxt:
+                case e.ParticleSystem:
                     return "text";
                 case e.Aniclip:
                 case e.DDS:
@@ -14975,7 +14976,7 @@ var gd3d;
                         var trans = this.carelist[bonename];
                         var transMat = this.careBoneMat[bonename];
                         var index = this._playClip.indexDic[bonename];
-                        if (index) {
+                        if (index != null) {
                             if (this.beCross && this.lastFrame) {
                                 transMat.lerpInWorldWithData(this.inversTpos[bonename], this.lastFrame[bonename], this.curFrame, index * 7 + 1, 1 - this.crossPercentage);
                             }
@@ -25273,6 +25274,269 @@ var gd3d;
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
+    var framework;
+    (function (framework) {
+        var Noise = (function () {
+            function Noise(seed) {
+                if (seed === void 0) { seed = 0; }
+                this._seed = 0;
+                this._p = [];
+                this.seed = seed;
+            }
+            Noise.prototype.perlin1 = function (x) {
+                var perm = this._p;
+                var X = Math.floor(x);
+                x = x - X;
+                X = X & 255;
+                var gi00 = perm[X] % 2;
+                var gi10 = perm[X + 1] % 2;
+                var n00 = dot1(grad1[gi00], x);
+                var n10 = dot1(grad1[gi10], x - 1);
+                var u = fade(x);
+                var nx0 = mix(n00, n10, u);
+                return nx0;
+            };
+            Noise.prototype.perlin2 = function (x, y) {
+                var perm = this._p;
+                var X = Math.floor(x);
+                var Y = Math.floor(y);
+                x = x - X;
+                y = y - Y;
+                X = X & 255;
+                Y = Y & 255;
+                var gi00 = perm[X + perm[Y]] % 4;
+                var gi10 = perm[X + 1 + perm[Y]] % 4;
+                var gi01 = perm[X + perm[Y + 1]] % 4;
+                var gi11 = perm[X + 1 + perm[Y + 1]] % 4;
+                var n00 = dot2(grad2[gi00], x, y);
+                var n10 = dot2(grad2[gi10], x - 1, y);
+                var n01 = dot2(grad2[gi01], x, y - 1);
+                var n11 = dot2(grad2[gi11], x - 1, y - 1);
+                var u = fade(x);
+                var v = fade(y);
+                var nx0 = mix(n00, n10, u);
+                var nx1 = mix(n01, n11, u);
+                var nxy = mix(nx0, nx1, v);
+                return nxy;
+            };
+            Noise.prototype.perlin3 = function (x, y, z) {
+                var perm = this._p;
+                var X = Math.floor(x);
+                var Y = Math.floor(y);
+                var Z = Math.floor(z);
+                x = x - X;
+                y = y - Y;
+                z = z - Z;
+                X = X & 255;
+                Y = Y & 255;
+                Z = Z & 255;
+                var gi000 = perm[X + perm[Y + perm[Z]]] % 12;
+                var gi100 = perm[X + 1 + perm[Y + perm[Z]]] % 12;
+                var gi010 = perm[X + perm[Y + 1 + perm[Z]]] % 12;
+                var gi110 = perm[X + 1 + perm[Y + 1 + perm[Z]]] % 12;
+                var gi001 = perm[X + perm[Y + perm[Z + 1]]] % 12;
+                var gi101 = perm[X + 1 + perm[Y + perm[Z + 1]]] % 12;
+                var gi011 = perm[X + perm[Y + 1 + perm[Z + 1]]] % 12;
+                var gi111 = perm[X + 1 + perm[Y + 1 + perm[Z + 1]]] % 12;
+                var n000 = dot(grad3[gi000], x, y, z);
+                var n100 = dot(grad3[gi100], x - 1, y, z);
+                var n010 = dot(grad3[gi010], x, y - 1, z);
+                var n110 = dot(grad3[gi110], x - 1, y - 1, z);
+                var n001 = dot(grad3[gi001], x, y, z - 1);
+                var n101 = dot(grad3[gi101], x - 1, y, z - 1);
+                var n011 = dot(grad3[gi011], x, y - 1, z - 1);
+                var n111 = dot(grad3[gi111], x - 1, y - 1, z - 1);
+                var u = fade(x);
+                var v = fade(y);
+                var w = fade(z);
+                var nx00 = mix(n000, n100, u);
+                var nx01 = mix(n001, n101, u);
+                var nx10 = mix(n010, n110, u);
+                var nx11 = mix(n011, n111, u);
+                var nxy0 = mix(nx00, nx10, v);
+                var nxy1 = mix(nx01, nx11, v);
+                var nxyz = mix(nxy0, nxy1, w);
+                return nxyz;
+            };
+            Noise.prototype.perlinN = function () {
+                var ps = [];
+                for (var _i = 0; _i < arguments.length; _i++) {
+                    ps[_i] = arguments[_i];
+                }
+                var perm = this._p;
+                var n = ps.length;
+                var pp = [];
+                var PS = [];
+                var PF = [];
+                for (var i = 0; i < n; i++) {
+                    var p = ps[i];
+                    var P = Math.floor(p);
+                    p = p - P;
+                    P = P & 255;
+                    pp[i] = p;
+                    PS[i] = P;
+                    PF[i] = fade(p);
+                }
+                var gradN = createGrad(n);
+                var numEdge = gradN.length;
+                var bits = getBits(n);
+                var dns = [];
+                for (var i = 0, len = bits.length; i < len; i++) {
+                    var bit = bits[i];
+                    var bitn = bit.length;
+                    var gi = 0;
+                    while (bitn > 0) {
+                        bitn--;
+                        gi = perm[PS[bitn] + bit[bitn] + gi];
+                    }
+                    var grad = gradN[gi % numEdge];
+                    bitn = bit.length;
+                    var dn = 0;
+                    while (bitn > 0) {
+                        bitn--;
+                        dn += grad[bitn] * (pp[bitn] - bit[bitn]);
+                    }
+                    dns[i] = dn;
+                }
+                for (var i = 0; i < n; i++) {
+                    for (var j = 0, len = dns.length; j < len; j += 2) {
+                        dns[j / 2] = mix(dns[j], dns[j + 1], PF[i]);
+                    }
+                    dns.length = dns.length >> 1;
+                }
+                return dns[0];
+            };
+            Object.defineProperty(Noise.prototype, "seed", {
+                get: function () {
+                    return this._seed;
+                },
+                set: function (v) {
+                    this._seed = v;
+                    var p = this._p;
+                    if (v > 0 && v < 1) {
+                        v *= 65536;
+                    }
+                    v = Math.floor(v);
+                    if (v < 256) {
+                        v |= v << 8;
+                    }
+                    for (var i = 0; i < 256; i++) {
+                        var v0;
+                        if (i & 1) {
+                            v0 = permutation[i] ^ (v & 255);
+                        }
+                        else {
+                            v0 = permutation[i] ^ ((v >> 8) & 255);
+                        }
+                        p[i] = p[i + 256] = v0;
+                    }
+                },
+                enumerable: true,
+                configurable: true
+            });
+            return Noise;
+        }());
+        framework.Noise = Noise;
+        function createGrad(n) {
+            if (createGradCache[n])
+                return createGradCache[n];
+            var gradBase = createGradBase(n - 1);
+            var grad = [];
+            if (n > 1) {
+                for (var i = n - 1; i >= 0; i--) {
+                    for (var j = 0; j < gradBase.length; j++) {
+                        var item = gradBase[j].concat();
+                        item.splice(i, 0, 0);
+                        grad.push(item);
+                    }
+                }
+            }
+            else {
+                grad = gradBase;
+            }
+            createGradCache[n] = grad;
+            return grad;
+        }
+        framework.createGrad = createGrad;
+        var createGradCache = {};
+        function createGradBase(n) {
+            if (n < 2)
+                return [
+                    [1], [-1],
+                ];
+            var grad = createGradBase(n - 1);
+            for (var i = 0, len = grad.length; i < len; i++) {
+                var item = grad[i];
+                grad[i] = item.concat(1);
+                grad[i + len] = item.concat(-1);
+            }
+            return grad;
+        }
+        function getBits(n) {
+            if (getBitsChace[n])
+                return getBitsChace[n];
+            if (n < 2)
+                return [
+                    [0], [1],
+                ];
+            var grad = getBits(n - 1);
+            for (var i = 0, len = grad.length; i < len; i++) {
+                var item = grad[i];
+                grad[i] = item.concat(0);
+                grad[i + len] = item.concat(1);
+            }
+            getBitsChace[n] = grad;
+            return grad;
+        }
+        framework.getBits = getBits;
+        var getBitsChace = {};
+        var grad1 = [
+            [1], [-1],
+        ];
+        var grad2 = [
+            [1, 0], [-1, 0],
+            [0, 1], [0, -1],
+        ];
+        var grad3 = [
+            [1, 1, 0], [-1, 1, 0], [1, -1, 0], [-1, -1, 0],
+            [1, 0, 1], [-1, 0, 1], [1, 0, -1], [-1, 0, -1],
+            [0, 1, 1], [0, -1, 1], [0, 1, -1], [0, -1, -1]
+        ];
+        var permutation = [
+            151, 160, 137, 91, 90, 15,
+            131, 13, 201, 95, 96, 53, 194, 233, 7, 225, 140, 36, 103, 30, 69, 142, 8, 99, 37, 240, 21, 10, 23,
+            190, 6, 148, 247, 120, 234, 75, 0, 26, 197, 62, 94, 252, 219, 203, 117, 35, 11, 32, 57, 177, 33,
+            88, 237, 149, 56, 87, 174, 20, 125, 136, 171, 168, 68, 175, 74, 165, 71, 134, 139, 48, 27, 166,
+            77, 146, 158, 231, 83, 111, 229, 122, 60, 211, 133, 230, 220, 105, 92, 41, 55, 46, 245, 40, 244,
+            102, 143, 54, 65, 25, 63, 161, 1, 216, 80, 73, 209, 76, 132, 187, 208, 89, 18, 169, 200, 196,
+            135, 130, 116, 188, 159, 86, 164, 100, 109, 198, 173, 186, 3, 64, 52, 217, 226, 250, 124, 123,
+            5, 202, 38, 147, 118, 126, 255, 82, 85, 212, 207, 206, 59, 227, 47, 16, 58, 17, 182, 189, 28, 42,
+            223, 183, 170, 213, 119, 248, 152, 2, 44, 154, 163, 70, 221, 153, 101, 155, 167, 43, 172, 9,
+            129, 22, 39, 253, 19, 98, 108, 110, 79, 113, 224, 232, 178, 185, 112, 104, 218, 246, 97, 228,
+            251, 34, 242, 193, 238, 210, 144, 12, 191, 179, 162, 241, 81, 51, 145, 235, 249, 14, 239, 107,
+            49, 192, 214, 31, 181, 199, 106, 157, 184, 84, 204, 176, 115, 121, 50, 45, 127, 4, 150, 254,
+            138, 236, 205, 93, 222, 114, 67, 29, 24, 72, 243, 141, 128, 195, 78, 66, 215, 61, 156, 180
+        ];
+        function dot(g, x, y, z) {
+            return g[0] * x + g[1] * y + g[2] * z;
+        }
+        function dot2(g, x, y) {
+            return g[0] * x + g[1] * y;
+        }
+        function dot1(g, x) {
+            return g[0] * x;
+        }
+        function mix(a, b, t) {
+            return (1 - t) * a + t * b;
+        }
+        function fade(t) {
+            return t * t * t * (t * (t * 6 - 15) + 10);
+        }
+        framework.noise = new Noise();
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
     var math;
     (function (math) {
         var RotationOrder;
@@ -32113,6 +32377,7 @@ var gd3d;
                 this.sizeBySpeed = new framework.ParticleSizeBySpeedModule();
                 this.rotationOverLifetime = new framework.ParticleRotationOverLifetimeModule();
                 this.rotationBySpeed = new framework.ParticleRotationBySpeedModule();
+                this.noise = new framework.ParticleNoiseModule();
                 this.textureSheetAnimation = new framework.ParticleTextureSheetAnimationModule();
                 this.main.enabled = true;
                 this.emission.enabled = true;
@@ -32287,6 +32552,16 @@ var gd3d;
                     framework.ArrayUtil.replace(this._modules, this._rotationBySpeed, v);
                     v.particleSystem = this;
                     this._rotationBySpeed = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleSystem.prototype, "noise", {
+                get: function () { return this._noise; },
+                set: function (v) {
+                    framework.ArrayUtil.replace(this._modules, this._noise, v);
+                    v.particleSystem = this;
+                    this._noise = v;
                 },
                 enumerable: true,
                 configurable: true
@@ -32682,6 +32957,42 @@ var gd3d;
                     });
                 }
             };
+            ParticleSystem.prototype.addParticlePosition = function (particle, position, space, name) {
+                if (name != undefined) {
+                    this.removeParticleVelocity(particle, name);
+                    particle.cache[name] = { value: new gd3d.math.vector3(position.x, position.y, position.z), space: space };
+                }
+                if (space != this.main.simulationSpace) {
+                    if (space == framework.ParticleSystemSimulationSpace.World) {
+                        gd3d.math.matrixTransformVector3(position, this.worldToLocalMatrix, position);
+                    }
+                    else {
+                        gd3d.math.matrixTransformVector3(position, this.localToWorldMatrix, position);
+                    }
+                }
+                particle.position.x += position.x;
+                particle.position.y += position.y;
+                particle.position.z += position.z;
+            };
+            ParticleSystem.prototype.removeParticlePosition = function (particle, name) {
+                var obj = particle.cache[name];
+                if (obj) {
+                    delete particle.cache[name];
+                    var space = obj.space;
+                    var value = obj.value;
+                    if (space != this.main.simulationSpace) {
+                        if (space == framework.ParticleSystemSimulationSpace.World) {
+                            gd3d.math.matrixTransformVector3(value, this.worldToLocalMatrix, value);
+                        }
+                        else {
+                            gd3d.math.matrixTransformVector3(value, this.localToWorldMatrix, value);
+                        }
+                    }
+                    particle.position.x -= value.x;
+                    particle.position.y -= value.y;
+                    particle.position.z -= value.z;
+                }
+            };
             ParticleSystem.prototype.addParticleVelocity = function (particle, velocity, space, name) {
                 if (name != undefined) {
                     this.removeParticleVelocity(particle, name);
@@ -32894,6 +33205,18 @@ var gd3d;
             ParticleSystemMeshShapeType[ParticleSystemMeshShapeType["Edge"] = 1] = "Edge";
             ParticleSystemMeshShapeType[ParticleSystemMeshShapeType["Triangle"] = 2] = "Triangle";
         })(ParticleSystemMeshShapeType = framework.ParticleSystemMeshShapeType || (framework.ParticleSystemMeshShapeType = {}));
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleSystemNoiseQuality;
+        (function (ParticleSystemNoiseQuality) {
+            ParticleSystemNoiseQuality[ParticleSystemNoiseQuality["Low"] = 0] = "Low";
+            ParticleSystemNoiseQuality[ParticleSystemNoiseQuality["Medium"] = 1] = "Medium";
+            ParticleSystemNoiseQuality[ParticleSystemNoiseQuality["High"] = 2] = "High";
+        })(ParticleSystemNoiseQuality = framework.ParticleSystemNoiseQuality || (framework.ParticleSystemNoiseQuality = {}));
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -33687,6 +34010,248 @@ var gd3d;
         framework.ParticleMainModule = ParticleMainModule;
         var world_gravity = new gd3d.math.vector3(0, -9.8, 0);
         var _Main_preGravity = "_Main_preGravity";
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var ParticleNoiseModule = (function (_super) {
+            __extends(ParticleNoiseModule, _super);
+            function ParticleNoiseModule() {
+                var _this = _super !== null && _super.apply(this, arguments) || this;
+                _this.separateAxes = false;
+                _this.strength3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), { xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 }, yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 }, zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 } });
+                _this.frequency = 0.5;
+                _this.scrollSpeed = new framework.MinMaxCurve();
+                _this.damping = true;
+                _this.octaveCount = 1;
+                _this.octaveMultiplier = 0.5;
+                _this.octaveScale = 2;
+                _this.quality = framework.ParticleSystemNoiseQuality.High;
+                _this.remapEnabled = false;
+                _this.remap3D = framework.serialization.setValue(new framework.MinMaxCurveVector3(), {
+                    xCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 },
+                    yCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 },
+                    zCurve: { between0And1: true, constant: 1, constantMin: 1, constantMax: 1, curveMultiplier: 1 }
+                });
+                _this._scrollValue = 0;
+                return _this;
+            }
+            Object.defineProperty(ParticleNoiseModule.prototype, "strength", {
+                get: function () {
+                    return this.strength3D.xCurve;
+                },
+                set: function (v) {
+                    this.strength3D.xCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleNoiseModule.prototype, "strengthX", {
+                get: function () {
+                    return this.strength3D.xCurve;
+                },
+                set: function (v) {
+                    this.strength3D.xCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleNoiseModule.prototype, "strengthY", {
+                get: function () {
+                    return this.strength3D.yCurve;
+                },
+                set: function (v) {
+                    this.strength3D.yCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleNoiseModule.prototype, "strengthZ", {
+                get: function () {
+                    return this.strength3D.zCurve;
+                },
+                set: function (v) {
+                    this.strength3D.zCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleNoiseModule.prototype, "remap", {
+                get: function () {
+                    return this.remap3D.xCurve;
+                },
+                set: function (v) {
+                    this.remap3D.xCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleNoiseModule.prototype, "remapX", {
+                get: function () {
+                    return this.remap3D.xCurve;
+                },
+                set: function (v) {
+                    this.remap3D.xCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleNoiseModule.prototype, "remapY", {
+                get: function () {
+                    return this.remap3D.yCurve;
+                },
+                set: function (v) {
+                    this.remap3D.yCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            Object.defineProperty(ParticleNoiseModule.prototype, "remapZ", {
+                get: function () {
+                    return this.remap3D.zCurve;
+                },
+                set: function (v) {
+                    this.remap3D.zCurve = v;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ParticleNoiseModule.prototype.initParticleState = function (particle) {
+                particle[_Noise_strength_rate] = Math.random();
+                particle[_Noise_particle_rate] = Math.random();
+            };
+            ParticleNoiseModule.prototype.updateParticleState = function (particle) {
+                this.particleSystem.removeParticlePosition(particle, _Noise_preOffset);
+                if (!this.enabled)
+                    return;
+                var strengthX = 1;
+                var strengthY = 1;
+                var strengthZ = 1;
+                if (this.separateAxes) {
+                    var strength3D = this.strength3D.getValue(particle.rateAtLifeTime, particle[_Noise_strength_rate]);
+                    strengthX = strength3D.x;
+                    strengthY = strength3D.y;
+                    strengthZ = strength3D.z;
+                }
+                else {
+                    strengthX = strengthY = strengthZ = this.strength.getValue(particle.rateAtLifeTime, particle[_Noise_strength_rate]);
+                }
+                var frequency = ParticleNoiseModule._frequencyScale * this.frequency;
+                var offsetPos = new gd3d.math.vector3(strengthX, strengthY, strengthZ);
+                offsetPos.x *= ParticleNoiseModule._strengthScale;
+                offsetPos.y *= ParticleNoiseModule._strengthScale;
+                offsetPos.z *= ParticleNoiseModule._strengthScale;
+                if (this.damping) {
+                    offsetPos.x = offsetPos.x / this.frequency;
+                    offsetPos.y = offsetPos.y / this.frequency;
+                    offsetPos.z = offsetPos.z / this.frequency;
+                }
+                var time = particle.rateAtLifeTime * ParticleNoiseModule._timeScale % 1;
+                offsetPos.x *= this._getNoiseValue((1 / 3 * 0 + time) * frequency, particle[_Noise_particle_rate] * frequency);
+                offsetPos.y *= this._getNoiseValue((1 / 3 * 1 + time) * frequency, particle[_Noise_particle_rate] * frequency);
+                offsetPos.z *= this._getNoiseValue((1 / 3 * 2 + time) * frequency, particle[_Noise_particle_rate] * frequency);
+                this.particleSystem.addParticlePosition(particle, offsetPos, this.particleSystem.main.simulationSpace, _Noise_preOffset);
+            };
+            ParticleNoiseModule.prototype.drawImage = function (image) {
+                var strength = this._getDrawImageStrength();
+                var strengthX = strength.x;
+                var strengthY = strength.y;
+                var strengthZ = strength.z;
+                strengthX *= ParticleNoiseModule._strengthScale;
+                strengthY *= ParticleNoiseModule._strengthScale;
+                strengthZ *= ParticleNoiseModule._strengthScale;
+                if (this.damping) {
+                    strengthX /= this.frequency;
+                    strengthY /= this.frequency;
+                    strengthZ /= this.frequency;
+                }
+                var frequency = ParticleNoiseModule._frequencyScale * this.frequency;
+                var data = image.data;
+                var imageWidth = image.width;
+                var imageHeight = image.height;
+                for (var x = 0; x < imageWidth; x++) {
+                    for (var y = 0; y < imageHeight; y++) {
+                        var xv = x / imageWidth * frequency;
+                        var yv = 1 - y / imageHeight * frequency;
+                        var value = this._getNoiseValue(xv, yv);
+                        if (xv < 1 / 3)
+                            value = (value * strengthX + 1) / 2 * 256;
+                        else if (xv < 2 / 3)
+                            value = (value * strengthY + 1) / 2 * 256;
+                        else
+                            value = (value * strengthZ + 1) / 2 * 256;
+                        var cell = (x + y * imageWidth) * 4;
+                        data[cell] = data[cell + 1] = data[cell + 2] = Math.floor(value);
+                        data[cell + 3] = 255;
+                    }
+                }
+            };
+            ParticleNoiseModule.prototype._getDrawImageStrength = function () {
+                var strengthX = 1;
+                var strengthY = 1;
+                var strengthZ = 1;
+                if (this.separateAxes) {
+                    if (this.strengthX.mode == framework.MinMaxCurveMode.Curve || this.strengthX.mode == framework.MinMaxCurveMode.TwoCurves)
+                        strengthX = this.strengthX.curveMultiplier;
+                    else if (this.strengthX.mode == framework.MinMaxCurveMode.Constant)
+                        strengthX = this.strengthX.constant;
+                    else if (this.strengthX.mode == framework.MinMaxCurveMode.TwoConstants)
+                        strengthX = this.strengthX.constantMax;
+                    if (this.strengthY.mode == framework.MinMaxCurveMode.Curve || this.strengthY.mode == framework.MinMaxCurveMode.TwoCurves)
+                        strengthY = this.strengthY.curveMultiplier;
+                    else if (this.strengthY.mode == framework.MinMaxCurveMode.Constant)
+                        strengthY = this.strengthY.constant;
+                    else if (this.strengthY.mode == framework.MinMaxCurveMode.TwoConstants)
+                        strengthY = this.strengthY.constantMax;
+                    if (this.strengthZ.mode == framework.MinMaxCurveMode.Curve || this.strengthZ.mode == framework.MinMaxCurveMode.TwoCurves)
+                        strengthZ = this.strengthZ.curveMultiplier;
+                    else if (this.strengthZ.mode == framework.MinMaxCurveMode.Constant)
+                        strengthZ = this.strengthZ.constant;
+                    else if (this.strengthZ.mode == framework.MinMaxCurveMode.TwoConstants)
+                        strengthZ = this.strengthZ.constantMax;
+                }
+                else {
+                    if (this.strength.mode == framework.MinMaxCurveMode.Curve || this.strength.mode == framework.MinMaxCurveMode.TwoCurves)
+                        strengthX = strengthY = strengthZ = this.strength.curveMultiplier;
+                    else if (this.strength.mode == framework.MinMaxCurveMode.Constant)
+                        strengthX = strengthY = strengthZ = this.strength.constant;
+                    else if (this.strength.mode == framework.MinMaxCurveMode.TwoConstants)
+                        strengthX = strengthY = strengthZ = this.strength.constantMax;
+                }
+                return { x: strengthX, y: strengthY, z: strengthZ };
+            };
+            ParticleNoiseModule.prototype._getNoiseValue = function (x, y) {
+                var value = this._getNoiseValueBase(x, y);
+                for (var l = 1, ln = this.octaveCount; l < ln; l++) {
+                    var value0 = this._getNoiseValueBase(x * this.octaveScale, y * this.octaveScale);
+                    value += (value0 - value) * this.octaveMultiplier;
+                }
+                return value;
+            };
+            ParticleNoiseModule.prototype._getNoiseValueBase = function (x, y) {
+                var scrollValue = this._scrollValue;
+                if (this.quality == framework.ParticleSystemNoiseQuality.Low) {
+                    return framework.noise.perlin1(x + scrollValue);
+                }
+                if (this.quality == framework.ParticleSystemNoiseQuality.Medium) {
+                    return framework.noise.perlin2(x, y + scrollValue);
+                }
+                return framework.noise.perlin3(x, y, scrollValue);
+            };
+            ParticleNoiseModule.prototype.update = function (interval) {
+                this._scrollValue += this.scrollSpeed.getValue(this.particleSystem.rateAtDuration) * interval / 1000;
+            };
+            ParticleNoiseModule._frequencyScale = 5;
+            ParticleNoiseModule._strengthScale = 0.3;
+            ParticleNoiseModule._timeScale = 5;
+            return ParticleNoiseModule;
+        }(framework.ParticleModule));
+        framework.ParticleNoiseModule = ParticleNoiseModule;
+        var _Noise_strength_rate = "_Noise_strength_rate";
+        var _Noise_particle_rate = "_Noise_particle_rate";
+        var _Noise_preOffset = "_Noise_preOffset";
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -34664,7 +35229,7 @@ var gd3d;
         var ParticleEmissionBurst = (function () {
             function ParticleEmissionBurst() {
                 this.time = 0;
-                this.count = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 30, constantMin: 30, constantMax: 30 });
+                this.count = framework.serialization.setValue(new framework.MinMaxCurve(), { constant: 30, constantMin: 30, constantMax: 30, mode: framework.MinMaxCurveMode.TwoConstants });
                 this.cycleCount = 1;
                 this.repeatInterval = 0.01;
                 this.probability = 1.0;
@@ -34769,9 +35334,9 @@ var gd3d;
                 configurable: true
             });
             ParticleSystemShapeBox.prototype.calcParticlePosDir = function (particle, position, dir) {
-                position.x = this.boxX * (Math.random() * 2 - 1);
-                position.y = this.boxY * (Math.random() * 2 - 1);
-                position.z = this.boxZ * (Math.random() * 2 - 1);
+                position.x = Math.random() * 2 - 1;
+                position.y = Math.random() * 2 - 1;
+                position.z = Math.random() * 2 - 1;
                 if (this.emitFrom == ParticleSystemShapeBoxEmitFrom.Shell) {
                     var max = Math.max(Math.abs(position.x), Math.abs(position.y), Math.abs(position.z));
                     if (Math.abs(position.x) == max) {
@@ -34799,9 +35364,10 @@ var gd3d;
                         position.y = position.y < 0 ? -1 : 1;
                     }
                 }
-                particle.position.x = position.x;
-                particle.position.y = position.y;
-                particle.position.z = position.z;
+                var scale = 0.5;
+                position.x = position.x * this.boxX * scale;
+                position.y = position.y * this.boxY * scale;
+                position.z = position.z * this.boxZ * scale;
                 dir.x = 0;
                 dir.y = 0;
                 dir.z = 1;

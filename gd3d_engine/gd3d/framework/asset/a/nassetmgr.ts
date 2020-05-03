@@ -117,6 +117,7 @@ namespace gd3d.framework
             case e.TextAsset:
             case e.TextureDesc:
             case e.PackTxt:
+            case e.ParticleSystem:
                 return "text";
             case e.Aniclip:
             case e.DDS:
