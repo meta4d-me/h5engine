@@ -20388,7 +20388,7 @@ var gd3d;
                 return Math.floor(maxrate * maxlife + burstCount + 2);
             };
             F14EmissionBatch.prototype.render = function (context, assetmgr, camera, Effqueue) {
-                if (!this.mat)
+                if (!this.mat || !this.mat.setQueue)
                     return;
                 if (this.emission.baseddata.simulateInLocalSpace) {
                     gd3d.math.matrixClone(this.effect.mvpMat, context.matrixModelViewProject);
