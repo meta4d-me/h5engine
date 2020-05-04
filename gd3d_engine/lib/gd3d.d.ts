@@ -1702,6 +1702,7 @@ declare namespace gd3d.framework {
             [id: string]: shader;
         };
         static initGuidList(): void;
+        static setLoading(guid: number, data: any): void;
         load(url: string, type?: AssetTypeEnum, onstate?: loadCallback, downloadFinish?: () => void): void;
         static setStateError(state: stateLoad, onstate: (state?: stateLoad) => void, err: Error): void;
         download(guid: number, url: string, type: AssetTypeEnum, finish: () => void, errcb?: (err: Error) => void, bundle?: assetBundle): void;

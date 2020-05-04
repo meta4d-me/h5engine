@@ -105,6 +105,8 @@ namespace gd3d.framework
 
         public render(context: renderContext, assetmgr: assetMgr, camera: camera,Effqueue:number)
         {
+            if(!this.mat)
+                return;
             //gd3d.math.matrixMultiply(this.effect.mvpMat,gd3d.math.pool.identityMat, context.matrixModelViewProject);
             if(this.emission.baseddata.simulateInLocalSpace)
             {
