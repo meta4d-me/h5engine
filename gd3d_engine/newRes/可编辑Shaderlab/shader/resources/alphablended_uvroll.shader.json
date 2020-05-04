@@ -10,20 +10,20 @@
   "passes": {
     "base": [
       {
-        "blendmode": "add",
+        "blendmode": "blend",
         "showface": "all",
         "zwrite": "off",
-        "vs": "particlesystem",
-        "fs": "particlesystem"
+        "vs": "additive_uvroll",
+        "fs": "additive_uvroll"
       }
     ],
     "base_fog": [
       {
-        "blendmode": "add",
+        "blendmode": "blend",
         "showface": "all",
         "zwrite": "off",
-        "vs": "particlesystem",
-        "fs": "particlesystem"
+        "vs": "additive_uvroll",
+        "fs": "additive_uvroll"
       }
     ],
     "shadowgen": [],

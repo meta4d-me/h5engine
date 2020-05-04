@@ -10,6 +10,10 @@ uniform mat4 glstate_matrix_mvp;
 
 uniform vec4 _MainTex_ST;
 
+uniform float _UVSpeedX;
+uniform float _UVSpeedY;
+uniform float glstate_timer;
+
 varying vec4 v_color;
 varying vec2 v_uv;
 
@@ -96,6 +100,8 @@ void main()
     v_uv = _glesMultiTexCoord0.xy * _MainTex_ST.xy + _MainTex_ST.zw;
 
     position = particleAnimation(position);
+
+    v_uv = v_uv + vec2(_UVSpeedX,_UVSpeedY) * glstate_timer;
 
     //计算投影坐标
     gl_Position = glstate_matrix_mvp * position;
