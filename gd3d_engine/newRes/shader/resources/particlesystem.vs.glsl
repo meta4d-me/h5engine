@@ -4,7 +4,6 @@ precision mediump float;
 //坐标属性
 attribute vec3 _glesVertex;
 attribute vec2 _glesMultiTexCoord0;
-attribute vec4 _glesColor;
 
 uniform mat4 glstate_matrix_mvp;
 
@@ -84,7 +83,7 @@ vec4 particleAnimation(vec4 position)
     position.xyz = position.xyz + a_particle_position.xyz;
 
     // 颜色
-    v_color = a_particle_color * _glesColor;
+    v_color = a_particle_color;
 
     if(a_particle_flipUV.x > 0.5) v_uv.x = 1.0 - v_uv.x;
     if(a_particle_flipUV.y > 0.5) v_uv.y = 1.0 - v_uv.y;
