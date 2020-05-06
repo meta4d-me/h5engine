@@ -8704,10 +8704,7 @@ var gd3d;
                                 var fsize = reader.readUInt32();
                                 var bin = reader.readBytesRef(fsize);
                                 var guid = this.files[name] || this.texs[name];
-                                framework.assetMgr.mapLoading[guid] = {
-                                    readyok: true,
-                                    data: bin.buffer
-                                };
+                                framework.assetMgr.setLoading(guid, { readyok: true, data: bin.buffer });
                                 pkgld.subRes.push(guid);
                             }
                         }
@@ -8720,10 +8717,7 @@ var gd3d;
                             var json = JSON.parse(pkgld.data);
                             for (var k in json) {
                                 var guid = this.files[k];
-                                framework.assetMgr.mapLoading[guid] = {
-                                    readyok: true,
-                                    data: json[k]
-                                };
+                                framework.assetMgr.setLoading(guid, { readyok: true, data: json[k] });
                                 pkgld.subRes.push(guid);
                             }
                         }
@@ -8971,6 +8965,9 @@ var gd3d;
                         assetMgr.onGuidInit();
                 });
             };
+            assetMgr.setLoading = function (guid, data) {
+                assetMgr.mapLoading[guid] = data;
+            };
             assetMgr.prototype.load = function (url, type, onstate, downloadFinish) {
                 var _this_1 = this;
                 if (type === void 0) { type = framework.AssetTypeEnum.Auto; }
@@ -9056,8 +9053,10 @@ var gd3d;
                 var loading = assetMgr.mapLoading[guid];
                 if (loading && loading.readyok && finish)
                     return finish();
-                else if (!loading)
-                    assetMgr.mapLoading[guid] = loading = { readyok: false, url: url };
+                else if (!loading) {
+                    loading = { readyok: false, url: url };
+                    assetMgr.setLoading(guid, loading);
+                }
                 if (type == framework.AssetTypeEnum.Texture) {
                     loading.cbQueue = [];
                     this.loadImg(guid, url, function (img) {
@@ -9081,7 +9080,8 @@ var gd3d;
                             console.error("\u8D44\u6E90\u4E0B\u8F7D\u53D6\u6D88:" + url + " , bundle:" + bundle.name + " \u5DF2\u91CA\u653E");
                             return;
                         }
-                        loading = assetMgr.mapLoading[guid] = { readyok: true };
+                        loading = { readyok: true };
+                        assetMgr.setLoading(guid, loading);
                     }
                     else {
                         loading.readyok = true;
@@ -9094,8 +9094,10 @@ var gd3d;
                 if (assetMgr.mapImage[guid])
                     return cb(assetMgr.mapImage[guid]);
                 var loading = assetMgr.mapLoading[guid];
-                if (!loading)
-                    loading = assetMgr.mapLoading[guid] = { readyok: false, cbQueue: [] };
+                if (!loading) {
+                    loading = { readyok: false, cbQueue: [] };
+                    assetMgr.setLoading(guid, loading);
+                }
                 loading.cbQueue.push(cb);
                 this._loadImg(url, function (img) {
                     if (bundle && bundle.isunload == true) {
@@ -20386,6 +20388,8 @@ var gd3d;
                 return Math.floor(maxrate * maxlife + burstCount + 2);
             };
             F14EmissionBatch.prototype.render = function (context, assetmgr, camera, Effqueue) {
+                if (!this.mat || !this.mat.setQueue)
+                    return;
                 if (this.emission.baseddata.simulateInLocalSpace) {
                     gd3d.math.matrixClone(this.effect.mvpMat, context.matrixModelViewProject);
                 }

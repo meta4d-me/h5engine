@@ -13,8 +13,8 @@
         "blendmode": "blend",
         "showface": "all",
         "zwrite": "off",
-        "vs": "particlesystem",
-        "fs": "particlesystem"
+        "vs": "additive_uvroll",
+        "fs": "additive_uvroll"
       }
     ],
     "base_fog": [
@@ -22,27 +22,12 @@
         "blendmode": "blend",
         "showface": "all",
         "zwrite": "off",
-        "vs": "particlesystem",
-        "fs": "particlesystem"
+        "vs": "additive_uvroll",
+        "fs": "additive_uvroll"
       }
     ],
-    "instance": [
-      {
-        "blendmode": "blend",
-        "showface": "all",
-        "zwrite": "off",
-        "vs": "particlesystem",
-        "fs": "particlesystem"
-      }
-    ],
-    "instance_fog": [
-      {
-        "blendmode": "blend",
-        "showface": "all",
-        "zwrite": "off",
-        "vs": "particlesystem",
-        "fs": "particlesystem"
-      }
-    ]
+    "shadowgen": [],
+    "bone": [],
+    "shadowuse": []
   }
 }

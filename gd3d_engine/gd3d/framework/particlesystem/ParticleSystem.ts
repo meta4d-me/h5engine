@@ -637,7 +637,8 @@ namespace gd3d.framework
                         },
                     };
 
-                    this.material.draw(context, mesh, subMeshs[0], "base", drawInstanceInfo);
+                    let drawtype = meshRenderer.instanceDrawType(context);
+                    this.material.draw(context, mesh, subMeshs[0], drawtype, drawInstanceInfo);
                 }
             }
         }
