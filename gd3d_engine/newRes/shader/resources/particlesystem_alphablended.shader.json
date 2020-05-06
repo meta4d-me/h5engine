@@ -26,8 +26,23 @@
         "fs": "particlesystem"
       }
     ],
-    "shadowgen": [],
-    "bone": [],
-    "shadowuse": []
+    "instance": [
+      {
+        "blendmode": "blend",
+        "showface": "all",
+        "zwrite": "off",
+        "vs": "particlesystem",
+        "fs": "particlesystem"
+      }
+    ],
+    "instance_fog": [
+      {
+        "blendmode": "blend",
+        "showface": "all",
+        "zwrite": "off",
+        "vs": "particlesystem",
+        "fs": "particlesystem"
+      }
+    ]
   }
 }
