@@ -241,7 +241,7 @@ namespace gd3d.framework
                 let sm = subMeshs[i];
                 let mid = subMeshs[i].matIndex;//根据这个找到使用的具体哪个材质    
                 let usemat = mr.materials[mid];
-                let drawtype = this.instanceDrawType(context,mr,sm);
+                let drawtype = this.instanceDrawType(context);
                 let vbo = this._getVBO(context.webgl);
                 let drawInstanceInfo: DrawInstanceInfo = {
                     instanceCount: insLen,
@@ -315,7 +315,7 @@ namespace gd3d.framework
             }
         }
 
-        private static instanceDrawType(context : renderContext , mr : meshRenderer ,  _subMeshInfo : subMeshInfo){
+        static instanceDrawType(context : renderContext){
             let drawtype = "instance";
             //fog
             let _fog = gd3d.framework.sceneMgr.scene.fog;
