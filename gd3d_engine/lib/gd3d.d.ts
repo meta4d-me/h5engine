@@ -6070,7 +6070,7 @@ declare namespace gd3d.framework {
         static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera, instanceArray: IRendererGpuIns[]): void;
         private static readonly insOffsetMatrixStr;
         private static setInstanceOffsetMatrix;
-        private static instanceDrawType;
+        static instanceDrawType(context: renderContext): string;
         private static _vbos;
         private static _getVBO;
         isGpuInstancing(): boolean;
@@ -13920,6 +13920,12 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         queue: number;
+        /**
+         * Biases Particle System sorting amongst other transparencies.
+         *
+         * Use lower (negative) numbers to prioritize the Particle System to draw closer to the front, and use higher numbers to prioritize other transparent objects.
+         */
+        sortingFudge: number;
         readonly transform: transform;
         /**
          * Is the particle system playing right now ?
