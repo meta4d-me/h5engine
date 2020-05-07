@@ -1173,8 +1173,11 @@ namespace gd3d.framework
                         list.sort((a, b) =>
                         {
                             if (a.queue != b.queue)
-                            {
+                            {                                
                                 return a.queue - b.queue;
+                            }else if(a instanceof ParticleSystem && b instanceof ParticleSystem)
+                            {
+                                return b.sortingFudge - a.sortingFudge;
                             }
                             else
                             {

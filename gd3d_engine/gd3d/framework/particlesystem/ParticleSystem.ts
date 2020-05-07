@@ -46,6 +46,13 @@ namespace gd3d.framework
          */
         queue: number = 0;
 
+        /**
+         * Biases Particle System sorting amongst other transparencies.
+         * 
+         * Use lower (negative) numbers to prioritize the Particle System to draw closer to the front, and use higher numbers to prioritize other transparent objects.
+         */
+        sortingFudge = 0;
+
         get transform()
         {
             return this.gameObject && this.gameObject.transform;
