@@ -4188,6 +4188,8 @@ var test_GPU_instancing = (function () {
         this.createCount = 500;
         this.mats = [];
         this.isInstancing = true;
+        this.isStatic = true;
+        this.count = 0;
     }
     test_GPU_instancing.prototype.start = function (app) {
         return __awaiter(this, void 0, void 0, function () {
@@ -4224,6 +4226,7 @@ var test_GPU_instancing = (function () {
                         app.showFps();
                         _dat = new dat.GUI();
                         _dat.add(this, 'isInstancing');
+                        _dat.add(this, 'isStatic');
                         _dat.add(this, 'createCount');
                         _dat.add(this, 'refresh');
                         return [2];
@@ -4258,6 +4261,8 @@ var test_GPU_instancing = (function () {
     };
     test_GPU_instancing.prototype.createOne = function (app, needInstance) {
         var obj = gd3d.framework.TransformUtil.CreatePrimitive(gd3d.framework.PrimitiveType.Cube, app);
+        obj.gameObject.isStatic = this.isStatic;
+        obj.name = "cube_" + ++this.count;
         this.cubeRoot.addChild(obj);
         var range = 10;
         gd3d.math.vec3Set(obj.localPosition, this.getRandom(range), this.getRandom(range), this.getRandom(range));

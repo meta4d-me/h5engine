@@ -641,12 +641,14 @@ declare class test_GPU_instancing implements IState {
     private instanceShBase;
     private mats;
     private isInstancing;
+    private isStatic;
     private cubeRoot;
     start(app: gd3d.framework.application): Promise<void>;
     refresh(): void;
     createByNum(num: number): void;
     instanceSwitch(): void;
     initMaterails(): void;
+    private count;
     createOne(app: any, needInstance: boolean): void;
     private getRandom;
     update(delta: number): void;
