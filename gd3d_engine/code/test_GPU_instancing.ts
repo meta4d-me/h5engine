@@ -9,6 +9,7 @@ class test_GPU_instancing implements IState
     private instanceShBase : gd3d.framework.shader;
     private mats : gd3d.framework.material[] =[];
     private isInstancing = true;
+    private isStatic = true;
     private cubeRoot : gd3d.framework.transform;
     async start(app: gd3d.framework.application)
     {
@@ -48,6 +49,7 @@ class test_GPU_instancing implements IState
         //set datui
         let _dat = new dat.GUI();
         _dat.add(this , 'isInstancing');
+        _dat.add(this , 'isStatic');
         _dat.add(this , 'createCount');
         _dat.add(this , 'refresh');
 
@@ -81,9 +83,12 @@ class test_GPU_instancing implements IState
        this._mat_ins.setShader(this.instanceShBase);
     }
 
+    private count = 0;
     createOne(app , needInstance : boolean )
     {
         let obj = gd3d.framework.TransformUtil.CreatePrimitive(gd3d.framework.PrimitiveType.Cube, app);
+        obj.gameObject.isStatic = this.isStatic;
+        obj.name = `cube_${++this.count}`;
         this.cubeRoot.addChild(obj);
         let range = 10;
         gd3d.math.vec3Set(obj.localPosition, this.getRandom(range), this.getRandom(range), this.getRandom(range));
