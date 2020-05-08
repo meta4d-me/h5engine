@@ -17157,6 +17157,10 @@ var gd3d;
             }
             AssetFactory_ParticleSystem.prototype.parse = function (assetmgr, bundle, name, txt) {
                 var data = framework.ParticleSystemData.get(name);
+                if (!data) {
+                    data = new framework.ParticleSystemData();
+                    data.value = name;
+                }
                 data.setData(txt);
                 return data;
             };
