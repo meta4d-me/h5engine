@@ -174,6 +174,13 @@ namespace gd3d.framework
             });
         }
 
+        static setLoading(guid: number, data: any)
+        {
+            // let loading = assetMgr.mapLoading[guid];
+            // if (loading && loading.readyok)
+            //     throw new Error(`冲突的guid:${guid}`);
+            assetMgr.mapLoading[guid] = data;
+        }
         //加载资源
         load(url: string, type: AssetTypeEnum = AssetTypeEnum.Auto,
             /** 这是解析完成的回调 */
@@ -284,7 +291,10 @@ namespace gd3d.framework
             if (loading && loading.readyok && finish)
                 return finish();
             else if (!loading)
-                assetMgr.mapLoading[guid] = loading = { readyok: false, url: url };
+            {
+                loading = { readyok: false, url: url };
+                assetMgr.setLoading(guid, loading);
+            }
 
             if (type == AssetTypeEnum.Texture)
             {
@@ -317,7 +327,8 @@ namespace gd3d.framework
                         console.error(`资源下载取消:${url} , bundle:${bundle.name} 已释放`);
                         return;
                     }
-                    loading = assetMgr.mapLoading[guid] = { readyok: true };
+                    loading = { readyok: true };
+                    assetMgr.setLoading(guid, loading);
                 } else
                 {
                     loading.readyok = true;
@@ -335,7 +346,10 @@ namespace gd3d.framework
 
             let loading = assetMgr.mapLoading[guid];
             if (!loading)
-                loading = assetMgr.mapLoading[guid] = { readyok: false, cbQueue: [] }
+            {
+                loading = { readyok: false, cbQueue: [] };
+                assetMgr.setLoading(guid, loading);
+            }
             loading.cbQueue.push(cb);
             this._loadImg(url, (img) =>
             {
@@ -408,6 +422,7 @@ namespace gd3d.framework
             }
         }
 
+
         parseRes(asset: { guid: number, type: number, name: string, dwguid?: number }, bundle?: assetBundle)
         {
             return new Promise<IAsset>((resolve, reject) =>
@@ -427,7 +442,7 @@ namespace gd3d.framework
                     return reject(new Error(`无法找到[${AssetTypeEnum[asset.type]}]的解析器`));
                 if (!factory.parse)
                     return reject(new Error(`解析器 ${factory.constructor.name} 没有实现parse方法`));
-                
+
                 let _this = this;
                 function nextRes(retasset)
                 {
@@ -447,9 +462,10 @@ namespace gd3d.framework
                     }
                     resolve(retasset);
                 }
-                try {
-                    let __asset: any = factory.parse(this, bundle, asset.name, data, asset.dwguid);                   
-                  
+                try
+                {
+                    let __asset: any = factory.parse(this, bundle, asset.name, data, asset.dwguid);
+
                     let retasset: IAsset = __asset;
                     // if (__asset instanceof threading.gdPromise){
                     if (__asset && __asset["then"])
@@ -464,7 +480,8 @@ namespace gd3d.framework
                         // console.error(`[解析资源] await 完成 ${asset.name}`);
                     } else
                         nextRes(retasset);
-                } catch (error) {
+                } catch (error)
+                {
                     console.error(`资源解析错误:${error.message}\n${error.stack}`);
                     reject(error);
                 }

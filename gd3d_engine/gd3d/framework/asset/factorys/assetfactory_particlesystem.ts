@@ -8,6 +8,11 @@ namespace gd3d.framework
 
             var data = ParticleSystemData.get(name);
 
+            if (!data)
+            {
+                data = new ParticleSystemData();
+                data.value = name;
+            }
             data.setData(txt);
 
             return data;

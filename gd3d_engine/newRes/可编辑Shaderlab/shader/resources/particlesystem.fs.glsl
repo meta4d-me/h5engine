@@ -8,7 +8,18 @@ uniform sampler2D _MainTex;
 
 varying vec4 v_color;
 
+#ifdef FOG
+uniform lowp vec4 glstate_fog_color; 
+varying lowp float factor;
+#endif
+
 void main()
 {
-    gl_FragColor = 2.0 * v_color * _TintColor * texture2D(_MainTex, v_uv);
+    vec4 color = 2.0 * v_color * _TintColor * texture2D(_MainTex, v_uv);
+
+    #ifdef FOG
+        color.xyz = mix(glstate_fog_color.rgb, color.rgb, factor);
+    #endif
+    
+    gl_FragColor = color;
 }

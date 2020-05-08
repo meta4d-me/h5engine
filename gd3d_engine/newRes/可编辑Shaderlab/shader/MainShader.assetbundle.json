@@ -1,6 +1,22 @@
 {
   "files":[
       {
+          "name":"resources/additive_uvroll.fs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/additive_uvroll.shader.json",
+          "length":0
+          },
+      {
+          "name":"resources/additive_uvroll.vs.glsl",
+          "length":0
+          },
+      {
+          "name":"resources/alphablended_uvroll.shader.json",
+          "length":0
+          },
+      {
           "name":"resources/asi.fs.glsl",
           "length":0
           },

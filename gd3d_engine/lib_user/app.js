@@ -5,11 +5,10 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -4189,6 +4188,8 @@ var test_GPU_instancing = (function () {
         this.createCount = 500;
         this.mats = [];
         this.isInstancing = true;
+        this.isStatic = true;
+        this.count = 0;
     }
     test_GPU_instancing.prototype.start = function (app) {
         return __awaiter(this, void 0, void 0, function () {
@@ -4225,6 +4226,7 @@ var test_GPU_instancing = (function () {
                         app.showFps();
                         _dat = new dat.GUI();
                         _dat.add(this, 'isInstancing');
+                        _dat.add(this, 'isStatic');
                         _dat.add(this, 'createCount');
                         _dat.add(this, 'refresh');
                         return [2];
@@ -4259,6 +4261,8 @@ var test_GPU_instancing = (function () {
     };
     test_GPU_instancing.prototype.createOne = function (app, needInstance) {
         var obj = gd3d.framework.TransformUtil.CreatePrimitive(gd3d.framework.PrimitiveType.Cube, app);
+        obj.gameObject.isStatic = this.isStatic;
+        obj.name = "cube_" + ++this.count;
         this.cubeRoot.addChild(obj);
         var range = 10;
         gd3d.math.vec3Set(obj.localPosition, this.getRandom(range), this.getRandom(range), this.getRandom(range));
@@ -4353,7 +4357,7 @@ var test_LineRenderer = (function () {
 }());
 var test_ParticleSystem = (function () {
     function test_ParticleSystem() {
-        this._particles = ["ParticleAdditive", "FX_Laser", "Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "ps_noise", "Fire", "Flames", "shark-levelup"];
+        this._particles = ["ParticleAdditive", "fx_zd1", "Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "ps_noise", "Fire", "Flames", "shark-levelup"];
         this._isMove = false;
         this._particleStartPosition = new gd3d.math.vector3();
         this._particleCurrentPosition = new gd3d.math.vector3();

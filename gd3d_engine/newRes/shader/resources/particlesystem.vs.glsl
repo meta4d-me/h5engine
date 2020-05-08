@@ -4,25 +4,42 @@ precision mediump float;
 //坐标属性
 attribute vec3 _glesVertex;
 attribute vec2 _glesMultiTexCoord0;
-attribute vec4 _glesColor;
 
 uniform mat4 glstate_matrix_mvp;
 
 uniform vec4 _MainTex_ST;
 
+uniform float _UVSpeedX;
+uniform float _UVSpeedY;
+uniform float glstate_timer;
+
 varying vec4 v_color;
 varying vec2 v_uv;
 
-
-attribute vec3 a_particle_position;
-attribute vec3 a_particle_scale;
-attribute vec3 a_particle_rotation;
-attribute vec4 a_particle_color;
-attribute vec4 a_particle_tilingOffset;
-attribute vec2 a_particle_flipUV;
+#ifdef INSTANCE
+    attribute vec4 a_particle_position;
+    attribute vec4 a_particle_scale;
+    attribute vec4 a_particle_rotation;
+    attribute vec4 a_particle_color;
+    attribute vec4 a_particle_tilingOffset;
+    attribute vec4 a_particle_flipUV;
+#else
+    uniform vec4 a_particle_position;
+    uniform vec4 a_particle_scale;
+    uniform vec4 a_particle_rotation;
+    uniform vec4 a_particle_color;
+    uniform vec4 a_particle_tilingOffset;
+    uniform vec4 a_particle_flipUV;
+#endif
 
 uniform mat4 u_particle_billboardMatrix;
+uniform vec4 u_particle_pivotOffset;
 
+#ifdef FOG
+uniform lowp float glstate_fog_start;
+uniform lowp float glstate_fog_end;
+varying lowp float factor;
+#endif
 
 mat3 makeParticleRotationMatrix(vec3 rotation)
 {
@@ -68,6 +85,8 @@ vec4 particleAnimation(vec4 position)
 {
     mat3 billboardMatrix = mat3(u_particle_billboardMatrix[0].xyz,u_particle_billboardMatrix[1].xyz,u_particle_billboardMatrix[2].xyz);
     
+    position.xyz = position.xyz + u_particle_pivotOffset.xyz;
+    
     // 计算缩放
     position.xyz = position.xyz * a_particle_scale.xyz;
 
@@ -80,7 +99,7 @@ vec4 particleAnimation(vec4 position)
     position.xyz = position.xyz + a_particle_position.xyz;
 
     // 颜色
-    v_color = a_particle_color * _glesColor;
+    v_color = a_particle_color;
 
     if(a_particle_flipUV.x > 0.5) v_uv.x = 1.0 - v_uv.x;
     if(a_particle_flipUV.y > 0.5) v_uv.y = 1.0 - v_uv.y;
@@ -97,6 +116,15 @@ void main()
 
     position = particleAnimation(position);
 
+    v_uv = v_uv + vec2(_UVSpeedX,_UVSpeedY) * glstate_timer;
+
     //计算投影坐标
-    gl_Position = glstate_matrix_mvp * position;
+    position = glstate_matrix_mvp * position;
+
+    #ifdef FOG
+        factor = (glstate_fog_end - abs(position.z))/(glstate_fog_end - glstate_fog_start);
+        factor = clamp(factor, 0.0, 1.0);
+    #endif
+
+    gl_Position = position;
 }

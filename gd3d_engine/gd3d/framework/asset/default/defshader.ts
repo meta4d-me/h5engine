@@ -269,7 +269,7 @@ namespace gd3d.framework
                 // 混合字体与描边颜色
                 col = mix(outlineCol, col, col.a);
 
-                col.rgb = col.rgb * xlv_COLOR.a;
+                col.a = col.a * xlv_COLOR.a;
                 
                 // 设置最终值
                 gl_FragData[0] = col;

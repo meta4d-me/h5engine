@@ -155,14 +155,14 @@ namespace gd3d.framework
                     let url = `${this.baseUrl}resources/${k}`;
                     // console.error(`[下載資源] 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                     if (k.endsWith(".png") || k.endsWith(".jpg"))
-                        this.assetmgr.loadImg(guid, url, imageNext.bind(this,url), this);
+                        this.assetmgr.loadImg(guid, url, imageNext.bind(this, url), this);
                     else if (k.endsWith(".pvr.bin"))
-                        this.assetmgr.download(guid, url, AssetTypeEnum.PVR, imageNext.bind(this,url), () =>
+                        this.assetmgr.download(guid, url, AssetTypeEnum.PVR, imageNext.bind(this, url), () =>
                         {
                             console.error(`[下載資源]失败:${url} ,bundle:${this.name}`);
                         }, this);
                     else if (k.endsWith(".ktx"))
-                        this.assetmgr.download(guid, url, AssetTypeEnum.KTX, imageNext.bind(this,url), () =>
+                        this.assetmgr.download(guid, url, AssetTypeEnum.KTX, imageNext.bind(this, url), () =>
                         {
                             console.error(`[下載資源]失败:${url} ,bundle:${this.name}`);
                         }, this);
@@ -196,11 +196,10 @@ namespace gd3d.framework
                             var name = String.fromCharCode.apply(null, namebytes);
                             var fsize = reader.readUInt32();
                             var bin = reader.readBytesRef(fsize);
-                            var guid = this.files[name] || this.texs[name];//如果文件找不到,就去找图片
-                            assetMgr.mapLoading[guid] = {
-                                readyok: true,
-                                data: bin.buffer
-                            };
+                            var guid = this.files[name] || this.texs[name];//如果文件找不到,就去找图片                            
+
+                            assetMgr.setLoading(guid, { readyok: true, data: bin.buffer });
+
                             pkgld.subRes.push(guid);
                             // console.log(`解压 bin文件${name},size:${fsize},guid:${guid}`);
                         }
@@ -217,10 +216,7 @@ namespace gd3d.framework
                         for (let k in json)
                         {
                             var guid = this.files[k];
-                            assetMgr.mapLoading[guid] = {
-                                readyok: true,
-                                data: json[k]
-                            };
+                            assetMgr.setLoading(guid, { readyok: true, data: json[k] });
                             pkgld.subRes.push(guid);
                             // console.log(`解压 text文件${k},size:${json[k].length},${guid}`);
                         }
@@ -282,7 +278,7 @@ namespace gd3d.framework
 
                 //解析顺序按枚举从小到大来排序
                 assets.sort((a, b) => { return a.type - b.type; });
-                
+
                 for (var i = 0, len = assets.length; i < len; ++i)
                 {
                     let asset = assets[i];

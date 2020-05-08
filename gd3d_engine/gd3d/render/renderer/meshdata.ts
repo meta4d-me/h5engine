@@ -20,7 +20,7 @@
         trisindex: number[];
 
         tmpVArr: Float32Array;
-        tmpInxArr: Uint16Array; 
+        tmpInxArr: Uint16Array;
         static addQuadPos(data: meshData, quad: gd3d.math.vector3[]): void
         {
             var istart = data.pos.length;
@@ -708,10 +708,10 @@
             if (vf & VertexFormatMask.ColorEX) total += 16;
             return total;
         }
-       
-        
+
+
         genVertexDataArray(vf: VertexFormatMask): Float32Array
-        {   
+        {
             var _this = this;
             // if (_this.tmpVArr)
             //     return _this.tmpVArr;
@@ -1006,6 +1006,34 @@
 
             return md;
         }
+
+        /**
+         * 获取AABB
+         * 
+         * @param recalculate 是否重新计算AABB
+         */
+        getAABB(recalculate = false)
+        {
+            if (!this._aabb || recalculate)
+            {
+                let minimum = new math.vector3();
+                let maximum = new math.vector3();
+
+                math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+                let len = this.pos.length;
+                let pos = this.pos;
+                for (var i = 0; i < len; i++)
+                {
+                    math.vec3Max(pos[i], maximum, maximum);
+                    math.vec3Min(pos[i], minimum, minimum);
+                }
+                this._aabb = new gd3d.framework.aabb(minimum, maximum);
+            }
+
+            return this._aabb;
+        }
+        private _aabb: gd3d.framework.aabb;
     }
 
 }
