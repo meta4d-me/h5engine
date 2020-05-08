@@ -13926,6 +13926,14 @@ declare namespace gd3d.framework {
          * Use lower (negative) numbers to prioritize the Particle System to draw closer to the front, and use higher numbers to prioritize other transparent objects.
          */
         sortingFudge: number;
+        /**
+         * 参考Unity ParticleSystemRenderer.pivot
+         *
+         * Modify the pivot point used for rotating particles.
+         *
+         * The units are expressed as a multiplier of the particle sizes, relative to their diameters. For example, a value of 0.5 adjusts the pivot by the particle radius, allowing particles to rotate around their edges.
+         */
+        pivot: math.vector3;
         readonly transform: transform;
         /**
          * Is the particle system playing right now ?
@@ -14009,6 +14017,7 @@ declare namespace gd3d.framework {
         textureSheetAnimation: ParticleTextureSheetAnimationModule;
         private _textureSheetAnimation;
         private _mesh;
+        private _meshAABB;
         /**
          * @private
          */
@@ -21338,6 +21347,13 @@ declare namespace gd3d.render {
         genIndexDataArrayTri2Line(): Uint16Array;
         genIndexDataArrayQuad2Line(): Uint16Array;
         static cloneByObj(target: meshData): meshData;
+        /**
+         * 获取AABB
+         *
+         * @param recalculate 是否重新计算AABB
+         */
+        getAABB(recalculate?: boolean): framework.aabb;
+        private _aabb;
     }
 }
 declare namespace gd3d.render {

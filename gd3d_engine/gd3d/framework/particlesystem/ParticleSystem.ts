@@ -53,6 +53,15 @@ namespace gd3d.framework
          */
         sortingFudge = 0;
 
+        /**
+         * 参考Unity ParticleSystemRenderer.pivot
+         * 
+         * Modify the pivot point used for rotating particles.
+         * 
+         * The units are expressed as a multiplier of the particle sizes, relative to their diameters. For example, a value of 0.5 adjusts the pivot by the particle radius, allowing particles to rotate around their edges.
+         */
+        pivot = new math.vector3(0, 0, 0);
+
         get transform()
         {
             return this.gameObject && this.gameObject.transform;
@@ -262,6 +271,7 @@ namespace gd3d.framework
         private _textureSheetAnimation: ParticleTextureSheetAnimationModule;
 
         private _mesh: mesh;
+        private _meshAABB: aabb;
 
         //本意mesh filter 可以弄一点 模型处理，比如lod
         //先直进直出吧
@@ -289,6 +299,7 @@ namespace gd3d.framework
                 this._mesh.unuse();
             }
             this._mesh = mesh;
+            this._meshAABB = this._mesh.data.getAABB();
             if (this._mesh != null)
             {
                 this._mesh.use();
@@ -343,6 +354,7 @@ namespace gd3d.framework
             if (!this._mesh)
             {
                 this._mesh = sceneMgr.app.getAssetMgr().getDefaultMesh(gd3d.framework.defMesh.quad);
+                this._meshAABB = this._mesh.data.getAABB();
             }
 
             if (!this.material)
@@ -560,11 +572,19 @@ namespace gd3d.framework
 
             this.material.setMatrix("u_particle_billboardMatrix", billboardMatrix);
 
+            // 计算中心点偏移
+            var pivotOffset = new math.vector4(
+                this.pivot.x * (this._meshAABB.maximum.x - this._meshAABB.minimum.x),
+                -this.pivot.z * (this._meshAABB.maximum.y - this._meshAABB.minimum.y),
+                this.pivot.y * (this._meshAABB.maximum.z - this._meshAABB.minimum.z),
+                0
+            );
+            this.material.setVector4("u_particle_pivotOffset", pivotOffset);
+
             if (this.main.simulationSpace == ParticleSystemSimulationSpace.World)
             {
                 gd3d.math.matrixClone(context.matrixViewProject, context.matrixModelViewProject);
             }
-
             if (!isSupportDrawInstancedArrays)
             {
                 for (let i = 0, n = this._activeParticles.length; i < n; i++)
