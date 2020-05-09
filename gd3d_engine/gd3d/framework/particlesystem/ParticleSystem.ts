@@ -11,6 +11,31 @@ namespace gd3d.framework
     }
 
     /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * ui事件
+     * @version gd3d 1.0
+     */
+    export class ParticleSystemEvent extends AEvent
+    {
+        On<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any)
+        {
+            super.On(event, func, thisArg);
+        }
+
+        Off<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any)
+        {
+            super.RemoveListener(event, func, thisArg);
+        }
+
+        Emit<K extends keyof GameObjectEventMap>(event: K, args: GameObjectEventMap[K])
+        {
+            super.Emit(event, args);
+        }
+    }
+
+    /**
      * 粒子系统
      * 
      * @author feng3d
@@ -344,6 +369,33 @@ namespace gd3d.framework
         }
         private _particleSystemData: ParticleSystemData;
 
+        /**
+         * 用于处理事件的监听与派发
+         */
+        private aEvent = new ParticleSystemEvent();
+
+        /**
+        * 添加UI事件监听者
+        * @param eventEnum 事件类型
+        * @param func 事件触发回调方法 (Warn: 不要使用 func.bind() , 它会导致相等判断失败)
+        * @param thisArg 回调方法执行者
+        */
+        addListener<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any)
+        {
+            this.aEvent.On(event, func, thisArg);
+        }
+
+        /**
+         * 移除事件监听者
+         * @param event 事件类型
+         * @param func 事件触发回调方法
+         * @param thisArg 回调方法执行者
+         */
+        removeListener<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any)
+        {
+            this.aEvent.Off(event, func, thisArg);
+        }
+
         onPlay()
         {
 
@@ -443,7 +495,7 @@ namespace gd3d.framework
             if (!this.main.loop && this._activeParticles.length == 0 && this._realTime > this.main.duration)
             {
                 this.stop();
-                // this.dispatch("particleCompleted", this);
+                this.aEvent.Emit("particleCompleted", this);
             }
         }
 
@@ -665,7 +717,7 @@ namespace gd3d.framework
                     };
 
                     let drawtype = meshRenderer.instanceDrawType(context);
-                    this.material.draw(context, mesh, subMeshs[0], "instance", drawInstanceInfo);
+                    this.material.draw(context, mesh, subMeshs[0], drawtype, drawInstanceInfo);
                 }
             }
         }

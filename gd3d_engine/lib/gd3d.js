@@ -48562,6 +48562,30 @@ var gd3d;
     var framework;
     (function (framework) {
         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * ui事件
+         * @version gd3d 1.0
+         */
+        var ParticleSystemEvent = /** @class */ (function (_super) {
+            __extends(ParticleSystemEvent, _super);
+            function ParticleSystemEvent() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            ParticleSystemEvent.prototype.On = function (event, func, thisArg) {
+                _super.prototype.On.call(this, event, func, thisArg);
+            };
+            ParticleSystemEvent.prototype.Off = function (event, func, thisArg) {
+                _super.prototype.RemoveListener.call(this, event, func, thisArg);
+            };
+            ParticleSystemEvent.prototype.Emit = function (event, args) {
+                _super.prototype.Emit.call(this, event, args);
+            };
+            return ParticleSystemEvent;
+        }(gd3d.AEvent));
+        framework.ParticleSystemEvent = ParticleSystemEvent;
+        /**
          * 粒子系统
          *
          * @author feng3d
@@ -48603,6 +48627,10 @@ var gd3d;
                  * 启动延迟(以秒为单位)。在调用.play()时初始化值。
                  */
                 this.startDelay = 0;
+                /**
+                 * 用于处理事件的监听与派发
+                 */
+                this.aEvent = new ParticleSystemEvent();
                 this._startDelay_rate = Math.random();
                 this._vbos = [];
                 this._attributes = [
@@ -48956,6 +48984,24 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            /**
+            * 添加UI事件监听者
+            * @param eventEnum 事件类型
+            * @param func 事件触发回调方法 (Warn: 不要使用 func.bind() , 它会导致相等判断失败)
+            * @param thisArg 回调方法执行者
+            */
+            ParticleSystem.prototype.addListener = function (event, func, thisArg) {
+                this.aEvent.On(event, func, thisArg);
+            };
+            /**
+             * 移除事件监听者
+             * @param event 事件类型
+             * @param func 事件触发回调方法
+             * @param thisArg 回调方法执行者
+             */
+            ParticleSystem.prototype.removeListener = function (event, func, thisArg) {
+                this.aEvent.Off(event, func, thisArg);
+            };
             ParticleSystem.prototype.onPlay = function () {
             };
             ParticleSystem.prototype.start = function () {
@@ -49008,7 +49054,7 @@ var gd3d;
                 // 判断非循环的效果是否播放结束
                 if (!this.main.loop && this._activeParticles.length == 0 && this._realTime > this.main.duration) {
                     this.stop();
-                    // this.dispatch("particleCompleted", this);
+                    this.aEvent.Emit("particleCompleted", this);
                 }
             };
             /**
@@ -49168,7 +49214,7 @@ var gd3d;
                             },
                         };
                         var drawtype = framework.meshRenderer.instanceDrawType(context);
-                        this.material.draw(context, mesh, subMeshs[0], "instance", drawInstanceInfo);
+                        this.material.draw(context, mesh, subMeshs[0], drawtype, drawInstanceInfo);
                     }
                 }
             };

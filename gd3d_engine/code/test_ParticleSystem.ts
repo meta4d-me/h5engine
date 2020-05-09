@@ -23,7 +23,7 @@ class test_ParticleSystem implements IState
     camera: gd3d.framework.camera;
     astMgr: gd3d.framework.assetMgr;
 
-    private _particles = ["ParticleAdditive","fx_zd1","Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "ps_noise", "Fire", "Flames", "shark-levelup"];
+    private _particles = ["ParticleAdditive", "treasurechest", "Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "ps_noise", "Fire", "Flames", "shark-levelup"];
     private _particle: gd3d.framework.transform;
 
     private _isMove = false;
@@ -36,8 +36,15 @@ class test_ParticleSystem implements IState
     async start(app: gd3d.framework.application)
     {
         this.app = app;
-        this.scene = this.app.getScene();
+        var scene = this.scene = this.app.getScene();
         this.astMgr = this.app.getAssetMgr();
+
+        //雾效
+        // scene.fog = new gd3d.framework.Fog();
+        // scene.fog._Start = 1;
+        // scene.fog._End = 150;
+        // // scene.fog._Color = new gd3d.math.vector4(52 / 255, 137 / 255, 155 / 255, 0.75);// new gd3d.math.vector4(0 / 255, 152 / 255, 160 / 255, 1);
+        // scene.fog._Color = new gd3d.math.vector4(5 / 255, 166 / 255, 182 / 255, 1);
 
         gd3d.framework.assetMgr.openGuid = false;
 
@@ -68,6 +75,12 @@ class test_ParticleSystem implements IState
         {
             var ps: gd3d.framework.ParticleSystem = <any>v;
             ps.play();
+
+            ps.addListener("particleCompleted", (ps) =>
+            {
+                console.log("粒子系统播放完成！");
+            }, this);
+
         })
     }
 
@@ -131,7 +144,7 @@ class test_ParticleSystem implements IState
 
         this._particle = new gd3d.framework.transform();
         this._particle.addChild(cubeTran);
-        
+
         this.scene.addChild(this._particle);
 
         this._particleStartPosition = new gd3d.math.vector3();

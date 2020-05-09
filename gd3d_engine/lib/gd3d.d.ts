@@ -13896,6 +13896,18 @@ declare namespace gd3d.framework {
         particleCompleted: ParticleSystem;
     }
     /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * ui事件
+     * @version gd3d 1.0
+     */
+    class ParticleSystemEvent extends AEvent {
+        On<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any): void;
+        Off<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any): void;
+        Emit<K extends keyof GameObjectEventMap>(event: K, args: GameObjectEventMap[K]): void;
+    }
+    /**
      * 粒子系统
      *
      * @author feng3d
@@ -14046,6 +14058,24 @@ declare namespace gd3d.framework {
         startDelay: number;
         particleSystemData: ParticleSystemData;
         private _particleSystemData;
+        /**
+         * 用于处理事件的监听与派发
+         */
+        private aEvent;
+        /**
+        * 添加UI事件监听者
+        * @param eventEnum 事件类型
+        * @param func 事件触发回调方法 (Warn: 不要使用 func.bind() , 它会导致相等判断失败)
+        * @param thisArg 回调方法执行者
+        */
+        addListener<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any): void;
+        /**
+         * 移除事件监听者
+         * @param event 事件类型
+         * @param func 事件触发回调方法
+         * @param thisArg 回调方法执行者
+         */
+        removeListener<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any): void;
         onPlay(): void;
         start(): void;
         remove(): void;
