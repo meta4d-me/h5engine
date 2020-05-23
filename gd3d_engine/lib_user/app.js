@@ -4188,6 +4188,8 @@ var test_GPU_instancing = (function () {
         this.createCount = 500;
         this.mats = [];
         this.isInstancing = true;
+        this.isStatic = true;
+        this.count = 0;
     }
     test_GPU_instancing.prototype.start = function (app) {
         return __awaiter(this, void 0, void 0, function () {
@@ -4224,6 +4226,7 @@ var test_GPU_instancing = (function () {
                         app.showFps();
                         _dat = new dat.GUI();
                         _dat.add(this, 'isInstancing');
+                        _dat.add(this, 'isStatic');
                         _dat.add(this, 'createCount');
                         _dat.add(this, 'refresh');
                         return [2];
@@ -4258,6 +4261,8 @@ var test_GPU_instancing = (function () {
     };
     test_GPU_instancing.prototype.createOne = function (app, needInstance) {
         var obj = gd3d.framework.TransformUtil.CreatePrimitive(gd3d.framework.PrimitiveType.Cube, app);
+        obj.gameObject.isStatic = this.isStatic;
+        obj.name = "cube_" + ++this.count;
         this.cubeRoot.addChild(obj);
         var range = 10;
         gd3d.math.vec3Set(obj.localPosition, this.getRandom(range), this.getRandom(range), this.getRandom(range));
@@ -4352,7 +4357,7 @@ var test_LineRenderer = (function () {
 }());
 var test_ParticleSystem = (function () {
     function test_ParticleSystem() {
-        this._particles = ["ParticleAdditive", "fx_zd1", "Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "ps_noise", "Fire", "Flames", "shark-levelup"];
+        this._particles = ["ParticleAdditive", "treasurechest", "Particle_Sweat_Disable", "Particle_Dust_Disable", "ParticleAlphaBlended", "ps_inheritVelocity", "ParticleSystem", "ps_noise", "Fire", "Flames", "shark-levelup"];
         this._isMove = false;
         this._particleStartPosition = new gd3d.math.vector3();
         this._particleCurrentPosition = new gd3d.math.vector3();
@@ -4363,11 +4368,12 @@ var test_ParticleSystem = (function () {
     }
     test_ParticleSystem.prototype.start = function (app) {
         return __awaiter(this, void 0, void 0, function () {
+            var scene;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
                         this.app = app;
-                        this.scene = this.app.getScene();
+                        scene = this.scene = this.app.getScene();
                         this.astMgr = this.app.getAssetMgr();
                         gd3d.framework.assetMgr.openGuid = false;
                         return [4, demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", this.astMgr)];
@@ -4395,9 +4401,13 @@ var test_ParticleSystem = (function () {
         gui.add(this, 'stop');
     };
     test_ParticleSystem.prototype.play = function () {
+        var _this = this;
         this._particle.gameObject.getComponentsInChildren("ParticleSystem").forEach(function (v) {
             var ps = v;
             ps.play();
+            ps.addListener("particleCompleted", function (ps) {
+                console.log("粒子系统播放完成！");
+            }, _this);
         });
     };
     test_ParticleSystem.prototype.stop = function () {

@@ -13896,6 +13896,18 @@ declare namespace gd3d.framework {
         particleCompleted: ParticleSystem;
     }
     /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * ui事件
+     * @version gd3d 1.0
+     */
+    class ParticleSystemEvent extends AEvent {
+        On<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any): void;
+        Off<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any): void;
+        Emit<K extends keyof GameObjectEventMap>(event: K, args: GameObjectEventMap[K]): void;
+    }
+    /**
      * 粒子系统
      *
      * @author feng3d
@@ -13926,6 +13938,14 @@ declare namespace gd3d.framework {
          * Use lower (negative) numbers to prioritize the Particle System to draw closer to the front, and use higher numbers to prioritize other transparent objects.
          */
         sortingFudge: number;
+        /**
+         * 参考Unity ParticleSystemRenderer.pivot
+         *
+         * Modify the pivot point used for rotating particles.
+         *
+         * The units are expressed as a multiplier of the particle sizes, relative to their diameters. For example, a value of 0.5 adjusts the pivot by the particle radius, allowing particles to rotate around their edges.
+         */
+        pivot: math.vector3;
         readonly transform: transform;
         /**
          * Is the particle system playing right now ?
@@ -14009,6 +14029,7 @@ declare namespace gd3d.framework {
         textureSheetAnimation: ParticleTextureSheetAnimationModule;
         private _textureSheetAnimation;
         private _mesh;
+        private _meshAABB;
         /**
          * @private
          */
@@ -14037,6 +14058,24 @@ declare namespace gd3d.framework {
         startDelay: number;
         particleSystemData: ParticleSystemData;
         private _particleSystemData;
+        /**
+         * 用于处理事件的监听与派发
+         */
+        private aEvent;
+        /**
+        * 添加UI事件监听者
+        * @param eventEnum 事件类型
+        * @param func 事件触发回调方法 (Warn: 不要使用 func.bind() , 它会导致相等判断失败)
+        * @param thisArg 回调方法执行者
+        */
+        addListener<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any): void;
+        /**
+         * 移除事件监听者
+         * @param event 事件类型
+         * @param func 事件触发回调方法
+         * @param thisArg 回调方法执行者
+         */
+        removeListener<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any): void;
         onPlay(): void;
         start(): void;
         remove(): void;
@@ -21338,6 +21377,13 @@ declare namespace gd3d.render {
         genIndexDataArrayTri2Line(): Uint16Array;
         genIndexDataArrayQuad2Line(): Uint16Array;
         static cloneByObj(target: meshData): meshData;
+        /**
+         * 获取AABB
+         *
+         * @param recalculate 是否重新计算AABB
+         */
+        getAABB(recalculate?: boolean): framework.aabb;
+        private _aabb;
     }
 }
 declare namespace gd3d.render {

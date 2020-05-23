@@ -17157,6 +17157,10 @@ var gd3d;
             }
             AssetFactory_ParticleSystem.prototype.parse = function (assetmgr, bundle, name, txt) {
                 var data = framework.ParticleSystemData.get(name);
+                if (!data) {
+                    data = new framework.ParticleSystemData();
+                    data.value = name;
+                }
                 data.setData(txt);
                 return data;
             };
@@ -48558,6 +48562,30 @@ var gd3d;
     var framework;
     (function (framework) {
         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * ui事件
+         * @version gd3d 1.0
+         */
+        var ParticleSystemEvent = /** @class */ (function (_super) {
+            __extends(ParticleSystemEvent, _super);
+            function ParticleSystemEvent() {
+                return _super !== null && _super.apply(this, arguments) || this;
+            }
+            ParticleSystemEvent.prototype.On = function (event, func, thisArg) {
+                _super.prototype.On.call(this, event, func, thisArg);
+            };
+            ParticleSystemEvent.prototype.Off = function (event, func, thisArg) {
+                _super.prototype.RemoveListener.call(this, event, func, thisArg);
+            };
+            ParticleSystemEvent.prototype.Emit = function (event, args) {
+                _super.prototype.Emit.call(this, event, args);
+            };
+            return ParticleSystemEvent;
+        }(gd3d.AEvent));
+        framework.ParticleSystemEvent = ParticleSystemEvent;
+        /**
          * 粒子系统
          *
          * @author feng3d
@@ -48579,6 +48607,14 @@ var gd3d;
                  * Use lower (negative) numbers to prioritize the Particle System to draw closer to the front, and use higher numbers to prioritize other transparent objects.
                  */
                 this.sortingFudge = 0;
+                /**
+                 * 参考Unity ParticleSystemRenderer.pivot
+                 *
+                 * Modify the pivot point used for rotating particles.
+                 *
+                 * The units are expressed as a multiplier of the particle sizes, relative to their diameters. For example, a value of 0.5 adjusts the pivot by the particle radius, allowing particles to rotate around their edges.
+                 */
+                this.pivot = new gd3d.math.vector3(0, 0, 0);
                 this._isPlaying = false;
                 /**
                  * Playback position in seconds.
@@ -48591,6 +48627,10 @@ var gd3d;
                  * 启动延迟(以秒为单位)。在调用.play()时初始化值。
                  */
                 this.startDelay = 0;
+                /**
+                 * 用于处理事件的监听与派发
+                 */
+                this.aEvent = new ParticleSystemEvent();
                 this._startDelay_rate = Math.random();
                 this._vbos = [];
                 this._attributes = [
@@ -48914,6 +48954,7 @@ var gd3d;
                         this._mesh.unuse();
                     }
                     this._mesh = mesh;
+                    this._meshAABB = this._mesh.data.getAABB();
                     if (this._mesh != null) {
                         this._mesh.use();
                     }
@@ -48943,11 +48984,30 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            /**
+            * 添加UI事件监听者
+            * @param eventEnum 事件类型
+            * @param func 事件触发回调方法 (Warn: 不要使用 func.bind() , 它会导致相等判断失败)
+            * @param thisArg 回调方法执行者
+            */
+            ParticleSystem.prototype.addListener = function (event, func, thisArg) {
+                this.aEvent.On(event, func, thisArg);
+            };
+            /**
+             * 移除事件监听者
+             * @param event 事件类型
+             * @param func 事件触发回调方法
+             * @param thisArg 回调方法执行者
+             */
+            ParticleSystem.prototype.removeListener = function (event, func, thisArg) {
+                this.aEvent.Off(event, func, thisArg);
+            };
             ParticleSystem.prototype.onPlay = function () {
             };
             ParticleSystem.prototype.start = function () {
                 if (!this._mesh) {
                     this._mesh = framework.sceneMgr.app.getAssetMgr().getDefaultMesh(gd3d.framework.defMesh.quad);
+                    this._meshAABB = this._mesh.data.getAABB();
                 }
                 if (!this.material) {
                     this.material = framework.sceneMgr.app.getAssetMgr().getDefParticleMat();
@@ -48994,7 +49054,7 @@ var gd3d;
                 // 判断非循环的效果是否播放结束
                 if (!this.main.loop && this._activeParticles.length == 0 && this._realTime > this.main.duration) {
                     this.stop();
-                    // this.dispatch("particleCompleted", this);
+                    this.aEvent.Emit("particleCompleted", this);
                 }
             };
             /**
@@ -49094,6 +49154,9 @@ var gd3d;
                     gd3d.math.matrixLookat(new gd3d.math.vector3(), cameraForward, cameraUp, billboardMatrix);
                 }
                 this.material.setMatrix("u_particle_billboardMatrix", billboardMatrix);
+                // 计算中心点偏移
+                var pivotOffset = new gd3d.math.vector4(this.pivot.x * (this._meshAABB.maximum.x - this._meshAABB.minimum.x), -this.pivot.z * (this._meshAABB.maximum.y - this._meshAABB.minimum.y), this.pivot.y * (this._meshAABB.maximum.z - this._meshAABB.minimum.z), 0);
+                this.material.setVector4("u_particle_pivotOffset", pivotOffset);
                 if (this.main.simulationSpace == framework.ParticleSystemSimulationSpace.World) {
                     gd3d.math.matrixClone(context.matrixViewProject, context.matrixModelViewProject);
                 }
@@ -66751,6 +66814,28 @@ var gd3d;
                     });
                 }
                 return md;
+            };
+            /**
+             * 获取AABB
+             *
+             * @param recalculate 是否重新计算AABB
+             */
+            meshData.prototype.getAABB = function (recalculate) {
+                if (recalculate === void 0) { recalculate = false; }
+                if (!this._aabb || recalculate) {
+                    var minimum = new gd3d.math.vector3();
+                    var maximum = new gd3d.math.vector3();
+                    gd3d.math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                    gd3d.math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+                    var len = this.pos.length;
+                    var pos = this.pos;
+                    for (var i = 0; i < len; i++) {
+                        gd3d.math.vec3Max(pos[i], maximum, maximum);
+                        gd3d.math.vec3Min(pos[i], minimum, minimum);
+                    }
+                    this._aabb = new gd3d.framework.aabb(minimum, maximum);
+                }
+                return this._aabb;
             };
             return meshData;
         }());

@@ -33,6 +33,7 @@ varying vec2 v_uv;
 #endif
 
 uniform mat4 u_particle_billboardMatrix;
+uniform vec4 u_particle_pivotOffset;
 
 #ifdef FOG
 uniform lowp float glstate_fog_start;
@@ -83,6 +84,8 @@ mat3 makeParticleRotationMatrix(vec3 rotation)
 vec4 particleAnimation(vec4 position) 
 {
     mat3 billboardMatrix = mat3(u_particle_billboardMatrix[0].xyz,u_particle_billboardMatrix[1].xyz,u_particle_billboardMatrix[2].xyz);
+    
+    position.xyz = position.xyz + u_particle_pivotOffset.xyz;
     
     // 计算缩放
     position.xyz = position.xyz * a_particle_scale.xyz;

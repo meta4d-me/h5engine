@@ -11,6 +11,31 @@ namespace gd3d.framework
     }
 
     /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * ui事件
+     * @version gd3d 1.0
+     */
+    export class ParticleSystemEvent extends AEvent
+    {
+        On<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any)
+        {
+            super.On(event, func, thisArg);
+        }
+
+        Off<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any)
+        {
+            super.RemoveListener(event, func, thisArg);
+        }
+
+        Emit<K extends keyof GameObjectEventMap>(event: K, args: GameObjectEventMap[K])
+        {
+            super.Emit(event, args);
+        }
+    }
+
+    /**
      * 粒子系统
      * 
      * @author feng3d
@@ -52,6 +77,15 @@ namespace gd3d.framework
          * Use lower (negative) numbers to prioritize the Particle System to draw closer to the front, and use higher numbers to prioritize other transparent objects.
          */
         sortingFudge = 0;
+
+        /**
+         * 参考Unity ParticleSystemRenderer.pivot
+         * 
+         * Modify the pivot point used for rotating particles.
+         * 
+         * The units are expressed as a multiplier of the particle sizes, relative to their diameters. For example, a value of 0.5 adjusts the pivot by the particle radius, allowing particles to rotate around their edges.
+         */
+        pivot = new math.vector3(0, 0, 0);
 
         get transform()
         {
@@ -262,6 +296,7 @@ namespace gd3d.framework
         private _textureSheetAnimation: ParticleTextureSheetAnimationModule;
 
         private _mesh: mesh;
+        private _meshAABB: aabb;
 
         //本意mesh filter 可以弄一点 模型处理，比如lod
         //先直进直出吧
@@ -289,6 +324,7 @@ namespace gd3d.framework
                 this._mesh.unuse();
             }
             this._mesh = mesh;
+            this._meshAABB = this._mesh.data.getAABB();
             if (this._mesh != null)
             {
                 this._mesh.use();
@@ -333,6 +369,33 @@ namespace gd3d.framework
         }
         private _particleSystemData: ParticleSystemData;
 
+        /**
+         * 用于处理事件的监听与派发
+         */
+        private aEvent = new ParticleSystemEvent();
+
+        /**
+        * 添加UI事件监听者
+        * @param eventEnum 事件类型
+        * @param func 事件触发回调方法 (Warn: 不要使用 func.bind() , 它会导致相等判断失败)
+        * @param thisArg 回调方法执行者
+        */
+        addListener<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any)
+        {
+            this.aEvent.On(event, func, thisArg);
+        }
+
+        /**
+         * 移除事件监听者
+         * @param event 事件类型
+         * @param func 事件触发回调方法
+         * @param thisArg 回调方法执行者
+         */
+        removeListener<K extends keyof GameObjectEventMap>(event: K, func: (args: GameObjectEventMap[K]) => void, thisArg: any)
+        {
+            this.aEvent.Off(event, func, thisArg);
+        }
+
         onPlay()
         {
 
@@ -343,6 +406,7 @@ namespace gd3d.framework
             if (!this._mesh)
             {
                 this._mesh = sceneMgr.app.getAssetMgr().getDefaultMesh(gd3d.framework.defMesh.quad);
+                this._meshAABB = this._mesh.data.getAABB();
             }
 
             if (!this.material)
@@ -431,7 +495,7 @@ namespace gd3d.framework
             if (!this.main.loop && this._activeParticles.length == 0 && this._realTime > this.main.duration)
             {
                 this.stop();
-                // this.dispatch("particleCompleted", this);
+                this.aEvent.Emit("particleCompleted", this);
             }
         }
 
@@ -560,11 +624,19 @@ namespace gd3d.framework
 
             this.material.setMatrix("u_particle_billboardMatrix", billboardMatrix);
 
+            // 计算中心点偏移
+            var pivotOffset = new math.vector4(
+                this.pivot.x * (this._meshAABB.maximum.x - this._meshAABB.minimum.x),
+                -this.pivot.z * (this._meshAABB.maximum.y - this._meshAABB.minimum.y),
+                this.pivot.y * (this._meshAABB.maximum.z - this._meshAABB.minimum.z),
+                0
+            );
+            this.material.setVector4("u_particle_pivotOffset", pivotOffset);
+
             if (this.main.simulationSpace == ParticleSystemSimulationSpace.World)
             {
                 gd3d.math.matrixClone(context.matrixViewProject, context.matrixModelViewProject);
             }
-
             if (!isSupportDrawInstancedArrays)
             {
                 for (let i = 0, n = this._activeParticles.length; i < n; i++)
