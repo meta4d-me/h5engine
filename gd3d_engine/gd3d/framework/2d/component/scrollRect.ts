@@ -139,8 +139,6 @@ namespace gd3d.framework
                             let addtransY = lp.y - sp.y;
                             math.vec2Clone(this.strPos, this._content.localTranslate);
                             this.SlideTo(addtransX, addtransY);
-                            if (this.onMoveFun)
-                                this.onMoveFun(addtransX, addtransY);
                         }
                         if (this.inertia)
                         {
@@ -188,6 +186,9 @@ namespace gd3d.framework
             }
 
             ctrans.markDirty();
+
+            if (this.onMoveFun)
+                this.onMoveFun(addtransX, addtransY);
         }
 
         private readonly collectNum = 3; //控制采集精度

@@ -22,10 +22,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -8880,8 +8881,6 @@ var gd3d;
                                 var addtransY = lp.y - sp.y;
                                 gd3d.math.vec2Clone(this.strPos, this._content.localTranslate);
                                 this.SlideTo(addtransX, addtransY);
-                                if (this.onMoveFun)
-                                    this.onMoveFun(addtransX, addtransY);
                             }
                             if (this.inertia) {
                                 this.collectPointing();
@@ -8921,6 +8920,8 @@ var gd3d;
                         cpos.y = -1 * (ctrans.height - trans.height);
                 }
                 ctrans.markDirty();
+                if (this.onMoveFun)
+                    this.onMoveFun(addtransX, addtransY);
             };
             //收集点数据
             scrollRect.prototype.collectPointing = function () {
@@ -27774,6 +27775,7 @@ var gd3d;
          * @version gd3d 1.0
          */
         var effectSystem = /** @class */ (function () {
+            // @reflect.selfClone
             function effectSystem() {
                 this.layer = framework.RenderLayerEnum.Transparent;
                 /**
