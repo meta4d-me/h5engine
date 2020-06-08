@@ -8975,6 +8975,11 @@ var gd3d;
                 var tv2 = scrollRect_1.helpv2;
                 gd3d.math.vec2SLerp(this.lastfv, fv, this.cgCount / this.cgTime, tv2);
                 this.SlideTo(tv2.x, tv2.y);
+                if (this.canfly == false) //惯性滑动 结束
+                 {
+                    if (this.onSlideEndFun)
+                        this.onSlideEndFun();
+                }
             };
             scrollRect.prototype.remove = function () {
                 this._content = null;

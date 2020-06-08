@@ -3208,6 +3208,7 @@ declare namespace gd3d.framework {
         onMoveFun: (x: number, y: number) => {};
         onDownFun: (x: number, y: number) => {};
         onUpFun: () => {};
+        onSlideEndFun: () => {};
         remove(): void;
     }
 }

@@ -261,10 +261,16 @@ namespace gd3d.framework
             let tv2 = scrollRect.helpv2;
             math.vec2SLerp(this.lastfv, fv, this.cgCount / this.cgTime, tv2);
             this.SlideTo(tv2.x, tv2.y);
+
+            if(this.canfly==false)//惯性滑动 结束
+            {
+                if(this.onSlideEndFun)this.onSlideEndFun();
+            }
         }
         public onMoveFun: (x: number, y: number) => {};
         public onDownFun: (x: number, y: number) => {};
         public onUpFun: () => {};
+        public onSlideEndFun: () => {};//惯性滑动 结束
         remove()
         {
             this._content = null;
