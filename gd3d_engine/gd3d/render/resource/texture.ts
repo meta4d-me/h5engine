@@ -1,5 +1,7 @@
 ﻿namespace gd3d.render
 {
+    /** 是否全局关闭，贴图mipmap */
+    export let mipmapCancel : boolean = false;
     /**
      * @private
      */
@@ -210,6 +212,9 @@
             this.format = format;
             this.linear = linear;
             this.mipmap = mipmap;
+            if(mipmapCancel){
+                this.mipmap = false;
+            }
 
             //if (url == null)//不给定url 则 texture 不加载
             //    return;
@@ -243,6 +248,9 @@
             this.width = img.width;
             this.height = img.height;
             this.mipmap = mipmap;
+            if(mipmapCancel){
+                this.mipmap = false;
+            }
             this.linear = linear;
             this.premultiply = premultiply;
             this.repeat = repeat;
@@ -334,6 +342,9 @@
             this.width = width;
             this.height = height;
             this.mipmap = mipmap;
+            if(mipmapCancel){
+                this.mipmap = false;
+            }
             this.linear = linear;
             this.repeat = repeat;
             this.mirroredU = mirroredU;
@@ -641,6 +652,9 @@
             this.webgl = webgl;
             this.format = format;
             this.mipmap = mipmap;
+            if(mipmapCancel){
+                this.mipmap = false;
+            }
             this.linear = linear;
 
             this.texture = webgl.createTexture();
