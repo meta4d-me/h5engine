@@ -15,7 +15,7 @@ namespace gd3d.framework
     {
         static readonly ClassName: string = "label";
 
-        private _text: string;
+        private _text: string = "";
         /**
          * @public
          * @language zh_CN
