@@ -288,9 +288,9 @@
     export function loadImg(url: string, fun: (_tex: HTMLImageElement, _err?: Error, loadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {
         let guid = framework.resID.next();
-        framework.assetMgr.Instance.loadImg(guid, url, (img) =>
+        framework.assetMgr.Instance.loadImg(guid, url, (img , err ) =>
         {
-            fun(img);
+            fun(img , err);
         });
         // gd3d.io.xhrLoad(url, fun, onprocess, "blob", (req) =>
         // {

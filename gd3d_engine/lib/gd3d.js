@@ -15271,7 +15271,7 @@ var gd3d;
                     assetMgr.setLoading(guid, loading);
                 }
                 loading.cbQueue.push(cb);
-                this._loadImg(url, function (img) {
+                this._loadImg(url, function (img, err) {
                     if (bundle && bundle.isunload == true) {
                         console.error("img\u4E0B\u8F7D\u53D6\u6D88:" + url + " , bundle:" + bundle.name + " \u5DF2\u91CA\u653E");
                         loading.cbQueue = [];
@@ -15280,8 +15280,11 @@ var gd3d;
                     assetMgr.mapImage[guid] = img;
                     loading.readyok = true;
                     loading.data = img;
-                    while (loading.cbQueue.length > 0)
-                        loading.cbQueue.shift()(img);
+                    while (loading.cbQueue.length > 0) {
+                        var _cb = loading.cbQueue.shift();
+                        if (_cb)
+                            _cb(img, err);
+                    }
                 });
             };
             //微信可复写
@@ -15290,7 +15293,14 @@ var gd3d;
                 //webgl跨域渲染要这样玩 [crossOrigin = ""]否则服务器允许跨域也没用
                 img.crossOrigin = "";
                 img.src = url;
-                img.onload = cb.bind(this, img);
+                img.onload = function () {
+                    if (cb)
+                        cb(img);
+                };
+                img.onerror = function (_err) {
+                    if (cb)
+                        cb(img, _err);
+                };
             };
             assetMgr.prototype.use = function (asset) {
                 var guid = asset.getGUID();
@@ -64023,8 +64033,8 @@ var gd3d;
         function loadImg(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
             var guid = gd3d.framework.resID.next();
-            gd3d.framework.assetMgr.Instance.loadImg(guid, url, function (img) {
-                fun(img);
+            gd3d.framework.assetMgr.Instance.loadImg(guid, url, function (img, err) {
+                fun(img, err);
             });
             // gd3d.io.xhrLoad(url, fun, onprocess, "blob", (req) =>
             // {
@@ -67456,6 +67466,8 @@ var gd3d;
 (function (gd3d) {
     var render;
     (function (render) {
+        /** 是否全局关闭，贴图mipmap */
+        render.mipmapCancel = false;
         /**
          * @private
          */
@@ -67637,6 +67649,9 @@ var gd3d;
                 this.format = format;
                 this.linear = linear;
                 this.mipmap = mipmap;
+                if (render.mipmapCancel) {
+                    this.mipmap = false;
+                }
                 //if (url == null)//不给定url 则 texture 不加载
                 //    return;
                 this.texture = webgl.createTexture();
@@ -67671,6 +67686,9 @@ var gd3d;
                 this.width = img.width;
                 this.height = img.height;
                 this.mipmap = mipmap;
+                if (render.mipmapCancel) {
+                    this.mipmap = false;
+                }
                 this.linear = linear;
                 this.premultiply = premultiply;
                 this.repeat = repeat;
@@ -67744,6 +67762,9 @@ var gd3d;
                 this.width = width;
                 this.height = height;
                 this.mipmap = mipmap;
+                if (render.mipmapCancel) {
+                    this.mipmap = false;
+                }
                 this.linear = linear;
                 this.repeat = repeat;
                 this.mirroredU = mirroredU;
@@ -67984,6 +68005,9 @@ var gd3d;
                 this.webgl = webgl;
                 this.format = format;
                 this.mipmap = mipmap;
+                if (render.mipmapCancel) {
+                    this.mipmap = false;
+                }
                 this.linear = linear;
                 this.texture = webgl.createTexture();
             }

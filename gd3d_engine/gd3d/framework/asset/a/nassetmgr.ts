@@ -339,7 +339,7 @@ namespace gd3d.framework
         }
 
         //加载图片
-        loadImg(guid: number, url: string, cb: (img) => void, bundle?: assetBundle)
+        loadImg(guid: number, url: string, cb: (img , err?) => void, bundle?: assetBundle)
         {
             if (assetMgr.mapImage[guid])
                 return cb(assetMgr.mapImage[guid]);
@@ -351,7 +351,7 @@ namespace gd3d.framework
                 assetMgr.setLoading(guid, loading);
             }
             loading.cbQueue.push(cb);
-            this._loadImg(url, (img) =>
+            this._loadImg(url, (img , err) =>
             {
                 if (bundle && bundle.isunload == true)
                 {
@@ -362,19 +362,26 @@ namespace gd3d.framework
                 assetMgr.mapImage[guid] = img;
                 loading.readyok = true;
                 loading.data = img;
-                while (loading.cbQueue.length > 0)
-                    loading.cbQueue.shift()(img);
+                while (loading.cbQueue.length > 0){
+                    let _cb = loading.cbQueue.shift() as (img , err?) => void;
+                    if(_cb) _cb(img , err);
+                }
             });
         }
 
         //微信可复写
-        protected _loadImg(url: string, cb: (img) => void)
+        protected _loadImg(url: string, cb: (img , err?) => void)
         {
             let img = new Image();
             //webgl跨域渲染要这样玩 [crossOrigin = ""]否则服务器允许跨域也没用
             img.crossOrigin = "";
             img.src = url;
-            img.onload = cb.bind(this, img);
+            img.onload = ()=>{
+                if(cb) cb(img);
+            }
+            img.onerror = (_err)=>{
+                if(cb) cb(img , _err);
+            }
         }
 
         use(asset: IAsset)
