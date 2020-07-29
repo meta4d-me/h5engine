@@ -81,7 +81,20 @@ namespace gd3d.framework
          * 开启使用Gpu Instance 渲染模式
          */
         get enableGpuInstancing (){ return this._enableGpuInstancing ;};
-        set enableGpuInstancing (enable : boolean ){ this._enableGpuInstancing = enable;};
+        set enableGpuInstancing (enable : boolean ){ 
+            this._enableGpuInstancing = enable;
+            if(enable){
+                this.getTexGuid(this);   //贴图使用唯一标识ID，gupInstance 使用
+                this.getShaderGuid(this.shader);
+                this.refreshGpuInstancingGUID();
+            }
+        };
+
+        //
+        private _shaderGUID : string = "";
+        private _textureGUID : string = "";
+        /** gpuInstancing 材质唯一ID */
+        gpuInstancingGUID : string = "";
 
         constructor(assetName: string = null)
         {
@@ -285,7 +298,9 @@ namespace gd3d.framework
                     setContainer.length = oldLen + att.size;
                     setContainer.fill(0,oldLen);
                 }else{
-                    arr.forEach(v=>{setContainer.push(v)});
+                    for(let i=0 , len = arr.length ; i < len ; i++){
+                        setContainer.push(arr[i]);
+                    }
                 }
             }
         }
@@ -311,6 +326,10 @@ namespace gd3d.framework
         {
             this.shader = shader;
             this.defaultMapUniform = shader.defaultMapUniform;
+            if(this._enableGpuInstancing){
+                this.getShaderGuid(shader);
+                this.refreshGpuInstancingGUID();
+            }
         }
         // private _changeShaderMap: { [name: string]: material } = {};
         // /**
@@ -545,6 +564,11 @@ namespace gd3d.framework
                 }
                 this.uniformDirtyMap[_id] = true;
 
+                if(this._enableGpuInstancing){
+                    this.getTexGuid(this);   //贴图使用唯一标识ID，gupInstance 使用
+                    this.refreshGpuInstancingGUID();
+                }
+
             } else
             {
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -559,6 +583,35 @@ namespace gd3d.framework
             //     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             // }
 
+        }
+
+        //贴图使用唯一标识ID，gupInstance 使用
+        private getTexGuid(mat : material){
+            let staMap = mat.statedMapUniforms;
+            this._textureGUID = "";
+            for(let key in staMap){
+                let val = staMap[key];
+                if(val.getGUID == null) continue;
+                let guid = (val as gd3d.framework.texture).getGUID();
+                this._textureGUID += `_${guid}`;
+            }
+        }
+
+        private getShaderGuid(sh : gd3d.framework.shader){
+            if(!sh) return;
+            if(!sh.passes["instance"] && !sh.passes["instance_fog"]){
+                console.warn(`shader ${sh.getName()} , has not "instance" pass when enable gpuInstance on the material ${this.getName()}.`);
+            }else{
+                this._shaderGUID = ""+ sh.getGUID();
+            }
+        }
+
+        private refreshGpuInstancingGUID(){
+            if(!this._shaderGUID) {
+                this.gpuInstancingGUID = "";
+                return;
+            }
+            this.gpuInstancingGUID = `${this._shaderGUID}_${this._textureGUID}`;
         }
 
         setCubeTexture(_id: string, _texture: gd3d.framework.texture)

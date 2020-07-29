@@ -320,14 +320,32 @@ namespace gd3d.framework
             let mr = r as meshRenderer;
             let mf = mr.filter;
             if(!mf || !mf.mesh) return;
-            if(!mr.materials[0]) return;
-            let sh = mr.materials[0].getShader();
-            if(!sh) return;
-            let id = `${sh.getGUID()}_${mf.mesh.getGUID()}`;
+            let mat = mr.materials[0];
+            if(!mat || !mat.gpuInstancingGUID) return;
+            // let sh = mat.getShader();
+            // if(!sh) return;
+            // if(!sh.passes["instance"] && !sh.passes["instance_fog"]){
+            //     console.warn(`shader ${sh.getName()} , has not "instance" pass when enable gpuInstance on the material ${mat.getName()}.`);
+            //     return;
+            // }
+            // let texId = this.getTexId(mat);
+            let id = `${mf.mesh.getGUID()}_${mat.gpuInstancingGUID}`;
             let list = this.gpuInstanceMap[id];
             if(!list) list = this.gpuInstanceMap[id] = [];
             list.push(r);
         }
+
+        // private getTexId(mat : material) : string{
+        //     let result = "";
+        //     let staMap = mat.statedMapUniforms;
+        //     for(let key in staMap){
+        //         let val = staMap[key];
+        //         if(val.getGUID == null) continue;
+        //         let guid = (val as gd3d.framework.texture).getGUID();
+        //         result += `_${guid}`;
+        //     }
+        //     return result;
+        // }
     }
 
 }

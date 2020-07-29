@@ -217,7 +217,8 @@ namespace gd3d.framework
         }
 
         private static helpIMatrix = new gd3d.math.matrix();
-        static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera , instanceArray : IRendererGpuIns[]){
+        private static cacheInstancVboMaps : {[key:string] : Float32Array} = {};
+        static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera , instanceArray : IRendererGpuIns[] , key : string){
             let insLen = instanceArray.length;
             if(insLen < 1) return;
             DrawCallInfo.inc.currentState=DrawCallEnum.Meshrender;
@@ -252,17 +253,24 @@ namespace gd3d.framework
                     activeAttributes: (gl, pass) =>
                     {
                         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                        let dataArr = meshRenderer.cacheInstancVboMaps[key];
+
                         let data = [];
-                        for(let i=0;i < insLen ;i++){
-                            let mr = instanceArray[i] as meshRenderer;
-                            let mat = mr.materials[mid];
-                            if(pass.program.mapAttrib[`${this.insOffsetMatrixStr}0`]){//vs中 注册过 offsetmatrix的才处理
-                                this.setInstanceOffsetMatrix(mr.gameObject.transform,mat); //RTS offset 矩阵
+                        if(!dataArr){
+                            for(let i=0;i < insLen ;i++){
+                                let mr = instanceArray[i] as meshRenderer;
+                                let mat = mr.materials[mid];
+                                if(pass.program.mapAttrib[`${this.insOffsetMatrixStr}0`]){//vs中 注册过 offsetmatrix的才处理
+                                    this.setInstanceOffsetMatrix(mr.gameObject.transform,mat); //RTS offset 矩阵
+                                }
+                                mat.uploadInstanceAtteribute( pass ,data);  //收集 各material instance atteribute
+    
                             }
-                            mat.uploadInstanceAtteribute( pass ,data);  //收集 各material instance atteribute
+                            dataArr = meshRenderer.cacheInstancVboMaps[key] = new Float32Array(data);
                         }
                         
-                        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+                        gl.bufferData(gl.ARRAY_BUFFER, dataArr , gl.STATIC_DRAW);
+                        // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data) , gl.STATIC_DRAW);
                         
                         let offset = 0;
                         let attMap = pass.program.mapCustomAttrib;

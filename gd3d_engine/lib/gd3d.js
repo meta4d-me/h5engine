@@ -22,10 +22,11 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
         function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
@@ -7630,6 +7631,7 @@ var gd3d;
          */
         var label = /** @class */ (function () {
             function label() {
+                this._text = "";
                 this.needRefreshFont = false;
                 this._fontName = "defFont.font.json";
                 this._fontsize = 14;
@@ -20480,6 +20482,7 @@ var gd3d;
                 */
                 this._queue = 0;
             }
+            meshRenderer_1 = meshRenderer;
             Object.defineProperty(meshRenderer.prototype, "renderLayer", {
                 /**
                  * @public
@@ -20604,7 +20607,7 @@ var gd3d;
                         usemat.draw(context, mesh, sm, drawtype);
                 }
             };
-            meshRenderer.GpuInstancingRender = function (context, assetmgr, camera, instanceArray) {
+            meshRenderer.GpuInstancingRender = function (context, assetmgr, camera, instanceArray, key) {
                 var _this = this;
                 var insLen = instanceArray.length;
                 if (insLen < 1)
@@ -20636,20 +20639,25 @@ var gd3d;
                         },
                         activeAttributes: function (gl, pass) {
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
+                            var dataArr = meshRenderer_1.cacheInstancVboMaps[key];
                             var data = [];
-                            for (var i_2 = 0; i_2 < insLen; i_2++) {
-                                var mr_1 = instanceArray[i_2];
-                                var mat = mr_1.materials[mid];
-                                if (pass.program.mapAttrib[_this.insOffsetMatrixStr + "0"]) { //vs中 注册过 offsetmatrix的才处理
-                                    _this.setInstanceOffsetMatrix(mr_1.gameObject.transform, mat); //RTS offset 矩阵
+                            if (!dataArr) {
+                                for (var i_2 = 0; i_2 < insLen; i_2++) {
+                                    var mr_1 = instanceArray[i_2];
+                                    var mat = mr_1.materials[mid];
+                                    if (pass.program.mapAttrib[_this.insOffsetMatrixStr + "0"]) { //vs中 注册过 offsetmatrix的才处理
+                                        _this.setInstanceOffsetMatrix(mr_1.gameObject.transform, mat); //RTS offset 矩阵
+                                    }
+                                    mat.uploadInstanceAtteribute(pass, data); //收集 各material instance atteribute
                                 }
-                                mat.uploadInstanceAtteribute(pass, data); //收集 各material instance atteribute
+                                dataArr = meshRenderer_1.cacheInstancVboMaps[key] = new Float32Array(data);
                             }
-                            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
+                            gl.bufferData(gl.ARRAY_BUFFER, dataArr, gl.STATIC_DRAW);
+                            // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data) , gl.STATIC_DRAW);
                             var offset = 0;
                             var attMap = pass.program.mapCustomAttrib;
-                            for (var key in attMap) {
-                                var att = attMap[key];
+                            for (var key_1 in attMap) {
+                                var att = attMap[key_1];
                                 var location_1 = att.location;
                                 if (location_1 == -1)
                                     break;
@@ -20662,8 +20670,8 @@ var gd3d;
                         disableAttributes: function (gl, pass) {
                             gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                             var attMap = pass.program.mapCustomAttrib;
-                            for (var key in attMap) {
-                                var att = attMap[key];
+                            for (var key_2 in attMap) {
+                                var att = attMap[key_2];
                                 var location_2 = att.location;
                                 if (location_2 == -1)
                                     break;
@@ -20735,8 +20743,10 @@ var gd3d;
             */
             meshRenderer.prototype.clone = function () {
             };
+            var meshRenderer_1;
             meshRenderer.ClassName = "meshRenderer";
             meshRenderer.helpIMatrix = new gd3d.math.matrix();
+            meshRenderer.cacheInstancVboMaps = {};
             meshRenderer.insOffsetMatrixStr = "instance_offset_matrix_";
             meshRenderer._vbos = [];
             __decorate([
@@ -20755,7 +20765,7 @@ var gd3d;
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
             ], meshRenderer.prototype, "layer", void 0);
-            meshRenderer = __decorate([
+            meshRenderer = meshRenderer_1 = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
                 __metadata("design:paramtypes", [])
@@ -21587,6 +21597,11 @@ var gd3d;
                  */
                 this.defaultAsset = false;
                 this._enableGpuInstancing = false;
+                //
+                this._shaderGUID = "";
+                this._textureGUID = "";
+                /** gpuInstancing 材质唯一ID */
+                this.gpuInstancingGUID = "";
                 this.instanceAttribValMap = {};
                 this.queue = 0;
                 this.statedMapUniforms = {};
@@ -21601,7 +21616,14 @@ var gd3d;
             material_3 = material;
             Object.defineProperty(material.prototype, "enableGpuInstancing", {
                 get: function () { return this._enableGpuInstancing; },
-                set: function (enable) { this._enableGpuInstancing = enable; },
+                set: function (enable) {
+                    this._enableGpuInstancing = enable;
+                    if (enable) {
+                        this.getTexGuid(this); //贴图使用唯一标识ID，gupInstance 使用
+                        this.getShaderGuid(this.shader);
+                        this.refreshGpuInstancingGUID();
+                    }
+                },
                 enumerable: true,
                 configurable: true
             });
@@ -21764,7 +21786,9 @@ var gd3d;
                         setContainer.fill(0, oldLen);
                     }
                     else {
-                        arr.forEach(function (v) { setContainer.push(v); });
+                        for (var i = 0, len = arr.length; i < len; i++) {
+                            setContainer.push(arr[i]);
+                        }
                     }
                 }
             };
@@ -21787,6 +21811,10 @@ var gd3d;
             material.prototype.setShader = function (shader) {
                 this.shader = shader;
                 this.defaultMapUniform = shader.defaultMapUniform;
+                if (this._enableGpuInstancing) {
+                    this.getShaderGuid(shader);
+                    this.refreshGpuInstancingGUID();
+                }
             };
             // private _changeShaderMap: { [name: string]: material } = {};
             // /**
@@ -21979,6 +22007,10 @@ var gd3d;
                         this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
                     this.uniformDirtyMap[_id] = true;
+                    if (this._enableGpuInstancing) {
+                        this.getTexGuid(this); //贴图使用唯一标识ID，gupInstance 使用
+                        this.refreshGpuInstancingGUID();
+                    }
                 }
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -21991,6 +22023,35 @@ var gd3d;
                 // {
                 //     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
                 // }
+            };
+            //贴图使用唯一标识ID，gupInstance 使用
+            material.prototype.getTexGuid = function (mat) {
+                var staMap = mat.statedMapUniforms;
+                this._textureGUID = "";
+                for (var key in staMap) {
+                    var val = staMap[key];
+                    if (val.getGUID == null)
+                        continue;
+                    var guid = val.getGUID();
+                    this._textureGUID += "_" + guid;
+                }
+            };
+            material.prototype.getShaderGuid = function (sh) {
+                if (!sh)
+                    return;
+                if (!sh.passes["instance"] && !sh.passes["instance_fog"]) {
+                    console.warn("shader " + sh.getName() + " , has not \"instance\" pass when enable gpuInstance on the material " + this.getName() + ".");
+                }
+                else {
+                    this._shaderGUID = "" + sh.getGUID();
+                }
+            };
+            material.prototype.refreshGpuInstancingGUID = function () {
+                if (!this._shaderGUID) {
+                    this.gpuInstancingGUID = "";
+                    return;
+                }
+                this.gpuInstancingGUID = this._shaderGUID + "_" + this._textureGUID;
             };
             material.prototype.setCubeTexture = function (_id, _texture) {
                 if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == gd3d.render.UniformTypeEnum.CubeTexture) {
@@ -27472,7 +27533,7 @@ var gd3d;
                         var gpuList = rmap[key];
                         if (!gpuList)
                             continue;
-                        framework.meshRenderer.GpuInstancingRender(context, assetmgr, this, gpuList);
+                        framework.meshRenderer.GpuInstancingRender(context, assetmgr, this, gpuList, key);
                     }
                 }
                 // for (var i = 0; i < scene.renderList.renderLayers.length; i++)
@@ -27774,6 +27835,7 @@ var gd3d;
          * @version gd3d 1.0
          */
         var effectSystem = /** @class */ (function () {
+            // @reflect.selfClone
             function effectSystem() {
                 this.layer = framework.RenderLayerEnum.Transparent;
                 /**
@@ -56437,6 +56499,8 @@ var gd3d;
                 this.haveComponet = false;
                 /** 需要初始化组件 */
                 this.needInit = false;
+                /** 需要没帧调用组件update */
+                this.needUpdate = true;
                 this._visible = true;
             }
             /**
@@ -57233,12 +57297,17 @@ var gd3d;
                 var mf = mr.filter;
                 if (!mf || !mf.mesh)
                     return;
-                if (!mr.materials[0])
+                var mat = mr.materials[0];
+                if (!mat || !mat.gpuInstancingGUID)
                     return;
-                var sh = mr.materials[0].getShader();
-                if (!sh)
-                    return;
-                var id = sh.getGUID() + "_" + mf.mesh.getGUID();
+                // let sh = mat.getShader();
+                // if(!sh) return;
+                // if(!sh.passes["instance"] && !sh.passes["instance_fog"]){
+                //     console.warn(`shader ${sh.getName()} , has not "instance" pass when enable gpuInstance on the material ${mat.getName()}.`);
+                //     return;
+                // }
+                // let texId = this.getTexId(mat);
+                var id = mf.mesh.getGUID() + "_" + mat.gpuInstancingGUID;
                 var list = this.gpuInstanceMap[id];
                 if (!list)
                     list = this.gpuInstanceMap[id] = [];
@@ -57545,6 +57614,8 @@ var gd3d;
                 }
             };
             scene.prototype.objupdate = function (node, delta) {
+                if (!node.gameObject.needUpdate)
+                    return;
                 if (!(node.hasComponent == false && node.hasComponentChild == false)) {
                     if (node.gameObject.needInit)
                         node.gameObject.init(this.app.bePlay); //组件还未初始化的初始化
