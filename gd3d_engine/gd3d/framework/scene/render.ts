@@ -299,6 +299,25 @@ namespace gd3d.framework
             }
         }
 
+        addStaticInstanceRenderer(renderer: IRendererGpuIns , webgl : WebGLRenderingContext){
+            if(!webgl.drawArraysInstanced || !renderer.isGpuInstancing || !renderer.isGpuInstancing()) return;
+            let idx = 0;
+            if (renderer.layer == RenderLayerEnum.Common)
+            {
+            }
+            else if (renderer.layer == RenderLayerEnum.Transparent)
+            {
+                idx = 1;
+            }
+            else if (renderer.layer == RenderLayerEnum.Overlay)
+            {
+                idx = 2;
+            }
+
+            this.renderLayers[idx].addInstance
+
+        }
+
         
         //此处应该根据绘制分类处理
         renderLayers: renderLayer[];
@@ -315,13 +334,21 @@ namespace gd3d.framework
         {
             this.needSort = _sort;
         }
+
+        /** gpu instance map*/
         gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {}; 
+        /** gpu instance 静态渲染模式 ，玩家自己管理 */
+        gpuInstanceStaticMap: {[sID:string] : { renderers : IRendererGpuIns[] , buffer : Float32Array}} = {}; 
+
         addInstance(r : IRendererGpuIns){
             let mr = r as meshRenderer;
             let mf = mr.filter;
             if(!mf || !mf.mesh) return;
             let mat = mr.materials[0];
-            if(!mat || !mat.gpuInstancingGUID) return;
+            if(!mat) return;
+            let gpuInstancingGUID = mat.gpuInstancingGUID;
+            if(!gpuInstancingGUID) return;
+
             // let sh = mat.getShader();
             // if(!sh) return;
             // if(!sh.passes["instance"] && !sh.passes["instance_fog"]){
@@ -329,10 +356,15 @@ namespace gd3d.framework
             //     return;
             // }
             // let texId = this.getTexId(mat);
-            let id = `${mf.mesh.getGUID()}_${mat.gpuInstancingGUID}`;
-            let list = this.gpuInstanceMap[id];
-            if(!list) list = this.gpuInstanceMap[id] = [];
-            list.push(r);
+
+            let id = `${mf.mesh.getGUID()}_${gpuInstancingGUID}`;
+            if(!this.gpuInstanceMap[id]) this.gpuInstanceMap[id] = [];
+            this.gpuInstanceMap[id].push(r);
+        }
+
+        addInstanceStatic(rs : IRendererGpuIns[]){
+            this.gpuInstanceStaticMap
+
         }
 
         // private getTexId(mat : material) : string{
