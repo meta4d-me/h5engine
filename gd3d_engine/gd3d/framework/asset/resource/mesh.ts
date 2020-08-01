@@ -11,7 +11,8 @@ namespace gd3d.framework
     export class mesh implements IAsset
     {
         static readonly ClassName: string = "mesh";
-
+        public maximun: math.vector3;
+        public minimun: math.vector3;
         private name: constText;
         private id: resID = new resID();
         defaultAsset: boolean = false;

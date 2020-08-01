@@ -256,7 +256,7 @@ namespace gd3d.framework
         // }
 
         /** 创建过的 aabb 缓存 ，避免每次重复构建  */
-        private static aabbStoreMap : {[key:number] : gd3d.math.vector3[]} = {};
+        private static aabbStoreMap: { [key: number]: gd3d.math.vector3[] } = {};
 
         private static readonly aabbCareTypes = ["meshFilter", "skinnedMeshRenderer", "canvasRenderer"];
         /**
@@ -284,22 +284,29 @@ namespace gd3d.framework
                             let m = filter.mesh;
                             let id = m.getGUID();
                             let min_max_v3 = transform.aabbStoreMap[id]; //优化 每次实例化都需构建
-                            if(min_max_v3){
+                            if (m.maximun && m.minimun)
+                            {
+                                minimum = m.minimun;
+                                maximum = m.maximun;
+
+                            } else if (min_max_v3)
+                            {
                                 minimum = min_max_v3[0];
                                 maximum = min_max_v3[1];
-                            }else{
+                            } else
+                            {
                                 var meshdata: gd3d.render.meshData = m.data;
                                 math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
                                 math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
                                 let len = meshdata.pos.length;
                                 let pos = meshdata.pos;
-                                for (var i = 0; i < len ; i++)
+                                for (var i = 0; i < len; i++)
                                 {
                                     math.vec3Max(pos[i], maximum, maximum);
                                     math.vec3Min(pos[i], minimum, minimum);
                                 }
 
-                                transform.aabbStoreMap[id] = [minimum,maximum];
+                                transform.aabbStoreMap[id] = [minimum, maximum];
                             }
 
                             matched = true;
@@ -312,17 +319,24 @@ namespace gd3d.framework
                             let m = skinmesh.mesh;
                             let id = m.getGUID();
                             let min_max_v3 = transform.aabbStoreMap[id]; //优化 每次实例化都需构建
-                            if(min_max_v3){
+                            if (m.maximun && m.minimun)
+                            {
+                                minimum = m.minimun;
+                                maximum = m.maximun;
+
+                            } else if (min_max_v3)
+                            {
                                 minimum = min_max_v3[0];
                                 maximum = min_max_v3[1];
-                            }else{
+                            } else
+                            {
                                 // NOTE: 如果当前物体有骨骼动画, 则不会使用这里的aabb进行剔除
                                 var skinmeshdata: gd3d.render.meshData = skinmesh.mesh.data;
                                 math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
                                 math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-    
+
                                 var p0 = gd3d.math.pool.new_vector3();
-    
+
                                 let len = skinmeshdata.pos.length;
                                 for (var i = 0; i < len; i++)
                                 {
@@ -332,7 +346,7 @@ namespace gd3d.framework
                                 }
                                 gd3d.math.pool.delete_vector3(p0);
 
-                                transform.aabbStoreMap[id] = [minimum,maximum];
+                                transform.aabbStoreMap[id] = [minimum, maximum];
                             }
                             matched = true;
                         }
@@ -476,7 +490,7 @@ namespace gd3d.framework
         {
             if (index < 0)
                 return;
-            if(!node)
+            if (!node)
             {
                 console.error(`node is null?? ${this.name}`);
                 console.error(new Error().stack);
@@ -534,7 +548,7 @@ namespace gd3d.framework
             if (node._parent != this || this.children == null)
             {
                 console.warn("not my child.");
-                return ;   
+                return;
             }
             var i = this.children.indexOf(node);
             if (i >= 0)
@@ -920,7 +934,8 @@ namespace gd3d.framework
          */
         getWorldTranslate()
         {
-            if (!this.firstCalc && this.gameObject.isStatic){
+            if (!this.firstCalc && this.gameObject.isStatic)
+            {
                 return this.worldTranslate;
             }
             if (!this._parent || !this._parent._parent)
