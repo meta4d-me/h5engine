@@ -288,26 +288,53 @@ namespace gd3d.framework
 
         instanceAttribValMap : {[id:string]:number[]} = {};
         /** gpu instancing 使用值上传 */
-        uploadInstanceAtteribute(pass: render.glDrawPass,setContainer: number[]){
+        // uploadInstanceAtteribute(pass: render.glDrawPass,setContainer: number[]){
+        //     let attmap =  pass.program.mapCustomAttrib;
+        //     for(let key in attmap){
+        //         let arr = this.instanceAttribValMap[key];
+        //         if(!arr){
+        //             let att = pass.program.mapCustomAttrib[key];
+        //             let oldLen = setContainer.length;
+        //             setContainer.length = oldLen + att.size;
+        //             setContainer.fill(0,oldLen);
+        //         }else{
+        //             for(let i=0 , len = arr.length ; i < len ; i++){
+        //                 setContainer.push(arr[i]);
+        //             }
+        //         }
+        //     }
+        // }
+
+        uploadInstanceAtteribute(pass: render.glDrawPass, darr: gd3d.math.ExtenArray<Float32Array>){
             let attmap =  pass.program.mapCustomAttrib;
             for(let key in attmap){
                 let arr = this.instanceAttribValMap[key];
                 if(!arr){
                     let att = pass.program.mapCustomAttrib[key];
-                    let oldLen = setContainer.length;
-                    setContainer.length = oldLen + att.size;
-                    setContainer.fill(0,oldLen);
+                    // let oldLen = setContainer.length;
+                    // setContainer.length = oldLen + att.size;
+                    // setContainer.fill(0,oldLen);
+                    for(let i=0 , len = att.size ; i < len ; i++){
+                        darr.push(0);
+                    }
                 }else{
                     for(let i=0 , len = arr.length ; i < len ; i++){
-                        setContainer.push(arr[i]);
+                        darr.push(arr[i]);
                     }
                 }
             }
         }
 
-        private setInstanceAttribValue(id:string,arr:number[]){
-            if(!id) return;
-            this.instanceAttribValMap[id] = arr;
+        // private setInstanceAttribValue(id:string,arr:number[]){
+        //     if(!id) return;
+        //     this.instanceAttribValMap[id] = arr;
+        // }
+
+        private getInstanceAttribValue(id:string){
+            if(this.instanceAttribValMap[id] == null){
+                this.instanceAttribValMap[id] = [];
+            }
+            return this.instanceAttribValMap[id];
         }
 
         private isNotBuildinAttribId(id:string){
@@ -429,7 +456,9 @@ namespace gd3d.framework
             }
             
             if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
-                this.setInstanceAttribValue(_id,[_number]);
+                let arr = this.getInstanceAttribValue(_id);
+                arr[0] = _number;
+                // this.setInstanceAttribValue(_id,[_number]);
             }
         }
         /**
@@ -447,11 +476,19 @@ namespace gd3d.framework
             }
 
             if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
-                let arr : number [] = []
-                _numbers.forEach((v)=>{
-                    arr.push(v);
-                });
-                this.setInstanceAttribValue(_id,arr);
+
+                if(_numbers.length == 1 || _numbers.length == 4){
+                    let arr = this.getInstanceAttribValue(_id);
+                    for(let i=0 , len = _numbers.length ;i < len ;i++){
+                        arr[i] = _numbers[i];
+                    }
+                }
+                
+                // let arr : number [] = []
+                // _numbers.forEach((v,i)=>{
+                //     arr.push(v);
+                // });
+                // this.setInstanceAttribValue(_id,arr);
             }
         }
         /**
@@ -469,7 +506,12 @@ namespace gd3d.framework
             }
 
             if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
-                this.setInstanceAttribValue(_id,[_vector4.x,_vector4.y,_vector4.z,_vector4.w]);
+                let arr = this.getInstanceAttribValue(_id);
+                arr[0] = _vector4.x;
+                arr[1] = _vector4.y;
+                arr[2] = _vector4.z;
+                arr[3] = _vector4.w;
+                // this.setInstanceAttribValue(_id,[_vector4.x,_vector4.y,_vector4.z,_vector4.w]);
             }
         }
         /**
@@ -487,11 +529,16 @@ namespace gd3d.framework
                 console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
             }
             if( this._enableGpuInstancing && this.isNotBuildinAttribId(_id)){
-                let arr : number [] = []
-                _vector4v.forEach((v)=>{
-                    arr.push(v);
-                });
-                this.setInstanceAttribValue(_id,arr);
+                let arr = this.getInstanceAttribValue(_id);
+                for(let i=0 , len = _vector4v.length ;i < len ;i++){
+                    arr[i] = _vector4v[i];
+                }
+
+                // let arr : number [] = []
+                // _vector4v.forEach((v)=>{
+                //     arr.push(v);
+                // });
+                // this.setInstanceAttribValue(_id,arr);
             }
         }
         /**

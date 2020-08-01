@@ -589,6 +589,106 @@ namespace gd3d.math
                 + "[" + this.rawData[3] + "," + this.rawData[4] + "," + this.rawData[5] + "]";
         }
     }
+
+    /**
+     * 动态延长 Array 
+     */
+    export class ExtenArray<T extends Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array | Float32Array | Float64Array>{
+        private _buffer: T;
+        private _buoy: number = -1;
+        private _length: number;
+
+        /** 定长数组 */
+        get buffer() { return this._buffer; };
+        /** 已经使用到数量 */
+        get count() { return this._buoy + 1; };
+        set count(val : number) {
+            if(val < 0) val = 0;
+            if(val > this._length) {
+                let needSize =  Math.ceil( val / this._length ) * this._length;
+                this.exlength(needSize);
+            }
+            this._buoy = val -1; 
+        };
+
+        /**
+         * 动态延长 Array 
+         * @param bufferType buffer类型
+         * @param initSize 初始array 长度
+         */
+        constructor(private bufferType: new (size: number) => T, initSize: number = 32)
+        {
+            this._length = initSize;
+            // this._buffer = new T(initSize);
+            this._buffer = new bufferType(initSize);
+        }
+
+        /** push添加到array */
+        push(num: number)
+        {
+            this._buoy++;
+            if (this._buoy >= this._length)
+            {
+                this.exlength();
+            }
+            this._buffer[this._buoy] = num;
+        }
+
+        private exlength(mult : number = 2)
+        {
+            let _nlength = this._length * mult;
+            let _buffer = this._buffer;
+            // let _nbuffer = new T(_nlength);
+            let _nbuffer = new this.bufferType(_nlength);
+            for (let i = 0, len = this._length; i < len; i++)
+            {
+                _nbuffer[i] = _buffer[i];
+            }
+            this._buffer = _nbuffer;
+            this._length = _nlength;
+        }
+
+    }
+
+    /**
+     * 复用数组 ，用于频繁重复创建数组容器的场景(减少GC消耗)
+     */
+    export class ReuseArray<T>{
+        private arr : Array<T>= [];
+        private buoy = -1 ;
+
+        /** 获取 Array 对象 */
+        getArray(){
+            return this.arr;
+        }
+
+        /** 获取当前长度 */
+        get length(){ return this.buoy + 1; };
+        set length(val){ this.buoy = val - 1;};
+
+        push(val : T){
+            this.buoy++;
+            this.arr[this.buoy] = val;
+        }
+
+        /** 获取指定索引的值 */
+        get(index: number){
+            if(index > this.buoy ) return null;
+            return this.arr[index];
+        }
+
+        /** 数组所有值置为null  */
+        clear(){
+            var len = this.arr.length;
+            for(var i=0; i < len ;i++){
+                if(this.arr[i] == null && i >= this.buoy) break;
+                this.arr[i] = null;
+            } 
+            this.buoy = -1;
+        }
+    }
+
+
     // //表示一个变换
     // export class transform
     // {

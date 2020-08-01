@@ -274,7 +274,12 @@ namespace gd3d.framework
             let len = this.renderLayers.length;
             for(let i=0;i < len;i++){
                 this.renderLayers[i].list.length = 0;
-                this.renderLayers[i].gpuInstanceMap = {};
+                let obj = this.renderLayers[i].gpuInstanceMap;
+                for(let key in obj){
+                    // obj[key].clear();
+                    obj[key].length=0;
+                }
+                // this.renderLayers[i].gpuInstanceMap = {};
             }
         }
         addRenderer(renderer: IRenderer , webgl : WebGLRenderingContext)
@@ -299,24 +304,24 @@ namespace gd3d.framework
             }
         }
 
-        addStaticInstanceRenderer(renderer: IRendererGpuIns , webgl : WebGLRenderingContext){
-            if(!webgl.drawArraysInstanced || !renderer.isGpuInstancing || !renderer.isGpuInstancing()) return;
-            let idx = 0;
-            if (renderer.layer == RenderLayerEnum.Common)
-            {
-            }
-            else if (renderer.layer == RenderLayerEnum.Transparent)
-            {
-                idx = 1;
-            }
-            else if (renderer.layer == RenderLayerEnum.Overlay)
-            {
-                idx = 2;
-            }
+        // addStaticInstanceRenderer(renderer: IRendererGpuIns , webgl : WebGLRenderingContext){
+        //     if(!webgl.drawArraysInstanced || !renderer.isGpuInstancing || !renderer.isGpuInstancing()) return;
+        //     let idx = 0;
+        //     if (renderer.layer == RenderLayerEnum.Common)
+        //     {
+        //     }
+        //     else if (renderer.layer == RenderLayerEnum.Transparent)
+        //     {
+        //         idx = 1;
+        //     }
+        //     else if (renderer.layer == RenderLayerEnum.Overlay)
+        //     {
+        //         idx = 2;
+        //     }
 
-            this.renderLayers[idx].addInstance
+        //     this.renderLayers[idx].addInstance
 
-        }
+        // }
 
         
         //此处应该根据绘制分类处理
@@ -336,9 +341,11 @@ namespace gd3d.framework
         }
 
         /** gpu instance map*/
-        gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {}; 
+        // gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {}; 
+        gpuInstanceMap: {[sID:string] : math.ReuseArray<IRendererGpuIns>} = {}; 
         /** gpu instance 静态渲染模式 ，玩家自己管理 */
-        gpuInstanceStaticMap: {[sID:string] : { renderers : IRendererGpuIns[] , buffer : Float32Array}} = {}; 
+        // gpuInstanceStaticMap: {[sID:string] : { renderers : IRendererGpuIns[] , buffer : Float32Array}} = {}; 
+        gpuInstanceStaticMap: {[sID:string] : { renderers : math.ReuseArray<IRendererGpuIns> , buffer : Float32Array}} = {}; 
 
         addInstance(r : IRendererGpuIns){
             let mr = r as meshRenderer;
@@ -348,7 +355,6 @@ namespace gd3d.framework
             if(!mat) return;
             let gpuInstancingGUID = mat.gpuInstancingGUID;
             if(!gpuInstancingGUID) return;
-
             // let sh = mat.getShader();
             // if(!sh) return;
             // if(!sh.passes["instance"] && !sh.passes["instance_fog"]){
@@ -357,15 +363,35 @@ namespace gd3d.framework
             // }
             // let texId = this.getTexId(mat);
 
-            let id = `${mf.mesh.getGUID()}_${gpuInstancingGUID}`;
-            if(!this.gpuInstanceMap[id]) this.gpuInstanceMap[id] = [];
+            // let id = `${mf.mesh.getGUID()}_${gpuInstancingGUID}`;
+            let id = renderLayer.getRandererGUID(mf.mesh.getGUID() , gpuInstancingGUID);
+            if(!this.gpuInstanceMap[id]) {
+                this.gpuInstanceMap[id] = new math.ReuseArray<IRendererGpuIns>();
+            }
             this.gpuInstanceMap[id].push(r);
         }
 
-        addInstanceStatic(rs : IRendererGpuIns[]){
-            this.gpuInstanceStaticMap
 
+        private static gpuInsRandererGUID = -1;
+        private static gpuInsRandererGUIDMap = {};
+        /** gpuInstancing 唯一ID */
+        private static getRandererGUID(meshGuid :number , materialGuid : string): number{
+            let meshTemp = this.gpuInsRandererGUIDMap[meshGuid];
+            if(!meshTemp){
+                meshTemp = this.gpuInsRandererGUIDMap[meshGuid] = {};
+            }
+            let rId = meshTemp[materialGuid];
+            if(rId == null){
+                this.gpuInsRandererGUID++;
+                rId = meshTemp[materialGuid] = this.gpuInsRandererGUID;
+            }
+            return rId;
         }
+
+        // addInstanceStatic(rs : IRendererGpuIns[]){
+        //     this.gpuInstanceStaticMap
+
+        // }
 
         // private getTexId(mat : material) : string{
         //     let result = "";

@@ -216,15 +216,20 @@ namespace gd3d.framework
 
         }
 
+        private static helpReuseArray = new gd3d.math.ReuseArray<number>();
+        private static helpDArray = new gd3d.math.ExtenArray<Float32Array>(Float32Array);
         private static helpIMatrix = new gd3d.math.matrix();
         private static cacheInstancVboMaps : {[key:string] : Float32Array} = {};
-        static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera , instanceArray : IRendererGpuIns[] , cacheBuffer? : Float32Array){
+        // static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera , instanceArray : IRendererGpuIns[] , cacheBuffer? : Float32Array){
+        static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera , instanceArray : gd3d.math.ReuseArray<IRendererGpuIns>, cacheBuffer? : Float32Array){
             let insLen = instanceArray.length;
             if(insLen < 1) return;
             DrawCallInfo.inc.currentState=DrawCallEnum.Meshrender;
-            let mr = instanceArray[0] as gd3d.framework.meshRenderer;
-            let go = instanceArray[0].gameObject;
-            let tran = go.transform;
+            // let mr = instanceArray[0] as gd3d.framework.meshRenderer;
+            let mr = instanceArray.get(0) as gd3d.framework.meshRenderer;
+            // let go = instanceArray[0].gameObject;
+            let go = mr.gameObject;
+            // let tran = go.transform;
             let filter = mr.filter; 
 
             context.updateLightMask(go.layer);
@@ -257,19 +262,24 @@ namespace gd3d.framework
                     {
                         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
                         let dataArr = cacheBuffer;
-                        let data : number[] = [];
+                        // let data : number[] = [];
+                        let _mid = mid;
                         if(!cacheBuffer){
+                            this.helpDArray.count = 0;
                             for(let i=0;i < insLen ;i++){
-                                let mr = instanceArray[i] as meshRenderer;
-                                let mat = mr.materials[mid];
+                                // let mr = instanceArray[i] as meshRenderer;
+                                let mr = instanceArray.get(i) as meshRenderer;
+                                let mat = mr.materials[_mid];
                                 // if(pass.program.mapAttrib[`${this.insOffsetMatrixStr}0`]){//vs中 注册过 offsetmatrix的才处理
                                 //     this.setInstanceOffsetMatrix(mr.gameObject.transform,mat); //RTS offset 矩阵
                                 // }
                                 this.setInstanceOffsetMatrix(mr.gameObject.transform,mat,pass);
-                                mat.uploadInstanceAtteribute( pass ,data);  //收集 各material instance atteribute
+                                // mat.uploadInstanceAtteribute( pass ,data);  //收集 各material instance atteribute
+                                mat.uploadInstanceAtteribute(pass , this.helpDArray);
     
                             }
-                            dataArr = new Float32Array(data);
+                            // dataArr = new Float32Array(arr);
+                            dataArr = this.helpDArray.buffer;
                         }
                         
                         gl.bufferData(gl.ARRAY_BUFFER, dataArr , gl.STATIC_DRAW);
@@ -311,19 +321,20 @@ namespace gd3d.framework
         }
 
         private static readonly insOffsetMatrixStr = "instance_offset_matrix_";
+        private static insOffsetMtxIDMap = [`instance_offset_matrix_0`,`instance_offset_matrix_1`,`instance_offset_matrix_2`,`instance_offset_matrix_3`];
         static setInstanceOffsetMatrix(tran: gd3d.framework.transform, mat: material , pass : render.glDrawPass){
-            if(!pass.program.mapAttrib[`${this.insOffsetMatrixStr}0`]) return;
+            if(!pass.program.mapAttrib[this.insOffsetMtxIDMap[0]]) return;
             this._setInstanceOffsetMatrix(tran , mat);
         }
 
         private static _setInstanceOffsetMatrix(tran: gd3d.framework.transform, mat: material){
             let _wmat = tran.getWorldMatrix();
-            let insOffsetMtxStr = this.insOffsetMatrixStr;
             let len = 4;
             let rawdata = _wmat.rawData;
             for(let i=0;i<len;i++){
-                let arr = mat.instanceAttribValMap[`${insOffsetMtxStr}${i}`];
-                if(!arr) arr = mat.instanceAttribValMap[`${insOffsetMtxStr}${i}`] = [];
+                let id = this.insOffsetMtxIDMap[i];
+                let arr = mat.instanceAttribValMap[id];
+                if(!arr) arr = mat.instanceAttribValMap[id] = [];
                  arr[0] = rawdata[0 + 4 * i];
                  arr[1] = rawdata[1 + 4 * i];
                  arr[2] = rawdata[2 + 4 * i];
@@ -356,7 +367,8 @@ namespace gd3d.framework
         }
 
         isGpuInstancing(){
-            if(!this.materials || !this.materials[0]) return false;
+            // if(!this.materials || !this.materials[0]) return false;
+            if(!this.materials || this.materials.length < 1) return false;
             return this.materials[0].enableGpuInstancing;
         }
          /**

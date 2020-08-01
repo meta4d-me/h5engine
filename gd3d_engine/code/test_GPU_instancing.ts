@@ -129,7 +129,6 @@ class test_GPU_instancing implements IState
                 this.mrArr.push(v);
             });
         }
-        debugger;
         if(this.isInstancing)
         for(let i=0, len = this.mrArr.length ;i < len;i++){
             gpuInstanceMgr.addToBatcher(this.mrArr[i]);
@@ -198,7 +197,7 @@ class test_GPU_instancing implements IState
     }
 }
 
-type batcherStrct = {sh : gd3d.framework.shader , pass : gd3d.render.glDrawPass , darr : dArray<Float32Array> , renderers : gd3d.framework.IRendererGpuIns[]};
+type batcherStrct = {sh : gd3d.framework.shader , pass : gd3d.render.glDrawPass , darr : gd3d.math.ExtenArray<Float32Array> , renderers : gd3d.math.ReuseArray<gd3d.framework.IRendererGpuIns>};
 class gpuInstanceMgr{
     private static SetedMap : {[resUrl  : string] : boolean} = {}
     /**
@@ -265,20 +264,22 @@ class gpuInstanceMgr{
         if(!bs){
             let _sh = mat.getShader();
             let _pass = _sh.passes[gd3d.framework.meshRenderer.instanceDrawType()][0];
-            let _darr = new dArray<Float32Array>(Float32Array);
-            let _renderers = [];
-            bs = this.batcherMap[id] = {sh : _sh , pass : _pass , darr : _darr , renderers : _renderers }
+            let _darr = new gd3d.math.ExtenArray<Float32Array>(Float32Array);
+            // let _renderers = [];
+            let _renderers = new gd3d.math.ReuseArray<gd3d.framework.IRendererGpuIns>();
+            bs = this.batcherMap[id] = {sh : _sh , pass : _pass , darr : _darr , renderers : _renderers };
         }
         let pass : gd3d.render.glDrawPass = bs.pass;
-        let darr : dArray<Float32Array> = bs.darr;
-        let renderers : gd3d.framework.IRendererGpuIns[] = bs.renderers;
+        // let darr : gd3d.math.ExtenArray<Float32Array> = bs.darr;
+        let darr : gd3d.math.ExtenArray<Float32Array> = bs.darr;
+        let renderers : gd3d.math.ReuseArray<gd3d.framework.IRendererGpuIns> = bs.renderers;
         
         gd3d.framework.meshRenderer.setInstanceOffsetMatrix(mr.gameObject.transform , mat , pass); //RTS offset 矩阵
         renderers.push(mr);
         this.uploadInstanceAtteribute( mat , pass ,darr);  //收集 各material instance atteribute
     }
 
-    private static uploadInstanceAtteribute(mat : gd3d.framework.material ,pass : gd3d.render.glDrawPass , darr: dArray<Float32Array>){
+    private static uploadInstanceAtteribute(mat : gd3d.framework.material ,pass : gd3d.render.glDrawPass , darr: gd3d.math.ExtenArray<Float32Array>){
         // let sh = mat.getShader();
         // let pass = sh.passes[gd3d.framework.meshRenderer.instanceDrawType()][0];
         // gd3d.framework.meshRenderer.setInstanceOffsetMatrix(mr.gameObject.transform , mat , pass); //RTS offset 矩阵
@@ -309,10 +310,10 @@ class gpuInstanceBatcher{
     private _cellSize : number ;
     /** 浮标位置 */
     private buoy : number = 0;
-    private _dArr : dArray<Float32Array>;
+    private _dArr : gd3d.math.ExtenArray<Float32Array>;
     get dBuffer (){return this._dArr;}
     constructor(size : number ){
-        this._dArr = new dArray<Float32Array>(Float32Array);
+        this._dArr = new gd3d.math.ExtenArray<Float32Array>(Float32Array);
         this._cellSize = size;
     }
 
@@ -326,41 +327,3 @@ class gpuInstanceBatcher{
     }
 }
 
-
-class dArray<T extends Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array | Float32Array | Float64Array>{
-    private _buffer : T;
-    private _buoy : number = -1;
-    private _length : number;
-
-    /** 定长数组 */
-    get buffer (){ return this._buffer;};
-    /** 数量 */
-    get count (){ return this._buoy + 1;};
-
-    constructor (private bufferType: new (size:number) => T , initSize : number = 128){
-        this._length = initSize;
-        // this._buffer = new T(initSize);
-        this._buffer = new bufferType(initSize);
-    }
- 
-    push(num : number){
-        this._buoy ++;
-        if(this._buoy >=  this._length ){
-            this.exlength();
-        }
-        this._buffer[this._buoy] = num;
-    }
-
-    private exlength(){
-        let _nlength = this._length * 2;
-        let _buffer = this._buffer;
-        // let _nbuffer = new T(_nlength);
-        let _nbuffer = new this.bufferType(_nlength);
-        for(let i=0 , len = this._length ; i < len ; i++){
-            _nbuffer[i] = _buffer[i];
-        }
-        this._buffer = _nbuffer;
-        this._length = _nlength;
-    }
-
-}
