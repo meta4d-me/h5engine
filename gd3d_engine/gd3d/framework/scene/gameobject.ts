@@ -177,8 +177,6 @@ namespace gd3d.framework
         componentTypes: { [key: string]: boolean } = {};
         private componentsInit: nodeComponent[] = [];
         // private componentsPlayed: nodeComponent[] = [];
-        /** 拥有组件 */
-        haveComponet: boolean = false;
         /** 需要初始化组件 */
         needInit:boolean = false;
         /** 需要没帧调用组件update */
@@ -346,7 +344,6 @@ namespace gd3d.framework
                 console.error("this component is null");
                 return;
             }
-            this.transform.markHaveComponent();
             if (comp.gameObject != null)
             {
                 console.error("this components has added to a  gameObject");
@@ -448,7 +445,8 @@ namespace gd3d.framework
                     sceneMgr.app.markNotify(this.transform, NotifyType.AddCamera);
                 if (reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1")
                     sceneMgr.app.markNotify(this.transform, NotifyType.AddCanvasRender);                
-                this.needInit = this.haveComponet = true;
+                this.needInit = true;
+                this.transform.markHaveComponent();
             }
 
             this.componentTypes[typeStr] = true;
@@ -644,7 +642,7 @@ namespace gd3d.framework
                 ++i;
             }
             if (this.components.length < 1)
-                this.haveComponet = false;
+                this.transform.hasComponent = false;
         }
 
         /**
@@ -683,7 +681,7 @@ namespace gd3d.framework
                 ++i;
             }
             if (this.components.length < 1)
-                this.haveComponet = false;
+                this.transform.hasComponent = false;
 
             return result;
         }
@@ -715,7 +713,7 @@ namespace gd3d.framework
 
             this.components.length = 0;
             this.componentTypes = {};
-            this.haveComponet = false;
+            this.transform.hasComponent = false;
         }
 
         private clearOfCompRemove(cComp: nodeComponent){
