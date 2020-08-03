@@ -284,17 +284,18 @@ namespace gd3d.framework
         }
         addRenderer(renderer: IRenderer , webgl : WebGLRenderingContext)
         {
-            let idx = 0;
-            if (renderer.layer == RenderLayerEnum.Common)
+            let layer = renderer.layer; 
+            if (layer == RenderLayerEnum.Common)
             {
+                var idx = 0;
             }
-            else if (renderer.layer == RenderLayerEnum.Transparent)
-            {
-                idx = 1;
-            }
-            else if (renderer.layer == RenderLayerEnum.Overlay)
+            else if (layer == RenderLayerEnum.Overlay)
             {
                 idx = 2;
+            }
+            else if (layer == RenderLayerEnum.Transparent)
+            {
+                idx = 1;
             }
             let gpuInsR = (renderer as IRendererGpuIns);
             if(!webgl.drawArraysInstanced || !gpuInsR.isGpuInstancing || !gpuInsR.isGpuInstancing()){

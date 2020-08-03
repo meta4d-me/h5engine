@@ -428,8 +428,11 @@ namespace gd3d.framework
                 }
             }
 
-            if(functionIsEmpty(comp.update))
+            if(functionIsEmpty(comp.update)){
                 comp.update =undefined;//update空转
+            }else{
+                this.transform.markHaveUpdateComp();
+            }
 
             // if (comp.update.toString().length < 35)
             // {

@@ -6,7 +6,7 @@ class test_GPU_instancing implements IState
     private _app : gd3d.framework.application;
     private _scene: gd3d.framework.scene;
     private _mat_ins: gd3d.framework.material;
-    private createCount = 10000;
+    private createCount = 20000;
     private instanceShBase : gd3d.framework.shader;
     private mats : gd3d.framework.material[] =[];
     private mrArr : gd3d.framework.meshRenderer[] =[];
@@ -70,7 +70,7 @@ class test_GPU_instancing implements IState
 
         //
         gd3d.framework.transform.prototype["checkToTop"] = () => { }; //去掉检查优化
-        app.isFrustumCulling = false;
+        // app.isFrustumCulling = false;
     }
 
     private _batcher = false;
