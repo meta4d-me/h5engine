@@ -10,17 +10,13 @@ class test_GPU_instancing implements IState
     private instanceShBase : gd3d.framework.shader;
     private mats : gd3d.framework.material[] =[];
     private mrArr : gd3d.framework.meshRenderer[] =[];
-    private lookAtCameraTransArr : gd3d.framework.transform[] =[];
     private isInstancing = true;
-    private isStatic = true;
     private cubeRoot : gd3d.framework.transform;
     private cam : gd3d.framework.camera;
     private modelType : string = "";
     private subRange = 10;
     async start(app: gd3d.framework.application)
     {
-        
-
         await demoTool.loadbySync(`newRes/shader/MainShader.assetbundle.json`, app.getAssetMgr());
         await demoTool.loadbySync(`newRes/test/shader/customShader/customShader.assetbundle.json`, app.getAssetMgr());  //项目shader
         await datGui.init();
@@ -63,8 +59,9 @@ class test_GPU_instancing implements IState
         _dat.add(this , 'isInstancing').listen();
         _dat.add(this , 'instanceSwitch');
         _dat.add(this , 'batcherSwitch');
-        _dat.add(this , 'isStatic');
-        _dat.add(this , 'needUpdate');
+        _dat.add(this , 'isStatic').listen();;
+        _dat.add(this , 'needUpdate').listen();;
+        _dat.add(this , 'needFillRenderer').listen();;
         _dat.add(this , 'createCount');
         _dat.add(this , 'refresh');
 
@@ -76,36 +73,65 @@ class test_GPU_instancing implements IState
     private _batcher = false;
     batcherSwitch(){
         this._batcher =!this._batcher;
-        let renderList = this._scene.renderList;
         if(this._batcher){
-            this.cubeRoot.parent.removeChild(this.cubeRoot);
-            for(let key in gpuInstanceMgr.batcherMap){
-                let v = gpuInstanceMgr.batcherMap[key];
-                renderList.renderLayers[0].gpuInstanceStaticMap[key] = {renderers : v.renderers , buffer : v.darr.buffer}
-            }
+            // this.cubeRoot.parent.removeChild(this.cubeRoot);
+         
+            this.mrArr.forEach((mr)=>{
+                let tran =  mr.gameObject.transform;
+                tran.needGpuInstancBatcher = true;
+            });
+
+            this.needFillRenderer = false;
         }else{
-            this._scene.addChild(this.cubeRoot);
-            renderList.renderLayers[0].gpuInstanceStaticMap = {}; 
+            // this._scene.addChild(this.cubeRoot);
+            this.mrArr.forEach((mr)=>{
+                let tran =  mr.gameObject.transform;
+                tran.needGpuInstancBatcher = true;
+            });
+
+            this.needFillRenderer = true;
         }
+
+        this._scene.refreshGpuInstancBatcher();
     }
 
     refresh(){
         this.cubeRoot.removeAllChild();
+        this.cubeRoot.gameObject.isStatic = this.isStatic;
+        this.mrArr.length = 0;
+        this.mats.length = 0;
+
         if(!this.modelType){
             this.createByNum(this.createCount);
         }else{
             this.loadTest(this.modelType);
-        }     
+        }
     }
 
-    private _needUpdate = true; 
+    private _isStatic = true;
+    get isStatic (){ return this._isStatic;}
+    set isStatic (v){
+        this._isStatic = v;
+        this.cubeRoot.gameObject.isStatic = v;
+    }
+
+    private _needUpdate = true;
     get needUpdate (){ return this._needUpdate;}
-    set needUpdate (v){ 
+    set needUpdate (v){
         this._needUpdate = v;
-        this.cubeRoot.gameObject.needUpdate = v;
+        this.cubeRoot.needUpdate = v;
     }
 
-    private loadedTest = false; 
+
+    private _needFillRenderer = true;
+    get needFillRenderer (){ return this._needFillRenderer;}
+    set needFillRenderer (v){
+        this._needFillRenderer = v;
+        this.cubeRoot.needFillRenderer = v;
+    }
+
+
+    private loadedTest = false;
     async loadTest(modelName: string){
         let url = `newRes/pfb/model/${modelName}/${modelName}.assetbundle.json`;
         if(!this.loadedTest)
@@ -114,10 +140,9 @@ class test_GPU_instancing implements IState
 
         let m = this._app.getAssetMgr().getAssetByName(`${modelName}.prefab.json` , `${modelName}.assetbundle.json`) as gd3d.framework.prefab;
         let count = this.createCount;
-        let  range = this.subRange;
+        let range = this.subRange;
         for(let i=0 ;i < count;i++){
             let tran = m.getCloneTrans();
-            tran.gameObject.isStatic = true;
             this.cubeRoot.addChild(tran);
             gd3d.math.vec3Set(tran.localTranslate , Math.random() * range ,Math.random() * range , Math.random() * range );
             tran.localTranslate = tran.localTranslate;
@@ -127,11 +152,8 @@ class test_GPU_instancing implements IState
             let mrs = tran.gameObject.getComponentsInChildren("meshRenderer") as gd3d.framework.meshRenderer[];
             mrs.forEach((v)=>{
                 this.mrArr.push(v);
+                // v.gameObject.transform.enableCulling = false;
             });
-        }
-        if(this.isInstancing)
-        for(let i=0, len = this.mrArr.length ;i < len;i++){
-            gpuInstanceMgr.addToBatcher(this.mrArr[i]);
         }
     }
 
@@ -162,7 +184,7 @@ class test_GPU_instancing implements IState
     createOne(app , needInstance : boolean )
     {
         let obj = gd3d.framework.TransformUtil.CreatePrimitive(gd3d.framework.PrimitiveType.Cube, app);
-        obj.gameObject.isStatic = this.isStatic;
+        obj.gameObject.transform.enableCulling = false;
         obj.name = `cube_${++this.count}`;
         this.cubeRoot.addChild(obj);
         let range = this.subRange;
@@ -174,6 +196,7 @@ class test_GPU_instancing implements IState
         mr.materials[0].enableGpuInstancing = needInstance;
         mr.materials[0].setVector4("a_particle_color",new gd3d.math.vector4(Math.random(),Math.random(),Math.random(),1));
         this.mats.push(mr.materials[0]);
+        this.mrArr.push(mr);
     }
 
     private lookAtCamera(trans : gd3d.framework.transform){
@@ -197,7 +220,7 @@ class test_GPU_instancing implements IState
     }
 }
 
-type batcherStrct = {sh : gd3d.framework.shader , pass : gd3d.render.glDrawPass , darr : gd3d.math.ExtenArray<Float32Array> , renderers : gd3d.math.ReuseArray<gd3d.framework.IRendererGpuIns>};
+type batcherStrct = {pass : gd3d.render.glDrawPass , darr : gd3d.math.ExtenArray<Float32Array> , renderers : gd3d.math.ReuseArray<gd3d.framework.IRendererGpuIns>};
 class gpuInstanceMgr{
     private static SetedMap : {[resUrl  : string] : boolean} = {}
     /**
@@ -234,7 +257,7 @@ class gpuInstanceMgr{
             }
             if(val instanceof gd3d.math.vector4){
                mat.setVector4(key , val);
-                continue; 
+                continue;
             }
         }
     }
@@ -247,83 +270,8 @@ class gpuInstanceMgr{
             console.warn(`shader ${sh.getName()} , 没有 instance 通道, 无法使用 gupInstance 功能.`);
             return false;
         }
-        return true;    
+        return true;
     }
 
-    // static Type batcherStrct = {[id : string] : {sh : gd3d.framework.shader , pass : gd3d.render.glDrawPass , darr : dArray<Float32Array>}};
-    static batcherMap : {[id: string] : batcherStrct} = {};
-    static addToBatcher(mr : gd3d.framework.meshRenderer ){
-        let mat = mr.materials[0];
-        let mf = mr.filter;
-        if(!mf){
-            mf = mr.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
-        }
-        if(!mf) return;
-        let id = `${mf.mesh.getGUID()}_${mat.gpuInstancingGUID}`;
-        let bs : batcherStrct = this.batcherMap[id];
-        if(!bs){
-            let _sh = mat.getShader();
-            let _pass = _sh.passes[gd3d.framework.meshRenderer.instanceDrawType()][0];
-            let _darr = new gd3d.math.ExtenArray<Float32Array>(Float32Array);
-            // let _renderers = [];
-            let _renderers = new gd3d.math.ReuseArray<gd3d.framework.IRendererGpuIns>();
-            bs = this.batcherMap[id] = {sh : _sh , pass : _pass , darr : _darr , renderers : _renderers };
-        }
-        let pass : gd3d.render.glDrawPass = bs.pass;
-        // let darr : gd3d.math.ExtenArray<Float32Array> = bs.darr;
-        let darr : gd3d.math.ExtenArray<Float32Array> = bs.darr;
-        let renderers : gd3d.math.ReuseArray<gd3d.framework.IRendererGpuIns> = bs.renderers;
-        
-        gd3d.framework.meshRenderer.setInstanceOffsetMatrix(mr.gameObject.transform , mat , pass); //RTS offset 矩阵
-        renderers.push(mr);
-        this.uploadInstanceAtteribute( mat , pass ,darr);  //收集 各material instance atteribute
-    }
-
-    private static uploadInstanceAtteribute(mat : gd3d.framework.material ,pass : gd3d.render.glDrawPass , darr: gd3d.math.ExtenArray<Float32Array>){
-        // let sh = mat.getShader();
-        // let pass = sh.passes[gd3d.framework.meshRenderer.instanceDrawType()][0];
-        // gd3d.framework.meshRenderer.setInstanceOffsetMatrix(mr.gameObject.transform , mat , pass); //RTS offset 矩阵
-
-        let attmap =  pass.program.mapCustomAttrib;
-        for(let key in attmap){
-            let arr = mat.instanceAttribValMap[key];
-            if(!arr){
-                let att = pass.program.mapCustomAttrib[key];
-                // let oldLen = setContainer.length;
-                // setContainer.length = oldLen + att.size;
-                // setContainer.fill(0,oldLen);
-                for(let i=0 , len = att.size ; i < len ; i++){
-                    darr.push(0);
-                }
-            }else{
-                for(let i=0 , len = arr.length ; i < len ; i++){
-                    darr.push(arr[i]);
-                }
-            }
-        }
-    }
-
-}
-
-class gpuInstanceBatcher{
-    // isDynamic : boolean = true;
-    private _cellSize : number ;
-    /** 浮标位置 */
-    private buoy : number = 0;
-    private _dArr : gd3d.math.ExtenArray<Float32Array>;
-    get dBuffer (){return this._dArr;}
-    constructor(size : number ){
-        this._dArr = new gd3d.math.ExtenArray<Float32Array>(Float32Array);
-        this._cellSize = size;
-    }
-
-    push(data : number[]){
-        let uselen = Math.floor( data.length % this._cellSize);
-        let count = 0;
-        while(count < uselen){
-            this._dArr.push(data[count]);
-            count++;
-        }
-    }
 }
 

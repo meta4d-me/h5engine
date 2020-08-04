@@ -270,11 +270,11 @@ namespace gd3d.framework
             this.renderLayers.push(overlay);
         }
         clear()
-        {            
-            let len = this.renderLayers.length;
-            for(let i=0;i < len;i++){
-                this.renderLayers[i].list.length = 0;
-                let obj = this.renderLayers[i].gpuInstanceMap;
+        {
+            let lys = this.renderLayers;
+            for(let i=0 , len = lys.length;i < len;i++){
+                lys[i].list.length = 0;
+                let obj = lys[i].gpuInstanceMap;
                 for(let key in obj){
                     // obj[key].clear();
                     obj[key].length=0;
@@ -282,21 +282,32 @@ namespace gd3d.framework
                 // this.renderLayers[i].gpuInstanceMap = {};
             }
         }
+        clearBatcher(){
+            let lys = this.renderLayers;
+            for(let i=0 , len = lys.length;i < len;i++){
+                let obj = lys[i].gpuInstanceBatcherMap;
+                for(let key in obj){
+                    obj[key].dispose();
+                    delete obj[key];
+                }
+            }
+        }
         addRenderer(renderer: IRenderer , webgl : WebGLRenderingContext)
         {
-            let layer = renderer.layer; 
-            if (layer == RenderLayerEnum.Common)
-            {
-                var idx = 0;
-            }
-            else if (layer == RenderLayerEnum.Overlay)
-            {
-                idx = 2;
-            }
-            else if (layer == RenderLayerEnum.Transparent)
-            {
-                idx = 1;
-            }
+            var idx = renderer.layer;
+            // let layer = renderer.layer; 
+            // var idx = 0;
+            // if (layer == RenderLayerEnum.Common)
+            // {
+            // }
+            // else if (layer == RenderLayerEnum.Overlay)
+            // {
+            //     idx = 2;
+            // }
+            // else if (layer == RenderLayerEnum.Transparent)
+            // {
+            //     idx = 1;
+            // }
             let gpuInsR = (renderer as IRendererGpuIns);
             if(!webgl.drawArraysInstanced || !gpuInsR.isGpuInstancing || !gpuInsR.isGpuInstancing()){
                 this.renderLayers[idx].list.push(renderer);
@@ -305,24 +316,13 @@ namespace gd3d.framework
             }
         }
 
-        // addStaticInstanceRenderer(renderer: IRendererGpuIns , webgl : WebGLRenderingContext){
-        //     if(!webgl.drawArraysInstanced || !renderer.isGpuInstancing || !renderer.isGpuInstancing()) return;
-        //     let idx = 0;
-        //     if (renderer.layer == RenderLayerEnum.Common)
-        //     {
-        //     }
-        //     else if (renderer.layer == RenderLayerEnum.Transparent)
-        //     {
-        //         idx = 1;
-        //     }
-        //     else if (renderer.layer == RenderLayerEnum.Overlay)
-        //     {
-        //         idx = 2;
-        //     }
-
-        //     this.renderLayers[idx].addInstance
-
-        // }
+        addStaticInstanceRenderer(renderer: IRendererGpuIns , webgl : WebGLRenderingContext , isStatic : boolean){
+            if(!isStatic) return;
+            let go = renderer.gameObject;
+            if( !go || !go.transform.needGpuInstancBatcher || !renderer.isGpuInstancing || !renderer.isGpuInstancing()) return;
+            let idx = renderer.layer;
+            this.renderLayers[idx].addInstanceToBatcher(renderer);
+        }
 
         
         //此处应该根据绘制分类处理
@@ -344,9 +344,7 @@ namespace gd3d.framework
         /** gpu instance map*/
         // gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {}; 
         gpuInstanceMap: {[sID:string] : math.ReuseArray<IRendererGpuIns>} = {}; 
-        /** gpu instance 静态渲染模式 ，玩家自己管理 */
-        // gpuInstanceStaticMap: {[sID:string] : { renderers : IRendererGpuIns[] , buffer : Float32Array}} = {}; 
-        gpuInstanceStaticMap: {[sID:string] : { renderers : math.ReuseArray<IRendererGpuIns> , buffer : Float32Array}} = {}; 
+        gpuInstanceBatcherMap: {[sID:string] : meshGpuInsBatcher} = {}; 
 
         addInstance(r : IRendererGpuIns){
             let mr = r as meshRenderer;
@@ -356,20 +354,39 @@ namespace gd3d.framework
             if(!mat) return;
             let gpuInstancingGUID = mat.gpuInstancingGUID;
             if(!gpuInstancingGUID) return;
-            // let sh = mat.getShader();
-            // if(!sh) return;
-            // if(!sh.passes["instance"] && !sh.passes["instance_fog"]){
-            //     console.warn(`shader ${sh.getName()} , has not "instance" pass when enable gpuInstance on the material ${mat.getName()}.`);
-            //     return;
-            // }
-            // let texId = this.getTexId(mat);
-
-            // let id = `${mf.mesh.getGUID()}_${gpuInstancingGUID}`;
             let id = renderLayer.getRandererGUID(mf.mesh.getGUID() , gpuInstancingGUID);
             if(!this.gpuInstanceMap[id]) {
                 this.gpuInstanceMap[id] = new math.ReuseArray<IRendererGpuIns>();
             }
             this.gpuInstanceMap[id].push(r);
+        }
+
+        addInstanceToBatcher(r : IRendererGpuIns){
+            let mr = r as meshRenderer;
+            let mf = mr.filter;
+            if(!mf) return;
+            let mat = mr.materials[0];
+            if(!mat) return;
+            let gpuInstancingGUID = mat.gpuInstancingGUID;
+            if(!gpuInstancingGUID) return;
+            // if(!mf){
+            //     mf = mr.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
+            // }
+            let mesh = mf.mesh;
+            let id = renderLayer.getRandererGUID(mesh.getGUID() , gpuInstancingGUID);
+            let bs : gd3d.framework.meshGpuInsBatcher = this.gpuInstanceBatcherMap[id];
+            if(!bs){
+                bs = this.gpuInstanceBatcherMap[id] = new gd3d.framework.meshGpuInsBatcher(mr.gameObject.layer , mesh , mr.materials);
+            }
+
+            for(let i=0 , len = bs.bufferDArrs.length ; i < len ;i++){
+                let pass = bs.passArr[i];
+                let darr = bs.bufferDArrs[i];
+                gd3d.framework.meshRenderer.setInstanceOffsetMatrix(mr.gameObject.transform , mat , pass); //RTS offset 矩阵
+                mat.uploadInstanceAtteribute(pass ,darr);  //收集 各material instance atteribute    
+            }
+
+            bs.count ++;
         }
 
 
@@ -388,23 +405,6 @@ namespace gd3d.framework
             }
             return rId;
         }
-
-        // addInstanceStatic(rs : IRendererGpuIns[]){
-        //     this.gpuInstanceStaticMap
-
-        // }
-
-        // private getTexId(mat : material) : string{
-        //     let result = "";
-        //     let staMap = mat.statedMapUniforms;
-        //     for(let key in staMap){
-        //         let val = staMap[key];
-        //         if(val.getGUID == null) continue;
-        //         let guid = (val as gd3d.framework.texture).getGUID();
-        //         result += `_${guid}`;
-        //     }
-        //     return result;
-        // }
     }
 
 }

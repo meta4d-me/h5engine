@@ -29,6 +29,24 @@ namespace gd3d.framework
         private static helpquat_1 = new math.quaternion();
 
         private static helpmtx = new gd3d.math.matrix();
+        /**自己是否有组件 */
+        hasComponent: boolean = false; 
+        /**子对象是否有组件  */
+        hasComponentChild: boolean = false; 
+        /** 自己是否有渲染器组件 */
+        hasRendererComp: boolean = false; 
+        /** 子对象是否有渲染器组件 */
+        hasRendererCompChild: boolean = false; 
+        /**自己是否有需要update方法的组件 */
+        hasUpdateComp: boolean = false; 
+        /**子对象是否有需要update方法的组件 */
+        hasUpdateCompChild: boolean = false; 
+        /** 需要每帧调用组件update , 设置为false 该节点以及子节点都会跳过update 函数的调用（减少消耗）*/
+        needUpdate : boolean = true;
+        /** 需要每帧筛查FillRenderer , 设置为false 该节点以及子节点都会跳过FillRenderer 函数的调用（减少消耗）*/
+        needFillRenderer : boolean = true;
+        /** 需要gpuInstanceBatcher 模式渲染 (减少渲染消耗 , 仅适合静态物)*/
+        needGpuInstancBatcher : boolean = false;
 
         private checkLRTSChange(): boolean
         {
@@ -759,13 +777,7 @@ namespace gd3d.framework
         //     }
         // }
 
-        public hasComponent: boolean = false; //自己是否有组件
-        public hasComponentChild: boolean = false;  //子对象是否有组件
-        public hasRendererComp: boolean = false; //自己是否有渲染器组件
-        public hasRendererCompChild: boolean = false; //子对象是否有渲染器组件
-        public hasUpdateComp: boolean = false; //自己是否有需要update方法的组件
-        public hasUpdateCompChild: boolean = false; //子对象是否有需要update方法的组件
-
+   
 
         private _localRotate: math.quaternion = new math.quaternion();
         /**

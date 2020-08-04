@@ -50,6 +50,8 @@ namespace gd3d.framework
         disableAttributes(gl: WebGLRenderingContext, pass : render.glDrawPass): void;
     }
 
+    
+
     /**
      * @public
      * @language zh_CN
@@ -305,6 +307,12 @@ namespace gd3d.framework
         //     }
         // }
 
+        /**
+         * 上传InstanceAtteribute 数据
+         * @param pass 绘制通道
+         * @param darr 数组对象
+         * @param ignoreMap 忽略列表
+         */
         uploadInstanceAtteribute(pass: render.glDrawPass, darr: gd3d.math.ExtenArray<Float32Array>){
             let attmap =  pass.program.mapCustomAttrib;
             for(let key in attmap){
