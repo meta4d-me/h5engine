@@ -818,11 +818,17 @@ namespace gd3d.framework
          * 刷新 GpuInstancBatcher
          * 被 batcher 条件[isStatic= true , visible = true , needGpuInstancBatcher = true , isGpuInstancing() = true]
          */
-        refreshGpuInstancBatcher(){
+        /**
+         * 刷新 GpuInstancBatcher
+         * 被 batcher 条件[isStatic= true , visible = true , needGpuInstancBatcher = true , isGpuInstancing() = true]
+         * @param rootNode 指定刷新节点（默认为 场景根节点）
+         */
+        refreshGpuInstancBatcher(rootNode?: gd3d.framework.transform){
             //清理历史 缓存
             this.renderList.clearBatcher();
             //遍历所有 渲染对象，有标记的（静态 && gpuInstancingTag ）加到batcher列表
-            this.fillGpuInsBatcher(this.rootNode , this.rootNode.gameObject.isStatic);
+            if(!rootNode) rootNode = this.rootNode;
+            this.fillGpuInsBatcher(rootNode , rootNode.gameObject.isStatic);
         }
 
         private fillGpuInsBatcher(node : gd3d.framework.transform , isStatic : boolean){
