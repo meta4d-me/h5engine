@@ -53,6 +53,8 @@ namespace gd3d.framework
          */
         @gd3d.reflect.Field("vector4")
         lightmapScaleOffset: math.vector4 = new math.vector4(1, 1, 0, 0);
+
+        private lastMat0Id = -1;
         /**
          * @public
          * @language zh_CN
@@ -79,7 +81,7 @@ namespace gd3d.framework
          /**
          * @private
          */
-        _queue: number = 0;
+        private _queue: number = 0;
         /**
          * @public
          * @language zh_CN
@@ -91,26 +93,28 @@ namespace gd3d.framework
         {
             return this._queue;
         }
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置此组件的场景渲染层级排序number大小
-         * @version gd3d 1.0
-         */
         set queue(value: number)
         {
             this._queue = value;
             this.issetq = true;
         }
-         /**
-         * @private
+
+        private _filter: meshFilter;
+        
+        /**
+         * 渲染使用 meshFilter
          */
-        filter: meshFilter;
+        get filter (){
+            if(!this._filter){
+                this._filter = this.gameObject.getComponent("meshFilter") as meshFilter;
+            }
+            return this._filter;
+        }
+        set filter (val){ this._filter = val;}
+
+
         start()
         {
-            this.filter = this.gameObject.getComponent("meshFilter") as meshFilter;
-          
             this.refreshLayerAndQue();
 
             if(this.lightmapIndex ==-2)
@@ -124,10 +128,15 @@ namespace gd3d.framework
 
         }
 
-        private refreshLayerAndQue()
+        /** 
+         * 刷新 渲染layer 和 渲染 queueId （切换了材质时需要手动刷新）
+         * *优化了自动处理的消耗
+         *  */
+        refreshLayerAndQue()
         {
             if (this.materials == null || this.materials.length == 0)
             {
+                //没有材质 给一个默认材质
                 this.materials = [];
                 let material = new framework.material();
                 material.use();
@@ -142,32 +151,19 @@ namespace gd3d.framework
 
         update(delta: number)
         {
-            if (this.materials != null && this.materials.length > 0)
-            {
-                let _mat = this.materials[0];
-                if (_mat)
-                {
-                    this.layer = _mat.getLayer();
-                    if (!this.issetq)
-                        this._queue = _mat.getQueue();
-                }
-            }
-            if(this.filter==null)
-            {
-                this.filter = this.gameObject.getComponent("meshFilter") as meshFilter;
-            }
+            
         }
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
             DrawCallInfo.inc.currentState=DrawCallEnum.Meshrender;
             let go = this.gameObject;
             let tran = go.transform;
-            let filter = this.filter; 
+            let filter = this.filter;
 
             context.updateLightMask(go.layer);
             context.updateModel(tran);
             if(filter == null) return;
-            let mesh = this.filter.getMeshOutput();
+            let mesh = filter.getMeshOutput();
             if(mesh == null || mesh.glMesh == null || mesh.submesh == null) return;
             let subMeshs = mesh.submesh;
             if(subMeshs == null) return;

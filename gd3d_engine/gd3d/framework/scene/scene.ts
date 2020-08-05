@@ -401,17 +401,19 @@ namespace gd3d.framework
         private objupdate(node: transform, delta)
         {
             if(!node.gameObject.needUpdate) return;
+            if(!node.hasUpdateComp && !node.hasUpdateCompChild) return;     //没有
 
             if (!(node.hasComponent == false && node.hasComponentChild == false))
             {
-                if (node.gameObject.needInit)
-                    node.gameObject.init(this.app.bePlay);//组件还未初始化的初始化
-                if (node.gameObject.haveComponet)
+                let go = node.gameObject;
+                if (go.needInit)
+                    go.init(this.app.bePlay);//组件还未初始化的初始化
+                if (go.haveComponet && node.hasUpdateComp)
                 {
-                    node.gameObject.update(delta);
+                    go.update(delta);
 
-                        if(this.autoCollectlightCamera)
-                            this.collectCameraAndLight(node);
+                    if(this.autoCollectlightCamera)
+                        this.collectCameraAndLight(node);
                 }
             }
             //这里要检测长度 因为在update 或init中 children会改变

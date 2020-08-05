@@ -499,6 +499,9 @@ namespace gd3d.framework
             if (node.hasRendererComp || node.hasRendererCompChild)
                 this.markHaveRendererComp();
 
+            if(node.hasUpdateComp || node.hasUpdateCompChild)
+                this.markHaveUpdateComp();
+
             node.dirtify(true);
 
         }
@@ -722,6 +725,17 @@ namespace gd3d.framework
             }
         }
 
+        markHaveUpdateComp()
+        {
+            this.hasUpdateComp = true;
+            var p = this._parent;
+            while (p != null)
+            {
+                p.hasUpdateCompChild = true;
+                p = p._parent;
+            }
+        }
+
         // /**
         // * @private
         // * @language zh_CN
@@ -749,6 +763,9 @@ namespace gd3d.framework
         public hasComponentChild: boolean = false;  //子对象是否有组件
         public hasRendererComp: boolean = false; //自己是否有渲染器组件
         public hasRendererCompChild: boolean = false; //子对象是否有渲染器组件
+        public hasUpdateComp: boolean = false; //自己是否有需要update方法的组件
+        public hasUpdateCompChild: boolean = false; //子对象是否有需要update方法的组件
+
 
         private _localRotate: math.quaternion = new math.quaternion();
         /**
