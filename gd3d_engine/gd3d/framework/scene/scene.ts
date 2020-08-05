@@ -408,7 +408,7 @@ namespace gd3d.framework
                 let go = node.gameObject;
                 if (go.needInit)
                     go.init(this.app.bePlay);//组件还未初始化的初始化
-                if (go.haveComponet && node.hasUpdateComp)
+                if (node.hasComponent && node.hasUpdateComp)
                 {
                     go.update(delta);
 
