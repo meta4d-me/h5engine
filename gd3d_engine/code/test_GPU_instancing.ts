@@ -20,7 +20,7 @@ class test_GPU_instancing implements IState
         await demoTool.loadbySync(`newRes/shader/MainShader.assetbundle.json`, app.getAssetMgr());
         await demoTool.loadbySync(`newRes/test/shader/customShader/customShader.assetbundle.json`, app.getAssetMgr());  //项目shader
         await datGui.init();
-
+        gd3d["hehe"] = true;
         let scene = this._scene = app.getScene();
         this.cubeRoot = new gd3d.framework.transform();
         this.cubeRoot.localTranslate.y = -5;

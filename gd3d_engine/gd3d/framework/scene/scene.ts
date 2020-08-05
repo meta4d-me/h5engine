@@ -400,22 +400,28 @@ namespace gd3d.framework
 
         private objupdate(node: transform, delta)
         {
-            if(!node.needUpdate) return;
-            if(!node.hasUpdateComp && !node.hasUpdateCompChild) return;     //没有
+            let needInit = node.hasInitComp || node.hasInitCompChild || node.hasOnPlayComp || node.hasOnPlayCompChild;
+            let needUpate = node.needUpdate;
+            if(needUpate)   needUpate =  node.hasUpdateComp || node.hasUpdateCompChild;
+            if(!needInit && !needUpate) return; //init 和 update 都不需要 直接return
 
-            if (!(node.hasComponent == false && node.hasComponentChild == false))
-            {
-                let go = node.gameObject;
-                if (go.needInit)
-                    go.init(this.app.bePlay);//组件还未初始化的初始化
-                if (node.hasComponent && node.hasUpdateComp)
-                {
-                    go.update(delta);
-
-                    if(this.autoCollectlightCamera)
-                        this.collectCameraAndLight(node);
-                }
+            if(node.hasInitCompChild){
+                node.hasInitCompChild = false;
             }
+
+            let go = node.gameObject;
+            // if (go.needInit){
+            if (node.hasInitComp){
+                go.init(this.app.bePlay);//组件还未初始化的初始化
+            }
+            if (node.hasUpdateComp || node.hasOnPlayComp || node.hasOnPlayCompChild)
+            {
+                go.update(delta);
+            }
+
+            // if(this.autoCollectlightCamera)          //流程放入 camera 和 light 的update中了
+            //     this.collectCameraAndLight(node);
+       
             //这里要检测长度 因为在update 或init中 children会改变
             for (var i = 0 ; i < node.children.length; ++i)
                 this.objupdate(node.children[i], delta);
