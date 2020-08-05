@@ -648,6 +648,11 @@ namespace gd3d.math
             this._length = _nlength;
         }
 
+        /** 对象清理 */
+        dispose(){
+            this._buffer = null;
+        }
+
     }
 
     /**

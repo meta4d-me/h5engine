@@ -2,6 +2,168 @@
 
 namespace gd3d.framework
 {
+    /** meshRenderer GpuInstancing 合批类
+     * 
+     */
+    export class meshGpuInsBatcher{
+        /** 实例数量 */
+        count : number = 0;
+        /** 渲染使用mesh */
+        mesh : gd3d.framework.mesh;
+        /** 材质数组（应对submesh） */
+        materials : gd3d.framework.material[];
+        /** 游戏标记layer */
+        gameLayer : number;
+        /** batcher 缓存的array */
+        bufferDArrs : gd3d.math.ExtenArray<Float32Array>[];
+        /** 当前材质上 使用到的通道列表 */
+        passArr : gd3d.render.glDrawPass[];
+        /** passId 对应 passArr 中的索引map*/
+        passIdMap : {[id:number] : number};
+        constructor(_glayer : number , _mesh : gd3d.framework.mesh , _mats : gd3d.framework.material[]){
+            this.gameLayer = _glayer;
+            this.mesh = _mesh;
+            this.mesh.use();
+            this.materials = _mats;
+            let _sh = _mats[0].getShader();
+            this.passArr = [];
+            this.bufferDArrs = [];
+            this.passIdMap = {};
+            let tempArr = _sh.passes[gd3d.framework.meshRenderer.instanceDrawType()];
+            for(let i=0 , len = tempArr.length ;i < len;i++){
+                let pass = tempArr[i];
+                this.passArr.push(pass);
+                this.bufferDArrs.push(new gd3d.math.ExtenArray<Float32Array>(Float32Array));
+                this.passIdMap[pass.id.getID()] = i;
+            }
+        }
+
+        /** 清理 */
+        dispose(){
+            // for(let i=0 , len = this.materials.length ; i < len ;i++){
+            //     let mat = this.materials[i];
+            //     mat.unuse();
+            // }
+            for(let i=0 , len = this.bufferDArrs.length ; i < len ;i++){
+                this.bufferDArrs[i].dispose();
+            }
+
+           this.passArr = null;
+            this.mesh = null;
+            this.materials = null;
+            this.bufferDArrs = null;
+            this.passIdMap = null;
+        }
+    }
+
+    /** mesh  Gpu 实例 绘制info数据类*/
+    export class meshGpuInstanceDrawInfo implements DrawInstanceInfo
+    {
+        instanceCount: number;
+        mid : number;
+        vbo : WebGLBuffer ; 
+        cacheBuffers : gd3d.math.ExtenArray<Float32Array>[];
+        bufferIdMap : {[passId : number] : number};
+        instanceArray : gd3d.math.ReuseArray<IRendererGpuIns>;
+        helpDArray : gd3d.math.ExtenArray<Float32Array>;
+        private attSuccess : boolean = false;
+        initBuffer(gl: WebGLRenderingContext): void
+        {
+            
+        }
+        activeAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void
+        {
+            if(!this.instanceArray && !this.cacheBuffers) return;
+            let cacheBuffer : gd3d.math.ExtenArray<Float32Array>;
+            if(this.bufferIdMap){
+                let idx = this.bufferIdMap[pass.id.getID()];
+                cacheBuffer = this.cacheBuffers[idx]
+            }
+
+            let _mid = this.mid;
+            gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+            let dataArr : Float32Array;
+            if(cacheBuffer){
+                dataArr = cacheBuffer.buffer;
+            }
+            if(!dataArr){
+                this.helpDArray.count = 0;
+                let len = this.instanceCount;
+                for(let i=0;i < len ;i++){
+                    let mr = this.instanceArray.get(i) as meshRenderer;
+                    let mat = mr.materials[_mid];
+                    meshRenderer.setInstanceOffsetMatrix(mr.gameObject.transform,mat,pass);
+                    mat.uploadInstanceAtteribute(pass , this.helpDArray );
+                }
+                dataArr = this.helpDArray.buffer;
+            }
+            
+            gl.bufferData(gl.ARRAY_BUFFER, dataArr , gl.STATIC_DRAW);
+            
+            let offset = 0;
+            let attMap = pass.program.mapCustomAttrib;
+            for(let key in attMap){
+                let att = attMap[key];
+                let location = att.location;
+                if (location == -1) break;
+                gl.enableVertexAttribArray(location);
+                gl.vertexAttribPointer(location, att.size, gl.FLOAT, false, pass.program.strideInsAttrib, offset);
+                gl.vertexAttribDivisor(location, 1);
+                offset += att.size * 4;
+            }
+
+            this.attSuccess = true;
+        }
+        disableAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void
+        {
+            if(this.attSuccess){
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+                let attMap = pass.program.mapCustomAttrib;
+                for(let key in attMap){
+                    let att = attMap[key];
+                    let location = att.location;
+                    if (location == -1) break;
+                    gl.vertexAttribDivisor(location, 0);
+                    gl.disableVertexAttribArray(location);
+                }
+
+                this.attSuccess = false;
+            }
+
+            //clear
+            this.instanceCount = this.mid = 0;
+            this.vbo = null;
+            this.cacheBuffers = null;
+            this.instanceArray = null;
+            this.helpDArray = null;
+            this.bufferIdMap = null;
+
+            if(this.onDisableAttribute){
+                this.onDisableAttribute(this);
+            }
+        }
+
+        /** Disable 结束回调 */
+        onDisableAttribute : (info : meshGpuInstanceDrawInfo)=>any;
+
+        private static _pool : meshGpuInstanceDrawInfo [] = [];
+        
+        /** 池子中取出一个 */
+        static new_info (){
+            let info = this._pool.pop();
+            if(info) return info;
+
+            info = new meshGpuInstanceDrawInfo();
+            return info;
+        }
+
+        /** 放回池子 */
+        static del_info (info : meshGpuInstanceDrawInfo){
+            this._pool.push(info);
+        }
+        
+    }
+
      /**
      * @public
      * @language zh_CN
@@ -113,6 +275,13 @@ namespace gd3d.framework
         set filter (val){ this._filter = val;}
 
 
+        private static readonly insOffsetMatrixStr = "instance_offset_matrix_";
+        private static insOffsetMtxIDMap = [`instance_offset_matrix_0`,`instance_offset_matrix_1`,`instance_offset_matrix_2`,`instance_offset_matrix_3`];
+        private static GpuInsAttrignoreMap = {"instance_offset_matrix_0":true,"instance_offset_matrix_1":true,"instance_offset_matrix_2":true,"instance_offset_matrix_3":true};
+        private static helpDArray = new gd3d.math.ExtenArray<Float32Array>(Float32Array);
+        private static helpIMatrix = new gd3d.math.matrix();
+
+
         start()
         {
             this.refreshLayerAndQue();
@@ -151,7 +320,7 @@ namespace gd3d.framework
 
         update(delta: number)
         {
-            
+
         }
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
         {
@@ -212,12 +381,8 @@ namespace gd3d.framework
 
         }
 
-        private static helpReuseArray = new gd3d.math.ReuseArray<number>();
-        private static helpDArray = new gd3d.math.ExtenArray<Float32Array>(Float32Array);
-        private static helpIMatrix = new gd3d.math.matrix();
-        private static cacheInstancVboMaps : {[key:string] : Float32Array} = {};
         // static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera , instanceArray : IRendererGpuIns[] , cacheBuffer? : Float32Array){
-        static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera , instanceArray : gd3d.math.ReuseArray<IRendererGpuIns>, cacheBuffer? : Float32Array){
+        static _GpuInstancingRender(context: renderContext, instanceArray : gd3d.math.ReuseArray<IRendererGpuIns>, cacheBuffer? : Float32Array){
             let insLen = instanceArray.length;
             if(insLen < 1) return;
             DrawCallInfo.inc.currentState=DrawCallEnum.Meshrender;
@@ -241,12 +406,12 @@ namespace gd3d.framework
                 context.fog = sceneMgr.scene.fog;
             }
             let len = subMeshs.length;
+            let drawtype = this.instanceDrawType();
             for (let i = 0; i < len; i++)
             {
                 let sm = subMeshs[i];
                 let mid = subMeshs[i].matIndex;//根据这个找到使用的具体哪个材质    
                 let usemat = mr.materials[mid];
-                let drawtype = this.instanceDrawType();
                 let vbo = this._getVBO(context.webgl);
                 let drawInstanceInfo: DrawInstanceInfo = {
                     instanceCount: insLen,
@@ -266,13 +431,14 @@ namespace gd3d.framework
                                 // let mr = instanceArray[i] as meshRenderer;
                                 let mr = instanceArray.get(i) as meshRenderer;
                                 let mat = mr.materials[_mid];
+
                                 // if(pass.program.mapAttrib[`${this.insOffsetMatrixStr}0`]){//vs中 注册过 offsetmatrix的才处理
                                 //     this.setInstanceOffsetMatrix(mr.gameObject.transform,mat); //RTS offset 矩阵
                                 // }
                                 this.setInstanceOffsetMatrix(mr.gameObject.transform,mat,pass);
                                 // mat.uploadInstanceAtteribute( pass ,data);  //收集 各material instance atteribute
-                                mat.uploadInstanceAtteribute(pass , this.helpDArray);
-    
+                                // mat.uploadInstanceAtteribute(pass , this.helpDArray , this.GpuInsAttrignoreMap);
+                                mat.uploadInstanceAtteribute(pass , this.helpDArray );
                             }
                             // dataArr = new Float32Array(arr);
                             dataArr = this.helpDArray.buffer;
@@ -316,8 +482,101 @@ namespace gd3d.framework
             }
         }
 
-        private static readonly insOffsetMatrixStr = "instance_offset_matrix_";
-        private static insOffsetMtxIDMap = [`instance_offset_matrix_0`,`instance_offset_matrix_1`,`instance_offset_matrix_2`,`instance_offset_matrix_3`];
+        private static onGpuInsDisableAttribute (info : meshGpuInstanceDrawInfo){
+            if(!info) return;
+            meshGpuInstanceDrawInfo.del_info(info);
+        }
+
+        static GpuInstancingRender(context: renderContext, instanceArray : gd3d.math.ReuseArray<IRendererGpuIns>, cacheBuffer? : Float32Array){
+            let insLen = instanceArray.length;
+            if(insLen < 1) return;
+            DrawCallInfo.inc.currentState=DrawCallEnum.Meshrender;
+            // let mr = instanceArray[0] as gd3d.framework.meshRenderer;
+            let mr = instanceArray.get(0) as gd3d.framework.meshRenderer;
+            // let go = instanceArray[0].gameObject;
+            let go = mr.gameObject;
+            // let tran = go.transform;
+            let filter = mr.filter; 
+
+            context.updateLightMask(go.layer);
+            context.updateModelByMatrix(this.helpIMatrix);
+            if(filter == null) return;
+            let mesh = filter.getMeshOutput();
+            if(mesh == null || mesh.glMesh == null || mesh.submesh == null) return;
+            let subMeshs = mesh.submesh;
+
+            // mesh.glMesh.bindVboBuffer(context.webgl);
+            if (sceneMgr.scene.fog)
+            {
+                context.fog = sceneMgr.scene.fog;
+            }
+            let len = subMeshs.length;
+            let drawtype = this.instanceDrawType();
+            for (let i = 0; i < len; i++)
+            {
+                let sm = subMeshs[i];
+                let mid = subMeshs[i].matIndex;//根据这个找到使用的具体哪个材质    
+                let usemat = mr.materials[mid];
+
+                let drawInstanceInfo: meshGpuInstanceDrawInfo = meshGpuInstanceDrawInfo.new_info();
+                drawInstanceInfo.mid = mid;
+                drawInstanceInfo.instanceCount = insLen;
+                drawInstanceInfo.vbo = this._getVBO(context.webgl);
+                drawInstanceInfo.instanceArray = instanceArray;
+                drawInstanceInfo.helpDArray = this.helpDArray;
+                drawInstanceInfo.onDisableAttribute = this.onGpuInsDisableAttribute.bind(this);
+
+                ///----------------------------------------------------------------
+
+                if (usemat != null)
+                    usemat.draw(context, mesh, sm, drawtype , drawInstanceInfo);
+            }
+        }
+
+        static GpuInstancingRenderBatcher(context: renderContext, batcher : meshGpuInsBatcher){
+            let insLen = batcher.count;
+            if(insLen < 1) return;
+            DrawCallInfo.inc.currentState=DrawCallEnum.Meshrender;
+            let mesh = batcher.mesh;
+            let mats = batcher.materials;
+            let gameLayer = batcher.gameLayer;
+            
+            context.updateLightMask(gameLayer);
+            context.updateModelByMatrix(this.helpIMatrix);
+            if (sceneMgr.scene.fog)
+            {
+                context.fog = sceneMgr.scene.fog;
+            }
+
+            let subMeshs = mesh.submesh;
+            let len = subMeshs.length;
+            for (let i = 0; i < len; i++)
+            {
+                let sm = subMeshs[i];
+                let mid = subMeshs[i].matIndex;//根据这个找到使用的具体哪个材质    
+                let usemat = mats[mid];
+                let drawtype = this.instanceDrawType();
+                let vbo = this._getVBO(context.webgl);
+
+                let drawInstanceInfo: meshGpuInstanceDrawInfo = meshGpuInstanceDrawInfo.new_info();
+                drawInstanceInfo.mid = mid;
+                drawInstanceInfo.instanceCount = insLen;
+                drawInstanceInfo.vbo = this._getVBO(context.webgl);
+                drawInstanceInfo.cacheBuffers = batcher.bufferDArrs;
+                drawInstanceInfo.bufferIdMap = batcher.passIdMap;
+                drawInstanceInfo.onDisableAttribute = this.onGpuInsDisableAttribute.bind(this);
+
+                if (usemat != null)
+                    usemat.draw(context, mesh, sm, drawtype , drawInstanceInfo);
+            }
+        }
+
+        /**
+         * 设置 OffsetMatrix
+         * @param tran transform
+         * @param mat 材质对象
+         * @param pass 绘制通道对象
+         */
         static setInstanceOffsetMatrix(tran: gd3d.framework.transform, mat: material , pass : render.glDrawPass){
             if(!pass.program.mapAttrib[this.insOffsetMtxIDMap[0]]) return;
             this._setInstanceOffsetMatrix(tran , mat);
@@ -344,7 +603,7 @@ namespace gd3d.framework
             let _fog = gd3d.framework.sceneMgr.scene.fog;
             if (_fog)
             {
-                drawtype +="_fog" 
+                drawtype = "instance_fog";
             }
             return drawtype;
         }

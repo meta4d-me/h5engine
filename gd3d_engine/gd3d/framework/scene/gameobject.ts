@@ -179,8 +179,6 @@ namespace gd3d.framework
         // private componentsPlayed: nodeComponent[] = [];
         /** 需要初始化组件 */
         needInit:boolean = false;
-        /** 需要没帧调用组件update */
-        needUpdate : boolean = true;
         /**
          * @public
          * @language zh_CN
