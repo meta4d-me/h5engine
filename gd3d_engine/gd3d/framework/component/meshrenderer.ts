@@ -218,7 +218,7 @@ namespace gd3d.framework
 
         private static helpIMatrix = new gd3d.math.matrix();
         private static cacheInstancVboMaps : {[key:string] : Float32Array} = {};
-        static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera , instanceArray : IRendererGpuIns[] , key : string){
+        static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera , instanceArray : IRendererGpuIns[] , cacheBuffer? : Float32Array){
             let insLen = instanceArray.length;
             if(insLen < 1) return;
             DrawCallInfo.inc.currentState=DrawCallEnum.Meshrender;
@@ -235,14 +235,17 @@ namespace gd3d.framework
             let subMeshs = mesh.submesh;
 
             // mesh.glMesh.bindVboBuffer(context.webgl);
-
+            if (sceneMgr.scene.fog)
+            {
+                context.fog = sceneMgr.scene.fog;
+            }
             let len = subMeshs.length;
             for (let i = 0; i < len; i++)
             {
                 let sm = subMeshs[i];
                 let mid = subMeshs[i].matIndex;//根据这个找到使用的具体哪个材质    
                 let usemat = mr.materials[mid];
-                let drawtype = this.instanceDrawType(context);
+                let drawtype = this.instanceDrawType();
                 let vbo = this._getVBO(context.webgl);
                 let drawInstanceInfo: DrawInstanceInfo = {
                     instanceCount: insLen,
@@ -253,20 +256,20 @@ namespace gd3d.framework
                     activeAttributes: (gl, pass) =>
                     {
                         gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-                        let dataArr = meshRenderer.cacheInstancVboMaps[key];
-
-                        let data = [];
-                        if(!dataArr){
+                        let dataArr = cacheBuffer;
+                        let data : number[] = [];
+                        if(!cacheBuffer){
                             for(let i=0;i < insLen ;i++){
                                 let mr = instanceArray[i] as meshRenderer;
                                 let mat = mr.materials[mid];
-                                if(pass.program.mapAttrib[`${this.insOffsetMatrixStr}0`]){//vs中 注册过 offsetmatrix的才处理
-                                    this.setInstanceOffsetMatrix(mr.gameObject.transform,mat); //RTS offset 矩阵
-                                }
+                                // if(pass.program.mapAttrib[`${this.insOffsetMatrixStr}0`]){//vs中 注册过 offsetmatrix的才处理
+                                //     this.setInstanceOffsetMatrix(mr.gameObject.transform,mat); //RTS offset 矩阵
+                                // }
+                                this.setInstanceOffsetMatrix(mr.gameObject.transform,mat,pass);
                                 mat.uploadInstanceAtteribute( pass ,data);  //收集 各material instance atteribute
     
                             }
-                            dataArr = meshRenderer.cacheInstancVboMaps[key] = new Float32Array(data);
+                            dataArr = new Float32Array(data);
                         }
                         
                         gl.bufferData(gl.ARRAY_BUFFER, dataArr , gl.STATIC_DRAW);
@@ -308,7 +311,12 @@ namespace gd3d.framework
         }
 
         private static readonly insOffsetMatrixStr = "instance_offset_matrix_";
-        private static setInstanceOffsetMatrix(tran: gd3d.framework.transform, mat: material){
+        static setInstanceOffsetMatrix(tran: gd3d.framework.transform, mat: material , pass : render.glDrawPass){
+            if(!pass.program.mapAttrib[`${this.insOffsetMatrixStr}0`]) return;
+            this._setInstanceOffsetMatrix(tran , mat);
+        }
+
+        private static _setInstanceOffsetMatrix(tran: gd3d.framework.transform, mat: material){
             let _wmat = tran.getWorldMatrix();
             let insOffsetMtxStr = this.insOffsetMatrixStr;
             let len = 4;
@@ -323,14 +331,13 @@ namespace gd3d.framework
             }
         }
 
-        static instanceDrawType(context : renderContext){
+        static instanceDrawType(){
             let drawtype = "instance";
             //fog
             let _fog = gd3d.framework.sceneMgr.scene.fog;
             if (_fog)
             {
                 drawtype +="_fog" 
-                context.fog = _fog;
             }
             return drawtype;
         }
