@@ -1133,7 +1133,7 @@ namespace gd3d.framework
                 for(let key in rmap){
                     let gpuList = rmap[key];
                     if(!gpuList) continue;
-                    meshRenderer.GpuInstancingRender(context, assetmgr, this , gpuList);
+                    meshRenderer.GpuInstancingRender(context, assetmgr, this , gpuList , key);
                 }
             }
             // for (var i = 0; i < scene.renderList.renderLayers.length; i++)

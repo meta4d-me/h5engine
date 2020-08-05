@@ -400,6 +400,7 @@ namespace gd3d.framework
 
         private objupdate(node: transform, delta)
         {
+            if(!node.gameObject.needUpdate) return;
 
             if (!(node.hasComponent == false && node.hasComponentChild == false))
             {
