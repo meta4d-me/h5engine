@@ -709,9 +709,10 @@
             return total;
         }
 
-
+        static timer = 0;
         genVertexDataArray(vf: VertexFormatMask): Float32Array
         {
+            let timeaa = performance.now();
             var _this = this;
             // if (_this.tmpVArr)
             //     return _this.tmpVArr;
@@ -853,6 +854,9 @@
                     }
                 }
             }
+            let tttttt = performance.now() - timeaa;
+            meshData.timer += tttttt;
+            console.error("解析Mesh总耗时：" + meshData.timer);
             return varray;
         }
         genIndexDataArray(): Uint16Array

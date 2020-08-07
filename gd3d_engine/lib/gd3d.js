@@ -19051,13 +19051,8 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
-            /**
-            * @private
-            * @language zh_CN
-            * 构建aabb
-            * @version gd3d 1.0
-            */
             transform.prototype._buildAABB = function () {
+                var tttt11111 = performance.now();
                 var minimum = new gd3d.math.vector3();
                 var maximum = new gd3d.math.vector3();
                 var _types = transform_2.aabbCareTypes;
@@ -19161,6 +19156,9 @@ var gd3d;
                     maximum.x = maximum.y = maximum.z = 1;
                 }
                 var _aabb = new framework.aabb(minimum, maximum);
+                var ttt2222 = performance.now() - tttt11111;
+                transform_2.timer += ttt2222;
+                console.error("解析AABB总耗时：" + transform_2.timer);
                 return _aabb;
             };
             Object.defineProperty(transform.prototype, "physicsImpostor", {
@@ -19915,6 +19913,13 @@ var gd3d;
             /** 创建过的 aabb 缓存 ，避免每次重复构建  */
             transform.aabbStoreMap = {};
             transform.aabbCareTypes = ["meshFilter", "skinnedMeshRenderer", "canvasRenderer"];
+            /**
+            * @private
+            * @language zh_CN
+            * 构建aabb
+            * @version gd3d 1.0
+            */
+            transform.timer = 0;
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
@@ -66555,6 +66560,7 @@ var gd3d;
                 return total;
             };
             meshData.prototype.genVertexDataArray = function (vf) {
+                var timeaa = performance.now();
                 var _this = this;
                 // if (_this.tmpVArr)
                 //     return _this.tmpVArr;
@@ -66724,6 +66730,9 @@ var gd3d;
                         }
                     }
                 }
+                var tttttt = performance.now() - timeaa;
+                meshData.timer += tttttt;
+                console.error("解析Mesh总耗时：" + meshData.timer);
                 return varray;
             };
             meshData.prototype.genIndexDataArray = function () {
@@ -66871,6 +66880,7 @@ var gd3d;
                 }
                 return this._aabb;
             };
+            meshData.timer = 0;
             return meshData;
         }());
         render.meshData = meshData;

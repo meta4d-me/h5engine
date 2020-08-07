@@ -5398,6 +5398,7 @@ declare namespace gd3d.framework {
         * 构建aabb
         * @version gd3d 1.0
         */
+        static timer: number;
         private _buildAABB;
         /**
          * @public
@@ -21642,6 +21643,7 @@ declare namespace gd3d.render {
         static genCircleLineCCW(radius: number, segment?: number, wide?: number): meshData;
         caclByteLength(): number;
         static calcByteSize(vf: VertexFormatMask): number;
+        static timer: number;
         genVertexDataArray(vf: VertexFormatMask): Float32Array;
         genIndexDataArray(): Uint16Array;
         genIndexDataArrayTri2Line(): Uint16Array;

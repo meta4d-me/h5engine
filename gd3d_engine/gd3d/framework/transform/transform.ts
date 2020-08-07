@@ -265,8 +265,10 @@ namespace gd3d.framework
         * 构建aabb
         * @version gd3d 1.0
         */
+        static timer = 0;
         private _buildAABB(): aabb
         {
+            let tttt11111 = performance.now();
             let minimum = new math.vector3();
             let maximum = new math.vector3();
             let _types = transform.aabbCareTypes;
@@ -396,6 +398,9 @@ namespace gd3d.framework
             }
 
             let _aabb = new aabb(minimum, maximum);
+            let ttt2222 = performance.now() - tttt11111;
+            transform.timer += ttt2222;
+            console.error("解析AABB总耗时：" + transform.timer);
             return _aabb;
         }
 
