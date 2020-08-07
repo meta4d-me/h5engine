@@ -400,19 +400,28 @@ namespace gd3d.framework
 
         private objupdate(node: transform, delta)
         {
+            let needInit = node.hasInitComp || node.hasInitCompChild || node.hasOnPlayComp || node.hasOnPlayCompChild;
+            let needUpate = node.needUpdate;
+            if(needUpate)   needUpate =  node.hasUpdateComp || node.hasUpdateCompChild;
+            if(!needInit && !needUpate) return; //init 和 update 都不需要 直接return
 
-            if (!(node.hasComponent == false && node.hasComponentChild == false))
-            {
-                if (node.gameObject.needInit)
-                    node.gameObject.init(this.app.bePlay);//组件还未初始化的初始化
-                if (node.gameObject.haveComponet)
-                {
-                    node.gameObject.update(delta);
-
-                        if(this.autoCollectlightCamera)
-                            this.collectCameraAndLight(node);
-                }
+            if(node.hasInitCompChild){
+                node.hasInitCompChild = false;
             }
+
+            let go = node.gameObject;
+            // if (go.needInit){
+            if (node.hasInitComp){
+                go.init(this.app.bePlay);//组件还未初始化的初始化
+            }
+            if (node.hasUpdateComp || node.hasOnPlayComp || node.hasOnPlayCompChild)
+            {
+                go.update(delta);
+            }
+
+            // if(this.autoCollectlightCamera)          //流程放入 camera 和 light 的update中了
+            //     this.collectCameraAndLight(node);
+       
             //这里要检测长度 因为在update 或init中 children会改变
             for (var i = 0 ; i < node.children.length; ++i)
                 this.objupdate(node.children[i], delta);
@@ -808,6 +817,42 @@ namespace gd3d.framework
                 // console.error(e.message);
                 throw e;
                 return false;
+            }
+        }
+
+        /** 
+         * 刷新 GpuInstancBatcher
+         * 被 batcher 条件[isStatic= true , visible = true , needGpuInstancBatcher = true , isGpuInstancing() = true]
+         */
+        /**
+         * 刷新 GpuInstancBatcher
+         * 被 batcher 条件[isStatic= true , visible = true , needGpuInstancBatcher = true , isGpuInstancing() = true]
+         * @param rootNode 指定刷新节点（默认为 场景根节点）
+         */
+        refreshGpuInstancBatcher(rootNode?: gd3d.framework.transform){
+            //清理历史 缓存
+            this.renderList.clearBatcher();
+            //遍历所有 渲染对象，有标记的（静态 && gpuInstancingTag ）加到batcher列表
+            if(!rootNode) rootNode = this.rootNode;
+            this.fillGpuInsBatcher(rootNode , rootNode.gameObject.isStatic);
+        }
+
+        private fillGpuInsBatcher(node : gd3d.framework.transform , isStatic : boolean){
+            if(!this.webgl.drawArraysInstanced)return;
+            //检查渲染对象
+            let go = node.gameObject;
+            isStatic = isStatic || go.isStatic;
+            if (!go || !go.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false)) return;  //自己没有渲染组件 且 子物体也没有 return
+            let renderer = go.renderer;
+            if(renderer){
+                this.renderList.addStaticInstanceRenderer( renderer as IRendererGpuIns , this.webgl , isStatic);
+            }
+
+            let children = node.children;
+            if(children){
+                for(let i=0 , len = children.length; i < len ;i++){
+                    this.fillGpuInsBatcher(children[i] , isStatic);
+                }
             }
         }
     }

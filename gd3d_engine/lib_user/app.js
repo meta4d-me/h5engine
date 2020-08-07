@@ -4186,10 +4186,17 @@ var test_Decal = (function () {
 }());
 var test_GPU_instancing = (function () {
     function test_GPU_instancing() {
-        this.createCount = 500;
+        this.createCount = 20000;
         this.mats = [];
+        this.mrArr = [];
         this.isInstancing = true;
-        this.isStatic = true;
+        this.modelType = "";
+        this.subRange = 10;
+        this._batcher = false;
+        this._isStatic = true;
+        this._needUpdate = true;
+        this._needFillRenderer = true;
+        this.loadedTest = false;
         this.count = 0;
     }
     test_GPU_instancing.prototype.start = function (app) {
@@ -4200,11 +4207,16 @@ var test_GPU_instancing = (function () {
                     case 0: return [4, demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", app.getAssetMgr())];
                     case 1:
                         _a.sent();
-                        return [4, datGui.init()];
+                        return [4, demoTool.loadbySync("newRes/test/shader/customShader/customShader.assetbundle.json", app.getAssetMgr())];
                     case 2:
                         _a.sent();
+                        return [4, datGui.init()];
+                    case 3:
+                        _a.sent();
+                        gd3d["hehe"] = true;
                         scene = this._scene = app.getScene();
                         this.cubeRoot = new gd3d.framework.transform();
+                        this.cubeRoot.localTranslate.y = -5;
                         scene.addChild(this.cubeRoot);
                         this._app = app;
                         objCam = new gd3d.framework.transform();
@@ -4213,6 +4225,7 @@ var test_GPU_instancing = (function () {
                         cam.near = 0.01;
                         cam.far = 120;
                         cam.fov = Math.PI * 0.3;
+                        this.cam = cam;
                         objCam.localTranslate = new gd3d.math.vector3(0, 15, -15);
                         objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
                         hoverc = cam.gameObject.addComponent("HoverCameraScript");
@@ -4226,18 +4239,116 @@ var test_GPU_instancing = (function () {
                         app.showDrawCall();
                         app.showFps();
                         _dat = new dat.GUI();
-                        _dat.add(this, 'isInstancing');
-                        _dat.add(this, 'isStatic');
+                        _dat.add(this, "modelType", ["", "bullet_11", "bullet_12"]);
+                        _dat.add(this, 'isInstancing').listen();
+                        _dat.add(this, 'instanceSwitch');
+                        _dat.add(this, 'batcherSwitch');
+                        _dat.add(this, 'isStatic').listen();
+                        ;
+                        _dat.add(this, 'needUpdate').listen();
+                        ;
+                        _dat.add(this, 'needFillRenderer').listen();
+                        ;
                         _dat.add(this, 'createCount');
                         _dat.add(this, 'refresh');
+                        gd3d.framework.transform.prototype["checkToTop"] = function () { };
                         return [2];
                 }
             });
         });
     };
+    test_GPU_instancing.prototype.batcherSwitch = function () {
+        this._batcher = !this._batcher;
+        if (this._batcher) {
+            this.mrArr.forEach(function (mr) {
+                var tran = mr.gameObject.transform;
+                tran.needGpuInstancBatcher = true;
+            });
+            this.needFillRenderer = false;
+        }
+        else {
+            this.mrArr.forEach(function (mr) {
+                var tran = mr.gameObject.transform;
+                tran.needGpuInstancBatcher = true;
+            });
+            this.needFillRenderer = true;
+        }
+        this._scene.refreshGpuInstancBatcher();
+    };
     test_GPU_instancing.prototype.refresh = function () {
         this.cubeRoot.removeAllChild();
-        this.createByNum(this.createCount);
+        this.cubeRoot.gameObject.isStatic = this.isStatic;
+        this.mrArr.length = 0;
+        this.mats.length = 0;
+        if (!this.modelType) {
+            this.createByNum(this.createCount);
+        }
+        else {
+            this.loadTest(this.modelType);
+        }
+    };
+    Object.defineProperty(test_GPU_instancing.prototype, "isStatic", {
+        get: function () { return this._isStatic; },
+        set: function (v) {
+            this._isStatic = v;
+            this.cubeRoot.gameObject.isStatic = v;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(test_GPU_instancing.prototype, "needUpdate", {
+        get: function () { return this._needUpdate; },
+        set: function (v) {
+            this._needUpdate = v;
+            this.cubeRoot.needUpdate = v;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(test_GPU_instancing.prototype, "needFillRenderer", {
+        get: function () { return this._needFillRenderer; },
+        set: function (v) {
+            this._needFillRenderer = v;
+            this.cubeRoot.needFillRenderer = v;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    test_GPU_instancing.prototype.loadTest = function (modelName) {
+        return __awaiter(this, void 0, void 0, function () {
+            var url, m, count, range, i, tran, mrs;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        url = "newRes/pfb/model/" + modelName + "/" + modelName + ".assetbundle.json";
+                        if (!!this.loadedTest) return [3, 2];
+                        return [4, demoTool.loadbySync(url, this._app.getAssetMgr())];
+                    case 1:
+                        _a.sent();
+                        _a.label = 2;
+                    case 2:
+                        this.loadedTest = true;
+                        m = this._app.getAssetMgr().getAssetByName(modelName + ".prefab.json", modelName + ".assetbundle.json");
+                        count = this.createCount;
+                        range = this.subRange;
+                        for (i = 0; i < count; i++) {
+                            tran = m.getCloneTrans();
+                            this.cubeRoot.addChild(tran);
+                            gd3d.math.vec3Set(tran.localTranslate, Math.random() * range, Math.random() * range, Math.random() * range);
+                            tran.localTranslate = tran.localTranslate;
+                            if (this.isInstancing) {
+                                gpuInstanceMgr.setToGupInstance(tran, url, this.mats);
+                            }
+                            mrs = tran.gameObject.getComponentsInChildren("meshRenderer");
+                            mrs.forEach(function (v) {
+                                _this.mrArr.push(v);
+                            });
+                        }
+                        return [2];
+                }
+            });
+        });
     };
     test_GPU_instancing.prototype.createByNum = function (num) {
         if (num < 1)
@@ -4262,10 +4373,10 @@ var test_GPU_instancing = (function () {
     };
     test_GPU_instancing.prototype.createOne = function (app, needInstance) {
         var obj = gd3d.framework.TransformUtil.CreatePrimitive(gd3d.framework.PrimitiveType.Cube, app);
-        obj.gameObject.isStatic = this.isStatic;
+        obj.gameObject.transform.enableCulling = false;
         obj.name = "cube_" + ++this.count;
         this.cubeRoot.addChild(obj);
-        var range = 10;
+        var range = this.subRange;
         gd3d.math.vec3Set(obj.localPosition, this.getRandom(range), this.getRandom(range), this.getRandom(range));
         var mr = obj.gameObject.getComponent("meshRenderer");
         var mat = this._mat_ins;
@@ -4273,13 +4384,76 @@ var test_GPU_instancing = (function () {
         mr.materials[0].enableGpuInstancing = needInstance;
         mr.materials[0].setVector4("a_particle_color", new gd3d.math.vector4(Math.random(), Math.random(), Math.random(), 1));
         this.mats.push(mr.materials[0]);
+        this.mrArr.push(mr);
+    };
+    test_GPU_instancing.prototype.lookAtCamera = function (trans) {
+        if (!this.cam)
+            return;
+        var camPos = this.cam.gameObject.transform.localPosition;
+        var tempQuat = test_GPU_instancing.help_quat;
+        gd3d.math.quat2Lookat(trans.getWorldPosition(), camPos, tempQuat);
+        trans.setWorldRotate(tempQuat);
     };
     test_GPU_instancing.prototype.getRandom = function (range) {
         return range * Math.random() * (Math.random() > 0.5 ? 1 : -1);
     };
     test_GPU_instancing.prototype.update = function (delta) {
     };
+    test_GPU_instancing.help_quat = new gd3d.math.quaternion();
     return test_GPU_instancing;
+}());
+var gpuInstanceMgr = (function () {
+    function gpuInstanceMgr() {
+    }
+    gpuInstanceMgr.setToGupInstance = function (tran, resUrl, mats) {
+        if (this.SetedMap[resUrl] || !tran)
+            return;
+        if (resUrl)
+            this.SetedMap[resUrl] = true;
+        var mrs = tran.gameObject.getComponentsInChildren("meshRenderer");
+        for (var i = 0, len = mrs.length; i < len; i++) {
+            var mr = mrs[i];
+            for (var j = 0, len_1 = mr.materials.length; j < len_1; j++) {
+                var mat = mr.materials[j];
+                var canUseGpuIns = this.ckCanUseGpuInstance(mat);
+                if (!canUseGpuIns)
+                    continue;
+                mat.enableGpuInstancing = true;
+                this.fillParameters(mat);
+                if (mats) {
+                    mats.push(mat);
+                }
+            }
+        }
+    };
+    gpuInstanceMgr.fillParameters = function (mat) {
+        var staMap = mat.statedMapUniforms;
+        for (var key in staMap) {
+            var val = staMap[key];
+            if (typeof (val) == "number") {
+                mat.setFloat(key, val);
+                continue;
+            }
+            if (val instanceof gd3d.math.vector4) {
+                mat.setVector4(key, val);
+                continue;
+            }
+        }
+    };
+    gpuInstanceMgr.ckCanUseGpuInstance = function (mat) {
+        if (!mat)
+            return false;
+        var sh = mat.getShader();
+        if (!sh)
+            return false;
+        if (!sh.passes["instance"] && !sh.passes["instance_fog"]) {
+            console.warn("shader " + sh.getName() + " , \u6CA1\u6709 instance \u901A\u9053, \u65E0\u6CD5\u4F7F\u7528 gupInstance \u529F\u80FD.");
+            return false;
+        }
+        return true;
+    };
+    gpuInstanceMgr.SetedMap = {};
+    return gpuInstanceMgr;
 }());
 var test_LineRenderer = (function () {
     function test_LineRenderer() {

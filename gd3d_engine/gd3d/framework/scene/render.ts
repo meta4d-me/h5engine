@@ -270,33 +270,58 @@ namespace gd3d.framework
             this.renderLayers.push(overlay);
         }
         clear()
-        {            
-            let len = this.renderLayers.length;
-            for(let i=0;i < len;i++){
-                this.renderLayers[i].list.length = 0;
-                this.renderLayers[i].gpuInstanceMap = {};
+        {
+            let lys = this.renderLayers;
+            for(let i=0 , len = lys.length;i < len;i++){
+                lys[i].list.length = 0;
+                let obj = lys[i].gpuInstanceMap;
+                for(let key in obj){
+                    // obj[key].clear();
+                    obj[key].length=0;
+                }
+                // this.renderLayers[i].gpuInstanceMap = {};
+            }
+        }
+        clearBatcher(){
+            let lys = this.renderLayers;
+            for(let i=0 , len = lys.length;i < len;i++){
+                let obj = lys[i].gpuInstanceBatcherMap;
+                for(let key in obj){
+                    obj[key].dispose();
+                    delete obj[key];
+                }
             }
         }
         addRenderer(renderer: IRenderer , webgl : WebGLRenderingContext)
         {
-            let idx = 0;
-            if (renderer.layer == RenderLayerEnum.Common)
-            {
-            }
-            else if (renderer.layer == RenderLayerEnum.Transparent)
-            {
-                idx = 1;
-            }
-            else if (renderer.layer == RenderLayerEnum.Overlay)
-            {
-                idx = 2;
-            }
+            var idx = renderer.layer;
+            // let layer = renderer.layer; 
+            // var idx = 0;
+            // if (layer == RenderLayerEnum.Common)
+            // {
+            // }
+            // else if (layer == RenderLayerEnum.Overlay)
+            // {
+            //     idx = 2;
+            // }
+            // else if (layer == RenderLayerEnum.Transparent)
+            // {
+            //     idx = 1;
+            // }
             let gpuInsR = (renderer as IRendererGpuIns);
             if(!webgl.drawArraysInstanced || !gpuInsR.isGpuInstancing || !gpuInsR.isGpuInstancing()){
                 this.renderLayers[idx].list.push(renderer);
             }else{
                 this.renderLayers[idx].addInstance(gpuInsR);
             }
+        }
+
+        addStaticInstanceRenderer(renderer: IRendererGpuIns , webgl : WebGLRenderingContext , isStatic : boolean){
+            if(!isStatic) return;
+            let go = renderer.gameObject;
+            if( !go || !go.transform.needGpuInstancBatcher || !renderer.isGpuInstancing || !renderer.isGpuInstancing()) return;
+            let idx = renderer.layer;
+            this.renderLayers[idx].addInstanceToBatcher(renderer);
         }
 
         
@@ -315,18 +340,70 @@ namespace gd3d.framework
         {
             this.needSort = _sort;
         }
-        gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {}; 
+
+        /** gpu instance map*/
+        // gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {}; 
+        gpuInstanceMap: {[sID:string] : math.ReuseArray<IRendererGpuIns>} = {}; 
+        gpuInstanceBatcherMap: {[sID:string] : meshGpuInsBatcher} = {}; 
+
         addInstance(r : IRendererGpuIns){
             let mr = r as meshRenderer;
             let mf = mr.filter;
             if(!mf || !mf.mesh) return;
-            if(!mr.materials[0]) return;
-            let sh = mr.materials[0].getShader();
-            if(!sh) return;
-            let id = `${sh.getGUID()}_${mf.mesh.getGUID()}`;
-            let list = this.gpuInstanceMap[id];
-            if(!list) list = this.gpuInstanceMap[id] = [];
-            list.push(r);
+            let mat = mr.materials[0];
+            if(!mat) return;
+            let gpuInstancingGUID = mat.gpuInstancingGUID;
+            if(!gpuInstancingGUID) return;
+            let id = renderLayer.getRandererGUID(mf.mesh.getGUID() , gpuInstancingGUID);
+            if(!this.gpuInstanceMap[id]) {
+                this.gpuInstanceMap[id] = new math.ReuseArray<IRendererGpuIns>();
+            }
+            this.gpuInstanceMap[id].push(r);
+        }
+
+        addInstanceToBatcher(r : IRendererGpuIns){
+            let mr = r as meshRenderer;
+            let mf = mr.filter;
+            if(!mf) return;
+            let mat = mr.materials[0];
+            if(!mat) return;
+            let gpuInstancingGUID = mat.gpuInstancingGUID;
+            if(!gpuInstancingGUID) return;
+            // if(!mf){
+            //     mf = mr.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
+            // }
+            let mesh = mf.mesh;
+            let id = renderLayer.getRandererGUID(mesh.getGUID() , gpuInstancingGUID);
+            let bs : gd3d.framework.meshGpuInsBatcher = this.gpuInstanceBatcherMap[id];
+            if(!bs){
+                bs = this.gpuInstanceBatcherMap[id] = new gd3d.framework.meshGpuInsBatcher(mr.gameObject.layer , mesh , mr.materials);
+            }
+
+            for(let i=0 , len = bs.bufferDArrs.length ; i < len ;i++){
+                let pass = bs.passArr[i];
+                let darr = bs.bufferDArrs[i];
+                gd3d.framework.meshRenderer.setInstanceOffsetMatrix(mr.gameObject.transform , mat , pass); //RTS offset 矩阵
+                mat.uploadInstanceAtteribute(pass ,darr);  //收集 各material instance atteribute    
+            }
+
+            bs.count ++;
+        }
+
+
+        private static gpuInsRandererGUID = -1;
+        private static gpuInsRandererGUIDMap = {};
+        /** gpuInstancing 唯一ID */
+        private static getRandererGUID(meshGuid :number , materialGuid : string): number{
+            let meshTemp = this.gpuInsRandererGUIDMap[meshGuid];
+            if(!meshTemp){
+                meshTemp = this.gpuInsRandererGUIDMap[meshGuid] = {};
+            }
+            let rId = meshTemp[materialGuid];
+            if(rId == null){
+                this.gpuInsRandererGUID++;
+                rId = meshTemp[materialGuid] = this.gpuInsRandererGUID;
+            }
+            return rId;
         }
     }
 

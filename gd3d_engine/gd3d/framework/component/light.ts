@@ -90,7 +90,15 @@ namespace gd3d.framework
 
         update(delta: number)
         {
-
+            let _scene = sceneMgr.scene;
+            if(_scene.autoCollectlightCamera){
+                //收集灯光
+                var l = this;
+                if (l != null && l.gameObject.visible)
+                {
+                    _scene.addLight(l);
+                }
+            }
         }
          /**
          * @private

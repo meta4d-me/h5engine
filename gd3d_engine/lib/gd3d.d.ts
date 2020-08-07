@@ -856,6 +856,48 @@ declare namespace gd3d.math {
         constructor(datas?: Array<number>);
         toString(): string;
     }
+    /**
+     * 动态延长 Array
+     */
+    class ExtenArray<T extends Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array | Float32Array | Float64Array> {
+        private bufferType;
+        private _buffer;
+        private _buoy;
+        private _length;
+        /** 定长数组 */
+        get buffer(): T;
+        /** 已经使用到数量 */
+        get count(): number;
+        set count(val: number);
+        /**
+         * 动态延长 Array
+         * @param bufferType buffer类型
+         * @param initSize 初始array 长度
+         */
+        constructor(bufferType: new (size: number) => T, initSize?: number);
+        /** push添加到array */
+        push(num: number): void;
+        private exlength;
+        /** 对象清理 */
+        dispose(): void;
+    }
+    /**
+     * 复用数组 ，用于频繁重复创建数组容器的场景(减少GC消耗)
+     */
+    class ReuseArray<T> {
+        private arr;
+        private buoy;
+        /** 获取 Array 对象 */
+        getArray(): T[];
+        /** 获取当前长度 */
+        get length(): number;
+        set length(val: number);
+        push(val: T): void;
+        /** 获取指定索引的值 */
+        get(index: number): T;
+        /** 数组所有值置为null  */
+        clear(): void;
+    }
     function vec4FormJson(json: string, vec4: vector4): void;
     function vec3FormJson(json: string, vec3: vector3): void;
     function vec2FormJson(json: string, vec2: vector2): void;
@@ -5320,6 +5362,28 @@ declare namespace gd3d.framework {
         private static helpquat;
         private static helpquat_1;
         private static helpmtx;
+        /** 自己是否有渲染器组件 */
+        hasRendererComp: boolean;
+        /** 子对象是否有渲染器组件 */
+        hasRendererCompChild: boolean;
+        /**自己是否有需要update方法的组件 */
+        hasUpdateComp: boolean;
+        /**子对象是否有需要update方法的组件 */
+        hasUpdateCompChild: boolean;
+        /**自己是否有需要init方法的组件 */
+        hasInitComp: boolean;
+        /**子对象是否有需要init方法的组件 */
+        hasInitCompChild: boolean;
+        /**自己是否有需要OnPlay方法的组件 */
+        hasOnPlayComp: boolean;
+        /**子对象是否有需要OnPlay方法的组件 */
+        hasOnPlayCompChild: boolean;
+        /** 需要每帧调用组件update , 设置为false 该节点以及子节点都会跳过update 函数的调用（减少消耗）*/
+        needUpdate: boolean;
+        /** 需要每帧筛查FillRenderer , 设置为false 该节点以及子节点都会跳过FillRenderer 函数的调用（减少消耗）*/
+        needFillRenderer: boolean;
+        /** 需要gpuInstanceBatcher 模式渲染 (减少渲染消耗 , 仅适合静态物)*/
+        needGpuInstancBatcher: boolean;
         private checkLRTSChange;
         private fastEqual;
         private _scene;
@@ -5526,12 +5590,10 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         markDirty(): void;
-        markHaveComponent(): void;
-        markHaveRendererComp(): void;
-        hasComponent: boolean;
-        hasComponentChild: boolean;
-        hasRendererComp: boolean;
-        hasRendererCompChild: boolean;
+        markHaveRendererComp(selfHas?: boolean): void;
+        markHaveUpdateComp(selfHas?: boolean): void;
+        markHaveInitComp(selfHas?: boolean): void;
+        markHaveOnplayComp(selfHas?: boolean): void;
         private _localRotate;
         /**
          * @public
@@ -6037,6 +6099,53 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    /** meshRenderer GpuInstancing 合批类
+     *
+     */
+    class meshGpuInsBatcher {
+        /** 实例数量 */
+        count: number;
+        /** 渲染使用mesh */
+        mesh: gd3d.framework.mesh;
+        /** 材质数组（应对submesh） */
+        materials: gd3d.framework.material[];
+        /** 游戏标记layer */
+        gameLayer: number;
+        /** batcher 缓存的array */
+        bufferDArrs: gd3d.math.ExtenArray<Float32Array>[];
+        /** 当前材质上 使用到的通道列表 */
+        passArr: gd3d.render.glDrawPass[];
+        /** passId 对应 passArr 中的索引map*/
+        passIdMap: {
+            [id: number]: number;
+        };
+        constructor(_glayer: number, _mesh: gd3d.framework.mesh, _mats: gd3d.framework.material[]);
+        /** 清理 */
+        dispose(): void;
+    }
+    /** mesh  Gpu 实例 绘制info数据类*/
+    class meshGpuInstanceDrawInfo implements DrawInstanceInfo {
+        instanceCount: number;
+        mid: number;
+        vbo: WebGLBuffer;
+        cacheBuffers: gd3d.math.ExtenArray<Float32Array>[];
+        bufferIdMap: {
+            [passId: number]: number;
+        };
+        instanceArray: gd3d.math.ReuseArray<IRendererGpuIns>;
+        helpDArray: gd3d.math.ExtenArray<Float32Array>;
+        private attSuccess;
+        initBuffer(gl: WebGLRenderingContext): void;
+        activeAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
+        disableAttributes(gl: WebGLRenderingContext, pass: render.glDrawPass): void;
+        /** Disable 结束回调 */
+        onDisableAttribute: (info: meshGpuInstanceDrawInfo) => any;
+        private static _pool;
+        /** 池子中取出一个 */
+        static new_info(): meshGpuInstanceDrawInfo;
+        /** 放回池子 */
+        static del_info(info: meshGpuInstanceDrawInfo): void;
+    }
     /**
     * @public
     * @language zh_CN
@@ -6076,6 +6185,7 @@ declare namespace gd3d.framework {
         * @private
         */
         lightmapScaleOffset: math.vector4;
+        private lastMat0Id;
         /**
          * @public
          * @language zh_CN
@@ -6097,7 +6207,7 @@ declare namespace gd3d.framework {
         /**
         * @private
         */
-        _queue: number;
+        private _queue;
         /**
          * @public
          * @language zh_CN
@@ -6106,28 +6216,39 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         get queue(): number;
-        /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置此组件的场景渲染层级排序number大小
-         * @version gd3d 1.0
-         */
         set queue(value: number);
+        private _filter;
         /**
-        * @private
-        */
-        filter: meshFilter;
+         * 渲染使用 meshFilter
+         */
+        get filter(): meshFilter;
+        set filter(val: meshFilter);
+        private static readonly insOffsetMatrixStr;
+        private static insOffsetMtxIDMap;
+        private static GpuInsAttrignoreMap;
+        private static helpDArray;
+        private static helpIMatrix;
         start(): void;
         onPlay(): void;
-        private refreshLayerAndQue;
+        /**
+         * 刷新 渲染layer 和 渲染 queueId （切换了材质时需要手动刷新）
+         * *优化了自动处理的消耗
+         *  */
+        refreshLayerAndQue(): void;
         update(delta: number): void;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
-        private static helpIMatrix;
-        static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera, instanceArray: IRendererGpuIns[]): void;
-        private static readonly insOffsetMatrixStr;
-        private static setInstanceOffsetMatrix;
-        static instanceDrawType(context: renderContext): string;
+        private static onGpuInsDisableAttribute;
+        static GpuInstancingRender(context: renderContext, instanceArray: gd3d.math.ReuseArray<IRendererGpuIns>, cacheBuffer?: Float32Array): void;
+        static GpuInstancingRenderBatcher(context: renderContext, batcher: meshGpuInsBatcher): void;
+        /**
+         * 设置 OffsetMatrix
+         * @param tran transform
+         * @param mat 材质对象
+         * @param pass 绘制通道对象
+         */
+        static setInstanceOffsetMatrix(tran: gd3d.framework.transform, mat: material, pass: render.glDrawPass): void;
+        private static _setInstanceOffsetMatrix;
+        static instanceDrawType(): string;
         private static _vbos;
         private static _getVBO;
         isGpuInstancing(): boolean;
@@ -6477,6 +6598,10 @@ declare namespace gd3d.framework {
         private _enableGpuInstancing;
         get enableGpuInstancing(): boolean;
         set enableGpuInstancing(enable: boolean);
+        private _shaderGUID;
+        private _textureGUID;
+        /** gpuInstancing 材质唯一ID */
+        gpuInstancingGUID: string;
         constructor(assetName?: string);
         /**
          * @public
@@ -6532,8 +6657,14 @@ declare namespace gd3d.framework {
             [id: string]: number[];
         };
         /** gpu instancing 使用值上传 */
-        uploadInstanceAtteribute(pass: render.glDrawPass, setContainer: number[]): void;
-        private setInstanceAttribValue;
+        /**
+         * 上传InstanceAtteribute 数据
+         * @param pass 绘制通道
+         * @param darr 数组对象
+         * @param ignoreMap 忽略列表
+         */
+        uploadInstanceAtteribute(pass: render.glDrawPass, darr: gd3d.math.ExtenArray<Float32Array>): void;
+        private getInstanceAttribValue;
         private isNotBuildinAttribId;
         /**
          * @public
@@ -6614,6 +6745,9 @@ declare namespace gd3d.framework {
          * @private
          */
         setTexture(_id: string, _texture: gd3d.framework.texture, resname?: string): void;
+        private getTexGuid;
+        private getShaderGuid;
+        private refreshGpuInstancingGUID;
         setCubeTexture(_id: string, _texture: gd3d.framework.texture): void;
         private uniformDirtyMap;
         private static lastDrawMatID;
@@ -17631,10 +17765,6 @@ declare namespace gd3d.framework {
             [key: string]: boolean;
         };
         private componentsInit;
-        /** 拥有组件 */
-        haveComponet: boolean;
-        /** 需要初始化组件 */
-        needInit: boolean;
         /**
          * @public
          * @language zh_CN
@@ -17915,7 +18045,9 @@ declare namespace gd3d.framework {
     class renderList {
         constructor();
         clear(): void;
+        clearBatcher(): void;
         addRenderer(renderer: IRenderer, webgl: WebGLRenderingContext): void;
+        addStaticInstanceRenderer(renderer: IRendererGpuIns, webgl: WebGLRenderingContext, isStatic: boolean): void;
         renderLayers: renderLayer[];
     }
     /**
@@ -17925,10 +18057,19 @@ declare namespace gd3d.framework {
         needSort: boolean;
         list: IRenderer[];
         constructor(_sort?: boolean);
+        /** gpu instance map*/
         gpuInstanceMap: {
-            [sID: string]: IRendererGpuIns[];
+            [sID: string]: math.ReuseArray<IRendererGpuIns>;
+        };
+        gpuInstanceBatcherMap: {
+            [sID: string]: meshGpuInsBatcher;
         };
         addInstance(r: IRendererGpuIns): void;
+        addInstanceToBatcher(r: IRendererGpuIns): void;
+        private static gpuInsRandererGUID;
+        private static gpuInsRandererGUIDMap;
+        /** gpuInstancing 唯一ID */
+        private static getRandererGUID;
     }
 }
 declare namespace gd3d.framework {
@@ -18175,6 +18316,17 @@ declare namespace gd3d.framework {
          */
         enablePhysics(gravity: math.vector3, plugin?: IPhysicsEnginePlugin): boolean;
         enable2DPhysics(gravity: math.vector2, physicOption?: IEngine2DOP): boolean;
+        /**
+         * 刷新 GpuInstancBatcher
+         * 被 batcher 条件[isStatic= true , visible = true , needGpuInstancBatcher = true , isGpuInstancing() = true]
+         */
+        /**
+         * 刷新 GpuInstancBatcher
+         * 被 batcher 条件[isStatic= true , visible = true , needGpuInstancBatcher = true , isGpuInstancing() = true]
+         * @param rootNode 指定刷新节点（默认为 场景根节点）
+         */
+        refreshGpuInstancBatcher(rootNode?: gd3d.framework.transform): void;
+        private fillGpuInsBatcher;
     }
 }
 declare namespace gd3d.framework {

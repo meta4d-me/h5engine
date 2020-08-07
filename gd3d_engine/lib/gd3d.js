@@ -2268,6 +2268,118 @@ var gd3d;
             return matrix3x2;
         }());
         math.matrix3x2 = matrix3x2;
+        /**
+         * 动态延长 Array
+         */
+        var ExtenArray = /** @class */ (function () {
+            /**
+             * 动态延长 Array
+             * @param bufferType buffer类型
+             * @param initSize 初始array 长度
+             */
+            function ExtenArray(bufferType, initSize) {
+                if (initSize === void 0) { initSize = 32; }
+                this.bufferType = bufferType;
+                this._buoy = -1;
+                this._length = initSize;
+                // this._buffer = new T(initSize);
+                this._buffer = new bufferType(initSize);
+            }
+            Object.defineProperty(ExtenArray.prototype, "buffer", {
+                /** 定长数组 */
+                get: function () { return this._buffer; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            Object.defineProperty(ExtenArray.prototype, "count", {
+                /** 已经使用到数量 */
+                get: function () { return this._buoy + 1; },
+                set: function (val) {
+                    if (val < 0)
+                        val = 0;
+                    if (val > this._length) {
+                        var needSize = Math.ceil(val / this._length) * this._length;
+                        this.exlength(needSize);
+                    }
+                    this._buoy = val - 1;
+                },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            ;
+            /** push添加到array */
+            ExtenArray.prototype.push = function (num) {
+                this._buoy++;
+                if (this._buoy >= this._length) {
+                    this.exlength();
+                }
+                this._buffer[this._buoy] = num;
+            };
+            ExtenArray.prototype.exlength = function (mult) {
+                if (mult === void 0) { mult = 2; }
+                var _nlength = this._length * mult;
+                var _buffer = this._buffer;
+                // let _nbuffer = new T(_nlength);
+                var _nbuffer = new this.bufferType(_nlength);
+                for (var i = 0, len = this._length; i < len; i++) {
+                    _nbuffer[i] = _buffer[i];
+                }
+                this._buffer = _nbuffer;
+                this._length = _nlength;
+            };
+            /** 对象清理 */
+            ExtenArray.prototype.dispose = function () {
+                this._buffer = null;
+            };
+            return ExtenArray;
+        }());
+        math.ExtenArray = ExtenArray;
+        /**
+         * 复用数组 ，用于频繁重复创建数组容器的场景(减少GC消耗)
+         */
+        var ReuseArray = /** @class */ (function () {
+            function ReuseArray() {
+                this.arr = [];
+                this.buoy = -1;
+            }
+            /** 获取 Array 对象 */
+            ReuseArray.prototype.getArray = function () {
+                return this.arr;
+            };
+            Object.defineProperty(ReuseArray.prototype, "length", {
+                /** 获取当前长度 */
+                get: function () { return this.buoy + 1; },
+                set: function (val) { this.buoy = val - 1; },
+                enumerable: true,
+                configurable: true
+            });
+            ;
+            ;
+            ReuseArray.prototype.push = function (val) {
+                this.buoy++;
+                this.arr[this.buoy] = val;
+            };
+            /** 获取指定索引的值 */
+            ReuseArray.prototype.get = function (index) {
+                if (index > this.buoy)
+                    return null;
+                return this.arr[index];
+            };
+            /** 数组所有值置为null  */
+            ReuseArray.prototype.clear = function () {
+                var len = this.arr.length;
+                for (var i = 0; i < len; i++) {
+                    if (this.arr[i] == null && i >= this.buoy)
+                        break;
+                    this.arr[i] = null;
+                }
+                this.buoy = -1;
+            };
+            return ReuseArray;
+        }());
+        math.ReuseArray = ReuseArray;
         // //表示一个变换
         // export class transform
         // {
@@ -18821,6 +18933,32 @@ var gd3d;
                 this.helpLRotate = new gd3d.math.quaternion();
                 this.helpLPos = new gd3d.math.vector3();
                 this.helpLScale = new gd3d.math.vector3(1, 1, 1);
+                // /**自己是否有组件 */
+                // hasComponent: boolean = false; 
+                // /**子对象是否有组件  */
+                // hasComponentChild: boolean = false; 
+                /** 自己是否有渲染器组件 */
+                this.hasRendererComp = false;
+                /** 子对象是否有渲染器组件 */
+                this.hasRendererCompChild = false;
+                /**自己是否有需要update方法的组件 */
+                this.hasUpdateComp = false;
+                /**子对象是否有需要update方法的组件 */
+                this.hasUpdateCompChild = false;
+                /**自己是否有需要init方法的组件 */
+                this.hasInitComp = false;
+                /**子对象是否有需要init方法的组件 */
+                this.hasInitCompChild = false;
+                /**自己是否有需要OnPlay方法的组件 */
+                this.hasOnPlayComp = false;
+                /**子对象是否有需要OnPlay方法的组件 */
+                this.hasOnPlayCompChild = false;
+                /** 需要每帧调用组件update , 设置为false 该节点以及子节点都会跳过update 函数的调用（减少消耗）*/
+                this.needUpdate = true;
+                /** 需要每帧筛查FillRenderer , 设置为false 该节点以及子节点都会跳过FillRenderer 函数的调用（减少消耗）*/
+                this.needFillRenderer = true;
+                /** 需要gpuInstanceBatcher 模式渲染 (减少渲染消耗 , 仅适合静态物)*/
+                this.needGpuInstancBatcher = false;
                 /**
                  * @public
                  * @language zh_CN
@@ -18933,10 +19071,6 @@ var gd3d;
                 //         this.aabbchilddirty = false;
                 //     }
                 // }
-                this.hasComponent = false; //自己是否有组件
-                this.hasComponentChild = false; //子对象是否有组件
-                this.hasRendererComp = false; //自己是否有渲染器组件
-                this.hasRendererCompChild = false; //子对象是否有渲染器组件
                 this._localRotate = new gd3d.math.quaternion();
                 this._localTranslate = new gd3d.math.vector3(0, 0, 0);
                 this._localScale = new gd3d.math.vector3(1, 1, 1);
@@ -18955,18 +19089,6 @@ var gd3d;
             }
             transform_2 = transform;
             transform.prototype.checkLRTSChange = function () {
-                // if(!math.vec3Equal(this.helpLPos,this._localTranslate,Number.MIN_VALUE))
-                //     return true;
-                // if(!math.quatEqual(this.helpLRotate,this._localRotate,Number.MIN_VALUE))
-                //     return true;
-                // if(!math.vec3Equal(this.helpLScale,this._localScale,Number.MIN_VALUE))
-                //     return true;
-                // if (!this.fastEqual(this.helpLPos.rawData, this._localTranslate.rawData))
-                //     return true;
-                // if (!this.fastEqual(this.helpLRotate.rawData, this._localRotate.rawData))
-                //     return true;
-                // if (!this.fastEqual(this.helpLScale.rawData, this._localScale.rawData))
-                //     return true;
                 if (!this.fastEqual(this.helpLPos, this._localTranslate))
                     return true;
                 if (!this.fastEqual(this.helpLRotate, this._localRotate))
@@ -19222,10 +19344,16 @@ var gd3d;
                 node.scene = this.scene;
                 node._parent = this;
                 framework.sceneMgr.app.markNotify(node, framework.NotifyType.AddChild);
-                if (node.hasComponent || node.hasComponentChild)
-                    this.markHaveComponent();
+                // if (node.hasComponent || node.hasComponentChild)
+                //     this.markHaveComponent();
                 if (node.hasRendererComp || node.hasRendererCompChild)
-                    this.markHaveRendererComp();
+                    node.markHaveRendererComp(node.hasRendererComp);
+                if (node.hasUpdateComp || node.hasUpdateCompChild)
+                    node.markHaveUpdateComp(node.hasUpdateComp);
+                if (node.hasInitComp || node.hasInitCompChild)
+                    node.markHaveInitComp(node.hasInitComp);
+                if (node.hasOnPlayComp || node.hasOnPlayCompChild)
+                    node.markHaveOnplayComp(node.hasOnPlayComp);
                 node.dirtify(true);
             };
             /**
@@ -19255,7 +19383,7 @@ var gd3d;
              * @version gd3d 1.0
              */
             transform.prototype.removeChild = function (node) {
-                if (node._parent != this || this.children == null) {
+                if (node._parent != this || this.children == null || this.children.length < 1) {
                     console.warn("not my child.");
                     return;
                 }
@@ -19264,6 +19392,13 @@ var gd3d;
                     this.children.splice(i, 1);
                     framework.sceneMgr.app.markNotify(node, framework.NotifyType.RemoveChild);
                     node._parent = null;
+                }
+                if (this.children.length < 1) {
+                    // this.hasComponentChild = false;
+                    this.hasInitCompChild = false;
+                    this.hasOnPlayCompChild = false;
+                    this.hasRendererCompChild = false;
+                    this.hasUpdateCompChild = false;
                 }
             };
             /**
@@ -19389,19 +19524,49 @@ var gd3d;
                 //     p = p._parent;
                 // }
             };
-            transform.prototype.markHaveComponent = function () {
-                this.hasComponent = true;
-                var p = this._parent;
-                while (p != null) {
-                    p.hasComponentChild = true;
-                    p = p._parent;
-                }
-            };
-            transform.prototype.markHaveRendererComp = function () {
-                this.hasRendererComp = true;
+            // markHaveComponent()
+            // {
+            //     this.hasComponent = true;
+            //     var p = this._parent;
+            //     while (p != null)
+            //     {
+            //         p.hasComponentChild = true;
+            //         p = p._parent;
+            //     }
+            // }
+            transform.prototype.markHaveRendererComp = function (selfHas) {
+                if (selfHas === void 0) { selfHas = true; }
+                this.hasRendererComp = this.hasRendererComp || selfHas;
                 var p = this._parent;
                 while (p != null) {
                     p.hasRendererCompChild = true;
+                    p = p._parent;
+                }
+            };
+            transform.prototype.markHaveUpdateComp = function (selfHas) {
+                if (selfHas === void 0) { selfHas = true; }
+                this.hasUpdateComp = this.hasUpdateComp || selfHas;
+                var p = this._parent;
+                while (p != null) {
+                    p.hasUpdateCompChild = true;
+                    p = p._parent;
+                }
+            };
+            transform.prototype.markHaveInitComp = function (selfHas) {
+                if (selfHas === void 0) { selfHas = true; }
+                this.hasInitComp = this.hasInitComp || selfHas;
+                var p = this._parent;
+                while (p != null && !p.hasInitCompChild) {
+                    p.hasInitCompChild = true;
+                    p = p._parent;
+                }
+            };
+            transform.prototype.markHaveOnplayComp = function (selfHas) {
+                if (selfHas === void 0) { selfHas = true; }
+                this.hasOnPlayComp = this.hasOnPlayComp || selfHas;
+                var p = this._parent;
+                while (p != null && !p.hasOnPlayCompChild) {
+                    p.hasOnPlayCompChild = true;
                     p = p._parent;
                 }
             };
@@ -20474,6 +20639,137 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        /** meshRenderer GpuInstancing 合批类
+         *
+         */
+        var meshGpuInsBatcher = /** @class */ (function () {
+            function meshGpuInsBatcher(_glayer, _mesh, _mats) {
+                /** 实例数量 */
+                this.count = 0;
+                this.gameLayer = _glayer;
+                this.mesh = _mesh;
+                this.mesh.use();
+                this.materials = _mats;
+                var _sh = _mats[0].getShader();
+                this.passArr = [];
+                this.bufferDArrs = [];
+                this.passIdMap = {};
+                var tempArr = _sh.passes[gd3d.framework.meshRenderer.instanceDrawType()];
+                for (var i = 0, len = tempArr.length; i < len; i++) {
+                    var pass = tempArr[i];
+                    this.passArr.push(pass);
+                    this.bufferDArrs.push(new gd3d.math.ExtenArray(Float32Array));
+                    this.passIdMap[pass.id.getID()] = i;
+                }
+            }
+            /** 清理 */
+            meshGpuInsBatcher.prototype.dispose = function () {
+                // for(let i=0 , len = this.materials.length ; i < len ;i++){
+                //     let mat = this.materials[i];
+                //     mat.unuse();
+                // }
+                for (var i = 0, len = this.bufferDArrs.length; i < len; i++) {
+                    this.bufferDArrs[i].dispose();
+                }
+                this.passArr = null;
+                this.mesh = null;
+                this.materials = null;
+                this.bufferDArrs = null;
+                this.passIdMap = null;
+            };
+            return meshGpuInsBatcher;
+        }());
+        framework.meshGpuInsBatcher = meshGpuInsBatcher;
+        /** mesh  Gpu 实例 绘制info数据类*/
+        var meshGpuInstanceDrawInfo = /** @class */ (function () {
+            function meshGpuInstanceDrawInfo() {
+                this.attSuccess = false;
+            }
+            meshGpuInstanceDrawInfo.prototype.initBuffer = function (gl) {
+            };
+            meshGpuInstanceDrawInfo.prototype.activeAttributes = function (gl, pass) {
+                if (!this.instanceArray && !this.cacheBuffers)
+                    return;
+                var cacheBuffer;
+                if (this.bufferIdMap) {
+                    var idx = this.bufferIdMap[pass.id.getID()];
+                    if (idx == null)
+                        idx = 0;
+                    cacheBuffer = this.cacheBuffers[idx];
+                }
+                var _mid = this.mid;
+                gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+                var dataArr;
+                if (cacheBuffer) {
+                    dataArr = cacheBuffer.buffer;
+                }
+                if (!dataArr) {
+                    this.helpDArray.count = 0;
+                    var len = this.instanceCount;
+                    for (var i = 0; i < len; i++) {
+                        var mr = this.instanceArray.get(i);
+                        var mat = mr.materials[_mid];
+                        meshRenderer.setInstanceOffsetMatrix(mr.gameObject.transform, mat, pass);
+                        mat.uploadInstanceAtteribute(pass, this.helpDArray);
+                    }
+                    dataArr = this.helpDArray.buffer;
+                }
+                gl.bufferData(gl.ARRAY_BUFFER, dataArr, gl.STATIC_DRAW);
+                var offset = 0;
+                var attMap = pass.program.mapCustomAttrib;
+                for (var key in attMap) {
+                    var att = attMap[key];
+                    var location_1 = att.location;
+                    if (location_1 == -1)
+                        break;
+                    gl.enableVertexAttribArray(location_1);
+                    gl.vertexAttribPointer(location_1, att.size, gl.FLOAT, false, pass.program.strideInsAttrib, offset);
+                    gl.vertexAttribDivisor(location_1, 1);
+                    offset += att.size * 4;
+                }
+                this.attSuccess = true;
+            };
+            meshGpuInstanceDrawInfo.prototype.disableAttributes = function (gl, pass) {
+                if (this.attSuccess) {
+                    gl.bindBuffer(gl.ARRAY_BUFFER, this.vbo);
+                    var attMap = pass.program.mapCustomAttrib;
+                    for (var key in attMap) {
+                        var att = attMap[key];
+                        var location_2 = att.location;
+                        if (location_2 == -1)
+                            break;
+                        gl.vertexAttribDivisor(location_2, 0);
+                        gl.disableVertexAttribArray(location_2);
+                    }
+                    this.attSuccess = false;
+                }
+                //clear
+                this.instanceCount = this.mid = 0;
+                this.vbo = null;
+                this.cacheBuffers = null;
+                this.instanceArray = null;
+                this.helpDArray = null;
+                this.bufferIdMap = null;
+                if (this.onDisableAttribute) {
+                    this.onDisableAttribute(this);
+                }
+            };
+            /** 池子中取出一个 */
+            meshGpuInstanceDrawInfo.new_info = function () {
+                var info = this._pool.pop();
+                if (info)
+                    return info;
+                info = new meshGpuInstanceDrawInfo();
+                return info;
+            };
+            /** 放回池子 */
+            meshGpuInstanceDrawInfo.del_info = function (info) {
+                this._pool.push(info);
+            };
+            meshGpuInstanceDrawInfo._pool = [];
+            return meshGpuInstanceDrawInfo;
+        }());
+        framework.meshGpuInstanceDrawInfo = meshGpuInstanceDrawInfo;
         /**
         * @public
         * @language zh_CN
@@ -20504,6 +20800,7 @@ var gd3d;
                 * @private
                 */
                 this.lightmapScaleOffset = new gd3d.math.vector4(1, 1, 0, 0);
+                this.lastMat0Id = -1;
                 /**
                  * @public
                  * @language zh_CN
@@ -20546,13 +20843,6 @@ var gd3d;
                 get: function () {
                     return this._queue;
                 },
-                /**
-                 * @public
-                 * @language zh_CN
-                 * @classdesc
-                 * 设置此组件的场景渲染层级排序number大小
-                 * @version gd3d 1.0
-                 */
                 set: function (value) {
                     this._queue = value;
                     this.issetq = true;
@@ -20560,8 +20850,21 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            Object.defineProperty(meshRenderer.prototype, "filter", {
+                /**
+                 * 渲染使用 meshFilter
+                 */
+                get: function () {
+                    if (!this._filter) {
+                        this._filter = this.gameObject.getComponent("meshFilter");
+                    }
+                    return this._filter;
+                },
+                set: function (val) { this._filter = val; },
+                enumerable: true,
+                configurable: true
+            });
             meshRenderer.prototype.start = function () {
-                this.filter = this.gameObject.getComponent("meshFilter");
                 this.refreshLayerAndQue();
                 if (this.lightmapIndex == -2) {
                     this.useGlobalLightMap = false;
@@ -20569,8 +20872,13 @@ var gd3d;
             };
             meshRenderer.prototype.onPlay = function () {
             };
+            /**
+             * 刷新 渲染layer 和 渲染 queueId （切换了材质时需要手动刷新）
+             * *优化了自动处理的消耗
+             *  */
             meshRenderer.prototype.refreshLayerAndQue = function () {
                 if (this.materials == null || this.materials.length == 0) {
+                    //没有材质 给一个默认材质
                     this.materials = [];
                     var material_2 = new framework.material();
                     material_2.use();
@@ -20582,17 +20890,6 @@ var gd3d;
                     this._queue = this.materials[0].getQueue();
             };
             meshRenderer.prototype.update = function (delta) {
-                if (this.materials != null && this.materials.length > 0) {
-                    var _mat = this.materials[0];
-                    if (_mat) {
-                        this.layer = _mat.getLayer();
-                        if (!this.issetq)
-                            this._queue = _mat.getQueue();
-                    }
-                }
-                if (this.filter == null) {
-                    this.filter = this.gameObject.getComponent("meshFilter");
-                }
             };
             meshRenderer.prototype.render = function (context, assetmgr, camera) {
                 framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.Meshrender;
@@ -20603,7 +20900,7 @@ var gd3d;
                 context.updateModel(tran);
                 if (filter == null)
                     return;
-                var mesh = this.filter.getMeshOutput();
+                var mesh = filter.getMeshOutput();
                 if (mesh == null || mesh.glMesh == null || mesh.submesh == null)
                     return;
                 var subMeshs = mesh.submesh;
@@ -20642,15 +20939,21 @@ var gd3d;
                         usemat.draw(context, mesh, sm, drawtype);
                 }
             };
-            meshRenderer.GpuInstancingRender = function (context, assetmgr, camera, instanceArray) {
-                var _this = this;
+            meshRenderer.onGpuInsDisableAttribute = function (info) {
+                if (!info)
+                    return;
+                meshGpuInstanceDrawInfo.del_info(info);
+            };
+            meshRenderer.GpuInstancingRender = function (context, instanceArray, cacheBuffer) {
                 var insLen = instanceArray.length;
                 if (insLen < 1)
                     return;
                 framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.Meshrender;
-                var mr = instanceArray[0];
-                var go = instanceArray[0].gameObject;
-                var tran = go.transform;
+                // let mr = instanceArray[0] as gd3d.framework.meshRenderer;
+                var mr = instanceArray.get(0);
+                // let go = instanceArray[0].gameObject;
+                var go = mr.gameObject;
+                // let tran = go.transform;
                 var filter = mr.filter;
                 context.updateLightMask(go.layer);
                 context.updateModelByMatrix(this.helpIMatrix);
@@ -20661,86 +20964,91 @@ var gd3d;
                     return;
                 var subMeshs = mesh.submesh;
                 // mesh.glMesh.bindVboBuffer(context.webgl);
+                if (framework.sceneMgr.scene.fog) {
+                    context.fog = framework.sceneMgr.scene.fog;
+                }
                 var len = subMeshs.length;
-                var _loop_5 = function (i) {
+                var drawtype = this.instanceDrawType();
+                for (var i = 0; i < len; i++) {
                     var sm = subMeshs[i];
                     var mid = subMeshs[i].matIndex; //根据这个找到使用的具体哪个材质    
                     var usemat = mr.materials[mid];
-                    var drawtype = this_2.instanceDrawType(context);
-                    var vbo = this_2._getVBO(context.webgl);
-                    var drawInstanceInfo = {
-                        instanceCount: insLen,
-                        initBuffer: function (gl) {
-                        },
-                        activeAttributes: function (gl, pass) {
-                            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-                            var data = [];
-                            for (var i_2 = 0; i_2 < insLen; i_2++) {
-                                var mr_1 = instanceArray[i_2];
-                                var mat = mr_1.materials[mid];
-                                if (pass.program.mapAttrib[_this.insOffsetMatrixStr + "0"]) { //vs中 注册过 offsetmatrix的才处理
-                                    _this.setInstanceOffsetMatrix(mr_1.gameObject.transform, mat); //RTS offset 矩阵
-                                }
-                                mat.uploadInstanceAtteribute(pass, data); //收集 各material instance atteribute
-                            }
-                            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data), gl.STATIC_DRAW);
-                            var offset = 0;
-                            var attMap = pass.program.mapCustomAttrib;
-                            for (var key in attMap) {
-                                var att = attMap[key];
-                                var location_1 = att.location;
-                                if (location_1 == -1)
-                                    break;
-                                gl.enableVertexAttribArray(location_1);
-                                gl.vertexAttribPointer(location_1, att.size, gl.FLOAT, false, pass.program.strideInsAttrib, offset);
-                                gl.vertexAttribDivisor(location_1, 1);
-                                offset += att.size * 4;
-                            }
-                        },
-                        disableAttributes: function (gl, pass) {
-                            gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-                            var attMap = pass.program.mapCustomAttrib;
-                            for (var key in attMap) {
-                                var att = attMap[key];
-                                var location_2 = att.location;
-                                if (location_2 == -1)
-                                    break;
-                                gl.vertexAttribDivisor(location_2, 0);
-                                gl.disableVertexAttribArray(location_2);
-                            }
-                        },
-                    };
+                    var drawInstanceInfo = meshGpuInstanceDrawInfo.new_info();
+                    drawInstanceInfo.mid = mid;
+                    drawInstanceInfo.instanceCount = insLen;
+                    drawInstanceInfo.vbo = this._getVBO(context.webgl);
+                    drawInstanceInfo.instanceArray = instanceArray;
+                    drawInstanceInfo.helpDArray = this.helpDArray;
+                    drawInstanceInfo.onDisableAttribute = this.onGpuInsDisableAttribute.bind(this);
                     ///----------------------------------------------------------------
                     if (usemat != null)
                         usemat.draw(context, mesh, sm, drawtype, drawInstanceInfo);
-                };
-                var this_2 = this;
-                for (var i = 0; i < len; i++) {
-                    _loop_5(i);
                 }
             };
-            meshRenderer.setInstanceOffsetMatrix = function (tran, mat) {
+            meshRenderer.GpuInstancingRenderBatcher = function (context, batcher) {
+                var insLen = batcher.count;
+                if (insLen < 1)
+                    return;
+                framework.DrawCallInfo.inc.currentState = framework.DrawCallEnum.Meshrender;
+                var mesh = batcher.mesh;
+                var mats = batcher.materials;
+                var gameLayer = batcher.gameLayer;
+                context.updateLightMask(gameLayer);
+                context.updateModelByMatrix(this.helpIMatrix);
+                if (framework.sceneMgr.scene.fog) {
+                    context.fog = framework.sceneMgr.scene.fog;
+                }
+                var subMeshs = mesh.submesh;
+                var len = subMeshs.length;
+                for (var i = 0; i < len; i++) {
+                    var sm = subMeshs[i];
+                    var mid = subMeshs[i].matIndex; //根据这个找到使用的具体哪个材质    
+                    var usemat = mats[mid];
+                    var drawtype = this.instanceDrawType();
+                    var vbo = this._getVBO(context.webgl);
+                    var drawInstanceInfo = meshGpuInstanceDrawInfo.new_info();
+                    drawInstanceInfo.mid = mid;
+                    drawInstanceInfo.instanceCount = insLen;
+                    drawInstanceInfo.vbo = this._getVBO(context.webgl);
+                    drawInstanceInfo.cacheBuffers = batcher.bufferDArrs;
+                    drawInstanceInfo.bufferIdMap = batcher.passIdMap;
+                    drawInstanceInfo.onDisableAttribute = this.onGpuInsDisableAttribute.bind(this);
+                    if (usemat != null)
+                        usemat.draw(context, mesh, sm, drawtype, drawInstanceInfo);
+                }
+            };
+            /**
+             * 设置 OffsetMatrix
+             * @param tran transform
+             * @param mat 材质对象
+             * @param pass 绘制通道对象
+             */
+            meshRenderer.setInstanceOffsetMatrix = function (tran, mat, pass) {
+                if (!pass.program.mapAttrib[this.insOffsetMtxIDMap[0]])
+                    return;
+                this._setInstanceOffsetMatrix(tran, mat);
+            };
+            meshRenderer._setInstanceOffsetMatrix = function (tran, mat) {
                 var _wmat = tran.getWorldMatrix();
-                var insOffsetMtxStr = this.insOffsetMatrixStr;
                 var len = 4;
                 var rawdata = _wmat.rawData;
                 for (var i = 0; i < len; i++) {
-                    var arr = mat.instanceAttribValMap["" + insOffsetMtxStr + i];
+                    var id = this.insOffsetMtxIDMap[i];
+                    var arr = mat.instanceAttribValMap[id];
                     if (!arr)
-                        arr = mat.instanceAttribValMap["" + insOffsetMtxStr + i] = [];
+                        arr = mat.instanceAttribValMap[id] = [];
                     arr[0] = rawdata[0 + 4 * i];
                     arr[1] = rawdata[1 + 4 * i];
                     arr[2] = rawdata[2 + 4 * i];
                     arr[3] = rawdata[3 + 4 * i];
                 }
             };
-            meshRenderer.instanceDrawType = function (context) {
+            meshRenderer.instanceDrawType = function () {
                 var drawtype = "instance";
                 //fog
                 var _fog = gd3d.framework.sceneMgr.scene.fog;
                 if (_fog) {
-                    drawtype += "_fog";
-                    context.fog = _fog;
+                    drawtype = "instance_fog";
                 }
                 return drawtype;
             };
@@ -20754,7 +21062,8 @@ var gd3d;
                 return vbo;
             };
             meshRenderer.prototype.isGpuInstancing = function () {
-                if (!this.materials || !this.materials[0])
+                // if(!this.materials || !this.materials[0]) return false;
+                if (!this.materials || this.materials.length < 1)
                     return false;
                 return this.materials[0].enableGpuInstancing;
             };
@@ -20774,8 +21083,11 @@ var gd3d;
             meshRenderer.prototype.clone = function () {
             };
             meshRenderer.ClassName = "meshRenderer";
-            meshRenderer.helpIMatrix = new gd3d.math.matrix();
             meshRenderer.insOffsetMatrixStr = "instance_offset_matrix_";
+            meshRenderer.insOffsetMtxIDMap = ["instance_offset_matrix_0", "instance_offset_matrix_1", "instance_offset_matrix_2", "instance_offset_matrix_3"];
+            meshRenderer.GpuInsAttrignoreMap = { "instance_offset_matrix_0": true, "instance_offset_matrix_1": true, "instance_offset_matrix_2": true, "instance_offset_matrix_3": true };
+            meshRenderer.helpDArray = new gd3d.math.ExtenArray(Float32Array);
+            meshRenderer.helpIMatrix = new gd3d.math.matrix();
             meshRenderer._vbos = [];
             __decorate([
                 gd3d.reflect.Field("material[]"),
@@ -21625,6 +21937,11 @@ var gd3d;
                  */
                 this.defaultAsset = false;
                 this._enableGpuInstancing = false;
+                //
+                this._shaderGUID = "";
+                this._textureGUID = "";
+                /** gpuInstancing 材质唯一ID */
+                this.gpuInstancingGUID = "";
                 this.instanceAttribValMap = {};
                 this.queue = 0;
                 this.statedMapUniforms = {};
@@ -21639,7 +21956,14 @@ var gd3d;
             material_3 = material;
             Object.defineProperty(material.prototype, "enableGpuInstancing", {
                 get: function () { return this._enableGpuInstancing; },
-                set: function (enable) { this._enableGpuInstancing = enable; },
+                set: function (enable) {
+                    this._enableGpuInstancing = enable;
+                    if (enable) {
+                        this.getTexGuid(this); //贴图使用唯一标识ID，gupInstance 使用
+                        this.getShaderGuid(this.shader);
+                        this.refreshGpuInstancingGUID();
+                    }
+                },
                 enumerable: true,
                 configurable: true
             });
@@ -21791,25 +22115,57 @@ var gd3d;
                 }
             };
             /** gpu instancing 使用值上传 */
-            material.prototype.uploadInstanceAtteribute = function (pass, setContainer) {
+            // uploadInstanceAtteribute(pass: render.glDrawPass,setContainer: number[]){
+            //     let attmap =  pass.program.mapCustomAttrib;
+            //     for(let key in attmap){
+            //         let arr = this.instanceAttribValMap[key];
+            //         if(!arr){
+            //             let att = pass.program.mapCustomAttrib[key];
+            //             let oldLen = setContainer.length;
+            //             setContainer.length = oldLen + att.size;
+            //             setContainer.fill(0,oldLen);
+            //         }else{
+            //             for(let i=0 , len = arr.length ; i < len ; i++){
+            //                 setContainer.push(arr[i]);
+            //             }
+            //         }
+            //     }
+            // }
+            /**
+             * 上传InstanceAtteribute 数据
+             * @param pass 绘制通道
+             * @param darr 数组对象
+             * @param ignoreMap 忽略列表
+             */
+            material.prototype.uploadInstanceAtteribute = function (pass, darr) {
                 var attmap = pass.program.mapCustomAttrib;
                 for (var key in attmap) {
                     var arr = this.instanceAttribValMap[key];
                     if (!arr) {
                         var att = pass.program.mapCustomAttrib[key];
-                        var oldLen = setContainer.length;
-                        setContainer.length = oldLen + att.size;
-                        setContainer.fill(0, oldLen);
+                        // let oldLen = setContainer.length;
+                        // setContainer.length = oldLen + att.size;
+                        // setContainer.fill(0,oldLen);
+                        for (var i = 0, len = att.size; i < len; i++) {
+                            darr.push(0);
+                        }
                     }
                     else {
-                        arr.forEach(function (v) { setContainer.push(v); });
+                        for (var i = 0, len = arr.length; i < len; i++) {
+                            darr.push(arr[i]);
+                        }
                     }
                 }
             };
-            material.prototype.setInstanceAttribValue = function (id, arr) {
-                if (!id)
-                    return;
-                this.instanceAttribValMap[id] = arr;
+            // private setInstanceAttribValue(id:string,arr:number[]){
+            //     if(!id) return;
+            //     this.instanceAttribValMap[id] = arr;
+            // }
+            material.prototype.getInstanceAttribValue = function (id) {
+                if (this.instanceAttribValMap[id] == null) {
+                    this.instanceAttribValMap[id] = [];
+                }
+                return this.instanceAttribValMap[id];
             };
             material.prototype.isNotBuildinAttribId = function (id) {
                 return !gd3d.render.glProgram.isBuildInAttrib(id);
@@ -21825,6 +22181,10 @@ var gd3d;
             material.prototype.setShader = function (shader) {
                 this.shader = shader;
                 this.defaultMapUniform = shader.defaultMapUniform;
+                if (this._enableGpuInstancing) {
+                    this.getShaderGuid(shader);
+                    this.refreshGpuInstancingGUID();
+                }
             };
             // private _changeShaderMap: { [name: string]: material } = {};
             // /**
@@ -21905,7 +22265,9 @@ var gd3d;
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
                 }
                 if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
-                    this.setInstanceAttribValue(_id, [_number]);
+                    var arr = this.getInstanceAttribValue(_id);
+                    arr[0] = _number;
+                    // this.setInstanceAttribValue(_id,[_number]);
                 }
             };
             /**
@@ -21920,11 +22282,17 @@ var gd3d;
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
                 }
                 if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
-                    var arr_1 = [];
-                    _numbers.forEach(function (v) {
-                        arr_1.push(v);
-                    });
-                    this.setInstanceAttribValue(_id, arr_1);
+                    if (_numbers.length == 1 || _numbers.length == 4) {
+                        var arr = this.getInstanceAttribValue(_id);
+                        for (var i = 0, len = _numbers.length; i < len; i++) {
+                            arr[i] = _numbers[i];
+                        }
+                    }
+                    // let arr : number [] = []
+                    // _numbers.forEach((v,i)=>{
+                    //     arr.push(v);
+                    // });
+                    // this.setInstanceAttribValue(_id,arr);
                 }
             };
             /**
@@ -21939,7 +22307,12 @@ var gd3d;
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
                 }
                 if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
-                    this.setInstanceAttribValue(_id, [_vector4.x, _vector4.y, _vector4.z, _vector4.w]);
+                    var arr = this.getInstanceAttribValue(_id);
+                    arr[0] = _vector4.x;
+                    arr[1] = _vector4.y;
+                    arr[2] = _vector4.z;
+                    arr[3] = _vector4.w;
+                    // this.setInstanceAttribValue(_id,[_vector4.x,_vector4.y,_vector4.z,_vector4.w]);
                 }
             };
             /**
@@ -21954,11 +22327,15 @@ var gd3d;
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
                 }
                 if (this._enableGpuInstancing && this.isNotBuildinAttribId(_id)) {
-                    var arr_2 = [];
-                    _vector4v.forEach(function (v) {
-                        arr_2.push(v);
-                    });
-                    this.setInstanceAttribValue(_id, arr_2);
+                    var arr = this.getInstanceAttribValue(_id);
+                    for (var i = 0, len = _vector4v.length; i < len; i++) {
+                        arr[i] = _vector4v[i];
+                    }
+                    // let arr : number [] = []
+                    // _vector4v.forEach((v)=>{
+                    //     arr.push(v);
+                    // });
+                    // this.setInstanceAttribValue(_id,arr);
                 }
             };
             /**
@@ -22017,6 +22394,10 @@ var gd3d;
                         this.setVector4(_texelsizeName, new gd3d.math.vector4(1.0 / _gltexture.width, 1.0 / _gltexture.height, _gltexture.width, _gltexture.height));
                     }
                     this.uniformDirtyMap[_id] = true;
+                    if (this._enableGpuInstancing) {
+                        this.getTexGuid(this); //贴图使用唯一标识ID，gupInstance 使用
+                        this.refreshGpuInstancingGUID();
+                    }
                 }
                 else {
                     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
@@ -22029,6 +22410,35 @@ var gd3d;
                 // {
                 //     console.log("Set wrong uniform value. Mat Name: " + this.getName() + " Unifom :" + _id);
                 // }
+            };
+            //贴图使用唯一标识ID，gupInstance 使用
+            material.prototype.getTexGuid = function (mat) {
+                var staMap = mat.statedMapUniforms;
+                this._textureGUID = "";
+                for (var key in staMap) {
+                    var val = staMap[key];
+                    if (val.getGUID == null)
+                        continue;
+                    var guid = val.getGUID();
+                    this._textureGUID += "_" + guid;
+                }
+            };
+            material.prototype.getShaderGuid = function (sh) {
+                if (!sh)
+                    return;
+                if (!sh.passes["instance"] && !sh.passes["instance_fog"]) {
+                    console.warn("shader " + sh.getName() + " , has not \"instance\" pass when enable gpuInstance on the material " + this.getName() + ".");
+                }
+                else {
+                    this._shaderGUID = "" + sh.getGUID();
+                }
+            };
+            material.prototype.refreshGpuInstancingGUID = function () {
+                if (!this._shaderGUID) {
+                    this.gpuInstancingGUID = "";
+                    return;
+                }
+                this.gpuInstancingGUID = this._shaderGUID + "_" + this._textureGUID;
             };
             material.prototype.setCubeTexture = function (_id, _texture) {
                 if (this.defaultMapUniform[_id] != null && this.defaultMapUniform[_id].type == gd3d.render.UniformTypeEnum.CubeTexture) {
@@ -22626,7 +23036,7 @@ var gd3d;
                 var vertexCount = read.readUInt32();
                 var fmt = gd3d.render.VertexFormatMask;
                 data.pos = [];
-                for (var i_3 = 0; i_3 < vertexCount; ++i_3) {
+                for (var i_2 = 0; i_2 < vertexCount; ++i_2) {
                     data.pos.push({
                         x: read.readSingle(),
                         y: read.readSingle(),
@@ -26524,19 +26934,19 @@ var gd3d;
             bloomctr.prototype.remove = function () {
                 this._init = false;
                 if (this.camera) {
-                    var arr_3 = this.camera.postQueues;
+                    var arr_1 = this.camera.postQueues;
                     var dArr = [];
-                    for (var i = 0; i < arr_3.length; i++) {
-                        var temp = arr_3[i];
+                    for (var i = 0; i < arr_1.length; i++) {
+                        var temp = arr_1[i];
                         if (temp[this.tag]) {
                             dArr.push(temp);
                         }
                     }
                     dArr.forEach(function (element) {
                         if (element) {
-                            var idx = arr_3.indexOf(element);
+                            var idx = arr_1.indexOf(element);
                             if (idx != -1) {
-                                arr_3.splice(idx, 1);
+                                arr_1.splice(idx, 1);
                             }
                         }
                     });
@@ -26854,6 +27264,22 @@ var gd3d;
             };
             camera.prototype.update = function (delta) {
                 this._updateOverLays(delta);
+                var _scene = framework.sceneMgr.scene;
+                if (_scene.autoCollectlightCamera) {
+                    // //收集摄像机
+                    // var c = this;
+                    // if (c.gameObject.visibleInScene)
+                    // {
+                    //     _scene.renderCameras.push(c);
+                    // }
+                    // var cl = _scene.renderCameras.length;
+                    // while (_scene.renderContext.length < cl)
+                    // {
+                    //     _scene.renderContext.push(new renderContext(_scene.webgl));
+                    // }
+                    if (this.gameObject.visibleInScene)
+                        _scene.addCamera(this);
+                }
             };
             /** overLays update */
             camera.prototype._updateOverLays = function (delta) {
@@ -27306,6 +27732,8 @@ var gd3d;
             };
             camera.prototype._fillRenderer = function (scene, node, _isStatic) {
                 if (_isStatic === void 0) { _isStatic = false; }
+                if (!node.needFillRenderer)
+                    return; //强制不fill 
                 var go = node.gameObject;
                 if (!go || !go.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false))
                     return; //自己没有渲染组件 且 子物体也没有 return
@@ -27510,7 +27938,15 @@ var gd3d;
                         var gpuList = rmap[key];
                         if (!gpuList)
                             continue;
-                        framework.meshRenderer.GpuInstancingRender(context, assetmgr, this, gpuList);
+                        framework.meshRenderer.GpuInstancingRender(context, gpuList);
+                    }
+                    // Batcher gpu instancing process
+                    var bRmap = rlayers[i].gpuInstanceBatcherMap;
+                    for (var key in bRmap) {
+                        var obj = bRmap[key];
+                        if (!obj)
+                            continue;
+                        framework.meshRenderer.GpuInstancingRenderBatcher(context, obj);
                     }
                 }
                 // for (var i = 0; i < scene.renderList.renderLayers.length; i++)
@@ -27568,8 +28004,8 @@ var gd3d;
                 }
                 else {
                     // for (let item of this.postQueues)
-                    for (var i_4 = 0, l_1 = this.postQueues.length; i_4 < l_1; ++i_4) {
-                        this.postQueues[i_4].render(scene, context, this);
+                    for (var i_3 = 0, l_1 = this.postQueues.length; i_3 < l_1; ++i_3) {
+                        this.postQueues[i_3].render(scene, context, this);
                     }
                     context.webgl.flush();
                 }
@@ -28328,9 +28764,9 @@ var gd3d;
                     return;
                 var index = -1;
                 if (_initFrameData.attrsData.mat != null) {
-                    for (var i_5 = 0; i_5 < this.matDataGroups.length; i_5++) {
-                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_5], _initFrameData.attrsData.mat)) {
-                            index = i_5;
+                    for (var i_4 = 0; i_4 < this.matDataGroups.length; i_4++) {
+                        if (framework.EffectMatData.beEqual(this.matDataGroups[i_4], _initFrameData.attrsData.mat)) {
+                            index = i_4;
                             break;
                         }
                     }
@@ -28394,42 +28830,42 @@ var gd3d;
                 // }
                 element.update();
                 subEffectBatcher.effectElements.push(element);
-                for (var i_6 = 0; i_6 < vertexCount; i_6++) {
+                for (var i_5 = 0; i_5 < vertexCount; i_5++) {
                     { //postion
                         var vertex = gd3d.math.pool.new_vector3();
-                        vertex.x = vertexArr[i_6 * vertexSize + 0];
-                        vertex.y = vertexArr[i_6 * vertexSize + 1];
-                        vertex.z = vertexArr[i_6 * vertexSize + 2];
+                        vertex.x = vertexArr[i_5 * vertexSize + 0];
+                        vertex.y = vertexArr[i_5 * vertexSize + 1];
+                        vertex.z = vertexArr[i_5 * vertexSize + 2];
                         gd3d.math.matrixTransformVector3(vertex, element.curAttrData.matrix, vertex);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 0] = vertex.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 1] = vertex.y;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 2] = vertex.z;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 0] = vertex.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 1] = vertex.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 2] = vertex.z;
                         gd3d.math.pool.delete_vector3(vertex);
                     }
                     { //normal
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 3] = vertexArr[i_6 * vertexSize + 3];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 4] = vertexArr[i_6 * vertexSize + 4];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 5] = vertexArr[i_6 * vertexSize + 5];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 3] = vertexArr[i_5 * vertexSize + 3];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 4] = vertexArr[i_5 * vertexSize + 4];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 5] = vertexArr[i_5 * vertexSize + 5];
                     }
                     { //tangent
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 6] = vertexArr[i_6 * vertexSize + 6];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 7] = vertexArr[i_6 * vertexSize + 7];
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 8] = vertexArr[i_6 * vertexSize + 8];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 6] = vertexArr[i_5 * vertexSize + 6];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 7] = vertexArr[i_5 * vertexSize + 7];
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 8] = vertexArr[i_5 * vertexSize + 8];
                     }
                     { //color
                         //处理一下颜色，以防灰度值 > 1\
                         var r = gd3d.math.floatClamp(element.curAttrData.color.x, 0, 1);
                         var g = gd3d.math.floatClamp(element.curAttrData.color.y, 0, 1);
                         var b = gd3d.math.floatClamp(element.curAttrData.color.z, 0, 1);
-                        var a = gd3d.math.floatClamp(vertexArr[i_6 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 9] = r;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 10] = g;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 11] = b;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * 15 + 12] = a;
+                        var a = gd3d.math.floatClamp(vertexArr[i_5 * vertexSize + 12] * element.curAttrData.alpha, 0, 1);
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 9] = r;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 10] = g;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 11] = b;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * 15 + 12] = a;
                     }
                     { //uv
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 13] = vertexArr[i_6 * vertexSize + 13] * element.curAttrData.tilling.x;
-                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_6) * vertexSize + 14] = vertexArr[i_6 * vertexSize + 14] * element.curAttrData.tilling.y;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 13] = vertexArr[i_5 * vertexSize + 13] * element.curAttrData.tilling.x;
+                        subEffectBatcher.dataForVbo[(vertexStartIndex + i_5) * vertexSize + 14] = vertexArr[i_5 * vertexSize + 14] * element.curAttrData.tilling.y;
                         //  this.dataForVbo[(this._vercount + i) * total + 13] = vertexArr[i * total + 13] * materialData.tiling.x + materialData.offset.x;
                         // this.dataForVbo[(this._vercount + i) * total + 14] = vertexArr[i * total + 14] * materialData.tiling.y + materialData.offset.y;
                     }
@@ -29512,11 +29948,11 @@ var gd3d;
                 if (this.delayElements.length > 0) {
                     if (this.refElements.length > 0)
                         this.refElements = [];
-                    for (var i_7 = this.delayElements.length - 1; i_7 >= 0; i_7--) {
-                        var data = this.delayElements[i_7];
+                    for (var i_6 = this.delayElements.length - 1; i_6 >= 0; i_6--) {
+                        var data = this.delayElements[i_6];
                         if (data.delayTime <= this.playTimer) {
-                            this.addElement(this.delayElements[i_7]);
-                            this.delayElements.splice(i_7, 1);
+                            this.addElement(this.delayElements[i_6]);
+                            this.delayElements.splice(i_6, 1);
                         }
                     }
                 }
@@ -31002,6 +31438,14 @@ var gd3d;
             light.prototype.onPlay = function () {
             };
             light.prototype.update = function (delta) {
+                var _scene = framework.sceneMgr.scene;
+                if (_scene.autoCollectlightCamera) {
+                    //收集灯光
+                    var l = this;
+                    if (l != null && l.gameObject.visible) {
+                        _scene.addLight(l);
+                    }
+                }
             };
             /**
             * @private
@@ -32727,19 +33171,19 @@ var gd3d;
             vignettingCtr.prototype.remove = function () {
                 this._init = false;
                 if (this.camera) {
-                    var arr_4 = this.camera.postQueues;
+                    var arr_2 = this.camera.postQueues;
                     var dArr = [];
-                    for (var i = 0; i < arr_4.length; i++) {
-                        var temp = arr_4[i];
+                    for (var i = 0; i < arr_2.length; i++) {
+                        var temp = arr_2[i];
                         if (temp[this.tag]) {
                             dArr.push(temp);
                         }
                     }
                     dArr.forEach(function (element) {
                         if (element) {
-                            var idx = arr_4.indexOf(element);
+                            var idx = arr_2.indexOf(element);
                             if (idx != -1) {
-                                arr_4.splice(idx, 1);
+                                arr_2.splice(idx, 1);
                             }
                         }
                     });
@@ -36706,8 +37150,8 @@ var gd3d;
                 arr = this.events[event] = [];
             }
             else {
-                for (var _i = 0, arr_5 = arr; _i < arr_5.length; _i++) {
-                    var ft = arr_5[_i];
+                for (var _i = 0, arr_3 = arr; _i < arr_3.length; _i++) {
+                    var ft = arr_3[_i];
                     if (ft.func == func) {
                         FT = ft;
                         break;
@@ -36735,8 +37179,8 @@ var gd3d;
             var arr = this.events[event];
             if (!arr)
                 return;
-            for (var _a = 0, arr_6 = arr; _a < arr_6.length; _a++) {
-                var FT = arr_6[_a];
+            for (var _a = 0, arr_4 = arr; _a < arr_4.length; _a++) {
+                var FT = arr_4[_a];
                 for (var _b = 0, _c = FT.thisArgs; _b < _c.length; _b++) {
                     var thisArg = _c[_b];
                     FT.func.apply(thisArg, args);
@@ -49252,7 +49696,7 @@ var gd3d;
                                 });
                             },
                         };
-                        var drawtype = framework.meshRenderer.instanceDrawType(context);
+                        var drawtype = framework.meshRenderer.instanceDrawType();
                         this.material.draw(context, mesh, subMeshs[0], drawtype, drawInstanceInfo);
                     }
                 }
@@ -49361,8 +49805,8 @@ var gd3d;
                     // 处理喷发
                     var inCycleStart = startTime - cycleStartTime;
                     var inCycleEnd = endTime - cycleStartTime;
-                    for (var i_8 = 0; i_8 < bursts.length; i_8++) {
-                        var burst = bursts[i_8];
+                    for (var i_7 = 0; i_7 < bursts.length; i_7++) {
+                        var burst = bursts[i_7];
                         if (burst.isProbability && inCycleStart <= burst.time && burst.time < inCycleEnd) {
                             emits.push({ time: cycleStartTime + burst.time, num: burst.count.getValue(rateAtDuration) });
                         }
@@ -56471,11 +56915,6 @@ var gd3d;
                 this.components = [];
                 this.componentTypes = {};
                 this.componentsInit = [];
-                // private componentsPlayed: nodeComponent[] = [];
-                /** 拥有组件 */
-                this.haveComponet = false;
-                /** 需要初始化组件 */
-                this.needInit = false;
                 this._visible = true;
             }
             /**
@@ -56569,7 +57008,8 @@ var gd3d;
                         c.OnPlayed = true;
                     }
                 }
-                this.needInit = false;
+                this.transform.hasInitCompChild = false;
+                this.transform.hasInitComp = false;
             };
             /**
              * @public
@@ -56592,8 +57032,13 @@ var gd3d;
                         c.comp.onPlay(); //运行时的 enabled 开启 后调用 onPlay()
                         c.OnPlayed = true;
                     }
+                    this.transform.hasOnPlayComp = false;
+                    this.transform.hasOnPlayCompChild = false;
                     if (c.comp.update)
                         c.comp.update(delta);
+                }
+                if (len < 1) {
+                    this.transform.hasOnPlayCompChild = false;
                 }
             };
             /**
@@ -56609,7 +57054,6 @@ var gd3d;
                     console.error("this component is null");
                     return;
                 }
-                this.transform.markHaveComponent();
                 if (comp.gameObject != null) {
                     console.error("this components has added to a  gameObject");
                     return;
@@ -56671,8 +57115,12 @@ var gd3d;
                         //throw new Error("已经有一个碰撞盒的组件了，不能俩");
                     }
                 }
-                if (framework.functionIsEmpty(comp.update))
+                if (framework.functionIsEmpty(comp.update)) {
                     comp.update = undefined; //update空转
+                }
+                else {
+                    this.transform.markHaveUpdateComp();
+                }
                 // if (comp.update.toString().length < 35)
                 // {
                 //     //update 空转
@@ -56685,7 +57133,9 @@ var gd3d;
                         framework.sceneMgr.app.markNotify(this.transform, framework.NotifyType.AddCamera);
                     if (gd3d.reflect.getClassTag(comp["__proto__"], "canvasRenderer") == "1")
                         framework.sceneMgr.app.markNotify(this.transform, framework.NotifyType.AddCanvasRender);
-                    this.needInit = this.haveComponet = true;
+                    this.transform.markHaveInitComp();
+                    this.transform.markHaveOnplayComp();
+                    // this.transform.markHaveComponent();
                 }
                 this.componentTypes[typeStr] = true;
                 return comp;
@@ -56855,8 +57305,9 @@ var gd3d;
                     }
                     ++i;
                 }
-                if (this.components.length < 1)
-                    this.haveComponet = false;
+                if (this.components.length < 1) {
+                    this.transform.hasUpdateComp = false;
+                }
             };
             /**
              * @public
@@ -56889,8 +57340,9 @@ var gd3d;
                     }
                     ++i;
                 }
-                if (this.components.length < 1)
-                    this.haveComponet = false;
+                if (this.components.length < 1) {
+                    this.transform.hasUpdateComp = false;
+                }
                 return result;
             };
             /**
@@ -56914,7 +57366,11 @@ var gd3d;
                 this.collider = null;
                 this.components.length = 0;
                 this.componentTypes = {};
-                this.haveComponet = false;
+                var tran = this.transform;
+                tran.hasUpdateComp = false;
+                tran.hasRendererComp = false;
+                tran.hasInitComp = false;
+                tran.hasOnPlayComp = false;
             };
             gameObject.prototype.clearOfCompRemove = function (cComp) {
                 var comp = cComp.comp;
@@ -56928,8 +57384,10 @@ var gd3d;
                 }
                 if (comp == this.camera)
                     this.camera = null;
-                if (comp == this.renderer)
+                if (comp == this.renderer) {
+                    this.transform.hasRendererComp = false;
                     this.renderer = null;
+                }
                 if (comp == this.light)
                     this.light = null;
                 if (comp == this.collider)
@@ -57228,22 +57686,42 @@ var gd3d;
                 this.renderLayers.push(overlay);
             }
             renderList.prototype.clear = function () {
-                var len = this.renderLayers.length;
-                for (var i = 0; i < len; i++) {
-                    this.renderLayers[i].list.length = 0;
-                    this.renderLayers[i].gpuInstanceMap = {};
+                var lys = this.renderLayers;
+                for (var i = 0, len = lys.length; i < len; i++) {
+                    lys[i].list.length = 0;
+                    var obj = lys[i].gpuInstanceMap;
+                    for (var key in obj) {
+                        // obj[key].clear();
+                        obj[key].length = 0;
+                    }
+                    // this.renderLayers[i].gpuInstanceMap = {};
+                }
+            };
+            renderList.prototype.clearBatcher = function () {
+                var lys = this.renderLayers;
+                for (var i = 0, len = lys.length; i < len; i++) {
+                    var obj = lys[i].gpuInstanceBatcherMap;
+                    for (var key in obj) {
+                        obj[key].dispose();
+                        delete obj[key];
+                    }
                 }
             };
             renderList.prototype.addRenderer = function (renderer, webgl) {
-                var idx = 0;
-                if (renderer.layer == RenderLayerEnum.Common) {
-                }
-                else if (renderer.layer == RenderLayerEnum.Transparent) {
-                    idx = 1;
-                }
-                else if (renderer.layer == RenderLayerEnum.Overlay) {
-                    idx = 2;
-                }
+                var idx = renderer.layer;
+                // let layer = renderer.layer; 
+                // var idx = 0;
+                // if (layer == RenderLayerEnum.Common)
+                // {
+                // }
+                // else if (layer == RenderLayerEnum.Overlay)
+                // {
+                //     idx = 2;
+                // }
+                // else if (layer == RenderLayerEnum.Transparent)
+                // {
+                //     idx = 1;
+                // }
                 var gpuInsR = renderer;
                 if (!webgl.drawArraysInstanced || !gpuInsR.isGpuInstancing || !gpuInsR.isGpuInstancing()) {
                     this.renderLayers[idx].list.push(renderer);
@@ -57251,6 +57729,15 @@ var gd3d;
                 else {
                     this.renderLayers[idx].addInstance(gpuInsR);
                 }
+            };
+            renderList.prototype.addStaticInstanceRenderer = function (renderer, webgl, isStatic) {
+                if (!isStatic)
+                    return;
+                var go = renderer.gameObject;
+                if (!go || !go.transform.needGpuInstancBatcher || !renderer.isGpuInstancing || !renderer.isGpuInstancing())
+                    return;
+                var idx = renderer.layer;
+                this.renderLayers[idx].addInstanceToBatcher(renderer);
             };
             return renderList;
         }());
@@ -57264,7 +57751,10 @@ var gd3d;
                 this.needSort = false;
                 //先暂时分配 透明与不透明两组
                 this.list = [];
+                /** gpu instance map*/
+                // gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {}; 
                 this.gpuInstanceMap = {};
+                this.gpuInstanceBatcherMap = {};
                 this.needSort = _sort;
             }
             renderLayer.prototype.addInstance = function (r) {
@@ -57272,17 +57762,61 @@ var gd3d;
                 var mf = mr.filter;
                 if (!mf || !mf.mesh)
                     return;
-                if (!mr.materials[0])
+                var mat = mr.materials[0];
+                if (!mat)
                     return;
-                var sh = mr.materials[0].getShader();
-                if (!sh)
+                var gpuInstancingGUID = mat.gpuInstancingGUID;
+                if (!gpuInstancingGUID)
                     return;
-                var id = sh.getGUID() + "_" + mf.mesh.getGUID();
-                var list = this.gpuInstanceMap[id];
-                if (!list)
-                    list = this.gpuInstanceMap[id] = [];
-                list.push(r);
+                var id = renderLayer.getRandererGUID(mf.mesh.getGUID(), gpuInstancingGUID);
+                if (!this.gpuInstanceMap[id]) {
+                    this.gpuInstanceMap[id] = new gd3d.math.ReuseArray();
+                }
+                this.gpuInstanceMap[id].push(r);
             };
+            renderLayer.prototype.addInstanceToBatcher = function (r) {
+                var mr = r;
+                var mf = mr.filter;
+                if (!mf)
+                    return;
+                var mat = mr.materials[0];
+                if (!mat)
+                    return;
+                var gpuInstancingGUID = mat.gpuInstancingGUID;
+                if (!gpuInstancingGUID)
+                    return;
+                // if(!mf){
+                //     mf = mr.gameObject.getComponent("meshFilter") as gd3d.framework.meshFilter;
+                // }
+                var mesh = mf.mesh;
+                var id = renderLayer.getRandererGUID(mesh.getGUID(), gpuInstancingGUID);
+                var bs = this.gpuInstanceBatcherMap[id];
+                if (!bs) {
+                    bs = this.gpuInstanceBatcherMap[id] = new gd3d.framework.meshGpuInsBatcher(mr.gameObject.layer, mesh, mr.materials);
+                }
+                for (var i = 0, len = bs.bufferDArrs.length; i < len; i++) {
+                    var pass = bs.passArr[i];
+                    var darr = bs.bufferDArrs[i];
+                    gd3d.framework.meshRenderer.setInstanceOffsetMatrix(mr.gameObject.transform, mat, pass); //RTS offset 矩阵
+                    mat.uploadInstanceAtteribute(pass, darr); //收集 各material instance atteribute    
+                }
+                bs.count++;
+            };
+            /** gpuInstancing 唯一ID */
+            renderLayer.getRandererGUID = function (meshGuid, materialGuid) {
+                var meshTemp = this.gpuInsRandererGUIDMap[meshGuid];
+                if (!meshTemp) {
+                    meshTemp = this.gpuInsRandererGUIDMap[meshGuid] = {};
+                }
+                var rId = meshTemp[materialGuid];
+                if (rId == null) {
+                    this.gpuInsRandererGUID++;
+                    rId = meshTemp[materialGuid] = this.gpuInsRandererGUID;
+                }
+                return rId;
+            };
+            renderLayer.gpuInsRandererGUID = -1;
+            renderLayer.gpuInsRandererGUIDMap = {};
             return renderLayer;
         }());
         framework.renderLayer = renderLayer;
@@ -57584,15 +58118,25 @@ var gd3d;
                 }
             };
             scene.prototype.objupdate = function (node, delta) {
-                if (!(node.hasComponent == false && node.hasComponentChild == false)) {
-                    if (node.gameObject.needInit)
-                        node.gameObject.init(this.app.bePlay); //组件还未初始化的初始化
-                    if (node.gameObject.haveComponet) {
-                        node.gameObject.update(delta);
-                        if (this.autoCollectlightCamera)
-                            this.collectCameraAndLight(node);
-                    }
+                var needInit = node.hasInitComp || node.hasInitCompChild || node.hasOnPlayComp || node.hasOnPlayCompChild;
+                var needUpate = node.needUpdate;
+                if (needUpate)
+                    needUpate = node.hasUpdateComp || node.hasUpdateCompChild;
+                if (!needInit && !needUpate)
+                    return; //init 和 update 都不需要 直接return
+                if (node.hasInitCompChild) {
+                    node.hasInitCompChild = false;
                 }
+                var go = node.gameObject;
+                // if (go.needInit){
+                if (node.hasInitComp) {
+                    go.init(this.app.bePlay); //组件还未初始化的初始化
+                }
+                if (node.hasUpdateComp || node.hasOnPlayComp || node.hasOnPlayCompChild) {
+                    go.update(delta);
+                }
+                // if(this.autoCollectlightCamera)          //流程放入 camera 和 light 的update中了
+                //     this.collectCameraAndLight(node);
                 //这里要检测长度 因为在update 或init中 children会改变
                 for (var i = 0; i < node.children.length; ++i)
                     this.objupdate(node.children[i], delta);
@@ -57939,6 +58483,42 @@ var gd3d;
                     // console.error(e.message);
                     throw e;
                     return false;
+                }
+            };
+            /**
+             * 刷新 GpuInstancBatcher
+             * 被 batcher 条件[isStatic= true , visible = true , needGpuInstancBatcher = true , isGpuInstancing() = true]
+             */
+            /**
+             * 刷新 GpuInstancBatcher
+             * 被 batcher 条件[isStatic= true , visible = true , needGpuInstancBatcher = true , isGpuInstancing() = true]
+             * @param rootNode 指定刷新节点（默认为 场景根节点）
+             */
+            scene.prototype.refreshGpuInstancBatcher = function (rootNode) {
+                //清理历史 缓存
+                this.renderList.clearBatcher();
+                //遍历所有 渲染对象，有标记的（静态 && gpuInstancingTag ）加到batcher列表
+                if (!rootNode)
+                    rootNode = this.rootNode;
+                this.fillGpuInsBatcher(rootNode, rootNode.gameObject.isStatic);
+            };
+            scene.prototype.fillGpuInsBatcher = function (node, isStatic) {
+                if (!this.webgl.drawArraysInstanced)
+                    return;
+                //检查渲染对象
+                var go = node.gameObject;
+                isStatic = isStatic || go.isStatic;
+                if (!go || !go.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false))
+                    return; //自己没有渲染组件 且 子物体也没有 return
+                var renderer = go.renderer;
+                if (renderer) {
+                    this.renderList.addStaticInstanceRenderer(renderer, this.webgl, isStatic);
+                }
+                var children = node.children;
+                if (children) {
+                    for (var i = 0, len = children.length; i < len; i++) {
+                        this.fillGpuInsBatcher(children[i], isStatic);
+                    }
                 }
             };
             return scene;
@@ -61091,12 +61671,12 @@ var gd3d;
             handler: function (target, source, property, handlers, serialization) {
                 var spv = source[property];
                 if (Array.isArray(spv)) {
-                    var arr_7 = target[property] || [];
+                    var arr_5 = target[property] || [];
                     var keys = Object.keys(spv);
                     keys.forEach(function (v) {
-                        propertyHandler(arr_7, spv, v, handlers, serialization);
+                        propertyHandler(arr_5, spv, v, handlers, serialization);
                     });
-                    target[property] = arr_7;
+                    target[property] = arr_5;
                     return true;
                 }
                 return false;

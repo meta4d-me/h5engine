@@ -246,6 +246,23 @@ namespace gd3d.framework
         update(delta: number)
         {
             this._updateOverLays(delta);
+
+            let _scene = sceneMgr.scene;
+            if(_scene.autoCollectlightCamera){
+                // //收集摄像机
+                // var c = this;
+                // if (c.gameObject.visibleInScene)
+                // {
+                //     _scene.renderCameras.push(c);
+                // }
+                // var cl = _scene.renderCameras.length;
+                // while (_scene.renderContext.length < cl)
+                // {
+                //     _scene.renderContext.push(new renderContext(_scene.webgl));
+                // }
+                if (this.gameObject.visibleInScene)
+                _scene.addCamera(this);
+            }
         }
 
         /** overLays update */
@@ -850,6 +867,7 @@ namespace gd3d.framework
 
         private _fillRenderer(scene: scene, node: transform, _isStatic: boolean = false)
         {
+            if(!node.needFillRenderer) return;  //强制不fill 
             let go = node.gameObject;
             if (!go || !go.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false)) return;  //自己没有渲染组件 且 子物体也没有 return
 
@@ -1133,7 +1151,15 @@ namespace gd3d.framework
                 for(let key in rmap){
                     let gpuList = rmap[key];
                     if(!gpuList) continue;
-                    meshRenderer.GpuInstancingRender(context, assetmgr, this , gpuList);
+                    meshRenderer.GpuInstancingRender(context , gpuList);
+                }
+
+                // Batcher gpu instancing process
+                let bRmap = rlayers[i].gpuInstanceBatcherMap;
+                for(let key in bRmap){
+                    let obj = bRmap[key];
+                    if(!obj) continue;
+                    meshRenderer.GpuInstancingRenderBatcher(context , obj);
                 }
             }
             // for (var i = 0; i < scene.renderList.renderLayers.length; i++)

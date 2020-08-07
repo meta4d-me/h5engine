@@ -634,24 +634,53 @@ declare class test_Decal implements IState {
     update(delta: number): void;
 }
 declare class test_GPU_instancing implements IState {
+    private static readonly help_quat;
     private _app;
     private _scene;
     private _mat_ins;
     private createCount;
     private instanceShBase;
     private mats;
+    private mrArr;
     private isInstancing;
-    private isStatic;
     private cubeRoot;
+    private cam;
+    private modelType;
+    private subRange;
     start(app: gd3d.framework.application): Promise<void>;
+    private _batcher;
+    batcherSwitch(): void;
     refresh(): void;
+    private _isStatic;
+    get isStatic(): boolean;
+    set isStatic(v: boolean);
+    private _needUpdate;
+    get needUpdate(): boolean;
+    set needUpdate(v: boolean);
+    private _needFillRenderer;
+    get needFillRenderer(): boolean;
+    set needFillRenderer(v: boolean);
+    private loadedTest;
+    loadTest(modelName: string): Promise<void>;
     createByNum(num: number): void;
     instanceSwitch(): void;
     initMaterails(): void;
     private count;
     createOne(app: any, needInstance: boolean): void;
+    private lookAtCamera;
     private getRandom;
     update(delta: number): void;
+}
+declare type batcherStrct = {
+    pass: gd3d.render.glDrawPass;
+    darr: gd3d.math.ExtenArray<Float32Array>;
+    renderers: gd3d.math.ReuseArray<gd3d.framework.IRendererGpuIns>;
+};
+declare class gpuInstanceMgr {
+    private static SetedMap;
+    static setToGupInstance(tran: gd3d.framework.transform, resUrl?: string, mats?: gd3d.framework.material[]): void;
+    private static fillParameters;
+    private static ckCanUseGpuInstance;
 }
 declare class test_LineRenderer implements IState {
     app: gd3d.framework.application;
