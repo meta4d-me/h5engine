@@ -77,6 +77,7 @@ namespace gd3d.framework
             let cacheBuffer : gd3d.math.ExtenArray<Float32Array>;
             if(this.bufferIdMap){
                 let idx = this.bufferIdMap[pass.id.getID()];
+                if(idx == null) idx = 0; 
                 cacheBuffer = this.cacheBuffers[idx]
             }
 
@@ -379,107 +380,6 @@ namespace gd3d.framework
                     usemat.draw(context, mesh, sm, drawtype);
             }
 
-        }
-
-        // static GpuInstancingRender(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera , instanceArray : IRendererGpuIns[] , cacheBuffer? : Float32Array){
-        static _GpuInstancingRender(context: renderContext, instanceArray : gd3d.math.ReuseArray<IRendererGpuIns>, cacheBuffer? : Float32Array){
-            let insLen = instanceArray.length;
-            if(insLen < 1) return;
-            DrawCallInfo.inc.currentState=DrawCallEnum.Meshrender;
-            // let mr = instanceArray[0] as gd3d.framework.meshRenderer;
-            let mr = instanceArray.get(0) as gd3d.framework.meshRenderer;
-            // let go = instanceArray[0].gameObject;
-            let go = mr.gameObject;
-            // let tran = go.transform;
-            let filter = mr.filter; 
-
-            context.updateLightMask(go.layer);
-            context.updateModelByMatrix(this.helpIMatrix);
-            if(filter == null) return;
-            let mesh = filter.getMeshOutput();
-            if(mesh == null || mesh.glMesh == null || mesh.submesh == null) return;
-            let subMeshs = mesh.submesh;
-
-            // mesh.glMesh.bindVboBuffer(context.webgl);
-            if (sceneMgr.scene.fog)
-            {
-                context.fog = sceneMgr.scene.fog;
-            }
-            let len = subMeshs.length;
-            let drawtype = this.instanceDrawType();
-            for (let i = 0; i < len; i++)
-            {
-                let sm = subMeshs[i];
-                let mid = subMeshs[i].matIndex;//根据这个找到使用的具体哪个材质    
-                let usemat = mr.materials[mid];
-                let vbo = this._getVBO(context.webgl);
-                let drawInstanceInfo: DrawInstanceInfo = {
-                    instanceCount: insLen,
-                    initBuffer: (gl ) =>
-                    {
-                        
-                    },
-                    activeAttributes: (gl, pass) =>
-                    {
-                        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-                        let dataArr = cacheBuffer;
-                        // let data : number[] = [];
-                        let _mid = mid;
-                        if(!cacheBuffer){
-                            this.helpDArray.count = 0;
-                            for(let i=0;i < insLen ;i++){
-                                // let mr = instanceArray[i] as meshRenderer;
-                                let mr = instanceArray.get(i) as meshRenderer;
-                                let mat = mr.materials[_mid];
-
-                                // if(pass.program.mapAttrib[`${this.insOffsetMatrixStr}0`]){//vs中 注册过 offsetmatrix的才处理
-                                //     this.setInstanceOffsetMatrix(mr.gameObject.transform,mat); //RTS offset 矩阵
-                                // }
-                                this.setInstanceOffsetMatrix(mr.gameObject.transform,mat,pass);
-                                // mat.uploadInstanceAtteribute( pass ,data);  //收集 各material instance atteribute
-                                // mat.uploadInstanceAtteribute(pass , this.helpDArray , this.GpuInsAttrignoreMap);
-                                mat.uploadInstanceAtteribute(pass , this.helpDArray );
-                            }
-                            // dataArr = new Float32Array(arr);
-                            dataArr = this.helpDArray.buffer;
-                        }
-                        
-                        gl.bufferData(gl.ARRAY_BUFFER, dataArr , gl.STATIC_DRAW);
-                        // gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(data) , gl.STATIC_DRAW);
-                        
-                        let offset = 0;
-                        let attMap = pass.program.mapCustomAttrib;
-                        for(let key in attMap){
-                            let att = attMap[key];
-                            let location = att.location;
-                            if (location == -1) break;
-    
-                            gl.enableVertexAttribArray(location);
-                            gl.vertexAttribPointer(location, att.size, gl.FLOAT, false, pass.program.strideInsAttrib, offset);
-                            gl.vertexAttribDivisor(location, 1);
-                            offset += att.size * 4;
-                        }
-                    },
-                    disableAttributes: (gl, pass) =>
-                    {
-                        gl.bindBuffer(gl.ARRAY_BUFFER, vbo);
-
-                        let attMap = pass.program.mapCustomAttrib;
-                        for(let key in attMap){
-                            let att = attMap[key];
-                            let location = att.location;
-                            if (location == -1) break;
-    
-                            gl.vertexAttribDivisor(location, 0);
-                            gl.disableVertexAttribArray(location);
-                        }
-                    },
-                };
-                ///----------------------------------------------------------------
-
-                if (usemat != null)
-                    usemat.draw(context, mesh, sm, drawtype , drawInstanceInfo);
-            }
         }
 
         private static onGpuInsDisableAttribute (info : meshGpuInstanceDrawInfo){
