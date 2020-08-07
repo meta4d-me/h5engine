@@ -29,10 +29,10 @@ namespace gd3d.framework
         private static helpquat_1 = new math.quaternion();
 
         private static helpmtx = new gd3d.math.matrix();
-        /**自己是否有组件 */
-        hasComponent: boolean = false; 
-        /**子对象是否有组件  */
-        hasComponentChild: boolean = false; 
+        // /**自己是否有组件 */
+        // hasComponent: boolean = false; 
+        // /**子对象是否有组件  */
+        // hasComponentChild: boolean = false; 
         /** 自己是否有渲染器组件 */
         hasRendererComp: boolean = false; 
         /** 子对象是否有渲染器组件 */
@@ -41,6 +41,15 @@ namespace gd3d.framework
         hasUpdateComp: boolean = false; 
         /**子对象是否有需要update方法的组件 */
         hasUpdateCompChild: boolean = false; 
+        /**自己是否有需要init方法的组件 */
+        hasInitComp: boolean = false; 
+        /**子对象是否有需要init方法的组件 */
+        hasInitCompChild: boolean = false; 
+        /**自己是否有需要OnPlay方法的组件 */
+        hasOnPlayComp: boolean = false; 
+        /**子对象是否有需要OnPlay方法的组件 */
+        hasOnPlayCompChild: boolean = false; 
+
         /** 需要每帧调用组件update , 设置为false 该节点以及子节点都会跳过update 函数的调用（减少消耗）*/
         needUpdate : boolean = true;
         /** 需要每帧筛查FillRenderer , 设置为false 该节点以及子节点都会跳过FillRenderer 函数的调用（减少消耗）*/
@@ -50,19 +59,6 @@ namespace gd3d.framework
 
         private checkLRTSChange(): boolean
         {
-            // if(!math.vec3Equal(this.helpLPos,this._localTranslate,Number.MIN_VALUE))
-            //     return true;
-            // if(!math.quatEqual(this.helpLRotate,this._localRotate,Number.MIN_VALUE))
-            //     return true;
-            // if(!math.vec3Equal(this.helpLScale,this._localScale,Number.MIN_VALUE))
-            //     return true;
-
-            // if (!this.fastEqual(this.helpLPos.rawData, this._localTranslate.rawData))
-            //     return true;
-            // if (!this.fastEqual(this.helpLRotate.rawData, this._localRotate.rawData))
-            //     return true;
-            // if (!this.fastEqual(this.helpLScale.rawData, this._localScale.rawData))
-            //     return true;
             if (!this.fastEqual(this.helpLPos, this._localTranslate))
                 return true;
             if (!this.fastEqual(this.helpLRotate, this._localRotate))
@@ -511,14 +507,21 @@ namespace gd3d.framework
             node.scene = this.scene;
             node._parent = this;
             sceneMgr.app.markNotify(node, NotifyType.AddChild);
-            if (node.hasComponent || node.hasComponentChild)
-                this.markHaveComponent();
+            // if (node.hasComponent || node.hasComponentChild)
+            //     this.markHaveComponent();
 
             if (node.hasRendererComp || node.hasRendererCompChild)
-                this.markHaveRendererComp();
+                node.markHaveRendererComp(node.hasRendererComp);
 
             if(node.hasUpdateComp || node.hasUpdateCompChild)
-                this.markHaveUpdateComp();
+                node.markHaveUpdateComp(node.hasUpdateComp);
+            
+            if(node.hasInitComp || node.hasInitCompChild )
+                node.markHaveInitComp(node.hasInitComp);
+
+            if(node.hasOnPlayComp || node.hasOnPlayCompChild)
+                node.markHaveOnplayComp(node.hasOnPlayComp);
+
 
             node.dirtify(true);
 
@@ -552,7 +555,7 @@ namespace gd3d.framework
          */
         removeChild(node: transform)
         {
-            if (node._parent != this || this.children == null)
+            if (node._parent != this || this.children == null || this.children.length < 1)
             {
                 console.warn("not my child.");
                 return ;   
@@ -565,6 +568,13 @@ namespace gd3d.framework
                 node._parent = null;
             }
 
+            if(this.children.length < 1){
+                // this.hasComponentChild = false;
+                this.hasInitCompChild = false;
+                this.hasOnPlayCompChild = false;
+                this.hasRendererCompChild = false;
+                this.hasUpdateCompChild = false;
+            }
         }
         /**
          * @public
@@ -722,19 +732,19 @@ namespace gd3d.framework
             //     p = p._parent;
             // }
         }
-        markHaveComponent()
+        // markHaveComponent()
+        // {
+        //     this.hasComponent = true;
+        //     var p = this._parent;
+        //     while (p != null)
+        //     {
+        //         p.hasComponentChild = true;
+        //         p = p._parent;
+        //     }
+        // }
+        markHaveRendererComp(selfHas = true)
         {
-            this.hasComponent = true;
-            var p = this._parent;
-            while (p != null)
-            {
-                p.hasComponentChild = true;
-                p = p._parent;
-            }
-        }
-        markHaveRendererComp()
-        {
-            this.hasRendererComp = true;
+            this.hasRendererComp = this.hasRendererComp || selfHas;
             var p = this._parent;
             while (p != null)
             {
@@ -743,13 +753,34 @@ namespace gd3d.framework
             }
         }
 
-        markHaveUpdateComp()
+        markHaveUpdateComp(selfHas = true)
         {
-            this.hasUpdateComp = true;
+            this.hasUpdateComp = this.hasUpdateComp || selfHas;
             var p = this._parent;
             while (p != null)
             {
                 p.hasUpdateCompChild = true;
+                p = p._parent;
+            }
+        }
+
+        markHaveInitComp(selfHas = true)
+        {
+            this.hasInitComp = this.hasInitComp || selfHas;
+            var p = this._parent;
+            while (p != null && !p.hasInitCompChild)
+            {
+                p.hasInitCompChild = true;
+                p = p._parent;
+            }
+        }
+
+        markHaveOnplayComp(selfHas = true){
+            this.hasOnPlayComp = this.hasOnPlayComp || selfHas;
+            var p = this._parent;
+            while (p != null && !p.hasOnPlayCompChild)
+            {
+                p.hasOnPlayCompChild = true;
                 p = p._parent;
             }
         }
