@@ -53,7 +53,8 @@
         {
             if (fun)
                 fun(null, new Error(`URL : ${url} \n onerr on req: `));
-            loadFail(req, url, fun, onprocess, responseType, loadedFun);
+            //因 onloadend 无论成功失败都会回调   这里的重试注掉 
+            // loadFail(req, url, fun, onprocess, responseType, loadedFun);
         };
         req.onloadend = () =>
         {
