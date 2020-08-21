@@ -288,8 +288,8 @@
      */
     export function loadImg(url: string, fun: (_tex: HTMLImageElement, _err?: Error, loadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {
-        let guid = framework.resID.next();
-        framework.assetMgr.Instance.loadImg(guid, url, (img , err ) =>
+        // let guid = framework.resID.next();
+        framework.assetMgr.Instance["_loadImg"](url, (img , err ) =>
         {
             fun(img , err);
         });

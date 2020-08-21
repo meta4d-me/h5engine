@@ -145,7 +145,7 @@ namespace gd3d.framework
 
         static mapLoading: { [key: number]: { url?: string, readyok: boolean, data?: any, cbQueue?: loadCallback[], subRes?: number[] } } = {};//下载好的,未下载好的,资源
         static mapGuid: { [key: number]: assetRef } = {};//解析好的资源
-        static mapImage: { [key: number]: HTMLImageElement } = {};//图片缓存
+        static mapImage: { [key: number]: HTMLImageElement | ArrayBuffer} = {};//图片缓存
         static mapNamed: { [key: string]: IAsset } = {};//资源名是 ,系统资源类型的名字 或自己定义的名字
         static mapBundleNamed: { [key: number]: { [name: string]: assetRef } } = {};
 
