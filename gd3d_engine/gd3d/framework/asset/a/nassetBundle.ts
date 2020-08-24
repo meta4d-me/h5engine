@@ -3,6 +3,8 @@ namespace gd3d.framework
 
     export class assetBundle
     {
+        /** 解析后清理 加载缓存资源数据 */
+        static needClearLoadedRes = false;
         static idNext = -1;//id起始位置               
 
         files: { [key: string]: number } = {}; //Array<{ name: string, guid: number }>;
@@ -300,6 +302,21 @@ namespace gd3d.framework
                 }
                 this.ready = true;
                 // console.log(`资源包:${this.name} 准备完毕. 解析耗时${Date.now() - time}/ms`);
+
+                //清理 多余img
+                if(assetBundle.needClearLoadedRes){
+                    //img map
+                    let texs = this.texs;
+                    for(let key in texs){
+                        let id = texs[key];
+                        delete assetMgr.mapImage[id];
+                        //loading map 
+                        let loading = assetMgr.mapLoading[id];
+                        if(loading && loading.readyok){
+                            delete loading.data;
+                        }
+                    }
+                }
             }
             this.parseResolve();
         }
