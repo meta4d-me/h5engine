@@ -133,7 +133,7 @@ namespace gd3d.framework
             mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
             if (assetmgr.app.getScene().fog)
             {
-                context.fog = assetmgr.app.getScene().fog;
+                // context.fog = assetmgr.app.getScene().fog;
                 this.mat.draw(context, mesh, mesh.submesh[0], "base_fog");
             } else
             {

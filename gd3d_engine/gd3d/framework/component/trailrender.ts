@@ -452,7 +452,7 @@ namespace gd3d.framework
             //--------------------------render-------------------------------------------
             if (this.gameObject.getScene().fog)
             {
-                context.fog = this.gameObject.getScene().fog;
+                // context.fog = this.gameObject.getScene().fog;
                 this.material.draw(context, this.mesh, this.mesh.submesh[0], "base_fog");
             } else
             {

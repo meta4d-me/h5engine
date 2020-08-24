@@ -474,7 +474,7 @@ namespace gd3d.framework
                     
                     if (this.gameObject.getScene().fog)
                     {
-                        context.fog = this.gameObject.getScene().fog;
+                        // context.fog = this.gameObject.getScene().fog;
                         subEffectBatcher.mat.draw(context, mesh, mesh.submesh[0], "base_fog");//只有一个submesh
                     } else
                     {
