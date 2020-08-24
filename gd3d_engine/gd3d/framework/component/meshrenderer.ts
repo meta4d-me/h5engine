@@ -372,10 +372,10 @@ namespace gd3d.framework
                         context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
                     }
                 }
-                if (scene.fog)
-                {
-                    context.fog = scene.fog;
-                }
+                // if (scene.fog)
+                // {
+                //     context.fog = scene.fog;
+                // }
                 if (usemat != null)
                     usemat.draw(context, mesh, sm, drawtype);
             }
@@ -406,10 +406,10 @@ namespace gd3d.framework
             let subMeshs = mesh.submesh;
 
             // mesh.glMesh.bindVboBuffer(context.webgl);
-            if (sceneMgr.scene.fog)
-            {
-                context.fog = sceneMgr.scene.fog;
-            }
+            // if (sceneMgr.scene.fog)
+            // {
+            //     context.fog = sceneMgr.scene.fog;
+            // }
             let len = subMeshs.length;
             let drawtype = this.instanceDrawType();
             for (let i = 0; i < len; i++)
@@ -443,10 +443,10 @@ namespace gd3d.framework
             
             context.updateLightMask(gameLayer);
             context.updateModelByMatrix(this.helpIMatrix);
-            if (sceneMgr.scene.fog)
-            {
-                context.fog = sceneMgr.scene.fog;
-            }
+            // if (sceneMgr.scene.fog)
+            // {
+            //     context.fog = sceneMgr.scene.fog;
+            // }
 
             let subMeshs = mesh.submesh;
             let len = subMeshs.length;

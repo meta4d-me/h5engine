@@ -219,7 +219,7 @@ namespace gd3d.framework {
                         if (usemat != null) {
 
                             if (this.gameObject.transform.scene.fog) {
-                                context.fog = this.gameObject.transform.scene.fog;
+                                // context.fog = this.gameObject.transform.scene.fog;
                                 usemat.draw(context, this._mesh, sm, "skin_fog");
                             } else {
                                 usemat.draw(context, this._mesh, sm, "skin");

@@ -318,6 +318,7 @@ namespace gd3d.framework
             //一个camera 不是一次单纯的绘制，camera 还有多个绘制遍
             var cam = this.renderCameras[camindex];
             var context = this.renderContext[camindex];
+            context.fog = this.fog;
             if ((this.app.bePlay && !cam.isEditorCam) || (!this.app.bePlay && cam.isEditorCam))
             {
                 context.updateCamera(this.app, cam);
