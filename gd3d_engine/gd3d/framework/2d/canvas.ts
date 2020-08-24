@@ -197,6 +197,15 @@ namespace gd3d.framework
         isDrawByDepth = false;
 
         /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         *  强行lable置顶渲染（用于优化Drawcall）
+         * @version gd3d 1.0
+         */
+        isForceLabelTopRender = false;
+
+        /**
          * 启用UI事件
          */
         enableUIEvent = true;
@@ -587,6 +596,10 @@ namespace gd3d.framework
             if (!this.isDrawByDepth)
             {
                 this.drawScene(this.rootNode, context, assetmgr);
+                if(this.isForceLabelTopRender){
+                    this.renderTopLabels();
+                    canvas.helpLabelArr.length = 0;
+                }
             }
             else
             {
@@ -667,6 +680,8 @@ namespace gd3d.framework
          */
         assetmgr: assetMgr;
 
+        private static readonly helpLabelArr : gd3d.math.ReuseArray<label> = new gd3d.math.ReuseArray();
+
         /**
          * @public
          * @language zh_CN
@@ -681,9 +696,14 @@ namespace gd3d.framework
         {
             //context.updateModel(this.gameObject.transform);
             if (!node.visible) return;
-            if (node.renderer != null)
+            let r = node.renderer;
+            if (r != null)
             {
-                node.renderer.render(this);
+                if(!this.isForceLabelTopRender || !("isLabel" in r)){
+                    r.render(this);
+                }else{
+                    canvas.helpLabelArr.push(r);
+                }
             }
             if (node.children != null)
             {
@@ -691,6 +711,15 @@ namespace gd3d.framework
                 {
                     this.drawScene(node.children[i], context, assetmgr);
                 }
+            }
+        }
+
+        private renderTopLabels(){
+            let len = canvas.helpLabelArr.length
+            if(len < 1) return;
+            let arr = canvas.helpLabelArr;
+            for(let i=0;i < len;i++){
+                arr.get(i).render(this);
             }
         }
 

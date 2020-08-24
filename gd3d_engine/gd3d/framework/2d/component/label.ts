@@ -14,8 +14,10 @@ namespace gd3d.framework
     export class label implements IRectRenderer
     {
         static readonly ClassName: string = "label";
-
-        private _text: string;
+        /**字段 用于快速判断实例是否是label */
+        readonly isLabel = true;
+         
+        private _text: string = "";
         /**
          * @public
          * @language zh_CN
