@@ -78,6 +78,8 @@ class PvrParse
         let textureFormat;
         let textureType;
         var t2d = new gd3d.render.glTexture2D(this.gl);
+        t2d.height = this.height;
+        t2d.width = this.width;
         switch (this.pixelFormatH)
         {
             case 0:

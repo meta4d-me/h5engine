@@ -90,6 +90,8 @@ namespace gd3d.framework
 
             // 初始化纹理
             var t2d = new gd3d.render.glTexture2D(gl);
+            t2d.height = pixelHeight;
+            t2d.width = pixelWidth;
             t2d.format = gd3d.render.TextureFormatEnum.KTX;
 
             var target = gl.TEXTURE_2D;
