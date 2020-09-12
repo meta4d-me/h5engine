@@ -2585,6 +2585,14 @@ var gd3d;
                  */
                 this.isDrawByDepth = false;
                 /**
+                 * @public
+                 * @language zh_CN
+                 * @classdesc
+                 *  强行lable置顶渲染（用于优化Drawcall）
+                 * @version gd3d 1.0
+                 */
+                this.isForceLabelTopRender = false;
+                /**
                  * 启用UI事件
                  */
                 this.enableUIEvent = true;
@@ -2894,6 +2902,10 @@ var gd3d;
                 //begin
                 if (!this.isDrawByDepth) {
                     this.drawScene(this.rootNode, context, assetmgr);
+                    if (this.isForceLabelTopRender) {
+                        this.renderTopLabels();
+                        canvas_1.helpLabelArr.length = 0;
+                    }
                 }
                 else {
                     this.drawSceneByDepth(this.rootNode, context, assetmgr);
@@ -2962,13 +2974,28 @@ var gd3d;
                 //context.updateModel(this.gameObject.transform);
                 if (!node.visible)
                     return;
-                if (node.renderer != null) {
-                    node.renderer.render(this);
+                var r = node.renderer;
+                if (r != null) {
+                    if (!this.isForceLabelTopRender || !("isLabel" in r)) {
+                        r.render(this);
+                    }
+                    else {
+                        canvas_1.helpLabelArr.push(r);
+                    }
                 }
                 if (node.children != null) {
                     for (var i = 0; i < node.children.length; i++) {
                         this.drawScene(node.children[i], context, assetmgr);
                     }
+                }
+            };
+            canvas.prototype.renderTopLabels = function () {
+                var len = canvas_1.helpLabelArr.length;
+                if (len < 1)
+                    return;
+                var arr = canvas_1.helpLabelArr;
+                for (var i = 0; i < len; i++) {
+                    arr.get(i).render(this);
                 }
             };
             /** 按深度层 合批渲染 */
@@ -3183,6 +3210,7 @@ var gd3d;
             var canvas_1;
             canvas.ClassName = "canvas";
             canvas.help_v2 = new gd3d.math.vector2();
+            canvas.helpLabelArr = new gd3d.math.ReuseArray();
             //深度渲染层列表
             canvas.depthTag = "__depthTag__";
             canvas.flowIndexTag = "__flowIndexTag__";
@@ -7743,6 +7771,8 @@ var gd3d;
          */
         var label = /** @class */ (function () {
             function label() {
+                /**字段 用于快速判断实例是否是label */
+                this.isLabel = true;
                 this.needRefreshFont = false;
                 this._fontName = "defFont.font.json";
                 this._fontsize = 14;
@@ -14227,6 +14257,8 @@ var gd3d;
                 }
                 // 初始化纹理
                 var t2d = new gd3d.render.glTexture2D(gl);
+                t2d.height = pixelHeight;
+                t2d.width = pixelWidth;
                 t2d.format = gd3d.render.TextureFormatEnum.KTX;
                 var target = gl.TEXTURE_2D;
                 gl.activeTexture(gl.TEXTURE0);
@@ -14333,6 +14365,8 @@ var PvrParse = /** @class */ (function () {
         var textureFormat;
         var textureType;
         var t2d = new gd3d.render.glTexture2D(this.gl);
+        t2d.height = this.height;
+        t2d.width = this.width;
         switch (this.pixelFormatH) {
             case 0:
                 textureFormat = t2d.ext.COMPRESSED_RGB_PVRTC_2BPPV1_IMG;
@@ -14978,7 +15012,7 @@ var gd3d;
             //解析
             assetBundle.prototype.parseFile = function () {
                 return __awaiter(this, void 0, void 0, function () {
-                    var assets, k, type, i, len, asset, error_1;
+                    var assets, k, type, i, len, asset, error_1, texs, key, id, loading;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
@@ -15039,6 +15073,19 @@ var gd3d;
                                 return [3 /*break*/, 1];
                             case 6:
                                 this.ready = true;
+                                // console.log(`资源包:${this.name} 准备完毕. 解析耗时${Date.now() - time}/ms`);
+                                //清理 多余img
+                                if (assetBundle.needClearLoadedRes) {
+                                    texs = this.texs;
+                                    for (key in texs) {
+                                        id = texs[key];
+                                        delete framework.assetMgr.mapImage[id];
+                                        loading = framework.assetMgr.mapLoading[id];
+                                        if (loading && loading.readyok) {
+                                            delete loading.data;
+                                        }
+                                    }
+                                }
                                 this.parseResolve();
                                 return [2 /*return*/];
                         }
@@ -15074,6 +15121,8 @@ var gd3d;
                 // this.unload(true);
                 this.parseReject(error);
             };
+            /** 解析后清理 加载缓存资源数据 */
+            assetBundle.needClearLoadedRes = false;
             assetBundle.idNext = -1; //id起始位置               
             assetBundle.reTryTest = {};
             return assetBundle;
@@ -17806,7 +17855,12 @@ var gd3d;
                 var _texture = new framework.texture(filename);
                 var _textureFormat = gd3d.render.TextureFormatEnum.RGBA; //这里需要确定格式
                 var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat);
-                t2d.uploadImage(_tex, false, true, true, false);
+                if (_tex) {
+                    t2d.uploadImage(_tex, false, true, true, false);
+                }
+                else {
+                    console.warn("_tex load fail !");
+                }
                 _texture.glTexture = t2d;
                 return _texture;
             };
@@ -19173,8 +19227,13 @@ var gd3d;
                 enumerable: true,
                 configurable: true
             });
+            /**
+            * @private
+            * @language zh_CN
+            * 构建aabb
+            * @version gd3d 1.0
+            */
             transform.prototype._buildAABB = function () {
-                var tttt11111 = performance.now();
                 var minimum = new gd3d.math.vector3();
                 var maximum = new gd3d.math.vector3();
                 var _types = transform_2.aabbCareTypes;
@@ -19278,9 +19337,6 @@ var gd3d;
                     maximum.x = maximum.y = maximum.z = 1;
                 }
                 var _aabb = new framework.aabb(minimum, maximum);
-                var ttt2222 = performance.now() - tttt11111;
-                transform_2.timer += ttt2222;
-                console.error("解析AABB总耗时：" + transform_2.timer);
                 return _aabb;
             };
             Object.defineProperty(transform.prototype, "physicsImpostor", {
@@ -20078,13 +20134,6 @@ var gd3d;
             /** 创建过的 aabb 缓存 ，避免每次重复构建  */
             transform.aabbStoreMap = {};
             transform.aabbCareTypes = ["meshFilter", "skinnedMeshRenderer", "canvasRenderer"];
-            /**
-            * @private
-            * @language zh_CN
-            * 构建aabb
-            * @version gd3d 1.0
-            */
-            transform.timer = 0;
             __decorate([
                 gd3d.reflect.Field("string"),
                 __metadata("design:type", String)
@@ -20932,9 +20981,10 @@ var gd3d;
                             context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
                         }
                     }
-                    if (scene.fog) {
-                        context.fog = scene.fog;
-                    }
+                    // if (scene.fog)
+                    // {
+                    //     context.fog = scene.fog;
+                    // }
                     if (usemat != null)
                         usemat.draw(context, mesh, sm, drawtype);
                 }
@@ -20964,9 +21014,10 @@ var gd3d;
                     return;
                 var subMeshs = mesh.submesh;
                 // mesh.glMesh.bindVboBuffer(context.webgl);
-                if (framework.sceneMgr.scene.fog) {
-                    context.fog = framework.sceneMgr.scene.fog;
-                }
+                // if (sceneMgr.scene.fog)
+                // {
+                //     context.fog = sceneMgr.scene.fog;
+                // }
                 var len = subMeshs.length;
                 var drawtype = this.instanceDrawType();
                 for (var i = 0; i < len; i++) {
@@ -20995,9 +21046,10 @@ var gd3d;
                 var gameLayer = batcher.gameLayer;
                 context.updateLightMask(gameLayer);
                 context.updateModelByMatrix(this.helpIMatrix);
-                if (framework.sceneMgr.scene.fog) {
-                    context.fog = framework.sceneMgr.scene.fog;
-                }
+                // if (sceneMgr.scene.fog)
+                // {
+                //     context.fog = sceneMgr.scene.fog;
+                // }
                 var subMeshs = mesh.submesh;
                 var len = subMeshs.length;
                 for (var i = 0; i < len; i++) {
@@ -21448,7 +21500,7 @@ var gd3d;
                             var usemat = this.materials[mid];
                             if (usemat != null) {
                                 if (this.gameObject.transform.scene.fog) {
-                                    context.fog = this.gameObject.transform.scene.fog;
+                                    // context.fog = this.gameObject.transform.scene.fog;
                                     usemat.draw(context, this._mesh, sm, "skin_fog");
                                 }
                                 else {
@@ -28613,7 +28665,7 @@ var gd3d;
                         //mesh.glMesh.uploadVertexSubData(context.webgl, subEffectBatcher.dataForVbo);
                         mesh_2.glMesh.uploadVertexData(context.webgl, subEffectBatcher.dataForVbo);
                         if (this.gameObject.getScene().fog) {
-                            context.fog = this.gameObject.getScene().fog;
+                            // context.fog = this.gameObject.getScene().fog;
                             subEffectBatcher.mat.draw(context, mesh_2, mesh_2.submesh[0], "base_fog"); //只有一个submesh
                         }
                         else {
@@ -30404,7 +30456,7 @@ var gd3d;
                             var usemat = this.materials[mid];
                             if (usemat != null) {
                                 if (this.gameObject.transform.scene.fog) {
-                                    context.fog = this.gameObject.transform.scene.fog;
+                                    // context.fog = this.gameObject.transform.scene.fog;
                                     usemat.draw(context, this._mesh, sm, "skin_fog");
                                 }
                                 else {
@@ -32738,7 +32790,7 @@ var gd3d;
                 this.mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
                 //--------------------------render-------------------------------------------
                 if (this.gameObject.getScene().fog) {
-                    context.fog = this.gameObject.getScene().fog;
+                    // context.fog = this.gameObject.getScene().fog;
                     this.material.draw(context, this.mesh, this.mesh.submesh[0], "base_fog");
                 }
                 else {
@@ -33052,7 +33104,7 @@ var gd3d;
                 this.mesh.submesh[0].size = (this.targetPath.length - 1) * 6;
                 //--------------------------render-------------------------------------------
                 if (this.gameObject.getScene().fog) {
-                    context.fog = this.gameObject.getScene().fog;
+                    // context.fog = this.gameObject.getScene().fog;
                     this.material.draw(context, this.mesh, this.mesh.submesh[0], "base_fog");
                 }
                 else {
@@ -46322,7 +46374,7 @@ var gd3d;
                 //mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
                 mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
                 if (assetmgr.app.getScene().fog) {
-                    context.fog = assetmgr.app.getScene().fog;
+                    // context.fog = assetmgr.app.getScene().fog;
                     this.mat.draw(context, mesh, mesh.submesh[0], "base_fog");
                 }
                 else {
@@ -48208,7 +48260,7 @@ var gd3d;
                 //mesh.glMesh.uploadVertexSubData(context.webgl, this.dataForVbo);
                 mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
                 if (assetmgr.app.getScene().fog) {
-                    context.fog = assetmgr.app.getScene().fog;
+                    // context.fog = assetmgr.app.getScene().fog;
                     this.mat.draw(context, mesh, mesh.submesh[0], "base_fog");
                 }
                 else {
@@ -58061,6 +58113,7 @@ var gd3d;
                 //一个camera 不是一次单纯的绘制，camera 还有多个绘制遍
                 var cam = this.renderCameras[camindex];
                 var context = this.renderContext[camindex];
+                context.fog = this.fog;
                 if ((this.app.bePlay && !cam.isEditorCam) || (!this.app.bePlay && cam.isEditorCam)) {
                     context.updateCamera(this.app, cam);
                     context.updateLights(this.renderLights);
@@ -64432,7 +64485,8 @@ var gd3d;
             req.onerror = function (ev) {
                 if (fun)
                     fun(null, new Error("URL : " + url + " \n onerr on req: "));
-                loadFail(req, url, fun, onprocess, responseType, loadedFun);
+                //因 onloadend 无论成功失败都会回调   这里的重试注掉 
+                // loadFail(req, url, fun, onprocess, responseType, loadedFun);
             };
             req.onloadend = function () {
                 //console.error(" is onload");
@@ -64634,8 +64688,8 @@ var gd3d;
          */
         function loadImg(url, fun, onprocess) {
             if (onprocess === void 0) { onprocess = null; }
-            var guid = gd3d.framework.resID.next();
-            gd3d.framework.assetMgr.Instance.loadImg(guid, url, function (img, err) {
+            // let guid = framework.resID.next();
+            gd3d.framework.assetMgr.Instance["_loadImg"](url, function (img, err) {
                 fun(img, err);
             });
             // gd3d.io.xhrLoad(url, fun, onprocess, "blob", (req) =>
@@ -67140,7 +67194,7 @@ var gd3d;
                 return total;
             };
             meshData.prototype.genVertexDataArray = function (vf) {
-                var timeaa = performance.now();
+                // let timeaa = performance.now();
                 var _this = this;
                 // if (_this.tmpVArr)
                 //     return _this.tmpVArr;
@@ -67310,9 +67364,9 @@ var gd3d;
                         }
                     }
                 }
-                var tttttt = performance.now() - timeaa;
-                meshData.timer += tttttt;
-                console.error("解析Mesh总耗时：" + meshData.timer);
+                // let tttttt = performance.now() - timeaa;
+                // meshData.timer += tttttt;
+                // console.error("解析Mesh总耗时：" + meshData.timer);
                 return varray;
             };
             meshData.prototype.genIndexDataArray = function () {

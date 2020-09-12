@@ -70,8 +70,8 @@ declare namespace gd3d.framework {
          * 绘制区域宽度 像素单位
          * @version gd3d 1.0
          */
-        get width(): number;
-        get height(): number;
+        readonly width: number;
+        readonly height: number;
         limitFrame: boolean;
         notify: INotify;
         private _timeScale;
@@ -82,15 +82,14 @@ declare namespace gd3d.framework {
          * 设置timescale
          * @version gd3d 1.0
          */
-        set timeScale(val: number);
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 获取timescale
-         * @version gd3d 1.0
-         */
-        get timeScale(): number;
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 获取timescale
+        * @version gd3d 1.0
+        */
+        timeScale: number;
         private _tar;
         private _standDeltaTime;
         /**
@@ -100,15 +99,14 @@ declare namespace gd3d.framework {
          * 设置固定帧数 不设置即为不限制帧数
          * @version gd3d 1.0
          */
-        set targetFrame(val: number);
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 获取当前固定帧数
-         * @version gd3d 1.0
-         */
-        get targetFrame(): number;
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 获取当前固定帧数
+        * @version gd3d 1.0
+        */
+        targetFrame: number;
         screenAdaptiveType: string;
         private _fixHeight;
         private _fixWidth;
@@ -117,11 +115,11 @@ declare namespace gd3d.framework {
         private canvasFixedType;
         private _canvasClientWidth;
         private _canvasClientHeight;
-        set canvasFixHeight(val: number);
-        set canvasFixWidth(val: number);
-        get canvasClientWidth(): number;
-        get canvasClientHeight(): number;
-        get scaleFromPandding(): number;
+        canvasFixHeight: number;
+        canvasFixWidth: number;
+        readonly canvasClientWidth: number;
+        readonly canvasClientHeight: number;
+        readonly scaleFromPandding: number;
         private _scaleFromPandding;
         /**
          * @public
@@ -160,7 +158,7 @@ declare namespace gd3d.framework {
         showDrawCall(): void;
         closeDrawCall(): void;
         private _frameID;
-        get frameID(): number;
+        readonly frameID: number;
         private beStepNumber;
         private update;
         private updateScreenAsp;
@@ -188,7 +186,7 @@ declare namespace gd3d.framework {
         /**
          * @private
          */
-        get deltaTime(): number;
+        readonly deltaTime: number;
         private pretimer;
         private updateTimer;
         /**
@@ -248,28 +246,25 @@ declare namespace gd3d.framework {
         /**
          * @private
          */
-        get bePause(): boolean;
         /**
-         * @private
-         */
-        set bePause(value: boolean);
+        * @private
+        */
+        bePause: boolean;
         private _beStepForward;
         /**
          * @private
          */
-        get beStepForward(): boolean;
         /**
-         * @private
-         */
-        set beStepForward(value: boolean);
+        * @private
+        */
+        beStepForward: boolean;
         private updateUserCode;
         private updateEditorCode;
         private _beRendering;
         /**
          * 渲染开关
          */
-        get beRendering(): boolean;
-        set beRendering(val: boolean);
+        beRendering: boolean;
         /**
          * @public
          * @language zh_CN
@@ -371,27 +366,27 @@ declare namespace gd3d.framework {
         /**
          * GPU类型
          */
-        static get GraphDevice(): string;
+        static readonly GraphDevice: string;
         /**
          * canvas 宽度
          */
-        static get CanvasWidth(): number;
+        static readonly CanvasWidth: number;
         /**
          * canvas 高度
          */
-        static get CanvasHeight(): number;
+        static readonly CanvasHeight: number;
         /**
          * 屏幕自适应方式
          */
-        static get ScreenAdaptiveType(): string;
+        static readonly ScreenAdaptiveType: string;
         /**
          * 屏幕宽度
          */
-        static get ScreenWidth(): number;
+        static readonly ScreenWidth: number;
         /**
          * 屏幕高度
          */
-        static get ScreenHeight(): number;
+        static readonly ScreenHeight: number;
     }
     enum DrawCallEnum {
         UI = 0,
@@ -401,7 +396,7 @@ declare namespace gd3d.framework {
     }
     class DrawCallInfo {
         private static _inc;
-        static get inc(): DrawCallInfo;
+        static readonly inc: DrawCallInfo;
         static BeActived: boolean;
         data: number[];
         currentState: DrawCallEnum;
@@ -511,7 +506,7 @@ declare namespace gd3d.framework {
      */
     class sceneMgr {
         private static _ins;
-        static get ins(): sceneMgr;
+        static readonly ins: sceneMgr;
         static app: application;
         static scene: scene;
     }
@@ -865,10 +860,9 @@ declare namespace gd3d.math {
         private _buoy;
         private _length;
         /** 定长数组 */
-        get buffer(): T;
+        readonly buffer: T;
         /** 已经使用到数量 */
-        get count(): number;
-        set count(val: number);
+        count: number;
         /**
          * 动态延长 Array
          * @param bufferType buffer类型
@@ -890,8 +884,7 @@ declare namespace gd3d.math {
         /** 获取 Array 对象 */
         getArray(): T[];
         /** 获取当前长度 */
-        get length(): number;
-        set length(val: number);
+        length: number;
         push(val: T): void;
         /** 获取指定索引的值 */
         get(index: number): T;
@@ -974,6 +967,14 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         isDrawByDepth: boolean;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         *  强行lable置顶渲染（用于优化Drawcall）
+         * @version gd3d 1.0
+         */
+        isForceLabelTopRender: boolean;
         /**
          * 启用UI事件
          */
@@ -1124,6 +1125,7 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         assetmgr: assetMgr;
+        private static readonly helpLabelArr;
         /**
          * @public
          * @language zh_CN
@@ -1135,6 +1137,7 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         drawScene(node: transform2D, context: renderContext, assetmgr: assetMgr): void;
+        private renderTopLabels;
         static readonly depthTag = "__depthTag__";
         static readonly flowIndexTag = "__flowIndexTag__";
         private rendererDic;
@@ -1229,8 +1232,7 @@ declare namespace gd3d.framework {
          * @private
          */
         constructor();
-        get renderLayer(): number;
-        set renderLayer(layer: number);
+        renderLayer: number;
         /**
          * @public
          * @language zh_CN
@@ -1238,8 +1240,7 @@ declare namespace gd3d.framework {
          * 不受视锥剔除
          * @version gd3d 1.0
          */
-        get dontFrustumCulling(): boolean;
-        set dontFrustumCulling(val: boolean);
+        dontFrustumCulling: boolean;
         /**
          * @private
          */
@@ -1679,8 +1680,7 @@ declare namespace gd3d.framework {
          * 当前2d节点所属的canvas
          * @version gd3d 1.0
          */
-        set canvas(val: canvas);
-        get canvas(): canvas;
+        canvas: canvas;
         /**
          * 启用 UI 布局功能
          */
@@ -1729,7 +1729,7 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         private _parent;
-        get parent(): transform2D;
+        readonly parent: transform2D;
         /**
          * @public
          * @language zh_CN
@@ -1737,8 +1737,7 @@ declare namespace gd3d.framework {
          * 当前2d节点的孩子节点
          * @version gd3d 1.0
          */
-        get children(): transform2D[];
-        set children(children: transform2D[]);
+        children: transform2D[];
         private _children;
         /**
          * @public
@@ -1781,7 +1780,7 @@ declare namespace gd3d.framework {
          * 如果其父节点不可见，其同样不可见
          * @version gd3d 1.0
          */
-        get visibleInScene(): boolean;
+        readonly visibleInScene: boolean;
         /**
          * @public
          * @language zh_CN
@@ -1789,8 +1788,7 @@ declare namespace gd3d.framework {
          * 当前2d节点的隐藏状态
          * @version gd3d 1.0
          */
-        get visible(): boolean;
-        set visible(val: boolean);
+        visible: boolean;
         /**
          * @private
          * @language zh_CN
@@ -1798,7 +1796,7 @@ declare namespace gd3d.framework {
          * 获取自身
          * @version gd3d 1.0
          */
-        get transform(): this;
+        readonly transform: this;
         /**
          * @public
          * @language zh_CN
@@ -1836,11 +1834,11 @@ declare namespace gd3d.framework {
         localRotate: number;
         private _maskrectId;
         /** 裁剪遮罩矩形 ID */
-        get maskRectId(): string;
+        readonly maskRectId: string;
         private _maskRect;
         private _temp_maskRect;
         /** 裁剪遮罩矩形 */
-        get maskRect(): math.rect;
+        readonly maskRect: math.rect;
         private _isMask;
         /**
          * @public
@@ -1849,11 +1847,10 @@ declare namespace gd3d.framework {
          * 当前节点是否是mask
          * @version gd3d 1.0
          */
-        get isMask(): boolean;
-        set isMask(b: boolean);
+        isMask: boolean;
         private updateMaskRect;
         private _parentIsMask;
-        get parentIsMask(): boolean;
+        readonly parentIsMask: boolean;
         private localMatrix;
         private worldMatrix;
         private canvasWorldMatrix;
@@ -1992,7 +1989,7 @@ declare namespace gd3d.framework {
          * 获取当前transform是否被释放掉了
          * @version gd3d 1.0
          */
-        get beDispose(): boolean;
+        readonly beDispose: boolean;
         private _beDispose;
         onDispose: () => void;
         /**
@@ -2157,8 +2154,7 @@ declare namespace gd3d.framework {
          * 布局状态
          * @version gd3d 1.0
          */
-        set layoutState(state: number);
-        get layoutState(): number;
+        layoutState: number;
         private layoutValueMap;
         /**
          * @public
@@ -2177,8 +2173,7 @@ declare namespace gd3d.framework {
          * 布局百分比模式状态
          * @version gd3d 1.0
          */
-        set layoutPercentState(state: number);
-        get layoutPercentState(): number;
+        layoutPercentState: number;
         private layoutDirty;
         private lastWidth;
         private lastHeight;
@@ -2329,8 +2324,7 @@ declare namespace gd3d.framework {
          * 按钮变换类型
          * @version gd3d 1.0
          */
-        get transition(): TransitionType;
-        set transition(transition: TransitionType);
+        transition: TransitionType;
         private _originalColor;
         private _originalSprite;
         private _origianlSpriteName;
@@ -2343,8 +2337,7 @@ declare namespace gd3d.framework {
          * 默认显示图像
          * @version gd3d 1.0
          */
-        get targetImage(): image2D;
-        set targetImage(graphic: image2D);
+        targetImage: image2D;
         private _pressedSprite;
         /**
          * @public
@@ -2353,8 +2346,7 @@ declare namespace gd3d.framework {
          * 按下时要显示的sprite
          * @version gd3d 1.0
          */
-        get pressedGraphic(): sprite;
-        set pressedGraphic(sprite: sprite);
+        pressedGraphic: sprite;
         private _normalColor;
         /**
          * @public
@@ -2363,8 +2355,7 @@ declare namespace gd3d.framework {
          * 正常的显示颜色
          * @version gd3d 1.0
          */
-        get normalColor(): math.color;
-        set normalColor(color: math.color);
+        normalColor: math.color;
         private _pressedColor;
         /**
          * @public
@@ -2373,8 +2364,7 @@ declare namespace gd3d.framework {
          * 按下后的颜色
          * @version gd3d 1.0
          */
-        get pressedColor(): math.color;
-        set pressedColor(color: math.color);
+        pressedColor: math.color;
         private _fadeDuration;
         /**
          * @public
@@ -2383,8 +2373,7 @@ declare namespace gd3d.framework {
          * 颜色淡出持续时间
          * @version gd3d 1.0
          */
-        get fadeDuration(): number;
-        set fadeDuration(duration: number);
+        fadeDuration: number;
         /**
          * @private
          */
@@ -2508,7 +2497,7 @@ declare namespace gd3d.framework {
          * ui默认材质
          */
         private _uimat;
-        private get uimat();
+        private readonly uimat;
         private _imageType;
         /**
          * @public
@@ -2517,8 +2506,7 @@ declare namespace gd3d.framework {
          * 图片显示模式
          * @version gd3d 1.0
          */
-        get imageType(): ImageType;
-        set imageType(type: ImageType);
+        imageType: ImageType;
         private _fillMethod;
         /**
          * @public
@@ -2527,8 +2515,7 @@ declare namespace gd3d.framework {
          * 图片填充方式
          * @version gd3d 1.0
          */
-        get fillMethod(): FillMethod;
-        set fillMethod(method: FillMethod);
+        fillMethod: FillMethod;
         private _fillAmmount;
         /**
          * @public
@@ -2537,8 +2524,7 @@ declare namespace gd3d.framework {
          * 填充率
          * @version gd3d 1.0
          */
-        get fillAmmount(): number;
-        set fillAmmount(ammount: number);
+        fillAmmount: number;
         transform: transform2D;
         /**
          * @public
@@ -2547,8 +2533,7 @@ declare namespace gd3d.framework {
          * 精灵
          * @version gd3d 1.0
          */
-        set sprite(sprite: sprite);
-        get sprite(): sprite;
+        sprite: sprite;
         private _spriteName;
         private _imageBorder;
         /**
@@ -2558,7 +2543,7 @@ declare namespace gd3d.framework {
          * 9宫格边距
          * @version gd3d 1.0
          */
-        get imageBorder(): math.border;
+        readonly imageBorder: math.border;
         /**
          * @private
          */
@@ -2673,8 +2658,7 @@ declare namespace gd3d.framework {
          * 底框显示图像
          * @version gd3d 1.0
          */
-        get frameImage(): image2D;
-        set frameImage(frameImg: image2D);
+        frameImage: image2D;
         private customRegexStr;
         private beFocus;
         private inputElement;
@@ -2686,7 +2670,7 @@ declare namespace gd3d.framework {
          * 文字内容
          * @version gd3d 1.0
          */
-        get text(): string;
+        readonly text: string;
         private _charlimit;
         /**
          * @public
@@ -2695,8 +2679,7 @@ declare namespace gd3d.framework {
          * 限制输入字符数
          * @version gd3d 1.0
          */
-        get characterLimit(): number;
-        set characterLimit(charlimit: number);
+        characterLimit: number;
         private _lineType;
         /**
          * @public
@@ -2705,8 +2688,7 @@ declare namespace gd3d.framework {
          * 文本行格式
          * @version gd3d 1.0
          */
-        get LineType(): lineType;
-        set LineType(lineType: lineType);
+        LineType: lineType;
         private _contentType;
         /**
         * @public
@@ -2715,8 +2697,7 @@ declare namespace gd3d.framework {
         * 文本内容格式
         * @version gd3d 1.0
         */
-        get ContentType(): number;
-        set ContentType(contentType: number);
+        ContentType: number;
         private _textLable;
         /**
          * @public
@@ -2725,8 +2706,7 @@ declare namespace gd3d.framework {
          * 输入内容label
          * @version gd3d 1.0
          */
-        get TextLabel(): label;
-        set TextLabel(textLabel: label);
+        TextLabel: label;
         private _placeholderLabel;
         /**
          * @public
@@ -2735,8 +2715,7 @@ declare namespace gd3d.framework {
          * 输入内容label
          * @version gd3d 1.0
          */
-        get PlaceholderLabel(): label;
-        set PlaceholderLabel(placeholderLabel: label);
+        PlaceholderLabel: label;
         /**
          * 刷新布局
          */
@@ -2809,6 +2788,8 @@ declare namespace gd3d.framework {
      */
     class label implements IRectRenderer {
         static readonly ClassName: string;
+        /**字段 用于快速判断实例是否是label */
+        readonly isLabel = true;
         private _text;
         /**
          * @public
@@ -2817,8 +2798,7 @@ declare namespace gd3d.framework {
          * 文字内容
          * @version gd3d 1.0
          */
-        get text(): string;
-        set text(text: string);
+        text: string;
         private initdater;
         private _font;
         /**
@@ -2828,8 +2808,7 @@ declare namespace gd3d.framework {
          * 字体
          * @version gd3d 1.0
          */
-        get font(): font;
-        set font(font: font);
+        font: font;
         private needRefreshFont;
         private _fontName;
         private _fontsize;
@@ -2840,8 +2819,7 @@ declare namespace gd3d.framework {
          * 字体大小
          * @version gd3d 1.0
          */
-        get fontsize(): number;
-        set fontsize(size: number);
+        fontsize: number;
         /**
          * @public
          * @language zh_CN
@@ -2943,7 +2921,7 @@ declare namespace gd3d.framework {
           * ui默认材质
           */
         private _uimat;
-        private get uimat();
+        private readonly uimat;
         private dirtyData;
         /**
          * @private
@@ -3022,26 +3000,22 @@ declare namespace gd3d.framework {
         /**
          * 裁切容器
          */
-        get cutPanel(): transform2D;
-        set cutPanel(trans: transform2D);
+        cutPanel: transform2D;
         private _barBg;
         /**
          * 进度条 背景图
          */
-        get barBg(): image2D;
-        set barBg(img: image2D);
+        barBg: image2D;
         private _barOverImg;
         /**
          * 进度条 上层覆盖图
          */
-        get barOverImg(): image2D;
-        set barOverImg(img: image2D);
+        barOverImg: image2D;
         private _value;
         /**
          * 进度值 0-1
          */
-        get value(): number;
-        set value(value: number);
+        value: number;
         /**
          * @private
          */
@@ -3089,8 +3063,7 @@ declare namespace gd3d.framework {
          * 图片
          * @version gd3d 1.0
          */
-        get image(): texture;
-        set image(_image: texture);
+        image: texture;
         /**
          * @public
          * @language zh_CN
@@ -3132,7 +3105,7 @@ declare namespace gd3d.framework {
          * ui默认材质
          */
         private _uimat;
-        private get uimat();
+        private readonly uimat;
         /**
          * @private
          */
@@ -3191,8 +3164,7 @@ declare namespace gd3d.framework {
          * 输入内容label
          * @version gd3d 1.0
          */
-        get content(): transform2D;
-        set content(content: transform2D);
+        content: transform2D;
         /**
          * @public
          * @language zh_CN
@@ -3480,7 +3452,7 @@ declare namespace gd3d.framework {
         private static helpV2_1;
         private static helpRefAngle;
         /** 2d物理引擎实例对象 */
-        get physicsEngine(): physicEngine2D;
+        readonly physicsEngine: physicEngine2D;
         protected _physicsEngine: physicEngine2D;
         constructor();
         private lastScale;
@@ -3495,8 +3467,7 @@ declare namespace gd3d.framework {
         onInit: (phy2dBody: I2DPhysicsBody) => any;
         private _positionOffset;
         /** 物理对象 碰撞体位置偏移量 */
-        get positionOffset(): math.vector2;
-        set positionOffset(pos: math.vector2);
+        positionOffset: math.vector2;
         /** 是否已休眠
         * A flag that indicates whether the body is considered sleeping. A sleeping body acts similar to a static body, except it is only temporary and can be awoken.
         * If you need to set a body as sleeping, you should use `Sleeping.set` as this requires more than just setting this flag.
@@ -3635,7 +3606,7 @@ declare namespace gd3d.framework {
         static readonly ClassName: string;
         transform: transform2D;
         /** 胶囊体朝向为 Y 轴 */
-        get y_Axis(): boolean;
+        readonly y_Axis: boolean;
         maxSides: number;
         start(): void;
         onPlay(): void;
@@ -3653,7 +3624,7 @@ declare namespace gd3d.framework {
         static readonly ClassName: string;
         transform: transform2D;
         /** 圆形的半径（取 宽和高两者之间最大的值为半径） */
-        get radius(): number;
+        readonly radius: number;
         maxSides: number;
         start(): void;
         onPlay(): void;
@@ -3741,7 +3712,7 @@ declare namespace gd3d.framework {
     }
     class physicEngine2D {
         private _Matter;
-        get Matter(): any;
+        readonly Matter: any;
         matterEngine: any;
         engineWorld: IWorld;
         engineRunner: IRunner;
@@ -3912,8 +3883,7 @@ declare namespace gd3d.framework {
         applyForce(body: Ibody, positon: math.Ivec2, force: math.Ivec2): void;
         applyForceAtCenter(body: Ibody, force: math.Ivec2): void;
         setGravity(x: number, y: number): void;
-        set enableSleeping(val: boolean);
-        get enableSleeping(): boolean;
+        enableSleeping: boolean;
         /** 设置速度
          * Sets the linear velocity of the body instantly. Position, angle, force etc. are unchanged. See also `Body.applyForce`.
          */
@@ -4452,14 +4422,14 @@ declare namespace gd3d.framework {
          * 获取文件数加载进度
          * @version gd3d 1.0
          */
-        get fileProgress(): number;
+        readonly fileProgress: number;
         /**
          * @public
          * @language zh_CN
          * 已加载的字节长度
          * @version gd3d 1.0
          */
-        get curByteLength(): number;
+        readonly curByteLength: number;
         /**
          * @public
          * @language zh_CN
@@ -4473,7 +4443,7 @@ declare namespace gd3d.framework {
          * 获取文件真实加载进度
          * @version gd3d 1.0
          */
-        get progress(): number;
+        readonly progress: number;
         progressCall: boolean;
         compressTextLoaded: number;
         compressBinLoaded: number;
@@ -4507,6 +4477,8 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     class assetBundle {
         private assetmgr;
+        /** 解析后清理 加载缓存资源数据 */
+        static needClearLoadedRes: boolean;
         static idNext: number;
         files: {
             [key: string]: number;
@@ -4568,7 +4540,7 @@ declare namespace gd3d.framework {
             [key: number]: assetRef;
         };
         static mapImage: {
-            [key: number]: HTMLImageElement;
+            [key: number]: HTMLImageElement | ArrayBuffer;
         };
         static mapNamed: {
             [key: string]: IAsset;
@@ -4975,7 +4947,7 @@ declare namespace gd3d.framework {
          * 播放时长
          * @version gd3d 1.0
          */
-        get time(): number;
+        readonly time: number;
         /**
          * @public
          * @language zh_CN
@@ -5139,16 +5111,15 @@ declare namespace gd3d.framework {
          * 获取当前texture
          * @version gd3d 1.0
          */
-        get texture(): texture;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置当前texture
-         * @param value
-         * @version gd3d 1.0
-         */
-        set texture(value: texture);
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 设置当前texture
+        * @param value
+        * @version gd3d 1.0
+        */
+        texture: texture;
         /**
          * @public
          * @language zh_CN
@@ -5267,8 +5238,7 @@ declare namespace gd3d.framework {
          */
         caclByteLength(): number;
         private _texture;
-        get texture(): texture;
-        set texture(value: texture);
+        texture: texture;
         /**
          * @public
          * @language zh_CN
@@ -5395,15 +5365,14 @@ declare namespace gd3d.framework {
          * @param value 场景实例
          * @version gd3d 1.0
          */
-        set scene(value: scene);
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 获取所在场景
-         * @version gd3d 1.0
-         */
-        get scene(): scene;
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 获取所在场景
+        * @version gd3d 1.0
+        */
+        scene: scene;
         /**
          * @public
          * @language zh_CN
@@ -5446,7 +5415,7 @@ declare namespace gd3d.framework {
          * 自己的aabb
          * @version gd3d 1.0
          */
-        get aabb(): aabb;
+        readonly aabb: aabb;
         /**
         * @private
         * @language zh_CN
@@ -5462,7 +5431,6 @@ declare namespace gd3d.framework {
         * 构建aabb
         * @version gd3d 1.0
         */
-        static timer: number;
         private _buildAABB;
         /**
          * @public
@@ -5480,8 +5448,7 @@ declare namespace gd3d.framework {
          * 物理代理对象
          * @version gd3d 1.0
          */
-        get physicsImpostor(): PhysicsImpostor;
-        set physicsImpostor(physicsImp: PhysicsImpostor);
+        physicsImpostor: PhysicsImpostor;
         /**
          * @public
          * @language zh_CN
@@ -5490,7 +5457,7 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         private _parent;
-        get parent(): transform;
+        readonly parent: transform;
         /**
          * @public
          * @language zh_CN
@@ -5602,8 +5569,7 @@ declare namespace gd3d.framework {
          * 本地旋转四元数
          * @version gd3d 1.0
          */
-        get localRotate(): math.quaternion;
-        set localRotate(rotate: math.quaternion);
+        localRotate: math.quaternion;
         private _localTranslate;
         /**
          * @public
@@ -5612,8 +5578,7 @@ declare namespace gd3d.framework {
          * 本地位移
          * @version gd3d 1.0
          */
-        get localTranslate(): math.vector3;
-        set localTranslate(position: math.vector3);
+        localTranslate: math.vector3;
         /**
         * @public
         * @language zh_CN
@@ -5621,8 +5586,7 @@ declare namespace gd3d.framework {
         * 本地位移
         * @version gd3d 1.0
         */
-        get localPosition(): math.vector3;
-        set localPosition(position: math.vector3);
+        localPosition: math.vector3;
         private _localScale;
         /**
          * @public
@@ -5631,8 +5595,7 @@ declare namespace gd3d.framework {
          * 本地缩放
          * @version gd3d 1.0
          */
-        get localScale(): math.vector3;
-        set localScale(scale: math.vector3);
+        localScale: math.vector3;
         private localMatrix;
         private _localEulerAngles;
         /**
@@ -5642,8 +5605,7 @@ declare namespace gd3d.framework {
          * 本地旋转的欧拉角
          * @version gd3d 1.0
          */
-        get localEulerAngles(): math.vector3;
-        set localEulerAngles(angles: math.vector3);
+        localEulerAngles: math.vector3;
         private worldMatrix;
         private worldRotate;
         worldTranslate: math.vector3;
@@ -5799,7 +5761,7 @@ declare namespace gd3d.framework {
          * 获取当前transform是否被释放掉了
          * @version gd3d 1.0
          */
-        get beDispose(): boolean;
+        readonly beDispose: boolean;
         private _beDispose;
         onDispose: () => void;
         /**
@@ -5902,7 +5864,7 @@ declare namespace gd3d.framework {
         * 获取该碰撞盒物体的世界矩阵
         * @version gd3d 1.0
         */
-        get matrix(): gd3d.math.matrix;
+        readonly matrix: gd3d.math.matrix;
         private started;
         start(): void;
         onPlay(): void;
@@ -5918,7 +5880,6 @@ declare namespace gd3d.framework {
         * 碰撞盒的可见性
         * @version gd3d 1.0
         */
-        get colliderVisible(): boolean;
         /**
         * @public
         * @language zh_CN
@@ -5926,7 +5887,7 @@ declare namespace gd3d.framework {
         * 设置碰撞盒的可见性
         * @version gd3d 1.0
         */
-        set colliderVisible(value: boolean);
+        colliderVisible: boolean;
         /**
          * 检查创建碰撞区域 显示mesh
          */
@@ -6018,7 +5979,6 @@ declare namespace gd3d.framework {
         * 碰撞体的可见性
         * @version gd3d 1.0
         */
-        get colliderVisible(): boolean;
         /**
         * @public
         * @language zh_CN
@@ -6027,7 +5987,7 @@ declare namespace gd3d.framework {
         * 碰撞体的可见性
         * @version gd3d 1.0
         */
-        set colliderVisible(value: boolean);
+        colliderVisible: boolean;
         /**
         * @private
         */
@@ -6070,7 +6030,6 @@ declare namespace gd3d.framework {
         /**
          * @private
          */
-        get mesh(): mesh;
         /**
         * @public
         * @language zh_CN
@@ -6079,7 +6038,7 @@ declare namespace gd3d.framework {
         * 设置mesh数据
         * @version gd3d 1.0
         */
-        set mesh(mesh: mesh);
+        mesh: mesh;
         /**
         * @public
         * @language zh_CN
@@ -6201,8 +6160,7 @@ declare namespace gd3d.framework {
          * 渲染mask层级（和相机相对应）
          * @version gd3d 1.0
          */
-        get renderLayer(): number;
-        set renderLayer(layer: number);
+        renderLayer: number;
         private issetq;
         /**
         * @private
@@ -6215,14 +6173,12 @@ declare namespace gd3d.framework {
          * 返回此组件的场景渲染层级排序依据queue大小
          * @version gd3d 1.0
          */
-        get queue(): number;
-        set queue(value: number);
+        queue: number;
         private _filter;
         /**
          * 渲染使用 meshFilter
          */
-        get filter(): meshFilter;
-        set filter(val: meshFilter);
+        filter: meshFilter;
         private static readonly insOffsetMatrixStr;
         private static insOffsetMtxIDMap;
         private static GpuInsAttrignoreMap;
@@ -6296,18 +6252,16 @@ declare namespace gd3d.framework {
         /**
          * 渲染mask层级（和相机相对应）
          */
-        get renderLayer(): number;
-        set renderLayer(layer: number);
+        renderLayer: number;
         private issetq;
         _queue: number;
         /**
          * 返回此组件的场景渲染层级排序依据queue大小
          */
-        get queue(): number;
         /**
-         * 设置此组件的场景渲染层级排序number大小
-         */
-        set queue(value: number);
+        * 设置此组件的场景渲染层级排序number大小
+        */
+        queue: number;
         /**
          * 材质数组
          */
@@ -6319,17 +6273,15 @@ declare namespace gd3d.framework {
         /**
          * 返回动画播放组件
          */
-        get player(): aniplayer;
-        set player(p: aniplayer);
+        player: aniplayer;
         private _mesh;
         /**
          * 返回mesh数据
          */
-        get mesh(): mesh;
         /**
-         * 设置mesh数据
-         */
-        set mesh(mesh: mesh);
+        * 设置mesh数据
+        */
+        mesh: mesh;
         /**
          * @private
          */
@@ -6354,7 +6306,7 @@ declare namespace gd3d.framework {
         private _efficient;
         private _skeletonMatrixData;
         _aabb: aabb;
-        get aabb(): aabb;
+        readonly aabb: aabb;
         start(): void;
         onPlay(): void;
         /**
@@ -6490,7 +6442,7 @@ declare namespace gd3d.framework {
          * 循环模式
          * @version gd3d 1.0
          */
-        get wrapMode(): WrapMode;
+        readonly wrapMode: WrapMode;
         _wrapMode: WrapMode;
         /**
          * @public
@@ -6498,7 +6450,7 @@ declare namespace gd3d.framework {
          * 动画片段的帧率
          * @version gd3d 1.0
          */
-        get fps(): number;
+        readonly fps: number;
         private frameRate;
         /**
          * @public
@@ -6507,7 +6459,7 @@ declare namespace gd3d.framework {
          * 播放时长
          * @version gd3d 1.0
          */
-        get time(): number;
+        readonly time: number;
         /**
          * @public
          * @language zh_CN
@@ -6515,7 +6467,7 @@ declare namespace gd3d.framework {
          * 最大帧数
          * @version gd3d 1.0
          */
-        get frameCount(): number;
+        readonly frameCount: number;
         /**
          * @public
          * @language zh_CN
@@ -6525,7 +6477,7 @@ declare namespace gd3d.framework {
          */
         curves: AnimationCurve[];
         private _interpolation;
-        get interpolation(): Interpolation;
+        readonly interpolation: Interpolation;
     }
     class AnimationCurve {
         path: string;
@@ -6596,8 +6548,7 @@ declare namespace gd3d.framework {
          */
         defaultAsset: boolean;
         private _enableGpuInstancing;
-        get enableGpuInstancing(): boolean;
-        set enableGpuInstancing(enable: boolean);
+        enableGpuInstancing: boolean;
         private _shaderGUID;
         private _textureGUID;
         /** gpuInstancing 材质唯一ID */
@@ -7501,16 +7452,15 @@ declare namespace gd3d.framework {
          * 获取当前texture
          * @version gd3d 1.0
          */
-        get texture(): texture;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置texture
-         * @param value texture实例
-         * @version gd3d 1.0
-         */
-        set texture(value: texture);
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 设置texture
+        * @param value texture实例
+        * @version gd3d 1.0
+        */
+        texture: texture;
         /**
          * @public
          * @language zh_CN
@@ -7544,7 +7494,7 @@ declare namespace gd3d.framework {
          * uv的u范围
          * @version gd3d 1.0
          */
-        get urange(): math.vector2;
+        readonly urange: math.vector2;
         /**
          * @public
          * @language zh_CN
@@ -7552,7 +7502,7 @@ declare namespace gd3d.framework {
          * uv的v范围
          * @version gd3d 1.0
          */
-        get vrange(): math.vector2;
+        readonly vrange: math.vector2;
     }
 }
 declare namespace gd3d.framework {
@@ -7715,15 +7665,14 @@ declare namespace gd3d.framework {
          * 如果是imgdesc加载来的图片，通过这个可以获取到真实的图片名字
          * @version gd3d 1.0
          */
-        get realName(): string;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置图片名称
-         * @version gd3d 1.0
-         */
-        set realName(name: string);
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 设置图片名称
+        * @version gd3d 1.0
+        */
+        realName: string;
     }
 }
 declare namespace gd3d.framework {
@@ -7782,16 +7731,15 @@ declare namespace gd3d.framework {
         * 获取音量大小
         * @version gd3d 1.0
         */
-        get volume(): number;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置音量大小
-         * @param value 音量值
-         * @version gd3d 1.0
-         */
-        set volume(val: number);
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 设置音量大小
+        * @param value 音量值
+        * @version gd3d 1.0
+        */
+        volume: number;
         isplay: boolean;
         /**
          * @public
@@ -7836,13 +7784,13 @@ declare namespace gd3d.framework {
         private careBoneMat;
         private inversTpos;
         private startepose;
-        get PlayFrameID(): number;
-        get currentAniclipName(): string;
-        get currentAniclip(): animationClip;
+        readonly PlayFrameID: number;
+        readonly currentAniclipName: string;
+        readonly currentAniclip: animationClip;
         /**
          * 动画循环播放次数
          */
-        get playCount(): number;
+        readonly playCount: number;
         private init;
         addToCareList(bone: transform): void;
         private _awaitClips;
@@ -8026,16 +7974,15 @@ declare namespace gd3d.framework {
         * 获取音量大小
         * @version gd3d 1.0
         */
-        get volume(): number;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置音量大小
-         * @param value 音量值
-         * @version gd3d 1.0
-         */
-        set volume(val: number);
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 设置音量大小
+        * @param value 音量值
+        * @version gd3d 1.0
+        */
+        volume: number;
         /**
          * @public
          * @language zh_CN
@@ -8131,8 +8078,7 @@ declare namespace gd3d.framework {
          * 发光阈值 - 图像中亮度高于该阈值的区域将产生泛光效果
          * @version gd3d 1.0
          */
-        get bloomThreshold(): number;
-        set bloomThreshold(value: number);
+        bloomThreshold: number;
         /**
          * @public
          * @language zh_CN
@@ -8140,8 +8086,7 @@ declare namespace gd3d.framework {
          * 强度 - 附加光（影响到该特效的光源）的全局光强
          * @version gd3d 1.0
          */
-        get bloomIntensity(): number;
-        set bloomIntensity(value: number);
+        bloomIntensity: number;
         /**
          * @public
          * @language zh_CN
@@ -8149,8 +8094,7 @@ declare namespace gd3d.framework {
          * 模糊扩散 - Frag down sample 的偏移距离
          * @version gd3d 1.0
          */
-        get blurSpread(): number;
-        set blurSpread(value: number);
+        blurSpread: number;
         private app;
         private scene;
         private camera;
@@ -8269,15 +8213,14 @@ declare namespace gd3d.framework {
          * 相机到近裁剪面距离
          * @version gd3d 1.0
          */
-        get near(): number;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置相机到近裁剪面距离
-         * @version gd3d 1.0
-         */
-        set near(val: number);
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 设置相机到近裁剪面距离
+        * @version gd3d 1.0
+        */
+        near: number;
         private _far;
         /**
          * @public
@@ -8286,15 +8229,14 @@ declare namespace gd3d.framework {
          * 相机到远裁剪面距离
          * @version gd3d 1.0
          */
-        get far(): number;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置相机到远裁剪面距离
-         * @version gd3d 1.0
-         */
-        set far(val: number);
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 设置相机到远裁剪面距离
+        * @version gd3d 1.0
+        */
+        far: number;
         /**
          * @public
          * @language zh_CN
@@ -8306,7 +8248,7 @@ declare namespace gd3d.framework {
         /**
          * 当前RenderContext 的 Index
          */
-        get CurrContextIndex(): number;
+        readonly CurrContextIndex: number;
         private _contextIdx;
         /**
          * @private
@@ -8520,8 +8462,7 @@ declare namespace gd3d.framework {
          * 透视投影的fov
          * @version gd3d 1.0
          */
-        set fov(val: number);
-        get fov(): number;
+        fov: number;
         _size: number;
         /**
          * @public
@@ -8530,8 +8471,7 @@ declare namespace gd3d.framework {
          * 正交投影的竖向size
          * @version gd3d 1.0
          */
-        set size(val: number);
-        get size(): number;
+        size: number;
         private _opvalue;
         /**
          * @public
@@ -8540,8 +8480,7 @@ declare namespace gd3d.framework {
          * 0=正交， 1=透视 中间值可以在两种相机间过度
          * @version gd3d 1.0
          */
-        set opvalue(val: number);
-        get opvalue(): number;
+        opvalue: number;
         /**
          * @private
          */
@@ -8624,12 +8563,11 @@ declare namespace gd3d.framework {
          * UI canvas
          * @version gd3d 1.0
          */
-        get canvas(): canvas;
+        readonly canvas: canvas;
         private _overlay2d;
         setOverLay(lay: overlay2D): void;
         getOverLay(): overlay2D;
-        get sortOrder(): number;
-        set sortOrder(order: number);
+        sortOrder: number;
         private isCanvasinit;
         private canvasInit;
         private _lastMode;
@@ -8641,8 +8579,7 @@ declare namespace gd3d.framework {
          * renderMode UI render模式
          * @version gd3d 1.0
          */
-        get renderMode(): canvasRenderMode;
-        set renderMode(mode: canvasRenderMode);
+        renderMode: canvasRenderMode;
         private styleToMode;
         start(): void;
         onPlay(): void;
@@ -8695,8 +8632,7 @@ declare namespace gd3d.framework {
          * 渲染层级
          * @version gd3d 1.0
          */
-        get renderLayer(): number;
-        set renderLayer(layer: number);
+        renderLayer: number;
         /**
          * @public
          * @language zh_CN
@@ -8756,8 +8692,7 @@ declare namespace gd3d.framework {
         * @private
         */
         private _textasset;
-        set jsonData(text: textasset);
-        get jsonData(): textasset;
+        jsonData: textasset;
         /**
          * @public
          * @language zh_CN
@@ -8776,11 +8711,10 @@ declare namespace gd3d.framework {
         /**
         * @private
         */
-        set data(value: EffectSystemData);
         /**
         * @private
         */
-        get data(): EffectSystemData;
+        data: EffectSystemData;
         /**
         * @private
         */
@@ -8789,7 +8723,7 @@ declare namespace gd3d.framework {
         /**
         * @private
         */
-        get totalFrameCount(): number;
+        readonly totalFrameCount: number;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
@@ -8917,7 +8851,7 @@ declare namespace gd3d.framework {
         * @type {number}
         * @memberof effectSystem
         */
-        get leftLifeTime(): number;
+        readonly leftLifeTime: number;
     }
 }
 declare namespace gd3d.framework {
@@ -8946,8 +8880,7 @@ declare namespace gd3d.framework {
          * 渲染层级
          * @version gd3d 1.0
          */
-        get renderLayer(): number;
-        set renderLayer(layer: number);
+        renderLayer: number;
         /**
          * @public
          * @language zh_CN
@@ -9019,11 +8952,10 @@ declare namespace gd3d.framework {
         /**
         * @private
         */
-        set data(value: EffectSystemData);
         /**
         * @private
         */
-        get data(): EffectSystemData;
+        data: EffectSystemData;
         /**
         * @private
         */
@@ -9032,7 +8964,7 @@ declare namespace gd3d.framework {
         /**
         * @private
         */
-        get totalFrameCount(): number;
+        readonly totalFrameCount: number;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
@@ -9132,7 +9064,7 @@ declare namespace gd3d.framework {
         * @type {number}
         * @memberof effectSystem
         */
-        get leftLifeTime(): number;
+        readonly leftLifeTime: number;
     }
 }
 declare namespace gd3d.framework {
@@ -9151,18 +9083,16 @@ declare namespace gd3d.framework {
         /**
          * 渲染mask层级（和相机相对应）
          */
-        get renderLayer(): number;
-        set renderLayer(layer: number);
+        renderLayer: number;
         private issetq;
         _queue: number;
         /**
          * 返回此组件的场景渲染层级排序依据queue大小
          */
-        get queue(): number;
         /**
-         * 设置此组件的场景渲染层级排序number大小
-         */
-        set queue(value: number);
+        * 设置此组件的场景渲染层级排序number大小
+        */
+        queue: number;
         /**
          * 材质数组
          */
@@ -9174,11 +9104,10 @@ declare namespace gd3d.framework {
         /**
          * 返回mesh数据
          */
-        get mesh(): mesh;
         /**
-         * 设置mesh数据
-         */
-        set mesh(mesh: mesh);
+        * 设置mesh数据
+        */
+        mesh: mesh;
         /**
          * @private
          */
@@ -9196,7 +9125,7 @@ declare namespace gd3d.framework {
          */
         size: math.vector3;
         _aabb: aabb;
-        get aabb(): aabb;
+        readonly aabb: aabb;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
@@ -9270,15 +9199,14 @@ declare namespace gd3d.framework {
          * 设置路径组件需要的路径资源
          * @version gd3d 1.0
          */
-        set pathasset(pathasset: pathasset);
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 路径组件的pathasset
-         * @version gd3d 1.0
-         */
-        get pathasset(): pathasset;
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 路径组件的pathasset
+        * @version gd3d 1.0
+        */
+        pathasset: pathasset;
         /**
          * @public
          * @language zh_CN
@@ -9389,30 +9317,26 @@ declare namespace gd3d.framework {
         clips: keyFrameAniClip[];
         private clipMap;
         private _nowClip;
-        private get nowFrame();
+        private readonly nowFrame;
         private nowTime;
         private pathPropertyMap;
         gameObject: gameObject;
         private playEndDic;
         private _currClipName;
         /** 获得当前片段的名字 */
-        get currClipName(): string;
+        readonly currClipName: string;
         private _speed;
         /** 播放速度 */
-        get speed(): number;
-        set speed(v: number);
+        speed: number;
         private _animateOnlyIfVisible;
         /** 动画是否仅仅可显示时 有效播放 */
-        get animateOnlyIfVisible(): boolean;
-        set animateOnlyIfVisible(v: boolean);
+        animateOnlyIfVisible: boolean;
         private _cullingType;
         /** 动画的剔除类型 */
-        get cullingType(): AnimationCullingType;
-        set cullingType(v: AnimationCullingType);
+        cullingType: AnimationCullingType;
         private _localBounds;
         /** 动画的剔除类型 */
-        get localBounds(): aabb;
-        set localBounds(v: aabb);
+        localBounds: aabb;
         /** 播放结束的归一化时间点 范围 0 ~ 1 */
         private endNormalizedTime;
         start(): void;
@@ -9684,7 +9608,7 @@ declare namespace gd3d.framework {
          * 碰撞球中心点
          * @version gd3d 1.0
          */
-        get worldCenter(): math.vector3;
+        readonly worldCenter: math.vector3;
         /**
          * @public
          * @language zh_CN
@@ -9700,7 +9624,7 @@ declare namespace gd3d.framework {
         * 获取该碰撞盒物体的世界矩阵
         * @version gd3d 1.0
         */
-        get matrix(): gd3d.math.matrix;
+        readonly matrix: gd3d.math.matrix;
         start(): void;
         onPlay(): void;
         update(delta: number): void;
@@ -9715,7 +9639,6 @@ declare namespace gd3d.framework {
         * 返回碰撞盒可见性
         * @version gd3d 1.0
         */
-        get colliderVisible(): boolean;
         /**
         * @public
         * @language zh_CN
@@ -9723,7 +9646,7 @@ declare namespace gd3d.framework {
         * 设置碰撞盒是否可见
         * @version gd3d 1.0
         */
-        set colliderVisible(value: boolean);
+        colliderVisible: boolean;
         /**
         * @private
         */
@@ -9797,8 +9720,7 @@ declare namespace gd3d.framework {
          * 渲染mask层级（和相机相对应）
          * @version gd3d 1.0
          */
-        get renderLayer(): number;
-        set renderLayer(layer: number);
+        renderLayer: number;
         /**
          * @public
          * @language zh_CN
@@ -9861,7 +9783,6 @@ declare namespace gd3d.framework {
          * 设置拖尾的材质
          * @version gd3d 1.0
          */
-        set material(material: gd3d.framework.material);
         /**
         * @public
         * @language zh_CN
@@ -9869,7 +9790,7 @@ declare namespace gd3d.framework {
         * 得到拖尾上的材质
         * @version gd3d 1.0
         */
-        get material(): gd3d.framework.material;
+        material: gd3d.framework.material;
         /**
         * @public
         * @language zh_CN
@@ -9877,7 +9798,6 @@ declare namespace gd3d.framework {
         *  返回 matrial调色
         * @version gd3d 1.0
         */
-        get color(): gd3d.math.color;
         /**
         * @public
         * @language zh_CN
@@ -9885,7 +9805,7 @@ declare namespace gd3d.framework {
         *设置 matrial颜色
         * @version gd3d 1.0
         */
-        set color(color: gd3d.math.color);
+        color: gd3d.math.color;
         /**
         * @public
         * @language zh_CN
@@ -9969,8 +9889,7 @@ declare namespace gd3d.framework {
     class trailRender_recorde implements IRenderer {
         static readonly ClassName: string;
         layer: RenderLayerEnum;
-        get renderLayer(): number;
-        set renderLayer(layer: number);
+        renderLayer: number;
         queue: number;
         private _startWidth;
         private _endWidth;
@@ -9989,12 +9908,9 @@ declare namespace gd3d.framework {
         interpNumber: number;
         interpPath: trailNode[];
         private targetPath;
-        set material(material: gd3d.framework.material);
-        get material(): gd3d.framework.material;
-        get startColor(): gd3d.math.color;
-        set startColor(color: gd3d.math.color);
-        set endColor(color: gd3d.math.color);
-        get endColor(): gd3d.math.color;
+        material: gd3d.framework.material;
+        startColor: gd3d.math.color;
+        endColor: gd3d.math.color;
         setWidth(startWidth: number, endWidth?: number): void;
         private activeMaxpointlimit;
         setMaxpointcontroll(value?: boolean): void;
@@ -10073,8 +9989,7 @@ declare namespace gd3d.framework {
         private bundleName;
         static readonly ClassName: string;
         layer: RenderLayerEnum;
-        get renderLayer(): number;
-        set renderLayer(layer: number);
+        renderLayer: number;
         queue: number;
         start(): void;
         onPlay(): void;
@@ -10089,21 +10004,19 @@ declare namespace gd3d.framework {
          * f14eff 资源
          * @private
          */
-        get f14eff(): f14eff;
-        set f14eff(asset: f14eff);
+        f14eff: f14eff;
         private _delayTime;
         /**
          * delaytime
          * @private
          */
-        get delay(): number;
-        set delay(deley: number);
+        delay: number;
         setData(data: F14EffectData, bundleName: string): void;
         constructor(bundleName: string);
         /**
          * ref effect 增加transform层控制
          */
-        get root(): transform;
+        readonly root: transform;
         _root: transform;
         private elements;
         renderBatch: F14Basebatch[];
@@ -10114,7 +10027,7 @@ declare namespace gd3d.framework {
         update(deltaTime: number): void;
         private OnEndOnceLoop;
         private _renderCamera;
-        get renderCamera(): camera;
+        readonly renderCamera: camera;
         mvpMat: math.matrix;
         render(context: renderContext, assetmgr: assetMgr, camera: camera, Effqueue?: number): void;
         private totalTime;
@@ -10710,8 +10623,7 @@ declare namespace gd3d.framework {
          * 渲染层级
          * @version gd3d 1.0
          */
-        get renderLayer(): number;
-        set renderLayer(layer: number);
+        renderLayer: number;
         /**
          * @public
          * @language zh_CN
@@ -10720,7 +10632,7 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         queue: number;
-        get transform(): transform;
+        readonly transform: transform;
         gameObject: gameObject;
         /**
          * Connect the start and end positions of the line together to form a continuous loop.
@@ -10788,55 +10700,49 @@ declare namespace gd3d.framework {
          *
          * 设置曲线，以描述沿线长度在各个点处的线宽。
          */
-        get widthCurve(): AnimationCurve1;
+        readonly widthCurve: AnimationCurve1;
         /**
          * Set an overall multiplier that is applied to the LineRenderer.widthCurve to get the final width of the line.
          *
          * 设置一个应用于LineRenderer.widthCurve的总乘数，以获取线的最终宽度。
          */
-        get widthMultiplier(): number;
-        set widthMultiplier(v: number);
+        widthMultiplier: number;
         /**
          * Set the color gradient describing the color of the line at various points along its length.
          *
          * 设置颜色渐变，以描述线条沿其长度的各个点的颜色。
          */
-        get colorGradient(): Gradient;
+        readonly colorGradient: Gradient;
         /**
          * Set the color at the end of the line.
          *
          * 设置线尾颜色。
          */
-        get endColor(): math.color;
-        set endColor(v: math.color);
+        endColor: math.color;
         /**
          * Set the width at the end of the line.
          *
          * 设置线尾宽度。
          */
-        get endWidth(): number;
-        set endWidth(v: number);
+        endWidth: number;
         /**
          * Set/get the number of vertices.
          *
          * 设置/获取顶点数。
          */
-        get positionCount(): number;
-        set positionCount(v: number);
+        positionCount: number;
         /**
          * Set the color at the start of the line.
          *
          * 设置行线头颜色。
          */
-        get startColor(): math.color;
-        set startColor(v: math.color);
+        startColor: math.color;
         /**
          * Set the width at the start of the line.
          *
          * 设置线头宽度
          */
-        get startWidth(): number;
-        set startWidth(v: number);
+        startWidth: number;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         onPlay(): void;
         start(): void;
@@ -10991,8 +10897,7 @@ declare namespace gd3d.framework {
          * 渲染层级
          * @version gd3d 1.0
          */
-        get renderLayer(): number;
-        set renderLayer(layer: number);
+        renderLayer: number;
         /**
          * @public
          * @language zh_CN
@@ -11001,7 +10906,7 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         queue: number;
-        get transform(): transform;
+        readonly transform: transform;
         gameObject: gameObject;
         /**
          * 结点列表。
@@ -11073,59 +10978,50 @@ declare namespace gd3d.framework {
          *
          * 设置曲线，以描述沿线长度在各个点处的线宽。
          */
-        get widthCurve(): AnimationCurve1;
-        set widthCurve(v: AnimationCurve1);
+        widthCurve: AnimationCurve1;
         /**
          * Set an overall multiplier that is applied to the LineRenderer.widthCurve to get the final width of the line.
          *
          * 设置一个应用于LineRenderer.widthCurve的总乘数，以获取线的最终宽度。
          */
-        get widthMultiplier(): number;
-        set widthMultiplier(v: number);
+        widthMultiplier: number;
         /**
          * Set the color gradient describing the color of the line at various points along its length.
          *
          * 设置颜色渐变，以描述线条沿其长度的各个点的颜色。
          */
-        get colorGradient(): Gradient;
-        set colorGradient(v: Gradient);
+        colorGradient: Gradient;
         /**
          * Set the color at the end of the line.
          *
          * 设置线尾颜色。
          */
-        get endColor(): math.color;
-        set endColor(v: math.color);
+        endColor: math.color;
         /**
          * Set the width at the end of the line.
          *
          * 设置线尾宽度。
          */
-        get endWidth(): number;
-        set endWidth(v: number);
+        endWidth: number;
         /**
          * Set/get the number of vertices.
          *
          * 设置/获取顶点数。
          */
-        get positionCount(): number;
-        set positionCount(v: number);
+        positionCount: number;
         /**
          * Set the color at the start of the line.
          *
          * 设置行线头颜色。
          */
-        get startColor(): math.color;
-        set startColor(v: math.color);
+        startColor: math.color;
         /**
          * Set the width at the start of the line.
          *
          * 设置线头宽度
          */
-        get startWidth(): number;
-        set startWidth(v: number);
-        get trailRendererData(): TrailRendererData;
-        set trailRendererData(v: TrailRendererData);
+        startWidth: number;
+        trailRendererData: TrailRendererData;
         private _trailRendererData;
         render(context: renderContext, assetmgr: assetMgr, camera: camera): void;
         onPlay(): void;
@@ -11237,8 +11133,7 @@ declare namespace gd3d.framework {
         /**
          * 粒子系统资源名称
          */
-        get value(): string;
-        set value(v: string);
+        value: string;
         private _value;
         constructor(assetName?: string);
         /**
@@ -11632,11 +11527,11 @@ declare namespace gd3d.framework {
         private keyboardMap;
         private handlers;
         private _wheel;
-        get wheel(): number;
+        readonly wheel: number;
         private _point;
-        get point(): pointinfo;
+        readonly point: pointinfo;
         private _touches;
-        get touches(): {
+        readonly touches: {
             [id: number]: pointinfo;
         };
         private rMtr_90;
@@ -11828,7 +11723,7 @@ declare namespace gd3d.io {
         readStringAnsi(): string;
         getLength(): number;
         getBytesAvailable(): number;
-        get length(): number;
+        readonly length: number;
         writeInt8(num: number): void;
         writeUInt8(num: number): void;
         writeInt16(num: number): void;
@@ -11927,9 +11822,9 @@ declare namespace gd3d.io {
     class SerializeDependent {
         static resourseDatas: any[];
         static GetAssetContent(asset: any): {
-            name: string;
-            value: string;
-            type: SaveAssetType;
+            "name": string;
+            "value": string;
+            "type": SaveAssetType;
         };
         static GetAssetUrl(asset: any, assetMgr: any): void;
     }
@@ -12062,8 +11957,7 @@ declare namespace gd3d.io {
         readUInt32(): number;
         readUint8Array(target?: Uint8Array, offset?: number, length?: number): Uint8Array;
         readUint8ArrayByOffset(target: Uint8Array, offset: number, length?: number): Uint8Array;
-        set position(value: number);
-        get position(): number;
+        position: number;
         readBoolean(): boolean;
         readByte(): number;
         readBytes(target?: Uint8Array, offset?: number, length?: number): Uint8Array;
@@ -12100,7 +11994,7 @@ declare namespace gd3d.io {
         static stringToUtf8Array(str: string): number[];
         writeStringUtf8DataOnly(str: string): void;
         writeUint8Array(array: Uint8Array | number[], offset?: number, length?: number): void;
-        get length(): number;
+        readonly length: number;
         writeByte(num: number): void;
         writeBytes(array: Uint8Array | number[], offset?: number, length?: number): void;
         writeUnsignedShort(num: number): void;
@@ -12251,8 +12145,7 @@ declare namespace gd3d.framework {
          * This isn't a very good seeding function, but it works ok. It supports 2^16
          * different seed values. Write something better if you need more seeds.
          */
-        get seed(): number;
-        set seed(v: number);
+        seed: number;
         private _seed;
         private _p;
     }
@@ -12557,7 +12450,7 @@ declare namespace gd3d.framework {
         /**
          * 导航网格Json数据
          */
-        get navmeshJson(): string;
+        readonly navmeshJson: string;
         private _navmeshJson;
         /**
         * 加载NavMesh
@@ -12580,7 +12473,7 @@ declare namespace gd3d.framework {
         private createMesh;
         showNavmesh(isshow: boolean, material?: gd3d.framework.material): void;
         dispose(): void;
-        static get Instance(): NavMeshLoadManager;
+        static readonly Instance: NavMeshLoadManager;
         moveToPoints(startPos: gd3d.math.vector3, endPos: gd3d.math.vector3): Array<gd3d.math.vector3>;
         /** 获取指定位置的三角形索引*/
         static findtriIndex(point: gd3d.math.vector3, trans: gd3d.framework.transform): number;
@@ -12838,11 +12731,9 @@ declare namespace gd3d.framework {
          * @memberof effect
          */
         private _totalVertexCount;
-        get curTotalVertexCount(): number;
-        set curTotalVertexCount(val: number);
+        curTotalVertexCount: number;
         private _indexStartIndex;
-        get indexStartIndex(): number;
-        set indexStartIndex(value: number);
+        indexStartIndex: number;
         private _vbosize;
         /**
          * 动态设定vbo大小
@@ -13158,32 +13049,26 @@ declare namespace gd3d.framework {
     class ParticleStartData {
         shapeType: ParticleSystemShape;
         private _position;
-        set position(_pos: gd3d.math.vector3);
-        get position(): gd3d.math.vector3;
+        position: gd3d.math.vector3;
         private _direction;
-        set direction(_dir: gd3d.math.vector3);
-        get direction(): gd3d.math.vector3;
+        direction: gd3d.math.vector3;
         private _width;
-        set width(_w: number);
-        get width(): number;
+        width: number;
         private _height;
-        set height(_h: number);
-        get height(): number;
+        height: number;
         depth: number;
         private _radius;
-        set radius(_r: number);
-        get radius(): number;
+        radius: number;
         private _angle;
-        set angle(_a: number);
-        get angle(): number;
-        get randomDirection(): gd3d.math.vector3;
-        get boxDirection(): gd3d.math.vector3;
-        get sphereDirection(): gd3d.math.vector3;
-        get hemisphereDirection(): gd3d.math.vector3;
+        angle: number;
+        readonly randomDirection: gd3d.math.vector3;
+        readonly boxDirection: gd3d.math.vector3;
+        readonly sphereDirection: gd3d.math.vector3;
+        readonly hemisphereDirection: gd3d.math.vector3;
         emitFrom: emitfromenum;
-        get coneDirection(): gd3d.math.vector3;
-        get circleDirection(): gd3d.math.vector3;
-        get edgeDirection(): math.vector3;
+        readonly coneDirection: gd3d.math.vector3;
+        readonly circleDirection: gd3d.math.vector3;
+        readonly edgeDirection: math.vector3;
         private getposition;
         clone(): ParticleStartData;
     }
@@ -13205,9 +13090,9 @@ declare namespace gd3d.framework {
         private _valueLimitMin;
         private _valueLimitMax;
         private beInited;
-        set value(_v: number);
-        set valueLimitMin(_v: number);
-        set valueLimitMax(_v: number);
+        value: number;
+        valueLimitMin: number;
+        valueLimitMax: number;
         clone(): ValueData;
         /**
          * 针对随机类型，只要随机过一次就保持这个值不变
@@ -13523,7 +13408,7 @@ declare namespace gd3d.framework {
         private addParticle;
         private addBatcher;
         private _renderCamera;
-        get renderCamera(): camera;
+        readonly renderCamera: camera;
         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera): void;
         dispose(): void;
         vbo: Float32Array;
@@ -13579,10 +13464,8 @@ declare namespace gd3d.framework {
         * 贝塞尔曲线上所有的个数
         */
         private _bezierPointNum;
-        get beizerPoints(): gd3d.math.vector3[];
-        set beizerPoints(value: gd3d.math.vector3[]);
-        get bezierPointNum(): number;
-        set bezierPointNum(value: number);
+        beizerPoints: gd3d.math.vector3[];
+        bezierPointNum: number;
         /**
          * 线性贝塞尔曲线
          * @param start
@@ -14189,8 +14072,7 @@ declare namespace gd3d.framework {
          * 渲染层级
          * @version gd3d 1.0
          */
-        get renderLayer(): number;
-        set renderLayer(layer: number);
+        renderLayer: number;
         /**
          * @public
          * @language zh_CN
@@ -14213,109 +14095,93 @@ declare namespace gd3d.framework {
          * The units are expressed as a multiplier of the particle sizes, relative to their diameters. For example, a value of 0.5 adjusts the pivot by the particle radius, allowing particles to rotate around their edges.
          */
         pivot: math.vector3;
-        get transform(): transform;
+        readonly transform: transform;
         /**
          * Is the particle system playing right now ?
          *
          * 粒子系统正在运行吗?
          */
-        get isPlaying(): boolean;
+        readonly isPlaying: boolean;
         private _isPlaying;
         /**
          * Is the particle system stopped right now ?
          *
          * 粒子系统现在停止了吗?
          */
-        get isStopped(): boolean;
+        readonly isStopped: boolean;
         /**
          * Is the particle system paused right now ?
          *
          * 粒子系统现在暂停了吗?
          */
-        get isPaused(): boolean;
+        readonly isPaused: boolean;
         /**
          * The current number of particles (Read Only).
          *
          * 当前粒子数(只读)。
          */
-        get particleCount(): number;
+        readonly particleCount: number;
         /**
          * Playback position in seconds.
          *
          * 回放位置(秒)
          */
         time: number;
-        get main(): ParticleMainModule;
-        set main(v: ParticleMainModule);
+        main: ParticleMainModule;
         private _main;
-        get emission(): ParticleEmissionModule;
-        set emission(v: ParticleEmissionModule);
+        emission: ParticleEmissionModule;
         private _emission;
-        get shape(): ParticleShapeModule;
-        set shape(v: ParticleShapeModule);
+        shape: ParticleShapeModule;
         private _shape;
-        get velocityOverLifetime(): ParticleVelocityOverLifetimeModule;
-        set velocityOverLifetime(v: ParticleVelocityOverLifetimeModule);
+        velocityOverLifetime: ParticleVelocityOverLifetimeModule;
         private _velocityOverLifetime;
-        get limitVelocityOverLifetime(): ParticleLimitVelocityOverLifetimeModule;
-        set limitVelocityOverLifetime(v: ParticleLimitVelocityOverLifetimeModule);
+        limitVelocityOverLifetime: ParticleLimitVelocityOverLifetimeModule;
         private _limitVelocityOverLifetime;
         /**
          * Script interface for the Particle System velocity inheritance module.
          *
          * 粒子系统速度继承模块。
          */
-        get inheritVelocity(): ParticleInheritVelocityModule;
-        set inheritVelocity(v: ParticleInheritVelocityModule);
+        inheritVelocity: ParticleInheritVelocityModule;
         private _inheritVelocity;
-        get forceOverLifetime(): ParticleForceOverLifetimeModule;
-        set forceOverLifetime(v: ParticleForceOverLifetimeModule);
+        forceOverLifetime: ParticleForceOverLifetimeModule;
         private _forceOverLifetime;
-        get colorOverLifetime(): ParticleColorOverLifetimeModule;
-        set colorOverLifetime(v: ParticleColorOverLifetimeModule);
+        colorOverLifetime: ParticleColorOverLifetimeModule;
         private _colorOverLifetime;
         /**
          * 颜色随速度变化模块。
          */
-        get colorBySpeed(): ParticleColorBySpeedModule;
-        set colorBySpeed(v: ParticleColorBySpeedModule);
+        colorBySpeed: ParticleColorBySpeedModule;
         private _colorBySpeed;
-        get sizeOverLifetime(): ParticleSizeOverLifetimeModule;
-        set sizeOverLifetime(v: ParticleSizeOverLifetimeModule);
+        sizeOverLifetime: ParticleSizeOverLifetimeModule;
         private _sizeOverLifetime;
         /**
          * 缩放随速度变化模块
          */
-        get sizeBySpeed(): ParticleSizeBySpeedModule;
-        set sizeBySpeed(v: ParticleSizeBySpeedModule);
+        sizeBySpeed: ParticleSizeBySpeedModule;
         private _sizeBySpeed;
-        get rotationOverLifetime(): ParticleRotationOverLifetimeModule;
-        set rotationOverLifetime(v: ParticleRotationOverLifetimeModule);
+        rotationOverLifetime: ParticleRotationOverLifetimeModule;
         private _rotationOverLifetime;
         /**
          * 旋转角度随速度变化模块
          */
-        get rotationBySpeed(): ParticleRotationBySpeedModule;
-        set rotationBySpeed(v: ParticleRotationBySpeedModule);
+        rotationBySpeed: ParticleRotationBySpeedModule;
         private _rotationBySpeed;
         /**
          * 旋转角度随速度变化模块
          */
-        get noise(): ParticleNoiseModule;
-        set noise(v: ParticleNoiseModule);
+        noise: ParticleNoiseModule;
         private _noise;
         /**
          * 粒子系统纹理表动画模块。
          */
-        get textureSheetAnimation(): ParticleTextureSheetAnimationModule;
-        set textureSheetAnimation(v: ParticleTextureSheetAnimationModule);
+        textureSheetAnimation: ParticleTextureSheetAnimationModule;
         private _textureSheetAnimation;
         private _mesh;
         private _meshAABB;
         /**
          * @private
          */
-        get mesh(): mesh;
         /**
         * @public
         * @language zh_CN
@@ -14324,7 +14190,7 @@ declare namespace gd3d.framework {
         * 设置mesh数据
         * @version gd3d 1.0
         */
-        set mesh(mesh: mesh);
+        mesh: mesh;
         /**
          * @public
          * @language zh_CN
@@ -14333,14 +14199,13 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         material: material;
-        get single(): boolean;
+        readonly single: boolean;
         /**
          * Start delay in seconds.
          * 启动延迟(以秒为单位)。在调用.play()时初始化值。
          */
         startDelay: number;
-        get particleSystemData(): ParticleSystemData;
-        set particleSystemData(v: ParticleSystemData);
+        particleSystemData: ParticleSystemData;
         private _particleSystemData;
         /**
          * 用于处理事件的监听与派发
@@ -14413,7 +14278,7 @@ declare namespace gd3d.framework {
         /**
          * 此时在周期中的位置
          */
-        get rateAtDuration(): number;
+        readonly rateAtDuration: number;
         /**
          * 发射粒子
          * @param time 当前粒子时间
@@ -14528,8 +14393,7 @@ declare namespace gd3d.framework {
         /**
          * 粒子系统资源名称
          */
-        get value(): string;
-        set value(v: string);
+        value: string;
         private _value;
         constructor(assetName?: string);
         /**
@@ -15123,8 +14987,7 @@ declare namespace gd3d.framework {
          * 如果您只想更改整体的速率乘数，那么这比访问整个曲线更有效。
          * 只在
          */
-        get rateOverTimeMultiplier(): number;
-        set rateOverTimeMultiplier(v: number);
+        rateOverTimeMultiplier: number;
         /**
          * The rate at which new particles are spawned, over distance.
          * New particles will only be emitted when the emitter moves.
@@ -15142,8 +15005,7 @@ declare namespace gd3d.framework {
          * 改变速率随距离变化的乘数。
          * 如果您只想更改整体的速率乘数，那么这比访问整个曲线更有效。
          */
-        get rateOverDistanceMultiplier(): number;
-        set rateOverDistanceMultiplier(v: number);
+        rateOverDistanceMultiplier: number;
         /**
          * 爆发数组
          */
@@ -15153,7 +15015,7 @@ declare namespace gd3d.framework {
          *
          * 当前的爆发次数。
          */
-        get burstCount(): number;
+        readonly burstCount: number;
         /**
          * Get the burst array.
          * 获取爆发数组。
@@ -15205,43 +15067,37 @@ declare namespace gd3d.framework {
          *
          * 在X轴上定义粒子力的曲线。
          */
-        get x(): MinMaxCurve;
-        set x(v: MinMaxCurve);
+        x: MinMaxCurve;
         /**
          * Change the X axis mulutiplier.
          *
          * 改变X轴的乘数。
          */
-        get xMultiplier(): number;
-        set xMultiplier(v: number);
+        xMultiplier: number;
         /**
          * The curve defining particle forces in the Y axis.
          *
          * 在Y轴上定义粒子力的曲线。
          */
-        get y(): MinMaxCurve;
-        set y(v: MinMaxCurve);
+        y: MinMaxCurve;
         /**
          * Change the Y axis mulutiplier.
          *
          * 改变Y轴的乘数。
          */
-        get yMultiplier(): number;
-        set yMultiplier(v: number);
+        yMultiplier: number;
         /**
          * The curve defining particle forces in the Z axis.
          *
          * 在Z轴上定义粒子力的曲线。
          */
-        get z(): MinMaxCurve;
-        set z(v: MinMaxCurve);
+        z: MinMaxCurve;
         /**
          * Change the Z axis mulutiplier.
          *
          * 改变Z轴的乘数。
          */
-        get zMultiplier(): number;
-        set zMultiplier(v: number);
+        zMultiplier: number;
         /**
          * 初始化粒子状态
          * @param particle 粒子
@@ -15279,15 +15135,13 @@ declare namespace gd3d.framework {
          *
          * 曲线，用来定义在粒子的生命周期内应用了多少发射速度。
          */
-        get curve(): MinMaxCurve;
-        set curve(v: MinMaxCurve);
+        curve: MinMaxCurve;
         /**
          * Change the curve multiplier.
          *
          * 改变曲线的乘数。
          */
-        get curveMultiplier(): number;
-        set curveMultiplier(v: number);
+        curveMultiplier: number;
         /**
          * 初始化粒子状态
          * @param particle 粒子
@@ -15345,50 +15199,43 @@ declare namespace gd3d.framework {
          *
          * 改变限制乘法因子。
          */
-        get limitMultiplier(): number;
-        set limitMultiplier(v: number);
+        limitMultiplier: number;
         /**
          * Maximum velocity curve for the X axis.
          *
          * X轴的最大速度曲线。
          */
-        get limitX(): MinMaxCurve;
-        set limitX(v: MinMaxCurve);
+        limitX: MinMaxCurve;
         /**
          * Change the limit multiplier on the X axis.
          *
          * 改变X轴上的极限乘法器。
          */
-        get limitXMultiplier(): number;
-        set limitXMultiplier(v: number);
+        limitXMultiplier: number;
         /**
          * Maximum velocity curve for the Y axis.
          *
          * Y轴的最大速度曲线。
          */
-        get limitY(): MinMaxCurve;
-        set limitY(v: MinMaxCurve);
+        limitY: MinMaxCurve;
         /**
          * Change the limit multiplier on the Y axis.
          *
          * 改变Y轴上的极限乘法器。
          */
-        get limitYMultiplier(): number;
-        set limitYMultiplier(v: number);
+        limitYMultiplier: number;
         /**
          * Maximum velocity curve for the Z axis.
          *
          * Z轴的最大速度曲线。
          */
-        get limitZ(): MinMaxCurve;
-        set limitZ(v: MinMaxCurve);
+        limitZ: MinMaxCurve;
         /**
          * Change the limit multiplier on the Z axis.
          *
          * 更改Z轴上的极限乘法器。
          */
-        get limitZMultiplier(): number;
-        set limitZMultiplier(v: number);
+        limitZMultiplier: number;
         /**
          * 初始化粒子状态
          *
@@ -15437,7 +15284,7 @@ declare namespace gd3d.framework {
          *
          * 启动延迟乘数(以秒为单位)。
          */
-        get startDelayMultiplier(): number;
+        readonly startDelayMultiplier: number;
         /**
          * The total lifetime in seconds that each new particle will have.
          *
@@ -15451,8 +15298,7 @@ declare namespace gd3d.framework {
          * 起始寿命乘数。
          * 如果您只想更改总体寿命乘数，则此方法比访问整个曲线更有效。
          */
-        get startLifetimeMultiplier(): number;
-        set startLifetimeMultiplier(v: number);
+        startLifetimeMultiplier: number;
         /**
          * The initial speed of particles when emitted.
          *
@@ -15466,8 +15312,7 @@ declare namespace gd3d.framework {
          * 粒子发射时的初始速度的乘子。
          * 这种方法比访问整个曲线更有效，如果你只想改变整体速度乘数。
          */
-        get startSpeedMultiplier(): number;
-        set startSpeedMultiplier(v: number);
+        startSpeedMultiplier: number;
         /**
          * A flag to enable specifying particle size individually for each axis.
          *
@@ -15479,8 +15324,7 @@ declare namespace gd3d.framework {
          *
          * 粒子发射时的初始大小。
          */
-        get startSize(): MinMaxCurve;
-        set startSize(v: MinMaxCurve);
+        startSize: MinMaxCurve;
         /**
          * Start size multiplier.
          * This method is more efficient than accessing the whole curve, if you only want to change the overall size multiplier.
@@ -15488,8 +15332,7 @@ declare namespace gd3d.framework {
          * 开始尺寸乘数。
          * 如果您只想更改整体尺寸倍增器，则此方法比访问整个曲线更有效。
          */
-        get startSizeMultiplier(): number;
-        set startSizeMultiplier(v: number);
+        startSizeMultiplier: number;
         /**
          * The initial size of particles when emitted.
          *
@@ -15501,8 +15344,7 @@ declare namespace gd3d.framework {
          *
          * 发射时沿X轴的粒子的初始大小。
          */
-        get startSizeX(): MinMaxCurve;
-        set startSizeX(v: MinMaxCurve);
+        startSizeX: MinMaxCurve;
         /**
          * Start rotation multiplier along the X axis.
          * This method is more efficient than accessing the whole curve, if you only want to change the overall size multiplier.
@@ -15510,15 +15352,13 @@ declare namespace gd3d.framework {
          * 启动旋转乘法器沿X轴。
          * 如果您只想更改整体大小倍增器，则此方法比访问整个曲线更有效。
          */
-        get startSizeXMultiplier(): number;
-        set startSizeXMultiplier(v: number);
+        startSizeXMultiplier: number;
         /**
          * The initial size of particles along the Y axis when emitted.
          *
          * 发射时沿Y轴的粒子的初始大小。
          */
-        get startSizeY(): MinMaxCurve;
-        set startSizeY(v: MinMaxCurve);
+        startSizeY: MinMaxCurve;
         /**
          * Start rotation multiplier along the Y axis.
          * This method is more efficient than accessing the whole curve, if you only want to change the overall size multiplier.
@@ -15526,15 +15366,13 @@ declare namespace gd3d.framework {
          * 启动旋转乘法器沿Y轴。
          * 如果您只想更改整体大小倍增器，则此方法比访问整个曲线更有效。
          */
-        get startSizeYMultiplier(): number;
-        set startSizeYMultiplier(v: number);
+        startSizeYMultiplier: number;
         /**
          * The initial size of particles along the Z axis when emitted.
          *
          * 发射时沿Z轴的粒子的初始大小。
          */
-        get startSizeZ(): MinMaxCurve;
-        set startSizeZ(v: MinMaxCurve);
+        startSizeZ: MinMaxCurve;
         /**
          * Start rotation multiplier along the Z axis.
          * This method is more efficient than accessing the whole curve, if you only want to change the overall size multiplier.
@@ -15542,8 +15380,7 @@ declare namespace gd3d.framework {
          * 启动旋转乘法器沿Z轴。
          * 如果您只想更改整体大小倍增器，则此方法比访问整个曲线更有效。
          */
-        get startSizeZMultiplier(): number;
-        set startSizeZMultiplier(v: number);
+        startSizeZMultiplier: number;
         /**
          * A flag to enable 3D particle rotation.
          * 一个启用粒子3D旋转的标记。
@@ -15553,8 +15390,7 @@ declare namespace gd3d.framework {
          * The initial rotation of particles when emitted.
          * 粒子发射时的初始旋转。
          */
-        get startRotation(): MinMaxCurve;
-        set startRotation(v: MinMaxCurve);
+        startRotation: MinMaxCurve;
         /**
          * Start rotation multiplier.
          * This method is more efficient than accessing the whole curve, if you only want to change the overall rotation multiplier.
@@ -15562,8 +15398,7 @@ declare namespace gd3d.framework {
          * 开始旋转乘数。
          * 这种方法比访问整个曲线更有效，如果你只想改变整体旋转乘数。
          */
-        get startRotationMultiplier(): number;
-        set startRotationMultiplier(v: number);
+        startRotationMultiplier: number;
         /**
          * The initial rotation of particles when emitted.
          *
@@ -15575,8 +15410,7 @@ declare namespace gd3d.framework {
          *
          * 发射时粒子围绕X轴的初始旋转。
          */
-        get startRotationX(): MinMaxCurve;
-        set startRotationX(v: MinMaxCurve);
+        startRotationX: MinMaxCurve;
         /**
          * Start rotation multiplier around the X axis.
          * This method is more efficient than accessing the whole curve, if you only want to change the overall rotation multiplier.
@@ -15584,15 +15418,13 @@ declare namespace gd3d.framework {
          * 开始绕X轴旋转乘法器。
          * 这种方法比访问整个曲线更有效，如果你只想改变整体旋转乘数。
          */
-        get startRotationXMultiplier(): number;
-        set startRotationXMultiplier(v: number);
+        startRotationXMultiplier: number;
         /**
          * The initial rotation of particles around the Y axis when emitted.
          *
          * 发射时粒子围绕Y轴的初始旋转。
          */
-        get startRotationY(): MinMaxCurve;
-        set startRotationY(v: MinMaxCurve);
+        startRotationY: MinMaxCurve;
         /**
          * Start rotation multiplier around the Y axis.
          * This method is more efficient than accessing the whole curve, if you only want to change the overall rotation multiplier.
@@ -15600,15 +15432,13 @@ declare namespace gd3d.framework {
          * 开始绕Y轴旋转乘法器。
          * 这种方法比访问整个曲线更有效，如果你只想改变整体旋转乘数。
          */
-        get startRotationYMultiplier(): number;
-        set startRotationYMultiplier(v: number);
+        startRotationYMultiplier: number;
         /**
          * The initial rotation of particles around the Z axis when emitted.
          *
          * 发射时粒子围绕Z轴的初始旋转。
          */
-        get startRotationZ(): MinMaxCurve;
-        set startRotationZ(v: MinMaxCurve);
+        startRotationZ: MinMaxCurve;
         /**
          * Start rotation multiplier around the Z axis.
          * This method is more efficient than accessing the whole curve, if you only want to change the overall rotation multiplier.
@@ -15616,8 +15446,7 @@ declare namespace gd3d.framework {
          * 开始绕Z轴旋转乘法器。
          * 这种方法比访问整个曲线更有效，如果你只想改变整体旋转乘数。
          */
-        get startRotationZMultiplier(): number;
-        set startRotationZMultiplier(v: number);
+        startRotationZMultiplier: number;
         /**
          * Cause some particles to spin in the opposite direction. Set between 0 and 1, where higher values will cause a higher proportion of particles to spin in the opposite direction.
          *
@@ -15643,8 +15472,7 @@ declare namespace gd3d.framework {
          *
          * @todo
          */
-        get simulationSpace(): ParticleSystemSimulationSpace;
-        set simulationSpace(v: ParticleSystemSimulationSpace);
+        simulationSpace: ParticleSystemSimulationSpace;
         private _simulationSpace;
         /**
          * Simulate particles relative to a custom transform component.
@@ -15712,8 +15540,7 @@ declare namespace gd3d.framework {
          *
          * 整体噪音效应有多强。
          */
-        get strength(): MinMaxCurve;
-        set strength(v: MinMaxCurve);
+        strength: MinMaxCurve;
         /**
          * How strong the overall noise effect is.
          *
@@ -15725,22 +15552,19 @@ declare namespace gd3d.framework {
          *
          * 在使用分别控制每个轴时，在X轴上定义效果的强度。
          */
-        get strengthX(): MinMaxCurve;
-        set strengthX(v: MinMaxCurve);
+        strengthX: MinMaxCurve;
         /**
          * Define the strength of the effect on the Y axis, when using separateAxes option.
          *
          * 在使用分别控制每个轴时，在Y轴上定义效果的强度。
          */
-        get strengthY(): MinMaxCurve;
-        set strengthY(v: MinMaxCurve);
+        strengthY: MinMaxCurve;
         /**
          * Define the strength of the effect on the Z axis, when using separateAxes option.
          *
          * 在使用分别控制每个轴时，在Z轴上定义效果的强度。
          */
-        get strengthZ(): MinMaxCurve;
-        set strengthZ(v: MinMaxCurve);
+        strengthZ: MinMaxCurve;
         /**
          * Low values create soft, smooth noise, and high values create rapidly changing noise.
          *
@@ -15794,8 +15618,7 @@ declare namespace gd3d.framework {
          *
          * 定义如何重新映射噪声值。
          */
-        get remap(): MinMaxCurve;
-        set remap(v: MinMaxCurve);
+        remap: MinMaxCurve;
         /**
          * Define how the noise values are remapped.
          *
@@ -15807,22 +15630,19 @@ declare namespace gd3d.framework {
          *
          * 在使用分别控制每个轴时，如何在X轴上重新映射噪声值。
          */
-        get remapX(): MinMaxCurve;
-        set remapX(v: MinMaxCurve);
+        remapX: MinMaxCurve;
         /**
          * Define how the noise values are remapped on the Y axis, when using the ParticleSystem.NoiseModule.separateAxes option.
          *
          * 在使用分别控制每个轴时，如何在Y轴上重新映射噪声值。
          */
-        get remapY(): MinMaxCurve;
-        set remapY(v: MinMaxCurve);
+        remapY: MinMaxCurve;
         /**
          * Define how the noise values are remapped on the Z axis, when using the ParticleSystem.NoiseModule.separateAxes option.
          *
          * 在使用分别控制每个轴时，如何在Z轴上重新映射噪声值。
          */
-        get remapZ(): MinMaxCurve;
-        set remapZ(v: MinMaxCurve);
+        remapZ: MinMaxCurve;
         /**
          * 初始化粒子状态
          * @param particle 粒子
@@ -15891,43 +15711,37 @@ declare namespace gd3d.framework {
          *
          * X轴的旋转随速度变化曲线。
          */
-        get x(): MinMaxCurve;
-        set x(v: MinMaxCurve);
+        x: MinMaxCurve;
         /**
          * Rotation multiplier around the X axis.
          *
          * 绕X轴旋转乘法器
          */
-        get xMultiplier(): number;
-        set xMultiplier(v: number);
+        xMultiplier: number;
         /**
          * Rotation by speed curve for the Y axis.
          *
          * Y轴的旋转随速度变化曲线。
          */
-        get y(): MinMaxCurve;
-        set y(v: MinMaxCurve);
+        y: MinMaxCurve;
         /**
          * Rotation multiplier around the Y axis.
          *
          * 绕Y轴旋转乘法器
          */
-        get yMultiplier(): number;
-        set yMultiplier(v: number);
+        yMultiplier: number;
         /**
          * Rotation by speed curve for the Z axis.
          *
          * Z轴的旋转随速度变化曲线。
          */
-        get z(): MinMaxCurve;
-        set z(v: MinMaxCurve);
+        z: MinMaxCurve;
         /**
          * Rotation multiplier around the Z axis.
          *
          * 绕Z轴旋转乘法器
          */
-        get zMultiplier(): number;
-        set zMultiplier(v: number);
+        zMultiplier: number;
         /**
          * 初始化粒子状态
          * @param particle 粒子
@@ -15961,43 +15775,37 @@ declare namespace gd3d.framework {
          *
          * X轴的旋转寿命曲线。
          */
-        get x(): MinMaxCurve;
-        set x(v: MinMaxCurve);
+        x: MinMaxCurve;
         /**
          * Rotation multiplier around the X axis.
          *
          * 绕X轴旋转乘法器
          */
-        get xMultiplier(): number;
-        set xMultiplier(v: number);
+        xMultiplier: number;
         /**
          * Rotation over lifetime curve for the Y axis.
          *
          * Y轴的旋转寿命曲线。
          */
-        get y(): MinMaxCurve;
-        set y(v: MinMaxCurve);
+        y: MinMaxCurve;
         /**
          * Rotation multiplier around the Y axis.
          *
          * 绕Y轴旋转乘法器
          */
-        get yMultiplier(): number;
-        set yMultiplier(v: number);
+        yMultiplier: number;
         /**
          * Rotation over lifetime curve for the Z axis.
          *
          * Z轴的旋转寿命曲线。
          */
-        get z(): MinMaxCurve;
-        set z(v: MinMaxCurve);
+        z: MinMaxCurve;
         /**
          * Rotation multiplier around the Z axis.
          *
          * 绕Z轴旋转乘法器
          */
-        get zMultiplier(): number;
-        set zMultiplier(v: number);
+        zMultiplier: number;
         /**
          * 初始化粒子状态
          * @param particle 粒子
@@ -16023,15 +15831,13 @@ declare namespace gd3d.framework {
          * Type of shape to emit particles from.
          * 发射粒子的形状类型。
          */
-        get shapeType(): ParticleSystemShapeType;
-        set shapeType(v: ParticleSystemShapeType);
+        shapeType: ParticleSystemShapeType;
         private _shapeType;
         /**
          * Type of shape to emit particles from.
          * 发射粒子的形状类型。
          */
-        get shape(): ParticleSystemShapeType1;
-        set shape(v: ParticleSystemShapeType1);
+        shape: ParticleSystemShapeType1;
         private _shape;
         /**
          * 当前使用的发射形状
@@ -16084,8 +15890,7 @@ declare namespace gd3d.framework {
          *
          * 发射形状的电弧速度的乘数。
          */
-        get arcSpeedMultiplier(): number;
-        set arcSpeedMultiplier(v: number);
+        arcSpeedMultiplier: number;
         /**
          * Control the gap between emission points around the arc.
          *
@@ -16197,8 +16002,7 @@ declare namespace gd3d.framework {
          *
          * 发射形状的半径速度的乘法器。
          */
-        get radiusSpeedMultiplier(): number;
-        set radiusSpeedMultiplier(v: number);
+        radiusSpeedMultiplier: number;
         /**
          * Control the gap between emission points around the radius.
          *
@@ -16239,8 +16043,7 @@ declare namespace gd3d.framework {
          *
          * 基于速度的粒度控制曲线。
          */
-        get size(): MinMaxCurve;
-        set size(v: MinMaxCurve);
+        size: MinMaxCurve;
         /**
          * Curve to control particle size based on speed.
          *
@@ -16258,50 +16061,43 @@ declare namespace gd3d.framework {
          *
          * 尺寸的乘数。
          */
-        get sizeMultiplier(): number;
-        set sizeMultiplier(v: number);
+        sizeMultiplier: number;
         /**
          * Size over speed curve for the X axis.
          *
          * X轴的尺寸随生命周期变化曲线。
          */
-        get x(): MinMaxCurve;
-        set x(v: MinMaxCurve);
+        x: MinMaxCurve;
         /**
          * X axis size multiplier.
          *
          * X轴尺寸的乘数。
          */
-        get xMultiplier(): number;
-        set xMultiplier(v: number);
+        xMultiplier: number;
         /**
          * Size over speed curve for the Y axis.
          *
          * Y轴的尺寸随生命周期变化曲线。
          */
-        get y(): MinMaxCurve;
-        set y(v: MinMaxCurve);
+        y: MinMaxCurve;
         /**
          * Y axis size multiplier.
          *
          * Y轴尺寸的乘数。
          */
-        get yMultiplier(): number;
-        set yMultiplier(v: number);
+        yMultiplier: number;
         /**
          * Size over speed curve for the Z axis.
          *
          * Z轴的尺寸随生命周期变化曲线。
          */
-        get z(): MinMaxCurve;
-        set z(v: MinMaxCurve);
+        z: MinMaxCurve;
         /**
          * Z axis size multiplier.
          *
          * Z轴尺寸的乘数。
          */
-        get zMultiplier(): number;
-        set zMultiplier(v: number);
+        zMultiplier: number;
         /**
          * 初始化粒子状态
          * @param particle 粒子
@@ -16332,15 +16128,13 @@ declare namespace gd3d.framework {
          *
          * 基于寿命的粒度控制曲线。
          */
-        get size(): MinMaxCurve;
-        set size(v: MinMaxCurve);
+        size: MinMaxCurve;
         /**
          * Size multiplier.
          *
          * 尺寸的乘数。
          */
-        get sizeMultiplier(): number;
-        set sizeMultiplier(v: number);
+        sizeMultiplier: number;
         /**
          * Curve to control particle size based on lifetime.
          *
@@ -16352,43 +16146,37 @@ declare namespace gd3d.framework {
          *
          * X轴的尺寸随生命周期变化曲线。
          */
-        get x(): MinMaxCurve;
-        set x(v: MinMaxCurve);
+        x: MinMaxCurve;
         /**
          * X axis size multiplier.
          *
          * X轴尺寸的乘数。
          */
-        get xMultiplier(): number;
-        set xMultiplier(v: number);
+        xMultiplier: number;
         /**
          * Size over lifetime curve for the Y axis.
          *
          * Y轴的尺寸随生命周期变化曲线。
          */
-        get y(): MinMaxCurve;
-        set y(v: MinMaxCurve);
+        y: MinMaxCurve;
         /**
          * Y axis size multiplier.
          *
          * Y轴尺寸的乘数。
          */
-        get yMultiplier(): number;
-        set yMultiplier(v: number);
+        yMultiplier: number;
         /**
          * Size over lifetime curve for the Z axis.
          *
          * Z轴的尺寸随生命周期变化曲线。
          */
-        get z(): MinMaxCurve;
-        set z(v: MinMaxCurve);
+        z: MinMaxCurve;
         /**
          * Z axis size multiplier.
          *
          * Z轴尺寸的乘数。
          */
-        get zMultiplier(): number;
-        set zMultiplier(v: number);
+        zMultiplier: number;
         /**
          * 初始化粒子状态
          * @param particle 粒子
@@ -16437,8 +16225,7 @@ declare namespace gd3d.framework {
          *
          * 当useRandomRow设置为false时，显式选择使用纹理表的哪一行。
          */
-        get rowIndex(): number;
-        set rowIndex(v: number);
+        rowIndex: number;
         private _rowIndex;
         /**
          * Define a random starting frame for the texture sheet animation.
@@ -16471,43 +16258,37 @@ declare namespace gd3d.framework {
          *
          * 在粒子上翻转U坐标，使它们呈现水平镜像。
          */
-        get flipU(): number;
-        set flipU(v: number);
+        flipU: number;
         /**
          * Flip the V coordinate on particles, causing them to appear mirrored vertically.
          *
          * 在粒子上翻转V坐标，使它们垂直镜像。
          */
-        get flipV(): number;
-        set flipV(v: number);
+        flipV: number;
         /**
          * Frame over time mutiplier.
          *
          * 帧随时间变化的乘数。
          */
-        get frameOverTimeMultiplier(): number;
-        set frameOverTimeMultiplier(v: number);
+        frameOverTimeMultiplier: number;
         /**
          * Defines the tiling of the texture in the X axis.
          *
          * 定义纹理在X轴上的平铺。
          */
-        get numTilesX(): number;
-        set numTilesX(v: number);
+        numTilesX: number;
         /**
          * Defines the tiling of the texture in the Y axis.
          *
          * 定义纹理在Y轴上的平铺。
          */
-        get numTilesY(): number;
-        set numTilesY(v: number);
+        numTilesY: number;
         /**
          * Starting frame multiplier.
          *
          * 起始帧乘数。
          */
-        get startFrameMultiplier(): number;
-        set startFrameMultiplier(v: number);
+        startFrameMultiplier: number;
         /**
          * 初始化粒子状态
          * @param particle 粒子
@@ -16548,43 +16329,37 @@ declare namespace gd3d.framework {
          *
          * 曲线控制粒子速度基于寿命，在X轴上。
          */
-        get x(): MinMaxCurve;
-        set x(v: MinMaxCurve);
+        x: MinMaxCurve;
         /**
          * X axis speed multiplier.
          *
          * X轴速度倍增器。
          */
-        get xMultiplier(): number;
-        set xMultiplier(v: number);
+        xMultiplier: number;
         /**
          * Curve to control particle speed based on lifetime, on the Y axis.
          *
          * 曲线控制粒子速度基于寿命，在Y轴上。
          */
-        get y(): MinMaxCurve;
-        set y(v: MinMaxCurve);
+        y: MinMaxCurve;
         /**
          * Y axis speed multiplier.
          *
          * Y轴速度倍增器。
          */
-        get yMultiplier(): number;
-        set yMultiplier(v: number);
+        yMultiplier: number;
         /**
          * Curve to control particle speed based on lifetime, on the Z axis.
          *
          * 曲线控制粒子速度基于寿命，在Z轴上。
          */
-        get z(): MinMaxCurve;
-        set z(v: MinMaxCurve);
+        z: MinMaxCurve;
         /**
          * Z axis speed multiplier.
          *
          * Z轴速度倍增器。
          */
-        get zMultiplier(): number;
-        set zMultiplier(v: number);
+        zMultiplier: number;
         /**
          * 初始化粒子状态
          * @param particle 粒子
@@ -16616,15 +16391,13 @@ declare namespace gd3d.framework {
          * Minimum number of bursts to be emitted.
          * 要发射的最小爆发数量。
          */
-        get minCount(): number;
-        set minCount(v: number);
+        minCount: number;
         /**
          * Maximum number of bursts to be emitted.
          *
          * 要发射的最大爆发数量。
          */
-        get maxCount(): number;
-        set maxCount(v: number);
+        maxCount: number;
         /**
          * How many times to play the burst. (0 means infinitely).
          * 爆发次数。(0意味着无限)。
@@ -16647,7 +16420,7 @@ declare namespace gd3d.framework {
         /**
          * 是否喷发
          */
-        get isProbability(): boolean;
+        readonly isProbability: boolean;
         private _isProbability;
         /**
          * 通过触发的几率计算是否喷发。
@@ -16701,18 +16474,15 @@ declare namespace gd3d.framework {
         /**
          * 盒子X方向缩放。
          */
-        get boxX(): number;
-        set boxX(v: number);
+        boxX: number;
         /**
          * 盒子Y方向缩放。
          */
-        get boxY(): number;
-        set boxY(v: number);
+        boxY: number;
         /**
          * 盒子Z方向缩放。
          */
-        get boxZ(): number;
-        set boxZ(v: number);
+        boxZ: number;
         /**
          * 粒子系统盒子发射类型。
          */
@@ -16734,30 +16504,25 @@ declare namespace gd3d.framework {
      * @author feng3d
      */
     class ParticleSystemShapeCircle extends ParticleSystemShapeBase {
-        get radius(): number;
-        set radius(v: number);
-        get arc(): number;
-        set arc(v: number);
+        radius: number;
+        arc: number;
         /**
          * The mode used for generating particles around the arc.
          *
          * 在弧线周围产生粒子的模式。
          */
-        get arcMode(): ParticleSystemShapeMultiModeValue;
-        set arcMode(v: ParticleSystemShapeMultiModeValue);
+        arcMode: ParticleSystemShapeMultiModeValue;
         /**
          * Control the gap between emission points around the arc.
          *
          * 控制弧线周围发射点之间的间隙。
          */
-        get arcSpread(): number;
-        set arcSpread(v: number);
+        arcSpread: number;
         /**
          * When using one of the animated modes, how quickly to move the emission position around the arc.
          * 当使用一个动画模式时，如何快速移动发射位置周围的弧。
          */
-        get arcSpeed(): MinMaxCurve;
-        set arcSpeed(v: MinMaxCurve);
+        arcSpeed: MinMaxCurve;
         /**
          * 是否从圆形边缘发射。
          */
@@ -16783,43 +16548,36 @@ declare namespace gd3d.framework {
          * Angle of the cone.
          * 圆锥的角度。
          */
-        get angle(): number;
-        set angle(v: number);
+        angle: number;
         /**
          * 圆锥体底部半径。
          */
-        get radius(): number;
-        set radius(v: number);
+        radius: number;
         /**
          * Length of the cone.
          *
          * 圆锥的长度（高度）。
          */
-        get length(): number;
-        set length(v: number);
+        length: number;
         /**
          * Circle arc angle.
          */
-        get arc(): number;
-        set arc(v: number);
+        arc: number;
         /**
          * The mode used for generating particles around the arc.
          * 在弧线周围产生粒子的模式。
          */
-        get arcMode(): ParticleSystemShapeMultiModeValue;
-        set arcMode(v: ParticleSystemShapeMultiModeValue);
+        arcMode: ParticleSystemShapeMultiModeValue;
         /**
          * Control the gap between emission points around the arc.
          * 控制弧线周围发射点之间的间隙。
          */
-        get arcSpread(): number;
-        set arcSpread(v: number);
+        arcSpread: number;
         /**
          * When using one of the animated modes, how quickly to move the emission position around the arc.
          * 当使用一个动画模式时，如何快速移动发射位置周围的弧。
          */
-        get arcSpeed(): MinMaxCurve;
-        set arcSpeed(v: MinMaxCurve);
+        arcSpeed: MinMaxCurve;
         /**
          * 粒子系统圆锥体发射类型。
          */
@@ -16844,29 +16602,25 @@ declare namespace gd3d.framework {
         /**
          * 边长的一半。
          */
-        get radius(): number;
-        set radius(v: number);
+        radius: number;
         /**
          * The mode used for generating particles around the radius.
          *
          * 在弧线周围产生粒子的模式。
          */
-        get radiusMode(): ParticleSystemShapeMultiModeValue;
-        set radiusMode(v: ParticleSystemShapeMultiModeValue);
+        radiusMode: ParticleSystemShapeMultiModeValue;
         /**
          * Control the gap between emission points around the radius.
          *
          * 控制弧线周围发射点之间的间隙。
          */
-        get radiusSpread(): number;
-        set radiusSpread(v: number);
+        radiusSpread: number;
         /**
          * When using one of the animated modes, how quickly to move the emission position around the radius.
          *
          * 当使用一个动画模式时，如何快速移动发射位置周围的弧。
          */
-        get radiusSpeed(): MinMaxCurve;
-        set radiusSpeed(v: MinMaxCurve);
+        radiusSpeed: MinMaxCurve;
         /**
          * 计算粒子的发射位置与方向
          *
@@ -16887,8 +16641,7 @@ declare namespace gd3d.framework {
         /**
          * 球体半径
          */
-        get radius(): number;
-        set radius(v: number);
+        radius: number;
         /**
          * 是否从球面发射
          */
@@ -17225,13 +16978,10 @@ declare namespace gd3d.framework {
         private static helpquat;
         private static helpv3;
         private static helpv3_1;
-        get isDisposed(): boolean;
-        get mass(): number;
-        set mass(value: number);
-        get friction(): number;
-        set friction(value: number);
-        get restitution(): number;
-        set restitution(value: number);
+        readonly isDisposed: boolean;
+        mass: number;
+        friction: number;
+        restitution: number;
         uniqueId: number;
         private _joints;
         /**
@@ -17265,20 +17015,18 @@ declare namespace gd3d.framework {
         /**
          * Gets the body that holds this impostor. Either its own, or its parent.
          */
-        get physicsBody(): any;
+        /**
+        * Set the physics body. Used mainly by the physics engine/plugin
+        */
+        physicsBody: any;
         /**
          * Get the parent of the physics imposter
          * @returns Physics imposter or null
          */
-        get parent(): PhysicsImpostor;
         /**
-         * Sets the parent of the physics imposter
-         */
-        set parent(value: PhysicsImpostor);
-        /**
-         * Set the physics body. Used mainly by the physics engine/plugin
-         */
-        set physicsBody(physicsBody: any);
+        * Sets the parent of the physics imposter
+        */
+        parent: PhysicsImpostor;
         resetUpdateFlags(): void;
         private _obb;
         private getObb;
@@ -17385,7 +17133,7 @@ declare namespace gd3d.framework {
         /**
          * result body is sleeping
          */
-        get isSleeping(): boolean;
+        readonly isSleeping: boolean;
         /**
          * Wake the body up.
          */
@@ -17481,9 +17229,8 @@ declare namespace gd3d.framework {
         private _physicsJoint;
         protected _physicsPlugin: IPhysicsEnginePlugin;
         constructor(type: number, jointData: PhysicsJointData);
-        get physicsJoint(): any;
-        set physicsJoint(newJoint: any);
-        set physicsPlugin(physicsPlugin: IPhysicsEnginePlugin);
+        physicsJoint: any;
+        physicsPlugin: IPhysicsEnginePlugin;
         /**
          * Execute a function that is physics-plugin specific.
          * @param {Function} func the function that will be executed.
@@ -17806,7 +17553,7 @@ declare namespace gd3d.framework {
          * 获取在场景中的可见状态
          * @version gd3d 1.0
          */
-        get visibleInScene(): boolean;
+        readonly visibleInScene: boolean;
         /**
          * @public
          * @language zh_CN
@@ -17814,16 +17561,15 @@ declare namespace gd3d.framework {
          * 获取自身的可见状态
          * @version gd3d 1.0
          */
-        get visible(): boolean;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置自身的可见状态
-         * @param val
-         * @version gd3d 1.0
-         */
-        set visible(val: boolean);
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 设置自身的可见状态
+        * @param val
+        * @version gd3d 1.0
+        */
+        visible: boolean;
         /**
          * @public
          * @language zh_CN
@@ -17967,14 +17713,14 @@ declare namespace gd3d.framework {
         private _lastM_IT;
         private _matrixWorld2Object;
         /** M 矩阵的逆矩阵 */
-        get matrixWorld2Object(): math.matrix;
+        readonly matrixWorld2Object: math.matrix;
         matrixModelViewProject: gd3d.math.matrix;
         private _matrixModelView;
-        get matrixModelView(): math.matrix;
+        readonly matrixModelView: math.matrix;
         private _matrixInverseModelView;
         private _lastMV_IT;
         /** MV 矩阵的逆转置矩阵 */
-        get matrixInverseModelView(): math.matrix;
+        readonly matrixInverseModelView: math.matrix;
         matrixViewProject: gd3d.math.matrix;
         floatTimer: number;
         intLightCount: number;
@@ -18157,16 +17903,15 @@ declare namespace gd3d.framework {
          * 获取当前主相机
          * @version gd3d 1.0
          */
-        get mainCamera(): camera;
         /**
-         * @public
-         * @language zh_CN
-         * @classdesc
-         * 设置当前主相机
-         * @param _camera 相机组件实例
-         * @version gd3d 1.0
-         */
-        set mainCamera(_camera: camera);
+        * @public
+        * @language zh_CN
+        * @classdesc
+        * 设置当前主相机
+        * @param _camera 相机组件实例
+        * @version gd3d 1.0
+        */
+        mainCamera: camera;
         renderContext: renderContext[];
         private renderLights;
         /**
@@ -18382,7 +18127,7 @@ declare namespace gd3d.threading {
     class thread {
         static workerInstance: Worker;
         private static instance;
-        static get Instance(): thread;
+        static readonly Instance: thread;
         private worker;
         private callID;
         private callMap;
@@ -18483,7 +18228,7 @@ declare namespace gd3d.framework {
         * @version gd3d 1.0
         * @platform Web,Native
         */
-        get center(): gd3d.math.vector3;
+        readonly center: gd3d.math.vector3;
         /**
         * @public
         * @language zh_CN
@@ -18612,7 +18357,7 @@ declare namespace gd3d.framework {
         * 包围盒世界空间下各个点坐标
         * @version gd3d 1.0
         */
-        get vectorsWorld(): math.vector3[];
+        readonly vectorsWorld: math.vector3[];
         /**
        * @public
        * @language zh_CN
@@ -18620,7 +18365,7 @@ declare namespace gd3d.framework {
        * 在世界空间的中心点
        * @version gd3d 1.0
        */
-        get worldCenter(): math.vector3;
+        readonly worldCenter: math.vector3;
         /**
         * @public
         * @language zh_CN
@@ -18628,7 +18373,7 @@ declare namespace gd3d.framework {
         * 包围盒在世界坐标中各轴向半长
         * @version gd3d 1.0
         */
-        get halfSizeWorld(): math.vector3;
+        readonly halfSizeWorld: math.vector3;
         /**
         * @public
         * @language zh_CN
@@ -18636,7 +18381,7 @@ declare namespace gd3d.framework {
         * x,y,z 轴方向
         * @version gd3d 1.0
         */
-        get directions(): math.vector3[];
+        readonly directions: math.vector3[];
         /**
         * @public
         * @language zh_CN
@@ -18741,8 +18486,7 @@ declare namespace gd3d.framework { /**
         * 包围盒大小
         * @version gd3d 1.0
         */
-        get size(): gd3d.math.vector2;
-        set size(size: gd3d.math.vector2);
+        size: gd3d.math.vector2;
         /**
         * @public
         * @language zh_CN
@@ -20055,179 +19799,179 @@ declare namespace gd3d.framework {
          * @type {!Object.<number, string>}
          */
         static readonly glValidEnumContexts: {
-            enable: {
+            'enable': {
                 0: boolean;
             };
-            disable: {
+            'disable': {
                 0: boolean;
             };
-            getParameter: {
+            'getParameter': {
                 0: boolean;
             };
-            drawArrays: {
+            'drawArrays': {
                 0: boolean;
             };
-            drawElements: {
+            'drawElements': {
                 0: boolean;
                 2: boolean;
             };
-            createShader: {
+            'createShader': {
                 0: boolean;
             };
-            getShaderParameter: {
+            'getShaderParameter': {
                 1: boolean;
             };
-            getProgramParameter: {
+            'getProgramParameter': {
                 1: boolean;
             };
-            getVertexAttrib: {
+            'getVertexAttrib': {
                 1: boolean;
             };
-            vertexAttribPointer: {
+            'vertexAttribPointer': {
                 2: boolean;
             };
-            bindTexture: {
+            'bindTexture': {
                 0: boolean;
             };
-            activeTexture: {
+            'activeTexture': {
                 0: boolean;
             };
-            getTexParameter: {
-                0: boolean;
-                1: boolean;
-            };
-            texParameterf: {
+            'getTexParameter': {
                 0: boolean;
                 1: boolean;
             };
-            texParameteri: {
+            'texParameterf': {
+                0: boolean;
+                1: boolean;
+            };
+            'texParameteri': {
                 0: boolean;
                 1: boolean;
                 2: boolean;
             };
-            texImage2D: {
+            'texImage2D': {
                 0: boolean;
                 2: boolean;
                 6: boolean;
                 7: boolean;
             };
-            texSubImage2D: {
+            'texSubImage2D': {
                 0: boolean;
                 6: boolean;
                 7: boolean;
             };
-            copyTexImage2D: {
+            'copyTexImage2D': {
                 0: boolean;
                 2: boolean;
             };
-            copyTexSubImage2D: {
+            'copyTexSubImage2D': {
                 0: boolean;
             };
-            generateMipmap: {
+            'generateMipmap': {
                 0: boolean;
             };
-            bindBuffer: {
+            'bindBuffer': {
                 0: boolean;
             };
-            bufferData: {
+            'bufferData': {
                 0: boolean;
                 2: boolean;
             };
-            bufferSubData: {
+            'bufferSubData': {
                 0: boolean;
             };
-            getBufferParameter: {
-                0: boolean;
-                1: boolean;
-            };
-            pixelStorei: {
+            'getBufferParameter': {
                 0: boolean;
                 1: boolean;
             };
-            readPixels: {
+            'pixelStorei': {
+                0: boolean;
+                1: boolean;
+            };
+            'readPixels': {
                 4: boolean;
                 5: boolean;
             };
-            bindRenderbuffer: {
+            'bindRenderbuffer': {
                 0: boolean;
             };
-            bindFramebuffer: {
+            'bindFramebuffer': {
                 0: boolean;
             };
-            checkFramebufferStatus: {
+            'checkFramebufferStatus': {
                 0: boolean;
             };
-            framebufferRenderbuffer: {
-                0: boolean;
-                1: boolean;
-                2: boolean;
-            };
-            framebufferTexture2D: {
+            'framebufferRenderbuffer': {
                 0: boolean;
                 1: boolean;
                 2: boolean;
             };
-            getFramebufferAttachmentParameter: {
+            'framebufferTexture2D': {
                 0: boolean;
                 1: boolean;
                 2: boolean;
             };
-            getRenderbufferParameter: {
-                0: boolean;
-                1: boolean;
-            };
-            renderbufferStorage: {
-                0: boolean;
-                1: boolean;
-            };
-            clear: {
-                0: boolean;
-            };
-            depthFunc: {
-                0: boolean;
-            };
-            blendFunc: {
-                0: boolean;
-                1: boolean;
-            };
-            blendFuncSeparate: {
-                0: boolean;
-                1: boolean;
-                2: boolean;
-                3: boolean;
-            };
-            blendEquation: {
-                0: boolean;
-            };
-            blendEquationSeparate: {
-                0: boolean;
-                1: boolean;
-            };
-            stencilFunc: {
-                0: boolean;
-            };
-            stencilFuncSeparate: {
-                0: boolean;
-                1: boolean;
-            };
-            stencilMaskSeparate: {
-                0: boolean;
-            };
-            stencilOp: {
+            'getFramebufferAttachmentParameter': {
                 0: boolean;
                 1: boolean;
                 2: boolean;
             };
-            stencilOpSeparate: {
+            'getRenderbufferParameter': {
+                0: boolean;
+                1: boolean;
+            };
+            'renderbufferStorage': {
+                0: boolean;
+                1: boolean;
+            };
+            'clear': {
+                0: boolean;
+            };
+            'depthFunc': {
+                0: boolean;
+            };
+            'blendFunc': {
+                0: boolean;
+                1: boolean;
+            };
+            'blendFuncSeparate': {
                 0: boolean;
                 1: boolean;
                 2: boolean;
                 3: boolean;
             };
-            cullFace: {
+            'blendEquation': {
                 0: boolean;
             };
-            frontFace: {
+            'blendEquationSeparate': {
+                0: boolean;
+                1: boolean;
+            };
+            'stencilFunc': {
+                0: boolean;
+            };
+            'stencilFuncSeparate': {
+                0: boolean;
+                1: boolean;
+            };
+            'stencilMaskSeparate': {
+                0: boolean;
+            };
+            'stencilOp': {
+                0: boolean;
+                1: boolean;
+                2: boolean;
+            };
+            'stencilOpSeparate': {
+                0: boolean;
+                1: boolean;
+                2: boolean;
+                3: boolean;
+            };
+            'cullFace': {
+                0: boolean;
+            };
+            'frontFace': {
                 0: boolean;
             };
         };
@@ -20368,7 +20112,7 @@ declare namespace gd3d.framework {
         /**
          * 关键点数量
          */
-        get numKeys(): number;
+        readonly numKeys: number;
         /**
          * 添加关键点
          *
@@ -21173,7 +20917,7 @@ declare namespace gd3d.math {
         * 获取1填充的v4
         * @version gd3d 1.0
         */
-        static get vector4_one(): vector4;
+        static readonly vector4_one: vector4;
         private static unused_vector4;
         /**
         * @public
@@ -21215,7 +20959,7 @@ declare namespace gd3d.math {
         * 获取1填充的color
         * @version gd3d 1.0
         */
-        static get color_one(): color;
+        static readonly color_one: color;
         private static unused_color;
         /**
         * @public
@@ -21257,7 +21001,7 @@ declare namespace gd3d.math {
         * 获取v3朝y轴正向
         * @version gd3d 1.0
         */
-        static get vector3_up(): vector3;
+        static readonly vector3_up: vector3;
         private static _vector3_right;
         /**
         * @public
@@ -21266,7 +21010,7 @@ declare namespace gd3d.math {
         * 获取v3朝x轴正向
         * @version gd3d 1.0
         */
-        static get vector3_right(): vector3;
+        static readonly vector3_right: vector3;
         private static _vector3_forward;
         /**
         * @public
@@ -21275,7 +21019,7 @@ declare namespace gd3d.math {
         * 获取v3朝z轴正向
         * @version gd3d 1.0
         */
-        static get vector3_forward(): vector3;
+        static readonly vector3_forward: vector3;
         private static _vector3_zero;
         /**
         * @public
@@ -21284,7 +21028,7 @@ declare namespace gd3d.math {
         * 获取0填充的v3
         * @version gd3d 1.0
         */
-        static get vector3_zero(): vector3;
+        static readonly vector3_zero: vector3;
         private static _vector3_one;
         /**
         * @public
@@ -21293,7 +21037,7 @@ declare namespace gd3d.math {
         * 获取1填充的v3
         * @version gd3d 1.0
         */
-        static get vector3_one(): vector3;
+        static readonly vector3_one: vector3;
         private static unused_vector3;
         /**
         * @public
@@ -21343,7 +21087,7 @@ declare namespace gd3d.math {
         * 获取v2 zero
         * @version gd3d 1.0
         */
-        static get vector2_zero(): vector2;
+        static readonly vector2_zero: vector2;
         private static _vector2_up;
         /**
         * @public
@@ -21352,7 +21096,7 @@ declare namespace gd3d.math {
         * 获取v2朝y轴正向
         * @version gd3d 1.0
         */
-        static get vector2_up(): vector2;
+        static readonly vector2_up: vector2;
         private static _vector2_right;
         /**
         * @public
@@ -21361,7 +21105,7 @@ declare namespace gd3d.math {
         * 获取v2朝x轴正向
         * @version gd3d 1.0
         */
-        static get vector2_right(): vector2;
+        static readonly vector2_right: vector2;
         private static unused_vector2;
         /**
         * @public
@@ -21724,7 +21468,7 @@ declare namespace gd3d.render {
      */
     class drawInfo {
         private static _ins;
-        static get ins(): drawInfo;
+        static readonly ins: drawInfo;
         triCount: number;
         vboCount: number;
         renderCount: number;
@@ -21887,7 +21631,7 @@ declare namespace gd3d.render {
             [id: string]: attribute;
         };
         private _strideInsAttrib;
-        get strideInsAttrib(): number;
+        readonly strideInsAttrib: number;
         initAttribute(webgl: WebGLRenderingContext): void;
         private tryGetLocation;
         vs: glShader;
@@ -21960,14 +21704,14 @@ declare namespace gd3d.render {
         constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);
         private webgl;
         private _width;
-        get width(): number;
+        readonly width: number;
         private _height;
-        get height(): number;
+        readonly height: number;
         private _data;
         private _grayData;
-        get data(): Uint8Array;
+        readonly data: Uint8Array;
         private _gray;
-        get gray(): boolean;
+        readonly gray: boolean;
         getPixel(u: number, v: number): any;
         /** 刷新data数据 */
         refresh(texRGBA: WebGLTexture): void;
