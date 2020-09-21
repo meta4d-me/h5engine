@@ -26,7 +26,15 @@ namespace gd3d.framework
     @reflect.node2DComponent
     export class button implements I2DComponent ,event.IUIEventer ,I2DPointListener
     {
-        static readonly ClassName:string="button";
+        static readonly ClassName : string = "button";
+
+        /** 开启 交互时 路径派发 */
+        static enablePathDispatch : boolean = false;
+
+        /**
+         * 按钮交互时 调用路径返回（需要 enablePathDispatch == true）
+         */
+        static onPath : ( path : string )=>any;
 
         private _transition: TransitionType = TransitionType.ColorTint;
         /**
@@ -240,6 +248,9 @@ namespace gd3d.framework
                         if(this.UIEventer.listenerCount(event.UIEventEnum[pd]) > 0){
                             ev.eated = true;
                             this.UIEventer.EmitEnum(pd,ev);
+                            if(button.enablePathDispatch && button.onPath){
+                                button.onPath(`${this.caclePath()}:[${event.UIEventEnum[pd]}]`);
+                            }
                         }
                         this.downPointV2.x = ev.x;
                         this.downPointV2.y = ev.y;
@@ -264,6 +275,9 @@ namespace gd3d.framework
                         if(this.UIEventer.listenerCount(event.UIEventEnum[pu]) > 0){
                             ev.eated = true;
                             this.UIEventer.EmitEnum(pu,ev);
+                            if(button.enablePathDispatch && button.onPath){
+                                button.onPath(`${this.caclePath()}:[${event.UIEventEnum[pu]}]`);
+                            }
                         }
                         
                         //this.onClick.excute();
@@ -271,6 +285,9 @@ namespace gd3d.framework
                         if(!this.isMovedLimit && this.UIEventer.listenerCount(event.UIEventEnum[pc]) > 0){
                             ev.eated = true;
                             this.UIEventer.EmitEnum(pc,ev);
+                            if(button.enablePathDispatch && button.onPath){
+                                button.onPath(`${this.caclePath()}:[${event.UIEventEnum[pc]}]`);
+                            }
                         }
                     }
                 }
@@ -399,6 +416,21 @@ namespace gd3d.framework
                 this._targetImage.sprite = sprite;
                 this._targetImage.transform.markDirty();
             }
+        }
+
+        /** 计算path */
+        private caclePath() : string{
+            if(!this.transform) return "";
+            let result : string = this.transform.name;
+            let currTran = this.transform;
+            let parent = currTran.parent;
+            while(parent){
+                result = `${parent.name}_${result}`;
+                currTran = parent;
+                parent = currTran.parent;
+            }
+
+            return result;
         }
     }
 }
