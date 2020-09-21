@@ -425,7 +425,7 @@ namespace gd3d.framework
             let currTran = this.transform;
             let parent = currTran.parent;
             while(parent){
-                result = `${parent.name}_${result}`;
+                result = `${parent.name}|${result}`;
                 currTran = parent;
                 parent = currTran.parent;
             }
