@@ -2316,6 +2316,12 @@ declare namespace gd3d.framework {
      */
     class button implements I2DComponent, event.IUIEventer, I2DPointListener {
         static readonly ClassName: string;
+        /** 开启 交互时 路径派发 */
+        static enablePathDispatch: boolean;
+        /**
+         * 按钮交互时 调用路径返回（需要 enablePathDispatch == true）
+         */
+        static onPath: (path: string) => any;
         private _transition;
         /**
          * @public
@@ -2436,6 +2442,8 @@ declare namespace gd3d.framework {
          * @private
          */
         private changeSprite;
+        /** 计算path */
+        private caclePath;
     }
 }
 declare namespace gd3d.framework {

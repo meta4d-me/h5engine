@@ -5710,6 +5710,7 @@ var gd3d;
                 this._downInThis = false;
                 this._dragOut = false;
             }
+            button_1 = button;
             Object.defineProperty(button.prototype, "transition", {
                 /**
                  * @public
@@ -5885,6 +5886,9 @@ var gd3d;
                             if (this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pd]) > 0) {
                                 ev.eated = true;
                                 this.UIEventer.EmitEnum(pd, ev);
+                                if (button_1.enablePathDispatch && button_1.onPath) {
+                                    button_1.onPath(this.caclePath() + ":[" + gd3d.event.UIEventEnum[pd] + "]");
+                                }
                             }
                             this.downPointV2.x = ev.x;
                             this.downPointV2.y = ev.y;
@@ -5906,12 +5910,18 @@ var gd3d;
                             if (this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pu]) > 0) {
                                 ev.eated = true;
                                 this.UIEventer.EmitEnum(pu, ev);
+                                if (button_1.enablePathDispatch && button_1.onPath) {
+                                    button_1.onPath(this.caclePath() + ":[" + gd3d.event.UIEventEnum[pu] + "]");
+                                }
                             }
                             //this.onClick.excute();
                             var pc = gd3d.event.UIEventEnum.PointerClick;
                             if (!this.isMovedLimit && this.UIEventer.listenerCount(gd3d.event.UIEventEnum[pc]) > 0) {
                                 ev.eated = true;
                                 this.UIEventer.EmitEnum(pc, ev);
+                                if (button_1.enablePathDispatch && button_1.onPath) {
+                                    button_1.onPath(this.caclePath() + ":[" + gd3d.event.UIEventEnum[pc] + "]");
+                                }
                             }
                         }
                     }
@@ -6009,7 +6019,24 @@ var gd3d;
                     this._targetImage.transform.markDirty();
                 }
             };
+            /** 计算path */
+            button.prototype.caclePath = function () {
+                if (!this.transform)
+                    return "";
+                var result = this.transform.name;
+                var currTran = this.transform;
+                var parent = currTran.parent;
+                while (parent) {
+                    result = parent.name + "|" + result;
+                    currTran = parent;
+                    parent = currTran.parent;
+                }
+                return result;
+            };
+            var button_1;
             button.ClassName = "button";
+            /** 开启 交互时 路径派发 */
+            button.enablePathDispatch = false;
             __decorate([
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number),
@@ -6045,7 +6072,7 @@ var gd3d;
                 __metadata("design:type", Number),
                 __metadata("design:paramtypes", [Number])
             ], button.prototype, "fadeDuration", null);
-            button = __decorate([
+            button = button_1 = __decorate([
                 gd3d.reflect.node2DComponent
             ], button);
             return button;
@@ -18035,7 +18062,9 @@ var gd3d;
                 switch (tType) {
                     case this.t_Normal:
                         var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat);
-                        t2d.uploadImage(img, _mipmap, _linear, _premultiplyAlpha, _repeat);
+                        if (img) {
+                            t2d.uploadImage(img, _mipmap, _linear, _premultiplyAlpha, _repeat);
+                        }
                         _texture.glTexture = t2d;
                         break;
                     case this.t_PVR:
