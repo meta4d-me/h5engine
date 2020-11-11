@@ -15506,13 +15506,13 @@ var gd3d;
                         else {
                             if (!assetMgr.mapBundleNamed[asset.bundle.guid][asset.getName()])
                                 assetMgr.mapBundleNamed[asset.bundle.guid][asset.getName()] = ref;
-                            else
-                                console.warn("\u8D44\u6E90\u547D\u540D\u51B2\u7A81:" + asset.getName());
+                            // else
+                            //     console.warn(`资源命名冲突:${asset.getName()}`);
                         }
                     }
                     else {
-                        if (assetMgr.mapNamed[asset.getName()])
-                            console.warn("\u8D44\u6E90\u547D\u540D\u51B2\u7A81:" + asset.getName());
+                        // if (assetMgr.mapNamed[asset.getName()])
+                        //     console.warn(`资源命名冲突:${asset.getName()}`);
                         assetMgr.mapNamed[asset.getName()] = asset;
                     }
                 }
