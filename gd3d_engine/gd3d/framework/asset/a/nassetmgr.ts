@@ -404,13 +404,13 @@ namespace gd3d.framework
                     {
                         if (!assetMgr.mapBundleNamed[asset.bundle.guid][asset.getName()])
                             assetMgr.mapBundleNamed[asset.bundle.guid][asset.getName()] = ref;
-                        else
-                            console.warn(`资源命名冲突:${asset.getName()}`);
+                        // else
+                        //     console.warn(`资源命名冲突:${asset.getName()}`);
                     }
                 } else
                 {
-                    if (assetMgr.mapNamed[asset.getName()])
-                        console.warn(`资源命名冲突:${asset.getName()}`);
+                    // if (assetMgr.mapNamed[asset.getName()])
+                    //     console.warn(`资源命名冲突:${asset.getName()}`);
                     assetMgr.mapNamed[asset.getName()] = asset;
                 }
             } else
