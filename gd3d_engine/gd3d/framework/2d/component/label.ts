@@ -13,6 +13,9 @@ namespace gd3d.framework
     @reflect.nodeRender
     export class label implements IRectRenderer
     {
+        /** 尝试 动态扩展 字体信息 函数接口 */
+        static onTryExpandTexts : (str : string)=> void;
+
         static readonly ClassName: string = "label";
         /**字段 用于快速判断实例是否是label */
         readonly isLabel = true; 
@@ -167,11 +170,32 @@ namespace gd3d.framework
         private indexarr = [];
         private remainarrx = [];
 
+        private lastStr : string = "";
+        /** 检查文字,是否需要 动态添加 */
+        private chackText(str : string){
+            let _font = this.font;
+            if(!_font || !str || str == this.lastStr) return;
+            let missingStr : string = "";
+            for (var i = 0 , len = this._text.length ; i < len; i++){
+                let c = this._text.charAt(i);
+                if(_font.cmap[c]) continue;
+                missingStr += c;
+            }
+
+            if(label.onTryExpandTexts) label.onTryExpandTexts(missingStr);
+
+            this.lastStr = str;
+        }
+
         /**
          * @private
          */
         updateData(_font: gd3d.framework.font)
         {
+            if(label.onTryExpandTexts){
+                this.chackText(this._text);
+            }
+
             this.dirtyData = false;
 
             var rate = this._fontsize / _font.pointSize;
@@ -193,7 +217,7 @@ namespace gd3d.framework
             tyadd += this._fontsize * this.linespace;
             let contrast_w = this.horizontalOverflow ? Number.MAX_VALUE : this.transform.width;
             let contrast_h = this.verticalOverflow ? Number.MAX_VALUE : this.transform.height;
-            for (var i = 0; i < this._text.length; i++)
+            for (var i = 0 , len = this._text.length ; i < len; i++)
             {
                 let c = this._text.charAt(i);
                 let isNewline = c == `\n`; //换行符
