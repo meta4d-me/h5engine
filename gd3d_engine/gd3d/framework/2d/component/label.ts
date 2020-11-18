@@ -1,7 +1,6 @@
 ﻿/// <reference path="../../../io/reflect.ts" />
 
-namespace gd3d.framework
-{
+namespace gd3d.framework {
     /**
      * @public
      * @language zh_CN
@@ -11,12 +10,14 @@ namespace gd3d.framework
      */
     @reflect.node2DComponent
     @reflect.nodeRender
-    export class label implements IRectRenderer
-    {
+    export class label implements IRectRenderer {
+
+        /** 尝试 动态扩展 字体信息 函数接口 */
+        static onTryExpandTexts: (str: string) => void;
         static readonly ClassName: string = "label";
         /**字段 用于快速判断实例是否是label */
         readonly isLabel = true;
-         
+
         private _text: string = "";
         /**
          * @public
@@ -26,12 +27,10 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("string")
-        get text(): string
-        {
+        get text(): string {
             return this._text;
         }
-        set text(text: string)
-        {
+        set text(text: string) {
             text = text == null ? "" : text;
             this._text = text;
             //设置缓存长度
@@ -39,12 +38,10 @@ namespace gd3d.framework
             this.dirtyData = true;
         }
 
-        private initdater()
-        {
+        private initdater() {
             var cachelen = 6 * 13 * this._text.length;
             this.datar.splice(0, this.datar.length);
-            while (this.datar.length < cachelen)
-            {   // {pos,color1,uv,color2}
+            while (this.datar.length < cachelen) {   // {pos,color1,uv,color2}
                 this.datar.push(
                     0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1,
                     0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
@@ -54,8 +51,7 @@ namespace gd3d.framework
                     0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
                 );
             }
-            while (this.datar.length < cachelen)
-            {
+            while (this.datar.length < cachelen) {
                 this.datar.pop();
             }
         }
@@ -68,26 +64,21 @@ namespace gd3d.framework
          * 字体
          * @version gd3d 1.0
          */
-        get font()
-        {
+        get font() {
             return this._font;
         }
-        set font(font: font)
-        {
+        set font(font: font) {
             if (font == this._font) return;
 
             this.needRefreshFont = true;
-            if (this._font)
-            {
+            if (this._font) {
                 this._font.unuse();
             }
             this._font = font;
-            if (font)
-            {
+            if (font) {
                 this._font.use();
                 this._fontName = this._font.getName();
-            } else
-            {
+            } else {
                 this._fontName = "";
             }
         }
@@ -104,12 +95,10 @@ namespace gd3d.framework
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("number")
-        get fontsize()
-        {
+        get fontsize() {
             return this._fontsize;
         }
-        set fontsize(size: number)
-        {
+        set fontsize(size: number) {
             this._fontsize = size;
         }
 
@@ -167,11 +156,31 @@ namespace gd3d.framework
         private indexarr = [];
         private remainarrx = [];
 
+        private lastStr: string = "";
+        /** 检查文字,是否需要 动态添加 */
+        private chackText(str: string) {
+            let _font = this.font;
+            if (!_font || !str || str == this.lastStr) return;
+            let missingStr: string = "";
+            for (var i = 0, len = this._text.length; i < len; i++) {
+                let c = this._text.charAt(i);
+                if (_font.cmap[c]) continue;
+                missingStr += c;
+            }
+
+            if (label.onTryExpandTexts) label.onTryExpandTexts(missingStr);
+
+            this.lastStr = str;
+        }
+
         /**
          * @private
          */
-        updateData(_font: gd3d.framework.font)
-        {
+        updateData(_font: gd3d.framework.font) {
+            if (label.onTryExpandTexts) {
+                this.chackText(this._text);
+            }
+
             this.dirtyData = false;
 
             var rate = this._fontsize / _font.pointSize;
@@ -193,23 +202,18 @@ namespace gd3d.framework
             tyadd += this._fontsize * this.linespace;
             let contrast_w = this.horizontalOverflow ? Number.MAX_VALUE : this.transform.width;
             let contrast_h = this.verticalOverflow ? Number.MAX_VALUE : this.transform.height;
-            for (var i = 0; i < this._text.length; i++)
-            {
+            for (var i = 0, len = this._text.length; i < len; i++) {
                 let c = this._text.charAt(i);
                 let isNewline = c == `\n`; //换行符
                 let cinfo = _font.cmap[c];
-                if (!isNewline && cinfo == undefined)
-                {
+                if (!isNewline && cinfo == undefined) {
                     continue;
                 }
-                if (isNewline || txadd + cinfo.xAddvance * rate > contrast_w)
-                {
-                    if (tyadd + this._fontsize * this.linespace > contrast_h)
-                    {
+                if (isNewline || txadd + cinfo.xAddvance * rate > contrast_w) {
+                    if (tyadd + this._fontsize * this.linespace > contrast_h) {
                         break;
                     }
-                    else
-                    {
+                    else {
                         this.indexarr.push(i);
                         this.remainarrx.push(this.transform.width - txadd);
                         txadd = 0;
@@ -225,36 +229,29 @@ namespace gd3d.framework
             var i = 0;
             var xadd = 0;
             var yadd = 0;
-            if (this.verticalType == VerticalType.Center)
-            {
+            if (this.verticalType == VerticalType.Center) {
                 yadd += remainy / 2;
             }
-            else if (this.verticalType == VerticalType.Boom)
-            {
+            else if (this.verticalType == VerticalType.Boom) {
                 yadd += remainy;
             }
 
             //清理缓存
             this.initdater();
-            for (var arri = 0; arri < this.indexarr.length; arri++)
-            {
+            for (var arri = 0; arri < this.indexarr.length; arri++) {
                 //一行
                 xadd = 0;
-                if (this.horizontalType == HorizontalType.Center)
-                {
+                if (this.horizontalType == HorizontalType.Center) {
                     xadd += this.remainarrx[arri] / 2;
                 }
-                else if (this.horizontalType == HorizontalType.Right)
-                {
+                else if (this.horizontalType == HorizontalType.Right) {
                     xadd += this.remainarrx[arri];
                 }
 
-                for (; i < this.indexarr[arri]; i++)
-                {
+                for (; i < this.indexarr[arri]; i++) {
                     let c = this._text.charAt(i);
                     let cinfo = _font.cmap[c];
-                    if (cinfo == undefined)
-                    {
+                    if (cinfo == undefined) {
                         continue;
                     }
 
@@ -309,8 +306,7 @@ namespace gd3d.framework
                     this.datar[i * 6 * 13 + 13 * 5 + 8] = v3;
 
                     //主color
-                    for (var j = 0; j < 6; j++)
-                    {
+                    for (var j = 0; j < 6; j++) {
                         this.datar[i * 6 * 13 + 13 * j + 3] = this.color.r;
                         this.datar[i * 6 * 13 + 13 * j + 4] = this.color.g;
                         this.datar[i * 6 * 13 + 13 * j + 5] = this.color.b;
@@ -465,8 +461,7 @@ namespace gd3d.framework
          * 设置rander Shader名字
          * @version gd3d 1.0
          */
-        setShaderByName(shaderName: string)
-        {
+        setShaderByName(shaderName: string) {
             this._CustomShaderName = shaderName;
         }
 
@@ -477,10 +472,8 @@ namespace gd3d.framework
          * 获取rander 的材质
          * @version gd3d 1.0
          */
-        getMaterial()
-        {
-            if (!this._uimat)
-            {
+        getMaterial() {
+            if (!this._uimat) {
                 return this.uimat;
             }
             return this._uimat;
@@ -495,10 +488,8 @@ namespace gd3d.framework
          * 获取渲染绘制矩形边界
          * @version gd3d 1.0
          */
-        getDrawBounds()
-        {
-            if (!this._darwRect)
-            {
+        getDrawBounds() {
+            if (!this._darwRect) {
                 this._darwRect = new math.rect();
                 this.calcDrawRect();
             }
@@ -510,34 +501,29 @@ namespace gd3d.framework
           * ui默认材质
           */
         private _uimat: material;
-        private get uimat()
-        {
+        private get uimat() {
             let assetmgr = this.transform.canvas.assetmgr;
             if (!assetmgr) return this._uimat;
 
             this.searchTexture();
 
-            if (this.font && this.font.texture)
-            {
+            if (this.font && this.font.texture) {
                 let pMask = this.transform.parentIsMask;
                 let mat = this._uimat;
                 let rectTag = "";
                 let uiTag = "_ui";
-                if (pMask)
-                {
+                if (pMask) {
                     //when parentIsMask,can't multiplexing material , can be multiplexing when parent equal
                     let rId = this.transform.maskRectId;
                     rectTag = `mask(${rId})`;
                 }
                 let matName = this.font.texture.getName() + uiTag + rectTag;
-                if (!mat || mat.getName() != matName)
-                {
+                if (!mat || mat.getName() != matName) {
                     if (mat) mat.unuse();
                     mat = assetmgr.getAssetByName(matName) as gd3d.framework.material;
                     if (mat) mat.use();
                 }
-                if (!mat)
-                {
+                if (!mat) {
                     mat = new material(matName);
                     let sh = assetmgr.getShader(this._CustomShaderName);
                     sh = sh ? sh : assetmgr.getShader(pMask ? label.defMaskUIShader : label.defUIShader);
@@ -556,45 +542,37 @@ namespace gd3d.framework
         /**
          * @private
          */
-        render(canvas: canvas)
-        {
+        render(canvas: canvas) {
             let mat = this.uimat;
             if (!mat) return;
 
             if (!this._font) return;
-            if (this.dirtyData == true)
-            {
+            if (this.dirtyData == true) {
                 this.updateData(this._font);
                 this.dirtyData = false;
             }
 
             let img;
-            if (this._font)
-            {
+            if (this._font) {
                 img = this._font.texture;
             }
 
-            if (img)
-            {
+            if (img) {
                 let needRMask = false;
-                if (this.needRefreshFont)
-                {
+                if (this.needRefreshFont) {
                     mat.setTexture("_MainTex", img);
                     this.needRefreshFont = false;
                     needRMask = true;
                 }
 
-                if (this.transform.parentIsMask)
-                {
+                if (this.transform.parentIsMask) {
                     if (this._cacheMaskV4 == null) this._cacheMaskV4 = new math.vector4();
                     let rect = this.transform.maskRect;
-                    if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h || needRMask)
-                    {
+                    if (this._cacheMaskV4.x != rect.x || this._cacheMaskV4.y != rect.y || this._cacheMaskV4.w != rect.w || this._cacheMaskV4.z != rect.h || needRMask) {
                         this._cacheMaskV4.x = rect.x; this._cacheMaskV4.y = rect.y; this._cacheMaskV4.z = rect.w; this._cacheMaskV4.w = rect.h;
                         mat.setVector4("_maskRect", this._cacheMaskV4);
                     }
-                }else
-                {
+                } else {
                     mat.setFloat("_outlineWidth", this.outlineWidth);
                 }
 
@@ -604,23 +582,19 @@ namespace gd3d.framework
         }
 
         //资源管理器中寻找 指定的贴图资源
-        private searchTexture()
-        {
+        private searchTexture() {
             if (this._font) return;
             let assetmgr: framework.assetMgr = this.transform.canvas.assetmgr;
             let resName = this._fontName;
             let abname = resName.replace(".font.json", ".assetbundle.json");
-            let temp = assetmgr.getAssetByName(resName, abname);            
-            if (!temp)
-            {
+            let temp = assetmgr.getAssetByName(resName, abname);
+            if (!temp) {
                 resName = `${this._fontName}.font.json`
                 temp = assetmgr.getAssetByName(resName, abname);
             }
-            if (temp != null)
-            {
+            if (temp != null) {
                 let tfont = assetmgr.getAssetByName(resName, abname) as gd3d.framework.font;
-                if (tfont)
-                {
+                if (tfont) {
                     this.font = tfont;
                     this.needRefreshFont = true;
                 }
@@ -632,8 +606,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        updateTran()
-        {
+        updateTran() {
             var m = this.transform.getWorldMatrix();
 
             var l = -this.transform.pivot.x * this.transform.width;
@@ -649,8 +622,7 @@ namespace gd3d.framework
         private min_y: number = Number.MAX_VALUE;
         private max_y: number = Number.MAX_VALUE * -1;
         /** 计算drawRect */
-        private calcDrawRect()
-        {
+        private calcDrawRect() {
             if (!this._darwRect) return;
             //drawBounds (y 轴反向)
             let canvas = this.transform.canvas;
@@ -681,21 +653,18 @@ namespace gd3d.framework
         /**
          * @private
          */
-        start()
-        {
+        start() {
 
         }
 
-        onPlay()
-        {
+        onPlay() {
 
         }
 
         /**
          * @private
          */
-        update(delta: number)
-        {
+        update(delta: number) {
 
         }
 
@@ -711,8 +680,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        remove()
-        {
+        remove() {
             if (this._font) this._font.unuse();
             if (this._uimat) this._uimat.unuse();
             this.indexarr.length = 0;
@@ -731,8 +699,7 @@ namespace gd3d.framework
      * 横向显示方式
      * @version gd3d 1.0
      */
-    export enum HorizontalType
-    {
+    export enum HorizontalType {
         Center,
         Left,
         Right
@@ -745,8 +712,7 @@ namespace gd3d.framework
      * 纵向显示方式
      * @version gd3d 1.0
      */
-    export enum VerticalType
-    {
+    export enum VerticalType {
         Center,
         Top,
         Boom
