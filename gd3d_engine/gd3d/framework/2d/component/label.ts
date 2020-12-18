@@ -14,8 +14,6 @@ namespace gd3d.framework {
 
         /** 尝试 动态扩展 字体信息 函数接口 */
         static onTryExpandTexts: (str: string) => void;
-        /** 尝试 动态扩展 字体信息 函数接口 */
-        static onTryExpandTexts : (str : string)=> void;
 
         static readonly ClassName: string = "label";
         /**字段 用于快速判断实例是否是label */
