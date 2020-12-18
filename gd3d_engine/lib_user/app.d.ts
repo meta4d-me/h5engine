@@ -113,7 +113,7 @@ declare namespace t {
 }
 declare class localSave {
     private static _instance;
-    static get Instance(): localSave;
+    static readonly Instance: localSave;
     localServerPath: string;
     stringToUtf8Array(str: string): number[];
     file_str2blob(string: string): Blob;
@@ -641,18 +641,22 @@ declare class test_GPU_instancing implements IState {
     private createCount;
     private instanceShBase;
     private mats;
-    private lookAtCameraTransArr;
+    private mrArr;
     private isInstancing;
-    private isStatic;
     private cubeRoot;
     private cam;
     private modelType;
     private subRange;
     start(app: gd3d.framework.application): Promise<void>;
+    private _batcher;
+    batcherSwitch(): void;
     refresh(): void;
+    private _isStatic;
+    isStatic: boolean;
     private _needUpdate;
-    get needUpdate(): boolean;
-    set needUpdate(v: boolean);
+    needUpdate: boolean;
+    private _needFillRenderer;
+    needFillRenderer: boolean;
     private loadedTest;
     loadTest(modelName: string): Promise<void>;
     createByNum(num: number): void;
@@ -664,6 +668,11 @@ declare class test_GPU_instancing implements IState {
     private getRandom;
     update(delta: number): void;
 }
+declare type batcherStrct = {
+    pass: gd3d.render.glDrawPass;
+    darr: gd3d.math.ExtenArray<Float32Array>;
+    renderers: gd3d.math.ReuseArray<gd3d.framework.IRendererGpuIns>;
+};
 declare class gpuInstanceMgr {
     private static SetedMap;
     static setToGupInstance(tran: gd3d.framework.transform, resUrl?: string, mats?: gd3d.framework.material[]): void;
@@ -710,8 +719,7 @@ declare class test_ParticleSystem implements IState {
     setGUI(): void;
     play(): void;
     stop(): void;
-    private get particleName();
-    private set particleName(value);
+    private particleName;
     private _particleName;
     private init;
     private _showParticle;
@@ -1138,8 +1146,8 @@ declare class Joystick {
     private touchRight;
     private mouseLeft;
     private mouseRight;
-    get leftTouching(): boolean;
-    get rightTouching(): boolean;
+    readonly leftTouching: boolean;
+    readonly rightTouching: boolean;
     private onMouseDown;
     private onMouseUp;
     private onMouseMove;
@@ -1517,9 +1525,9 @@ declare class test_multipleplayer_anim implements IState {
         [id: string]: gd3d.framework.transform;
     };
     resName: string;
-    get abName(): string;
-    get prefabName(): string;
-    get resPath(): string;
+    readonly abName: string;
+    readonly prefabName: string;
+    readonly resPath: string;
     start(app: gd3d.framework.application): void;
     camera: gd3d.framework.camera;
     cube: gd3d.framework.transform;
@@ -2420,12 +2428,10 @@ declare namespace gd3d.framework {
         private _lastDistance;
         private _panAngle;
         private _panRad;
-        set panAngle(value: number);
-        get panAngle(): number;
+        panAngle: number;
         private _tiltAngle;
         private _tiltRad;
-        set tiltAngle(value: number);
-        get tiltAngle(): number;
+        tiltAngle: number;
         onPlay(): void;
         start(): void;
         private cupTargetV3;
@@ -2498,8 +2504,7 @@ declare class DecalVertex {
 }
 declare class guideMask extends gd3d.framework.behaviour2d {
     private _holeRect;
-    get holeRect(): gd3d.math.rect;
-    set holeRect(val: gd3d.math.rect);
+    holeRect: gd3d.math.rect;
     template: gd3d.framework.transform2D;
     private inited;
     onPlay(): void;

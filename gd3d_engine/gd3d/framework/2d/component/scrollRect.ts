@@ -139,8 +139,6 @@ namespace gd3d.framework
                             let addtransY = lp.y - sp.y;
                             math.vec2Clone(this.strPos, this._content.localTranslate);
                             this.SlideTo(addtransX, addtransY);
-                            if (this.onMoveFun)
-                                this.onMoveFun(addtransX, addtransY);
                         }
                         if (this.inertia)
                         {
@@ -188,6 +186,9 @@ namespace gd3d.framework
             }
 
             ctrans.markDirty();
+
+            if (this.onMoveFun)
+                this.onMoveFun(addtransX, addtransY);
         }
 
         private readonly collectNum = 3; //控制采集精度
@@ -260,10 +261,16 @@ namespace gd3d.framework
             let tv2 = scrollRect.helpv2;
             math.vec2SLerp(this.lastfv, fv, this.cgCount / this.cgTime, tv2);
             this.SlideTo(tv2.x, tv2.y);
+
+            if(this.canfly==false)//惯性滑动 结束
+            {
+                if(this.onSlideEndFun)this.onSlideEndFun();
+            }
         }
         public onMoveFun: (x: number, y: number) => {};
         public onDownFun: (x: number, y: number) => {};
         public onUpFun: () => {};
+        public onSlideEndFun: () => {};//惯性滑动 结束
         remove()
         {
             this._content = null;

@@ -4186,14 +4186,16 @@ var test_Decal = (function () {
 }());
 var test_GPU_instancing = (function () {
     function test_GPU_instancing() {
-        this.createCount = 500;
+        this.createCount = 20000;
         this.mats = [];
-        this.lookAtCameraTransArr = [];
+        this.mrArr = [];
         this.isInstancing = true;
-        this.isStatic = true;
         this.modelType = "";
         this.subRange = 10;
+        this._batcher = false;
+        this._isStatic = true;
         this._needUpdate = true;
+        this._needFillRenderer = true;
         this.loadedTest = false;
         this.count = 0;
     }
@@ -4211,6 +4213,7 @@ var test_GPU_instancing = (function () {
                         return [4, datGui.init()];
                     case 3:
                         _a.sent();
+                        gd3d["hehe"] = true;
                         scene = this._scene = app.getScene();
                         this.cubeRoot = new gd3d.framework.transform();
                         this.cubeRoot.localTranslate.y = -5;
@@ -4239,19 +4242,44 @@ var test_GPU_instancing = (function () {
                         _dat.add(this, "modelType", ["", "bullet_11", "bullet_12"]);
                         _dat.add(this, 'isInstancing').listen();
                         _dat.add(this, 'instanceSwitch');
-                        _dat.add(this, 'isStatic');
-                        _dat.add(this, 'needUpdate');
+                        _dat.add(this, 'batcherSwitch');
+                        _dat.add(this, 'isStatic').listen();
+                        ;
+                        _dat.add(this, 'needUpdate').listen();
+                        ;
+                        _dat.add(this, 'needFillRenderer').listen();
+                        ;
                         _dat.add(this, 'createCount');
                         _dat.add(this, 'refresh');
                         gd3d.framework.transform.prototype["checkToTop"] = function () { };
-                        app.isFrustumCulling = false;
                         return [2];
                 }
             });
         });
     };
+    test_GPU_instancing.prototype.batcherSwitch = function () {
+        this._batcher = !this._batcher;
+        if (this._batcher) {
+            this.mrArr.forEach(function (mr) {
+                var tran = mr.gameObject.transform;
+                tran.needGpuInstancBatcher = true;
+            });
+            this.needFillRenderer = false;
+        }
+        else {
+            this.mrArr.forEach(function (mr) {
+                var tran = mr.gameObject.transform;
+                tran.needGpuInstancBatcher = true;
+            });
+            this.needFillRenderer = true;
+        }
+        this._scene.refreshGpuInstancBatcher();
+    };
     test_GPU_instancing.prototype.refresh = function () {
         this.cubeRoot.removeAllChild();
+        this.cubeRoot.gameObject.isStatic = this.isStatic;
+        this.mrArr.length = 0;
+        this.mats.length = 0;
         if (!this.modelType) {
             this.createByNum(this.createCount);
         }
@@ -4259,18 +4287,37 @@ var test_GPU_instancing = (function () {
             this.loadTest(this.modelType);
         }
     };
+    Object.defineProperty(test_GPU_instancing.prototype, "isStatic", {
+        get: function () { return this._isStatic; },
+        set: function (v) {
+            this._isStatic = v;
+            this.cubeRoot.gameObject.isStatic = v;
+        },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(test_GPU_instancing.prototype, "needUpdate", {
         get: function () { return this._needUpdate; },
         set: function (v) {
             this._needUpdate = v;
-            this.cubeRoot.gameObject.needUpdate = v;
+            this.cubeRoot.needUpdate = v;
+        },
+        enumerable: true,
+        configurable: true
+    });
+    Object.defineProperty(test_GPU_instancing.prototype, "needFillRenderer", {
+        get: function () { return this._needFillRenderer; },
+        set: function (v) {
+            this._needFillRenderer = v;
+            this.cubeRoot.needFillRenderer = v;
         },
         enumerable: true,
         configurable: true
     });
     test_GPU_instancing.prototype.loadTest = function (modelName) {
         return __awaiter(this, void 0, void 0, function () {
-            var url, m, count, range, i, tran;
+            var url, m, count, range, i, tran, mrs;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
@@ -4289,9 +4336,14 @@ var test_GPU_instancing = (function () {
                             tran = m.getCloneTrans();
                             this.cubeRoot.addChild(tran);
                             gd3d.math.vec3Set(tran.localTranslate, Math.random() * range, Math.random() * range, Math.random() * range);
+                            tran.localTranslate = tran.localTranslate;
                             if (this.isInstancing) {
                                 gpuInstanceMgr.setToGupInstance(tran, url, this.mats);
                             }
+                            mrs = tran.gameObject.getComponentsInChildren("meshRenderer");
+                            mrs.forEach(function (v) {
+                                _this.mrArr.push(v);
+                            });
                         }
                         return [2];
                 }
@@ -4321,7 +4373,7 @@ var test_GPU_instancing = (function () {
     };
     test_GPU_instancing.prototype.createOne = function (app, needInstance) {
         var obj = gd3d.framework.TransformUtil.CreatePrimitive(gd3d.framework.PrimitiveType.Cube, app);
-        obj.gameObject.isStatic = this.isStatic;
+        obj.gameObject.transform.enableCulling = false;
         obj.name = "cube_" + ++this.count;
         this.cubeRoot.addChild(obj);
         var range = this.subRange;
@@ -4332,6 +4384,7 @@ var test_GPU_instancing = (function () {
         mr.materials[0].enableGpuInstancing = needInstance;
         mr.materials[0].setVector4("a_particle_color", new gd3d.math.vector4(Math.random(), Math.random(), Math.random(), 1));
         this.mats.push(mr.materials[0]);
+        this.mrArr.push(mr);
     };
     test_GPU_instancing.prototype.lookAtCamera = function (trans) {
         if (!this.cam)

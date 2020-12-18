@@ -190,7 +190,9 @@ namespace gd3d.framework
             {
                 case this.t_Normal:
                     var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat);
-                    t2d.uploadImage(img, _mipmap, _linear, _premultiplyAlpha, _repeat);
+                    if(img){
+                        t2d.uploadImage(img, _mipmap, _linear, _premultiplyAlpha, _repeat);
+                    }
                     _texture.glTexture = t2d;
                     break;
                 case this.t_PVR:

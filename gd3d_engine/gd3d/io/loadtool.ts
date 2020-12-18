@@ -53,7 +53,8 @@
         {
             if (fun)
                 fun(null, new Error(`URL : ${url} \n onerr on req: `));
-            loadFail(req, url, fun, onprocess, responseType, loadedFun);
+            //因 onloadend 无论成功失败都会回调   这里的重试注掉 
+            // loadFail(req, url, fun, onprocess, responseType, loadedFun);
         };
         req.onloadend = () =>
         {
@@ -288,9 +289,9 @@
     export function loadImg(url: string, fun: (_tex: HTMLImageElement, _err?: Error, loadFail?: boolean) => void, onprocess: (curLength: number, totalLength: number) => void = null): void
     {
         // let guid = framework.resID.next();
-        framework.assetMgr.Instance["_loadImg"]( url, (img) =>
+        framework.assetMgr.Instance["_loadImg"](url, (img , err ) =>
         {
-            fun(img);
+            fun(img , err);
         });
         // gd3d.io.xhrLoad(url, fun, onprocess, "blob", (req) =>
         // {

@@ -270,7 +270,7 @@ namespace gd3d.framework
         // }
 
         /** 创建过的 aabb 缓存 ，避免每次重复构建  */
-        private static aabbStoreMap : {[key:number] : gd3d.math.vector3[]} = {};
+        private static aabbStoreMap: { [key: number]: gd3d.math.vector3[] } = {};
 
         private static readonly aabbCareTypes = ["meshFilter", "skinnedMeshRenderer", "canvasRenderer"];
         /**
@@ -293,62 +293,88 @@ namespace gd3d.framework
                 {
                     case meshFilter.ClassName:
                         var filter = this.gameObject.getComponent("meshFilter") as meshFilter;
-                        if (filter != null && filter.mesh != null && filter.mesh.data != null && filter.mesh.data.pos != null)
+
+                        if (filter != null && filter.mesh != null)
                         {
                             let m = filter.mesh;
-                            let id = m.getGUID();
-                            let min_max_v3 = transform.aabbStoreMap[id]; //优化 每次实例化都需构建
-                            if(min_max_v3){
-                                minimum = min_max_v3[0];
-                                maximum = min_max_v3[1];
-                            }else{
-                                var meshdata: gd3d.render.meshData = m.data;
-                                math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
-                                math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-                                let len = meshdata.pos.length;
-                                let pos = meshdata.pos;
-                                for (var i = 0; i < len ; i++)
+                            if (m.maximun && m.minimun)
+                            {
+                                //mesh上自带 min max
+                                minimum = m.minimun;
+                                maximum = m.maximun;
+                                matched = true;
+                            } else if (filter.mesh.data != null && filter.mesh.data.pos != null)
+                            {
+                                let id = m.getGUID();
+                                let min_max_v3 = transform.aabbStoreMap[id]; //优化 每次实例化都需构建
+                                if (min_max_v3)
                                 {
-                                    math.vec3Max(pos[i], maximum, maximum);
-                                    math.vec3Min(pos[i], minimum, minimum);
+                                    //取缓存数据
+                                    minimum = min_max_v3[0];
+                                    maximum = min_max_v3[1];
+                                } else
+                                {
+                                    //根据 mesh 顶点数据生成
+                                    var meshdata: gd3d.render.meshData = m.data;
+                                    math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                                    math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
+                                    let len = meshdata.pos.length;
+                                    let pos = meshdata.pos;
+                                    for (var i = 0; i < len; i++)
+                                    {
+                                        math.vec3Max(pos[i], maximum, maximum);
+                                        math.vec3Min(pos[i], minimum, minimum);
+                                    }
+
+                                    transform.aabbStoreMap[id] = [minimum, maximum];
                                 }
 
-                                transform.aabbStoreMap[id] = [minimum,maximum];
+                                matched = true;
                             }
 
-                            matched = true;
                         }
+
                         break;
                     case skinnedMeshRenderer.ClassName:
                         var skinmesh = this.gameObject.getComponent("skinnedMeshRenderer") as gd3d.framework.skinnedMeshRenderer;
-                        if (skinmesh != null && skinmesh.mesh != null && skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null)
+                        if (filter != null && filter.mesh != null)
                         {
                             let m = skinmesh.mesh;
-                            let id = m.getGUID();
-                            let min_max_v3 = transform.aabbStoreMap[id]; //优化 每次实例化都需构建
-                            if(min_max_v3){
-                                minimum = min_max_v3[0];
-                                maximum = min_max_v3[1];
-                            }else{
-                                // NOTE: 如果当前物体有骨骼动画, 则不会使用这里的aabb进行剔除
-                                var skinmeshdata: gd3d.render.meshData = skinmesh.mesh.data;
-                                math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
-                                math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
-    
-                                var p0 = gd3d.math.pool.new_vector3();
-    
-                                let len = skinmeshdata.pos.length;
-                                for (var i = 0; i < len; i++)
+                            if (m.maximun && m.minimun)
+                            {
+                                minimum = m.minimun;
+                                maximum = m.maximun;
+                                matched = true;
+                            } else if (skinmesh.mesh.data != null && skinmesh.mesh.data.pos != null)
+                            {
+                                let id = m.getGUID();
+                                let min_max_v3 = transform.aabbStoreMap[id]; //优化 每次实例化都需构建
+                                if (min_max_v3)
                                 {
-                                    skinmesh.calActualVertexByIndex(i, p0);
-                                    math.vec3Max(p0, maximum, maximum);
-                                    math.vec3Min(p0, minimum, minimum);
-                                }
-                                gd3d.math.pool.delete_vector3(p0);
+                                    minimum = min_max_v3[0];
+                                    maximum = min_max_v3[1];
+                                } else
+                                {
+                                    // NOTE: 如果当前物体有骨骼动画, 则不会使用这里的aabb进行剔除
+                                    var skinmeshdata: gd3d.render.meshData = skinmesh.mesh.data;
+                                    math.vec3SetByFloat(Number.MAX_VALUE, Number.MAX_VALUE, Number.MAX_VALUE, minimum);
+                                    math.vec3SetByFloat(-Number.MAX_VALUE, -Number.MAX_VALUE, -Number.MAX_VALUE, maximum);
 
-                                transform.aabbStoreMap[id] = [minimum,maximum];
+                                    var p0 = gd3d.math.pool.new_vector3();
+
+                                    let len = skinmeshdata.pos.length;
+                                    for (var i = 0; i < len; i++)
+                                    {
+                                        skinmesh.calActualVertexByIndex(i, p0);
+                                        math.vec3Max(p0, maximum, maximum);
+                                        math.vec3Min(p0, minimum, minimum);
+                                    }
+                                    gd3d.math.pool.delete_vector3(p0);
+
+                                    transform.aabbStoreMap[id] = [minimum, maximum];
+                                }
+                                matched = true;
                             }
-                            matched = true;
                         }
                         break;
                     case canvasRenderer.ClassName:
@@ -490,7 +516,7 @@ namespace gd3d.framework
         {
             if (index < 0)
                 return;
-            if(!node)
+            if (!node)
             {
                 console.error(`node is null?? ${this.name}`);
                 console.error(new Error().stack);
@@ -558,7 +584,7 @@ namespace gd3d.framework
             if (node._parent != this || this.children == null || this.children.length < 1)
             {
                 console.warn("not my child.");
-                return ;   
+                return;
             }
             var i = this.children.indexOf(node);
             if (i >= 0)
@@ -980,7 +1006,8 @@ namespace gd3d.framework
          */
         getWorldTranslate()
         {
-            if (!this.firstCalc && this.gameObject.isStatic){
+            if (!this.firstCalc && this.gameObject.isStatic)
+            {
                 return this.worldTranslate;
             }
             if (!this._parent || !this._parent._parent)

@@ -56,8 +56,12 @@ namespace gd3d.framework
             let _tex = assetMgr.mapImage[imgGuid] || assetMgr.mapLoading[imgGuid].data;
             let _texture =  new texture(filename);
             var _textureFormat = render.TextureFormatEnum.RGBA;//这里需要确定格式
-            var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat)
-            t2d.uploadImage(_tex, false, true, true, false);
+            var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat);
+            if(_tex){
+                t2d.uploadImage(_tex, false, true, true, false);
+            }else{
+                console.warn(`_tex load fail !`);
+            }
             _texture.glTexture = t2d;
             return _texture;
         }
