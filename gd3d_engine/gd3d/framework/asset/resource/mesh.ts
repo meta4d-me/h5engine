@@ -253,9 +253,11 @@ namespace gd3d.framework
                     var y = read.readSingle();
                     var z = read.readSingle();
                     var w = read.readSingle();
-                    tangent.x = x / w;
-                    tangent.y = y / w;
-                    tangent.z = z / w;
+                    tangent.x = x ;
+                    tangent.y = y ;
+                    tangent.z = z ;
+                    gd3d.math.vec3Normalize(tangent , tangent);
+                    gd3d.math.vec3ScaleByNum(tangent, w + 2 , tangent);
                     data.tangent.push(tangent);
                 }
             }
