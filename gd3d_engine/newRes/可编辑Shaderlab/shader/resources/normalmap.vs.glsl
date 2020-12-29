@@ -25,12 +25,16 @@ varying mediump vec2 xlv_TEXCOORD0;
 varying lowp mat3 TBNmat;
 varying lowp vec3 worldpos;
 
+//获取 tangent 的 W 值
+lowp float tangentW(lowp vec3 _tangent){
+	return sqrt(_tangent.x * _tangent.x + _tangent.y * _tangent.y + _tangent.z * _tangent.z) - 2.0;
+}
 
 lowp mat3 calBTNMatrix(lowp mat3 NormalMatToWorld,lowp vec3 _normal,lowp vec3 _tangent)
 {
     lowp vec3 normal=normalize(NormalMatToWorld*_normal);
     lowp vec3 tangent=normalize(NormalMatToWorld*_tangent);
-    lowp vec3 binormal=cross(normal,tangent);
+    lowp vec3 binormal=cross(normal,tangent) * tangentW(_tangent);
   	return (mat3(tangent,binormal,normal));
 
 }
