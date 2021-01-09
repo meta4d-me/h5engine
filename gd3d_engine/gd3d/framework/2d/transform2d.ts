@@ -1414,7 +1414,7 @@ namespace gd3d.framework {
                 this.layoutDirty = true;
 
             if (!this.layoutDirty) return;
-            let state = this._layoutState;
+            let state = this._layoutState | this._layoutPercentState;
             if (state != 0) {
                 if (state & layoutOption.LEFT) {
                     if (state & layoutOption.RIGHT) {
