@@ -92,7 +92,6 @@
             else if (mode == BlendModeEnum.Blend)
             {
                 this.state_blend = true;
-                this.state_zwrite = false;
                 this.state_blendEquation = webglkit.FUNC_ADD;
                 this.state_blendSrcRGB = webglkit.SRC_ALPHA;
                 this.state_blendDestRGB = webglkit.ONE_MINUS_SRC_ALPHA;
