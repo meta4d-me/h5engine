@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
@@ -178,7 +178,7 @@ var gd3d;
                     return this.webgl.canvas.width;
                     // return this.webgl.canvas.getBoundingClientRect().width;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(application.prototype, "height", {
@@ -193,7 +193,7 @@ var gd3d;
                     return this.webgl.canvas.height;
                     // return this.webgl.canvas.getBoundingClientRect().height;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(application.prototype, "timeScale", {
@@ -217,7 +217,7 @@ var gd3d;
                 set: function (val) {
                     this._timeScale = val;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(application.prototype, "targetFrame", {
@@ -244,40 +244,40 @@ var gd3d;
                     this._tar = val;
                     this._standDeltaTime = 1 / this._tar;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(application.prototype, "canvasFixHeight", {
                 set: function (val) {
                     this._fixHeight = val;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(application.prototype, "canvasFixWidth", {
                 set: function (val) {
                     this._fixWidth = val;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(application.prototype, "canvasClientWidth", {
                 get: function () {
                     return this._canvasClientWidth;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(application.prototype, "canvasClientHeight", {
                 get: function () {
                     return this._canvasClientHeight;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(application.prototype, "scaleFromPandding", {
                 get: function () { return this._scaleFromPandding; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -493,7 +493,7 @@ var gd3d;
             };
             Object.defineProperty(application.prototype, "frameID", {
                 get: function () { return this._frameID; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -606,7 +606,7 @@ var gd3d;
                 get: function () {
                     return this._deltaTime * this._timeScale;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -712,7 +712,7 @@ var gd3d;
                 set: function (value) {
                     this._bePause = value;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(application.prototype, "beStepForward", {
@@ -728,7 +728,7 @@ var gd3d;
                 set: function (value) {
                     this._beStepForward = value;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             application.prototype.updateUserCode = function (delta) {
@@ -810,7 +810,7 @@ var gd3d;
                  */
                 get: function () { return this._beRendering; },
                 set: function (val) { this._beRendering = val; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -1012,7 +1012,7 @@ var gd3d;
                         return "unknown";
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(DeviceInfo, "CanvasWidth", {
@@ -1027,7 +1027,7 @@ var gd3d;
                         return null;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(DeviceInfo, "CanvasHeight", {
@@ -1042,7 +1042,7 @@ var gd3d;
                         return null;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(DeviceInfo, "ScreenAdaptiveType", {
@@ -1057,7 +1057,7 @@ var gd3d;
                         return "unknown";
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(DeviceInfo, "ScreenWidth", {
@@ -1067,7 +1067,7 @@ var gd3d;
                 get: function () {
                     return window.screen.width * (window.devicePixelRatio || 1);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(DeviceInfo, "ScreenHeight", {
@@ -1077,7 +1077,7 @@ var gd3d;
                 get: function () {
                     return window.screen.height * (window.devicePixelRatio || 1);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             return DeviceInfo;
@@ -1102,7 +1102,7 @@ var gd3d;
                     }
                     return this._inc;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             DrawCallInfo.prototype.reset = function () {
@@ -1206,7 +1206,7 @@ var gd3d;
                         sceneMgr._ins = new sceneMgr();
                     return sceneMgr._ins;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             return sceneMgr;
@@ -2288,7 +2288,7 @@ var gd3d;
             Object.defineProperty(ExtenArray.prototype, "buffer", {
                 /** 定长数组 */
                 get: function () { return this._buffer; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -2304,7 +2304,7 @@ var gd3d;
                     }
                     this._buoy = val - 1;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -2352,7 +2352,7 @@ var gd3d;
                 /** 获取当前长度 */
                 get: function () { return this.buoy + 1; },
                 set: function (val) { this.buoy = val - 1; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -3278,7 +3278,7 @@ var gd3d;
                 set: function (layer) {
                     this.gameObject.layer = layer;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(canvasRenderer.prototype, "dontFrustumCulling", {
@@ -3305,7 +3305,7 @@ var gd3d;
                             this.gameObject.hideFlags ^= framework.HideFlags.DontFrustumCulling;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -4337,14 +4337,14 @@ var gd3d;
                         return;
                     this._canvas = val;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(transform2D.prototype, "parent", {
                 get: function () {
                     return this._parent;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(transform2D.prototype, "children", {
@@ -4361,7 +4361,7 @@ var gd3d;
                 set: function (children) {
                     this._children = children;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(transform2D.prototype, "visibleInScene", {
@@ -4380,7 +4380,7 @@ var gd3d;
                     }
                     return obj.visible;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(transform2D.prototype, "visible", {
@@ -4400,7 +4400,7 @@ var gd3d;
                         framework.sceneMgr.app.markNotify(this, framework.NotifyType.ChangeVisible);
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -4415,13 +4415,13 @@ var gd3d;
                 get: function () {
                     return this;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(transform2D.prototype, "maskRectId", {
                 /** 裁剪遮罩矩形 ID */
                 get: function () { return this._maskrectId; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(transform2D.prototype, "maskRect", {
@@ -4437,7 +4437,7 @@ var gd3d;
                     }
                     return this._temp_maskRect;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(transform2D.prototype, "isMask", {
@@ -4457,7 +4457,7 @@ var gd3d;
                     if (this._parent != null)
                         this.updateTran(true);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             transform2D.prototype.updateMaskRect = function () {
@@ -4519,7 +4519,7 @@ var gd3d;
                 get: function () {
                     return this._parentIsMask;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -4859,7 +4859,7 @@ var gd3d;
                 get: function () {
                     return this._beDispose;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -5263,7 +5263,7 @@ var gd3d;
                         this._layoutState = state;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             //private layoutValueMap : number[] = [];   // map structure {layoutOption : value}
@@ -5308,7 +5308,7 @@ var gd3d;
                         this._layoutPercentState = state;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             transform2D.prototype.refreshLayout = function () {
@@ -5320,7 +5320,7 @@ var gd3d;
                     this.layoutDirty = true;
                 if (!this.layoutDirty)
                     return;
-                var state = this._layoutState;
+                var state = this._layoutState | this._layoutPercentState;
                 if (state != 0) {
                     if (state & layoutOption.LEFT) {
                         if (state & layoutOption.RIGHT) {
@@ -5733,7 +5733,7 @@ var gd3d;
                         }
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(button.prototype, "targetImage", {
@@ -5766,7 +5766,7 @@ var gd3d;
                     }
                     this._targetImage = graphic;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(button.prototype, "pressedGraphic", {
@@ -5786,7 +5786,7 @@ var gd3d;
                         this._pressedSpriteName = sprite.getName();
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(button.prototype, "normalColor", {
@@ -5806,7 +5806,7 @@ var gd3d;
                         this._targetImage.color = color;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(button.prototype, "pressedColor", {
@@ -5823,7 +5823,7 @@ var gd3d;
                 set: function (color) {
                     this._pressedColor = color;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(button.prototype, "fadeDuration", {
@@ -5840,7 +5840,7 @@ var gd3d;
                 set: function (duration) {
                     this._fadeDuration = duration;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -6206,7 +6206,7 @@ var gd3d;
                     }
                     return this._uimat;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(image2D.prototype, "imageType", {
@@ -6226,7 +6226,7 @@ var gd3d;
                     if (this.transform != null)
                         this.transform.markDirty();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(image2D.prototype, "fillMethod", {
@@ -6246,7 +6246,7 @@ var gd3d;
                     if (this.transform != null)
                         this.transform.markDirty();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(image2D.prototype, "fillAmmount", {
@@ -6265,7 +6265,7 @@ var gd3d;
                     if (this.transform != null)
                         this.transform.markDirty();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(image2D.prototype, "sprite", {
@@ -6341,7 +6341,7 @@ var gd3d;
                         this._spriteName = "";
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(image2D.prototype, "imageBorder", {
@@ -6355,7 +6355,7 @@ var gd3d;
                 get: function () {
                     return this._imageBorder;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -7396,7 +7396,7 @@ var gd3d;
                 set: function (frameImg) {
                     this._frameImage = frameImg;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(inputField.prototype, "text", {
@@ -7410,7 +7410,7 @@ var gd3d;
                 get: function () {
                     return this._text;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(inputField.prototype, "characterLimit", {
@@ -7426,7 +7426,7 @@ var gd3d;
                     this._charlimit = parseInt("" + charlimit);
                     this._charlimit = isNaN(this._charlimit) || this._charlimit < 0 ? 0 : this._charlimit;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(inputField.prototype, "LineType", {
@@ -7441,7 +7441,7 @@ var gd3d;
                 set: function (lineType) {
                     this._lineType = lineType;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(inputField.prototype, "ContentType", {
@@ -7456,7 +7456,7 @@ var gd3d;
                 set: function (contentType) {
                     this._contentType = contentType;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(inputField.prototype, "TextLabel", {
@@ -7474,7 +7474,7 @@ var gd3d;
                     textLabel.text = this._text;
                     this._textLable = textLabel;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(inputField.prototype, "PlaceholderLabel", {
@@ -7493,7 +7493,7 @@ var gd3d;
                         placeholderLabel.text = "Enter Text...";
                     this._placeholderLabel = placeholderLabel;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -7800,6 +7800,7 @@ var gd3d;
             function label() {
                 /**字段 用于快速判断实例是否是label */
                 this.isLabel = true;
+                this._text = "";
                 this.needRefreshFont = false;
                 this._fontName = "defFont.font.json";
                 this._fontsize = 14;
@@ -7846,6 +7847,7 @@ var gd3d;
                 //计算数组
                 this.indexarr = [];
                 this.remainarrx = [];
+                this.lastStr = "";
                 this.data_begin = new gd3d.math.vector2(0, 0);
                 this.datar = [];
                 /**
@@ -7894,7 +7896,7 @@ var gd3d;
                     this.initdater();
                     this.dirtyData = true;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             label.prototype.initdater = function () {
@@ -7934,7 +7936,7 @@ var gd3d;
                         this._fontName = "";
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(label.prototype, "fontsize", {
@@ -7951,13 +7953,35 @@ var gd3d;
                 set: function (size) {
                     this._fontsize = size;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
+            /** 检查文字,是否需要 动态添加 */
+            label.prototype.chackText = function (str) {
+                var _font = this.font;
+                if (!_font || !str || str == this.lastStr)
+                    return;
+                var missingStr = "";
+                for (var i = 0, len = this._text.length; i < len; i++) {
+                    var c = this._text.charAt(i);
+                    if (_font.cmap[c])
+                        continue;
+                    missingStr += c;
+                }
+                if (label_1.onTryExpandTexts)
+                    label_1.onTryExpandTexts(missingStr);
+                this.lastStr = str;
+            };
             /**
              * @private
              */
             label.prototype.updateData = function (_font) {
+                if (label_1.onTryExpandTexts) {
+                    this.chackText(this._text);
+                }
+                if (label_1.onTryExpandTexts) {
+                    this.chackText(this._text);
+                }
                 this.dirtyData = false;
                 var rate = this._fontsize / _font.pointSize;
                 var m = this.transform.getWorldMatrix();
@@ -7976,7 +8000,7 @@ var gd3d;
                 tyadd += this._fontsize * this.linespace;
                 var contrast_w = this.horizontalOverflow ? Number.MAX_VALUE : this.transform.width;
                 var contrast_h = this.verticalOverflow ? Number.MAX_VALUE : this.transform.height;
-                for (var i = 0; i < this._text.length; i++) {
+                for (var i = 0, len = this._text.length; i < len; i++) {
                     var c = this._text.charAt(i);
                     var isNewline = c == "\n"; //换行符
                     var cinfo = _font.cmap[c];
@@ -8241,7 +8265,7 @@ var gd3d;
                     }
                     return this._uimat;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -8485,7 +8509,7 @@ var gd3d;
                     this._cutPanel = trans;
                     this.refreshBar();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(progressbar.prototype, "barBg", {
@@ -8499,7 +8523,7 @@ var gd3d;
                     this._barBg = img;
                     this.refreshBar();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(progressbar.prototype, "barOverImg", {
@@ -8513,7 +8537,7 @@ var gd3d;
                     this._barOverImg = img;
                     this.refreshBar();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(progressbar.prototype, "value", {
@@ -8530,7 +8554,7 @@ var gd3d;
                     this._cutPanel.width = this._value * this._barBg.transform.width;
                     this._cutPanel.markDirty();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -8664,7 +8688,7 @@ var gd3d;
                         this._image.use();
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -8740,7 +8764,7 @@ var gd3d;
                     }
                     return this._uimat;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             // /**
@@ -8998,7 +9022,7 @@ var gd3d;
                 set: function (content) {
                     this._content = content;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             scrollRect.prototype.start = function () {
@@ -10483,7 +10507,7 @@ var gd3d;
                         console.error("Physics not enabled. Please use scene.enable2DPhysics(...) before creating 2dPhysicsBody.");
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -10512,7 +10536,7 @@ var gd3d;
                         this.enableBT = false;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -10815,7 +10839,7 @@ var gd3d;
             Object.defineProperty(capsuleBody2d.prototype, "y_Axis", {
                 /** 胶囊体朝向为 Y 轴 */
                 get: function () { return this.transform.height > this.transform.width; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -10866,7 +10890,7 @@ var gd3d;
                 get: function () {
                     return (this.transform.width > this.transform.height ? this.transform.width : this.transform.height) * 0.5;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -11096,7 +11120,7 @@ var gd3d;
             }
             Object.defineProperty(physicEngine2D.prototype, "Matter", {
                 get: function () { return this._Matter; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -11474,7 +11498,7 @@ var gd3d;
                 set: function (val) {
                     this.matterEngine.enableSleeping = val;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             //-----------------body设置-------------------------
@@ -14810,7 +14834,7 @@ var gd3d;
                 get: function () {
                     return this.curtask / this.totaltask;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(stateLoad.prototype, "curByteLength", {
@@ -14832,7 +14856,7 @@ var gd3d;
                     result += this.compressTextLoaded + this.compressBinLoaded;
                     return result;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(stateLoad.prototype, "progress", {
@@ -14845,7 +14869,7 @@ var gd3d;
                 get: function () {
                     return this.curByteLength / this.totalByteLength;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             return stateLoad;
@@ -18317,7 +18341,7 @@ var gd3d;
                         return 0;
                     return this.frameCount / this.fps;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             animationClip.ClassName = "animationClip";
@@ -18670,7 +18694,7 @@ var gd3d;
                     this._texture = value;
                     this._texture.use();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -18922,7 +18946,7 @@ var gd3d;
                     if (this._texture)
                         this._texture.use();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -19221,7 +19245,7 @@ var gd3d;
                 set: function (value) {
                     this._scene = value;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -19253,7 +19277,7 @@ var gd3d;
                     }
                     return this._aabb;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -19382,14 +19406,14 @@ var gd3d;
                 set: function (physicsImp) {
                     this._physicsImpostor = physicsImp;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(transform.prototype, "parent", {
                 get: function () {
                     return this._parent;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -19672,7 +19696,7 @@ var gd3d;
                         this.dirtify(true);
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(transform.prototype, "localTranslate", {
@@ -19692,7 +19716,7 @@ var gd3d;
                         this.dirtify(true);
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(transform.prototype, "localPosition", {
@@ -19712,7 +19736,7 @@ var gd3d;
                         this.dirtify(true);
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(transform.prototype, "localScale", {
@@ -19732,7 +19756,7 @@ var gd3d;
                         this.dirtify(true);
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(transform.prototype, "localEulerAngles", {
@@ -19753,7 +19777,7 @@ var gd3d;
                         this.dirtify(true);
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -20062,7 +20086,7 @@ var gd3d;
                 get: function () {
                     return this._beDispose;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -20291,7 +20315,7 @@ var gd3d;
                     gd3d.math.matrixMakeIdentity(boxcollider_1._tempMatrix);
                     return boxcollider_1._tempMatrix;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             boxcollider.prototype.start = function () {
@@ -20332,7 +20356,7 @@ var gd3d;
                         this.subTran.gameObject.visible = this._colliderVisible;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -20542,7 +20566,7 @@ var gd3d;
                         this.subTran.gameObject.visible = this._colliderVisible;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -20671,7 +20695,7 @@ var gd3d;
                         this._mesh.use();
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -20907,7 +20931,7 @@ var gd3d;
                 set: function (layer) {
                     this.gameObject.layer = layer;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(meshRenderer.prototype, "queue", {
@@ -20925,7 +20949,7 @@ var gd3d;
                     this._queue = value;
                     this.issetq = true;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(meshRenderer.prototype, "filter", {
@@ -20939,7 +20963,7 @@ var gd3d;
                     return this._filter;
                 },
                 set: function (val) { this._filter = val; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             meshRenderer.prototype.start = function () {
@@ -21237,7 +21261,7 @@ var gd3d;
                 set: function (layer) {
                     this.gameObject.layer = layer;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(skinnedMeshRenderer.prototype, "queue", {
@@ -21254,7 +21278,7 @@ var gd3d;
                     this._queue = value;
                     this.issetq = true;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(skinnedMeshRenderer.prototype, "player", {
@@ -21270,7 +21294,7 @@ var gd3d;
                 set: function (p) {
                     this._player = p;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(skinnedMeshRenderer.prototype, "mesh", {
@@ -21292,7 +21316,7 @@ var gd3d;
                         this._mesh.use();
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(skinnedMeshRenderer.prototype, "aabb", {
@@ -21325,7 +21349,7 @@ var gd3d;
                     }
                     return this._aabb;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             skinnedMeshRenderer.prototype.start = function () {
@@ -21809,7 +21833,7 @@ var gd3d;
                  * @version gd3d 1.0
                  */
                 get: function () { return this._wrapMode; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(keyFrameAniClip.prototype, "fps", {
@@ -21822,7 +21846,7 @@ var gd3d;
                 get: function () {
                     return this.frameRate;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(keyFrameAniClip.prototype, "time", {
@@ -21836,7 +21860,7 @@ var gd3d;
                 get: function () {
                     return this.length;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(keyFrameAniClip.prototype, "frameCount", {
@@ -21848,14 +21872,14 @@ var gd3d;
                  * @version gd3d 1.0
                  */
                 get: function () { return Math.floor(this.frameRate * this.length); },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(keyFrameAniClip.prototype, "interpolation", {
                 get: function () {
                     return this._interpolation;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             keyFrameAniClip.ClassName = "keyFrameAniClip";
@@ -21892,7 +21916,7 @@ var gd3d;
                         kFAniClipUtil._typePair = kFAniClipUtil.regType();
                     return kFAniClipUtil._typePair;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             kFAniClipUtil.isUnityExp = function (tag) {
@@ -22045,7 +22069,7 @@ var gd3d;
                         this.refreshGpuInstancingGUID();
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -22986,9 +23010,11 @@ var gd3d;
                         var y = read.readSingle();
                         var z = read.readSingle();
                         var w = read.readSingle();
-                        tangent.x = x / w;
-                        tangent.y = y / w;
-                        tangent.z = z / w;
+                        tangent.x = x;
+                        tangent.y = y;
+                        tangent.z = z;
+                        gd3d.math.vec3Normalize(tangent, tangent);
+                        gd3d.math.vec3ScaleByNum(tangent, w + 2, tangent);
                         data.tangent.push(tangent);
                     }
                 }
@@ -24735,7 +24761,7 @@ var gd3d;
                     this._texture = value;
                     this._texture.use();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(sprite.prototype, "urange", {
@@ -24754,7 +24780,7 @@ var gd3d;
                     }
                     return this._urange;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(sprite.prototype, "vrange", {
@@ -24773,7 +24799,7 @@ var gd3d;
                     }
                     return this._vrange;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             sprite.ClassName = "sprite";
@@ -25008,7 +25034,7 @@ var gd3d;
                 set: function (name) {
                     this._realName = name;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             texture.ClassName = "texture";
@@ -25188,7 +25214,7 @@ var gd3d;
                     val = val <= 0 ? 0 : val;
                     this.gainNode.gain.value = val;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -25263,7 +25289,7 @@ var gd3d;
                 get: function () {
                     return this._playFrameid;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(aniplayer.prototype, "currentAniclipName", {
@@ -25275,14 +25301,14 @@ var gd3d;
                         return null;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(aniplayer.prototype, "currentAniclip", {
                 get: function () {
                     return this._playClip;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(aniplayer.prototype, "playCount", {
@@ -25290,7 +25316,7 @@ var gd3d;
                  * 动画循环播放次数
                  */
                 get: function () { return this._playCount; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             aniplayer.prototype.init = function () {
@@ -26702,7 +26728,7 @@ var gd3d;
                 set: function (val) {
                     this.audioChannel == null ? 0 : this.audioChannel.volume = val;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -26862,7 +26888,7 @@ var gd3d;
                         return;
                     this.material.setFloat("_bloomThreshold", this._bloomThreshold);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -26882,7 +26908,7 @@ var gd3d;
                     //this.material.setFloat("_bloomIntensity", this._bloomIntensity);
                     this.material_3.setFloat("_bloomIntensity", this._bloomIntensity);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -26910,7 +26936,7 @@ var gd3d;
                     //gd3d.math.pool.delete_vector4(v4_1);
                     //gd3d.math.pool.delete_vector4(v4_2);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -27294,7 +27320,7 @@ var gd3d;
                     this._near = val;
                     this.projectMatrixDirty = true;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(camera.prototype, "far", {
@@ -27321,7 +27347,7 @@ var gd3d;
                     this._far = val;
                     this.projectMatrixDirty = true;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(camera.prototype, "CurrContextIndex", {
@@ -27330,7 +27356,7 @@ var gd3d;
                  * 当前RenderContext 的 Index
                  */
                 get: function () { return this._contextIdx; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -27728,7 +27754,7 @@ var gd3d;
                     this._fov = val;
                     this.projectMatrixDirty = true;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(camera.prototype, "size", {
@@ -27746,7 +27772,7 @@ var gd3d;
                     this._size = val;
                     this.projectMatrixDirty = true;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(camera.prototype, "opvalue", {
@@ -27769,7 +27795,7 @@ var gd3d;
                     this._opvalue = val;
                     this.projectMatrixDirty = true;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -28198,7 +28224,7 @@ var gd3d;
                     if (this._overlay2d && this._overlay2d.canvas)
                         return this._overlay2d.canvas;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             canvascontainer.prototype.setOverLay = function (lay) {
@@ -28217,7 +28243,7 @@ var gd3d;
                     if (this._overlay2d)
                         this._overlay2d.sortOrder = order;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             canvascontainer.prototype.canvasInit = function () {
@@ -28245,7 +28271,7 @@ var gd3d;
                     this._renderMode = mode;
                     this.styleToMode();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             canvascontainer.prototype.styleToMode = function () {
@@ -28386,7 +28412,7 @@ var gd3d;
                 set: function (layer) {
                     this.gameObject.layer = layer;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(effectSystem.prototype, "jsonData", {
@@ -28398,7 +28424,7 @@ var gd3d;
                     //this.setJsonData(this._textasset);
                     this.setJsonDataStr(this.jsonData.content);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -28444,7 +28470,7 @@ var gd3d;
                 set: function (value) {
                     this._data = value;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -28462,7 +28488,7 @@ var gd3d;
                 get: function () {
                     return this.data.life * effectSystem_1.fps;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             effectSystem.prototype.start = function () {
@@ -29027,7 +29053,7 @@ var gd3d;
                     else
                         return 9999999999;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             var effectSystem_1;
@@ -29939,7 +29965,7 @@ var gd3d;
                 set: function (layer) {
                     this.gameObject.layer = layer;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -29967,7 +29993,7 @@ var gd3d;
                 set: function (value) {
                     this._data = value;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -29985,7 +30011,7 @@ var gd3d;
                 get: function () {
                     return this.data.life * framework.effectSystem.fps;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             TestEffectSystem.prototype.start = function () {
@@ -30279,7 +30305,7 @@ var gd3d;
                     else
                         return 9999999999;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             TestEffectSystem.ClassName = "TestEffectSystem";
@@ -30343,7 +30369,7 @@ var gd3d;
                 set: function (layer) {
                     this.gameObject.layer = layer;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(f4skinnedMeshRenderer.prototype, "queue", {
@@ -30360,7 +30386,7 @@ var gd3d;
                     this._queue = value;
                     this.issetq = true;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(f4skinnedMeshRenderer.prototype, "mesh", {
@@ -30382,7 +30408,7 @@ var gd3d;
                         this._mesh.use();
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(f4skinnedMeshRenderer.prototype, "aabb", {
@@ -30415,7 +30441,7 @@ var gd3d;
                     }
                     return this._aabb;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             f4skinnedMeshRenderer.prototype.start = function () {
@@ -30756,7 +30782,7 @@ var gd3d;
                         this._pathasset.use();
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -30946,42 +30972,42 @@ var gd3d;
                         return 0;
                     return Math.floor(this._nowClip.fps * this.nowTime);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
             Object.defineProperty(keyFrameAniPlayer.prototype, "currClipName", {
                 /** 获得当前片段的名字 */
                 get: function () { return this._currClipName; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(keyFrameAniPlayer.prototype, "speed", {
                 /** 播放速度 */
                 get: function () { return this._speed; },
                 set: function (v) { this._speed = v; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(keyFrameAniPlayer.prototype, "animateOnlyIfVisible", {
                 /** 动画是否仅仅可显示时 有效播放 */
                 get: function () { return this._animateOnlyIfVisible; },
                 set: function (v) { this._animateOnlyIfVisible = v; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(keyFrameAniPlayer.prototype, "cullingType", {
                 /** 动画的剔除类型 */
                 get: function () { return this._cullingType; },
                 set: function (v) { this._cullingType = v; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(keyFrameAniPlayer.prototype, "localBounds", {
                 /** 动画的剔除类型 */
                 get: function () { return this._localBounds; },
                 set: function (v) { this._localBounds = v; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             keyFrameAniPlayer.prototype.start = function () {
@@ -32198,7 +32224,7 @@ var gd3d;
                     gd3d.math.matrixTransformVector3(this._worldCenter, this.gameObject.transform.getWorldMatrix(), this._worldCenter);
                     return this._worldCenter;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -32224,7 +32250,7 @@ var gd3d;
                         return this.gameObject.transform.getWorldMatrix();
                     return new gd3d.math.matrix();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             spherecollider.prototype.start = function () {
@@ -32277,7 +32303,7 @@ var gd3d;
                         this.subTran.gameObject.visible = this._colliderVisible;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -32504,7 +32530,7 @@ var gd3d;
                 set: function (layer) {
                     this.gameObject.layer = layer;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -32611,7 +32637,7 @@ var gd3d;
                     this._material = material;
                     this.layer = this.material.getLayer();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(trailRender.prototype, "color", {
@@ -32638,7 +32664,7 @@ var gd3d;
                 set: function (color) {
                     this._color = color;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -32890,7 +32916,7 @@ var gd3d;
                 set: function (layer) {
                     this.gameObject.layer = layer;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(trailRender_recorde.prototype, "material", {
@@ -32910,7 +32936,7 @@ var gd3d;
                     this._material = material;
                     this.layer = this._material.getLayer();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(trailRender_recorde.prototype, "startColor", {
@@ -32923,7 +32949,7 @@ var gd3d;
                 set: function (color) {
                     this._startColor = color;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(trailRender_recorde.prototype, "endColor", {
@@ -32936,7 +32962,7 @@ var gd3d;
                 set: function (color) {
                     this._endColor = color;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             trailRender_recorde.prototype.setWidth = function (startWidth, endWidth) {
@@ -33335,7 +33361,7 @@ var gd3d;
                 set: function (layer) {
                     this.gameObject.layer = layer;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             f14EffectSystem.prototype.start = function () {
@@ -33360,7 +33386,7 @@ var gd3d;
                     this._f14eff = asset;
                     this.setData(asset.data, this.bundleName);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(f14EffectSystem.prototype, "delay", {
@@ -33374,7 +33400,7 @@ var gd3d;
                 set: function (deley) {
                     this._delayTime = deley;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             f14EffectSystem.prototype.setData = function (data, bundleName) {
@@ -33410,7 +33436,7 @@ var gd3d;
                     // }
                     return this._root || this.gameObject.transform;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             f14EffectSystem.prototype.update = function (deltaTime) {
@@ -33508,7 +33534,7 @@ var gd3d;
                         return gd3d.framework.sceneMgr.app.getScene().mainCamera;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             f14EffectSystem.prototype.render = function (context, assetmgr, camera, Effqueue) {
@@ -35951,14 +35977,14 @@ var gd3d;
                 set: function (layer) {
                     this.gameObject.layer = layer;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(LineRenderer.prototype, "transform", {
                 get: function () {
                     return this.gameObject && this.gameObject.transform;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(LineRenderer.prototype, "widthCurve", {
@@ -35970,7 +35996,7 @@ var gd3d;
                 get: function () {
                     return this.lineWidth.curve;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(LineRenderer.prototype, "widthMultiplier", {
@@ -35985,7 +36011,7 @@ var gd3d;
                 set: function (v) {
                     this.lineWidth.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(LineRenderer.prototype, "colorGradient", {
@@ -35997,7 +36023,7 @@ var gd3d;
                 get: function () {
                     return this.lineColor.gradient;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(LineRenderer.prototype, "endColor", {
@@ -36023,7 +36049,7 @@ var gd3d;
                     color.g = v.g;
                     color.b = v.b;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(LineRenderer.prototype, "endWidth", {
@@ -36038,7 +36064,7 @@ var gd3d;
                 set: function (v) {
                     this.widthCurve.keys[this.widthCurve.keys.length - 1].value = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(LineRenderer.prototype, "positionCount", {
@@ -36053,7 +36079,7 @@ var gd3d;
                 set: function (v) {
                     this.positions.length = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(LineRenderer.prototype, "startColor", {
@@ -36079,7 +36105,7 @@ var gd3d;
                     color.g = v.g;
                     color.b = v.b;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(LineRenderer.prototype, "startWidth", {
@@ -36094,7 +36120,7 @@ var gd3d;
                 set: function (v) {
                     this.widthCurve.keys[0].value = v / this.widthMultiplier;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             LineRenderer.prototype.render = function (context, assetmgr, camera) {
@@ -36632,14 +36658,14 @@ var gd3d;
                 set: function (layer) {
                     this.gameObject.layer = layer;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(TrailRenderer.prototype, "transform", {
                 get: function () {
                     return this.gameObject && this.gameObject.transform;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(TrailRenderer.prototype, "widthCurve", {
@@ -36654,7 +36680,7 @@ var gd3d;
                 set: function (v) {
                     this.lineWidth.curve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(TrailRenderer.prototype, "widthMultiplier", {
@@ -36669,7 +36695,7 @@ var gd3d;
                 set: function (v) {
                     this.lineWidth.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(TrailRenderer.prototype, "colorGradient", {
@@ -36684,7 +36710,7 @@ var gd3d;
                 set: function (v) {
                     this.lineColor.gradient = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(TrailRenderer.prototype, "endColor", {
@@ -36710,7 +36736,7 @@ var gd3d;
                     color.g = v.g;
                     color.b = v.b;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(TrailRenderer.prototype, "endWidth", {
@@ -36725,7 +36751,7 @@ var gd3d;
                 set: function (v) {
                     this.widthCurve.keys[this.widthCurve.keys.length - 1].value = v / this.widthMultiplier;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(TrailRenderer.prototype, "positionCount", {
@@ -36740,7 +36766,7 @@ var gd3d;
                 set: function (v) {
                     this.positions.length = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(TrailRenderer.prototype, "startColor", {
@@ -36766,7 +36792,7 @@ var gd3d;
                     color.g = v.g;
                     color.b = v.b;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(TrailRenderer.prototype, "startWidth", {
@@ -36781,7 +36807,7 @@ var gd3d;
                 set: function (v) {
                     this.widthCurve.keys[0].value = v / this.widthMultiplier;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(TrailRenderer.prototype, "trailRendererData", {
@@ -36798,7 +36824,7 @@ var gd3d;
                     }
                     this._trailRendererData = data;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             TrailRenderer.prototype.render = function (context, assetmgr, camera) {
@@ -37054,7 +37080,7 @@ var gd3d;
                     }
                     TrailRendererData_1._datas[v] = this;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -37659,19 +37685,19 @@ var gd3d;
             }
             Object.defineProperty(inputMgr.prototype, "wheel", {
                 get: function () { return this._wheel; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
             Object.defineProperty(inputMgr.prototype, "point", {
                 get: function () { return this._point; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
             Object.defineProperty(inputMgr.prototype, "touches", {
                 get: function () { return this._touches; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -38409,7 +38435,7 @@ var gd3d;
                 get: function () {
                     return this.w_offset;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             binTool.prototype.writeInt8 = function (num) {
@@ -38554,7 +38580,7 @@ var gd3d;
                         this.instnace = new memoryPool();
                     return memoryPool.instnace;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -40384,7 +40410,7 @@ var gd3d;
                 set: function (value) {
                     this.seek(value);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             binReader.prototype.readBoolean = function () {
@@ -40572,7 +40598,7 @@ var gd3d;
                 get: function () {
                     return this._seek;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             binWriter.prototype.writeByte = function (num) {
@@ -41009,7 +41035,7 @@ var gd3d;
                         p[i] = p[i + 256] = v0;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             return Noise;
@@ -43022,7 +43048,7 @@ var gd3d;
                  * 导航网格Json数据
                  */
                 get: function () { return this._navmeshJson; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -43187,7 +43213,7 @@ var gd3d;
                         NavMeshLoadManager._instance = new NavMeshLoadManager();
                     return NavMeshLoadManager._instance;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             NavMeshLoadManager.prototype.moveToPoints = function (startPos, endPos) {
@@ -44617,7 +44643,7 @@ var gd3d;
                     this._totalVertexCount = val;
                     this.resizeVboSize(this._totalVertexCount * this.vertexSize);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(EffectBatcher.prototype, "indexStartIndex", {
@@ -44635,7 +44661,7 @@ var gd3d;
                         this.dataForEbo = new Uint16Array(this._indexStartIndex);
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -45066,7 +45092,7 @@ var gd3d;
                 set: function (_pos) {
                     gd3d.math.vec3Clone(_pos, this._position);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "direction", {
@@ -45076,7 +45102,7 @@ var gd3d;
                 set: function (_dir) {
                     gd3d.math.vec3Clone(_dir, this._direction);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "width", {
@@ -45086,7 +45112,7 @@ var gd3d;
                 set: function (_w) {
                     this._width = _w;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "height", {
@@ -45096,7 +45122,7 @@ var gd3d;
                 set: function (_h) {
                     this._height = _h;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "radius", {
@@ -45106,7 +45132,7 @@ var gd3d;
                 set: function (_r) {
                     this._radius = _r;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "angle", {
@@ -45116,7 +45142,7 @@ var gd3d;
                 set: function (_a) {
                     this._angle = _a;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "randomDirection", {
@@ -45138,7 +45164,7 @@ var gd3d;
                             return this.direction;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "boxDirection", {
@@ -45149,7 +45175,7 @@ var gd3d;
                     gd3d.math.vec3Normalize(this.position, this.direction);
                     return this.direction;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "sphereDirection", {
@@ -45163,7 +45189,7 @@ var gd3d;
                     gd3d.math.vec3ScaleByNum(this.direction, radius, this.position);
                     return this.direction;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "hemisphereDirection", {
@@ -45177,7 +45203,7 @@ var gd3d;
                     gd3d.math.vec3ScaleByNum(this.direction, radius, this.position);
                     return this.direction;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "coneDirection", {
@@ -45203,7 +45229,7 @@ var gd3d;
                     this.direction.y = Math.cos(this.angle * Math.PI / 180);
                     return this.direction;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "circleDirection", {
@@ -45220,7 +45246,7 @@ var gd3d;
                     this.getposition(this.direction, length);
                     return this.direction;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleStartData.prototype, "edgeDirection", {
@@ -45233,7 +45259,7 @@ var gd3d;
                     this.getposition(edgePos, length);
                     return this.direction;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ParticleStartData.prototype.getposition = function (dir, length) {
@@ -45293,7 +45319,7 @@ var gd3d;
                     this._value = _v;
                     this.isRandom = false;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ValueData.prototype, "valueLimitMin", {
@@ -45301,7 +45327,7 @@ var gd3d;
                     this._valueLimitMin = _v;
                     this.isRandom = true;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ValueData.prototype, "valueLimitMax", {
@@ -45309,7 +45335,7 @@ var gd3d;
                     this._valueLimitMax = _v;
                     this.isRandom = true;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ValueData.prototype.clone = function () {
@@ -46267,7 +46293,7 @@ var gd3d;
                         return gd3d.framework.sceneMgr.app.getScene().mainCamera;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             EffectElementEmission.prototype.render = function (context, assetmgr, camera) {
@@ -46625,7 +46651,7 @@ var gd3d;
                 set: function (value) {
                     this._beizerPoints = value;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(Curve3.prototype, "bezierPointNum", {
@@ -46635,7 +46661,7 @@ var gd3d;
                 set: function (value) {
                     this._bezierPointNum = value;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -49268,14 +49294,14 @@ var gd3d;
                 set: function (layer) {
                     this.gameObject.layer = layer;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "transform", {
                 get: function () {
                     return this.gameObject && this.gameObject.transform;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "isPlaying", {
@@ -49287,7 +49313,7 @@ var gd3d;
                 get: function () {
                     return this._isPlaying;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "isStopped", {
@@ -49299,7 +49325,7 @@ var gd3d;
                 get: function () {
                     return !this._isPlaying && this.time == 0;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "isPaused", {
@@ -49311,7 +49337,7 @@ var gd3d;
                 get: function () {
                     return !this._isPlaying && this.time != 0;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "particleCount", {
@@ -49323,7 +49349,7 @@ var gd3d;
                 get: function () {
                     return this._activeParticles.length;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "main", {
@@ -49333,7 +49359,7 @@ var gd3d;
                     v.particleSystem = this;
                     this._main = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "emission", {
@@ -49343,7 +49369,7 @@ var gd3d;
                     v.particleSystem = this;
                     this._emission = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "shape", {
@@ -49353,7 +49379,7 @@ var gd3d;
                     v.particleSystem = this;
                     this._shape = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "velocityOverLifetime", {
@@ -49363,7 +49389,7 @@ var gd3d;
                     v.particleSystem = this;
                     this._velocityOverLifetime = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "limitVelocityOverLifetime", {
@@ -49373,7 +49399,7 @@ var gd3d;
                     v.particleSystem = this;
                     this._limitVelocityOverLifetime = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "inheritVelocity", {
@@ -49388,7 +49414,7 @@ var gd3d;
                     v.particleSystem = this;
                     this._inheritVelocity = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "forceOverLifetime", {
@@ -49398,7 +49424,7 @@ var gd3d;
                     v.particleSystem = this;
                     this._forceOverLifetime = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "colorOverLifetime", {
@@ -49408,7 +49434,7 @@ var gd3d;
                     v.particleSystem = this;
                     this._colorOverLifetime = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "colorBySpeed", {
@@ -49421,7 +49447,7 @@ var gd3d;
                     v.particleSystem = this;
                     this._colorBySpeed = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "sizeOverLifetime", {
@@ -49431,7 +49457,7 @@ var gd3d;
                     v.particleSystem = this;
                     this._sizeOverLifetime = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "sizeBySpeed", {
@@ -49444,7 +49470,7 @@ var gd3d;
                     v.particleSystem = this;
                     this._sizeBySpeed = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "rotationOverLifetime", {
@@ -49454,7 +49480,7 @@ var gd3d;
                     v.particleSystem = this;
                     this._rotationOverLifetime = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "rotationBySpeed", {
@@ -49467,7 +49493,7 @@ var gd3d;
                     v.particleSystem = this;
                     this._rotationBySpeed = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "noise", {
@@ -49480,7 +49506,7 @@ var gd3d;
                     v.particleSystem = this;
                     this._noise = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "textureSheetAnimation", {
@@ -49493,7 +49519,7 @@ var gd3d;
                     v.particleSystem = this;
                     this._textureSheetAnimation = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "mesh", {
@@ -49523,12 +49549,12 @@ var gd3d;
                         this._mesh.use();
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "single", {
                 get: function () { return true; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystem.prototype, "particleSystemData", {
@@ -49545,7 +49571,7 @@ var gd3d;
                     }
                     this._particleSystemData = data;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -49798,7 +49824,7 @@ var gd3d;
                 get: function () {
                     return (this._realTime % this.main.duration) / this.main.duration;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -50217,7 +50243,7 @@ var gd3d;
                     }
                     ParticleSystemData_1._datas[v] = this;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -50983,7 +51009,7 @@ var gd3d;
                 set: function (v) {
                     this.rateOverTime.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleEmissionModule.prototype, "rateOverDistanceMultiplier", {
@@ -51000,7 +51026,7 @@ var gd3d;
                 set: function (v) {
                     this.rateOverDistance.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleEmissionModule.prototype, "burstCount", {
@@ -51012,7 +51038,7 @@ var gd3d;
                 get: function () {
                     return this.bursts.length;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -51096,7 +51122,7 @@ var gd3d;
                 set: function (v) {
                     this.force.xCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleForceOverLifetimeModule.prototype, "xMultiplier", {
@@ -51111,7 +51137,7 @@ var gd3d;
                 set: function (v) {
                     this.x.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleForceOverLifetimeModule.prototype, "y", {
@@ -51126,7 +51152,7 @@ var gd3d;
                 set: function (v) {
                     this.force.yCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleForceOverLifetimeModule.prototype, "yMultiplier", {
@@ -51141,7 +51167,7 @@ var gd3d;
                 set: function (v) {
                     this.y.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleForceOverLifetimeModule.prototype, "z", {
@@ -51156,7 +51182,7 @@ var gd3d;
                 set: function (v) {
                     this.force.zCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleForceOverLifetimeModule.prototype, "zMultiplier", {
@@ -51171,7 +51197,7 @@ var gd3d;
                 set: function (v) {
                     this.z.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -51239,7 +51265,7 @@ var gd3d;
                 set: function (v) {
                     this.multiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleInheritVelocityModule.prototype, "curveMultiplier", {
@@ -51254,7 +51280,7 @@ var gd3d;
                 set: function (v) {
                     this.multiplier.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -51355,7 +51381,7 @@ var gd3d;
                 set: function (v) {
                     this.limit.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleLimitVelocityOverLifetimeModule.prototype, "limitX", {
@@ -51370,7 +51396,7 @@ var gd3d;
                 set: function (v) {
                     this.limit3D.xCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleLimitVelocityOverLifetimeModule.prototype, "limitXMultiplier", {
@@ -51385,7 +51411,7 @@ var gd3d;
                 set: function (v) {
                     this.limit3D.xCurve.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleLimitVelocityOverLifetimeModule.prototype, "limitY", {
@@ -51400,7 +51426,7 @@ var gd3d;
                 set: function (v) {
                     this.limit3D.yCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleLimitVelocityOverLifetimeModule.prototype, "limitYMultiplier", {
@@ -51415,7 +51441,7 @@ var gd3d;
                 set: function (v) {
                     this.limit3D.yCurve.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleLimitVelocityOverLifetimeModule.prototype, "limitZ", {
@@ -51430,7 +51456,7 @@ var gd3d;
                 set: function (v) {
                     this.limit3D.zCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleLimitVelocityOverLifetimeModule.prototype, "limitZMultiplier", {
@@ -51445,7 +51471,7 @@ var gd3d;
                 set: function (v) {
                     this.limit3D.zCurve.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -51627,7 +51653,7 @@ var gd3d;
                 get: function () {
                     return this.startDelay.curveMultiplier;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startLifetimeMultiplier", {
@@ -51644,7 +51670,7 @@ var gd3d;
                 set: function (v) {
                     this.startLifetime.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startSpeedMultiplier", {
@@ -51661,7 +51687,7 @@ var gd3d;
                 set: function (v) {
                     this.startSpeed.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startSize", {
@@ -51676,7 +51702,7 @@ var gd3d;
                 set: function (v) {
                     this.startSize3D.xCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startSizeMultiplier", {
@@ -51693,7 +51719,7 @@ var gd3d;
                 set: function (v) {
                     this.startSize.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startSizeX", {
@@ -51708,7 +51734,7 @@ var gd3d;
                 set: function (v) {
                     this.startSize3D.xCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startSizeXMultiplier", {
@@ -51725,7 +51751,7 @@ var gd3d;
                 set: function (v) {
                     this.startSizeX.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startSizeY", {
@@ -51740,7 +51766,7 @@ var gd3d;
                 set: function (v) {
                     this.startSize3D.yCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startSizeYMultiplier", {
@@ -51757,7 +51783,7 @@ var gd3d;
                 set: function (v) {
                     this.startSizeY.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startSizeZ", {
@@ -51772,7 +51798,7 @@ var gd3d;
                 set: function (v) {
                     this.startSize3D.zCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startSizeZMultiplier", {
@@ -51789,7 +51815,7 @@ var gd3d;
                 set: function (v) {
                     this.startSizeZ.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startRotation", {
@@ -51803,7 +51829,7 @@ var gd3d;
                 set: function (v) {
                     this.startRotation3D.zCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startRotationMultiplier", {
@@ -51820,7 +51846,7 @@ var gd3d;
                 set: function (v) {
                     this.startRotation.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startRotationX", {
@@ -51835,7 +51861,7 @@ var gd3d;
                 set: function (v) {
                     this.startRotation3D.xCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startRotationXMultiplier", {
@@ -51852,7 +51878,7 @@ var gd3d;
                 set: function (v) {
                     this.startRotationX.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startRotationY", {
@@ -51867,7 +51893,7 @@ var gd3d;
                 set: function (v) {
                     this.startRotation3D.yCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startRotationYMultiplier", {
@@ -51884,7 +51910,7 @@ var gd3d;
                 set: function (v) {
                     this.startRotationY.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startRotationZ", {
@@ -51899,7 +51925,7 @@ var gd3d;
                 set: function (v) {
                     this.startRotation3D.zCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "startRotationZMultiplier", {
@@ -51916,7 +51942,7 @@ var gd3d;
                 set: function (v) {
                     this.startRotationZ.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleMainModule.prototype, "simulationSpace", {
@@ -51936,7 +51962,7 @@ var gd3d;
                         this.particleSystem._simulationSpaceChanged();
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -52099,7 +52125,7 @@ var gd3d;
                 set: function (v) {
                     this.strength3D.xCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleNoiseModule.prototype, "strengthX", {
@@ -52114,7 +52140,7 @@ var gd3d;
                 set: function (v) {
                     this.strength3D.xCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleNoiseModule.prototype, "strengthY", {
@@ -52129,7 +52155,7 @@ var gd3d;
                 set: function (v) {
                     this.strength3D.yCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleNoiseModule.prototype, "strengthZ", {
@@ -52144,7 +52170,7 @@ var gd3d;
                 set: function (v) {
                     this.strength3D.zCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleNoiseModule.prototype, "remap", {
@@ -52159,7 +52185,7 @@ var gd3d;
                 set: function (v) {
                     this.remap3D.xCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleNoiseModule.prototype, "remapX", {
@@ -52174,7 +52200,7 @@ var gd3d;
                 set: function (v) {
                     this.remap3D.xCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleNoiseModule.prototype, "remapY", {
@@ -52189,7 +52215,7 @@ var gd3d;
                 set: function (v) {
                     this.remap3D.yCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleNoiseModule.prototype, "remapZ", {
@@ -52204,7 +52230,7 @@ var gd3d;
                 set: function (v) {
                     this.remap3D.zCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -52432,7 +52458,7 @@ var gd3d;
                 set: function (v) {
                     this.angularVelocity.xCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleRotationBySpeedModule.prototype, "xMultiplier", {
@@ -52447,7 +52473,7 @@ var gd3d;
                 set: function (v) {
                     this.x.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleRotationBySpeedModule.prototype, "y", {
@@ -52462,7 +52488,7 @@ var gd3d;
                 set: function (v) {
                     this.angularVelocity.yCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleRotationBySpeedModule.prototype, "yMultiplier", {
@@ -52477,7 +52503,7 @@ var gd3d;
                 set: function (v) {
                     this.y.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleRotationBySpeedModule.prototype, "z", {
@@ -52492,7 +52518,7 @@ var gd3d;
                 set: function (v) {
                     this.angularVelocity.zCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleRotationBySpeedModule.prototype, "zMultiplier", {
@@ -52507,7 +52533,7 @@ var gd3d;
                 set: function (v) {
                     this.z.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -52588,7 +52614,7 @@ var gd3d;
                 set: function (v) {
                     this.angularVelocity.xCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleRotationOverLifetimeModule.prototype, "xMultiplier", {
@@ -52603,7 +52629,7 @@ var gd3d;
                 set: function (v) {
                     this.x.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleRotationOverLifetimeModule.prototype, "y", {
@@ -52618,7 +52644,7 @@ var gd3d;
                 set: function (v) {
                     this.angularVelocity.yCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleRotationOverLifetimeModule.prototype, "yMultiplier", {
@@ -52633,7 +52659,7 @@ var gd3d;
                 set: function (v) {
                     this.y.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleRotationOverLifetimeModule.prototype, "z", {
@@ -52648,7 +52674,7 @@ var gd3d;
                 set: function (v) {
                     this.angularVelocity.zCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleRotationOverLifetimeModule.prototype, "zMultiplier", {
@@ -52663,7 +52689,7 @@ var gd3d;
                 set: function (v) {
                     this.z.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -52857,7 +52883,7 @@ var gd3d;
                     this._shapeType = v;
                     this._onShapeTypeChanged();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleShapeModule.prototype, "shape", {
@@ -52874,7 +52900,7 @@ var gd3d;
                     this._shape = v;
                     this._onShapeChanged();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleShapeModule.prototype, "arcSpeedMultiplier", {
@@ -52889,7 +52915,7 @@ var gd3d;
                 set: function (v) {
                     this.arcSpeed.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleShapeModule.prototype, "radiusSpeedMultiplier", {
@@ -52904,7 +52930,7 @@ var gd3d;
                 set: function (v) {
                     this.radiusSpeed.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -53199,7 +53225,7 @@ var gd3d;
                 set: function (v) {
                     this.size3D.xCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSizeBySpeedModule.prototype, "sizeMultiplier", {
@@ -53214,7 +53240,7 @@ var gd3d;
                 set: function (v) {
                     this.size.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSizeBySpeedModule.prototype, "x", {
@@ -53229,7 +53255,7 @@ var gd3d;
                 set: function (v) {
                     this.size3D.xCurve;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSizeBySpeedModule.prototype, "xMultiplier", {
@@ -53244,7 +53270,7 @@ var gd3d;
                 set: function (v) {
                     this.x.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSizeBySpeedModule.prototype, "y", {
@@ -53259,7 +53285,7 @@ var gd3d;
                 set: function (v) {
                     this.size3D.yCurve;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSizeBySpeedModule.prototype, "yMultiplier", {
@@ -53274,7 +53300,7 @@ var gd3d;
                 set: function (v) {
                     this.y.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSizeBySpeedModule.prototype, "z", {
@@ -53289,7 +53315,7 @@ var gd3d;
                 set: function (v) {
                     this.size3D.zCurve;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSizeBySpeedModule.prototype, "zMultiplier", {
@@ -53304,7 +53330,7 @@ var gd3d;
                 set: function (v) {
                     this.z.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -53376,7 +53402,7 @@ var gd3d;
                 set: function (v) {
                     this.size3D.xCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "sizeMultiplier", {
@@ -53391,7 +53417,7 @@ var gd3d;
                 set: function (v) {
                     this.size.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "x", {
@@ -53406,7 +53432,7 @@ var gd3d;
                 set: function (v) {
                     this.size3D.xCurve;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "xMultiplier", {
@@ -53421,7 +53447,7 @@ var gd3d;
                 set: function (v) {
                     this.x.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "y", {
@@ -53436,7 +53462,7 @@ var gd3d;
                 set: function (v) {
                     this.size3D.yCurve;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "yMultiplier", {
@@ -53451,7 +53477,7 @@ var gd3d;
                 set: function (v) {
                     this.y.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "z", {
@@ -53466,7 +53492,7 @@ var gd3d;
                 set: function (v) {
                     this.size3D.zCurve;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSizeOverLifetimeModule.prototype, "zMultiplier", {
@@ -53481,7 +53507,7 @@ var gd3d;
                 set: function (v) {
                     this.z.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -53588,7 +53614,7 @@ var gd3d;
                 set: function (v) {
                     this._rowIndex = gd3d.math.floatClamp(v, 0, this.tiles.y - 1);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleTextureSheetAnimationModule.prototype, "flipU", {
@@ -53603,7 +53629,7 @@ var gd3d;
                 set: function (v) {
                     this.flipUV.x = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleTextureSheetAnimationModule.prototype, "flipV", {
@@ -53618,7 +53644,7 @@ var gd3d;
                 set: function (v) {
                     this.flipUV.y = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleTextureSheetAnimationModule.prototype, "frameOverTimeMultiplier", {
@@ -53633,7 +53659,7 @@ var gd3d;
                 set: function (v) {
                     this.frameOverTime.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleTextureSheetAnimationModule.prototype, "numTilesX", {
@@ -53648,7 +53674,7 @@ var gd3d;
                 set: function (v) {
                     this.tiles.x = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleTextureSheetAnimationModule.prototype, "numTilesY", {
@@ -53663,7 +53689,7 @@ var gd3d;
                 set: function (v) {
                     this.tiles.y = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleTextureSheetAnimationModule.prototype, "startFrameMultiplier", {
@@ -53678,7 +53704,7 @@ var gd3d;
                 set: function (v) {
                     this.startFrame.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -53774,7 +53800,7 @@ var gd3d;
                 set: function (v) {
                     this.velocity.xCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleVelocityOverLifetimeModule.prototype, "xMultiplier", {
@@ -53789,7 +53815,7 @@ var gd3d;
                 set: function (v) {
                     this.x.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleVelocityOverLifetimeModule.prototype, "y", {
@@ -53804,7 +53830,7 @@ var gd3d;
                 set: function (v) {
                     this.velocity.yCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleVelocityOverLifetimeModule.prototype, "yMultiplier", {
@@ -53819,7 +53845,7 @@ var gd3d;
                 set: function (v) {
                     this.y.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleVelocityOverLifetimeModule.prototype, "z", {
@@ -53834,7 +53860,7 @@ var gd3d;
                 set: function (v) {
                     this.velocity.zCurve = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleVelocityOverLifetimeModule.prototype, "zMultiplier", {
@@ -53849,7 +53875,7 @@ var gd3d;
                 set: function (v) {
                     this.z.curveMultiplier = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -53927,7 +53953,7 @@ var gd3d;
                 set: function (v) {
                     this.count.constantMin = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleEmissionBurst.prototype, "maxCount", {
@@ -53942,7 +53968,7 @@ var gd3d;
                 set: function (v) {
                     this.count.constantMax = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleEmissionBurst.prototype, "isProbability", {
@@ -53952,7 +53978,7 @@ var gd3d;
                 get: function () {
                     return this._isProbability;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -54043,7 +54069,7 @@ var gd3d;
                 set: function (v) {
                     this._module.box.x = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystemShapeBox.prototype, "boxY", {
@@ -54056,7 +54082,7 @@ var gd3d;
                 set: function (v) {
                     this._module.box.y = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystemShapeBox.prototype, "boxZ", {
@@ -54069,7 +54095,7 @@ var gd3d;
                 set: function (v) {
                     this._module.box.z = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -54153,7 +54179,7 @@ var gd3d;
                 set: function (v) {
                     this._module.radius = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystemShapeCircle.prototype, "arc", {
@@ -54163,7 +54189,7 @@ var gd3d;
                 set: function (v) {
                     this._module.arc = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystemShapeCircle.prototype, "arcMode", {
@@ -54178,7 +54204,7 @@ var gd3d;
                 set: function (v) {
                     this._module.arcMode = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystemShapeCircle.prototype, "arcSpread", {
@@ -54193,7 +54219,7 @@ var gd3d;
                 set: function (v) {
                     this._module.arcSpread = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystemShapeCircle.prototype, "arcSpeed", {
@@ -54207,7 +54233,7 @@ var gd3d;
                 set: function (v) {
                     this._module.arcSpeed = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -54290,7 +54316,7 @@ var gd3d;
                 set: function (v) {
                     this._module.angle = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystemShapeCone.prototype, "radius", {
@@ -54303,7 +54329,7 @@ var gd3d;
                 set: function (v) {
                     this._module.radius = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystemShapeCone.prototype, "length", {
@@ -54318,7 +54344,7 @@ var gd3d;
                 set: function (v) {
                     this._module.length = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystemShapeCone.prototype, "arc", {
@@ -54331,7 +54357,7 @@ var gd3d;
                 set: function (v) {
                     this._module.arc = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystemShapeCone.prototype, "arcMode", {
@@ -54345,7 +54371,7 @@ var gd3d;
                 set: function (v) {
                     this._module.arcMode = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystemShapeCone.prototype, "arcSpread", {
@@ -54359,7 +54385,7 @@ var gd3d;
                 set: function (v) {
                     this._module.arcSpread = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystemShapeCone.prototype, "arcSpeed", {
@@ -54373,7 +54399,7 @@ var gd3d;
                 set: function (v) {
                     this._module.arcSpeed = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -54461,7 +54487,7 @@ var gd3d;
                 set: function (v) {
                     this._module.radius = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystemShapeEdge.prototype, "radiusMode", {
@@ -54476,7 +54502,7 @@ var gd3d;
                 set: function (v) {
                     this._module.radiusMode = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystemShapeEdge.prototype, "radiusSpread", {
@@ -54491,7 +54517,7 @@ var gd3d;
                 set: function (v) {
                     this._module.radiusSpread = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(ParticleSystemShapeEdge.prototype, "radiusSpeed", {
@@ -54506,7 +54532,7 @@ var gd3d;
                 set: function (v) {
                     this._module.radiusSpeed = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -54580,7 +54606,7 @@ var gd3d;
                 set: function (v) {
                     this._module.radius = v;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -56130,7 +56156,7 @@ var gd3d;
                 get: function () {
                     return this._isDisposed;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(PhysicsImpostor.prototype, "mass", {
@@ -56140,7 +56166,7 @@ var gd3d;
                 set: function (value) {
                     this.setMass(value);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(PhysicsImpostor.prototype, "friction", {
@@ -56150,7 +56176,7 @@ var gd3d;
                 set: function (value) {
                     this._physicsEngine.getPhysicsPlugin().setBodyFriction(this, value);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(PhysicsImpostor.prototype, "restitution", {
@@ -56160,7 +56186,7 @@ var gd3d;
                 set: function (value) {
                     this._physicsEngine.getPhysicsPlugin().setBodyRestitution(this, value);
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -56225,7 +56251,7 @@ var gd3d;
                     this._physicsBody = physicsBody;
                     this.resetUpdateFlags();
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(PhysicsImpostor.prototype, "parent", {
@@ -56242,7 +56268,7 @@ var gd3d;
                 set: function (value) {
                     this._parent = value;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             PhysicsImpostor.prototype.resetUpdateFlags = function () {
@@ -56482,7 +56508,7 @@ var gd3d;
                     }
                     return false;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -56638,14 +56664,14 @@ var gd3d;
                     }
                     this._physicsJoint = newJoint;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(PhysicsJoint.prototype, "physicsPlugin", {
                 set: function (physicsPlugin) {
                     this._physicsPlugin = physicsPlugin;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -57023,7 +57049,7 @@ var gd3d;
                     }
                     return obj.visible;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(gameObject.prototype, "visible", {
@@ -57051,7 +57077,7 @@ var gd3d;
                         framework.sceneMgr.app.markNotify(this.transform, framework.NotifyType.ChangeVisible);
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             ;
@@ -57572,7 +57598,7 @@ var gd3d;
                     }
                     return this._matrixWorld2Object;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(renderContext.prototype, "matrixModelView", {
@@ -57580,7 +57606,7 @@ var gd3d;
                     gd3d.math.matrixMultiply(this.matrixView, this.matrixModel, this._matrixModelView);
                     return this._matrixModelView;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(renderContext.prototype, "matrixInverseModelView", {
@@ -57593,7 +57619,7 @@ var gd3d;
                     }
                     return this._matrixInverseModelView;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             renderContext.prototype.updateCamera = function (app, camera) {
@@ -58012,7 +58038,7 @@ var gd3d;
                         }
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -58836,7 +58862,7 @@ var gd3d;
                         thread.instance = new thread();
                     return thread.instance;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             thread.prototype.OnMessage = function (e) {
@@ -59077,7 +59103,7 @@ var gd3d;
                     gd3d.math.vec3ScaleByNum(this._center, 0.5, this._center);
                     return this._center;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -59344,7 +59370,7 @@ var gd3d;
                     }
                     return this._vectorsWorld;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(obb.prototype, "worldCenter", {
@@ -59362,7 +59388,7 @@ var gd3d;
                     }
                     return this._worldCenter;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(obb.prototype, "halfSizeWorld", {
@@ -59395,7 +59421,7 @@ var gd3d;
                     }
                     return this._halfSizeWorld;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(obb.prototype, "directions", {
@@ -59415,7 +59441,7 @@ var gd3d;
                     }
                     return this._directions;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -59630,7 +59656,7 @@ var gd3d;
                     this.halfWidth = this._size.x / 2;
                     this.halfHeight = this._size.y / 2;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -63321,7 +63347,7 @@ var gd3d;
                 get: function () {
                     return this.keys.length;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -64899,7 +64925,7 @@ var gd3d;
                     }
                     return pool._vector4_one;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -64987,7 +65013,7 @@ var gd3d;
                     }
                     return pool._color_one;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -65077,7 +65103,7 @@ var gd3d;
                     pool._vector3_up.x = pool._vector3_up.z = 0;
                     return pool._vector3_up;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(pool, "vector3_right", {
@@ -65096,7 +65122,7 @@ var gd3d;
                     pool._vector3_right.y = pool._vector3_right.z = 0;
                     return pool._vector3_right;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(pool, "vector3_forward", {
@@ -65115,7 +65141,7 @@ var gd3d;
                     pool._vector3_forward.z = 1;
                     return pool._vector3_forward;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(pool, "vector3_zero", {
@@ -65133,7 +65159,7 @@ var gd3d;
                     pool._vector3_zero.x = pool._vector3_zero.y = pool._vector3_zero.z = 0;
                     return pool._vector3_zero;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(pool, "vector3_one", {
@@ -65151,7 +65177,7 @@ var gd3d;
                     pool._vector3_one.x = pool._vector3_one.y = pool._vector3_one.z = 1;
                     return pool._vector3_one;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -65251,7 +65277,7 @@ var gd3d;
                     pool._vector2_zero.x = pool._vector2_zero.y = 1;
                     return pool._vector2_zero;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(pool, "vector2_up", {
@@ -65270,7 +65296,7 @@ var gd3d;
                     pool._vector2_up.y = 1;
                     return pool._vector2_up;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(pool, "vector2_right", {
@@ -65289,7 +65315,7 @@ var gd3d;
                     pool._vector2_right.y = 0;
                     return pool._vector2_right;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             /**
@@ -65887,7 +65913,6 @@ var gd3d;
                 }
                 else if (mode == BlendModeEnum.Blend) {
                     this.state_blend = true;
-                    this.state_zwrite = false;
                     this.state_blendEquation = render.webglkit.FUNC_ADD;
                     this.state_blendSrcRGB = render.webglkit.SRC_ALPHA;
                     this.state_blendDestRGB = render.webglkit.ONE_MINUS_SRC_ALPHA;
@@ -66307,7 +66332,7 @@ var gd3d;
                         drawInfo._ins = new drawInfo();
                     return drawInfo._ins;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             return drawInfo;
@@ -67877,7 +67902,7 @@ var gd3d;
             };
             Object.defineProperty(glProgram.prototype, "strideInsAttrib", {
                 get: function () { return this._strideInsAttrib; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             glProgram.prototype.initAttribute = function (webgl) {
@@ -68189,12 +68214,12 @@ var gd3d;
             }
             Object.defineProperty(textureReader.prototype, "width", {
                 get: function () { return this._width; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(textureReader.prototype, "height", {
                 get: function () { return this._height; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(textureReader.prototype, "data", {
@@ -68206,12 +68231,12 @@ var gd3d;
                         return this._data;
                     }
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(textureReader.prototype, "gray", {
                 get: function () { return this._gray; },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             textureReader.prototype.getPixel = function (u, v) {
