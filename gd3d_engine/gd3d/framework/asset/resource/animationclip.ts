@@ -134,7 +134,7 @@ namespace gd3d.framework
                 {
                     var read: gd3d.io.binReader = new gd3d.io.binReader(buf);
                     // var _name =
-                    read.readStringAnsi();
+                    read.readStringUtf8();
                     this.fps = read.readFloat();
                     const scaleMagic = read.readByte();
                     this.hasScaled = scaleMagic == 0xFA
@@ -151,7 +151,7 @@ namespace gd3d.framework
                     this.bones = [];
                     for (let i = 0; i < this.boneCount; i++)
                     {
-                        let bonename = read.readStringAnsi();
+                        let bonename = read.readStringUtf8();
                         this.bones.push(bonename);
                         this.indexDic[bonename] = i;
                     }
@@ -162,7 +162,7 @@ namespace gd3d.framework
                     for (let i = 0; i < this.subclipCount; i++)
                     {
                         let _subClip = new subClip();
-                        _subClip.name = read.readStringAnsi();
+                        _subClip.name = read.readStringUtf8();
                         _subClip.loop = read.readBoolean();
                         this.subclips.push(_subClip);
                     }

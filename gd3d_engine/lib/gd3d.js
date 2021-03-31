@@ -18266,7 +18266,7 @@ var gd3d;
                     try {
                         var read = new gd3d.io.binReader(buf);
                         // var _name =
-                        read.readStringAnsi();
+                        read.readStringUtf8();
                         _this.fps = read.readFloat();
                         var scaleMagic = read.readByte();
                         _this.hasScaled = scaleMagic == 0xFA;
@@ -18280,7 +18280,7 @@ var gd3d;
                         _this.boneCount = read.readInt();
                         _this.bones = [];
                         for (var i = 0; i < _this.boneCount; i++) {
-                            var bonename = read.readStringAnsi();
+                            var bonename = read.readStringUtf8();
                             _this.bones.push(bonename);
                             _this.indexDic[bonename] = i;
                         }
@@ -18289,7 +18289,7 @@ var gd3d;
                         _this.subclips = [];
                         for (var i = 0; i < _this.subclipCount; i++) {
                             var _subClip = new subClip();
-                            _subClip.name = read.readStringAnsi();
+                            _subClip.name = read.readStringUtf8();
                             _subClip.loop = read.readBoolean();
                             _this.subclips.push(_subClip);
                         }
