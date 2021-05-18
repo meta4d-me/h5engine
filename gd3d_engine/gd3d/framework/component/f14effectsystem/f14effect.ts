@@ -57,6 +57,7 @@ namespace gd3d.framework
                 this._f14eff.unuse();
             }
             this._f14eff = asset;
+            this.bundleName = asset.assetbundle;
             this.setData(asset.data, this.bundleName);
         }
         private _delayTime: number = 0;
