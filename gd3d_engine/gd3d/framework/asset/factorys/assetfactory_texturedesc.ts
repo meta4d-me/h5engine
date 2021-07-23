@@ -7,6 +7,7 @@ namespace gd3d.framework
         private readonly t_PVR = "t_PVR";
         private readonly t_DDS = "t_DDS";
         private readonly t_KTX = "t_KTX";
+        private readonly t_ASTC = "t_ASTC";
         //#region 废弃de参考代码
         // newAsset(): texture
         // {
@@ -173,15 +174,21 @@ namespace gd3d.framework
 
             _texture.realName = _name;
             let tType = this.t_Normal;
-            if (_name.indexOf(".pvr.bin") >= 0)
+            if (_name.indexOf(".astc") >= 0)
+            {
+                tType = this.t_ASTC;
+            }
+            else if (_name.indexOf(".pvr.bin") >= 0)
             {
                 tType = this.t_PVR;
-            } else if (_name.indexOf(".dds.bin") >= 0)
-            {
-                tType = this.t_DDS;
-            } else if (_name.indexOf(".ktx") >= 0)
+            }
+            else if (_name.indexOf(".ktx") >= 0)
             {
                 tType = this.t_KTX;
+            }
+            else if (_name.indexOf(".dds.bin") >= 0)
+            {
+                tType = this.t_DDS;
             }
             let imgGuid = dwguid || bundle.texs[_name];
             let img = assetMgr.mapImage[imgGuid] || assetMgr.mapLoading[imgGuid].data;
@@ -190,17 +197,21 @@ namespace gd3d.framework
             {
                 case this.t_Normal:
                     var t2d = new gd3d.render.glTexture2D(assetmgr.webgl, _textureFormat);
-                    if(img){
+                    if (img)
+                    {
                         t2d.uploadImage(img, _mipmap, _linear, _premultiplyAlpha, _repeat);
                     }
                     _texture.glTexture = t2d;
+                    break;
+                case this.t_ASTC:
+                    _texture.glTexture = ASTCParse.parse(assetmgr.webgl, img);
                     break;
                 case this.t_PVR:
                     let pvr: PvrParse = new PvrParse(assetmgr.webgl);
                     _texture.glTexture = pvr.parse(img);
                     break;
                 case this.t_KTX:
-                    _texture.glTexture = KTXParse.parse(assetmgr.webgl,img);
+                    _texture.glTexture = KTXParse.parse(assetmgr.webgl, img);
                     break;
                 case this.t_DDS:
                     throw new Error("暂不支持DDS");

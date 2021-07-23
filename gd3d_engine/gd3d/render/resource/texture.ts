@@ -15,6 +15,20 @@
         PVRTC2_RGB = 4,
         PVRTC2_RGBA = 4,
         KTX = 5,
+        ASTC_RGBA_4x4,
+        ASTC_RGBA_5x4,
+        ASTC_RGBA_5x5,
+        ASTC_RGBA_6x5,
+        ASTC_RGBA_6x6,
+        ASTC_RGBA_8x5,
+        ASTC_RGBA_8x6,
+        ASTC_RGBA_8x8,
+        ASTC_RGBA_10x5,
+        ASTC_RGBA_10x6,
+        ASTC_RGBA_10x8,
+        ASTC_RGBA_10x10,
+        ASTC_RGBA_12x10,
+        ASTC_RGBA_12x12,
     }
     /**
      * @private
