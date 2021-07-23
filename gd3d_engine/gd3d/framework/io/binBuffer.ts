@@ -378,7 +378,7 @@ namespace gd3d.io
         }
         getBytesAvailable(): number
         {
-            return this.w_offset;
+            return this.w_offset-this.r_offset;
         }
         get length(): number
         {
