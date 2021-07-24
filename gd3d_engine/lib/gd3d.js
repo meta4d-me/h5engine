@@ -14231,6 +14231,101 @@ var gd3d;
     (function (framework) {
         /**
          *
+         * astc 格式概述  https://github.com/ARM-software/astc-encoder/blob/main/Docs/FormatOverview.md
+         * Khronos Group  astc格式规范 https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#ASTC
+         */
+        var ASTCParse = /** @class */ (function () {
+            function ASTCParse() {
+            }
+            /**
+             *
+             * @param gl WebGLRenderingContext
+             * @param arrayBuffer contents of the ASTC container file
+             */
+            ASTCParse.parse = function (gl, arrayBuffer) {
+                var result;
+                var ext = gl.getExtension('WEBGL_compressed_texture_astc');
+                if (!ext) {
+                    console.error("\u5F53\u524D\u73AF\u5883 \u4E0D\u652F\u6301 ASTC \u538B\u7F29\u7EB9\u7406");
+                    return;
+                }
+                ext.COMPRESSED_RGBA_ASTC_10x10_KHR;
+                this.decodeBuffer(ext, arrayBuffer);
+                // 初始化纹理
+                var t2d = result = new gd3d.render.glTexture2D(gl);
+                t2d.width = this.pixelHeight;
+                t2d.height = this.pixelWidth;
+                t2d.format = this.getTextureFormat(ext, this.gLInternalFormat);
+                var target = gl.TEXTURE_2D;
+                gl.activeTexture(gl.TEXTURE0);
+                gl.bindTexture(target, t2d.texture);
+                //当前框架下 ，这里无法处理 mipmap
+                var textureBuf = new Uint8Array(arrayBuffer, this.HEADER_MAX);
+                gl.compressedTexImage2D(target, 0, this.gLInternalFormat, t2d.width, t2d.height, 0, textureBuf);
+                gl.texParameteri(target, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.texParameteri(target, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+                //clear
+                this.gLInternalFormat = null;
+                this.pixelWidth = null;
+                this.pixelHeight = null;
+                return result;
+            };
+            //解码 
+            ASTCParse.decodeBuffer = function (ext, _buf) {
+                var header = new Uint8Array(_buf, 0, this.HEADER_MAX);
+                var astcTag = header[3] + (header[2] << 8) + (header[1] << 16) + (header[0] << 24);
+                if (astcTag !== 0x13ABA15C) {
+                    throw new Error('ASTC 无效的头文件');
+                }
+                var xdim = header[4];
+                var ydim = header[5];
+                var zdim = header[6];
+                if ((xdim < 3 || xdim > 6 || ydim < 3 || ydim > 6 || zdim < 3 || zdim > 6)
+                    && (xdim < 4 || xdim === 7 || xdim === 9 || xdim === 11 || xdim > 12
+                        || ydim < 4 || ydim === 7 || ydim === 9 || ydim === 11 || ydim > 12 || zdim !== 1)) {
+                    throw new Error(' ASTC 无效的头文件');
+                }
+                this.gLInternalFormat = ext["COMPRESSED_RGBA_ASTC_" + xdim + "x" + ydim + "_KHR"];
+                this.pixelWidth = header[this.HEADER_SIZE_X] + (header[this.HEADER_SIZE_X + 1] << 8) + (header[this.HEADER_SIZE_X + 2] << 16);
+                this.pixelHeight = header[this.HEADER_SIZE_Y] + (header[this.HEADER_SIZE_Y + 1] << 8) + (header[this.HEADER_SIZE_Y + 2] << 16);
+                // let pixeLen = header[this.HEADER_SIZE_Z] + (header[this.HEADER_SIZE_Z + 1] << 8) + (header[this.HEADER_SIZE_Z + 2] << 16);
+            };
+            ASTCParse.getTextureFormat = function (ext, gLInternalFormat) {
+                ext.COMPRESSED_RGBA_ASTC_4x4_KHR;
+                var tfEnum = gd3d.render.TextureFormatEnum;
+                switch (gLInternalFormat) {
+                    case ext.COMPRESSED_RGBA_ASTC_4x4_KHR: return tfEnum.ASTC_RGBA_4x4;
+                    case ext.COMPRESSED_RGBA_ASTC_5x4_KHR: return tfEnum.ASTC_RGBA_5x4;
+                    case ext.COMPRESSED_RGBA_ASTC_5x5_KHR: return tfEnum.ASTC_RGBA_5x5;
+                    case ext.COMPRESSED_RGBA_ASTC_6x5_KHR: return tfEnum.ASTC_RGBA_6x5;
+                    case ext.COMPRESSED_RGBA_ASTC_6x6_KHR: return tfEnum.ASTC_RGBA_6x6;
+                    case ext.COMPRESSED_RGBA_ASTC_8x5_KHR: return tfEnum.ASTC_RGBA_8x5;
+                    case ext.COMPRESSED_RGBA_ASTC_8x6_KHR: return tfEnum.ASTC_RGBA_8x6;
+                    case ext.COMPRESSED_RGBA_ASTC_8x8_KHR: return tfEnum.ASTC_RGBA_8x8;
+                    case ext.COMPRESSED_RGBA_ASTC_10x5_KHR: return tfEnum.ASTC_RGBA_10x5;
+                    case ext.COMPRESSED_RGBA_ASTC_10x6_KHR: return tfEnum.ASTC_RGBA_10x6;
+                    case ext.COMPRESSED_RGBA_ASTC_10x8_KHR: return tfEnum.ASTC_RGBA_10x8;
+                    case ext.COMPRESSED_RGBA_ASTC_10x10_KHR: return tfEnum.ASTC_RGBA_10x10;
+                    case ext.COMPRESSED_RGBA_ASTC_12x10_KHR: return tfEnum.ASTC_RGBA_12x10;
+                    case ext.COMPRESSED_RGBA_ASTC_12x12_KHR: return tfEnum.ASTC_RGBA_12x12;
+                    default:
+                }
+            };
+            ASTCParse.HEADER_SIZE_X = 7;
+            ASTCParse.HEADER_SIZE_Y = 10;
+            ASTCParse.HEADER_SIZE_Z = 13;
+            ASTCParse.HEADER_MAX = 16;
+            return ASTCParse;
+        }());
+        framework.ASTCParse = ASTCParse;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        /**
+         *
          * for description see https://www.khronos.org/opengles/sdk/tools/KTX/
          * for file layout see https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/
          *
@@ -14675,37 +14770,41 @@ var gd3d;
              * Android平台ETC1压缩纹理
              */
             AssetTypeEnum[AssetTypeEnum["KTX"] = 20] = "KTX";
-            AssetTypeEnum[AssetTypeEnum["F14Effect"] = 21] = "F14Effect";
+            /**
+             * ARM 压缩纹理，ios 、android 通用
+             */
+            AssetTypeEnum[AssetTypeEnum["ASTC"] = 21] = "ASTC";
+            AssetTypeEnum[AssetTypeEnum["F14Effect"] = 22] = "F14Effect";
             /**
              * @public
              * @language zh_CN
              * dds贴图
              * @version gd3d 1.0
              */
-            AssetTypeEnum[AssetTypeEnum["DDS"] = 22] = "DDS";
+            AssetTypeEnum[AssetTypeEnum["DDS"] = 23] = "DDS";
             /**
              * @public
              * @language zh_CN
              * 场景
              * @version gd3d 1.0
              */
-            AssetTypeEnum[AssetTypeEnum["Scene"] = 23] = "Scene";
+            AssetTypeEnum[AssetTypeEnum["Scene"] = 24] = "Scene";
             /**
              * @public
              * @language zh_CN
              * 预设
              * @version gd3d 1.0
              */
-            AssetTypeEnum[AssetTypeEnum["Prefab"] = 24] = "Prefab";
-            AssetTypeEnum[AssetTypeEnum["cPrefab"] = 25] = "cPrefab";
+            AssetTypeEnum[AssetTypeEnum["Prefab"] = 25] = "Prefab";
+            AssetTypeEnum[AssetTypeEnum["cPrefab"] = 26] = "cPrefab";
             /**
              * 粒子系统
              */
-            AssetTypeEnum[AssetTypeEnum["ParticleSystem"] = 26] = "ParticleSystem";
+            AssetTypeEnum[AssetTypeEnum["ParticleSystem"] = 27] = "ParticleSystem";
             /**
              * 拖尾
              */
-            AssetTypeEnum[AssetTypeEnum["TrailRenderer"] = 27] = "TrailRenderer";
+            AssetTypeEnum[AssetTypeEnum["TrailRenderer"] = 28] = "TrailRenderer";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
         /**
          * @public
@@ -14996,6 +15095,10 @@ var gd3d;
                         // console.error(`[下載資源] 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                         if (k.endsWith(".png") || k.endsWith(".jpg"))
                             _this.assetmgr.loadImg(guid, url, imageNext.bind(_this, url), _this);
+                        else if (k.endsWith(".astc"))
+                            _this.assetmgr.download(guid, url, framework.AssetTypeEnum.ASTC, imageNext.bind(_this, url), function () {
+                                console.error("[\u4E0B\u8F09\u8CC7\u6E90]\u5931\u8D25:" + url + " ,bundle:" + _this.name);
+                            }, _this);
                         else if (k.endsWith(".pvr.bin"))
                             _this.assetmgr.download(guid, url, framework.AssetTypeEnum.PVR, imageNext.bind(_this, url), function () {
                                 console.error("[\u4E0B\u8F09\u8CC7\u6E90]\u5931\u8D25:" + url + " ,bundle:" + _this.name);
@@ -15217,6 +15320,10 @@ var gd3d;
                     case ".pvr":
                     case ".pvr.bin.js":
                         return framework.AssetTypeEnum.PVR;
+                    case ".astc.bin":
+                    case ".astc":
+                    case ".astc.bin.js":
+                        return framework.AssetTypeEnum.ASTC;
                     case ".ktx.bin":
                     case ".ktx":
                     case ".ktx.bin.js":
@@ -15297,6 +15404,7 @@ var gd3d;
                 case e.Mesh:
                 case e.PVR:
                 case e.KTX:
+                case e.ASTC:
                 case e.PackBin:
                     return "arraybuffer";
                 default:
@@ -16440,6 +16548,26 @@ var gd3d;
             return AssetFactory_Aniclip;
         }());
         framework.AssetFactory_Aniclip = AssetFactory_Aniclip;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_ASTC = /** @class */ (function () {
+            function AssetFactory_ASTC() {
+            }
+            AssetFactory_ASTC.prototype.parse = function (assetmgr, bundle, name, bytes, dwguid) {
+                var _texture = new framework.texture(name);
+                _texture.glTexture = framework.ASTCParse.parse(assetmgr.webgl, bytes);
+                return _texture;
+            };
+            AssetFactory_ASTC = __decorate([
+                framework.assetF(framework.AssetTypeEnum.ASTC)
+            ], AssetFactory_ASTC);
+            return AssetFactory_ASTC;
+        }());
+        framework.AssetFactory_ASTC = AssetFactory_ASTC;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -17933,6 +18061,7 @@ var gd3d;
                 this.t_PVR = "t_PVR";
                 this.t_DDS = "t_DDS";
                 this.t_KTX = "t_KTX";
+                this.t_ASTC = "t_ASTC";
             }
             //#region 废弃de参考代码
             // newAsset(): texture
@@ -18071,14 +18200,17 @@ var gd3d;
                 var _texture = new framework.texture(name);
                 _texture.realName = _name;
                 var tType = this.t_Normal;
-                if (_name.indexOf(".pvr.bin") >= 0) {
-                    tType = this.t_PVR;
+                if (_name.indexOf(".astc") >= 0) {
+                    tType = this.t_ASTC;
                 }
-                else if (_name.indexOf(".dds.bin") >= 0) {
-                    tType = this.t_DDS;
+                else if (_name.indexOf(".pvr.bin") >= 0) {
+                    tType = this.t_PVR;
                 }
                 else if (_name.indexOf(".ktx") >= 0) {
                     tType = this.t_KTX;
+                }
+                else if (_name.indexOf(".dds.bin") >= 0) {
+                    tType = this.t_DDS;
                 }
                 var imgGuid = dwguid || bundle.texs[_name];
                 var img = framework.assetMgr.mapImage[imgGuid] || framework.assetMgr.mapLoading[imgGuid].data;
@@ -18090,6 +18222,9 @@ var gd3d;
                             t2d.uploadImage(img, _mipmap, _linear, _premultiplyAlpha, _repeat);
                         }
                         _texture.glTexture = t2d;
+                        break;
+                    case this.t_ASTC:
+                        _texture.glTexture = framework.ASTCParse.parse(assetmgr.webgl, img);
                         break;
                     case this.t_PVR:
                         var pvr = new PvrParse(assetmgr.webgl);
@@ -33384,6 +33519,7 @@ var gd3d;
                         this._f14eff.unuse();
                     }
                     this._f14eff = asset;
+                    this.bundleName = asset.assetbundle;
                     this.setData(asset.data, this.bundleName);
                 },
                 enumerable: false,
@@ -38429,7 +38565,7 @@ var gd3d;
                 return this.w_offset;
             };
             binTool.prototype.getBytesAvailable = function () {
-                return this.w_offset;
+                return this.w_offset - this.r_offset;
             };
             Object.defineProperty(binTool.prototype, "length", {
                 get: function () {
@@ -68196,6 +68332,20 @@ var gd3d;
             TextureFormatEnum[TextureFormatEnum["PVRTC2_RGB"] = 4] = "PVRTC2_RGB";
             TextureFormatEnum[TextureFormatEnum["PVRTC2_RGBA"] = 4] = "PVRTC2_RGBA";
             TextureFormatEnum[TextureFormatEnum["KTX"] = 5] = "KTX";
+            TextureFormatEnum[TextureFormatEnum["ASTC_RGBA_4x4"] = 6] = "ASTC_RGBA_4x4";
+            TextureFormatEnum[TextureFormatEnum["ASTC_RGBA_5x4"] = 7] = "ASTC_RGBA_5x4";
+            TextureFormatEnum[TextureFormatEnum["ASTC_RGBA_5x5"] = 8] = "ASTC_RGBA_5x5";
+            TextureFormatEnum[TextureFormatEnum["ASTC_RGBA_6x5"] = 9] = "ASTC_RGBA_6x5";
+            TextureFormatEnum[TextureFormatEnum["ASTC_RGBA_6x6"] = 10] = "ASTC_RGBA_6x6";
+            TextureFormatEnum[TextureFormatEnum["ASTC_RGBA_8x5"] = 11] = "ASTC_RGBA_8x5";
+            TextureFormatEnum[TextureFormatEnum["ASTC_RGBA_8x6"] = 12] = "ASTC_RGBA_8x6";
+            TextureFormatEnum[TextureFormatEnum["ASTC_RGBA_8x8"] = 13] = "ASTC_RGBA_8x8";
+            TextureFormatEnum[TextureFormatEnum["ASTC_RGBA_10x5"] = 14] = "ASTC_RGBA_10x5";
+            TextureFormatEnum[TextureFormatEnum["ASTC_RGBA_10x6"] = 15] = "ASTC_RGBA_10x6";
+            TextureFormatEnum[TextureFormatEnum["ASTC_RGBA_10x8"] = 16] = "ASTC_RGBA_10x8";
+            TextureFormatEnum[TextureFormatEnum["ASTC_RGBA_10x10"] = 17] = "ASTC_RGBA_10x10";
+            TextureFormatEnum[TextureFormatEnum["ASTC_RGBA_12x10"] = 18] = "ASTC_RGBA_12x10";
+            TextureFormatEnum[TextureFormatEnum["ASTC_RGBA_12x12"] = 19] = "ASTC_RGBA_12x12";
         })(TextureFormatEnum = render.TextureFormatEnum || (render.TextureFormatEnum = {}));
         /**
          * @private

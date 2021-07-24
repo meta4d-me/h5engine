@@ -4152,6 +4152,30 @@ declare namespace gd3d.framework {
 declare namespace gd3d.framework {
     /**
      *
+     * astc 格式概述  https://github.com/ARM-software/astc-encoder/blob/main/Docs/FormatOverview.md
+     * Khronos Group  astc格式规范 https://www.khronos.org/registry/DataFormat/specs/1.3/dataformat.1.3.html#ASTC
+     */
+    class ASTCParse {
+        private static readonly HEADER_SIZE_X;
+        private static readonly HEADER_SIZE_Y;
+        private static readonly HEADER_SIZE_Z;
+        private static readonly HEADER_MAX;
+        private static gLInternalFormat;
+        private static pixelWidth;
+        private static pixelHeight;
+        /**
+         *
+         * @param gl WebGLRenderingContext
+         * @param arrayBuffer contents of the ASTC container file
+         */
+        static parse(gl: WebGLRenderingContext, arrayBuffer: ArrayBuffer): render.glTexture2D;
+        private static decodeBuffer;
+        private static getTextureFormat;
+    }
+}
+declare namespace gd3d.framework {
+    /**
+     *
      * for description see https://www.khronos.org/opengles/sdk/tools/KTX/
      * for file layout see https://www.khronos.org/opengles/sdk/tools/KTX/file_format_spec/
      *
@@ -4357,37 +4381,41 @@ declare namespace gd3d.framework {
          * Android平台ETC1压缩纹理
          */
         KTX = 20,
-        F14Effect = 21,
+        /**
+         * ARM 压缩纹理，ios 、android 通用
+         */
+        ASTC = 21,
+        F14Effect = 22,
         /**
          * @public
          * @language zh_CN
          * dds贴图
          * @version gd3d 1.0
          */
-        DDS = 22,
+        DDS = 23,
         /**
          * @public
          * @language zh_CN
          * 场景
          * @version gd3d 1.0
          */
-        Scene = 23,
+        Scene = 24,
         /**
          * @public
          * @language zh_CN
          * 预设
          * @version gd3d 1.0
          */
-        Prefab = 24,
-        cPrefab = 25,
+        Prefab = 25,
+        cPrefab = 26,
         /**
          * 粒子系统
          */
-        ParticleSystem = 26,
+        ParticleSystem = 27,
         /**
          * 拖尾
          */
-        TrailRenderer = 27
+        TrailRenderer = 28
     }
     /**
      * @public
@@ -4771,6 +4799,11 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class AssetFactory_ASTC implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer, dwguid: number): texture;
+    }
+}
+declare namespace gd3d.framework {
     class AssetFactory_Atlas implements IAssetFactory {
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): atlas;
     }
@@ -4885,6 +4918,7 @@ declare namespace gd3d.framework {
         private readonly t_PVR;
         private readonly t_DDS;
         private readonly t_KTX;
+        private readonly t_ASTC;
         parse(assetmgr: assetMgr, bundle: assetBundle, name: string, data: string, dwguid: number): texture;
         needDownload(text: string): any;
     }
@@ -21977,7 +22011,21 @@ declare namespace gd3d.render {
         PVRTC4_RGBA = 4,
         PVRTC2_RGB = 4,
         PVRTC2_RGBA = 4,
-        KTX = 5
+        KTX = 5,
+        ASTC_RGBA_4x4 = 6,
+        ASTC_RGBA_5x4 = 7,
+        ASTC_RGBA_5x5 = 8,
+        ASTC_RGBA_6x5 = 9,
+        ASTC_RGBA_6x6 = 10,
+        ASTC_RGBA_8x5 = 11,
+        ASTC_RGBA_8x6 = 12,
+        ASTC_RGBA_8x8 = 13,
+        ASTC_RGBA_10x5 = 14,
+        ASTC_RGBA_10x6 = 15,
+        ASTC_RGBA_10x8 = 16,
+        ASTC_RGBA_10x10 = 17,
+        ASTC_RGBA_12x10 = 18,
+        ASTC_RGBA_12x12 = 19
     }
     /**
      * @private
