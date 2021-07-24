@@ -149,6 +149,10 @@ namespace gd3d.framework
          * Android平台ETC1压缩纹理
          */
         KTX,
+        /**
+         * ARM 压缩纹理，ios 、android 通用
+         */
+        ASTC,
 
         F14Effect,
 

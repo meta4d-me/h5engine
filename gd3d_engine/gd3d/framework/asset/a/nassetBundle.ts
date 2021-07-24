@@ -158,6 +158,11 @@ namespace gd3d.framework
                     // console.error(`[下載資源] 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
                     if (k.endsWith(".png") || k.endsWith(".jpg"))
                         this.assetmgr.loadImg(guid, url, imageNext.bind(this, url), this);
+                    else if (k.endsWith(".astc"))
+                        this.assetmgr.download(guid, url, AssetTypeEnum.ASTC, imageNext.bind(this, url), () =>
+                        {
+                            console.error(`[下載資源]失败:${url} ,bundle:${this.name}`);
+                        }, this);
                     else if (k.endsWith(".pvr.bin"))
                         this.assetmgr.download(guid, url, AssetTypeEnum.PVR, imageNext.bind(this, url), () =>
                         {

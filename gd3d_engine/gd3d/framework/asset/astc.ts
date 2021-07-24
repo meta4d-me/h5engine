@@ -39,7 +39,7 @@ namespace gd3d.framework
             let t2d = result = new gd3d.render.glTexture2D(gl);
             t2d.width = this.pixelHeight;
             t2d.height = this.pixelWidth;
-            t2d.format = this.getTextureFormat(ext , this.gLInternalFormat);
+            t2d.format = this.getTextureFormat(ext, this.gLInternalFormat);
             let target = gl.TEXTURE_2D;
             gl.activeTexture(gl.TEXTURE0);
             gl.bindTexture(target, t2d.texture);
@@ -47,6 +47,9 @@ namespace gd3d.framework
             //当前框架下 ，这里无法处理 mipmap
             let textureBuf = new Uint8Array(arrayBuffer, this.HEADER_MAX);
             gl.compressedTexImage2D(target, 0, this.gLInternalFormat, t2d.width, t2d.height, 0, textureBuf);
+
+            gl.texParameteri(target, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+            gl.texParameteri(target, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
             //clear
             this.gLInternalFormat = null;
@@ -60,7 +63,7 @@ namespace gd3d.framework
         {
             const header = new Uint8Array(_buf, 0, this.HEADER_MAX);
 
-            const astcTag = (header[3] << 24) + (header[2] << 16) + (header[1] << 8) + header[0];
+            const astcTag = header[3]  + (header[2] << 8) + (header[1] << 16) + (header[0] << 24);
             if (astcTag !== 0x13ABA15C)
             {
                 throw new Error('ASTC 无效的头文件');
@@ -88,20 +91,20 @@ namespace gd3d.framework
             let tfEnum = render.TextureFormatEnum;
             switch (gLInternalFormat)
             {
-                case ext.COMPRESSED_RGBA_ASTC_4x4_KHR:      return tfEnum.ASTC_RGBA_4x4;
-                case ext.COMPRESSED_RGBA_ASTC_5x4_KHR:      return tfEnum.ASTC_RGBA_5x4;
-                case ext.COMPRESSED_RGBA_ASTC_5x5_KHR:      return tfEnum.ASTC_RGBA_5x5;
-                case ext.COMPRESSED_RGBA_ASTC_6x5_KHR:      return tfEnum.ASTC_RGBA_6x5;
-                case ext.COMPRESSED_RGBA_ASTC_6x6_KHR:      return tfEnum.ASTC_RGBA_6x6;
-                case ext.COMPRESSED_RGBA_ASTC_8x5_KHR:      return tfEnum.ASTC_RGBA_8x5;
-                case ext.COMPRESSED_RGBA_ASTC_8x6_KHR:      return tfEnum.ASTC_RGBA_8x6;
-                case ext.COMPRESSED_RGBA_ASTC_8x8_KHR:      return tfEnum.ASTC_RGBA_8x8;
-                case ext.COMPRESSED_RGBA_ASTC_10x5_KHR:     return tfEnum.ASTC_RGBA_10x5;
-                case ext.COMPRESSED_RGBA_ASTC_10x6_KHR:     return tfEnum.ASTC_RGBA_10x6;
-                case ext.COMPRESSED_RGBA_ASTC_10x8_KHR:     return tfEnum.ASTC_RGBA_10x8;
-                case ext.COMPRESSED_RGBA_ASTC_10x10_KHR:    return tfEnum.ASTC_RGBA_10x10;
-                case ext.COMPRESSED_RGBA_ASTC_12x10_KHR:    return tfEnum.ASTC_RGBA_12x10;
-                case ext.COMPRESSED_RGBA_ASTC_12x12_KHR:    return tfEnum.ASTC_RGBA_12x12;
+                case ext.COMPRESSED_RGBA_ASTC_4x4_KHR: return tfEnum.ASTC_RGBA_4x4;
+                case ext.COMPRESSED_RGBA_ASTC_5x4_KHR: return tfEnum.ASTC_RGBA_5x4;
+                case ext.COMPRESSED_RGBA_ASTC_5x5_KHR: return tfEnum.ASTC_RGBA_5x5;
+                case ext.COMPRESSED_RGBA_ASTC_6x5_KHR: return tfEnum.ASTC_RGBA_6x5;
+                case ext.COMPRESSED_RGBA_ASTC_6x6_KHR: return tfEnum.ASTC_RGBA_6x6;
+                case ext.COMPRESSED_RGBA_ASTC_8x5_KHR: return tfEnum.ASTC_RGBA_8x5;
+                case ext.COMPRESSED_RGBA_ASTC_8x6_KHR: return tfEnum.ASTC_RGBA_8x6;
+                case ext.COMPRESSED_RGBA_ASTC_8x8_KHR: return tfEnum.ASTC_RGBA_8x8;
+                case ext.COMPRESSED_RGBA_ASTC_10x5_KHR: return tfEnum.ASTC_RGBA_10x5;
+                case ext.COMPRESSED_RGBA_ASTC_10x6_KHR: return tfEnum.ASTC_RGBA_10x6;
+                case ext.COMPRESSED_RGBA_ASTC_10x8_KHR: return tfEnum.ASTC_RGBA_10x8;
+                case ext.COMPRESSED_RGBA_ASTC_10x10_KHR: return tfEnum.ASTC_RGBA_10x10;
+                case ext.COMPRESSED_RGBA_ASTC_12x10_KHR: return tfEnum.ASTC_RGBA_12x10;
+                case ext.COMPRESSED_RGBA_ASTC_12x12_KHR: return tfEnum.ASTC_RGBA_12x12;
                 default:
             }
         }

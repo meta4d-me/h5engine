@@ -41,6 +41,10 @@ namespace gd3d.framework
                 case ".pvr":
                 case ".pvr.bin.js":
                     return AssetTypeEnum.PVR;
+                case ".astc.bin":
+                case ".astc":
+                case ".astc.bin.js":
+                    return AssetTypeEnum.ASTC;
                 case ".ktx.bin":
                 case ".ktx":
                 case ".ktx.bin.js":
@@ -124,6 +128,7 @@ namespace gd3d.framework
             case e.Mesh:
             case e.PVR:
             case e.KTX:
+            case e.ASTC:
             case e.PackBin:
                 return "arraybuffer";
             default:
