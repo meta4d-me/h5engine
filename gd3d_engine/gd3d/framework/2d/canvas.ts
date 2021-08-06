@@ -483,10 +483,13 @@ namespace gd3d.framework
             }
         }
 
+        private _insIdFrameMap : {[insID : number] : number} = {};
 
         private objupdate(node: transform2D, delta)
         {
             if (!node || !node.visible) return;
+            let app = this.scene.app;
+            let currFrameID = app.frameID;
 
             node.init(this.scene.app.bePlay);//组件还未初始化的初始化
             let compLen = node.components.length;
@@ -508,18 +511,22 @@ namespace gd3d.framework
                     
                     if (instanceOfI2DPointListener(comp))
                     {  //判断是否为
-                        this._peCareListBuoy++;
                         var insId = node.insId.getInsID();
-                        var plist = this._pointEventCareList;
-                        var pBuoy = this._peCareListBuoy;
-                        if (plist.length <= pBuoy)
-                        {
-                            plist.push(insId);
-                        } else
-                        {
-                            plist[pBuoy] = insId;
+                        //insID 去重
+                        if(this._insIdFrameMap[insId] != currFrameID){
+                            this._insIdFrameMap[insId] = currFrameID;
+                            this._peCareListBuoy++;
+                            var plist = this._pointEventCareList;
+                            var pBuoy = this._peCareListBuoy;
+                            if (plist.length <= pBuoy)
+                            {
+                                plist.push(insId);
+                            } else
+                            {
+                                plist[pBuoy] = insId;
+                            }
+                            plist[pBuoy];
                         }
-                        plist[pBuoy];
                     }
                 }
             }
