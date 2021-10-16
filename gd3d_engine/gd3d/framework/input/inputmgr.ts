@@ -179,6 +179,7 @@ namespace gd3d.framework
                 }
         }
         private _touchmove(ev:TouchEvent){
+            ev.preventDefault();    //避免 在触摸设备中，下拉 触发浏览器刷新监听。
             this.HtmlNativeEventer.Emit("touchmove",ev);
 
             this._point.touch = true;

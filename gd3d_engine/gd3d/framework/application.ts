@@ -1,21 +1,18 @@
 
 
 //主要的入口
-namespace gd3d.framework
-{
+namespace gd3d.framework {
 
     /**
      * @private
      */
-    export interface INotify
-    {
+    export interface INotify {
         notify(trans: any, type: NotifyType);
     }
     /**
      * @private
      */
-    export enum NotifyType
-    {
+    export enum NotifyType {
         AddChild,
         RemoveChild,
         ChangeVisible,
@@ -29,8 +26,7 @@ namespace gd3d.framework
      * 设定画布的渲染大小，选择长或者宽作为标准锁定画布大小进行渲染。横屏选择FixedWidthType，竖屏选择FixedHeightType。目的是锁定屏幕大小，防止分辨率过高导致渲染压力过大
      * @version gd3d 1.0
      */
-    export enum CanvasFixedType
-    {
+    export enum CanvasFixedType {
         /** 随着窗口自由适应 */
         Free,
         /** 固定宽度 */
@@ -45,8 +41,7 @@ namespace gd3d.framework
      * 引擎的主入口
      * @version gd3d 1.0
      */
-    export class application
-    {
+    export class application {
 
         /**
          * @public
@@ -77,8 +72,7 @@ namespace gd3d.framework
          * 绘制区域宽度 像素单位
          * @version gd3d 1.0
          */
-        get width()
-        {
+        get width() {
             return this.webgl.canvas.width;
             // return this.webgl.canvas.getBoundingClientRect().width;
         }
@@ -90,8 +84,7 @@ namespace gd3d.framework
         //  * 绘制区域高度 像素单位
         //  * @version gd3d 1.0
         //  */
-        get height()
-        {
+        get height() {
             return this.webgl.canvas.height;
             // return this.webgl.canvas.getBoundingClientRect().height;
         }
@@ -106,8 +99,7 @@ namespace gd3d.framework
          * 设置timescale
          * @version gd3d 1.0
          */
-        set timeScale(val: number)
-        {
+        set timeScale(val: number) {
             this._timeScale = val;
         }
         /**
@@ -117,8 +109,7 @@ namespace gd3d.framework
          * 获取timescale
          * @version gd3d 1.0
          */
-        get timeScale(): number
-        {
+        get timeScale(): number {
             return this._timeScale;
         }
         // private version: string = "v0.0.1";
@@ -132,8 +123,7 @@ namespace gd3d.framework
          * 设置固定帧数 不设置即为不限制帧数
          * @version gd3d 1.0
          */
-        set targetFrame(val: number)
-        {
+        set targetFrame(val: number) {
             if (val == 0)
                 val = -1;
             this._tar = val;
@@ -147,8 +137,7 @@ namespace gd3d.framework
          * 获取当前固定帧数
          * @version gd3d 1.0
          */
-        get targetFrame()
-        {
+        get targetFrame() {
             return this._tar;
         }
         screenAdaptiveType: string;
@@ -163,20 +152,16 @@ namespace gd3d.framework
         private canvasFixedType: CanvasFixedType = CanvasFixedType.Free;
         private _canvasClientWidth: number;
         private _canvasClientHeight: number;
-        set canvasFixHeight(val: number)
-        {
+        set canvasFixHeight(val: number) {
             this._fixHeight = val;
         }
-        set canvasFixWidth(val: number)
-        {
+        set canvasFixWidth(val: number) {
             this._fixWidth = val;
         }
-        get canvasClientWidth(): number
-        {
+        get canvasClientWidth(): number {
             return this._canvasClientWidth;
         }
-        get canvasClientHeight(): number
-        {
+        get canvasClientHeight(): number {
             return this._canvasClientHeight;
         }
 
@@ -190,8 +175,7 @@ namespace gd3d.framework
          * @param div 绘制区域的dom
          * @version gd3d 1.0
          */
-        start(div: HTMLDivElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false)
-        {
+        start(div: HTMLDivElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false) {
             // var metas = document.getElementsByName("viewport") as NodeListOf<HTMLMetaElement>;
             // var meta: HTMLMetaElement;
             // if (!metas || metas.length < 1)
@@ -204,8 +188,7 @@ namespace gd3d.framework
             //     meta = metas[0];
             // meta.content = "width=device-width, height=device-height, user-scalable=no, initial-scale=1, minimum-scale=0.5, maximum-scale=0.5";
 
-            if (div == null)
-            {
+            if (div == null) {
                 console.error("root div does Null at application start ");
                 return;
             }
@@ -227,8 +210,7 @@ namespace gd3d.framework
             div.appendChild(rotateDiv);
 
             var canvas = document.createElement("canvas");
-            if (canvas == null)
-            {
+            if (canvas == null) {
                 console.error("Failed to create canvas at the application.start()");
                 throw Error("Failed to create canvas at the application.start()");
             }
@@ -252,8 +234,7 @@ namespace gd3d.framework
             //this.showDrawCall();
         }
 
-        startForCanvas(canvas: HTMLCanvasElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false)
-        {
+        startForCanvas(canvas: HTMLCanvasElement, type: CanvasFixedType = CanvasFixedType.Free, val: number = 1200, webglDebug = false) {
             console.log("engine version: " + version.VERSION);
 
             this.ccWidth = this.ccWidth == undefined ? canvas.clientWidth : this.ccWidth;
@@ -264,8 +245,7 @@ namespace gd3d.framework
             let tempWebGlUtil = new WebGLUtils();
             this.webgl = tempWebGlUtil.setupWebGL(canvas);
             // console.error(" i am ---tempWebGlUtil-" + webglDebug);
-            if (this.webgl == null)
-            {
+            if (this.webgl == null) {
                 console.error("Failed to get webgl at the application.start()");
                 throw Error("Failed to get webgl at the application.start()");
             }
@@ -273,8 +253,7 @@ namespace gd3d.framework
             // 扩展
             new GLExtension(this.webgl);
 
-            switch (type)
-            {
+            switch (type) {
                 case CanvasFixedType.FixedWidthType: this.canvasFixWidth = val; break;
                 case CanvasFixedType.FixedHeightType: this.canvasFixHeight = val; break;
             }
@@ -327,37 +306,31 @@ namespace gd3d.framework
             gd3d.io.referenceInfo.regDefaultType();
 
             let initovercallback = window["initovercallback"];
-            if (initovercallback != null)
-            {
+            if (initovercallback != null) {
                 initovercallback(this);
             }
 
             //debug
-            if (webglDebug)
-            {
+            if (webglDebug) {
                 let tempWebGLDebugUtils = new WebGLDebugUtils();
                 this.webgl = tempWebGLDebugUtils.makeDebugContext(this.webgl);
                 console.error(" i am ---webglDebug-");
             }
         }
 
-        markNotify(trans: any, type: NotifyType)
-        {
+        markNotify(trans: any, type: NotifyType) {
             // this.doNotify(trans, type);
         }
 
-        private doNotify(trans: transform, type: NotifyType)
-        {
+        private doNotify(trans: transform, type: NotifyType) {
             if (trans == null)
                 return;
             if (!this.checkFilter(trans))
                 return;
             if (this.notify)
                 this.notify.notify(trans, type);
-            if (trans.children != null)
-            {
-                for (let index in trans.children)
-                {
+            if (trans.children != null) {
+                for (let index in trans.children) {
                     this.doNotify(trans.children[index], type);
                 }
             }
@@ -366,19 +339,14 @@ namespace gd3d.framework
          * @private
          * @param trans
          */
-        checkFilter(trans: any)
-        {
-            if (trans instanceof gd3d.framework.transform)
-            {
-                if (trans.gameObject.hideFlags & gd3d.framework.HideFlags.HideInHierarchy)
-                {
+        checkFilter(trans: any) {
+            if (trans instanceof gd3d.framework.transform) {
+                if (trans.gameObject.hideFlags & gd3d.framework.HideFlags.HideInHierarchy) {
                     return false;
                 }
             }
-            if (trans instanceof gd3d.framework.transform2D)
-            {
-                if (trans.hideFlags & gd3d.framework.HideFlags.HideInHierarchy)
-                {
+            if (trans instanceof gd3d.framework.transform2D) {
+                if (trans.hideFlags & gd3d.framework.HideFlags.HideInHierarchy) {
                     return false;
                 }
             }
@@ -393,19 +361,16 @@ namespace gd3d.framework
          * 显示性能参数面板
          * @version gd3d 1.0
          */
-        showFps()
-        {
+        showFps() {
             if (!this.container) return;
-            if (this.stats == null)
-            {
+            if (this.stats == null) {
                 this.stats = new Stats.Stats(this);
                 this.stats.container.style.position = 'absolute'; //绝对坐标
                 this.stats.container.style.left = '0px';// (0,0)px,左上角
                 this.stats.container.style.top = '0px';
                 this.container.appendChild(this.stats.container);
             }
-            else
-            {
+            else {
                 this.container.appendChild(this.stats.container);
             }
         }
@@ -418,28 +383,23 @@ namespace gd3d.framework
          * @param div 绘制区域的dom
          * @version gd3d 1.0
          */
-        closeFps()
-        {
-            if (this.stats != null)
-            {
+        closeFps() {
+            if (this.stats != null) {
                 this.container.removeChild(this.stats.container);
             }
         }
 
-        showDrawCall()
-        {
+        showDrawCall() {
             DrawCallInfo.inc.showDrawcallInfo();
         }
-        closeDrawCall()
-        {
+        closeDrawCall() {
             DrawCallInfo.inc.closeDrawCallInfo();
         }
         private _frameID = 0;
         get frameID() { return this._frameID; };
         private beStepNumber = 0;
         //delta 单位秒
-        private update(delta: number)
-        {
+        private update(delta: number) {
             this._frameID++;
 
             //if (this.outcontainer.clientWidth != this._canvasClientWidth || this.outcontainer.clientHeight != this._canvasClientHeight)
@@ -449,18 +409,14 @@ namespace gd3d.framework
 
             this.updateScreenAsp();
 
-            if (this.bePlay)
-            {
-                if (this.bePause)
-                {
-                    if (this.beStepForward && this.beStepNumber > 0)
-                    {
+            if (this.bePlay) {
+                if (this.bePause) {
+                    if (this.beStepForward && this.beStepNumber > 0) {
                         this.beStepNumber--;
                         this.updateUserCode(delta);
                     }
                 }
-                else
-                {
+                else {
                     if (this._inputmgr)
                         this._inputmgr.update(delta);
                     this.updateUserCode(delta);
@@ -470,25 +426,21 @@ namespace gd3d.framework
             if (this.updateEditorCode)
                 this.updateEditorCode(delta);
 
-            if (this._scene != null)
-            {
+            if (this._scene != null) {
                 this._scene.update(delta);
             }
         }
 
-        private updateScreenAsp()
-        {
+        private updateScreenAsp() {
             if (!this.outcontainer)
                 return;
-            if (this.webgl && this.webgl.canvas)
-            {
+            if (this.webgl && this.webgl.canvas) {
                 var canvas = <HTMLCanvasElement>this.webgl.canvas;
                 this.ccWidth = canvas.clientWidth != null ? canvas.clientWidth : this.ccWidth;
                 this.ccHeight = canvas.clientHeight != null ? canvas.clientHeight : this.ccHeight;
             }
 
-            if (this.ccWidth != this._canvasClientWidth || this.ccHeight != this._canvasClientHeight)
-            {
+            if (this.ccWidth != this._canvasClientWidth || this.ccHeight != this._canvasClientHeight) {
                 this._canvasClientWidth = this.ccWidth;
                 this._canvasClientHeight = this.ccHeight;
                 this.setScreenAsp();
@@ -518,14 +470,12 @@ namespace gd3d.framework
         }
 
         //设置屏幕的 ASP
-        private setScreenAsp()
-        {
+        private setScreenAsp() {
             if (!this.webgl || !this.webgl.canvas) return;
             let canvas = this.webgl.canvas;
             let devicePixelRatio = window.devicePixelRatio || 1;
             let type = this.canvasFixedType;
-            switch (type)
-            {
+            switch (type) {
                 case CanvasFixedType.Free:
                     this.screenAdaptiveType = "宽高度自适应(宽高都不固定,真实像素宽高)";
                     canvas.width = this.ccWidth * devicePixelRatio;
@@ -559,8 +509,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        getUserUpdateTimer()
-        {
+        getUserUpdateTimer() {
             return this.usercodetime;
         }
         private beginTimer;
@@ -569,8 +518,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        getTotalTime(): number
-        {
+        getTotalTime(): number {
             return this.totalTime;
         }
 
@@ -578,8 +526,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        public get deltaTime()
-        {
+        public get deltaTime() {
             return this._deltaTime * this._timeScale;
         }
         private pretimer: number = 0;
@@ -587,8 +534,7 @@ namespace gd3d.framework
         /**
          * @private
          */
-        getUpdateTimer()
-        {
+        getUpdateTimer() {
             return this.updateTimer;
         }
 
@@ -596,18 +542,15 @@ namespace gd3d.framework
          * @private
          */
         public isFrustumCulling: boolean = true;
-        private loop()
-        {
+        private loop() {
             var now = Date.now() / 1000;
             this._deltaTime = now - this.lastTimer;
             this.totalTime = now - this.beginTimer;
             this.updateTimer = now - this.pretimer;
-            if (this._deltaTime < this._standDeltaTime)
-            {
+            if (this._deltaTime < this._standDeltaTime) {
                 let _this = this;
                 let del = this._standDeltaTime - this._deltaTime;
-                setTimeout(function ()
-                {
+                setTimeout(function () {
                     var _now = Date.now() / 1000;
                     _this.lastTimer = _now;
                     _this.pretimer = _now;
@@ -617,19 +560,16 @@ namespace gd3d.framework
                     _this.loop();
                 }, del * 1000);
             }
-            else
-            {
+            else {
                 this.update(this.deltaTime);
                 if (this.stats != null)
                     this.stats.update();
                 this.lastTimer = now;
                 this.pretimer = now;
-                if (this.limitFrame)
-                {
+                if (this.limitFrame) {
                     requestAnimationFrame(this.loop.bind(this));
                 }
-                else
-                {
+                else {
                     setTimeout(this.loop.bind(this), 1);
                 }
             }
@@ -643,16 +583,13 @@ namespace gd3d.framework
         //我们只留一个控制层即可
 
         private _scene: scene;
-        private initScene()
-        {
-            if (this._scene == null)
-            {
+        private initScene() {
+            if (this._scene == null) {
                 this._scene = new scene(this);
                 sceneMgr.scene = this._scene;
             }
         }
-        private initRender(): any
-        {
+        private initRender(): any {
             uniformSetter.initAutouniform();
             render.shaderUniform.webgl = this.webgl;
             render.shaderUniform.initApplyUnifmFunc();
@@ -664,16 +601,13 @@ namespace gd3d.framework
          * 获取场景实例
          * @version gd3d 1.0
          */
-        getScene(): scene
-        {
+        getScene(): scene {
             return this._scene;
         }
 
         private _assetmgr: assetMgr
-        private initAssetMgr()
-        {
-            if (this._assetmgr == null)
-            {
+        private initAssetMgr() {
+            if (this._assetmgr == null) {
                 assetMgr.Instance = this._assetmgr = new assetMgr(this);
                 this._assetmgr.initDefAsset();
             }
@@ -685,18 +619,15 @@ namespace gd3d.framework
          * 获取资源管理器实例
          * @version gd3d 1.0
          */
-        getAssetMgr()
-        {
+        getAssetMgr() {
             return this._assetmgr;
         }
 
 
 
         private _inputmgr: inputMgr
-        private initInputMgr()
-        {
-            if (this._inputmgr == null)
-            {
+        private initInputMgr() {
+            if (this._inputmgr == null) {
                 this._inputmgr = new inputMgr(this);
             }
         }
@@ -707,8 +638,7 @@ namespace gd3d.framework
          * 获取输入管理器实例
          * @version gd3d 1.0
          */
-        getInputMgr()
-        {
+        getInputMgr() {
             return this._inputmgr;
         }
 
@@ -742,54 +672,44 @@ namespace gd3d.framework
         /**
          * @private
          */
-        public get bePause()
-        {
+        public get bePause() {
             return this._bePause;
         }
         /**
          * @private
          */
-        public set bePause(value: boolean)
-        {
+        public set bePause(value: boolean) {
             this._bePause = value;
         }
         private _beStepForward: boolean = false;
         /**
          * @private
          */
-        public get beStepForward()
-        {
+        public get beStepForward() {
             return this._beStepForward;
         }
         /**
          * @private
          */
-        public set beStepForward(value: boolean)
-        {
+        public set beStepForward(value: boolean) {
             this._beStepForward = value;
         }
 
-        private updateUserCode(delta: number)
-        {
+        private updateUserCode(delta: number) {
             //add new code;
-            while (this._userCodeNew.length > 0)
-            {
+            while (this._userCodeNew.length > 0) {
                 var c = this._userCodeNew.pop();//this._userCodeNew[i];
-                if (c.isClosed() == false)
-                {
+                if (c.isClosed() == false) {
                     c.onStart(this);
                     this._userCode.push(c);
                 }
             }
 
-            for (let i = 0, len = this._userCode.length; i < len; ++i)
-            {
+            for (let i = 0, len = this._userCode.length; i < len; ++i) {
                 c = this._userCode[i];
-                if (c.isClosed() == false && c.onUpdate)
-                {
+                if (c.isClosed() == false && c.onUpdate) {
                     c.onUpdate(delta);
-                } else
-                {
+                } else {
                     this._userCode.splice(i, 1);
                 }
             }
@@ -830,27 +750,21 @@ namespace gd3d.framework
             */
         }
 
-        private updateEditorCode(delta: number)
-        {
-            for (let i = this._editorCodeNew.length - 1; i >= 0; i--)
-            {
+        private updateEditorCode(delta: number) {
+            for (let i = this._editorCodeNew.length - 1; i >= 0; i--) {
                 let c = this._editorCodeNew[i];
-                if (c.isClosed() == false)
-                {
+                if (c.isClosed() == false) {
                     c.onStart(this);
                     this._editorCode.push(c);
                     this._editorCodeNew.splice(i, 1);
                 }
             }
             let closeindex = -1;
-            for (let i = this._editorCode.length - 1; i >= 0; i--)
-            {
+            for (let i = this._editorCode.length - 1; i >= 0; i--) {
                 let c = this._editorCode[i];
-                if (c.isClosed())
-                {
+                if (c.isClosed()) {
                     this._editorCode.splice(i, 1);
-                } else
-                {
+                } else {
                     c.onUpdate(delta);
                 }
             }
@@ -871,8 +785,7 @@ namespace gd3d.framework
          * @param program usercode实例
          * @version gd3d 1.0
          */
-        addUserCodeDirect(program: IUserCode)
-        {
+        addUserCodeDirect(program: IUserCode) {
             if (program.onUpdate.toString().length < 35)
                 program.onUpdate = undefined;
             this._userCodeNew.push(program);
@@ -885,12 +798,10 @@ namespace gd3d.framework
          * @param classname usercode类名
          * @version gd3d 1.0
          */
-        addUserCode(classname: string)
-        {
+        addUserCode(classname: string) {
             //反射创建实例的方法
             var prototype = gd3d.reflect.getPrototype(classname);
-            if (prototype != null)
-            {
+            if (prototype != null) {
                 var code = gd3d.reflect.createInstance(prototype, { "usercode": "1" });
                 this.addUserCodeDirect(code);
             }
@@ -904,12 +815,10 @@ namespace gd3d.framework
          * @param classname editorcode类名
          * @version gd3d 1.0
          */
-        addEditorCode(classname: string)
-        {
+        addEditorCode(classname: string) {
             //反射创建实例的方法
             var prototype = gd3d.reflect.getPrototype(classname);
-            if (prototype != null)
-            {
+            if (prototype != null) {
                 var code = gd3d.reflect.createInstance(prototype, { "editorcode": "1" });
                 this.addEditorCodeDirect(code);
             }
@@ -922,24 +831,22 @@ namespace gd3d.framework
          * @param program editorcode实例
          * @version gd3d 1.0
          */
-        addEditorCodeDirect(program: IEditorCode)
-        {
+        addEditorCodeDirect(program: IEditorCode) {
             this._editorCodeNew.push(program);
         }
 
-        public orientation: string = OrientationMode.AUTO;//旋转角度
+        /** 旋转角度 OrientationMode.AUTO */
+        public orientation: string = OrientationMode.AUTO;//
         public shouldRotate = false; //需要旋转
         private lastWidth = 0;
         private lastHeight = 0;
         public OffOrientationUpdate = false;  //关闭更新
-        private updateOrientationMode()
-        {
+        private updateOrientationMode() {
             if (this.OffOrientationUpdate || !this.outcontainer) return;
             let screenRect = this.outcontainer.getBoundingClientRect();
 
             this.shouldRotate = false;
-            if (this.orientation != OrientationMode.AUTO)
-            {
+            if (this.orientation != OrientationMode.AUTO) {
                 this.shouldRotate =
                     (this.orientation == OrientationMode.LANDSCAPE || this.orientation == OrientationMode.LANDSCAPE_FLIPPED) && screenRect.height > screenRect.width ||
                     this.orientation == OrientationMode.PORTRAIT && screenRect.width > screenRect.height;
@@ -950,6 +857,65 @@ namespace gd3d.framework
 
             if (this.lastWidth == screenWidth && this.lastHeight == screenHeight) return; //不再重复
 
+            this.refreshOrientationMode(screenRect, screenWidth, screenHeight);
+            // this.lastWidth = screenWidth;
+            // this.lastHeight = screenHeight;
+            // // if (this.width !== screenWidth) {
+            // //     this.width = screenWidth;
+            // // }
+            // // if (this.height !== screenHeight) {
+            // //     this.height = screenHeight;
+            // // }
+            // if (this.container) {
+            //     this.container.style[getPrefixStyleName("transformOrigin")] = "0% 0% 0px";
+            //     this.container.style.width = screenWidth + "px";
+            //     this.container.style.height = screenHeight + "px";
+
+
+            //     let rotation = 0;
+            //     if (this.shouldRotate) {
+            //         if (this.orientation == OrientationMode.LANDSCAPE) {//
+            //             rotation = 90;
+            //             this.container.style.top = (screenRect.height - screenWidth) / 2 + "px";
+            //             this.container.style.left = (screenRect.width + screenHeight) / 2 + "px";
+            //         }
+            //         else {
+            //             rotation = -90;
+            //             this.container.style.top = (screenRect.height + screenWidth) / 2 + "px";
+            //             this.container.style.left = (screenRect.width - screenHeight) / 2 + "px";
+            //         }
+            //     }
+            //     else {
+            //         this.container.style.top = (screenRect.height - screenHeight) / 2 + "px";
+            //         this.container.style.left = (screenRect.width - screenWidth) / 2 + "px";
+            //     }
+
+            //     let transform = `rotate(${rotation}deg)`;
+            //     this.container.style[getPrefixStyleName("transform")] = transform;
+            // }
+        }
+
+        /**
+         * 刷新 一次,视窗朝向数据。
+         * @param rect 视窗矩形区域
+         * @param screenWidth 视窗宽度
+         * @param screenHeight 视窗高度
+         */
+        public refreshOrientationMode(rect?: DOMRect, screenWidth?: number, screenHeight?: number) {
+            let screenRect = rect == null ? this.outcontainer.getBoundingClientRect() : rect;
+            this.shouldRotate = false;
+            if (this.orientation != OrientationMode.AUTO) {
+                this.shouldRotate =
+                    (this.orientation == OrientationMode.LANDSCAPE || this.orientation == OrientationMode.LANDSCAPE_FLIPPED) && screenRect.height > screenRect.width ||
+                    this.orientation == OrientationMode.PORTRAIT && screenRect.width > screenRect.height;
+            }
+            if (screenWidth == null) {
+                screenWidth = this.shouldRotate ? screenRect.height : screenRect.width;
+            }
+            if (screenHeight) {
+                screenHeight = this.shouldRotate ? screenRect.width : screenRect.height;
+            }
+
             this.lastWidth = screenWidth;
             this.lastHeight = screenHeight;
             // if (this.width !== screenWidth) {
@@ -958,31 +924,26 @@ namespace gd3d.framework
             // if (this.height !== screenHeight) {
             //     this.height = screenHeight;
             // }
-            if (this.container)
-            {
+            if (this.container) {
                 this.container.style[getPrefixStyleName("transformOrigin")] = "0% 0% 0px";
                 this.container.style.width = screenWidth + "px";
                 this.container.style.height = screenHeight + "px";
 
 
                 let rotation = 0;
-                if (this.shouldRotate)
-                {
-                    if (this.orientation == OrientationMode.LANDSCAPE)
-                    {//
+                if (this.shouldRotate) {
+                    if (this.orientation == OrientationMode.LANDSCAPE) {//
                         rotation = 90;
                         this.container.style.top = (screenRect.height - screenWidth) / 2 + "px";
                         this.container.style.left = (screenRect.width + screenHeight) / 2 + "px";
                     }
-                    else
-                    {
+                    else {
                         rotation = -90;
                         this.container.style.top = (screenRect.height + screenWidth) / 2 + "px";
                         this.container.style.left = (screenRect.width - screenHeight) / 2 + "px";
                     }
                 }
-                else
-                {
+                else {
                     this.container.style.top = (screenRect.height - screenHeight) / 2 + "px";
                     this.container.style.left = (screenRect.width - screenWidth) / 2 + "px";
                 }
@@ -999,8 +960,7 @@ namespace gd3d.framework
      * usercode接口
      * @version gd3d 1.0
      */
-    export interface IUserCode
-    {
+    export interface IUserCode {
         onStart(app: gd3d.framework.application);
         //以秒为单位的间隔
         onUpdate(delta: number);
@@ -1013,8 +973,7 @@ namespace gd3d.framework
      * editorcode接口
      * @version gd3d 1.0
      */
-    export interface IEditorCode
-    {
+    export interface IEditorCode {
         onStart(app: gd3d.framework.application);
         //以秒为单位的间隔
         onUpdate(delta: number);
@@ -1049,26 +1008,21 @@ namespace gd3d.framework
     /**
      * @private
      */
-    export function getPrefixStyleName(name: string, element?: any): string
-    {
+    export function getPrefixStyleName(name: string, element?: any): string {
         let header: string = "";
 
-        if (element != null)
-        {
+        if (element != null) {
             header = getPrefix(name, element);
         }
-        else
-        {
-            if (currentPrefix == null)
-            {
+        else {
+            if (currentPrefix == null) {
                 let tempStyle = document.createElement('div').style;
                 currentPrefix = getPrefix("transform", tempStyle);
             }
             header = currentPrefix;
         }
 
-        if (header == "")
-        {
+        if (header == "") {
             return name;
         }
 
@@ -1078,21 +1032,17 @@ namespace gd3d.framework
     /**
      * @private
      */
-    export function getPrefix(name: string, element: any): string
-    {
-        if (name in element)
-        {
+    export function getPrefix(name: string, element: any): string {
+        if (name in element) {
             return "";
         }
 
         name = name.charAt(0).toUpperCase() + name.substring(1, name.length);
         let transArr: string[] = ["webkit", "ms", "Moz", "O"];
-        for (let i: number = 0; i < transArr.length; i++)
-        {
+        for (let i: number = 0; i < transArr.length; i++) {
             let tempStyle: string = transArr[i] + name;
 
-            if (tempStyle in element)
-            {
+            if (tempStyle in element) {
                 return transArr[i];
             }
         }
