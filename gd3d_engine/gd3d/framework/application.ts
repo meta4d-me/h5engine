@@ -909,10 +909,10 @@ namespace gd3d.framework {
                     (this.orientation == OrientationMode.LANDSCAPE || this.orientation == OrientationMode.LANDSCAPE_FLIPPED) && screenRect.height > screenRect.width ||
                     this.orientation == OrientationMode.PORTRAIT && screenRect.width > screenRect.height;
             }
-            if (screenWidth == null) {
+            if (!screenWidth) {
                 screenWidth = this.shouldRotate ? screenRect.height : screenRect.width;
             }
-            if (screenHeight) {
+            if (!screenHeight) {
                 screenHeight = this.shouldRotate ? screenRect.width : screenRect.height;
             }
 
