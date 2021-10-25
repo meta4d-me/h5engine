@@ -215,12 +215,12 @@ namespace gd3d.framework
                     this._touches[id].touch = false;
                 }
 
-                // //所有触点全放开，point.touch才false
-                // for (var key in this._touches)
-                // {
-                //     if (this._touches[key].touch == true)
-                //         return;
-                // }
+                //所有触点全放开，point.touch才false
+                for (var key in this._touches)
+                {
+                    if (this._touches[key].touch == true)
+                        return;
+                }
                 this._point.touch = false;
         }
         private _touchcancel(ev:TouchEvent){
