@@ -290,6 +290,7 @@ namespace gd3d.framework {
 
         private lastWidth = 0;
         private lastHeight = 0;
+        private lastMultiTouch = false;
 
         /**
          * @public
@@ -303,7 +304,7 @@ namespace gd3d.framework {
          * @param multiTouch 是否多点中
          * @version gd3d 1.0
          */
-        update(delta: number, touch: Boolean, XOnModelSpace: number, YOnModelSpace: number, multiTouch = false) {
+        update(delta: number, touch: boolean, XOnModelSpace: number, YOnModelSpace: number, multiTouch = false) {
             //canvas 的空间是左上角(-asp,1)-(asp,-1),和屏幕空间一致
             //右下角是 1*asp，1
             //这里有点状况，不应该乘以
@@ -340,7 +341,7 @@ namespace gd3d.framework {
                 this.pointEvent.c_x = tv2.x;
                 this.pointEvent.c_y = tv2.y;
                 var skip = false;
-                if (!this.pointDown && !touch && !multiTouch)//nothing
+                if (!this.pointDown && !touch && !multiTouch &&!this.lastMultiTouch)//nothing
                 {
                     skip = true;
                 }
@@ -377,6 +378,7 @@ namespace gd3d.framework {
                 }
 
                 // gd3d.poolv2_del(tv2);
+                this.lastMultiTouch = multiTouch;
             }
 
             rootnode.updateTran(false);
