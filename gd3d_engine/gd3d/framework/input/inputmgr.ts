@@ -146,6 +146,7 @@ namespace gd3d.framework {
         }
 
         private _touchstart(ev: TouchEvent) {
+            ev.preventDefault(); 
             this.HtmlNativeEventer.Emit("touchstart", ev);
 
             // this.CalcuPoint(ev.touches[0].clientX,ev.touches[0].clientY,this._point);
@@ -200,6 +201,7 @@ namespace gd3d.framework {
             }
         }
         private _touchend(ev: TouchEvent) {
+            ev.preventDefault(); 
             this.HtmlNativeEventer.Emit("touchend", ev);
 
             for (var i = 0; i < ev.changedTouches.length; i++) {
@@ -218,6 +220,7 @@ namespace gd3d.framework {
             this._point.multiTouch = false;
         }
         private _touchcancel(ev: TouchEvent) {
+            ev.preventDefault(); 
             this.HtmlNativeEventer.Emit("touchcancel", ev);
 
             this._touchend(ev);
