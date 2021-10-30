@@ -244,6 +244,11 @@ namespace gd3d.framework {
             this.HtmlNativeEventer.Emit("blur", ev);
 
             this._point.touch = false;
+            //清理 keys 状态
+            let _map = this.keyboardMap;
+            for(let key in _map){
+                _map[key] = false;
+            }
         }
 
 
