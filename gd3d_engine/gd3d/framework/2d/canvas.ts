@@ -305,6 +305,15 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         update(delta: number, touch: boolean, XOnModelSpace: number, YOnModelSpace: number, multiTouch = false) {
+            this.rootSizeAdjust();
+            this.burstPointEvent(touch, XOnModelSpace, YOnModelSpace, multiTouch);
+            this.updateNodeTree(delta);
+        }
+
+        /**
+         * 根节点 尺寸 调整
+         */
+        rootSizeAdjust() {
             //canvas 的空间是左上角(-asp,1)-(asp,-1),和屏幕空间一致
             //右下角是 1*asp，1
             //这里有点状况，不应该乘以
@@ -329,64 +338,76 @@ namespace gd3d.framework {
                 rootnode.localScale.y = -2 / this.pixelHeight;
                 rootnode.markDirty();
             }
+        }
 
-            if (this.enableUIEvent) {//updateinput
-                //重置event
-                this.pointEvent.eated = false;
-                let tv2 = canvas.help_v2;
-                tv2.x = this.pointEvent.x = XOnModelSpace;
-                tv2.y = this.pointEvent.y = YOnModelSpace;
-                this.pointEvent.selected = null;
-                this.clipPosToCanvasPos(tv2, tv2);
-                this.pointEvent.c_x = tv2.x;
-                this.pointEvent.c_y = tv2.y;
-                var skip = false;
-                if (!this.pointDown && !touch && !multiTouch &&!this.lastMultiTouch)//nothing
-                {
-                    skip = true;
-                }
-                else if (this.pointDown == false && touch == true)//pointdown
-                {
-                    this.pointEvent.type = event.PointEventEnum.PointDown;
-                }
-                else if (this.pointDown == true && touch == true)//pointhold
-                {
-                    this.pointEvent.type = event.PointEventEnum.PointHold;
-                    // if (this.pointX == this.pointEvent.x && this.pointY == this.pointEvent.y)
-                    // {
-                    //     // console.log("skip event");
-                    //     skip = true;
-                    // }
-                }
-                else if (this.pointDown == true && touch == false)//pointup
-                {
-                    this.pointEvent.type = event.PointEventEnum.PointUp;
-                }
-                //事件走的是flash U型圈
-                if (!skip) {
-                    if (this.scene.app.bePlay) {
-                        // rootnode.onCapturePointEvent(this, this.pointEvent);
-                        // rootnode.onPointEvent(this, this.pointEvent);
-
-                        //优化
-                        // this.capturePointFlow();  //多余 flow
-                        this.popPointFlow();
-                    }
-                    this.pointDown = touch;
-                    this.pointX = this.pointEvent.x;
-                    this.pointY = this.pointEvent.y;
-                }
-
-                // gd3d.poolv2_del(tv2);
-                this.lastMultiTouch = multiTouch;
-            }
-
-            rootnode.updateTran(false);
+        /** 刷新节点树 */
+        public updateNodeTree(delta: number) {
+            //upadte
+            this.rootNode.updateTran(false);
             //rootnode.update(delta);
             if (this.scene.app.bePlay) {
                 this._peCareListBuoy = -1;
-                this.objupdate(rootnode, delta);
+                this.objupdate(this.rootNode, delta);
             }
+        }
+
+        /**
+         * 触发 point 事件流
+         * @param touch 是否有点
+         * @param XOnModelSpace 坐标x
+         * @param YOnModelSpace 坐标y
+         * @param multiTouch 多点
+         */
+        public burstPointEvent(touch: boolean, XOnModelSpace: number, YOnModelSpace: number, multiTouch = false) {
+            if (!this.enableUIEvent) return;
+            //重置event
+            this.pointEvent.eated = false;
+            let tv2 = canvas.help_v2;
+            tv2.x = this.pointEvent.x = XOnModelSpace;
+            tv2.y = this.pointEvent.y = YOnModelSpace;
+            this.pointEvent.selected = null;
+            this.clipPosToCanvasPos(tv2, tv2);
+            this.pointEvent.c_x = tv2.x;
+            this.pointEvent.c_y = tv2.y;
+            var skip = false;
+            if (!this.pointDown && !touch && !multiTouch && !this.lastMultiTouch)//nothing
+            {
+                skip = true;
+            }
+            else if (this.pointDown == false && touch == true)//pointdown
+            {
+                this.pointEvent.type = event.PointEventEnum.PointDown;
+            }
+            else if (this.pointDown == true && touch == true)//pointhold
+            {
+                this.pointEvent.type = event.PointEventEnum.PointHold;
+                // if (this.pointX == this.pointEvent.x && this.pointY == this.pointEvent.y)
+                // {
+                //     // console.log("skip event");
+                //     skip = true;
+                // }
+            }
+            else if (this.pointDown == true && touch == false)//pointup
+            {
+                this.pointEvent.type = event.PointEventEnum.PointUp;
+            }
+            //事件走的是flash U型圈
+            if (!skip) {
+                if (this.scene.app.bePlay) {
+                    // rootnode.onCapturePointEvent(this, this.pointEvent);
+                    // rootnode.onPointEvent(this, this.pointEvent);
+
+                    //优化
+                    // this.capturePointFlow();  //多余 flow
+                    this.popPointFlow();
+                }
+                this.pointDown = touch;
+                this.pointX = this.pointEvent.x;
+                this.pointY = this.pointEvent.y;
+            }
+
+            // gd3d.poolv2_del(tv2);
+            this.lastMultiTouch = multiTouch;
         }
 
         //捕获阶段流

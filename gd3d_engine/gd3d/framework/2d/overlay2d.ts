@@ -20,8 +20,10 @@ namespace gd3d.framework {
      * @version gd3d 1.0
      */
     @gd3d.reflect.SerializeType
-    export class overlay2D implements IOverLay {
+    export class overlay2D implements IOverLay, IDisposable {
         static readonly ClassName: string = "overlay2D";
+        /** point事件 直接模式（默认True,在dom输入原生帧直接触发） */
+        public static pointEventDirectMode: boolean = true;
 
         /**
          * @public
@@ -33,6 +35,14 @@ namespace gd3d.framework {
         constructor() {
             this.canvas = new canvas();
             sceneMgr.app.markNotify(this.canvas.getRoot(), NotifyType.AddChild);
+        }
+
+        private _hasListenerEvent = false;
+        private _disposed = false;
+        public get disposed() { return this._disposed };
+        dispose(): void {
+            this.unRegEvents();
+            this._disposed = true;
         }
 
         /**
@@ -58,6 +68,34 @@ namespace gd3d.framework {
             camera.calcViewPortPixel(this.app);
             this.canvas.scene = camera.gameObject.getScene();
             this.inputmgr = camera.gameObject.getScene().app.getInputMgr();
+
+            if (overlay2D.pointEventDirectMode) {
+                this.regEvnets();
+            }
+        }
+
+        private regEvnets() {
+            this._hasListenerEvent = true;
+            let ipt = gd3d.framework.sceneMgr.app.getInputMgr();
+            ipt.addHTMLElementListener("touchstart", this.refreshAndPointEvent, this);
+            ipt.addHTMLElementListener("touchmove", this.refreshAndPointEvent, this);
+            ipt.addHTMLElementListener("touchend", this.refreshAndPointEvent, this);
+            ipt.addHTMLElementListener("touchcancel", this.refreshAndPointEvent, this);
+            ipt.addHTMLElementListener("mousedown", this.refreshAndPointEvent, this);
+            ipt.addHTMLElementListener("mousemove", this.refreshAndPointEvent, this);
+            ipt.addHTMLElementListener("mouseup", this.refreshAndPointEvent, this);
+        }
+
+        private unRegEvents() {
+            if (!this._hasListenerEvent) return;
+            let ipt = gd3d.framework.sceneMgr.app.getInputMgr();
+            ipt.removeHTMLElementListener("touchstart", this.refreshAndPointEvent, this);
+            ipt.removeHTMLElementListener("touchmove", this.refreshAndPointEvent, this);
+            ipt.removeHTMLElementListener("touchend", this.refreshAndPointEvent, this);
+            ipt.removeHTMLElementListener("touchcancel", this.refreshAndPointEvent, this);
+            ipt.removeHTMLElementListener("mousedown", this.refreshAndPointEvent, this);
+            ipt.removeHTMLElementListener("mousemove", this.refreshAndPointEvent, this);
+            ipt.removeHTMLElementListener("mouseup", this.refreshAndPointEvent, this);
         }
 
         /**
@@ -223,12 +261,24 @@ namespace gd3d.framework {
             //layout update
             this.ckScaleMode();
 
-            // this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
-            // let rect = this.camera.viewport;
-            // let real_x = this.inputmgr.point.x - rect.x * this.app.width ;
-            // let real_y = this.inputmgr.point.y - rect.y * this.app.height;
-            // let sx = (real_x / this.viewPixelrect.w) * 2 - 1;
-            // let sy = (real_y / this.viewPixelrect.h) * -2 + 1;
+            this.canvas.rootSizeAdjust();
+
+            if(!this._hasListenerEvent){
+                this.onPointEvent();
+            }
+
+            this.canvas.updateNodeTree(delta);
+
+        }
+
+        /** 刷新ui point数据并触发 事件 */
+        private refreshAndPointEvent() {
+            this.inputmgr.pointCk();
+            this.onPointEvent();
+        }
+
+        /** ui point 事件 */
+        private onPointEvent() {
             //用屏幕空间坐标系丢给canvas
             let _p = this.inputmgr.point;
             this.helpv2.x = _p.x;
@@ -237,8 +287,7 @@ namespace gd3d.framework {
             let mPos = this.helpv2_1;
             this.calScreenPosToClipPos(sPos, mPos);
 
-            //canvas de update 直接集成pointevent处理
-            this.canvas.update(delta, _p.touch, mPos.x, mPos.y, _p.multiTouch);
+            this.canvas.burstPointEvent(_p.touch, mPos.x, mPos.y, _p.multiTouch);
         }
 
         private lastVPRect = new math.rect();
@@ -300,7 +349,7 @@ namespace gd3d.framework {
          * @public
          * @language zh_CN
          * @classdesc
-         * 事件检测
+         * 投射拣选检测
          * @param mx x偏移
          * @param my y偏移
          * @version gd3d 1.0

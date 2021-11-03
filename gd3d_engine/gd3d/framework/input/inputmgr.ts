@@ -87,25 +87,27 @@ namespace gd3d.framework {
 
         //mouse
         private _mousedown(ev: MouseEvent) {
-            this.HtmlNativeEventer.Emit("mousedown", ev);
 
             this.CalcuPoint(ev.offsetX, ev.offsetY, this._point);
             this._buttons[ev.button] = true;
             this._point.touch = true;
+
+            this.HtmlNativeEventer.Emit("mousedown", ev);
         }
         private _mouseup(ev: MouseEvent) {
-            this.HtmlNativeEventer.Emit("mouseup", ev);
 
             this._buttons[ev.button] = false;
             this._point.touch = false;
+
+            this.HtmlNativeEventer.Emit("mouseup", ev);
         }
         private _mousemove(ev: MouseEvent) {
-            this.HtmlNativeEventer.Emit("mousemove", ev);
 
             this.CalcuPoint(ev.offsetX, ev.offsetY, this._point);
+
+            this.HtmlNativeEventer.Emit("mousemove", ev);
         }
         private _mousewheel(ev: WheelEvent) {
-            this.HtmlNativeEventer.Emit("wheel", ev);
 
             this.hasWheel = true;
             if (ev.detail) {
@@ -117,6 +119,9 @@ namespace gd3d.framework {
             } else {
                 this.lastWheel = 0;
             }
+
+
+            this.HtmlNativeEventer.Emit("wheel", ev);
         }
 
         //touch
@@ -146,8 +151,7 @@ namespace gd3d.framework {
         }
 
         private _touchstart(ev: TouchEvent) {
-            ev.preventDefault(); 
-            this.HtmlNativeEventer.Emit("touchstart", ev);
+            ev.preventDefault();
 
             // this.CalcuPoint(ev.touches[0].clientX,ev.touches[0].clientY,this._point);
             this._point.touch = true;
@@ -173,10 +177,11 @@ namespace gd3d.framework {
                 this._point.x = lastTouche.x;
                 this._point.y = lastTouche.y;
             }
+
+            this.HtmlNativeEventer.Emit("touchstart", ev);
         }
         private _touchmove(ev: TouchEvent) {
             ev.preventDefault();    //避免 在触摸设备中，下拉 触发浏览器刷新监听。
-            this.HtmlNativeEventer.Emit("touchmove", ev);
 
             this._point.touch = true;
             this._point.multiTouch = true;
@@ -199,10 +204,11 @@ namespace gd3d.framework {
                 this._point.x = lastTouche.x;
                 this._point.y = lastTouche.y;
             }
+
+            this.HtmlNativeEventer.Emit("touchmove", ev);
         }
         private _touchend(ev: TouchEvent) {
-            ev.preventDefault(); 
-            this.HtmlNativeEventer.Emit("touchend", ev);
+            ev.preventDefault();
 
             for (var i = 0; i < ev.changedTouches.length; i++) {
                 var touch = ev.changedTouches[i];
@@ -218,37 +224,43 @@ namespace gd3d.framework {
                     return;
             }
             this._point.multiTouch = false;
+
+            this.HtmlNativeEventer.Emit("touchend", ev);
         }
         private _touchcancel(ev: TouchEvent) {
-            ev.preventDefault(); 
-            this.HtmlNativeEventer.Emit("touchcancel", ev);
-
+            ev.preventDefault();
+            
             this._touchend(ev);
+
+            this.HtmlNativeEventer.Emit("touchcancel", ev);
         }
 
         //key
         private _keydown(ev: KeyboardEvent) {
-            this.HtmlNativeEventer.Emit("keydown", ev);
-
+            
             this.keyboardMap[ev.keyCode] = true;
             this.keyDownCode = ev.keyCode;
+
+            this.HtmlNativeEventer.Emit("keydown", ev);
         }
         private _keyup(ev: KeyboardEvent) {
-            this.HtmlNativeEventer.Emit("keyup", ev);
-
+            
             delete this.keyboardMap[ev.keyCode];
             this.keyUpCode = ev.keyCode;
+
+            this.HtmlNativeEventer.Emit("keyup", ev);
         }
         //
         private _blur(ev) {
-            this.HtmlNativeEventer.Emit("blur", ev);
-
+            
             this._point.touch = false;
             //清理 keys 状态
             let _map = this.keyboardMap;
-            for(let key in _map){
+            for (let key in _map) {
                 _map[key] = false;
             }
+            
+            this.HtmlNativeEventer.Emit("blur", ev);
         }
 
 
@@ -270,7 +282,10 @@ namespace gd3d.framework {
             this.keyCodeCk();
         }
 
-        private pointCk() {
+        /**
+         * point 刷新检查
+         */
+        public pointCk() {
             let pt = this._point;
             if (this.lastPoint.x != pt.x || this.lastPoint.y != pt.y) {
                 //on move
