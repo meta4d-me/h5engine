@@ -160,7 +160,8 @@ var gd3d;
                 this._bePause = false;
                 this._beStepForward = false;
                 this._beRendering = true;
-                this.orientation = framework.OrientationMode.AUTO; //旋转角度
+                /** 旋转角度 OrientationMode.AUTO */
+                this.orientation = framework.OrientationMode.AUTO; //
                 this.shouldRotate = false; //需要旋转
                 this.lastWidth = 0;
                 this.lastHeight = 0;
@@ -884,6 +885,60 @@ var gd3d;
                 var screenHeight = this.shouldRotate ? screenRect.width : screenRect.height;
                 if (this.lastWidth == screenWidth && this.lastHeight == screenHeight)
                     return; //不再重复
+                this.refreshOrientationMode(screenRect, screenWidth, screenHeight);
+                // this.lastWidth = screenWidth;
+                // this.lastHeight = screenHeight;
+                // // if (this.width !== screenWidth) {
+                // //     this.width = screenWidth;
+                // // }
+                // // if (this.height !== screenHeight) {
+                // //     this.height = screenHeight;
+                // // }
+                // if (this.container) {
+                //     this.container.style[getPrefixStyleName("transformOrigin")] = "0% 0% 0px";
+                //     this.container.style.width = screenWidth + "px";
+                //     this.container.style.height = screenHeight + "px";
+                //     let rotation = 0;
+                //     if (this.shouldRotate) {
+                //         if (this.orientation == OrientationMode.LANDSCAPE) {//
+                //             rotation = 90;
+                //             this.container.style.top = (screenRect.height - screenWidth) / 2 + "px";
+                //             this.container.style.left = (screenRect.width + screenHeight) / 2 + "px";
+                //         }
+                //         else {
+                //             rotation = -90;
+                //             this.container.style.top = (screenRect.height + screenWidth) / 2 + "px";
+                //             this.container.style.left = (screenRect.width - screenHeight) / 2 + "px";
+                //         }
+                //     }
+                //     else {
+                //         this.container.style.top = (screenRect.height - screenHeight) / 2 + "px";
+                //         this.container.style.left = (screenRect.width - screenWidth) / 2 + "px";
+                //     }
+                //     let transform = `rotate(${rotation}deg)`;
+                //     this.container.style[getPrefixStyleName("transform")] = transform;
+                // }
+            };
+            /**
+             * 刷新 一次,视窗朝向数据。
+             * @param rect 视窗矩形区域
+             * @param screenWidth 视窗宽度
+             * @param screenHeight 视窗高度
+             */
+            application.prototype.refreshOrientationMode = function (rect, screenWidth, screenHeight) {
+                var screenRect = rect == null ? this.outcontainer.getBoundingClientRect() : rect;
+                this.shouldRotate = false;
+                if (this.orientation != framework.OrientationMode.AUTO) {
+                    this.shouldRotate =
+                        (this.orientation == framework.OrientationMode.LANDSCAPE || this.orientation == framework.OrientationMode.LANDSCAPE_FLIPPED) && screenRect.height > screenRect.width ||
+                            this.orientation == framework.OrientationMode.PORTRAIT && screenRect.width > screenRect.height;
+                }
+                if (!screenWidth) {
+                    screenWidth = this.shouldRotate ? screenRect.height : screenRect.width;
+                }
+                if (!screenHeight) {
+                    screenHeight = this.shouldRotate ? screenRect.width : screenRect.height;
+                }
                 this.lastWidth = screenWidth;
                 this.lastHeight = screenHeight;
                 // if (this.width !== screenWidth) {
@@ -2602,6 +2657,8 @@ var gd3d;
                 this.pointY = 0;
                 this.lastWidth = 0;
                 this.lastHeight = 0;
+                this.lastMultiTouch = false;
+                this._insIdFrameMap = {};
                 this.lastMaskSta = -1;
                 this.rendererDic = {}; //渲染对象字典容器
                 this.depthList = [];
@@ -2694,9 +2751,19 @@ var gd3d;
              * @param touch 是否接收到事件
              * @param XOnModelSpace 模型空间下的x偏移
              * @param YOnModelSpace 模型空间下的y偏移
+             * @param multiTouch 是否多点中
              * @version gd3d 1.0
              */
-            canvas.prototype.update = function (delta, touch, XOnModelSpace, YOnModelSpace) {
+            canvas.prototype.update = function (delta, touch, XOnModelSpace, YOnModelSpace, multiTouch) {
+                if (multiTouch === void 0) { multiTouch = false; }
+                this.rootSizeAdjust();
+                this.burstPointEvent(touch, XOnModelSpace, YOnModelSpace, multiTouch);
+                this.updateNodeTree(delta);
+            };
+            /**
+             * 根节点 尺寸 调整
+             */
+            canvas.prototype.rootSizeAdjust = function () {
                 //canvas 的空间是左上角(-asp,1)-(asp,-1),和屏幕空间一致
                 //右下角是 1*asp，1
                 //这里有点状况，不应该乘以
@@ -2719,59 +2786,74 @@ var gd3d;
                     rootnode.localScale.y = -2 / this.pixelHeight;
                     rootnode.markDirty();
                 }
-                if (this.enableUIEvent) { //updateinput
-                    //重置event
-                    this.pointEvent.eated = false;
-                    var tv2 = canvas_1.help_v2;
-                    tv2.x = this.pointEvent.x = XOnModelSpace;
-                    tv2.y = this.pointEvent.y = YOnModelSpace;
-                    this.pointEvent.selected = null;
-                    this.clipPosToCanvasPos(tv2, tv2);
-                    this.pointEvent.c_x = tv2.x;
-                    this.pointEvent.c_y = tv2.y;
-                    var skip = false;
-                    if (this.pointDown == false && touch == false) //nothing
-                     {
-                        skip = true;
-                    }
-                    else if (this.pointDown == false && touch == true) //pointdown
-                     {
-                        this.pointEvent.type = gd3d.event.PointEventEnum.PointDown;
-                    }
-                    else if (this.pointDown == true && touch == true) //pointhold
-                     {
-                        this.pointEvent.type = gd3d.event.PointEventEnum.PointHold;
-                        // if (this.pointX == this.pointEvent.x && this.pointY == this.pointEvent.y)
-                        // {
-                        //     // console.log("skip event");
-                        //     skip = true;
-                        // }
-                    }
-                    else if (this.pointDown == true && touch == false) //pointup
-                     {
-                        this.pointEvent.type = gd3d.event.PointEventEnum.PointUp;
-                    }
-                    //事件走的是flash U型圈
-                    if (!skip) {
-                        if (this.scene.app.bePlay) {
-                            // rootnode.onCapturePointEvent(this, this.pointEvent);
-                            // rootnode.onPointEvent(this, this.pointEvent);
-                            //优化
-                            // this.capturePointFlow();  //多余 flow
-                            this.popPointFlow();
-                        }
-                        this.pointDown = touch;
-                        this.pointX = this.pointEvent.x;
-                        this.pointY = this.pointEvent.y;
-                    }
-                    // gd3d.poolv2_del(tv2);
-                }
-                rootnode.updateTran(false);
+            };
+            /** 刷新节点树 */
+            canvas.prototype.updateNodeTree = function (delta) {
+                //upadte
+                this.rootNode.updateTran(false);
                 //rootnode.update(delta);
                 if (this.scene.app.bePlay) {
                     this._peCareListBuoy = -1;
-                    this.objupdate(rootnode, delta);
+                    this.objupdate(this.rootNode, delta);
                 }
+            };
+            /**
+             * 触发 point 事件流
+             * @param touch 是否有点
+             * @param XOnModelSpace 坐标x
+             * @param YOnModelSpace 坐标y
+             * @param multiTouch 多点
+             */
+            canvas.prototype.burstPointEvent = function (touch, XOnModelSpace, YOnModelSpace, multiTouch) {
+                if (multiTouch === void 0) { multiTouch = false; }
+                if (!this.enableUIEvent)
+                    return;
+                //重置event
+                this.pointEvent.eated = false;
+                var tv2 = canvas_1.help_v2;
+                tv2.x = this.pointEvent.x = XOnModelSpace;
+                tv2.y = this.pointEvent.y = YOnModelSpace;
+                this.pointEvent.selected = null;
+                this.clipPosToCanvasPos(tv2, tv2);
+                this.pointEvent.c_x = tv2.x;
+                this.pointEvent.c_y = tv2.y;
+                var skip = false;
+                if (!this.pointDown && !touch && !multiTouch && !this.lastMultiTouch) //nothing
+                 {
+                    skip = true;
+                }
+                else if (this.pointDown == false && touch == true) //pointdown
+                 {
+                    this.pointEvent.type = gd3d.event.PointEventEnum.PointDown;
+                }
+                else if (this.pointDown == true && touch == true) //pointhold
+                 {
+                    this.pointEvent.type = gd3d.event.PointEventEnum.PointHold;
+                    // if (this.pointX == this.pointEvent.x && this.pointY == this.pointEvent.y)
+                    // {
+                    //     // console.log("skip event");
+                    //     skip = true;
+                    // }
+                }
+                else if (this.pointDown == true && touch == false) //pointup
+                 {
+                    this.pointEvent.type = gd3d.event.PointEventEnum.PointUp;
+                }
+                //事件走的是flash U型圈
+                if (!skip) {
+                    if (this.scene.app.bePlay) {
+                        // rootnode.onCapturePointEvent(this, this.pointEvent);
+                        // rootnode.onPointEvent(this, this.pointEvent);
+                        //优化
+                        // this.capturePointFlow();  //多余 flow
+                        this.popPointFlow();
+                    }
+                    this.pointDown = touch;
+                    this.pointX = this.pointEvent.x;
+                    this.pointY = this.pointEvent.y;
+                }
+                // gd3d.poolv2_del(tv2);
+                this.lastMultiTouch = multiTouch;
             };
             //捕获阶段流
             canvas.prototype.capturePointFlow = function () {
@@ -2830,6 +2912,8 @@ var gd3d;
             canvas.prototype.objupdate = function (node, delta) {
                 if (!node || !node.visible)
                     return;
+                var app = this.scene.app;
+                var currFrameID = app.frameID;
                 node.init(this.scene.app.bePlay); //组件还未初始化的初始化
                 var compLen = node.components.length;
                 if (compLen > 0) {
@@ -2849,17 +2933,21 @@ var gd3d;
                         if (comp.update)
                             comp.update(delta);
                         if (framework.instanceOfI2DPointListener(comp)) { //判断是否为
-                            this._peCareListBuoy++;
                             var insId = node.insId.getInsID();
-                            var plist = this._pointEventCareList;
-                            var pBuoy = this._peCareListBuoy;
-                            if (plist.length <= pBuoy) {
-                                plist.push(insId);
+                            //insID 去重
+                            if (this._insIdFrameMap[insId] != currFrameID) {
+                                this._insIdFrameMap[insId] = currFrameID;
+                                this._peCareListBuoy++;
+                                var plist = this._pointEventCareList;
+                                var pBuoy = this._peCareListBuoy;
+                                if (plist.length <= pBuoy) {
+                                    plist.push(insId);
+                                }
+                                else {
+                                    plist[pBuoy] = insId;
+                                }
+                                plist[pBuoy];
                             }
-                            else {
-                                plist[pBuoy] = insId;
-                            }
-                            plist[pBuoy];
                         }
                     }
                 }
@@ -3607,6 +3695,8 @@ var gd3d;
              * @version gd3d 1.0
              */
             function overlay2D() {
+                this._hasListenerEvent = false;
+                this._disposed = false;
                 /**
                  * @private
                  * @language zh_CN
@@ -3679,6 +3769,17 @@ var gd3d;
                 this.canvas = new framework.canvas();
                 framework.sceneMgr.app.markNotify(this.canvas.getRoot(), framework.NotifyType.AddChild);
             }
+            overlay2D_1 = overlay2D;
+            Object.defineProperty(overlay2D.prototype, "disposed", {
+                get: function () { return this._disposed; },
+                enumerable: false,
+                configurable: true
+            });
+            ;
+            overlay2D.prototype.dispose = function () {
+                this.unRegEvents();
+                this._disposed = true;
+            };
             /**
              * @private
              */
@@ -3690,6 +3791,32 @@ var gd3d;
                 camera.calcViewPortPixel(this.app);
                 this.canvas.scene = camera.gameObject.getScene();
                 this.inputmgr = camera.gameObject.getScene().app.getInputMgr();
+                if (overlay2D_1.pointEventDirectMode) {
+                    this.regEvnets();
+                }
+            };
+            overlay2D.prototype.regEvnets = function () {
+                this._hasListenerEvent = true;
+                var ipt = gd3d.framework.sceneMgr.app.getInputMgr();
+                ipt.addHTMLElementListener("touchstart", this.refreshAndPointEvent, this);
+                ipt.addHTMLElementListener("touchmove", this.refreshAndPointEvent, this);
+                ipt.addHTMLElementListener("touchend", this.refreshAndPointEvent, this);
+                ipt.addHTMLElementListener("touchcancel", this.refreshAndPointEvent, this);
+                ipt.addHTMLElementListener("mousedown", this.refreshAndPointEvent, this);
+                ipt.addHTMLElementListener("mousemove", this.refreshAndPointEvent, this);
+                ipt.addHTMLElementListener("mouseup", this.refreshAndPointEvent, this);
+            };
+            overlay2D.prototype.unRegEvents = function () {
+                if (!this._hasListenerEvent)
+                    return;
+                var ipt = gd3d.framework.sceneMgr.app.getInputMgr();
+                ipt.removeHTMLElementListener("touchstart", this.refreshAndPointEvent, this);
+                ipt.removeHTMLElementListener("touchmove", this.refreshAndPointEvent, this);
+                ipt.removeHTMLElementListener("touchend", this.refreshAndPointEvent, this);
+                ipt.removeHTMLElementListener("touchcancel", this.refreshAndPointEvent, this);
+                ipt.removeHTMLElementListener("mousedown", this.refreshAndPointEvent, this);
+                ipt.removeHTMLElementListener("mousemove", this.refreshAndPointEvent, this);
+                ipt.removeHTMLElementListener("mouseup", this.refreshAndPointEvent, this);
             };
             /**
              * @public
@@ -3772,20 +3899,27 @@ var gd3d;
             overlay2D.prototype.update = function (delta) {
                 //layout update
                 this.ckScaleMode();
-                // this.camera.calcViewPortPixel(this.app, this.viewPixelrect);
-                // let rect = this.camera.viewport;
-                // let real_x = this.inputmgr.point.x - rect.x * this.app.width ;
-                // let real_y = this.inputmgr.point.y - rect.y * this.app.height;
-                // let sx = (real_x / this.viewPixelrect.w) * 2 - 1;
-                // let sy = (real_y / this.viewPixelrect.h) * -2 + 1;
+                this.canvas.rootSizeAdjust();
+                if (!this._hasListenerEvent) {
+                    this.onPointEvent();
+                }
+                this.canvas.updateNodeTree(delta);
+            };
+            /** 刷新ui point数据并触发 事件 */
+            overlay2D.prototype.refreshAndPointEvent = function () {
+                this.inputmgr.pointCk();
+                this.onPointEvent();
+            };
+            /** ui point 事件 */
+            overlay2D.prototype.onPointEvent = function () {
                 //用屏幕空间坐标系丢给canvas
-                this.helpv2.x = this.inputmgr.point.x;
-                this.helpv2.y = this.inputmgr.point.y;
+                var _p = this.inputmgr.point;
+                this.helpv2.x = _p.x;
+                this.helpv2.y = _p.y;
                 var sPos = this.helpv2;
                 var mPos = this.helpv2_1;
                 this.calScreenPosToClipPos(sPos, mPos);
-                //canvas de update 直接集成pointevent处理
-                this.canvas.update(delta, this.inputmgr.point.touch, mPos.x, mPos.y);
+                this.canvas.burstPointEvent(_p.touch, mPos.x, mPos.y, _p.multiTouch);
             };
             //检查缩放模式 改变
             overlay2D.prototype.ckScaleMode = function () {
@@ -3841,7 +3975,7 @@ var gd3d;
              * @public
              * @language zh_CN
              * @classdesc
-             * 事件检测
+             * 投射拣选检测
              * @param mx x偏移
              * @param my y偏移
              * @version gd3d 1.0
@@ -3972,7 +4106,10 @@ var gd3d;
                 outScreenPos.x = real_x + rect.x * this.app.width;
                 outScreenPos.y = real_y + rect.y * this.app.height;
             };
+            var overlay2D_1;
             overlay2D.ClassName = "overlay2D";
+            /** point事件 直接模式（默认True,在dom输入原生帧直接触发） */
+            overlay2D.pointEventDirectMode = true;
             __decorate([
                 gd3d.reflect.Field("canvas"),
                 __metadata("design:type", framework.canvas)
@@ -3997,7 +4134,7 @@ var gd3d;
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
             ], overlay2D.prototype, "sortOrder", void 0);
-            overlay2D = __decorate([
+            overlay2D = overlay2D_1 = __decorate([
                 gd3d.reflect.SerializeType,
                 __metadata("design:paramtypes", [])
             ], overlay2D);
@@ -7382,6 +7519,7 @@ var gd3d;
                 this._lineType = lineType.SingleLine;
                 this._contentType = contentType.None;
             }
+            inputField_1 = inputField;
             Object.defineProperty(inputField.prototype, "frameImage", {
                 /**
                  * @public
@@ -7519,13 +7657,24 @@ var gd3d;
              */
             inputField.prototype.start = function () {
                 var _this = this;
+                //ios fix thing
+                this.ckIsIos();
                 this.inputElement = document.createElement("Input");
                 this.inputElement.style.opacity = "0";
-                this.inputElement.style.visibility = "hidden";
+                this.inputElement.style.display = "none";
+                this.inputElement.tabIndex = 0;
+                this.inputElement.autofocus = true;
                 if (this.transform.canvas.scene) {
                     var htmlCanv = this.transform.canvas.scene.webgl.canvas;
                     if (htmlCanv)
                         htmlCanv.parentElement.appendChild(this.inputElement);
+                }
+                if (inputField_1._isIos) {
+                    this.inputElement.onclick = function () {
+                        // console.error(`onclick : ${this.transform.insId.getInsID()} , ${this.inputElement.value}`);
+                        _this.inputElement.blur();
+                        _this.inputElement.focus();
+                    };
                 }
                 this.inputElement.onblur = function (e) {
                     _this.beFocus = false;
@@ -7534,6 +7683,18 @@ var gd3d;
                     _this.beFocus = true;
                 };
                 this.inputElmLayout();
+            };
+            inputField.prototype.ckIsIos = function () {
+                //ios 有保护 , focus 必须在 dom 事件帧触发。
+                if (inputField_1._isIos == null) {
+                    if (navigator && navigator.userAgent) {
+                        var u = navigator.userAgent;
+                        inputField_1._isIos = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
+                    }
+                    else {
+                        inputField_1._isIos = false;
+                    }
+                }
             };
             inputField.prototype.onPlay = function () {
             };
@@ -7546,14 +7707,19 @@ var gd3d;
                     return;
                 var pos = this.transform.getWorldTranslate();
                 var cssStyle = this.inputElement.style;
-                if (pos.x + "px" == cssStyle.left && pos.y + "px" == cssStyle.top && this.transform.width + "px" == cssStyle.width && this.transform.height + "px" == cssStyle.height)
+                var p = this.transform.pivot;
+                var w = this.transform.width;
+                var h = this.transform.height;
+                var realX = pos.x - p.x * w;
+                var realY = pos.y - p.y * h;
+                if (realX + "px" == cssStyle.left && realY + "px" == cssStyle.top && w + "px" == cssStyle.width && h + "px" == cssStyle.height)
                     return;
                 var scale = this.transform.canvas.scene.app.canvasClientHeight / this.transform.canvas.pixelHeight;
                 cssStyle.position = "absolute";
-                cssStyle.left = pos.x * scale + "px";
-                cssStyle.top = pos.y * scale + "px";
-                cssStyle.width = this.transform.width * scale + "px";
-                cssStyle.height = this.transform.height * scale + "px";
+                cssStyle.left = realX * scale + "px";
+                cssStyle.top = realY * scale + "px";
+                cssStyle.width = w * scale + "px";
+                cssStyle.height = h * scale + "px";
             };
             /**
              * @private
@@ -7686,9 +7852,12 @@ var gd3d;
                 this.transform = null;
                 this._frameImage = null;
                 if (this.inputElement) {
+                    this.inputElement.onfocus = null;
+                    this.inputElement.onclick = null;
+                    this.inputElement.onblur = null;
                     this.inputElement.disabled = false;
                     this.inputElement.value = "";
-                    this.inputElement.style.visibility = "hidden";
+                    this.inputElement.style.display = "none";
                     if (this.inputElement.parentElement)
                         this.inputElement.parentElement.removeChild(this.inputElement);
                     this.inputElement = null;
@@ -7698,23 +7867,30 @@ var gd3d;
              * @private
              */
             inputField.prototype.onPointEvent = function (canvas, ev, oncap) {
+                // if(this._isIos) return;
                 if (oncap == false) {
                     if (ev.type != gd3d.event.PointEventEnum.PointDown)
                         return;
                     var b = this.transform.ContainsCanvasPoint(new gd3d.math.vector2(ev.x, ev.y));
-                    if (b) {
-                        this.inputElement.style.visibility = "visible";
-                        this.inputElement.focus();
-                    }
-                    else {
-                        if (this.beFocus)
-                            this.inputElement.blur();
-                        if (this.inputElement.style.visibility != "hidden")
-                            this.inputElement.style.visibility = "hidden";
-                    }
+                    this.setFocus(b);
                 }
             };
+            inputField.prototype.setFocus = function (isFocus) {
+                if (isFocus) {
+                    this.inputElement.style.display = "";
+                    if (!this.beFocus) {
+                        this.inputElement.focus();
+                    }
+                }
+                else {
+                    if (this.beFocus)
+                        this.inputElement.blur();
+                    this.inputElement.style.display = "none";
+                }
+            };
+            var inputField_1;
             inputField.ClassName = "inputField";
+            inputField.helpV2 = new gd3d.math.vector2();
             __decorate([
                 gd3d.reflect.Field("reference", null, "image2D"),
                 __metadata("design:type", framework.image2D),
@@ -7745,7 +7921,7 @@ var gd3d;
                 __metadata("design:type", framework.label),
                 __metadata("design:paramtypes", [framework.label])
             ], inputField.prototype, "PlaceholderLabel", null);
-            inputField = __decorate([
+            inputField = inputField_1 = __decorate([
                 gd3d.reflect.node2DComponent
             ], inputField);
             return inputField;
@@ -22324,9 +22500,13 @@ var gd3d;
                 if (lastMatSame === void 0) { lastMatSame = false; }
                 gd3d.render.shaderUniform.texindex = 0;
                 var udMap = this.uniformDirtyMap;
+                var uTEnum = gd3d.render.UniformTypeEnum;
                 for (var key in pass.mapuniforms) {
                     var unifom = pass.mapuniforms[key];
                     if (lastMatSame && !material_3.sameMatPassMap[unifom.name] && !udMap[unifom.name]) {
+                        if (uTEnum.Texture == unifom.type || uTEnum.CubeTexture == unifom.type) {
+                            gd3d.render.shaderUniform.texindex++;
+                        }
                         continue;
                     }
                     udMap[unifom.name] = false; //标记为 没有 变化
@@ -22913,7 +23093,9 @@ var gd3d;
                 glstate_matrix_mvp: true,
                 glstate_vec4_bones: true,
                 glstate_matrix_bones: true,
-                boneSampler: true
+                boneSampler: true,
+                glstate_lightmapOffset: true,
+                _LightmapTex: true
             };
             material.lastDrawMatID = -1;
             material.lastDrawMeshID = -1;
@@ -37757,6 +37939,7 @@ var gd3d;
             function pointinfo() {
                 this.id = -1;
                 this.touch = false;
+                this.multiTouch = false;
                 this.x = 0;
                 this.y = 0;
             }
@@ -37860,22 +38043,21 @@ var gd3d;
             };
             //mouse
             inputMgr.prototype._mousedown = function (ev) {
-                this.HtmlNativeEventer.Emit("mousedown", ev);
                 this.CalcuPoint(ev.offsetX, ev.offsetY, this._point);
                 this._buttons[ev.button] = true;
                 this._point.touch = true;
+                this.HtmlNativeEventer.Emit("mousedown", ev);
             };
             inputMgr.prototype._mouseup = function (ev) {
-                this.HtmlNativeEventer.Emit("mouseup", ev);
                 this._buttons[ev.button] = false;
                 this._point.touch = false;
+                this.HtmlNativeEventer.Emit("mouseup", ev);
             };
             inputMgr.prototype._mousemove = function (ev) {
-                this.HtmlNativeEventer.Emit("mousemove", ev);
                 this.CalcuPoint(ev.offsetX, ev.offsetY, this._point);
+                this.HtmlNativeEventer.Emit("mousemove", ev);
             };
             inputMgr.prototype._mousewheel = function (ev) {
-                this.HtmlNativeEventer.Emit("wheel", ev);
                 this.hasWheel = true;
                 if (ev.detail) {
                     this.lastWheel = -1 * ev.detail;
@@ -37889,6 +38071,7 @@ var gd3d;
                 else {
                     this.lastWheel = 0;
                 }
+                this.HtmlNativeEventer.Emit("wheel", ev);
             };
             //touch
             inputMgr.prototype.tryAddTouchP = function (id) {
@@ -37915,9 +38098,10 @@ var gd3d;
                 this._point.y = ys / count;
             };
             inputMgr.prototype._touchstart = function (ev) {
-                this.HtmlNativeEventer.Emit("touchstart", ev);
+                ev.preventDefault();
                 // this.CalcuPoint(ev.touches[0].clientX,ev.touches[0].clientY,this._point);
                 this._point.touch = true;
+                this._point.multiTouch = true;
                 var lastTouche;
                 for (var i = 0; i < ev.changedTouches.length; i++) {
                     var touch = ev.changedTouches[i];
@@ -37934,10 +38118,12 @@ var gd3d;
                     this._point.x = lastTouche.x;
                     this._point.y = lastTouche.y;
                 }
+                this.HtmlNativeEventer.Emit("touchstart", ev);
             };
             inputMgr.prototype._touchmove = function (ev) {
-                this.HtmlNativeEventer.Emit("touchmove", ev);
+                ev.preventDefault(); //避免 在触摸设备中，下拉 触发浏览器刷新监听。
                 this._point.touch = true;
+                this._point.multiTouch = true;
                 var lastTouche;
                 for (var i = 0; i < ev.changedTouches.length; i++) {
                     var touch = ev.changedTouches[i];
@@ -37954,42 +38140,50 @@ var gd3d;
                     this._point.x = lastTouche.x;
                     this._point.y = lastTouche.y;
                 }
+                this.HtmlNativeEventer.Emit("touchmove", ev);
             };
             inputMgr.prototype._touchend = function (ev) {
-                this.HtmlNativeEventer.Emit("touchend", ev);
+                ev.preventDefault();
                 for (var i = 0; i < ev.changedTouches.length; i++) {
                     var touch = ev.changedTouches[i];
                     var id = touch.identifier;
                     this.tryAddTouchP(id);
                     this._touches[id].touch = false;
                 }
-                // //所有触点全放开，point.touch才false
-                // for (var key in this._touches)
-                // {
-                //     if (this._touches[key].touch == true)
-                //         return;
-                // }
                 this._point.touch = false;
+                //所有触点全放开，point.touch才false
+                for (var key in this._touches) {
+                    if (this._touches[key].touch == true)
+                        return;
+                }
+                this._point.multiTouch = false;
+                this.HtmlNativeEventer.Emit("touchend", ev);
             };
             inputMgr.prototype._touchcancel = function (ev) {
-                this.HtmlNativeEventer.Emit("touchcancel", ev);
+                ev.preventDefault();
                 this._touchend(ev);
+                this.HtmlNativeEventer.Emit("touchcancel", ev);
             };
             //key
             inputMgr.prototype._keydown = function (ev) {
-                this.HtmlNativeEventer.Emit("keydown", ev);
                 this.keyboardMap[ev.keyCode] = true;
                 this.keyDownCode = ev.keyCode;
+                this.HtmlNativeEventer.Emit("keydown", ev);
             };
             inputMgr.prototype._keyup = function (ev) {
-                this.HtmlNativeEventer.Emit("keyup", ev);
                 delete this.keyboardMap[ev.keyCode];
                 this.keyUpCode = ev.keyCode;
+                this.HtmlNativeEventer.Emit("keyup", ev);
             };
             //
             inputMgr.prototype._blur = function (ev) {
-                this.HtmlNativeEventer.Emit("blur", ev);
                 this._point.touch = false;
+                //清理 keys 状态
+                var _map = this.keyboardMap;
+                for (var key in _map) {
+                    _map[key] = false;
+                }
+                this.HtmlNativeEventer.Emit("blur", ev);
             };
             inputMgr.prototype.update = function (delta) {
                 this._lastbuttons[0] = this._buttons[0];
@@ -38000,6 +38194,9 @@ var gd3d;
                 this.pointCk();
                 this.keyCodeCk();
             };
+            /**
+             * point 刷新检查
+             */
             inputMgr.prototype.pointCk = function () {
                 var pt = this._point;
                 if (this.lastPoint.x != pt.x || this.lastPoint.y != pt.y) {

@@ -306,12 +306,20 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         addEditorCodeDirect(program: IEditorCode): void;
+        /** 旋转角度 OrientationMode.AUTO */
         orientation: string;
         shouldRotate: boolean;
         private lastWidth;
         private lastHeight;
         OffOrientationUpdate: boolean;
         private updateOrientationMode;
+        /**
+         * 刷新 一次,视窗朝向数据。
+         * @param rect 视窗矩形区域
+         * @param screenWidth 视窗宽度
+         * @param screenHeight 视窗高度
+         */
+        refreshOrientationMode(rect?: DOMRect, screenWidth?: number, screenHeight?: number): void;
     }
     /**
      * @public
@@ -1067,6 +1075,7 @@ declare namespace gd3d.framework {
         private pointY;
         private lastWidth;
         private lastHeight;
+        private lastMultiTouch;
         /**
          * @public
          * @language zh_CN
@@ -1076,11 +1085,27 @@ declare namespace gd3d.framework {
          * @param touch 是否接收到事件
          * @param XOnModelSpace 模型空间下的x偏移
          * @param YOnModelSpace 模型空间下的y偏移
+         * @param multiTouch 是否多点中
          * @version gd3d 1.0
          */
-        update(delta: number, touch: Boolean, XOnModelSpace: number, YOnModelSpace: number): void;
+        update(delta: number, touch: boolean, XOnModelSpace: number, YOnModelSpace: number, multiTouch?: boolean): void;
+        /**
+         * 根节点 尺寸 调整
+         */
+        rootSizeAdjust(): void;
+        /** 刷新节点树 */
+        updateNodeTree(delta: number): void;
+        /**
+         * 触发 point 事件流
+         * @param touch 是否有点
+         * @param XOnModelSpace 坐标x
+         * @param YOnModelSpace 坐标y
+         * @param multiTouch 多点
+         */
+        burstPointEvent(touch: boolean, XOnModelSpace: number, YOnModelSpace: number, multiTouch?: boolean): void;
         private capturePointFlow;
         private popPointFlow;
+        private _insIdFrameMap;
         private objupdate;
         private lastMat;
         /**
@@ -1411,8 +1436,10 @@ declare namespace gd3d.framework {
      * 2DUI的容器类，与canvasrender(3DUI)相对应。
      * @version gd3d 1.0
      */
-    class overlay2D implements IOverLay {
+    class overlay2D implements IOverLay, IDisposable {
         static readonly ClassName: string;
+        /** point事件 直接模式（默认True,在dom输入原生帧直接触发） */
+        static pointEventDirectMode: boolean;
         /**
          * @public
          * @language zh_CN
@@ -1421,6 +1448,10 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         constructor();
+        private _hasListenerEvent;
+        private _disposed;
+        get disposed(): boolean;
+        dispose(): void;
         /**
          * @private
          * @language zh_CN
@@ -1436,6 +1467,8 @@ declare namespace gd3d.framework {
          * @private
          */
         start(camera: camera): void;
+        private regEvnets;
+        private unRegEvents;
         /**
          * @private
          */
@@ -1538,6 +1571,10 @@ declare namespace gd3d.framework {
          * @private
          */
         update(delta: number): void;
+        /** 刷新ui point数据并触发 事件 */
+        private refreshAndPointEvent;
+        /** ui point 事件 */
+        private onPointEvent;
         private lastVPRect;
         private lastScreenMR;
         private lastMR_width;
@@ -1547,7 +1584,7 @@ declare namespace gd3d.framework {
          * @public
          * @language zh_CN
          * @classdesc
-         * 事件检测
+         * 投射拣选检测
          * @param mx x偏移
          * @param my y偏移
          * @version gd3d 1.0
@@ -2675,6 +2712,7 @@ declare namespace gd3d.framework {
      */
     class inputField implements I2DComponent, I2DPointListener {
         static readonly ClassName: string;
+        private static readonly helpV2;
         /**
          * @public
          * @language zh_CN
@@ -2697,6 +2735,7 @@ declare namespace gd3d.framework {
         private beFocus;
         private inputElement;
         private _text;
+        private static _isIos;
         /**
          * @public
          * @language zh_CN
@@ -2763,6 +2802,7 @@ declare namespace gd3d.framework {
          * @private
          */
         start(): void;
+        private ckIsIos;
         onPlay(): void;
         /**
         * @private
@@ -2787,6 +2827,7 @@ declare namespace gd3d.framework {
          * @private
          */
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        private setFocus;
     }
     /**
      * @public
@@ -11671,6 +11712,7 @@ declare namespace gd3d.framework {
     class pointinfo {
         id: number;
         touch: boolean;
+        multiTouch: boolean;
         x: number;
         y: number;
     }
@@ -11725,7 +11767,10 @@ declare namespace gd3d.framework {
         private downPoint;
         private lastPoint;
         update(delta: any): void;
-        private pointCk;
+        /**
+         * point 刷新检查
+         */
+        pointCk(): void;
         private keyDownCode;
         private keyUpCode;
         private keyCodeCk;

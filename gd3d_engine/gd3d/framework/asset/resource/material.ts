@@ -244,18 +244,24 @@ namespace gd3d.framework
             glstate_matrix_mvp: true,
             glstate_vec4_bones: true,
             glstate_matrix_bones: true,
-            boneSampler: true
+            boneSampler: true,
+            glstate_lightmapOffset:true,
+            _LightmapTex:true
         }
 
         uploadUnifoms(pass: render.glDrawPass, context: renderContext, lastMatSame = false)
         {
             render.shaderUniform.texindex = 0;
             let udMap = this.uniformDirtyMap;
+            let uTEnum = render.UniformTypeEnum;
             for (let key in pass.mapuniforms)
             {
                 let unifom = pass.mapuniforms[key];
                 if (lastMatSame && !material.sameMatPassMap[unifom.name] && !udMap[unifom.name])
                 {
+                    if(uTEnum.Texture == unifom.type || uTEnum.CubeTexture == unifom.type){
+                        render.shaderUniform.texindex++;
+                    }
                     continue;
                 }
                 udMap[unifom.name] = false;  //标记为 没有 变化
