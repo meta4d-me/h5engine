@@ -45,6 +45,10 @@ namespace gd3d.framework
                 case ".astc":
                 case ".astc.bin.js":
                     return AssetTypeEnum.ASTC;
+                case ".raw.bin":
+                case ".raw":
+                case ".raw.bin.js":
+                    return AssetTypeEnum.RAW;
                 case ".ktx.bin":
                 case ".ktx":
                 case ".ktx.bin.js":
@@ -130,6 +134,7 @@ namespace gd3d.framework
             case e.KTX:
             case e.ASTC:
             case e.PackBin:
+            case e.RAW:
                 return "arraybuffer";
             default:
                 // throw Error(`无法识别类型 enum:${AssetTypeEnum[type]},type:${type}`);

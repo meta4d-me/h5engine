@@ -15,6 +15,7 @@
         PVRTC2_RGB = 4,
         PVRTC2_RGBA = 4,
         KTX = 5,
+        FLOAT16 = 6,
         ASTC_RGBA_4x4,
         ASTC_RGBA_5x4,
         ASTC_RGBA_5x5,
@@ -351,7 +352,7 @@
             //this.img = null;
 
         }
-        uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array | Float32Array, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false, premultiplyAlpha = true, flipY = true, dataType: number = this.webgl.UNSIGNED_BYTE): void
+        uploadByteArray(mipmap: boolean, linear: boolean, width: number, height: number, data: Uint8Array | Float32Array | ArrayBufferView, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false, premultiplyAlpha = true, flipY = true, dataType: number = this.webgl.UNSIGNED_BYTE): void
         {
             this.width = width;
             this.height = height;
@@ -376,6 +377,13 @@
             var formatGL = this.webgl.RGBA;
             if (this.format == TextureFormatEnum.RGB)
                 formatGL = this.webgl.RGB;
+            else if(this.format == TextureFormatEnum.FLOAT16)
+            {
+                formatGL = this.webgl.RGBA;
+                var ext = this .webgl.getExtension('OES_texture_half_float');
+                if(ext == null) throw "nit support oes";
+                dataType = ext.HALF_FLOAT_OES;
+            }    
             else if (this.format == TextureFormatEnum.Gray)
                 formatGL = this.webgl.LUMINANCE;
             this.webgl.texImage2D(this.webgl.TEXTURE_2D,
@@ -386,8 +394,8 @@
                 0,
                 formatGL,
                 //最后这个type，可以管格式
-                dataType
-                , data);
+                dataType, 
+                data);
             if (mipmap)
             {
                 //生成mipmap

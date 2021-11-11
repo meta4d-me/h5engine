@@ -44,7 +44,7 @@ var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
             ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
         return extendStatics(d, b);
     };
     return function (d, b) {
@@ -1029,7 +1029,7 @@ var localSave = (function () {
             }
             return this._instance;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     localSave.prototype.stringToUtf8Array = function (str) {
@@ -4293,7 +4293,7 @@ var test_GPU_instancing = (function () {
             this._isStatic = v;
             this.cubeRoot.gameObject.isStatic = v;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(test_GPU_instancing.prototype, "needUpdate", {
@@ -4302,7 +4302,7 @@ var test_GPU_instancing = (function () {
             this._needUpdate = v;
             this.cubeRoot.needUpdate = v;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(test_GPU_instancing.prototype, "needFillRenderer", {
@@ -4311,7 +4311,7 @@ var test_GPU_instancing = (function () {
             this._needFillRenderer = v;
             this.cubeRoot.needFillRenderer = v;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     test_GPU_instancing.prototype.loadTest = function (modelName) {
@@ -4599,7 +4599,7 @@ var test_ParticleSystem = (function () {
             this._showParticle(v);
             this._particleName = v;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     test_ParticleSystem.prototype.init = function () {
@@ -7967,14 +7967,14 @@ var Joystick = (function () {
         get: function () {
             return this.touchLeft != 0;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(Joystick.prototype, "rightTouching", {
         get: function () {
             return this.touchRight != 0;
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Joystick.prototype.onMouseDown = function (e) {
@@ -10760,17 +10760,17 @@ var test_multipleplayer_anim = (function () {
     }
     Object.defineProperty(test_multipleplayer_anim.prototype, "abName", {
         get: function () { return "res/prefabs/" + this.resName + "/" + this.resName + ".assetbundle.json"; },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(test_multipleplayer_anim.prototype, "prefabName", {
         get: function () { return this.resName + ".prefab.json"; },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     Object.defineProperty(test_multipleplayer_anim.prototype, "resPath", {
         get: function () { return "res/prefabs/" + this.resName + "/resources/"; },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     test_multipleplayer_anim.prototype.start = function (app) {
@@ -16614,7 +16614,7 @@ var gd3d;
                     this._panAngle = Math.max(this.minPanAngle, Math.min(this.maxPanAngle, value));
                     this._panRad = this._panAngle * Math.PI / 180;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             Object.defineProperty(HoverCameraScript.prototype, "tiltAngle", {
@@ -16625,7 +16625,7 @@ var gd3d;
                     this._tiltAngle = Math.max(this.minTileAngle, Math.min(this.maxTileAngle, value));
                     this._tiltRad = this._tiltAngle * Math.PI / 180;
                 },
-                enumerable: true,
+                enumerable: false,
                 configurable: true
             });
             HoverCameraScript.prototype.onPlay = function () {
@@ -17100,7 +17100,7 @@ var guideMask = (function (_super) {
             this.refreshMask();
             console.error("set holeRect");
         },
-        enumerable: true,
+        enumerable: false,
         configurable: true
     });
     guideMask.prototype.onPlay = function () {
