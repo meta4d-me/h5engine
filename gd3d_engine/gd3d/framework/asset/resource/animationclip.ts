@@ -509,7 +509,7 @@ namespace gd3d.framework
         static caclByteLength(): number
         {
             let total = 0;
-            total += math.caclStringByteLength(name);
+            total += math.caclStringByteLength(this.name);
             total += 1;
             total += 8;
             return total;

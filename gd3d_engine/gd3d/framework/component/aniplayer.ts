@@ -99,24 +99,43 @@ namespace gd3d.framework
                 this.startepose[name] = this.startPos[i];
             }
 
+            // let asbones: asbone[] = this.gameObject.getComponentsInChildren("asbone") as asbone[];
+            // for (let key in asbones)
+            // {
+            //     let trans = asbones[key].gameObject.transform;
+            //     this.carelist[trans.name] = trans;
+            //     this.careBoneMat[trans.name] = PoseBoneMatrix.create();
+            //     this.careBoneMat[trans.name].r = math.pool.new_quaternion();
+            //     this.careBoneMat[trans.name].t = math.pool.new_vector3();
+            //     this.careBoneMat[trans.name].s = 1;
+            // }
+
+            this.allAsboneToCareList();
+        }
+
+        /**
+         * 收集所有的 asbone 到 更新列表
+         */
+        allAsboneToCareList(){
             let asbones: asbone[] = this.gameObject.getComponentsInChildren("asbone") as asbone[];
             for (let key in asbones)
             {
                 let trans = asbones[key].gameObject.transform;
-                this.carelist[trans.name] = trans;
-                this.careBoneMat[trans.name] = PoseBoneMatrix.create();
-                this.careBoneMat[trans.name].r = math.pool.new_quaternion();
-                this.careBoneMat[trans.name].t = math.pool.new_vector3();
-                this.careBoneMat[trans.name].s = 1;
+                this.addToCareList(trans);
             }
         }
+
+        /**
+         * 添加 到 更新骨骼节点列表 
+         * @param bone 骨骼节点
+         */
         addToCareList(bone: transform)
         {
-            if (this.carelist[bone.name] != null) return;
             this.carelist[bone.name] = bone;
             this.careBoneMat[bone.name] = PoseBoneMatrix.create();
             this.careBoneMat[bone.name].r = math.pool.new_quaternion();
             this.careBoneMat[bone.name].t = math.pool.new_vector3();
+            this.careBoneMat[bone.name].s = 1;
         }
 
         private _awaitClips : string [] = [];
