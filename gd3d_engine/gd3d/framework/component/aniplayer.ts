@@ -1,7 +1,6 @@
 /// <reference path="../../io/reflect.ts" />
 
-namespace gd3d.framework
-{
+namespace gd3d.framework {
     /**
      * @public
      * @language zh_CN
@@ -10,9 +9,8 @@ namespace gd3d.framework
      * @version gd3d 1.0
      */
     @reflect.nodeComponent
-    export class aniplayer implements INodeComponent
-    {
-        static readonly ClassName:string="aniplayer";
+    export class aniplayer implements INodeComponent {
+        static readonly ClassName: string = "aniplayer";
 
         gameObject: gameObject;
 
@@ -56,23 +54,29 @@ namespace gd3d.framework
         //tpose: { [key: string]: math.matrix } = {};
         private startepose: { [key: string]: PoseBoneMatrix } = {};
 
-        public get PlayFrameID(): number
-        {
+        private _hasBoneMap: { [boneName: string]: boolean };
+        private get hasBoneMap() {
+            if (!this._hasBoneMap) {
+                let _map = this._hasBoneMap = {};
+                for (let i = 0; i < this.bones.length; i++) {
+                    _map[this.bones[i].name] = true;
+                }
+            }
+            return this._hasBoneMap;
+        }
+
+        public get PlayFrameID(): number {
             return this._playFrameid;
         }
 
-        public get currentAniclipName(): string
-        {
-            if (this._playClip)
-            {
+        public get currentAniclipName(): string {
+            if (this._playClip) {
                 return this._playClip.getName();
-            } else
-            {
+            } else {
                 return null;
             }
         }
-        public get currentAniclip(): animationClip
-        {
+        public get currentAniclip(): animationClip {
             return this._playClip;
         }
         /**
@@ -80,10 +84,8 @@ namespace gd3d.framework
          */
         public get playCount() { return this._playCount; }
 
-        private init()
-        {
-            for (let i = 0; i < this.bones.length; i++)
-            {
+        private init() {
+            for (let i = 0; i < this.bones.length; i++) {
                 let _info = this.bones[i];
                 let name = _info.name;
                 var nb = PoseBoneMatrix.create();
@@ -116,11 +118,10 @@ namespace gd3d.framework
         /**
          * 收集所有的 asbone 到 更新列表
          */
-        allAsboneToCareList(){
+        allAsboneToCareList() {
             let asbones: asbone[] = this.gameObject.getComponentsInChildren("asbone") as asbone[];
-            for (let key in asbones)
-            {
-                let trans = asbones[key].gameObject.transform;
+            for (let i = 0, len = asbones.length; i < len; i++) {
+                let trans = asbones[i].gameObject.transform;
                 this.addToCareList(trans);
             }
         }
@@ -129,8 +130,13 @@ namespace gd3d.framework
          * 添加 到 更新骨骼节点列表 
          * @param bone 骨骼节点
          */
-        addToCareList(bone: transform)
-        {
+        addToCareList(bone: transform) {
+            if (!bone) return;
+            let _map = this.hasBoneMap;
+            if (!_map[bone.name]) {
+                console.info(`aniplayer [${this.gameObject.getName()}] node [${bone.name}] is not a valid bone!`);
+                return;
+            }
             this.carelist[bone.name] = bone;
             this.careBoneMat[bone.name] = PoseBoneMatrix.create();
             this.careBoneMat[bone.name].r = math.pool.new_quaternion();
@@ -138,29 +144,29 @@ namespace gd3d.framework
             this.careBoneMat[bone.name].s = 1;
         }
 
-        private _awaitClips : string [] = [];
+        private _awaitClips: string[] = [];
         /** 获取待加载的 动画片段名 列表 */
-        awaitLoadClipNames(){
+        awaitLoadClipNames() {
             this.collectClipNames();
             return this._awaitClips;
         }
 
-        private _allClipNames : string[] = [];
+        private _allClipNames: string[] = [];
         /** 所有的动画片段名列表，包含待加载的列表 */
-        allClipNames(){
+        allClipNames() {
             this.collectClipNames();
             return this._allClipNames;
         }
 
         private collected = false;
-        private collectClipNames(){
-            if(this.collected) return;
-            if(this.clips){
-                this.clips.forEach(clip=>{
-                    if(clip){
+        private collectClipNames() {
+            if (this.collected) return;
+            if (this.clips) {
+                this.clips.forEach(clip => {
+                    if (clip) {
                         let cname = clip.getName();
                         this._allClipNames.push(cname);
-                        if(!this.haveClip(cname)){
+                        if (!this.haveClip(cname)) {
                             this._awaitClips.push(cname);
                         }
                     }
@@ -170,76 +176,68 @@ namespace gd3d.framework
         }
 
         /** 添加动画片段 通过名字加载 */
-        addClipByNameLoad(_assetMgr: assetMgr, resPath:string , clipName : string, callback? : (state:stateLoad , clipName: string)=>any){
+        addClipByNameLoad(_assetMgr: assetMgr, resPath: string, clipName: string, callback?: (state: stateLoad, clipName: string) => any) {
             let url = `${resPath}/${clipName}`;
-            _assetMgr.load(url,gd3d.framework.AssetTypeEnum.Aniclip,(sta)=>{
-                if(sta.isfinish){
+            _assetMgr.load(url, gd3d.framework.AssetTypeEnum.Aniclip, (sta) => {
+                if (sta.isfinish) {
                     let clip = sta.resstateFirst.res as gd3d.framework.animationClip;
                     this.addClip(clip);
                 }
-                if(callback){
-                    callback(sta,clipName);
+                if (callback) {
+                    callback(sta, clipName);
                 }
             });
         }
 
         /** 添加动画片段 */
-        addClip(clip: animationClip)
-        {
-            if (clip != null)
-            {
+        addClip(clip: animationClip) {
+            if (clip != null) {
                 this.clipnames[clip.getName()] = clip;
             }
         }
         /** 是否有装载指定动画判断 */
-        haveClip(name: string): boolean
-        {
+        haveClip(name: string): boolean {
             return this.clipnames[name] != null;
         }
         /** 获取动画片段 */
-        getClip(name: string){
+        getClip(name: string) {
             return this.clipnames[name];
         }
-        start()
-        {
-            if(!this.bones) return;
+        start() {
+            if (!this.bones) return;
             this.init();
             let len = this.clips.length;
-            for(let i = 0 ;i < len ;i++){
+            for (let i = 0; i < len; i++) {
                 let clip = this.clips[i];
-                if(!clip.frames || Object.keys(clip.frames).length < 1) continue;
+                if (!clip.frames || Object.keys(clip.frames).length < 1) continue;
                 this.addClip(clip);
             }
             let firstClip = this.clips[0];
-            if(this.autoplay && firstClip  &&  firstClip.frames && Object.keys(firstClip.frames).length >= 1){
+            if (this.autoplay && firstClip && firstClip.frames && Object.keys(firstClip.frames).length >= 1) {
                 this.playAniclip(firstClip);
             }
         }
 
-        onPlay()
-        {
+        onPlay() {
 
         }
         private temptMat: math.matrix = math.pool.new_matrix();
-        frameDirty : boolean = true;
-        update(delta: number)
-        {
+        frameDirty: boolean = true;
+        update(delta: number) {
             if (!this.bePlay) return;
             this.checkFrameId(delta);
             if (!this.bePlay) return;
-            if (this.beCross)
-            {
+            if (this.beCross) {
                 this.crossRestTimer -= delta * this.speed;
                 this.crossPercentage = this.crossRestTimer / this.crossTotalTime;
-                if (this.crossRestTimer <= 0)
-                {
+                if (this.crossRestTimer <= 0) {
                     this.beCross = false;
                 }
             }
             let lastFdata = this.curFrame;
             this.frameDirty = false;
             let currFdata = this._playClip.frames[this._playFrameid];
-            if(currFdata == lastFdata) return;
+            if (currFdata == lastFdata) return;
 
             this.frameDirty = true;
             this.curFrame = currFdata;
@@ -247,25 +245,21 @@ namespace gd3d.framework
             const bs = this._playClip.hasScaled
                 ? 8 // TODO: 8
                 : 7;
-            if(!this.curFrame) {
-                console.error(`frames of null on aniplayer.update() , framesIsNull :${this._playClip.frames == null } , GameObjectName: ${this.gameObject.getName()} , _playFrameid:${this._playFrameid} , clipName : ${this._playClip.getName()}`);
+            if (!this.curFrame) {
+                console.error(`frames of null on aniplayer.update() , framesIsNull :${this._playClip.frames == null} , GameObjectName: ${this.gameObject.getName()} , _playFrameid:${this._playFrameid} , clipName : ${this._playClip.getName()}`);
                 return;
             }
 
             if (this._playClip.indexDic.len)
-                for (let bonename in this.carelist)
-                {
+                for (let bonename in this.carelist) {
                     let trans = this.carelist[bonename];
                     let transMat = this.careBoneMat[bonename];
 
                     let index = this._playClip.indexDic[bonename];
-                    if (index != null)
-                    {
-                        if (this.beCross && this.lastFrame)
-                        {
+                    if (index != null) {
+                        if (this.beCross && this.lastFrame) {
                             transMat.lerpInWorldWithData(this.inversTpos[bonename], this.lastFrame[bonename], this.curFrame, index * 7 + 1, 1 - this.crossPercentage);
-                        } else
-                        {
+                        } else {
                             transMat.r.x = this.curFrame[index * bs + 1];
                             transMat.r.y = this.curFrame[index * bs + 2];
                             transMat.r.z = this.curFrame[index * bs + 3];
@@ -274,7 +268,7 @@ namespace gd3d.framework
                             transMat.t.x = this.curFrame[index * bs + 5];
                             transMat.t.y = this.curFrame[index * bs + 6];
                             transMat.t.z = this.curFrame[index * bs + 7];
-                            if(this._playClip.hasScaled) {
+                            if (this._playClip.hasScaled) {
                                 transMat.s = this.curFrame[index * bs + 8];
                             }
                         }
@@ -294,8 +288,7 @@ namespace gd3d.framework
                         // trans.setWorldMatrix(_matrix);
                         // let i=0;
                         // trans.updateTran(false);
-                    } else
-                    {
+                    } else {
                         console.error("Bone: " + bonename + " Not Record in Aniclip(" + this._playClip.getName() + ").");
                     }
                 }
@@ -314,16 +307,13 @@ namespace gd3d.framework
          * 根据动画片段名字播放动画
          * @version gd3d 1.0
          */
-        play(animName: string, onPlayEnd: () => void = null, speed: number = 1.0, beRevert: boolean = false)
-        {
+        play(animName: string, onPlayEnd: () => void = null, speed: number = 1.0, beRevert: boolean = false) {
             let clip = this.clipnames[animName];
-            if (clip == null)
-            {
+            if (clip == null) {
                 console.error("animclip " + this.gameObject.transform.name + "  " + animName + " is not exist");
                 return;
             }
-            if (this.bePlay)
-            {
+            if (this.bePlay) {
                 this.OnClipPlayEnd();
             }
             this.beCross = false;
@@ -341,24 +331,20 @@ namespace gd3d.framework
          * 根据动画片段名字播放动画
          * @version gd3d 1.0
          */
-        playCross(animName: string, crosstimer: number, onPlayEnd: () => void = null, speed: number = 1.0, beRevert: boolean = false)
-        {
+        playCross(animName: string, crosstimer: number, onPlayEnd: () => void = null, speed: number = 1.0, beRevert: boolean = false) {
             let clip = this.clipnames[animName];
-            if (clip == null)
-            {
+            if (clip == null) {
                 console.error("animclip " + this.gameObject.transform.name + "  " + animName + " is not exist");
                 return;
             }
             if (this.bePlay)//正在播放其他动画
             {
-                if (crosstimer > 0 && this.curFrame)
-                {
+                if (crosstimer > 0 && this.curFrame) {
                     this.recordeLastFrameData();
                     this.beCross = true;
                     this.crossTotalTime = crosstimer;
                     this.crossRestTimer = crosstimer;
-                } else
-                {
+                } else {
                     this.beCross = false;
                 }
                 this.OnClipPlayEnd();
@@ -368,34 +354,28 @@ namespace gd3d.framework
         }
         private beActivedEndFrame: boolean = false;
         private endFrame: number = 0;
-        playToXFrame(animName: string, endframe: number, crosstimer: number = 0, onPlayEnd: () => void = null, speed: number = 1.0)
-        {
+        playToXFrame(animName: string, endframe: number, crosstimer: number = 0, onPlayEnd: () => void = null, speed: number = 1.0) {
             let clip = this.clipnames[animName];
-            if (clip == null)
-            {
+            if (clip == null) {
                 console.error("animclip " + this.gameObject.transform.name + "  " + animName + " is not exist");
                 return;
             }
             if (this.bePlay)//正在播放其他动画
             {
-                if (crosstimer > 0 && this.curFrame)
-                {
+                if (crosstimer > 0 && this.curFrame) {
                     this.recordeLastFrameData();
                     this.beCross = true;
                     this.crossTotalTime = crosstimer;
                     this.crossRestTimer = crosstimer;
-                } else
-                {
+                } else {
                     this.beCross = false;
                 }
                 this.OnClipPlayEnd();
             }
-            if (endframe >= 0)
-            {
+            if (endframe >= 0) {
                 this.beActivedEndFrame = true;
                 this.endFrame = endframe;
-            } else
-            {
+            } else {
                 this.beActivedEndFrame = false;
             }
             this.playAniclip(clip, onPlayEnd, speed, false);
@@ -404,14 +384,11 @@ namespace gd3d.framework
         //private tempPoseMat:PoseBoneMatrix=PoseBoneMatrix.createDefault();
         // private tempPoseMat1:PoseBoneMatrix=PoseBoneMatrix.createDefault();
 
-        private recordeLastFrameData()
-        {
+        private recordeLastFrameData() {
             if (this.lastFrame == null) this.lastFrame = {};
-            for (let key in this._playClip.bones)
-            {
+            for (let key in this._playClip.bones) {
                 let bonename = this._playClip.bones[key];
-                if (!this.lastFrame[bonename])
-                {
+                if (!this.lastFrame[bonename]) {
                     this.lastFrame[bonename] = PoseBoneMatrix.create();
                 }
                 let index = this._playClip.indexDic[bonename];
@@ -419,8 +396,7 @@ namespace gd3d.framework
             }
         }
 
-        private playAniclip(aniclip: animationClip, onPlayEnd: () => void = null, speed: number = 1.0, beRevert: boolean = false)
-        {
+        private playAniclip(aniclip: animationClip, onPlayEnd: () => void = null, speed: number = 1.0, beRevert: boolean = false) {
             this.beActived = true;
             this.bePlay = true;
             this._playTimer = 0;
@@ -438,21 +414,16 @@ namespace gd3d.framework
          * 停止播放动画
          * @version gd3d 1.0
          */
-        stop(): void
-        {
-            if (this.bePlay)
-            {
+        stop(): void {
+            if (this.bePlay) {
                 this.OnClipPlayEnd();
             }
         }
 
-        pause(): void
-        {
-            if (this.bePlay)
-            {
+        pause(): void {
+            if (this.bePlay) {
                 this.bePlay = false;
-            } else if (!this.bePlay && this._playClip)
-            {
+            } else if (!this.bePlay && this._playClip) {
                 this.bePlay = true;
             }
         }
@@ -460,37 +431,30 @@ namespace gd3d.framework
         /**
          * 是否在播放动画
          */
-        isPlay(): boolean
-        {
+        isPlay(): boolean {
             return this.bePlay;
         }
         /**
          * 是否在停止动画
          */
-        isStop(): boolean
-        {
+        isStop(): boolean {
             return !this.bePlay;
         }
         /**
          * @private
          */
-        remove()
-        {
+        remove() {
             if (this.clips)
-                this.clips.forEach(temp =>
-                {
+                this.clips.forEach(temp => {
                     if (temp) temp.unuse();
                 });
-            for (let key in this.lastFrame)
-            {
+            for (let key in this.lastFrame) {
                 PoseBoneMatrix.recycle(this.lastFrame[key]);
             }
-            for (let key in this.careBoneMat)
-            {
+            for (let key in this.careBoneMat) {
                 PoseBoneMatrix.recycle(this.careBoneMat[key]);
             }
-            for (let key in this.boneCache)
-            {
+            for (let key in this.boneCache) {
                 PoseBoneMatrix.recycle(this.boneCache[key]);
             }
             this.clips.length = 0;
@@ -509,36 +473,31 @@ namespace gd3d.framework
         /**
          * @private
          */
-        clone()
-        {
+        clone() {
 
         }
-        private checkFrameId(delay: number): void
-        {
+        private checkFrameId(delay: number): void {
             let lastFid = this._playFrameid;
             this._playTimer += delay * this.speed;
             this._playFrameid = (this._playClip.fps * this._playTimer) | 0;
             let clipFrameCount = this._playClip.frameCount;
-            if (this.beActivedEndFrame && this._playFrameid > this.endFrame )
-            {
+            if (this.beActivedEndFrame && this._playFrameid > this.endFrame) {
                 this._playFrameid = this.endFrame;
-                if(lastFid == this.endFrame){
+                if (lastFid == this.endFrame) {
                     this.OnClipPlayEnd();
                 }
-            }else if (this._playClip.loop)//加上循环与非循环动画的分别控制
+            } else if (this._playClip.loop)//加上循环与非循环动画的分别控制
             {
                 this._playCount = Math.floor(this._playFrameid / clipFrameCount);
                 this._playFrameid %= clipFrameCount;
             }
-            else if (this._playFrameid > clipFrameCount - 1)
-            {
+            else if (this._playFrameid > clipFrameCount - 1) {
                 this._playFrameid = clipFrameCount - 1;
                 //-------------------OnPlayEnd
                 this.OnClipPlayEnd();
             }
 
-            if (this.beRevert)
-            {
+            if (this.beRevert) {
                 this._playFrameid = clipFrameCount - this._playFrameid - 1;
             }
 
@@ -546,8 +505,7 @@ namespace gd3d.framework
             this._playFrameid = this._playFrameid < 0 ? 0 : this._playFrameid;
         }
 
-        private OnClipPlayEnd()
-        {
+        private OnClipPlayEnd() {
             let Clipame = this._playClip ? this._playClip.getName() : "";
             this._playClip = null;
             // this.lastFrame=null;
@@ -555,30 +513,24 @@ namespace gd3d.framework
             this.beCross = false;
 
             let endFunc = this.playEndDic[Clipame];
-            if (endFunc)
-            {
+            if (endFunc) {
                 endFunc();
             }
         }
         private beActived: boolean = false;//是否play过动画
         private boneCache: { [id: string]: PoseBoneMatrix } = {};
-        private recyclecache()
-        {
-            for (let key in this.boneCache)
-            {
+        private recyclecache() {
+            for (let key in this.boneCache) {
                 PoseBoneMatrix.recycle(this.boneCache[key]);
             }
             this.boneCache = {};
         }
 
-        fillPoseData(data: Float32Array, bones: transform[]): void
-        {
-            if( !bones || !data) return;
-            if (!this.bePlay)
-            {
+        fillPoseData(data: Float32Array, bones: transform[]): void {
+            if (!bones || !data) return;
+            if (!this.bePlay) {
                 if (this.beActived) return;
-                for (let i = 0, len = bones.length; i < len; i++)
-                {
+                for (let i = 0, len = bones.length; i < len; i++) {
                     let bonename = bones[i].name;
                     let boneMat = this.startepose[bonename];
                     data[i * 8 + 0] = boneMat.r.x;
@@ -592,29 +544,23 @@ namespace gd3d.framework
                 }
                 return;
             }
-            if(!this.curFrame ) return;
+            if (!this.curFrame) return;
             if (this._playClip.indexDic.len)
-                for (let i = 0, len = bones.length; i < len; i++)
-                {
+                for (let i = 0, len = bones.length; i < len; i++) {
                     let bonename = bones[i].name;
                     let index = this._playClip.indexDic[bonename];
 
-                    if (index != null)
-                    {
-                        if (this.beCross && this.lastFrame)
-                        {
+                    if (index != null) {
+                        if (this.beCross && this.lastFrame) {
                             // let lastindex=this.lastIndexDic[bonename];
                             let boneMat;
-                            if (this.careBoneMat[bonename])
-                            {
+                            if (this.careBoneMat[bonename]) {
                                 boneMat = this.careBoneMat[bonename];
 
-                            } else if (this.boneCache[bonename])
-                            {
+                            } else if (this.boneCache[bonename]) {
                                 boneMat = this.boneCache[bonename];
                             }
-                            else
-                            {
+                            else {
                                 let mat = PoseBoneMatrix.create();
                                 mat.lerpInWorldWithData(this.inversTpos[bonename], this.lastFrame[bonename], this.curFrame, index * 7 + 1, 1 - this.crossPercentage);
                                 this.boneCache[bonename] = mat;
@@ -628,8 +574,7 @@ namespace gd3d.framework
                             data[i * 8 + 6] = boneMat.t.z;
                             // data[i * 8 + 7] = 1;
                             data[i * 8 + 7] = boneMat.s ? boneMat.s : 1;
-                        } else
-                        {
+                        } else {
                             const bs = this._playClip.hasScaled
                                 ? 8
                                 : 7;
@@ -645,8 +590,7 @@ namespace gd3d.framework
                                 : 1;
                             // data[i * 8 + 7] = 1;
                         }
-                    } else
-                    {
+                    } else {
                         // console.error("Bone: " + bonename + " Not Record in Aniclip(" + this._playClip.getName() + ").");
                     }
                     //----------------------
