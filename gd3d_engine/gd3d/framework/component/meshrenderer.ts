@@ -357,7 +357,7 @@ namespace gd3d.framework
                     if (scene.lightmaps.length > lightIdx)
                     {
                         context.lightmap = scene.lightmaps[lightIdx];
-                        context.lightmap_01 = meshRenderer.getLightMap_01Img(context.lightmap);
+                        //context.lightmap_01 = meshRenderer.getLightMap_01Img(context.lightmap);
                         context.lightmapOffset = this.lightmapScaleOffset;
                         context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
                     }
@@ -369,7 +369,8 @@ namespace gd3d.framework
                     {
                         drawtype = scene.fog ? "lightmap_fog" : "lightmap";
                         context.lightmap = usemat.statedMapUniforms["_LightmapTex"];
-                        context.lightmap_01 = meshRenderer.getLightMap_01Img(context.lightmap);
+                        //if(context.lightmap.getName){}
+                        //context.lightmap_01 = meshRenderer.getLightMap_01Img(context.lightmap);
                         context.lightmapOffset = this.lightmapScaleOffset;
                         context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
                     }

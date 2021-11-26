@@ -21369,7 +21369,6 @@ var gd3d;
                 */
                 this._queue = 0;
             }
-            meshRenderer_1 = meshRenderer;
             Object.defineProperty(meshRenderer.prototype, "renderLayer", {
                 /**
                  * @public
@@ -21475,7 +21474,7 @@ var gd3d;
                         //usemat.shaderStatus = shaderStatus.Lightmap;
                         if (scene.lightmaps.length > lightIdx) {
                             context.lightmap = scene.lightmaps[lightIdx];
-                            context.lightmap_01 = meshRenderer_1.getLightMap_01Img(context.lightmap);
+                            //context.lightmap_01 = meshRenderer.getLightMap_01Img(context.lightmap);
                             context.lightmapOffset = this.lightmapScaleOffset;
                             context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
                         }
@@ -21484,7 +21483,8 @@ var gd3d;
                         if (!this.useGlobalLightMap) {
                             drawtype = scene.fog ? "lightmap_fog" : "lightmap";
                             context.lightmap = usemat.statedMapUniforms["_LightmapTex"];
-                            context.lightmap_01 = meshRenderer_1.getLightMap_01Img(context.lightmap);
+                            //if(context.lightmap.getName){}
+                            //context.lightmap_01 = meshRenderer.getLightMap_01Img(context.lightmap);
                             context.lightmapOffset = this.lightmapScaleOffset;
                             context.lightmapUV = mesh.glMesh.vertexFormat & gd3d.render.VertexFormatMask.UV1 ? 1 : 0;
                         }
@@ -21655,7 +21655,6 @@ var gd3d;
             */
             meshRenderer.prototype.clone = function () {
             };
-            var meshRenderer_1;
             meshRenderer.ClassName = "meshRenderer";
             meshRenderer.insOffsetMatrixStr = "instance_offset_matrix_";
             meshRenderer.insOffsetMtxIDMap = ["instance_offset_matrix_0", "instance_offset_matrix_1", "instance_offset_matrix_2", "instance_offset_matrix_3"];
@@ -21679,7 +21678,7 @@ var gd3d;
                 gd3d.reflect.Field("number"),
                 __metadata("design:type", Number)
             ], meshRenderer.prototype, "layer", void 0);
-            meshRenderer = meshRenderer_1 = __decorate([
+            meshRenderer = __decorate([
                 gd3d.reflect.nodeRender,
                 gd3d.reflect.nodeComponent,
                 __metadata("design:paramtypes", [])
