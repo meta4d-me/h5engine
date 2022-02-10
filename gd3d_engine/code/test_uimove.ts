@@ -47,7 +47,7 @@ class test_uimove implements IState
         childRect.width = 300;
         childRect.height = 200;
         parentRect.children.push(childRect);
-        childRect.parent = parentRect;
+        childRect["_parent"] = parentRect;
         childRect.alignType = AlignType.CENTER;
         parentRect.layout();
 
@@ -79,7 +79,7 @@ class Rect extends gd3d.framework.transform
     public width: number;
     public height: number;
     public offset: gd3d.math.vector3 = new gd3d.math.vector3();
-    public parent: Rect;
+    public get bParent(){ return (this.parent as Rect)}
     public children: Rect[] = [];
     public alignType: AlignType = AlignType.NONE;
     public points: gd3d.math.vector3[] = [];
@@ -97,28 +97,28 @@ class Rect extends gd3d.framework.transform
                     this.alignPos = new gd3d.math.vector3(0, 0, 0);
                     break;
                 case AlignType.LEFT:
-                    this.alignPos = new gd3d.math.vector3(0, (this.parent.height - this.height) / 2);
+                    this.alignPos = new gd3d.math.vector3(0, (this.bParent.height - this.height) / 2);
                     break;
                 case AlignType.RIGHT:
-                    this.alignPos = new gd3d.math.vector3(this.parent.width - this.width, (this.parent.height - this.height) / 2);
+                    this.alignPos = new gd3d.math.vector3(this.bParent.width - this.width, (this.bParent.height - this.height) / 2);
                     break;
                 case AlignType.TOP:
-                    this.alignPos = new gd3d.math.vector3((this.parent.width - this.width) / 2, 0);
+                    this.alignPos = new gd3d.math.vector3((this.bParent.width - this.width) / 2, 0);
                     break;
                 case AlignType.BOTTOM:
-                    this.alignPos = new gd3d.math.vector3((this.parent.width - this.width) / 2, this.parent.height - this.height);
+                    this.alignPos = new gd3d.math.vector3((this.bParent.width - this.width) / 2, this.bParent.height - this.height);
                     break;
                 case AlignType.TOP_LEFT:
                     this.alignPos = new gd3d.math.vector3(0, 0);
                     break;
                 case AlignType.BOTTOM_LEFT:
-                    this.alignPos = new gd3d.math.vector3(0, this.parent.height - this.height);
+                    this.alignPos = new gd3d.math.vector3(0, this.bParent.height - this.height);
                     break;
                 case AlignType.TOP_RIGHT:
-                    this.alignPos = new gd3d.math.vector3(this.parent.width - this.width, 0);
+                    this.alignPos = new gd3d.math.vector3(this.bParent.width - this.width, 0);
                     break;
                 case AlignType.BOTTOM_RIGHT:
-                    this.alignPos = new gd3d.math.vector3(this.parent.width - this.width, this.parent.height - this.height);
+                    this.alignPos = new gd3d.math.vector3(this.bParent.width - this.width, this.bParent.height - this.height);
                     break;
 
             }
