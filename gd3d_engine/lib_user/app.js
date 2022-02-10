@@ -869,14 +869,14 @@ var t;
             this.taskmgr = new gd3d.framework.taskMgr();
         }
         light_d1.prototype.loadShader = function (laststate, state) {
-            this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            this.app.getAssetMgr().load("newRes/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
                 if (_state.isfinish) {
                     state.finish = true;
                 }
             });
         };
         light_d1.prototype.loadText = function (laststate, state) {
-            this.app.getAssetMgr().load("res/zg256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            this.app.getAssetMgr().load("newRes/zg256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                 if (s.isfinish) {
                     state.finish = true;
                 }
@@ -884,7 +884,7 @@ var t;
                     state.error = true;
                 }
             });
-            this.app.getAssetMgr().load("res/rock256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            this.app.getAssetMgr().load("newRes/rock256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                 if (s.isfinish) {
                     state.finish = true;
                 }
@@ -892,7 +892,7 @@ var t;
                     state.error = true;
                 }
             });
-            this.app.getAssetMgr().load("res/rock_n256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            this.app.getAssetMgr().load("newRes/rock_n256.png", gd3d.framework.AssetTypeEnum.Auto, function (s) {
                 if (s.isfinish) {
                     state.finish = true;
                 }
@@ -903,9 +903,9 @@ var t;
         };
         light_d1.prototype.addcube = function (laststate, state) {
             var _this = this;
-            var sphereString = "res/prefabs/sphere/resources/Sphere.mesh.bin";
-            var cubeString = "res/prefabs/cube/resources/Cube.mesh.bin";
-            this.app.getAssetMgr().load(sphereString, gd3d.framework.AssetTypeEnum.Auto, function (s) {
+            var sphereString = "newRes/pfb/sphere/resources/Sphere.mesh.bin";
+            var cubeString = "newRes/pfb/cube/resources/Cube.mesh.bin";
+            this.app.getAssetMgr().load(cubeString, gd3d.framework.AssetTypeEnum.Auto, function (s) {
                 if (s.isfinish) {
                     for (var i = -4; i < 5; i++) {
                         for (var j = -4; j < 5; j++) {
@@ -9989,7 +9989,7 @@ var t;
             this.taskmgr = new gd3d.framework.taskMgr();
         }
         test_light1.prototype.loadShader = function (laststate, state) {
-            this.app.getAssetMgr().load("res/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
+            this.app.getAssetMgr().load("newRes/shader/Mainshader.assetbundle.json", gd3d.framework.AssetTypeEnum.Auto, function (_state) {
                 if (_state.isfinish) {
                     state.finish = true;
                 }
