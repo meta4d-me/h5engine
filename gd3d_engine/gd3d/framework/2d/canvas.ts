@@ -338,11 +338,9 @@ namespace gd3d.framework
          */
         update(delta: number, touch: boolean, XOnModelSpace: number, YOnModelSpace: number, multiTouch = false)
         {
-            if (this.onPreUpdate) this.onPreUpdate(delta);
             this.rootSizeAdjust();
             this.burstPointEvent(touch, XOnModelSpace, YOnModelSpace, multiTouch);
             this.updateNodeTree(delta);
-            if (this.onLateUpdate) this.onLateUpdate(delta);
         }
 
         /**
@@ -382,6 +380,8 @@ namespace gd3d.framework
         /** 刷新节点树 */
         public updateNodeTree(delta: number)
         {
+            if (this.onPreUpdate) this.onPreUpdate(delta);
+
             //upadte
             this.rootNode.updateTran(false);
             //rootnode.update(delta);
@@ -390,6 +390,8 @@ namespace gd3d.framework
                 this._peCareListBuoy = -1;
                 this.objupdate(this.rootNode, delta);
             }
+
+            if (this.onLateUpdate) this.onLateUpdate(delta);
         }
 
         /**
