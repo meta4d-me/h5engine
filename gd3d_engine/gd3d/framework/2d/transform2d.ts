@@ -680,23 +680,24 @@ namespace gd3d.framework {
             let osX = px * w;
             let osY = py * h;
 
-            let min = transform2D.help_v2;
-            let max = transform2D.help_v2_1;
-            gd3d.math.vec2Set(min, -osX, -osY);
-            gd3d.math.vec2Set(max, w - osX, h - osY);
+            let p0 = transform2D.help_v2;
+            let p1 = transform2D.help_v2_1;
+            gd3d.math.vec2Set(p0, -osX, -osY);
+            gd3d.math.vec2Set(p1, w - osX, h - osY);
 
-            gd3d.math.matrix3x2TransformVector2(wMtx, min, min);
-            gd3d.math.matrix3x2TransformVector2(wMtx, max, max);
+            gd3d.math.matrix3x2TransformVector2(wMtx, p0, p0);
+            gd3d.math.matrix3x2TransformVector2(wMtx, p1, p1);
 
-            if(this.canvas){
-                this.canvas.clipPosToCanvasPos(min,min);
-                this.canvas.clipPosToCanvasPos(max,max);
+            if (this.canvas) {
+                this.canvas.clipPosToCanvasPos(p0, p0);
+                this.canvas.clipPosToCanvasPos(p1, p1);
             }
 
-            this._aabbRect.x = min.x;
-            this._aabbRect.y = min.y;
-            this._aabbRect.w = max.x - min.x;
-            this._aabbRect.h = max.y - min.y;
+            let min = p0;
+            let max = p1;
+            math.vec2Set(min, Math.min(p0.x, p1.x), Math.min(p0.y, p1.y));
+            math.vec2Set(max, Math.max(p0.x, p1.x), Math.max(p0.y, p1.y));
+            math.rectSet(this._aabbRect, min.x, min.y, max.x - min.x, max.y - min.y);
         }
 
         //计算 to canvasMtx 矩阵
