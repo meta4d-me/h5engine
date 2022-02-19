@@ -118,6 +118,8 @@ namespace gd3d.framework {
 
         private static readonly help_v2 = new gd3d.math.vector2();
         private static readonly help_v2_1 = new gd3d.math.vector2();
+        private static readonly help_v2_2 = new gd3d.math.vector2();
+        private static readonly help_v2_3 = new gd3d.math.vector2();
 
         private static readonly help_mtx = new gd3d.math.matrix3x2();
         private static readonly help_mtx_1 = new gd3d.math.matrix3x2();
@@ -351,6 +353,7 @@ namespace gd3d.framework {
         private dirty: boolean = true;//自己是否需要更新
         private dirtyChild: boolean = true;//子层是否需要更新
         private dirtyWorldDecompose: boolean = false;
+        private dirtyAABB: boolean = false;//AABB 标记脏
 
         /**
          * @public
@@ -426,6 +429,11 @@ namespace gd3d.framework {
             if (this._temp_aabbRect == null) this._temp_aabbRect = new math.rect();
             if (this._aabbRect != null) {
                 math.rectClone(this._aabbRect, this._temp_aabbRect);
+            }
+
+            if (this.dirtyAABB) {
+                this.calcAABB(this.worldMatrix);
+                this.dirtyAABB = false;
             }
             return this._temp_aabbRect;
         }
@@ -639,7 +647,7 @@ namespace gd3d.framework {
             }
 
             //aabb
-            this.calcAABB(this.worldMatrix);
+            this.dirtyAABB = true;
 
             if (this._children != null) {
                 for (var i = 0, l = this._children.length; i < l; i++) {
@@ -682,21 +690,30 @@ namespace gd3d.framework {
 
             let p0 = transform2D.help_v2;
             let p1 = transform2D.help_v2_1;
+            let p2 = transform2D.help_v2_2;
+            let p3 = transform2D.help_v2_3;
             gd3d.math.vec2Set(p0, -osX, -osY);
-            gd3d.math.vec2Set(p1, w - osX, h - osY);
+            gd3d.math.vec2Set(p1, w - osX, -osY);
+            gd3d.math.vec2Set(p2, w - osX, h - osY);
+            gd3d.math.vec2Set(p3, -osX, h - osY);
 
             gd3d.math.matrix3x2TransformVector2(wMtx, p0, p0);
             gd3d.math.matrix3x2TransformVector2(wMtx, p1, p1);
+            gd3d.math.matrix3x2TransformVector2(wMtx, p2, p2);
+            gd3d.math.matrix3x2TransformVector2(wMtx, p3, p3);
 
             if (this.canvas) {
                 this.canvas.clipPosToCanvasPos(p0, p0);
                 this.canvas.clipPosToCanvasPos(p1, p1);
+                this.canvas.clipPosToCanvasPos(p2, p2);
+                this.canvas.clipPosToCanvasPos(p3, p3);
             }
 
             let min = p0;
             let max = p1;
-            math.vec2Set(min, Math.min(p0.x, p1.x), Math.min(p0.y, p1.y));
-            math.vec2Set(max, Math.max(p0.x, p1.x), Math.max(p0.y, p1.y));
+            math.vec2Set(min, Math.min(p0.x, p1.x, p2.x, p3.x), Math.min(p0.y, p1.y, p2.y, p3.y));
+            math.vec2Set(max, Math.max(p0.x, p1.x, p2.x, p3.x), Math.max(p0.y, p1.y, p2.y, p3.y));
+
             math.rectSet(this._aabbRect, min.x, min.y, max.x - min.x, max.y - min.y);
         }
 
