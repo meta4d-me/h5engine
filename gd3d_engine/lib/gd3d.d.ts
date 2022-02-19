@@ -955,6 +955,7 @@ declare namespace gd3d.framework {
     class canvas {
         static readonly ClassName: string;
         private static readonly help_v2;
+        private static readonly help_rect_CanvasV;
         /**
          * @public
          * @language zh_CN
@@ -994,6 +995,8 @@ declare namespace gd3d.framework {
          * 启用UI事件
          */
         enableUIEvent: boolean;
+        /** 启用 剔除超出可视范围的渲染节点  */
+        enableOutsideRenderClip: boolean;
         /**
          * @public
          * @language zh_CN
@@ -1026,6 +1029,10 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         scene: scene;
+        /** canvas 更新前回调函数 */
+        onPreUpdate: (dt: number) => any;
+        /** canvas 更新后回调函数 */
+        onLateUpdate: (dt: number) => any;
         /**
          * @public
          * @language zh_CN
@@ -1169,6 +1176,11 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         drawScene(node: transform2D, context: renderContext, assetmgr: assetMgr): void;
+        /**
+         * 检查是在可视区域外
+         * @param node 节点
+         */
+        private ckViewOutside;
         private renderTopLabels;
         static readonly depthTag = "__depthTag__";
         static readonly flowIndexTag = "__flowIndexTag__";
@@ -1898,6 +1910,10 @@ declare namespace gd3d.framework {
          */
         get isMask(): boolean;
         set isMask(b: boolean);
+        private _aabbRect;
+        private _temp_aabbRect;
+        /** aabb 矩形 */
+        get aabbRect(): math.rect;
         private updateMaskRect;
         private _parentIsMask;
         get parentIsMask(): boolean;
@@ -1968,6 +1984,7 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         updateWorldTran(): void;
+        private calcAABB;
         private CalcReCanvasMtx;
         /**
          * @private
@@ -7937,6 +7954,8 @@ declare namespace gd3d.framework {
         private careBoneMat;
         private inversTpos;
         private startepose;
+        private _hasBoneMap;
+        private get hasBoneMap();
         get PlayFrameID(): number;
         get currentAniclipName(): string;
         get currentAniclip(): animationClip;
@@ -7945,6 +7964,14 @@ declare namespace gd3d.framework {
          */
         get playCount(): number;
         private init;
+        /**
+         * 收集所有的 asbone 到 更新列表
+         */
+        allAsboneToCareList(): void;
+        /**
+         * 添加 到 更新骨骼节点列表
+         * @param bone 骨骼节点
+         */
         addToCareList(bone: transform): void;
         private _awaitClips;
         /** 获取待加载的 动画片段名 列表 */
@@ -12502,7 +12529,20 @@ declare namespace gd3d.math {
     function rectSet_One(out: rect): void;
     function rectSet_Zero(out: rect): void;
     function rectEqul(src1: rect, src2: rect): boolean;
+    /**
+     * 判断点是否在矩形中
+     * @param x 点坐标x
+     * @param y 点坐标y
+     * @param src 矩形
+     */
     function rectInner(x: number, y: number, src: rect): boolean;
+    /**
+     * 判断两矩形是否重叠
+     * @param r1 矩形1
+     * @param r2 矩形2
+     */
+    function rectOverlap(r1: rect, r2: rect): boolean;
+    function rectSet(out: rect, x: number, y: number, w: number, h: number): void;
     /**
      * 检测两个矩形是否相碰
      * @param r1

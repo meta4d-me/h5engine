@@ -2651,6 +2651,8 @@ var gd3d;
                  * 启用UI事件
                  */
                 this.enableUIEvent = true;
+                /** 启用 剔除超出可视范围的渲染节点  */
+                this.enableOutsideRenderClip = true;
                 this.pointDown = false;
                 this.pointEvent = new framework.PointEvent();
                 this.pointX = 0;
@@ -2789,6 +2791,8 @@ var gd3d;
             };
             /** 刷新节点树 */
             canvas.prototype.updateNodeTree = function (delta) {
+                if (this.onPreUpdate)
+                    this.onPreUpdate(delta);
                 //upadte
                 this.rootNode.updateTran(false);
                 //rootnode.update(delta);
@@ -2796,6 +2800,8 @@ var gd3d;
                     this._peCareListBuoy = -1;
                     this.objupdate(this.rootNode, delta);
                 }
+                if (this.onLateUpdate)
+                    this.onLateUpdate(delta);
             };
             /**
              * 触发 point 事件流
@@ -3063,7 +3069,8 @@ var gd3d;
                 if (!node.visible)
                     return;
                 var r = node.renderer;
-                if (r != null) {
+                if (r != null && (!this.enableOutsideRenderClip || !this.ckViewOutside(r))) { //视窗剔除
+                    //渲染
                     if (!this.isForceLabelTopRender || !("isLabel" in r)) {
                         r.render(this);
                     }
@@ -3076,6 +3083,18 @@ var gd3d;
                         this.drawScene(node.children[i], context, assetmgr);
                     }
                 }
+            };
+            /**
+             * 检查是在可视区域外
+             * @param node 节点
+             */
+            canvas.prototype.ckViewOutside = function (node) {
+                var canvasRect = canvas_1.help_rect_CanvasV;
+                gd3d.math.rectSet(canvasRect, 0, 0, this.pixelWidth, this.pixelHeight);
+                // let nodeRect = node.getDrawBounds();
+                var nodeRect = node.transform.aabbRect;
+                var isInside = gd3d.math.rectOverlap(canvasRect, nodeRect);
+                return !isInside;
             };
             canvas.prototype.renderTopLabels = function () {
                 var len = canvas_1.helpLabelArr.length;
@@ -3298,6 +3317,7 @@ var gd3d;
             var canvas_1;
             canvas.ClassName = "canvas";
             canvas.help_v2 = new gd3d.math.vector2();
+            canvas.help_rect_CanvasV = new gd3d.math.rect();
             canvas.helpLabelArr = new gd3d.math.ReuseArray();
             //深度渲染层列表
             canvas.depthTag = "__depthTag__";
@@ -4382,6 +4402,7 @@ var gd3d;
                 this.localRotate = 0; //旋转
                 this._maskrectId = "";
                 this._isMask = false;
+                this._aabbRect = new gd3d.math.rect();
                 this._parentIsMask = false;
                 this.localMatrix = new gd3d.math.matrix3x2; //2d矩阵
                 //这个是如果爹改了就要跟着算的
@@ -4597,6 +4618,19 @@ var gd3d;
                 enumerable: false,
                 configurable: true
             });
+            Object.defineProperty(transform2D.prototype, "aabbRect", {
+                /** aabb 矩形 */
+                get: function () {
+                    if (this._temp_aabbRect == null)
+                        this._temp_aabbRect = new gd3d.math.rect();
+                    if (this._aabbRect != null) {
+                        gd3d.math.rectClone(this._aabbRect, this._temp_aabbRect);
+                    }
+                    return this._temp_aabbRect;
+                },
+                enumerable: false,
+                configurable: true
+            });
             transform2D.prototype.updateMaskRect = function () {
                 var rect_x;
                 var rect_y;
@@ -4794,6 +4828,8 @@ var gd3d;
                         this.renderer.updateTran();
                     }
                 }
+                //aabb
+                this.calcAABB(this.worldMatrix);
                 if (this._children != null) {
                     for (var i = 0, l = this._children.length; i < l; i++) {
                         this._children[i].updateTran(parentChange || this.dirty);
@@ -4821,6 +4857,29 @@ var gd3d;
                 }
                 var top = dirtylist.pop();
                 top.updateTran(false);
+            };
+            //计算AABB 包围盒
+            transform2D.prototype.calcAABB = function (wMtx) {
+                var w = this.width;
+                var h = this.height;
+                var px = this.pivot.x;
+                var py = this.pivot.y;
+                var osX = px * w;
+                var osY = py * h;
+                var min = transform2D_1.help_v2;
+                var max = transform2D_1.help_v2_1;
+                gd3d.math.vec2Set(min, -osX, -osY);
+                gd3d.math.vec2Set(max, w - osX, h - osY);
+                gd3d.math.matrix3x2TransformVector2(wMtx, min, min);
+                gd3d.math.matrix3x2TransformVector2(wMtx, max, max);
+                if (this.canvas) {
+                    this.canvas.clipPosToCanvasPos(min, min);
+                    this.canvas.clipPosToCanvasPos(max, max);
+                }
+                this._aabbRect.x = min.x;
+                this._aabbRect.y = min.y;
+                this._aabbRect.w = max.x - min.x;
+                this._aabbRect.h = max.y - min.y;
             };
             //计算 to canvasMtx 矩阵
             transform2D.prototype.CalcReCanvasMtx = function (out) {
@@ -18871,7 +18930,7 @@ var gd3d;
             }
             subClip.caclByteLength = function () {
                 var total = 0;
-                total += gd3d.math.caclStringByteLength(name);
+                total += gd3d.math.caclStringByteLength(this.name);
                 total += 1;
                 total += 8;
                 return total;
@@ -25602,6 +25661,19 @@ var gd3d;
                 this.beActived = false; //是否play过动画
                 this.boneCache = {};
             }
+            Object.defineProperty(aniplayer.prototype, "hasBoneMap", {
+                get: function () {
+                    if (!this._hasBoneMap) {
+                        var _map = this._hasBoneMap = {};
+                        for (var i = 0; i < this.bones.length; i++) {
+                            _map[this.bones[i].name] = true;
+                        }
+                    }
+                    return this._hasBoneMap;
+                },
+                enumerable: false,
+                configurable: true
+            });
             Object.defineProperty(aniplayer.prototype, "PlayFrameID", {
                 get: function () {
                     return this._playFrameid;
@@ -25652,23 +25724,45 @@ var gd3d;
                     // this.tpose[name] = bindpose;
                     this.startepose[name_2] = this.startPos[i];
                 }
+                // let asbones: asbone[] = this.gameObject.getComponentsInChildren("asbone") as asbone[];
+                // for (let key in asbones)
+                // {
+                //     let trans = asbones[key].gameObject.transform;
+                //     this.carelist[trans.name] = trans;
+                //     this.careBoneMat[trans.name] = PoseBoneMatrix.create();
+                //     this.careBoneMat[trans.name].r = math.pool.new_quaternion();
+                //     this.careBoneMat[trans.name].t = math.pool.new_vector3();
+                //     this.careBoneMat[trans.name].s = 1;
+                // }
+                this.allAsboneToCareList();
+            };
+            /**
+             * 收集所有的 asbone 到 更新列表
+             */
+            aniplayer.prototype.allAsboneToCareList = function () {
                 var asbones = this.gameObject.getComponentsInChildren("asbone");
-                for (var key in asbones) {
-                    var trans = asbones[key].gameObject.transform;
-                    this.carelist[trans.name] = trans;
-                    this.careBoneMat[trans.name] = framework.PoseBoneMatrix.create();
-                    this.careBoneMat[trans.name].r = gd3d.math.pool.new_quaternion();
-                    this.careBoneMat[trans.name].t = gd3d.math.pool.new_vector3();
-                    this.careBoneMat[trans.name].s = 1;
+                for (var i = 0, len = asbones.length; i < len; i++) {
+                    var trans = asbones[i].gameObject.transform;
+                    this.addToCareList(trans);
                 }
             };
+            /**
+             * 添加 到 更新骨骼节点列表
+             * @param bone 骨骼节点
+             */
             aniplayer.prototype.addToCareList = function (bone) {
-                if (this.carelist[bone.name] != null)
+                if (!bone)
                     return;
+                var _map = this.hasBoneMap;
+                if (!_map[bone.name]) {
+                    console.info("aniplayer [" + this.gameObject.getName() + "] node [" + bone.name + "] is not a valid bone!");
+                    return;
+                }
                 this.carelist[bone.name] = bone;
                 this.careBoneMat[bone.name] = framework.PoseBoneMatrix.create();
                 this.careBoneMat[bone.name].r = gd3d.math.pool.new_quaternion();
                 this.careBoneMat[bone.name].t = gd3d.math.pool.new_vector3();
+                this.careBoneMat[bone.name].s = 1;
             };
             /** 获取待加载的 动画片段名 列表 */
             aniplayer.prototype.awaitLoadClipNames = function () {
@@ -42261,6 +42355,12 @@ var gd3d;
                 (src1.h != src2.h));
         }
         math.rectEqul = rectEqul;
+        /**
+         * 判断点是否在矩形中
+         * @param x 点坐标x
+         * @param y 点坐标y
+         * @param src 矩形
+         */
         function rectInner(x, y, src) {
             if (x < src.x || x > src.x + src.w ||
                 y < src.y || y > src.y + src.h) {
@@ -42269,6 +42369,29 @@ var gd3d;
             return true;
         }
         math.rectInner = rectInner;
+        /**
+         * 判断两矩形是否重叠
+         * @param r1 矩形1
+         * @param r2 矩形2
+         */
+        function rectOverlap(r1, r2) {
+            //两矩形中心点距离 小于 半尺寸则重叠了
+            //X轴
+            if ((r1.x + r1.w) < r2.x || r1.x > (r1.x + r1.w))
+                return false;
+            //y轴
+            if ((r1.y + r1.h) < r2.y || r1.y > (r1.y + r1.h))
+                return false;
+            return true;
+        }
+        math.rectOverlap = rectOverlap;
+        function rectSet(out, x, y, w, h) {
+            out.x = x;
+            out.y = y;
+            out.w = w;
+            out.h = h;
+        }
+        math.rectSet = rectSet;
         /**
          * 检测两个矩形是否相碰
          * @param r1

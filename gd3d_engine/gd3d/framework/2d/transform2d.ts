@@ -25,7 +25,7 @@ namespace gd3d.framework {
      * 2d Point事件流接口
      * @version gd3d 1.0
      */
-    export interface I2DPointListener{
+    export interface I2DPointListener {
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean);
     }
 
@@ -33,7 +33,7 @@ namespace gd3d.framework {
      * 实例对象是 I2DPointListener
      * @param object
      */
-    export function instanceOfI2DPointListener(object){
+    export function instanceOfI2DPointListener(object) {
         return "onPointEvent" in object;
     }
 
@@ -91,12 +91,12 @@ namespace gd3d.framework {
      */
     @gd3d.reflect.SerializeType
     export class C2DComponent {
-        static readonly ClassName:string="C2DComponent";
+        static readonly ClassName: string = "C2DComponent";
 
         @gd3d.reflect.Field("I2DComponent")
         comp: I2DComponent;
         init: boolean;
-        OnPlayed : boolean = false;
+        OnPlayed: boolean = false;
         constructor(comp: I2DComponent, init: boolean = false) {
             this.comp = comp;
             this.init = init;
@@ -114,7 +114,7 @@ namespace gd3d.framework {
      */
     @gd3d.reflect.SerializeType
     export class transform2D {
-        static readonly ClassName:string="transform2D";
+        static readonly ClassName: string = "transform2D";
 
         private static readonly help_v2 = new gd3d.math.vector2();
         private static readonly help_v2_1 = new gd3d.math.vector2();
@@ -126,12 +126,12 @@ namespace gd3d.framework {
         private _canvas: canvas;
 
         //insID : transform2D 收集 map
-        private static _transform2DMap : {[guid:number]: transform2D} = {};
+        private static _transform2DMap: { [guid: number]: transform2D } = {};
         /**
          * 获取transform2D 通过 insID
          * @param id transform2D
          */
-        static getTransform2DById(insID:number){
+        static getTransform2DById(insID: number) {
             return this._transform2DMap[insID];
         }
 
@@ -224,7 +224,7 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         private _parent: transform2D;
-        get parent(){
+        get parent() {
             return this._parent;
         }
 
@@ -236,10 +236,10 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         @gd3d.reflect.Field("transform2D[]")
-        get children(){
+        get children() {
             return this._children;
         }
-        set children(children:transform2D[]){
+        set children(children: transform2D[]) {
             this._children = children;
         }
         private _children: transform2D[] = [];
@@ -384,7 +384,7 @@ namespace gd3d.framework {
 
         private _maskrectId = "";
         /** 裁剪遮罩矩形 ID */
-        get maskRectId () {return this._maskrectId; }
+        get maskRectId() { return this._maskrectId; }
 
 
         private _maskRect: math.rect;
@@ -419,6 +419,17 @@ namespace gd3d.framework {
                 this.updateTran(true);
         }
 
+        private _aabbRect: math.rect = new math.rect();
+        private _temp_aabbRect: math.rect;
+        /** aabb 矩形 */
+        get aabbRect() {
+            if (this._temp_aabbRect == null) this._temp_aabbRect = new math.rect();
+            if (this._aabbRect != null) {
+                math.rectClone(this._aabbRect, this._temp_aabbRect);
+            }
+            return this._temp_aabbRect;
+        }
+
         private updateMaskRect() {
             let rect_x; let rect_y; let rect_w; let rect_h;
             let ParentRect;
@@ -429,7 +440,7 @@ namespace gd3d.framework {
                 this._parentIsMask = false;
             if (this.isMask || this.parentIsMask) {
                 this._maskrectId = "";
-                if(this.parentIsMask){
+                if (this.parentIsMask) {
                     this._maskrectId = this._parent._maskrectId;
                 }
 
@@ -503,7 +514,7 @@ namespace gd3d.framework {
             // node.canvas = this.canvas;
             // sceneMgr.app.markNotify(node, NotifyType.AddChild);
             // this.markDirty();
-            this.addChildAt(node,this._children.length);
+            this.addChildAt(node, this._children.length);
         }
 
         /**
@@ -516,7 +527,7 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         addChildAt(node: transform2D, index: number) {
-            if (index < 0 || !node ){
+            if (index < 0 || !node) {
                 return;
             }
             if (node._parent != null) {
@@ -543,16 +554,16 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         removeChild(node: transform2D) {
-            if(!node){
+            if (!node) {
                 console.warn(`target is null`);
                 return;
             }
             if (node._parent != this || this._children == null) {
                 console.warn("not my child.");
-                return ;
+                return;
             }
             var i = this._children.indexOf(node);
-            if(i < 0 ) return;
+            if (i < 0) return;
             this._children.splice(i, 1);
             node._parent = null;
             delete transform2D._transform2DMap[node.insId.getInsID()];
@@ -566,9 +577,9 @@ namespace gd3d.framework {
          * 为当前2d节点移除所有子节点
          * @version gd3d 1.0
          */
-        removeAllChild(needDispose:boolean = false) {
+        removeAllChild(needDispose: boolean = false) {
             while (this._children.length > 0) {
-                if(needDispose)
+                if (needDispose)
                     this._children[0].dispose();
                 else
                     this.removeChild(this._children[0]);
@@ -608,7 +619,7 @@ namespace gd3d.framework {
                 gd3d.math.matrix3x2MakeTransformRTS(this.localTranslate, this.localScale, this.localRotate, this.localMatrix);
             }
             if (this.dirty || parentChange) {
-                if(this.enableUILayout){
+                if (this.enableUILayout) {
                     this.refreshLayout();
                 }
                 if (this.parent == null) {
@@ -619,7 +630,7 @@ namespace gd3d.framework {
                 }
 
                 this.dirtyWorldDecompose = true;
-                if(this.enableUIMaskRect){
+                if (this.enableUIMaskRect) {
                     this.updateMaskRect();
                 }
                 if (this.renderer != null) {
@@ -627,8 +638,11 @@ namespace gd3d.framework {
                 }
             }
 
+            //aabb
+            this.calcAABB(this.worldMatrix);
+
             if (this._children != null) {
-                for (var i = 0,l=this._children.length; i < l; i++) {
+                for (var i = 0, l = this._children.length; i < l; i++) {
                     this._children[i].updateTran(parentChange || this.dirty);
                 }
             }
@@ -655,6 +669,34 @@ namespace gd3d.framework {
             }
             var top = dirtylist.pop();
             top.updateTran(false);
+        }
+
+        //计算AABB 包围盒
+        private calcAABB(wMtx: math.matrix3x2) {
+            let w = this.width;
+            let h = this.height;
+            let px = this.pivot.x;
+            let py = this.pivot.y;
+            let osX = px * w;
+            let osY = py * h;
+
+            let min = transform2D.help_v2;
+            let max = transform2D.help_v2_1;
+            gd3d.math.vec2Set(min, -osX, -osY);
+            gd3d.math.vec2Set(max, w - osX, h - osY);
+
+            gd3d.math.matrix3x2TransformVector2(wMtx, min, min);
+            gd3d.math.matrix3x2TransformVector2(wMtx, max, max);
+
+            if(this.canvas){
+                this.canvas.clipPosToCanvasPos(min,min);
+                this.canvas.clipPosToCanvasPos(max,max);
+            }
+
+            this._aabbRect.x = min.x;
+            this._aabbRect.y = min.y;
+            this._aabbRect.w = max.x - min.x;
+            this._aabbRect.h = max.y - min.y;
         }
 
         //计算 to canvasMtx 矩阵
@@ -851,13 +893,12 @@ namespace gd3d.framework {
          * 获取当前transform是否被释放掉了
          * @version gd3d 1.0
          */
-        get beDispose():boolean
-        {
+        get beDispose(): boolean {
             return this._beDispose;
         }
-        private _beDispose:boolean = false;//是否被释放了
+        private _beDispose: boolean = false;//是否被释放了
 
-        public onDispose:()=>void;
+        public onDispose: () => void;
 
         /**
          * @public
@@ -867,12 +908,12 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         dispose() {
-            if(this._parent)    this._parent.removeChild(this);
+            if (this._parent) this._parent.removeChild(this);
             this._dispose();
         }
 
-        private _dispose(){
-            if(this._beDispose)  return;
+        private _dispose() {
+            if (this._beDispose) return;
             if (this._children) {
                 for (var k in this._children) {
                     this._children[k]._dispose();
@@ -883,7 +924,7 @@ namespace gd3d.framework {
             this.removeAllComponents();
 
             this._beDispose = true;
-            if(this.onDispose)
+            if (this.onDispose)
                 this.onDispose();
         }
 
@@ -923,8 +964,8 @@ namespace gd3d.framework {
          */
         @gd3d.reflect.Field("C2DComponent[]")
         components: C2DComponent[] = [];
-        componentTypes:{[key:string]:boolean} = {};
-        private componentsInit :C2DComponent[]=[];
+        componentTypes: { [key: string]: boolean } = {};
+        private componentsInit: C2DComponent[] = [];
         // private componentplayed :C2DComponent[]=[];
 
         /**
@@ -937,14 +978,13 @@ namespace gd3d.framework {
         init(bePlay = false) {
 
             let comps = this.componentsInit;
-            if(comps.length <= 0 ) return;
+            if (comps.length <= 0) return;
 
-            while(comps.length > 0){    //这里不要再改回 for循环 , 当组件init 时添加其他组件时，会造成问题
+            while (comps.length > 0) {    //这里不要再改回 for循环 , 当组件init 时添加其他组件时，会造成问题
                 let c = comps.shift();
                 c.comp.start();
                 c.init = true;
-                if (bePlay)
-                {
+                if (bePlay) {
                     if ((StringUtil.ENABLED in c.comp) && !c.comp[StringUtil.ENABLED]) continue;  //组件enable影响
                     c.comp.onPlay();
                     c.OnPlayed = true;
@@ -962,7 +1002,7 @@ namespace gd3d.framework {
          */
         addComponent(type: string): I2DComponent {
             let pp = gd3d.reflect.getPrototype(type);
-            if(!pp) throw new Error(`get null of ${type} to getPrototype`);
+            if (!pp) throw new Error(`get null of ${type} to getPrototype`);
             let comp = gd3d.reflect.createInstance(pp, { "2dcomp": "1" });
             return this.addComponentDirect(comp);
         }
@@ -976,7 +1016,7 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         addComponentDirect(comp: I2DComponent): I2DComponent {
-            if(!comp) {
+            if (!comp) {
                 console.error("this component is null");
                 return;
             }
@@ -986,8 +1026,8 @@ namespace gd3d.framework {
             }
             comp.transform = this;
             let typeStr = getClassName(comp);
-            if(this.componentTypes[typeStr]){
-                console.error(this.name+"   已经有一个" + typeStr + "的组件了，不能俩");
+            if (this.componentTypes[typeStr]) {
+                console.error(this.name + "   已经有一个" + typeStr + "的组件了，不能俩");
                 return;
             }
 
@@ -1027,10 +1067,10 @@ namespace gd3d.framework {
             }
 
 
-            if(functionIsEmpty(comp.update))
-                comp.update =undefined;//update空转
+            if (functionIsEmpty(comp.update))
+                comp.update = undefined;//update空转
 
-			this.componentTypes[typeStr] = true;
+            this.componentTypes[typeStr] = true;
             return comp;
         }
 
@@ -1047,7 +1087,7 @@ namespace gd3d.framework {
             // let typeName =  reflect.getClassName(comp); //组件继承时remove fial
             let typeName = getClassName(comp);
 
-            if(!this.componentTypes[typeName])
+            if (!this.componentTypes[typeName])
                 return;
             delete this.componentTypes[typeName];
             for (var i = 0; i < this.components.length; i++) {
@@ -1059,13 +1099,13 @@ namespace gd3d.framework {
             }
         }
 
-        private clearOfCompRemove(cComp: C2DComponent){
+        private clearOfCompRemove(cComp: C2DComponent) {
             let comp = cComp.comp;
-            if(cComp.init){
+            if (cComp.init) {
                 comp.remove();
-            }else{
+            } else {
                 let i = this.componentsInit.indexOf(cComp);
-                if(i != -1) this.componentsInit.splice(i, 1);
+                if (i != -1) this.componentsInit.splice(i, 1);
             }
 
             if (comp == this.renderer) this.renderer = null;
@@ -1083,8 +1123,8 @@ namespace gd3d.framework {
          * @version gd3d 1.0
          */
         removeComponentByTypeName(type: string) {
-            if(!this.componentTypes[type])
-            return;
+            if (!this.componentTypes[type])
+                return;
             delete this.componentTypes[type];
             let comps = this.components;
             let len = comps.length;
@@ -1179,7 +1219,7 @@ namespace gd3d.framework {
          */
         private getNodeCompoents(node: transform2D, _type: string, comps: I2DComponent[]) {
             let len = node.components.length;
-            for(let i = 0; i < len ;i++){
+            for (let i = 0; i < len; i++) {
                 let comp = node.components[i].comp;
                 let cname = getClassName(comp);
                 // var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
@@ -1189,7 +1229,7 @@ namespace gd3d.framework {
             }
             if (node._children != null) {
                 let len_1 = node._children.length;
-                for(let j = 0; j < len_1 ;j++){
+                for (let j = 0; j < len_1; j++) {
                     this.getNodeCompoents(node._children[j], _type, comps);
                 }
             }
@@ -1199,7 +1239,7 @@ namespace gd3d.framework {
          * 获取当前节点下及子节点第一个能找到的组件
          * @param type 组件名称
          */
-        getFirstComponentInChildren(type: string):I2DComponent{
+        getFirstComponentInChildren(type: string): I2DComponent {
             return this.getNodeFirstComponent(this, type);
         }
 
@@ -1208,9 +1248,9 @@ namespace gd3d.framework {
          * @param node
          * @param type
          */
-        private getNodeFirstComponent(node: transform2D, type: string){
+        private getNodeFirstComponent(node: transform2D, type: string) {
             let len = node.components.length;
-            for(let i = 0; i < len ;i++){
+            for (let i = 0; i < len; i++) {
                 let comp = node.components[i].comp;
                 let cname = getClassName(comp);
                 // var cname = gd3d.reflect.getClassName(node.components[i].comp["__proto__"]);
@@ -1218,11 +1258,11 @@ namespace gd3d.framework {
                     return comp;
                 }
             }
-            if (node._children != null){
+            if (node._children != null) {
                 let len_1 = node._children.length;
-                for(let j = 0; j < len_1 ;j++){
+                for (let j = 0; j < len_1; j++) {
                     let result = node.getNodeFirstComponent(node._children[j], type);
-                    if(result) return result;
+                    if (result) return result;
                 }
             }
         }
@@ -1490,14 +1530,14 @@ namespace gd3d.framework {
          * 设置兄弟姐妹序列索引
          * @version gd3d 1.0
          */
-        setSiblingIndex(siblingIndex:number){
+        setSiblingIndex(siblingIndex: number) {
             let p = this._parent;
-            if(!p || !p._children || siblingIndex >= p._children.length || isNaN(siblingIndex) || siblingIndex < 0 ) return;
+            if (!p || !p._children || siblingIndex >= p._children.length || isNaN(siblingIndex) || siblingIndex < 0) return;
             let currIdx = p._children.indexOf(this);
-            if(currIdx == -1 || currIdx == siblingIndex)   return;
-            p._children.splice(currIdx,1);
+            if (currIdx == -1 || currIdx == siblingIndex) return;
+            p._children.splice(currIdx, 1);
             let useidx = siblingIndex > currIdx ? siblingIndex - 1 : siblingIndex;
-            p._children.splice(useidx,0,this); //insert to target pos
+            p._children.splice(useidx, 0, this); //insert to target pos
         }
 
         /**
@@ -1507,10 +1547,10 @@ namespace gd3d.framework {
          * 获取兄弟姐妹序列索引
          * @version gd3d 1.0
          */
-        getSiblingIndex():number{
+        getSiblingIndex(): number {
             let p = this._parent;
-            if(!p || !p._children)  return -1;
-            if(p._children.length < 1)   return 0;
+            if (!p || !p._children) return -1;
+            if (p._children.length < 1) return 0;
             return p._children.indexOf(this);
         }
 
