@@ -3069,7 +3069,7 @@ var gd3d;
                 if (!node.visible)
                     return;
                 var r = node.renderer;
-                if (r != null && (!this.enableOutsideRenderClip || !this.ckViewOutside(r))) { //视窗剔除
+                if (r != null && (!this.enableOutsideRenderClip || !this.ckViewOutside(node))) { //视窗剔除
                     //渲染
                     if (!this.isForceLabelTopRender || !("isLabel" in r)) {
                         r.render(this);
@@ -3092,7 +3092,7 @@ var gd3d;
                 var canvasRect = canvas_1.help_rect_CanvasV;
                 gd3d.math.rectSet(canvasRect, 0, 0, this.pixelWidth, this.pixelHeight);
                 // let nodeRect = node.getDrawBounds();
-                var nodeRect = node.transform.aabbRect;
+                var nodeRect = node.aabbRect;
                 var isInside = gd3d.math.rectOverlap(canvasRect, nodeRect);
                 return !isInside;
             };
@@ -4376,6 +4376,7 @@ var gd3d;
                 this.dirty = true; //自己是否需要更新
                 this.dirtyChild = true; //子层是否需要更新
                 this.dirtyWorldDecompose = false;
+                this.dirtyAABB = false; //AABB 标记脏
                 /**
                  * @public
                  * @language zh_CN
@@ -4626,6 +4627,10 @@ var gd3d;
                     if (this._aabbRect != null) {
                         gd3d.math.rectClone(this._aabbRect, this._temp_aabbRect);
                     }
+                    if (this.dirtyAABB) {
+                        this.calcAABB(this.worldMatrix);
+                        this.dirtyAABB = false;
+                    }
                     return this._temp_aabbRect;
                 },
                 enumerable: false,
@@ -4829,7 +4834,7 @@ var gd3d;
                     }
                 }
                 //aabb
-                this.calcAABB(this.worldMatrix);
+                this.dirtyAABB = true;
                 if (this._children != null) {
                     for (var i = 0, l = this._children.length; i < l; i++) {
                         this._children[i].updateTran(parentChange || this.dirty);
@@ -4866,20 +4871,29 @@ var gd3d;
                 var py = this.pivot.y;
                 var osX = px * w;
                 var osY = py * h;
-                var min = transform2D_1.help_v2;
-                var max = transform2D_1.help_v2_1;
-                gd3d.math.vec2Set(min, -osX, -osY);
-                gd3d.math.vec2Set(max, w - osX, h - osY);
-                gd3d.math.matrix3x2TransformVector2(wMtx, min, min);
-                gd3d.math.matrix3x2TransformVector2(wMtx, max, max);
+                var p0 = transform2D_1.help_v2;
+                var p1 = transform2D_1.help_v2_1;
+                var p2 = transform2D_1.help_v2_2;
+                var p3 = transform2D_1.help_v2_3;
+                gd3d.math.vec2Set(p0, -osX, -osY);
+                gd3d.math.vec2Set(p1, w - osX, -osY);
+                gd3d.math.vec2Set(p2, w - osX, h - osY);
+                gd3d.math.vec2Set(p3, -osX, h - osY);
+                gd3d.math.matrix3x2TransformVector2(wMtx, p0, p0);
+                gd3d.math.matrix3x2TransformVector2(wMtx, p1, p1);
+                gd3d.math.matrix3x2TransformVector2(wMtx, p2, p2);
+                gd3d.math.matrix3x2TransformVector2(wMtx, p3, p3);
                 if (this.canvas) {
-                    this.canvas.clipPosToCanvasPos(min, min);
-                    this.canvas.clipPosToCanvasPos(max, max);
+                    this.canvas.clipPosToCanvasPos(p0, p0);
+                    this.canvas.clipPosToCanvasPos(p1, p1);
+                    this.canvas.clipPosToCanvasPos(p2, p2);
+                    this.canvas.clipPosToCanvasPos(p3, p3);
                 }
-                this._aabbRect.x = min.x;
-                this._aabbRect.y = min.y;
-                this._aabbRect.w = max.x - min.x;
-                this._aabbRect.h = max.y - min.y;
+                var min = p0;
+                var max = p1;
+                gd3d.math.vec2Set(min, Math.min(p0.x, p1.x, p2.x, p3.x), Math.min(p0.y, p1.y, p2.y, p3.y));
+                gd3d.math.vec2Set(max, Math.max(p0.x, p1.x, p2.x, p3.x), Math.max(p0.y, p1.y, p2.y, p3.y));
+                gd3d.math.rectSet(this._aabbRect, min.x, min.y, max.x - min.x, max.y - min.y);
             };
             //计算 to canvasMtx 矩阵
             transform2D.prototype.CalcReCanvasMtx = function (out) {
@@ -5627,6 +5641,8 @@ var gd3d;
             transform2D.ClassName = "transform2D";
             transform2D.help_v2 = new gd3d.math.vector2();
             transform2D.help_v2_1 = new gd3d.math.vector2();
+            transform2D.help_v2_2 = new gd3d.math.vector2();
+            transform2D.help_v2_3 = new gd3d.math.vector2();
             transform2D.help_mtx = new gd3d.math.matrix3x2();
             transform2D.help_mtx_1 = new gd3d.math.matrix3x2();
             //insID : transform2D 收集 map

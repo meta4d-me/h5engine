@@ -1714,6 +1714,8 @@ declare namespace gd3d.framework {
         static readonly ClassName: string;
         private static readonly help_v2;
         private static readonly help_v2_1;
+        private static readonly help_v2_2;
+        private static readonly help_v2_3;
         private static readonly help_mtx;
         private static readonly help_mtx_1;
         private _canvas;
@@ -1869,6 +1871,7 @@ declare namespace gd3d.framework {
         private dirty;
         private dirtyChild;
         private dirtyWorldDecompose;
+        private dirtyAABB;
         /**
          * @public
          * @language zh_CN
