@@ -678,7 +678,7 @@ namespace gd3d.framework {
             //context.updateModel(this.gameObject.transform);
             if (!node.visible) return;
             let r = node.renderer;
-            if (r != null && (!this.enableOutsideRenderClip || !this.ckViewOutside(r))) { //视窗剔除
+            if (r != null && (!this.enableOutsideRenderClip || !this.ckViewOutside(node))) { //视窗剔除
                 //渲染
                 if (!this.isForceLabelTopRender || !("isLabel" in r)) {
                     r.render(this);
@@ -697,11 +697,11 @@ namespace gd3d.framework {
          * 检查是在可视区域外
          * @param node 节点
          */
-        private ckViewOutside(node: IRectRenderer): boolean {
+        private ckViewOutside(node: transform2D): boolean {
             let canvasRect = canvas.help_rect_CanvasV;
             math.rectSet(canvasRect, 0, 0, this.pixelWidth, this.pixelHeight);
             // let nodeRect = node.getDrawBounds();
-            let nodeRect = node.transform.aabbRect;
+            let nodeRect = node.aabbRect;
             let isInside = math.rectOverlap(canvasRect, nodeRect);
             return !isInside;
         }
