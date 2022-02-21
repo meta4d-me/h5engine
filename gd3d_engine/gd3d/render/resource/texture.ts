@@ -1,7 +1,7 @@
 ﻿namespace gd3d.render
 {
     /** 是否全局关闭，贴图mipmap */
-    export let mipmapCancel : boolean = false;
+    export let mipmapCancel: boolean = false;
     /**
      * @private
      */
@@ -42,28 +42,33 @@
             this._height = height;
             this.webgl = webgl;
             this._data = new Uint8Array(this._width * this._height * 4);
-            if(gray)
+            if (gray)
                 this._grayData = new Uint8Array(this._width * this._height);
 
             this.refresh(texRGBA);
         }
 
-        private webgl : WebGLRenderingContext;
+        private _isDispose = false;
+        private webgl: WebGLRenderingContext;
         private _width: number;
-        get width(){return this._width;}
+        get width() { return this._width; }
         private _height: number;
-        get height(){return this._height;}
+        get height() { return this._height; }
         private _data: Uint8Array;
         private _grayData: Uint8Array;
-        get data (){
-            if(this._gray){
+        get data()
+        {
+            if (this._gray)
+            {
                 return this._grayData;
-            }else{
+            } else
+            {
                 return this._data;
             }
         }
         private _gray: boolean;
-        get gray(){return this._gray;}
+        get gray() { return this._gray; }
+        get isDispose() { return this._isDispose; }
         getPixel(u: number, v: number): any
         {
             var x = (u * this._width) | 0;
@@ -81,10 +86,12 @@
         }
 
         /** 刷新data数据 */
-        refresh( texRGBA: WebGLTexture ){
-            if(!texRGBA){
+        refresh(texRGBA: WebGLTexture)
+        {
+            if (!texRGBA)
+            {
                 console.warn(`texRGBA is null `);
-                return ;
+                return;
             }
             var fbo = this.webgl.createFramebuffer();
             var fbold = this.webgl.getParameter(this.webgl.FRAMEBUFFER_BINDING);
@@ -106,6 +113,13 @@
                     this._grayData[i] = this._data[i * 4];  //now only rad pass
                 }
             }
+        }
+
+        dispose()
+        {
+            this.webgl = null;
+            this._data = null;
+            this._grayData = null;
         }
     }
     /**
@@ -214,11 +228,11 @@
     export class glTexture2D implements ITexture
     {
         public ext: any;
-        private linear:boolean = true;
-        private premultiply:boolean = true;
-        private repeat:boolean = true;
-        private mirroredU:boolean = true;
-        private mirroredV:boolean = true;
+        private linear: boolean = true;
+        private premultiply: boolean = true;
+        private repeat: boolean = true;
+        private mirroredU: boolean = true;
+        private mirroredV: boolean = true;
 
         constructor(webgl: WebGLRenderingContext, format: TextureFormatEnum = TextureFormatEnum.RGBA, mipmap: boolean = false, linear: boolean = true)
         {
@@ -226,7 +240,8 @@
             this.format = format;
             this.linear = linear;
             this.mipmap = mipmap;
-            if(mipmapCancel){
+            if (mipmapCancel)
+            {
                 this.mipmap = false;
             }
 
@@ -254,15 +269,16 @@
             //         return ext;
             //     }
             // }
-            return this.webgl.getExtension(name)||this.webgl.getExtension(`MOZ_${name}`)||
-            this.webgl.getExtension(`OP_${name}`)||this.webgl.getExtension(`WEBKIT_${name}`)||null;
+            return this.webgl.getExtension(name) || this.webgl.getExtension(`MOZ_${name}`) ||
+                this.webgl.getExtension(`OP_${name}`) || this.webgl.getExtension(`WEBKIT_${name}`) || null;
         }
         uploadImage(img: HTMLImageElement, mipmap: boolean, linear: boolean, premultiply: boolean = true, repeat: boolean = false, mirroredU: boolean = false, mirroredV: boolean = false): void
         {
             this.width = img.width;
             this.height = img.height;
             this.mipmap = mipmap;
-            if(mipmapCancel){
+            if (mipmapCancel)
+            {
                 this.mipmap = false;
             }
             this.linear = linear;
@@ -356,7 +372,8 @@
             this.width = width;
             this.height = height;
             this.mipmap = mipmap;
-            if(mipmapCancel){
+            if (mipmapCancel)
+            {
                 this.mipmap = false;
             }
             this.linear = linear;
@@ -364,12 +381,15 @@
             this.mirroredU = mirroredU;
             this.mirroredV = mirroredV;
             this.loaded = true;
-            if (premultiplyAlpha) {
+            if (premultiplyAlpha)
+            {
                 this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
-            } else {
+            } else
+            {
                 this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 0);
             }
-            if (flipY) {
+            if (flipY)
+            {
                 // this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
             }
             this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
@@ -618,8 +638,8 @@
             glTexture2D.mapTexture[name] = t;
             return t;
         }
-        
-        static particleTexture(webgl: WebGLRenderingContext,name = framework.defTexture.particle)
+
+        static particleTexture(webgl: WebGLRenderingContext, name = framework.defTexture.particle)
         {
             var t = glTexture2D.mapTexture[name];
             if (t != undefined)
@@ -630,7 +650,7 @@
             t = new glTexture2D(webgl, TextureFormatEnum.RGBA, mipmap, linear);
 
             var size = 64
-            
+
             var data = new Uint8Array(size * size * 4);
             var half = size / 2;
             for (let i = 0; i < size; i++)
@@ -666,7 +686,8 @@
             this.webgl = webgl;
             this.format = format;
             this.mipmap = mipmap;
-            if(mipmapCancel){
+            if (mipmapCancel)
+            {
                 this.mipmap = false;
             }
             this.linear = linear;
@@ -674,41 +695,45 @@
             this.texture = webgl.createTexture();
         }
         uploadImages(
-            Texture_NEGATIVE_X: framework.texture ,
-            Texture_NEGATIVE_Y: framework.texture ,
-            Texture_NEGATIVE_Z: framework.texture ,
-            Texture_POSITIVE_X: framework.texture ,
-            Texture_POSITIVE_Y: framework.texture ,
-            Texture_POSITIVE_Z: framework.texture ){
-                let wrc = this.webgl;
+            Texture_NEGATIVE_X: framework.texture,
+            Texture_NEGATIVE_Y: framework.texture,
+            Texture_NEGATIVE_Z: framework.texture,
+            Texture_POSITIVE_X: framework.texture,
+            Texture_POSITIVE_Y: framework.texture,
+            Texture_POSITIVE_Z: framework.texture)
+        {
+            let wrc = this.webgl;
 
-                let textures = [Texture_NEGATIVE_X,Texture_NEGATIVE_Y,Texture_NEGATIVE_Z,Texture_POSITIVE_X,Texture_POSITIVE_Y,Texture_POSITIVE_Z];
-                const typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z,wrc.TEXTURE_CUBE_MAP_POSITIVE_X,wrc.TEXTURE_CUBE_MAP_POSITIVE_Y,wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
-                for(var i=0; i<typeArr.length ;i++){
-                    let reader = (textures[i].glTexture as glTexture2D).getReader();
-                    if(!reader){
-                        console.warn(`getReader() fail : ${textures[i].getName()}`);
-                        return ;
-                    }
-                    this.upload(reader.data,reader.width,reader.height,typeArr[i]);
+            let textures = [Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z];
+            const typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z, wrc.TEXTURE_CUBE_MAP_POSITIVE_X, wrc.TEXTURE_CUBE_MAP_POSITIVE_Y, wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
+            for (var i = 0; i < typeArr.length; i++)
+            {
+                let reader = (textures[i].glTexture as glTexture2D).getReader();
+                if (!reader)
+                {
+                    console.warn(`getReader() fail : ${textures[i].getName()}`);
+                    return;
                 }
+                this.upload(reader.data, reader.width, reader.height, typeArr[i]);
+            }
         }
 
-        private upload(data: HTMLImageElement | Uint8Array,width:number,height:number,TEXTURE_CUBE_MAP_ : number): void
+        private upload(data: HTMLImageElement | Uint8Array, width: number, height: number, TEXTURE_CUBE_MAP_: number): void
         {
             this.width = width;
             this.height = height;
             this.loaded = true;
             let gl = this.webgl;
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,1);
+            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
 
             this.webgl.bindTexture(this.webgl.TEXTURE_CUBE_MAP, this.texture);
             var formatGL = this.webgl.RGBA;
             if (this.format == TextureFormatEnum.RGB)
-            formatGL = this.webgl.RGB;
+                formatGL = this.webgl.RGB;
             else if (this.format == TextureFormatEnum.Gray)
-            formatGL = this.webgl.LUMINANCE;
-            if(data instanceof HTMLImageElement){
+                formatGL = this.webgl.LUMINANCE;
+            if (data instanceof HTMLImageElement)
+            {
                 this.webgl.texImage2D(TEXTURE_CUBE_MAP_,
                     0,
                     formatGL,
@@ -716,18 +741,19 @@
                     //最后这个type，可以管格式
                     this.webgl.UNSIGNED_BYTE
                     , data);
-                }else{
-                    this.webgl.texImage2D(TEXTURE_CUBE_MAP_,
-                        0,
-                        formatGL,
-                        width,
-                        height,
-                        0,
-                        formatGL,
-                        //最后这个type，可以管格式
-                        this.webgl.UNSIGNED_BYTE
-                        , data);
-                    }
+            } else
+            {
+                this.webgl.texImage2D(TEXTURE_CUBE_MAP_,
+                    0,
+                    formatGL,
+                    width,
+                    height,
+                    0,
+                    formatGL,
+                    //最后这个type，可以管格式
+                    this.webgl.UNSIGNED_BYTE
+                    , data);
+            }
 
             gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
             gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
