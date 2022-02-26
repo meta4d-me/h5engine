@@ -43,6 +43,25 @@ namespace gd3d.framework {
         private inputElement: HTMLInputElement;
         private _text: string = "";
         private static _isIos: boolean;
+
+        /** 选择区域的开始位置 */
+        get selectionStart() {
+            if (this.inputElement) return this.inputElement.selectionStart;
+            return 0;
+        }
+
+        /** 选择区域的结束位置 */
+        get selectionEnd() {
+            if (this.inputElement) return this.inputElement.selectionEnd;
+            return 0;
+        }
+
+        /** 选择区域的方向 ， forward ：从前往后 backward ：从后往前 */
+        get selectionDirection() {
+            if (this.inputElement) return this.inputElement.selectionDirection;
+            return "forward";
+        }
+
         /**
          * @public
          * @language zh_CN
@@ -54,6 +73,14 @@ namespace gd3d.framework {
             return this._text;
         }
 
+        /**
+         * 清除输入文本
+         */
+        public clearText() {
+            this._text = "";
+            this.inputElement.value = this._text;
+            this._textLable.text = this._text;
+        }
 
         private _charlimit: number = 0;
         /**
@@ -135,6 +162,32 @@ namespace gd3d.framework {
             this._placeholderLabel = placeholderLabel;
         }
 
+        private _cursorTrans: transform2D;
+        /**
+         * 选择 光标 节点对象
+         */
+        @gd3d.reflect.Field("reference", null, "transform2D")
+        get CursorTrans(): transform2D {
+            return this._cursorTrans;
+        }
+        set CursorTrans(val: transform2D) {
+            this._cursorTrans = val;
+            if (val) { val.visible = false; }
+        }
+
+        private _selectionBG: transform2D;
+        /**
+         * 选择 字符串背景 节点对象
+         */
+        @gd3d.reflect.Field("reference", null, "transform2D")
+        get SelectionBG(): transform2D {
+            return this._selectionBG;
+        }
+        set SelectionBG(val: transform2D) {
+            this._selectionBG = val;
+            if (val) { val.visible = false; }
+        }
+
         /**
          * 刷新布局
          */
@@ -195,7 +248,7 @@ namespace gd3d.framework {
 
         private ckIsIos() {
             //ios 有保护 , focus 必须在 dom 事件帧触发。
-            if(inputField._isIos == null){
+            if (inputField._isIos == null) {
                 if (navigator && navigator.userAgent) {
                     let u = navigator.userAgent;
                     inputField._isIos = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/);
@@ -355,12 +408,101 @@ namespace gd3d.framework {
 
         }
 
+        private _lastIsCursorMode: boolean = false;
+        private _twinkleTime: number = 0.6;
+        private _twinkleTimeCount: number = 0;
+        private _lastSStart: number = 0;
+        private _lastSEnd: number = 0;
+        private _currStartX: number = 0;
+        private _currEndX: number = 0;
+        /** 选择状态刷新 */
+        private selectionRefresh(dt: number) {
+            if (!this.inputElement || !this._textLable || !this._textLable.font || !this.beFocus) return;
+            let sIdx = this.selectionStart;
+            let eInx = this.selectionEnd;
+            let difLen = sIdx - eInx;
+            let isCursorMode = difLen == 0;
+            let selectionDirty = sIdx != this._lastSStart || eInx != this._lastSEnd || isCursorMode; //光标有变化
+            let needSwitch = this._lastIsCursorMode != isCursorMode;
+            this._lastIsCursorMode = isCursorMode;
+            let _cNode = this._cursorTrans;
+            let _sbgNode = this._selectionBG;
+            let lpt = gd3d.framework.layoutOption;
+            //switch mode
+            if (needSwitch) {
+                //hide all 
+                if (_sbgNode) _sbgNode.visible = false;
+                if (_cNode) _cNode.visible = false;
+                //visible
+                if (isCursorMode) {
+                    if (_cNode) _cNode.visible = true;
+                } else {
+                    if (_sbgNode) _sbgNode.visible = true;
+                }
+            }
+
+            //
+            this._lastSStart = sIdx;
+            this._lastSEnd = eInx;
+
+            //update
+            if (isCursorMode) {
+                //光标
+                if (!_cNode) return;
+                if (selectionDirty) {
+                    this._twinkleTimeCount = 0;
+                    this._currStartX = this.getInputTextXPos(sIdx);
+                }
+
+                //光标定时闪烁
+                this._twinkleTimeCount += dt;
+                if (this._twinkleTimeCount >= this._twinkleTime) {
+                    _cNode.visible = !_cNode.visible;
+                    this._twinkleTimeCount = 0;
+                }
+                //位置刷新
+                _cNode.setLayoutValue(lpt.LEFT, this._currStartX);
+                _cNode.markDirty();
+            } else {
+                if (!_sbgNode) return;
+                if (selectionDirty) {
+                    this._twinkleTimeCount = 0;
+                    this._currStartX = this.getInputTextXPos(sIdx);
+                    this._currEndX = this.getInputTextXPos(eInx);
+                }
+                let bgW = Math.abs(this._currEndX - this._currStartX);
+
+                //位置、宽高 刷新
+                _sbgNode.setLayoutValue(lpt.LEFT, this._currStartX);
+                _sbgNode.width = bgW;
+                _sbgNode.markDirty();
+            }
+        }
+
+        //获取 输入文本 的坐标的X值
+        private getInputTextXPos(strIndex: number): number {
+            let result = 0;
+            let text = this._textLable.text;
+            let f = this._textLable.font;
+            var rate = this._textLable.fontsize / f.pointSize;
+            //计算字符偏移
+            for (let i = 0, len = strIndex; i < len; i++) {
+                let c = text[i];
+                let cInfo = f.cmap[c];
+                if (!cInfo) continue;
+                result += cInfo.xAddvance * rate;
+            }
+
+            return result;
+        }
+
         /**
          * @private
          */
         update(delta: number) {
             this.layoutRefresh();
             this.textRefresh();
+            this.selectionRefresh(delta);
         }
 
         /**
