@@ -1,4 +1,5 @@
 import { BlendMode } from "../node_modules/@esotericsoftware/spine-core/dist/SlotData";
+import { spineSkeleton } from "./spineComp";
 
 export class SpineMeshBatcher {
     private static VERTEX_SIZE = 9;
@@ -8,7 +9,7 @@ export class SpineMeshBatcher {
     private indices: Uint16Array;
     private indicesLength = 0;
 
-    private mats: { mat: gd3d.render.glProgram, start: number, count: number }[] = [];
+    private mats: { program: gd3d.render.glProgram, start: number, count: number }[] = [];
     private _needUpdate: boolean;
 
     constructor(maxVertices: number = 10920) {
@@ -38,9 +39,10 @@ export class SpineMeshBatcher {
     }
 
     batch(vertices: ArrayLike<number>, verticesLength: number, indices: ArrayLike<number>, indicesLength: number, slotBlendMode: BlendMode, slotTexture: gd3d.framework.texture, z: number = 0) {
-        let indexStart = this.verticesLength / SpineMeshBatcher.VERTEX_SIZE;
-        let vertexBuffer = this.vertices;
+        let indexAdd = this.verticesLength / SpineMeshBatcher.VERTEX_SIZE;
+        let indexStart = this.indicesLength;
         let i = this.verticesLength;
+        let vertexBuffer = this.vertices;
         let j = 0;
         for (; j < verticesLength;) {
             vertexBuffer[i++] = vertices[j++];//x
@@ -57,9 +59,14 @@ export class SpineMeshBatcher {
 
         let indicesArray = this.indices;
         for (i = this.indicesLength, j = 0; j < indicesLength; i++, j++)
-            indicesArray[i] = indices[j] + indexStart;
+            indicesArray[i] = indices[j] + indexAdd;
         this.indicesLength += indicesLength;
-        //todo
+        this.addMat(indexStart, indicesLength, slotBlendMode, slotTexture)
+    }
+
+    private addMat(start: number, count: number, slotBlendMode: BlendMode, slotTexture: gd3d.framework.texture) {
+        let mat = new gd3d.framework.material();
+        mat.setShader(spineSkeleton.shader);
     }
 
     end() {
@@ -68,6 +75,7 @@ export class SpineMeshBatcher {
 
     render(webgl: WebGLRenderingContext) {
         if (this._needUpdate) {
+            this._needUpdate = false;
             if (this.mesh == null) {
                 let mesh = new gd3d.render.glMesh();
                 let vf = gd3d.render.VertexFormatMask.Position
@@ -86,7 +94,7 @@ export class SpineMeshBatcher {
         if (this.mesh) {
             this.mesh.bindVboBuffer(webgl);
             for (let i = 0; i < this.mats.length; i++) {
-                let { mat, start, count } = this.mats[i]
+                let { program: mat, start, count } = this.mats[i]
                 this.mesh.bind(webgl, mat, 0)
                 this.mesh.drawElementTris(webgl, start, count);
             }

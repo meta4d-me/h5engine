@@ -9,14 +9,21 @@ export interface NumberArrayLike {
 
 export class spineSkeleton implements gd3d.framework.I2DComponent {
     static readonly ClassName: string = "spineSkeleton";
+    static shader: gd3d.framework.shader;
     skeleton: Skeleton;
     state: AnimationState;
     vertexEffect: VertexEffect;
+    private _shader: gd3d.framework.shader;
     constructor(skeletonData: SkeletonData) {
         this.skeleton = new Skeleton(skeletonData);
         let animData = new AnimationStateData(skeletonData);
         this.state = new AnimationState(animData);
     }
+
+    set shader(shader: gd3d.framework.shader) {
+        this._shader = shader;
+    }
+
     private datar: number[] = [
         //3 pos  4 color  2 uv 4 color2
         0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1,
@@ -203,9 +210,7 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
                     batch.begin();
                 }
 
-                const slotBlendMode = slot.data.blendMode;
-                const slotTexture = texture.texture;
-                batch.batch(finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, slotBlendMode, slotTexture, z);
+                batch.batch(finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, slot.data.blendMode, texture.texture, z);
                 z += zOffset;
             }
 
