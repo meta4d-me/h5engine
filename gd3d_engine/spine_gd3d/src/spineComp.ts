@@ -9,19 +9,20 @@ export interface NumberArrayLike {
 
 export class spineSkeleton implements gd3d.framework.I2DComponent {
     static readonly ClassName: string = "spineSkeleton";
-    static shader: gd3d.framework.shader;
+    static drawPass: gd3d.render.glDrawPass;
+    static premultipliedAlpha: boolean = false;
     skeleton: Skeleton;
     state: AnimationState;
     vertexEffect: VertexEffect;
-    private _shader: gd3d.framework.shader;
+    private _drawPass: gd3d.render.glDrawPass;
     constructor(skeletonData: SkeletonData) {
         this.skeleton = new Skeleton(skeletonData);
         let animData = new AnimationStateData(skeletonData);
         this.state = new AnimationState(animData);
     }
 
-    set shader(shader: gd3d.framework.shader) {
-        this._shader = shader;
+    set drawPass(drawPass: gd3d.render.glDrawPass) {
+        this._drawPass = drawPass;
     }
 
     private datar: number[] = [
@@ -51,8 +52,10 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
         this.updateGeometry();
     }
     render(canvas: gd3d.framework.canvas) {
-
-
+        let context: gd3d.framework.renderContext = canvas["context"];
+        for (let i = 0; i < this.batches.length; i++) {
+            this.batches[i].render(context);
+        }
     }
     private batches = new Array<SpineMeshBatcher>();
     private nextBatchIndex = 0;
@@ -210,7 +213,7 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
                     batch.begin();
                 }
 
-                batch.batch(finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, slot.data.blendMode, texture.texture, z);
+                batch.batch(finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, z, slot.data.blendMode, texture.texture);
                 z += zOffset;
             }
 
@@ -229,7 +232,7 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
 
     private nextBatch() {
         if (this.batches.length == this.nextBatchIndex) {
-            let batch = new SpineMeshBatcher();
+            let batch = new SpineMeshBatcher(this._drawPass ?? spineSkeleton.drawPass);
             this.batches.push(batch);
         }
         let batch = this.batches[this.nextBatchIndex++];
