@@ -411,22 +411,32 @@ namespace gd3d.framework {
         private _lastIsCursorMode: boolean = false;
         private _twinkleTime: number = 0.6;
         private _twinkleTimeCount: number = 0;
-        private _lastSStart: number = 0;
-        private _lastSEnd: number = 0;
+        private _lastSStart: number = -1;
+        private _lastSEnd: number = -1;
         private _currStartX: number = 0;
         private _currEndX: number = 0;
         /** 选择状态刷新 */
         private selectionRefresh(dt: number) {
-            if (!this.inputElement || !this._textLable || !this._textLable.font || !this.beFocus) return;
+            let _cNode = this._cursorTrans;
+            let _sbgNode = this._selectionBG;
+            if (!_cNode && !_sbgNode) return;
+
+            if (!this.beFocus) {
+                if (this._selectionBG) this._selectionBG.visible = false;
+                if (this._cursorTrans) this._cursorTrans.visible = false;
+                this._lastSStart = -1;
+                this._lastSEnd = -1;
+                this._lastIsCursorMode = false;
+                return;
+            }
+            if (!this.inputElement || !this._textLable || !this._textLable.font) return;
             let sIdx = this.selectionStart;
             let eInx = this.selectionEnd;
             let difLen = sIdx - eInx;
             let isCursorMode = difLen == 0;
-            let selectionDirty = sIdx != this._lastSStart || eInx != this._lastSEnd || isCursorMode; //光标有变化
             let needSwitch = this._lastIsCursorMode != isCursorMode;
+            let selectionDirty = sIdx != this._lastSStart || eInx != this._lastSEnd || needSwitch; //光标有变化
             this._lastIsCursorMode = isCursorMode;
-            let _cNode = this._cursorTrans;
-            let _sbgNode = this._selectionBG;
             let lpt = gd3d.framework.layoutOption;
             //switch mode
             if (needSwitch) {
@@ -452,6 +462,7 @@ namespace gd3d.framework {
                 if (selectionDirty) {
                     this._twinkleTimeCount = 0;
                     this._currStartX = this.getInputTextXPos(sIdx);
+                    if (_cNode) _cNode.visible = true;
                 }
 
                 //光标定时闪烁
