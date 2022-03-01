@@ -1,12 +1,9 @@
-import { AnimationState, AnimationStateData, BlendMode, ClippingAttachment, Color, MeshAttachment, RegionAttachment, Skeleton, SkeletonClipping, SkeletonData, TextureAtlasRegion, Vector2, VertexEffect } from "../node_modules/@esotericsoftware/spine-core/dist/index";
-import { Gd3dTexture } from "./assetmgr";
+import { AnimationState, VertexEffect, SkeletonData, AnimationStateData, SkeletonClipping, Vector2, Color, RegionAttachment, TextureAtlasRegion, MeshAttachment, ClippingAttachment, NumberArrayLike, Skeleton } from "@esotericsoftware/spine-core";
+import { Gd3dTexture } from "./assetMgr";
 import { SpineMeshBatcher } from "./spineMeshBatcher";
 
-export interface NumberArrayLike {
-    readonly length: number;
-    [n: number]: number;
-}
-
+@gd3d.reflect.node2DComponent
+@gd3d.reflect.nodeRender
 export class spineSkeleton implements gd3d.framework.I2DComponent {
     static readonly ClassName: string = "spineSkeleton";
     static drawPass: gd3d.render.glDrawPass;
@@ -213,7 +210,7 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
                     batch.begin();
                 }
 
-                batch.batch(finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, z, slot.data.blendMode, texture.texture);
+                batch.batch(finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, z, slot.data.blendMode, texture);
                 z += zOffset;
             }
 
@@ -240,7 +237,7 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
     }
 
     private _darwRect: any;
-    color: any;
+    // color: any;
     private _cacheMaskV4: gd3d.math.vector4;
     updateTran() {
         var m = this.transform.getWorldMatrix();
@@ -272,12 +269,12 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
         this.datar[5 * 13] = x3;
         this.datar[5 * 13 + 1] = y3;
         //主color
-        for (var i = 0; i < 6; i++) {
-            this.datar[i * 13 + 3] = this.color.r;
-            this.datar[i * 13 + 4] = this.color.g;
-            this.datar[i * 13 + 5] = this.color.b;
-            this.datar[i * 13 + 6] = this.color.a;
-        }
+        // for (var i = 0; i < 6; i++) {
+        //     this.datar[i * 13 + 3] = this.color.r;
+        //     this.datar[i * 13 + 4] = this.color.g;
+        //     this.datar[i * 13 + 5] = this.color.b;
+        //     this.datar[i * 13 + 6] = this.color.a;
+        // }
 
         //drawRect 
         this.min_x = Math.min(x0, x1, x2, x3, this.min_x);

@@ -1,4 +1,5 @@
-import { BlendMode } from "../node_modules/@esotericsoftware/spine-core/dist/SlotData";
+import { BlendMode } from "@esotericsoftware/spine-core";
+import { Gd3dTexture } from ".";
 import { spineSkeleton } from "./spineComp";
 
 const ONE = 1;
@@ -16,7 +17,7 @@ export class SpineMeshBatcher {
     private indices: Uint16Array;
     private indicesLength = 0;
 
-    private drawParams: { start: number, count: number, slotTexture: gd3d.framework.texture, srcRgb: number, srcAlpha: number, dstRgb: number, dstAlpha: number }[] = [];
+    private drawParams: { start: number, count: number, slotTexture: Gd3dTexture, srcRgb: number, srcAlpha: number, dstRgb: number, dstAlpha: number }[] = [];
     private _needUpdate: boolean;
     private _drawPass: gd3d.render.glDrawPass;
     private _mat: gd3d.framework.material;
@@ -53,7 +54,7 @@ export class SpineMeshBatcher {
         this.drawParams = [];
     }
 
-    batch(vertices: ArrayLike<number>, verticesLength: number, indices: ArrayLike<number>, indicesLength: number, z: number = 0, slotBlendMode: BlendMode, slotTexture: gd3d.framework.texture) {
+    batch(vertices: ArrayLike<number>, verticesLength: number, indices: ArrayLike<number>, indicesLength: number, z: number = 0, slotBlendMode: BlendMode, slotTexture: Gd3dTexture) {
         let indexAdd = this.verticesLength / SpineMeshBatcher.VERTEX_SIZE;
         let indexStart = this.indicesLength;
         let i = this.verticesLength;
@@ -79,7 +80,7 @@ export class SpineMeshBatcher {
         this.addDrawParams(indexStart, indicesLength, slotBlendMode, slotTexture)
     }
 
-    private addDrawParams(start: number, count: number, slotBlendMode: BlendMode, slotTexture: gd3d.framework.texture) {
+    private addDrawParams(start: number, count: number, slotBlendMode: BlendMode, slotTexture: Gd3dTexture) {
         let srcRgb, srcAlpha, dstRgb, dstAlpha;
         switch (slotBlendMode) {
             case BlendMode.Normal:
@@ -141,7 +142,7 @@ export class SpineMeshBatcher {
                 this._drawPass.state_blendSrcAlpha = srcAlpha;
                 this._drawPass.state_blendDestALpha = dstAlpha;
                 this._drawPass.use(webgl);
-                this._mat.setTexture("_MainTex", slotTexture)
+                this._mat.setTexture("_MainTex", slotTexture.texture);
                 this._mat.uploadUnifoms(this._drawPass, context);
                 this.mesh.bind(webgl, this._drawPass.program, 0);
                 this.mesh.drawElementTris(webgl, start, count);
