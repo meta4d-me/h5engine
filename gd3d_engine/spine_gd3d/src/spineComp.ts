@@ -2,24 +2,25 @@ import { AnimationState, VertexEffect, SkeletonData, AnimationStateData, Skeleto
 import { Gd3dTexture } from "./assetMgr";
 import { SpineMeshBatcher } from "./spineMeshBatcher";
 
+
 @gd3d.reflect.node2DComponent
 @gd3d.reflect.nodeRender
 export class spineSkeleton implements gd3d.framework.I2DComponent {
     static readonly ClassName: string = "spineSkeleton";
-    static drawPass: gd3d.render.glDrawPass;
+    static shader: gd3d.framework.shader;
     static premultipliedAlpha: boolean = false;
     skeleton: Skeleton;
     state: AnimationState;
     vertexEffect: VertexEffect;
-    private _drawPass: gd3d.render.glDrawPass;
+    private _shader: gd3d.framework.shader;
     constructor(skeletonData: SkeletonData) {
         this.skeleton = new Skeleton(skeletonData);
         let animData = new AnimationStateData(skeletonData);
         this.state = new AnimationState(animData);
     }
 
-    set drawPass(drawPass: gd3d.render.glDrawPass) {
-        this._drawPass = drawPass;
+    set shader(shader: gd3d.framework.shader) {
+        this._shader = shader;
     }
 
     private datar: number[] = [
@@ -49,9 +50,10 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
         this.updateGeometry();
     }
     render(canvas: gd3d.framework.canvas) {
+        let app = canvas.scene.app;
         let context: gd3d.framework.renderContext = canvas["context"];
         for (let i = 0; i < this.batches.length; i++) {
-            this.batches[i].render(context);
+            this.batches[i].render(context, app);
         }
     }
     private batches = new Array<SpineMeshBatcher>();
@@ -82,8 +84,6 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
         let drawOrder = this.skeleton.drawOrder;
         let batch = this.nextBatch();
         batch.begin();
-        let z = 0;
-        let zOffset = this.zOffset;
         for (let i = 0, n = drawOrder.length; i < n; i++) {
             let vertexSize = clipper.isClipping() ? 2 : spineSkeleton.VERTEX_SIZE;
             let slot = drawOrder[i];
@@ -210,8 +210,8 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
                     batch.begin();
                 }
 
-                batch.batch(finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, z, slot.data.blendMode, texture);
-                z += zOffset;
+                batch.batch(finalVertices, finalVerticesLength, finalIndices, finalIndicesLength, 0, slot.data.blendMode, texture);
+                // z += zOffset;
             }
 
             clipper.clipEndWithSlot(slot);
@@ -229,7 +229,7 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
 
     private nextBatch() {
         if (this.batches.length == this.nextBatchIndex) {
-            let batch = new SpineMeshBatcher(this._drawPass ?? spineSkeleton.drawPass);
+            let batch = new SpineMeshBatcher(this._shader ?? spineSkeleton.shader);
             this.batches.push(batch);
         }
         let batch = this.batches[this.nextBatchIndex++];
