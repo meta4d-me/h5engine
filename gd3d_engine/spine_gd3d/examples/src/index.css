@@ -2,3 +2,26 @@ body{
     padding: 0;
     margin: 0;
 }
+
+.container{
+    position: absolute;
+}
+
+.ui{
+    position: absolute;
+    bottom: 20%;
+    width: fit-content;
+    margin: auto;
+    left: 0;
+    right: 0;
+}
+
+.speed{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.slider{
+    width: 400px;
+}

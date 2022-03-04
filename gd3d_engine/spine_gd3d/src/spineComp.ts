@@ -7,16 +7,16 @@ import { SpineMeshBatcher } from "./spineMeshBatcher";
 @gd3d.reflect.nodeRender
 export class spineSkeleton implements gd3d.framework.I2DComponent {
     static readonly ClassName: string = "spineSkeleton";
-    static shader: gd3d.framework.shader;
     static premultipliedAlpha: boolean = false;
     skeleton: Skeleton;
     state: AnimationState;
+    animData: AnimationStateData;
     vertexEffect: VertexEffect;
     private _shader: gd3d.framework.shader;
     constructor(skeletonData: SkeletonData) {
         this.skeleton = new Skeleton(skeletonData);
-        let animData = new AnimationStateData(skeletonData);
-        this.state = new AnimationState(animData);
+        this.animData = new AnimationStateData(skeletonData);
+        this.state = new AnimationState(this.animData);
     }
 
     set shader(shader: gd3d.framework.shader) {
@@ -229,7 +229,7 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
 
     private nextBatch() {
         if (this.batches.length == this.nextBatchIndex) {
-            let batch = new SpineMeshBatcher(this._shader ?? spineSkeleton.shader);
+            let batch = new SpineMeshBatcher(this._shader);
             this.batches.push(batch);
         }
         let batch = this.batches[this.nextBatchIndex++];

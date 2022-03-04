@@ -1,5 +1,5 @@
 import { BlendMode } from "@esotericsoftware/spine-core";
-import { Gd3dTexture } from ".";
+import { defSpineShaderName, Gd3dTexture } from ".";
 import { spineSkeleton } from "./spineComp";
 
 const ONE = 1;
@@ -20,18 +20,12 @@ export class SpineMeshBatcher {
     private drawParams: { start: number, count: number, slotTexture: Gd3dTexture, slotBlendMode: BlendMode, srcRgb: number, srcAlpha: number, dstRgb: number, dstAlpha: number }[] = [];
     private _needUpdate: boolean;
     private _shader: gd3d.framework.shader;
-    private _mat: gd3d.framework.material;
-
     constructor(shader: gd3d.framework.shader, maxVertices: number = 10920) {
         if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
         this.vertices = new Float32Array(maxVertices * SpineMeshBatcher.VERTEX_SIZE);
         this.indices = new Uint16Array(maxVertices * 3);
-        let mat = new gd3d.framework.material();
-        mat.setShader(shader);
         this._shader = shader;
-        this._mat = mat;
     }
-
     dispose() {
 
     }
@@ -116,6 +110,8 @@ export class SpineMeshBatcher {
         this._needUpdate = true;
     }
 
+    private _projectMat = new gd3d.math.matrix();
+    private _mat = new gd3d.framework.material();
     render(context: gd3d.framework.renderContext, app: gd3d.framework.application) {
         let { webgl } = context;
         if (this._needUpdate) {
@@ -136,13 +132,14 @@ export class SpineMeshBatcher {
             }
         }
         if (this.mesh) {
-            let pass = this._shader.passes["base"][0];
+            let shader = this._shader ?? app.getAssetMgr().getShader(defSpineShaderName);
+            this._mat.setShader(shader);
+            this.ortho(-app.width / 2, app.width / 2, -app.height / 2, app.height / 2, -1, 1, this._projectMat);
             this.mesh.bindVboBuffer(webgl);
-            let mat = new gd3d.math.matrix()
-            this.ortho(-app.width / 2, app.width / 2, -app.height / 2, app.height / 2, -1, 1, mat);
+            let pass = shader.passes["base"][0];
+            this.mesh.bind(webgl, pass.program, 0);
             for (let i = 0; i < this.drawParams.length; i++) {
                 let { start, count, slotTexture, srcRgb, srcAlpha, dstAlpha, dstRgb } = this.drawParams[i]
-                this.mesh.bindVboBuffer(webgl);
                 pass.state_blend = true;
                 pass.state_blendEquation = gd3d.render.webglkit.FUNC_ADD;
                 pass.state_blendSrcRGB = srcRgb;
@@ -151,18 +148,12 @@ export class SpineMeshBatcher {
                 pass.state_blendDestALpha = dstAlpha;
                 pass.use(webgl);
                 this._mat.setTexture("_MainTex", slotTexture.texture);
-                this._mat.setMatrix("_SpineMvp", mat);
+                this._mat.setMatrix("_SpineMvp", this._projectMat);
                 this._mat.uploadUnifoms(pass, context);
-                this.mesh.bind(webgl, pass.program, 0);
                 this.mesh.drawElementTris(webgl, start, count);
             }
         }
     }
-
-    private ortho2d(x: number, y: number, width: number, height: number, out: gd3d.math.matrix) {
-        return this.ortho(x, x + width, y, y + height, -1, 1, out);
-    }
-
     private ortho(left: number, right: number, bottom: number, top: number, near: number, far: number, out: gd3d.math.matrix) {
         let x_orth = 2 / (right - left);
         let y_orth = 2 / (top - bottom);
