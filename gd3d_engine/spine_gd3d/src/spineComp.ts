@@ -23,16 +23,6 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
         this._shader = shader;
     }
 
-    private datar: number[] = [
-        //3 pos  4 color  2 uv 4 color2
-        0, 0, 0, 1, 1, 1, 1, 0, 0, 1, 1, 1, 1,
-        0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
-        0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,
-        0, 0, 0, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1,
-        0, 0, 0, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1,
-        0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1
-    ];
-
     start() {
 
     }
@@ -52,6 +42,15 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
     render(canvas: gd3d.framework.canvas) {
         let app = canvas.scene.app;
         let context: gd3d.framework.renderContext = canvas["context"];
+        let mat = new gd3d.math.matrix();
+        let worldPos = this.transform.getWorldTranslate();
+        let worldRot = this.transform.getWorldRotate();
+        let worldScale = this.transform.getWorldScale();
+        let quat = new gd3d.math.quaternion();
+        gd3d.math.quatFromAxisAngle(gd3d.math.z_AXIS(), worldRot.v * 180 / Math.PI, quat)
+        gd3d.math.matrixMakeTransformRTS(new gd3d.math.vector3(worldPos.x, worldPos.y, 0), new gd3d.math.vector3(worldScale.x, worldScale.y, 1.0), quat, mat);
+        context.matrixModel = mat;
+
         for (let i = 0; i < this.batches.length; i++) {
             this.batches[i].render(context, app);
         }
@@ -70,6 +69,7 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
     static VERTEX_SIZE = 2 + 2 + 4;
     static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
     private updateGeometry() {
+        let mat = this.transform.getWorldMatrix();
         this.clearBatches();
 
         let tempPos = this.tempPos;
@@ -236,92 +236,13 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
         return batch;
     }
 
-    private _darwRect: any;
-    // color: any;
-    private _cacheMaskV4: gd3d.math.vector4;
     updateTran() {
         var m = this.transform.getWorldMatrix();
-
-        var l = -this.transform.pivot.x * this.transform.width;
-        var r = this.transform.width + l;
-        var t = -this.transform.pivot.y * this.transform.height;
-        var b = this.transform.height + t;
-
-        var x0 = l * m.rawData[0] + t * m.rawData[2] + m.rawData[4];
-        var y0 = l * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
-        var x1 = r * m.rawData[0] + t * m.rawData[2] + m.rawData[4];
-        var y1 = r * m.rawData[1] + t * m.rawData[3] + m.rawData[5];
-        var x2 = l * m.rawData[0] + b * m.rawData[2] + m.rawData[4];
-        var y2 = l * m.rawData[1] + b * m.rawData[3] + m.rawData[5];
-        var x3 = r * m.rawData[0] + b * m.rawData[2] + m.rawData[4];
-        var y3 = r * m.rawData[1] + b * m.rawData[3] + m.rawData[5];
-
-        this.datar[0 * 13] = x0;
-        this.datar[0 * 13 + 1] = y0;
-        this.datar[1 * 13] = x1;
-        this.datar[1 * 13 + 1] = y1;
-        this.datar[2 * 13] = x2;
-        this.datar[2 * 13 + 1] = y2;
-        this.datar[3 * 13] = x2;
-        this.datar[3 * 13 + 1] = y2;
-        this.datar[4 * 13] = x1;
-        this.datar[4 * 13 + 1] = y1;
-        this.datar[5 * 13] = x3;
-        this.datar[5 * 13 + 1] = y3;
-        //主color
-        // for (var i = 0; i < 6; i++) {
-        //     this.datar[i * 13 + 3] = this.color.r;
-        //     this.datar[i * 13 + 4] = this.color.g;
-        //     this.datar[i * 13 + 5] = this.color.b;
-        //     this.datar[i * 13 + 6] = this.color.a;
-        // }
-
-        //drawRect 
-        this.min_x = Math.min(x0, x1, x2, x3, this.min_x);
-        this.min_y = Math.min(y0, y1, y2, y3, this.min_y);
-        this.max_x = Math.max(x0, x1, x2, x3, this.max_x);
-        this.max_y = Math.max(y0, y1, y2, y3, this.max_y);
-        this.calcDrawRect();
-    }
-
-
-    private min_x: number = Number.MAX_VALUE;
-    private max_x: number = Number.MAX_VALUE * -1;
-    private min_y: number = Number.MAX_VALUE;
-    private max_y: number = Number.MAX_VALUE * -1;
-    /** 计算drawRect */
-    private calcDrawRect() {
-        if (!this._darwRect) return;
-        //drawBounds (y 轴反向)
-        let canvas = this.transform.canvas;
-        if (!canvas) return;
-        let minPos = gd3d.poolv2();
-        minPos.x = this.min_x;
-        minPos.y = this.max_y;
-        canvas.clipPosToCanvasPos(minPos, minPos);
-
-        let maxPos = gd3d.poolv2();
-        maxPos.x = this.max_x;
-        maxPos.y = this.min_y;
-        canvas.clipPosToCanvasPos(maxPos, maxPos);
-
-        this._darwRect.x = minPos.x;
-        this._darwRect.y = minPos.y;
-        this._darwRect.w = maxPos.x - minPos.x;
-        this._darwRect.h = maxPos.y - minPos.y;
-
-        this.min_x = this.min_y = Number.MAX_VALUE;
-        this.max_x = this.max_y = Number.MAX_VALUE * -1;
-
-        gd3d.poolv2_del(minPos);
-        gd3d.poolv2_del(maxPos);
     }
 
 
     transform: gd3d.framework.transform2D;
     remove() {
-        this._cacheMaskV4 = null;
         this.transform = null;
-        this.datar.length = 0;
     }
 }

@@ -139,7 +139,7 @@ export class SpineMeshBatcher {
             let pass = this._shader.passes["base"][0];
             this.mesh.bindVboBuffer(webgl);
             let mat = new gd3d.math.matrix()
-            this.ortho2d(0, 0, app.width, app.height, mat);
+            this.ortho(-app.width / 2, app.width / 2, -app.height / 2, app.height / 2, -1, 1, mat);
             for (let i = 0; i < this.drawParams.length; i++) {
                 let { start, count, slotTexture, srcRgb, srcAlpha, dstAlpha, dstRgb } = this.drawParams[i]
                 this.mesh.bindVboBuffer(webgl);
