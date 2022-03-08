@@ -134,7 +134,7 @@ export class SpineMeshBatcher {
         if (this.mesh) {
             let shader = this._shader ?? app.getAssetMgr().getShader(defSpineShaderName);
             this._mat.setShader(shader);
-            this.ortho(-app.width / 2, app.width / 2, -app.height / 2, app.height / 2, -1, 1, this._projectMat);
+            ortho(-app.width / 2, app.width / 2, -app.height / 2, app.height / 2, -1, 1, this._projectMat);
             this.mesh.bindVboBuffer(webgl);
             let pass = shader.passes["base"][0];
             this.mesh.bind(webgl, pass.program, 0);
@@ -154,32 +154,34 @@ export class SpineMeshBatcher {
             }
         }
     }
-    private ortho(left: number, right: number, bottom: number, top: number, near: number, far: number, out: gd3d.math.matrix) {
-        let x_orth = 2 / (right - left);
-        let y_orth = 2 / (top - bottom);
-        let z_orth = -2 / (far - near);
 
-        let tx = -(right + left) / (right - left);
-        let ty = -(top + bottom) / (top - bottom);
-        let tz = -(far + near) / (far - near);
 
-        out.rawData[0] = x_orth;
-        out.rawData[1] = 0;
-        out.rawData[2] = 0;
-        out.rawData[3] = 0;
-        out.rawData[4] = 0;
-        out.rawData[5] = y_orth;
-        out.rawData[6] = 0;
-        out.rawData[7] = 0;
-        out.rawData[8] = 0;
-        out.rawData[9] = 0;
-        out.rawData[10] = z_orth;
-        out.rawData[11] = 0;
-        out.rawData[12] = tx;
-        out.rawData[13] = ty;
-        out.rawData[14] = tz;
-        out.rawData[15] = 1;
-        return this;
-    }
+}
 
+function ortho(left: number, right: number, bottom: number, top: number, near: number, far: number, out: gd3d.math.matrix) {
+    let x_orth = 2 / (right - left);
+    let y_orth = 2 / (top - bottom);
+    let z_orth = -2 / (far - near);
+
+    let tx = -(right + left) / (right - left);
+    let ty = -(top + bottom) / (top - bottom);
+    let tz = -(far + near) / (far - near);
+
+    out.rawData[0] = x_orth;
+    out.rawData[1] = 0;
+    out.rawData[2] = 0;
+    out.rawData[3] = 0;
+    out.rawData[4] = 0;
+    out.rawData[5] = y_orth;
+    out.rawData[6] = 0;
+    out.rawData[7] = 0;
+    out.rawData[8] = 0;
+    out.rawData[9] = 0;
+    out.rawData[10] = z_orth;
+    out.rawData[11] = 0;
+    out.rawData[12] = tx;
+    out.rawData[13] = ty;
+    out.rawData[14] = tz;
+    out.rawData[15] = 1;
+    return out;
 }

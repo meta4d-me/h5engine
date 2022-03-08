@@ -3,7 +3,7 @@ import { Route, Redirect, Switch, Link, HashRouter as Router } from "react-route
 import { ImageChange } from "./pages/imageChange";
 import { Mesh } from "./pages/mesh";
 import { ChangeSkin } from "./pages/changeSkin";
-import { Spritesheet } from "./pages/spritesheet";
+import { SpriteSheet } from "./pages/spriteSheet";
 import { Transition } from "./pages/transition";
 import { HoverBoard } from "./pages/hoverBoard";
 
@@ -26,7 +26,7 @@ export class APP extends React.Component {
                     </div>
                 }} />
                 <Switch>
-                    <Route path="/sprit_sheet" component={Spritesheet} />
+                    <Route path="/sprit_sheet" component={SpriteSheet} />
                     <Route path="/image_change" component={ImageChange} />
                     <Route path="/transition" component={Transition} />
                     <Route path="/mesh" component={Mesh} />

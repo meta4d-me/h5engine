@@ -61,13 +61,6 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
         }
     }
 
-    calBoneScreenPos(boneName: string): gd3d.math.vector2 {
-        let bone = this.skeleton.findBone(boneName);
-        if (bone == null) return null;
-        let x = this.skeleton.x + bone.worldX;
-        let y = this.skeleton.y + bone.worldY;
-    }
-
     private batches = new Array<SpineMeshBatcher>();
     private nextBatchIndex = 0;
     private clipper = new SkeletonClipping();
@@ -256,4 +249,8 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
     remove() {
         this.transform = null;
     }
+}
+
+function ortho(arg0: number, arg1: number, arg2: number, arg3: number, arg4: number, arg5: number, vpMat: gd3d.math.matrix) {
+    throw new Error("Function not implemented.");
 }

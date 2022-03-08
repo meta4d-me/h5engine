@@ -1,7 +1,7 @@
 import { Slider } from "antd";
 import React from "react";
 import { AtlasAttachmentLoader, SkeletonJson, SpineAssetMgr, spineSkeleton } from "../../../src/index";
-export class Spritesheet extends React.Component {
+export class SpriteSheet extends React.Component {
     private _comp: spineSkeleton;
     componentDidMount(): void {
         let app = new gd3d.framework.application();
@@ -42,8 +42,8 @@ export class Spritesheet extends React.Component {
                 comp.state.setAnimation(0, animation, true);
                 let spineNode = new gd3d.framework.transform2D;
                 //可用transform2d缩放等
-                // spineNode.localTranslate.x = 200;
-                // spineNode.localTranslate.y = -500;
+                // spineNode.localTranslate.x = app.width / 2;
+                // spineNode.localTranslate.y = -app.height / 2;
                 // spineNode.localRotate = 30 * Math.PI / 180;
                 // spineNode.localScale.x = 3;
                 spineNode.addComponentDirect(comp);

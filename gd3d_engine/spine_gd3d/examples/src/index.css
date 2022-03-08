@@ -25,3 +25,10 @@ body{
 .slider{
     width: 400px;
 }
+
+.radiusCircle{
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background-color: deeppink;
+}
