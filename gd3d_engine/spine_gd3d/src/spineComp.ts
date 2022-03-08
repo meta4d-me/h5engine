@@ -38,23 +38,36 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
         state.apply(skeleton);
         skeleton.updateWorldTransform();
         this.updateGeometry();
+
+        this.onUpdate?.(delta);
     }
+    onUpdate: (delta: number) => void
+
+
+    private _quat = new gd3d.math.quaternion();
+    private _modelMat = new gd3d.math.matrix();
     render(canvas: gd3d.framework.canvas) {
         let app = canvas.scene.app;
         let context: gd3d.framework.renderContext = canvas["context"];
-        let mat = new gd3d.math.matrix();
         let worldPos = this.transform.getWorldTranslate();
         let worldRot = this.transform.getWorldRotate();
         let worldScale = this.transform.getWorldScale();
-        let quat = new gd3d.math.quaternion();
-        gd3d.math.quatFromAxisAngle(gd3d.math.z_AXIS(), worldRot.v * 180 / Math.PI, quat)
-        gd3d.math.matrixMakeTransformRTS(new gd3d.math.vector3(worldPos.x, worldPos.y, 0), new gd3d.math.vector3(worldScale.x, worldScale.y, 1.0), quat, mat);
-        context.matrixModel = mat;
+        gd3d.math.quatFromAxisAngle(gd3d.math.z_AXIS(), worldRot.v * 180 / Math.PI, this._quat)
+        gd3d.math.matrixMakeTransformRTS(new gd3d.math.vector3(worldPos.x, worldPos.y, 0), new gd3d.math.vector3(worldScale.x, worldScale.y, 1.0), this._quat, this._modelMat);
+        context.matrixModel = this._modelMat;
 
         for (let i = 0; i < this.batches.length; i++) {
             this.batches[i].render(context, app);
         }
     }
+
+    calBoneScreenPos(boneName: string): gd3d.math.vector2 {
+        let bone = this.skeleton.findBone(boneName);
+        if (bone == null) return null;
+        let x = this.skeleton.x + bone.worldX;
+        let y = this.skeleton.y + bone.worldY;
+    }
+
     private batches = new Array<SpineMeshBatcher>();
     private nextBatchIndex = 0;
     private clipper = new SkeletonClipping();
@@ -69,9 +82,7 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
     static VERTEX_SIZE = 2 + 2 + 4;
     static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
     private updateGeometry() {
-        let mat = this.transform.getWorldMatrix();
         this.clearBatches();
-
         let tempPos = this.tempPos;
         let tempUv = this.tempUv;
         let tempLight = this.tempLight;
