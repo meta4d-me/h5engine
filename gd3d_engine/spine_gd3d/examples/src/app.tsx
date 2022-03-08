@@ -6,6 +6,7 @@ import { ChangeSkin } from "./pages/changeSkin";
 import { SpriteSheet } from "./pages/spriteSheet";
 import { Transition } from "./pages/transition";
 import { HoverBoard } from "./pages/hoverBoard";
+import { AdditiveBlending } from "./pages/additiveblending";
 
 export class APP extends React.Component {
     componentDidMount() {
@@ -23,6 +24,8 @@ export class APP extends React.Component {
                         <Link to={"/mesh"}><li>网格变形</li></Link>
                         <Link to={"/change_skin"}><li>换皮肤</li></Link>
                         <Link to={"/hover_board"}><li>反向动力学</li></Link>
+                        <Link to={"/mix_add"}><li>相加动画混合</li></Link>
+
                     </div>
                 }} />
                 <Switch>
@@ -32,6 +35,7 @@ export class APP extends React.Component {
                     <Route path="/mesh" component={Mesh} />
                     <Route path="/change_skin" component={ChangeSkin} />
                     <Route path="/hover_board" component={HoverBoard} />
+                    <Route path="/mix_add" component={AdditiveBlending} />
                 </Switch>
             </Router>
         </div>;
