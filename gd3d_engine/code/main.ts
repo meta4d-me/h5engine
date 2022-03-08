@@ -21,6 +21,11 @@ class main implements gd3d.framework.IUserCode
         //关闭 guid 依赖
         gd3d.framework.assetMgr.openGuid = false;
 
+        this.clearBtn();
+        new HDR_sample().start(this.app);
+
+        return;
+
         //-------------------------------------基础
         this.addBtn("基础==>", () =>
         {
