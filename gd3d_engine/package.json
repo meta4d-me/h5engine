@@ -9,8 +9,14 @@
   "scripts": {
     "etcpack": "node scripts/etcpack.js",
     "etc1shader": "node scripts/etc1shader.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build-gd3d": "cd gd3d && tsc",
+    "build-code": "cd code && tsc",
+    "build": "yarn build-gd3d && yarn build-code"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "typescript": "4.0.3"
+  }
 }

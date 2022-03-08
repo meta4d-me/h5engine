@@ -128,6 +128,7 @@
         vertexCount: number;
         vertexByteSize: number;
         ebos: WebGLBuffer[];
+        eboDataType = WebGLRenderingContext.UNSIGNED_SHORT;
         indexCounts: number[];
         lineMode :number;
         bindVboBuffer(webgl: WebGLRenderingContext)
@@ -302,8 +303,9 @@
             webgl.bufferSubData(webgl.ELEMENT_ARRAY_BUFFER, offset, data);
         }
 
-        uploadIndexData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array)
+        uploadIndexData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array, dataType = WebGLRenderingContext.UNSIGNED_SHORT)
         {
+            this.eboDataType = dataType;
             webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
             webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, data,this.mode);
         }
@@ -346,10 +348,10 @@
             drawInfo.ins.renderCount ++;
             if(instanceCount > 1 && webgl.drawElementsInstanced != null)
             {
-                webgl.drawElementsInstanced(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
+                webgl.drawElementsInstanced(webgl.TRIANGLES, count, this.eboDataType, start * 2, instanceCount);
             }else
             {
-                webgl.drawElements(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2);
+                webgl.drawElements(webgl.TRIANGLES, count, this.eboDataType, start * 2);
             }
         }
         drawElementLines(webgl: WebGLRenderingContext, start: number = 0, count: number = -1, instanceCount = 1)
@@ -359,10 +361,10 @@
             drawInfo.ins.renderCount ++;
             if(instanceCount > 1 && webgl.drawElementsInstanced != null)
             {
-                webgl.drawElementsInstanced(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
+                webgl.drawElementsInstanced(webgl.LINES, count, this.eboDataType, start * 2, instanceCount);
             }else
             {
-                webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);
+                webgl.drawElements(webgl.LINES, count, this.eboDataType, start * 2);
             }
         }
 

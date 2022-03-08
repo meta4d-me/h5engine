@@ -158,7 +158,7 @@
             webgl.texImage2D(webgl.TEXTURE_2D, 0, webgl.RGBA, width, height, 0, webgl.RGBA, webgl.UNSIGNED_BYTE, null);
 
             webgl.framebufferTexture2D(webgl.FRAMEBUFFER, webgl.COLOR_ATTACHMENT0, webgl.TEXTURE_2D, this.texture, 0);
-            
+
             //set unUse state
             glRenderTarget.useNull(webgl);
         }
@@ -557,7 +557,8 @@
             return t;
         }
 
-        static particleTexture(webgl: WebGLRenderingContext, name = framework.defTexture.particle) {
+        static particleTexture(webgl: WebGLRenderingContext,name = framework.defTexture.particle)
+        {
             var t = glTexture2D.mapTexture[name];
             if (t != undefined)
                 return t;
@@ -607,24 +608,36 @@
             this.texture = webgl.createTexture();
         }
         uploadImages(
-            Texture_NEGATIVE_X: framework.texture,
-            Texture_NEGATIVE_Y: framework.texture,
-            Texture_NEGATIVE_Z: framework.texture,
-            Texture_POSITIVE_X: framework.texture,
-            Texture_POSITIVE_Y: framework.texture,
-            Texture_POSITIVE_Z: framework.texture) {
-            let wrc = this.webgl;
+            Texture_NEGATIVE_X: framework.texture ,
+            Texture_NEGATIVE_Y: framework.texture ,
+            Texture_NEGATIVE_Z: framework.texture ,
+            Texture_POSITIVE_X: framework.texture ,
+            Texture_POSITIVE_Y: framework.texture ,
+            Texture_POSITIVE_Z: framework.texture ,
+            min = WebGLRenderingContext.NEAREST, max = WebGLRenderingContext.NEAREST, mipmap: number = null
+        ) {
+                let wrc = this.webgl;
 
-            let textures = [Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z];
-            const typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z, wrc.TEXTURE_CUBE_MAP_POSITIVE_X, wrc.TEXTURE_CUBE_MAP_POSITIVE_Y, wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
-            for (var i = 0; i < typeArr.length; i++) {
-                let reader = (textures[i].glTexture as glTexture2D).getReader();
-                if (!reader) {
-                    console.warn(`getReader() fail : ${textures[i].getName()}`);
-                    return;
+                let textures = [Texture_NEGATIVE_X,Texture_NEGATIVE_Y,Texture_NEGATIVE_Z,Texture_POSITIVE_X,Texture_POSITIVE_Y,Texture_POSITIVE_Z];
+                const typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y,wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z,wrc.TEXTURE_CUBE_MAP_POSITIVE_X,wrc.TEXTURE_CUBE_MAP_POSITIVE_Y,wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
+                for(var i=0; i<typeArr.length ;i++){
+                    let reader = (textures[i].glTexture as glTexture2D).getReader();
+                    if(!reader){
+                        console.warn(`getReader() fail : ${textures[i].getName()}`);
+                        return ;
+                    }
+                    this.upload(reader.data,reader.width,reader.height,typeArr[i]);
                 }
-                this.upload(reader.data, reader.width, reader.height, typeArr[i]);
-            }
+                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_MIN_FILTER, min);
+                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_MAG_FILTER, max);
+                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_WRAP_S, wrc.CLAMP_TO_EDGE);
+                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_WRAP_T, wrc.CLAMP_TO_EDGE);
+
+                if (mipmap !== null)
+                {
+                    wrc.generateMipmap(wrc.TEXTURE_CUBE_MAP);
+                }
+
         }
 
         private upload(data: HTMLImageElement | Uint8Array, width: number, height: number, TEXTURE_CUBE_MAP_: number): void {
@@ -632,7 +645,7 @@
             this.height = height;
             this.loaded = true;
             let gl = this.webgl;
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+            // gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,1);
 
             this.webgl.bindTexture(this.webgl.TEXTURE_CUBE_MAP, this.texture);
             var formatGL = this.webgl.RGBA;
@@ -661,12 +674,11 @@
                     , data);
             }
 
-            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-            let mipmap = this.mipmap;
+            // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, min);
+            // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, max);
+            // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            // let mipmap = this.mipmap;
             let linear = this.linear;
             // let repeat = true;
             // let premultiply = true;
