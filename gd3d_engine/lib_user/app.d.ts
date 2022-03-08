@@ -682,6 +682,16 @@ declare class gpuInstanceMgr {
     private static fillParameters;
     private static ckCanUseGpuInstance;
 }
+declare class HDR_sample implements IState {
+    app: gd3d.framework.application;
+    scene: gd3d.framework.scene;
+    assetMgr: gd3d.framework.assetMgr;
+    _load(path: string, type?: gd3d.framework.AssetTypeEnum): any;
+    load<T extends gd3d.framework.IAsset>(path: string, name: string, type?: gd3d.framework.AssetTypeEnum): Promise<T>;
+    loadCubeTexture(folder: string, images?: string[]): Promise<gd3d.framework.texture>;
+    start(app: gd3d.framework.application): void;
+    update(delta: number): void;
+}
 declare class test_LineRenderer implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;

@@ -2741,7 +2741,6 @@ declare namespace gd3d.framework {
     class inputField implements I2DComponent, I2DPointListener {
         static readonly ClassName: string;
         private static readonly helpV2;
-        private static _isIos;
         /**
          * @public
          * @language zh_CN
@@ -2764,15 +2763,7 @@ declare namespace gd3d.framework {
         private beFocus;
         private inputElement;
         private _text;
-        private _lastAddRTextFID;
-        /** 用户 按回车键时提交 回调函数 */
-        onTextSubmit: (text: string) => void;
-        /** 选择区域的开始位置 */
-        get selectionStart(): number;
-        /** 选择区域的结束位置 */
-        get selectionEnd(): number;
-        /** 选择区域的方向 ， forward ：从前往后 backward ：从后往前 */
-        get selectionDirection(): "none" | "forward" | "backward";
+        private static _isIos;
         /**
          * @public
          * @language zh_CN
@@ -2877,10 +2868,6 @@ declare namespace gd3d.framework {
          */
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
         private setFocus;
-        /** 显示 标签 */
-        private showLable;
-        /** 显示 html组件 */
-        private showEle;
     }
     /**
      * @public
@@ -4359,6 +4346,25 @@ declare namespace gd3d.framework {
         private static getTextureFormat;
     }
 }
+declare class HdrParser {
+    private gl;
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 解析hdr图片
+     * @param raw 图片二进制数据
+     * @version gd3d 1.0
+     */
+    textDecoder: TextDecoder;
+    constructor(gl: WebGLRenderingContext);
+    parseRGBE(raw: ArrayBuffer): {
+        width: number;
+        height: number;
+        buffer: Uint8Array;
+    };
+    get2DTexture(raw: ArrayBuffer): gd3d.render.glTexture2D;
+}
 declare namespace gd3d.framework {
     /**
      *
@@ -4601,7 +4607,13 @@ declare namespace gd3d.framework {
         /**
          * 拖尾
          */
-        TrailRenderer = 28
+        TrailRenderer = 28,
+        /**
+         * HDR贴图
+         */
+        HDR = 29,
+        GLTF = 30,
+        BIN = 31
     }
     /**
      * @public
@@ -4836,7 +4848,7 @@ declare namespace gd3d.framework {
         };
         static initGuidList(): void;
         static setLoading(guid: number, data: any): void;
-        load(url: string, type?: AssetTypeEnum, 
+        load(url: string, type?: AssetTypeEnum,
         /** 这是解析完成的回调 */
         onstate?: loadCallback, downloadFinish?: () => void): void;
         static setStateError(state: stateLoad, onstate: (state?: stateLoad) => void, err: Error): void;
@@ -4995,6 +5007,11 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class AssetFactory_BIN implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer): bin;
+    }
+}
+declare namespace gd3d.framework {
     class AssetFactory_cPrefab implements IAssetFactory {
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): prefab;
     }
@@ -5026,8 +5043,18 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class AssetFactory_GLTF implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): gltf;
+    }
+}
+declare namespace gd3d.framework {
     class AssetFactory_GLVertexShader implements IAssetFactory {
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): void;
+    }
+}
+declare namespace gd3d.framework {
+    class AssetFactory_HDR implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer): texture;
     }
 }
 declare namespace gd3d.framework {
@@ -5419,6 +5446,95 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * json资源
+     * @version gd3d 1.0
+     */
+    class bin implements IAsset {
+        data: ArrayBuffer;
+        static readonly ClassName: string;
+        private name;
+        private id;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否为默认资源
+         * @version gd3d 1.0
+         */
+        defaultAsset: boolean;
+        constructor(assetName: string, data: ArrayBuffer);
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源名称
+         * @version gd3d 1.0
+         */
+        getName(): string;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源唯一id
+         * @version gd3d 1.0
+         */
+        getGUID(): number;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数加一
+         * @version gd3d 1.0
+         */
+        use(): void;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数减一
+         * @version gd3d 1.0
+         */
+        unuse(disposeNow?: boolean): void;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 释放资源
+         * @version gd3d 1.0
+         */
+        dispose(): void;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 计算资源字节大小
+         * @version gd3d 1.0
+         */
+        caclByteLength(): number;
+        private _realName;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 如果是imgdesc加载来的图片，通过这个可以获取到真实的图片名字
+         * @version gd3d 1.0
+         */
+        get realName(): string;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置图片名称
+         * @version gd3d 1.0
+         */
+        set realName(name: string);
+    }
+}
+declare namespace gd3d.framework {
     class f14node {
         trans: transform;
         f14Effect: f14EffectSystem;
@@ -5592,6 +5708,135 @@ declare namespace gd3d.framework {
          */
         xAddvance: number;
         static caclByteLength(): number;
+    }
+}
+declare namespace gd3d.framework {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * json资源
+     * @version gd3d 1.0
+     */
+    class gltf implements IAsset {
+        data: any;
+        static readonly ClassName: string;
+        private name;
+        private id;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否为默认资源
+         * @version gd3d 1.0
+         */
+        defaultAsset: boolean;
+        constructor(assetName: string, data: any);
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源名称
+         * @version gd3d 1.0
+         */
+        getName(): string;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源唯一id
+         * @version gd3d 1.0
+         */
+        getGUID(): number;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数加一
+         * @version gd3d 1.0
+         */
+        use(): void;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数减一
+         * @version gd3d 1.0
+         */
+        unuse(disposeNow?: boolean): void;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 释放资源
+         * @version gd3d 1.0
+         */
+        dispose(): void;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 计算资源字节大小
+         * @version gd3d 1.0
+         */
+        caclByteLength(): number;
+        private _realName;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 如果是imgdesc加载来的图片，通过这个可以获取到真实的图片名字
+         * @version gd3d 1.0
+         */
+        get realName(): string;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置图片名称
+         * @version gd3d 1.0
+         */
+        set realName(name: string);
+        buffers: bin[];
+        load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture): Promise<transform>;
+    }
+    class Accessor {
+        static types: {
+            SCALAR: number;
+            VEC1: number;
+            VEC2: number;
+            VEC3: number;
+            VEC4: number;
+            MAT2: number;
+            MAT3: number;
+            MAT4: number;
+        };
+        attribute: string;
+        bufferView: any;
+        byteOffset: number;
+        componentType: number;
+        normalized: boolean;
+        count: number;
+        max: number[];
+        min: number[];
+        size: number;
+        private _data;
+        constructor({ bufferView, byteOffset, componentType, normalized, count, type, max, min }: {
+            bufferView: any;
+            byteOffset?: number;
+            componentType: any;
+            normalized?: boolean;
+            count: any;
+            type: any;
+            max?: any[];
+            min?: any[];
+        }, name?: string);
+        get data(): any;
+        static newFloat32Array(acc: Accessor): Float32Array;
+        static getSubChunks(acc: any, data: any): any[];
+        static getFloat32Blocks(acc: Accessor): any[];
+        static newTypedArray(acc: Accessor): Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array;
+        static getData(acc: Accessor): any[] | Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array;
     }
 }
 declare namespace gd3d.framework {

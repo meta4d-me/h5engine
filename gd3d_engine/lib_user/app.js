@@ -1171,6 +1171,9 @@ var main = (function () {
         console.log("i am here.");
         this.app = app;
         gd3d.framework.assetMgr.openGuid = false;
+        this.clearBtn();
+        new HDR_sample().start(this.app);
+        return;
         this.addBtn("基础==>", function () {
             demoList.addBtn("最小demo", function () { return new mini_sample(); });
             demoList.addBtn("f14effect", function () { return new dome.db_test_f14eff(); });
@@ -4471,6 +4474,123 @@ var gpuInstanceMgr = (function () {
     };
     gpuInstanceMgr.SetedMap = {};
     return gpuInstanceMgr;
+}());
+var HDR_sample = (function () {
+    function HDR_sample() {
+    }
+    HDR_sample.prototype._load = function (path, type) {
+        var _this = this;
+        if (type === void 0) { type = gd3d.framework.AssetTypeEnum.Auto; }
+        return new Promise(function (resolve) {
+            var _a;
+            (_a = _this.assetMgr) === null || _a === void 0 ? void 0 : _a.load(path, type, function (res) {
+                if (res.isfinish)
+                    resolve(res);
+                else
+                    resolve(null);
+            });
+        });
+    };
+    HDR_sample.prototype.load = function (path, name, type) {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, this._load(path + name, type)];
+                    case 1:
+                        _a.sent();
+                        return [2, this.assetMgr.getAssetByName(name)];
+                }
+            });
+        });
+    };
+    HDR_sample.prototype.loadCubeTexture = function (folder, images) {
+        if (images === void 0) { images = [
+            'negx.hdr',
+            'negy.hdr',
+            'negz.hdr',
+            'posx.hdr',
+            'posy.hdr',
+            'posz.hdr',
+        ]; }
+        return __awaiter(this, void 0, void 0, function () {
+            var tex, cubeTex;
+            var _this = this;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, Promise.all(images.map(function (n) { return _this.load(folder, n); }))];
+                    case 1:
+                        tex = _a.sent();
+                        cubeTex = new gd3d.framework.texture(folder.split('/').pop());
+                        cubeTex.glTexture = new gd3d.render.glTextureCube(this.app.webgl, gd3d.render.TextureFormatEnum.RGBA, true, true);
+                        cubeTex.use();
+                        cubeTex.glTexture.uploadImages(tex[0], tex[1], tex[2], tex[3], tex[4], tex[5]);
+                        return [2, cubeTex];
+                }
+            });
+        });
+    };
+    HDR_sample.prototype.start = function (app) {
+        var _this = this;
+        this.app = app;
+        this.scene = this.app.getScene();
+        this.assetMgr = this.app.getAssetMgr();
+        var scene = app.getScene();
+        var objCam = new gd3d.framework.transform();
+        scene.addChild(objCam);
+        var cam = objCam.gameObject.addComponent("camera");
+        cam.near = 0.01;
+        cam.far = 1000;
+        objCam.localTranslate = new gd3d.math.vector3(0, 15, -15);
+        objCam.lookatPoint(new gd3d.math.vector3(0, 0, 0));
+        var hoverc = cam.gameObject.addComponent("HoverCameraScript");
+        hoverc.panAngle = 180;
+        hoverc.tiltAngle = 45;
+        hoverc.distance = 30;
+        hoverc.scaleSpeed = 0.1;
+        hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0);
+        var HDRpath = "res/pbrRes/HDR/";
+        (function () { return __awaiter(_this, void 0, void 0, function () {
+            var env, skybox, mf_c, mr_c, brdf, gltfFolder, gltf, root;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4, demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", app.getAssetMgr())];
+                    case 1:
+                        _a.sent();
+                        return [4, demoTool.loadbySync("newRes/test/shader/customShader/customShader.assetbundle.json", app.getAssetMgr())];
+                    case 2:
+                        _a.sent();
+                        return [4, this.loadCubeTexture(HDRpath + 'helipad/')];
+                    case 3:
+                        env = _a.sent();
+                        skybox = new gd3d.framework.transform();
+                        skybox.localScale.x = skybox.localScale.y = skybox.localScale.z = 600;
+                        this.scene.addChild(skybox);
+                        mf_c = skybox.gameObject.addComponent("meshFilter");
+                        mf_c.mesh = this.assetMgr.getDefaultMesh("cube");
+                        mr_c = skybox.gameObject.addComponent("meshRenderer");
+                        mr_c.materials[0] = new gd3d.framework.material("skyboxmat");
+                        mr_c.materials[0].setShader(this.assetMgr.getShader("skybox.shader.json"));
+                        mr_c.materials[0].setCubeTexture("u_sky", env);
+                        return [4, this.load('res/pbrRes/', 'brdf.png')];
+                    case 4:
+                        brdf = _a.sent();
+                        gltfFolder = 'res/pbrRes/FlightHelmet/glTF/';
+                        return [4, this.load(gltfFolder, 'FlightHelmet.gltf')];
+                    case 5:
+                        gltf = _a.sent();
+                        return [4, gltf.load(this.assetMgr, this.app.webgl, gltfFolder, brdf)];
+                    case 6:
+                        root = _a.sent();
+                        gd3d.math.vec3SetAll(root.localScale, 10);
+                        this.app.getScene().addChild(root);
+                        return [2];
+                }
+            });
+        }); })();
+    };
+    HDR_sample.prototype.update = function (delta) {
+    };
+    return HDR_sample;
 }());
 var test_LineRenderer = (function () {
     function test_LineRenderer() {

@@ -57,6 +57,24 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
+var __spreadArrays = (this && this.__spreadArrays) || function () {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+};
 var gd3d;
 (function (gd3d) {
     var version = /** @class */ (function () {
@@ -762,7 +780,7 @@ var gd3d;
                     }
                 }
                 // this._userCodeNew.length = 0;
-    
+
                 //update logic
                 var closeindex = -1;
                 for (var i = 0; i < this._userCode.length; i++)
@@ -777,7 +795,7 @@ var gd3d;
                         closeindex = i;
                     }
                 }
-    
+
                 //remove closed
                 if (closeindex >= 0)
                 {
@@ -1470,7 +1488,7 @@ var gd3d;
             if (target["__gdmeta__"][fieldName] == null)
                 target["__gdmeta__"][fieldName] = {};
             target["__gdmeta__"][fieldName]["type"] = "field";
-            //fill meta 
+            //fill meta
             // var t = Reflect.getMetadata("design:type", target, fieldName);
             // if (t == null)//ie.反射这套sb 机制 ，居然和ie不兼容
             // {
@@ -2791,8 +2809,6 @@ var gd3d;
             };
             /** 刷新节点树 */
             canvas.prototype.updateNodeTree = function (delta) {
-                if (this.onPreUpdate)
-                    this.onPreUpdate(delta);
                 //upadte
                 this.rootNode.updateTran(false);
                 //rootnode.update(delta);
@@ -2802,6 +2818,64 @@ var gd3d;
                 }
                 if (this.onLateUpdate)
                     this.onLateUpdate(delta);
+            };
+            /**
+             * 触发 point 事件流
+             * @param touch 是否有点
+             * @param XOnModelSpace 坐标x
+             * @param YOnModelSpace 坐标y
+             * @param multiTouch 多点
+             */
+            canvas.prototype.burstPointEvent = function (touch, XOnModelSpace, YOnModelSpace, multiTouch) {
+                if (multiTouch === void 0) { multiTouch = false; }
+                if (!this.enableUIEvent)
+                    return;
+                //重置event
+                this.pointEvent.eated = false;
+                var tv2 = canvas_1.help_v2;
+                tv2.x = this.pointEvent.x = XOnModelSpace;
+                tv2.y = this.pointEvent.y = YOnModelSpace;
+                this.pointEvent.selected = null;
+                this.clipPosToCanvasPos(tv2, tv2);
+                this.pointEvent.c_x = tv2.x;
+                this.pointEvent.c_y = tv2.y;
+                var skip = false;
+                if (!this.pointDown && !touch && !multiTouch && !this.lastMultiTouch) //nothing
+                 {
+                    skip = true;
+                }
+                else if (this.pointDown == false && touch == true) //pointdown
+                 {
+                    this.pointEvent.type = gd3d.event.PointEventEnum.PointDown;
+                }
+                else if (this.pointDown == true && touch == true) //pointhold
+                 {
+                    this.pointEvent.type = gd3d.event.PointEventEnum.PointHold;
+                    // if (this.pointX == this.pointEvent.x && this.pointY == this.pointEvent.y)
+                    // {
+                    //     // console.log("skip event");
+                    //     skip = true;
+                    // }
+                }
+                else if (this.pointDown == true && touch == false) //pointup
+                 {
+                    this.pointEvent.type = gd3d.event.PointEventEnum.PointUp;
+                }
+                //事件走的是flash U型圈
+                if (!skip) {
+                    if (this.scene.app.bePlay) {
+                        // rootnode.onCapturePointEvent(this, this.pointEvent);
+                        // rootnode.onPointEvent(this, this.pointEvent);
+                        //优化
+                        // this.capturePointFlow();  //多余 flow
+                        this.popPointFlow();
+                    }
+                    this.pointDown = touch;
+                    this.pointX = this.pointEvent.x;
+                    this.pointY = this.pointEvent.y;
+                }
+                // gd3d.poolv2_del(tv2);
+                this.lastMultiTouch = multiTouch;
             };
             /**
              * 触发 point 事件流
@@ -3116,7 +3190,7 @@ var gd3d;
                 this.depthQTree.clear();
                 //所有Renderer 计算 深度
                 this.flowCount = 0;
-                //test 
+                //test
                 this.collectToDepthL(node);
                 //按队列顺序 逐各渲染
                 this.sortDepthList();
@@ -3134,8 +3208,8 @@ var gd3d;
                 var idList = [];
                 var _loop_1 = function (i) {
                     idList.length = 0;
-                    //逐层按相同材质连续排序 
-                    //不同层首尾连接规则 1.队列头部 放置 和上一层同材质类型 2.尾部放置 数量最多的类型 
+                    //逐层按相同材质连续排序
+                    //不同层首尾连接规则 1.队列头部 放置 和上一层同材质类型 2.尾部放置 数量最多的类型
                     var arr = this_1.depthList[i];
                     var tempM = {};
                     arr.forEach(function (rn, idx) {
@@ -3150,7 +3224,7 @@ var gd3d;
                             }
                         }
                     });
-                    //排序  1.队列头部 放置 和上一层同材质类型 2.尾部放置 数量最多的类型 
+                    //排序  1.队列头部 放置 和上一层同材质类型 2.尾部放置 数量最多的类型
                     //1.队列头部 放置 和上一层同材质类型
                     if (lastGuid != -1 && this_1.helpMap[lastGuid] && this_1.helpMap[lastGuid].length > 0) {
                         var sidx = idList.indexOf(lastGuid);
@@ -3223,7 +3297,7 @@ var gd3d;
             canvas.prototype.checkBottomUI = function (rd) {
                 //检测 bottomUI  (逐当前 depthList 层检测 rect 碰撞 ，优化工具 四叉树 )
                 //无 ，depth = 0
-                //有 ，depth = bottomUI.depth + 1 
+                //有 ，depth = bottomUI.depth + 1
                 var tempCup = [];
                 var myr = rd.getDrawBounds();
                 this.depthQTree.retrieve(myr, tempCup);
@@ -3245,7 +3319,7 @@ var gd3d;
                     depth = wrd[canvas_1.depthTag] + 1;
                 }
                 rd[canvas_1.depthTag] = depth;
-                //填入 到四叉树 
+                //填入 到四叉树
                 this.depthQTree.insert(myr);
                 if (!this.depthList[depth])
                     this.depthList[depth] = [];
@@ -6938,7 +7012,7 @@ var gd3d;
                     this.datar[i * this._unitLen + 5] = this.color.b;
                     this.datar[i * this._unitLen + 6] = this.color.a;
                 }
-                //drawRect 
+                //drawRect
                 this.min_x = Math.min(x0, x1, x2, x3, this.min_x);
                 this.min_y = Math.min(y0, y1, y2, y3, this.min_y);
                 this.max_x = Math.max(x0, x1, x2, x3, this.max_x);
@@ -7883,53 +7957,31 @@ var gd3d;
                     // this._textLable.horizontalOverflow = isSingleLine;
                 }
             };
-            /**设置 通用 样式 */
-            inputField.prototype.setStyleEle = function (Ele) {
-                Ele.style.outline = "medium";
-                Ele.style.background = "transparent";
-                Ele.style.border = "0";
-                Ele.style.padding = "0";
-                Ele.style.display = "none";
-            };
-            inputField.prototype.createInputEle = function () {
-                this.inputElement = document.createElement("Input");
-                var inpEle = this.inputElement;
-                this.setStyleEle(inpEle);
-                inpEle.type = "text";
-                inpEle.style["-moz-appearance"] = 'textfield';
-            };
-            inputField.prototype.createTextAreaEle = function () {
-                this.inputElement = document.createElement("textarea");
-                var inpEle = this.inputElement;
-                this.setStyleEle(inpEle);
-                inpEle.style.resize = "none";
-                inpEle.style.overflowY = 'scroll'; //Y 轴滚动条
-                // inpEle.style.scrollbarGutter = "stable";
-            };
-            /** 初始化 html 元素 */
-            inputField.prototype.initEle = function () {
+            /**
+             * @private
+             */
+            inputField.prototype.start = function () {
                 var _this = this;
                 //ios fix thing
                 this.ckIsIos();
-                //create Ele
-                if (this._lineType == lineType.SingleLine) {
-                    this.createInputEle();
-                }
-                else {
-                    this.createTextAreaEle();
-                }
-                var inpEle = this.inputElement;
-                //attchNode
-                inpEle.tabIndex = 0;
-                inpEle.value = this._text;
-                // inpEle.autofocus = true;
+                this.inputElement = document.createElement("Input");
+                this.inputElement.style.opacity = "0";
+                this.inputElement.style.display = "none";
+                this.inputElement.tabIndex = 0;
+                this.inputElement.autofocus = true;
                 if (this.transform.canvas.scene) {
                     var htmlCanv = this.transform.canvas.scene.webgl.canvas;
                     if (htmlCanv)
                         htmlCanv.parentElement.appendChild(inpEle);
                 }
-                //reg event
-                inpEle.onblur = function (e) {
+                if (inputField_1._isIos) {
+                    this.inputElement.onclick = function () {
+                        // console.error(`onclick : ${this.transform.insId.getInsID()} , ${this.inputElement.value}`);
+                        _this.inputElement.blur();
+                        _this.inputElement.focus();
+                    };
+                }
+                this.inputElement.onblur = function (e) {
                     _this.beFocus = false;
                 };
                 inpEle.onfocus = function (e) {
@@ -7954,55 +8006,6 @@ var gd3d;
                 // inpEle.addEventListener('keydown', () => { console.log("keydown") });
                 // inpEle.addEventListener('touchstart', () => { console.log("touchstart") });
                 this.inputElmLayout();
-            };
-            inputField.prototype.updateEleStyle = function () {
-                var inpEle = this.inputElement;
-                if (!inpEle)
-                    return;
-                //
-                if (this._textLable) {
-                    var fontSize = this._textLable.fontsize / window.devicePixelRatio;
-                    inpEle.style.fontSize = fontSize + "px";
-                    var cssColor = gd3d.math.colorToCSS(this._textLable.color, false);
-                    inpEle.style.color = cssColor;
-                    // let _font = this._textLable.font;
-                    // inpEle.style.fontFamily = 
-                    switch (this._textLable.horizontalType) {
-                        case framework.HorizontalType.Left:
-                            inpEle.style.textAlign = "left";
-                            break;
-                        case framework.HorizontalType.Center:
-                            inpEle.style.textAlign = "center";
-                            break;
-                        case framework.HorizontalType.Right:
-                            inpEle.style.textAlign = "right";
-                            break;
-                    }
-                }
-                var placeholderStr = "Enter Text...";
-                if (this._placeholderLabel)
-                    placeholderStr = this._placeholderLabel.text;
-                inpEle.placeholder = placeholderStr;
-            };
-            inputField.prototype.removeEle = function () {
-                var inpEle = this.inputElement;
-                if (!inpEle)
-                    return;
-                inpEle.onfocus = null;
-                inpEle.onclick = null;
-                inpEle.onblur = null;
-                inpEle.disabled = false;
-                inpEle.value = "";
-                inpEle.style.display = "none";
-                if (inpEle.parentElement)
-                    inpEle.parentElement.removeChild(inpEle);
-                this.inputElement = null;
-            };
-            /**
-             * @private
-             */
-            inputField.prototype.start = function () {
-                this.initEle();
             };
             inputField.prototype.ckIsIos = function () {
                 //ios 有保护 , focus 必须在 dom 事件帧触发。
@@ -8114,7 +8117,17 @@ var gd3d;
                 this._textLable = null;
                 this.transform = null;
                 this._frameImage = null;
-                this.removeEle();
+                if (this.inputElement) {
+                    this.inputElement.onfocus = null;
+                    this.inputElement.onclick = null;
+                    this.inputElement.onblur = null;
+                    this.inputElement.disabled = false;
+                    this.inputElement.value = "";
+                    this.inputElement.style.display = "none";
+                    if (this.inputElement.parentElement)
+                        this.inputElement.parentElement.removeChild(this.inputElement);
+                    this.inputElement = null;
+                }
             };
             /**
              * @private
@@ -8130,7 +8143,7 @@ var gd3d;
             };
             inputField.prototype.setFocus = function (isFocus) {
                 if (isFocus) {
-                    this.showEle();
+                    this.inputElement.style.display = "";
                     if (!this.beFocus) {
                         this.inputElement.focus();
                     }
@@ -8138,36 +8151,8 @@ var gd3d;
                 else {
                     if (this.beFocus)
                         this.inputElement.blur();
-                    this.showLable();
-                }
-            };
-            /** 显示 标签 */
-            inputField.prototype.showLable = function () {
-                if (this.inputElement)
                     this.inputElement.style.display = "none";
-                if (this._textLable) {
-                    this._textLable.transform.visible = false;
-                    if (this._placeholderLabel)
-                        this._placeholderLabel.transform.visible = false;
-                    if (this._textLable.text != "") {
-                        this._textLable.transform.visible = true;
-                    }
-                    else {
-                        if (this._placeholderLabel)
-                            this._placeholderLabel.transform.visible = true;
-                    }
                 }
-            };
-            /** 显示 html组件 */
-            inputField.prototype.showEle = function () {
-                //更新
-                this.updateEleStyle();
-                if (this.inputElement)
-                    this.inputElement.style.display = ""; //显示html元素对象
-                if (this._textLable)
-                    this._textLable.transform.visible = false;
-                if (this._placeholderLabel)
-                    this._placeholderLabel.transform.visible = false;
             };
             var inputField_1;
             inputField.ClassName = "inputField";
@@ -8614,7 +8599,7 @@ var gd3d;
             //                 this.datar[rI * 6 * 13 + 13 * j + 11] = this.color2.b;
             //                 this.datar[rI * 6 * 13 + 13 * j + 12] = this.color2.a;
             //             }
-            //             //drawRect 
+            //             //drawRect
             //             this.min_x = Math.min(_x0, _x1, _x2, _x3, this.min_x);
             //             this.min_y = Math.min(_y0, _y1, _y2, _y3, this.min_y);
             //             this.max_x = Math.max(_x0, _x1, _x2, _x3, this.max_x);
@@ -8932,7 +8917,7 @@ var gd3d;
                         datar[_I * 6 * 13 + 13 * 4 + 8] = v1;
                         datar[_I * 6 * 13 + 13 * 5 + 7] = u3;
                         datar[_I * 6 * 13 + 13 * 5 + 8] = v3;
-                        //drawRect 
+                        //drawRect
                         this.min_x = Math.min(_x0, _x1, _x2, _x3, this.min_x);
                         this.min_y = Math.min(_y0, _y1, _y2, _y3, this.min_y);
                         this.max_x = Math.max(_x0, _x1, _x2, _x3, this.max_x);
@@ -9922,7 +9907,7 @@ var gd3d;
             //         if(!canvas.assetmgr) return;
             //         let mat = this._uimat;
             //         if(!mat || mat.getName() != matName){
-            //             if(mat) mat.unuse(); 
+            //             if(mat) mat.unuse();
             //             mat = canvas.assetmgr.getAssetByName(matName) as gd3d.framework.material;
             //             if(mat) mat.use();
             //         }
@@ -10007,7 +9992,7 @@ var gd3d;
                     this.datar[i * 13 + 5] = this.color.b;
                     this.datar[i * 13 + 6] = this.color.a;
                 }
-                //drawRect 
+                //drawRect
                 this.min_x = Math.min(x0, x1, x2, x3, this.min_x);
                 this.min_y = Math.min(y0, y1, y2, y3, this.min_y);
                 this.max_x = Math.max(x0, x1, x2, x3, this.max_x);
@@ -12844,7 +12829,7 @@ var gd3d;
         //资源需要有一个固定的名字，一个唯一的id
         //唯一的id 是定位的需求，他不需要assetMgr就能够满足
         //name 是我们做named的管理时，需要
-        //资源的来源有三种，     
+        //资源的来源有三种，
         //一，随意new，这个也可以用引用计数管理，随你
         //二，加载而来，也是这个使用引用计数管理
         //三，静态管理，这个是特殊的，不要为他设计
@@ -12979,7 +12964,7 @@ var gd3d;
 //          * @language zh_CN
 //          * @classdesc
 //          * 解析包
-//          * @param json 
+//          * @param json
 //          * @version gd3d 1.0
 //          */
 //         parse(json: any, totalLength: number = 0) {
@@ -13086,7 +13071,7 @@ var gd3d;
 //             for(let i=0; i < fLen ;i++){
 //                 let file = filse[i];
 //                 nameMap[file.name] = true;
-//             }            
+//             }
 //             let guidList : {[guid:string] : boolean} = {};
 //             let list: { url: string, type: AssetTypeEnum, guid : string , asset: IAsset, handle: () => any }[] = [];
 //             //遍历每项资源 整理到加载列表
@@ -13110,7 +13095,7 @@ var gd3d;
 //                             continue;
 //                         }
 //                         let sRef = assetmgr.mapRes[mAssId];
-//                         //同guid 资源 是否 正在加载中 
+//                         //同guid 资源 是否 正在加载中
 //                         if (sRef && assetmgr.assetIsLoing(sRef)) {
 //                             //是 加入 guid_waitLoad_map
 //                             //关联到 bundle 的 加载状态队列
@@ -13212,11 +13197,11 @@ var gd3d;
 //                             break;
 //                     }
 //                     _item.asset = asset;
-//                     if (type != AssetTypeEnum.GLVertexShader && 
-//                         type != AssetTypeEnum.GLFragmentShader && 
-//                         type != AssetTypeEnum.Shader&& 
-//                         type != AssetTypeEnum.PackBin && 
-//                         type != AssetTypeEnum.PackTxt && 
+//                     if (type != AssetTypeEnum.GLVertexShader &&
+//                         type != AssetTypeEnum.GLFragmentShader &&
+//                         type != AssetTypeEnum.Shader&&
+//                         type != AssetTypeEnum.PackBin &&
+//                         type != AssetTypeEnum.PackTxt &&
 //                         type != AssetTypeEnum.Prefab&&
 //                         type != AssetTypeEnum.cPrefab
 //                         ) {
@@ -13233,7 +13218,7 @@ var gd3d;
 //                 }
 //             }
 //             let handles = {};
-//             //按类型整理顺序到list 
+//             //按类型整理顺序到list
 //             for (let i = 0, len = asslist.length; i < len; ++i) {
 //                 for (let j = 0, clen = asslist[i].length; j < clen; ++j) {
 //                     let item = asslist[i][j];
@@ -13359,7 +13344,7 @@ var gd3d;
 //         /**
 //          * 添加到仅加载不解析列表 (true 成功)
 //          * @param url assetBundle 的 url
-//          * @param assetmgr 
+//          * @param assetmgr
 //          */
 //         // static addNoParsing(url:string , assetmgr : assetMgr):boolean{
 //         //     if(! url || assetmgr.maploaded[url]) return false;  //对应资源已在 加载中或加载完成的 不处理
@@ -13385,7 +13370,7 @@ var gd3d;
 //         // private static noParsingLoadedDic : {[guid:string] : { url: string, type: AssetTypeEnum, guid: string, asset: IAsset, handle: () => any }} = {};
 //         // private static pardingGuidDic : {[key:string] : boolean} = {};
 //         /**
-//          * 尝试解析预载过的 AB 资源 
+//          * 尝试解析预载过的 AB 资源
 //          * return true 解析成功
 //          * @param url assetBundle 的 url
 //          */
@@ -13428,13 +13413,13 @@ var gd3d;
 //         //         loadlist.push(l);
 //         //     }
 //         //     if(guidCount == 0){
-//         //         source.call(loadlist, source.state, onstate);                           
+//         //         source.call(loadlist, source.state, onstate);
 //         //     }
 //         //     return true;
 //         // }
 //         /** 仅资源加载完毕 回调 , ( 仅 addNoParsing() 调用过的有效 ) */
 //         // static preloadCompleteFun:(url:string)=>any;
-//         //文件加载完毕后统一解析处理 
+//         //文件加载完毕后统一解析处理
 //         // private NextHandle(list: { url: string, type: AssetTypeEnum, guid: string, asset: IAsset, handle: () => any }[], state, onstate) {
 //         //     // if (assetBundle.needParsing) {
 //         //     if (!assetBundle.noParsingDic[this.url]) {
@@ -13446,9 +13431,9 @@ var gd3d;
 //         //         // delete this.assetmgr.mapInLoad[fname]; //inload 记录清除
 //         //         let keyList = [];
 //         //         let len = list.length;
-//         //         for(let i=0; i < len ;i++){  //不解析资源 下载完毕 的guid 或者 url 标记 
+//         //         for(let i=0; i < len ;i++){  //不解析资源 下载完毕 的guid 或者 url 标记
 //         //             let l = list[i];
-//         //             let key = "";   
+//         //             let key = "";
 //         //             if(!l )continue;
 //         //             key = l.guid;
 //         //             if(!key) key = l.url;
@@ -13483,9 +13468,9 @@ var gd3d;
 //                 var hitem = list[i];
 //                 if (!hitem.handle)
 //                     continue;
-//                 if (hitem.type == AssetTypeEnum.Scene || 
-//                     hitem.type == AssetTypeEnum.Prefab || 
-//                     hitem.type == AssetTypeEnum.cPrefab || 
+//                 if (hitem.type == AssetTypeEnum.Scene ||
+//                     hitem.type == AssetTypeEnum.Prefab ||
+//                     hitem.type == AssetTypeEnum.cPrefab ||
 //                     hitem.type == AssetTypeEnum.F14Effect) {
 //                     lastHandle.push(hitem)
 //                     continue;
@@ -13523,7 +13508,7 @@ var gd3d;
 //                             finish();
 //                             awaits.length = 0;
 //                         }
-//                     });                   
+//                     });
 //                 }
 //             }
 //             if(awaits.length == 0){
@@ -13968,7 +13953,7 @@ var gd3d;
 //          * @language zh_CN
 //          * @classdesc
 //          * 通过name获取shader资源
-//          * @param name 
+//          * @param name
 //          * @version gd3d 1.0
 //          */
 //         getShader(name: string): shader
@@ -14441,11 +14426,11 @@ var gd3d;
 //         }
 //         /**
 //          * @private
-//          * @param packnum 
-//          * @param url 
-//          * @param type 
-//          * @param onstate 
-//          * @param state 
+//          * @param packnum
+//          * @param url
+//          * @param type
+//          * @param onstate
+//          * @param state
 //          */
 //         loadResByPack(respack: any, url: string, type: AssetTypeEnum, onstate: (state: stateLoad) => void, state: stateLoad, asset: IAsset, call: (handle: any) => void)
 //         {
@@ -14498,8 +14483,8 @@ var gd3d;
 //         private waitStateDic: { [name: string]: Function[] } = {};
 //         /**
 //          * @private
-//          * @param name 
-//          * @param state 
+//          * @param name
+//          * @param state
 //          */
 //         public doWaitState(name: string, state: stateLoad)
 //         {
@@ -14872,7 +14857,7 @@ var gd3d;
 //             this.load(url, type, onstate);
 //         }
 //         /**
-//          * 
+//          *
 //          * @param scenename 场景名字 (***.scene.json)
 //          */
 //         loadSceneLightmap(sceneurl: string)
@@ -15035,8 +15020,8 @@ var gd3d;
 //          * @language zh_CN
 //          * @classdesc
 //          * 保存材质
-//          * @param mat 
-//          * @param fun 
+//          * @param mat
+//          * @param fun
 //          */
 //         saveMaterial(mat: material, fun: (data: SaveInfo) => void)
 //         {
@@ -15458,7 +15443,7 @@ var gd3d;
                 this.pixelHeight = null;
                 return result;
             };
-            //解码 
+            //解码
             ASTCParse.decodeBuffer = function (ext, _buf) {
                 var header = new Uint8Array(_buf, 0, this.HEADER_MAX);
                 var astcTag = header[3] + (header[2] << 8) + (header[1] << 16) + (header[0] << 24);
@@ -15508,6 +15493,111 @@ var gd3d;
         framework.ASTCParse = ASTCParse;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
+var HdrParser = /** @class */ (function () {
+    function HdrParser(gl) {
+        this.gl = gl;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 解析hdr图片
+         * @param raw 图片二进制数据
+         * @version gd3d 1.0
+         */
+        this.textDecoder = new TextDecoder();
+    }
+    HdrParser.prototype.parseRGBE = function (raw) {
+        var data = new Uint8Array(raw);
+        var p = 0;
+        while (!(data[p] === 0x0A && data[p + 1] === 0x0A))
+            p++;
+        var info = this.textDecoder.decode(data.subarray(0, p)).split('\n');
+        if (info[0] !== '#?RADIANCE') {
+            console.warn('unexpected magic number');
+        }
+        var size_base = p += 2;
+        while (data[++p] !== 0x0A)
+            ;
+        var _a = this.textDecoder.decode(data.subarray(size_base, p)).split(' ').map(function (e) { return Number(e); }), height = _a[1], width = _a[3];
+        var total = height * width;
+        var rgbeData = data.subarray(p + 1);
+        // allocate memory for uncompressed data
+        var buffer = new Uint8Array(total * 4);
+        var ptr = 0;
+        if (total * 4 !== rgbeData.length) {
+            var _loop_2 = function (y) {
+                var flag = rgbeData.subarray(ptr, ptr += 4);
+                if (flag.slice(0, 2).every(function (e) { return e === 0x02; })) {
+                    var scanline_buf_1 = new Array(4).fill(0)
+                        .map(function () { return new Uint8Array(width); })
+                        .map(function (line) {
+                        var lp = 0;
+                        while (lp < width) {
+                            var count = 0;
+                            var data_1 = rgbeData.subarray(ptr, ptr += 2);
+                            if (data_1[0] > 128) {
+                                count = data_1[0] - 128;
+                                while (count--) {
+                                    line[lp++] = data_1[1];
+                                }
+                            }
+                            else {
+                                count = data_1[0] - 1;
+                                line[lp++] = data_1[1];
+                                while (count--) {
+                                    line[lp++] = rgbeData.subarray(ptr, ++ptr)[0];
+                                }
+                            }
+                        }
+                        return line;
+                    });
+                    var _loop_4 = function (x) {
+                        var pixel = buffer.subarray((y * width + x) * 4, (y * width + (x + 1)) * 4);
+                        pixel.forEach(function (_, i) { return pixel[i] = scanline_buf_1[i][x]; });
+                    };
+                    for (var x = 0; x < width; x++) {
+                        _loop_4(x);
+                    }
+                }
+            };
+            // RLE
+            for (var y = 0; y < height; y++) {
+                _loop_2(y);
+            }
+        }
+        else {
+            var _loop_3 = function (x) {
+                var rgbe = rgbeData.subarray(x * 4, (x + 1) * 4);
+                var pixel = buffer.subarray(x * 4, (x + 1) * 4);
+                pixel.forEach(function (_, i) { return pixel[i] = rgbe[i]; });
+            };
+            for (var x = 0; x < total; x++) {
+                _loop_3(x);
+            }
+        }
+        return {
+            width: width, height: height, buffer: buffer,
+        };
+    };
+    HdrParser.prototype.get2DTexture = function (raw) {
+        var _a = this.parseRGBE(raw), width = _a.width, height = _a.height, buffer = _a.buffer;
+        var t2d = new gd3d.render.glTexture2D(this.gl);
+        t2d.width = width;
+        t2d.height = height;
+        t2d.format = gd3d.render.TextureFormatEnum.RGBA;
+        this.gl.activeTexture(this.gl.TEXTURE0);
+        this.gl.bindTexture(this.gl.TEXTURE_2D, t2d.texture);
+        this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, 0); //不对Y翻转
+        this.gl.pixelStorei(this.gl.UNPACK_ALIGNMENT, 1); //对齐方式
+        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, width, height, 0, this.gl.RGBA, this.gl.UNSIGNED_BYTE, buffer);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.LINEAR);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+        this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+        return t2d;
+    };
+    return HdrParser;
+}());
 var gd3d;
 (function (gd3d) {
     var framework;
@@ -15993,6 +16083,12 @@ var gd3d;
              * 拖尾
              */
             AssetTypeEnum[AssetTypeEnum["TrailRenderer"] = 28] = "TrailRenderer";
+            /**
+             * HDR贴图
+             */
+            AssetTypeEnum[AssetTypeEnum["HDR"] = 29] = "HDR";
+            AssetTypeEnum[AssetTypeEnum["GLTF"] = 30] = "GLTF";
+            AssetTypeEnum[AssetTypeEnum["BIN"] = 31] = "BIN";
         })(AssetTypeEnum = framework.AssetTypeEnum || (framework.AssetTypeEnum = {}));
         /**
          * @public
@@ -16227,7 +16323,7 @@ var gd3d;
                         // console.log(`当前资源是压缩状态.`);
                         _this.pkgsGuid = _this.pkgsGuid || [];
                         var nameURL = _this.url.substring(0, _this.url.lastIndexOf(".assetbundle"));
-                        var _loop_2 = function (i, len) {
+                        var _loop_5 = function (i, len) {
                             var extName = _this.pkgs[i].substring(_this.pkgs[i].indexOf("."));
                             var url = nameURL + extName;
                             var kurl = url.replace(framework.assetMgr.cdnRoot, "");
@@ -16246,12 +16342,12 @@ var gd3d;
                             }, _this);
                         };
                         for (var i = 0, len = _this.pkgs.length; i < len; ++i) {
-                            _loop_2(i, len);
+                            _loop_5(i, len);
                         }
                     }
                     else {
                         _this.dw_fileCount += Object.keys(_this.files).length;
-                        var _loop_3 = function (k) {
+                        var _loop_6 = function (k) {
                             var guid = _this.files[k];
                             var url = _this.baseUrl + "resources/" + k;
                             // console.error(`[下載資源] 00 ${this.name},${url}  ,${dwpkgCount}/${this.dw_fileCount}`);
@@ -16266,7 +16362,7 @@ var gd3d;
                         };
                         // console.log(`当前资源是分包状态.`);
                         for (var k in _this.files) {
-                            _loop_3(k);
+                            _loop_6(k);
                         }
                     }
                     //下载图片
@@ -16276,7 +16372,7 @@ var gd3d;
                         if (dwpkgCount >= this.dw_fileCount)
                             this.parseFile();
                     };
-                    var _loop_4 = function (k) {
+                    var _loop_7 = function (k) {
                         var guid = _this.texs[k];
                         _this.files[k] = guid; //先下载 然后给解析器补充一个key
                         var url = _this.baseUrl + "resources/" + k;
@@ -16297,7 +16393,7 @@ var gd3d;
                             }, _this);
                     };
                     for (var k in _this.texs) {
-                        _loop_4(k);
+                        _loop_7(k);
                     }
                 });
             };
@@ -16306,7 +16402,7 @@ var gd3d;
                 for (var i = this.pkgsGuid.length - 1; i >= 0; --i) {
                     var pkgGuid = this.pkgsGuid[i];
                     var pkgld = framework.assetMgr.mapLoading[pkgGuid];
-                    if (!pkgld || !pkgld.data || pkgld.data == 0) //被解析过了不再解析 项目中标记的 
+                    if (!pkgld || !pkgld.data || pkgld.data == 0) //被解析过了不再解析 项目中标记的
                         continue;
                     var isbin = this.pkgs[i].endsWith(".bpkg.json");
                     pkgld.subRes = [];
@@ -16322,7 +16418,7 @@ var gd3d;
                                 var name = String.fromCharCode.apply(null, namebytes);
                                 var fsize = reader.readUInt32();
                                 var bin = reader.readBytesRef(fsize);
-                                var guid = this.files[name] || this.texs[name]; //如果文件找不到,就去找图片                            
+                                var guid = this.files[name] || this.texs[name]; //如果文件找不到,就去找图片
                                 framework.assetMgr.setLoading(guid, { readyok: true, data: bin.buffer });
                                 pkgld.subRes.push(guid);
                                 // console.log(`解压 bin文件${name},size:${fsize},guid:${guid}`);
@@ -16465,7 +16561,7 @@ var gd3d;
             };
             /** 解析后清理 加载缓存资源数据 */
             assetBundle.needClearLoadedRes = false;
-            assetBundle.idNext = -1; //id起始位置               
+            assetBundle.idNext = -1; //id起始位置
             assetBundle.reTryTest = {};
             return assetBundle;
         }());
@@ -16561,6 +16657,12 @@ var gd3d;
                         return framework.AssetTypeEnum.ParticleSystem;
                     case ".trailrenderer.json":
                         return framework.AssetTypeEnum.TrailRenderer;
+                    case ".hdr":
+                        return framework.AssetTypeEnum.HDR;
+                    case ".gltf":
+                        return framework.AssetTypeEnum.GLTF;
+                    case ".bin":
+                        return framework.AssetTypeEnum.BIN;
                 }
                 i = file.indexOf(".", i + 1);
             }
@@ -16586,6 +16688,7 @@ var gd3d;
                 case e.TextureDesc:
                 case e.PackTxt:
                 case e.ParticleSystem:
+                case e.GLTF:
                     return "text";
                 case e.Aniclip:
                 case e.DDS:
@@ -16594,6 +16697,8 @@ var gd3d;
                 case e.KTX:
                 case e.ASTC:
                 case e.PackBin:
+                case e.HDR:
+                case e.BIN:
                     return "arraybuffer";
                 default:
                     // throw Error(`无法识别类型 enum:${AssetTypeEnum[type]},type:${type}`);
@@ -16638,7 +16743,7 @@ var gd3d;
                 assetMgr.mapLoading[guid] = data;
             };
             //加载资源
-            assetMgr.prototype.load = function (url, type, 
+            assetMgr.prototype.load = function (url, type,
             /** 这是解析完成的回调 */
             onstate, downloadFinish) {
                 var _this_1 = this;
@@ -16688,7 +16793,7 @@ var gd3d;
                         var filename = framework.getFileName(url);
                         var next = function (name, guid, type, dwguid) {
                             _this_1.parseRes({ name: name, guid: guid, type: type, dwguid: dwguid }).then(function (asset) {
-                                //解析完毕                       
+                                //解析完毕
                                 state.isfinish = true;
                                 if (asset) {
                                     state.resstateFirst = {
@@ -17046,7 +17151,7 @@ var gd3d;
             assetMgr.mapNamed = {}; //资源名是 ,系统资源类型的名字 或自己定义的名字
             assetMgr.mapBundleNamed = {};
             assetMgr.noparseBundle = []; //未解析的资源包
-            assetMgr.atonceParse = true; //是否立即解析        
+            assetMgr.atonceParse = true; //是否立即解析
             assetMgr.openGuid = true; //是否开启去重能力
             assetMgr.useBinJs = false;
             assetMgr.txt = ".txt";
@@ -17450,35 +17555,35 @@ var gd3d;
             }";
             defShader.vscodefontUI = " \n        attribute vec4 _glesVertex;    \n        attribute vec4 _glesColor;                   \n        attribute vec4 _glesColorEx;                   \n        attribute vec4 _glesMultiTexCoord0;          \n        uniform highp mat4 glstate_matrix_mvp;       \n        varying lowp vec4 xlv_COLOR;                 \n        varying lowp vec4 xlv_COLOREx;                                                  \n        varying highp vec2 xlv_TEXCOORD0;            \n        void main()                                      \n        {                                                \n            highp vec4 tmpvar_1;                         \n            tmpvar_1.w = 1.0;                            \n            tmpvar_1.xyz = _glesVertex.xyz;              \n            xlv_COLOR = _glesColor;                      \n            xlv_COLOREx = _glesColorEx;                      \n            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,1.0-_glesMultiTexCoord0.y);      \n            gl_Position = (glstate_matrix_mvp * tmpvar_1);   \n        }";
             // 使用正常位图字体shader
-            // static fscodefontUI: string = ` 
-            // precision mediump float ; 
-            // uniform sampler2D _MainTex; 
+            // static fscodefontUI: string = `
+            // precision mediump float ;
+            // uniform sampler2D _MainTex;
             // varying lowp vec4 xlv_COLOR; // 字体颜色
             // varying lowp vec4 xlv_COLOREx; // 描边颜色
-            // varying highp vec2 xlv_TEXCOORD0;     
-            // void main()   
-            // {  
+            // varying highp vec2 xlv_TEXCOORD0;
+            // void main()
+            // {
             //     vec4 col = texture2D(_MainTex, xlv_TEXCOORD0);
             //     col.a = col.r * xlv_COLOR.a;
             //     col.rgb = xlv_COLOR.rgb;
             //     gl_FragData[0] = col;
             // }`;
             // 原来sdf字体shader
-            // static fscodefontUI: string = ` 
-            // precision mediump float ; 
-            // uniform sampler2D _MainTex; 
+            // static fscodefontUI: string = `
+            // precision mediump float ;
+            // uniform sampler2D _MainTex;
             // varying lowp vec4 xlv_COLOR; // 字体颜色
             // varying lowp vec4 xlv_COLOREx; // 描边颜色
-            // varying highp vec2 xlv_TEXCOORD0;     
-            // void main()   
-            // {  
-            //     float scale = 10.0;    
-            //     float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.47)*scale;    
-            //     float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.4)*scale;    
-            //     float c=xlv_COLOR.a * clamp ( d,0.0,1.0);   
-            //     float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);   
-            //     bc =min(1.0-c,bc);  
-            //     gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;  
+            // varying highp vec2 xlv_TEXCOORD0;
+            // void main()
+            // {
+            //     float scale = 10.0;
+            //     float d = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.47)*scale;
+            //     float bd = (texture2D(_MainTex, xlv_TEXCOORD0).r - 0.4)*scale;
+            //     float c=xlv_COLOR.a * clamp ( d,0.0,1.0);
+            //     float bc=xlv_COLOREx.a * clamp ( bd,0.0,1.0);
+            //     bc =min(1.0-c,bc);
+            //     gl_FragData[0] =xlv_COLOR*c + xlv_COLOREx*bc;
             // }`;
             // 根据 https://zhuanlan.zhihu.com/p/26217154 文章进行修改的shader
             defShader.fscodefontUI = " \n            precision mediump float ; \n            uniform sampler2D _MainTex; \n\n            uniform highp float _outlineWidth; // \u63CF\u8FB9\u5BBD\u5EA6\n\n            varying lowp vec4 xlv_COLOR; // \u5B57\u4F53\u989C\u8272\n            varying lowp vec4 xlv_COLOREx; // \u63CF\u8FB9\u989C\u8272\n            varying highp vec2 xlv_TEXCOORD0;     \n            void main()   \n            {  \n                // \u5728gd3d\u4E2D\u4F7F\u7528\u7684sdf\u5B57\u4F53\u505A\u4E86\u6700\u5927\u503C\u4E3A2\u50CF\u7D20\u7684\u6709\u5411\u8DDD\u79BB\u8FD0\u7B97\u4E14\u4FDD\u5B58\u5230\u4F4D\u56FE\u4E0A\u3002\n                // \u989C\u8272\u503C[0,255]\u5BF9\u4E8E\u533A\u95F4[-2,2]\u3002\n                // \u989C\u8272\u503Cv\u8868\u793A\u8DDD\u79BB\u5B57\u7B26\u8FB9\u7F18\u6709 (v/255*4-2) \u5355\u4F4D\u8DDD\u79BB\u3002\u5355\u4F4D\u8DDD\u79BB\u4E3A\u6B63\u8868\u793A\u5728\u5B57\u7B26\u5185\uFF0C\u5426\u5219\u5728\u5B57\u7B26\u5916\u3002\n                \n                float _DistanceMark = 0.0; // \u8DDD\u79BB\u4E3A 0 \u5904\u662F\u5B57\u7B26\u8FB9\u7F18\n                float _SmoothDelta = 0.5; // \u5728\u5B57\u7B26\u8FB9\u7F18 0.5 \u50CF\u7D20\u8FDB\u884C\u63D2\u503C \n\n                float _OutlineDistanceMark = -_outlineWidth; // \u63CF\u8FB9\u4F4D\u7F6E\n\n                vec4 col = texture2D(_MainTex, xlv_TEXCOORD0);\n                float distance = col.r * 4.0 - 2.0;\n\n                // \u5E73\u6ED1\u5B57\u4F53\u8FB9\u7F18\n                col.a = smoothstep(_DistanceMark - _SmoothDelta, _DistanceMark + _SmoothDelta, distance);\n                // \u4E0D\u5E73\u6ED1 \u76F8\u5F53\u4E8E _SmoothDelta = 0\n                // if (distance < _DistanceMark)\n                //     col.a = 0.0;\n                // else\n                //     col.a = 1.0;\n\n                col.rgb = xlv_COLOR.rgb;\n            \n                // Outlining \u63CF\u8FB9\n                vec4 outlineCol = vec4(1.0,1.0,1.0,1.0);\n\n                outlineCol.a = smoothstep(_OutlineDistanceMark - _outlineWidth, _OutlineDistanceMark + _outlineWidth, distance);\n                outlineCol.rgb = xlv_COLOREx.rgb;\n                outlineCol.a = outlineCol.a * xlv_COLOREx.a;\n                \n                // \u6DF7\u5408\u5B57\u4F53\u4E0E\u63CF\u8FB9\u989C\u8272\n                col = mix(outlineCol, col, col.a);\n\n                col.a = col.a * xlv_COLOR.a;\n                \n                // \u8BBE\u7F6E\u6700\u7EC8\u503C\n                gl_FragData[0] = col;\n        }";
@@ -17661,11 +17766,11 @@ var gd3d;
             {
                 return null;
             }
-    
+
             load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: animationClip, call: (handle: () => void) => void)
             {
                 let filename = getFileName(url);
-    
+
                 state.resstate[filename] = new ResourceState();
                 if(state.resstateFirst==null)
                 {
@@ -17674,7 +17779,7 @@ var gd3d;
                 gd3d.io.loadArrayBuffer(url,
                     (_buffer, err, isloadFail) =>
                     {
-    
+
                         call(() =>
                         {
                             state.isloadFail = isloadFail ? true : false;
@@ -17683,7 +17788,7 @@ var gd3d;
                             let time = Date.now();
                             let _clip = asset ? asset : new animationClip(filename);
                             // _clip.Parse(_buffer);
-    
+
                             // AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
                             return _clip.Parse(_buffer).then(() =>
                             {
@@ -17692,18 +17797,18 @@ var gd3d;
                                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
                             });
                         });
-    
+
                     },
                     (loadedLength, totalLength) =>
                     {
                         AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                     })
             }
-    
+
             loadByPack(respack, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: animationClip, call: (handle: () => void) => void)
             {
                 let filename = getFileName(url);
-    
+
                 state.resstate[filename] = new ResourceState();
                 if(state.resstateFirst==null)
                 {
@@ -17713,7 +17818,7 @@ var gd3d;
                 let _buffer = respack[filename];
                 let _clip = asset ? asset : new animationClip(filename);
                 // _clip.Parse(_buffer);
-    
+
                 // AssetFactoryTools.useAsset(assetMgr, onstate, state, _clip, url);
                 call(() =>
                 {
@@ -17771,11 +17876,11 @@ var gd3d;
             {
                 return null;
             }
-    
+
             load(url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: atlas, call: (handle: () => void) => void)
             {
                 let filename = getFileName(url);
-    
+
                 state.resstate[filename] = new ResourceState();
                 if(state.resstateFirst==null)
                 {
@@ -17788,10 +17893,10 @@ var gd3d;
                         state.isloadFail = isloadFail ? true : false;
                         if (AssetFactoryTools.catchError(err, onstate, state))
                             return;
-    
+
                         let _atlas = asset ? asset : new atlas(filename);
                         _atlas.Parse(txt, assetMgr);
-    
+
                         AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
                     });
                 },
@@ -17800,7 +17905,7 @@ var gd3d;
                         AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
                     })
             }
-    
+
             loadByPack(respack: any, url: string, onstate: (state: stateLoad) => void, state: stateLoad, assetMgr: assetMgr, asset: atlas, call: (handle: () => void) => void)
             {
                 call(() =>
@@ -17814,7 +17919,7 @@ var gd3d;
                     let txt = respack[filename];
                     let _atlas = asset ? asset : new atlas(filename);
                     _atlas.Parse(txt, assetMgr);
-    
+
                     AssetFactoryTools.useAsset(assetMgr, onstate, state, _atlas, url);
                 });
             }*/
@@ -17829,6 +17934,24 @@ var gd3d;
             return AssetFactory_Atlas;
         }());
         framework.AssetFactory_Atlas = AssetFactory_Atlas;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_BIN = /** @class */ (function () {
+            function AssetFactory_BIN() {
+            }
+            AssetFactory_BIN.prototype.parse = function (assetmgr, bundle, name, bytes) {
+                return new framework.bin(name, bytes);
+            };
+            AssetFactory_BIN = __decorate([
+                framework.assetF(framework.AssetTypeEnum.BIN)
+            ], AssetFactory_BIN);
+            return AssetFactory_BIN;
+        }());
+        framework.AssetFactory_BIN = AssetFactory_BIN;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -17921,7 +18044,7 @@ var gd3d;
         var AssetFactory_DDS = /** @class */ (function () {
             function AssetFactory_DDS() {
             }
-            //#region 废弃de参考代码        
+            //#region 废弃de参考代码
             // newAsset(): texture
             // {
             //     return null;
@@ -17974,7 +18097,7 @@ var gd3d;
             //         {
             //             AssetFactoryTools.onProgress(loadedLength, totalLength, onstate, state, filename);
             //         });
-            // }        
+            // }
             //#endregion
             AssetFactory_DDS.prototype.parse = function (assetmgr, bundle, filename, bytes) {
                 throw Error("暂不支持dds");
@@ -18236,6 +18359,24 @@ var gd3d;
 (function (gd3d) {
     var framework;
     (function (framework) {
+        var AssetFactory_GLTF = /** @class */ (function () {
+            function AssetFactory_GLTF() {
+            }
+            AssetFactory_GLTF.prototype.parse = function (assetmgr, bundle, filename, txt) {
+                return new gd3d.framework.gltf(filename, JSON.parse(txt));
+            };
+            AssetFactory_GLTF = __decorate([
+                framework.assetF(framework.AssetTypeEnum.GLTF)
+            ], AssetFactory_GLTF);
+            return AssetFactory_GLTF;
+        }());
+        framework.AssetFactory_GLTF = AssetFactory_GLTF;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
         var AssetFactory_GLVertexShader = /** @class */ (function () {
             function AssetFactory_GLVertexShader() {
             }
@@ -18303,6 +18444,26 @@ var gd3d;
             return AssetFactory_GLVertexShader;
         }());
         framework.AssetFactory_GLVertexShader = AssetFactory_GLVertexShader;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
+var gd3d;
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        var AssetFactory_HDR = /** @class */ (function () {
+            function AssetFactory_HDR() {
+            }
+            AssetFactory_HDR.prototype.parse = function (assetmgr, bundle, name, bytes) {
+                var _texture = new framework.texture(name);
+                _texture.glTexture = new HdrParser(assetmgr.webgl).get2DTexture(bytes);
+                return _texture;
+            };
+            AssetFactory_HDR = __decorate([
+                framework.assetF(framework.AssetTypeEnum.HDR)
+            ], AssetFactory_HDR);
+            return AssetFactory_HDR;
+        }());
+        framework.AssetFactory_HDR = AssetFactory_HDR;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
 var gd3d;
@@ -18550,7 +18711,7 @@ var gd3d;
             //     //             let _mesh = asset ? asset : new mesh(filename);
             //     //             let time = Date.now();
             //     //             return _mesh.Parse(_buffer, assetMgr.webgl).then(() =>
-            //     //             {                            
+            //     //             {
             //     //                 AssetFactoryTools.useAsset(assetMgr, onstate, state, _mesh, url);
             //     //                 let calc = Date.now() - time;
             //     //                 console.log(`[json]加载:${url}  耗时:${calc}/ms`);
@@ -19083,8 +19244,8 @@ var gd3d;
                 }
             };
             AssetFactory_Shader.prototype.parse = function (assetmgr, bundle, filename, txt) {
-                // if(assetmgr.mapShader[filename]!=null)            
-                //     console.error(`##shader重复设置:${filename}`);                
+                // if(assetmgr.mapShader[filename]!=null)
+                //     console.error(`##shader重复设置:${filename}`);
                 // assetmgr.setAssetUrl(_shader, url);
                 var _shader = new framework.shader(filename);
                 this.parseShader(_shader, assetmgr, txt, filename);
@@ -20070,6 +20231,135 @@ var gd3d;
         framework.atlas = atlas;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
+/// <reference path="../../../io/reflect.ts" />
+var gd3d;
+/// <reference path="../../../io/reflect.ts" />
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * json资源
+         * @version gd3d 1.0
+         */
+        var bin = /** @class */ (function () {
+            function bin(assetName, data) {
+                if (assetName === void 0) { assetName = null; }
+                this.data = data;
+                this.id = new framework.resID();
+                /**
+                 * @public
+                 * @language zh_CN
+                 * @classdesc
+                 * 是否为默认资源
+                 * @version gd3d 1.0
+                 */
+                this.defaultAsset = false;
+                if (!assetName) {
+                    assetName = "json_" + this.getGUID();
+                }
+                this.name = new framework.constText(assetName);
+            }
+            /**
+             * @public
+             * @language zh_CN
+             * @classdesc
+             * 获取资源名称
+             * @version gd3d 1.0
+             */
+            bin.prototype.getName = function () {
+                return this.name.getText();
+            };
+            /**
+             * @public
+             * @language zh_CN
+             * @classdesc
+             * 获取资源唯一id
+             * @version gd3d 1.0
+             */
+            bin.prototype.getGUID = function () {
+                return this.id.getID();
+            };
+            /**
+             * @public
+             * @language zh_CN
+             * @classdesc
+             * 引用计数加一
+             * @version gd3d 1.0
+             */
+            bin.prototype.use = function () {
+                framework.sceneMgr.app.getAssetMgr().use(this);
+            };
+            /**
+             * @public
+             * @language zh_CN
+             * @classdesc
+             * 引用计数减一
+             * @version gd3d 1.0
+             */
+            bin.prototype.unuse = function (disposeNow) {
+                if (disposeNow === void 0) { disposeNow = false; }
+                framework.sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
+            };
+            /**
+             * @public
+             * @language zh_CN
+             * @classdesc
+             * 释放资源
+             * @version gd3d 1.0
+             */
+            bin.prototype.dispose = function () {
+            };
+            /**
+             * @public
+             * @language zh_CN
+             * @classdesc
+             * 计算资源字节大小
+             * @version gd3d 1.0
+             */
+            bin.prototype.caclByteLength = function () {
+                return this.data.byteLength;
+            };
+            Object.defineProperty(bin.prototype, "realName", {
+                /**
+                 * @public
+                 * @language zh_CN
+                 * @classdesc
+                 * 如果是imgdesc加载来的图片，通过这个可以获取到真实的图片名字
+                 * @version gd3d 1.0
+                 */
+                get: function () {
+                    return this._realName;
+                },
+                /**
+                 * @public
+                 * @language zh_CN
+                 * @classdesc
+                 * 设置图片名称
+                 * @version gd3d 1.0
+                 */
+                set: function (name) {
+                    this._realName = name;
+                },
+                enumerable: false,
+                configurable: true
+            });
+            bin.ClassName = "json";
+            __decorate([
+                gd3d.reflect.Field("constText"),
+                __metadata("design:type", framework.constText)
+            ], bin.prototype, "name", void 0);
+            bin = __decorate([
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [String, ArrayBuffer])
+            ], bin);
+            return bin;
+        }());
+        framework.bin = bin;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
     var framework;
@@ -20346,6 +20636,387 @@ var gd3d;
         framework.charinfo = charinfo;
     })(framework = gd3d.framework || (gd3d.framework = {}));
 })(gd3d || (gd3d = {}));
+/// <reference path="../../../io/reflect.ts" />
+var gd3d;
+/// <reference path="../../../io/reflect.ts" />
+(function (gd3d) {
+    var framework;
+    (function (framework) {
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * json资源
+         * @version gd3d 1.0
+         */
+        var gltf = /** @class */ (function () {
+            function gltf(assetName, data) {
+                if (assetName === void 0) { assetName = null; }
+                this.data = data;
+                this.id = new framework.resID();
+                /**
+                 * @public
+                 * @language zh_CN
+                 * @classdesc
+                 * 是否为默认资源
+                 * @version gd3d 1.0
+                 */
+                this.defaultAsset = false;
+                if (!assetName) {
+                    assetName = "json_" + this.getGUID();
+                }
+                this.name = new framework.constText(assetName);
+            }
+            /**
+             * @public
+             * @language zh_CN
+             * @classdesc
+             * 获取资源名称
+             * @version gd3d 1.0
+             */
+            gltf.prototype.getName = function () {
+                return this.name.getText();
+            };
+            /**
+             * @public
+             * @language zh_CN
+             * @classdesc
+             * 获取资源唯一id
+             * @version gd3d 1.0
+             */
+            gltf.prototype.getGUID = function () {
+                return this.id.getID();
+            };
+            /**
+             * @public
+             * @language zh_CN
+             * @classdesc
+             * 引用计数加一
+             * @version gd3d 1.0
+             */
+            gltf.prototype.use = function () {
+                framework.sceneMgr.app.getAssetMgr().use(this);
+            };
+            /**
+             * @public
+             * @language zh_CN
+             * @classdesc
+             * 引用计数减一
+             * @version gd3d 1.0
+             */
+            gltf.prototype.unuse = function (disposeNow) {
+                if (disposeNow === void 0) { disposeNow = false; }
+                framework.sceneMgr.app.getAssetMgr().unuse(this, disposeNow);
+            };
+            /**
+             * @public
+             * @language zh_CN
+             * @classdesc
+             * 释放资源
+             * @version gd3d 1.0
+             */
+            gltf.prototype.dispose = function () {
+            };
+            /**
+             * @public
+             * @language zh_CN
+             * @classdesc
+             * 计算资源字节大小
+             * @version gd3d 1.0
+             */
+            gltf.prototype.caclByteLength = function () {
+                var _a, _b;
+                return (_b = (_a = this.data) === null || _a === void 0 ? void 0 : _a.buffers) === null || _b === void 0 ? void 0 : _b.map(function (e) { return e.byteLength; }).reduce(function (a, b) { return a + b; }, 0);
+            };
+            Object.defineProperty(gltf.prototype, "realName", {
+                /**
+                 * @public
+                 * @language zh_CN
+                 * @classdesc
+                 * 如果是imgdesc加载来的图片，通过这个可以获取到真实的图片名字
+                 * @version gd3d 1.0
+                 */
+                get: function () {
+                    return this._realName;
+                },
+                /**
+                 * @public
+                 * @language zh_CN
+                 * @classdesc
+                 * 设置图片名称
+                 * @version gd3d 1.0
+                 */
+                set: function (name) {
+                    this._realName = name;
+                },
+                enumerable: false,
+                configurable: true
+            });
+            gltf.prototype.load = function (mgr, ctx, folder, brdf) {
+                var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+                return __awaiter(this, void 0, void 0, function () {
+                    var load, _l, images, textures, materials, views, accessors, meshes, nodes, defaltScene, scene, parseNode, roots;
+                    var _this = this;
+                    return __generator(this, function (_m) {
+                        switch (_m.label) {
+                            case 0:
+                                load = function (uri) { return new Promise(function (res) {
+                                    mgr.load(folder + uri, framework.AssetTypeEnum.Auto, function () {
+                                        res(mgr.getAssetByName(uri));
+                                    });
+                                }); };
+                                _l = this;
+                                return [4 /*yield*/, Promise.all((_a = this.data.buffers) === null || _a === void 0 ? void 0 : _a.map(function (_a) {
+                                        var uri = _a.uri;
+                                        return load(uri);
+                                    }))];
+                            case 1:
+                                _l.buffers = _m.sent();
+                                return [4 /*yield*/, Promise.all((_b = this.data.images) === null || _b === void 0 ? void 0 : _b.map(function (_a) {
+                                        var uri = _a.uri;
+                                        return load(uri);
+                                    }))];
+                            case 2:
+                                images = _m.sent();
+                                return [4 /*yield*/, Promise.all((_c = this.data.textures) === null || _c === void 0 ? void 0 : _c.map(function (_a) {
+                                        var sampler = _a.sampler, source = _a.source;
+                                        var tex = images[source]; // TODO:
+                                        return tex;
+                                    }))];
+                            case 3:
+                                textures = _m.sent();
+                                materials = (_d = this.data.materials) === null || _d === void 0 ? void 0 : _d.map(function (m) {
+                                    var mat = new framework.material(m.name);
+                                    mat.setShader(mgr.getShader("pbr.shader.json"));
+                                    mat.setTexture('brdf', brdf);
+                                    if (m.normalTexture) {
+                                        mat.setTexture("uv_MetallicRoughness", textures[m.normalTexture.index]);
+                                    }
+                                    if (m.occlusionTexture) {
+                                        mat.setTexture("uv_AO", textures[m.occlusionTexture.index]);
+                                    }
+                                    if (m.pbrMetallicRoughness) {
+                                        var _a = m.pbrMetallicRoughness, baseColorFactor = _a.baseColorFactor, baseColorTexture = _a.baseColorTexture, metallicFactor = _a.metallicFactor, roughnessFactor = _a.roughnessFactor, metallicRoughnessTexture = _a.metallicRoughnessTexture;
+                                        if (baseColorTexture) {
+                                            mat.setTexture("uv_Basecolor", textures[baseColorTexture.index]);
+                                        }
+                                        if (metallicRoughnessTexture) {
+                                            mat.setTexture("uv_MetallicRoughness", textures[metallicRoughnessTexture.index]);
+                                        }
+                                    }
+                                    return mat;
+                                });
+                                views = (_e = this.data.bufferViews) === null || _e === void 0 ? void 0 : _e.map(function (_a) {
+                                    var _b = _a.buffer, buffer = _b === void 0 ? 0 : _b, _c = _a.byteOffset, byteOffset = _c === void 0 ? 0 : _c, _d = _a.byteLength, byteLength = _d === void 0 ? 0 : _d, _e = _a.byteStride, byteStride = _e === void 0 ? 0 : _e;
+                                    // return {byteStride ,dv: new DataView(this.buffers[buffer].data, byteOffset, byteLength)};
+                                    return { byteOffset: byteOffset, byteLength: byteLength, byteStride: byteStride, rawBuffer: _this.buffers[buffer].data };
+                                });
+                                accessors = (_g = (_f = this.data) === null || _f === void 0 ? void 0 : _f.accessors) === null || _g === void 0 ? void 0 : _g.map(function (acc) {
+                                    return __assign(__assign({}, acc), { bufferView: views[acc.bufferView] });
+                                });
+                                meshes = (_h = this.data.meshes) === null || _h === void 0 ? void 0 : _h.map(function (_a) {
+                                    var name = _a.name, primitives = _a.primitives;
+                                    return primitives.map(function (_a) {
+                                        var _b, _c, _d;
+                                        var _e, _f, _g, _h, _j, _k;
+                                        var attributes = _a.attributes, indices = _a.indices, material = _a.material;
+                                        var mf = new framework.mesh(folder + name);
+                                        var mdata = mf.data = new gd3d.render.meshData();
+                                        var vert = mdata.pos = [];
+                                        var uv1 = mdata.uv = [];
+                                        var normal = mdata.normal = [];
+                                        // const colors = mdata.color = [];
+                                        var attr = {};
+                                        for (var k in attributes) {
+                                            attr[k] = new Accessor(accessors[attributes[k]], k);
+                                        }
+                                        var vcount = attr.POSITION.count;
+                                        var bs = +((_f = (_e = attr.POSITION) === null || _e === void 0 ? void 0 : _e.size) !== null && _f !== void 0 ? _f : 0)
+                                            // + (attr.COLOR?.size ?? 0)
+                                            + ((_h = (_g = attr.TEXCOORD_0) === null || _g === void 0 ? void 0 : _g.size) !== null && _h !== void 0 ? _h : 0)
+                                            + ((_k = (_j = attr.NORMAL) === null || _j === void 0 ? void 0 : _j.size) !== null && _k !== void 0 ? _k : 0);
+                                        // + (attr.TANGENT?.size ?? 0);
+                                        var vbo = new Float32Array(vcount * bs);
+                                        mf.glMesh = new gd3d.render.glMesh();
+                                        var vf = gd3d.render.VertexFormatMask.Position
+                                            | gd3d.render.VertexFormatMask.UV0
+                                            | gd3d.render.VertexFormatMask.Normal;
+                                        // | gd3d.render.VertexFormatMask.Color
+                                        // | gd3d.render.VertexFormatMask.BlendIndex4
+                                        // | gd3d.render.VertexFormatMask.BlendWeight4;
+                                        mf.glMesh.initBuffer(ctx, vf, vcount, gd3d.render.MeshTypeEnum.Dynamic);
+                                        var ebo = new Accessor(accessors[indices], "indices").data;
+                                        mdata.trisindex = Array.from(ebo);
+                                        for (var i = 0; i < vcount; i++) {
+                                            vert[i] = new ((_b = gd3d.math.vector3).bind.apply(_b, __spreadArrays([void 0], attr.POSITION.data[i])))();
+                                            uv1[i] = new ((_c = gd3d.math.vector2).bind.apply(_c, __spreadArrays([void 0], attr.TEXCOORD_0.data[i])))();
+                                            normal[i] = new ((_d = gd3d.math.vector3).bind.apply(_d, __spreadArrays([void 0], attr.NORMAL.data[i])))();
+                                            var cur = vbo.subarray(i * bs); // offset
+                                            var position = cur.subarray(0, 3);
+                                            // const color = cur.subarray(3, 7);
+                                            var uv = cur.subarray(3, 5);
+                                            var n = cur.subarray(5, 8);
+                                            position.set(attr.POSITION.data[i]);
+                                            uv.set(attr.TEXCOORD_0.data[i]);
+                                            n.set(attr.NORMAL.data[i]);
+                                            // const tangent = cur.subarray(7, 9);
+                                            // colors[i] = new gd3d.math.vector4();
+                                        }
+                                        mf.glMesh.uploadVertexData(ctx, vbo);
+                                        mf.glMesh.addIndex(ctx, ebo.length);
+                                        mf.glMesh.uploadIndexData(ctx, 0, ebo);
+                                        mf.submesh = [];
+                                        var sm = new gd3d.framework.subMeshInfo();
+                                        sm.matIndex = 0;
+                                        sm.useVertexIndex = 0;
+                                        sm.start = 0;
+                                        sm.size = ebo.length;
+                                        sm.line = false;
+                                        mf.submesh.push(sm);
+                                        mf.glMesh.uploadIndexSubData(ctx, 0, ebo);
+                                        return { m: mf, mat: materials[material] };
+                                    });
+                                });
+                                nodes = (_j = this.data.nodes) === null || _j === void 0 ? void 0 : _j.map(function (_a) {
+                                    var name = _a.name, mesh = _a.mesh, matrix = _a.matrix, rotation = _a.rotation, scale = _a.scale, translation = _a.translation, skin = _a.skin, camera = _a.camera, children = _a.children;
+                                    var n = new gd3d.framework.transform();
+                                    n.name = name;
+                                    if (matrix != null) {
+                                        n.getLocalMatrix().rawData = matrix;
+                                    }
+                                    else {
+                                        if (translation != null)
+                                            gd3d.math.vec3Set(n.localTranslate, translation[0], translation[1], translation[2]);
+                                        if (rotation != null) {
+                                            n.localRotate.x = rotation[0];
+                                            n.localRotate.y = rotation[1];
+                                            n.localRotate.z = rotation[2];
+                                            n.localRotate.w = rotation[3];
+                                        }
+                                        if (scale != null)
+                                            gd3d.math.vec3Set(n.localScale, scale[0], scale[1], scale[2]);
+                                    }
+                                    n.markDirty();
+                                    if (mesh != null) {
+                                        var child = meshes[mesh].map(function (_a) {
+                                            var m = _a.m, mat = _a.mat;
+                                            var submesh = new gd3d.framework.transform();
+                                            var mf = submesh.gameObject.addComponent("meshFilter");
+                                            mf.mesh = m;
+                                            var renderer = submesh.gameObject.addComponent("meshRenderer");
+                                            renderer.materials = [mat];
+                                            // renderer.materials.push(mat);
+                                            // renderer.materials.push(new framework.material());
+                                            // renderer.materials[0].setShader(mgr.getShader("shader/def"));
+                                            // renderer.materials[0].setShader(mgr.getShader("simple.shader.json"));
+                                            return submesh;
+                                        });
+                                        child.forEach(function (c) { return n.addChild(c); });
+                                    }
+                                    return { n: n, children: children };
+                                });
+                                defaltScene = (_k = this.data.scene) !== null && _k !== void 0 ? _k : 0;
+                                scene = new gd3d.framework.transform();
+                                parseNode = function (i) {
+                                    var _a = nodes[i], n = _a.n, children = _a.children;
+                                    children === null || children === void 0 ? void 0 : children.forEach(function (c) {
+                                        n.addChild(parseNode(c));
+                                    });
+                                    return n;
+                                };
+                                roots = this.data.scenes[defaltScene].nodes.map(parseNode);
+                                roots.forEach(function (r) { return scene.addChild(r); });
+                                return [2 /*return*/, scene];
+                        }
+                    });
+                });
+            };
+            gltf.ClassName = "json";
+            __decorate([
+                gd3d.reflect.Field("constText"),
+                __metadata("design:type", framework.constText)
+            ], gltf.prototype, "name", void 0);
+            gltf = __decorate([
+                gd3d.reflect.SerializeType,
+                __metadata("design:paramtypes", [String, Object])
+            ], gltf);
+            return gltf;
+        }());
+        framework.gltf = gltf;
+        var Accessor = /** @class */ (function () {
+            function Accessor(_a, name) {
+                var bufferView = _a.bufferView, _b = _a.byteOffset, byteOffset = _b === void 0 ? 0 : _b, componentType = _a.componentType, _c = _a.normalized, normalized = _c === void 0 ? false : _c, count = _a.count, type = _a.type, _d = _a.max, max = _d === void 0 ? [] : _d, _e = _a.min, min = _e === void 0 ? [] : _e;
+                if (name === void 0) { name = ''; }
+                this.attribute = name;
+                this.bufferView = bufferView;
+                this.byteOffset = byteOffset;
+                this.componentType = componentType;
+                this.normalized = normalized;
+                this.count = count;
+                this.max = max;
+                this.min = min;
+                this.size = Accessor.types[type];
+            }
+            Object.defineProperty(Accessor.prototype, "data", {
+                get: function () {
+                    if (!this._data)
+                        this._data = Accessor.getData(this);
+                    return this._data;
+                },
+                enumerable: false,
+                configurable: true
+            });
+            Accessor.newFloat32Array = function (acc) {
+                return new Float32Array(acc.bufferView.rawBuffer, acc.byteOffset + acc.bufferView.byteOffset, acc.size * acc.count);
+            };
+            Accessor.getSubChunks = function (acc, data) {
+                var blocks = [];
+                for (var i = 0; i < acc.count; i++) {
+                    var offset = i * acc.size;
+                    blocks.push(data.subarray(offset, offset + acc.size));
+                }
+                return blocks;
+            };
+            Accessor.getFloat32Blocks = function (acc) {
+                return this.getSubChunks(acc, Accessor.newTypedArray(acc));
+            };
+            Accessor.newTypedArray = function (acc) {
+                switch (acc.componentType) {
+                    case 5120:
+                        return new Int8Array(acc.bufferView.rawBuffer, acc.byteOffset + acc.bufferView.byteOffset, acc.size * acc.count);
+                    case 5121:
+                        return new Uint8Array(acc.bufferView.rawBuffer, acc.byteOffset + acc.bufferView.byteOffset, acc.size * acc.count);
+                    case 5122:
+                        return new Int16Array(acc.bufferView.rawBuffer, acc.byteOffset + acc.bufferView.byteOffset, acc.size * acc.count);
+                    case 5123:
+                        return new Uint16Array(acc.bufferView.rawBuffer, acc.byteOffset + acc.bufferView.byteOffset, acc.size * acc.count);
+                    case 5125:
+                        return new Uint32Array(acc.bufferView.rawBuffer, acc.byteOffset + acc.bufferView.byteOffset, acc.size * acc.count);
+                    case 5126:
+                        return new Float32Array(acc.bufferView.rawBuffer, acc.byteOffset + acc.bufferView.byteOffset, acc.size * acc.count);
+                }
+            };
+            Accessor.getData = function (acc) {
+                if (acc.size > 1) {
+                    return this.getFloat32Blocks(acc);
+                }
+                return this.newTypedArray(acc);
+            };
+            Accessor.types = {
+                "SCALAR": 1,
+                'VEC1': 1,
+                'VEC2': 2,
+                'VEC3': 3,
+                'VEC4': 4,
+                "MAT2": 4,
+                "MAT3": 9,
+                "MAT4": 16,
+            };
+            return Accessor;
+        }());
+        framework.Accessor = Accessor;
+    })(framework = gd3d.framework || (gd3d.framework = {}));
+})(gd3d || (gd3d = {}));
 /// <reference path="../../io/reflect.ts" />
 var gd3d;
 /// <reference path="../../io/reflect.ts" />
@@ -20364,9 +21035,9 @@ var gd3d;
                 this.helpLPos = new gd3d.math.vector3();
                 this.helpLScale = new gd3d.math.vector3(1, 1, 1);
                 // /**自己是否有组件 */
-                // hasComponent: boolean = false; 
+                // hasComponent: boolean = false;
                 // /**子对象是否有组件  */
-                // hasComponentChild: boolean = false; 
+                // hasComponentChild: boolean = false;
                 /** 自己是否有渲染器组件 */
                 this.hasRendererComp = false;
                 /** 子对象是否有渲染器组件 */
@@ -22337,7 +23008,7 @@ var gd3d;
                 var lightIdx = this.lightmapIndex;
                 for (var i = 0; i < len; i++) {
                     var sm = subMeshs[i];
-                    var mid = subMeshs[i].matIndex; //根据这个找到使用的具体哪个材质    
+                    var mid = subMeshs[i].matIndex; //根据这个找到使用的具体哪个材质
                     var usemat = this.materials[mid];
                     var drawtype = scene.fog ? "base_fog" : "base";
                     if (lightIdx >= 0 && scene.lightmaps.length > 0) {
@@ -22398,7 +23069,7 @@ var gd3d;
                 var drawtype = this.instanceDrawType();
                 for (var i = 0; i < len; i++) {
                     var sm = subMeshs[i];
-                    var mid = subMeshs[i].matIndex; //根据这个找到使用的具体哪个材质    
+                    var mid = subMeshs[i].matIndex; //根据这个找到使用的具体哪个材质
                     var usemat = mr.materials[mid];
                     var drawInstanceInfo = meshGpuInstanceDrawInfo.new_info();
                     drawInstanceInfo.mid = mid;
@@ -22430,7 +23101,7 @@ var gd3d;
                 var len = subMeshs.length;
                 for (var i = 0; i < len; i++) {
                     var sm = subMeshs[i];
-                    var mid = subMeshs[i].matIndex; //根据这个找到使用的具体哪个材质    
+                    var mid = subMeshs[i].matIndex; //根据这个找到使用的具体哪个材质
                     var usemat = mats[mid];
                     var drawtype = this.instanceDrawType();
                     var vbo = this._getVBO(context.webgl);
@@ -23979,7 +24650,7 @@ var gd3d;
                     //                 {
                     //                     shaders.push(k);
                     //                 }
-                    //                 console.error(` 
+                    //                 console.error(`
                     // #######当前shader#######:
                     //                 ${shaders.join("\n")}`);
                     throw new Error("mat解析错误:" + this.name + "  shader 为空！shadername：" + shaderName + " bundleName: " + bundleName);
@@ -24600,7 +25271,7 @@ var gd3d;
             //     read.position = read.position + 24;
             //     var vcount = read.readUInt32();
             //     var vec10tpose: number[] = [];
-            //     //分片加载 
+            //     //分片加载
             //     this.readProcess(read, data, objVF, vcount, vec10tpose, () =>
             //     {
             //         this.readFinish(read, data, inData, objVF, webgl);
@@ -24739,7 +25410,7 @@ var gd3d;
                 this.data.blendWeight = inData.meshData.blendWeight;
                 this.data.trisindex = inData.meshData.trisindex;
                 this.submesh = inData.submesh;
-    
+
                 this.glMesh = new gd3d.render.glMesh();
                 var vertexs = this.data.genVertexDataArray(this.data.originVF);
                 var indices = this.data.genIndexDataArray();
@@ -27742,7 +28413,7 @@ var gd3d;
         //      * @param clipname 动画片段名
         //      */
         //     onPlayEnd:(clipname:string)=>any;
-        //     private checkFrameId(delay: number): void 
+        //     private checkFrameId(delay: number): void
         //     {
         //         if (this.playStyle == PlayStyle.NormalPlay)
         //         {
@@ -28051,7 +28722,7 @@ var gd3d;
                 }
                 // //郭加的
                 // if(this.beLoop)
-                // {   
+                // {
                 //     c.source.onended=()=>
                 //     {
                 //         this.play(buffer, beLoop, volume);
@@ -29204,7 +29875,7 @@ var gd3d;
             camera.prototype._fillRenderer = function (scene, node, _isStatic) {
                 if (_isStatic === void 0) { _isStatic = false; }
                 if (!node.needFillRenderer)
-                    return; //强制不fill 
+                    return; //强制不fill
                 var go = node.gameObject;
                 if (!go || !go.visible || (node.hasRendererComp == false && node.hasRendererCompChild == false))
                     return; //自己没有渲染组件 且 子物体也没有 return
@@ -29392,7 +30063,7 @@ var gd3d;
                 for (var i = 0, l = rlayers.length; i < l; ++i) {
                     var ls = rlayers[i].list;
                     var len = ls.length;
-                    for (var j = 0; j < len; ++j) 
+                    for (var j = 0; j < len; ++j)
                     // for (let item of layer.list)
                     {
                         var item = ls[j];
@@ -30626,10 +31297,10 @@ var gd3d;
 //         }
 //         /**
 //          * 更新特效数据
-//          * 
+//          *
 //          * @private
-//          * @param {number} delta 
-//          * 
+//          * @param {number} delta
+//          *
 //          * @memberof effectSystem
 //          */
 //         private _update(delta: number)
@@ -30695,11 +31366,11 @@ var gd3d;
 //         }
 //         /**
 //          * 将插值信息合并到当前帧数据
-//          * 
-//          * @param {EffectAttrsData} realUseCurFrameData 
-//          * @param {EffectFrameData} curFrameData 
-//          * @returns 
-//          * 
+//          *
+//          * @param {EffectAttrsData} realUseCurFrameData
+//          * @param {EffectFrameData} curFrameData
+//          * @returns
+//          *
 //          * @memberof effectSystem
 //          */
 //         private mergeLerpAttribData(realUseCurFrameData: EffectAttrsData, effect: EffectElementSingleMesh, frameId: number)
@@ -30725,15 +31396,15 @@ var gd3d;
 //         }
 //         /**
 //          * 根据当前帧的数据更新EffectBatcher中的vbo，ebo信息
-//          * 
+//          *
 //          * @private
-//          * @param {EffectBatcher} effectBatcher 
-//          * @param {EffectAttrsData} curAttrsData 
-//          * @param {EffectFrameData} initFrameData 
-//          * @param {number} vertexStartIndex 
-//          * @param {number} delta 
-//          * @returns 
-//          * 
+//          * @param {EffectBatcher} effectBatcher
+//          * @param {EffectAttrsData} curAttrsData
+//          * @param {EffectFrameData} initFrameData
+//          * @param {number} vertexStartIndex
+//          * @param {number} delta
+//          * @returns
+//          *
 //          * @memberof effectSystem
 //          */
 //         private updateEffectBatcher(effectBatcher: EffectBatcherNew, curAttrsData: EffectAttrsData, mesh: gd3d.framework.mesh, vertexStartIndex: number)
@@ -30804,11 +31475,11 @@ var gd3d;
 //         }
 //         /**
 //          * 提交各个EffectBatcher中的数据进行渲染
-//          * 
-//          * @param {renderContext} context 
-//          * @param {assetMgr} assetmgr 
-//          * @param {gd3d.framework.camera} camera 
-//          * 
+//          *
+//          * @param {renderContext} context
+//          * @param {assetMgr} assetmgr
+//          * @param {gd3d.framework.camera} camera
+//          *
 //          * @memberof effectSystem
 //          */
 //         render(context: renderContext, assetmgr: assetMgr, camera: gd3d.framework.camera)
@@ -30959,9 +31630,9 @@ var gd3d;
 //         private beExecuteNextFrame: boolean = true;
 //         /**
 //          * 计算当前的frameid
-//          * 
+//          *
 //          * @private
-//          * 
+//          *
 //          * @memberof effectSystem
 //          */
 //         private checkFrameId(): boolean
@@ -31161,7 +31832,7 @@ var gd3d;
 //         public effectElements: EffectElementSingleMesh[] = [];
 //         /**
 //          * 当前总的顶点数量
-//          * 
+//          *
 //          * @private
 //          * @type {number}
 //          * @memberof effect
@@ -31197,10 +31868,10 @@ var gd3d;
 //         private _vbosize: number = 0;
 //         /**
 //          * 动态设定vbo大小
-//          * 
-//          * @param {number} value 
-//          * @returns 
-//          * 
+//          *
+//          * @param {number} value
+//          * @returns
+//          *
 //          * @memberof effect
 //          */
 //         public resizeVboSize(value: number)
@@ -32388,7 +33059,7 @@ var gd3d;
                 this.nowTime += delta * this._speed;
                 var raelTime = this.nowTime;
                 var clipTime = clip.time;
-                //    
+                //
                 //是否播完
                 if (this.checkPlayEnd(clip)) {
                     this.OnClipPlayEnd();
@@ -33139,7 +33810,7 @@ var gd3d;
 //         }
 //         /**
 //          * @private
-//          * @param index 
+//          * @param index
 //          */
 //         getMatByIndex(index: number)
 //         {
@@ -34151,7 +34822,7 @@ var gd3d;
                     this.dataForVbo[(i * 2 + 1) * 9 + 7] = i / (length - 1);
                     this.dataForVbo[(i * 2 + 1) * 9 + 8] = 1;
                 }
-                //--------------------------------------     
+                //--------------------------------------
                 for (var k = 0; k < length - 1; k++) {
                     this.dataForEbo[k * 6 + 0] = k * 2;
                     this.dataForEbo[k * 6 + 1] = (k + 1) * 2;
@@ -34865,7 +35536,7 @@ var gd3d;
                 //         return;
                 //     }
                 // }
-                // this.renderActive=true;//上面return了应该不再render 
+                // this.renderActive=true;//上面return了应该不再render
                 // this.totalFrame=this.totalTime*this.fps;
                 // if(!this.data.beloop&&this.totalFrame>this.data.lifeTime)
                 // {
@@ -35128,7 +35799,7 @@ var gd3d;
             //        if(this.frameList[i]>=this.effect.data.lifeTime)
             //         {
             //             this.removeFrame(this.frameList[i]);
-            //         } 
+            //         }
             //     }
             // }
             F14Layer.prototype.addFrame = function (index, framedata) {
@@ -35752,8 +36423,8 @@ var gd3d;
                 this.rotEuler = new gd3d.math.vector3();
                 //----------------render
                 this.rendermodel = RenderModelEnum.Mesh;
-                //public Material material;  
-                //public Mesh mesh;//仅在rendermodel为mesh的时候显示     
+                //public Material material;
+                //public Mesh mesh;//仅在rendermodel为mesh的时候显示
                 this.beloop = true;
                 this.lifeTime = new framework.NumberData(20);
                 this.simulateInLocalSpace = true; //粒子运动运动空间（世界还是本地)
@@ -36115,7 +36786,7 @@ var gd3d;
                     this.emission.particlelist[i].uploadMeshdata();
                 }
                 //---------------------render
-                //this.mesh.glMesh.bindVboBuffer(context.webgl);      
+                //this.mesh.glMesh.bindVboBuffer(context.webgl);
                 this.mesh.glMesh.uploadVertexData(context.webgl, this.dataForVbo);
                 this.mesh.glMesh.uploadIndexData(context.webgl, 0, this.dataForEbo);
                 this.mesh.submesh[0].size = this.curIndexCount;
@@ -37757,7 +38428,7 @@ var gd3d;
              * @param cameraPosition 摄像机局部坐标
              */
             LineRenderer.calcPositionVectex = function (positions, loop, rateAtLines, lineWidth, alignment, cameraPosition) {
-                // 
+                //
                 var positionVectex = [];
                 // 处理两端循环情况
                 if (loop) {
@@ -42139,7 +42810,7 @@ var gd3d;
                     return b;
                 }
                 do {
-                    // 
+                    //
                     var x = a - fa * (b - a) / (fb - fa);
                     var fr = f(x);
                     if (fa * fr < 0) {
@@ -42712,7 +43383,7 @@ var gd3d;
             return false;
         }
         math.isContain = isContain;
-        // 计算叉乘 |P0P1| × |P0P2| 
+        // 计算叉乘 |P0P1| × |P0P2|
         function Multiply(p1, p2, p0) {
             return ((p1.x - p0.x) * (p2.y - p0.y) - (p2.x - p0.x) * (p1.y - p0.y));
         }
@@ -43625,7 +44296,7 @@ var gd3d;
             //to.rawData.set(from.rawData);
             // to.rawData[0]=from.rawData[0];
             // to.rawData[1]=from.rawData[1];
-            // to.rawData[2]=from.rawData[2]; 
+            // to.rawData[2]=from.rawData[2];
         }
         math.vec3Clone = vec3Clone;
         // export function vec3ToString(result: string)
@@ -44450,7 +45121,7 @@ var gd3d;
                 info.vecs = listVec;
                 var polys = [];
                 var list = j["p"];
-                for (var i = 0; i < list.length; i++) 
+                for (var i = 0; i < list.length; i++)
                 //foreach (var json in j.asDict()["p"].AsList())
                 {
                     var json = list[i];
@@ -45106,40 +45777,40 @@ var gd3d;
                 return wayPoints;
             };
             pathFinding.intersectBorder = function (a, b, c, d) {
-                //线段ab的法线N1  
+                //线段ab的法线N1
                 var nx1 = (b.z - a.z), ny1 = (a.x - b.x);
-                //线段cd的法线N2  
+                //线段cd的法线N2
                 var nx2 = (d.z - c.z), ny2 = (c.x - d.x);
-                //两条法线做叉乘, 如果结果为0, 说明线段ab和线段cd平行或共线,不相交  
+                //两条法线做叉乘, 如果结果为0, 说明线段ab和线段cd平行或共线,不相交
                 var denominator = nx1 * ny2 - ny1 * nx2;
                 if (denominator == 0) {
                     return null;
                 }
-                //在法线N2上的投影  
+                //在法线N2上的投影
                 var distC_N2 = nx2 * c.x + ny2 * c.z;
                 var distA_N2 = nx2 * a.x + ny2 * a.z - distC_N2;
                 var distB_N2 = nx2 * b.x + ny2 * b.z - distC_N2;
-                // 点a投影和点b投影在点c投影同侧 (对点在线段上的情况,本例当作不相交处理);  
+                // 点a投影和点b投影在点c投影同侧 (对点在线段上的情况,本例当作不相交处理);
                 if (distA_N2 * distB_N2 >= 0) {
                     return null;
                 }
-                //  
-                //判断点c点d 和线段ab的关系, 原理同上  
-                //  
-                //在法线N1上的投影  
+                //
+                //判断点c点d 和线段ab的关系, 原理同上
+                //
+                //在法线N1上的投影
                 var distA_N1 = nx1 * a.x + ny1 * a.z;
                 var distC_N1 = nx1 * c.x + ny1 * c.z - distA_N1;
                 var distD_N1 = nx1 * d.x + ny1 * d.z - distA_N1;
                 if (distC_N1 * distD_N1 >= 0) {
                     return null;
                 }
-                //计算交点坐标  
+                //计算交点坐标
                 var fraction = distA_N2 / denominator;
                 var dx = fraction * ny1, dz = -fraction * nx1;
                 var newpoint = new framework.navVec3();
                 framework.navVec3.lerp(a, b, -fraction, newpoint);
                 return newpoint;
-                //return { x: a.x + dx , y: a.z + dz };  
+                //return { x: a.x + dx , y: a.z + dz };
             };
             return pathFinding;
         }());
@@ -48419,7 +49090,7 @@ var gd3d;
                 this.frameInternal = 1 / framework.effectSystem.fps;
             };
             RotationAction.prototype.update = function (frameIndex) {
-                // // if (this.startFrame > frameIndex || this.endFrame < frameIndex) 
+                // // if (this.startFrame > frameIndex || this.endFrame < frameIndex)
                 this.elements.curAttrData.euler.z = this.elements.curAttrData.euler.z + (this.velocity.z.getValue()) * this.frameInternal;
                 if (this.elements.curAttrData.renderModel == framework.RenderModel.None) {
                     this.elements.curAttrData.euler.x = this.elements.curAttrData.euler.x + (this.velocity.x.getValue()) * this.frameInternal;
@@ -48972,7 +49643,7 @@ var gd3d;
                             // {
                             //     //data.beLoop = <boolean>_data["beloop"];
                             //     data.paricleLoop=<boolean>_data["beloop"];
-                            //     if(data.paricleLoop) 
+                            //     if(data.paricleLoop)
                             //     {
                             //         data.beLoop=true;
                             //     }
@@ -49533,7 +50204,7 @@ var gd3d;
                 var dir = new gd3d.math.vector3();
                 gd3d.math.vec3Subtract(targetpos, eye, dir);
                 gd3d.math.vec3Normalize(dir, dir);
-                //dir在xz面上的单位投影          
+                //dir在xz面上的单位投影
                 var unitprojectedXZ = new gd3d.math.vector3(dir.x, 0, dir.z);
                 gd3d.math.vec3Normalize(unitprojectedXZ, unitprojectedXZ);
                 var yaw = Math.acos(unitprojectedXZ.z) / Math.PI * 180;
@@ -49544,7 +50215,7 @@ var gd3d;
                 var right = gd3d.math.pool.new_vector3();
                 gd3d.math.vec3Cross(up, dir, right);
                 gd3d.math.vec3Normalize(right, right);
-                //dir在xz面上的投影   
+                //dir在xz面上的投影
                 var projectedXZ = new gd3d.math.vector3(dir.x, 0, dir.z);
                 var length = gd3d.math.vec3Length(projectedXZ);
                 var pitch = Math.acos(length) / Math.PI * 180;
@@ -49604,7 +50275,7 @@ var gd3d;
                 var dir = new gd3d.math.vector3();
                 gd3d.math.vec3Subtract(targetpos, eye, dir);
                 gd3d.math.vec3Normalize(dir, dir);
-                //dir在xz面上的单位投影          
+                //dir在xz面上的单位投影
                 var dirxz = new gd3d.math.vector3(dir.x, 0, dir.z);
                 gd3d.math.vec3Normalize(dirxz, dirxz);
                 var yaw = Math.acos(dirxz.z) / Math.PI * 180;
@@ -50386,7 +51057,7 @@ var gd3d;
                 //detal为 0.01699995994567871  造成短短时间发射大量粒子困难(0.1 发射50)至少需要detal<=0.002,按照detal为0.0169需要0.8左右的时间才能发射完，于是不能deta仅发射一个粒子。
                 //改为按照时间比例发射粒子
                 if (this.emissionData.emissionType == framework.ParticleEmissionType.continue) {
-                    // if (this.numcount == 0) 
+                    // if (this.numcount == 0)
                     // {
                     //     this.addParticle();
                     //     this.numcount++;
@@ -51296,7 +51967,7 @@ var gd3d;
                 var realEmitTime = this._realTime;
                 if (!loop)
                     realEmitTime = Math.min(realEmitTime, duration);
-                // 
+                //
                 var emits = [];
                 // 单粒子发射周期
                 var step = 1 / this.emission.rateOverTime.getValue(rateAtDuration);
@@ -52965,7 +53636,7 @@ var gd3d;
                 gd3d.math.matrixInverse(mat, mat);
                 // 还原到原空间
                 gd3d.math.matrixTransformNormal(pVelocity, mat, pVelocity);
-                // 
+                //
                 gd3d.math.vec3SLerp(particle.velocity, pVelocity, this.dampen, particle.velocity);
             };
             return ParticleLimitVelocityOverLifetimeModule;
@@ -57484,7 +58155,7 @@ var gd3d;
                                     gd3d.math.quatToEulerAngles(lwrot, lEuler); //上一次的 欧拉角
                                 }
                                 _this.lastRotMask = mask_;
-                                //逐轴冻结判定                        
+                                //逐轴冻结判定
                                 var t_x = lEuler.x;
                                 var t_y = lEuler.y;
                                 var t_z = lEuler.z;
@@ -58578,7 +59249,7 @@ var gd3d;
                         continue;
                     if (framework.StringUtil.ENABLED in c.comp && !c.comp[framework.StringUtil.ENABLED])
                         continue;
-                    if (!c.OnPlayed) //还没有 调用 OnPlayed 
+                    if (!c.OnPlayed) //还没有 调用 OnPlayed
                      {
                         c.comp.onPlay(); //运行时的 enabled 开启 后调用 onPlay()
                         c.OnPlayed = true;
@@ -58675,7 +59346,7 @@ var gd3d;
                 // if (comp.update.toString().length < 35)
                 // {
                 //     //update 空转
-                //     comp.update = undefined;                
+                //     comp.update = undefined;
                 // }
                 if (add) {
                     this.components.push(nodeObj);
@@ -59260,7 +59931,7 @@ var gd3d;
             };
             renderList.prototype.addRenderer = function (renderer, webgl) {
                 var idx = renderer.layer;
-                // let layer = renderer.layer; 
+                // let layer = renderer.layer;
                 // var idx = 0;
                 // if (layer == RenderLayerEnum.Common)
                 // {
@@ -59303,7 +59974,7 @@ var gd3d;
                 //先暂时分配 透明与不透明两组
                 this.list = [];
                 /** gpu instance map*/
-                // gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {}; 
+                // gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {};
                 this.gpuInstanceMap = {};
                 this.gpuInstanceBatcherMap = {};
                 this.needSort = _sort;
@@ -59349,7 +60020,7 @@ var gd3d;
                     var pass = bs.passArr[i];
                     var darr = bs.bufferDArrs[i];
                     gd3d.framework.meshRenderer.setInstanceOffsetMatrix(mr.gameObject.transform, mat, pass); //RTS offset 矩阵
-                    mat.uploadInstanceAtteribute(pass, darr); //收集 各material instance atteribute    
+                    mat.uploadInstanceAtteribute(pass, darr); //收集 各material instance atteribute
                 }
                 bs.count++;
             };
@@ -59703,12 +60374,12 @@ var gd3d;
                 if (node.gameObject.haveComponet)
                 {
                     node.gameObject.update(delta);
-    
+
                     this.collectCameraAndLight(node);
                 }
                 if (node.children)
                 {
-    
+
                     for (var i = 0, l = node.children.length; i < l; i++)
                     {
                         this.objupdate(node.children[i], delta);
@@ -61698,7 +62369,7 @@ var gd3d;
                     for (var i = 0; i < 8; i++) {
                         gd3d.math.vec3Clone(wVects[i], ray.tempVecs[i]);
                     }
-                    // obb.caclWorldVecs(ray.tempVecs, _collider.gameObject.transform.getWorldMatrix());   
+                    // obb.caclWorldVecs(ray.tempVecs, _collider.gameObject.transform.getWorldMatrix());
                     if (!ray.tempMData)
                         ray.tempMData = new gd3d.render.meshData();
                     gd3d.render.meshData.genBoxByArray(ray.tempVecs, ray.tempMData);
@@ -63175,7 +63846,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         //处理方法
         {
             priority: 0,
@@ -63190,7 +63861,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         // 排除不支持序列化对象 serializable == false 时不进行序列化
         {
             priority: 0,
@@ -63201,7 +63872,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         // 自定义序列化函数
         {
             priority: 0,
@@ -63216,7 +63887,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         //处理数组
         {
             priority: 0,
@@ -63233,7 +63904,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         //处理普通Object
         {
             priority: 0,
@@ -63250,7 +63921,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         // 使用默认序列化
         {
             priority: -10000,
@@ -63291,7 +63962,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         //处理方法
         {
             priority: 0,
@@ -63303,7 +63974,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         // 处理非原生Object对象
         {
             priority: 0,
@@ -63315,7 +63986,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         //处理数组
         {
             priority: 0,
@@ -63332,7 +64003,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         // 处理 没有类名称标记的 普通Object
         {
             priority: 0,
@@ -63353,7 +64024,7 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
+        },
         // 处理自定义反序列化对象
         {
             priority: 0,
@@ -63372,8 +64043,8 @@ var gd3d;
                 }
                 return false;
             }
-        }, 
-        // 处理自定义对象的反序列化 
+        },
+        // 处理自定义对象的反序列化
         {
             priority: -10000,
             handler: function (target, source, property, handlers, serialization) {
@@ -66055,7 +66726,7 @@ var gd3d;
             req.onerror = function (ev) {
                 if (fun)
                     fun(null, new Error("URL : " + url + " \n onerr on req: "));
-                //因 onloadend 无论成功失败都会回调   这里的重试注掉 
+                //因 onloadend 无论成功失败都会回调   这里的重试注掉
                 // loadFail(req, url, fun, onprocess, responseType, loadedFun);
             };
             req.onloadend = function () {
@@ -66124,7 +66795,7 @@ var gd3d;
                 else {
                     JSONParse(text || cached.text).then(function (json) {
                         //cachedMap[url] = json;
-                        // cached.json = json;                
+                        // cached.json = json;
                         r(json);
                     });
                 }
@@ -66290,7 +66961,7 @@ var gd3d;
 })(gd3d || (gd3d = {}));
 var gd3d;
 (function (gd3d) {
-    //定义 快捷使用池 数据结构对象 
+    //定义 快捷使用池 数据结构对象
     /** 从池中取一个 vector2 */
     function poolv2(clone) { return !clone ? gd3d.math.pool.new_vector2() : gd3d.math.pool.clone_vector2(clone); }
     gd3d.poolv2 = poolv2;
@@ -69960,7 +70631,7 @@ var gd3d;
                     formatGL = this.webgl.RGB;
                 else if (this.format == TextureFormatEnum.Gray)
                     formatGL = this.webgl.LUMINANCE;
-                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, formatGL, 
+                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, formatGL,
                 //最后这个type，可以管格式
                 this.webgl.UNSIGNED_BYTE, img);
                 if (mipmap) {
@@ -70042,7 +70713,7 @@ var gd3d;
                     formatGL = this.webgl.RGB;
                 else if (this.format == TextureFormatEnum.Gray)
                     formatGL = this.webgl.LUMINANCE;
-                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, width, height, 0, formatGL, 
+                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, formatGL, width, height, 0, formatGL,
                 //最后这个type，可以管格式
                 dataType, data);
                 if (mipmap) {
@@ -70294,12 +70965,12 @@ var gd3d;
                 else if (this.format == TextureFormatEnum.Gray)
                     formatGL = this.webgl.LUMINANCE;
                 if (data instanceof HTMLImageElement) {
-                    this.webgl.texImage2D(TEXTURE_CUBE_MAP_, 0, formatGL, formatGL, 
+                    this.webgl.texImage2D(TEXTURE_CUBE_MAP_, 0, formatGL, formatGL,
                     //最后这个type，可以管格式
                     this.webgl.UNSIGNED_BYTE, data);
                 }
                 else {
-                    this.webgl.texImage2D(TEXTURE_CUBE_MAP_, 0, formatGL, width, height, 0, formatGL, 
+                    this.webgl.texImage2D(TEXTURE_CUBE_MAP_, 0, formatGL, width, height, 0, formatGL,
                     //最后这个type，可以管格式
                     this.webgl.UNSIGNED_BYTE, data);
                 }
@@ -70434,7 +71105,7 @@ var gd3d;
                 //        data[seek + 1] = 100;
                 //        data[seek + 3] = 255;
                 //    }
-                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, this.formatGL, width, height, 0, this.formatGL, 
+                this.webgl.texImage2D(this.webgl.TEXTURE_2D, 0, this.formatGL, width, height, 0, this.formatGL,
                 //最后这个type，可以管格式
                 this.webgl.UNSIGNED_BYTE, data);
                 if (linear) {
