@@ -306,12 +306,20 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         addEditorCodeDirect(program: IEditorCode): void;
+        /** 旋转角度 OrientationMode.AUTO */
         orientation: string;
         shouldRotate: boolean;
         private lastWidth;
         private lastHeight;
         OffOrientationUpdate: boolean;
         private updateOrientationMode;
+        /**
+         * 刷新 一次,视窗朝向数据。
+         * @param rect 视窗矩形区域
+         * @param screenWidth 视窗宽度
+         * @param screenHeight 视窗高度
+         */
+        refreshOrientationMode(rect?: DOMRect, screenWidth?: number, screenHeight?: number): void;
     }
     /**
      * @public
@@ -1067,6 +1075,7 @@ declare namespace gd3d.framework {
         private pointY;
         private lastWidth;
         private lastHeight;
+        private lastMultiTouch;
         /**
          * @public
          * @language zh_CN
@@ -1076,11 +1085,27 @@ declare namespace gd3d.framework {
          * @param touch 是否接收到事件
          * @param XOnModelSpace 模型空间下的x偏移
          * @param YOnModelSpace 模型空间下的y偏移
+         * @param multiTouch 是否多点中
          * @version gd3d 1.0
          */
-        update(delta: number, touch: Boolean, XOnModelSpace: number, YOnModelSpace: number): void;
+        update(delta: number, touch: boolean, XOnModelSpace: number, YOnModelSpace: number, multiTouch?: boolean): void;
+        /**
+         * 根节点 尺寸 调整
+         */
+        rootSizeAdjust(): void;
+        /** 刷新节点树 */
+        updateNodeTree(delta: number): void;
+        /**
+         * 触发 point 事件流
+         * @param touch 是否有点
+         * @param XOnModelSpace 坐标x
+         * @param YOnModelSpace 坐标y
+         * @param multiTouch 多点
+         */
+        burstPointEvent(touch: boolean, XOnModelSpace: number, YOnModelSpace: number, multiTouch?: boolean): void;
         private capturePointFlow;
         private popPointFlow;
+        private _insIdFrameMap;
         private objupdate;
         private lastMat;
         /**
@@ -1411,8 +1436,10 @@ declare namespace gd3d.framework {
      * 2DUI的容器类，与canvasrender(3DUI)相对应。
      * @version gd3d 1.0
      */
-    class overlay2D implements IOverLay {
+    class overlay2D implements IOverLay, IDisposable {
         static readonly ClassName: string;
+        /** point事件 直接模式（默认True,在dom输入原生帧直接触发） */
+        static pointEventDirectMode: boolean;
         /**
          * @public
          * @language zh_CN
@@ -1421,6 +1448,10 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         constructor();
+        private _hasListenerEvent;
+        private _disposed;
+        get disposed(): boolean;
+        dispose(): void;
         /**
          * @private
          * @language zh_CN
@@ -1436,6 +1467,8 @@ declare namespace gd3d.framework {
          * @private
          */
         start(camera: camera): void;
+        private regEvnets;
+        private unRegEvents;
         /**
          * @private
          */
@@ -1538,6 +1571,10 @@ declare namespace gd3d.framework {
          * @private
          */
         update(delta: number): void;
+        /** 刷新ui point数据并触发 事件 */
+        private refreshAndPointEvent;
+        /** ui point 事件 */
+        private onPointEvent;
         private lastVPRect;
         private lastScreenMR;
         private lastMR_width;
@@ -1547,7 +1584,7 @@ declare namespace gd3d.framework {
          * @public
          * @language zh_CN
          * @classdesc
-         * 事件检测
+         * 投射拣选检测
          * @param mx x偏移
          * @param my y偏移
          * @version gd3d 1.0
@@ -2675,6 +2712,7 @@ declare namespace gd3d.framework {
      */
     class inputField implements I2DComponent, I2DPointListener {
         static readonly ClassName: string;
+        private static readonly helpV2;
         /**
          * @public
          * @language zh_CN
@@ -2697,6 +2735,7 @@ declare namespace gd3d.framework {
         private beFocus;
         private inputElement;
         private _text;
+        private static _isIos;
         /**
          * @public
          * @language zh_CN
@@ -2763,6 +2802,7 @@ declare namespace gd3d.framework {
          * @private
          */
         start(): void;
+        private ckIsIos;
         onPlay(): void;
         /**
         * @private
@@ -2787,6 +2827,7 @@ declare namespace gd3d.framework {
          * @private
          */
         onPointEvent(canvas: canvas, ev: PointEvent, oncap: boolean): void;
+        private setFocus;
     }
     /**
      * @public
@@ -4173,6 +4214,25 @@ declare namespace gd3d.framework {
         private static getTextureFormat;
     }
 }
+declare class HdrParser {
+    private gl;
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * 解析hdr图片
+     * @param raw 图片二进制数据
+     * @version gd3d 1.0
+     */
+    textDecoder: TextDecoder;
+    constructor(gl: WebGLRenderingContext);
+    parseRGBE(raw: ArrayBuffer): {
+        width: number;
+        height: number;
+        buffer: Uint8Array;
+    };
+    get2DTexture(raw: ArrayBuffer): gd3d.render.glTexture2D;
+}
 declare namespace gd3d.framework {
     /**
      *
@@ -4415,7 +4475,13 @@ declare namespace gd3d.framework {
         /**
          * 拖尾
          */
-        TrailRenderer = 28
+        TrailRenderer = 28,
+        /**
+         * HDR贴图
+         */
+        HDR = 29,
+        GLTF = 30,
+        BIN = 31
     }
     /**
      * @public
@@ -4809,6 +4875,11 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class AssetFactory_BIN implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer): bin;
+    }
+}
+declare namespace gd3d.framework {
     class AssetFactory_cPrefab implements IAssetFactory {
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): prefab;
     }
@@ -4840,8 +4911,18 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    class AssetFactory_GLTF implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): gltf;
+    }
+}
+declare namespace gd3d.framework {
     class AssetFactory_GLVertexShader implements IAssetFactory {
         parse(assetmgr: assetMgr, bundle: assetBundle, filename: string, txt: string): void;
+    }
+}
+declare namespace gd3d.framework {
+    class AssetFactory_HDR implements IAssetFactory {
+        parse(assetmgr: assetMgr, bundle: assetBundle, name: string, bytes: ArrayBuffer): texture;
     }
 }
 declare namespace gd3d.framework {
@@ -5233,6 +5314,95 @@ declare namespace gd3d.framework {
     }
 }
 declare namespace gd3d.framework {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * json资源
+     * @version gd3d 1.0
+     */
+    class bin implements IAsset {
+        data: ArrayBuffer;
+        static readonly ClassName: string;
+        private name;
+        private id;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否为默认资源
+         * @version gd3d 1.0
+         */
+        defaultAsset: boolean;
+        constructor(assetName: string, data: ArrayBuffer);
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源名称
+         * @version gd3d 1.0
+         */
+        getName(): string;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源唯一id
+         * @version gd3d 1.0
+         */
+        getGUID(): number;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数加一
+         * @version gd3d 1.0
+         */
+        use(): void;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数减一
+         * @version gd3d 1.0
+         */
+        unuse(disposeNow?: boolean): void;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 释放资源
+         * @version gd3d 1.0
+         */
+        dispose(): void;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 计算资源字节大小
+         * @version gd3d 1.0
+         */
+        caclByteLength(): number;
+        private _realName;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 如果是imgdesc加载来的图片，通过这个可以获取到真实的图片名字
+         * @version gd3d 1.0
+         */
+        get realName(): string;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置图片名称
+         * @version gd3d 1.0
+         */
+        set realName(name: string);
+    }
+}
+declare namespace gd3d.framework {
     class f14node {
         trans: transform;
         f14Effect: f14EffectSystem;
@@ -5399,6 +5569,135 @@ declare namespace gd3d.framework {
          */
         xAddvance: number;
         static caclByteLength(): number;
+    }
+}
+declare namespace gd3d.framework {
+    /**
+     * @public
+     * @language zh_CN
+     * @classdesc
+     * json资源
+     * @version gd3d 1.0
+     */
+    class gltf implements IAsset {
+        data: any;
+        static readonly ClassName: string;
+        private name;
+        private id;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 是否为默认资源
+         * @version gd3d 1.0
+         */
+        defaultAsset: boolean;
+        constructor(assetName: string, data: any);
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源名称
+         * @version gd3d 1.0
+         */
+        getName(): string;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 获取资源唯一id
+         * @version gd3d 1.0
+         */
+        getGUID(): number;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数加一
+         * @version gd3d 1.0
+         */
+        use(): void;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 引用计数减一
+         * @version gd3d 1.0
+         */
+        unuse(disposeNow?: boolean): void;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 释放资源
+         * @version gd3d 1.0
+         */
+        dispose(): void;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 计算资源字节大小
+         * @version gd3d 1.0
+         */
+        caclByteLength(): number;
+        private _realName;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 如果是imgdesc加载来的图片，通过这个可以获取到真实的图片名字
+         * @version gd3d 1.0
+         */
+        get realName(): string;
+        /**
+         * @public
+         * @language zh_CN
+         * @classdesc
+         * 设置图片名称
+         * @version gd3d 1.0
+         */
+        set realName(name: string);
+        buffers: bin[];
+        load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture): Promise<transform>;
+    }
+    class Accessor {
+        static types: {
+            SCALAR: number;
+            VEC1: number;
+            VEC2: number;
+            VEC3: number;
+            VEC4: number;
+            MAT2: number;
+            MAT3: number;
+            MAT4: number;
+        };
+        attribute: string;
+        bufferView: any;
+        byteOffset: number;
+        componentType: number;
+        normalized: boolean;
+        count: number;
+        max: number[];
+        min: number[];
+        size: number;
+        private _data;
+        constructor({ bufferView, byteOffset, componentType, normalized, count, type, max, min }: {
+            bufferView: any;
+            byteOffset?: number;
+            componentType: any;
+            normalized?: boolean;
+            count: any;
+            type: any;
+            max?: any[];
+            min?: any[];
+        }, name?: string);
+        get data(): any;
+        static newFloat32Array(acc: Accessor): Float32Array;
+        static getSubChunks(acc: any, data: any): any[];
+        static getFloat32Blocks(acc: Accessor): any[];
+        static newTypedArray(acc: Accessor): Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array;
+        static getData(acc: Accessor): any[] | Int8Array | Uint8Array | Int16Array | Uint16Array | Uint32Array | Float32Array;
     }
 }
 declare namespace gd3d.framework {
@@ -11671,6 +11970,7 @@ declare namespace gd3d.framework {
     class pointinfo {
         id: number;
         touch: boolean;
+        multiTouch: boolean;
         x: number;
         y: number;
     }
@@ -11725,7 +12025,10 @@ declare namespace gd3d.framework {
         private downPoint;
         private lastPoint;
         update(delta: any): void;
-        private pointCk;
+        /**
+         * point 刷新检查
+         */
+        pointCk(): void;
         private keyDownCode;
         private keyUpCode;
         private keyCodeCk;
