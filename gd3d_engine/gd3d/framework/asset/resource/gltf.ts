@@ -125,11 +125,17 @@ namespace gd3d.framework
             this._realName = name;
         }
 
+        hexToRgb = hex =>
+            hex?.replace(/^#?([a-f\d])([a-f\d])([a-f\d])$/i
+                , (m, r, g, b) => '#' + r + r + g + g + b + b)
+                .substring(1).match(/.{2}/g)
+                .map(x => parseInt(x, 16));
+
         buffers: bin[];
-        async load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture) {
+        async load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, env: texture, irrSH: texture, exposure?, specFactor = 1, irrFactor = 1, uvChecker?: texture) {
             const load = ( uri ) => new Promise((res) => {
                 mgr.load(folder + uri, AssetTypeEnum.Auto, () => {
-                    res(mgr.getAssetByName(uri));
+                    res(mgr.getAssetByName(uri.split('/').pop()));
                 });
             });
             this.buffers = await Promise.all(this.data.buffers?.map(({ uri }) => load(uri)));
@@ -138,24 +144,61 @@ namespace gd3d.framework
                 const tex = images[source] as texture; // TODO:
                 return tex;
             }));
+            const extrasCfg = this.data.extras?.clayViewerConfig?.materials as any[];
             const materials = this.data.materials?.map(m => {
                 const mat = new material(m.name);
+                let matCfg;
+                let cfgs = extrasCfg?.filter(e => e.name === m.name);
+                if (cfgs?.length > 0) matCfg = cfgs[0];
                 mat.setShader(mgr.getShader("pbr.shader.json"));
-                mat.setTexture('brdf', brdf);
+                if (brdf) {
+                    mat.setTexture('brdf', brdf);
+                }
+                if (env) {
+                    mat.setCubeTexture('u_env', env);
+                }
+                if (irrSH) {
+                    mat.setCubeTexture('u_diffuse', irrSH);
+                }
                 if (m.normalTexture) {
                     mat.setTexture("uv_MetallicRoughness", textures[m.normalTexture.index]);
                 }
                 if (m.occlusionTexture) {
                     mat.setTexture("uv_AO", textures[m.occlusionTexture.index]);
                 }
+                if (m.normalTexture)
+                {
+                    mat.setTexture("uv_Normal", textures[m.normalTexture.index]);
+                }
+                if (exposure != null) {
+                    mat.setFloat("u_Exposure", exposure);
+                }
+                mat.setFloat("specularIntensity", specFactor);
+                mat.setFloat("diffuseIntensity", irrFactor);
+                mat.setFloatv('CustomBasecolor', new Float32Array(this.hexToRgb(matCfg?.color) ?? m.pbrMetallicRoughness?.baseColorFactor));
+                mat.setFloat('CustomMetallic', matCfg?.metalness ?? m.pbrMetallicRoughness?.metallicFactor);
+                mat.setFloat('CustomRoughness', matCfg?.roughness ?? m.pbrMetallicRoughness?.roughnessFactor);
+                // console.log(matCfg.name);
+                // console.table({...m.pbrMetallicRoughness});
+                // console.table(matCfg);
+                // if (matCfg && matCfg.length > 0) {
+                    // mat.setFloatv("uvRepeat", new Float32Array([matCfg[0]?.uvRepeat[0] ?? 1, matCfg[0]?.uvRepeat[1] ?? 1]));
+                mat.setFloat("uvRepeat", matCfg?.uvRepeat[0] ?? 1);
+                // } else {
+                    // mat.setFloat("uvRepeat", 1);
+                // }
+
                 if (m.pbrMetallicRoughness) {
                     const { baseColorFactor, baseColorTexture, metallicFactor, roughnessFactor, metallicRoughnessTexture } = m.pbrMetallicRoughness;
                     if (baseColorTexture) {
-                        mat.setTexture("uv_Basecolor", textures[baseColorTexture.index]);
+                        mat.setTexture("uv_Basecolor", uvChecker ?? textures[baseColorTexture.index]);
                     }
                     if (metallicRoughnessTexture) {
                         mat.setTexture("uv_MetallicRoughness", textures[metallicRoughnessTexture.index]);
                     }
+                }
+                if (m.occlusionTexture) {
+                    mat.setTexture("uv_AO", textures[m.occlusionTexture.index]);
                 }
                 return mat;
             });
@@ -178,6 +221,7 @@ namespace gd3d.framework
                     const vert = mdata.pos = [];
                     const uv1 = mdata.uv = [];
                     const normal = mdata.normal = [];
+                    const tangent = mdata.tangent = [];
                     // const colors = mdata.color = [];
                     const attr: any = {};
                     for (let k in attributes) {
@@ -187,43 +231,93 @@ namespace gd3d.framework
                     const vcount = attr.POSITION.count;
                     const bs =
                         + (attr.POSITION?.size ?? 0)
-                        // + (attr.COLOR?.size ?? 0)
-                        + (attr.TEXCOORD_0?.size ?? 0)
                         + (attr.NORMAL?.size ?? 0)
-                        // + (attr.TANGENT?.size ?? 0);
+                        // + (attr.COLOR?.size ?? 0)
+                        + (attr.TANGENT?.size ? 3 : 0) // 引擎里的Tangent是vec3，而不是vec4
+                        + (attr.TEXCOORD_0?.size ?? 0)
+                        + (attr.TEXCOORD_1?.size ?? 0);
                     const vbo = new Float32Array(vcount * bs);
 
                     mf.glMesh = new gd3d.render.glMesh();
-                    const vf = gd3d.render.VertexFormatMask.Position
-                        | gd3d.render.VertexFormatMask.UV0
-                        | gd3d.render.VertexFormatMask.Normal
+                    let vf
+                    if (attr.POSITION?.size)
+                        vf |= gd3d.render.VertexFormatMask.Position;
+                    if (attr.NORMAL?.size)
+                        vf |= gd3d.render.VertexFormatMask.Normal;
                         // | gd3d.render.VertexFormatMask.Color
+                    if (attr.TANGENT?.size)
+                        vf |= gd3d.render.VertexFormatMask.Tangent;
+                    if (attr.TEXCOORD_0?.size)
+                        vf |= gd3d.render.VertexFormatMask.UV0;
+                    if (attr.TEXCOORD_1?.size)
+                        vf |= gd3d.render.VertexFormatMask.UV1;
                         // | gd3d.render.VertexFormatMask.BlendIndex4
                         // | gd3d.render.VertexFormatMask.BlendWeight4;
                     mf.glMesh.initBuffer(ctx, vf, vcount, gd3d.render.MeshTypeEnum.Dynamic);
 
-                    const ebo = new Accessor(accessors[indices], "indices").data;
+                    const eboAcc = new Accessor(accessors[indices], "indices");
+                    const ebo = eboAcc.data;
                     mdata.trisindex = Array.from(ebo);
 
                     for(let i = 0; i < vcount; i++) {
-                        vert[i] = new gd3d.math.vector3(...attr.POSITION.data[i]);
-                        uv1[i] = new gd3d.math.vector2(...attr.TEXCOORD_0.data[i]);
-                        normal[i] = new gd3d.math.vector3(...attr.NORMAL.data[i]);
+                        let uvFliped0;
+                        if (attr.TEXCOORD_0?.size != null) {
+                            uvFliped0 = [...attr.TEXCOORD_0.data[i]];
+                            uvFliped0[1] = uvFliped0[1] * -1 + 1;
+                            uv1[i] = new gd3d.math.vector2(...uvFliped0);
+                        }
+
+                        let uvFliped1;
+                        if (attr.TEXCOORD_1?.size != null) {
+                            uvFliped1 = [...attr.TEXCOORD_1.data[i]];
+                            uvFliped1[1] = uvFliped1[1] * -1 + 1;
+                            uv1[i] = new gd3d.math.vector2(...uvFliped1);
+                        }
+
+                        if (attr.POSITION?.size != null)
+                            vert[i] = new gd3d.math.vector3(...attr.POSITION.data[i]);
+
+                        if (attr.NORMAL?.size != null)
+                            normal[i] = new gd3d.math.vector3(...attr.NORMAL.data[i]);
+
+                        if (attr.TANGENT?.size != null)
+                            tangent[i] = new gd3d.math.vector3(...attr.TANGENT.data[i]);
+
                         const cur = vbo.subarray(i * bs); // offset
-                        const position = cur.subarray(0, 3);
+                        let bit = 0;
+                        if (attr.POSITION?.size != null) {
+                            const position = cur.subarray(bit, bit+=3);
+                            position.set(attr.POSITION.data[i]);
+                        }
+
                         // const color = cur.subarray(3, 7);
-                        const uv = cur.subarray(3, 5);
-                        const n = cur.subarray(5, 8);
-                        position.set(attr.POSITION.data[i]);
-                        uv.set(attr.TEXCOORD_0.data[i]);
-                        n.set(attr.NORMAL.data[i]);
+                        if (attr.NORMAL?.size != null) {
+                            const n = cur.subarray(bit, bit+=3);
+                            n.set(attr.NORMAL.data[i]);
+                        }
+
+                        if (attr.TANGENT?.size != null) {
+                            const tan = cur.subarray(bit, bit+=3);
+                            tan.set(attr.TANGENT.data[i].slice(0, 3));
+                        }
+
+                        if (attr.TEXCOORD_0?.size != null) {
+                            const uv = cur.subarray(bit, bit += 2);
+                            uv.set(uvFliped0);
+                        }
+
+                        if (attr.TEXCOORD_1?.size != null) {
+                            const uv = cur.subarray(bit, bit += 2);
+                            uv.set(uvFliped1);
+                        }
+
                         // const tangent = cur.subarray(7, 9);
 
                         // colors[i] = new gd3d.math.vector4();
                     }
                     mf.glMesh.uploadVertexData(ctx, vbo);
                     mf.glMesh.addIndex(ctx, ebo.length);
-                    mf.glMesh.uploadIndexData(ctx, 0, ebo);
+                    mf.glMesh.uploadIndexData(ctx, 0, ebo, eboAcc.componentType);
                     mf.submesh = [];
                     const sm = new gd3d.framework.subMeshInfo();
                     sm.matIndex = 0;
@@ -242,6 +336,7 @@ namespace gd3d.framework
                 n.name = name;
                 if (matrix != null) {
                     n.getLocalMatrix().rawData = matrix;
+                    math.matrixDecompose(n.getLocalMatrix(), n.localScale, n.localRotate, n.localTranslate);
                 } else {
                     if (translation != null)
                         math.vec3Set(n.localTranslate, translation[0], translation[1], translation[2]);

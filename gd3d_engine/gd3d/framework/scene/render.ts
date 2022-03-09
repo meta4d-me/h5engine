@@ -43,11 +43,11 @@ namespace gd3d.framework
         private _lastMV_IT : gd3d.math.matrix = new gd3d.math.matrix;
         /** MV 矩阵的逆转置矩阵 */
         get matrixInverseModelView(){
-            if(!gd3d.math.matrixEqual(this._lastMV_IT , this.matrixModelView , 0)){
-                gd3d.math.matrixInverse(this.matrixModelView, this._matrixInverseModelView);
+            // if(!gd3d.math.matrixEqual(this._lastMV_IT , this.matrixModelView , 0)){
+                gd3d.math.matrixInverse(this.matrixModel, this._matrixInverseModelView);
                 gd3d.math.matrixTranspose(this._matrixInverseModelView,this._matrixInverseModelView);
-                gd3d.math.matrixClone(this._matrixModelView ,this._lastMV_IT);
-            }
+                // gd3d.math.matrixClone(this._matrixInverseModelView ,this._lastMV_IT);
+            // }
             return this._matrixInverseModelView;
         }
 
@@ -101,7 +101,7 @@ namespace gd3d.framework
         {
             this._intLightCount = lights.length;
             if(this._intLightCount < 1) return;
-            
+
             this._lightCullingMask.length = 0;
             var dirt = math.pool.new_vector3();
             for (var i = 0, len = lights.length; i < len; i++)
@@ -137,7 +137,7 @@ namespace gd3d.framework
             math.pool.delete_vector3(dirt);
             //收集灯光参数
         }
-        updateOverlay()  
+        updateOverlay()
         {   //可能性优化点 UI 不用乘MVP 矩阵
             //v 特殊
             //gd3d.math.matrixMakeIdentity(this.matrixView);//v
@@ -295,7 +295,7 @@ namespace gd3d.framework
         addRenderer(renderer: IRenderer , webgl : WebGLRenderingContext)
         {
             var idx = renderer.layer;
-            // let layer = renderer.layer; 
+            // let layer = renderer.layer;
             // var idx = 0;
             // if (layer == RenderLayerEnum.Common)
             // {
@@ -324,7 +324,7 @@ namespace gd3d.framework
             this.renderLayers[idx].addInstanceToBatcher(renderer);
         }
 
-        
+
         //此处应该根据绘制分类处理
         renderLayers: renderLayer[];
     }
@@ -342,9 +342,9 @@ namespace gd3d.framework
         }
 
         /** gpu instance map*/
-        // gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {}; 
-        gpuInstanceMap: {[sID:string] : math.ReuseArray<IRendererGpuIns>} = {}; 
-        gpuInstanceBatcherMap: {[sID:string] : meshGpuInsBatcher} = {}; 
+        // gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {};
+        gpuInstanceMap: {[sID:string] : math.ReuseArray<IRendererGpuIns>} = {};
+        gpuInstanceBatcherMap: {[sID:string] : meshGpuInsBatcher} = {};
 
         addInstance(r : IRendererGpuIns){
             let mr = r as meshRenderer;
@@ -383,7 +383,7 @@ namespace gd3d.framework
                 let pass = bs.passArr[i];
                 let darr = bs.bufferDArrs[i];
                 gd3d.framework.meshRenderer.setInstanceOffsetMatrix(mr.gameObject.transform , mat , pass); //RTS offset 矩阵
-                mat.uploadInstanceAtteribute(pass ,darr);  //收集 各material instance atteribute    
+                mat.uploadInstanceAtteribute(pass ,darr);  //收集 各material instance atteribute
             }
 
             bs.count ++;

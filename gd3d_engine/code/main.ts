@@ -22,9 +22,11 @@ class main implements gd3d.framework.IUserCode
         gd3d.framework.assetMgr.openGuid = false;
 
         this.clearBtn();
-        new HDR_sample().start(this.app);
+        // 移动端调试log
+        window['eruda']?.init();
+        // new HDR_sample().start(this.app);
 
-        return;
+        // return;
 
         //-------------------------------------基础
         this.addBtn("基础==>", () =>
@@ -55,6 +57,7 @@ class main implements gd3d.framework.IUserCode
             demoList.addBtn("test_tex_uv", () => new test_texuv());
             demoList.addBtn("test_PBR 展示", () => new test_pbr());
             demoList.addBtn("test_PBR 场景", () => new test_pbr_scene());
+            demoList.addBtn("test_glTF 场景", () => new HDR_sample());
             demoList.addBtn("SSSSS", () => new test_sssss());
             demoList.addBtn("test_trailRender", () => new t.test_trailrender());
             demoList.addBtn("test_light1", () => new t.test_light1());
