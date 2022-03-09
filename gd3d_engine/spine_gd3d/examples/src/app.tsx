@@ -11,6 +11,7 @@ import { Vin } from "./pages/vin";
 import { StretchyMan } from "./pages/stretchyMan";
 import { Clip } from "./pages/clip";
 import { Tank } from "./pages/tank";
+import { WheelTransform } from "./pages/wheelTransform";
 
 export class APP extends React.Component {
     componentDidMount() {
@@ -32,6 +33,7 @@ export class APP extends React.Component {
                         <Link to={"/vin"}><li>路径约束</li></Link>
                         <Link to={"/clip"}><li>动画裁剪</li></Link>
                         <Link to={"/tank"}><li>变形约束</li></Link>
+                        <Link to={"/wheel_transform"}><li>转动约束</li></Link>
                     </div>
                 }} />
                 <Switch>
@@ -46,6 +48,7 @@ export class APP extends React.Component {
                     <Route path="/stretchy_man" component={StretchyMan} />
                     <Route path="/clip" component={Clip} />
                     <Route path="/tank" component={Tank} />
+                    <Route path="/wheel_transform" component={WheelTransform} />
                 </Switch>
             </Router>
         </div>;

@@ -16,33 +16,35 @@ export class SpineAssetMgr extends AssetManagerBase {
     private initShader() {
         let vscodeUI: string = `
         attribute vec4 _glesVertex;    
-        attribute vec4 _glesColor;                   
+        attribute vec4 _glesColor;
+        attribute vec4 _glesColorEx;                   
         attribute vec4 _glesMultiTexCoord0;          
         uniform highp mat4 _SpineMvp;
         uniform highp mat4 glstate_matrix_model;
-        varying lowp vec4 xlv_COLOR;                 
+        varying lowp vec4 v_light;  
+        varying lowp vec4 v_dark;               
         varying highp vec2 xlv_TEXCOORD0;            
         void main()                                      
         {                                                
             highp vec4 tmpvar_1;                         
             tmpvar_1.w = 1.0;                            
             tmpvar_1.xyz = _glesVertex.xyz;              
-            xlv_COLOR = _glesColor;                      
+            v_light = _glesColor;
+            v_dark = _glesColorEx;                    
             xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,_glesMultiTexCoord0.y);      
             gl_Position = (_SpineMvp*glstate_matrix_model* tmpvar_1);   
         }
         `;
         let fscodeUI: string = `
         uniform sampler2D _MainTex;
-        varying lowp vec4 xlv_COLOR;
+        varying lowp vec4 v_light;
+        varying lowp vec4 v_dark;
         varying highp vec2 xlv_TEXCOORD0;
         void main()
         {
-            lowp vec4 tmpvar_3 = (xlv_COLOR * texture2D(_MainTex, xlv_TEXCOORD0));
-            if(tmpvar_3.a<0.5){
-                discard;
-            }
-            gl_FragData[0] = tmpvar_3;
+            lowp vec4 texColor = texture2D(_MainTex, xlv_TEXCOORD0);
+            gl_FragColor.a = texColor.a * v_light.a;
+            gl_FragColor.rgb = ((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb;
         }`;
         let pool = this._assetMgr.shaderPool;
         pool.compileVS(this._assetMgr.webgl, "spine", vscodeUI);

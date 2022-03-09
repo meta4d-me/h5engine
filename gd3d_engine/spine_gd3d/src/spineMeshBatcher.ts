@@ -9,8 +9,17 @@ const ONE_MINUS_SRC_ALPHA = 0x0303;
 const ONE_MINUS_DST_ALPHA = 0x0305;
 const DST_COLOR = 0x0306;
 
+export function BlendParamToName(param: number) {
+    if (param == 1) return "ONE";
+    if (param == 0x0301) return "ONE_MINUS_SRC_COLOR";
+    if (param == 0x0302) return "SRC_ALPHA";
+    if (param == 0x0303) return "ONE_MINUS_SRC_ALPHA";
+    if (param == 0x0305) return "ONE_MINUS_DST_ALPHA";
+    if (param == 0x0306) return "DST_COLOR";
+}
+
 export class SpineMeshBatcher {
-    private static VERTEX_SIZE = 9;
+    private static VERTEX_SIZE = 13;
     private mesh: gd3d.render.glMesh;
     private vertices: Float32Array;
     private verticesLength = 0;
@@ -62,6 +71,10 @@ export class SpineMeshBatcher {
             vertexBuffer[i++] = vertices[j++];//a
             vertexBuffer[i++] = vertices[j++];//u
             vertexBuffer[i++] = vertices[j++];//v
+            vertexBuffer[i++] = vertices[j++];//r
+            vertexBuffer[i++] = vertices[j++];//g
+            vertexBuffer[i++] = vertices[j++];//b
+            vertexBuffer[i++] = vertices[j++];//a
         }
         this.verticesLength = i;
 
@@ -121,6 +134,7 @@ export class SpineMeshBatcher {
                 let vf = gd3d.render.VertexFormatMask.Position
                     | gd3d.render.VertexFormatMask.Color
                     | gd3d.render.VertexFormatMask.UV0
+                    | gd3d.render.VertexFormatMask.ColorEX
                 mesh.initBuffer(webgl, vf, this.vertices.length / SpineMeshBatcher.VERTEX_SIZE, gd3d.render.MeshTypeEnum.Dynamic);
                 mesh.uploadVertexData(webgl, this.vertices);
                 mesh.addIndex(webgl, this.indices.length);
@@ -139,13 +153,17 @@ export class SpineMeshBatcher {
             let pass = shader.passes["base"][0];
             this.mesh.bind(webgl, pass.program, 0);
             for (let i = 0; i < this.drawParams.length; i++) {
-                let { start, count, slotTexture, srcRgb, srcAlpha, dstAlpha, dstRgb } = this.drawParams[i]
+                let { start, count, slotTexture, srcRgb, srcAlpha, dstAlpha, dstRgb } = this.drawParams[i];
                 pass.state_blend = true;
                 pass.state_blendEquation = gd3d.render.webglkit.FUNC_ADD;
                 pass.state_blendSrcRGB = srcRgb;
-                pass.state_blendDestRGB = dstRgb;
                 pass.state_blendSrcAlpha = srcAlpha;
+                pass.state_blendDestRGB = dstRgb;
                 pass.state_blendDestALpha = dstAlpha;
+                //强制blend
+                gd3d.render.glDrawPass["lastPassID"] = null;
+                pass.state_blendMode = 1;
+                gd3d.render.glDrawPass.lastBlendMode = null;
                 pass.use(webgl);
                 this._mat.setTexture("_MainTex", slotTexture.texture);
                 this._mat.setMatrix("_SpineMvp", this._projectMat);

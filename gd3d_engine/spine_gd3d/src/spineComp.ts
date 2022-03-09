@@ -70,9 +70,10 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
     private tempLight = new Color();
     private tempDark = new Color();
     private tempColor = new Color();
+    private tempColor2 = new Color();
     private vertices = new Float32Array(1024);
     private zOffset: number = 0.1;
-    static VERTEX_SIZE = 2 + 2 + 4;
+    static VERTEX_SIZE = 2 + 2 + 4 + 4;
     static QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
     private updateGeometry() {
         this.clearBatches();
@@ -86,15 +87,16 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
         let triangles: Array<number> = null;
         let uvs = null;
         let drawOrder = this.skeleton.drawOrder;
+        let skeletonColor = this.skeleton.color;
         let batch = this.nextBatch();
         batch.begin();
         for (let i = 0, n = drawOrder.length; i < n; i++) {
             let vertexSize = clipper.isClipping() ? 2 : spineSkeleton.VERTEX_SIZE;
             let slot = drawOrder[i];
-            if (!slot.bone.active) continue;
+            if (!slot.bone.active) continue
             let attachment = slot.getAttachment();
-            let attachmentColor: Color = null;
             let texture: Gd3dTexture = null;
+            let attachmentColor: Color = null;
             let numFloats = 0;
             if (attachment instanceof RegionAttachment) {
                 let region = <RegionAttachment>attachment;
@@ -124,15 +126,31 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
             } else continue;
 
             if (texture != null) {
-                let skeleton = slot.bone.skeleton;
-                let skeletonColor = skeleton.color;
                 let slotColor = slot.color;
-                let alpha = skeletonColor.a * slotColor.a * attachmentColor.a;
-                let color = this.tempColor;
-                color.set(skeletonColor.r * slotColor.r * attachmentColor.r,
-                    skeletonColor.g * slotColor.g * attachmentColor.g,
-                    skeletonColor.b * slotColor.b * attachmentColor.b,
-                    alpha);
+                let finalColor = this.tempColor;
+                finalColor.r = skeletonColor.r * slotColor.r * attachmentColor.r;
+                finalColor.g = skeletonColor.g * slotColor.g * attachmentColor.g;
+                finalColor.b = skeletonColor.b * slotColor.b * attachmentColor.b;
+                finalColor.a = skeletonColor.a * slotColor.a * attachmentColor.a;
+                if (spineSkeleton.premultipliedAlpha) {
+                    finalColor.r *= finalColor.a;
+                    finalColor.g *= finalColor.a;
+                    finalColor.b *= finalColor.a;
+                }
+                let darkColor = this.tempColor2;
+                if (!slot.darkColor)
+                    darkColor.set(0, 0, 0, 1.0);
+                else {
+                    if (spineSkeleton.premultipliedAlpha) {
+                        darkColor.r = slot.darkColor.r * finalColor.a;
+                        darkColor.g = slot.darkColor.g * finalColor.a;
+                        darkColor.b = slot.darkColor.b * finalColor.a;
+                    } else {
+                        darkColor.setFromColor(slot.darkColor);
+                    }
+                    darkColor.a = spineSkeleton.premultipliedAlpha ? 1.0 : 0.0;
+                }
+
 
                 let finalVertices: NumberArrayLike;
                 let finalVerticesLength: number;
@@ -140,7 +158,7 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
                 let finalIndicesLength: number;
 
                 if (clipper.isClipping()) {
-                    clipper.clipTriangles(vertices, numFloats, triangles, triangles.length, uvs, color, null, false);
+                    clipper.clipTriangles(vertices, numFloats, triangles, triangles.length, uvs, finalColor, darkColor, true);
                     let clippedVertices = clipper.clippedVertices;
                     let clippedTriangles = clipper.clippedTriangles;
                     if (this.vertexEffect != null) {
@@ -149,10 +167,10 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
                         for (let v = 0, n = clippedVertices.length; v < n; v += vertexSize) {
                             tempPos.x = verts[v];
                             tempPos.y = verts[v + 1];
-                            tempLight.setFromColor(color);
-                            tempDark.set(0, 0, 0, 0);
+                            tempLight.set(verts[v + 2], verts[v + 3], verts[v + 4], verts[v + 5]);
                             tempUv.x = verts[v + 6];
                             tempUv.y = verts[v + 7];
+                            tempDark.set(verts[v + 8], verts[v + 9], verts[v + 10], verts[v + 11]);
                             vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
                             verts[v] = tempPos.x;
                             verts[v + 1] = tempPos.y;
@@ -161,7 +179,11 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
                             verts[v + 4] = tempLight.b;
                             verts[v + 5] = tempLight.a;
                             verts[v + 6] = tempUv.x;
-                            verts[v + 7] = tempUv.y;
+                            verts[v + 7] = tempUv.y
+                            verts[v + 8] = tempDark.r;
+                            verts[v + 9] = tempDark.g;
+                            verts[v + 10] = tempDark.b;
+                            verts[v + 11] = tempDark.a;
                         }
                     }
                     finalVertices = clippedVertices;
@@ -175,10 +197,10 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
                         for (let v = 0, u = 0, n = numFloats; v < n; v += vertexSize, u += 2) {
                             tempPos.x = verts[v];
                             tempPos.y = verts[v + 1];
-                            tempLight.setFromColor(color);
-                            tempDark.set(0, 0, 0, 0);
                             tempUv.x = uvs[u];
-                            tempUv.y = uvs[u + 1];
+                            tempUv.y = uvs[u + 1]
+                            tempLight.setFromColor(finalColor);
+                            tempDark.setFromColor(darkColor);
                             vertexEffect.transform(tempPos, tempUv, tempLight, tempDark);
                             verts[v] = tempPos.x;
                             verts[v + 1] = tempPos.y;
@@ -187,16 +209,24 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
                             verts[v + 4] = tempLight.b;
                             verts[v + 5] = tempLight.a;
                             verts[v + 6] = tempUv.x;
-                            verts[v + 7] = tempUv.y;
+                            verts[v + 7] = tempUv.y
+                            verts[v + 8] = tempDark.r;
+                            verts[v + 9] = tempDark.g;
+                            verts[v + 10] = tempDark.b;
+                            verts[v + 11] = tempDark.a;
                         }
                     } else {
                         for (let v = 2, u = 0, n = numFloats; v < n; v += vertexSize, u += 2) {
-                            verts[v] = color.r;
-                            verts[v + 1] = color.g;
-                            verts[v + 2] = color.b;
-                            verts[v + 3] = color.a;
+                            verts[v] = finalColor.r;
+                            verts[v + 1] = finalColor.g;
+                            verts[v + 2] = finalColor.b;
+                            verts[v + 3] = finalColor.a;
                             verts[v + 4] = uvs[u];
                             verts[v + 5] = uvs[u + 1];
+                            verts[v + 6] = darkColor.r;
+                            verts[v + 7] = darkColor.g;
+                            verts[v + 8] = darkColor.b;
+                            verts[v + 9] = darkColor.a;
                         }
                     }
                     finalVertices = vertices;

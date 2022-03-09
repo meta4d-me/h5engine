@@ -22,7 +22,7 @@ module.exports = {
                 oneOf: [
                     {
                         test: /\.(j|t)sx?$/,
-                        include: config.appPath,
+                        include: [config.appPath, path.resolve(__dirname, '../../src')],
                         exclude: config.node_modules_path,
                         use: "babel-loader",
                     },

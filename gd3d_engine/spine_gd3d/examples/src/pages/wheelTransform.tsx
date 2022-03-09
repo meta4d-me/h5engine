@@ -6,10 +6,11 @@ interface IState {
     hoverBone: Bone,
 }
 
-export class HoverBoard extends React.Component<{}, IState> {
+export class WheelTransform extends React.Component<{}, IState> {
     private _comp: spineSkeleton;
     private _app: gd3d.framework.application;
     private _inited: boolean = false;
+    wheel: Bone;
     constructor(props) {
         super(props);
         this.state = {
@@ -32,12 +33,12 @@ export class HoverBoard extends React.Component<{}, IState> {
         this.init(app, root2d);
     }
 
-    private controlBones = ["hoverboard controller", "hip controller", "board target", "crosshair"];
+    private controlBones = ["wheel2overlay", "wheel3overlay", "rotate-handle"];
     private init(app: gd3d.framework.application, root2d: gd3d.framework.overlay2D) {
         this._app = app;
         let assetManager = new SpineAssetMgr(app.getAssetMgr(), "./assets/");
         let skeletonFile = "demos.json";
-        let atlasFile = "atlas1.atlas"
+        let atlasFile = "atlas2.atlas"
         Promise.all([
             new Promise<void>((resolve, reject) => {
                 assetManager.loadJson(skeletonFile, () => resolve())
@@ -49,14 +50,16 @@ export class HoverBoard extends React.Component<{}, IState> {
                 let atlasLoader = new AtlasAttachmentLoader(assetManager.get(atlasFile));
                 let skeletonJson = new SkeletonJson(atlasLoader);
                 skeletonJson.scale = 0.4;
-                let skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).spineboy);
+                let skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).transforms);
                 let comp = new spineSkeleton(skeletonData);
                 this._comp = comp;
-                comp.state.setAnimation(0, "hoverboard", true);
                 let spineNode = new gd3d.framework.transform2D;
                 // spineNode.localTranslate.y = -app.height / 2;
                 spineNode.addComponentDirect(comp);
                 root2d.addChild(spineNode);
+
+                let wheel = this._comp.skeleton.findBone("wheel1overlay");
+                this.wheel = wheel;
                 comp.onUpdate = () => {
                     this.forceUpdate();
 
@@ -79,38 +82,70 @@ export class HoverBoard extends React.Component<{}, IState> {
                             this.bonesPos[boneName] = { bone, pos: [screen_x, screen_y] }
                         }
                     }
+
+                    //计算旋转骨骼的屏幕坐标
+                    let worldPos = this._comp.transform.getWorldTranslate();
+                    let worldRot = this._comp.transform.getWorldRotate();
+                    let worldScale = this._comp.transform.getWorldScale();
+                    gd3d.math.matrix3x2MakeTransformRTS(worldPos, worldScale, worldRot.v, this._temptMat);
+                    let bone = this._comp.skeleton.findBone("rotate-handle");
+                    let x = this._comp.skeleton.x + bone.worldX;
+                    let y = this._comp.skeleton.y + bone.worldY;
+                    gd3d.math.matrix3x2TransformVector2(this._temptMat, new gd3d.math.vector2(x, y), this._temptPos);
+                    let screen_x = this._temptPos.x + this._app.width / 2;
+                    let screen_y = this._app.height / 2 - this._temptPos.y;
+                    this.bonesPos["rotate-handle"] = { bone, pos: [screen_x, screen_y] }
                 }
             })
 
+        let lastAngle = 0;
         this.ref_container.current.addEventListener("mousemove", (ev) => {
             if (this._chooseBone) {
                 let bone = this._chooseBone.data.name;
-                this.bonesPos[bone].pos[0] = ev.clientX;
-                this.bonesPos[bone].pos[1] = ev.clientY;
+                if (["wheel2overlay", "wheel3overlay"].indexOf(bone) >= 0) {
+                    this.bonesPos[bone].pos[0] = ev.clientX;
+                    this.bonesPos[bone].pos[1] = ev.clientY;
 
-                let boneWorldPos = new gd3d.math.vector2(ev.clientX - app.width / 2, app.height / 2 - ev.clientY);
-                let worldPos = this._comp.transform.getWorldTranslate();
-                let worldRot = this._comp.transform.getWorldRotate();
-                let worldScale = this._comp.transform.getWorldScale();
-                gd3d.math.matrix3x2MakeTransformRTS(worldPos, worldScale, worldRot.v, this._temptMat);
-                gd3d.math.matrix3x2Inverse(this._temptMat, this._temptMat);
-                gd3d.math.matrix3x2TransformVector2(this._temptMat, boneWorldPos, this._temptPos);
+                    let boneWorldPos = new gd3d.math.vector2(ev.clientX - app.width / 2, app.height / 2 - ev.clientY);
+                    let worldPos = this._comp.transform.getWorldTranslate();
+                    let worldRot = this._comp.transform.getWorldRotate();
+                    let worldScale = this._comp.transform.getWorldScale();
+                    gd3d.math.matrix3x2MakeTransformRTS(worldPos, worldScale, worldRot.v, this._temptMat);
+                    gd3d.math.matrix3x2Inverse(this._temptMat, this._temptMat);
+                    gd3d.math.matrix3x2TransformVector2(this._temptMat, boneWorldPos, this._temptPos);
 
-                let tempt = new Vector2();
-                tempt.set(this._temptPos.x, this._temptPos.y)
-                this._chooseBone.parent.worldToLocal(tempt);
-                this._chooseBone.x = tempt.x;
-                this._chooseBone.y = tempt.y;
+                    let tempt = new Vector2();
+                    tempt.set(this._temptPos.x, this._temptPos.y)
+                    this._chooseBone.parent.worldToLocal(tempt);
+                    this._chooseBone.x = tempt.x;
+                    this._chooseBone.y = tempt.y;
+                } else {
+                    //计算旋转
+                    //screen world
+                    let mouseWorldPos = new gd3d.math.vector2(ev.clientX - app.width / 2, app.height / 2 - ev.clientY);
+                    let worldPos = this._comp.transform.getWorldTranslate();
+                    let worldRot = this._comp.transform.getWorldRotate();
+                    let worldScale = this._comp.transform.getWorldScale();
+                    //spine world
+                    let spineWorldPos = new gd3d.math.vector2();
+                    gd3d.math.matrix3x2MakeTransformRTS(worldPos, worldScale, worldRot.v, this._temptMat);
+                    gd3d.math.matrix3x2Inverse(this._temptMat, this._temptMat);
+                    gd3d.math.matrix3x2TransformVector2(this._temptMat, mouseWorldPos, spineWorldPos);
+
+                    let subRes = new gd3d.math.vector2();
+                    gd3d.math.vec2Subtract(spineWorldPos, new gd3d.math.vector2(this.wheel.worldX, this.wheel.worldY), subRes);
+                    gd3d.math.vec2Normalize(subRes, subRes);
+                    let angle = Math.acos(subRes.x);
+                    if (subRes.y < 0) angle = 2 * Math.PI - angle;
+                    var delta = angle - lastAngle;
+                    this._comp.skeleton.findBone("wheel1").rotation += delta * 180 / Math.PI;
+                    lastAngle = angle;
+                }
             }
         })
         this.ref_container.current.addEventListener("mouseup", () => this._chooseBone = null)
     }
 
-    private ChangeSpeed(ev) {
-        if (this._comp) {
-            this._comp.state.timeScale = ev / 100;
-        }
-    }
     private _temptMat = new gd3d.math.matrix();
     private _temptPos = new gd3d.math.vector2();
     private _chooseBone: Bone;
@@ -118,20 +153,6 @@ export class HoverBoard extends React.Component<{}, IState> {
 
     private ref_container = React.createRef<HTMLDivElement>();
 
-
-    private fire = () => {
-        this._comp.state.setAnimation(3, "aim", true);
-        this._comp.state.setAnimation(4, "shoot", false);
-        this._comp.state.addEmptyAnimation(4, 0.5, 0).listener = {
-            complete: (trackIndex) => {
-                this._comp.state.setEmptyAnimation(3, 0.2);
-            }
-        };
-    }
-    private jump = () => {
-        this._comp.state.setAnimation(2, "jump", false);
-        this._comp.state.addEmptyAnimation(2, 0.5, 0);
-    }
     render(): React.ReactNode {
         let { hoverBone } = this.state;
         return <div>
@@ -150,14 +171,6 @@ export class HoverBoard extends React.Component<{}, IState> {
                         ></div>
                     })
                 }
-            </div>
-            <div className="ui">
-                <Button onClick={this.fire} >射击</Button>
-                <Button onClick={this.jump} style={{ "marginLeft": "15px" }}>跳跃</Button>
-                <div className="speed">
-                    <div>动画速度：</div>
-                    <Slider className="slider" defaultValue={100} onChange={(ev) => this.ChangeSpeed(ev)} tipFormatter={(value) => value / 100} />
-                </div>
             </div>
         </div>
     }
