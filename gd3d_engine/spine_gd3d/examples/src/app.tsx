@@ -7,6 +7,10 @@ import { SpriteSheet } from "./pages/spriteSheet";
 import { Transition } from "./pages/transition";
 import { HoverBoard } from "./pages/hoverBoard";
 import { AdditiveBlending } from "./pages/additiveblending";
+import { Vin } from "./pages/vin";
+import { StretchyMan } from "./pages/stretchyMan";
+import { Clip } from "./pages/clip";
+import { Tank } from "./pages/tank";
 
 export class APP extends React.Component {
     componentDidMount() {
@@ -25,7 +29,9 @@ export class APP extends React.Component {
                         <Link to={"/change_skin"}><li>换皮肤</li></Link>
                         <Link to={"/hover_board"}><li>反向动力学</li></Link>
                         <Link to={"/mix_add"}><li>相加动画混合</li></Link>
-
+                        <Link to={"/vin"}><li>路径约束</li></Link>
+                        <Link to={"/clip"}><li>动画裁剪</li></Link>
+                        <Link to={"/tank"}><li>变形约束</li></Link>
                     </div>
                 }} />
                 <Switch>
@@ -36,6 +42,10 @@ export class APP extends React.Component {
                     <Route path="/change_skin" component={ChangeSkin} />
                     <Route path="/hover_board" component={HoverBoard} />
                     <Route path="/mix_add" component={AdditiveBlending} />
+                    <Route path="/vin" component={Vin} />
+                    <Route path="/stretchy_man" component={StretchyMan} />
+                    <Route path="/clip" component={Clip} />
+                    <Route path="/tank" component={Tank} />
                 </Switch>
             </Router>
         </div>;

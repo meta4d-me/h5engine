@@ -1,15 +1,17 @@
-import { Button, Slider } from "antd";
+import { Slider } from "antd";
 import React from "react";
 import { AtlasAttachmentLoader, Bone, SkeletonJson, SpineAssetMgr, spineSkeleton, Vector2 } from "../../../src/index";
 
 interface IState {
     hoverBone: Bone,
 }
-
-export class HoverBoard extends React.Component<{}, IState> {
+export class StretchyMan extends React.Component<{}, IState> {
     private _comp: spineSkeleton;
-    private _app: gd3d.framework.application;
     private _inited: boolean = false;
+    private _temptMat: gd3d.math.matrix3x2 = new gd3d.math.matrix3x2();
+    private _temptPos = new gd3d.math.vector2();
+    private _app: gd3d.framework.application;
+
     constructor(props) {
         super(props);
         this.state = {
@@ -31,13 +33,12 @@ export class HoverBoard extends React.Component<{}, IState> {
         camera.addOverLay(root2d);
         this.init(app, root2d);
     }
-
-    private controlBones = ["hoverboard controller", "hip controller", "board target", "crosshair"];
+    private controlBones = ["back leg controller", "front leg controller", "back arm controller", "front arm controller", "head controller", "hip controller"];
     private init(app: gd3d.framework.application, root2d: gd3d.framework.overlay2D) {
         this._app = app;
         let assetManager = new SpineAssetMgr(app.getAssetMgr(), "./assets/");
         let skeletonFile = "demos.json";
-        let atlasFile = "atlas1.atlas"
+        let atlasFile = "atlas2.atlas"
         Promise.all([
             new Promise<void>((resolve, reject) => {
                 assetManager.loadJson(skeletonFile, () => resolve())
@@ -49,17 +50,16 @@ export class HoverBoard extends React.Component<{}, IState> {
                 let atlasLoader = new AtlasAttachmentLoader(assetManager.get(atlasFile));
                 let skeletonJson = new SkeletonJson(atlasLoader);
                 skeletonJson.scale = 0.4;
-                let skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).spineboy);
+                let skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).stretchyman);
                 let comp = new spineSkeleton(skeletonData);
                 this._comp = comp;
-                comp.state.setAnimation(0, "hoverboard", true);
+                //设置播放动画
+                comp.state.setAnimation(0, "idle", true);
                 let spineNode = new gd3d.framework.transform2D;
-                // spineNode.localTranslate.y = -app.height / 2;
                 spineNode.addComponentDirect(comp);
                 root2d.addChild(spineNode);
-                comp.onUpdate = () => {
-                    this.forceUpdate();
 
+                comp.onUpdate = () => {
                     if (this._inited == false) {
                         this._inited = true;
                         let worldPos = this._comp.transform.getWorldTranslate();
@@ -79,9 +79,11 @@ export class HoverBoard extends React.Component<{}, IState> {
                             this.bonesPos[boneName] = { bone, pos: [screen_x, screen_y] }
                         }
                     }
+                    this.forceUpdate();
                 }
-            })
+            }
 
+            )
         this.ref_container.current.addEventListener("mousemove", (ev) => {
             if (this._chooseBone) {
                 let bone = this._chooseBone.data.name;
@@ -107,33 +109,10 @@ export class HoverBoard extends React.Component<{}, IState> {
         })
         this.ref_container.current.addEventListener("mouseup", () => this._chooseBone = null)
     }
-
-    private ChangeSpeed(ev) {
-        if (this._comp) {
-            this._comp.state.timeScale = ev / 100;
-        }
-    }
-    private _temptMat = new gd3d.math.matrix();
-    private _temptPos = new gd3d.math.vector2();
     private _chooseBone: Bone;
     private bonesPos: { [bone: string]: { bone: Bone, pos: number[] } } = {}
-
     private ref_container = React.createRef<HTMLDivElement>();
 
-
-    private fire = () => {
-        this._comp.state.setAnimation(3, "aim", true);
-        this._comp.state.setAnimation(4, "shoot", false);
-        this._comp.state.addEmptyAnimation(4, 0.5, 0).listener = {
-            complete: (trackIndex) => {
-                this._comp.state.setEmptyAnimation(3, 0.2);
-            }
-        };
-    }
-    private jump = () => {
-        this._comp.state.setAnimation(2, "jump", false);
-        this._comp.state.addEmptyAnimation(2, 0.5, 0);
-    }
     render(): React.ReactNode {
         let { hoverBone } = this.state;
         return <div>
@@ -152,14 +131,6 @@ export class HoverBoard extends React.Component<{}, IState> {
                         ></div>
                     })
                 }
-            </div>
-            <div className="ui">
-                <Button onClick={this.fire} >射击</Button>
-                <Button onClick={this.jump} style={{ "marginLeft": "15px" }}>跳跃</Button>
-                <div className="speed">
-                    <div>动画速度：</div>
-                    <Slider className="slider" defaultValue={100} onChange={(ev) => this.ChangeSpeed(ev)} tipFormatter={(value) => value / 100} />
-                </div>
             </div>
         </div>
     }
