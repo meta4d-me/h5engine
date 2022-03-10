@@ -31,6 +31,7 @@ export class APP extends React.Component {
                         <Link to={"/hover_board"}><li>反向动力学</li></Link>
                         <Link to={"/mix_add"}><li>相加动画混合</li></Link>
                         <Link to={"/vin"}><li>路径约束</li></Link>
+                        <Link to={"/stretchy_man"}><li>变形人</li></Link>
                         <Link to={"/clip"}><li>动画裁剪</li></Link>
                         <Link to={"/tank"}><li>变形约束</li></Link>
                         <Link to={"/wheel_transform"}><li>转动约束</li></Link>
