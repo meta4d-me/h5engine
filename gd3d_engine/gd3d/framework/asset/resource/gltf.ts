@@ -126,7 +126,7 @@ namespace gd3d.framework
         }
 
         buffers: bin[];
-        async load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture) {
+        async load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, uvChecker?: texture) {
             const load = ( uri ) => new Promise((res) => {
                 mgr.load(folder + uri, AssetTypeEnum.Auto, () => {
                     res(mgr.getAssetByName(uri));
@@ -151,7 +151,7 @@ namespace gd3d.framework
                 if (m.pbrMetallicRoughness) {
                     const { baseColorFactor, baseColorTexture, metallicFactor, roughnessFactor, metallicRoughnessTexture } = m.pbrMetallicRoughness;
                     if (baseColorTexture) {
-                        mat.setTexture("uv_Basecolor", textures[baseColorTexture.index]);
+                        mat.setTexture("uv_Basecolor", uvChecker ?? textures[baseColorTexture.index]);
                     }
                     if (metallicRoughnessTexture) {
                         mat.setTexture("uv_MetallicRoughness", textures[metallicRoughnessTexture.index]);
@@ -187,17 +187,17 @@ namespace gd3d.framework
                     const vcount = attr.POSITION.count;
                     const bs =
                         + (attr.POSITION?.size ?? 0)
-                        // + (attr.COLOR?.size ?? 0)
-                        + (attr.TEXCOORD_0?.size ?? 0)
                         + (attr.NORMAL?.size ?? 0)
+                        // + (attr.COLOR?.size ?? 0)
                         // + (attr.TANGENT?.size ?? 0);
-                    const vbo = new Float32Array(vcount * bs);
+                        + (attr.TEXCOORD_0?.size ?? 0)
+                        const vbo = new Float32Array(vcount * bs);
 
                     mf.glMesh = new gd3d.render.glMesh();
                     const vf = gd3d.render.VertexFormatMask.Position
-                        | gd3d.render.VertexFormatMask.UV0
                         | gd3d.render.VertexFormatMask.Normal
                         // | gd3d.render.VertexFormatMask.Color
+                        | gd3d.render.VertexFormatMask.UV0
                         // | gd3d.render.VertexFormatMask.BlendIndex4
                         // | gd3d.render.VertexFormatMask.BlendWeight4;
                     mf.glMesh.initBuffer(ctx, vf, vcount, gd3d.render.MeshTypeEnum.Dynamic);
@@ -212,11 +212,11 @@ namespace gd3d.framework
                         const cur = vbo.subarray(i * bs); // offset
                         const position = cur.subarray(0, 3);
                         // const color = cur.subarray(3, 7);
-                        const uv = cur.subarray(3, 5);
-                        const n = cur.subarray(5, 8);
+                        const n = cur.subarray(3, 6);
+                        const uv = cur.subarray(6, 8);
                         position.set(attr.POSITION.data[i]);
-                        uv.set(attr.TEXCOORD_0.data[i]);
                         n.set(attr.NORMAL.data[i]);
+                        uv.set(attr.TEXCOORD_0.data[i]);
                         // const tangent = cur.subarray(7, 9);
 
                         // colors[i] = new gd3d.math.vector4();

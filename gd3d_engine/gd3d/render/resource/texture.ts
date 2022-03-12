@@ -272,7 +272,7 @@
             this.mirroredV = mirroredV;
             this.loaded = true;
             this.webgl.pixelStorei(this.webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, premultiply ? 1 : 0);
-            this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
+            // this.webgl.pixelStorei(this.webgl.UNPACK_FLIP_Y_WEBGL, 1);
 
 
             this.webgl.bindTexture(this.webgl.TEXTURE_2D, this.texture);
@@ -618,7 +618,7 @@
             glTexture2D.mapTexture[name] = t;
             return t;
         }
-        
+
         static particleTexture(webgl: WebGLRenderingContext,name = framework.defTexture.particle)
         {
             var t = glTexture2D.mapTexture[name];
@@ -630,7 +630,7 @@
             t = new glTexture2D(webgl, TextureFormatEnum.RGBA, mipmap, linear);
 
             var size = 64
-            
+
             var data = new Uint8Array(size * size * 4);
             var half = size / 2;
             for (let i = 0; i < size; i++)

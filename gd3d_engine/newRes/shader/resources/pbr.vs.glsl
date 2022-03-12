@@ -1,6 +1,8 @@
 attribute highp vec3    _glesVertex;
 attribute highp vec2    _glesMultiTexCoord0;
 attribute highp vec3    _glesNormal;
+attribute highp vec3    _glesTangent;
+attribute highp vec3    _glesColor;
 
 uniform highp mat4      glstate_matrix_mvp;
 uniform highp mat4      glstate_matrix_model;
@@ -9,6 +11,7 @@ uniform highp mat4      glstate_matrix_world2object;
 varying highp vec3      v_normal;
 varying highp vec3      v_pos;
 varying highp vec2      xlv_TEXCOORD0;
+varying highp mat3		TBN;
 
 #ifdef FOG
 uniform lowp float glstate_fog_start;
@@ -65,9 +68,15 @@ void main () {
     position =calcVertex(position,_glesBlendIndex4,_glesBlendWeight4);
 #endif
 
-    v_pos           = (glstate_matrix_model * vec4(position, 1.0)).xyz;
+    vec4 wpos		= (glstate_matrix_model * vec4(position, 1.0));
+	v_pos			= wpos.xyz / wpos.w;
     v_normal        = normalize((glstate_matrix_world2object * vec4(_glesNormal, 0.0)).xyz);
     xlv_TEXCOORD0   = _glesMultiTexCoord0;
+
+	// TBN
+	vec3 tangent = normalize((glstate_matrix_world2object * vec4(_glesTangent, 0.0)).xyz);
+	vec3 bitangent = cross(v_normal, tangent) * _glesTangent.w;
+	TBN = mat3(tangent, bitangent, v_normal);
 
 #ifdef FOG
     factor = (glstate_fog_end - abs(position.z))/(glstate_fog_end - glstate_fog_start);
