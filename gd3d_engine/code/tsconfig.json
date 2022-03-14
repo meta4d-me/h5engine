@@ -2,11 +2,20 @@
   "compilerOptions": {
     "module": "system",
     "target": "es5",
+    "lib": [
+      "es2015",
+      "es2015.promise",
+      "dom",
+      "es5",
+      "es2015.iterable",
+      "es2015.core"
+    ],
     "declaration": true,
     "sourceMap": true,
     "removeComments": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "noImplicitUseStrict": true,
     "outFile": "../lib_user/app.js"
   }
 }
