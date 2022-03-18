@@ -60,7 +60,7 @@ vec3 toneMapACES(vec3 color) {
 }
 
 vec2 DFGApprox(float NoV, float roughness) {
-    float dotNV = saturate(NoV);
+    float dotNV = clamp(NoV, 0., 1.);
     vec4 c0 = vec4(-1, -0.0275, -0.572, 0.022);
     vec4 c1 = vec4(1, 0.0425, 1.04, -0.04);
     vec4 r = roughness * c0 + c1;
@@ -145,9 +145,9 @@ st_core init() {
     // vec4 AO = sRGBtoLINEAR(texture2D(uv_AO, xlv_TEXCOORD0));
 
     vec3 f0 = vec3(0.04);
-    temp.diffuse.rgb = temp.diffuse.rgb * (vec3(1) - f0) * (1. - temp.metallic);
-
     temp.f0 = mix(f0, temp.diffuse.xyz, temp.metallic);
+
+    temp.diffuse.rgb = temp.diffuse.rgb * (vec3(1) - f0) * (1. - temp.metallic);
     // temp.diffuse/=PI;
 
     temp.V = normalize(glstate_eyepos.xyz - v_pos);
