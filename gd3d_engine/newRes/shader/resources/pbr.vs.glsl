@@ -6,7 +6,7 @@ attribute highp vec3    _glesColor;
 
 uniform highp mat4      glstate_matrix_mvp;
 uniform highp mat4      glstate_matrix_model;
-uniform highp mat4      glstate_matrix_world2object;
+uniform highp mat4      glstate_matrix_it_modelview;
 
 varying highp vec3      v_normal;
 varying highp vec3      v_pos;
@@ -70,11 +70,11 @@ void main () {
 
     vec4 wpos		= (glstate_matrix_model * vec4(position, 1.0));
 	v_pos			= wpos.xyz / wpos.w;
-    v_normal        = normalize((glstate_matrix_world2object * vec4(_glesNormal, 0.0)).xyz);
+    v_normal        = normalize((glstate_matrix_it_modelview * vec4(_glesNormal, 0.0)).xyz);
     xlv_TEXCOORD0   = _glesMultiTexCoord0;
 
 	// TBN
-	vec3 tangent = normalize((glstate_matrix_world2object * vec4(_glesTangent, 0.0)).xyz);
+	vec3 tangent = normalize((glstate_matrix_it_modelview * vec4(_glesTangent, 0.0)).xyz);
 	vec3 bitangent = cross(v_normal, tangent);// * _glesTangent.w;
 	TBN = mat3(tangent, bitangent, v_normal);
 
