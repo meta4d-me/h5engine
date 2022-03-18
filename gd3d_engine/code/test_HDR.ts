@@ -105,7 +105,7 @@ class HDR_sample implements IState
 
             const gltfFolder = 'res/pbrRes/FlightHelmet/glTF/';
             const gltf = await this.load<gd3d.framework.gltf>(gltfFolder, 'FlightHelmet.gltf');
-            const root = await gltf.load(this.assetMgr, this.app.webgl, gltfFolder, brdf);
+            const root = await gltf.load(this.assetMgr, this.app.webgl, gltfFolder, brdf, env);
             gd3d.math.vec3SetAll(root.localScale, 10);
             this.app.getScene().addChild(root);
         })();

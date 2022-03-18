@@ -9,6 +9,7 @@ precision mediump float;
 
 uniform samplerCube u_sky;
 uniform vec4        glstate_eyepos;
+uniform float       u_Exposure
 
 varying vec3        v_pos;
 
@@ -26,9 +27,9 @@ vec3 toneMapACES(vec3 color) {
     const float C = 2.43;
     const float D = 0.59;
     const float E = 0.14;
-    return pow(clamp((color * (A * color + B)) / (color * (C * color + D) + E), 0.0, 1.0), vec3(1.0 / GAMMA));
+    return pow(clamp((color * (A * color + B)) / (color * (C * color + D) + E), 0.0, 1.0), vec3(1.0 / 2.2));
 }
 
 void main () {
-    gl_FragColor = vec4(toneMapACES(decoRGBE(textureCube(u_sky, normalize(v_pos - glstate_eyepos.xyz)))), 1);
+    gl_FragColor = vec4(toneMapACES(u_Exposure * decoRGBE(textureCube(u_sky, normalize(v_pos - glstate_eyepos.xyz)))), 1);
 }

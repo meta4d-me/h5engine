@@ -7,7 +7,8 @@
         "uv_Normal('Normal',Texture)='normal'{}",
         "CustomBasecolor ('Color', Color) = (1,1,1,1)",
         "CustomMetallic('Metallic',Range(0.0,1.0)) = 1.0",
-        "CustomRoughness('Roughness',Range(0.0,1.0)) = 1.0"
+        "CustomRoughness('Roughness',Range(0.0,1.0)) = 1.0",
+        "u_Exposure('Exposure',Range(0.0,100.0)) = 1.0"
     ],
     "passes": {
         "base": [

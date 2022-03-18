@@ -14,7 +14,7 @@ uniform vec4 light_2;
 
 uniform samplerCube u_env;      // IBL
 uniform sampler2D u_diffuse;  // diffuse
-
+uniform float u_Exposure;
 uniform sampler2D brdf;       // BRDF LUT
 uniform vec4 glstate_eyepos;
 
@@ -111,7 +111,7 @@ vec3 decoRGBE(vec4 r) {
 }
 
 struct st_core {
-    vec3 diffuse;
+    vec4 diffuse;
     vec3 f0;
     vec3 N;
     vec3 V;
@@ -126,7 +126,7 @@ st_core init() {
     st_core temp;
 
     // PBR Material
-    temp.diffuse = (sRGBtoLINEAR(texture2D(uv_Basecolor, xlv_TEXCOORD0)) * CustomBasecolor).rgb;
+    temp.diffuse = (sRGBtoLINEAR(texture2D(uv_Basecolor, xlv_TEXCOORD0)) * CustomBasecolor);
 
     vec3 rm = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).rgb;
     temp.roughness = clamp(rm.g, 0.04, 1.0) * CustomRoughness;
@@ -136,9 +136,9 @@ st_core init() {
     // vec4 AO = sRGBtoLINEAR(texture2D(uv_AO, xlv_TEXCOORD0));
 
     vec3 f0 = vec3(0.04);
-    temp.f0 = mix(f0, temp.diffuse.xyz, temp.metallic);
+    temp.diffuse.rgb = temp.diffuse.rgb * (vec3(1) - f0) * (1. - temp.metallic);
 
-    temp.diffuse = temp.diffuse.rgb * (vec3(1) - f0) * (1. - temp.metallic);
+    temp.f0 = mix(f0, temp.diffuse.xyz, temp.metallic);
     // temp.diffuse/=PI;
 
     temp.V = normalize(glstate_eyepos.xyz - v_pos);
@@ -168,7 +168,7 @@ vec3 lightBRDF(vec3 L, st_core core) {
     float D = D_GGX(core.alphaRoughness, NoH);
 
     vec3 specContrib = F * G * D / (4.0 * NoL * core.NoV);
-    vec3 diffuseContrib = (1.0 - F) * core.diffuse / PI;
+    vec3 diffuseContrib = (1.0 - F) * core.diffuse.rgb / PI;
     vec3 color = NoL * (diffuseContrib + specContrib);
 
     return color;
@@ -196,5 +196,7 @@ void main() {
     finalColor.xyz = mix(glstate_fog_color.rgb, finalColor.rgb, factor);
 #endif
 
-    gl_FragColor = vec4(toneMapACES(finalColor), 1.0);
+    finalColor *= u_Exposure;
+
+    gl_FragColor = vec4(toneMapACES(finalColor), c.diffuse.a);
 }
