@@ -75,7 +75,7 @@ void main () {
 
 	// TBN
 	vec3 tangent = normalize((glstate_matrix_world2object * vec4(_glesTangent, 0.0)).xyz);
-	vec3 bitangent = cross(v_normal, tangent) * _glesTangent.w;
+	vec3 bitangent = cross(v_normal, tangent);// * _glesTangent.w;
 	TBN = mat3(tangent, bitangent, v_normal);
 
 #ifdef FOG

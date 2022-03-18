@@ -1,4 +1,5 @@
 #extension GL_OES_standard_derivatives : enable
+#extension GL_EXT_shader_texture_lod : enable
 #ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
 #else
@@ -125,7 +126,7 @@ st_core init() {
     st_core temp;
 
     // PBR Material
-    temp.diffuse = sRGBtoLINEAR(texture2D(uv_Basecolor, xlv_TEXCOORD0)).rgb * CustomBasecolor;
+    temp.diffuse = (sRGBtoLINEAR(texture2D(uv_Basecolor, xlv_TEXCOORD0)) * CustomBasecolor).rgb;
 
     vec3 rm = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).rgb;
     temp.roughness = clamp(rm.g, 0.04, 1.0) * CustomRoughness;
