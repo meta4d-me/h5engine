@@ -125,19 +125,19 @@ st_core init() {
     st_core temp;
 
     // PBR Material
-    temp.Basecolor = sRGBtoLINEAR(texture2D(uv_Basecolor, xlv_TEXCOORD0)) * CustomBasecolor;
+    temp.diffuse = sRGBtoLINEAR(texture2D(uv_Basecolor, xlv_TEXCOORD0)).rgb * CustomBasecolor;
 
     vec3 rm = texture2D(uv_MetallicRoughness, xlv_TEXCOORD0).rgb;
     temp.roughness = clamp(rm.g, 0.04, 1.0) * CustomRoughness;
     temp.alphaRoughness = temp.roughness * temp.roughness;
     temp.metallic = clamp(rm.b, 0.0, 1.0) * CustomMetallic;
 
-    temp.AO = sRGBtoLINEAR(texture2D(uv_AO, xlv_TEXCOORD0));
+    // vec4 AO = sRGBtoLINEAR(texture2D(uv_AO, xlv_TEXCOORD0));
 
     vec3 f0 = vec3(0.04);
-    temp.f0 = mix(f0, temp.Basecolor.xyz, temp.metallic);
+    temp.f0 = mix(f0, temp.diffuse.xyz, temp.metallic);
 
-    temp.diffuse = temp.Basecolor.rgb * (vec3(1) - f0) * (1. - temp.metallic);
+    temp.diffuse = temp.diffuse.rgb * (vec3(1) - f0) * (1. - temp.metallic);
     // temp.diffuse/=PI;
 
     temp.V = normalize(glstate_eyepos.xyz - v_pos);
@@ -163,7 +163,7 @@ vec3 lightBRDF(vec3 L, st_core core) {
     // vec3 diffuse = core.Basecolor.rgb * NoL / PI;
 
     vec3 F = F_Schlick(VoH, core.f0);
-    float G = G_UE4(core.NoV, NoH, VoH, NoL, core.Roughness);
+    float G = G_UE4(core.NoV, NoH, VoH, NoL, core.roughness);
     float D = D_GGX(core.alphaRoughness, NoH);
 
     vec3 specContrib = F * G * D / (4.0 * NoL * core.NoV);
@@ -185,7 +185,7 @@ void main() {
     // finalColor += ((1.0 - F) * (1.0 - c.Metallic) * c.Basecolor.rgb + indirectSpecular) * c.AO.rgb; // IBL+PBR
 
     vec3 brdf = sRGBtoLINEAR(texture2D(brdf, vec2(c.NoV, 1. - c.alphaRoughness))).rgb;
-    vec3 IBLColor = decoRGBE(textureCubeLodEXT(env, c.R, lod));
+    vec3 IBLColor = decoRGBE(textureCubeLodEXT(u_env, c.R, lod));
     vec3 IBLspecular = 1.0 * IBLColor * (c.f0 * brdf.x + brdf.y);
     finalColor += IBLspecular;
 
@@ -195,5 +195,5 @@ void main() {
     finalColor.xyz = mix(glstate_fog_color.rgb, finalColor.rgb, factor);
 #endif
 
-    gl_FragColor = vec4(toneMapACES(finalColor), 1.0));
+    gl_FragColor = vec4(toneMapACES(finalColor), 1.0);
 }
