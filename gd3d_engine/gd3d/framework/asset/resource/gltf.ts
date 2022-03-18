@@ -126,7 +126,7 @@ namespace gd3d.framework
         }
 
         buffers: bin[];
-        async load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, env: texture, uvChecker?: texture) {
+        async load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, env: texture, exposure?, uvChecker?: texture) {
             const load = ( uri ) => new Promise((res) => {
                 mgr.load(folder + uri, AssetTypeEnum.Auto, () => {
                     res(mgr.getAssetByName(uri));
@@ -141,7 +141,9 @@ namespace gd3d.framework
             const materials = this.data.materials?.map(m => {
                 const mat = new material(m.name);
                 mat.setShader(mgr.getShader("pbr.shader.json"));
-                mat.setTexture('brdf', brdf);
+                if (brdf) {
+                    mat.setTexture('brdf', brdf);
+                }
                 mat.setCubeTexture('u_env', env);
                 if (m.normalTexture) {
                     mat.setTexture("uv_MetallicRoughness", textures[m.normalTexture.index]);
@@ -153,6 +155,9 @@ namespace gd3d.framework
                 {
                     mat.setTexture("uv_Normal", textures[m.normalTexture.index]);
                 }
+                if (exposure != null) {
+                    mat.setFloat("u_Exposure", exposure);
+                }
                 if (m.pbrMetallicRoughness) {
                     const { baseColorFactor, baseColorTexture, metallicFactor, roughnessFactor, metallicRoughnessTexture } = m.pbrMetallicRoughness;
                     if (baseColorTexture) {
@@ -161,6 +166,9 @@ namespace gd3d.framework
                     if (metallicRoughnessTexture) {
                         mat.setTexture("uv_MetallicRoughness", textures[metallicRoughnessTexture.index]);
                     }
+                }
+                if (m.occlusionTexture) {
+                    mat.setTexture("uv_AO", textures[m.occlusionTexture.index]);
                 }
                 return mat;
             });
@@ -223,8 +231,8 @@ namespace gd3d.framework
                         let bit = 0;
                         const position = cur.subarray(bit, bit+=3);
                         // const color = cur.subarray(3, 7);
-                        const tan = cur.subarray(bit, bit+=3);
                         const n = cur.subarray(bit, bit+=3);
+                        const tan = cur.subarray(bit, bit+=3);
                         const uv = cur.subarray(bit, bit+=2);
                         position.set(attr.POSITION.data[i]);
                         n.set(attr.NORMAL.data[i]);

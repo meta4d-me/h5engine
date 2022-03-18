@@ -87,6 +87,7 @@ class HDR_sample implements IState
             await demoTool.loadbySync(`newRes/test/shader/customShader/customShader.assetbundle.json`, app.getAssetMgr());  //项目shader
             // await datGui.init();
 
+            const exp = 4;
 
             const env = await this.loadCubeTexture(HDRpath + 'helipad/');
             const skybox = new gd3d.framework.transform();
@@ -100,13 +101,16 @@ class HDR_sample implements IState
             // let pass = mr_c.materials[0].getShader().passes["base"][0];
             // pass.state_showface = gd3d.render.ShowFaceStateEnum.CW;
             mr_c.materials[0].setCubeTexture("u_sky", env);
+            mr_c.materials[0].setFloat("u_Exposure", exp);
 
-            const brdf = await this.load<gd3d.framework.texture>('res/pbrRes/', 'brdf.png');
+            // const brdf = await this.load<gd3d.framework.texture>('res/pbrRes/', 'lut_ggx.png');
 
             const gltfFolder = 'res/pbrRes/FlightHelmet/glTF/';
             const gltf = await this.load<gd3d.framework.gltf>(gltfFolder, 'FlightHelmet.gltf');
-            const root = await gltf.load(this.assetMgr, this.app.webgl, gltfFolder, brdf, env);
+            const root = await gltf.load(this.assetMgr, this.app.webgl, gltfFolder, null, env, exp);
             gd3d.math.vec3SetAll(root.localScale, 10);
+            // root.localScale.x *= -1;
+            // root.markDirty();
             this.app.getScene().addChild(root);
         })();
     }

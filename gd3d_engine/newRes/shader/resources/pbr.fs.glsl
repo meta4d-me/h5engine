@@ -59,6 +59,15 @@ vec3 toneMapACES(vec3 color) {
     return pow(clamp((color * (A * color + B)) / (color * (C * color + D) + E), 0.0, 1.0), vec3(1.0 / GAMMA));
 }
 
+vec2 DFGApprox(float NoV, float roughness) {
+    float dotNV = saturate(NoV);
+    vec4 c0 = vec4(-1, -0.0275, -0.572, 0.022);
+    vec4 c1 = vec4(1, 0.0425, 1.04, -0.04);
+    vec4 r = roughness * c0 + c1;
+    float a004 = min(r.x * r.x, exp2(-9.28 * dotNV)) * r.x + r.y;
+    return vec2(-1.04, 1.04) * a004 + r.zw;
+}
+
 // Fresnel - F0 = Metalness
 vec3 F_Schlick(float VoH, vec3 F0) {
     return F0 + (vec3(1) - F0) * pow(1.0 - VoH, 5.0);
@@ -185,7 +194,8 @@ void main() {
     finalColor += lightBRDF(light_2.xyz - v_pos, c) * vec3(0.6, 0.6, 0.4);
     // finalColor += ((1.0 - F) * (1.0 - c.Metallic) * c.Basecolor.rgb + indirectSpecular) * c.AO.rgb; // IBL+PBR
 
-    vec3 brdf = sRGBtoLINEAR(texture2D(brdf, vec2(c.NoV, 1. - c.alphaRoughness))).rgb;
+    // vec3 brdf = sRGBtoLINEAR(texture2D(brdf, clamp(vec2(c.NoV, 1. - c.roughness), vec2(0), vec2(1)))).rgb;
+    vec2 brdf = DFGApprox(c.NoV, c.roughness);
     vec3 IBLColor = decoRGBE(textureCubeLodEXT(u_env, c.R, lod));
     vec3 IBLspecular = 1.0 * IBLColor * (c.f0 * brdf.x + brdf.y);
     finalColor += IBLspecular;
@@ -196,7 +206,7 @@ void main() {
     finalColor.xyz = mix(glstate_fog_color.rgb, finalColor.rgb, factor);
 #endif
 
-    finalColor *= u_Exposure;
+    finalColor *= u_Exposure * texture2D(uv_AO, xlv_TEXCOORD0).r;
 
     gl_FragColor = vec4(toneMapACES(finalColor), c.diffuse.a);
 }
