@@ -9,7 +9,7 @@ precision mediump float;
 
 uniform samplerCube u_sky;
 uniform vec4        glstate_eyepos;
-uniform float       u_Exposure
+uniform float       u_Exposure;
 
 varying vec3        v_pos;
 
