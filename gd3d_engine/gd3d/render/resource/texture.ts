@@ -679,7 +679,9 @@
             Texture_NEGATIVE_Z: framework.texture ,
             Texture_POSITIVE_X: framework.texture ,
             Texture_POSITIVE_Y: framework.texture ,
-            Texture_POSITIVE_Z: framework.texture ){
+            Texture_POSITIVE_Z: framework.texture ,
+            min = WebGLRenderingContext.NEAREST, max = WebGLRenderingContext.NEAREST, mipmap: number = null
+        ) {
                 let wrc = this.webgl;
 
                 let textures = [Texture_NEGATIVE_X,Texture_NEGATIVE_Y,Texture_NEGATIVE_Z,Texture_POSITIVE_X,Texture_POSITIVE_Y,Texture_POSITIVE_Z];
@@ -692,6 +694,16 @@
                     }
                     this.upload(reader.data,reader.width,reader.height,typeArr[i]);
                 }
+                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_MIN_FILTER, min);
+                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_MAG_FILTER, max);
+                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_WRAP_S, wrc.CLAMP_TO_EDGE);
+                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_WRAP_T, wrc.CLAMP_TO_EDGE);
+
+                if (mipmap !== null)
+                {
+                    wrc.generateMipmap(wrc.TEXTURE_CUBE_MAP);
+                }
+
         }
 
         private upload(data: HTMLImageElement | Uint8Array,width:number,height:number,TEXTURE_CUBE_MAP_ : number): void
@@ -700,7 +712,7 @@
             this.height = height;
             this.loaded = true;
             let gl = this.webgl;
-            gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,1);
+            // gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,1);
 
             this.webgl.bindTexture(this.webgl.TEXTURE_CUBE_MAP, this.texture);
             var formatGL = this.webgl.RGBA;
@@ -729,12 +741,11 @@
                         , data);
                     }
 
-            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-            gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-
-            let mipmap = this.mipmap;
+            // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, min);
+            // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, max);
+            // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+            // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+            // let mipmap = this.mipmap;
             let linear = this.linear;
             // let repeat = true;
             // let premultiply = true;

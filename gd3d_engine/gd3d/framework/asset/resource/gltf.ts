@@ -129,7 +129,7 @@ namespace gd3d.framework
         async load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, env: texture, exposure?, uvChecker?: texture) {
             const load = ( uri ) => new Promise((res) => {
                 mgr.load(folder + uri, AssetTypeEnum.Auto, () => {
-                    res(mgr.getAssetByName(uri));
+                    res(mgr.getAssetByName(uri.split('/').pop()));
                 });
             });
             this.buffers = await Promise.all(this.data.buffers?.map(({ uri }) => load(uri)));
@@ -208,11 +208,16 @@ namespace gd3d.framework
                     const vbo = new Float32Array(vcount * bs);
 
                     mf.glMesh = new gd3d.render.glMesh();
-                    const vf = gd3d.render.VertexFormatMask.Position
-                        | gd3d.render.VertexFormatMask.Normal
+                    let vf
+                    if (attr.POSITION?.size)
+                        vf |= gd3d.render.VertexFormatMask.Position;
+                    if (attr.NORMAL?.size)
+                        vf |= gd3d.render.VertexFormatMask.Normal;
                         // | gd3d.render.VertexFormatMask.Color
-                        | gd3d.render.VertexFormatMask.Tangent
-                        | gd3d.render.VertexFormatMask.UV0
+                    if (attr.TANGENT?.size)
+                        vf |= gd3d.render.VertexFormatMask.Tangent;
+                    if (attr.TEXCOORD_0?.size)
+                        vf |= gd3d.render.VertexFormatMask.UV0;
                         // | gd3d.render.VertexFormatMask.BlendIndex4
                         // | gd3d.render.VertexFormatMask.BlendWeight4;
                     mf.glMesh.initBuffer(ctx, vf, vcount, gd3d.render.MeshTypeEnum.Dynamic);
@@ -221,23 +226,45 @@ namespace gd3d.framework
                     mdata.trisindex = Array.from(ebo);
 
                     for(let i = 0; i < vcount; i++) {
-                        const uvFliped = [...attr.TEXCOORD_0.data[i]];
-                        uvFliped[1] = uvFliped[1] * -1 + 1;
-                        vert[i] = new gd3d.math.vector3(...attr.POSITION.data[i]);
-                        uv1[i] = new gd3d.math.vector2(...uvFliped);
-                        normal[i] = new gd3d.math.vector3(...attr.NORMAL.data[i]);
-                        tangent[i] = new gd3d.math.vector3(...attr.TANGENT.data[i]);
+                        let uvFliped;
+                        if (attr.TEXCOORD_0?.size != null) {
+                            uvFliped = [...attr.TEXCOORD_0.data[i]];
+                            uvFliped[1] = uvFliped[1] * -1 + 1;
+                            uv1[i] = new gd3d.math.vector2(...uvFliped);
+                        }
+
+                        if (attr.POSITION?.size != null)
+                            vert[i] = new gd3d.math.vector3(...attr.POSITION.data[i]);
+
+                        if (attr.NORMAL?.size != null)
+                            normal[i] = new gd3d.math.vector3(...attr.NORMAL.data[i]);
+
+                        if (attr.TANGENT?.size != null)
+                            tangent[i] = new gd3d.math.vector3(...attr.TANGENT.data[i]);
+
                         const cur = vbo.subarray(i * bs); // offset
                         let bit = 0;
-                        const position = cur.subarray(bit, bit+=3);
+                        if (attr.POSITION?.size != null) {
+                            const position = cur.subarray(bit, bit+=3);
+                            position.set(attr.POSITION.data[i]);
+                        }
+
                         // const color = cur.subarray(3, 7);
-                        const n = cur.subarray(bit, bit+=3);
-                        const tan = cur.subarray(bit, bit+=3);
-                        const uv = cur.subarray(bit, bit+=2);
-                        position.set(attr.POSITION.data[i]);
-                        n.set(attr.NORMAL.data[i]);
-                        uv.set(uvFliped);
-                        tan.set(attr.TANGENT.data[i].slice(0, 3));
+                        if (attr.NORMAL?.size != null) {
+                            const n = cur.subarray(bit, bit+=3);
+                            n.set(attr.NORMAL.data[i]);
+                        }
+
+                        if (attr.TANGENT?.size != null) {
+                            const tan = cur.subarray(bit, bit+=3);
+                            tan.set(attr.TANGENT.data[i].slice(0, 3));
+                        }
+
+                        if (attr.TEXCOORD_0?.size != null) {
+                            const uv = cur.subarray(bit, bit += 2);
+                            uv.set(uvFliped);
+                        }
+
                         // const tangent = cur.subarray(7, 9);
 
                         // colors[i] = new gd3d.math.vector4();

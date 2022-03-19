@@ -5659,7 +5659,7 @@ declare namespace gd3d.framework {
          */
         set realName(name: string);
         buffers: bin[];
-        load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture): Promise<transform>;
+        load(mgr: assetMgr, ctx: WebGLRenderingContext, folder: string, brdf: texture, env: texture, exposure?: any, uvChecker?: texture): Promise<transform>;
     }
     class Accessor {
         static types: {
@@ -22409,7 +22409,7 @@ declare namespace gd3d.render {
     }
     class glTextureCube implements ITexture {
         constructor(webgl: WebGLRenderingContext, format?: TextureFormatEnum, mipmap?: boolean, linear?: boolean);
-        uploadImages(Texture_NEGATIVE_X: framework.texture, Texture_NEGATIVE_Y: framework.texture, Texture_NEGATIVE_Z: framework.texture, Texture_POSITIVE_X: framework.texture, Texture_POSITIVE_Y: framework.texture, Texture_POSITIVE_Z: framework.texture): void;
+        uploadImages(Texture_NEGATIVE_X: framework.texture, Texture_NEGATIVE_Y: framework.texture, Texture_NEGATIVE_Z: framework.texture, Texture_POSITIVE_X: framework.texture, Texture_POSITIVE_Y: framework.texture, Texture_POSITIVE_Z: framework.texture, min?: number, max?: number, mipmap?: number): void;
         private upload;
         webgl: WebGLRenderingContext;
         loaded: boolean;

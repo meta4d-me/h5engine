@@ -4506,7 +4506,7 @@ var HDR_sample = (function () {
                         cubeTex = new gd3d.framework.texture(folder.split('/').pop());
                         cubeTex.glTexture = new gd3d.render.glTextureCube(this.app.webgl, gd3d.render.TextureFormatEnum.RGBA, true, true);
                         cubeTex.use();
-                        cubeTex.glTexture.uploadImages(tex[0], tex[1], tex[2], tex[3], tex[4], tex[5]);
+                        cubeTex.glTexture.uploadImages(tex[0], tex[1], tex[2], tex[3], tex[4], tex[5], WebGLRenderingContext.LINEAR_MIPMAP_LINEAR, WebGLRenderingContext.LINEAR, WebGLRenderingContext.TEXTURE_CUBE_MAP);
                         return [2, cubeTex];
                 }
             });
@@ -4533,7 +4533,8 @@ var HDR_sample = (function () {
         hoverc.lookAtPoint = new gd3d.math.vector3(0, 0, 0);
         var HDRpath = "res/pbrRes/HDR/";
         (function () { return __awaiter(_this, void 0, void 0, function () {
-            var env, skybox, mf_c, mr_c, brdf, gltfFolder, gltf, root;
+            var exp, env, skybox, mf_c, mr_c, loadGLTF, par, gltfModels;
+            var _this = this;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4, demoTool.loadbySync("newRes/shader/MainShader.assetbundle.json", app.getAssetMgr())];
@@ -4542,6 +4543,7 @@ var HDR_sample = (function () {
                         return [4, demoTool.loadbySync("newRes/test/shader/customShader/customShader.assetbundle.json", app.getAssetMgr())];
                     case 2:
                         _a.sent();
+                        exp = 4;
                         return [4, this.loadCubeTexture(HDRpath + 'helipad/')];
                     case 3:
                         env = _a.sent();
@@ -4554,18 +4556,57 @@ var HDR_sample = (function () {
                         mr_c.materials[0] = new gd3d.framework.material("skyboxmat");
                         mr_c.materials[0].setShader(this.assetMgr.getShader("skybox.shader.json"));
                         mr_c.materials[0].setCubeTexture("u_sky", env);
-                        return [4, this.load('res/pbrRes/', 'brdf.png')];
-                    case 4:
-                        brdf = _a.sent();
-                        gltfFolder = 'res/pbrRes/FlightHelmet/glTF/';
-                        return [4, this.load(gltfFolder, 'FlightHelmet.gltf')];
-                    case 5:
-                        gltf = _a.sent();
-                        return [4, gltf.load(this.assetMgr, this.app.webgl, gltfFolder, brdf)];
-                    case 6:
-                        root = _a.sent();
-                        gd3d.math.vec3SetAll(root.localScale, 10);
-                        this.app.getScene().addChild(root);
+                        mr_c.materials[0].setFloat("u_Exposure", exp);
+                        loadGLTF = function (_a) {
+                            var gltfFolder = _a.gltfFolder, file = _a.file, scale = _a.scale;
+                            return __awaiter(_this, void 0, void 0, function () {
+                                var gltf, root;
+                                return __generator(this, function (_b) {
+                                    switch (_b.label) {
+                                        case 0: return [4, this.load(gltfFolder, file)];
+                                        case 1:
+                                            gltf = _b.sent();
+                                            return [4, gltf.load(this.assetMgr, this.app.webgl, gltfFolder, null, env, exp)];
+                                        case 2:
+                                            root = _b.sent();
+                                            gd3d.math.vec3SetAll(root.localScale, scale !== null && scale !== void 0 ? scale : 1);
+                                            root.localScale.x *= -1;
+                                            this.app.getScene().addChild(root);
+                                            return [2, root];
+                                    }
+                                });
+                            });
+                        };
+                        par = new URL(window.location.href).searchParams;
+                        gltfModels = [
+                            {
+                                gltfFolder: 'res/pbrRes/FlightHelmet/glTF/',
+                                file: 'FlightHelmet.gltf',
+                                scale: 20,
+                                cb: function (root) { }
+                            },
+                        ];
+                        if (par.has('folder')) {
+                            gltfModels.push({
+                                gltfFolder: par.get('folder'),
+                                file: par.get('file'),
+                                scale: par.get('scale') ? parseFloat(par.get('scale')) : 1,
+                                cb: function (root) { return root.localTranslate.x += par.get('x') ? parseFloat(par.get('x')) : 0; },
+                            });
+                        }
+                        gltfModels.map(function (cfg) { return __awaiter(_this, void 0, void 0, function () {
+                            var root;
+                            return __generator(this, function (_a) {
+                                switch (_a.label) {
+                                    case 0: return [4, loadGLTF(cfg)];
+                                    case 1:
+                                        root = _a.sent();
+                                        if (cfg.cb)
+                                            cfg.cb(root);
+                                        return [2];
+                                }
+                            });
+                        }); });
                         return [2];
                 }
             });
@@ -9197,131 +9238,6 @@ var test_uiPerfabLoad = (function () {
     };
     return test_uiPerfabLoad;
 }());
-var test_uimove = (function () {
-    function test_uimove() {
-        this.timer = 0;
-    }
-    test_uimove.prototype.start = function (app) {
-        console.log("i am here.");
-        this.app = app;
-        this.scene = this.app.getScene();
-        var objCam = new gd3d.framework.transform();
-        objCam.name = "sth.";
-        this.scene.addChild(objCam);
-        this.camera = objCam.gameObject.addComponent("camera");
-        this.camera.near = 0.01;
-        this.camera.far = 100;
-        objCam.localTranslate = new gd3d.math.vector3(0, 10, -10);
-        objCam.markDirty();
-        this.test();
-    };
-    test_uimove.prototype.update = function (delta) {
-        this.timer += delta;
-        var x = Math.sin(this.timer);
-        var z = Math.cos(this.timer);
-        var x2 = Math.sin(this.timer * 0.1);
-        var z2 = Math.cos(this.timer * 0.1);
-    };
-    test_uimove.prototype.test = function () {
-        var parentRect = new Rect();
-        parentRect.width = 600;
-        parentRect.height = 400;
-        parentRect.children = [];
-        var childRect = new Rect();
-        childRect.width = 300;
-        childRect.height = 200;
-        parentRect.children.push(childRect);
-        childRect.parent = parentRect;
-        childRect.alignType = AlignType.CENTER;
-        parentRect.layout();
-        childRect.localEulerAngles = new gd3d.math.vector3(0, 90, 0);
-        var matrix = gd3d.math.pool.new_matrix();
-        var qua = gd3d.math.pool.new_quaternion();
-        var vec = gd3d.math.pool.new_vector3();
-        gd3d.math.quatFromEulerAngles(childRect.localEulerAngles.x, childRect.localEulerAngles.y, childRect.localEulerAngles.z, qua);
-        gd3d.math.vec3Add(childRect.localTranslate, childRect.alignPos, vec);
-        gd3d.math.matrixMakeTransformRTS(vec, childRect.localScale, qua, matrix);
-        gd3d.math.pool.delete_vector3(vec);
-        gd3d.math.pool.delete_quaternion(qua);
-        console.log(matrix.toString());
-        for (var i = 0; i < childRect.points.length; i++) {
-            console.log(i + " before: " + childRect.points[i]);
-            gd3d.math.matrixTransformVector3(childRect.points[i], matrix, childRect.points[i]);
-            console.log(i + " after: " + childRect.points[i]);
-        }
-        gd3d.math.pool.delete_matrix(matrix);
-        console.log(matrix.toString());
-    };
-    return test_uimove;
-}());
-var Rect = (function (_super) {
-    __extends(Rect, _super);
-    function Rect() {
-        var _this = _super !== null && _super.apply(this, arguments) || this;
-        _this.offset = new gd3d.math.vector3();
-        _this.children = [];
-        _this.alignType = AlignType.NONE;
-        _this.points = [];
-        _this.alignPos = new gd3d.math.vector3();
-        return _this;
-    }
-    Rect.prototype.layout = function () {
-        if (this.parent != null && this.alignType != null) {
-            switch (this.alignType) {
-                case AlignType.CENTER:
-                    this.alignPos = new gd3d.math.vector3(0, 0, 0);
-                    break;
-                case AlignType.LEFT:
-                    this.alignPos = new gd3d.math.vector3(0, (this.parent.height - this.height) / 2);
-                    break;
-                case AlignType.RIGHT:
-                    this.alignPos = new gd3d.math.vector3(this.parent.width - this.width, (this.parent.height - this.height) / 2);
-                    break;
-                case AlignType.TOP:
-                    this.alignPos = new gd3d.math.vector3((this.parent.width - this.width) / 2, 0);
-                    break;
-                case AlignType.BOTTOM:
-                    this.alignPos = new gd3d.math.vector3((this.parent.width - this.width) / 2, this.parent.height - this.height);
-                    break;
-                case AlignType.TOP_LEFT:
-                    this.alignPos = new gd3d.math.vector3(0, 0);
-                    break;
-                case AlignType.BOTTOM_LEFT:
-                    this.alignPos = new gd3d.math.vector3(0, this.parent.height - this.height);
-                    break;
-                case AlignType.TOP_RIGHT:
-                    this.alignPos = new gd3d.math.vector3(this.parent.width - this.width, 0);
-                    break;
-                case AlignType.BOTTOM_RIGHT:
-                    this.alignPos = new gd3d.math.vector3(this.parent.width - this.width, this.parent.height - this.height);
-                    break;
-            }
-        }
-        var pos = gd3d.math.pool.new_vector3();
-        gd3d.math.vec3Add(this.alignPos, this.localTranslate, pos);
-        this.points[0] = new gd3d.math.vector3(pos.x - this.width / 2, pos.y + this.height / 2, pos.z);
-        this.points[1] = new gd3d.math.vector3(pos.x - this.width / 2, pos.y - this.height / 2, pos.z);
-        this.points[2] = new gd3d.math.vector3(pos.x + this.width / 2, pos.y - this.height / 2, pos.z);
-        this.points[3] = new gd3d.math.vector3(pos.x + this.width / 2, pos.y - this.height / 2, pos.z);
-        for (var i = 0; i < this.children.length; i++) {
-            this.children[i].layout();
-        }
-    };
-    return Rect;
-}(gd3d.framework.transform));
-var AlignType;
-(function (AlignType) {
-    AlignType[AlignType["NONE"] = 0] = "NONE";
-    AlignType[AlignType["CENTER"] = 1] = "CENTER";
-    AlignType[AlignType["LEFT"] = 2] = "LEFT";
-    AlignType[AlignType["RIGHT"] = 3] = "RIGHT";
-    AlignType[AlignType["TOP"] = 4] = "TOP";
-    AlignType[AlignType["BOTTOM"] = 5] = "BOTTOM";
-    AlignType[AlignType["TOP_LEFT"] = 6] = "TOP_LEFT";
-    AlignType[AlignType["BOTTOM_LEFT"] = 7] = "BOTTOM_LEFT";
-    AlignType[AlignType["TOP_RIGHT"] = 8] = "TOP_RIGHT";
-    AlignType[AlignType["BOTTOM_RIGHT"] = 9] = "BOTTOM_RIGHT";
-})(AlignType || (AlignType = {}));
 var test_anim = (function () {
     function test_anim() {
         this.cubes = {};
@@ -16721,8 +16637,14 @@ var gd3d;
                 _this._fingerTwo = false;
                 _this._panAngle = 0;
                 _this._panRad = 0;
+                _this._cur_panRad = 0;
+                _this.damping = 0.08;
+                _this.panSpeed = 0.01;
                 _this._tiltAngle = 0;
                 _this._tiltRad = 0;
+                _this._cur_tiltRad = 0;
+                _this.panDir = new gd3d.math.vector3();
+                _this.targetOffset = new gd3d.math.vector3();
                 _this.cupTargetV3 = new gd3d.math.vector3();
                 return _this;
             }
@@ -16758,15 +16680,18 @@ var gd3d;
                 this.inputMgr.addPointListener(gd3d.event.PointEventEnum.MouseWheel, this.onWheel, this);
             };
             HoverCameraScript.prototype.update = function (delta) {
-                var distanceX = this.distance * Math.sin(this._panRad) * Math.cos(this._tiltRad);
-                var distanceY = this.distance * (this._tiltRad == 0 ? 0 : Math.sin(this._tiltRad));
-                var distanceZ = this.distance * Math.cos(this._panRad) * Math.cos(this._tiltRad);
+                var tiltRad = this._cur_tiltRad = gd3d.math.numberLerp(this._cur_tiltRad, this._tiltRad, this.damping);
+                var panRad = this._cur_panRad = gd3d.math.numberLerp(this._cur_panRad, this._panRad, this.damping);
+                var distanceX = this.distance * Math.sin(panRad) * Math.cos(tiltRad);
+                var distanceY = this.distance * (tiltRad == 0 ? 0 : Math.sin(tiltRad));
+                var distanceZ = this.distance * Math.cos(panRad) * Math.cos(tiltRad);
                 if (this.lookAtTarget) {
                     gd3d.math.vec3Clone(this.lookAtTarget.getWorldTranslate(), this.cupTargetV3);
                 }
                 else {
                     gd3d.math.vec3Clone(this.lookAtPoint, this.cupTargetV3);
                 }
+                gd3d.math.vec3Add(this.cupTargetV3, this.targetOffset, this.cupTargetV3);
                 var tempv3 = gd3d.math.pool.new_vector3(this.cupTargetV3.x + distanceX, this.cupTargetV3.y + distanceY, this.cupTargetV3.z + distanceZ);
                 this.gameObject.transform.setWorldPosition(tempv3);
                 this.gameObject.transform.lookatPoint(this.cupTargetV3);
@@ -16786,8 +16711,18 @@ var gd3d;
                     return;
                 var moveX = this.inputMgr.point.x - this._lastMouseX;
                 var moveY = this.inputMgr.point.y - this._lastMouseY;
-                this.panAngle += moveX;
-                this.tiltAngle += moveY;
+                if (this.inputMgr.isPressed(0)) {
+                    this.panAngle += moveX;
+                    this.tiltAngle += moveY;
+                }
+                else if (this.inputMgr.isPressed(1) || this.inputMgr.isPressed(2)) {
+                    gd3d.math.vec3Set(this.panDir, -moveX, moveY, 0);
+                    gd3d.math.vec3ScaleByNum(this.panDir, this.panSpeed, this.panDir);
+                    gd3d.math.quatTransformVector(this.gameObject.transform.localRotate, this.panDir, this.panDir);
+                    gd3d.math.vec3Add(this.targetOffset, this.panDir, this.targetOffset);
+                    gd3d.math.vec3Add(this.gameObject.transform.localPosition, this.panDir, this.gameObject.transform.localPosition);
+                    this.gameObject.transform.markDirty();
+                }
                 this._lastMouseX = this.inputMgr.point.x;
                 this._lastMouseY = this.inputMgr.point.y;
             };

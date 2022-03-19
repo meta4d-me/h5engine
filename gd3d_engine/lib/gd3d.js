@@ -19773,7 +19773,7 @@ var gd3d;
                 enumerable: false,
                 configurable: true
             });
-            gltf.prototype.load = function (mgr, ctx, folder, brdf) {
+            gltf.prototype.load = function (mgr, ctx, folder, brdf, env, exposure, uvChecker) {
                 var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
                 return __awaiter(this, void 0, void 0, function () {
                     var load, _l, images, textures, materials, views, accessors, meshes, nodes, defaltScene, scene, parseNode, roots;
@@ -19783,7 +19783,7 @@ var gd3d;
                             case 0:
                                 load = function (uri) { return new Promise(function (res) {
                                     mgr.load(folder + uri, framework.AssetTypeEnum.Auto, function () {
-                                        res(mgr.getAssetByName(uri));
+                                        res(mgr.getAssetByName(uri.split('/').pop()));
                                     });
                                 }); };
                                 _l = this;
@@ -19809,21 +19809,33 @@ var gd3d;
                                 materials = (_d = this.data.materials) === null || _d === void 0 ? void 0 : _d.map(function (m) {
                                     var mat = new framework.material(m.name);
                                     mat.setShader(mgr.getShader("pbr.shader.json"));
-                                    mat.setTexture('brdf', brdf);
+                                    if (brdf) {
+                                        mat.setTexture('brdf', brdf);
+                                    }
+                                    mat.setCubeTexture('u_env', env);
                                     if (m.normalTexture) {
                                         mat.setTexture("uv_MetallicRoughness", textures[m.normalTexture.index]);
                                     }
                                     if (m.occlusionTexture) {
                                         mat.setTexture("uv_AO", textures[m.occlusionTexture.index]);
                                     }
+                                    if (m.normalTexture) {
+                                        mat.setTexture("uv_Normal", textures[m.normalTexture.index]);
+                                    }
+                                    if (exposure != null) {
+                                        mat.setFloat("u_Exposure", exposure);
+                                    }
                                     if (m.pbrMetallicRoughness) {
                                         var _a = m.pbrMetallicRoughness, baseColorFactor = _a.baseColorFactor, baseColorTexture = _a.baseColorTexture, metallicFactor = _a.metallicFactor, roughnessFactor = _a.roughnessFactor, metallicRoughnessTexture = _a.metallicRoughnessTexture;
                                         if (baseColorTexture) {
-                                            mat.setTexture("uv_Basecolor", textures[baseColorTexture.index]);
+                                            mat.setTexture("uv_Basecolor", uvChecker !== null && uvChecker !== void 0 ? uvChecker : textures[baseColorTexture.index]);
                                         }
                                         if (metallicRoughnessTexture) {
                                             mat.setTexture("uv_MetallicRoughness", textures[metallicRoughnessTexture.index]);
                                         }
+                                    }
+                                    if (m.occlusionTexture) {
+                                        mat.setTexture("uv_AO", textures[m.occlusionTexture.index]);
                                     }
                                     return mat;
                                 });
@@ -19838,48 +19850,75 @@ var gd3d;
                                 meshes = (_h = this.data.meshes) === null || _h === void 0 ? void 0 : _h.map(function (_a) {
                                     var name = _a.name, primitives = _a.primitives;
                                     return primitives.map(function (_a) {
-                                        var _b, _c, _d;
-                                        var _e, _f, _g, _h, _j, _k;
+                                        var _b, _c, _d, _e;
+                                        var _f, _g, _h, _j, _k, _l, _m, _o, _p, _q, _r, _s, _t, _u, _v, _w, _x, _y, _z;
                                         var attributes = _a.attributes, indices = _a.indices, material = _a.material;
                                         var mf = new framework.mesh(folder + name);
                                         var mdata = mf.data = new gd3d.render.meshData();
                                         var vert = mdata.pos = [];
                                         var uv1 = mdata.uv = [];
                                         var normal = mdata.normal = [];
+                                        var tangent = mdata.tangent = [];
                                         // const colors = mdata.color = [];
                                         var attr = {};
                                         for (var k in attributes) {
                                             attr[k] = new Accessor(accessors[attributes[k]], k);
                                         }
                                         var vcount = attr.POSITION.count;
-                                        var bs = +((_f = (_e = attr.POSITION) === null || _e === void 0 ? void 0 : _e.size) !== null && _f !== void 0 ? _f : 0)
+                                        var bs = +((_g = (_f = attr.POSITION) === null || _f === void 0 ? void 0 : _f.size) !== null && _g !== void 0 ? _g : 0)
+                                            + ((_j = (_h = attr.NORMAL) === null || _h === void 0 ? void 0 : _h.size) !== null && _j !== void 0 ? _j : 0)
                                             // + (attr.COLOR?.size ?? 0)
-                                            + ((_h = (_g = attr.TEXCOORD_0) === null || _g === void 0 ? void 0 : _g.size) !== null && _h !== void 0 ? _h : 0)
-                                            + ((_k = (_j = attr.NORMAL) === null || _j === void 0 ? void 0 : _j.size) !== null && _k !== void 0 ? _k : 0);
-                                        // + (attr.TANGENT?.size ?? 0);
+                                            + (((_k = attr.TANGENT) === null || _k === void 0 ? void 0 : _k.size) ? 3 : 0) // 引擎里的Tangent是vec3，而不是vec4
+                                            + ((_m = (_l = attr.TEXCOORD_0) === null || _l === void 0 ? void 0 : _l.size) !== null && _m !== void 0 ? _m : 0);
                                         var vbo = new Float32Array(vcount * bs);
                                         mf.glMesh = new gd3d.render.glMesh();
-                                        var vf = gd3d.render.VertexFormatMask.Position
-                                            | gd3d.render.VertexFormatMask.UV0
-                                            | gd3d.render.VertexFormatMask.Normal;
+                                        var vf;
+                                        if ((_o = attr.POSITION) === null || _o === void 0 ? void 0 : _o.size)
+                                            vf |= gd3d.render.VertexFormatMask.Position;
+                                        if ((_p = attr.NORMAL) === null || _p === void 0 ? void 0 : _p.size)
+                                            vf |= gd3d.render.VertexFormatMask.Normal;
                                         // | gd3d.render.VertexFormatMask.Color
+                                        if ((_q = attr.TANGENT) === null || _q === void 0 ? void 0 : _q.size)
+                                            vf |= gd3d.render.VertexFormatMask.Tangent;
+                                        if ((_r = attr.TEXCOORD_0) === null || _r === void 0 ? void 0 : _r.size)
+                                            vf |= gd3d.render.VertexFormatMask.UV0;
                                         // | gd3d.render.VertexFormatMask.BlendIndex4
                                         // | gd3d.render.VertexFormatMask.BlendWeight4;
                                         mf.glMesh.initBuffer(ctx, vf, vcount, gd3d.render.MeshTypeEnum.Dynamic);
                                         var ebo = new Accessor(accessors[indices], "indices").data;
                                         mdata.trisindex = Array.from(ebo);
                                         for (var i = 0; i < vcount; i++) {
-                                            vert[i] = new ((_b = gd3d.math.vector3).bind.apply(_b, __spreadArrays([void 0], attr.POSITION.data[i])))();
-                                            uv1[i] = new ((_c = gd3d.math.vector2).bind.apply(_c, __spreadArrays([void 0], attr.TEXCOORD_0.data[i])))();
-                                            normal[i] = new ((_d = gd3d.math.vector3).bind.apply(_d, __spreadArrays([void 0], attr.NORMAL.data[i])))();
+                                            var uvFliped = void 0;
+                                            if (((_s = attr.TEXCOORD_0) === null || _s === void 0 ? void 0 : _s.size) != null) {
+                                                uvFliped = __spreadArrays(attr.TEXCOORD_0.data[i]);
+                                                uvFliped[1] = uvFliped[1] * -1 + 1;
+                                                uv1[i] = new ((_b = gd3d.math.vector2).bind.apply(_b, __spreadArrays([void 0], uvFliped)))();
+                                            }
+                                            if (((_t = attr.POSITION) === null || _t === void 0 ? void 0 : _t.size) != null)
+                                                vert[i] = new ((_c = gd3d.math.vector3).bind.apply(_c, __spreadArrays([void 0], attr.POSITION.data[i])))();
+                                            if (((_u = attr.NORMAL) === null || _u === void 0 ? void 0 : _u.size) != null)
+                                                normal[i] = new ((_d = gd3d.math.vector3).bind.apply(_d, __spreadArrays([void 0], attr.NORMAL.data[i])))();
+                                            if (((_v = attr.TANGENT) === null || _v === void 0 ? void 0 : _v.size) != null)
+                                                tangent[i] = new ((_e = gd3d.math.vector3).bind.apply(_e, __spreadArrays([void 0], attr.TANGENT.data[i])))();
                                             var cur = vbo.subarray(i * bs); // offset
-                                            var position = cur.subarray(0, 3);
+                                            var bit = 0;
+                                            if (((_w = attr.POSITION) === null || _w === void 0 ? void 0 : _w.size) != null) {
+                                                var position = cur.subarray(bit, bit += 3);
+                                                position.set(attr.POSITION.data[i]);
+                                            }
                                             // const color = cur.subarray(3, 7);
-                                            var uv = cur.subarray(3, 5);
-                                            var n = cur.subarray(5, 8);
-                                            position.set(attr.POSITION.data[i]);
-                                            uv.set(attr.TEXCOORD_0.data[i]);
-                                            n.set(attr.NORMAL.data[i]);
+                                            if (((_x = attr.NORMAL) === null || _x === void 0 ? void 0 : _x.size) != null) {
+                                                var n = cur.subarray(bit, bit += 3);
+                                                n.set(attr.NORMAL.data[i]);
+                                            }
+                                            if (((_y = attr.TANGENT) === null || _y === void 0 ? void 0 : _y.size) != null) {
+                                                var tan = cur.subarray(bit, bit += 3);
+                                                tan.set(attr.TANGENT.data[i].slice(0, 3));
+                                            }
+                                            if (((_z = attr.TEXCOORD_0) === null || _z === void 0 ? void 0 : _z.size) != null) {
+                                                var uv = cur.subarray(bit, bit += 2);
+                                                uv.set(uvFliped);
+                                            }
                                             // const tangent = cur.subarray(7, 9);
                                             // colors[i] = new gd3d.math.vector4();
                                         }
@@ -58643,11 +58682,11 @@ var gd3d;
             Object.defineProperty(renderContext.prototype, "matrixInverseModelView", {
                 /** MV 矩阵的逆转置矩阵 */
                 get: function () {
-                    if (!gd3d.math.matrixEqual(this._lastMV_IT, this.matrixModelView, 0)) {
-                        gd3d.math.matrixInverse(this.matrixModelView, this._matrixInverseModelView);
-                        gd3d.math.matrixTranspose(this._matrixInverseModelView, this._matrixInverseModelView);
-                        gd3d.math.matrixClone(this._matrixModelView, this._lastMV_IT);
-                    }
+                    // if(!gd3d.math.matrixEqual(this._lastMV_IT , this.matrixModelView , 0)){
+                    gd3d.math.matrixInverse(this.matrixModel, this._matrixInverseModelView);
+                    gd3d.math.matrixTranspose(this._matrixInverseModelView, this._matrixInverseModelView);
+                    // gd3d.math.matrixClone(this._matrixInverseModelView ,this._lastMV_IT);
+                    // }
                     return this._matrixInverseModelView;
                 },
                 enumerable: false,
@@ -58847,7 +58886,7 @@ var gd3d;
             };
             renderList.prototype.addRenderer = function (renderer, webgl) {
                 var idx = renderer.layer;
-                // let layer = renderer.layer; 
+                // let layer = renderer.layer;
                 // var idx = 0;
                 // if (layer == RenderLayerEnum.Common)
                 // {
@@ -58890,7 +58929,7 @@ var gd3d;
                 //先暂时分配 透明与不透明两组
                 this.list = [];
                 /** gpu instance map*/
-                // gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {}; 
+                // gpuInstanceMap: {[sID:string] : IRendererGpuIns[]} = {};
                 this.gpuInstanceMap = {};
                 this.gpuInstanceBatcherMap = {};
                 this.needSort = _sort;
@@ -58936,7 +58975,7 @@ var gd3d;
                     var pass = bs.passArr[i];
                     var darr = bs.bufferDArrs[i];
                     gd3d.framework.meshRenderer.setInstanceOffsetMatrix(mr.gameObject.transform, mat, pass); //RTS offset 矩阵
-                    mat.uploadInstanceAtteribute(pass, darr); //收集 各material instance atteribute    
+                    mat.uploadInstanceAtteribute(pass, darr); //收集 各material instance atteribute
                 }
                 bs.count++;
             };
@@ -69771,7 +69810,10 @@ var gd3d;
                 this.linear = linear;
                 this.texture = webgl.createTexture();
             }
-            glTextureCube.prototype.uploadImages = function (Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z) {
+            glTextureCube.prototype.uploadImages = function (Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z, min, max, mipmap) {
+                if (min === void 0) { min = WebGLRenderingContext.NEAREST; }
+                if (max === void 0) { max = WebGLRenderingContext.NEAREST; }
+                if (mipmap === void 0) { mipmap = null; }
                 var wrc = this.webgl;
                 var textures = [Texture_NEGATIVE_X, Texture_NEGATIVE_Y, Texture_NEGATIVE_Z, Texture_POSITIVE_X, Texture_POSITIVE_Y, Texture_POSITIVE_Z];
                 var typeArr = [wrc.TEXTURE_CUBE_MAP_NEGATIVE_X, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Y, wrc.TEXTURE_CUBE_MAP_NEGATIVE_Z, wrc.TEXTURE_CUBE_MAP_POSITIVE_X, wrc.TEXTURE_CUBE_MAP_POSITIVE_Y, wrc.TEXTURE_CUBE_MAP_POSITIVE_Z];
@@ -69783,13 +69825,20 @@ var gd3d;
                     }
                     this.upload(reader.data, reader.width, reader.height, typeArr[i]);
                 }
+                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_MIN_FILTER, min);
+                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_MAG_FILTER, max);
+                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_WRAP_S, wrc.CLAMP_TO_EDGE);
+                wrc.texParameteri(wrc.TEXTURE_CUBE_MAP, wrc.TEXTURE_WRAP_T, wrc.CLAMP_TO_EDGE);
+                if (mipmap !== null) {
+                    wrc.generateMipmap(wrc.TEXTURE_CUBE_MAP);
+                }
             };
             glTextureCube.prototype.upload = function (data, width, height, TEXTURE_CUBE_MAP_) {
                 this.width = width;
                 this.height = height;
                 this.loaded = true;
                 var gl = this.webgl;
-                gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, 1);
+                // gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL,1);
                 this.webgl.bindTexture(this.webgl.TEXTURE_CUBE_MAP, this.texture);
                 var formatGL = this.webgl.RGBA;
                 if (this.format == TextureFormatEnum.RGB)
@@ -69806,11 +69855,11 @@ var gd3d;
                     //最后这个type，可以管格式
                     this.webgl.UNSIGNED_BYTE, data);
                 }
-                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-                gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-                var mipmap = this.mipmap;
+                // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MIN_FILTER, min);
+                // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_MAG_FILTER, max);
+                // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+                // gl.texParameteri(gl.TEXTURE_CUBE_MAP, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+                // let mipmap = this.mipmap;
                 var linear = this.linear;
                 // let repeat = true;
                 // let premultiply = true;

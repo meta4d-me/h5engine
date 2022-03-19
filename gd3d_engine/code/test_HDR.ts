@@ -47,6 +47,7 @@ class HDR_sample implements IState
             tex[3],
             tex[4],
             tex[5],
+            WebGLRenderingContext.LINEAR_MIPMAP_LINEAR, WebGLRenderingContext.LINEAR, WebGLRenderingContext.TEXTURE_CUBE_MAP
         );
         return cubeTex;
     }
@@ -105,13 +106,45 @@ class HDR_sample implements IState
 
             // const brdf = await this.load<gd3d.framework.texture>('res/pbrRes/', 'lut_ggx.png');
 
-            const gltfFolder = 'res/pbrRes/FlightHelmet/glTF/';
-            const gltf = await this.load<gd3d.framework.gltf>(gltfFolder, 'FlightHelmet.gltf');
-            const root = await gltf.load(this.assetMgr, this.app.webgl, gltfFolder, null, env, exp);
-            gd3d.math.vec3SetAll(root.localScale, 10);
-            // root.localScale.x *= -1;
-            // root.markDirty();
-            this.app.getScene().addChild(root);
+            const loadGLTF = async ({gltfFolder, file, scale }) => {
+                const gltf = await this.load<gd3d.framework.gltf>(gltfFolder, file);
+                const root = await gltf.load(this.assetMgr, this.app.webgl, gltfFolder, null, env, exp);
+                gd3d.math.vec3SetAll(root.localScale, scale ?? 1);
+                root.localScale.x *= -1;
+                this.app.getScene().addChild(root);
+                return root;
+            }
+            const par = new URL(window.location.href).searchParams;
+
+            const gltfModels = [
+                {
+                    gltfFolder: 'res/pbrRes/FlightHelmet/glTF/',
+                    file: 'FlightHelmet.gltf',
+                    scale: 20,
+                    cb: root => {}
+                },
+                // {
+                //     gltfFolder: 'res/pbrRes/BoomBoxWithAxes/glTF/',
+                //     file: 'BoomBoxWithAxes.gltf',
+                //     scale: 300,
+                //     cb: (root) => root.localTranslate.x += 8,
+                // },
+            ];
+
+            if (par.has('folder')) {
+                gltfModels.push({
+                    gltfFolder: par.get('folder'),
+                    file: par.get('file'),
+                    scale: par.get('scale') ? parseFloat(par.get('scale')) : 1,
+                    cb: root => root.localTranslate.x += par.get('x') ? parseFloat(par.get('x')) : 0,
+                })
+            }
+
+
+            gltfModels.map(async (cfg) => {
+                const root = await loadGLTF(cfg);
+                if (cfg.cb) cfg.cb(root);
+            });
         })();
     }
 

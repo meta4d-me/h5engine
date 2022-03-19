@@ -1262,41 +1262,6 @@ declare class test_uiPerfabLoad implements IState {
     private loadTexture;
     update(delta: number): void;
 }
-declare class test_uimove implements IState {
-    app: gd3d.framework.application;
-    scene: gd3d.framework.scene;
-    start(app: gd3d.framework.application): void;
-    camera: gd3d.framework.camera;
-    cube: gd3d.framework.transform;
-    cube2: gd3d.framework.transform;
-    cube3: gd3d.framework.transform;
-    timer: number;
-    update(delta: number): void;
-    private test;
-}
-declare class Rect extends gd3d.framework.transform {
-    width: number;
-    height: number;
-    offset: gd3d.math.vector3;
-    parent: Rect;
-    children: Rect[];
-    alignType: AlignType;
-    points: gd3d.math.vector3[];
-    alignPos: gd3d.math.vector3;
-    layout(): void;
-}
-declare enum AlignType {
-    NONE = 0,
-    CENTER = 1,
-    LEFT = 2,
-    RIGHT = 3,
-    TOP = 4,
-    BOTTOM = 5,
-    TOP_LEFT = 6,
-    BOTTOM_LEFT = 7,
-    TOP_RIGHT = 8,
-    BOTTOM_RIGHT = 9
-}
 declare class test_anim implements IState {
     app: gd3d.framework.application;
     scene: gd3d.framework.scene;
@@ -2442,12 +2407,18 @@ declare namespace gd3d.framework {
         private _lastDistance;
         private _panAngle;
         private _panRad;
+        private _cur_panRad;
+        private damping;
+        private panSpeed;
         set panAngle(value: number);
         get panAngle(): number;
         private _tiltAngle;
         private _tiltRad;
+        private _cur_tiltRad;
         set tiltAngle(value: number);
         get tiltAngle(): number;
+        private panDir;
+        private targetOffset;
         onPlay(): void;
         start(): void;
         private cupTargetV3;

@@ -1,5 +1,5 @@
 {
-    "layer": "geometry",
+    "layer": "transparent",
     "properties": [
         "uv_Basecolor('albedo',Texture)='white'{}",
         "uv_MetallicRoughness('MetallicRoughness',Texture)='white'{}",
@@ -13,6 +13,7 @@
     "passes": {
         "base": [
             {
+                "blendmode": "blend",
                 "showface": "all",
                 "vs": "pbr",
                 "fs": "pbr"
