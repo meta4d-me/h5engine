@@ -222,7 +222,8 @@ namespace gd3d.framework
                         // | gd3d.render.VertexFormatMask.BlendWeight4;
                     mf.glMesh.initBuffer(ctx, vf, vcount, gd3d.render.MeshTypeEnum.Dynamic);
 
-                    const ebo = new Accessor(accessors[indices], "indices").data;
+                    const eboAcc = new Accessor(accessors[indices], "indices");
+                    const ebo = eboAcc.data;
                     mdata.trisindex = Array.from(ebo);
 
                     for(let i = 0; i < vcount; i++) {
@@ -271,7 +272,7 @@ namespace gd3d.framework
                     }
                     mf.glMesh.uploadVertexData(ctx, vbo);
                     mf.glMesh.addIndex(ctx, ebo.length);
-                    mf.glMesh.uploadIndexData(ctx, 0, ebo);
+                    mf.glMesh.uploadIndexData(ctx, 0, ebo, eboAcc.componentType);
                     mf.submesh = [];
                     const sm = new gd3d.framework.subMeshInfo();
                     sm.matIndex = 0;
@@ -290,6 +291,7 @@ namespace gd3d.framework
                 n.name = name;
                 if (matrix != null) {
                     n.getLocalMatrix().rawData = matrix;
+                    math.matrixDecompose(n.getLocalMatrix(), n.localScale, n.localRotate, n.localTranslate);
                 } else {
                     if (translation != null)
                         math.vec3Set(n.localTranslate, translation[0], translation[1], translation[2]);

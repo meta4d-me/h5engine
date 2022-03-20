@@ -19885,7 +19885,8 @@ var gd3d;
                                         // | gd3d.render.VertexFormatMask.BlendIndex4
                                         // | gd3d.render.VertexFormatMask.BlendWeight4;
                                         mf.glMesh.initBuffer(ctx, vf, vcount, gd3d.render.MeshTypeEnum.Dynamic);
-                                        var ebo = new Accessor(accessors[indices], "indices").data;
+                                        var eboAcc = new Accessor(accessors[indices], "indices");
+                                        var ebo = eboAcc.data;
                                         mdata.trisindex = Array.from(ebo);
                                         for (var i = 0; i < vcount; i++) {
                                             var uvFliped = void 0;
@@ -19924,7 +19925,7 @@ var gd3d;
                                         }
                                         mf.glMesh.uploadVertexData(ctx, vbo);
                                         mf.glMesh.addIndex(ctx, ebo.length);
-                                        mf.glMesh.uploadIndexData(ctx, 0, ebo);
+                                        mf.glMesh.uploadIndexData(ctx, 0, ebo, eboAcc.componentType);
                                         mf.submesh = [];
                                         var sm = new gd3d.framework.subMeshInfo();
                                         sm.matIndex = 0;
@@ -19943,6 +19944,7 @@ var gd3d;
                                     n.name = name;
                                     if (matrix != null) {
                                         n.getLocalMatrix().rawData = matrix;
+                                        gd3d.math.matrixDecompose(n.getLocalMatrix(), n.localScale, n.localRotate, n.localTranslate);
                                     }
                                     else {
                                         if (translation != null)
@@ -67413,6 +67415,7 @@ var gd3d;
          */
         var glMesh = /** @class */ (function () {
             function glMesh() {
+                this.eboDataType = WebGLRenderingContext.UNSIGNED_SHORT;
                 this.bindIndex = -1;
                 this.vertexFormat = VertexFormatMask.Position;
             }
@@ -67609,7 +67612,9 @@ var gd3d;
                 webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
                 webgl.bufferSubData(webgl.ELEMENT_ARRAY_BUFFER, offset, data);
             };
-            glMesh.prototype.uploadIndexData = function (webgl, eboindex, data) {
+            glMesh.prototype.uploadIndexData = function (webgl, eboindex, data, dataType) {
+                if (dataType === void 0) { dataType = WebGLRenderingContext.UNSIGNED_SHORT; }
+                this.eboDataType = dataType;
                 webgl.bindBuffer(webgl.ELEMENT_ARRAY_BUFFER, this.ebos[eboindex]);
                 webgl.bufferData(webgl.ELEMENT_ARRAY_BUFFER, data, this.mode);
             };
@@ -67655,10 +67660,10 @@ var gd3d;
                 drawInfo.ins.triCount += count / 3;
                 drawInfo.ins.renderCount++;
                 if (instanceCount > 1 && webgl.drawElementsInstanced != null) {
-                    webgl.drawElementsInstanced(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
+                    webgl.drawElementsInstanced(webgl.TRIANGLES, count, this.eboDataType, start * 2, instanceCount);
                 }
                 else {
-                    webgl.drawElements(webgl.TRIANGLES, count, webgl.UNSIGNED_SHORT, start * 2);
+                    webgl.drawElements(webgl.TRIANGLES, count, this.eboDataType, start * 2);
                 }
             };
             glMesh.prototype.drawElementLines = function (webgl, start, count, instanceCount) {
@@ -67669,10 +67674,10 @@ var gd3d;
                     count = ((this.indexCounts[this.bindIndex] / 2) | 0) * 2;
                 drawInfo.ins.renderCount++;
                 if (instanceCount > 1 && webgl.drawElementsInstanced != null) {
-                    webgl.drawElementsInstanced(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2, instanceCount);
+                    webgl.drawElementsInstanced(webgl.LINES, count, this.eboDataType, start * 2, instanceCount);
                 }
                 else {
-                    webgl.drawElements(webgl.LINES, count, webgl.UNSIGNED_SHORT, start * 2);
+                    webgl.drawElements(webgl.LINES, count, this.eboDataType, start * 2);
                 }
             };
             return glMesh;

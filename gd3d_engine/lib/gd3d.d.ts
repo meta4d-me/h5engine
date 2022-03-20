@@ -22107,6 +22107,7 @@ declare namespace gd3d.render {
         vertexCount: number;
         vertexByteSize: number;
         ebos: WebGLBuffer[];
+        eboDataType: number;
         indexCounts: number[];
         lineMode: number;
         bindVboBuffer(webgl: WebGLRenderingContext): void;
@@ -22116,7 +22117,7 @@ declare namespace gd3d.render {
         uploadVertexSubData(webgl: WebGLRenderingContext, varray: Float32Array, offset?: number): void;
         uploadVertexData(webgl: WebGLRenderingContext, varray: Float32Array): void;
         uploadIndexSubData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array, offset?: number): void;
-        uploadIndexData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array): void;
+        uploadIndexData(webgl: WebGLRenderingContext, eboindex: number, data: Uint16Array, dataType?: number): void;
         drawArrayTris(webgl: WebGLRenderingContext, start?: number, count?: number, instanceCount?: number): void;
         drawArrayLines(webgl: WebGLRenderingContext, start?: number, count?: number, instanceCount?: number): void;
         drawElementTris(webgl: WebGLRenderingContext, start?: number, count?: number, instanceCount?: number): void;

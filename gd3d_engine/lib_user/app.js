@@ -4578,6 +4578,7 @@ var HDR_sample = (function () {
                             });
                         };
                         par = new URL(window.location.href).searchParams;
+                        exp = par.has('exp') ? parseFloat(par.get('exp')) : exp;
                         gltfModels = [
                             {
                                 gltfFolder: 'res/pbrRes/FlightHelmet/glTF/',

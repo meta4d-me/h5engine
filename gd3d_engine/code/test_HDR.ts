@@ -88,7 +88,7 @@ class HDR_sample implements IState
             await demoTool.loadbySync(`newRes/test/shader/customShader/customShader.assetbundle.json`, app.getAssetMgr());  //项目shader
             // await datGui.init();
 
-            const exp = 4;
+            let exp = 4;
 
             const env = await this.loadCubeTexture(HDRpath + 'helipad/');
             const skybox = new gd3d.framework.transform();
@@ -115,7 +115,7 @@ class HDR_sample implements IState
                 return root;
             }
             const par = new URL(window.location.href).searchParams;
-
+            exp = par.has('exp') ? parseFloat(par.get('exp')) : exp;
             const gltfModels = [
                 {
                     gltfFolder: 'res/pbrRes/FlightHelmet/glTF/',

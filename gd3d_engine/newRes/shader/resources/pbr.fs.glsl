@@ -185,7 +185,7 @@ vec3 lightBRDF(vec3 L, st_core core) {
 
 void main() {
     st_core c = init();
-    float lod = clamp(c.roughness * 10.0, 0.0, 1.0);
+    float lod = clamp(c.roughness * 10.0, 0.0, 11.0);
     vec3 finalColor;
 
     // vec2 envBRDF    = texture2D(brdf, vec2(clamp(c.NoV, 0.0, 0.9999999), clamp(1.0-c.Roughness, 0.0, 0.9999999))).rg;
