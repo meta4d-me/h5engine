@@ -2427,7 +2427,16 @@ declare namespace gd3d.framework {
         private onPointUp;
         private onPointMove;
         private onWheel;
+        lastTouch: math.vector2;
+        diffv2: math.vector2;
+        touchRotateID: number;
+        lastTouches: {
+            id: number;
+            pos: pointinfo;
+        }[];
+        panFingers: math.vector2[];
         private onTouch;
+        private onTouchMove;
         remove(): void;
     }
 }

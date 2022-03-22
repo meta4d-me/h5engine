@@ -53,6 +53,17 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
+var __assign = (this && this.__assign) || function () {
+    __assign = Object.assign || function(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
+                t[p] = s[p];
+        }
+        return t;
+    };
+    return __assign.apply(this, arguments);
+};
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
@@ -16647,6 +16658,10 @@ var gd3d;
                 _this.panDir = new gd3d.math.vector3();
                 _this.targetOffset = new gd3d.math.vector3();
                 _this.cupTargetV3 = new gd3d.math.vector3();
+                _this.lastTouch = new gd3d.math.vector2();
+                _this.diffv2 = new gd3d.math.vector2();
+                _this.lastTouches = null;
+                _this.panFingers = [new gd3d.math.vector2(), new gd3d.math.vector2()];
                 return _this;
             }
             Object.defineProperty(HoverCameraScript.prototype, "panAngle", {
@@ -16679,6 +16694,8 @@ var gd3d;
                 this.inputMgr.addPointListener(gd3d.event.PointEventEnum.PointUp, this.onPointUp, this);
                 this.inputMgr.addPointListener(gd3d.event.PointEventEnum.PointMove, this.onPointMove, this);
                 this.inputMgr.addPointListener(gd3d.event.PointEventEnum.MouseWheel, this.onWheel, this);
+                this.inputMgr.addHTMLElementListener('touchstart', this.onTouch, this);
+                this.inputMgr.addHTMLElementListener('touchmove', this.onTouchMove, this);
             };
             HoverCameraScript.prototype.update = function (delta) {
                 var tiltRad = this._cur_tiltRad = gd3d.math.numberLerp(this._cur_tiltRad, this._tiltRad, this.damping);
@@ -16730,7 +16747,85 @@ var gd3d;
             HoverCameraScript.prototype.onWheel = function () {
                 this.distance = Math.max(this.distance - this.inputMgr.wheel * 2, 1);
             };
-            HoverCameraScript.prototype.onTouch = function () {
+            HoverCameraScript.prototype.onTouch = function (ev) {
+                var _this = this;
+                if (ev.targetTouches.length == 1) {
+                    var touch = this.inputMgr.touches[ev.targetTouches[0].identifier];
+                    this.touchRotateID = ev.targetTouches[0].identifier;
+                    gd3d.math.vec2Set(this.lastTouch, touch.x, touch.y);
+                }
+                else if (ev.targetTouches.length == 2) {
+                    var touches = [0, 1].map(function (i) {
+                        return {
+                            id: ev.targetTouches[i].identifier,
+                            pos: __assign({}, _this.inputMgr.touches[ev.targetTouches[i].identifier]),
+                        };
+                    });
+                    this.lastTouches = touches;
+                }
+            };
+            HoverCameraScript.prototype.onTouchMove = function (ev) {
+                var _this = this;
+                var _a, _b;
+                if (ev.targetTouches.length == 1) {
+                    var touch = this.inputMgr.touches[ev.targetTouches[0].identifier];
+                    if (this.touchRotateID == ev.targetTouches[0].identifier) {
+                        gd3d.math.vec2Set(this.diffv2, touch.x, touch.y);
+                        gd3d.math.vec2Subtract(this.diffv2, this.lastTouch, this.diffv2);
+                        this.panAngle += (_a = this.diffv2.x / (window === null || window === void 0 ? void 0 : window.devicePixelRatio)) !== null && _a !== void 0 ? _a : 1;
+                        this.tiltAngle += (_b = this.diffv2.y / (window === null || window === void 0 ? void 0 : window.devicePixelRatio)) !== null && _b !== void 0 ? _b : 1;
+                    }
+                    gd3d.math.vec2Set(this.lastTouch, touch.x, touch.y);
+                    this.touchRotateID = ev.targetTouches[0].identifier;
+                }
+                else if (ev.targetTouches.length == 2) {
+                    var touch = this.inputMgr.touches[ev.changedTouches[0].identifier];
+                    gd3d.math.vec2Set(this.lastTouch, touch.x, touch.y);
+                    var touches = [0, 1].map(function (i) {
+                        return {
+                            id: ev.targetTouches[i].identifier,
+                            pos: __assign({}, _this.inputMgr.touches[ev.targetTouches[i].identifier]),
+                        };
+                    });
+                    var deltas = touches.map(function (_a, i) {
+                        var _b;
+                        var id = _a.id, pos = _a.pos;
+                        var lastpos = (_b = _this.lastTouches.filter(function (t) { return t.id == id; })[0]) === null || _b === void 0 ? void 0 : _b.pos;
+                        if (lastpos) {
+                            gd3d.math.vec2Set(_this.panFingers[i], pos.x, pos.y);
+                            gd3d.math.vec2Set(_this.diffv2, lastpos.x, lastpos.y);
+                            gd3d.math.vec2Subtract(_this.panFingers[i], _this.diffv2, _this.panFingers[i]);
+                            return _this.panFingers[i];
+                        }
+                    });
+                    if (deltas.length == 2) {
+                        var dot = gd3d.math.vec2Dot(deltas[0], deltas[1]);
+                        if (dot < 0.2) {
+                            var lastpos = this.lastTouches.map(function (_a) {
+                                var pos = _a.pos;
+                                return pos;
+                            });
+                            gd3d.math.vec2Set(this.diffv2, lastpos[0].x - lastpos[1].x, lastpos[0].y - lastpos[1].y);
+                            var dis = gd3d.math.vec2Dot(this.diffv2, this.diffv2);
+                            var dpos = touches.map(function (_a) {
+                                var pos = _a.pos;
+                                return pos;
+                            });
+                            gd3d.math.vec2Set(this.diffv2, dpos[0].x - dpos[1].x, dpos[0].y - dpos[1].y);
+                            dis -= gd3d.math.vec2Dot(this.diffv2, this.diffv2);
+                            this.distance = Math.max(this.distance + dis * 1e-5, 1);
+                        }
+                        else {
+                            gd3d.math.vec3Set(this.panDir, -this.panFingers[0].x, this.panFingers[0].y, 0);
+                            gd3d.math.vec3ScaleByNum(this.panDir, this.panSpeed, this.panDir);
+                            gd3d.math.quatTransformVector(this.gameObject.transform.localRotate, this.panDir, this.panDir);
+                            gd3d.math.vec3Add(this.targetOffset, this.panDir, this.targetOffset);
+                            gd3d.math.vec3Add(this.gameObject.transform.localPosition, this.panDir, this.gameObject.transform.localPosition);
+                            this.gameObject.transform.markDirty();
+                        }
+                    }
+                    this.lastTouches = touches;
+                }
             };
             HoverCameraScript.prototype.remove = function () {
                 this.inputMgr.removePointListener(gd3d.event.PointEventEnum.PointDown, this.onPointDown, this);
