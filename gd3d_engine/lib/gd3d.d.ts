@@ -2756,6 +2756,12 @@ declare namespace gd3d.framework {
         private inputElement;
         private _text;
         private static _isIos;
+        /** 选择区域的开始位置 */
+        get selectionStart(): number;
+        /** 选择区域的结束位置 */
+        get selectionEnd(): number;
+        /** 选择区域的方向 ， forward ：从前往后 backward ：从后往前 */
+        get selectionDirection(): "none" | "forward" | "backward";
         /**
          * @public
          * @language zh_CN
@@ -2764,6 +2770,10 @@ declare namespace gd3d.framework {
          * @version gd3d 1.0
          */
         get text(): string;
+        /**
+         * 清除输入文本
+         */
+        clearText(): void;
         private _charlimit;
         /**
          * @public
@@ -2814,6 +2824,18 @@ declare namespace gd3d.framework {
          */
         get PlaceholderLabel(): label;
         set PlaceholderLabel(placeholderLabel: label);
+        private _cursorTrans;
+        /**
+         * 选择 光标 节点对象
+         */
+        get CursorTrans(): transform2D;
+        set CursorTrans(val: transform2D);
+        private _selectionBG;
+        /**
+         * 选择 字符串背景 节点对象
+         */
+        get SelectionBG(): transform2D;
+        set SelectionBG(val: transform2D);
         /**
          * 刷新布局
          */
@@ -2835,6 +2857,16 @@ declare namespace gd3d.framework {
          */
         private textRefresh;
         private filterContentText;
+        private _lastIsCursorMode;
+        private _twinkleTime;
+        private _twinkleTimeCount;
+        private _lastSStart;
+        private _lastSEnd;
+        private _currStartX;
+        private _currEndX;
+        /** 选择状态刷新 */
+        private selectionRefresh;
+        private getInputTextXPos;
         /**
          * @private
          */
@@ -22120,6 +22152,7 @@ declare namespace gd3d.render {
      */
     class textureReader {
         constructor(webgl: WebGLRenderingContext, texRGBA: WebGLTexture, width: number, height: number, gray?: boolean);
+        private _isDispose;
         private webgl;
         private _width;
         get width(): number;
@@ -22130,9 +22163,11 @@ declare namespace gd3d.render {
         get data(): Uint8Array;
         private _gray;
         get gray(): boolean;
+        get isDispose(): boolean;
         getPixel(u: number, v: number): any;
         /** 刷新data数据 */
         refresh(texRGBA: WebGLTexture): void;
+        dispose(): void;
     }
     /**
      * @private
