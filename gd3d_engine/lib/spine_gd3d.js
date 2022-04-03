@@ -10917,7 +10917,8 @@
             if (this.mesh) {
                 let shader = (_a = this._shader) !== null && _a !== void 0 ? _a : app.getAssetMgr().getShader(defSpineShaderName);
                 this._mat.setShader(shader);
-                ortho(-app.width / 2, app.width / 2, -app.height / 2, app.height / 2, -1, 1, this._projectMat);
+                // ortho(0, app.width, 0, app.height, -1, 1, this._projectMat);
+                // gd3d.math.matrixMakeIdentity(this._projectMat);
                 this.mesh.bindVboBuffer(webgl);
                 let pass = shader.passes["base"][0];
                 this.mesh.bind(webgl, pass.program, 0);
@@ -10935,7 +10936,7 @@
                     gd3d.render.glDrawPass.lastBlendMode = null;
                     pass.use(webgl);
                     this._mat.setTexture("_MainTex", slotTexture.texture);
-                    this._mat.setMatrix("_SpineMvp", this._projectMat);
+                    // this._mat.setMatrix("_SpineMvp", this._projectMat);
                     this._mat.uploadUnifoms(pass, context);
                     this.mesh.drawElementTris(webgl, start, count);
                 }
@@ -10972,8 +10973,9 @@
     var spineSkeleton_1;
     exports.spineSkeleton = spineSkeleton_1 = class spineSkeleton {
         constructor(skeletonData) {
-            this._quat = new gd3d.math.quaternion();
-            this._modelMat = new gd3d.math.matrix();
+            this._toTransFormMatrix = new gd3d.math.matrix3x2([1, 0, 0, -1, 0, 0]);
+            this._spineToWorld = new gd3d.math.matrix3x2();
+            this._spineToWorld2 = new gd3d.math.matrix();
             this.batches = new Array();
             this.nextBatchIndex = 0;
             this.clipper = new SkeletonClipping();
@@ -11006,15 +11008,36 @@
             this.updateGeometry();
             (_a = this.onUpdate) === null || _a === void 0 ? void 0 : _a.call(this, delta);
         }
+        get toTransformMatrix() {
+            return this._toTransFormMatrix;
+        }
+        getToCanvasMatrix(mat = new gd3d.math.matrix3x2()) {
+            gd3d.math.matrix3x2Multiply(this.transform.getCanvasWorldMatrix(), this._toTransFormMatrix, mat);
+            return mat;
+        }
         render(canvas) {
             let app = canvas.scene.app;
             let context = canvas["context"];
-            let worldPos = this.transform.getWorldTranslate();
-            let worldRot = this.transform.getWorldRotate();
-            let worldScale = this.transform.getWorldScale();
-            gd3d.math.quatFromAxisAngle(gd3d.math.z_AXIS(), worldRot.v * 180 / Math.PI, this._quat);
-            gd3d.math.matrixMakeTransformRTS(new gd3d.math.vector3(worldPos.x, worldPos.y, 0), new gd3d.math.vector3(worldScale.x, worldScale.y, 1.0), this._quat, this._modelMat);
-            context.matrixModel = this._modelMat;
+            let worldMat = this.transform.getWorldMatrix();
+            let spineToWorld = this._spineToWorld;
+            gd3d.math.matrix3x2Multiply(worldMat, this._toTransFormMatrix, spineToWorld);
+            let mat = this._spineToWorld2;
+            mat.rawData[0] = spineToWorld.rawData[0];
+            mat.rawData[1] = spineToWorld.rawData[1];
+            mat.rawData[4] = spineToWorld.rawData[2];
+            mat.rawData[5] = spineToWorld.rawData[3];
+            mat.rawData[12] = spineToWorld.rawData[4];
+            mat.rawData[13] = spineToWorld.rawData[5];
+            context.matrixModel = mat;
+            // let worldPos = this.transform.getWorldTranslate();
+            // let worldRot = this.transform.getWorldRotate();
+            // let worldScale = this.transform.getWorldScale();
+            // gd3d.math.quatFromAxisAngle(gd3d.math.z_AXIS(), worldRot.v * 180 / Math.PI, this._quat)
+            // gd3d.math.matrixMakeTransformRTS(new gd3d.math.vector3(worldPos.x, worldPos.y, 0), new gd3d.math.vector3(worldScale.x, worldScale.y, 1.0), this._quat, this._modelMat);
+            // let pmat = new gd3d.math.matrix();
+            // ortho(0, app.width, 0, app.height, -1, 1, pmat);
+            // gd3d.math.matrixMultiply(pmat, this._modelMat, this._modelMat);
+            // context.matrixModel = this._modelMat;
             for (let i = 0; i < this.batches.length; i++) {
                 this.batches[i].render(context, app);
             }
@@ -11239,7 +11262,6 @@
         attribute vec4 _glesColor;
         attribute vec4 _glesColorEx;                   
         attribute vec4 _glesMultiTexCoord0;          
-        uniform highp mat4 _SpineMvp;
         uniform highp mat4 glstate_matrix_model;
         varying lowp vec4 v_light;  
         varying lowp vec4 v_dark;               
@@ -11252,7 +11274,7 @@
             v_light = _glesColor;
             v_dark = _glesColorEx;                    
             xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,_glesMultiTexCoord0.y);      
-            gl_Position = (_SpineMvp*glstate_matrix_model* tmpvar_1);   
+            gl_Position = glstate_matrix_model* tmpvar_1;   
         }
         `;
             let fscodeUI = `
@@ -11278,7 +11300,7 @@
             spineShader.fillUnDefUniform(p);
             p.state_ztest = false;
             p.state_zwrite = false;
-            p.state_showface = gd3d.render.ShowFaceStateEnum.CW;
+            p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
             this._assetMgr.mapShader[spineShader.getName()] = spineShader;
         }
     }
@@ -11423,8 +11445,9 @@
     exports.VertexAttachment = VertexAttachment;
     exports.WindowedMean = WindowedMean;
     exports.defSpineShaderName = defSpineShaderName;
+    exports.ortho = ortho;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-//# sourceMappingURL=spin_gd3d.umd.js.map
+//# sourceMappingURL=spine_gd3d.js.map

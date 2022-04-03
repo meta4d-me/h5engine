@@ -48,8 +48,10 @@
 //     }
 // }
 
-class test_spine_imageChange implements IState {
-    start(app: gd3d.framework.application) {
+class test_spine_imageChange implements IState
+{
+    start(app: gd3d.framework.application)
+    {
         let scene = app.getScene();
         //相机
         var objCam = new gd3d.framework.transform();
@@ -63,13 +65,16 @@ class test_spine_imageChange implements IState {
         let atlasFile = "atlas1.atlas"
         let animation = "death";
         Promise.all([
-            new Promise<void>((resolve, reject) => {
+            new Promise<void>((resolve, reject) =>
+            {
                 assetManager.loadJson(skeletonFile, () => resolve())
             }),
-            new Promise<void>((resolve, reject) => {
+            new Promise<void>((resolve, reject) =>
+            {
                 assetManager.loadTextureAtlas(atlasFile, () => resolve());
             })])
-            .then(() => {
+            .then(() =>
+            {
                 let atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
                 let skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
                 skeletonJson.scale = 0.4;
@@ -78,6 +83,8 @@ class test_spine_imageChange implements IState {
                 //设置播放动画
                 comp.state.setAnimation(0, animation, true);
                 let spineNode = new gd3d.framework.transform2D;
+                spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+                spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
                 spineNode.addComponentDirect(comp);
                 root2d.addChild(spineNode);
             })

@@ -1,6 +1,8 @@
 
-class test_spine_additiveBlending implements IState {
-    start(app: gd3d.framework.application) {
+class test_spine_additiveBlending implements IState
+{
+    start(app: gd3d.framework.application)
+    {
 
         let scene = app.getScene();
         //相机
@@ -14,13 +16,16 @@ class test_spine_additiveBlending implements IState {
         let skeletonFile = "demos.json";
         let atlasFile = "atlas2.atlas"
         Promise.all([
-            new Promise<void>((resolve, reject) => {
+            new Promise<void>((resolve, reject) =>
+            {
                 assetManager.loadJson(skeletonFile, () => resolve())
             }),
-            new Promise<void>((resolve, reject) => {
+            new Promise<void>((resolve, reject) =>
+            {
                 assetManager.loadTextureAtlas(atlasFile, () => resolve());
             })])
-            .then(() => {
+            .then(() =>
+            {
                 let atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
                 let skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
                 skeletonJson.scale = 0.4;
@@ -44,23 +49,30 @@ class test_spine_additiveBlending implements IState {
                 down.alpha = 0;
 
                 let spineNode = new gd3d.framework.transform2D;
+                spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+                spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
                 spineNode.addComponentDirect(comp);
                 root2d.addChild(spineNode);
 
-                document.addEventListener("mousemove", (ev) => {
+                document.addEventListener("mousemove", (ev) =>
+                {
                     //计算混合比例
-                    if (ev.x - app.width / 2 > 0) {
+                    if (ev.x - app.width / 2 > 0)
+                    {
                         right.alpha = (ev.x - app.width / 2) / (app.width / 2)
                         left.alpha = 0;
-                    } else {
+                    } else
+                    {
                         right.alpha = 0;
                         left.alpha = (app.width / 2 - ev.x) / (app.width / 2);
                     }
 
-                    if (ev.y - app.height / 2 > 0) {
+                    if (ev.y - app.height / 2 > 0)
+                    {
                         up.alpha = 0;
                         down.alpha = (ev.y - app.height / 2) / (app.height / 2)
-                    } else {
+                    } else
+                    {
                         down.alpha = 0;
                         up.alpha = (app.height / 2 - ev.y) / (app.height / 2)
                     }

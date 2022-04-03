@@ -1,4 +1,5 @@
-class test_spine_wheelTransform implements IState {
+class test_spine_wheelTransform implements IState
+{
     private _inited: boolean;
     private controlBones = ["wheel2overlay", "wheel3overlay", "rotate-handle"];
     private _temptMat = new gd3d.math.matrix();
@@ -7,7 +8,8 @@ class test_spine_wheelTransform implements IState {
     private bonesPos: { [bone: string]: { bone: spine_gd3d.Bone, boneUI: HTMLDivElement } } = {}
     private _hoverBone: string;
 
-    start(app: gd3d.framework.application) {
+    start(app: gd3d.framework.application)
+    {
 
         let scene = app.getScene();
         //相机
@@ -21,13 +23,16 @@ class test_spine_wheelTransform implements IState {
         let skeletonFile = "demos.json";
         let atlasFile = "atlas2.atlas"
         Promise.all([
-            new Promise<void>((resolve, reject) => {
+            new Promise<void>((resolve, reject) =>
+            {
                 assetManager.loadJson(skeletonFile, () => resolve())
             }),
-            new Promise<void>((resolve, reject) => {
+            new Promise<void>((resolve, reject) =>
+            {
                 assetManager.loadTextureAtlas(atlasFile, () => resolve());
             })])
-            .then(() => {
+            .then(() =>
+            {
                 let atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
                 let skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
                 skeletonJson.scale = 0.4;
@@ -35,56 +40,64 @@ class test_spine_wheelTransform implements IState {
                 let comp = new spine_gd3d.spineSkeleton(skeletonData);
                 this._comp = comp;
                 let spineNode = new gd3d.framework.transform2D;
+                spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+                spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
                 spineNode.addComponentDirect(comp);
                 root2d.addChild(spineNode);
 
                 let wheel = this._comp.skeleton.findBone("wheel1overlay");
-                comp.onUpdate = () => {
-                    if (!this._inited) {
+                comp.onUpdate = () =>
+                {
+                    if (!this._inited)
+                    {
                         this._inited = true;
                         let ui = document.getElementById("drawarea") as HTMLDivElement;
 
                         let lastAngle = 0;
                         //拖动骨骼
-                        document.addEventListener("mousemove", (ev) => {
-                            if (this._chooseBone) {
+                        document.addEventListener("mousemove", (ev) =>
+                        {
+                            if (this._chooseBone)
+                            {
                                 let bone = this._chooseBone.data.name;
                                 //拖拉骨骼
-                                if (["wheel2overlay", "wheel3overlay"].indexOf(bone) >= 0) {
+                                if (["wheel2overlay", "wheel3overlay"].indexOf(bone) >= 0)
+                                {
                                     //修改UI位置
                                     this.bonesPos[bone].boneUI.style.left = ev.clientX + "px";
                                     this.bonesPos[bone].boneUI.style.top = ev.clientY + "px";
 
                                     //修改骨骼位置
-                                    let boneWorldPos = new gd3d.math.vector2(ev.clientX - app.width / 2, app.height / 2 - ev.clientY);
-                                    let worldPos = this._comp.transform.getWorldTranslate();
-                                    let worldRot = this._comp.transform.getWorldRotate();
-                                    let worldScale = this._comp.transform.getWorldScale();
-                                    gd3d.math.matrix3x2MakeTransformRTS(worldPos, worldScale, worldRot.v, this._temptMat);
-                                    gd3d.math.matrix3x2Inverse(this._temptMat, this._temptMat);
-                                    gd3d.math.matrix3x2TransformVector2(this._temptMat, boneWorldPos, this._temptPos);
-
+                                    let temptPos = new gd3d.math.vector2();
+                                    temptPos.x = ev.clientX;
+                                    temptPos.y = ev.clientY;
+                                    root2d.calScreenPosToCanvasPos(temptPos, temptPos);
+                                    let toMat = this._comp.getToCanvasMatrix();
+                                    let temptMat = new gd3d.math.matrix3x2();
+                                    gd3d.math.matrix3x2Inverse(toMat, temptMat);
+                                    gd3d.math.matrix3x2TransformVector2(temptMat, temptPos, temptPos);
                                     let tempt = new spine_gd3d.Vector2();
-                                    tempt.set(this._temptPos.x, this._temptPos.y)
+                                    tempt.set(temptPos.x, temptPos.y)
+
                                     this._chooseBone.parent.worldToLocal(tempt);
                                     this._chooseBone.x = tempt.x;
                                     this._chooseBone.y = tempt.y;
-                                } else {
+                                } else
+                                {
                                     //计算旋转
                                     //修改骨骼位置
                                     //screen world
-                                    let mouseWorldPos = new gd3d.math.vector2(ev.clientX - app.width / 2, app.height / 2 - ev.clientY);
-                                    let worldPos = this._comp.transform.getWorldTranslate();
-                                    let worldRot = this._comp.transform.getWorldRotate();
-                                    let worldScale = this._comp.transform.getWorldScale();
-                                    //spine world
-                                    let spineWorldPos = new gd3d.math.vector2();
-                                    gd3d.math.matrix3x2MakeTransformRTS(worldPos, worldScale, worldRot.v, this._temptMat);
-                                    gd3d.math.matrix3x2Inverse(this._temptMat, this._temptMat);
-                                    gd3d.math.matrix3x2TransformVector2(this._temptMat, mouseWorldPos, spineWorldPos);
+                                    let temptPos = new gd3d.math.vector2();
+                                    temptPos.x = ev.clientX;
+                                    temptPos.y = ev.clientY;
+                                    root2d.calScreenPosToCanvasPos(temptPos, temptPos);
+                                    let toMat = this._comp.getToCanvasMatrix();
+                                    let temptMat = new gd3d.math.matrix3x2();
+                                    gd3d.math.matrix3x2Inverse(toMat, temptMat);
+                                    gd3d.math.matrix3x2TransformVector2(temptMat, temptPos, temptPos);
 
                                     let subRes = new gd3d.math.vector2();
-                                    gd3d.math.vec2Subtract(spineWorldPos, new gd3d.math.vector2(wheel.worldX, wheel.worldY), subRes);
+                                    gd3d.math.vec2Subtract(temptPos, new gd3d.math.vector2(wheel.worldX, wheel.worldY), subRes);
                                     gd3d.math.vec2Normalize(subRes, subRes);
                                     let angle = Math.acos(subRes.x);
                                     if (subRes.y < 0) angle = 2 * Math.PI - angle;
@@ -97,20 +110,21 @@ class test_spine_wheelTransform implements IState {
                         document.addEventListener("mouseup", () => this._chooseBone = null)
 
                         //初始化骨骼UI
-                        let worldPos = this._comp.transform.getWorldTranslate();
-                        let worldRot = this._comp.transform.getWorldRotate();
-                        let worldScale = this._comp.transform.getWorldScale();
-                        gd3d.math.matrix3x2MakeTransformRTS(worldPos, worldScale, worldRot.v, this._temptMat);
-                        for (let i = 0; i < this.controlBones.length; i++) {
+                        let temptMat = this._comp.getToCanvasMatrix();
+                        let temptPos = new gd3d.math.vector2();
+
+                        for (let i = 0; i < this.controlBones.length; i++)
+                        {
                             // if(this.bonesPos[this.controlBones[i]]!=null)
                             let boneName = this.controlBones[i];
                             let bone = this._comp.skeleton.findBone(boneName);
                             let x = this._comp.skeleton.x + bone.worldX;
                             let y = this._comp.skeleton.y + bone.worldY;
-                            gd3d.math.matrix3x2TransformVector2(this._temptMat, new gd3d.math.vector2(x, y), this._temptPos);
+                            gd3d.math.matrix3x2TransformVector2(temptMat, new gd3d.math.vector2(x, y), temptPos);
+                            root2d.calCanvasPosToScreenPos(temptPos, temptPos);
+                            let screen_x = temptPos.x;
+                            let screen_y = temptPos.y;
 
-                            let screen_x = this._temptPos.x + app.width / 2;
-                            let screen_y = app.height / 2 - this._temptPos.y;
                             let boneUI = document.createElement("div", {});
                             boneUI.style.position = "absolute";
                             boneUI.style.width = "10px";
@@ -118,13 +132,16 @@ class test_spine_wheelTransform implements IState {
                             boneUI.style.backgroundColor = "blue";
                             boneUI.style.top = screen_y + "px";
                             boneUI.style.left = screen_x + "px";
-                            boneUI.addEventListener("mouseenter", () => {
+                            boneUI.addEventListener("mouseenter", () =>
+                            {
                                 boneUI.style.backgroundColor = "green";
                             });
-                            boneUI.addEventListener("mouseleave", () => {
+                            boneUI.addEventListener("mouseleave", () =>
+                            {
                                 boneUI.style.backgroundColor = "blue";
                             });
-                            boneUI.addEventListener("mousedown", () => {
+                            boneUI.addEventListener("mousedown", () =>
+                            {
                                 this._chooseBone = bone;
                             });
                             this.bonesPos[boneName] = { bone, boneUI }
@@ -132,16 +149,16 @@ class test_spine_wheelTransform implements IState {
                         }
                     }
                     //计算旋转骨骼的屏幕坐标
-                    let worldPos = this._comp.transform.getWorldTranslate();
-                    let worldRot = this._comp.transform.getWorldRotate();
-                    let worldScale = this._comp.transform.getWorldScale();
-                    gd3d.math.matrix3x2MakeTransformRTS(worldPos, worldScale, worldRot.v, this._temptMat);
+                    let temptMat = this._comp.getToCanvasMatrix();
+                    let temptPos = new gd3d.math.vector2();
+
                     let bone = this._comp.skeleton.findBone("rotate-handle");
                     let x = this._comp.skeleton.x + bone.worldX;
                     let y = this._comp.skeleton.y + bone.worldY;
-                    gd3d.math.matrix3x2TransformVector2(this._temptMat, new gd3d.math.vector2(x, y), this._temptPos);
-                    let screen_x = this._temptPos.x + app.width / 2;
-                    let screen_y = app.height / 2 - this._temptPos.y;
+                    gd3d.math.matrix3x2TransformVector2(temptMat, new gd3d.math.vector2(x, y), temptPos);
+                    root2d.calCanvasPosToScreenPos(temptPos, temptPos);
+                    let screen_x = temptPos.x;
+                    let screen_y = temptPos.y;
                     this.bonesPos["rotate-handle"].boneUI.style.left = screen_x + "px";
                     this.bonesPos["rotate-handle"].boneUI.style.top = screen_y + "px";
                 }
