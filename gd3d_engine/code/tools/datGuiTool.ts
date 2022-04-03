@@ -1,24 +1,30 @@
-declare let Promise;
+// declare let Promise;
 /**
  * datGui 工具类
  * 
  * dat使用教程 @see http://workshop.chromeexperiments.com/examples/gui/#1--Basic-Usage
  */
-class datGui {
+class datGui
+{
 
     private static _inited = false;
-    static async init(){
-       await this.loadJs();
-       this._inited = true;
-    } 
+    static async init()
+    {
+        await this.loadJs();
+        this._inited = true;
+    }
 
     //加载 js
-    private static loadJs(){
+    private static loadJs()
+    {
         let datUrl = `./lib/dat.gui.js`;
-        let p = new gd3d.threading.gdPromise<any>((resolve,reason)=>{
-            gd3d.io.loadText(datUrl,(txt)=>{
+        let p = new gd3d.threading.gdPromise<any>((resolve, reason) =>
+        {
+            gd3d.io.loadText(datUrl, (txt) =>
+            {
                 let isok = eval(txt);
-                setTimeout(() => {
+                setTimeout(() =>
+                {
                     resolve();
                     console.warn(dat);
                 }, 0);
@@ -28,14 +34,16 @@ class datGui {
     }
 
     /** 使用样例 */
-    static example(){
-        let FizzyText = function() {
+    static example()
+    {
+        let FizzyText = function ()
+        {
             this.message = 'dat.gui';
             this.speed = 0.8;
             this.displayOutline = false;
-            this.explode = function() { console.log(`do explode`) };
+            this.explode = function () { console.log(`do explode`) };
             // Define render logic ...
-          };
+        };
 
         let text = new FizzyText();
         let gui = new dat.GUI();
