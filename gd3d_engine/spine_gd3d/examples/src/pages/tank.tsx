@@ -40,7 +40,10 @@ export class Tank extends React.Component {
                 //设置播放动画
                 comp.state.setAnimation(0, "drive", true);
                 let spineNode = new gd3d.framework.transform2D;
-                spineNode.localTranslate.x = 500;
+                spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+                spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+
+                // spineNode.localTranslate.x = 500;
                 spineNode.localScale.x = 0.5;
                 spineNode.localScale.y = 0.5;
                 spineNode.addComponentDirect(comp);

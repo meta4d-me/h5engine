@@ -1,25 +1,17 @@
 {
-  "name": "@mtgoo/ctool",
+  "name": "spine_gd3d",
   "version": "0.1.0",
-  "main": "./dist/spin_gd3d.umd.js",
+  "main": "./dist/spine_gd3d.js",
   "module": "./dist/spine_gd3d.es.js",
   "typings": "./dist/types/index.d.ts",
   "files": [
     "dist/"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/mtgoo/ctool.git"
-  },
   "keywords": [
     "web"
   ],
   "author": "NichijouCC",
   "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/mtgoo/ctool/issues"
-  },
-  "homepage": "https://github.com/mtgoo/ctool#readme",
   "scripts": {
     "start": "rollup -c rollup.config.js -w",
     "build": "rollup -c rollup.config.js",

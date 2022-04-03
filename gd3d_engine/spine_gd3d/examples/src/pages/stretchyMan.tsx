@@ -56,26 +56,27 @@ export class StretchyMan extends React.Component<{}, IState> {
                 //设置播放动画
                 comp.state.setAnimation(0, "idle", true);
                 let spineNode = new gd3d.framework.transform2D;
+                spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+                spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
                 spineNode.addComponentDirect(comp);
                 root2d.addChild(spineNode);
 
                 comp.onUpdate = () => {
                     if (this._inited == false) {
                         this._inited = true;
-                        let worldPos = this._comp.transform.getWorldTranslate();
-                        let worldRot = this._comp.transform.getWorldRotate();
-                        let worldScale = this._comp.transform.getWorldScale();
-                        gd3d.math.matrix3x2MakeTransformRTS(worldPos, worldScale, worldRot.v, this._temptMat);
+                        let temptMat = this._comp.getToCanvasMatrix();
+                        let temptPos = new gd3d.math.vector2();
                         for (let i = 0; i < this.controlBones.length; i++) {
                             // if(this.bonesPos[this.controlBones[i]]!=null)
                             let boneName = this.controlBones[i];
                             let bone = this._comp.skeleton.findBone(boneName);
                             let x = this._comp.skeleton.x + bone.worldX;
                             let y = this._comp.skeleton.y + bone.worldY;
-                            gd3d.math.matrix3x2TransformVector2(this._temptMat, new gd3d.math.vector2(x, y), this._temptPos);
+                            gd3d.math.matrix3x2TransformVector2(temptMat, new gd3d.math.vector2(x, y), temptPos);
+                            root2d.calCanvasPosToScreenPos(temptPos, temptPos);
+                            let screen_x = temptPos.x;
+                            let screen_y = temptPos.y;
 
-                            let screen_x = this._temptPos.x + this._app.width / 2;
-                            let screen_y = this._app.height / 2 - this._temptPos.y;
                             this.bonesPos[boneName] = { bone, pos: [screen_x, screen_y] }
                         }
                     }
@@ -92,16 +93,17 @@ export class StretchyMan extends React.Component<{}, IState> {
                 this.bonesPos[bone].pos[0] = ev.clientX;
                 this.bonesPos[bone].pos[1] = ev.clientY;
 
-                let boneWorldPos = new gd3d.math.vector2(ev.clientX - app.width / 2, app.height / 2 - ev.clientY);
-                let worldPos = this._comp.transform.getWorldTranslate();
-                let worldRot = this._comp.transform.getWorldRotate();
-                let worldScale = this._comp.transform.getWorldScale();
-                gd3d.math.matrix3x2MakeTransformRTS(worldPos, worldScale, worldRot.v, this._temptMat);
-                gd3d.math.matrix3x2Inverse(this._temptMat, this._temptMat);
-                gd3d.math.matrix3x2TransformVector2(this._temptMat, boneWorldPos, this._temptPos);
+                let temptPos = new gd3d.math.vector2();
+                temptPos.x = ev.clientX;
+                temptPos.y = ev.clientY;
+                root2d.calScreenPosToCanvasPos(temptPos, temptPos);
+                let toMat = this._comp.getToCanvasMatrix();
+                let temptMat = new gd3d.math.matrix3x2();
+                gd3d.math.matrix3x2Inverse(toMat, temptMat);
+                gd3d.math.matrix3x2TransformVector2(temptMat, temptPos, temptPos);
 
                 let tempt = new Vector2();
-                tempt.set(this._temptPos.x, this._temptPos.y)
+                tempt.set(temptPos.x, temptPos.y)
                 this._chooseBone.parent.worldToLocal(tempt);
                 this._chooseBone.x = tempt.x;
                 this._chooseBone.y = tempt.y;

@@ -49,6 +49,8 @@ export class Transition extends React.Component {
                 this.setAnimations(comp.state);
                 // comp.state.setAnimation(0, animation, true);
                 let spineNode = new gd3d.framework.transform2D;
+                spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+                spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
                 spineNode.addComponentDirect(comp);
                 root2d.addChild(spineNode);
             })

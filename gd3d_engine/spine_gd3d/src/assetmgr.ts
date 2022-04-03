@@ -19,7 +19,6 @@ export class SpineAssetMgr extends AssetManagerBase {
         attribute vec4 _glesColor;
         attribute vec4 _glesColorEx;                   
         attribute vec4 _glesMultiTexCoord0;          
-        uniform highp mat4 _SpineMvp;
         uniform highp mat4 glstate_matrix_model;
         varying lowp vec4 v_light;  
         varying lowp vec4 v_dark;               
@@ -32,7 +31,7 @@ export class SpineAssetMgr extends AssetManagerBase {
             v_light = _glesColor;
             v_dark = _glesColorEx;                    
             xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,_glesMultiTexCoord0.y);      
-            gl_Position = (_SpineMvp*glstate_matrix_model* tmpvar_1);   
+            gl_Position = glstate_matrix_model* tmpvar_1;   
         }
         `;
         let fscodeUI: string = `
@@ -58,7 +57,7 @@ export class SpineAssetMgr extends AssetManagerBase {
         spineShader.fillUnDefUniform(p);
         p.state_ztest = false;
         p.state_zwrite = false;
-        p.state_showface = gd3d.render.ShowFaceStateEnum.CW;
+        p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
 
         this._assetMgr.mapShader[spineShader.getName()] = spineShader;
     }

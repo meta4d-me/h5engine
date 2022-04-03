@@ -148,7 +148,8 @@ export class SpineMeshBatcher {
         if (this.mesh) {
             let shader = this._shader ?? app.getAssetMgr().getShader(defSpineShaderName);
             this._mat.setShader(shader);
-            ortho(-app.width / 2, app.width / 2, -app.height / 2, app.height / 2, -1, 1, this._projectMat);
+            // ortho(0, app.width, 0, app.height, -1, 1, this._projectMat);
+            // gd3d.math.matrixMakeIdentity(this._projectMat);
             this.mesh.bindVboBuffer(webgl);
             let pass = shader.passes["base"][0];
             this.mesh.bind(webgl, pass.program, 0);
@@ -166,7 +167,7 @@ export class SpineMeshBatcher {
                 gd3d.render.glDrawPass.lastBlendMode = null;
                 pass.use(webgl);
                 this._mat.setTexture("_MainTex", slotTexture.texture);
-                this._mat.setMatrix("_SpineMvp", this._projectMat);
+                // this._mat.setMatrix("_SpineMvp", this._projectMat);
                 this._mat.uploadUnifoms(pass, context);
                 this.mesh.drawElementTris(webgl, start, count);
             }
@@ -176,7 +177,7 @@ export class SpineMeshBatcher {
 
 }
 
-function ortho(left: number, right: number, bottom: number, top: number, near: number, far: number, out: gd3d.math.matrix) {
+export function ortho(left: number, right: number, bottom: number, top: number, near: number, far: number, out: gd3d.math.matrix) {
     let x_orth = 2 / (right - left);
     let y_orth = 2 / (top - bottom);
     let z_orth = -2 / (far - near);
