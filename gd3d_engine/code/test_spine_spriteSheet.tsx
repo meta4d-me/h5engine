@@ -1,6 +1,8 @@
 
-declare namespace spine_gd3d {
-    class spineSkeleton implements gd3d.framework.I2DComponent {
+declare namespace spine_gd3d
+{
+    class spineSkeleton implements gd3d.framework.I2DComponent
+    {
         constructor(skeletonData: any)
         state: AnimationState;
         animData: any;
@@ -11,25 +13,30 @@ declare namespace spine_gd3d {
         transform: gd3d.framework.transform2D;
         remove();
         onUpdate: () => void;
+        getToCanvasMatrix(mat?: gd3d.math.matrix3x2): gd3d.math.matrix3x2;
     }
-    class SpineAssetMgr {
+    class SpineAssetMgr
+    {
         constructor(mgr: gd3d.framework.assetMgr, baseUrl?: string)
         loadJson(fileUrl: string, cb: () => void)
         loadTextureAtlas(fileUrl: string, cb: () => void);
         get(asset: string): any;
     }
 
-    class AtlasAttachmentLoader {
+    class AtlasAttachmentLoader
+    {
         constructor(atlas: any)
     }
 
-    class SkeletonJson {
+    class SkeletonJson
+    {
         constructor(json: any);
         readSkeletonData(data: any)
         scale: number
     }
 
-    class AnimationState {
+    class AnimationState
+    {
         timeScale: number;
         addAnimation(trackIndex: number, animationName: string, loop?: boolean, delay?: number): TrackEntry
         setAnimation(trackIndex: number, animationName: string, loop?: boolean): TrackEntry
@@ -38,7 +45,8 @@ declare namespace spine_gd3d {
         setEmptyAnimation(trackIndex: number, mixDuration?: number): TrackEntry;
     }
 
-    class TrackEntry {
+    class TrackEntry
+    {
         previous: TrackEntry;
         next: TrackEntry;
         mixingFrom: TrackEntry;
@@ -49,13 +57,15 @@ declare namespace spine_gd3d {
         mixBlend: MixBlend;
         alpha: number;
     }
-    enum MixBlend {
+    enum MixBlend
+    {
         setup = 0,
         first = 1,
         replace = 2,
         add = 3
     }
-    class AnimationStateListener {
+    class AnimationStateListener
+    {
         start?(entry: TrackEntry): void;
         interrupt?(entry: TrackEntry): void;
         end?(entry: TrackEntry): void;
@@ -64,7 +74,8 @@ declare namespace spine_gd3d {
         event?(entry: TrackEntry, event: Event): void;
     }
 
-    class Skeleton {
+    class Skeleton
+    {
         data: SkeletonData
         slots: Slot[];
         scaleX: number;
@@ -77,18 +88,21 @@ declare namespace spine_gd3d {
         findBone(boneName: string): Bone;
     }
 
-    class SkeletonData {
+    class SkeletonData
+    {
         skins: Skin[];
     }
 
-    class Skin {
+    class Skin
+    {
         name: string;
         setAttachment(slotIndex: number, name: string, attachment: Attachment): void;
         attachments: { [att: string]: Attachment }[]
         constructor(name: string)
     }
 
-    class Bone {
+    class Bone
+    {
         data: BoneData;
         skeleton: Skeleton;
         parent: Bone;
@@ -122,7 +136,8 @@ declare namespace spine_gd3d {
         localToWorldRotation(localRotation: number): number;
         rotateWorld(degrees: number): void;
     }
-    class BoneData {
+    class BoneData
+    {
         index: number;
         name: string;
         parent: BoneData;
@@ -135,22 +150,27 @@ declare namespace spine_gd3d {
         shearX: number;
         shearY: number;
     }
-    class Slot {
+    class Slot
+    {
 
     }
-    abstract class Attachment {
+    abstract class Attachment
+    {
         name: string;
     }
 
-    class Vector2 {
+    class Vector2
+    {
         x: number;
         y: number;
         set(x: number, y: number);
     }
 }
 
-class test_spine_spriteSheet implements IState {
-    start(app: gd3d.framework.application) {
+class test_spine_spriteSheet implements IState
+{
+    start(app: gd3d.framework.application)
+    {
 
         let scene = app.getScene();
         //相机
@@ -165,13 +185,16 @@ class test_spine_spriteSheet implements IState {
         let atlasFile = "atlas1.atlas"
         let animation = "walk";
         Promise.all([
-            new Promise<void>((resolve, reject) => {
+            new Promise<void>((resolve, reject) =>
+            {
                 assetManager.loadJson(skeletonFile, () => resolve())
             }),
-            new Promise<void>((resolve, reject) => {
+            new Promise<void>((resolve, reject) =>
+            {
                 assetManager.loadTextureAtlas(atlasFile, () => resolve());
             })])
-            .then(() => {
+            .then(() =>
+            {
                 let atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
                 let skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
                 skeletonJson.scale = 0.4;
@@ -182,20 +205,22 @@ class test_spine_spriteSheet implements IState {
                 comp.state.setAnimation(0, animation, true);
                 let spineNode = new gd3d.framework.transform2D;
                 //可用transform2d缩放等
-                // spineNode.localTranslate.x = app.width / 2;
-                // spineNode.localTranslate.y = -app.height / 2;
+                spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+                spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
                 // spineNode.localRotate = 30 * Math.PI / 180;
-                // spineNode.localScale.x = 3;
+                spineNode.localScale.x = -1;
                 spineNode.addComponentDirect(comp);
                 root2d.addChild(spineNode);
                 //GUI
                 datGui.init().then(() => this.setGUI())
             })
     }
-    setGUI() {
+    setGUI()
+    {
         if (!dat) return;
         let gui = new dat.GUI();
-        gui.add(this, 'speed', 0, 2).onChange((value) => {
+        gui.add(this, 'speed', 0, 2).onChange((value) =>
+        {
             this._comp.state.timeScale = value;
         });
     }

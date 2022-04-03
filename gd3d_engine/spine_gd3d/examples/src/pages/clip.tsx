@@ -40,6 +40,9 @@ export class Clip extends React.Component {
                 //设置播放动画
                 comp.state.setAnimation(0, "portal", true);
                 let spineNode = new gd3d.framework.transform2D;
+                spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+                spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+
                 spineNode.addComponentDirect(comp);
                 root2d.addChild(spineNode);
             })

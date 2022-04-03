@@ -24,6 +24,11 @@ export class SpriteSheet extends React.Component {
         let skeletonFile = "demos.json";
         let atlasFile = "atlas1.atlas"
         let animation = "walk";
+
+        // skeletonFile = "skeleton_animation/cha_ObliqueFront_walk_idle/json/skeleton.json";
+        // atlasFile = "skeleton_animation/cha_ObliqueFront_walk_idle/json/skeleton.atlas";
+        // animation = "cha_ObliqueFront_walk";
+
         Promise.all([
             new Promise<void>((resolve, reject) => {
                 assetManager.loadJson(skeletonFile, () => resolve())
@@ -34,18 +39,24 @@ export class SpriteSheet extends React.Component {
             .then(() => {
                 let atlasLoader = new AtlasAttachmentLoader(assetManager.get(atlasFile));
                 let skeletonJson = new SkeletonJson(atlasLoader);
-                skeletonJson.scale = 0.4;
+                // skeletonJson.scale = 0.4;
+                skeletonJson.scale = 1;
                 let skeletonData = skeletonJson.readSkeletonData(assetManager.get(skeletonFile).raptor);
                 let comp = new spineSkeleton(skeletonData);
                 this._comp = comp;
                 //设置播放动画
                 comp.state.setAnimation(0, animation, true);
+                // comp.skeleton.setSkinByName("Normal_BOT_skin")
                 let spineNode = new gd3d.framework.transform2D;
                 //可用transform2d缩放等
                 // spineNode.localTranslate.x = app.width / 2;
                 // spineNode.localTranslate.y = -app.height / 2;
                 // spineNode.localRotate = 30 * Math.PI / 180;
-                // spineNode.localScale.x = 3;
+                // spineNode.localScale.y = -1;
+                // spineNode.localScale.x = -1;
+
+                spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+                spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
                 spineNode.addComponentDirect(comp);
                 root2d.addChild(spineNode);
             })

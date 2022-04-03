@@ -1,6 +1,6 @@
 import { AnimationState, VertexEffect, SkeletonData, AnimationStateData, SkeletonClipping, Vector2, Color, RegionAttachment, TextureAtlasRegion, MeshAttachment, ClippingAttachment, NumberArrayLike, Skeleton } from "@esotericsoftware/spine-core";
 import { Gd3dTexture } from "./assetMgr";
-import { SpineMeshBatcher } from "./spineMeshBatcher";
+import { ortho, SpineMeshBatcher } from "./spineMeshBatcher";
 
 
 @gd3d.reflect.node2DComponent
@@ -43,18 +43,44 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
     }
     onUpdate: (delta: number) => void
 
+    private _toTransFormMatrix = new gd3d.math.matrix3x2([1, 0, 0, -1, 0, 0]);
+    get toTransformMatrix() {
+        return this._toTransFormMatrix;
+    }
 
-    private _quat = new gd3d.math.quaternion();
-    private _modelMat = new gd3d.math.matrix();
+    getToCanvasMatrix(mat = new gd3d.math.matrix3x2()): gd3d.math.matrix3x2 {
+        gd3d.math.matrix3x2Multiply(this.transform.getCanvasWorldMatrix(), this._toTransFormMatrix, mat)
+        return mat;
+    }
+
+    private _spineToWorld = new gd3d.math.matrix3x2();
+    private _spineToWorld2 = new gd3d.math.matrix();
     render(canvas: gd3d.framework.canvas) {
         let app = canvas.scene.app;
         let context: gd3d.framework.renderContext = canvas["context"];
-        let worldPos = this.transform.getWorldTranslate();
-        let worldRot = this.transform.getWorldRotate();
-        let worldScale = this.transform.getWorldScale();
-        gd3d.math.quatFromAxisAngle(gd3d.math.z_AXIS(), worldRot.v * 180 / Math.PI, this._quat)
-        gd3d.math.matrixMakeTransformRTS(new gd3d.math.vector3(worldPos.x, worldPos.y, 0), new gd3d.math.vector3(worldScale.x, worldScale.y, 1.0), this._quat, this._modelMat);
-        context.matrixModel = this._modelMat;
+        let worldMat = this.transform.getWorldMatrix();
+        let spineToWorld = this._spineToWorld;
+
+        gd3d.math.matrix3x2Multiply(worldMat, this._toTransFormMatrix, spineToWorld);
+
+        let mat = this._spineToWorld2;
+        mat.rawData[0] = spineToWorld.rawData[0];
+        mat.rawData[1] = spineToWorld.rawData[1];
+        mat.rawData[4] = spineToWorld.rawData[2];
+        mat.rawData[5] = spineToWorld.rawData[3];
+        mat.rawData[12] = spineToWorld.rawData[4];
+        mat.rawData[13] = spineToWorld.rawData[5];
+        context.matrixModel = mat;
+
+        // let worldPos = this.transform.getWorldTranslate();
+        // let worldRot = this.transform.getWorldRotate();
+        // let worldScale = this.transform.getWorldScale();
+        // gd3d.math.quatFromAxisAngle(gd3d.math.z_AXIS(), worldRot.v * 180 / Math.PI, this._quat)
+        // gd3d.math.matrixMakeTransformRTS(new gd3d.math.vector3(worldPos.x, worldPos.y, 0), new gd3d.math.vector3(worldScale.x, worldScale.y, 1.0), this._quat, this._modelMat);
+        // let pmat = new gd3d.math.matrix();
+        // ortho(0, app.width, 0, app.height, -1, 1, pmat);
+        // gd3d.math.matrixMultiply(pmat, this._modelMat, this._modelMat);
+        // context.matrixModel = this._modelMat;
 
         for (let i = 0; i < this.batches.length; i++) {
             this.batches[i].render(context, app);
@@ -279,8 +305,4 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
     remove() {
         this.transform = null;
     }
-}
-
-function ortho(arg0: number, arg1: number, arg2: number, arg3: number, arg4: number, arg5: number, vpMat: gd3d.math.matrix) {
-    throw new Error("Function not implemented.");
 }

@@ -39,6 +39,8 @@ class test_spine_transition implements IState
                 //播放一系列动画
                 this.setAnimations(comp.state);
                 let spineNode = new gd3d.framework.transform2D;
+                spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+                spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
                 spineNode.addComponentDirect(comp);
                 root2d.addChild(spineNode);
                 //GUI

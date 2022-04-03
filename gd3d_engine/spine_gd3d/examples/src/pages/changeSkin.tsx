@@ -43,6 +43,8 @@ export class ChangeSkin extends React.Component {
                 //设置播放动画
                 comp.state.setAnimation(0, animation, true);
                 let spineNode = new gd3d.framework.transform2D;
+                spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+                spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
                 spineNode.addComponentDirect(comp);
                 root2d.addChild(spineNode);
             })
@@ -66,7 +68,7 @@ export class ChangeSkin extends React.Component {
         //         newSkin.setAttachment(slotIndex, attachmentName, attachments[attachmentName]);
         //     }
         // }
-        let randomIndex = Math.floor(Math.random() * (skeleton.data.skins.length - 1));
+        let randomIndex = Math.floor(Math.random() * skeleton.data.skins.length);
         let skin = skeleton.data.skins[randomIndex]
         this._comp.skeleton.setSkin(skin);
         this._comp.skeleton.setSlotsToSetupPose();

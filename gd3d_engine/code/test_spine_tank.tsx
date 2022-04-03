@@ -1,6 +1,8 @@
 
-class test_spine_tank implements IState {
-    start(app: gd3d.framework.application) {
+class test_spine_tank implements IState
+{
+    start(app: gd3d.framework.application)
+    {
 
         let scene = app.getScene();
         //相机
@@ -14,13 +16,16 @@ class test_spine_tank implements IState {
         let skeletonFile = "demos.json";
         let atlasFile = "atlas2.atlas"
         Promise.all([
-            new Promise<void>((resolve, reject) => {
+            new Promise<void>((resolve, reject) =>
+            {
                 assetManager.loadJson(skeletonFile, () => resolve())
             }),
-            new Promise<void>((resolve, reject) => {
+            new Promise<void>((resolve, reject) =>
+            {
                 assetManager.loadTextureAtlas(atlasFile, () => resolve());
             })])
-            .then(() => {
+            .then(() =>
+            {
                 let atlasLoader = new spine_gd3d.AtlasAttachmentLoader(assetManager.get(atlasFile));
                 let skeletonJson = new spine_gd3d.SkeletonJson(atlasLoader);
                 skeletonJson.scale = 0.4;
@@ -29,7 +34,8 @@ class test_spine_tank implements IState {
                 this._comp = comp;
                 comp.state.setAnimation(0, "drive", true);
                 let spineNode = new gd3d.framework.transform2D;
-                spineNode.localTranslate.x = 500;
+                spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+                spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
                 spineNode.localScale.x = 0.5;
                 spineNode.localScale.y = 0.5;
                 spineNode.addComponentDirect(comp);
@@ -38,10 +44,12 @@ class test_spine_tank implements IState {
                 datGui.init().then(() => this.setGUI())
             })
     }
-    setGUI() {
+    setGUI()
+    {
         if (!dat) return;
         let gui = new dat.GUI();
-        gui.add(this, 'speed', 0, 2).onChange((value) => {
+        gui.add(this, 'speed', 0, 2).onChange((value) =>
+        {
             this._comp.state.timeScale = value;
         });
     }

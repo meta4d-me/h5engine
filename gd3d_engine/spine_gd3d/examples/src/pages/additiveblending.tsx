@@ -56,6 +56,10 @@ export class AdditiveBlending extends React.Component {
                 down.alpha = 0;
 
                 let spineNode = new gd3d.framework.transform2D;
+
+                spineNode.localTranslate.x = root2d.canvas.pixelWidth / 2;
+                spineNode.localTranslate.y = root2d.canvas.pixelHeight / 2;
+
                 spineNode.addComponentDirect(comp);
                 root2d.addChild(spineNode);
 
