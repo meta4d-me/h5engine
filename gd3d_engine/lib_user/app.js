@@ -1177,12 +1177,14 @@ var main = (function () {
     }
     main_1 = main;
     main.prototype.onStart = function (app) {
+        var _a;
         if (!main_1.instance)
             main_1.instance = this;
         console.log("i am here.");
         this.app = app;
         gd3d.framework.assetMgr.openGuid = false;
         this.clearBtn();
+        (_a = window['eruda']) === null || _a === void 0 ? void 0 : _a.init();
         new HDR_sample().start(this.app);
         return;
         this.addBtn("基础==>", function () {

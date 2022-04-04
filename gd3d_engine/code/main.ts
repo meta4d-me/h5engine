@@ -22,6 +22,8 @@ class main implements gd3d.framework.IUserCode
         gd3d.framework.assetMgr.openGuid = false;
 
         this.clearBtn();
+        // 移动端调试log
+        window['eruda']?.init();
         new HDR_sample().start(this.app);
 
         return;
