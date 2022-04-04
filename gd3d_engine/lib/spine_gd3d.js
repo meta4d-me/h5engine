@@ -11073,7 +11073,7 @@
     var spineSkeleton_1;
     exports.spineSkeleton = spineSkeleton_1 = class spineSkeleton {
         constructor(skeletonData) {
-            this.MainColor = new gd3d.math.vector4(1, 1, 1, 1);
+            this.mainColor = new gd3d.math.vector4(1, 1, 1, 1);
             this._toTransFormMatrix = new gd3d.math.matrix3x2([1, 0, 0, -1, 0, 0]);
             this._spineToWorld = new gd3d.math.matrix3x2();
             this._spineToWorld2 = new gd3d.math.matrix();
@@ -11328,7 +11328,7 @@
         }
         nextBatch() {
             if (this.batches.length == this.nextBatchIndex) {
-                let batch = new SpineMeshBatcher(this._shader, this.MainColor);
+                let batch = new SpineMeshBatcher(this._shader, this.mainColor);
                 this.batches.push(batch);
             }
             let batch = this.batches[this.nextBatchIndex++];
@@ -11456,3 +11456,4 @@
     Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
+//# sourceMappingURL=spine_gd3d.js.map

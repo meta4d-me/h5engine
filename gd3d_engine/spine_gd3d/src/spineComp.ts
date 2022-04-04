@@ -13,7 +13,7 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
     animData: AnimationStateData;
     vertexEffect: VertexEffect;
     private _shader: gd3d.framework.shader;
-    MainColor = new gd3d.math.vector4(1, 1, 1, 1);
+    mainColor = new gd3d.math.vector4(1, 1, 1, 1);
     constructor(skeletonData: SkeletonData) {
         this.skeleton = new Skeleton(skeletonData);
         this.animData = new AnimationStateData(skeletonData);
@@ -290,7 +290,7 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
 
     private nextBatch() {
         if (this.batches.length == this.nextBatchIndex) {
-            let batch = new SpineMeshBatcher(this._shader, this.MainColor);
+            let batch = new SpineMeshBatcher(this._shader, this.mainColor);
             this.batches.push(batch);
         }
         let batch = this.batches[this.nextBatchIndex++];
