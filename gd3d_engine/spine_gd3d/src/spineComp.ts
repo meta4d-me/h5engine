@@ -57,6 +57,10 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
     private _spineToWorld = new gd3d.math.matrix3x2();
     private _spineToWorld2 = new gd3d.math.matrix();
     render(canvas: gd3d.framework.canvas) {
+
+        canvas["lastMat"] = null;
+        canvas.batcher.end(canvas.webgl);
+
         let app = canvas.scene.app;
         let context: gd3d.framework.renderContext = canvas["context"];
         let worldMat = this.transform.getWorldMatrix();

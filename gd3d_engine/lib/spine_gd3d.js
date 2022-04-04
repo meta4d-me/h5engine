@@ -11117,6 +11117,8 @@
             return mat;
         }
         render(canvas) {
+            canvas["lastMat"] = null;
+            canvas.batcher.end(canvas.webgl);
             let app = canvas.scene.app;
             let context = canvas["context"];
             let worldMat = this.transform.getWorldMatrix();
@@ -11456,4 +11458,3 @@
     Object.defineProperty(exports, '__esModule', { value: true });
 
 })));
-//# sourceMappingURL=spine_gd3d.js.map
