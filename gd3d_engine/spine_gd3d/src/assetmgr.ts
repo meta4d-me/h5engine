@@ -1,5 +1,5 @@
 import { AssetManagerBase, Downloader, Texture, TextureFilter, TextureWrap } from "@esotericsoftware/spine-core";
-import { spineSkeleton } from ".";
+import { setting } from "./setting";
 
 export const defSpineShaderName = "shader/spine"
 
@@ -36,14 +36,15 @@ export class SpineAssetMgr extends AssetManagerBase {
         `;
         let fscodeUI: string = `
         uniform sampler2D _MainTex;
+        uniform highp vec4 MainColor;
         varying lowp vec4 v_light;
         varying lowp vec4 v_dark;
         varying highp vec2 xlv_TEXCOORD0;
         void main()
         {
             lowp vec4 texColor = texture2D(_MainTex, xlv_TEXCOORD0);
-            gl_FragColor.a = texColor.a * v_light.a;
-            gl_FragColor.rgb = ((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb;
+            gl_FragColor.a = MainColor.a*texColor.a * v_light.a;
+            gl_FragColor.rgb =MainColor.rgb*(((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb);
         }`;
         let pool = this._assetMgr.shaderPool;
         pool.compileVS(this._assetMgr.webgl, "spine", vscodeUI);
@@ -71,7 +72,7 @@ export class Gd3dTexture extends Texture {
         if (this._needUpdate) {
             this._needUpdate = false;
             this._webgl.bindTexture(this._webgl.TEXTURE_2D, this._texture.glTexture.texture);
-            this._webgl.pixelStorei(this._webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, spineSkeleton.premultipliedAlpha ? 1 : 0);
+            this._webgl.pixelStorei(this._webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, setting.premultipliedAlpha ? 1 : 0);
             this._webgl.pixelStorei(this._webgl.UNPACK_FLIP_Y_WEBGL, 0);
             this._webgl.texImage2D(this._webgl.TEXTURE_2D, 0, this._webgl.RGBA, this._webgl.RGBA, this._webgl.UNSIGNED_BYTE, this.getImage());
             this._webgl.texParameteri(this._webgl.TEXTURE_2D, this._webgl.TEXTURE_MAG_FILTER, this._magFilter ?? this._webgl.LINEAR);

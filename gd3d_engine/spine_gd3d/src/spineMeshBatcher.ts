@@ -1,6 +1,6 @@
 import { BlendMode } from "@esotericsoftware/spine-core";
-import { defSpineShaderName, Gd3dTexture } from ".";
-import { spineSkeleton } from "./spineComp";
+import { defSpineShaderName, Gd3dTexture } from "./assetMgr";
+import { setting } from "./setting";
 
 const ONE = 1;
 const ONE_MINUS_SRC_COLOR = 0x0301;
@@ -29,11 +29,13 @@ export class SpineMeshBatcher {
     private drawParams: { start: number, count: number, slotTexture: Gd3dTexture, slotBlendMode: BlendMode, srcRgb: number, srcAlpha: number, dstRgb: number, dstAlpha: number }[] = [];
     private _needUpdate: boolean;
     private _shader: gd3d.framework.shader;
-    constructor(shader: gd3d.framework.shader, maxVertices: number = 10920) {
+    private _color: gd3d.math.vector4;
+    constructor(shader: gd3d.framework.shader, color: gd3d.math.vector4, maxVertices: number = 10920) {
         if (maxVertices > 10920) throw new Error("Can't have more than 10920 triangles per batch: " + maxVertices);
         this.vertices = new Float32Array(maxVertices * SpineMeshBatcher.VERTEX_SIZE);
         this.indices = new Uint16Array(maxVertices * 3);
         this._shader = shader;
+        this._color = color;
     }
     dispose() {
 
@@ -96,12 +98,12 @@ export class SpineMeshBatcher {
         let srcRgb, srcAlpha, dstRgb, dstAlpha;
         switch (slotBlendMode) {
             case BlendMode.Normal:
-                srcRgb = spineSkeleton.premultipliedAlpha ? ONE : SRC_ALPHA;
+                srcRgb = setting.premultipliedAlpha ? ONE : SRC_ALPHA;
                 srcAlpha = ONE;
                 dstRgb = dstAlpha = ONE_MINUS_SRC_ALPHA;
                 break;
             case BlendMode.Additive:
-                srcRgb = spineSkeleton.premultipliedAlpha ? ONE : SRC_ALPHA;
+                srcRgb = setting.premultipliedAlpha ? ONE : SRC_ALPHA;
                 srcAlpha = ONE;
                 dstRgb = dstAlpha = ONE;
                 break;
@@ -167,6 +169,7 @@ export class SpineMeshBatcher {
                 gd3d.render.glDrawPass.lastBlendMode = null;
                 pass.use(webgl);
                 this._mat.setTexture("_MainTex", slotTexture.texture);
+                this._mat.setVector4("MainColor", this._color);
                 // this._mat.setMatrix("_SpineMvp", this._projectMat);
                 this._mat.uploadUnifoms(pass, context);
                 this.mesh.drawElementTris(webgl, start, count);

@@ -4,6 +4,8 @@
     (global = global || self, factory(global.spine_gd3d = {}));
 }(this, (function (exports) { 'use strict';
 
+    var setting = { premultipliedAlpha: false };
+
     /******************************************************************************
      * Spine Runtimes License Agreement
      * Last updated January 1, 2020. Replaces all prior versions.
@@ -10758,6 +10760,102 @@
     }
     SwirlEffect.interpolation = new PowOut(2);
 
+    const defSpineShaderName = "shader/spine";
+    class SpineAssetMgr extends AssetManagerBase {
+        constructor(assetMgr, pathPrefix = "", downloader = null) {
+            super((image) => new Gd3dTexture(image, assetMgr.webgl), pathPrefix, downloader);
+            this._assetMgr = assetMgr;
+            this.initShader();
+        }
+        initShader() {
+            let vscodeUI = `
+        attribute vec4 _glesVertex;    
+        attribute vec4 _glesColor;
+        attribute vec4 _glesColorEx;                   
+        attribute vec4 _glesMultiTexCoord0;          
+        uniform highp mat4 glstate_matrix_model;
+        varying lowp vec4 v_light;  
+        varying lowp vec4 v_dark;               
+        varying highp vec2 xlv_TEXCOORD0;            
+        void main()                                      
+        {                                                
+            highp vec4 tmpvar_1;                         
+            tmpvar_1.w = 1.0;                            
+            tmpvar_1.xyz = _glesVertex.xyz;              
+            v_light = _glesColor;
+            v_dark = _glesColorEx;                    
+            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,_glesMultiTexCoord0.y);      
+            gl_Position = glstate_matrix_model* tmpvar_1;   
+        }
+        `;
+            let fscodeUI = `
+        uniform sampler2D _MainTex;
+        uniform highp vec4 MainColor;
+        varying lowp vec4 v_light;
+        varying lowp vec4 v_dark;
+        varying highp vec2 xlv_TEXCOORD0;
+        void main()
+        {
+            lowp vec4 texColor = texture2D(_MainTex, xlv_TEXCOORD0);
+            gl_FragColor.a = MainColor.a*texColor.a * v_light.a;
+            gl_FragColor.rgb =MainColor.rgb*(((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb);
+        }`;
+            let pool = this._assetMgr.shaderPool;
+            pool.compileVS(this._assetMgr.webgl, "spine", vscodeUI);
+            pool.compileFS(this._assetMgr.webgl, "spine", fscodeUI);
+            let program = pool.linkProgram(this._assetMgr.webgl, "spine", "spine");
+            var spineShader = new gd3d.framework.shader(defSpineShaderName);
+            spineShader.passes["base"] = [];
+            var p = new gd3d.render.glDrawPass();
+            p.setProgram(program);
+            spineShader.passes["base"].push(p);
+            spineShader.fillUnDefUniform(p);
+            p.state_ztest = false;
+            p.state_zwrite = false;
+            p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
+            this._assetMgr.mapShader[spineShader.getName()] = spineShader;
+        }
+    }
+    class Gd3dTexture extends Texture {
+        constructor(image, webgl) {
+            super(image);
+            this._needUpdate = true;
+            this._webgl = webgl;
+            const tex = new gd3d.framework.texture();
+            var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
+            tex.glTexture = new gd3d.render.glTexture2D(webgl, _textureFormat);
+            this._texture = tex;
+        }
+        get texture() {
+            var _a, _b, _c, _d;
+            if (this._needUpdate) {
+                this._needUpdate = false;
+                this._webgl.bindTexture(this._webgl.TEXTURE_2D, this._texture.glTexture.texture);
+                this._webgl.pixelStorei(this._webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, setting.premultipliedAlpha ? 1 : 0);
+                this._webgl.pixelStorei(this._webgl.UNPACK_FLIP_Y_WEBGL, 0);
+                this._webgl.texImage2D(this._webgl.TEXTURE_2D, 0, this._webgl.RGBA, this._webgl.RGBA, this._webgl.UNSIGNED_BYTE, this.getImage());
+                this._webgl.texParameteri(this._webgl.TEXTURE_2D, this._webgl.TEXTURE_MAG_FILTER, (_a = this._magFilter) !== null && _a !== void 0 ? _a : this._webgl.LINEAR);
+                this._webgl.texParameteri(this._webgl.TEXTURE_2D, this._webgl.TEXTURE_MIN_FILTER, (_b = this._minFilter) !== null && _b !== void 0 ? _b : this._webgl.LINEAR);
+                this._webgl.texParameteri(this._webgl.TEXTURE_2D, this._webgl.TEXTURE_WRAP_S, (_c = this._uWrap) !== null && _c !== void 0 ? _c : this._webgl.CLAMP_TO_EDGE);
+                this._webgl.texParameteri(this._webgl.TEXTURE_2D, this._webgl.TEXTURE_WRAP_T, (_d = this._vWrap) !== null && _d !== void 0 ? _d : this._webgl.CLAMP_TO_EDGE);
+            }
+            return this._texture;
+        }
+        setFilters(minFilter, magFilter) {
+            this._needUpdate = true;
+            this._minFilter = minFilter;
+            this._magFilter = magFilter;
+        }
+        setWraps(uWrap, vWrap) {
+            this._needUpdate = true;
+            this._uWrap = uWrap;
+            this._vWrap = vWrap;
+        }
+        dispose() {
+            throw new Error("Method not implemented.");
+        }
+    }
+
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation. All rights reserved.
     Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -10799,7 +10897,7 @@
             return "DST_COLOR";
     }
     class SpineMeshBatcher {
-        constructor(shader, maxVertices = 10920) {
+        constructor(shader, color, maxVertices = 10920) {
             this.verticesLength = 0;
             this.indicesLength = 0;
             this.drawParams = [];
@@ -10810,6 +10908,7 @@
             this.vertices = new Float32Array(maxVertices * SpineMeshBatcher.VERTEX_SIZE);
             this.indices = new Uint16Array(maxVertices * 3);
             this._shader = shader;
+            this._color = color;
         }
         dispose() {
         }
@@ -10867,12 +10966,12 @@
             let srcRgb, srcAlpha, dstRgb, dstAlpha;
             switch (slotBlendMode) {
                 case exports.BlendMode.Normal:
-                    srcRgb = exports.spineSkeleton.premultipliedAlpha ? ONE : SRC_ALPHA;
+                    srcRgb = setting.premultipliedAlpha ? ONE : SRC_ALPHA;
                     srcAlpha = ONE;
                     dstRgb = dstAlpha = ONE_MINUS_SRC_ALPHA;
                     break;
                 case exports.BlendMode.Additive:
-                    srcRgb = exports.spineSkeleton.premultipliedAlpha ? ONE : SRC_ALPHA;
+                    srcRgb = setting.premultipliedAlpha ? ONE : SRC_ALPHA;
                     srcAlpha = ONE;
                     dstRgb = dstAlpha = ONE;
                     break;
@@ -10936,6 +11035,7 @@
                     gd3d.render.glDrawPass.lastBlendMode = null;
                     pass.use(webgl);
                     this._mat.setTexture("_MainTex", slotTexture.texture);
+                    this._mat.setVector4("MainColor", this._color);
                     // this._mat.setMatrix("_SpineMvp", this._projectMat);
                     this._mat.uploadUnifoms(pass, context);
                     this.mesh.drawElementTris(webgl, start, count);
@@ -10973,6 +11073,7 @@
     var spineSkeleton_1;
     exports.spineSkeleton = spineSkeleton_1 = class spineSkeleton {
         constructor(skeletonData) {
+            this.MainColor = new gd3d.math.vector4(1, 1, 1, 1);
             this._toTransFormMatrix = new gd3d.math.matrix3x2([1, 0, 0, -1, 0, 0]);
             this._spineToWorld = new gd3d.math.matrix3x2();
             this._spineToWorld2 = new gd3d.math.matrix();
@@ -11102,7 +11203,7 @@
                     finalColor.g = skeletonColor.g * slotColor.g * attachmentColor.g;
                     finalColor.b = skeletonColor.b * slotColor.b * attachmentColor.b;
                     finalColor.a = skeletonColor.a * slotColor.a * attachmentColor.a;
-                    if (spineSkeleton_1.premultipliedAlpha) {
+                    if (setting.premultipliedAlpha) {
                         finalColor.r *= finalColor.a;
                         finalColor.g *= finalColor.a;
                         finalColor.b *= finalColor.a;
@@ -11111,7 +11212,7 @@
                     if (!slot.darkColor)
                         darkColor.set(0, 0, 0, 1.0);
                     else {
-                        if (spineSkeleton_1.premultipliedAlpha) {
+                        if (setting.premultipliedAlpha) {
                             darkColor.r = slot.darkColor.r * finalColor.a;
                             darkColor.g = slot.darkColor.g * finalColor.a;
                             darkColor.b = slot.darkColor.b * finalColor.a;
@@ -11119,7 +11220,7 @@
                         else {
                             darkColor.setFromColor(slot.darkColor);
                         }
-                        darkColor.a = spineSkeleton_1.premultipliedAlpha ? 1.0 : 0.0;
+                        darkColor.a = setting.premultipliedAlpha ? 1.0 : 0.0;
                     }
                     let finalVertices;
                     let finalVerticesLength;
@@ -11227,7 +11328,7 @@
         }
         nextBatch() {
             if (this.batches.length == this.nextBatchIndex) {
-                let batch = new SpineMeshBatcher(this._shader);
+                let batch = new SpineMeshBatcher(this._shader, this.MainColor);
                 this.batches.push(batch);
             }
             let batch = this.batches[this.nextBatchIndex++];
@@ -11241,108 +11342,12 @@
         }
     };
     exports.spineSkeleton.ClassName = "spineSkeleton";
-    exports.spineSkeleton.premultipliedAlpha = false;
     exports.spineSkeleton.VERTEX_SIZE = 2 + 2 + 4 + 4;
     exports.spineSkeleton.QUAD_TRIANGLES = [0, 1, 2, 2, 3, 0];
     exports.spineSkeleton = spineSkeleton_1 = __decorate([
         gd3d.reflect.node2DComponent,
         gd3d.reflect.nodeRender
     ], exports.spineSkeleton);
-
-    const defSpineShaderName = "shader/spine";
-    class SpineAssetMgr extends AssetManagerBase {
-        constructor(assetMgr, pathPrefix = "", downloader = null) {
-            super((image) => new Gd3dTexture(image, assetMgr.webgl), pathPrefix, downloader);
-            this._assetMgr = assetMgr;
-            this.initShader();
-        }
-        initShader() {
-            let vscodeUI = `
-        attribute vec4 _glesVertex;    
-        attribute vec4 _glesColor;
-        attribute vec4 _glesColorEx;                   
-        attribute vec4 _glesMultiTexCoord0;          
-        uniform highp mat4 glstate_matrix_model;
-        varying lowp vec4 v_light;  
-        varying lowp vec4 v_dark;               
-        varying highp vec2 xlv_TEXCOORD0;            
-        void main()                                      
-        {                                                
-            highp vec4 tmpvar_1;                         
-            tmpvar_1.w = 1.0;                            
-            tmpvar_1.xyz = _glesVertex.xyz;              
-            v_light = _glesColor;
-            v_dark = _glesColorEx;                    
-            xlv_TEXCOORD0 = vec2(_glesMultiTexCoord0.x,_glesMultiTexCoord0.y);      
-            gl_Position = glstate_matrix_model* tmpvar_1;   
-        }
-        `;
-            let fscodeUI = `
-        uniform sampler2D _MainTex;
-        varying lowp vec4 v_light;
-        varying lowp vec4 v_dark;
-        varying highp vec2 xlv_TEXCOORD0;
-        void main()
-        {
-            lowp vec4 texColor = texture2D(_MainTex, xlv_TEXCOORD0);
-            gl_FragColor.a = texColor.a * v_light.a;
-            gl_FragColor.rgb = ((texColor.a - 1.0) * v_dark.a + 1.0 - texColor.rgb) * v_dark.rgb + texColor.rgb * v_light.rgb;
-        }`;
-            let pool = this._assetMgr.shaderPool;
-            pool.compileVS(this._assetMgr.webgl, "spine", vscodeUI);
-            pool.compileFS(this._assetMgr.webgl, "spine", fscodeUI);
-            let program = pool.linkProgram(this._assetMgr.webgl, "spine", "spine");
-            var spineShader = new gd3d.framework.shader(defSpineShaderName);
-            spineShader.passes["base"] = [];
-            var p = new gd3d.render.glDrawPass();
-            p.setProgram(program);
-            spineShader.passes["base"].push(p);
-            spineShader.fillUnDefUniform(p);
-            p.state_ztest = false;
-            p.state_zwrite = false;
-            p.state_showface = gd3d.render.ShowFaceStateEnum.ALL;
-            this._assetMgr.mapShader[spineShader.getName()] = spineShader;
-        }
-    }
-    class Gd3dTexture extends Texture {
-        constructor(image, webgl) {
-            super(image);
-            this._needUpdate = true;
-            this._webgl = webgl;
-            const tex = new gd3d.framework.texture();
-            var _textureFormat = gd3d.render.TextureFormatEnum.RGBA;
-            tex.glTexture = new gd3d.render.glTexture2D(webgl, _textureFormat);
-            this._texture = tex;
-        }
-        get texture() {
-            var _a, _b, _c, _d;
-            if (this._needUpdate) {
-                this._needUpdate = false;
-                this._webgl.bindTexture(this._webgl.TEXTURE_2D, this._texture.glTexture.texture);
-                this._webgl.pixelStorei(this._webgl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, exports.spineSkeleton.premultipliedAlpha ? 1 : 0);
-                this._webgl.pixelStorei(this._webgl.UNPACK_FLIP_Y_WEBGL, 0);
-                this._webgl.texImage2D(this._webgl.TEXTURE_2D, 0, this._webgl.RGBA, this._webgl.RGBA, this._webgl.UNSIGNED_BYTE, this.getImage());
-                this._webgl.texParameteri(this._webgl.TEXTURE_2D, this._webgl.TEXTURE_MAG_FILTER, (_a = this._magFilter) !== null && _a !== void 0 ? _a : this._webgl.LINEAR);
-                this._webgl.texParameteri(this._webgl.TEXTURE_2D, this._webgl.TEXTURE_MIN_FILTER, (_b = this._minFilter) !== null && _b !== void 0 ? _b : this._webgl.LINEAR);
-                this._webgl.texParameteri(this._webgl.TEXTURE_2D, this._webgl.TEXTURE_WRAP_S, (_c = this._uWrap) !== null && _c !== void 0 ? _c : this._webgl.CLAMP_TO_EDGE);
-                this._webgl.texParameteri(this._webgl.TEXTURE_2D, this._webgl.TEXTURE_WRAP_T, (_d = this._vWrap) !== null && _d !== void 0 ? _d : this._webgl.CLAMP_TO_EDGE);
-            }
-            return this._texture;
-        }
-        setFilters(minFilter, magFilter) {
-            this._needUpdate = true;
-            this._minFilter = minFilter;
-            this._magFilter = magFilter;
-        }
-        setWraps(uWrap, vWrap) {
-            this._needUpdate = true;
-            this._uWrap = uWrap;
-            this._vWrap = vWrap;
-        }
-        dispose() {
-            throw new Error("Method not implemented.");
-        }
-    }
 
     exports.AlphaTimeline = AlphaTimeline;
     exports.Animation = Animation;
@@ -11446,6 +11451,7 @@
     exports.WindowedMean = WindowedMean;
     exports.defSpineShaderName = defSpineShaderName;
     exports.ortho = ortho;
+    exports.setting = setting;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 

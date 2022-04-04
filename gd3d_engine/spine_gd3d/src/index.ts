@@ -1,3 +1,4 @@
+export * from './setting'
 export * from './assetMgr'
 export * from './spineComp'
 export * from './spineMeshBatcher'

@@ -1,5 +1,6 @@
 import { AnimationState, VertexEffect, SkeletonData, AnimationStateData, SkeletonClipping, Vector2, Color, RegionAttachment, TextureAtlasRegion, MeshAttachment, ClippingAttachment, NumberArrayLike, Skeleton } from "@esotericsoftware/spine-core";
 import { Gd3dTexture } from "./assetMgr";
+import { setting } from "./setting";
 import { ortho, SpineMeshBatcher } from "./spineMeshBatcher";
 
 
@@ -7,12 +8,12 @@ import { ortho, SpineMeshBatcher } from "./spineMeshBatcher";
 @gd3d.reflect.nodeRender
 export class spineSkeleton implements gd3d.framework.I2DComponent {
     static readonly ClassName: string = "spineSkeleton";
-    static premultipliedAlpha: boolean = false;
     skeleton: Skeleton;
     state: AnimationState;
     animData: AnimationStateData;
     vertexEffect: VertexEffect;
     private _shader: gd3d.framework.shader;
+    MainColor = new gd3d.math.vector4(1, 1, 1, 1);
     constructor(skeletonData: SkeletonData) {
         this.skeleton = new Skeleton(skeletonData);
         this.animData = new AnimationStateData(skeletonData);
@@ -158,7 +159,7 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
                 finalColor.g = skeletonColor.g * slotColor.g * attachmentColor.g;
                 finalColor.b = skeletonColor.b * slotColor.b * attachmentColor.b;
                 finalColor.a = skeletonColor.a * slotColor.a * attachmentColor.a;
-                if (spineSkeleton.premultipliedAlpha) {
+                if (setting.premultipliedAlpha) {
                     finalColor.r *= finalColor.a;
                     finalColor.g *= finalColor.a;
                     finalColor.b *= finalColor.a;
@@ -167,14 +168,14 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
                 if (!slot.darkColor)
                     darkColor.set(0, 0, 0, 1.0);
                 else {
-                    if (spineSkeleton.premultipliedAlpha) {
+                    if (setting.premultipliedAlpha) {
                         darkColor.r = slot.darkColor.r * finalColor.a;
                         darkColor.g = slot.darkColor.g * finalColor.a;
                         darkColor.b = slot.darkColor.b * finalColor.a;
                     } else {
                         darkColor.setFromColor(slot.darkColor);
                     }
-                    darkColor.a = spineSkeleton.premultipliedAlpha ? 1.0 : 0.0;
+                    darkColor.a = setting.premultipliedAlpha ? 1.0 : 0.0;
                 }
 
 
@@ -289,7 +290,7 @@ export class spineSkeleton implements gd3d.framework.I2DComponent {
 
     private nextBatch() {
         if (this.batches.length == this.nextBatchIndex) {
-            let batch = new SpineMeshBatcher(this._shader);
+            let batch = new SpineMeshBatcher(this._shader, this.MainColor);
             this.batches.push(batch);
         }
         let batch = this.batches[this.nextBatchIndex++];
